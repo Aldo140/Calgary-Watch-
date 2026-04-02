@@ -10,7 +10,7 @@ import MobileBottomSheet from '@/src/components/MobileBottomSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { MOCK_INCIDENTS, getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, Filter, X, LogIn, Home } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, Filter, X, LogIn, Home, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -20,7 +20,7 @@ import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 
 export default function MapPage() {
-  const { user, signIn, logout, isAuthReady } = useAuth();
+  const { user, signIn, logout, isAuthReady, isAdmin } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
@@ -342,6 +342,18 @@ export default function MapPage() {
                         <p className="text-xs font-bold text-white truncate">{user.displayName}</p>
                         <p className="text-[10px] text-slate-500 truncate mt-0.5">{user.email}</p>
                       </div>
+                      {isAdmin && (
+                        <button
+                          onClick={() => {
+                            navigate('/admin');
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-blue-400 hover:bg-blue-500/10 transition-colors text-left"
+                        >
+                          <LayoutDashboard size={14} />
+                          Admin Portal
+                        </button>
+                      )}
                       <button 
                         onClick={() => {
                           logout();

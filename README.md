@@ -1,123 +1,152 @@
-# Calgary Watch — Real-Time Urban Awareness
+# Calgary Watch
 
-Calgary Watch is a production-grade community safety platform that combines live community reports with verified official data from the Calgary Police Service (CPS) and the City of Calgary.
+Calgary Watch is a real-time urban awareness platform for Calgary. It combines community-submitted reports with live Firestore updates, map visualization, and an admin operations portal.
 
-## 🚀 Overview
+## Production Improvements Completed
 
-The platform provides Calgarians with a real-time view of their city, enabling them to stay informed about incidents, road closures, and safety concerns as they happen.
+- Added a protected admin portal at `/admin`.
+- Restricted admin access to approved Google account: `jorti104@mtroyal.ca`.
+- Added live admin overview KPIs (incidents, unresolved count, 24h activity, stats averages, user visibility).
+- Added inline edit + delete controls for:
+  - `incidents`
+  - `community_stats`
+- Fixed production auth wiring by removing duplicate Firebase provider mounting.
+- Hardened Firebase initialization to use environment variables with fallback config.
+- Updated Firestore rules for admin email and `gas` incident category support.
 
-### Key Features
+## Stack
 
-- **Live Community Map:** Interactive Leaflet-based map with real-time incident pins.
-- **Heatmap Visualization:** Toggleable heatmap layer to identify incident clusters and high-activity zones.
-- **Area Intelligence:** Deep-dive panels for every Calgary neighborhood, featuring safety scores, crime trends, and historical context.
-- **Verified vs. Unverified:** Clear visual distinction between community reports and official data sources.
-- **Responsive Design:** Purpose-built experiences for both Desktop (sidebar-based) and Mobile (bottom-sheet based).
-- **Keyboard Shortcuts:** Power-user navigation for quick filtering and searching.
+- React + TypeScript + Vite
+- Firebase Auth (Google sign-in)
+- Cloud Firestore (real-time data + admin writes)
+- Leaflet + Leaflet heatmap
 
-## 📊 Data Sources & Trust
+## Live Data Extraction: How It Works
 
-Calgary Watch aggregates data from multiple high-integrity sources:
+### Current live extraction path in this project
 
-1.  **Calgary Police Service (CPS):** Official crime reports and major incident data via the [CPS Open Data Portal](https://www.calgary.ca/cps/statistics/calgary-police-service-open-data.html).
-2.  **City of Calgary 311:** Infrastructure issues, water main breaks, and road maintenance reports.
-3.  **Environment Canada:** Real-time weather alerts and severe storm warnings.
-4.  **ENMAX Power:** Live power outage data and restoration estimates.
-5.  **Community Reports:** Crowdsourced data from verified local residents, cross-referenced for accuracy.
+1. Community users submit incident reports from the map UI.
+2. Reports are written to Firestore `incidents` collection.
+3. The map view listens with `onSnapshot(...)` to Firestore.
+4. New/updated documents stream to connected clients in near real-time.
+5. Admin portal listens to `incidents`, `community_stats`, and `users` with live subscriptions.
+6. Admin edits are written back with `updateDoc(...)`, and all clients receive the update immediately via snapshots.
 
-### Verification Layers
-- **Level 1 (Unverified):** Single community report.
-- **Level 2 (Multiple Reports):** 3+ independent reports in the same vicinity.
-- **Level 3 (Verified):** Matches official data patterns or confirmed by city agencies.
+This is the live extraction layer currently implemented and running in code: Firestore real-time listeners are the extraction/stream transport for operational data.
 
-## 🛠 Tech Stack
+### Recommended official-source ingestion pattern (production)
 
-- **Frontend:** React 18, Vite, TypeScript
-- **Styling:** Tailwind CSS (Modern Dark Theme)
-- **Animations:** Framer Motion (motion/react), GSAP
-- **Maps:** Leaflet, Leaflet.heat
-- **Charts:** Recharts
-- **Icons:** Lucide React
-- **Routing:** React Router DOM
-- **Forms:** React Hook Form, Zod
-- **Backend:** Firebase (Firestore, Authentication)
+For CPS/311/Environment feeds, use a backend job (Cloud Functions or Cloud Run cron):
 
-## 🔥 Backend Architecture (Firebase)
+1. Poll official APIs on schedule.
+2. Normalize incoming schema to Calgary Watch format.
+3. Upsert records into Firestore (`incidents` and/or `community_stats`).
+4. Tag source metadata (`source_name`, `source_url`, verification tier).
+5. Let existing UI listeners stream those records instantly to users/admin.
 
-The application leverages Firebase for its real-time capabilities and secure data management:
+## Admin Portal
 
--   **Firestore:** A NoSQL document database used to store incidents, community notes, and neighborhood intelligence.
-    -   `incidents` collection: Stores live reports with geo-coordinates, categories, and verification statuses.
-    -   `neighborhoods` collection: Stores historical crime stats and safety scores.
--   **Authentication:** Firebase Auth handles secure user sign-in (Google OAuth), ensuring only authenticated users can submit reports.
--   **Security Rules:** Granular Firestore rules ensure that users can only write their own reports and cannot modify official data.
+- Route: `/admin`
+- Auth: Google sign-in via Firebase Auth
+- Access policy:
+  - Must be authenticated.
+  - Must match approved admin email `jorti104@mtroyal.ca`.
+- Capabilities:
+  - View operational KPIs.
+  - View user directory snapshot.
+  - Edit incident core fields and verification state.
+  - Edit community stats rows.
+  - Delete incidents/stats rows.
 
-## 📁 Project Structure
+## Firestore Collections
 
-```text
-/src
-  /components        # Reusable UI components
-    /ui              # Base UI components (Button, Card, etc.)
-    Sidebar.tsx      # Main desktop sidebar with live feed
-    Map.tsx          # Leaflet map implementation with heatmap
-    AreaIntelligencePanel.tsx # Neighborhood deep-dive
-    IncidentDetailPanel.tsx   # Premium incident view with source links
-    IncidentForm.tsx # Responsive reporting form
-    MobileBottomSheet.tsx     # Mobile-specific drawer
-    SkeletonLoader.tsx        # Loading states
-  /pages             # Main application routes
-    LandingPage.tsx  # Conversion-focused homepage
-    MapPage.tsx      # The core map application
-    AboutPage.tsx    # Mission and trust explanation
-  /lib               # Utility functions (cn, etc.)
-  /services          # API and Firebase services (mockData, etc.)
-  /types             # TypeScript definitions and constants
-  App.tsx            # Main router and layout orchestrator
+### `incidents`
+
+Typical fields:
+
+- `title`, `description`, `category`, `neighborhood`
+- `lat`, `lng`, `timestamp`
+- `name`, `email`, `authorUid`
+- `verified_status`, `report_count`
+- optional `source_name`, `source_url`, `source_logo`, `image_url`
+
+### `community_stats`
+
+- `community`, `month`
+- `violent_crime`, `property_crime`, `disorder_calls`
+- `safety_score`
+
+### `users`
+
+- `uid`, `displayName`, `email`, `photoURL`
+- `role` (`user` or `admin`)
+
+## Security Rules
+
+`firestore.rules` now includes:
+
+- Admin allowance for `jorti104@mtroyal.ca` (email-verified).
+- Incident category validation including `gas`.
+- Admin-only write access to `community_stats` and destructive operations.
+
+Deploy rules after changes:
+
+```bash
+firebase deploy --only firestore:rules
 ```
 
-## 📖 Developer Guide
+## Local Development
 
-### Getting Started
+1. Install dependencies:
 
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-2. **Environment Setup:**
-   Create a `.env` file with your Firebase configuration:
-   ```env
-   VITE_FIREBASE_API_KEY=your_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_domain
-   VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_bucket
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your_id
-   VITE_FIREBASE_APP_ID=your_app_id
-   ```
+2. Create `.env` from `.env.example` and fill Firebase values.
 
-3. **Run Development Server:**
-   ```bash
-   npm run dev
-   ```
+3. Start dev server:
 
-### Adding New Features
+```bash
+npm run dev
+```
 
-- **New Categories:** Update `IncidentCategory` in `src/types.ts` and add corresponding icons/colors in `CATEGORY_ICONS` and `CATEGORY_COLORS`.
-- **New Map Layers:** Add the layer logic to `src/components/Map.tsx` and update `LayerToggle.tsx`.
-- **New Pages:** Create the component in `src/pages/` and add the route to `src/App.tsx`.
+4. Validate types:
 
-## 🛡 Security & Trust
+```bash
+npm run lint
+```
 
-- **Firestore Rules:** All data is protected by granular security rules.
-- **Verification Logic:** Incidents are tagged with `verified_status` based on report density and official data matching.
-- **Privacy:** User PII is never exposed. Reports are tagged with pseudo-users or anonymous identifiers.
+5. Build production bundle:
 
-## 🌆 Future Expansion
+```bash
+npm run build
+```
 
-The platform is designed to be city-agnostic. To expand to a new city:
-1. Update the neighborhood data in `src/types.ts`.
-2. Adjust the map's initial center and bounds.
-3. Integrate the new city's open data portal (e.g., Edmonton Open Data).
+## Deploying Frontend
 
----
-*Built for the Calgary Community.*
+Example on Firebase Hosting:
+
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+Or deploy `dist/` to Netlify/Vercel/Cloudflare Pages.
+
+## Repository
+
+Target remote:
+
+`https://github.com/Aldo140/Calgary-Watch-.git`
+
+If this local folder is not yet a git repo, initialize and push:
+
+```bash
+git init
+git add .
+git commit -m "Production hardening, admin portal, and docs update"
+git branch -M main
+git remote add origin https://github.com/Aldo140/Calgary-Watch-.git
+git push -u origin main
+```

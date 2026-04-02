@@ -3,11 +3,94 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+
+    <!--
+      Security Headers are enforced via HTTP response headers on the server
+      (see firebase.json headers config). Meta tag equivalents don't work for
+      all headers, particularly X-Frame-Options.
+
+      NOTE: Content-Security-Policy is intentionally not in meta tags
+      because it cannot block inline event handlers or third-party Leaflet
+      tile CDNs without breaking the map. Enforce CSP via server headers
+      instead (see firebase.json headers config).
+    -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <title>Calgary Watch | Real-Time Community Safety Map</title>
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/icon.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/icon.png" />
+    <meta property="og:image" content="/icon.png" />
+    <meta name="twitter:image" content="/icon.png" />
+    
+    <meta
+      name="description"
+      content="Calgary Watch is a real-time community safety platform for Calgary. Explore live incident reports, map intelligence, and neighborhood context in one place."
+    />
+    <meta
+      name="keywords"
+      content="Calgary safety map, Calgary incidents, community reports, neighborhood safety, live alerts, Calgary Watch"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#020617" />
+    <link rel="canonical" href="https://aldo140.github.io/Calgary-Watch-/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Calgary Watch" />
+    <meta property="og:title" content="Calgary Watch | Real-Time Community Safety Map" />
+    <meta
+      property="og:description"
+      content="Explore Calgary incident updates in real time with community-sourced reports and neighborhood safety context."
+    />
+    <meta property="og:url" content="https://aldo140.github.io/Calgary-Watch-/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Calgary Watch | Real-Time Community Safety Map" />
+    <meta
+      name="twitter:description"
+      content="Real-time Calgary community safety map with live reports and neighborhood intelligence."
+    />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Calgary Watch",
+        "url": "https://aldo140.github.io/Calgary-Watch-/",
+        "description": "Real-time community safety platform for Calgary with live incident mapping and neighborhood awareness.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "CAD"
+        }
+      }
+    </script>
+
+    <!--
+      Preconnect to tile servers, image CDNs, and font providers.
+      Using crossorigin on CORS-capable origins to allow credential-free
+      connection reuse and reduce first-byte latency.
+    -->
+    <!-- Leaflet tile CDN -->
+    <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Image CDNs (Pexels hero/card images, Unsplash panel image) -->
+    <link rel="preconnect" href="https://images.pexels.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <!-- Firebase Auth / Firestore -->
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

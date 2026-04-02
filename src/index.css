@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 @import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 
@@ -6,6 +6,19 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* ============================================================
+     Calgary Watch Design Tokens
+     Inspired by Calgary's big sky, Rocky Mountains, Bow River,
+     prairie wheat, Stampede energy, and modern steel skyline.
+     ============================================================ */
+  --color-cw-sky:        #4A90D9;   /* Big Alberta sky blue       */
+  --color-cw-mountain:   #5C6B73;   /* Rocky Mountain grey        */
+  --color-cw-stampede:   #C0392B;   /* Calgary Stampede red       */
+  --color-cw-gold:       #D4A843;   /* Prairie gold / wheat       */
+  --color-cw-bow:        #2E8B7A;   /* Bow River teal             */
+  --color-cw-steel:      #F4F6F8;   /* Modern glass / snow white  */
+  --color-cw-night:      #1A1E2E;   /* Alberta deep-night sky     */
 }
 
 /* Custom Leaflet Popup Styling */
@@ -29,8 +42,14 @@
 .leaflet-bar {
   border: none !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  margin-top: 24px !important;
-  margin-right: 24px !important;
+  margin-bottom: 112px !important;
+  margin-left: 24px !important;
+}
+
+@media (min-width: 768px) {
+  .leaflet-bar {
+    margin-bottom: 128px !important;
+  }
 }
 
 .leaflet-bar a {
@@ -64,6 +83,10 @@
   body {
     @apply bg-slate-950 text-slate-50 antialiased;
   }
+
+  .light body {
+    @apply bg-slate-100 text-slate-900;
+  }
 }
 
 @layer utilities {
@@ -73,6 +96,85 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* ============================================================
+     animate-bounce-slow — used on landing page stat bubbles
+     ============================================================ */
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translate3d(0, 0, 0);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translate3d(0, -6px, 0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* ============================================================
+     Calgary mountain parallax — scroll-driven silhouette
+     ============================================================ */
+  @keyframes mountain-rise {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .mountain-rise {
+    animation: mountain-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* ============================================================
+     Northern lights particle drift - optimized for performance
+     ============================================================ */
+  @keyframes aurora-drift {
+    0%   { transform: translate3d(-5%, 0, 0) scaleX(1); opacity: 0.35; }
+    50%  { transform: translate3d(5%, 0, 0) scaleX(1.05); opacity: 0.5; }
+    100% { transform: translate3d(-5%, 0, 0) scaleX(1); opacity: 0.35; }
+  }
+  .aurora-drift {
+    animation: aurora-drift 8s ease-in-out infinite;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+  .aurora-drift-delay {
+    animation: aurora-drift 11s ease-in-out infinite reverse;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  /* ============================================================
+     Scroll reveal — used on about & landing sections
+     ============================================================ */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translate3d(0, 24px, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0);    }
+  }
+  .fade-up {
+    animation: fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  /* ============================================================
+     Bow River shimmer line - optimized
+     ============================================================ */
+  @keyframes river-flow {
+    0%   { background-position: 0% 50%;   }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%;   }
+  }
+  .river-flow {
+    background-size: 200% 200%;
+    animation: river-flow 3.5s ease-in-out infinite;
+    will-change: background-position;
+    backface-visibility: hidden;
   }
 
   @keyframes pulse-ring {
@@ -97,7 +199,9 @@
   }
 
   .animate-pulse-ring {
-    animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    animation: pulse-ring 1.4s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   @keyframes active-glow {
@@ -113,6 +217,8 @@
 
   .animate-active-glow {
     animation: active-glow 2s ease-in-out infinite;
+    will-change: box-shadow, border-color;
+    backface-visibility: hidden;
   }
 
   /* Custom Scrollbar */
@@ -143,5 +249,106 @@
   }
   .custom-map-tooltip:before {
     border-top-color: #0f172a !important;
+  }
+
+  /* Light mode system for map-heavy screens */
+  .light .bg-slate-950 {
+    background-color: #f8fafc !important;
+  }
+  .light .bg-slate-900,
+  .light .bg-slate-900\/95 {
+    background-color: #ffffff !important;
+  }
+  .light .bg-slate-900\/80,
+  .light .bg-slate-950\/80,
+  .light .bg-slate-950\/60,
+  .light .bg-slate-950\/50 {
+    background-color: rgba(255, 255, 255, 0.92) !important;
+  }
+  .light .border-white\/10,
+  .light .border-white\/5,
+  .light .border-white\/20 {
+    border-color: rgba(15, 23, 42, 0.12) !important;
+  }
+  .light .text-white {
+    color: #0f172a !important;
+  }
+  .light .text-slate-400 {
+    color: #64748b !important;
+  }
+  .light .text-slate-500 {
+    color: #475569 !important;
+  }
+  .light .text-slate-300 {
+    color: #334155 !important;
+  }
+  .light .bg-white\/5 {
+    background-color: rgba(15, 23, 42, 0.04) !important;
+  }
+  .light .bg-white\/10 {
+    background-color: rgba(15, 23, 42, 0.08) !important;
+  }
+  .light .bg-white\/\[0\.03\],
+  .light .bg-white\/\[0\.02\] {
+    background-color: rgba(15, 23, 42, 0.03) !important;
+  }
+  .light .text-blue-400,
+  .light .text-blue-500,
+  .light .text-blue-600 {
+    color: #111827 !important;
+  }
+  .light .border-blue-500\/20,
+  .light .border-blue-500\/30,
+  .light .border-blue-500\/50,
+  .light .border-blue-400 {
+    border-color: rgba(17, 24, 39, 0.25) !important;
+  }
+  .light .bg-blue-500\/10,
+  .light .bg-blue-600\/10 {
+    background-color: rgba(17, 24, 39, 0.08) !important;
+  }
+  .light .group-hover\:text-blue-400:hover,
+  .light .hover\:text-blue-400:hover {
+    color: #111827 !important;
+  }
+
+  /* Force strong contrast for selected dashboard chips in light mode */
+  .light .category-chip-selected,
+  .light .layer-chip-selected {
+    background-color: #111827 !important;
+    border-color: #111827 !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 20px -10px rgba(2, 6, 23, 0.75) !important;
+  }
+  .light .category-chip-selected .category-chip-icon,
+  .light .category-chip-selected .category-chip-count {
+    color: #ffffff !important;
+  }
+  .light .category-chip-selected .category-chip-count {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* Leaflet controls / popups in light mode */
+  .light .leaflet-bar a {
+    background-color: rgba(255, 255, 255, 0.96) !important;
+    color: #334155 !important;
+    border-color: rgba(15, 23, 42, 0.14) !important;
+  }
+  .light .leaflet-bar a:hover {
+    background-color: #ffffff !important;
+    color: #2563eb !important;
+    border-color: rgba(37, 99, 235, 0.45) !important;
+  }
+  .light .custom-leaflet-popup .leaflet-popup-tip {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+  }
+  .light .custom-map-tooltip {
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    color: #0f172a !important;
+  }
+  .light .custom-map-tooltip:before {
+    border-top-color: #ffffff !important;
   }
 }

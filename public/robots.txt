@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: https://aldo140.github.io/Calgary-Watch-/sitemap.xml

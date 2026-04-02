@@ -53,9 +53,13 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
     function isAdmin() {
       return isAuthenticated() &&
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        ((userDoc().data.role == 'admin') ||
          isApprovedAdminToken());
     }
 
@@ -78,13 +82,22 @@ service cloud.firestore {
     function isValidIncident(data) {
       return data.title is string && data.title.size() >= 5 && data.title.size() <= 100 &&
              data.description is string && data.description.size() >= 10 && data.description.size() <= 1000 &&
-             data.category in ['crime', 'traffic', 'infrastructure', 'weather', 'gas'] &&
+             data.category in ['crime', 'traffic', 'infrastructure', 'weather', 'gas', 'emergency'] &&
+             data.neighborhood is string && data.neighborhood.size() >= 2 && data.neighborhood.size() <= 80 &&
              data.lat is number && data.lng is number &&
              data.timestamp is number &&
              isValidEmail(data.email) &&
              data.name is string && data.name.size() >= 2 && data.name.size() <= 50 &&
              data.verified_status in ['unverified', 'multiple_reports', 'community_confirmed'] &&
              data.authorUid is string;
+    }
+
+    function isValidAuthorIncidentPatch(data) {
+      return data.title is string && data.title.size() >= 5 && data.title.size() <= 100 &&
+             data.description is string && data.description.size() >= 10 && data.description.size() <= 1000 &&
+             data.category in ['crime', 'traffic', 'infrastructure', 'weather', 'gas', 'emergency'] &&
+             data.neighborhood is string && data.neighborhood.size() >= 2 && data.neighborhood.size() <= 80 &&
+             data.lat is number && data.lng is number;
     }
 
     function isValidUser(data) {
@@ -99,7 +112,7 @@ service cloud.firestore {
     // ===============================================================
 
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId) &&
                     isValidUser(request.resource.data) &&
                     (request.resource.data.role == 'user' ||
@@ -112,15 +125,80 @@ service cloud.firestore {
     }
 
     match /incidents/{incidentId} {
-      allow read: if true; // Publicly readable for the map
-      allow create: if isAuthenticated() && isValidIncident(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
-      allow update: if isAuthenticated() && isValidIncident(request.resource.data) && (request.auth.uid == resource.data.authorUid || isAdmin());
+      allow read: if true;
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields([
+                      'title', 'description', 'category', 'neighborhood', 'lat', 'lng', 'timestamp',
+                      'email', 'name', 'source_name', 'anonymous', 'verified_status', 'authorUid', 'report_count'
+                    ]) &&
+                    isValidIncident(request.resource.data) &&
+                    request.resource.data.authorUid == request.auth.uid &&
+                    request.resource.data.verified_status == 'unverified' &&
+                    request.resource.data.report_count == 1;
+      allow update: if (
+                      isAdmin() &&
+                      hasOnlyAllowedFields([
+                        'title', 'description', 'category', 'neighborhood', 'lat', 'lng', 'timestamp',
+                        'email', 'name', 'verified_status', 'authorUid', 'report_count',
+                        'source_name', 'source_url', 'source_logo', 'image_url',
+                        'deleted', 'deletedAt', 'deletedBy'
+                      ]) &&
+                      isValidIncident(request.resource.data)
+                    ) || (
+                      isAuthenticated() &&
+                      request.auth.uid == resource.data.authorUid &&
+                      request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                        'title', 'description', 'category', 'neighborhood', 'lat', 'lng'
+                      ]) &&
+                      request.resource.data.authorUid == resource.data.authorUid &&
+                      request.resource.data.authorUid == request.auth.uid &&
+                      request.resource.data.email == resource.data.email &&
+                      request.resource.data.name == resource.data.name &&
+                      request.resource.data.verified_status == resource.data.verified_status &&
+                      request.resource.data.report_count == resource.data.report_count &&
+                      request.resource.data.timestamp == resource.data.timestamp &&
+                      isValidAuthorIncidentPatch(request.resource.data)
+                    );
       allow delete: if isAdmin();
     }
 
     match /community_stats/{statsId} {
       allow read: if true; // Publicly readable for area intelligence
       allow write: if isAdmin();
+    }
+
+    match /admin_audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() &&
+                    hasOnlyAllowedFields(['action', 'targetCollection', 'targetId', 'adminUid', 'adminEmail', 'timestamp', 'changes', 'metadata']);
+      allow update, delete: if false;
+    }
+
+    // city_requests: unauthenticated visitors can submit expansion requests.
+    // Rate limiting is enforced on the client. Each document must only contain
+    // the allowed fields; no PII beyond the city name is stored.
+    match /city_requests/{requestId} {
+      allow read: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['city', 'requestedAt', 'source']) &&
+                    request.resource.data.city is string &&
+                    request.resource.data.city.size() >= 2 &&
+                    request.resource.data.city.size() <= 100 &&
+                    request.resource.data.requestedAt is number &&
+                    request.resource.data.source is string &&
+                    request.resource.data.source.size() <= 50;
+      allow update, delete: if false;
+    }
+
+    // volunteers: anyone can submit interest; only admins can read.
+    match /volunteers/{volunteerId} {
+      allow read: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['name', 'email', 'role', 'createdAt']) &&
+                    request.resource.data.name is string &&
+                    request.resource.data.name.size() >= 1 &&
+                    request.resource.data.name.size() <= 100 &&
+                    isValidEmail(request.resource.data.email) &&
+                    request.resource.data.role in ['Marketing', 'Development', 'Administration'];
+      allow update, delete: if false;
     }
 
     match /{path=**} {

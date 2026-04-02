@@ -1,6 +1,6 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Info, Navigation, Layers, ExternalLink, MessageSquare } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Info, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/src/lib/utils';
@@ -17,6 +17,52 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
   const Icon = CATEGORY_ICONS[incident.category];
   const StatusIcon = STATUS_ICONS[incident.verified_status];
+  const safeSourceUrl = (() => {
+    if (!incident.source_url) return null;
+    try {
+      const parsed = new URL(incident.source_url);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.toString();
+      return null;
+    } catch {
+      return null;
+    }
+  })();
+  const safeSourceLogoUrl = (() => {
+    if (!incident.source_logo) return null;
+    try {
+      const parsed = new URL(incident.source_logo);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.toString();
+      return null;
+    } catch {
+      return null;
+    }
+  })();
+  const hasCoords = Number.isFinite(incident.lat) && Number.isFinite(incident.lng);
+  const canNavigate = hasCoords && incident.category !== 'weather';
+  const isAnonymous = Boolean(incident.anonymous) || incident.name?.toLowerCase() === 'anonymous' || incident.name?.toLowerCase().includes('anonymous');
+  const reporterName = isAnonymous ? 'Anonymous' : (incident.name?.trim() || 'Community Member');
+  const reporterInitial = reporterName.charAt(0).toUpperCase() || 'C';
+  const directionsUrl = canNavigate
+    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(incident.lat)},${encodeURIComponent(incident.lng)}`
+    : null;
+
+  // Build a share payload for the Web Share API; fall back to clipboard copy.
+  const handleShare = async () => {
+    const shareData = {
+      title: `Calgary Watch: ${incident.title}`,
+      text: `${incident.title} — reported in ${incident.neighborhood || 'Calgary'}. Check the live map for details.`,
+      url: typeof window !== 'undefined' ? window.location.href : '',
+    };
+    try {
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}`);
+      }
+    } catch {
+      // User cancelled share or API unavailable — fail silently.
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -25,10 +71,11 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
           initial={{ x: '100%', opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
-          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+          transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
+          style={{ willChange: 'transform' }}
           className="fixed inset-y-0 right-0 h-full w-full sm:max-w-lg z-[100] p-0 sm:p-6"
         >
-          <Card className="h-full flex flex-col bg-slate-950/95 backdrop-blur-3xl border-white/10 shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden p-0 rounded-none sm:rounded-[2.5rem] relative">
+          <Card className="h-full flex flex-col bg-slate-950/95 light:bg-white backdrop-blur-sm border-white/10 light:border-slate-200 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.4)] overflow-hidden p-0 rounded-none sm:rounded-[2.5rem] relative">
             {/* Background Glow */}
             <div className={cn(
               "absolute -top-24 -right-24 w-64 h-64 blur-[120px] opacity-20 rounded-full pointer-events-none",
@@ -41,12 +88,20 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
             {/* Header / Hero Section */}
             <div className="relative h-64 w-full shrink-0 overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80')] bg-cover bg-center grayscale opacity-30" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              {/* Background image — local WebP, no network round-trip */}
+              <img
+                src="/images/calgary7.webp"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover grayscale opacity-25 light:opacity-15"
+                loading="eager"
+                decoding="async"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent light:from-white light:via-white/70" />
               
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 p-3 text-slate-400 hover:text-white transition-all bg-white/5 hover:bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 z-20 group"
+                className="absolute top-6 right-6 p-3 text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 transition-all bg-white/5 light:bg-white/90 hover:bg-white/10 light:hover:bg-slate-100 backdrop-blur-xl rounded-2xl border border-white/10 light:border-slate-200 z-20 group"
               >
                 <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
               </button>
@@ -92,14 +147,14 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
             <div className="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/[0.03] rounded-3xl p-5 border border-white/10 hover:bg-white/[0.05] transition-colors group">
+                <div className="bg-white/[0.03] light:bg-slate-50 rounded-3xl p-5 border border-white/10 light:border-slate-200 hover:bg-white/[0.05] light:hover:bg-slate-100 transition-colors group">
                   <div className="flex items-center gap-2 mb-2">
                     <Clock size={16} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Time Ago</span>
                   </div>
                   <p className="text-white text-lg font-black">{formatDistanceToNow(incident.timestamp)}</p>
                 </div>
-                <div className="bg-white/[0.03] rounded-3xl p-5 border border-white/10 hover:bg-white/[0.05] transition-colors group">
+                <div className="bg-white/[0.03] light:bg-slate-50 rounded-3xl p-5 border border-white/10 light:border-slate-200 hover:bg-white/[0.05] light:hover:bg-slate-100 transition-colors group">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin size={16} className="text-slate-500 group-hover:text-red-400 transition-colors" />
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Location</span>
@@ -112,14 +167,14 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
                   <ShieldCheck size={14} />
-                  Official Source & Verification
+                  Community Source
                 </h3>
-                <div className="bg-gradient-to-br from-white/[0.05] to-transparent rounded-[2rem] p-6 border border-white/10 relative overflow-hidden group">
+                <div className="bg-gradient-to-br from-white/[0.05] to-transparent light:from-slate-50 light:to-slate-50 rounded-[2rem] p-6 border border-white/10 light:border-slate-200 relative overflow-hidden group">
                   <div className="flex items-start gap-5 relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-white/10 p-2 shrink-0 border border-white/10 overflow-hidden flex items-center justify-center">
-                      {incident.source_logo ? (
+                    <div className="w-16 h-16 rounded-2xl bg-white/10 light:bg-white p-2 shrink-0 border border-white/10 light:border-slate-200 overflow-hidden flex items-center justify-center">
+                      {safeSourceLogoUrl ? (
                         <img 
-                          src={incident.source_logo} 
+                          src={safeSourceLogoUrl} 
                           alt={incident.source_name} 
                           className="w-full h-full object-contain"
                           referrerPolicy="no-referrer"
@@ -130,10 +185,10 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-lg font-black text-white">{incident.source_name || 'Verified Source'}</h4>
-                        {incident.source_url && (
+                        <h4 className="text-lg font-black text-white light:text-slate-900">{incident.source_name || 'Community Source'}</h4>
+                        {safeSourceUrl && (
                           <a 
-                            href={incident.source_url} 
+                            href={safeSourceUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-blue-400"
@@ -142,10 +197,8 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                           </a>
                         )}
                       </div>
-                      <p className="text-slate-400 text-xs leading-relaxed">
-                        {incident.verified_status === 'community_confirmed' 
-                          ? 'This report is cross-referenced with official city data and has been validated by our automated integrity system.'
-                          : 'Community-sourced report with high credibility. Verification is ongoing through official channels.'}
+                      <p className="text-slate-400 light:text-slate-600 text-xs leading-relaxed">
+                        Community-reported information shared by Calgary Watch users. Please verify details with official channels before taking action.
                       </p>
                     </div>
                   </div>
@@ -156,15 +209,35 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                 </div>
               </div>
 
+              {/* Reporter */}
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Reporter</h3>
+                <div className="bg-white/[0.03] light:bg-slate-50 rounded-3xl p-4 border border-white/10 light:border-slate-200 flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-white/10 light:bg-white border border-white/20 light:border-slate-300 flex items-center justify-center overflow-hidden">
+                    {isAnonymous ? (
+                      <UserCircle2 size={26} className="text-slate-400 light:text-slate-600" />
+                    ) : (
+                      <span className="text-sm font-black text-white light:text-slate-900">{reporterInitial}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-white light:text-slate-900 truncate">{reporterName}</p>
+                    <p className="text-[11px] text-slate-400 light:text-slate-600">
+                      {isAnonymous ? 'Posted anonymously' : 'Community member'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Description Section */}
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
                   <MessageSquare size={14} />
                   Community Note
                 </h3>
-                <div className="bg-white/[0.02] p-6 rounded-[2rem] border border-white/5 relative group">
+                <div className="bg-white/[0.02] light:bg-slate-50 p-6 rounded-[2rem] border border-white/5 light:border-slate-200 relative group">
                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50 rounded-full group-hover:w-2 transition-all" />
-                  <p className="text-slate-200 text-base leading-relaxed font-medium pl-2">
+                  <p className="text-slate-200 light:text-slate-800 text-base leading-relaxed font-medium pl-2">
                     {incident.description}
                   </p>
                 </div>
@@ -194,19 +267,30 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
               {/* Action Buttons */}
               <div className="flex gap-4 pt-4">
-                <Button variant="secondary" className="flex-1 bg-white/5 hover:bg-white/10 border-white/10 rounded-2xl h-14 font-black tracking-wide text-sm">
+                <Button
+                  variant="secondary"
+                  className="flex-1 bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border-white/10 light:border-slate-300 rounded-2xl h-14 font-black tracking-wide text-sm"
+                  onClick={() => void handleShare()}
+                >
                   <Share2 size={20} className="mr-2" />
                   Share Report
                 </Button>
-                <Button variant="secondary" className="flex-1 bg-white/5 hover:bg-white/10 border-white/10 rounded-2xl h-14 font-black tracking-wide text-sm">
-                  <Navigation size={20} className="mr-2" />
-                  Navigate
-                </Button>
+                {canNavigate && directionsUrl ? (
+                  <a
+                    href={directionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border border-white/10 light:border-slate-300 rounded-2xl h-14 font-black tracking-wide text-sm text-white light:text-slate-900 transition-all active:scale-95"
+                  >
+                    <Navigation size={20} className="mr-2" />
+                    Navigate
+                  </a>
+                ) : null}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-8 border-t border-white/5 bg-slate-950/80 backdrop-blur-md">
+            <div className="p-8 border-t border-white/5 light:border-slate-200 bg-slate-950/80 light:bg-white/95 backdrop-blur-md">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
                   Report ID: {incident.id}

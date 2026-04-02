@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { User, onAuthStateChanged, signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
@@ -62,9 +62,32 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
     try {
       await signInWithPopup(auth, provider);
-    } catch (error) {
+    } catch (error: any) {
+      const code = error?.code || '';
+      const shouldFallbackToRedirect = [
+        'auth/popup-blocked',
+        'auth/popup-closed-by-user',
+        'auth/cancelled-popup-request',
+        'auth/operation-not-supported-in-this-environment',
+      ].includes(code);
+
+      if (shouldFallbackToRedirect) {
+        try {
+          await signInWithRedirect(auth, provider);
+          return;
+        } catch (redirectError) {
+          console.error('Sign in redirect error:', redirectError);
+        }
+      }
+
+      if (code === 'auth/unauthorized-domain') {
+        console.error('Sign in failed: current domain is not authorized in Firebase Authentication settings.');
+      }
+
       console.error('Sign in error:', error);
     }
   };

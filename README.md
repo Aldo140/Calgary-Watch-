@@ -135,6 +135,24 @@ firebase deploy --only hosting
 
 Or deploy `dist/` to Netlify/Vercel/Cloudflare Pages.
 
+### GitHub Pages (Configured)
+
+This repo now includes a GitHub Actions workflow for Pages deployment:
+
+- `.github/workflows/deploy-pages.yml`
+- Vite `base` is set to `/Calgary-Watch-/` in GitHub Actions builds.
+- Router auto-uses `HashRouter` on `github.io` so deep links work on static hosting.
+
+One-time GitHub setup:
+
+1. Go to repository **Settings** → **Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. Push to `main`. The workflow will build and deploy automatically.
+
+Expected site URL:
+
+`https://aldo140.github.io/Calgary-Watch-/`
+
 ## Repository
 
 Target remote:

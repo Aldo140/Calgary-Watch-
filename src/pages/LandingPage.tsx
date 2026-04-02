@@ -36,7 +36,13 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Features</a>
             <a href="#how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">How it Works</a>
-            <a href="/about" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">About</a>
+            <button
+              type="button"
+              onClick={() => navigate('/about')}
+              className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+            >
+              About
+            </button>
             <Button 
               variant="primary" 
               className="bg-blue-600 hover:bg-blue-700 rounded-full px-6"

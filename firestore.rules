@@ -56,7 +56,11 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() &&
         (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-         (request.auth.token.email == "jorti104@mtroyal.ca" && request.auth.token.email_verified == true));
+         isApprovedAdminToken());
+    }
+
+    function isApprovedAdminToken() {
+      return request.auth.token.email == "jorti104@mtroyal.ca" && request.auth.token.email_verified == true;
     }
 
     function isValidEmail(email) {
@@ -96,8 +100,14 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == 'user';
-      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role;
+      allow create: if isOwner(userId) &&
+                    isValidUser(request.resource.data) &&
+                    (request.resource.data.role == 'user' ||
+                     (request.resource.data.role == 'admin' && isApprovedAdminToken()));
+      allow update: if isOwner(userId) &&
+                    isValidUser(request.resource.data) &&
+                    (request.resource.data.role == resource.data.role ||
+                     (request.resource.data.role == 'admin' && isApprovedAdminToken()));
       allow delete: if isAdmin();
     }
 

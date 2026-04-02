@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: incidents
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required, 5-100 chars)
+    //   - description: string (required, 10-1000 chars)
+    //   - category: string (required, enum: crime, traffic, infrastructure, weather)
+    //   - lat: number (required)
+    //   - lng: number (required)
+    //   - timestamp: number (required)
+    //   - email: string (required, format: email)
+    //   - name: string (required, 2-50 chars)
+    //   - verified_status: string (required, enum: unverified, multiple_reports, community_confirmed)
+    //   - authorUid: string (required, immutable)
+    //   - report_count: number (optional, default 1)
+    //
+    // Collection: community_stats
+    // Document ID: auto-generated
+    // Fields:
+    //   - community: string (required)
+    //   - month: string (required)
+    //   - violent_crime: number (required)
+    //   - property_crime: number (required)
+    //   - disorder_calls: number (required)
+    //   - safety_score: number (required)
+    //
+    // Collection: users
+    // Document ID: userId (matches auth.uid)
+    // Fields:
+    //   - uid: string (required, matches auth.uid)
+    //   - displayName: string (required)
+    //   - email: string (required, format: email)
+    //   - role: string (required, enum: user, admin)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "mrotiz14@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidIncident(data) {
+      return data.title is string && data.title.size() >= 5 && data.title.size() <= 100 &&
+             data.description is string && data.description.size() >= 10 && data.description.size() <= 1000 &&
+             data.category in ['crime', 'traffic', 'infrastructure', 'weather'] &&
+             data.lat is number && data.lng is number &&
+             data.timestamp is number &&
+             isValidEmail(data.email) &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 50 &&
+             data.verified_status in ['unverified', 'multiple_reports', 'community_confirmed'] &&
+             data.authorUid is string;
+    }
+
+    function isValidUser(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.displayName is string && data.displayName.size() > 0 &&
+             isValidEmail(data.email) &&
+             data.role in ['user', 'admin'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == 'user';
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.role == resource.data.role;
+      allow delete: if isAdmin();
+    }
+
+    match /incidents/{incidentId} {
+      allow read: if true; // Publicly readable for the map
+      allow create: if isAuthenticated() && isValidIncident(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated() && isValidIncident(request.resource.data) && (request.auth.uid == resource.data.authorUid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /community_stats/{statsId} {
+      allow read: if true; // Publicly readable for area intelligence
+      allow write: if isAdmin();
+    }
+
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

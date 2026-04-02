@@ -1,0 +1,5 @@
+{
+  "name": "Calgary Watch",
+  "description": "Real-time urban intelligence platform for Calgary. Community-submitted reports and historical crime data.",
+  "requestFramePermissions": ["geolocation"]
+}

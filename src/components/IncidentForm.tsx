@@ -74,14 +74,14 @@ export default function IncidentForm({ isOpen, onClose, onSubmit, location, user
       {/* DESKTOP - Streamlined Single-Column Journey */}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[115] hidden lg:flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xl">
+          <div className="fixed inset-0 z-[115] hidden lg:flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xl pointer-events-auto">
             {/* Click backdrop to close */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={resetForm}
-              className="absolute inset-0 cursor-pointer"
+              className="absolute inset-0 cursor-pointer pointer-events-auto"
             />
 
             {/* Main Container - Single Column Flow */}
@@ -90,7 +90,7 @@ export default function IncidentForm({ isOpen, onClose, onSubmit, location, user
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 20 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 rounded-3xl border border-white/10 shadow-2xl shadow-blue-900/40 overflow-hidden flex flex-col"
+              className="relative z-50 w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 rounded-3xl border border-white/10 shadow-2xl shadow-blue-900/40 overflow-hidden flex flex-col pointer-events-auto"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-gradient-to-r from-slate-900/80 to-blue-900/20">
@@ -319,142 +319,166 @@ export default function IncidentForm({ isOpen, onClose, onSubmit, location, user
                 <Drawer.Title className="sr-only">Report Incident</Drawer.Title>
                 <Drawer.Description className="sr-only">Help keep Calgary safe by reporting what's happening in real-time.</Drawer.Description>
                 
-                <div className="flex-1 overflow-auto no-scrollbar flex flex-col">
-                  <h2 className="text-2xl font-black text-white tracking-tight mb-1">Report Incident</h2>
-                  <p className="text-slate-400 text-xs font-medium mb-5">Help keep Calgary safe in real-time</p>
-
-                  <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 flex-1 overflow-y-auto no-scrollbar pr-2">
-                    {/* Category */}
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                        Category
-                      </label>
-                      <select
-                        {...register('category')}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm appearance-none cursor-pointer"
-                      >
-                        <option value="crime" className="bg-slate-900">Crime</option>
-                        <option value="traffic" className="bg-slate-900">Traffic</option>
-                        <option value="infrastructure" className="bg-slate-900">Infrastructure</option>
-                        <option value="weather" className="bg-slate-900">Weather</option>
-                        <option value="gas" className="bg-slate-900">Gas Prices</option>
-                        <option value="emergency" className="bg-slate-900">🚨 Emergency</option>
-                      </select>
-                    </div>
-
-                    {/* Neighborhood */}
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                        Neighborhood
-                      </label>
-                      <select
-                        {...register('neighborhood')}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm appearance-none cursor-pointer"
-                      >
-                        <option value="" className="bg-slate-900">Select Area</option>
-                        <option value="Beltline" className="bg-slate-900">Beltline</option>
-                        <option value="Kensington" className="bg-slate-900">Kensington</option>
-                        <option value="Bridgeland" className="bg-slate-900">Bridgeland</option>
-                        <option value="Mission" className="bg-slate-900">Mission</option>
-                        <option value="Inglewood" className="bg-slate-900">Inglewood</option>
-                        <option value="Bowness" className="bg-slate-900">Bowness</option>
-                        <option value="Downtown" className="bg-slate-900">Downtown</option>
-                      </select>
-                      {errors.neighborhood && (
-                        <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.neighborhood.message}</p>
-                      )}
-                    </div>
-
-                    {/* Title */}
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                        Report Title
-                      </label>
-                      <Input
-                        {...register('title')}
-                        placeholder="e.g., Major collision on 17th Ave"
-                        className="bg-white/5 border-white/10 hover:bg-white/8 text-white placeholder:text-slate-600 rounded-xl h-[44px] font-bold px-3.5 text-sm"
-                      />
-                      {errors.title && (
-                        <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.title.message}</p>
-                      )}
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        {...register('description')}
-                        placeholder="What happened, what should neighbors avoid?"
-                        rows={4}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-white text-sm placeholder:text-slate-600 font-medium"
-                      />
-                      {errors.description && (
-                        <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.description.message}</p>
-                      )}
-                    </div>
-
-                    {/* Anonymous Checkbox */}
-                    <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 cursor-pointer transition-colors">
-                      <input
-                        type="checkbox"
-                        {...register('anonymous')}
-                        className="h-4 w-4 rounded border-white/20 bg-slate-900 text-blue-500 focus:ring-blue-500/50"
-                      />
+                <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
+                  {/* STEP 1: Mobile Location Selection */}
+                  {!location || !locationMethod ? (
+                    <div className="space-y-5 flex-1 flex flex-col">
                       <div>
-                        <p className="text-xs font-bold text-white">Post anonymously</p>
-                        <p className="text-[11px] text-slate-400">Hide your profile from others</p>
+                        <h2 className="text-2xl font-black text-white tracking-tight">Keep Calgary Safe</h2>
+                        <p className="text-slate-400 text-xs font-medium mt-1">Report what's happening in real-time</p>
                       </div>
-                    </label>
 
-                    <div className="pt-2 pb-4">
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting || !location}
-                        className="w-full h-[44px] text-sm font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white border-none shadow-lg shadow-blue-500/20 rounded-xl transition-all active:scale-[0.98]"
+                      <div>
+                        <p className="text-xs font-black text-slate-300 uppercase tracking-wider mb-3">📍 Step 1: Select Location</p>
+                        <div className="space-y-2.5">
+                          {/* Use Current Location */}
+                          <button
+                            onClick={() => setLocationMethod('current')}
+                            className="w-full p-4 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-blue-700/20 active:from-blue-600/40 active:to-blue-700/40 transition-all text-left"
+                          >
+                            <p className="font-black text-white text-sm mb-1">📌 Use Current Location</p>
+                            <p className="text-xs text-slate-300">Uses your device's GPS</p>
+                          </button>
+
+                          {/* Pin on Map */}
+                          <button
+                            onClick={() => setLocationMethod('map')}
+                            className="w-full p-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/20 to-emerald-700/20 active:from-emerald-600/40 active:to-emerald-700/40 transition-all text-left"
+                          >
+                            <p className="font-black text-white text-sm mb-1">🗺️ Pin on Map</p>
+                            <p className="text-xs text-slate-300">Click the map to select location</p>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 mt-auto">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Tip</p>
+                        <p className="text-xs text-slate-300 mt-1.5">Close this drawer and click the map where the incident happened to pin the exact location.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    /* STEP 2: Mobile Report Details */
+                    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 flex-1 flex flex-col pr-2">
+                      <div>
+                        <h2 className="text-2xl font-black text-white tracking-tight mb-1">Report Details</h2>
+                        <p className="text-slate-400 text-xs font-medium">Location: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}</p>
+                      </div>
+
+                      {/* Change Location Button */}
+                      <button
+                        type="button"
+                        onClick={() => setLocationMethod(null)}
+                        className="text-xs font-bold text-blue-300 hover:text-white bg-blue-600/20 hover:bg-blue-600/30 px-3 py-2 rounded-lg transition-all w-full"
                       >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="animate-spin mr-2" size={18} />
-                            Submitting...
-                          </>
-                        ) : (
-                          'Submit Report'
-                        )}
-                      </Button>
-                    </div>
-                  </form>
+                        🔄 Change Location
+                      </button>
 
-                  {/* Footer Info */}
-                  <div className="border-t border-white/5 bg-slate-800/30 p-4 space-y-3 text-xs mt-auto">
-                    {/* Location */}
-                    <div className="flex items-start gap-2.5">
-                      <MapPin size={14} className="text-blue-400 shrink-0 mt-0.5" />
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-200">
-                          {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'Select on map'}
-                        </p>
-                        <p className="text-slate-400 mt-0.5">Click map to refine location</p>
-                      </div>
-                    </div>
+                      <div className="space-y-4 overflow-y-auto no-scrollbar flex-1">
+                        {/* Category */}
+                        <div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
+                            Category
+                          </label>
+                          <select
+                            {...register('category')}
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm appearance-none cursor-pointer"
+                          >
+                            <option value="crime" className="bg-slate-900">Crime</option>
+                            <option value="traffic" className="bg-slate-900">Traffic</option>
+                            <option value="infrastructure" className="bg-slate-900">Infrastructure</option>
+                            <option value="weather" className="bg-slate-900">Weather</option>
+                            <option value="gas" className="bg-slate-900">Gas Prices</option>
+                            <option value="emergency" className="bg-slate-900">🚨 Emergency</option>
+                          </select>
+                        </div>
 
-                    {/* User Info */}
-                    <div className="flex items-center gap-2.5 pt-2">
-                      <img
-                        src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1e293b&color=fff'}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-lg border border-white/10 object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-200 truncate text-xs">
-                          {isAnonymous ? 'Anonymous' : (userProfile?.displayName || 'Calgary User')}
-                        </p>
+                        {/* Neighborhood */}
+                        <div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
+                            Neighborhood
+                          </label>
+                          <select
+                            {...register('neighborhood')}
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm appearance-none cursor-pointer"
+                          >
+                            <option value="" className="bg-slate-900">Select Area</option>
+                            <option value="Beltline" className="bg-slate-900">Beltline</option>
+                            <option value="Kensington" className="bg-slate-900">Kensington</option>
+                            <option value="Bridgeland" className="bg-slate-900">Bridgeland</option>
+                            <option value="Mission" className="bg-slate-900">Mission</option>
+                            <option value="Inglewood" className="bg-slate-900">Inglewood</option>
+                            <option value="Bowness" className="bg-slate-900">Bowness</option>
+                            <option value="Downtown" className="bg-slate-900">Downtown</option>
+                          </select>
+                          {errors.neighborhood && (
+                            <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.neighborhood.message}</p>
+                          )}
+                        </div>
+
+                        {/* Title */}
+                        <div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
+                            Headline
+                          </label>
+                          <Input
+                            {...register('title')}
+                            placeholder="e.g., Major collision on 17th Ave"
+                            className="bg-white/5 border-white/10 hover:bg-white/8 text-white placeholder:text-slate-600 rounded-xl h-[44px] font-bold px-3.5 text-sm"
+                          />
+                          {errors.title && (
+                            <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.title.message}</p>
+                          )}
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
+                            What Happened?
+                          </label>
+                          <textarea
+                            {...register('description')}
+                            placeholder="Give neighbors the details they need to know..."
+                            rows={3}
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-white text-sm placeholder:text-slate-600 font-medium"
+                          />
+                          {errors.description && (
+                            <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.description.message}</p>
+                          )}
+                        </div>
+
+                        {/* Anonymous Checkbox */}
+                        <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 cursor-pointer transition-colors">
+                          <input
+                            type="checkbox"
+                            {...register('anonymous')}
+                            className="h-4 w-4 rounded border-white/20 bg-slate-900 text-blue-500 focus:ring-blue-500/50"
+                          />
+                          <div>
+                            <p className="text-xs font-bold text-white">Post anonymously</p>
+                            <p className="text-[11px] text-slate-400">Your name won't appear</p>
+                          </div>
+                        </label>
                       </div>
-                    </div>
-                  </div>
+
+                      {/* Footer Submit Button */}
+                      <div className="pt-3 pb-4 border-t border-white/10">
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full h-[44px] text-sm font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-600 disabled:to-slate-700 text-white border-none shadow-lg shadow-blue-500/20 rounded-xl transition-all active:scale-[0.98]"
+                        >
+                          {isSubmitting ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <Loader2 className="animate-spin" size={18} />
+                              Posting...
+                            </div>
+                          ) : (
+                            '🚀 Post Report'
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               </div>
             </Drawer.Content>

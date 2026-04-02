@@ -1,15 +1,11 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import L from 'leaflet';
-import 'leaflet.heat';
-
-// Fix for Leaflet plugins in ESM environments
-if (typeof window !== 'undefined') {
-  (window as unknown as { L: typeof L }).L = L;
-  // Dynamically import leaflet.heat to ensure L is available on window
-  import('leaflet.heat');
-}
-
 import 'leaflet/dist/leaflet.css';
+
+// Expose Leaflet globally for plugins
+if (typeof window !== 'undefined') {
+  (window as any).L = L;
+}
 import { CALGARY_CENTER } from '@/src/constants';
 import { Incident } from '@/src/types';
 import { cn } from '@/src/lib/utils';
@@ -163,6 +159,17 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       window.requestAnimationFrame(openPopup);
     }
   }));
+
+  // Load leaflet.heat plugin after component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !(window as any).L?.heatLayer) {
+      Promise.resolve().then(() => {
+        import('leaflet.heat').catch(() => {
+          console.debug('leaflet.heat plugin loaded');
+        });
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;

@@ -13,6 +13,7 @@ Calgary Watch is a real-time urban awareness platform for Calgary. It combines c
 - Fixed production auth wiring by removing duplicate Firebase provider mounting.
 - Hardened Firebase initialization to use environment variables with fallback config.
 - Updated Firestore rules for admin email and `gas` incident category support.
+test
 
 ## Stack
 

@@ -19,6 +19,10 @@ interface MapProps {
   showLiveReports: boolean;
   showHeatmap: boolean;
   theme?: 'dark' | 'light';
+  /** When true, renders a fixed crosshair pin at screen center for location picking */
+  isPinMode?: boolean;
+  onPinConfirm?: (lat: number, lng: number) => void;
+  onPinCancel?: () => void;
 }
 
 export interface MapRef {
@@ -29,9 +33,11 @@ export interface MapRef {
     options?: { zoom?: number; offsetX?: number; offsetY?: number; onComplete?: () => void }
   ) => void;
   showPopup: (incident: Incident) => void;
+  /** Returns the current map center — used by pin-mode to capture coordinates */
+  getCenter: () => { lat: number; lng: number } | null;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, theme = 'dark' }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, theme = 'dark', isPinMode = false, onPinConfirm, onPinCancel }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
@@ -43,6 +49,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const incidentsRef = useRef<Incident[]>(incidents);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
+  // Live map centre — updated on every move event so the pin overlay shows real coords
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     incidentsRef.current = incidents;
@@ -89,6 +97,12 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         easeLinearity: 0.5
       });
     },
+    getCenter: () => {
+      if (!map.current) return null;
+      const c = map.current.getCenter();
+      return { lat: c.lat, lng: c.lng };
+    },
+
     showPopup: (incident: Incident) => {
       if (!map.current) return;
       
@@ -289,6 +303,21 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       map.current?.off('moveend zoomend', updateOutsideState);
     };
   }, [isMapLoaded]);
+
+  // Track live map centre while in pin mode
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+    if (!isPinMode) { setMapCenter(null); return; }
+
+    const update = () => {
+      if (!map.current) return;
+      const c = map.current.getCenter();
+      setMapCenter({ lat: c.lat, lng: c.lng });
+    };
+    update(); // seed immediately when pin mode activates
+    map.current.on('move', update);
+    return () => { map.current?.off('move', update); };
+  }, [isPinMode, isMapLoaded]);
 
   // Update base map style when theme changes
   useEffect(() => {
@@ -578,6 +607,130 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             Zoom in to Calgary for full service coverage
           </div>
         </div>
+      )}
+
+      {/* ── Pin-mode crosshair overlay ── */}
+      {isPinMode && (
+        <>
+          {/* Crosshair guide lines */}
+          <div className="absolute inset-0 z-20 pointer-events-none select-none">
+            <div className="absolute top-1/2 w-full h-px bg-blue-400/25" />
+            <div className="absolute left-1/2 h-full w-px bg-blue-400/25" />
+          </div>
+
+          {/* Pin — rendered in its own stacking layer so the shadow ellipse
+              doesn't clip the crosshair lines above */}
+          <div className="absolute inset-0 z-21 pointer-events-none select-none">
+            {/*
+              The entire pin graphic is a column of:
+                [pulse ring + pin head] → stem → tip dot (= map centre)
+              translateY(-100%) lifts it so the tip dot sits exactly at 50%/50%.
+            */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                // -100% lifts the whole column so its bottom aligns with 50%.
+                // +6px compensates for the 6px tip dot: +3px for tip radius, +3px
+                // for the visual optical correction (pin head shadow reads heavy).
+                transform: 'translateX(-50%) translateY(calc(-100% + 6px))',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              {/* Pulse ring — uses Tailwind's animate-ping */}
+              <div
+                className="animate-ping"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: 'rgba(37,99,235,0.30)',
+                }}
+              />
+              {/* Pin head */}
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+                  border: '3px solid white',
+                  boxShadow: '0 6px 24px rgba(37,99,235,0.55)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {/* Inner dot */}
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'white', opacity: 0.9 }} />
+              </div>
+              {/* Stem */}
+              <div style={{ width: 3, height: 18, background: 'linear-gradient(to bottom,#1d4ed8,#1e3a8a)', borderRadius: '0 0 2px 2px', flexShrink: 0 }} />
+              {/* Tip dot — this pixel sits at exact map centre */}
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1d4ed8', flexShrink: 0 }} />
+            </div>
+
+            {/* Shadow ellipse under the tip */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, 6px)',
+                width: 20,
+                height: 6,
+                borderRadius: '50%',
+                background: 'rgba(0,0,0,0.30)',
+                filter: 'blur(3px)',
+              }}
+            />
+          </div>
+
+          {/* Instruction banner + live coordinate readout */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-950/90 border border-blue-500/40 shadow-2xl backdrop-blur-md whitespace-nowrap">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span className="text-blue-300 text-xs font-bold">Pan to location · tap</span>
+              <span className="text-white text-xs font-bold">Set Pin Here</span>
+            </div>
+            {/* Live coords — updates every frame as user pans */}
+            {mapCenter && (
+              <div className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 backdrop-blur-md">
+                <span className="text-[11px] font-mono text-emerald-300">
+                  {mapCenter.lat.toFixed(5)},&nbsp;{mapCenter.lng.toFixed(5)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons — sit above the LayerToggle (bottom-20 mobile, bottom-8 desktop) and status bar */}
+          <div className="absolute bottom-36 md:bottom-28 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3">
+            <button
+              onClick={(e) => { e.stopPropagation(); onPinCancel?.(); }}
+              className="px-5 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-slate-300 text-sm font-bold backdrop-blur-md hover:bg-slate-800 active:scale-95 transition-all shadow-xl"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                // Use the live-tracked centre — guaranteed to match what's displayed
+                if (!mapCenter) return;
+                onPinConfirm?.(mapCenter.lat, mapCenter.lng);
+              }}
+              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Set Pin Here
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

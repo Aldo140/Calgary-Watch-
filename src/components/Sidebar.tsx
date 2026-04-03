@@ -88,38 +88,7 @@ export default function Sidebar({
     return () => clearTimeout(id);
   }, [searchQuery]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Focus search on '/'
-      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT') {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-      }
-      
-      // Switch categories on 1-6
-      if (['1', '2', '3', '4', '5', '6'].includes(e.key) && document.activeElement?.tagName !== 'INPUT') {
-        const index = parseInt(e.key) - 1;
-        if (categories[index]) {
-          onCategoryChange(categories[index].id as any);
-        }
-      }
-
-      // Toggle verified-only quick filter
-      if ((e.key === 'v' || e.key === 'V') && document.activeElement?.tagName !== 'INPUT') {
-        e.preventDefault();
-        setVerifiedOnly((prev) => !prev);
-      }
-
-      // Toggle recent-only quick filter
-      if ((e.key === 'r' || e.key === 'R') && document.activeElement?.tagName !== 'INPUT') {
-        e.preventDefault();
-        setRecentOnly((prev) => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onCategoryChange]);
+  // Keyboard shortcuts removed — they interfered with typing in report forms.
 
   const filteredIncidents = useMemo(() => {
     const q = debouncedSearch.toLowerCase().trim();

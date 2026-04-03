@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import Map, { MapRef } from '@/src/components/Map';
 import Sidebar from '@/src/components/Sidebar';
 import IncidentForm, { IncidentFormData } from '@/src/components/IncidentForm';
-import EmergencyModal from '@/src/components/EmergencyModal';
+import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyModal';
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
@@ -51,6 +51,8 @@ export default function MapPage() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
+  const [isEmergencyPinMode, setIsEmergencyPinMode] = useState(false);
+  const [confirmedEmergencyPinLocation, setConfirmedEmergencyPinLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoadingMoreIncidents, setIsLoadingMoreIncidents] = useState(false);
   const [hasMoreIncidents, setHasMoreIncidents] = useState(false);
   const hasInitializedIncidents = useRef(false);
@@ -216,17 +218,47 @@ export default function MapPage() {
     });
   }, []);
 
+  const [isPinMode, setIsPinMode] = useState(false);
+  // Coordinates captured the moment "Set Pin Here" fires — stored in MapPage
+  // state so there is zero prop-chain timing involved.
+  const [confirmedPinLocation, setConfirmedPinLocation] = useState<{ lat: number; lng: number } | null>(null);
+
   const handleMapClick = useCallback((lat: number, lng: number) => {
-    if (isFormOpen) {
+    if (isFormOpen && !isPinMode) {
       setSelectedLocation({ lat, lng });
     }
-  }, [isFormOpen]);
+  }, [isFormOpen, isPinMode]);
+
+  const handleRequestMapPin = useCallback(() => {
+    setConfirmedPinLocation(null);
+    setIsPinMode(true);
+    // Don't auto-fly — the user pans from wherever the map currently is.
+    // This avoids the crosshair appearing at GPS coordinates when the user
+    // hasn't chosen to navigate there.
+  }, []);
+
+  const handlePinConfirm = useCallback((lat: number, lng: number) => {
+    setConfirmedPinLocation({ lat, lng });
+    setIsPinMode(false);
+  }, []);
+
+  const handlePinCancel = useCallback(() => {
+    setIsPinMode(false);
+  }, []);
+
+  const handleFormClose = useCallback(() => {
+    setIsPinMode(false);
+    setConfirmedPinLocation(null);
+    setIsFormOpen(false);
+  }, []);
 
   const handleIncidentSubmit = useCallback((data: IncidentFormData & { lat: number; lng: number }) => {
     if (!user) {
       signIn();
       return;
     }
+    setIsPinMode(false);
+    setConfirmedPinLocation(null);
 
     const fallbackName = (user.email?.split('@')[0] || 'Calgary User').slice(0, 50);
     const fullName = (user.displayName && user.displayName.trim().length >= 2)
@@ -259,17 +291,16 @@ export default function MapPage() {
     });
   }, [user, signIn]);
 
-  const handleEmergencySubmit = useCallback((data: { category: string; title: string; description: string }) => {
+  const handleEmergencySubmit = useCallback((data: EmergencySubmitData) => {
     if (!user) { signIn(); return; }
     const fallbackName = (user.email?.split('@')[0] || 'Calgary User').slice(0, 50);
     const fullName = (user.displayName && user.displayName.trim().length >= 2)
       ? user.displayName.trim()
       : (fallbackName.length >= 2 ? fallbackName : 'Calgary User');
     const firstName = fullName.split(/\s+/)[0]?.slice(0, 50) || 'Calgary User';
-    const loc = userLocation || CALGARY_CENTER;
     const path = 'incidents';
-    
-    // Fire-and-forget: Don't await the Firestore write, let it happen in background
+    setConfirmedEmergencyPinLocation(null);
+
     startTransition(() => {
       (async () => {
         try {
@@ -277,9 +308,9 @@ export default function MapPage() {
             title: data.title,
             description: data.description,
             category: data.category,
-            neighborhood: 'Calgary',
-            lat: loc.lat,
-            lng: loc.lng,
+            neighborhood: data.neighborhood || 'Calgary',
+            lat: data.lat,
+            lng: data.lng,
             email: user.email || 'unknown@example.com',
             name: firstName,
             source_name: firstName,
@@ -294,7 +325,21 @@ export default function MapPage() {
         }
       })();
     });
-  }, [user, signIn, userLocation]);
+  }, [user, signIn]);
+
+  const handleEmergencyRequestPin = useCallback(() => {
+    setConfirmedEmergencyPinLocation(null);
+    setIsEmergencyPinMode(true);
+  }, []);
+
+  const handleEmergencyPinConfirm = useCallback((lat: number, lng: number) => {
+    setConfirmedEmergencyPinLocation({ lat, lng });
+    setIsEmergencyPinMode(false);
+  }, []);
+
+  const handleEmergencyPinCancel = useCallback(() => {
+    setIsEmergencyPinMode(false);
+  }, []);
 
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
@@ -420,6 +465,9 @@ export default function MapPage() {
           showLiveReports={showLiveReports}
           showHeatmap={showHeatmap}
           theme={theme}
+          isPinMode={isPinMode || isEmergencyPinMode}
+          onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
+          onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
         />
 
         {/* Top Header */}
@@ -688,9 +736,13 @@ export default function MapPage() {
         {/* Emergency Modal */}
         <EmergencyModal
           isOpen={isEmergencyOpen}
-          onClose={() => setIsEmergencyOpen(false)}
+          onClose={() => { setIsEmergencyOpen(false); setConfirmedEmergencyPinLocation(null); setIsEmergencyPinMode(false); }}
           onSubmit={handleEmergencySubmit}
           location={userLocation}
+          pinLocation={confirmedEmergencyPinLocation}
+          locationAvailable={!!userLocation}
+          onRequestMapPin={handleEmergencyRequestPin}
+          isPinMode={isEmergencyPinMode}
           userName={
             user
               ? ((user.displayName?.split(/\s+/)[0]) || user.email?.split('@')[0] || 'User')
@@ -701,9 +753,13 @@ export default function MapPage() {
         {/* Incident Form Modal */}
         <IncidentForm
           isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
+          onClose={handleFormClose}
           onSubmit={handleIncidentSubmit}
           location={selectedLocation}
+          pinLocation={confirmedPinLocation}
+          locationAvailable={!!userLocation}
+          onRequestMapPin={handleRequestMapPin}
+          isPinMode={isPinMode}
           userProfile={user ? {
             displayName: user.displayName || 'Calgary User',
             email: user.email || 'No email',

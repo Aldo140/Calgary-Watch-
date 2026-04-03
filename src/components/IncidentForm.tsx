@@ -2,12 +2,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/src/components/ui/Button';
-import { Card } from '@/src/components/ui/Card';
 import { Input } from '@/src/components/ui/Input';
-import { X, MapPin, Loader2 } from 'lucide-react';
+import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useRef } from 'react';
-import { Drawer } from 'vaul';
+import { useState, useRef, useEffect } from 'react';
 
 const incidentSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
@@ -23,468 +21,435 @@ interface IncidentFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: IncidentFormData & { lat: number; lng: number }) => void;
+  /** GPS / Calgary-centre coordinates (for the "use current location" path) */
   location: { lat: number; lng: number } | null;
+  /** Coordinates set by the crosshair pin — stored in MapPage state, passed directly here */
+  pinLocation: { lat: number; lng: number } | null;
+  /** Whether the device has granted location permission */
+  locationAvailable: boolean;
   userProfile: {
     displayName: string;
     email: string;
     photoURL: string;
   } | null;
+  /** Called when user chooses "drop a pin" — parent enters crosshair mode */
+  onRequestMapPin?: () => void;
+  /** True while the crosshair pin overlay is active on the map */
+  isPinMode?: boolean;
 }
 
-export default function IncidentForm({ isOpen, onClose, onSubmit, location, userProfile }: IncidentFormProps) {
+export default function IncidentForm({
+  isOpen,
+  onClose,
+  onSubmit,
+  location,
+  pinLocation,
+  locationAvailable,
+  userProfile,
+  onRequestMapPin,
+  isPinMode = false,
+}: IncidentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [locationMethod, setLocationMethod] = useState<'map' | 'current' | null>(null);
+  // 'choose'  = picking location method
+  // 'pinning' = crosshair active on map; form hidden
+  // 'form'    = filling in report details
+  const [step, setStep] = useState<'choose' | 'pinning' | 'form'>('choose');
   const submitDebounceRef = useRef(0);
-  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<IncidentFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<IncidentFormData>({
     resolver: zodResolver(incidentSchema),
-    defaultValues: {
-      category: 'crime',
-      anonymous: false,
-    },
+    defaultValues: { category: 'crime', anonymous: false },
   });
+
   const isAnonymous = watch('anonymous');
-  const selectedCategory = watch('category');
+
+  // When pin mode exits without confirmation (Cancel), return to choose step
+  useEffect(() => {
+    if (!isPinMode && step === 'pinning') {
+      setStep('choose');
+    }
+  }, [isPinMode, step]);
+
+  // When a confirmed pin arrives while we're in pinning step, advance to form
+  useEffect(() => {
+    if (step === 'pinning' && pinLocation) {
+      setStep('form');
+    }
+  }, [pinLocation, step]);
+
+  // Reset when form is reopened
+  useEffect(() => {
+    if (isOpen) setStep('choose');
+  }, [isOpen]);
+
+  // pinLocation (from crosshair) takes precedence over GPS location
+  const activeLocation = pinLocation ?? location;
 
   const handleFormSubmit = async (data: IncidentFormData) => {
-    if (!location) return;
-    
+    if (!activeLocation) return;
     const now = Date.now();
     if (now - submitDebounceRef.current < 500) return;
     submitDebounceRef.current = now;
-    
     setIsSubmitting(true);
-    onSubmit({ ...data, ...location });
-    
+    onSubmit({ ...data, ...activeLocation });
     setTimeout(() => {
       reset();
-      setLocationMethod(null);
+      setStep('choose');
       onClose();
       setIsSubmitting(false);
     }, 100);
   };
 
-  const resetForm = () => {
-    setLocationMethod(null);
+  const handleClose = () => {
     reset();
+    setStep('choose');
     onClose();
   };
 
+  const handleUseCurrentLocation = () => {
+    // location is already set in MapPage to userLocation when form opens;
+    // if GPS was denied, MapPage falls back to CALGARY_CENTER.
+    setStep('form');
+  };
+
+  const handlePinOnMap = () => {
+    setStep('pinning');
+    onRequestMapPin?.();
+  };
+
+  // ─── Location step ────────────────────────────────────────────────────────
+  const LocationStep = () => (
+    <div className="space-y-4 p-6">
+      <div>
+        <h3 className="text-lg font-black text-white mb-1">Step 1: Select Location</h3>
+        <p className="text-sm text-slate-400">Pin the exact spot where this happened</p>
+      </div>
+
+      <div className="space-y-3">
+        {/* ── Use Current Location ── */}
+        {locationAvailable ? (
+          <motion.button
+            type="button"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleUseCurrentLocation}
+            className="w-full p-5 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-blue-700/20 hover:from-blue-600/30 hover:to-blue-700/30 transition-all group text-left shadow-lg"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="font-black text-white text-base flex items-center gap-2">
+                  <Navigation size={16} className="text-blue-400" />
+                  Use My Current Location
+                </p>
+                <p className="text-xs text-slate-300 mt-1.5">Fast &amp; accurate — uses your device GPS</p>
+              </div>
+              <div className="text-blue-400 group-hover:translate-x-1 transition-transform">→</div>
+            </div>
+          </motion.button>
+        ) : (
+          /* GPS unavailable — explain and offer help */
+          <div className="p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-600/10 to-amber-700/10">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <p className="font-black text-white text-sm">Location Access Unavailable</p>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Your browser hasn't shared your location. You can enable it in your device settings, or just drop a pin on the map below.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {/* Deep-link to browser location settings (works on most mobile browsers) */}
+                  <a
+                    href="https://support.google.com/chrome/answer/142065"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-300 hover:text-white transition-colors underline underline-offset-2"
+                  >
+                    How to enable location
+                    <ExternalLink size={10} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Drop a Pin ── */}
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handlePinOnMap}
+          className="w-full p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/20 to-emerald-700/20 hover:from-emerald-600/30 hover:to-emerald-700/30 transition-all group text-left shadow-lg"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <p className="font-black text-white text-base flex items-center gap-2">
+                <MapPin size={16} className="text-emerald-400" />
+                Drop a Pin on the Map
+              </p>
+              <p className="text-xs text-slate-300 mt-1.5">
+                {locationAvailable
+                  ? 'Pan the map to any spot in Calgary'
+                  : 'Recommended — pan the map to the exact location'}
+              </p>
+            </div>
+            <div className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</div>
+          </div>
+        </motion.button>
+      </div>
+    </div>
+  );
+
+  // ─── Form step ────────────────────────────────────────────────────────────
+  const FormStep = () => (
+    <form
+      onSubmit={handleSubmit(handleFormSubmit)}
+      className="flex flex-col gap-5 p-6"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Location confirmation */}
+      <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-600/25 to-indigo-600/25 border border-blue-500/40 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-black text-blue-300 uppercase tracking-wide">
+            {pinLocation ? '📍 Pin Set' : locationAvailable ? '📡 GPS Location' : '🏙 City Centre (approx.)'}
+          </p>
+          <p className="text-xs text-slate-200 mt-0.5 font-mono">
+            {activeLocation?.lat.toFixed(5)}, {activeLocation?.lng.toFixed(5)}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setStep('choose')}
+          className="text-xs font-bold text-blue-300 hover:text-white bg-blue-600/20 hover:bg-blue-600/30 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap"
+        >
+          Change
+        </button>
+      </div>
+
+      {/* Category */}
+      <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Category</label>
+        <select
+          {...register('category')}
+          className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="crime">Crime</option>
+          <option value="traffic">Traffic</option>
+          <option value="infrastructure">Infrastructure</option>
+          <option value="weather">Weather</option>
+          <option value="gas">Gas Prices</option>
+          <option value="emergency">🚨 Emergency</option>
+        </select>
+      </div>
+
+      {/* Neighborhood */}
+      <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Neighbourhood</label>
+        <select
+          {...register('neighborhood')}
+          className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select Area</option>
+          <option value="Beltline">Beltline</option>
+          <option value="Kensington">Kensington</option>
+          <option value="Bridgeland">Bridgeland</option>
+          <option value="Mission">Mission</option>
+          <option value="Inglewood">Inglewood</option>
+          <option value="Bowness">Bowness</option>
+          <option value="Downtown">Downtown</option>
+          <option value="Saddleridge">Saddleridge</option>
+          <option value="Evanston">Evanston</option>
+          <option value="Mahogany">Mahogany</option>
+          <option value="Auburn Bay">Auburn Bay</option>
+          <option value="Signal Hill">Signal Hill</option>
+          <option value="Tuscany">Tuscany</option>
+          <option value="Royal Oak">Royal Oak</option>
+          <option value="Panorama Hills">Panorama Hills</option>
+          <option value="Midnapore">Midnapore</option>
+          <option value="Shawnessy">Shawnessy</option>
+          <option value="McKenzie Towne">McKenzie Towne</option>
+          <option value="Cranston">Cranston</option>
+          <option value="Copperfield">Copperfield</option>
+          <option value="Other">Other / Not Listed</option>
+        </select>
+        {errors.neighborhood && (
+          <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.neighborhood.message}</p>
+        )}
+      </div>
+
+      {/* Title */}
+      <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Headline</label>
+        <Input
+          {...register('title')}
+          placeholder="e.g., Major collision on 17th Ave SW"
+          className="bg-slate-900 border-white/10 text-white placeholder:text-slate-600 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
+        />
+        {errors.title && (
+          <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.title.message}</p>
+        )}
+      </div>
+
+      {/* Description */}
+      <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">What Happened?</label>
+        <textarea
+          {...register('description')}
+          placeholder="Give neighbours the details they need to know..."
+          rows={3}
+          className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white placeholder:text-slate-600 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        {errors.description && (
+          <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.description.message}</p>
+        )}
+      </div>
+
+      {/* Anonymous */}
+      <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 cursor-pointer transition-colors">
+        <input
+          type="checkbox"
+          {...register('anonymous')}
+          className="h-4 w-4 rounded border-white/20 bg-slate-900 accent-blue-500 cursor-pointer"
+        />
+        <div>
+          <p className="text-xs font-bold text-white">Post Anonymously</p>
+          <p className="text-[10px] text-slate-400">Your name won't appear</p>
+        </div>
+      </label>
+
+      {/* Submit */}
+      <div className="flex items-center gap-3 pt-2 border-t border-white/8">
+        <img
+          src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1e293b&color=fff'}
+          alt=""
+          className="w-8 h-8 rounded-lg border border-white/10 object-cover"
+          referrerPolicy="no-referrer"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold text-slate-200 truncate">
+            {isAnonymous ? 'Anonymous' : userProfile?.displayName?.toUpperCase()}
+          </p>
+        </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-6 h-11 font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm shadow-lg whitespace-nowrap"
+        >
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <Loader2 size={16} className="animate-spin" />
+              Posting…
+            </span>
+          ) : '🚀 Post Report'}
+        </Button>
+      </div>
+    </form>
+  );
+
+  // ─── Desktop modal ─────────────────────────────────────────────────────────
   return (
     <>
-      {/* DESKTOP - Streamlined Single-Column Journey */}
       <AnimatePresence>
-        {isOpen && (
-          <div className="fixed inset-0 z-[115] hidden lg:flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xl pointer-events-auto">
-            {/* Click backdrop to close */}
+        {isOpen && step !== 'pinning' && (
+          <div
+            className="fixed inset-0 z-[115] hidden lg:flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xl"
+            onClick={handleClose}
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={resetForm}
-              className="absolute inset-0 cursor-pointer pointer-events-auto"
-            />
-
-            {/* Main Container - Single Column Flow */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.93, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-50 w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 rounded-3xl border border-white/10 shadow-2xl shadow-blue-900/40 overflow-hidden flex flex-col pointer-events-auto"
+              exit={{ opacity: 0, scale: 0.93, y: 16 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative z-50 w-full max-w-xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 rounded-3xl border border-white/10 shadow-2xl shadow-blue-900/40 overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-gradient-to-r from-slate-900/80 to-blue-900/20">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-gradient-to-r from-slate-900/80 to-blue-900/15 flex-shrink-0">
                 <div>
-                  <h2 className="text-2xl font-black text-white">Keep Calgary Safe</h2>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">Report what's happening in real-time</p>
+                  <h2 className="text-xl font-black text-white">Keep Calgary Safe</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">Report what's happening in real-time</p>
                 </div>
-                <button
-                  onClick={resetForm}
-                  className="p-2.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all group"
-                >
-                  <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                <button onClick={handleClose} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+                  <X size={20} />
                 </button>
               </div>
 
-              {/* Content */}
               <div className="flex-1 overflow-y-auto">
-                {/* STEP 1: Location Selection */}
-                {!location || !locationMethod ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="px-8 py-8 space-y-6"
-                  >
-                    <div>
-                      <h3 className="text-lg font-black text-white mb-1">📍 Step 1: Select Location</h3>
-                      <p className="text-sm text-slate-400">This helps us pin the incident on the map</p>
-                    </div>
-
-                    <div className="space-y-3">
-                      {/* Use Current Location - Primary Action */}
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setLocationMethod('current')}
-                        className="w-full p-5 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-blue-700/20 hover:from-blue-600/30 hover:to-blue-700/30 transition-all group text-left shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="font-black text-white text-base">📌 Use My Current Location</p>
-                            <p className="text-xs text-slate-300 mt-1.5">Fast & accurate - uses your device GPS</p>
-                          </div>
-                          <div className="text-blue-400 group-hover:translate-x-1 transition-transform">→</div>
-                        </div>
-                      </motion.button>
-
-                      {/* Pin on Map - Secondary Action */}
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setLocationMethod('map')}
-                        className="w-full p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/20 to-emerald-700/20 hover:from-emerald-600/30 hover:to-emerald-700/30 transition-all group text-left shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="font-black text-white text-base">🗺️ Pin Exact Location on Map</p>
-                            <p className="text-xs text-slate-300 mt-1.5">Close this, click the map where it happened</p>
-                          </div>
-                          <div className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</div>
-                        </div>
-                      </motion.button>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 mt-6">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Pro Tip</p>
-                      <p className="text-xs text-slate-300 mt-2">Using your current location shares your general area. You can still change it on the map if needed.</p>
-                    </div>
-                  </motion.div>
-                ) : (
-                  /* STEP 2: Report Details */
-                  <motion.form
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    onSubmit={handleSubmit(handleFormSubmit)}
-                    className="px-8 py-8 space-y-6 flex flex-col h-full"
-                  >
-                    {/* Location Confirmation */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-500/50">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-blue-300 uppercase tracking-wide">✓ Location Set</p>
-                          <p className="text-xs text-slate-100">
-                            {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
-                          </p>
-                          <p className="text-[10px] text-blue-200 mt-2">
-                            Method: {locationMethod === 'current' ? 'Device Location' : 'Map Pin'}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setLocationMethod(null)}
-                          className="text-xs font-bold text-blue-300 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap"
-                        >
-                          Change
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <div>
-                      <h3 className="text-sm font-black text-white mb-3">📋 Step 2: Report Details</h3>
-                      <div className="space-y-4 flex-1">
-                        {/* Category */}
-                        <div>
-                          <label className="text-xs font-black text-slate-300 uppercase tracking-wider block mb-2.5">Category</label>
-                          <select
-                            {...register('category')}
-                            className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm"
-                          >
-                            <option value="crime">Crime</option>
-                            <option value="traffic">Traffic</option>
-                            <option value="infrastructure">Infrastructure</option>
-                            <option value="weather">Weather</option>
-                            <option value="gas">Gas Prices</option>
-                            <option value="emergency">🚨 Emergency</option>
-                          </select>
-                        </div>
-
-                        {/* Neighborhood */}
-                        <div>
-                          <label className="text-xs font-black text-slate-300 uppercase tracking-wider block mb-2.5">Neighborhood</label>
-                          <select
-                            {...register('neighborhood')}
-                            className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm"
-                          >
-                            <option value="">Select Area</option>
-                            <option value="Beltline">Beltline</option>
-                            <option value="Kensington">Kensington</option>
-                            <option value="Bridgeland">Bridgeland</option>
-                            <option value="Mission">Mission</option>
-                            <option value="Inglewood">Inglewood</option>
-                            <option value="Bowness">Bowness</option>
-                            <option value="Downtown">Downtown</option>
-                          </select>
-                          {errors.neighborhood && <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.neighborhood.message}</p>}
-                        </div>
-
-                        {/* Title */}
-                        <div>
-                          <label className="text-xs font-black text-slate-300 uppercase tracking-wider block mb-2.5">Headline</label>
-                          <Input
-                            {...register('title')}
-                            placeholder="e.g., Major collision on 17th Ave SW"
-                            className="bg-white/5 border-white/10 text-white placeholder:text-slate-600 rounded-xl h-11 font-bold px-4 text-sm"
-                          />
-                          {errors.title && <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.title.message}</p>}
-                        </div>
-
-                        {/* Description */}
-                        <div>
-                          <label className="text-xs font-black text-slate-300 uppercase tracking-wider block mb-2.5">What Happened?</label>
-                          <textarea
-                            {...register('description')}
-                            placeholder="Give neighbors the details they need to know..."
-                            rows={3}
-                            className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-white placeholder:text-slate-600 font-medium text-sm"
-                          />
-                          {errors.description && <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.description.message}</p>}
-                        </div>
-
-                        {/* Anonymous Toggle */}
-                        <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 cursor-pointer transition-colors group">
-                          <div className="relative inline-flex items-center">
-                            <input
-                              type="checkbox"
-                              {...register('anonymous')}
-                              className="h-5 w-5 rounded border-white/20 bg-slate-900 text-blue-500 cursor-pointer accent-blue-500"
-                            />
-                          </div>
-                          <div>
-                            <p className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">Post Anonymously</p>
-                            <p className="text-[10px] text-slate-400">Your name won't appear</p>
-                          </div>
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Footer with Submit */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                      <img
-                        src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1e293b&color=fff'}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-lg border border-white/10 object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-200 truncate">
-                          {isAnonymous ? 'Anonymous' : userProfile?.displayName?.toUpperCase()}
-                        </p>
-                      </div>
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-6 h-11 font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-600 disabled:to-slate-700 text-white rounded-xl text-sm shadow-lg shadow-blue-500/20 transition-all whitespace-nowrap"
-                      >
-                        {isSubmitting ? (
-                          <div className="flex items-center gap-2">
-                            <Loader2 size={16} className="animate-spin" />
-                            Posting...
-                          </div>
-                        ) : (
-                          '🚀 Post Report'
-                        )}
-                      </Button>
-                    </div>
-                  </motion.form>
-                )}
+                <AnimatePresence mode="wait">
+                  {step === 'choose' && (
+                    <motion.div key="choose" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
+                      <LocationStep />
+                    </motion.div>
+                  )}
+                  {step === 'form' && (
+                    <motion.div key="form" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
+                      <FormStep />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Mobile Drawer */}
-      <div className="lg:hidden">
-        <Drawer.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
-          <Drawer.Portal>
-            <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]" />
-            <Drawer.Content className="fixed bottom-0 left-0 right-0 h-[92vh] z-[111] outline-none">
-              <div className="h-full bg-slate-950 rounded-t-[3rem] overflow-hidden border-t border-white/10 flex flex-col p-6">
-                <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-white/10 mb-6" />
-                <Drawer.Title className="sr-only">Report Incident</Drawer.Title>
-                <Drawer.Description className="sr-only">Help keep Calgary safe by reporting what's happening in real-time.</Drawer.Description>
-                
-                <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
-                  {/* STEP 1: Mobile Location Selection */}
-                  {!location || !locationMethod ? (
-                    <div className="space-y-5 flex-1 flex flex-col">
-                      <div>
-                        <h2 className="text-2xl font-black text-white tracking-tight">Keep Calgary Safe</h2>
-                        <p className="text-slate-400 text-xs font-medium mt-1">Report what's happening in real-time</p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs font-black text-slate-300 uppercase tracking-wider mb-3">📍 Step 1: Select Location</p>
-                        <div className="space-y-2.5">
-                          {/* Use Current Location */}
-                          <button
-                            onClick={() => setLocationMethod('current')}
-                            className="w-full p-4 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-blue-700/20 active:from-blue-600/40 active:to-blue-700/40 transition-all text-left"
-                          >
-                            <p className="font-black text-white text-sm mb-1">📌 Use Current Location</p>
-                            <p className="text-xs text-slate-300">Uses your device's GPS</p>
-                          </button>
-
-                          {/* Pin on Map */}
-                          <button
-                            onClick={() => setLocationMethod('map')}
-                            className="w-full p-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/20 to-emerald-700/20 active:from-emerald-600/40 active:to-emerald-700/40 transition-all text-left"
-                          >
-                            <p className="font-black text-white text-sm mb-1">🗺️ Pin on Map</p>
-                            <p className="text-xs text-slate-300">Click the map to select location</p>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 mt-auto">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Tip</p>
-                        <p className="text-xs text-slate-300 mt-1.5">Close this drawer and click the map where the incident happened to pin the exact location.</p>
-                      </div>
-                    </div>
-                  ) : (
-                    /* STEP 2: Mobile Report Details */
-                    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 flex-1 flex flex-col pr-2">
-                      <div>
-                        <h2 className="text-2xl font-black text-white tracking-tight mb-1">Report Details</h2>
-                        <p className="text-slate-400 text-xs font-medium">Location: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}</p>
-                      </div>
-
-                      {/* Change Location Button */}
-                      <button
-                        type="button"
-                        onClick={() => setLocationMethod(null)}
-                        className="text-xs font-bold text-blue-300 hover:text-white bg-blue-600/20 hover:bg-blue-600/30 px-3 py-2 rounded-lg transition-all w-full"
-                      >
-                        🔄 Change Location
-                      </button>
-
-                      <div className="space-y-4 overflow-y-auto no-scrollbar flex-1">
-                        {/* Category */}
-                        <div>
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                            Category
-                          </label>
-                          <select
-                            {...register('category')}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm appearance-none cursor-pointer"
-                          >
-                            <option value="crime" className="bg-slate-900">Crime</option>
-                            <option value="traffic" className="bg-slate-900">Traffic</option>
-                            <option value="infrastructure" className="bg-slate-900">Infrastructure</option>
-                            <option value="weather" className="bg-slate-900">Weather</option>
-                            <option value="gas" className="bg-slate-900">Gas Prices</option>
-                            <option value="emergency" className="bg-slate-900">🚨 Emergency</option>
-                          </select>
-                        </div>
-
-                        {/* Neighborhood */}
-                        <div>
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                            Neighborhood
-                          </label>
-                          <select
-                            {...register('neighborhood')}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-white font-bold text-sm appearance-none cursor-pointer"
-                          >
-                            <option value="" className="bg-slate-900">Select Area</option>
-                            <option value="Beltline" className="bg-slate-900">Beltline</option>
-                            <option value="Kensington" className="bg-slate-900">Kensington</option>
-                            <option value="Bridgeland" className="bg-slate-900">Bridgeland</option>
-                            <option value="Mission" className="bg-slate-900">Mission</option>
-                            <option value="Inglewood" className="bg-slate-900">Inglewood</option>
-                            <option value="Bowness" className="bg-slate-900">Bowness</option>
-                            <option value="Downtown" className="bg-slate-900">Downtown</option>
-                          </select>
-                          {errors.neighborhood && (
-                            <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.neighborhood.message}</p>
-                          )}
-                        </div>
-
-                        {/* Title */}
-                        <div>
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                            Headline
-                          </label>
-                          <Input
-                            {...register('title')}
-                            placeholder="e.g., Major collision on 17th Ave"
-                            className="bg-white/5 border-white/10 hover:bg-white/8 text-white placeholder:text-slate-600 rounded-xl h-[44px] font-bold px-3.5 text-sm"
-                          />
-                          {errors.title && (
-                            <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.title.message}</p>
-                          )}
-                        </div>
-
-                        {/* Description */}
-                        <div>
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 block mb-2">
-                            What Happened?
-                          </label>
-                          <textarea
-                            {...register('description')}
-                            placeholder="Give neighbors the details they need to know..."
-                            rows={3}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-white text-sm placeholder:text-slate-600 font-medium"
-                          />
-                          {errors.description && (
-                            <p className="text-red-400 text-[10px] mt-1.5 font-bold">{errors.description.message}</p>
-                          )}
-                        </div>
-
-                        {/* Anonymous Checkbox */}
-                        <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 cursor-pointer transition-colors">
-                          <input
-                            type="checkbox"
-                            {...register('anonymous')}
-                            className="h-4 w-4 rounded border-white/20 bg-slate-900 text-blue-500 focus:ring-blue-500/50"
-                          />
-                          <div>
-                            <p className="text-xs font-bold text-white">Post anonymously</p>
-                            <p className="text-[11px] text-slate-400">Your name won't appear</p>
-                          </div>
-                        </label>
-                      </div>
-
-                      {/* Footer Submit Button */}
-                      <div className="pt-3 pb-4 border-t border-white/10">
-                        <Button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="w-full h-[44px] text-sm font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-600 disabled:to-slate-700 text-white border-none shadow-lg shadow-blue-500/20 rounded-xl transition-all active:scale-[0.98]"
-                        >
-                          {isSubmitting ? (
-                            <div className="flex items-center justify-center gap-2">
-                              <Loader2 className="animate-spin" size={18} />
-                              Posting...
-                            </div>
-                          ) : (
-                            '🚀 Post Report'
-                          )}
-                        </Button>
-                      </div>
-                    </form>
-                  )}
-                </div>
+      {/* ─── Mobile sheet ───────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isOpen && step !== 'pinning' && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleClose}
+            />
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-[111] lg:hidden rounded-t-[2.5rem] bg-slate-950 border-t border-white/10 flex flex-col"
+              style={{ maxHeight: '92dvh' }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 280 }}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <div className="flex-shrink-0 flex justify-center pt-4 pb-2">
+                <div className="w-10 h-1.5 rounded-full bg-white/15" />
               </div>
-            </Drawer.Content>
-          </Drawer.Portal>
-        </Drawer.Root>
-      </div>
+
+              <div className="flex items-center justify-between px-6 pb-4 flex-shrink-0">
+                <div>
+                  <h2 className="text-xl font-black text-white">Keep Calgary Safe</h2>
+                  <p className="text-xs text-slate-400 mt-0.5">Report in real-time</p>
+                </div>
+                <button onClick={handleClose} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto">
+                <AnimatePresence mode="wait">
+                  {step === 'choose' && (
+                    <motion.div key="choose" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
+                      <LocationStep />
+                    </motion.div>
+                  )}
+                  {step === 'form' && (
+                    <motion.div key="form" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
+                      <FormStep />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

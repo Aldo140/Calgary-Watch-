@@ -393,7 +393,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         incident.category === 'crime' ? 'bg-red-500' :
         incident.category === 'traffic' ? 'bg-orange-500' :
         incident.category === 'infrastructure' ? 'bg-blue-500' :
-        incident.category === 'gas' ? 'bg-emerald-500' :
         'bg-purple-500'
       );
       el.appendChild(pulse);
@@ -408,7 +407,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           incident.category === 'crime' ? 'bg-red-500 shadow-red-500/40' :
           incident.category === 'traffic' ? 'bg-orange-500 shadow-orange-500/40' :
           incident.category === 'infrastructure' ? 'bg-blue-500 shadow-blue-500/40' :
-          incident.category === 'gas' ? 'bg-emerald-500 shadow-emerald-500/40' :
           'bg-purple-500 shadow-purple-500/40'
         )
       );
@@ -439,17 +437,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           'M7 3v3',
           'M10 14 2.3 6.3',
           'm14 14 7.7-7.7',
-        ],
-        gas: [
-          'M3 22 L21 22',
-          'M4 9h16',
-          'M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18',
-          'M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h1',
-          'M10 22V15',
-          'M9 22V15',
-          'M11 22V15',
-          'M18 5v2',
-          'M14 7h1',
         ],
         weather: [
           'M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242',

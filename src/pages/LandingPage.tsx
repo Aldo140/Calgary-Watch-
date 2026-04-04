@@ -796,14 +796,14 @@ export default function LandingPage() {
                 ))}
               </div>
 
-              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full">
+              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full w-[55%] sm:w-full">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4A90D9]/12 border border-[#4A90D9]/25 w-fit">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#4A90D9] animate-pulse" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#4A90D9]">Real-time</span>
                 </div>
-                <div className="mt-auto">
-                  <h3 className="text-xl font-black text-white mb-1.5">Live Community Map</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds - no refresh, no lag.</p>
+                <div className="mt-auto pt-6 sm:pt-0">
+                  <h3 className="text-xl font-black text-white mb-1.5 leading-tight sm:leading-normal">Live Community Map</h3>
+                  <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds - no refresh, no lag.</p>
                 </div>
                 <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/5">
                   <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community powered</span>
@@ -927,14 +927,14 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full">
+              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full w-[55%] sm:w-full">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full w-fit" style={{ background:'rgba(139,92,246,0.10)', border:'1px solid rgba(139,92,246,0.22)' }}>
                   <Lock size={10} className="text-purple-400" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Privacy First</span>
                 </div>
-                <div className="mt-auto">
-                  <h3 className="text-xl font-black text-white mb-1.5">Post Anonymously</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed max-w-[26ch]">Report anything sensitive with zero identity attached. Yours by default.</p>
+                <div className="mt-auto pt-6 sm:pt-0">
+                  <h3 className="text-xl font-black text-white mb-1.5 leading-tight sm:leading-normal">Post Anonymously</h3>
+                  <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-[26ch]">Report anything sensitive with zero identity attached. Yours by default.</p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-white/5">
                   <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">100% Optional Identity</span>

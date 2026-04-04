@@ -1,6 +1,6 @@
-import { AlertCircle, Car, Construction, CloudRain, ShieldCheck, ShieldAlert, ShieldQuestion, Fuel, Siren } from 'lucide-react';
+import { AlertCircle, Car, Construction, CloudRain, ShieldCheck, ShieldAlert, ShieldQuestion, Siren } from 'lucide-react';
 
-export type IncidentCategory = 'crime' | 'traffic' | 'infrastructure' | 'weather' | 'gas' | 'emergency';
+export type IncidentCategory = 'crime' | 'traffic' | 'infrastructure' | 'weather' | 'emergency';
 
 export type CredibilityStatus = 'unverified' | 'multiple_reports' | 'community_confirmed';
 
@@ -9,7 +9,6 @@ export const CATEGORY_ICONS = {
   traffic: Car,
   infrastructure: Construction,
   weather: CloudRain,
-  gas: Fuel,
   emergency: Siren,
 };
 

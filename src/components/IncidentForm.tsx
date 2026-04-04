@@ -47,8 +47,9 @@ function detectNeighbourhood(lat: number, lng: number): string {
 const incidentSchema = z.object({
   title: z.string().trim().min(5, 'Headline must be at least 5 characters'),
   description: z.string().trim().min(10, 'Description must be at least 10 characters'),
-  category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'gas', 'emergency']),
+  category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'emergency']),
   neighborhood: z.string().trim().min(2, 'Please choose a neighbourhood from the list'),
+  image_url: z.union([z.string().url('Must be a valid URL'), z.literal('')]).optional(),
   anonymous: z.boolean(),
 });
 
@@ -135,6 +136,7 @@ export default function IncidentForm({
       title: '',
       description: '',
       neighborhood: '',
+      image_url: '',
     },
   });
 
@@ -191,6 +193,7 @@ export default function IncidentForm({
           title: '',
           description: '',
           neighborhood: '',
+          image_url: '',
         });
         setStep('choose');
         setUsingGPS(false);
@@ -337,6 +340,16 @@ export default function IncidentForm({
               </button>
             </div>
 
+            <div className="p-3.5 rounded-xl border border-red-500/30 bg-gradient-to-br from-red-600/10 to-red-900/20 flex items-start gap-3">
+              <AlertTriangle className="text-red-400 mt-0.5 shrink-0" size={16} />
+              <div>
+                <p className="text-[10px] items-center gap-2 font-black tracking-widest uppercase text-red-400">🚨 Not Sent To Police</p>
+                <p className="text-xs text-red-200/80 mt-1 font-medium leading-relaxed">
+                  Calgary Watch is peer-to-peer and <b>does NOT</b> dispatch emergency services. If you require immediate police or medical assistance, please call <b>911</b>.
+                </p>
+              </div>
+            </div>
+
             <div>
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Category</label>
               <select
@@ -347,7 +360,6 @@ export default function IncidentForm({
                 <option value="traffic">Traffic</option>
                 <option value="infrastructure">Infrastructure</option>
                 <option value="weather">Weather</option>
-                <option value="gas">Gas Prices</option>
                 <option value="emergency">🚨 Emergency</option>
               </select>
             </div>
@@ -408,6 +420,18 @@ export default function IncidentForm({
               />
               {errors.description && (
                 <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.description.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 cursor-pointer flex justify-between">Photo URL <span className="text-slate-600 font-normal normal-case tracking-normal">Optional</span></label>
+              <Input
+                {...register('image_url')}
+                placeholder="e.g. imgur.com/photo.jpg"
+                className="bg-slate-900 border-white/10 text-white placeholder:text-slate-600 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
+              />
+              {errors.image_url && (
+                <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.image_url.message}</p>
               )}
             </div>
 

@@ -114,7 +114,6 @@
   }
   .animate-bounce-slow {
     animation: bounce-slow 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-    will-change: transform;
     backface-visibility: hidden;
   }
 
@@ -127,7 +126,6 @@
   }
   .mountain-rise {
     animation: mountain-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    will-change: transform;
     backface-visibility: hidden;
   }
 
@@ -141,12 +139,10 @@
   }
   .aurora-drift {
     animation: aurora-drift 8s ease-in-out infinite;
-    will-change: transform, opacity;
     backface-visibility: hidden;
   }
   .aurora-drift-delay {
     animation: aurora-drift 11s ease-in-out infinite reverse;
-    will-change: transform, opacity;
     backface-visibility: hidden;
   }
 
@@ -159,7 +155,6 @@
   }
   .fade-up {
     animation: fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    will-change: transform, opacity;
     backface-visibility: hidden;
   }
 
@@ -174,7 +169,6 @@
   .river-flow {
     background-size: 200% 200%;
     animation: river-flow 3.5s ease-in-out infinite;
-    will-change: background-position;
     backface-visibility: hidden;
   }
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
-import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, Fuel, UserCircle2, Siren } from 'lucide-react';
+import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, UserCircle2, Siren } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 
@@ -51,7 +51,6 @@ export default function Sidebar({
     { id: 'traffic',        label: 'Traffic',    icon: Car          },
     { id: 'infrastructure', label: 'Infra',      icon: Construction },
     { id: 'weather',        label: 'Weather',    icon: CloudRain    },
-    { id: 'gas',            label: 'Gas',        icon: Fuel         },
   ] as const;
 
   useEffect(() => {
@@ -352,7 +351,6 @@ export default function Sidebar({
                         incident.category === 'crime' ? 'bg-red-500' :
                         incident.category === 'traffic' ? 'bg-orange-500' :
                         incident.category === 'infrastructure' ? 'bg-blue-500' :
-                        incident.category === 'gas' ? 'bg-emerald-500' :
                         'bg-purple-500'
                       )} />
 
@@ -373,7 +371,6 @@ export default function Sidebar({
                               incident.category === 'crime' ? 'bg-red-500/20 text-red-400' :
                               incident.category === 'traffic' ? 'bg-orange-500/20 text-orange-400' :
                               incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400' :
-                              incident.category === 'gas' ? 'bg-emerald-500/20 text-emerald-400' :
                               'bg-purple-500/20 text-purple-400'
                             )}>
                               <Icon size={20} />
@@ -420,7 +417,6 @@ export default function Sidebar({
                               incident.category === 'crime' ? 'bg-red-500 text-white' :
                               incident.category === 'traffic' ? 'bg-orange-500 text-white' :
                               incident.category === 'infrastructure' ? 'bg-blue-500 text-white' :
-                              incident.category === 'gas' ? 'bg-emerald-500 text-white' :
                               'bg-purple-500 text-white'
                             )}>
                               {getReporterDisplay(incident).anonymous ? (

@@ -1,6 +1,6 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2 } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
@@ -27,7 +27,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
   if (!incident) return null;
 
-  const Icon = CATEGORY_ICONS[incident.category];
+  const Icon = CATEGORY_ICONS[incident.category as keyof typeof CATEGORY_ICONS] || AlertCircle;
   const StatusIcon = STATUS_ICONS[incident.verified_status];
   const safeSourceUrl = (() => {
     if (!incident.source_url) return null;
@@ -111,7 +111,6 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               incident.category === 'crime' ? 'bg-red-500' :
               incident.category === 'traffic' ? 'bg-orange-500' :
               incident.category === 'infrastructure' ? 'bg-blue-500' :
-              incident.category === 'gas' ? 'bg-emerald-500' :
               'bg-purple-500'
             )} />
 
@@ -157,7 +156,6 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                       incident.category === 'crime' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
                       incident.category === 'traffic' ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' :
                       incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                      incident.category === 'gas' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
                       'bg-purple-500/20 text-purple-400 border-purple-500/30'
                     )}
                   >

@@ -317,7 +317,7 @@ export default function Sidebar({
           <AnimatePresence mode="popLayout">
             {filteredIncidents.length > 0 ? (
               filteredIncidents.map((incident) => {
-                const Icon = CATEGORY_ICONS[incident.category];
+                const Icon = CATEGORY_ICONS[incident.category as keyof typeof CATEGORY_ICONS] || AlertCircle;
                 const StatusIcon = STATUS_ICONS[incident.verified_status];
                 const isActive = activeIncidentId === incident.id;
                 const isNew = Date.now() - incident.timestamp < 30 * 60 * 1000;

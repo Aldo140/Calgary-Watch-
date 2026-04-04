@@ -9,7 +9,7 @@ import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
-import { MOCK_INCIDENTS, getAreaIntelligence } from '@/src/services/mockData';
+import { getAreaIntelligence } from '@/src/services/mockData';
 import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, Filter, X, LogIn, Home, LayoutDashboard, Siren } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
@@ -26,7 +26,7 @@ export default function MapPage() {
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
   
-  const [incidents, setIncidents] = useState<Incident[]>(MOCK_INCIDENTS);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<IncidentCategory | 'all'>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -62,6 +62,7 @@ export default function MapPage() {
   const knownIncidentIds = useRef<Set<string>>(new Set());
   const lastVisibleIncidentDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const buttonClickDebounceRef = useRef(0); // Prevent rapid button clicks
+  const deepLinkHandledRef = useRef(false); // Ensure ?i= deep-link opens only once
 
   // Check for report=true in URL
   useEffect(() => {
@@ -75,6 +76,7 @@ export default function MapPage() {
       }
     }
   }, [searchParams, isAuthReady, user, userLocation, signIn]);
+
 
   useEffect(() => {
     if (theme === 'light') {
@@ -116,7 +118,8 @@ export default function MapPage() {
     if (!isAuthReady) return;
 
     if (!db) {
-      setIncidents(MOCK_INCIDENTS);
+      // Firebase not configured — start with an empty map.
+      setIncidents([]);
       setHasMoreIncidents(false);
       lastVisibleIncidentDoc.current = null;
       return;
@@ -147,35 +150,31 @@ export default function MapPage() {
       setIncidents((prev) => {
         const merged = new globalThis.Map<string, Incident>();
         incidentData.forEach((incident) => merged.set(incident.id, incident));
-        
-        // Find the oldest timestamp in the current live snapshot window
-        const oldestTimestamp = incidentData.length > 0 
-          ? Math.min(...incidentData.map(i => i.timestamp)) 
+
+        // Keep older incidents that were loaded via "Load More" but are outside
+        // the current live-snapshot window (they won't appear in `incidentData`).
+        const oldestTimestamp = incidentData.length > 0
+          ? Math.min(...incidentData.map(i => i.timestamp))
           : Date.now();
 
         prev.forEach((incident) => {
-          if (!merged.has(incident.id)) {
-            // Keep if it is older than our snapshot window (loaded via "Load More")
-            // Or if it is a client-side mock incident.
-            // DO NOT keep if it is newer but missing (means server rejected/deleted it).
-            if (incident.timestamp < oldestTimestamp || incident.id.startsWith('mock-')) {
-              merged.set(incident.id, incident);
-            }
+          if (!merged.has(incident.id) && incident.timestamp < oldestTimestamp) {
+            merged.set(incident.id, incident);
           }
         });
-        MOCK_INCIDENTS.forEach((mock) => {
-          if (![...merged.values()].find((real) => real.title === mock.title)) {
-            merged.set(mock.id, mock);
-          }
-        });
-        return [...merged.values()].sort((a, b) => b.timestamp - a.timestamp);
+
+        // Drop expired incidents (set by the ingestion pipeline via `expires_at`).
+        const now = Date.now();
+        return [...merged.values()]
+          .filter((i) => !i.expires_at || i.expires_at > now)
+          .sort((a, b) => b.timestamp - a.timestamp);
       });
       hasInitializedIncidents.current = true;
       knownIncidentIds.current = new Set(incidentData.map((i) => i.id));
     }, (error) => {
-      // Keep the map usable even if Firestore permissions are not deployed yet.
       console.error('Failed to subscribe to incidents:', error);
-      setIncidents(MOCK_INCIDENTS);
+      // Show an empty map rather than stale/fake data on error.
+      setIncidents([]);
     });
 
     return () => unsubscribe();
@@ -243,6 +242,17 @@ export default function MapPage() {
       setSelectedIncident(incident);
     });
   }, []);
+
+  // Deep-link: /map?i=INCIDENT_ID — auto-open incident detail panel once incidents load
+  useEffect(() => {
+    const targetId = searchParams.get('i');
+    if (!targetId || deepLinkHandledRef.current || incidents.length === 0) return;
+    const target = incidents.find((inc) => inc.id === targetId);
+    if (target) {
+      deepLinkHandledRef.current = true;
+      handleMarkerClick(target);
+    }
+  }, [searchParams, incidents, handleMarkerClick]);
 
   const [isPinMode, setIsPinMode] = useState(false);
   // Coordinates captured the moment "Set Pin Here" fires - stored in MapPage

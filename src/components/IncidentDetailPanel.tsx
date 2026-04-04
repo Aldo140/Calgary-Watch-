@@ -1,11 +1,24 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2, AlertCircle } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2, AlertCircle, Link, Twitter } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
 import { useState, useEffect } from 'react';
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  crime:          '🚨',
+  traffic:        '🚗',
+  infrastructure: '🔧',
+  weather:        '⛈️',
+  emergency:      '🆘',
+};
+
+function buildIncidentUrl(incidentId: string): string {
+  if (typeof window === 'undefined') return `https://calgarywatch.ca/map?i=${incidentId}`;
+  return `${window.location.origin}/map?i=${encodeURIComponent(incidentId)}`;
+}
 
 interface IncidentDetailPanelProps {
   incident: Incident | null;
@@ -17,6 +30,8 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
   );
+  // Must be declared before any early return to satisfy Rules of Hooks
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 1023px)');
@@ -58,21 +73,46 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
     ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(incident.lat)},${encodeURIComponent(incident.lng)}`
     : null;
 
-  // Build a share payload for the Web Share API; fall back to clipboard copy.
-  const handleShare = async () => {
-    const shareData = {
-      title: `Calgary Watch: ${incident.title}`,
-      text: `${incident.title} . Reported in ${incident.neighborhood || 'Calgary'}. Check the live map for details.`,
-      url: typeof window !== 'undefined' ? window.location.href : '',
-    };
+  const incidentUrl = buildIncidentUrl(incident.id);
+  const emoji = CATEGORY_EMOJI[incident.category] ?? '📍';
+  const timeAgo = formatDistanceToNow(incident.timestamp);
+
+  // Platform-share tweet text — short enough for 280 chars including the URL.
+  const tweetText = [
+    `${emoji} ${incident.title}`,
+    `📍 ${incident.neighborhood || 'Calgary'} · ${timeAgo} ago`,
+    '',
+    incidentUrl,
+    '',
+    '#CalgaryWatch #Calgary #YYC',
+  ].join('\n');
+
+  const handleShareToX = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    window.open(url, '_blank', 'noopener,noreferrer,width=560,height=480');
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(incidentUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard blocked — fall back to selecting text
+    }
+  };
+
+  // Native Web Share API (mobile) — fall back to X share on desktop.
+  const handleNativeShare = async () => {
+    const shareData = { title: `Calgary Watch: ${incident.title}`, text: tweetText, url: incidentUrl };
     try {
       if (navigator.share && navigator.canShare?.(shareData)) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}`);
+        handleShareToX();
       }
     } catch {
-      // User cancelled share or API unavailable - fail silently.
+      // cancelled — fail silently
     }
   };
 
@@ -305,24 +345,52 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               </motion.button>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
-                <Button
-                  variant="secondary"
-                  className="flex-1 bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border-white/10 light:border-slate-300 rounded-2xl h-14 font-black tracking-wide text-sm"
-                  onClick={() => void handleShare()}
-                >
-                  <Share2 size={20} className="mr-2" />
-                  Share Report
-                </Button>
+              <div className="space-y-3 pt-4">
+                {/* Share row */}
+                <div className="flex gap-2">
+                  {/* Post on X — primary CTA */}
+                  <button
+                    onClick={handleShareToX}
+                    className="flex-1 flex items-center justify-center gap-2 bg-black hover:bg-neutral-900 border border-white/10 rounded-2xl h-12 text-white text-xs font-black tracking-wide transition-all active:scale-95"
+                  >
+                    <Twitter size={15} />
+                    Post on X
+                  </button>
+
+                  {/* Copy link */}
+                  <button
+                    onClick={() => void handleCopyLink()}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-2 border rounded-2xl h-12 text-xs font-black tracking-wide transition-all active:scale-95',
+                      copied
+                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                        : 'bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border-white/10 light:border-slate-300 text-white light:text-slate-900'
+                    )}
+                  >
+                    <Link size={15} />
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </button>
+
+                  {/* Native share icon — only rendered when API is available */}
+                  <button
+                    onClick={() => void handleNativeShare()}
+                    title="More share options"
+                    className="w-12 h-12 flex items-center justify-center bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border border-white/10 light:border-slate-300 rounded-2xl text-slate-400 light:text-slate-600 transition-all active:scale-95 shrink-0"
+                  >
+                    <Share2 size={17} />
+                  </button>
+                </div>
+
+                {/* Navigate */}
                 {canNavigate && directionsUrl ? (
                   <a
                     href={directionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border border-white/10 light:border-slate-300 rounded-2xl h-14 font-black tracking-wide text-sm text-white light:text-slate-900 transition-all active:scale-95"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-white/5 light:bg-slate-100 hover:bg-white/10 light:hover:bg-slate-200 border border-white/10 light:border-slate-300 rounded-2xl h-12 font-black tracking-wide text-sm text-white light:text-slate-900 transition-all active:scale-95"
                   >
-                    <Navigation size={20} className="mr-2" />
-                    Navigate
+                    <Navigation size={18} />
+                    Open in Google Maps
                   </a>
                 ) : null}
               </div>

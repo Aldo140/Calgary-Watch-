@@ -231,6 +231,15 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
+  /* Safari / iOS viewport height fix.
+     Tailwind's h-screen / min-h-screen = 100vh, which on iOS Safari doesn't
+     account for the retractable address bar. Override with 100dvh where
+     supported (Safari 15.4+, Chrome 108+, Firefox 101+).                    */
+  @supports (height: 100dvh) {
+    .h-screen     { height: 100dvh; }
+    .min-h-screen { min-height: 100dvh; }
+  }
+
   /* Custom Map Tooltip */
   .custom-map-tooltip {
     background: #0f172a !important; /* slate-900 */

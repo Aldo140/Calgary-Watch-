@@ -1,0 +1,35 @@
+name: Ingest Live Data
+
+on:
+  schedule:
+    # Every 15 minutes — GitHub Actions minimum granularity is 5 min.
+    # In practice runs may be slightly delayed under load.
+    - cron: '*/15 * * * *'
+  # Allow a manual trigger from the Actions tab for testing.
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ingestion pipeline
+        run: npx tsx scripts/ingest/index.ts
+        env:
+          # Store the full service-account JSON in this GitHub secret.
+          # Generate it in Firebase Console → Project Settings → Service Accounts.
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID:  ${{ secrets.VITE_FIREBASE_PROJECT_ID }}

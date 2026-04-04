@@ -82,16 +82,16 @@
     </script>
 
     <script type="text/javascript">
+  // Decode the path redirect produced by 404.html before React Router initialises.
+  // 404.html encodes forward-slashes as '~and~', e.g. /map → /?p=~and~map
   (function(l) {
     if (l.search[1] === 'p') {
-      var decoded = l.search.slice(3).split('&').map(function(s) {
-        return s.replace(/~and~/g, '&')
-      }).join('?');
-      window.history.replaceState(null, null,
-          l.pathname.slice(0, -1) + decoded + l.hash
-      );
+      var rawPath = l.search.slice(3).split('&')[0]; // drop any &q=... query part
+      var decoded = rawPath.replace(/~and~/g, '/');
+      if (decoded.charAt(0) !== '/') decoded = '/' + decoded;
+      window.history.replaceState(null, null, decoded + l.hash);
     }
-  }(window.location))
+  }(window.location));
 </script>
 
     <!--

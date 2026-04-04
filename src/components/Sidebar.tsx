@@ -2,9 +2,43 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
-import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, UserCircle2, Siren } from 'lucide-react';
+import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, UserCircle2, Siren, Activity } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
+
+type RiskLevel = 'clear' | 'active' | 'high';
+
+interface NeighborhoodRisk {
+  name: string;
+  count: number;
+  level: RiskLevel;
+}
+
+const RISK_CONFIG: Record<RiskLevel, { dot: string; label: string; bg: string; text: string }> = {
+  clear:  { dot: 'bg-emerald-500', label: 'Clear',  bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  active: { dot: 'bg-amber-400',   label: 'Active', bg: 'bg-amber-400/10',   text: 'text-amber-400'   },
+  high:   { dot: 'bg-red-500',     label: 'High',   bg: 'bg-red-500/10',     text: 'text-red-400'     },
+};
+
+function useNeighborhoodPulse(incidents: Incident[]): NeighborhoodRisk[] {
+  return useMemo(() => {
+    const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+    const counts = new Map<string, number>();
+    for (const inc of incidents) {
+      if (inc.timestamp > twoHoursAgo && inc.deleted !== true && inc.neighborhood) {
+        counts.set(inc.neighborhood, (counts.get(inc.neighborhood) ?? 0) + 1);
+      }
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([name, count]) => ({
+        name,
+        count,
+        level: count >= 3 ? 'high' : count >= 1 ? 'active' : 'clear',
+      }));
+  }, [incidents]);
+}
 
 interface SidebarProps {
   incidents: Incident[];
@@ -118,6 +152,8 @@ export default function Sidebar({
         return 0;
       });
   }, [incidents, debouncedSearch, selectedCategory, verifiedOnly, recentOnly, sortBy]);
+
+  const neighborhoodPulse = useNeighborhoodPulse(incidents);
 
   // Count-up animation for total count
   const countValue = useSpring(0, { stiffness: 50, damping: 20 });
@@ -299,6 +335,36 @@ export default function Sidebar({
         </div>
       </div>
 
+      {/* Neighborhood Pulse — top areas with activity in the last 2h */}
+      {neighborhoodPulse.length > 0 && (
+        <div className="px-4 py-3 border-b border-white/5 light:border-slate-200">
+          <div className="flex items-center gap-1.5 mb-2.5">
+            <Activity size={12} className="text-blue-400" />
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Area Pulse · 2h</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {neighborhoodPulse.map(({ name, count, level }) => {
+              const cfg = RISK_CONFIG[level];
+              return (
+                <div
+                  key={name}
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold',
+                    cfg.bg,
+                    'border-white/5 light:border-slate-200'
+                  )}
+                  title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
+                >
+                  <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dot)} />
+                  <span className="text-white light:text-slate-800 truncate max-w-[90px]">{name}</span>
+                  <span className={cn('font-black', cfg.text)}>{count}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         <motion.div
           variants={{
@@ -380,6 +446,17 @@ export default function Sidebar({
                                 <div className="flex items-center justify-between gap-2">
                                   <h3 className="text-white text-sm font-bold leading-tight group-hover:text-blue-400 transition-colors light:text-slate-900 line-clamp-2">{incident.title}</h3>
                                   <div className="flex items-center gap-1.5 shrink-0">
+                                    {/* Data-source badge — only for non-community reports */}
+                                    {incident.data_source === 'official' && (
+                                      <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[8px] font-black text-blue-400 uppercase tracking-tighter">
+                                        Official
+                                      </span>
+                                    )}
+                                    {incident.data_source === 'system' && (
+                                      <span className="px-1.5 py-0.5 rounded bg-slate-500/20 border border-slate-500/30 text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                        Auto
+                                      </span>
+                                    )}
                                     {isNew && (
                                       <span className="px-1.5 py-0.5 rounded bg-blue-500 text-[8px] font-black text-white uppercase tracking-tighter animate-pulse">
                                         New
@@ -443,23 +520,34 @@ export default function Sidebar({
                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center">
                   <Search size={32} className="text-slate-600" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-white font-bold">No reports found</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">
-                    We couldn't find any reports matching your current filter or search criteria.
-                  </p>
+                <div className="space-y-2">
+                  {(debouncedSearch || selectedCategory !== 'all' || verifiedOnly || recentOnly) ? (
+                    <>
+                      <h3 className="text-white font-bold">No reports match</h3>
+                      <p className="text-slate-500 text-xs leading-relaxed">
+                        Try clearing your filters or searching a different term.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          onCategoryChange('all');
+                          setVerifiedOnly(false);
+                          setRecentOnly(false);
+                        }}
+                        className="text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-300 transition-colors"
+                      >
+                        Clear all filters
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="text-white font-bold">All clear right now</h3>
+                      <p className="text-slate-500 text-xs leading-relaxed max-w-[200px]">
+                        No incidents reported in Calgary at the moment. Be the first to report something you see.
+                      </p>
+                    </>
+                  )}
                 </div>
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    onCategoryChange('all');
-                    setVerifiedOnly(false);
-                    setRecentOnly(false);
-                  }}
-                  className="text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-300 transition-colors"
-                >
-                  Clear all filters
-                </button>
               </motion.div>
             )}
           </AnimatePresence>

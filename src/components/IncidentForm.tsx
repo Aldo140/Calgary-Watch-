@@ -44,9 +44,28 @@ function detectNeighbourhood(lat: number, lng: number): string {
   return best.name;
 }
 
+// Basic spam guard – block obvious joke/test submissions at the client level.
+// The list is intentionally short; backend moderation handles edge cases.
+const SPAM_PATTERNS = [
+  /\btest(ing)?\b/i,
+  /\bfake\b/i,
+  /\bpoop\b/i,
+  /\btoilet\b/i,
+  /\bshit\b/i,
+  /\bjoke\b/i,
+  /\bspam\b/i,
+  /^(aaa+|zzz+|xxx+|123+)$/i,
+];
+
+function containsSpam(text: string): boolean {
+  return SPAM_PATTERNS.some((re) => re.test(text.trim()));
+}
+
 const incidentSchema = z.object({
-  title: z.string().trim().min(5, 'Headline must be at least 5 characters'),
-  description: z.string().trim().min(10, 'Description must be at least 10 characters'),
+  title: z.string().trim().min(5, 'Headline must be at least 5 characters')
+    .refine((v) => !containsSpam(v), 'Please describe a real incident'),
+  description: z.string().trim().min(10, 'Description must be at least 10 characters')
+    .refine((v) => !containsSpam(v), 'Please describe a real incident'),
   category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'emergency']),
   neighborhood: z.string().trim().min(2, 'Please choose a neighbourhood from the list'),
   image_url: z.union([z.string().url('Must be a valid URL'), z.literal('')]).optional(),

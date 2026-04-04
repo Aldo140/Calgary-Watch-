@@ -5,15 +5,16 @@
 
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
-import LandingPage from '@/src/pages/LandingPage';
-import MapPage from '@/src/pages/MapPage';
 import SeoManager from '@/src/components/SeoManager';
 import { db } from '@/src/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
-// Lazy-load heavy pages so the initial JS bundle stays small.
-const AboutPage = lazy(() => import('@/src/pages/AboutPage'));
-const AdminPage = lazy(() => import('@/src/pages/AdminPage'));
+// Lazy-load every page so the initial bundle stays minimal and module-eval
+// failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
+const LandingPage = lazy(() => import('@/src/pages/LandingPage'));
+const MapPage     = lazy(() => import('@/src/pages/MapPage'));
+const AboutPage   = lazy(() => import('@/src/pages/AboutPage'));
+const AdminPage   = lazy(() => import('@/src/pages/AdminPage'));
 
 /**
  * Handles redirects from the 404.html hack.
@@ -38,11 +39,8 @@ function PageTracker() {
   const location = useLocation();
   useEffect(() => {
     if (!db || location.pathname === '/admin') return; // Exclude admin page from views
-    try {
-      addDoc(collection(db, 'page_views'), { timestamp: Date.now(), path: location.pathname });
-    } catch (error) {
-      // Ignore if write fails due to permissions or adblock
-    }
+    // Fire-and-forget – ignore permission/adblock rejections
+    addDoc(collection(db, 'page_views'), { timestamp: Date.now(), path: location.pathname }).catch(() => {});
   }, [location.pathname]);
   return null;
 }

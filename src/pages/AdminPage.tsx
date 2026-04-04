@@ -321,12 +321,17 @@ export default function AdminPage() {
     const confirmed = window.confirm('Soft-delete this incident? It will be hidden from the live feed.');
     if (!confirmed) return;
 
-    await updateDoc(doc(db, 'incidents', incidentId), {
-      deleted: true,
-      deletedAt: Date.now(),
-      deletedBy: user.uid,
-    });
-    await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { deleted: true });
+    try {
+      await updateDoc(doc(db, 'incidents', incidentId), {
+        deleted: true,
+        deletedAt: Date.now(),
+        deletedBy: user.uid,
+      });
+      await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { deleted: true });
+    } catch (err) {
+      console.error('Failed to soft-delete incident:', err);
+      alert('Could not delete this incident. Check your admin permissions and redeploy Firestore rules if needed.');
+    }
   };
 
   const softDeleteCommunityStats = async (statsId: string) => {
@@ -334,12 +339,17 @@ export default function AdminPage() {
     const confirmed = window.confirm('Soft-delete this community stats row?');
     if (!confirmed) return;
 
-    await updateDoc(doc(db, 'community_stats', statsId), {
-      deleted: true,
-      deletedAt: Date.now(),
-      deletedBy: user.uid,
-    });
-    await writeAuditLog('community_stats_soft_delete', 'community_stats', statsId, { deleted: true });
+    try {
+      await updateDoc(doc(db, 'community_stats', statsId), {
+        deleted: true,
+        deletedAt: Date.now(),
+        deletedBy: user.uid,
+      });
+      await writeAuditLog('community_stats_soft_delete', 'community_stats', statsId, { deleted: true });
+    } catch (err) {
+      console.error('Failed to soft-delete community stats:', err);
+      alert('Could not delete this row. Check your admin permissions.');
+    }
   };
 
   if (!isAuthReady) {

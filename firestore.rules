@@ -58,13 +58,25 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() &&
-        ((userDoc().data.role == 'admin') ||
-         isApprovedAdminToken());
+      // Check the auth token first (no extra Firestore read needed).
+      // Only fall back to the user document if the token check doesn't match,
+      // and guard with exists() to avoid a null-pointer when the doc is missing.
+      return isAuthenticated() && (
+        isApprovedAdminToken() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         userDoc().data.role == 'admin')
+      );
     }
 
     function isApprovedAdminToken() {
       return request.auth.token.email == "jorti104@mtroyal.ca" && request.auth.token.email_verified == true;
+    }
+
+    // System ingestion service account (authorUid = 'system').
+    // The ingest script uses the Firebase Admin SDK which bypasses these rules,
+    // but this function is kept here for documentation purposes.
+    function isSystemIngestion() {
+      return isAuthenticated() && request.auth.token.firebase.sign_in_provider == 'custom';
     }
 
     function isValidEmail(email) {
@@ -141,7 +153,8 @@ service cloud.firestore {
                         'title', 'description', 'category', 'neighborhood', 'lat', 'lng', 'timestamp',
                         'email', 'name', 'verified_status', 'authorUid', 'report_count',
                         'source_name', 'source_url', 'source_logo', 'image_url',
-                        'deleted', 'deletedAt', 'deletedBy'
+                        'deleted', 'deletedAt', 'deletedBy',
+                        'anonymous'  // present on all incidents submitted via the form
                       ]) &&
                       isValidIncident(request.resource.data)
                     ) || (
@@ -199,6 +212,15 @@ service cloud.firestore {
                     isValidEmail(request.resource.data.email) &&
                     request.resource.data.role in ['Marketing', 'Development', 'Administration'];
       allow update, delete: if false;
+    }
+
+    // Anonymous page view analytics – write-only from any visitor, no PII stored.
+    match /page_views/{viewId} {
+      allow create: if request.resource.data.keys().hasOnly(['timestamp', 'path']) &&
+                    request.resource.data.timestamp is number &&
+                    request.resource.data.path is string &&
+                    request.resource.data.path.size() <= 200;
+      allow read, update, delete: if isAdmin();
     }
 
     match /{path=**} {

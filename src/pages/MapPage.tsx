@@ -19,17 +19,18 @@ import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAf
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 
-function useOfficialTraffic(isAuthReady: boolean) {
+function useOfficialOpenData(isAuthReady: boolean) {
   const [officialIncidents, setOfficialIncidents] = useState<Incident[]>([]);
 
   useEffect(() => {
     if (!isAuthReady) return;
-    const fetchTraffic = async () => {
+    const fetchOpenData = async () => {
       try {
-        const res = await fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=88');
-        const data = await res.json();
-        const apiIncidents: Incident[] = data.map((item: any) => ({
-          id: `yyc-open-${item.id || item.incident_info.replace(/[^a-zA-Z]/g, '')}`,
+        // Fetch Calgary Traffic
+        const trafficRes = await fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt DESC');
+        const trafficData = await trafficRes.json();
+        const trafficIncidents: Incident[] = trafficData.map((item: any) => ({
+          id: `yyc-traffic-${item.id || item.incident_info.replace(/[^a-zA-Z]/g, '')}`,
           title: item.incident_info?.trim() || 'Traffic Issue',
           description: item.description || 'Traffic incident reported by City of Calgary.',
           category: 'traffic',
@@ -46,13 +47,47 @@ function useOfficialTraffic(isAuthReady: boolean) {
           source_name: 'City of Calgary Open Data',
           source_url: 'https://data.calgary.ca/',
         }));
-        setOfficialIncidents(apiIncidents);
+
+        // Fetch Calgary 311 (Recent issues for infrastructure / weather)
+        const three11Res = await fetch('https://data.calgary.ca/resource/iahh-g8bj.json?$limit=80&$order=updated_date DESC');
+        const three11Data = await three11Res.json();
+        
+        const three11Incidents: Incident[] = three11Data
+          .filter((item: any) => item.latitude && item.longitude)
+          .map((item: any) => {
+            // Map 311 service names to our categories
+            const sName = (item.service_name || '').toLowerCase();
+            let category: IncidentCategory = 'infrastructure';
+            if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain')) category = 'weather';
+            if (sName.includes('bylaw') || sName.includes('police')) category = 'crime';
+            
+            return {
+              id: `yyc-311-${item.service_request_id}`,
+              title: item.service_name || '311 Service Request',
+              description: `Status: ${item.status_description}. Managed by: ${item.agency_responsible || 'City of Calgary'}.`,
+              category,
+              neighborhood: item.comm_name || 'Calgary',
+              lat: parseFloat(item.latitude),
+              lng: parseFloat(item.longitude),
+              timestamp: new Date(item.updated_date || item.requested_date).getTime(),
+              email: 'opendata@calgary.ca',
+              name: 'Calgary 311 Sync',
+              anonymous: false,
+              verified_status: 'community_confirmed',
+              report_count: 1,
+              data_source: 'official',
+              source_name: 'Calgary 311',
+              source_url: 'https://data.calgary.ca/',
+            };
+          });
+
+        setOfficialIncidents([...trafficIncidents, ...three11Incidents]);
       } catch (err) {
-        console.error('Failed to fetch open data traffic:', err);
+        console.error('Failed to fetch official open data:', err);
       }
     };
-    fetchTraffic();
-    const interval = setInterval(fetchTraffic, 5 * 60 * 1000); // 5 min
+    fetchOpenData();
+    const interval = setInterval(fetchOpenData, 5 * 60 * 1000); // 5 min
     return () => clearInterval(interval);
   }, [isAuthReady]);
 
@@ -65,7 +100,7 @@ export default function MapPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
-  const officialTraffic = useOfficialTraffic(isAuthReady);
+  const officialOpenData = useOfficialOpenData(isAuthReady);
   
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -283,11 +318,11 @@ export default function MapPage() {
 
   // Deep-link: /map?i=INCIDENT_ID — auto-open incident detail panel once incidents load
   const incidents = useMemo(() => {
-    const combined = [...firebaseIncidents, ...officialTraffic];
+    const combined = [...firebaseIncidents, ...officialOpenData];
     // Deduplicate by id if needed, though they shouldn't conflict
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     return [...unique.values()].sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
-  }, [firebaseIncidents, officialTraffic]);
+  }, [firebaseIncidents, officialOpenData]);
 
   useEffect(() => {
     const targetId = searchParams.get('i');

@@ -711,6 +711,48 @@ export default function AboutPage() {
               </motion.div>
 
             </div>
+
+            {/* ---- Funding / Investor Banner ---- */}
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mt-8 rounded-2xl border border-[#4A90D9]/30 bg-gradient-to-r from-[#4A90D9]/8 via-[#2E8B7A]/5 to-[#D4A843]/8 light:from-blue-50 light:to-amber-50 p-8 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden"
+            >
+              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-[#4A90D9]/10 blur-[60px]" />
+                <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-[#D4A843]/10 blur-[60px]" />
+              </div>
+              <div className="relative flex-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2 py-1 rounded">Funding</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2 py-1 rounded">Seeking Investors</span>
+                </div>
+                <h3 className="text-xl md:text-2xl font-black mb-2">We're looking for funding to build the app.</h3>
+                <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed max-w-2xl">
+                  Calgary Watch has proven community demand. The next step is a native iOS and Android app with push alerts, an enhanced trust system, and expansion to other cities. We're actively seeking investors, grants, and strategic partners who believe in community-first public safety technology.
+                </p>
+                <ul className="mt-4 flex flex-wrap gap-3">
+                  {['Native app development', 'Push notification infrastructure', 'Multi-city expansion', 'Trust & AI layer'].map((item) => (
+                    <li key={item} className="text-xs font-semibold text-slate-300 light:text-slate-700 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 px-3 py-1.5 rounded-full">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <motion.a
+                href="mailto:jorti104@mtroyal.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
+                whileHover={{ scale: 1.04, boxShadow: '0 20px 40px rgba(74,144,217,0.25)' }}
+                whileTap={{ scale: 0.97 }}
+                className="relative shrink-0 rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white text-sm font-bold flex items-center gap-2 cursor-pointer whitespace-nowrap"
+              >
+                <Mail size={16} />
+                Reach Out
+                <ArrowRight size={14} />
+              </motion.a>
+            </motion.div>
+
           </div>
         </section>
 

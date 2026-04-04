@@ -1226,17 +1226,20 @@ export default function LandingPage() {
                    <Briefcase className="text-[#D4A843]" size={24} />
                 </div>
                 <h3 className="text-2xl font-black mb-3 text-white">Sustainability</h3>
-                <p className="text-sm text-slate-300 leading-relaxed mb-6 flex-1">
-                  Calgary Watch is currently a non-profit initiative. To scale safely, future sustainability may include:
+                <p className="text-sm text-slate-300 leading-relaxed mb-4 flex-1">
+                  Calgary Watch is a non-profit initiative. We're seeking investors and funding partners to build the native app and scale to more cities.
                 </p>
-                <div className="space-y-3 mb-6 bg-slate-950/50 p-4 rounded-xl border border-white/5">
-                  {['Local business partnerships', 'Anonymized data insights', 'Premium custom alerts'].map(i => (
+                <div className="space-y-3 mb-4 bg-slate-950/50 p-4 rounded-xl border border-white/5">
+                  {['Native iOS & Android app', 'Investor & grant partnerships', 'Local business sponsorships'].map(i => (
                     <div key={i} className="text-sm font-medium text-slate-200 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-[#D4A843] rounded-full" />{i}</div>
                   ))}
                 </div>
-                <div className="text-xs uppercase tracking-widest font-bold text-[#D4A843] bg-[#D4A843]/10 py-2 px-3 rounded text-center border border-[#D4A843]/20 mt-auto">
-                  Prioritizing Community Value
-                </div>
+                <a
+                  href="mailto:jorti104@mtroyal.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
+                  className="text-xs uppercase tracking-widest font-bold text-[#D4A843] bg-[#D4A843]/10 py-2 px-3 rounded text-center border border-[#D4A843]/20 mt-auto hover:bg-[#D4A843]/20 transition-colors block"
+                >
+                  Reach Out About Investing
+                </a>
               </div>
             </motion.div>
           </div>

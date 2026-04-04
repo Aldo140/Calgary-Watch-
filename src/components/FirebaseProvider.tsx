@@ -53,7 +53,10 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const isApprovedAdmin = isApprovedAdminEmail(currentUser.email);
-        // Upsert user profile without an initial read to avoid extra network round-trips.
+        if (!db) {
+          console.error("Firestore is not initialized.");
+          return;
+        }
         const userRef = doc(db, 'users', currentUser.uid);
         try {
           const role = isApprovedAdmin ? 'admin' : 'user';
@@ -103,13 +106,6 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     provider.setCustomParameters({ prompt: 'select_account' });
 
     try {
-      const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
-
-      if (isGitHubPages) {
-        await signInWithRedirect(auth, provider);
-        return;
-      }
-
       await signInWithPopup(auth, provider);
     } catch (error: unknown) {
       const code = (error instanceof Error ? (error as { code?: string }).code : undefined) ?? '';

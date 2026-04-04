@@ -19,14 +19,55 @@ import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAf
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 
+function useOfficialTraffic(isAuthReady: boolean) {
+  const [officialIncidents, setOfficialIncidents] = useState<Incident[]>([]);
+
+  useEffect(() => {
+    if (!isAuthReady) return;
+    const fetchTraffic = async () => {
+      try {
+        const res = await fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=88');
+        const data = await res.json();
+        const apiIncidents: Incident[] = data.map((item: any) => ({
+          id: `yyc-open-${item.id || item.incident_info.replace(/[^a-zA-Z]/g, '')}`,
+          title: item.incident_info?.trim() || 'Traffic Issue',
+          description: item.description || 'Traffic incident reported by City of Calgary.',
+          category: 'traffic',
+          neighborhood: item.quadrant ? `Calgary ${item.quadrant}` : 'Calgary',
+          lat: parseFloat(item.latitude),
+          lng: parseFloat(item.longitude),
+          timestamp: new Date(item.start_dt || new Date()).getTime(),
+          email: 'opendata@calgary.ca',
+          name: 'City of Calgary Traffic',
+          anonymous: false,
+          verified_status: 'community_confirmed',
+          report_count: 1,
+          data_source: 'official',
+          source_name: 'City of Calgary Open Data',
+          source_url: 'https://data.calgary.ca/',
+        }));
+        setOfficialIncidents(apiIncidents);
+      } catch (err) {
+        console.error('Failed to fetch open data traffic:', err);
+      }
+    };
+    fetchTraffic();
+    const interval = setInterval(fetchTraffic, 5 * 60 * 1000); // 5 min
+    return () => clearInterval(interval);
+  }, [isAuthReady]);
+
+  return officialIncidents;
+}
+
 export default function MapPage() {
   const INCIDENT_PAGE_SIZE = 60;
   const { user, signIn, logout, isAuthReady, isAdmin } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
+  const officialTraffic = useOfficialTraffic(isAuthReady);
   
-  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<IncidentCategory | 'all'>('all');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -119,7 +160,7 @@ export default function MapPage() {
 
     if (!db) {
       // Firebase not configured — start with an empty map.
-      setIncidents([]);
+      setFirebaseIncidents([]);
       setHasMoreIncidents(false);
       lastVisibleIncidentDoc.current = null;
       return;
@@ -147,12 +188,10 @@ export default function MapPage() {
       lastVisibleIncidentDoc.current = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
       setHasMoreIncidents(snapshot.docs.length === INCIDENT_PAGE_SIZE);
 
-      setIncidents((prev) => {
+      setFirebaseIncidents((prev) => {
         const merged = new globalThis.Map<string, Incident>();
         incidentData.forEach((incident) => merged.set(incident.id, incident));
 
-        // Keep older incidents that were loaded via "Load More" but are outside
-        // the current live-snapshot window (they won't appear in `incidentData`).
         const oldestTimestamp = incidentData.length > 0
           ? Math.min(...incidentData.map(i => i.timestamp))
           : Date.now();
@@ -163,7 +202,6 @@ export default function MapPage() {
           }
         });
 
-        // Drop expired incidents (set by the ingestion pipeline via `expires_at`).
         const now = Date.now();
         return [...merged.values()]
           .filter((i) => !i.expires_at || i.expires_at > now)
@@ -174,7 +212,7 @@ export default function MapPage() {
     }, (error) => {
       console.error('Failed to subscribe to incidents:', error);
       // Show an empty map rather than stale/fake data on error.
-      setIncidents([]);
+      setFirebaseIncidents([]);
     });
 
     return () => unsubscribe();
@@ -197,7 +235,7 @@ export default function MapPage() {
         .map((doc) => ({ id: doc.id, ...doc.data() } as Incident))
         .filter((incident) => incident.deleted !== true);
 
-      setIncidents((prev) => {
+      setFirebaseIncidents((prev) => {
         const merged = new globalThis.Map(prev.map((incident) => [incident.id, incident]));
         olderIncidents.forEach((incident) => {
           if (!merged.has(incident.id)) {
@@ -244,6 +282,13 @@ export default function MapPage() {
   }, []);
 
   // Deep-link: /map?i=INCIDENT_ID — auto-open incident detail panel once incidents load
+  const incidents = useMemo(() => {
+    const combined = [...firebaseIncidents, ...officialTraffic];
+    // Deduplicate by id if needed, though they shouldn't conflict
+    const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
+    return [...unique.values()].sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
+  }, [firebaseIncidents, officialTraffic]);
+
   useEffect(() => {
     const targetId = searchParams.get('i');
     if (!targetId || deepLinkHandledRef.current || incidents.length === 0) return;

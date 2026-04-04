@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
-import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, UserCircle2, Siren, Activity } from 'lucide-react';
+import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 
@@ -380,7 +380,7 @@ export default function Sidebar({
           animate="show"
           className="space-y-4"
         >
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence>
             {filteredIncidents.length > 0 ? (
               filteredIncidents.map((incident) => {
                 const Icon = CATEGORY_ICONS[incident.category as keyof typeof CATEGORY_ICONS] || AlertCircle;
@@ -394,7 +394,6 @@ export default function Sidebar({
                   <motion.div
                     key={incident.id}
                     ref={(el) => { cardRefs.current[incident.id] = el; }}
-                    layout
                     variants={{
                       hidden: { opacity: 0, y: 20 },
                       show: { opacity: 1, y: 0 }
@@ -497,7 +496,7 @@ export default function Sidebar({
                               'bg-purple-500 text-white'
                             )}>
                               {getReporterDisplay(incident).anonymous ? (
-                                <UserCircle2 size={22} />
+                                <User size={22} />
                               ) : (
                                 <span className="text-lg font-black tracking-tighter">
                                   {getReporterDisplay(incident).initial}

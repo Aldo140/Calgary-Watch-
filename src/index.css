@@ -195,7 +195,6 @@
 
   .animate-pulse-ring {
     animation: pulse-ring 1.4s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-    will-change: transform;
     backface-visibility: hidden;
   }
 
@@ -212,7 +211,6 @@
 
   .animate-active-glow {
     animation: active-glow 2s ease-in-out infinite;
-    will-change: box-shadow, border-color;
     backface-visibility: hidden;
   }
 

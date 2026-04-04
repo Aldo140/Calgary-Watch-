@@ -1,6 +1,6 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2, AlertCircle, Link, Twitter } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
@@ -294,7 +294,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                 <div className="bg-white/[0.03] light:bg-slate-50 rounded-3xl p-4 border border-white/10 light:border-slate-200 flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full bg-white/10 light:bg-white border border-white/20 light:border-slate-300 flex items-center justify-center overflow-hidden">
                     {isAnonymous ? (
-                      <UserCircle2 size={26} className="text-slate-400 light:text-slate-600" />
+                      <User size={26} className="text-slate-400 light:text-slate-600" />
                     ) : (
                       <span className="text-sm font-black text-white light:text-slate-900">{reporterInitial}</span>
                     )}

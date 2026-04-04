@@ -503,7 +503,7 @@ export default function LandingPage() {
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">Real-time, together.</span>
                 </h3>
                 <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-6 max-w-md">
-                  A live, community-powered incident map built specifically for this city. Neighbours report what they see and it appears on the map in seconds.
+                  A live, community-powered incident map built specifically for this city. Calgarians report real-time incidents and they appear on the map in seconds.
                 </p>
                 <div className="space-y-2 mb-7">
                   {['Live updates with no lag or delay', 'Verified with CPS data and community input', 'One map, every alert, all of Calgary'].map((point, i) => (

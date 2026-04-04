@@ -72,6 +72,19 @@
       }
     </script>
 
+    <script type="text/javascript">
+  (function(l) {
+    if (l.search[1] === 'p') {
+      var decoded = l.search.slice(3).split('&').map(function(s) {
+        return s.replace(/~and~/g, '&')
+      }).join('?');
+      window.history.replaceState(null, null,
+          l.pathname.slice(0, -1) + decoded + l.hash
+      );
+    }
+  }(window.location))
+</script>
+
     <!--
       Preconnect to tile servers, image CDNs, and font providers.
       Using crossorigin on CORS-capable origins to allow credential-free

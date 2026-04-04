@@ -3,16 +3,34 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
 import LandingPage from '@/src/pages/LandingPage';
 import MapPage from '@/src/pages/MapPage';
 import SeoManager from '@/src/components/SeoManager';
 
 // Lazy-load heavy pages so the initial JS bundle stays small.
-// These chunks are only fetched when the user navigates to that route.
 const AboutPage = lazy(() => import('@/src/pages/AboutPage'));
 const AdminPage = lazy(() => import('@/src/pages/AdminPage'));
+
+/**
+ * Handles redirects from the 404.html hack.
+ * This checks for the 'p' parameter in the URL and navigates to the correct internal route.
+ */
+function RedirectHandler() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirectPath = params.get('p');
+    
+    if (redirectPath) {
+      // Convert the path back from the ~and~ encoding if used in your 404 script
+      const cleanPath = redirectPath.replace(/~and~/g, '/');
+      window.history.replaceState(null, '', cleanPath);
+    }
+  }, []);
+
+  return null;
+}
 
 function PageLoader() {
   return (
@@ -26,34 +44,20 @@ function PageLoader() {
 }
 
 export default function App() {
-  const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
-  const routes = (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        {/* Redirect unknown paths to landing page */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
-  );
-
-  if (isGitHubPages) {
-    // Hash routing avoids GitHub Pages 404s on deep links; no basename needed.
-    return (
-      <HashRouter>
-        <SeoManager />
-        {routes}
-      </HashRouter>
-    );
-  }
-
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <BrowserRouter>
+      <RedirectHandler />
       <SeoManager />
-      {routes}
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          {/* Redirect unknown paths to landing page */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

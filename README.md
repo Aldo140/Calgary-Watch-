@@ -2,7 +2,9 @@
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
 
-Real-time community safety for Calgary. Calgarians report incidents the moment they happen and they appear on the map in under 30 seconds. Road closures, fires, flooding, safety alerts, all in one place.
+Real-time incident map for Calgary.
+
+Calgarians report incidents the moment they happen. Road closures, fires, flooding, and safety alerts appear on the map in under 30 seconds. Check what's happening near you before heading out.
 
 **[Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
 
@@ -12,21 +14,23 @@ Real-time community safety for Calgary. Calgarians report incidents the moment t
 
 ## What It Does
 
-Calgary Watch is a live, community-powered incident map. Users drop a pin, pick a category, and submit in under 30 seconds. The report goes live instantly with no moderation delay. A native-app-quality web experience means it works on any phone without installing anything.
+Calgary Watch is a live, community-powered safety map. Drop a pin, pick a category, submit in under 30 seconds. The report goes live instantly with no moderation delay. No app install needed — it works on any phone from the browser.
 
-The platform distinguishes between three data layers:
+Over time, Calgary Watch surfaces patterns and trends across neighbourhoods, moving from a real-time map toward a full city intelligence layer.
 
-- **Community Reports** - submitted by users in real time, labeled with trust indicators
-- **Official Data** - aggregated from Calgary Police Service open datasets for historical context
-- **System Signals** - inferred from clustered activity to surface patterns even at low usage
+The platform runs three data layers:
+
+- **Community Reports** - submitted by users in real time, labeled with trust indicators that improve as more users confirm them
+- **Official Data** - aggregated from Calgary Police Service open datasets for historical context and baselines
+- **System Signals** - inferred from clustered activity to surface patterns even at low usage, clearly labeled as low-confidence and system-generated
 
 ---
 
 ## Features
 
 ### Landing Page
-- Transparent nav that blends into the hero and hides on scroll-down, reappears on scroll-up
-- Full-screen hero with live Calgary background image, phone mockup simulation, and live incident feed
+- Transparent nav that blends into the hero, hides on scroll-down, reappears on scroll-up
+- Full-screen hero with live Calgary background, phone mockup simulation, and live incident feed
 - Bento feature grid with animated visuals: radar rings (Live Map), zone heatmap (Neighbourhood Intelligence), verification pipeline (Verified Reports), redacted report doc (Anonymous posting)
 - Horizontal snap-scroll How It Works on mobile
 - Compact mobile layouts throughout, no duplicate sections
@@ -61,18 +65,20 @@ The platform distinguishes between three data layers:
 | 03 | More Cities | Planned |
 | 04 | Enterprise | Planned |
 
-Phase 2 targets iOS and Android apps with push notifications and an enhanced credibility system. Phase 3 expands to other Canadian cities on demand.
+Phase 2 targets iOS and Android apps with push notifications for nearby incidents and activity spikes, along with an enhanced credibility system. Phase 3 expands to other Canadian cities on demand.
 
 ---
 
-## Trust and Safety
+## Trust and Data
 
 Calgary Watch is not an emergency service. Always call 911.
 
+Community reports are clearly labeled and gain confidence as more users confirm them. The system tracks confirmation counts, time decay, and proximity clustering to surface a trust score on every incident.
+
 - Anonymous reporting is on by default
 - User emails are never exposed publicly
-- Community reports are labeled as unverified until confirmed by multiple sources
 - Official data is sourced from Calgary Police Service open datasets and is not real-time
+- System signals are explicitly marked as low-confidence and machine-inferred
 
 ---
 

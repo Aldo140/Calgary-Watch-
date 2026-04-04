@@ -139,9 +139,20 @@ export default function MapPage() {
       setIncidents((prev) => {
         const merged = new globalThis.Map<string, Incident>();
         incidentData.forEach((incident) => merged.set(incident.id, incident));
+        
+        // Find the oldest timestamp in the current live snapshot window
+        const oldestTimestamp = incidentData.length > 0 
+          ? Math.min(...incidentData.map(i => i.timestamp)) 
+          : Date.now();
+
         prev.forEach((incident) => {
           if (!merged.has(incident.id)) {
-            merged.set(incident.id, incident);
+            // Keep if it is older than our snapshot window (loaded via "Load More")
+            // Or if it is a client-side mock incident.
+            // DO NOT keep if it is newer but missing (means server rejected/deleted it).
+            if (incident.timestamp < oldestTimestamp || incident.id.startsWith('mock-')) {
+              merged.set(incident.id, incident);
+            }
           }
         });
         MOCK_INCIDENTS.forEach((mock) => {
@@ -284,11 +295,24 @@ export default function MapPage() {
       (async () => {
         try {
           const { anonymous, ...incidentData } = data;
-          await addDoc(collection(db, path), {
-            ...incidentData,
+          
+          // Defensively ensure all strings match exactly Firestore Rules lengths
+          const safeTitle = incidentData.title.trim().padEnd(5, ' ').slice(0, 100);
+          const safeDesc = incidentData.description.trim().padEnd(10, ' ').slice(0, 1000);
+          const safeNeighborhood = (incidentData.neighborhood || 'Calgary').trim().padEnd(2, ' ').slice(0, 80);
+          const nameToUse = isAnonymous ? 'Anonymous' : firstName;
+          const safeName = nameToUse.trim().padEnd(2, ' ').slice(0, 50);
+          
+          await addDoc(collection(db!, path), {
+            title: safeTitle,
+            description: safeDesc,
+            category: incidentData.category,
+            neighborhood: safeNeighborhood,
+            lat: incidentData.lat,
+            lng: incidentData.lng,
             email: isAnonymous ? 'anonymous@calgarywatch.app' : (user.email || 'unknown@example.com'),
-            name: isAnonymous ? 'Anonymous' : firstName,
-            source_name: isAnonymous ? 'Anonymous' : firstName,
+            name: safeName,
+            source_name: safeName,
             anonymous: isAnonymous,
             timestamp: Date.now(),
             verified_status: 'unverified',
@@ -319,16 +343,22 @@ export default function MapPage() {
     startTransition(() => {
       (async () => {
         try {
-          await addDoc(collection(db, path), {
-            title: data.title,
-            description: data.description,
+          // Defensively ensure lengths
+          const safeTitle = data.title.trim().padEnd(5, ' ').slice(0, 100);
+          const safeDesc = data.description.trim().padEnd(10, ' ').slice(0, 1000);
+          const safeNeighborhood = (data.neighborhood || 'Calgary').trim().padEnd(2, ' ').slice(0, 80);
+          const safeName = firstName.trim().padEnd(2, ' ').slice(0, 50);
+
+          await addDoc(collection(db!, path), {
+            title: safeTitle,
+            description: safeDesc,
             category: data.category,
-            neighborhood: data.neighborhood || 'Calgary',
+            neighborhood: safeNeighborhood,
             lat: data.lat,
             lng: data.lng,
             email: user.email || 'unknown@example.com',
-            name: firstName,
-            source_name: firstName,
+            name: safeName,
+            source_name: safeName,
             anonymous: false,
             timestamp: Date.now(),
             verified_status: 'unverified',

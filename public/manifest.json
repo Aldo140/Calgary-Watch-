@@ -1,0 +1,17 @@
+{
+  "short_name": "Calgary Watch",
+  "name": "Calgary Watch | Real-Time Community Safety Map",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#020617",
+  "display": "standalone",
+  "theme_color": "#020617",
+  "description": "Real-time community safety platform for Calgary with live incident mapping and neighborhood awareness."
+}

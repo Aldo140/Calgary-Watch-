@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, CommunityStats } from '@/src/types';
-import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getCountFromServer, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
-import { ArrowLeft, Loader2, Lock, Save, Trash2, Activity, AlertTriangle, Clock3, Users, ShieldCheck, ChartNoAxesColumn, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Lock, Save, Trash2, Activity, AlertTriangle, Clock3, Users, ShieldCheck, ChartNoAxesColumn, Sparkles, RefreshCw, Siren, ChartPie } from 'lucide-react';
 import {
   ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -66,6 +66,8 @@ export default function AdminPage() {
   const [communityStats, setCommunityStats] = useState<(CommunityStats & { id: string })[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
+  const [totalPageViews, setTotalPageViews] = useState<number | null>(null);
 
   const [incidentDrafts, setIncidentDrafts] = useState<Record<string, EditableIncident>>({});
   const [statsDrafts, setStatsDrafts] = useState<Record<string, EditableCommunityStats>>({});
@@ -119,6 +121,12 @@ export default function AdminPage() {
       setUsers(rows);
     });
 
+    try {
+      getCountFromServer(collection(db, 'page_views'))
+        .then(snap => setTotalPageViews(snap.data().count))
+        .catch(() => setTotalPageViews(0));
+    } catch {}
+
     return () => {
       unsubIncidents();
       unsubStats();
@@ -127,13 +135,25 @@ export default function AdminPage() {
   }, [isAuthReady, isAdmin, user, db]);
 
   const totalIncidents = incidents.length;
+  const emergencyIncidents = incidents.filter((i) => i.category === 'emergency').length;
   const unresolvedIncidents = incidents.filter((i) => i.verified_status !== 'community_confirmed').length;
   const todayIncidents = incidents.filter((i) => Date.now() - i.timestamp < 24 * 60 * 60 * 1000).length;
+  const totalUsers = users.length;
   const uniqueReporterEmails = new Set(incidents.map((i) => i.email).filter(Boolean)).size;
   const averageSafety = useMemo(() => {
     if (communityStats.length === 0) return 0;
     return Math.round(communityStats.reduce((sum, row) => sum + Number(row.safety_score || 0), 0) / communityStats.length);
   }, [communityStats]);
+
+  const refreshUsers = async () => {
+    if (!db) return;
+    setIsRefreshingUsers(true);
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      setUsers(snap.docs.map(doc => doc.data() as UserProfile));
+    } catch {}
+    setIsRefreshingUsers(false);
+  };
 
   // ── Chart data ──────────────────────────────────────────────────────────────
 
@@ -141,6 +161,7 @@ export default function AdminPage() {
     const counts: Record<string, number> = {};
     incidents.forEach((i) => { counts[i.category] = (counts[i.category] ?? 0) + 1; });
     return [
+      { name: 'Emergency',      value: counts['emergency']      ?? 0, color: '#dc2626' },
       { name: 'Crime',          value: counts['crime']          ?? 0, color: '#ef4444' },
       { name: 'Traffic',        value: counts['traffic']        ?? 0, color: '#f97316' },
       { name: 'Infrastructure', value: counts['infrastructure'] ?? 0, color: '#3b82f6' },
@@ -148,6 +169,28 @@ export default function AdminPage() {
       { name: 'Gas',            value: counts['gas']            ?? 0, color: '#10b981' },
     ].filter((d) => d.value > 0);
   }, [incidents]);
+
+  const userRoleChartData = useMemo(() => {
+    let admins = 0;
+    let postingUsers = 0;
+    let lurkingUsers = 0;
+
+    const posterEmails = new Set(incidents.map(i => i.email).filter(Boolean));
+    // Incident type doesn't natively include uid, but loosely cast
+    const posterUids = new Set(incidents.map(i => (i as any).uid).filter(Boolean)); 
+
+    users.forEach(u => {
+      if (u.role === 'admin') admins++;
+      else if (posterEmails.has(u.email) || posterUids.has(u.uid)) postingUsers++;
+      else lurkingUsers++;
+    });
+
+    return [
+      { name: 'Posting Users', value: postingUsers, color: '#f59e0b' },
+      { name: 'View-Only Users', value: lurkingUsers, color: '#4A90D9' },
+      { name: 'Admins', value: admins, color: '#2E8B7A' },
+    ].filter((d) => d.value > 0);
+  }, [users, incidents]);
 
   const trustChartData = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -376,22 +419,38 @@ export default function AdminPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
+          <Card className="p-4 bg-red-950/40 border-red-500/30 rounded-2xl hover:border-red-500/60 transition-all shadow-[0_0_15px_rgba(239,68,68,0.1)]">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Total Incidents</p>
-              <Activity size={14} className="text-blue-400" />
+              <p className="text-xs text-red-400 font-black tracking-widest uppercase">SOS / Emergencies</p>
+              <Siren size={14} className="text-red-500 animate-pulse" />
             </div>
-            <p className="text-2xl font-black mt-2">{totalIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">All active reports in the system (soft-deleted excluded)</p>
+            <p className="text-2xl font-black mt-2 text-red-500">{emergencyIncidents}</p>
+            <p className="text-[10px] text-red-400/70 mt-1 leading-tight">Critical priority incidents actively monitored on the platform</p>
           </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-amber-400/40 transition-all">
+          <Card className="p-4 bg-amber-950/20 border-amber-500/20 rounded-2xl hover:border-amber-400/40 transition-all">
             <div className="flex items-center justify-between">
               <p className="text-xs text-slate-400">Unresolved</p>
               <AlertTriangle size={14} className="text-amber-400" />
             </div>
             <p className="text-2xl font-black text-amber-400 mt-2">{unresolvedIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Reports not yet marked community-confirmed · your moderation backlog</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Reports not yet community confirmed</p>
+          </Card>
+          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-slate-400">Total Reports</p>
+              <Activity size={14} className="text-blue-400" />
+            </div>
+            <p className="text-2xl font-black mt-2">{totalIncidents}</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">All active reports in the system</p>
+          </Card>
+          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-slate-400">Total Page Views</p>
+              <Activity size={14} className="text-pink-400" />
+            </div>
+            <p className="text-2xl font-black mt-2">{totalPageViews === null ? '...' : totalPageViews}</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Global interaction counts tracked across platform loads</p>
           </Card>
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
             <div className="flex items-center justify-between">
@@ -399,23 +458,15 @@ export default function AdminPage() {
               <Clock3 size={14} className="text-blue-400" />
             </div>
             <p className="text-2xl font-black text-blue-400 mt-2">{todayIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">New reports submitted in the past 24 hours · measures daily activity</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">New reports in the past 24 hours</p>
           </Card>
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-violet-400/40 transition-all">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Reporter Emails</p>
+              <p className="text-xs text-slate-400">Total Users</p>
               <Users size={14} className="text-violet-400" />
             </div>
-            <p className="text-2xl font-black mt-2">{uniqueReporterEmails}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Distinct contributors by email · excludes anonymous posts</p>
-          </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-cyan-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Stats Rows</p>
-              <ChartNoAxesColumn size={14} className="text-cyan-400" />
-            </div>
-            <p className="text-2xl font-black mt-2">{communityStats.length}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Neighborhood crime statistic records powering Area Intelligence</p>
+            <p className="text-2xl font-black mt-2">{totalUsers}</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Registered user accounts ({uniqueReporterEmails} active reporters)</p>
           </Card>
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-emerald-400/40 transition-all">
             <div className="flex items-center justify-between">
@@ -423,9 +474,90 @@ export default function AdminPage() {
               <ShieldCheck size={14} className="text-emerald-400" />
             </div>
             <p className="text-2xl font-black text-emerald-400 mt-2">{averageSafety}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Mean safety score (0-100) across all tracked neighborhoods · higher is safer</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Mean safety score (0-100) across all tracked neighborhoods</p>
           </Card>
         </div>
+
+        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold">Incidents (Editable)</h2>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Moderation Queue</span>
+              <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
+            </div>
+          </div>
+          {loadingData ? (
+            <div className="py-8 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
+          ) : (
+            <table className="w-full text-xs min-w-[1280px]">
+              <thead className="text-slate-400">
+                <tr className="border-b border-white/10">
+                  <th className="py-2 text-left">Title</th>
+                  <th className="py-2 text-left">Category</th>
+                  <th className="py-2 text-left">Neighborhood</th>
+                  <th className="py-2 text-left">Status</th>
+                  <th className="py-2 text-left">Reports</th>
+                  <th className="py-2 text-left">Description</th>
+                  <th className="py-2 text-left">Source</th>
+                  <th className="py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {incidents.map((incident) => {
+                  const draft = incidentDrafts[incident.id] || {
+                    ...emptyIncidentDraft,
+                    title: incident.title,
+                    description: incident.description,
+                    category: incident.category,
+                    neighborhood: incident.neighborhood,
+                    verified_status: incident.verified_status,
+                    report_count: incident.report_count,
+                    source_name: incident.source_name || '',
+                    source_url: incident.source_url || '',
+                  };
+
+                  return (
+                    <tr key={incident.id} className="border-b border-white/5 align-top hover:bg-white/[0.02] transition-colors">
+                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} /></td>
+                      <td className="py-2 pr-2">
+                        <select className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
+                          <option value="emergency">emergency</option>
+                          <option value="crime">crime</option>
+                          <option value="traffic">traffic</option>
+                          <option value="infrastructure">infrastructure</option>
+                          <option value="weather">weather</option>
+                          <option value="gas">gas</option>
+                        </select>
+                      </td>
+                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} /></td>
+                      <td className="py-2 pr-2">
+                        <select className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
+                          <option value="unverified">unverified</option>
+                          <option value="multiple_reports">multiple_reports</option>
+                          <option value="community_confirmed">community_confirmed</option>
+                        </select>
+                      </td>
+                      <td className="py-2 pr-2"><input type="number" className="w-24 bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} /></td>
+                      <td className="py-2 pr-2"><textarea className="w-full h-20 bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} /></td>
+                      <td className="py-2 pr-2">
+                        <input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2 mb-2" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
+                        <input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
+                      </td>
+                      <td className="py-2 flex gap-2">
+                        <Button onClick={() => saveIncident(incident.id)} className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700" disabled={savingIncidentId === incident.id}>
+                          {savingIncidentId === incident.id ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                        </Button>
+                        <Button variant="secondary" onClick={() => softDeleteIncident(incident.id)} className="h-9 px-3 text-xs text-red-400 border-red-500/30 hover:bg-red-500/10">
+                          <Trash2 size={14} />
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </Card>
 
         {/* ── Analytics ─────────────────────────────────────────────────────── */}
         <div className="space-y-4">
@@ -578,118 +710,84 @@ export default function AdminPage() {
         </div>
         {/* ── End Analytics ──────────────────────────────────────────────────── */}
 
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold">User Overview</h2>
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Directory</span>
-              <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
+        <div className="grid lg:grid-cols-3 gap-4">
+          <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto h-[400px]">
+            <div className="flex items-center justify-between mb-4 pr-1">
+              <h2 className="text-lg font-black flex items-center gap-2">
+                <Users size={16} className="text-blue-400" />
+                User Directory
+              </h2>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white" title="Force Refresh">
+                  <RefreshCw size={12} className={isRefreshingUsers ? "animate-spin" : ""} />
+                </Button>
+                <div className="flex flex-col items-end hidden md:flex">
+                  <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Directory</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <table className="w-full text-xs min-w-[720px]">
-            <thead className="text-slate-400">
-              <tr className="border-b border-white/10">
-                <th className="py-2 text-left">Name</th>
-                <th className="py-2 text-left">Email</th>
-                <th className="py-2 text-left">Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((profile) => (
-                <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-                  <td className="py-2">{profile.displayName || 'Unknown'}</td>
-                  <td className="py-2">{profile.email || 'No email'}</td>
-                  <td className="py-2">
-                    <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide ${profile.role === 'admin' ? 'bg-blue-500/20 text-blue-400' : 'bg-white/10 text-slate-300'}`}>
-                      {profile.role}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
-
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold">Incidents (Editable)</h2>
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Moderation Queue</span>
-              <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
-            </div>
-          </div>
-          {loadingData ? (
-            <div className="py-8 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
-          ) : (
-            <table className="w-full text-xs min-w-[1280px]">
-              <thead className="text-slate-400">
-                <tr className="border-b border-white/10">
-                  <th className="py-2 text-left">Title</th>
-                  <th className="py-2 text-left">Category</th>
-                  <th className="py-2 text-left">Neighborhood</th>
-                  <th className="py-2 text-left">Status</th>
-                  <th className="py-2 text-left">Reports</th>
-                  <th className="py-2 text-left">Description</th>
-                  <th className="py-2 text-left">Source</th>
-                  <th className="py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {incidents.map((incident) => {
-                  const draft = incidentDrafts[incident.id] || {
-                    ...emptyIncidentDraft,
-                    title: incident.title,
-                    description: incident.description,
-                    category: incident.category,
-                    neighborhood: incident.neighborhood,
-                    verified_status: incident.verified_status,
-                    report_count: incident.report_count,
-                    source_name: incident.source_name || '',
-                    source_url: incident.source_url || '',
-                  };
-
-                  return (
-                    <tr key={incident.id} className="border-b border-white/5 align-top hover:bg-white/[0.02] transition-colors">
-                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} /></td>
-                      <td className="py-2 pr-2">
-                        <select className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
-                          <option value="emergency">emergency</option>
-                          <option value="crime">crime</option>
-                          <option value="traffic">traffic</option>
-                          <option value="infrastructure">infrastructure</option>
-                          <option value="weather">weather</option>
-                          <option value="gas">gas</option>
-                        </select>
-                      </td>
-                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} /></td>
-                      <td className="py-2 pr-2">
-                        <select className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
-                          <option value="unverified">unverified</option>
-                          <option value="multiple_reports">multiple_reports</option>
-                          <option value="community_confirmed">community_confirmed</option>
-                        </select>
-                      </td>
-                      <td className="py-2 pr-2"><input type="number" className="w-24 bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} /></td>
-                      <td className="py-2 pr-2"><textarea className="w-full h-20 bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} /></td>
-                      <td className="py-2 pr-2">
-                        <input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2 mb-2" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
-                        <input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
-                      </td>
-                      <td className="py-2 flex gap-2">
-                        <Button onClick={() => saveIncident(incident.id)} className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700" disabled={savingIncidentId === incident.id}>
-                          {savingIncidentId === incident.id ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                        </Button>
-                        <Button variant="secondary" onClick={() => softDeleteIncident(incident.id)} className="h-9 px-3 text-xs text-red-400 border-red-500/30 hover:bg-red-500/10">
-                          <Trash2 size={14} />
-                        </Button>
+            <div className="overflow-y-auto custom-scrollbar h-[310px] pr-2">
+              <table className="w-full text-xs min-w-[500px]">
+                <thead className="text-slate-400 bg-slate-900/90 top-0 sticky z-10 backdrop-blur-md">
+                  <tr>
+                    <th className="py-3 text-left pl-2 rounded-tl-lg font-bold uppercase text-[9px] tracking-wider">UID</th>
+                    <th className="py-3 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
+                    <th className="py-3 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
+                    <th className="py-3 text-left rounded-tr-lg font-bold uppercase text-[9px] tracking-wider">Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((profile) => (
+                    <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                      <td className="py-3 pl-2 text-slate-500 font-mono text-[10px]">{profile.uid.slice(0, 8)}...</td>
+                      <td className="py-3 font-medium text-white">{profile.displayName || 'Unknown'}</td>
+                      <td className="py-3 text-slate-300">{profile.email || 'No email'}</td>
+                      <td className="py-3">
+                        <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'bg-white/5 border border-white/10 text-slate-300'}`}>
+                          {profile.role}
+                        </span>
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </Card>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Card className="col-span-1 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] flex flex-col items-center justify-center h-[400px]">
+            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] w-full text-left">User Roles</p>
+            <p className="text-[10px] text-slate-600 mb-6 mt-1 w-full text-left">Breakdown of platform users vs administrators.</p>
+            {userRoleChartData.length === 0 ? (
+              <p className="text-slate-600 text-xs py-8 text-center">No user data.</p>
+            ) : (
+              <div className="w-full flex-1 flex flex-col justify-center max-h-[220px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={userRoleChartData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" strokeWidth={0}>
+                      {userRoleChartData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ background: '#0f172a', border: '1px solid #ffffff15', borderRadius: 12, fontSize: 11 }}
+                      itemStyle={{ color: '#e2e8f0' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+                  {userRoleChartData.map((d) => (
+                    <span key={d.name} className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+                      <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
+                      {d.value} {d.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+
+        
 
         <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4">

@@ -2,8 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!--
       Security Headers are enforced via HTTP response headers on the server
       (see firebase.json headers config). Meta tag equivalents don't work for
@@ -21,6 +20,16 @@
     <!-- Icons — relative paths work with Vite `base` (e.g. GitHub project Pages /RepoName/) -->
     <link rel="icon" type="image/svg+xml" href="./icon.svg" sizes="any" />
     <link rel="apple-touch-icon" href="./icon.svg" />
+    <link rel="manifest" href="./manifest.json" />
+    
+    <!-- PWA & Mobile Optimization -->
+    <meta name="application-name" content="Calgary Watch" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Calgary Watch" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
     <meta property="og:image" content="https://aldo140.github.io/Calgary-Watch-/icon.svg" />
     <meta name="twitter:image" content="https://aldo140.github.io/Calgary-Watch-/icon.svg" />
     

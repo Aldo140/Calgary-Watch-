@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import LandingPage from '@/src/pages/LandingPage';
 import MapPage from '@/src/pages/MapPage';
 import SeoManager from '@/src/components/SeoManager';
+import { db } from '@/src/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 // Lazy-load heavy pages so the initial JS bundle stays small.
 const AboutPage = lazy(() => import('@/src/pages/AboutPage'));
@@ -32,6 +34,19 @@ function RedirectHandler() {
   return null;
 }
 
+function PageTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    if (!db || location.pathname === '/admin') return; // Exclude admin page from views
+    try {
+      addDoc(collection(db, 'page_views'), { timestamp: Date.now(), path: location.pathname });
+    } catch (error) {
+      // Ignore if write fails due to permissions or adblock
+    }
+  }, [location.pathname]);
+  return null;
+}
+
 function PageLoader() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -47,6 +62,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <RedirectHandler />
+      <PageTracker />
       <SeoManager />
       <Suspense fallback={<PageLoader />}>
         <Routes>

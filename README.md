@@ -50,9 +50,15 @@ The platform runs three data layers:
 - Optimistic UI, form submits in under 100ms perceived
 
 ### Admin
-- Incident management dashboard
-- Analytics: incidents over time, category breakdown, community safety breakdown
-- User management and moderation tools
+- Live operations control center with priority queue for SOS/Emergency posts
+- Live Page Views and user growth tracker separating administrative, active, and view-only users
+- Analytics: incidents over time, community safety breakdown, and high-frequency reporting areas
+- In-place moderation queue for quick incident review, categorization, and trust verification
+
+### Tech & Performance
+- **PWA Ready**: Installable as a standalone app on iOS and Android without an App Store
+- **SEO Optimized**: Fully defined canonical sitemaps, robots.txt crawl policies, and dynamically injected OpenGraph headers
+- **Cross-Browser Stability**: Advanced fallback support and dynamic viewport units ensures the UI doesn't crash on restrictive browsers like Safari (Privacy Mode)
 
 ---
 

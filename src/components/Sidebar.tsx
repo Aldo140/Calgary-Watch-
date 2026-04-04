@@ -55,31 +55,33 @@ export default function Sidebar({
   ] as const;
 
   useEffect(() => {
-    const persistedSort = localStorage.getItem('cw_sortBy');
-    const persistedVerifiedOnly = localStorage.getItem('cw_verifiedOnly');
-    const persistedRecentOnly = localStorage.getItem('cw_recentOnly');
+    try {
+      const persistedSort = localStorage.getItem('cw_sortBy');
+      const persistedVerifiedOnly = localStorage.getItem('cw_verifiedOnly');
+      const persistedRecentOnly = localStorage.getItem('cw_recentOnly');
 
-    if (persistedSort === 'newest' || persistedSort === 'oldest' || persistedSort === 'verified') {
-      setSortBy(persistedSort);
-    }
-    if (persistedVerifiedOnly === 'true') {
-      setVerifiedOnly(true);
-    }
-    if (persistedRecentOnly === 'true') {
-      setRecentOnly(true);
-    }
+      if (persistedSort === 'newest' || persistedSort === 'oldest' || persistedSort === 'verified') {
+        setSortBy(persistedSort);
+      }
+      if (persistedVerifiedOnly === 'true') {
+        setVerifiedOnly(true);
+      }
+      if (persistedRecentOnly === 'true') {
+        setRecentOnly(true);
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('cw_sortBy', sortBy);
+    try { localStorage.setItem('cw_sortBy', sortBy); } catch {}
   }, [sortBy]);
 
   useEffect(() => {
-    localStorage.setItem('cw_verifiedOnly', String(verifiedOnly));
+    try { localStorage.setItem('cw_verifiedOnly', String(verifiedOnly)); } catch {}
   }, [verifiedOnly]);
 
   useEffect(() => {
-    localStorage.setItem('cw_recentOnly', String(recentOnly));
+    try { localStorage.setItem('cw_recentOnly', String(recentOnly)); } catch {}
   }, [recentOnly]);
 
   // Debounce search input by 200ms to avoid filtering on every keystroke

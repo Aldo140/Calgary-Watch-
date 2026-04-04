@@ -42,7 +42,11 @@ export default function MapPage() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
-    return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
+    try {
+      return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      return 'dark';
+    }
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string; title: string; timestamp: number }[]>([]);
@@ -78,7 +82,11 @@ export default function MapPage() {
     } else {
       document.documentElement.classList.remove('light');
     }
-    localStorage.setItem('cw-theme', theme);
+    try {
+      localStorage.setItem('cw-theme', theme);
+    } catch {
+      // Safari private mode might throw
+    }
   }, [theme]);
 
   useEffect(() => {
@@ -412,7 +420,7 @@ export default function MapPage() {
   }, [incidents, mapRef]);
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 light:bg-slate-100 overflow-hidden font-sans relative">
+    <div className="flex h-dvh w-full bg-slate-950 light:bg-slate-100 overflow-hidden font-sans relative">
       <AnimatePresence>
         {isLoading && (
           <motion.div

@@ -141,7 +141,11 @@ export default function LandingPage() {
   const lastNavScrollY = useRef(0);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
-    return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
+    try {
+      return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      return 'dark';
+    }
   });
 
   const reducedMotion = prefersReducedMotion();
@@ -149,7 +153,11 @@ export default function LandingPage() {
   useEffect(() => {
     if (theme === 'light') document.documentElement.classList.add('light');
     else document.documentElement.classList.remove('light');
-    localStorage.setItem('cw-theme', theme);
+    try {
+      localStorage.setItem('cw-theme', theme);
+    } catch {
+      // ignore
+    }
   }, [theme]);
 
   // Nav scroll-aware hide/show + background once past hero
@@ -250,7 +258,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 light:bg-slate-50 text-white light:text-slate-900 font-sans overflow-x-hidden">
+    <div className="min-h-dvh bg-slate-950 light:bg-slate-50 text-white light:text-slate-900 font-sans overflow-x-hidden">
 
       {/* ================================================================
           NAVIGATION - clean fixed bar, consistent h-16
@@ -342,7 +350,7 @@ export default function LandingPage() {
         <div className="absolute top-1/4 left-[10%] w-96 h-96 bg-[#4A90D9]/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-1/4 right-[20%] w-96 h-96 bg-[#2E8B7A]/10 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-16 lg:pb-20 min-h-screen lg:min-h-[900px]">
+        <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-16 lg:pb-20 min-h-dvh lg:min-h-[900px]">
 
           {/* Left - content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-xl self-center pt-8 pb-4 lg:py-0">

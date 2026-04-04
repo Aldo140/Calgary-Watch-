@@ -219,7 +219,7 @@ export default function AboutPage() {
   const reducedMotion = prefersReducedMotion();
 
   return (
-    <div className="min-h-screen bg-slate-950 light:bg-white text-white light:text-slate-900 font-sans overflow-x-hidden">
+    <div className="min-h-dvh bg-slate-950 light:bg-white text-white light:text-slate-900 font-sans overflow-x-hidden">
 
       {/* ================================================================
           NAVIGATION
@@ -261,7 +261,7 @@ export default function AboutPage() {
           initial={reducedMotion ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="relative h-screen md:h-[85vh] overflow-hidden flex items-end"
+          className="relative h-dvh md:h-[85vh] overflow-hidden flex items-end"
         >
           {/* Background image with overlay */}
           <motion.div

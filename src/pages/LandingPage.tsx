@@ -136,6 +136,9 @@ export default function LandingPage() {
   const [isSubmittingCityRequest, setIsSubmittingCityRequest] = useState(false);
   const [cityRequestMessage, setCityRequestMessage] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
+  const [navScrolled, setNavScrolled] = useState(false);
+  const lastNavScrollY = useRef(0);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
     return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
@@ -148,6 +151,29 @@ export default function LandingPage() {
     else document.documentElement.classList.remove('light');
     localStorage.setItem('cw-theme', theme);
   }, [theme]);
+
+  // Nav scroll-aware hide/show + background once past hero
+  useEffect(() => {
+    const hideThreshold = 80;
+    const onScroll = () => {
+      const current = window.scrollY;
+      // background only appears once user has scrolled past the entire hero section
+      const heroBottom = heroRef.current
+        ? heroRef.current.offsetTop + heroRef.current.offsetHeight - 80
+        : 600;
+      setNavScrolled(current > heroBottom);
+      if (current < hideThreshold) {
+        setNavVisible(true);
+      } else if (current > lastNavScrollY.current + 4) {
+        setNavVisible(false);
+      } else if (current < lastNavScrollY.current - 4) {
+        setNavVisible(true);
+      }
+      lastNavScrollY.current = current;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // GSAP pulse dots
   useEffect(() => {
@@ -229,7 +255,13 @@ export default function LandingPage() {
       {/* ================================================================
           NAVIGATION — clean fixed bar, consistent h-16
           ================================================================ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 light:bg-white/95 backdrop-blur-xl border-b border-white/8 light:border-slate-200">
+      <nav className={cn(
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        navVisible ? 'translate-y-0' : '-translate-y-full',
+        navScrolled
+          ? 'bg-slate-950/85 light:bg-white/90 backdrop-blur-xl border-b border-white/8 light:border-slate-200'
+          : 'bg-transparent border-b border-transparent',
+      )}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
 
           {/* Logo */}
@@ -297,7 +329,7 @@ export default function LandingPage() {
       {/* ================================================================
           HERO
           ================================================================ */}
-      <section ref={heroRef} className="relative flex flex-col mt-16 lg:mt-20 overflow-hidden bg-slate-950 w-full">
+      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 w-full">
         
         {/* Full-width seamless background image */}
         <div className="absolute inset-0 pointer-events-none">
@@ -310,7 +342,7 @@ export default function LandingPage() {
         <div className="absolute top-1/4 left-[10%] w-96 h-96 bg-[#4A90D9]/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-1/4 right-[20%] w-96 h-96 bg-[#2E8B7A]/10 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 py-10 sm:py-16 lg:py-20 min-h-[calc(100svh-116px)] lg:min-h-[850px]">
+        <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-16 lg:pb-20 min-h-screen lg:min-h-[900px]">
 
           {/* Left — content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-xl self-center pt-8 pb-4 lg:py-0">
@@ -361,9 +393,11 @@ export default function LandingPage() {
 
               {/* Social proof */}
               <div className="flex items-center gap-3 pt-3">
-                <div className="flex -space-x-2.5" aria-hidden="true">
+                <div className="flex -space-x-2.5 shrink-0" aria-hidden="true">
                   {AVATARS.map((av, i) => (
-                    <img key={i} src={av.src} alt={av.alt} className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover" loading="lazy" />
+                    <img key={i} src={av.src} alt="" className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover shrink-0"
+                      loading="lazy"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                   ))}
                 </div>
                 <p className="text-sm text-slate-400">
@@ -494,6 +528,15 @@ export default function LandingPage() {
                            {/* Bottom fade */}
                            <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
                        </div>
+
+                       {/* Logo watermark — bottom right of phone */}
+                       <div className="absolute bottom-3 right-4 flex items-center gap-1.5 opacity-40 pointer-events-none">
+                         <img src={publicAsset('icon.svg')} alt="" className="w-4 h-4 object-contain" />
+                         <span className="text-[9px] font-black tracking-tight"
+                           style={{ background: 'linear-gradient(to right,#4A90D9,#2E8B7A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                           Calgary Watch
+                         </span>
+                       </div>
                    </div>
                 </div>
              </motion.div>
@@ -510,25 +553,25 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Live ticker (z-20 brings it to front overlapping absolute background image blocks) */}
-        <div className="relative z-20 bg-slate-900/90 backdrop-blur-md border-t border-white/10 px-6 sm:px-10 py-3 flex items-center gap-6 flex-wrap">
-          <span className="inline-flex items-center gap-2 bg-[#4A90D9] text-white text-[11px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg shrink-0">
+        {/* Live ticker */}
+        <div className="relative z-20 bg-slate-900/90 backdrop-blur-md border-t border-white/10 px-4 sm:px-8 py-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
+          <span className="inline-flex items-center gap-2 bg-[#4A90D9] text-white text-[11px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-lg shrink-0">
             <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-white" /></span>
             Live Feed
           </span>
-          <div className="flex items-center gap-6 flex-wrap flex-1 min-w-0">
+          <div className="flex items-center gap-5 shrink-0">
             {[
               { color: 'bg-red-500', glow: 'rgba(239,68,68,0.9)', text: '3 active alerts in Calgary' },
               { color: 'bg-amber-400', glow: 'rgba(251,191,36,0.9)', text: '12 community reports today' },
               { color: 'bg-[#2E8B7A]', glow: 'rgba(46,139,122,0.9)', text: 'All quadrants monitored · YYC' },
             ].map(({ color, glow, text }) => (
-              <div key={text} className="flex items-center gap-2 min-w-0">
-                <div className={`w-2 h-2 shrink-0 rounded-full pulse-dot ${color}`} style={{ boxShadow: `0 0 8px ${glow}` }} />
-                <span className="text-xs font-medium text-slate-300 light:text-slate-200 truncate">{text}</span>
+              <div key={text} className="flex items-center gap-2 shrink-0">
+                <div className={`w-2 h-2 rounded-full pulse-dot ${color}`} style={{ boxShadow: `0 0 8px ${glow}` }} />
+                <span className="text-xs font-medium text-slate-300 whitespace-nowrap">{text}</span>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-slate-600 hidden lg:block shrink-0">Updated in real time · Community-powered</p>
+          <p className="text-[11px] text-slate-600 shrink-0 ml-4 hidden sm:block">Updated in real time · Community-powered</p>
         </div>
 
         {/* Mountain silhouette */}
@@ -541,7 +584,7 @@ export default function LandingPage() {
       {/* ================================================================
           VISION SECTION
           ================================================================ */}
-      <section className="relative py-28 md:py-40 overflow-hidden bg-slate-950 flex items-center justify-center border-t border-b border-white/5">
+      <section className="relative py-16 md:py-28 lg:py-40 overflow-hidden bg-slate-950 flex items-center justify-center border-t border-b border-white/5">
         <motion.div 
           animate={{ rotate: [0, 90, 180, 270, 360], scale: [1, 1.2, 1] }} 
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
@@ -551,15 +594,15 @@ export default function LandingPage() {
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-8">
             <span className="text-[10px] uppercase font-black tracking-widest text-[#4A90D9]">Vision</span>
           </motion.div>
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1] text-white mb-8">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-white mb-6 md:mb-8">
             Calgary's real-time<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843] italic pr-2">urban intelligence layer.</span>
           </motion.h2>
-          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-xl md:text-2xl text-slate-300 font-light max-w-4xl mx-auto leading-relaxed mb-6">
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-lg md:text-xl lg:text-2xl text-slate-300 font-light max-w-4xl mx-auto leading-relaxed mb-6">
             Where community-reported incidents and verified public data combine to provide immediate awareness into city activity.
           </motion.p>
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="h-px w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto my-8" />
-          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="hidden sm:block text-sm md:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
             Our long-term goal is to expand beyond Calgary into a scalable platform for cities across Canada, enabling safer, more informed communities through accessible, real-time data.
           </motion.p>
         </div>
@@ -568,16 +611,16 @@ export default function LandingPage() {
       {/* ================================================================
           PROBLEM SECTION
           ================================================================ */}
-      <section className="py-28 px-6 relative overflow-hidden">
+      <section className="py-16 md:py-28 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -left-80 top-0 w-[500px] h-[500px] rounded-full blur-[80px] opacity-6 bg-[#4A90D9]" aria-hidden="true" />
           <div className="absolute -right-80 bottom-0 w-[500px] h-[500px] rounded-full blur-[80px] opacity-6 bg-[#2E8B7A]" aria-hidden="true" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7 }} className="max-w-4xl mb-16">
+          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7 }} className="max-w-4xl mb-10 md:mb-16">
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">The Problem</p>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-5">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-5">
               The{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-red-600">
                 Information Lag
@@ -597,8 +640,8 @@ export default function LandingPage() {
               { value: 74, suffix: '%', label: 'Missed a nearby event', sub: 'due to slow information reach', color: '#f59e0b', bg: 'from-amber-500/8' },
               { value: 30, suffix: 's', prefix: '< ', label: 'Calgary Watch lag', sub: 'community report to live map', color: '#4A90D9', bg: 'from-[#4A90D9]/12' },
             ].map((stat, i) => (
-              <div key={i} className={`relative bg-gradient-to-b ${stat.bg} to-transparent bg-slate-900/80 light:bg-white px-6 py-8 flex flex-col items-center text-center`}>
-                <div className="text-4xl md:text-5xl font-black tabular-nums mb-1.5 tracking-tight" style={{ color: stat.color }}>
+              <div key={i} className={`relative bg-gradient-to-b ${stat.bg} to-transparent bg-slate-900/80 light:bg-white px-3 py-6 sm:px-6 sm:py-8 flex flex-col items-center text-center`}>
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black tabular-nums mb-1 tracking-tight" style={{ color: stat.color }}>
                   <AnimatedCounter to={stat.value} suffix={stat.suffix} prefix={stat.prefix ?? ''} duration={1.8 + i * 0.2} />
                 </div>
                 <p className="text-sm font-bold text-white light:text-slate-900 mb-0.5">{stat.label}</p>
@@ -607,8 +650,8 @@ export default function LandingPage() {
             ))}
           </motion.div>
 
-          {/* 3 editorial rows */}
-          <div className="space-y-0 border border-white/8 light:border-slate-200 rounded-2xl overflow-hidden divide-y divide-white/8 light:divide-slate-200">
+          {/* 3 editorial rows — hidden on mobile to reduce scroll length */}
+          <div className="hidden md:block space-y-0 border border-white/8 light:border-slate-200 rounded-2xl overflow-hidden divide-y divide-white/8 light:divide-slate-200">
             {[
               { num: '01', tag: '30+ min delayed', tagColor: '#ef4444', title: "By the time it's in the news...", body: 'Local media reports incidents 30 or more minutes after they happen. That gap costs real decisions: a detour you could have taken, a street you would have avoided, a family member you could have warned.', icon: Radio, stat: '30+', statLabel: 'min delayed', reverse: false },
               { num: '02', tag: 'Lost in noise', tagColor: '#a855f7', title: "r/Calgary won't cut it", body: 'Critical alerts drown three pages down in memes and off-topic threads. The signal is there, somewhere, buried under noise. You need what you need, when you need it.', icon: Users, stat: '100s', statLabel: 'posts to scan', reverse: true },
@@ -643,7 +686,7 @@ export default function LandingPage() {
             </picture>
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40" />
             <div className="relative z-10 grid md:grid-cols-2 gap-0 min-h-[380px]">
-              <div className="p-10 md:p-12 flex flex-col justify-center">
+              <div className="p-6 md:p-10 lg:p-12 flex flex-col justify-center">
                 <div className="inline-flex items-center gap-2 mb-4 w-fit">
                   <div className="w-2 h-2 rounded-full bg-[#4A90D9] shadow-[0_0_8px_#4A90D9]" />
                   <span className="text-xs font-black uppercase tracking-wider text-[#4A90D9]">The Solution</span>
@@ -688,9 +731,9 @@ export default function LandingPage() {
       {/* ================================================================
           FEATURES SECTION
           ================================================================ */}
-      <section className="py-28 px-6" id="features">
+      <section className="py-16 md:py-28 px-4 sm:px-6" id="features">
         <div className="max-w-7xl mx-auto">
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="max-w-3xl mb-12">
+          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="max-w-3xl mb-10 md:mb-12">
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Features</p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.06]">
               Built for how Calgarians{' '}
@@ -701,40 +744,207 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
-            {[
-              { img: publicAsset('images/hero-wide.webp'), alt: 'Live map', badge: 'Real-time', badgeColor: 'text-blue-400 bg-blue-500/10', iconBg: 'bg-blue-500/90', Icon: MapIcon, title: 'Live Community Map', desc: 'Incidents appear on the map the moment they are reported. No refresh, no delay. Watch your neighbourhood update in real time.', hoverShadow: '0 28px 56px rgba(74,144,217,0.14)' },
-              { img: publicAsset('images/calgary3.webp'), alt: 'Neighbourhood', badge: 'Insights', badgeColor: 'text-teal-400 bg-teal-500/10', iconBg: 'bg-teal-500/90', Icon: Layers, title: 'Neighbourhood Intelligence', desc: 'Tap any area to see historical incident patterns, safety scores, and local trends specific to that part of Calgary.', hoverShadow: '0 28px 56px rgba(46,139,122,0.14)' },
-              { img: publicAsset('images/calgary5.webp'), alt: 'Verified data', badge: 'Verified', badgeColor: 'text-amber-400 bg-amber-500/10', iconBg: 'bg-amber-500/90', Icon: ShieldCheck, title: 'Verified Data', desc: 'Each report shows its source: community-submitted or cross-referenced with police data, so you know exactly how much to trust it.', hoverShadow: '0 28px 56px rgba(212,168,67,0.14)' },
-              { img: publicAsset('images/calgary4.webp'), alt: 'Anonymous', badge: 'Private', badgeColor: 'text-purple-400 bg-purple-500/10', iconBg: 'bg-purple-500/90', Icon: Lock, title: 'Post Anonymously', desc: 'See something sensitive? Report it without revealing who you are. Your identity stays private by default.', hoverShadow: '0 28px 56px rgba(139,92,246,0.14)' },
-            ].map((f, i) => (
-              <motion.div key={i}
-                initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, delay: i * 0.08 }}
-                whileHover={!reducedMotion ? { y: -10, boxShadow: f.hoverShadow } : undefined}
-                className="rounded-2xl border border-white/8 light:border-slate-200 overflow-hidden bg-slate-900/70 light:bg-white shadow-lg group h-full flex flex-col transition-all">
-                <div className="relative h-36 overflow-hidden bg-slate-800">
-                  <motion.img src={f.img} alt={f.alt} className="w-full h-full object-cover" loading="lazy" whileHover={!reducedMotion ? { scale: 1.08 } : undefined} transition={{ duration: 0.5 }} />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950/80" />
-                  <div className={`absolute top-3 right-3 w-9 h-9 rounded-xl ${f.iconBg} backdrop-blur flex items-center justify-center`}><f.Icon className="text-white" size={18} /></div>
+          {/* Bento feature grid */}
+          <div className="grid grid-cols-12 gap-3 sm:gap-4 mb-10 md:mb-12">
+
+            {/* 01 — Live Map (wide) */}
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6 }}
+              className="col-span-12 sm:col-span-7 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-[#4A90D9]/40"
+            >
+              {/* Atmosphere */}
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 40%, rgba(74,144,217,0.13) 0%, transparent 60%)' }} />
+              <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(74,144,217,1) 1px,transparent 1px),linear-gradient(90deg,rgba(74,144,217,1) 1px,transparent 1px)', backgroundSize: '28px 28px' }} />
+
+              {/* Live feed cards — right half */}
+              <div className="absolute right-0 top-0 bottom-0 w-[46%] flex flex-col justify-center gap-2 px-4 pointer-events-none">
+                {/* Radar rings behind feed */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                  {[150, 100, 56].map((s, i) => (
+                    <motion.div key={i} className="absolute rounded-full border border-[#4A90D9]/15"
+                      style={{ width: s, height: s, top: -s/2, left: -s/2 }}
+                      animate={reducedMotion ? {} : { scale:[1,1.14,1], opacity:[0.4,0.06,0.4] }}
+                      transition={{ duration:3, delay:i*0.7, repeat:Infinity }} />
+                  ))}
+                  <div className="w-3 h-3 rounded-full bg-[#4A90D9] shadow-[0_0_16px_#4A90D9]">
+                    <span className="absolute inset-0 rounded-full bg-[#4A90D9] animate-ping opacity-50" />
+                  </div>
                 </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <span className={`inline-block text-[10px] font-black uppercase tracking-wider ${f.badgeColor} px-2 py-1 rounded mb-2`}>{f.badge}</span>
-                  <h3 className="text-base font-black mb-2 light:text-slate-900">{f.title}</h3>
-                  <p className="text-sm text-slate-400 light:text-slate-600 flex-1 leading-relaxed">{f.desc}</p>
+                {/* Incident cards */}
+                {[
+                  { dot:'bg-red-500', glow:'#ef4444', label:'Major Collision · Deerfoot', time:'LIVE', timeColor:'text-red-400', bold:true },
+                  { dot:'bg-amber-400', glow:'#fbbf24', label:'Road Closed · Memorial Dr', time:'4m ago', timeColor:'text-slate-500', bold:false },
+                  { dot:'bg-[#2E8B7A]', glow:'#2E8B7A', label:'All Clear · Beltline', time:'12m ago', timeColor:'text-slate-600', bold:false },
+                ].map((item, i) => (
+                  <motion.div key={i}
+                    initial={reducedMotion ? undefined : { opacity:0, x:12 }} whileInView={{ opacity: i===2 ? 0.45 : 1, x:0 }} viewport={{ once:true }} transition={{ delay:0.4+i*0.12 }}
+                    className="relative z-10 bg-slate-800/75 backdrop-blur-md rounded-xl border border-white/8 px-3 py-2 shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.dot}`} style={{ boxShadow:`0 0 5px ${item.glow}` }} />
+                      <span className="text-[10px] font-medium text-white truncate flex-1">{item.label}</span>
+                      <span className={`text-[9px] font-black shrink-0 ${item.timeColor} ${item.bold ? 'animate-pulse' : ''}`}>{item.time}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4A90D9]/12 border border-[#4A90D9]/25 w-fit">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#4A90D9] animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#4A90D9]">Real-time</span>
                 </div>
-              </motion.div>
-            ))}
+                <div className="mt-auto">
+                  <h3 className="text-xl font-black text-white mb-1.5">Live Community Map</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds — no refresh, no lag.</p>
+                </div>
+                <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/5">
+                  <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community powered</span>
+                  <span className="text-2xl font-black text-[#4A90D9]">&lt;&nbsp;30s</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* 02 — Neighbourhood Intelligence (narrow) */}
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.08 }}
+              className="col-span-12 sm:col-span-5 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-[#2E8B7A]/40"
+            >
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 85%, rgba(46,139,122,0.16) 0%, transparent 60%)' }} />
+
+              {/* Calgary zone heatmap */}
+              <div className="absolute inset-x-5 top-12 bottom-[5.5rem] pointer-events-none">
+                <div className="grid grid-cols-3 grid-rows-2 gap-1.5 h-full">
+                  {[
+                    { z:'NW', v:0.45, c:'#2E8B7A' }, { z:'N',  v:0.72, c:'#4A90D9' }, { z:'NE', v:0.55, c:'#2E8B7A' },
+                    { z:'SW', v:0.88, c:'#D4A843' }, { z:'S',  v:0.32, c:'#2E8B7A' }, { z:'SE', v:0.60, c:'#4A90D9' },
+                  ].map((zone, i) => (
+                    <motion.div key={zone.z}
+                      className="rounded-xl flex items-center justify-center relative overflow-hidden"
+                      style={{ background:`${zone.c}${Math.round(zone.v*28).toString(16).padStart(2,'0')}`, border:`1px solid ${zone.c}22` }}
+                      initial={{ opacity:0, scale:0.85 }} whileInView={{ opacity:1, scale:1 }} viewport={{ once:true }}
+                      transition={{ delay:0.25+i*0.07 }}>
+                      <span className="text-[9px] font-black tracking-wide" style={{ color:`${zone.c}cc` }}>{zone.z}</span>
+                      <div className="absolute bottom-1 right-1.5 text-[7px] font-bold text-white/30">{Math.round(zone.v*100)}%</div>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="text-[11px] font-black text-white/5 tracking-[0.3em]">YYC</span>
+                </div>
+              </div>
+
+              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full">
+                <div className="w-9 h-9 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/25 flex items-center justify-center">
+                  <BarChart2 size={16} style={{ color:'#2E8B7A' }} />
+                </div>
+                <div className="mt-auto">
+                  <h3 className="text-xl font-black text-white mb-1.5">Neighbourhood Intelligence</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Safety trends and incident history by quadrant — live.</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* 03 — Verified Data (narrow) */}
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.14 }}
+              className="col-span-12 sm:col-span-5 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-[#D4A843]/40"
+            >
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 85% 15%, rgba(212,168,67,0.12) 0%, transparent 55%)' }} />
+
+              {/* Verification pipeline visual */}
+              <div className="absolute inset-x-5 top-12 bottom-[5.5rem] flex flex-col justify-center gap-3 pointer-events-none">
+                {[
+                  { label:'CPS Open Data',   icon: ShieldCheck,   color:'#D4A843', status:'Verified' },
+                  { label:'Community Input', icon: Users,          color:'#4A90D9', status:'Confirmed' },
+                  { label:'Admin Review',    icon: CheckCircle2,   color:'#2E8B7A', status:'Reviewed' },
+                ].map((step, i) => (
+                  <motion.div key={step.label}
+                    className="flex items-center gap-2.5"
+                    initial={reducedMotion ? undefined : { opacity:0, x:-10 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}
+                    transition={{ delay:0.3+i*0.12 }}>
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background:`${step.color}15`, border:`1px solid ${step.color}30` }}>
+                      <step.icon size={14} style={{ color:step.color }} />
+                    </div>
+                    <div className="flex-1 h-px" style={{ background:`linear-gradient(to right,${step.color}35,transparent)` }} />
+                    <span className="text-[9px] font-black uppercase tracking-wide shrink-0" style={{ color:step.color }}>✓ {step.status}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full">
+                <div className="flex gap-1.5">
+                  {['CPS Data','Community','Admin'].map((tag) => (
+                    <span key={tag} className="text-[9px] font-bold px-2 py-0.5 rounded-full border"
+                      style={{ background:'rgba(212,168,67,0.08)', color:'#D4A843', borderColor:'rgba(212,168,67,0.22)' }}>{tag}</span>
+                  ))}
+                </div>
+                <div className="mt-auto">
+                  <h3 className="text-xl font-black text-white mb-1.5">Source-Verified Reports</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Every incident shows its source — community or cross-referenced CPS data.</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* 04 — Post Anonymously (wide) */}
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.2 }}
+              className="col-span-12 sm:col-span-7 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-purple-500/40"
+            >
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 15% 55%, rgba(139,92,246,0.10) 0%, transparent 55%)' }} />
+
+              {/* Redacted report doc */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 w-[44%] pointer-events-none select-none">
+                <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl border border-white/8 p-4 shadow-2xl">
+                  <div className="text-[8px] font-mono text-slate-500 mb-3 uppercase tracking-widest border-b border-white/5 pb-2">Incident Report</div>
+                  {[
+                    { label:'Reporter ID', bars: 9 },
+                    { label:'Location',    bars: 7 },
+                    { label:'Contact',     bars: 11 },
+                  ].map((row) => (
+                    <div key={row.label} className="mb-2.5">
+                      <div className="text-[7px] text-slate-600 mb-1 uppercase tracking-wider">{row.label}</div>
+                      <div className="h-5 rounded-lg flex items-center px-2.5" style={{ background:'rgba(139,92,246,0.12)', border:'1px solid rgba(139,92,246,0.18)' }}>
+                        <span className="text-[9px] font-mono text-purple-400/50">{'█'.repeat(row.bars)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <motion.div className="mt-3 flex justify-end"
+                    animate={reducedMotion ? {} : { scale:[1,1.04,1] }} transition={{ duration:2, repeat:Infinity }}>
+                    <div className="px-2.5 py-1 rounded-lg border-2 text-[8px] font-black tracking-widest uppercase rotate-[-6deg]"
+                      style={{ borderColor:'rgba(139,92,246,0.45)', color:'#a78bfa', background:'rgba(139,92,246,0.08)' }}>
+                      Anonymous
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full w-fit" style={{ background:'rgba(139,92,246,0.10)', border:'1px solid rgba(139,92,246,0.22)' }}>
+                  <Lock size={10} className="text-purple-400" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Privacy First</span>
+                </div>
+                <div className="mt-auto">
+                  <h3 className="text-xl font-black text-white mb-1.5">Post Anonymously</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed max-w-[26ch]">Report anything sensitive with zero identity attached. Yours by default.</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-white/5">
+                  <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">100% Optional Identity</span>
+                </div>
+              </div>
+            </motion.div>
+
           </div>
 
-          {/* Real Calgary scenarios */}
+          {/* Real Calgary scenarios — hidden on mobile */}
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, delay: 0.15 }}
-            className="rounded-2xl border border-white/10 light:border-slate-200 overflow-hidden shadow-xl">
+            className="hidden md:block rounded-2xl border border-white/10 light:border-slate-200 overflow-hidden shadow-xl">
             <div className="grid md:grid-cols-2 gap-0">
-              <div className="relative h-56 md:h-full overflow-hidden">
+              <div className="relative h-48 md:h-full overflow-hidden">
                 <motion.img src={publicAsset('images/calgary1.webp')} alt="Calgary neighbourhood" className="w-full h-full object-cover" loading="lazy" whileHover={!reducedMotion ? { scale: 1.04 } : undefined} transition={{ duration: 0.5 }} />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 to-transparent" />
               </div>
-              <div className="p-8 md:p-12 flex flex-col justify-center bg-slate-900/60 light:bg-white">
+              <div className="p-6 md:p-8 lg:p-12 flex flex-col justify-center bg-slate-900/60 light:bg-white">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#4A90D9] mb-4">Real Calgary situations</p>
                 <h3 className="text-2xl md:text-3xl font-black mb-4 light:text-slate-900">Built for this city</h3>
                 <p className="text-sm text-slate-300 light:text-slate-700 leading-relaxed mb-5">
@@ -761,136 +971,182 @@ export default function LandingPage() {
       {/* ================================================================
           MOBILE EXPERIENCE SECTION
           ================================================================ */}
-      <section className="py-24 px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-slate-50 overflow-hidden">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }}>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/20 mb-6">
-              <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400">Mobile First Layout</span>
+      <section className="py-12 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-slate-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+
+          {/* Mobile: compact 2×2 feature grid only */}
+          <div className="md:hidden">
+            <div className="mb-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-2">Mobile First</p>
+              <h2 className="text-2xl font-black tracking-tight leading-tight">Built for one-handed use</h2>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6">
-              Optimized for real-time usage on the go
-            </h2>
-            <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8 max-w-xl">
-              Calgary Watch uses a modern bottom-sheet interface designed for quick, one-handed use. It feels like a native app right in your browser.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { icon: Layers, title: 'Bottom Sheet UI', desc: 'Gesture-driven incident browsing' },
-                { icon: Zap, title: 'Instant Submit', desc: 'Optimistic UI updates avoid lag' },
-                { icon: MapIcon, title: 'Fluid Maps', desc: 'Hardware-accelerated panning' },
-                { icon: Lock, title: 'No App Required', desc: 'Instant access via web browser' },
+                { icon: Layers, title: 'Bottom Sheet', desc: 'Swipe-driven browsing', color: '#8B5CF6' },
+                { icon: Zap,    title: 'Instant Post', desc: 'Under 30s to submit',  color: '#4A90D9' },
+                { icon: MapIcon,title: 'Fluid Maps',   desc: 'Hardware panning',     color: '#2E8B7A' },
+                { icon: Lock,   title: 'No Install',   desc: 'Direct from browser',  color: '#D4A843' },
               ].map((item, i) => (
-                <div key={i} className="flex flex-col gap-2 p-4 rounded-2xl bg-white/5 light:bg-white border border-white/5 light:border-slate-200">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-1">
-                    <item.icon className="text-purple-400" size={18} />
+                <motion.div key={i}
+                  initial={reducedMotion ? undefined : { opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay:i*0.07 }}
+                  className="flex flex-col gap-2 p-4 rounded-2xl border border-white/8 bg-slate-900/60">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background:`${item.color}18`, border:`1px solid ${item.color}30` }}>
+                    <item.icon size={16} style={{ color:item.color }} />
                   </div>
-                  <h4 className="text-white light:text-slate-900 font-bold text-sm">{item.title}</h4>
-                  <p className="text-xs text-slate-500">{item.desc}</p>
-                </div>
+                  <h4 className="text-white font-bold text-sm leading-tight">{item.title}</h4>
+                  <p className="text-[11px] text-slate-500 leading-tight">{item.desc}</p>
+                </motion.div>
               ))}
             </div>
-          </motion.div>
-          
-          <div className="relative flex justify-center perspective-[1200px]">
-            <motion.div 
-              style={{ rotateY: -15, rotateX: 5 }}
-              whileHover={{ rotateY: 0, rotateX: 0, scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 100, damping: 20 }}
-              className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-slate-900 bg-slate-950 shadow-[-30px_30px_80px_rgba(168,85,247,0.2)] overflow-hidden ring-1 ring-white/10"
-            >
-              {/* Dynamic Island */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30 flex items-center justify-between px-3">
-                <div className="w-2 h-2 rounded-full bg-green-500/50" />
-                <div className="w-2 h-2 rounded-full bg-blue-500/50" />
+          </div>
+
+          {/* Desktop: original two-column layout */}
+          <div className="hidden md:grid md:grid-cols-2 gap-16 items-center">
+            <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/20 mb-6">
+                <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400">Mobile First Layout</span>
               </div>
-              {/* Map BG */}
-              <div className="absolute inset-0 bg-slate-900"><img src={publicAsset('images/calgary7.webp')} className="w-full h-full object-cover opacity-60 mix-blend-screen" alt="" /></div>
-              {/* Fake UI */}
-              <div className="absolute top-16 left-4 right-4 flex gap-2 z-20">
-                <div className="h-10 flex-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-lg" />
-                <div className="h-10 w-10 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-lg" />
-              </div>
-              <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 4 }} className="absolute bottom-40 right-4 w-12 h-12 bg-purple-500 rounded-full z-20 flex items-center justify-center shadow-lg shadow-purple-500/40">
-                 <Zap size={20} className="text-white" />
-              </motion.div>
-              <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-slate-900/95 backdrop-blur-xl rounded-t-3xl border-t border-white/20 p-5 z-20 shadow-2xl">
-                <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
-                <div className="h-4 w-2/3 bg-white/10 rounded-md mb-3" />
-                <div className="h-4 w-1/2 bg-white/10 rounded-md mb-4" />
-                <div className="flex gap-3">
-                   <div className="h-10 flex-1 bg-blue-500/20 rounded-xl border border-blue-500/50" />
-                   <div className="h-10 flex-1 bg-teal-500/20 rounded-xl border border-teal-500/50" />
-                </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6">
+                Optimized for real-time usage on the go
+              </h2>
+              <p className="text-lg text-slate-400 leading-relaxed mb-8 max-w-xl">
+                Calgary Watch uses a modern bottom-sheet interface designed for quick, one-handed use. It feels like a native app right in your browser.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-5">
+                {[
+                  { icon: Layers, title: 'Bottom Sheet UI', desc: 'Gesture-driven incident browsing', color: '#8B5CF6' },
+                  { icon: Zap,    title: 'Instant Submit',  desc: 'Optimistic UI updates avoid lag',  color: '#4A90D9' },
+                  { icon: MapIcon,title: 'Fluid Maps',      desc: 'Hardware-accelerated panning',     color: '#2E8B7A' },
+                  { icon: Lock,   title: 'No App Required', desc: 'Instant access via web browser',   color: '#D4A843' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background:`${item.color}15`, border:`1px solid ${item.color}25` }}>
+                      <item.icon size={16} style={{ color:item.color }} />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-sm">{item.title}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </motion.div>
-            
-            {/* Ambient glow behind phone */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/30 blur-[80px] -z-10 rounded-full" />
+            <div className="relative flex justify-center perspective-[1200px]">
+              <motion.div style={{ rotateY:-15, rotateX:5 }} whileHover={{ rotateY:0, rotateX:0, scale:1.05 }} transition={{ type:'spring', stiffness:100, damping:20 }}
+                className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-slate-900 bg-slate-950 shadow-[-30px_30px_80px_rgba(168,85,247,0.2)] overflow-hidden ring-1 ring-white/10">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30" />
+                <div className="absolute inset-0 bg-slate-900"><img src={publicAsset('images/calgary7.webp')} className="w-full h-full object-cover opacity-60 mix-blend-screen" alt="" /></div>
+                <div className="absolute top-16 left-4 right-4 flex gap-2 z-20">
+                  <div className="h-10 flex-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20" />
+                  <div className="h-10 w-10 bg-white/10 backdrop-blur-md rounded-xl border border-white/20" />
+                </div>
+                <motion.div animate={{ y:[0,-8,0] }} transition={{ repeat:Infinity, duration:4 }} className="absolute bottom-40 right-4 w-12 h-12 bg-purple-500 rounded-full z-20 flex items-center justify-center shadow-lg shadow-purple-500/40">
+                  <Zap size={20} className="text-white" />
+                </motion.div>
+                <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-slate-900/95 backdrop-blur-xl rounded-t-3xl border-t border-white/20 p-5 z-20">
+                  <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
+                  <div className="h-4 w-2/3 bg-white/10 rounded-md mb-3" />
+                  <div className="h-4 w-1/2 bg-white/10 rounded-md mb-4" />
+                  <div className="flex gap-3">
+                    <div className="h-10 flex-1 bg-blue-500/20 rounded-xl border border-blue-500/50" />
+                    <div className="h-10 flex-1 bg-teal-500/20 rounded-xl border border-teal-500/50" />
+                  </div>
+                </div>
+              </motion.div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/30 blur-[80px] -z-10 rounded-full" />
+            </div>
           </div>
+
         </div>
       </section>
 
       {/* ================================================================
           HOW IT WORKS
           ================================================================ */}
-      <section className="py-28 px-6 relative overflow-hidden" id="how-it-works">
+      <section className="py-16 md:py-28 px-4 sm:px-6 relative overflow-hidden" id="how-it-works">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 opacity-[0.035] light:opacity-[0.025]" style={{ backgroundImage: 'linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px)', backgroundSize: '72px 72px' }} aria-hidden="true" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="mb-16">
+          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="mb-10 md:mb-16">
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Workflow</p>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-3">How it Works</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-3">How it Works</h2>
             <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed max-w-xl">Three fast steps for live local awareness.</p>
           </motion.div>
 
-          <div className="relative">
-            <div className="hidden lg:block absolute top-[4.5rem] left-[calc(16.66%+2rem)] right-[calc(16.66%+2rem)] h-px pointer-events-none"
-              style={{ background: 'linear-gradient(to right, #4A90D9, #2E8B7A, #D4A843)' }} aria-hidden="true" />
+          {/* Mobile: horizontal snap-scroll steps */}
+          <div className="lg:hidden -mx-4 px-4 flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2">
+            {([
+              { step:'01', Icon:MapPin,    title:'Spot it. Tap it.', desc:'Pick a category, drop a pin, add a note. Under 30 seconds. Anonymous if you prefer.', accentColor:'#4A90D9', metric:'< 30s', metricLabel:'report time' },
+              { step:'02', Icon:Zap,       title:'Live in seconds.', desc:'Your report hits the map instantly. No queue, no moderation lag. Everyone sees it now.', accentColor:'#2E8B7A', metric:'< 2s',  metricLabel:'to appear' },
+              { step:'03', Icon:BarChart2, title:'Context surfaces.', desc:'History, safety scores, and verified CPS data appear around every incident automatically.', accentColor:'#D4A843', metric:'100+', metricLabel:'data points' },
+            ] as const).map((item, i) => (
+              <div key={item.step} className="snap-start shrink-0 w-[78vw] max-w-[300px] rounded-2xl border overflow-hidden bg-slate-900/80" style={{ borderColor:`${item.accentColor}22` }}>
+                <div className="px-5 pt-5 pb-4 flex flex-col gap-3" style={{ background:`linear-gradient(160deg,${item.accentColor}10 0%,transparent 60%)` }}>
+                  <div className="flex items-center justify-between">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background:`${item.accentColor}18`, border:`1.5px solid ${item.accentColor}35` }}>
+                      <item.Icon size={22} style={{ color:item.accentColor }} />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ color:item.accentColor, background:`${item.accentColor}12`, border:`1px solid ${item.accentColor}22` }}>Step {item.step}</span>
+                  </div>
+                  <div>
+                    <span className="text-2xl font-black" style={{ color:item.accentColor }}>{item.metric}</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-2">{item.metricLabel}</span>
+                  </div>
+                </div>
+                <div className="px-5 pb-5 pt-3">
+                  <h3 className="text-base font-black text-white mb-1.5">{item.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
 
+          {/* Desktop: original 3-col grid */}
+          <div className="hidden lg:block relative">
+            <div className="absolute top-[4.5rem] left-[calc(16.66%+2rem)] right-[calc(16.66%+2rem)] h-px pointer-events-none"
+              style={{ background: 'linear-gradient(to right, #4A90D9, #2E8B7A, #D4A843)' }} aria-hidden="true" />
             <div className="grid lg:grid-cols-3 gap-5">
               {([
-                { step: '01', Icon: MapPin, title: 'Spot it. Tap it. Done.', desc: 'Pick a category, drop a pin on the map, and add a quick note. The whole report takes under 30 seconds. Post anonymously if you prefer.', accentColor: '#4A90D9', metric: '< 30s', metricLabel: 'Average report time', facts: ['7 incident categories', 'Anonymous option', 'One tap to submit'] },
-                { step: '02', Icon: Zap, title: "Live in seconds.", desc: "Your report appears on the map the moment it's submitted. No moderation queue, no delay. Everyone watching that area sees it instantly.", accentColor: '#2E8B7A', metric: '< 2s', metricLabel: 'Time to appear on map', facts: ['Real-time Firestore sync', 'Push to all active users', 'Zero moderation lag'] },
-                { step: '03', Icon: BarChart2, title: 'Context tells the full story.', desc: "Neighbourhood history, safety trends, and verified police data surface automatically around every incident, so you understand what's actually happening.", accentColor: '#D4A843', metric: '100+', metricLabel: 'Data points per area', facts: ['CPS verified data layer', 'Historical trend charts', 'Safety score per zone'] },
+                { step:'01', Icon:MapPin,    title:'Spot it. Tap it. Done.', desc:'Pick a category, drop a pin on the map, and add a quick note. Under 30 seconds. Post anonymously if you prefer.', accentColor:'#4A90D9', metric:'< 30s', metricLabel:'Average report time', facts:['7 incident categories','Anonymous option','One tap to submit'] },
+                { step:'02', Icon:Zap,       title:'Live in seconds.', desc:"Your report appears on the map the moment it's submitted. No moderation queue, no delay. Everyone watching that area sees it instantly.", accentColor:'#2E8B7A', metric:'< 2s', metricLabel:'Time to appear on map', facts:['Real-time Firestore sync','Push to all active users','Zero moderation lag'] },
+                { step:'03', Icon:BarChart2, title:'Context tells the full story.', desc:"Neighbourhood history, safety trends, and verified police data surface automatically around every incident, so you understand what's actually happening.", accentColor:'#D4A843', metric:'100+', metricLabel:'Data points per area', facts:['CPS verified data layer','Historical trend charts','Safety score per zone'] },
               ] as const).map((item, i) => (
                 <motion.div key={item.step}
-                  initial={reducedMotion ? undefined : { opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6, delay: i * 0.12 }}
+                  initial={reducedMotion ? undefined : { opacity:0, y:32 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, amount:0.2 }} transition={{ duration:0.6, delay:i*0.12 }}
                   className="group relative">
-                  <div className="relative h-full flex flex-col rounded-2xl border overflow-hidden shadow-lg bg-slate-900/60 light:bg-white" style={{ borderColor: `${item.accentColor}22` }}>
-                    <div className="relative flex flex-col items-center justify-center gap-4 px-8 py-10 overflow-hidden" style={{ background: `linear-gradient(160deg, ${item.accentColor}10 0%, transparent 60%)` }}>
-                      <span className="absolute right-4 top-3 text-[5rem] font-black leading-none select-none pointer-events-none" style={{ color: item.accentColor, opacity: 0.07 }}>{item.step}</span>
-                      {!reducedMotion && (
-                        <>
-                          <motion.div className="absolute w-32 h-32 rounded-full pointer-events-none" style={{ border: `1px solid ${item.accentColor}20` }} animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.1, 0.4] }} transition={{ duration: 3.5, repeat: Infinity, delay: i * 0.6 }} />
-                          <motion.div className="absolute w-20 h-20 rounded-full pointer-events-none" style={{ border: `1px solid ${item.accentColor}35` }} animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.15, 0.5] }} transition={{ duration: 2.8, repeat: Infinity, delay: i * 0.6 + 0.4 }} />
-                        </>
-                      )}
-                      <div className="hidden lg:flex absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full items-center justify-center z-20 border-2 border-slate-950" style={{ background: item.accentColor }}>
+                  <div className="relative h-full flex flex-col rounded-2xl border overflow-hidden shadow-lg bg-slate-900/60 light:bg-white" style={{ borderColor:`${item.accentColor}22` }}>
+                    <div className="relative flex flex-col items-center justify-center gap-4 px-8 py-10 overflow-hidden" style={{ background:`linear-gradient(160deg,${item.accentColor}10 0%,transparent 60%)` }}>
+                      <span className="absolute right-4 top-3 text-[5rem] font-black leading-none select-none pointer-events-none" style={{ color:item.accentColor, opacity:0.07 }}>{item.step}</span>
+                      {!reducedMotion && (<>
+                        <motion.div className="absolute w-32 h-32 rounded-full pointer-events-none" style={{ border:`1px solid ${item.accentColor}20` }} animate={{ scale:[1,1.2,1], opacity:[0.4,0.1,0.4] }} transition={{ duration:3.5, repeat:Infinity, delay:i*0.6 }} />
+                        <motion.div className="absolute w-20 h-20 rounded-full pointer-events-none" style={{ border:`1px solid ${item.accentColor}35` }} animate={{ scale:[1,1.3,1], opacity:[0.5,0.15,0.5] }} transition={{ duration:2.8, repeat:Infinity, delay:i*0.6+0.4 }} />
+                      </>)}
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center z-20 border-2 border-slate-950" style={{ background:item.accentColor }}>
                         <CheckCircle2 size={11} className="text-white" />
                       </div>
                       <motion.div className="relative z-10 w-18 h-18 rounded-2xl flex items-center justify-center"
-                        style={{ background: `linear-gradient(135deg, ${item.accentColor}20, ${item.accentColor}08)`, border: `1.5px solid ${item.accentColor}40`, boxShadow: `0 6px 24px ${item.accentColor}15` }}
-                        whileHover={!reducedMotion ? { scale: 1.08 } : undefined} transition={{ duration: 0.22 }}>
-                        <item.Icon size={32} style={{ color: item.accentColor }} strokeWidth={1.6} />
+                        style={{ background:`linear-gradient(135deg,${item.accentColor}20,${item.accentColor}08)`, border:`1.5px solid ${item.accentColor}40`, boxShadow:`0 6px 24px ${item.accentColor}15` }}
+                        whileHover={!reducedMotion ? { scale:1.08 } : undefined}>
+                        <item.Icon size={32} style={{ color:item.accentColor }} strokeWidth={1.6} />
                       </motion.div>
                       <div className="relative z-10 text-center">
-                        <span className="block text-2xl font-black" style={{ color: item.accentColor }}>{item.metric}</span>
+                        <span className="block text-2xl font-black" style={{ color:item.accentColor }}>{item.metric}</span>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{item.metricLabel}</span>
                       </div>
                     </div>
                     <div className="flex flex-col flex-1 p-6 gap-3">
                       <div className="flex items-center gap-2">
-                        <motion.div className="h-0.5 rounded-full" style={{ background: item.accentColor }} initial={{ width: 0 }} whileInView={{ width: 20 }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.12 + 0.15 }} />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: item.accentColor }}>Step {item.step}</span>
+                        <motion.div className="h-0.5 rounded-full" style={{ background:item.accentColor }} initial={{ width:0 }} whileInView={{ width:20 }} viewport={{ once:true }} transition={{ duration:0.45, delay:i*0.12+0.15 }} />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color:item.accentColor }}>Step {item.step}</span>
                       </div>
-                      <h3 className="text-base font-black text-white light:text-slate-900 leading-snug">{item.title}</h3>
-                      <p className="text-sm text-slate-400 light:text-slate-600 leading-relaxed flex-1">{item.desc}</p>
+                      <h3 className="text-base font-black text-white leading-snug">{item.title}</h3>
+                      <p className="text-sm text-slate-400 leading-relaxed flex-1">{item.desc}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {item.facts.map((fact) => (
-                          <span key={fact} className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${item.accentColor}10`, color: item.accentColor, border: `1px solid ${item.accentColor}22` }}>{fact}</span>
+                          <span key={fact} className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background:`${item.accentColor}10`, color:item.accentColor, border:`1px solid ${item.accentColor}22` }}>{fact}</span>
                         ))}
                       </div>
                     </div>
@@ -913,18 +1169,36 @@ export default function LandingPage() {
       {/* ================================================================
           ROADMAP & SUSTAINABILITY
           ================================================================ */}
-      <section className="py-24 px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/10">
+      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/10">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-[1fr_350px] gap-8">
             {/* Roadmap */}
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }}>
               <span className="inline-block px-3 py-1 rounded bg-[#2E8B7A]/10 text-[10px] font-black uppercase tracking-[0.25em] text-[#2E8B7A] mb-4">Scalability Roadmap</span>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.1] mb-8">Building for the future</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6 md:mb-8">Building the app &amp; beyond</h2>
+
+              {/* Mobile: compact timeline */}
+              <div className="sm:hidden space-y-0 border border-white/8 rounded-2xl overflow-hidden divide-y divide-white/8">
+                {[
+                  { phase:'01', title:'Calgary Launch',  color:'#2E8B7A', active:true  },
+                  { phase:'02', title:'Native App',      color:'#4A90D9', active:false },
+                  { phase:'03', title:'More Cities',     color:'#D4A843', active:false },
+                  { phase:'04', title:'Enterprise',      color:'#8B5CF6', active:false },
+                ].map((p) => (
+                  <div key={p.phase} className="flex items-center gap-4 px-4 py-3.5" style={{ background: p.active ? `${p.color}08` : 'transparent' }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black" style={{ background:`${p.color}18`, color:p.color, border:`1px solid ${p.color}30` }}>{p.phase}</div>
+                    <span className="text-sm font-bold text-white flex-1">{p.title}</span>
+                    {p.active && <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ color:p.color, background:`${p.color}15` }}>Live</span>}
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: 2×2 card grid */}
+              <div className="hidden sm:grid sm:grid-cols-2 gap-4">
                 {[
                   { phase: '01', title: 'Calgary Launch', items: ['Calgary-only launch', 'Real-time incident reporting', 'Community engagement'], active: true },
-                  { phase: '02', title: 'Smart Features', items: ['Push notifications for alerts', 'Enhanced credibility system', 'Improved analytics'], active: false },
-                  { phase: '03', title: 'Expansion', items: ['Multi-city expansion', 'City demand onboarding', 'Advanced data APIs'], active: false },
+                  { phase: '02', title: 'Native App', items: ['iOS & Android app', 'Push notifications for alerts', 'Enhanced credibility system'], active: false },
+                  { phase: '03', title: 'More Cities', items: ['Multi-city expansion', 'City demand onboarding', 'Advanced data APIs'], active: false },
                   { phase: '04', title: 'Enterprise', items: ['Public safety insights', 'Data business partnerships', 'Premium custom alerts'], active: false }
                 ].map((p, i) => (
                   <motion.div whileHover={{ y: -4, scale: 1.01 }} key={i} className={`relative p-6 rounded-[2rem] border overflow-hidden ${p.active ? 'border-[#2E8B7A]/50 bg-gradient-to-br from-[#2E8B7A]/10 to-transparent' : 'border-white/5 light:border-slate-200 bg-white/5 light:bg-slate-50'}`}>
@@ -972,16 +1246,16 @@ export default function LandingPage() {
       {/* ================================================================
           TRUST, TRANSPARENCY & LEGAL
           ================================================================ */}
-      <section className="py-24 px-6 bg-slate-950 border-t border-white/5 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-4 sm:px-6 bg-slate-950 border-t border-white/5 relative overflow-hidden">
         {/* Terminal/Hacker Grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
         
         <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} className="relative z-10 max-w-6xl mx-auto">
-          <div className="flex flex-col items-center mb-16">
-            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-               <ShieldCheck size={32} className="text-blue-400" />
+          <div className="flex flex-col items-center mb-10 md:mb-16">
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+               <ShieldCheck size={28} className="text-blue-400" />
             </div>
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-[1] text-white text-center mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-[1] text-white text-center mb-4">
               Security & Transparency
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl text-center font-mono text-sm">
@@ -989,9 +1263,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          <div className="hidden md:grid lg:grid-cols-2 gap-6 mb-8">
             {/* Realtime Data Box */}
-            <div className="p-8 rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#4A90D9]/50 transition-colors">
+            <div className="p-5 sm:p-8 rounded-2xl md:rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#4A90D9]/50 transition-colors">
               <div className="flex items-center justify-between mb-6">
                  <h3 className="text-2xl font-black text-white">Community Engine</h3>
                  <span className="px-3 py-1 bg-[#4A90D9]/10 text-[#4A90D9] text-[10px] uppercase font-black tracking-widest rounded-full border border-[#4A90D9]/20">Real-Time</span>
@@ -1009,7 +1283,7 @@ export default function LandingPage() {
             </div>
 
             {/* Official Data Box */}
-            <div className="p-8 rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#2E8B7A]/50 transition-colors">
+            <div className="p-5 sm:p-8 rounded-2xl md:rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#2E8B7A]/50 transition-colors">
               <div className="flex items-center justify-between mb-6">
                  <h3 className="text-2xl font-black text-white">Official Data</h3>
                  <span className="px-3 py-1 bg-[#2E8B7A]/10 text-[#2E8B7A] text-[10px] uppercase font-black tracking-widest rounded-full border border-[#2E8B7A]/20">Verified</span>
@@ -1021,7 +1295,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="p-6 rounded-3xl bg-red-500/5 border border-red-500/20 backdrop-blur-sm hover:bg-red-500/10 transition-colors">
               <h4 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider mb-3 text-red-400"><ShieldAlert size={14}/> Disclaimer</h4>
               <p className="text-[11px] text-slate-400 font-mono mb-2">User-generated content is not independently verified. Information may be inaccurate.</p>
@@ -1051,9 +1325,9 @@ export default function LandingPage() {
       {/* ================================================================
           FINAL CTA
           ================================================================ */}
-      <section className="py-24 px-6">
+      <section className="py-12 md:py-24 px-4 sm:px-6">
         <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55 }}
-          className="max-w-6xl mx-auto relative overflow-hidden rounded-[2.5rem] border border-white/10 light:border-slate-300 bg-slate-900/70 light:bg-white px-8 py-12 md:px-12 md:py-14">
+          className="max-w-6xl mx-auto relative overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-white/10 light:border-slate-300 bg-slate-900/70 light:bg-white px-6 py-10 md:px-12 md:py-14">
           <img src={publicAsset('images/calgary8.webp')} alt="" loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-8 light:opacity-5" />
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 10% 15%,rgba(46,139,122,0.12),transparent 35%),radial-gradient(circle at 90% 85%,rgba(74,144,217,0.12),transparent 45%)' }} aria-hidden="true" />
           <div className="relative z-10 grid lg:grid-cols-[1.2fr_auto] gap-8 items-center">
@@ -1062,18 +1336,18 @@ export default function LandingPage() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 light:text-slate-600">Live Community Network</span>
               </div>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.06] max-w-3xl light:text-slate-900">
+              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-[1.06] max-w-3xl light:text-slate-900">
                 Join Calgary's real-time awareness network.
               </h2>
               <p className="mt-4 text-sm md:text-base text-slate-400 light:text-slate-600 leading-relaxed max-w-2xl">
                 Open the city map to monitor incidents in motion, or add your report to strengthen neighbourhood awareness for everyone.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:min-w-[15rem]">
-              <Button size="lg" className="h-13 px-8 rounded-2xl text-base font-black" style={{ background: 'linear-gradient(135deg,#4A90D9 0%,#2E8B7A 100%)', boxShadow: '0 10px 30px -14px rgba(74,144,217,0.7)' }} onClick={() => navigate('/map')}>
+            <div className="flex flex-col gap-3 lg:min-w-[15rem]">
+              <Button size="lg" className="h-13 px-8 rounded-2xl text-base font-black w-full" style={{ background: 'linear-gradient(135deg,#4A90D9 0%,#2E8B7A 100%)', boxShadow: '0 10px 30px -14px rgba(74,144,217,0.7)' }} onClick={() => navigate('/map')}>
                 Open Live Map
               </Button>
-              <Button variant="secondary" size="lg" className="h-13 px-8 rounded-2xl bg-white/8 light:bg-white border border-white/15 light:border-slate-300 hover:bg-white/12 light:hover:bg-slate-100 text-base font-black text-white light:text-slate-900" onClick={() => navigate('/map?report=true')}>
+              <Button variant="secondary" size="lg" className="h-13 px-8 rounded-2xl bg-white/8 light:bg-white border border-white/15 light:border-slate-300 hover:bg-white/12 light:hover:bg-slate-100 text-base font-black text-white light:text-slate-900 w-full" onClick={() => navigate('/map?report=true')}>
                 Submit Report
               </Button>
             </div>
@@ -1084,7 +1358,7 @@ export default function LandingPage() {
       {/* ================================================================
           CITY EXPANSION REQUEST
           ================================================================ */}
-      <section className="py-16 px-6 border-t border-white/5 light:border-slate-200">
+      <section className="py-12 md:py-16 px-4 sm:px-6 border-t border-white/5 light:border-slate-200">
         <div className="max-w-md mx-auto text-center space-y-5">
           <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Want this in your city?</h4>
           <div className="flex gap-2">
@@ -1105,7 +1379,7 @@ export default function LandingPage() {
       {/* ================================================================
           FOOTER
           ================================================================ */}
-      <footer className="py-10 px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-white">
+      <footer className="py-10 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-white">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="text-[#4A90D9]" size={20} />

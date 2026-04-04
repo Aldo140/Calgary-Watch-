@@ -2,11 +2,109 @@
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
 
-Calgary Watch is a **real-time, community-powered incident map** built specifically for Calgary, AB. Neighbours report safety incidents — road closures, crime alerts, weather events, infrastructure issues — and they appear on the map instantly, layered with verified police data and neighbourhood context.
+Calgary Watch is a **real-time, community-powered incident map** built specifically for Calgary, AB. Calgarians report real-time incidents — road closures, crime alerts, weather events, infrastructure issues — and they appear on the map instantly, layered with verified police data and neighbourhood context.
 
 **[Visit Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
+![Mobile First](https://img.shields.io/badge/experience-mobile--first-purple)
 
 > Calgary Watch is a non-profit initiative. We're actively looking for volunteers and business partners.
+
+---
+
+## Vision
+
+Calgary Watch aims to become Calgary’s real-time urban intelligence layer — a platform where community-reported incidents and verified public data combine to provide immediate awareness and long-term insight into city activity.
+
+Our long-term goal is to expand beyond Calgary into a scalable platform for cities across Canada, enabling safer, more informed communities through accessible, real-time data.
+
+## Trust & Data Transparency
+
+Calgary Watch distinguishes between two types of data:
+
+### Community Reports (Real-Time)
+- Submitted by users in real time
+- May be unverified at the time of posting
+- Clearly labeled with trust indicators:
+  - Unverified
+  - Multiple Reports
+  - Community Confirmed
+
+### Official Data
+- Sourced from Calgary Police Service open datasets
+- Aggregated at the community level
+- Updated periodically (not real-time)
+
+Calgary Watch does not represent or replace official emergency services.
+
+## Disclaimer
+
+Calgary Watch is a community-powered platform. Information displayed may include user-generated content that has not been independently verified.
+
+This platform is not affiliated with or endorsed by the Calgary Police Service or any government entity.
+
+Do not rely on Calgary Watch for emergency response. In an emergency, call 911.
+
+## Privacy
+
+- Anonymous reporting is supported
+- Personally identifiable information is not publicly displayed
+- User emails are never exposed
+- Data collection is minimized to what is necessary for functionality
+
+We are committed to protecting user privacy while enabling community awareness.
+
+## Known Limitations
+
+- Community reports may be inaccurate or incomplete
+- Official data is not real-time and may lag behind live events
+- Some incidents may be underreported in certain areas
+- Map clustering and density may vary based on available data
+
+We are continuously improving data accuracy and coverage.
+
+## Mobile Experience
+
+Calgary Watch is designed mobile-first, optimized for real-time usage on the go:
+
+- Bottom sheet interface for incident browsing
+- Touch-friendly interactions and gesture navigation
+- Fast map interactions with minimal latency
+- Instant form submission with optimistic UI updates
+
+The experience is inspired by modern map-based applications and designed for quick, one-handed use in real-world scenarios.
+
+## Roadmap
+
+### Phase 1 (Current)
+- Calgary-only launch
+- Real-time incident reporting
+- Community engagement and validation
+
+### Phase 2
+- Push notifications for nearby incidents
+- Enhanced credibility system (user confirmations, reputation)
+- Improved analytics and trend detection
+
+### Phase 3
+- Multi-city expansion
+- City demand tracking and onboarding
+- Advanced data integrations (transit, weather, infrastructure APIs)
+
+### Phase 4
+- Public safety insights platform
+- Data partnerships with businesses and organizations
+- Premium alerting and analytics features
+
+## Sustainability
+
+Calgary Watch is currently a non-profit initiative.
+
+Future sustainability may include:
+- Local business partnerships (sponsored alerts, community services)
+- Aggregated, anonymized data insights for organizations
+- Premium features such as custom alerts and advanced analytics
+
+All monetization will prioritize community value and transparency.
 
 ---
 

@@ -107,7 +107,6 @@ async function pruneExpiredIncidents(db: Firestore): Promise<number> {
   const snapshot = await db
     .collection('incidents')
     .where('dedup_key', '!=', null)
-    .where('deleted', '==', false)
     .get();
 
   const batch = db.batch();
@@ -115,6 +114,7 @@ async function pruneExpiredIncidents(db: Firestore): Promise<number> {
 
   for (const doc of snapshot.docs) {
     const data = doc.data();
+    if (data.deleted) continue; // skip already-deleted docs in JS (avoids composite index)
     const expiresAt = data.expires_at as number | undefined;
     if (expiresAt && expiresAt < now) {
       batch.update(doc.ref, {

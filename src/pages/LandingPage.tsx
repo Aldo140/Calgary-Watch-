@@ -297,94 +297,124 @@ export default function LandingPage() {
           HERO
           ================================================================ */}
       <section ref={heroRef} className="flex flex-col mt-16">
-        <div className="flex flex-col lg:grid lg:grid-cols-[48fr_52fr]" style={{ minHeight: 'calc(100svh - 64px - 52px)' }}>
-
-          {/* Mobile photo */}
-          <div className="lg:hidden relative h-56 sm:h-72 overflow-hidden order-first">
-            <picture>
-              <source srcSet={publicAsset('images/calgary7.webp')} type="image/webp" />
-              <img src={publicAsset('images/calgary2.jpg')} alt="Calgary skyline" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-[center_40%]" />
-            </picture>
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950 to-transparent" aria-hidden="true" />
-          </div>
+        <div className="flex flex-col lg:grid lg:grid-cols-2 items-center gap-12 lg:gap-24 px-6 sm:px-12 xl:px-20 py-20 lg:py-32 xl:py-40 relative z-10 w-full max-w-[1600px] mx-auto min-h-[calc(100svh-64px)] overflow-hidden">
+          <AuroraBackground />
 
           {/* Left — content */}
-          <div className="relative flex flex-col justify-center bg-slate-950 light:bg-white px-8 sm:px-12 lg:px-16 xl:px-20 py-14 lg:py-20 overflow-hidden">
-            <AuroraBackground />
-
+          <div className="relative flex flex-col justify-center items-start z-20">
             <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, x: -28 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              className="relative z-10 max-w-xl"
+              initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              className="max-w-2xl"
             >
-              {/* Badges */}
-              <div className="flex flex-wrap items-center gap-2 mb-7">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#4A90D9]/10 border border-[#4A90D9]/30 rounded-full">
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4A90D9] opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4A90D9]" />
-                  </span>
-                  <span className="text-[11px] font-bold text-[#4A90D9] uppercase tracking-widest">Live · Calgary, AB</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2E8B7A]/10 border border-[#2E8B7A]/30 rounded-full">
-                  <span className="text-[11px] font-bold text-[#2E8B7A] uppercase tracking-widest">Non-Profit</span>
-                </div>
+              {/* Badges in a glass pill */}
+              <div className="inline-flex items-center gap-3 p-1.5 pr-5 rounded-full bg-white/5 border border-white/10 backdrop-blur-2xl mb-8 shadow-2xl">
+                 <div className="bg-[#4A90D9] text-white px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-[0_0_20px_rgba(74,144,217,0.5)]">
+                    <span className="relative flex h-2 w-2 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                    </span>
+                    Live · Calgary, AB
+                 </div>
+                 <span className="text-[10px] font-black text-[#2E8B7A] uppercase tracking-widest">
+                    Non-Profit
+                 </span>
               </div>
 
               {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.06] tracking-tight text-white light:text-slate-900 mb-5">
-                Know what's happening<br />in{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">Calgary</span>
-                {' '}right now.
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-black leading-[0.9] tracking-tighter text-white mb-8">
+                Know what's happening<br/>
+                <span className="relative inline-block mt-4 lg:mt-6 mb-2">
+                   <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
+                     in Calgary
+                   </span>
+                   <span className="absolute -bottom-2 left-0 right-0 h-4 bg-[#2E8B7A]/40 blur-2xl z-0" />
+                </span><br/> right now.
               </h1>
 
               {/* Description */}
-              <p className="text-base sm:text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-9 max-w-lg">
-                A live map where Calgarians report incidents the moment they happen. Road closures, fires, flooding, safety alerts — all in one place, verified and real-time.
+              <p className="text-lg sm:text-xl text-slate-400 font-light max-w-xl leading-relaxed mb-10">
+                A live map where Calgarians report incidents the moment they happen. Road closures, fires, flooding, safety alerts — all in one place, <span className="text-white font-medium">verified and real-time.</span>
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-wrap gap-3 mb-10">
-                <Button size="lg" className="bg-[#4A90D9] hover:bg-blue-500 rounded-xl px-8 h-12 text-base font-bold group shadow-[0_6px_24px_rgba(74,144,217,0.35)]" onClick={() => navigate('/map')}>
-                  Open Live Map
-                  <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={17} />
-                </Button>
-                <Button variant="secondary" size="lg" className="bg-white/5 light:bg-slate-100 border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 rounded-xl px-8 h-12 text-base font-bold text-white light:text-slate-800" onClick={() => navigate('/map?report=true')}>
-                  Report an Incident
-                </Button>
+              <div className="flex flex-wrap items-center gap-4 mb-12">
+                  <Button size="lg" className="rounded-2xl h-14 px-8 bg-white text-slate-950 hover:bg-slate-200 hover:scale-105 transition-all text-base font-black tracking-wide shadow-[0_0_40px_rgba(255,255,255,0.2)]" onClick={() => navigate('/map')}>
+                     <MapPin className="mr-2" size={18} /> Open Live Map
+                  </Button>
+                  <Button size="lg" variant="secondary" className="rounded-2xl h-14 px-8 bg-slate-900 border border-white/10 hover:bg-slate-800 transition-all text-base font-bold text-white shadow-[0_0_20px_rgba(255,255,255,0.05)]" onClick={() => navigate('/map?report=true')}>
+                     <Zap className="mr-2 text-[#D4A843]" size={18} /> Report an Incident
+                  </Button>
               </div>
 
               {/* Social proof — real avatar images */}
-              <div className="flex items-center gap-3 pt-3 border-t border-white/8 light:border-slate-200">
-                <div className="flex -space-x-2.5" aria-hidden="true">
+              <div className="inline-flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-xl">
+                <div className="flex -space-x-3">
                   {AVATARS.map((av, i) => (
-                    <img
-                      key={i}
-                      src={av.src}
-                      alt={av.alt}
-                      className="w-9 h-9 rounded-full border-2 border-slate-950 light:border-white object-cover"
-                      loading="lazy"
-                    />
+                     <img key={i} src={av.src} alt={av.alt} className="w-10 h-10 rounded-full border-2 border-slate-950 object-cover" loading="lazy" />
                   ))}
                 </div>
-                <p className="text-sm text-slate-500 light:text-slate-600">
-                  <span className="text-white light:text-slate-900 font-bold">2,400+</span> Calgarians this week
-                </p>
+                <div className="text-sm">
+                  <div className="text-white font-black text-base">2,400+ Calgarians</div>
+                  <div className="text-slate-400 text-xs font-semibold">contributed this week</div>
+                </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Right — Calgary photo (desktop) */}
-          <div className="hidden lg:block relative overflow-hidden">
-            <motion.div initial={reducedMotion ? undefined : { opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, ease: 'easeOut' }} className="absolute inset-0">
-              <picture>
-                <source srcSet={publicAsset('images/calgary7.webp')} type="image/webp" />
-                <img src={publicAsset('images/calgary2.jpg')} alt="Calgary skyline at night" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-[center_40%]" />
-              </picture>
-            </motion.div>
-            <div className="absolute inset-y-0 left-0 w-28 pointer-events-none" style={{ background: 'linear-gradient(to right, #020617 0%, transparent 100%)' }} aria-hidden="true" />
-            <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to top, #020617 0%, transparent 100%)' }} aria-hidden="true" />
+          {/* Right — 3D Exploded UI Display */}
+          <div className="relative w-full h-[500px] lg:h-[700px] perspective-[2000px] flex items-center justify-center mt-12 lg:mt-0 hidden md:flex z-20">
+              <motion.div 
+                 animate={{ rotateY: [-5, 5, -5], rotateX: [10, 15, 10] }}
+                 transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+                 className="relative w-full max-w-[500px] xl:max-w-[600px] aspect-square"
+                 style={{ transformStyle: 'preserve-3d' }}
+              >
+                 {/* Base Layer: Blurred glow */}
+                 <div className="absolute inset-0 bg-[#4A90D9]/20 blur-[100px] rounded-full" style={{ transform: 'translateZ(-100px)' }} />
+
+                 {/* Base Layer: Topo Map Glass */}
+                 <div className="absolute inset-0 rounded-[3rem] border border-white/10 bg-slate-900/40 backdrop-blur-3xl overflow-hidden shadow-[0_0_100px_rgba(74,144,217,0.15)] ring-1 ring-white/5" style={{ transform: 'translateZ(-50px)' }}>
+                    <img src={publicAsset('images/calgary7.webp')} className="w-full h-full object-cover opacity-60 mix-blend-screen scale-110" alt="" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#4A90D9]/20 via-[#2E8B7A]/10 to-[#D4A843]/10" />
+                    <div className="absolute inset-0 bg-slate-950/40 [mask-image:radial-gradient(circle_at_center,transparent_0%,black_100%)]" />
+                 </div>
+
+                 {/* Mid Layer: Scanning/Pulse Effects */}
+                 <div className="absolute inset-0 pointer-events-none" style={{ transform: 'translateZ(50px)' }}>
+                    <div className="absolute top-[25%] left-[25%] w-40 h-40 bg-red-500/20 rounded-full blur-2xl animate-pulse" />
+                    <div className="absolute top-[38%] left-[38%] w-4 h-4 rounded-full bg-red-500 shadow-[0_0_30px_rgba(239,68,68,1)] border-2 border-white" />
+                    
+                    <div className="absolute bottom-[25%] right-[25%] w-48 h-48 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+                    <div className="absolute bottom-[35%] right-[35%] w-3 h-3 rounded-full bg-blue-400 shadow-[0_0_30px_rgba(59,130,246,1)] border border-white" />
+                 </div>
+
+                 {/* Top Layer: Floating UI Widgets */}
+                 <div className="absolute inset-0 pointer-events-none" style={{ transform: 'translateZ(120px)' }}>
+                    {/* Widget 1 */}
+                    <motion.div animate={{ y: [-8, 8, -8] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }} className="absolute top-[20%] -left-12 lg:-left-20 p-4 bg-slate-900/80 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl flex items-center gap-4">
+                       <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/30">
+                          <AlertCircle size={20} className="text-red-400" />
+                       </div>
+                       <div>
+                          <div className="text-[10px] text-red-400 uppercase font-black tracking-widest mb-0.5">Critical Alert</div>
+                          <div className="text-sm font-bold text-white">Macleod Trail Closed</div>
+                       </div>
+                    </motion.div>
+
+                    {/* Widget 2 */}
+                    <motion.div animate={{ y: [8, -8, 8] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} className="absolute bottom-[20%] -right-12 lg:-right-16 p-4 bg-slate-900/80 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-2xl flex items-center gap-4">
+                       <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center border border-green-500/30">
+                          <ShieldCheck size={20} className="text-green-400" />
+                       </div>
+                       <div>
+                          <div className="text-[10px] text-green-400 uppercase font-black tracking-widest mb-0.5">Systems Nominal</div>
+                          <div className="text-sm font-bold text-white">Live CPS Sync: OK</div>
+                       </div>
+                    </motion.div>
+                 </div>
+              </motion.div>
           </div>
         </div>
 

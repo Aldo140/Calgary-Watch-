@@ -1,6 +1,41 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, AlertTriangle } from 'lucide-react';
+
+const NEIGHBOURHOODS = [
+  { name: 'Downtown', lat: 51.0478, lng: -114.0625 },
+  { name: 'Beltline', lat: 51.0381, lng: -114.0680 },
+  { name: 'Kensington', lat: 51.0603, lng: -114.0903 },
+  { name: 'Bridgeland', lat: 51.0602, lng: -114.0412 },
+  { name: 'Mission', lat: 51.0347, lng: -114.0670 },
+  { name: 'Inglewood', lat: 51.0406, lng: -114.0201 },
+  { name: 'Bowness', lat: 51.0975, lng: -114.1807 },
+  { name: 'Saddleridge', lat: 51.1494, lng: -113.9670 },
+  { name: 'Evanston', lat: 51.1902, lng: -114.0792 },
+  { name: 'Mahogany', lat: 50.9011, lng: -113.9603 },
+  { name: 'Auburn Bay', lat: 50.9099, lng: -114.0010 },
+  { name: 'Signal Hill', lat: 51.0660, lng: -114.2161 },
+  { name: 'Tuscany', lat: 51.1303, lng: -114.2208 },
+  { name: 'Royal Oak', lat: 51.1303, lng: -114.1827 },
+  { name: 'Panorama Hills', lat: 51.1655, lng: -114.0448 },
+  { name: 'Midnapore', lat: 50.9497, lng: -114.0683 },
+  { name: 'Shawnessy', lat: 50.9251, lng: -114.1245 },
+  { name: 'McKenzie Towne', lat: 50.9083, lng: -113.9534 },
+  { name: 'Cranston', lat: 50.8986, lng: -113.9836 },
+  { name: 'Copperfield', lat: 50.9141, lng: -113.9951 },
+] as const;
+
+function detectNeighbourhood(lat: number, lng: number): string {
+  const MAX_DIST = 0.035;
+  let best = { name: '', dist: Infinity };
+  for (const n of NEIGHBOURHOODS) {
+    const dLat = lat - n.lat;
+    const dLng = (lng - n.lng) * Math.cos(n.lat * (Math.PI / 180));
+    const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+    if (dist < MAX_DIST && dist < best.dist) best = { name: n.name, dist };
+  }
+  return best.name;
+}
 
 const EMERGENCY_TYPES = [
   { id: 'emergency',      label: 'Emergency',  icon: Siren,         color: 'bg-red-600',    ring: 'ring-red-500' },
@@ -54,8 +89,15 @@ export default function EmergencyModal({
   const [step, setStep] = useState<'choose' | 'form'>('choose');
   const submitDebounceRef = useRef(0);
 
-  // Crosshair pin coordinates take precedence over GPS
+  // Crosshair pin / tap coordinates take precedence over GPS
   const activeLocation = pinLocation ?? location;
+
+  // Auto-detect neighbourhood whenever active location changes
+  useEffect(() => {
+    if (!activeLocation) return;
+    const detected = detectNeighbourhood(activeLocation.lat, activeLocation.lng);
+    if (detected) setNeighborhood(detected);
+  }, [activeLocation?.lat, activeLocation?.lng]);
 
   // Advance to form when a pin is confirmed while we're choosing
   // (isPinMode going false with a new pinLocation)
@@ -74,7 +116,7 @@ export default function EmergencyModal({
     submitDebounceRef.current = now;
     setIsSubmitting(true);
     const label = EMERGENCY_TYPES.find((t) => t.id === selectedType)?.label ?? 'Emergency';
-    const title = `${label} — ${description.trim().slice(0, 60)}`;
+    const title = `${label}: ${description.trim().slice(0, 60)}`;
     onSubmit({ category: selectedType, title, description: description.trim(), neighborhood: neighborhood.trim(), lat: activeLocation.lat, lng: activeLocation.lng });
     setSubmitted(true);
     setTimeout(() => {
@@ -137,7 +179,7 @@ export default function EmergencyModal({
                 <AlertTriangle size={14} className="text-red-400 mt-0.5 shrink-0" />
                 <p className="text-[11px] text-red-200 leading-relaxed">
                   <span className="font-black">For life-threatening emergencies call 911 first.</span>{' '}
-                  This tool is for community awareness only — not a substitute for emergency services. Do not submit false reports.
+                  This tool is for community awareness only, not a substitute for emergency services. Do not submit false reports.
                 </p>
               </div>
 
@@ -299,7 +341,7 @@ export default function EmergencyModal({
                     {isSubmitting ? (
                       <><Loader2 size={20} className="animate-spin" /> Sending alert…</>
                     ) : submitted ? (
-                      '✓ Reported — stay safe'
+                      'Reported. Stay safe.'
                     ) : (
                       <><Siren size={20} /> Report Emergency Now</>
                     )}

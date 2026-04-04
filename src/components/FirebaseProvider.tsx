@@ -10,7 +10,7 @@ import {
   GoogleAuthProvider,
   signOut
 } from 'firebase/auth';
-import { auth, db } from '../firebase';
+import { auth, db, isFirebaseConfigured } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 
@@ -21,6 +21,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   isAuthReady: boolean;
   isAdmin: boolean;
+  /** Build has VITE_FIREBASE_* vars (CI secrets or local .env). */
+  isFirebaseConfigured: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +35,12 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
+    if (!auth || !db) {
+      setLoading(false);
+      setIsAuthReady(true);
+      return;
+    }
+
     void setPersistence(auth, browserLocalPersistence).catch((error) => {
       console.error('Failed to set auth persistence:', error);
     });
@@ -82,6 +90,12 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async () => {
+    if (!auth) {
+      console.warn(
+        'Sign-in unavailable: Firebase env vars were not set at build time. See README / GitHub Actions secrets.'
+      );
+      return;
+    }
     if (isSigningIn) return;
 
     setIsSigningIn(true);
@@ -125,6 +139,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
     } catch (error) {
@@ -133,7 +148,17 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, logout, isAuthReady, isAdmin }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        signIn,
+        logout,
+        isAuthReady,
+        isAdmin,
+        isFirebaseConfigured,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

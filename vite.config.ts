@@ -5,9 +5,18 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   const isGitHubActions = process.env.GITHUB_ACTIONS === 'true';
+  const envBase = process.env.VITE_BASE_PATH?.trim();
+  const base =
+    envBase && envBase.length > 0
+      ? envBase.endsWith('/')
+        ? envBase
+        : `${envBase}/`
+      : isGitHubActions
+        ? '/Calgary-Watch-/'
+        : '/';
 
   return {
-    base: isGitHubActions ? '/Calgary-Watch-/' : '/',
+    base,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

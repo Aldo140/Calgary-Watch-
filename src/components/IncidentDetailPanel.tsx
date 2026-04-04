@@ -1,10 +1,11 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Info, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2 } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, AlertTriangle, Navigation, Layers, ExternalLink, MessageSquare, UserCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/src/lib/utils';
+import { cn, publicAsset } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
+import { useState, useEffect } from 'react';
 
 interface IncidentDetailPanelProps {
   incident: Incident | null;
@@ -13,6 +14,17 @@ interface IncidentDetailPanelProps {
 }
 
 export default function IncidentDetailPanel({ incident, onClose, onViewNeighborhood }: IncidentDetailPanelProps) {
+  const [isMobileSheet, setIsMobileSheet] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    const fn = () => setIsMobileSheet(mq.matches);
+    mq.addEventListener('change', fn);
+    return () => mq.removeEventListener('change', fn);
+  }, []);
+
   if (!incident) return null;
 
   const Icon = CATEGORY_ICONS[incident.category];
@@ -50,7 +62,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   const handleShare = async () => {
     const shareData = {
       title: `Calgary Watch: ${incident.title}`,
-      text: `${incident.title} — reported in ${incident.neighborhood || 'Calgary'}. Check the live map for details.`,
+      text: `${incident.title} . Reported in ${incident.neighborhood || 'Calgary'}. Check the live map for details.`,
       url: typeof window !== 'undefined' ? window.location.href : '',
     };
     try {
@@ -64,18 +76,35 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
     }
   };
 
+  const sheetMotion = isMobileSheet
+    ? { initial: { y: '100%', opacity: 0 }, animate: { y: 0, opacity: 1 }, exit: { y: '100%', opacity: 0 } }
+    : { initial: { x: '100%', opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: '100%', opacity: 0 } };
+
   return (
     <AnimatePresence>
       {incident && (
         <motion.div
-          initial={{ x: '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0 }}
-          transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
+          key="incident-panel"
+          initial={sheetMotion.initial}
+          animate={sheetMotion.animate}
+          exit={sheetMotion.exit}
+          transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
           style={{ willChange: 'transform' }}
-          className="fixed inset-y-0 right-0 h-full w-full sm:max-w-lg z-[100] p-0 sm:p-6"
+          className={cn(
+            'fixed z-[100] w-full flex flex-col p-0',
+            isMobileSheet
+              ? 'inset-x-0 bottom-0 justify-end max-h-[88dvh]'
+              : 'inset-y-0 right-0 h-full sm:max-w-lg justify-start sm:p-6'
+          )}
         >
-          <Card className="h-full flex flex-col bg-slate-950/95 light:bg-white backdrop-blur-sm border-white/10 light:border-slate-200 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.4)] overflow-hidden p-0 rounded-none sm:rounded-[2.5rem] relative">
+          <Card
+            className={cn(
+              'flex flex-col bg-slate-950/97 light:bg-white backdrop-blur-md border-white/10 light:border-slate-200 shadow-[0_16px_48px_-20px_rgba(0,0,0,0.55)] overflow-hidden p-0 relative min-h-0',
+              isMobileSheet
+                ? 'max-h-[88dvh] w-full rounded-t-[1.75rem] rounded-b-none border-x-0 border-b-0'
+                : 'h-full rounded-none sm:rounded-[2.5rem]'
+            )}
+          >
             {/* Background Glow */}
             <div className={cn(
               "absolute -top-24 -right-24 w-64 h-64 blur-[120px] opacity-20 rounded-full pointer-events-none",
@@ -86,11 +115,23 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               'bg-purple-500'
             )} />
 
+            {/* Drag affordance — mobile sheet */}
+            {isMobileSheet && (
+              <div className="flex shrink-0 justify-center pt-3 pb-1">
+                <div className="h-1 w-10 rounded-full bg-white/20 light:bg-slate-300" aria-hidden />
+              </div>
+            )}
+
             {/* Header / Hero Section */}
-            <div className="relative h-64 w-full shrink-0 overflow-hidden">
+            <div
+              className={cn(
+                'relative w-full shrink-0 overflow-hidden',
+                isMobileSheet ? 'h-40' : 'h-64'
+              )}
+            >
               {/* Background image — local WebP, no network round-trip */}
               <img
-                src="/images/calgary7.webp"
+                src={publicAsset('images/calgary7.webp')}
                 alt=""
                 aria-hidden="true"
                 className="absolute inset-0 w-full h-full object-cover grayscale opacity-25 light:opacity-15"

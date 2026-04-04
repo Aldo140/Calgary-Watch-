@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Map, { MapRef } from '@/src/components/Map';
 import Sidebar from '@/src/components/Sidebar';
@@ -7,7 +7,6 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
-import MobileBottomSheet from '@/src/components/MobileBottomSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { MOCK_INCIDENTS, getAreaIntelligence } from '@/src/services/mockData';
@@ -67,7 +66,8 @@ export default function MapPage() {
         signIn();
       } else {
         setIsFormOpen(true);
-        setSelectedLocation(userLocation || CALGARY_CENTER);
+        setConfirmedPinLocation(null);
+        setSelectedLocation(CALGARY_CENTER);
       }
     }
   }, [searchParams, isAuthReady, user, userLocation, signIn]);
@@ -106,6 +106,13 @@ export default function MapPage() {
   // Real-time incidents listener
   useEffect(() => {
     if (!isAuthReady) return;
+
+    if (!db) {
+      setIncidents(MOCK_INCIDENTS);
+      setHasMoreIncidents(false);
+      lastVisibleIncidentDoc.current = null;
+      return;
+    }
 
     const q = query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(INCIDENT_PAGE_SIZE));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -156,7 +163,7 @@ export default function MapPage() {
   }, [isAuthReady]);
 
   const handleLoadMoreIncidents = useCallback(async () => {
-    if (isLoadingMoreIncidents || !hasMoreIncidents || !lastVisibleIncidentDoc.current) return;
+    if (!db || isLoadingMoreIncidents || !hasMoreIncidents || !lastVisibleIncidentDoc.current) return;
 
     setIsLoadingMoreIncidents(true);
     const path = 'incidents';
@@ -268,6 +275,10 @@ export default function MapPage() {
     const isAnonymous = Boolean(data.anonymous);
 
     const path = 'incidents';
+    if (!db) {
+      console.warn('Cannot post report: Firebase env vars were not set at build time.');
+      return;
+    }
     // Fire-and-forget: Don't await the Firestore write, let it happen in background
     startTransition(() => {
       (async () => {
@@ -300,6 +311,10 @@ export default function MapPage() {
     const firstName = fullName.split(/\s+/)[0]?.slice(0, 50) || 'Calgary User';
     const path = 'incidents';
     setConfirmedEmergencyPinLocation(null);
+    if (!db) {
+      console.warn('Cannot submit emergency report: Firebase env vars were not set at build time.');
+      return;
+    }
 
     startTransition(() => {
       (async () => {
@@ -340,6 +355,12 @@ export default function MapPage() {
   const handleEmergencyPinCancel = useCallback(() => {
     setIsEmergencyPinMode(false);
   }, []);
+
+  const filteredIncidentsCount = useMemo(
+    () =>
+      incidents.filter((i) => selectedCategory === 'all' || i.category === selectedCategory).length,
+    [incidents, selectedCategory]
+  );
 
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
@@ -386,10 +407,10 @@ export default function MapPage() {
             initial={{ opacity: 0, y: -40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-2.5 bg-amber-900/90 border border-amber-500/40 rounded-2xl shadow-xl backdrop-blur-xl text-amber-200 text-xs font-bold"
+            className="fixed top-4 max-lg:top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-2.5 bg-amber-900/90 border border-amber-500/40 rounded-2xl shadow-xl backdrop-blur-xl text-amber-200 text-xs font-bold"
           >
             <Navigation size={14} className="shrink-0" />
-            Location access denied — showing Calgary center instead.
+            Location access denied. Showing Calgary center instead.
             <button onClick={() => setLocationError(false)} className="ml-1 text-amber-400 hover:text-white transition-colors">
               <X size={14} />
             </button>
@@ -470,8 +491,187 @@ export default function MapPage() {
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
         />
 
-        {/* Top Header */}
-        <div className="absolute top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 flex items-center justify-between pointer-events-none z-30">
+        {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) — lg+ uses desktop header only */}
+        <div
+          className={cn(
+            'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden',
+            theme === 'light' && 'text-slate-900'
+          )}
+        >
+          <div className="flex items-center gap-2 pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 shadow-lg text-sky-400 light:text-blue-600"
+              aria-label="Back to home"
+            >
+              <Home size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 px-3.5 py-2.5 shadow-lg text-left active:scale-[0.99] transition-transform"
+            >
+              <Search size={16} className="shrink-0 text-sky-400/90 light:text-blue-600" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-sky-300/90 light:text-blue-700 truncate">
+                  Calgary Watch
+                </p>
+                <p className="text-xs font-bold text-white/90 light:text-slate-800 truncate">
+                  {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory} reports`}
+                </p>
+              </div>
+              <span className="shrink-0 rounded-full bg-amber-400/20 border border-amber-400/35 px-2 py-0.5 text-[10px] font-black tabular-nums text-amber-200 light:text-amber-800">
+                {filteredIncidentsCount}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 shadow-lg text-slate-200 light:text-slate-700"
+              aria-label="Filters and feed"
+            >
+              <Filter size={18} />
+            </button>
+          </div>
+          <div className="mt-2 flex justify-center pointer-events-none">
+            <div className="inline-flex flex-col items-center rounded-2xl border border-white/8 bg-black/25 light:bg-white/50 px-4 py-2 backdrop-blur-md">
+              <p className="text-center text-xl font-black tracking-tight text-amber-300 light:text-amber-700 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
+                {filteredIncidentsCount === 0
+                  ? 'No reports in view'
+                  : `${filteredIncidentsCount} live report${filteredIncidentsCount === 1 ? '' : 's'}`}
+              </p>
+              <p className="text-center text-[10px] font-semibold uppercase tracking-wider text-slate-300/90 light:text-slate-600 mt-0.5">
+                Community-powered · verify before you act
+              </p>
+            </div>
+          </div>
+          <div className="relative mt-2 flex items-center justify-end gap-2 pointer-events-auto px-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                if (userLocation) mapRef.current?.flyTo(userLocation.lat, userLocation.lng);
+                else mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
+              }}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 light:bg-white/85 backdrop-blur-md border border-white/10 light:border-slate-200 text-sky-400 light:text-blue-600 shadow-md"
+              aria-label="Recenter on your location"
+            >
+              <Navigation size={17} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 light:bg-white/85 backdrop-blur-md border border-white/10 light:border-slate-200 text-amber-300 light:text-amber-700 shadow-md"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  if (!showNotifications) setUnreadNotifications(0);
+                }}
+                className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 light:bg-white/85 backdrop-blur-md border border-white/10 light:border-slate-200 text-slate-200 light:text-slate-700 shadow-md"
+                aria-label="Notifications"
+              >
+                <Bell size={17} className={cn(unreadNotifications > 0 && 'text-sky-400')} />
+                {unreadNotifications > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[14px] h-3.5 px-0.5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-black/20">
+                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                  </span>
+                )}
+              </button>
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    className="absolute right-0 top-12 w-[min(18rem,calc(100vw-2rem))] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-white light:border-slate-300"
+                  >
+                    <div className="p-3 border-b border-white/5 light:border-slate-100">
+                      <h3 className="text-xs font-bold text-white light:text-slate-900">Notifications</h3>
+                    </div>
+                    <div className="max-h-52 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-3 text-[10px] text-slate-500 text-center">No new alerts.</div>
+                      ) : (
+                        notifications.map((n) => (
+                          <div key={n.id} className="px-3 py-2.5 border-b border-white/5 light:border-slate-100">
+                            <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{n.title}</p>
+                            <p className="text-[9px] text-slate-500 mt-0.5">
+                              {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            {user ? (
+              <button
+                type="button"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden border border-white/15 light:border-slate-200 bg-black/40 light:bg-white shadow-md"
+                aria-label="Account menu"
+              >
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" crossOrigin="anonymous" />
+                ) : (
+                  <span className="text-xs font-black text-white light:text-slate-800">{(user.displayName?.[0] ?? user.email?.[0] ?? 'U').toUpperCase()}</span>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={signIn}
+                className="h-10 px-3 rounded-xl bg-sky-600 text-white text-[10px] font-black uppercase tracking-wide shadow-md border border-sky-400/30"
+              >
+                Sign in
+              </button>
+            )}
+          </div>
+          <AnimatePresence>
+            {showUserMenu && user && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className="absolute right-0 top-full mt-1.5 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-white light:border-slate-300 pointer-events-auto"
+              >
+                <div className="p-3 border-b border-white/5">
+                  <p className="text-xs font-bold text-white truncate light:text-slate-900">{user.displayName}</p>
+                  <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                </div>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => { navigate('/admin'); setShowUserMenu(false); }}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-blue-400 hover:bg-blue-500/10 text-left"
+                  >
+                    <LayoutDashboard size={14} />
+                    Admin
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { logout(); setShowUserMenu(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-red-400 hover:bg-red-500/10 text-left"
+                >
+                  <LogOut size={14} />
+                  Sign out
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Desktop top header — unchanged at lg+ */}
+        <div className="absolute top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 items-center justify-between pointer-events-none z-30 hidden lg:flex">
           <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
             <Button
               variant="secondary"
@@ -486,12 +686,13 @@ export default function MapPage() {
             <Button
               variant="secondary"
               size="icon"
-              className="lg:hidden rounded-full w-10 h-10 md:w-12 md:h-12 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
+              className="rounded-full w-10 h-10 md:w-12 md:h-12 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
               onClick={() => setIsSidebarOpen(true)}
+              title="Open incident feed"
             >
               <Database size={18} className="text-blue-400" />
             </Button>
-            
+
             <Button
               variant="secondary"
               size="icon"
@@ -640,8 +841,8 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* FABs: Emergency SOS + Report Incident */}
-        <div className="absolute bottom-28 md:bottom-32 right-4 md:right-8 z-30 flex flex-col items-end gap-3">
+        {/* FABs: Emergency SOS + Report Incident — extra lift on small screens for layer dock */}
+        <div className="absolute right-4 md:right-8 z-30 flex flex-col items-end gap-3 max-lg:bottom-[calc(7.25rem+env(safe-area-inset-bottom))] md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] bottom-28 md:bottom-32">
           {/* SOS Emergency Button */}
           <Button
             variant="primary"
@@ -677,7 +878,10 @@ export default function MapPage() {
                 signIn();
               } else {
                 setIsFormOpen(true);
-                setSelectedLocation(userLocation || CALGARY_CENTER);
+                setConfirmedPinLocation(null);
+                // Start neutral — user picks GPS or pin explicitly in the form.
+                // Don't pre-fill with their home GPS coords.
+                setSelectedLocation(CALGARY_CENTER);
               }
             }}
           >
@@ -696,8 +900,8 @@ export default function MapPage() {
           setShowHeatmap={setShowHeatmap}
         />
 
-        {/* Bottom Status & Disclaimer Bar */}
-        <div className="absolute bottom-10 md:bottom-12 left-4 md:left-6 right-4 md:right-8 flex items-center justify-between pointer-events-none z-20">
+        {/* Bottom Status & Disclaimer Bar — desktop / tablet only; mobile uses top chrome + layer bar */}
+        <div className="absolute bottom-10 md:bottom-12 left-4 md:left-6 right-4 md:right-8 items-center justify-between pointer-events-none z-20 hidden lg:flex">
           <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-slate-950/60 light:bg-white/95 backdrop-blur-xl border border-white/5 light:border-slate-300 rounded-full shadow-lg">
             <div className="relative flex items-center justify-center w-1.5 h-1.5 md:w-2 md:h-2">
               <div className={cn(
@@ -756,9 +960,11 @@ export default function MapPage() {
           onClose={handleFormClose}
           onSubmit={handleIncidentSubmit}
           location={selectedLocation}
+          gpsLocation={userLocation}
           pinLocation={confirmedPinLocation}
           locationAvailable={!!userLocation}
           onRequestMapPin={handleRequestMapPin}
+          onClearPin={() => setConfirmedPinLocation(null)}
           isPinMode={isPinMode}
           userProfile={user ? {
             displayName: user.displayName || 'Calgary User',

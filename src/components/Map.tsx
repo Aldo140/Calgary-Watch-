@@ -52,6 +52,17 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   // Live map centre — updated on every move event so the pin overlay shows real coords
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
+  // Callback refs — keep the single Leaflet click handler up-to-date with latest props
+  // without needing to re-register it on every render.
+  const isPinModeRef = useRef(isPinMode);
+  const onPinConfirmRef = useRef(onPinConfirm);
+  const onMapClickRef = useRef(onMapClick);
+
+  // Update refs on every render (no dep array → always current)
+  useEffect(() => { isPinModeRef.current = isPinMode; });
+  useEffect(() => { onPinConfirmRef.current = onPinConfirm; });
+  useEffect(() => { onMapClickRef.current = onMapClick; });
+
   useEffect(() => {
     incidentsRef.current = incidents;
   }, [incidents]);
@@ -210,9 +221,14 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         maxZoom: 20
       }).addTo(map.current);
 
+      // Use refs so this single handler always calls the latest callbacks.
+      // (Leaflet handlers set up here can't close over changing React props.)
       map.current.on('click', (e: L.LeafletMouseEvent) => {
-        if (onMapClick) {
-          onMapClick(e.latlng.lat, e.latlng.lng);
+        if (isPinModeRef.current) {
+          // Tap-to-pin: tapping the map in pin mode instantly places the pin
+          onPinConfirmRef.current?.(e.latlng.lat, e.latlng.lng);
+        } else {
+          onMapClickRef.current?.(e.latlng.lat, e.latlng.lng);
         }
       });
 
@@ -269,11 +285,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         opacity: 0.9,
         dashArray: '8 6',
         fill: false,
-      });
-      perimeter.bindTooltip('Calgary service area', {
-        permanent: true,
-        direction: 'center',
-        className: 'custom-map-tooltip',
       });
 
       const centerMarker = L.circleMarker([CALGARY_CENTER.lat, CALGARY_CENTER.lng], {
@@ -592,17 +603,18 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         </div>
       )}
 
+      {/* Vignette: stronger on small screens so map chrome & cards read like a premium safety app; lg+ unchanged */}
       <div
         className={cn(
-          "absolute inset-0 pointer-events-none z-10",
+          'absolute inset-0 pointer-events-none z-10 bg-gradient-to-t to-transparent',
           theme === 'light'
-            ? 'bg-gradient-to-t from-white/40 to-transparent'
-            : 'bg-gradient-to-t from-slate-950/20 to-transparent'
+            ? 'from-white/55 via-white/10 max-lg:from-white/50 max-lg:via-white/5 lg:from-white/40'
+            : 'from-slate-950/70 via-slate-950/15 max-lg:from-slate-950/80 max-lg:via-slate-900/25 lg:from-slate-950/20'
         )}
       />
 
       {isOutsideServiceArea && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(5.5rem+env(safe-area-inset-top))] lg:top-4">
           <div className="px-3 py-2 rounded-xl border border-amber-400/30 bg-slate-950/85 text-amber-300 text-[11px] font-bold tracking-wide shadow-lg">
             Zoom in to Calgary for full service coverage
           </div>
@@ -693,10 +705,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           </div>
 
           {/* Instruction banner + live coordinate readout */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2 max-lg:top-[calc(5.25rem+env(safe-area-inset-top))] lg:top-4">
             <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-950/90 border border-blue-500/40 shadow-2xl backdrop-blur-md whitespace-nowrap">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span className="text-blue-300 text-xs font-bold">Pan to location · tap</span>
+              <span className="text-blue-300 text-xs font-bold">Tap map to place pin — or pan &amp; press</span>
               <span className="text-white text-xs font-bold">Set Pin Here</span>
             </div>
             {/* Live coords — updates every frame as user pans */}
@@ -710,7 +722,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           </div>
 
           {/* Action buttons — sit above the LayerToggle (bottom-20 mobile, bottom-8 desktop) and status bar */}
-          <div className="absolute bottom-36 md:bottom-28 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3">
+          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 max-lg:bottom-[7.25rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
             <button
               onClick={(e) => { e.stopPropagation(); onPinCancel?.(); }}
               className="px-5 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-slate-300 text-sm font-bold backdrop-blur-md hover:bg-slate-800 active:scale-95 transition-all shadow-xl"
@@ -720,9 +732,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // Use the live-tracked centre — guaranteed to match what's displayed
-                if (!mapCenter) return;
-                onPinConfirm?.(mapCenter.lat, mapCenter.lng);
+                // Read centre from Leaflet synchronously — avoids one-frame lag vs React mapCenter state
+                if (!map.current) return;
+                const c = map.current.getCenter();
+                onPinConfirm?.(c.lat, c.lng);
               }}
               className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all"
             >

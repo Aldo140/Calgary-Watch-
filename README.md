@@ -288,6 +288,23 @@ git push origin main
 # GitHub Actions deploys automatically
 ```
 
+**Firebase on Pages:** The app runs without Firebase if `VITE_FIREBASE_*` variables are missing (map uses demo data; sign-in is disabled). To enable the live backend on GitHub Pages, add these **repository secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Notes |
+|--------|--------|
+| `VITE_FIREBASE_API_KEY` | Firebase console → Project settings → Your apps |
+| `VITE_FIREBASE_AUTH_DOMAIN` | e.g. `your-project.firebaseapp.com` |
+| `VITE_FIREBASE_PROJECT_ID` | |
+| `VITE_FIREBASE_STORAGE_BUCKET` | |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | |
+| `VITE_FIREBASE_APP_ID` | |
+| `VITE_FIREBASE_MEASUREMENT_ID` | Optional |
+| `VITE_FIRESTORE_DATABASE_ID` | Optional (non-default DB) |
+
+Optional: **`VITE_BASE_PATH`** — set to `/` if the site is published at `https://YOURUSER.github.io/` (a `username.github.io` repository). The default CI base path is `/Calgary-Watch-/` for project Pages.
+
+In **Firebase Console → Authentication → Settings → Authorized domains**, add `YOURUSER.github.io` (and your custom domain if any).
+
 ### Firebase Hosting
 ```bash
 npm run build

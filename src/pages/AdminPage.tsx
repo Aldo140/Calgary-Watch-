@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import { db } from '@/src/firebase';
+import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, CommunityStats } from '@/src/types';
 import { addDoc, collection, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
@@ -78,7 +78,7 @@ export default function AdminPage() {
     targetId: string,
     changes: Record<string, unknown>,
   ) => {
-    if (!user) return;
+    if (!user || !db) return;
     await addDoc(collection(db, 'admin_audit_logs'), {
       action,
       targetCollection,
@@ -94,7 +94,7 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (!isAuthReady || !user || !isAdmin) return;
+    if (!isAuthReady || !user || !isAdmin || !db) return;
 
     const unsubIncidents = onSnapshot(
       query(collection(db, 'incidents'), orderBy('timestamp', 'desc')),
@@ -124,7 +124,7 @@ export default function AdminPage() {
       unsubStats();
       unsubUsers();
     };
-  }, [isAuthReady, isAdmin, user]);
+  }, [isAuthReady, isAdmin, user, db]);
 
   const totalIncidents = incidents.length;
   const unresolvedIncidents = incidents.filter((i) => i.verified_status !== 'community_confirmed').length;
@@ -242,7 +242,7 @@ export default function AdminPage() {
 
   const saveIncident = async (incidentId: string) => {
     const draft = incidentDrafts[incidentId];
-    if (!draft) return;
+    if (!draft || !db) return;
     setSavingIncidentId(incidentId);
     try {
       await updateDoc(doc(db, 'incidents', incidentId), {
@@ -257,7 +257,7 @@ export default function AdminPage() {
 
   const saveCommunityStats = async (statsId: string) => {
     const draft = statsDrafts[statsId];
-    if (!draft) return;
+    if (!draft || !db) return;
     setSavingStatsId(statsId);
     try {
       await updateDoc(doc(db, 'community_stats', statsId), {
@@ -274,7 +274,7 @@ export default function AdminPage() {
   };
 
   const softDeleteIncident = async (incidentId: string) => {
-    if (!user) return;
+    if (!user || !db) return;
     const confirmed = window.confirm('Soft-delete this incident? It will be hidden from the live feed.');
     if (!confirmed) return;
 
@@ -287,7 +287,7 @@ export default function AdminPage() {
   };
 
   const softDeleteCommunityStats = async (statsId: string) => {
-    if (!user) return;
+    if (!user || !db) return;
     const confirmed = window.confirm('Soft-delete this community stats row?');
     if (!confirmed) return;
 
@@ -303,6 +303,25 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
         <Loader2 className="animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isFirebaseConfigured) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white p-6 flex items-center justify-center">
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-white/10 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+          <h1 className="text-2xl font-black">Admin unavailable</h1>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            This deployment was built without Firebase environment variables. Add the{' '}
+            <code className="text-amber-300/90">VITE_FIREBASE_*</code> secrets to your GitHub repository and re-run the
+            Pages workflow, or run <code className="text-amber-300/90">npm run build</code> with a local{' '}
+            <code className="text-amber-300/90">.env</code> file.
+          </p>
+          <Button onClick={() => navigate('/map')} className="w-full">
+            Back to map
+          </Button>
+        </Card>
       </div>
     );
   }
@@ -372,7 +391,7 @@ export default function AdminPage() {
               <AlertTriangle size={14} className="text-amber-400" />
             </div>
             <p className="text-2xl font-black text-amber-400 mt-2">{unresolvedIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Reports not yet marked community-confirmed — your moderation backlog</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Reports not yet marked community-confirmed · your moderation backlog</p>
           </Card>
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
             <div className="flex items-center justify-between">
@@ -380,7 +399,7 @@ export default function AdminPage() {
               <Clock3 size={14} className="text-blue-400" />
             </div>
             <p className="text-2xl font-black text-blue-400 mt-2">{todayIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">New reports submitted in the past 24 hours — measures daily activity</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">New reports submitted in the past 24 hours · measures daily activity</p>
           </Card>
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-violet-400/40 transition-all">
             <div className="flex items-center justify-between">
@@ -388,7 +407,7 @@ export default function AdminPage() {
               <Users size={14} className="text-violet-400" />
             </div>
             <p className="text-2xl font-black mt-2">{uniqueReporterEmails}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Distinct contributors by email — excludes anonymous posts</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Distinct contributors by email · excludes anonymous posts</p>
           </Card>
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-cyan-400/40 transition-all">
             <div className="flex items-center justify-between">
@@ -404,7 +423,7 @@ export default function AdminPage() {
               <ShieldCheck size={14} className="text-emerald-400" />
             </div>
             <p className="text-2xl font-black text-emerald-400 mt-2">{averageSafety}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Mean safety score (0–100) across all tracked neighborhoods — higher is safer</p>
+            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Mean safety score (0-100) across all tracked neighborhoods · higher is safer</p>
           </Card>
         </div>
 
@@ -417,7 +436,7 @@ export default function AdminPage() {
 
           {/* Row 1: Incidents over time — full width */}
           <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Incidents — Last 14 Days</p>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Incidents: Last 14 Days</p>
             <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily report volume from your community. Spikes indicate high-activity periods worth reviewing.</p>
             {timelineChartData.every((d) => d.count === 0) ? (
               <p className="text-slate-600 text-xs py-8 text-center">No incident data yet.</p>

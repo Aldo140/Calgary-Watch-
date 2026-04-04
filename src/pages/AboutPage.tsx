@@ -16,6 +16,7 @@ import { useEffect, useRef, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView, animate } from 'motion/react';
 import { db } from '@/src/firebase';
+import { publicAsset } from '@/src/lib/utils';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import {
   ArrowLeft,
@@ -33,6 +34,7 @@ import {
   Eye,
   HeartHandshake,
   Handshake,
+  SectionIcon,
 } from 'lucide-react';
 
 function prefersReducedMotion(): boolean {
@@ -56,6 +58,10 @@ function VolunteerCard({ reducedMotion }: { reducedMotion: boolean }) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !role || !whyJoin.trim()) return;
     setStatus('submitting');
+    if (!db) {
+      setStatus('error');
+      return;
+    }
     try {
       await addDoc(collection(db, 'volunteers'), {
         name: name.trim().slice(0, 100),
@@ -156,7 +162,7 @@ function VolunteerCard({ reducedMotion }: { reducedMotion: boolean }) {
             <p className="text-[10px] text-slate-600 mt-1 text-right">{whyJoin.length}/500</p>
           </div>
           {status === 'error' && (
-            <p className="text-red-400 text-xs">Something went wrong — try emailing us directly.</p>
+            <p className="text-red-400 text-xs">Something went wrong. Try emailing us directly.</p>
           )}
           <motion.button
             type="submit"
@@ -222,7 +228,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <motion.div className="flex items-center gap-3" whileHover={{ scale: 1.02 }}>
             <img
-              src="/icon.webp"
+              src={publicAsset('icon.svg')}
               alt="Calgary Watch"
               className="w-16 h-16 object-contain drop-shadow-lg flex-shrink-0"
               onError={(e) => {
@@ -265,7 +271,7 @@ export default function AboutPage() {
             transition={{ duration: 1, ease: 'easeOut' }}
           >
             <img
-              src="/images/hero-wide.webp"
+              src={publicAsset('images/hero-wide.webp')}
               alt="Calgary skyline panorama"
               className="w-full h-full object-cover"
               loading="eager"
@@ -357,7 +363,7 @@ export default function AboutPage() {
                 Built for Calgarians, by Calgarians
               </h2>
               <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed">
-                Calgary Watch isn't generic. We understand this city — its neighbourhoods, its geography, its rhythm. We built a platform that turns local awareness into action, connecting people with the information they need to stay safe and informed.
+                Calgary Watch is built specifically for this city. We understand its neighbourhoods, its geography, its rhythm. We built a platform that turns local awareness into action, connecting people with the information they need to stay safe and informed.
               </p>
             </motion.div>
 
@@ -558,7 +564,7 @@ export default function AboutPage() {
               className="rounded-2xl overflow-hidden border border-white/10 light:border-slate-300"
             >
               <img
-                src="/images/calgary8.webp"
+                src={publicAsset('images/calgary8.webp')}
                 alt="Calgary downtown"
                 className="w-full h-96 object-cover"
                 loading="lazy"
@@ -624,7 +630,7 @@ export default function AboutPage() {
                 Get Involved
               </span>
               <h2 className="text-4xl md:text-5xl font-black leading-[1.15] mb-4">
-                Calgary Watch is built by the community — and it grows with it.
+                Calgary Watch is built by the community, and it grows with it.
               </h2>
               <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-4">
                 We're a small but dedicated team, and we're always looking for people who care about this city.
@@ -653,7 +659,7 @@ export default function AboutPage() {
                   </span>
                   <h3 className="text-xl font-black mt-3 mb-2">Always watching, always here</h3>
                   <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed">
-                    A dedicated team actively monitors Calgary Watch around the clock — reviewing reports, verifying incidents, and making sure the map stays accurate and trustworthy. Every pin you see has a real person behind it.
+                    A dedicated team actively monitors Calgary Watch around the clock, reviewing reports, verifying incidents, and making sure the map stays accurate and trustworthy. Every pin you see has a real person behind it.
                   </p>
                 </div>
               </motion.div>
@@ -681,7 +687,7 @@ export default function AboutPage() {
                   </span>
                   <h3 className="text-xl font-black mt-3 mb-2">Grow with Calgary</h3>
                   <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed mb-4">
-                    We're looking for Calgary-based businesses and organizations who want to be part of a platform that thousands of residents rely on. Sponsorship, integrations, local partnerships — let's build something together.
+                    We're looking for Calgary-based businesses and organizations who want to be part of a platform that thousands of residents rely on. Sponsorship, integrations, local partnerships. Let's build something together.
                   </p>
                   <ul className="space-y-1.5 text-sm text-slate-300 light:text-slate-700">
                     {['Sponsored neighbourhood alerts', 'Data & API integration', 'Co-branding opportunities'].map((item) => (

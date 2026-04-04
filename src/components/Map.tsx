@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
 
 // Expose Leaflet globally for plugins
 if (typeof window !== 'undefined') {
@@ -41,6 +43,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
+  const clusterGroup = useRef<any>(null);
   const heatmapLayer = useRef<any>(null);
   const baseTileLayer = useRef<L.TileLayer | null>(null);
   const popup = useRef<L.Popup | null>(null);
@@ -263,6 +266,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       if (popupClickHandler) {
         containerEl.removeEventListener('click', popupClickHandler);
       }
+      clusterGroup.current?.remove();
+      clusterGroup.current = null;
       map.current?.remove();
       map.current = null;
     };
@@ -315,6 +320,45 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     };
   }, [isMapLoaded]);
 
+  // Set up marker cluster group once map is ready.
+  // Separated from the init effect so a plugin-load failure never blocks
+  // isMapLoaded from being set to true.
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+    if (clusterGroup.current) return; // already created
+
+    const lAny = L as any;
+    if (typeof lAny.markerClusterGroup !== 'function') return;
+
+    clusterGroup.current = lAny.markerClusterGroup({
+      iconCreateFunction: (cluster: any) => {
+        const count = cluster.getChildCount();
+        const el = document.createElement('div');
+        el.style.cssText = [
+          'width:44px', 'height:44px',
+          'background:rgba(15,23,42,0.93)',
+          'border:2px solid rgba(34,211,238,0.60)',
+          'border-radius:14px',
+          'display:flex', 'align-items:center', 'justify-content:center',
+          'cursor:pointer',
+          'box-shadow:0 4px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(34,211,238,0.12)',
+        ].join(';');
+        const label = document.createElement('span');
+        label.style.cssText = 'color:white;font-size:12px;font-weight:900;letter-spacing:-0.01em;';
+        label.textContent = `+${count}`;
+        el.appendChild(label);
+        return L.divIcon({ html: el, className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+      },
+      maxClusterRadius: 48,
+      zoomToBoundsOnClick: true,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      animate: true,
+      disableClusteringAtZoom: 17,
+    });
+    clusterGroup.current.addTo(map.current);
+  }, [isMapLoaded]);
+
   // Track live map centre while in pin mode
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;
@@ -360,7 +404,11 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     // Remove old markers
     Object.keys(markers.current).forEach((id) => {
       if (!incidents.find((i) => i.id === id) || !showLiveReports) {
-        markers.current[id].remove();
+        if (clusterGroup.current) {
+          clusterGroup.current.removeLayer(markers.current[id]);
+        } else {
+          markers.current[id].remove();
+        }
         delete markers.current[id];
       }
     });
@@ -517,7 +565,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       try {
         const marker = L.marker([incident.lat, incident.lng], { icon })
-          .addTo(map.current!)
           .bindTooltip(incident.title, {
             direction: 'top',
             offset: [0, -20],
@@ -526,6 +573,12 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           .on('click', () => {
             window.requestAnimationFrame(() => onMarkerClick(incident));
           });
+
+        if (clusterGroup.current) {
+          clusterGroup.current.addLayer(marker);
+        } else {
+          marker.addTo(map.current!);
+        }
 
         markers.current[incident.id] = marker;
       } catch (err) {

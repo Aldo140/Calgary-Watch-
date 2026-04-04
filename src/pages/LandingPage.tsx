@@ -16,6 +16,7 @@ import {
   MapPin,
   Zap,
   BarChart2,
+  Clock,
   CheckCircle2,
   Lock,
   X,
@@ -418,19 +419,28 @@ export default function LandingPage() {
       {/* ================================================================
           VISION SECTION
           ================================================================ */}
-      <section className="py-16 px-6 bg-slate-900/40 light:bg-slate-50 border-t border-b border-white/5 light:border-slate-200">
-        <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.6 }} className="max-w-4xl mx-auto text-center">
-          <span className="inline-block text-[11px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-3">Vision</span>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-[1.1] mb-5">
-            Calgary’s real-time urban intelligence layer
-          </h2>
-          <p className="text-lg md:text-xl text-slate-300 light:text-slate-700 leading-relaxed mb-4 max-w-3xl mx-auto">
-            A platform where community-reported incidents and verified public data combine to provide immediate awareness and long-term insight into city activity.
-          </p>
-          <p className="text-sm text-slate-500 light:text-slate-500 leading-relaxed max-w-2xl mx-auto">
+      <section className="relative py-28 md:py-40 overflow-hidden bg-slate-950 flex items-center justify-center border-t border-b border-white/5">
+        <motion.div 
+          animate={{ rotate: [0, 90, 180, 270, 360], scale: [1, 1.2, 1] }} 
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute w-[600px] md:w-[1000px] aspect-square rounded-full blur-[100px] md:blur-[180px] bg-gradient-to-tr from-[#4A90D9]/20 via-[#2E8B7A]/10 to-[#D4A843]/20 pointer-events-none"
+        />
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-8">
+            <span className="text-[10px] uppercase font-black tracking-widest text-[#4A90D9]">Vision</span>
+          </motion.div>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1] text-white mb-8">
+            Calgary's real-time<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843] italic pr-2">urban intelligence layer.</span>
+          </motion.h2>
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-xl md:text-2xl text-slate-300 font-light max-w-4xl mx-auto leading-relaxed mb-6">
+            Where community-reported incidents and verified public data combine to provide immediate awareness into city activity.
+          </motion.p>
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="h-px w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto my-8" />
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
             Our long-term goal is to expand beyond Calgary into a scalable platform for cities across Canada, enabling safer, more informed communities through accessible, real-time data.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
       </section>
 
       {/* ================================================================
@@ -629,47 +639,73 @@ export default function LandingPage() {
       {/* ================================================================
           MOBILE EXPERIENCE SECTION
           ================================================================ */}
-      <section className="py-20 px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/30 light:bg-slate-50">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <section className="py-24 px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-slate-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }}>
-            <span className="inline-block text-[11px] font-black uppercase tracking-[0.25em] text-purple-400 mb-4 bg-purple-400/10 px-2 py-1 rounded">Mobile Experience</span>
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-[1.1] mb-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/20 mb-6">
+              <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400">Mobile First Layout</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6">
               Optimized for real-time usage on the go
             </h2>
-            <p className="text-base text-slate-400 light:text-slate-600 leading-relaxed mb-6 max-w-xl">
-              Calgary Watch is designed mobile-first. The experience is inspired by modern map-based applications and designed for quick, one-handed use in real-world scenarios.
+            <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8 max-w-xl">
+              Calgary Watch uses a modern bottom-sheet interface designed for quick, one-handed use. It feels like a native app right in your browser.
             </p>
-            <div className="space-y-3">
+            <div className="grid sm:grid-cols-2 gap-6">
               {[
-                { icon: Layers, text: 'Bottom sheet interface for incident browsing' },
-                { icon: Zap, text: 'Touch-friendly interactions and gesture navigation' },
-                { icon: MapIcon, text: 'Fast map interactions with minimal latency' },
-                { icon: CheckCircle2, text: 'Instant form submission with optimistic UI updates' },
+                { icon: Layers, title: 'Bottom Sheet UI', desc: 'Gesture-driven incident browsing' },
+                { icon: Zap, title: 'Instant Submit', desc: 'Optimistic UI updates avoid lag' },
+                { icon: MapIcon, title: 'Fluid Maps', desc: 'Hardware-accelerated panning' },
+                { icon: Lock, title: 'No App Required', desc: 'Instant access via web browser' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="text-purple-400" size={14} />
+                <div key={i} className="flex flex-col gap-2 p-4 rounded-2xl bg-white/5 light:bg-white border border-white/5 light:border-slate-200">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-1">
+                    <item.icon className="text-purple-400" size={18} />
                   </div>
-                  <span className="text-sm font-semibold text-slate-300 light:text-slate-700">{item.text}</span>
+                  <h4 className="text-white light:text-slate-900 font-bold text-sm">{item.title}</h4>
+                  <p className="text-xs text-slate-500">{item.desc}</p>
                 </div>
               ))}
             </div>
           </motion.div>
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="relative h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 light:border-slate-300">
-            <img src={publicAsset('images/calgary7.webp')} alt="Mobile map interface" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6">
-              <div className="w-full bg-slate-900/95 light:bg-white/95 backdrop-blur-xl rounded-xl p-4 border border-white/10 light:border-slate-200 shadow-xl">
-                <div className="w-12 h-1.5 bg-slate-700 light:bg-slate-300 rounded-full mx-auto mb-3" />
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  <span className="text-xs font-bold text-white light:text-slate-900">Incident Reported</span>
-                </div>
-                <div className="h-2 bg-slate-800 light:bg-slate-100 rounded w-3/4 mb-1.5" />
-                <div className="h-2 bg-slate-800 light:bg-slate-100 rounded w-1/2" />
+          
+          <div className="relative flex justify-center perspective-[1200px]">
+            <motion.div 
+              style={{ rotateY: -15, rotateX: 5 }}
+              whileHover={{ rotateY: 0, rotateX: 0, scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+              className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-slate-900 bg-slate-950 shadow-[-30px_30px_80px_rgba(168,85,247,0.2)] overflow-hidden ring-1 ring-white/10"
+            >
+              {/* Dynamic Island */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30 flex items-center justify-between px-3">
+                <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                <div className="w-2 h-2 rounded-full bg-blue-500/50" />
               </div>
-            </div>
-          </motion.div>
+              {/* Map BG */}
+              <div className="absolute inset-0 bg-slate-900"><img src={publicAsset('images/calgary7.webp')} className="w-full h-full object-cover opacity-60 mix-blend-screen" alt="" /></div>
+              {/* Fake UI */}
+              <div className="absolute top-16 left-4 right-4 flex gap-2 z-20">
+                <div className="h-10 flex-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-lg" />
+                <div className="h-10 w-10 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-lg" />
+              </div>
+              <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 4 }} className="absolute bottom-40 right-4 w-12 h-12 bg-purple-500 rounded-full z-20 flex items-center justify-center shadow-lg shadow-purple-500/40">
+                 <Zap size={20} className="text-white" />
+              </motion.div>
+              <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-slate-900/95 backdrop-blur-xl rounded-t-3xl border-t border-white/20 p-5 z-20 shadow-2xl">
+                <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
+                <div className="h-4 w-2/3 bg-white/10 rounded-md mb-3" />
+                <div className="h-4 w-1/2 bg-white/10 rounded-md mb-4" />
+                <div className="flex gap-3">
+                   <div className="h-10 flex-1 bg-blue-500/20 rounded-xl border border-blue-500/50" />
+                   <div className="h-10 flex-1 bg-teal-500/20 rounded-xl border border-teal-500/50" />
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Ambient glow behind phone */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/30 blur-[80px] -z-10 rounded-full" />
+          </div>
         </div>
       </section>
 
@@ -755,118 +791,136 @@ export default function LandingPage() {
       {/* ================================================================
           ROADMAP & SUSTAINABILITY
           ================================================================ */}
-      <section className="py-24 px-6 border-t border-white/5 light:border-slate-200">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_300px] gap-12">
-          {/* Roadmap */}
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }}>
-            <span className="inline-block text-[11px] font-black uppercase tracking-[0.25em] text-[#2E8B7A] mb-4">Scalability Roadmap</span>
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-[1.1] mb-8">Building for the future</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                { phase: 'Phase 1 (Current)', title: 'Calgary Launch', items: ['Calgary-only launch', 'Real-time incident reporting', 'Community engagement & validation'], active: true },
-                { phase: 'Phase 2', title: 'Smart Features', items: ['Push notifications for nearby incidents', 'Enhanced credibility system (reputation)', 'Improved analytics and trend detection'], active: false },
-                { phase: 'Phase 3', title: 'Expansion', items: ['Multi-city expansion', 'City demand tracking and onboarding', 'Advanced data integrations (transit, weather)'], active: false },
-                { phase: 'Phase 4', title: 'Enterprise', items: ['Public safety insights platform', 'Data partnerships with businesses', 'Premium alerting and analytics'], active: false }
-              ].map((p, i) => (
-                <div key={i} className={`p-5 rounded-2xl border ${p.active ? 'border-[#2E8B7A]/40 bg-[#2E8B7A]/5' : 'border-white/5 light:border-slate-200 bg-white/5 light:bg-slate-50'}`}>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${p.active ? 'text-[#2E8B7A]' : 'text-slate-500'}`}>{p.phase}</span>
-                  <h4 className="text-base font-black mt-1 mb-3 text-white light:text-slate-900">{p.title}</h4>
-                  <ul className="space-y-2">
-                    {p.items.map(item => (
-                      <li key={item} className="text-xs text-slate-400 light:text-slate-600 flex items-start gap-2">
-                        <span className="mt-1.5 w-1 h-1 rounded-full bg-slate-500 shrink-0" />
-                        <span className="leading-snug">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Sustainability */}
-          <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6, delay: 0.2 }} className="flex flex-col gap-6">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-[#D4A843]/10 to-transparent border border-[#D4A843]/20">
-              <div className="w-10 h-10 rounded-xl bg-[#D4A843]/20 flex items-center justify-center mb-4"><Briefcase className="text-[#D4A843]" size={18} /></div>
-              <h3 className="text-lg font-black mb-2 text-white light:text-slate-900">Sustainability</h3>
-              <p className="text-xs text-slate-400 light:text-slate-600 leading-relaxed mb-4">
-                Calgary Watch is currently a non-profit initiative. Future sustainability may include:
-              </p>
-              <ul className="space-y-2 mb-4">
-                {['Local business partnerships', 'Anonymized data insights', 'Premium custom alerts'].map(i => (
-                  <li key={i} className="text-xs font-medium text-slate-300 light:text-slate-700 flex gap-2"><CheckCircle2 size={14} className="text-[#D4A843]" />{i}</li>
+      <section className="py-24 px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-[1fr_350px] gap-8">
+            {/* Roadmap */}
+            <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }}>
+              <span className="inline-block px-3 py-1 rounded bg-[#2E8B7A]/10 text-[10px] font-black uppercase tracking-[0.25em] text-[#2E8B7A] mb-4">Scalability Roadmap</span>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.1] mb-8">Building for the future</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { phase: '01', title: 'Calgary Launch', items: ['Calgary-only launch', 'Real-time incident reporting', 'Community engagement'], active: true },
+                  { phase: '02', title: 'Smart Features', items: ['Push notifications for alerts', 'Enhanced credibility system', 'Improved analytics'], active: false },
+                  { phase: '03', title: 'Expansion', items: ['Multi-city expansion', 'City demand onboarding', 'Advanced data APIs'], active: false },
+                  { phase: '04', title: 'Enterprise', items: ['Public safety insights', 'Data business partnerships', 'Premium custom alerts'], active: false }
+                ].map((p, i) => (
+                  <motion.div whileHover={{ y: -4, scale: 1.01 }} key={i} className={`relative p-6 rounded-[2rem] border overflow-hidden ${p.active ? 'border-[#2E8B7A]/50 bg-gradient-to-br from-[#2E8B7A]/10 to-transparent' : 'border-white/5 light:border-slate-200 bg-white/5 light:bg-slate-50'}`}>
+                    <div className="absolute -top-4 -right-4 text-7xl font-black text-slate-800/10 light:text-slate-200/50 pointer-events-none">{p.phase}</div>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${p.active ? 'text-[#2E8B7A]' : 'text-slate-500'}`}>Phase {p.phase}</span>
+                    <h4 className="text-lg font-black mt-2 mb-4 text-white light:text-slate-900">{p.title}</h4>
+                    <ul className="space-y-2">
+                      {p.items.map(item => (
+                        <li key={item} className="text-[13px] text-slate-400 light:text-slate-600 flex items-start gap-2">
+                          <CheckCircle2 size={14} className={p.active ? "text-[#2E8B7A] shrink-0 mt-0.5" : "text-slate-600 shrink-0 mt-0.5"} />
+                          <span className="leading-tight">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
                 ))}
-              </ul>
-              <p className="text-[10px] text-[#D4A843] font-bold">All monetization prioritizes community value.</p>
-            </div>
-          </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Sustainability Glass Card */}
+            <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ delay: 0.2 }} className="flex flex-col h-full">
+              <div className="h-full mt-10 lg:mt-0 p-8 rounded-[2rem] bg-gradient-to-br from-slate-900 via-slate-900 to-[#D4A843]/10 border border-[#D4A843]/30 shadow-[0_0_50px_rgba(212,168,67,0.1)] relative overflow-hidden flex flex-col">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4A843]/20 blur-[50px] rounded-full mix-blend-screen" />
+                <div className="w-14 h-14 rounded-2xl bg-[#D4A843]/20 border border-[#D4A843]/40 flex items-center justify-center mb-6 backdrop-blur-md">
+                   <Briefcase className="text-[#D4A843]" size={24} />
+                </div>
+                <h3 className="text-2xl font-black mb-3 text-white">Sustainability</h3>
+                <p className="text-sm text-slate-300 leading-relaxed mb-6 flex-1">
+                  Calgary Watch is currently a non-profit initiative. To scale safely, future sustainability may include:
+                </p>
+                <div className="space-y-3 mb-6 bg-slate-950/50 p-4 rounded-xl border border-white/5">
+                  {['Local business partnerships', 'Anonymized data insights', 'Premium custom alerts'].map(i => (
+                    <div key={i} className="text-sm font-medium text-slate-200 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-[#D4A843] rounded-full" />{i}</div>
+                  ))}
+                </div>
+                <div className="text-xs uppercase tracking-widest font-bold text-[#D4A843] bg-[#D4A843]/10 py-2 px-3 rounded text-center border border-[#D4A843]/20 mt-auto">
+                  Prioritizing Community Value
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ================================================================
           TRUST, TRANSPARENCY & LEGAL
-      {/* ================================================================
-          TRUST, TRANSPARENCY & LEGAL
           ================================================================ */}
-      <section className="py-24 px-6 bg-slate-950 light:bg-white border-t border-white/5 light:border-slate-200">
-        <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <ShieldCheck size={40} className="mx-auto text-[#4A90D9] mb-4" />
-            <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.1] mb-5">Trust & Data Transparency</h2>
-            <p className="text-base text-slate-400 light:text-slate-600 max-w-2xl mx-auto">Calgary Watch distinguishes between two types of data to protect you and build transparent awareness.</p>
+      <section className="py-24 px-6 bg-slate-950 border-t border-white/5 relative overflow-hidden">
+        {/* Terminal/Hacker Grid background */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        
+        <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} className="relative z-10 max-w-6xl mx-auto">
+          <div className="flex flex-col items-center mb-16">
+            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+               <ShieldCheck size={32} className="text-blue-400" />
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight leading-[1] text-white text-center mb-4">
+              Security & Transparency
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl text-center font-mono text-sm">
+              [SYSTEM_INTEGRITY: OK] Calgary Watch distinguishes data layers to protect users and ensure trust.
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <div className="p-8 rounded-2xl bg-white/5 light:bg-slate-50 border border-white/10 light:border-slate-200">
-              <h3 className="text-xl font-black mb-4 text-[#4A90D9]">Community Reports (Real-Time)</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2"><span className="text-[#4A90D9] mt-0.5">•</span><span className="text-sm text-slate-300 light:text-slate-700">Submitted by users in real time</span></li>
-                <li className="flex items-start gap-2"><span className="text-[#4A90D9] mt-0.5">•</span><span className="text-sm text-slate-300 light:text-slate-700">May be unverified at the time of posting</span></li>
-                <li className="flex items-start gap-2"><span className="text-[#4A90D9] mt-0.5">•</span><span className="text-sm text-slate-300 light:text-slate-700">Clearly labeled with trust indicators: <span className="font-semibold px-2 py-0.5 bg-slate-800 light:bg-slate-200 rounded text-xs ml-1">Unverified</span> <span className="font-semibold px-2 py-0.5 bg-slate-800 light:bg-slate-200 rounded text-xs">Multiple Reports</span> <span className="font-semibold px-2 py-0.5 bg-slate-800 light:bg-slate-200 rounded text-xs">Community Confirmed</span></span></li>
+          <div className="grid lg:grid-cols-2 gap-6 mb-8">
+            {/* Realtime Data Box */}
+            <div className="p-8 rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#4A90D9]/50 transition-colors">
+              <div className="flex items-center justify-between mb-6">
+                 <h3 className="text-2xl font-black text-white">Community Engine</h3>
+                 <span className="px-3 py-1 bg-[#4A90D9]/10 text-[#4A90D9] text-[10px] uppercase font-black tracking-widest rounded-full border border-[#4A90D9]/20">Real-Time</span>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><Users size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-1">User Submitted</p><p className="text-xs text-slate-400">Reports appear instantly. May be unverified at the time of posting.</p></div></li>
+                <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><ShieldCheck size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-2">Trust Indicators</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-2 py-1 bg-slate-800 text-slate-300 rounded text-[10px] font-mono border border-slate-700">Unverified</span>
+                    <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-[10px] font-mono border border-blue-500/20">Multiple Reports</span>
+                    <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded text-[10px] font-mono border border-green-500/20">Community Confirmed</span>
+                  </div>
+                </div></li>
               </ul>
             </div>
-            <div className="p-8 rounded-2xl bg-white/5 light:bg-slate-50 border border-white/10 light:border-slate-200">
-              <h3 className="text-xl font-black mb-4 text-[#2E8B7A]">Official Data</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-2"><span className="text-[#2E8B7A] mt-0.5">•</span><span className="text-sm text-slate-300 light:text-slate-700">Sourced from Calgary Police Service open datasets</span></li>
-                <li className="flex items-start gap-2"><span className="text-[#2E8B7A] mt-0.5">•</span><span className="text-sm text-slate-300 light:text-slate-700">Aggregated at the community level</span></li>
-                <li className="flex items-start gap-2"><span className="text-[#2E8B7A] mt-0.5">•</span><span className="text-sm text-slate-300 light:text-slate-700">Updated periodically (not real-time)</span></li>
+
+            {/* Official Data Box */}
+            <div className="p-8 rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#2E8B7A]/50 transition-colors">
+              <div className="flex items-center justify-between mb-6">
+                 <h3 className="text-2xl font-black text-white">Official Data</h3>
+                 <span className="px-3 py-1 bg-[#2E8B7A]/10 text-[#2E8B7A] text-[10px] uppercase font-black tracking-widest rounded-full border border-[#2E8B7A]/20">Verified</span>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><ShieldCheck size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-1">Calgary Police Service</p><p className="text-xs text-slate-400">Sourced from open datasets. Not intended to represent or replace emergency services.</p></div></li>
+                <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><Clock size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-1">Periodic Sync</p><p className="text-xs text-slate-400">Aggregated at the community level. Updated periodically (not real-time).</p></div></li>
               </ul>
-              <p className="mt-4 text-xs font-bold text-slate-400">Calgary Watch does not represent or replace official emergency services.</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Disclaimer */}
-            <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5">
-              <h4 className="flex items-center gap-2 text-base font-black mb-3 text-red-400"><ShieldAlert size={16}/> Disclaimer</h4>
-              <p className="text-xs text-slate-400 light:text-slate-700 mb-2">Calgary Watch is a community-powered platform. Information displayed may include user-generated content that has not been independently verified.</p>
-              <p className="text-xs text-slate-400 light:text-slate-700 mb-2">This platform is not affiliated with or endorsed by the Calgary Police Service or any government entity.</p>
-              <p className="text-xs font-bold text-red-400">Do not rely on Calgary Watch for emergency response. In an emergency, call 911.</p>
+            <div className="p-6 rounded-3xl bg-red-500/5 border border-red-500/20 backdrop-blur-sm hover:bg-red-500/10 transition-colors">
+              <h4 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider mb-3 text-red-400"><ShieldAlert size={14}/> Disclaimer</h4>
+              <p className="text-[11px] text-slate-400 font-mono mb-2">User-generated content is not independently verified. Information may be inaccurate.</p>
+              <p className="text-[11px] font-bold text-red-400 font-mono mt-4">DO NOT RELY ON CALGARY WATCH FOR EMERGENCY RESPONSE. ALWAYS CALL 911.</p>
             </div>
-            
-            {/* Privacy */}
-            <div className="p-6 rounded-2xl border border-white/10 light:border-slate-200 bg-slate-900/40 light:bg-white">
-              <h4 className="flex items-center gap-2 text-base font-black mb-3 text-white light:text-slate-900"><Lock size={16}/> Privacy</h4>
-              <ul className="space-y-1.5 mb-3">
-                <li className="text-xs text-slate-400 light:text-slate-600">• Anonymous reporting is supported</li>
-                <li className="text-xs text-slate-400 light:text-slate-600">• Personally identifiable information is not publicly displayed</li>
-                <li className="text-xs text-slate-400 light:text-slate-600">• User emails are never exposed</li>
-                <li className="text-xs text-slate-400 light:text-slate-600">• Data collection is minimized to what is necessary</li>
+            <div className="p-6 rounded-3xl bg-slate-900 border border-white/10 backdrop-blur-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+              <h4 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider mb-3 text-white"><Lock size={14}/> Privacy Focus</h4>
+              <ul className="space-y-2">
+                {['Anonymous reporting supported', 'Emails are strictly hidden', 'Data collection minimized'].map(t => (
+                  <li key={t} className="text-[11px] text-slate-400 font-mono flex gap-2"><span className="text-green-400">{'>'}</span> {t}</li>
+                ))}
               </ul>
-              <p className="text-[10px] font-bold text-slate-500">We are committed to protecting user privacy while enabling community awareness.</p>
             </div>
-
-            {/* Known Limitations */}
-            <div className="p-6 rounded-2xl border border-white/10 light:border-slate-200 bg-slate-900/40 light:bg-white">
-              <h4 className="flex items-center gap-2 text-base font-black mb-3 text-white light:text-slate-900"><AlertCircle size={16}/> Known Limitations</h4>
-              <ul className="space-y-1.5 mb-3">
-                <li className="text-xs text-slate-400 light:text-slate-600">• Community reports may be inaccurate or incomplete</li>
-                <li className="text-xs text-slate-400 light:text-slate-600">• Official data is not real-time and may lag</li>
-                <li className="text-xs text-slate-400 light:text-slate-600">• Incidents may be underreported in certain areas</li>
-                <li className="text-xs text-slate-400 light:text-slate-600">• Map clustering and density may vary based on data</li>
+            <div className="p-6 rounded-3xl bg-slate-900 border border-white/10 backdrop-blur-sm">
+              <h4 className="flex items-center gap-2 text-sm font-black uppercase tracking-wider mb-3 text-white"><AlertCircle size={14}/> Limitations</h4>
+              <ul className="space-y-2">
+                {['Official data lags live events', 'Underreporting by area', 'Map density varies by source'].map(t => (
+                  <li key={t} className="text-[11px] text-slate-400 font-mono flex gap-2"><span className="text-amber-400">{'>'}</span> {t}</li>
+                ))}
               </ul>
-              <p className="text-[10px] font-bold text-slate-500">We are continuously improving data accuracy and coverage.</p>
             </div>
           </div>
         </motion.div>

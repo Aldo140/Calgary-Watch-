@@ -21,7 +21,7 @@ export const isFirebaseConfigured = missingFirebaseEnv.length === 0;
 
 if (!isFirebaseConfigured && import.meta.env.DEV) {
   console.warn(
-    `[Calgary Watch] Firebase disabled — missing env: ${missingFirebaseEnv.join(', ')}. ` +
+    `[Calgary Watch] Firebase disabled - missing env: ${missingFirebaseEnv.join(', ')}. ` +
       'Add a .env file locally or GitHub Actions secrets for production.'
   );
 }

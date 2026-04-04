@@ -58,9 +58,9 @@ interface EmergencyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: EmergencySubmitData) => void;
-  /** GPS location — null when denied */
+  /** GPS location - null when denied */
   location: { lat: number; lng: number } | null;
-  /** Coordinates set via crosshair pin — managed by parent */
+  /** Coordinates set via crosshair pin - managed by parent */
   pinLocation: { lat: number; lng: number } | null;
   locationAvailable: boolean;
   userName: string;

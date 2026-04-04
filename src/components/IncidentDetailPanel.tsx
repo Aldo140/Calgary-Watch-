@@ -72,7 +72,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
         await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}`);
       }
     } catch {
-      // User cancelled share or API unavailable — fail silently.
+      // User cancelled share or API unavailable - fail silently.
     }
   };
 
@@ -115,7 +115,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               'bg-purple-500'
             )} />
 
-            {/* Drag affordance — mobile sheet */}
+            {/* Drag affordance - mobile sheet */}
             {isMobileSheet && (
               <div className="flex shrink-0 justify-center pt-3 pb-1">
                 <div className="h-1 w-10 rounded-full bg-white/20 light:bg-slate-300" aria-hidden />
@@ -129,7 +129,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                 isMobileSheet ? 'h-40' : 'h-64'
               )}
             >
-              {/* Background image — local WebP, no network round-trip */}
+              {/* Background image - local WebP, no network round-trip */}
               <img
                 src={publicAsset('images/calgary7.webp')}
                 alt=""

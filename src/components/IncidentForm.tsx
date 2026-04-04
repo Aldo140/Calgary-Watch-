@@ -54,7 +54,7 @@ const incidentSchema = z.object({
 
 export type IncidentFormData = z.infer<typeof incidentSchema>;
 
-/** One mounted tree for the report flow — avoids duplicate inputs (desktop + mobile) breaking react-hook-form. */
+/** One mounted tree for the report flow - avoids duplicate inputs (desktop + mobile) breaking react-hook-form. */
 function useLgUp() {
   const [lg, setLg] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : false
@@ -74,7 +74,7 @@ interface IncidentFormProps {
   onSubmit: (data: IncidentFormData & { lat: number; lng: number }) => void;
   /** Neutral fallback coordinates (Calgary centre) */
   location: { lat: number; lng: number } | null;
-  /** Actual GPS coordinates — only used when user explicitly taps "Use My Location" */
+  /** Actual GPS coordinates - only used when user explicitly taps "Use My Location" */
   gpsLocation?: { lat: number; lng: number } | null;
   /** Coordinates set by tapping the map in pin mode */
   pinLocation: { lat: number; lng: number } | null;
@@ -85,7 +85,7 @@ interface IncidentFormProps {
     email: string;
     photoURL: string;
   } | null;
-  /** Called when user chooses "drop a pin" — parent enters crosshair mode */
+  /** Called when user chooses "drop a pin" - parent enters crosshair mode */
   onRequestMapPin?: () => void;
   /** True while the crosshair pin overlay is active on the map */
   isPinMode?: boolean;
@@ -142,7 +142,7 @@ export default function IncidentForm({
 
   // When pin mode exits without confirmation (Cancel), return to choose step.
   // Do not run on successful confirm: parent sets pinLocation and clears isPinMode in the same
-  // update — without the !pinLocation guard, we'd race setStep('choose') vs setStep('form').
+  // update - without the !pinLocation guard, we'd race setStep('choose') vs setStep('form').
   useEffect(() => {
     if (!isPinMode && step === 'pinning' && !pinLocation) {
       setStep('choose');
@@ -218,7 +218,7 @@ export default function IncidentForm({
   };
 
   const handleUseCurrentLocation = () => {
-    // Explicitly opt into GPS — this is the ONLY path that uses the device location.
+    // Explicitly opt into GPS - this is the ONLY path that uses the device location.
     onClearPin?.();
     setUsingGPS(true);
     setStep('form');
@@ -229,7 +229,7 @@ export default function IncidentForm({
     onRequestMapPin?.();
   };
 
-  // Single copy of steps in the DOM — never mount desktop + mobile forms together (breaks RHF / zod).
+  // Single copy of steps in the DOM - never mount desktop + mobile forms together (breaks RHF / zod).
   const reportSteps = (
     <AnimatePresence mode="wait">
       {step === 'choose' && (

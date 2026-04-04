@@ -1,7 +1,7 @@
 /**
  * AboutPage.tsx
  *
- * Calgary Watch — Redesigned About page with premium desktop/mobile UI
+ * Calgary Watch - Redesigned About page with premium desktop/mobile UI
  *
  * Features:
  *  - Full-width hero with background image
@@ -255,7 +255,7 @@ export default function AboutPage() {
       <main className="pt-24 pb-20">
 
         {/* ================================================================
-            HERO SECTION — Full width with image background
+            HERO SECTION - Full width with image background
             ================================================================ */}
         <motion.section
           initial={reducedMotion ? undefined : { opacity: 0 }}
@@ -345,7 +345,7 @@ export default function AboutPage() {
         </motion.section>
 
         {/* ================================================================
-            ABOUT SECTION — Who we are
+            ABOUT SECTION - Who we are
             ================================================================ */}
         <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-white">
           <div className="max-w-7xl mx-auto">
@@ -438,7 +438,7 @@ export default function AboutPage() {
         </section>
 
         {/* ================================================================
-            STORY SECTION — How it works with 3D cards & images
+            STORY SECTION - How it works with 3D cards & images
             ================================================================ */}
         <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50">
           <div className="max-w-7xl mx-auto">
@@ -551,7 +551,7 @@ export default function AboutPage() {
         </section>
 
         {/* ================================================================
-            MISSION SECTION — What drives us
+            MISSION SECTION - What drives us
             ================================================================ */}
         <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-white">
           <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -614,7 +614,7 @@ export default function AboutPage() {
         </section>
 
         {/* ================================================================
-            GET INVOLVED — Team, Volunteers, Business Partners
+            GET INVOLVED - Team, Volunteers, Business Partners
             ================================================================ */}
         <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50">
           <div className="max-w-7xl mx-auto">
@@ -664,7 +664,7 @@ export default function AboutPage() {
                 </div>
               </motion.div>
 
-              {/* Card 2: Volunteers — inline form */}
+              {/* Card 2: Volunteers - inline form */}
               <VolunteerCard reducedMotion={reducedMotion} />
 
               {/* Card 3: Business Partners */}
@@ -715,7 +715,7 @@ export default function AboutPage() {
         </section>
 
         {/* ================================================================
-            CONTACT SECTION — Get in touch
+            CONTACT SECTION - Get in touch
             ================================================================ */}
         <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50">
           <div className="max-w-3xl mx-auto text-center">

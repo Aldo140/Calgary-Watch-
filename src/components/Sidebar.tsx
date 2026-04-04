@@ -88,7 +88,7 @@ export default function Sidebar({
     return () => clearTimeout(id);
   }, [searchQuery]);
 
-  // Keyboard shortcuts removed — they interfered with typing in report forms.
+  // Keyboard shortcuts removed - they interfered with typing in report forms.
 
   const filteredIncidents = useMemo(() => {
     const q = debouncedSearch.toLowerCase().trim();
@@ -137,7 +137,7 @@ export default function Sidebar({
 
   return (
     <div className="flex flex-col h-full w-full lg:w-[22rem] bg-slate-950/50 light:bg-white/95 backdrop-blur-2xl border-r border-white/5 light:border-slate-200 overflow-hidden shadow-2xl z-20">
-      {/* Calgary Watch brand gradient — sky blue → Bow River teal (dark) / mountain stone → night (light) */}
+      {/* Calgary Watch brand gradient - sky blue → Bow River teal (dark) / mountain stone → night (light) */}
       <div
         className="h-1.5 w-full shrink-0"
         style={{

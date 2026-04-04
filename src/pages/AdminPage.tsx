@@ -434,7 +434,7 @@ export default function AdminPage() {
             <span className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Analytics</span>
           </div>
 
-          {/* Row 1: Incidents over time — full width */}
+          {/* Row 1: Incidents over time - full width */}
           <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
             <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Incidents: Last 14 Days</p>
             <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily report volume from your community. Spikes indicate high-activity periods worth reviewing.</p>
@@ -551,7 +551,7 @@ export default function AdminPage() {
             </Card>
           </div>
 
-          {/* Row 3: Community safety breakdown — full width */}
+          {/* Row 3: Community safety breakdown - full width */}
           {safetyChartData.length > 0 && (
             <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
               <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Community Safety vs Crime Breakdown</p>

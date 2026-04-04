@@ -213,7 +213,7 @@ export default function MapPage() {
     setSelectedArea(null);
     setActiveIncidentId(incident.id);
 
-    // Show popup immediately — no waiting for pan animation.
+    // Show popup immediately - no waiting for pan animation.
     window.requestAnimationFrame(() => {
       mapRef.current?.showPopup(incident);
     });
@@ -237,7 +237,7 @@ export default function MapPage() {
   }, []);
 
   const [isPinMode, setIsPinMode] = useState(false);
-  // Coordinates captured the moment "Set Pin Here" fires — stored in MapPage
+  // Coordinates captured the moment "Set Pin Here" fires - stored in MapPage
   // state so there is zero prop-chain timing involved.
   const [confirmedPinLocation, setConfirmedPinLocation] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -250,7 +250,7 @@ export default function MapPage() {
   const handleRequestMapPin = useCallback(() => {
     setConfirmedPinLocation(null);
     setIsPinMode(true);
-    // Don't auto-fly — the user pans from wherever the map currently is.
+    // Don't auto-fly - the user pans from wherever the map currently is.
     // This avoids the crosshair appearing at GPS coordinates when the user
     // hasn't chosen to navigate there.
   }, []);
@@ -521,7 +521,7 @@ export default function MapPage() {
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
         />
 
-        {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) — lg+ uses desktop header only */}
+        {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
         <div
           className={cn(
             'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden transition-all duration-300',
@@ -711,7 +711,7 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Desktop top header — unchanged at lg+ */}
+        {/* Desktop top header - unchanged at lg+ */}
         <div className="absolute top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 items-center justify-between pointer-events-none z-30 hidden lg:flex">
           <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
             <Button
@@ -872,7 +872,7 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* FABs: Emergency SOS + Report Incident — extra lift on small screens for layer dock */}
+        {/* FABs: Emergency SOS + Report Incident - extra lift on small screens for layer dock */}
         <div className={cn(
           "absolute right-4 md:right-8 z-30 flex flex-col items-end gap-3 max-lg:bottom-[calc(7.25rem+env(safe-area-inset-bottom))] md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] bottom-28 md:bottom-32 transition-all duration-300",
           (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
@@ -913,7 +913,7 @@ export default function MapPage() {
               } else {
                 setIsFormOpen(true);
                 setConfirmedPinLocation(null);
-                // Start neutral — user picks GPS or pin explicitly in the form.
+                // Start neutral - user picks GPS or pin explicitly in the form.
                 // Don't pre-fill with their home GPS coords.
                 setSelectedLocation(CALGARY_CENTER);
               }
@@ -934,7 +934,7 @@ export default function MapPage() {
           setShowHeatmap={setShowHeatmap}
         />
 
-        {/* Bottom Status & Disclaimer Bar — desktop / tablet only; mobile uses top chrome + layer bar */}
+        {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}
         <div className="absolute bottom-10 md:bottom-12 left-4 md:left-6 right-4 md:right-8 items-center justify-between pointer-events-none z-20 hidden lg:flex">
           <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-slate-950/60 light:bg-white/95 backdrop-blur-xl border border-white/5 light:border-slate-300 rounded-full shadow-lg">
             <div className="relative flex items-center justify-center w-1.5 h-1.5 md:w-2 md:h-2">

@@ -39,7 +39,7 @@ export default defineConfig(() => {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
             // Firebase SDK -- large but stable; split to allow parallel fetch
             'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-            // Leaflet map engine — heat plugin must NOT be split separately
+            // Leaflet map engine - heat plugin must NOT be split separately
             // because it reads window.L at module evaluation time (before our
             // `window.L = L` assignment runs if it lands in a different chunk).
             'vendor-leaflet': ['leaflet'],

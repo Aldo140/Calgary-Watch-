@@ -1,119 +1,127 @@
-# Calgary Watch: Urban Intelligence Platform
+# Calgary Watch
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
 
-Calgary Watch is an advanced, **real-time urban intelligence platform** designed to provide Calgarians with immediate, localized situational awareness. By fusing crowdsourced community reports with verified public safety datasets, the platform delivers a cinematic, highly-responsive map ecosystem where data is democratized and instantly accessible. 
+Real-time community safety for Calgary. Calgarians report incidents the moment they happen and they appear on the map in under 30 seconds. Road closures, fires, flooding, safety alerts, all in one place.
 
-Built with enterprise-grade performance, native mobile aesthetics, and a deep commitment to data transparency, Calgary Watch stands apart as a community-driven safety initiative.
+**[Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
 
-**[Visit Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub Repository](https://github.com/Aldo140/Calgary-Watch-)**
-
-![Mobile First Experience](https://img.shields.io/badge/experience-mobile--first-purple)
-
-> *Calgary Watch operates as a non-profit initiative. We are actively seeking dedicated volunteers and strategic business partnerships to further our mission of community safety and accessibility.*
+> Calgary Watch is a non-profit initiative. We are actively seeking volunteers and partners to grow the platform.
 
 ---
 
-## 🎯 Vision
+## What It Does
 
-Our mission is to establish the definitive real-time urban intelligence layer for the city of Calgary. 
+Calgary Watch is a live, community-powered incident map. Users drop a pin, pick a category, and submit in under 30 seconds. The report goes live instantly with no moderation delay. A native-app-quality web experience means it works on any phone without installing anything.
 
-While traditional news cycles operate on a delayed timeline—often reporting on incidents long after they've resolved—Calgary Watch closes the "40-minute gap," empowering citizens with instant updates on road closures, severe weather, social disturbances, and critical infrastructure issues.
+The platform distinguishes between three data layers:
 
----
-
-## 🚀 Key Features
-
-### 1. Immersive Native-App Web Experience
-- **Cinematic Urban Intelligence Grid UI**: High-end visual aesthetic utilizing dark-mode-first glassmorphism, depth-blurring, and fluid layout scaling. 
-- **Interactive Device Simulation**: The landing page features a fully dynamic, scroll-animated iPhone mockup that identically replicates the live behavior of the platform using `framer-motion`, complete with native mobile bottom-sheet UI paradigms and live "Sync" indicators.
-- **Micro-Animations & Gestures**: Sweeping highlights, dynamic pulse dots, and robust viewport-triggered animations.
-
-### 2. Live Sync Mapping Engine
-- **Zero-Latency Incident Feed**: Fully decoupled `onSnapshot` Firestore architecture streams events instantly bounding boxes and clustering algorithms to prevent visual clutter.
-- **Dynamic Action Overlays**: Custom "Floating Action Buttons" mimicking high-end native experiences, allowing rapid access to layers, user location, and reporting interfaces.
-
-### 3. Neighbourhood Intelligence Layers
-- Granular, community-level data analytics presenting safety scores, historical incident density heatmaps (powered by Leaflet.heat), and comparative metrics. 
-
-### 4. Seamless Mobile Delivery
-- Painstakingly engineered for perfect cross-device scaling. Mobile views adapt organically with intelligent DOM reordering to ensure text readability alongside unobstructed visual simulations. Forms submit in under <100ms via optimized transition buffers.
+- **Community Reports** - submitted by users in real time, labeled with trust indicators
+- **Official Data** - aggregated from Calgary Police Service open datasets for historical context
+- **System Signals** - inferred from clustered activity to surface patterns even at low usage
 
 ---
 
-## 🛡 Trust & Data Transparency
+## Features
 
-Calgary Watch distinguishes rigorously between data sources:
+### Landing Page
+- Transparent nav that blends into the hero and hides on scroll-down, reappears on scroll-up
+- Full-screen hero with live Calgary background image, phone mockup simulation, and live incident feed
+- Bento feature grid with animated visuals: radar rings (Live Map), zone heatmap (Neighbourhood Intelligence), verification pipeline (Verified Reports), redacted report doc (Anonymous posting)
+- Horizontal snap-scroll How It Works on mobile
+- Compact mobile layouts throughout, no duplicate sections
 
-1. **Community Reports (Real-Time)**: Submitted by users dynamically. Unverified statuses are explicitly labeled, and system logic measures "Trust Indicators" based on report confluence.
-2. **Official Data**: Aggregated non-real-time datasets from the Calgary Police Service, used for historical context and intelligence baselines rather than immediate response.
+### Map
+- Real-time Firestore `onSnapshot` stream, zero reload needed
+- Custom incident markers with category icons, pulse rings, and severity-based sizing
+- Leaflet heatmap layer for historical density
+- Bottom-sheet incident detail panel (mobile native feel)
+- Crosshair pin mode for precise location reporting
+- Floating action buttons: SOS, report, layer toggle, GPS
 
-### Disclaimers & Privacy
-- **Not an Emergency Service**: Calgary Watch does not replace 911.
-- **Anonymity First**: Identifiable user metrics are strictly localized. Anonymous reporting is enabled by default. 
-- **Non-Governmental**: Unaffiliated with the City of Calgary or CPS.
+### Reporting
+- 7 incident categories
+- Anonymous option by default
+- GPS or manual pin placement
+- Optimistic UI, form submits in under 100ms perceived
+
+### Admin
+- Incident management dashboard
+- Analytics: incidents over time, category breakdown, community safety breakdown
+- User management and moderation tools
 
 ---
 
-## 🗺 Roadmap
+## Roadmap
 
-- **Phase 1 (Active)**: Core Calgary deployment, real-time sync mapping, UI/UX conceptual modeling, and public launch.
-- **Phase 2 (Upcoming)**: Geofenced push-notifications, "Credibility Engine" for users, robust Admin Moderation dashboard mobile optimization.
-- **Phase 3**: Integration with open transit architectures (CTrain delays) and live meteorological sensors.
+| Phase | Title | Status |
+|---|---|---|
+| 01 | Calgary Launch | Active |
+| 02 | Native App | Upcoming |
+| 03 | More Cities | Planned |
+| 04 | Enterprise | Planned |
+
+Phase 2 targets iOS and Android apps with push notifications and an enhanced credibility system. Phase 3 expands to other Canadian cities on demand.
 
 ---
 
-## 💻 Tech Stack & Architecture
+## Trust and Safety
 
-Calgary Watch is engineered using modern, high-performance web topologies:
+Calgary Watch is not an emergency service. Always call 911.
 
-| Element | Technology |
+- Anonymous reporting is on by default
+- User emails are never exposed publicly
+- Community reports are labeled as unverified until confirmed by multiple sources
+- Official data is sourced from Calgary Police Service open datasets and is not real-time
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
 |---|---|
-| **Frontend Foundation** | React 19 + TypeScript (strict) |
-| **Tooling & Build** | Vite 6 + Tailwind CSS v4 |
-| **Database Ecosystem** | Google Cloud Firestore (NoSQL Live Sync) |
-| **Autonomic Motion** | Framer Motion & GSAP |
-| **Geospatial Engine** | Leaflet + Custom CARTO tileset mappings |
-| **Auth & Security** | Firebase Authentication (OAuth) + strict Firestore Validation Rules |
-| **Icons & Assets** | Lucide React |
-
-### Performance Optimization Directives
-- **React 18 Transitions**: `startTransition` handles deep network writes off-critical-thread.
-- **Image Transcoding**: All assets, including Hero panoramas natively encoded to WebP format, delivering an 82% footprint reduction.
-- **Component Splitting**: Heavy tree branches (Admin Portals, Geographic processing logic) utilize `React.lazy` and Suspense boundaries. 
+| Frontend | React 19 + TypeScript |
+| Build | Vite 6 + Tailwind CSS v4 |
+| Database | Google Cloud Firestore |
+| Animation | Framer Motion + GSAP |
+| Maps | Leaflet + CARTO tiles + Leaflet.heat |
+| Auth | Firebase Authentication |
+| Icons | Lucide React |
 
 ---
 
-## 🤝 Get Involved
+## Get Involved
 
-Calgary Watch is entirely volunteer-driven. We are expanding and heavily recruiting contributors across:
-- **Design & Engineering**: React developers, UX researchers, mapping experts.
-- **Operations & Marketing**: Social strategy, moderation management, local advocacy.
+Calgary Watch runs entirely on volunteers.
 
-To pitch partnerships or join the development team, contact us via the platform or at `jorti104@mtroyal.ca`.
+- **Engineering** - React, TypeScript, Firebase, mapping
+- **Design** - UX, mobile patterns, data visualization
+- **Operations** - community outreach, moderation, partnerships
+
+Contact: `jorti104@mtroyal.ca`
 
 ---
 
-## 🔧 Developer Access
+## Local Setup
 
 ```bash
-# Clone and Install
 git clone https://github.com/Aldo140/Calgary-Watch-.git
 cd Calgary-Watch--main
 npm install
 
-# Required Environment bindings (.env)
-VITE_FIREBASE_API_KEY=x
-VITE_FIREBASE_AUTH_DOMAIN=x
-VITE_FIREBASE_PROJECT_ID=x
-VITE_FIREBASE_STORAGE_BUCKET=x
-VITE_FIREBASE_MESSAGING_SENDER_ID=x
-VITE_FIREBASE_APP_ID=x
+# Create .env with your Firebase config
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 
-# Run Development Server
 npm run dev
 ```
 
+See [IMAGE_SETUP.md](IMAGE_SETUP.md) for adding local image assets.
+
 ---
 
-*Built for Calgary — non-profit, community-powered, and real-time.*
+*Built for Calgary. Non-profit, community-powered, real-time.*

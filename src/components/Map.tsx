@@ -33,7 +33,7 @@ export interface MapRef {
     options?: { zoom?: number; offsetX?: number; offsetY?: number; onComplete?: () => void }
   ) => void;
   showPopup: (incident: Incident) => void;
-  /** Returns the current map center — used by pin-mode to capture coordinates */
+  /** Returns the current map center - used by pin-mode to capture coordinates */
   getCenter: () => { lat: number; lng: number } | null;
 }
 
@@ -49,10 +49,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const incidentsRef = useRef<Incident[]>(incidents);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
-  // Live map centre — updated on every move event so the pin overlay shows real coords
+  // Live map centre - updated on every move event so the pin overlay shows real coords
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
-  // Callback refs — keep the single Leaflet click handler up-to-date with latest props
+  // Callback refs - keep the single Leaflet click handler up-to-date with latest props
   // without needing to re-register it on every render.
   const isPinModeRef = useRef(isPinMode);
   const onPinConfirmRef = useRef(onPinConfirm);
@@ -379,7 +379,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         ? 'relative w-14 h-14 flex items-center justify-center group'
         : 'relative w-10 h-10 flex items-center justify-center group';
 
-      // Pulse ring — emergency gets an extra outer ring
+      // Pulse ring - emergency gets an extra outer ring
       if (isEmergency) {
         const outerRing = document.createElement('div');
         outerRing.className = 'absolute inset-[-8px] rounded-2xl bg-red-600 animate-ping opacity-30';
@@ -414,7 +414,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       );
 
       // Build the SVG icon via DOM (avoids innerHTML XSS surface).
-      // All path data is static — no user data is interpolated into SVG markup.
+      // All path data is static - no user data is interpolated into SVG markup.
       const iconSize = isEmergency ? 28 : 20;
       const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -427,7 +427,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           'M5 10 3 9',
           'M19 10l2-1',
         ],
-        crime: [], // uses circle + lines — see special handling below
+        crime: [], // uses circle + lines - see special handling below
         traffic: [
           'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2',
           'M9 17h6',
@@ -472,7 +472,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       svg.style.color = 'white';
 
       if (incident.category === 'crime') {
-        // Circle + info lines — use createElementNS for circle and line
+        // Circle + info lines - use createElementNS for circle and line
         const circle = document.createElementNS(svgNS, 'circle');
         circle.setAttribute('cx', '12'); circle.setAttribute('cy', '12'); circle.setAttribute('r', '10');
         svg.appendChild(circle);
@@ -630,7 +630,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             <div className="absolute left-1/2 h-full w-px bg-blue-400/25" />
           </div>
 
-          {/* Pin — rendered in its own stacking layer so the shadow ellipse
+          {/* Pin - rendered in its own stacking layer so the shadow ellipse
               doesn't clip the crosshair lines above */}
           <div className="absolute inset-0 z-21 pointer-events-none select-none">
             {/*
@@ -652,7 +652,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
                 alignItems: 'center',
               }}
             >
-              {/* Pulse ring — uses Tailwind's animate-ping */}
+              {/* Pulse ring - uses Tailwind's animate-ping */}
               <div
                 className="animate-ping"
                 style={{
@@ -684,7 +684,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
               </div>
               {/* Stem */}
               <div style={{ width: 3, height: 18, background: 'linear-gradient(to bottom,#1d4ed8,#1e3a8a)', borderRadius: '0 0 2px 2px', flexShrink: 0 }} />
-              {/* Tip dot — this pixel sits at exact map centre */}
+              {/* Tip dot - this pixel sits at exact map centre */}
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1d4ed8', flexShrink: 0 }} />
             </div>
 
@@ -709,10 +709,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             <div className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-950/90 border border-blue-500/40 shadow-2xl backdrop-blur-md w-full">
               <svg className="shrink-0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               <span className="text-blue-300 text-[10px] sm:text-xs font-bold leading-tight flex-1 text-center truncate">
-                Tap map to pin — or pan & press <span className="text-white">Set Pin Here</span>
+                Tap map to pin - or pan & press <span className="text-white">Set Pin Here</span>
               </span>
             </div>
-            {/* Live coords — updates every frame as user pans */}
+            {/* Live coords - updates every frame as user pans */}
             {mapCenter && (
               <div className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 backdrop-blur-md">
                 <span className="text-[11px] font-mono text-emerald-300">
@@ -722,7 +722,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             )}
           </div>
 
-          {/* Action buttons — sit above the LayerToggle (bottom-20 mobile, bottom-8 desktop) and status bar */}
+          {/* Action buttons - sit above the LayerToggle (bottom-20 mobile, bottom-8 desktop) and status bar */}
           <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center flex-wrap gap-2 md:gap-3 w-[90vw] max-w-sm max-lg:bottom-[7.25rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
             <button
               onClick={(e) => { e.stopPropagation(); onPinCancel?.(); }}

@@ -253,7 +253,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-slate-950 light:bg-slate-50 text-white light:text-slate-900 font-sans overflow-x-hidden">
 
       {/* ================================================================
-          NAVIGATION — clean fixed bar, consistent h-16
+          NAVIGATION - clean fixed bar, consistent h-16
           ================================================================ */}
       <nav className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
@@ -344,7 +344,7 @@ export default function LandingPage() {
 
         <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-16 lg:pb-20 min-h-screen lg:min-h-[900px]">
 
-          {/* Left — content (Text naturally comes first on mobile) */}
+          {/* Left - content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-xl self-center pt-8 pb-4 lg:py-0">
             <AuroraBackground />
 
@@ -377,7 +377,7 @@ export default function LandingPage() {
 
               {/* Description */}
               <p className="text-base sm:text-lg text-slate-400 leading-relaxed mb-9 max-w-lg">
-                A live map where Calgarians report incidents the moment they happen. Road closures, fires, flooding, safety alerts — all in one place, verified and real-time.
+                A live map where Calgarians report incidents the moment they happen. Road closures, fires, flooding, safety alerts - all in one place, verified and real-time.
               </p>
 
               {/* CTAs (Desktop Only - Mobile buttons moved below phone) */}
@@ -407,7 +407,7 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          {/* Right — Interactive Visual Simulation (Phone) */}
+          {/* Right - Interactive Visual Simulation (Phone) */}
           <div className="relative w-full flex flex-col items-center justify-center pt-8 pb-10 lg:py-0 self-center">
              
              {/* Dynamic Floating iPhone Mockup */}
@@ -529,7 +529,7 @@ export default function LandingPage() {
                            <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
                        </div>
 
-                       {/* Logo watermark — bottom right of phone */}
+                       {/* Logo watermark - bottom right of phone */}
                        <div className="absolute bottom-3 right-4 flex items-center gap-1.5 opacity-40 pointer-events-none">
                          <img src={publicAsset('icon.svg')} alt="" className="w-4 h-4 object-contain" />
                          <span className="text-[9px] font-black tracking-tight"
@@ -627,7 +627,7 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed max-w-3xl">
-              A collision on Macleod Trail. Smoke south of the Bow. Police tape in Beltline. You'll hear about it on social media — maybe — 40 minutes after everyone nearby already knew. That gap costs real decisions.
+              A collision on Macleod Trail. Smoke south of the Bow. Police tape in Beltline. You'll hear about it on social media - maybe - 40 minutes after everyone nearby already knew. That gap costs real decisions.
             </p>
           </motion.div>
 
@@ -650,7 +650,7 @@ export default function LandingPage() {
             ))}
           </motion.div>
 
-          {/* 3 editorial rows — hidden on mobile to reduce scroll length */}
+          {/* 3 editorial rows - hidden on mobile to reduce scroll length */}
           <div className="hidden md:block space-y-0 border border-white/8 light:border-slate-200 rounded-2xl overflow-hidden divide-y divide-white/8 light:divide-slate-200">
             {[
               { num: '01', tag: '30+ min delayed', tagColor: '#ef4444', title: "By the time it's in the news...", body: 'Local media reports incidents 30 or more minutes after they happen. That gap costs real decisions: a detour you could have taken, a street you would have avoided, a family member you could have warned.', icon: Radio, stat: '30+', statLabel: 'min delayed', reverse: false },
@@ -747,7 +747,7 @@ export default function LandingPage() {
           {/* Bento feature grid */}
           <div className="grid grid-cols-12 gap-3 sm:gap-4 mb-10 md:mb-12">
 
-            {/* 01 — Live Map (wide) */}
+            {/* 01 - Live Map (wide) */}
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6 }}
               className="col-span-12 sm:col-span-7 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-[#4A90D9]/40"
@@ -756,7 +756,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 40%, rgba(74,144,217,0.13) 0%, transparent 60%)' }} />
               <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(74,144,217,1) 1px,transparent 1px),linear-gradient(90deg,rgba(74,144,217,1) 1px,transparent 1px)', backgroundSize: '28px 28px' }} />
 
-              {/* Live feed cards — right half */}
+              {/* Live feed cards - right half */}
               <div className="absolute right-0 top-0 bottom-0 w-[46%] flex flex-col justify-center gap-2 px-4 pointer-events-none">
                 {/* Radar rings behind feed */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -795,7 +795,7 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-auto">
                   <h3 className="text-xl font-black text-white mb-1.5">Live Community Map</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds — no refresh, no lag.</p>
+                  <p className="text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds - no refresh, no lag.</p>
                 </div>
                 <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/5">
                   <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community powered</span>
@@ -804,7 +804,7 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* 02 — Neighbourhood Intelligence (narrow) */}
+            {/* 02 - Neighbourhood Intelligence (narrow) */}
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.08 }}
               className="col-span-12 sm:col-span-5 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-[#2E8B7A]/40"
@@ -839,12 +839,12 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-auto">
                   <h3 className="text-xl font-black text-white mb-1.5">Neighbourhood Intelligence</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Safety trends and incident history by quadrant — live.</p>
+                  <p className="text-sm text-slate-400 leading-relaxed">Safety trends and incident history by quadrant - live.</p>
                 </div>
               </div>
             </motion.div>
 
-            {/* 03 — Verified Data (narrow) */}
+            {/* 03 - Verified Data (narrow) */}
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.14 }}
               className="col-span-12 sm:col-span-5 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-[#D4A843]/40"
@@ -881,12 +881,12 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-auto">
                   <h3 className="text-xl font-black text-white mb-1.5">Source-Verified Reports</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Every incident shows its source — community or cross-referenced CPS data.</p>
+                  <p className="text-sm text-slate-400 leading-relaxed">Every incident shows its source - community or cross-referenced CPS data.</p>
                 </div>
               </div>
             </motion.div>
 
-            {/* 04 — Post Anonymously (wide) */}
+            {/* 04 - Post Anonymously (wide) */}
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.6, delay: 0.2 }}
               className="col-span-12 sm:col-span-7 relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border border-white/8 min-h-[300px] flex flex-col transition-colors duration-300 hover:border-purple-500/40"
@@ -936,7 +936,7 @@ export default function LandingPage() {
 
           </div>
 
-          {/* Real Calgary scenarios — hidden on mobile */}
+          {/* Real Calgary scenarios - hidden on mobile */}
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, delay: 0.15 }}
             className="hidden md:block rounded-2xl border border-white/10 light:border-slate-200 overflow-hidden shadow-xl">
             <div className="grid md:grid-cols-2 gap-0">

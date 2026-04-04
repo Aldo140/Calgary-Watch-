@@ -15,8 +15,9 @@
  *  4. Deletes incidents whose `expires_at` has passed (house-keeping)
  */
 
-import * as admin from 'firebase-admin';
-import type { ServiceAccount } from 'firebase-admin';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import type { Firestore } from 'firebase-admin/firestore';
 import { fetchEnvironmentCanadaAlerts } from './sources/environment-canada.js';
 import { fetch511AlbertaEvents } from './sources/511-alberta.js';
 import type { NormalizedIncident } from './types.js';
@@ -25,19 +26,19 @@ import type { NormalizedIncident } from './types.js';
 // Firebase Admin init
 // ---------------------------------------------------------------------------
 
-function initFirebase(): admin.firestore.Firestore {
+function initFirebase(): Firestore {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountJson) {
     throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set.');
   }
 
-  const serviceAccount = JSON.parse(serviceAccountJson) as ServiceAccount;
+  const serviceAccount = JSON.parse(serviceAccountJson);
 
-  if (!admin.apps.length) {
-    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+  if (!getApps().length) {
+    initializeApp({ credential: cert(serviceAccount) });
   }
 
-  return admin.firestore();
+  return getFirestore();
 }
 
 // ---------------------------------------------------------------------------
@@ -49,7 +50,7 @@ function initFirebase(): admin.firestore.Firestore {
  * ingested incidents in Firestore.
  */
 async function loadExistingKeys(
-  db: admin.firestore.Firestore
+  db: Firestore
 ): Promise<Map<string, string>> {
   const snapshot = await db
     .collection('incidents')
@@ -69,11 +70,11 @@ async function loadExistingKeys(
 // ---------------------------------------------------------------------------
 
 async function upsertIncident(
-  db: admin.firestore.Firestore,
+  db: Firestore,
   incident: NormalizedIncident,
   existingId: string | undefined
 ): Promise<'created' | 'updated' | 'skipped'> {
-  const now = admin.firestore.FieldValue.serverTimestamp();
+  const now = FieldValue.serverTimestamp();
 
   if (existingId) {
     // Update only the expiry — don't overwrite fields the admin may have edited.
@@ -101,7 +102,7 @@ async function upsertIncident(
  * Soft-delete incidents whose expires_at is in the past and that
  * originated from the pipeline (dedup_key present).
  */
-async function pruneExpiredIncidents(db: admin.firestore.Firestore): Promise<number> {
+async function pruneExpiredIncidents(db: Firestore): Promise<number> {
   const now = Date.now();
   const snapshot = await db
     .collection('incidents')

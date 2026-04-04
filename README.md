@@ -1,17 +1,18 @@
-# Calgary Watch
+# Calgary Watch: Real-time Community Incident Map
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
 
-Calgary Watch is a **real-time, community-powered incident map** built specifically for Calgary, AB. Calgarians report real-time incidents — road closures, crime alerts, weather events, infrastructure issues — and they appear on the map instantly, layered with verified police data and neighbourhood context.
+Calgary Watch is an innovative, **real-time, community-powered incident map** designed specifically for Calgary, AB. Our platform enables citizens to report critical live events—such as road closures, crime alerts, severe weather, and infrastructure issues—which instantly populate a dynamic map. By fusing crowdsourced intelligence with verified public safety datasets (e.g., Calgary Police Service data), Calgary Watch provides users with unparalleled situational awareness and localized neighborhood context.
 
-**[Visit Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
-![Mobile First](https://img.shields.io/badge/experience-mobile--first-purple)
+**[Visit Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub Repository](https://github.com/Aldo140/Calgary-Watch-)**
 
-> Calgary Watch is a non-profit initiative. We're actively looking for volunteers and business partners.
+![Mobile First Experience](https://img.shields.io/badge/experience-mobile--first-purple)
+
+> *Calgary Watch operates as a non-profit initiative. We are actively seeking dedicated volunteers and strategic business partnerships to further our mission of community safety and accessibility.*
 
 ---
 
-## Vision
+## 🎯 Vision
 
 Calgary Watch aims to become Calgary’s real-time urban intelligence layer — a platform where community-reported incidents and verified public data combine to provide immediate awareness and long-term insight into city activity.
 

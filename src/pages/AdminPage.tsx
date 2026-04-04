@@ -370,13 +370,13 @@ export default function AdminPage() {
             <h1 className="text-3xl md:text-4xl font-black tracking-tight">Calgary Watch Admin</h1>
             <p className="text-sm text-slate-400 mt-1">Live command surface for incidents, trust status, and community intelligence.</p>
           </div>
-          <Button variant="secondary" onClick={() => navigate('/map')} className="flex items-center gap-2">
+          <Button variant="secondary" onClick={() => navigate('/map')} className="flex items-center justify-center gap-2 w-full md:w-auto mt-2 md:mt-0">
             <ArrowLeft size={16} />
             Back to map
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
             <div className="flex items-center justify-between">
               <p className="text-xs text-slate-400">Total Incidents</p>
@@ -581,7 +581,10 @@ export default function AdminPage() {
         <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold">User Overview</h2>
-            <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Directory</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Directory</span>
+              <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
+            </div>
           </div>
           <table className="w-full text-xs min-w-[720px]">
             <thead className="text-slate-400">
@@ -610,7 +613,10 @@ export default function AdminPage() {
         <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold">Incidents (Editable)</h2>
-            <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Moderation Queue</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Moderation Queue</span>
+              <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
+            </div>
           </div>
           {loadingData ? (
             <div className="py-8 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
@@ -688,7 +694,10 @@ export default function AdminPage() {
         <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold">Community Stats (Editable)</h2>
-            <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">City Intelligence</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">City Intelligence</span>
+              <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
+            </div>
           </div>
           <table className="w-full text-xs min-w-[980px]">
             <thead className="text-slate-400">

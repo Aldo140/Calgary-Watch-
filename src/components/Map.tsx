@@ -705,11 +705,12 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           </div>
 
           {/* Instruction banner + live coordinate readout */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2 max-lg:top-[calc(5.25rem+env(safe-area-inset-top))] lg:top-4">
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-950/90 border border-blue-500/40 shadow-2xl backdrop-blur-md whitespace-nowrap">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span className="text-blue-300 text-xs font-bold">Tap map to place pin — or pan &amp; press</span>
-              <span className="text-white text-xs font-bold">Set Pin Here</span>
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2 max-lg:top-[calc(5.25rem+env(safe-area-inset-top))] lg:top-4 w-[92vw] max-w-sm">
+            <div className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-950/90 border border-blue-500/40 shadow-2xl backdrop-blur-md w-full">
+              <svg className="shrink-0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span className="text-blue-300 text-[10px] sm:text-xs font-bold leading-tight flex-1 text-center truncate">
+                Tap map to pin — or pan & press <span className="text-white">Set Pin Here</span>
+              </span>
             </div>
             {/* Live coords — updates every frame as user pans */}
             {mapCenter && (
@@ -722,22 +723,21 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           </div>
 
           {/* Action buttons — sit above the LayerToggle (bottom-20 mobile, bottom-8 desktop) and status bar */}
-          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 max-lg:bottom-[7.25rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
+          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center flex-wrap gap-2 md:gap-3 w-[90vw] max-w-sm max-lg:bottom-[7.25rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
             <button
               onClick={(e) => { e.stopPropagation(); onPinCancel?.(); }}
-              className="px-5 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-slate-300 text-sm font-bold backdrop-blur-md hover:bg-slate-800 active:scale-95 transition-all shadow-xl"
+              className="px-5 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-slate-300 text-sm font-bold backdrop-blur-md hover:bg-slate-800 active:scale-95 transition-all shadow-xl whitespace-nowrap shrink-0 flex-1 max-w-[120px]"
             >
               Cancel
             </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // Read centre from Leaflet synchronously — avoids one-frame lag vs React mapCenter state
                 if (!map.current) return;
                 const c = map.current.getCenter();
                 onPinConfirm?.(c.lat, c.lng);
               }}
-              className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all whitespace-nowrap shrink-0 flex-[2]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               Set Pin Here

@@ -449,7 +449,7 @@ export default function MapPage() {
       </AnimatePresence>
 
       {/* Sidebar Feed - Desktop */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:flex flex-col h-full shrink-0 z-40 relative shadow-2xl">
         <Sidebar
           incidents={incidents}
           onIncidentClick={handleMarkerClick}
@@ -524,8 +524,9 @@ export default function MapPage() {
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) — lg+ uses desktop header only */}
         <div
           className={cn(
-            'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden',
-            theme === 'light' && 'text-slate-900'
+            'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden transition-all duration-300',
+            theme === 'light' && 'text-slate-900',
+            (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible -translate-y-4'
           )}
         >
           <div className="flex items-center gap-2 pointer-events-auto">
@@ -576,77 +577,87 @@ export default function MapPage() {
               </p>
             </div>
           </div>
-          <div className="relative mt-2 flex items-center justify-end gap-2 pointer-events-auto px-0.5">
+        </div>
+
+        {/* Mobile vertical action buttons (right edge) */}
+        <div
+          className={cn(
+            'absolute right-3 top-28 flex flex-col gap-2.5 z-30 pointer-events-none lg:hidden transition-all duration-300',
+            theme === 'light' && 'text-slate-900',
+            (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible translate-x-4'
+          )}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              if (userLocation) mapRef.current?.flyTo(userLocation.lat, userLocation.lng);
+              else mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
+            }}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-sky-400 light:text-blue-600 shadow-lg pointer-events-auto"
+            aria-label="Recenter on your location"
+          >
+            <Navigation size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-amber-300 light:text-amber-700 shadow-lg pointer-events-auto"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <div className="relative pointer-events-auto">
             <button
               type="button"
               onClick={() => {
-                if (userLocation) mapRef.current?.flyTo(userLocation.lat, userLocation.lng);
-                else mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
+                setShowNotifications(!showNotifications);
+                if (!showNotifications) setUnreadNotifications(0);
               }}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 light:bg-white/85 backdrop-blur-md border border-white/10 light:border-slate-200 text-sky-400 light:text-blue-600 shadow-md"
-              aria-label="Recenter on your location"
+              className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-slate-200 light:text-slate-700 shadow-lg"
+              aria-label="Notifications"
             >
-              <Navigation size={17} />
+              <Bell size={18} className={cn(unreadNotifications > 0 && 'text-sky-400')} />
+              {unreadNotifications > 0 && (
+                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border border-black/20">
+                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                </span>
+              )}
             </button>
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 light:bg-white/85 backdrop-blur-md border border-white/10 light:border-slate-200 text-amber-300 light:text-amber-700 shadow-md"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  if (!showNotifications) setUnreadNotifications(0);
-                }}
-                className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 light:bg-white/85 backdrop-blur-md border border-white/10 light:border-slate-200 text-slate-200 light:text-slate-700 shadow-md"
-                aria-label="Notifications"
-              >
-                <Bell size={17} className={cn(unreadNotifications > 0 && 'text-sky-400')} />
-                {unreadNotifications > 0 && (
-                  <span className="absolute top-1 right-1 min-w-[14px] h-3.5 px-0.5 bg-red-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border border-black/20">
-                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                  </span>
-                )}
-              </button>
-              <AnimatePresence>
-                {showNotifications && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    className="absolute right-0 top-12 w-[min(18rem,calc(100vw-2rem))] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-white light:border-slate-300"
-                  >
-                    <div className="p-3 border-b border-white/5 light:border-slate-100">
-                      <h3 className="text-xs font-bold text-white light:text-slate-900">Notifications</h3>
-                    </div>
-                    <div className="max-h-52 overflow-y-auto">
-                      {notifications.length === 0 ? (
-                        <div className="p-3 text-[10px] text-slate-500 text-center">No new alerts.</div>
-                      ) : (
-                        notifications.map((n) => (
-                          <div key={n.id} className="px-3 py-2.5 border-b border-white/5 light:border-slate-100">
-                            <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{n.title}</p>
-                            <p className="text-[9px] text-slate-500 mt-0.5">
-                              {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, x: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 8, scale: 0.96 }}
+                  className="absolute right-full mr-3 top-0 w-[min(18rem,calc(100vw-5rem))] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-white light:border-slate-300"
+                >
+                  <div className="p-3 border-b border-white/5 light:border-slate-100">
+                    <h3 className="text-xs font-bold text-white light:text-slate-900">Notifications</h3>
+                  </div>
+                  <div className="max-h-52 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-3 text-[10px] text-slate-500 text-center">No new alerts.</div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div key={n.id} className="px-3 py-2.5 border-b border-white/5 light:border-slate-100">
+                          <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{n.title}</p>
+                          <p className="text-[9px] text-slate-500 mt-0.5">
+                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <div className="relative pointer-events-auto">
             {user ? (
               <button
                 type="button"
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden border border-white/15 light:border-slate-200 bg-black/40 light:bg-white shadow-md"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden border border-white/15 light:border-slate-200 bg-black/45 light:bg-white shadow-lg"
                 aria-label="Account menu"
               >
                 {user.photoURL ? (
@@ -659,45 +670,45 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={signIn}
-                className="h-10 px-3 rounded-xl bg-sky-600 text-white text-[10px] font-black uppercase tracking-wide shadow-md border border-sky-400/30"
+                className="h-11 px-3.5 rounded-2xl bg-sky-600 text-white text-[10px] font-black uppercase tracking-wide shadow-lg border border-sky-400/30"
               >
                 Sign in
               </button>
             )}
-          </div>
-          <AnimatePresence>
-            {showUserMenu && user && (
-              <motion.div
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                className="absolute right-0 top-full mt-1.5 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-white light:border-slate-300 pointer-events-auto"
-              >
-                <div className="p-3 border-b border-white/5">
-                  <p className="text-xs font-bold text-white truncate light:text-slate-900">{user.displayName}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
-                </div>
-                {isAdmin && (
+            <AnimatePresence>
+              {showUserMenu && user && (
+                <motion.div
+                  initial={{ opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 8 }}
+                  className="absolute right-full mr-3 top-0 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-white light:border-slate-300 pointer-events-auto"
+                >
+                  <div className="p-3 border-b border-white/5">
+                    <p className="text-xs font-bold text-white truncate light:text-slate-900">{user.displayName}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                  </div>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => { navigate('/admin'); setShowUserMenu(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-blue-400 hover:bg-blue-500/10 text-left"
+                    >
+                      <LayoutDashboard size={14} />
+                      Admin
+                    </button>
+                  )}
                   <button
                     type="button"
-                    onClick={() => { navigate('/admin'); setShowUserMenu(false); }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-blue-400 hover:bg-blue-500/10 text-left"
+                    onClick={() => { logout(); setShowUserMenu(false); }}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-red-400 hover:bg-red-500/10 text-left rounded-b-2xl"
                   >
-                    <LayoutDashboard size={14} />
-                    Admin
+                    <LogOut size={14} />
+                    Sign out
                   </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => { logout(); setShowUserMenu(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-red-400 hover:bg-red-500/10 text-left"
-                >
-                  <LogOut size={14} />
-                  Sign out
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Desktop top header — unchanged at lg+ */}
@@ -711,16 +722,6 @@ export default function MapPage() {
               title="Back to Landing Page"
             >
               <Home size={18} className="text-blue-400" />
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="icon"
-              className="rounded-full w-10 h-10 md:w-12 md:h-12 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
-              onClick={() => setIsSidebarOpen(true)}
-              title="Open incident feed"
-            >
-              <Database size={18} className="text-blue-400" />
             </Button>
 
             <Button
@@ -872,7 +873,10 @@ export default function MapPage() {
         </div>
 
         {/* FABs: Emergency SOS + Report Incident — extra lift on small screens for layer dock */}
-        <div className="absolute right-4 md:right-8 z-30 flex flex-col items-end gap-3 max-lg:bottom-[calc(7.25rem+env(safe-area-inset-bottom))] md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] bottom-28 md:bottom-32">
+        <div className={cn(
+          "absolute right-4 md:right-8 z-30 flex flex-col items-end gap-3 max-lg:bottom-[calc(7.25rem+env(safe-area-inset-bottom))] md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] bottom-28 md:bottom-32 transition-all duration-300",
+          (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
+        )}>
           {/* SOS Emergency Button */}
           <Button
             variant="primary"

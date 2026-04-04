@@ -301,7 +301,7 @@ export default function LandingPage() {
           {/* Mobile photo */}
           <div className="lg:hidden relative h-56 sm:h-72 overflow-hidden order-first">
             <picture>
-              <source srcSet="/images/calgary7.webp" type="image/webp" />
+              <source srcSet={publicAsset('images/calgary7.webp')} type="image/webp" />
               <img src={publicAsset('images/calgary2.jpg')} alt="Calgary skyline" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-[center_40%]" />
             </picture>
             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950 to-transparent" aria-hidden="true" />
@@ -378,7 +378,7 @@ export default function LandingPage() {
           <div className="hidden lg:block relative overflow-hidden">
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, ease: 'easeOut' }} className="absolute inset-0">
               <picture>
-                <source srcSet="/images/calgary7.webp" type="image/webp" />
+                <source srcSet={publicAsset('images/calgary7.webp')} type="image/webp" />
                 <img src={publicAsset('images/calgary2.jpg')} alt="Calgary skyline at night" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-[center_40%]" />
               </picture>
             </motion.div>
@@ -488,7 +488,7 @@ export default function LandingPage() {
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.65 }}
             className="mt-12 relative rounded-2xl overflow-hidden shadow-2xl border border-[#4A90D9]/25">
             <picture>
-              <source srcSet="/images/calgary3.webp" type="image/webp" />
+              <source srcSet={publicAsset('images/calgary3.webp')} type="image/webp" />
               <img src={publicAsset('images/calgary3.webp')} alt="Calgary skyline" className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
             </picture>
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40" />
@@ -553,10 +553,10 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
             {[
-              { img: '/images/hero-wide.webp', alt: 'Live map', badge: 'Real-time', badgeColor: 'text-blue-400 bg-blue-500/10', iconBg: 'bg-blue-500/90', Icon: MapIcon, title: 'Live Community Map', desc: 'Incidents appear on the map the moment they are reported. No refresh, no delay. Watch your neighbourhood update in real time.', hoverShadow: '0 28px 56px rgba(74,144,217,0.14)' },
-              { img: '/images/calgary3.webp', alt: 'Neighbourhood', badge: 'Insights', badgeColor: 'text-teal-400 bg-teal-500/10', iconBg: 'bg-teal-500/90', Icon: Layers, title: 'Neighbourhood Intelligence', desc: 'Tap any area to see historical incident patterns, safety scores, and local trends specific to that part of Calgary.', hoverShadow: '0 28px 56px rgba(46,139,122,0.14)' },
-              { img: '/images/calgary5.webp', alt: 'Verified data', badge: 'Verified', badgeColor: 'text-amber-400 bg-amber-500/10', iconBg: 'bg-amber-500/90', Icon: ShieldCheck, title: 'Verified Data', desc: 'Each report shows its source: community-submitted or cross-referenced with police data, so you know exactly how much to trust it.', hoverShadow: '0 28px 56px rgba(212,168,67,0.14)' },
-              { img: '/images/calgary4.webp', alt: 'Anonymous', badge: 'Private', badgeColor: 'text-purple-400 bg-purple-500/10', iconBg: 'bg-purple-500/90', Icon: Lock, title: 'Post Anonymously', desc: 'See something sensitive? Report it without revealing who you are. Your identity stays private by default.', hoverShadow: '0 28px 56px rgba(139,92,246,0.14)' },
+              { img: publicAsset('images/hero-wide.webp'), alt: 'Live map', badge: 'Real-time', badgeColor: 'text-blue-400 bg-blue-500/10', iconBg: 'bg-blue-500/90', Icon: MapIcon, title: 'Live Community Map', desc: 'Incidents appear on the map the moment they are reported. No refresh, no delay. Watch your neighbourhood update in real time.', hoverShadow: '0 28px 56px rgba(74,144,217,0.14)' },
+              { img: publicAsset('images/calgary3.webp'), alt: 'Neighbourhood', badge: 'Insights', badgeColor: 'text-teal-400 bg-teal-500/10', iconBg: 'bg-teal-500/90', Icon: Layers, title: 'Neighbourhood Intelligence', desc: 'Tap any area to see historical incident patterns, safety scores, and local trends specific to that part of Calgary.', hoverShadow: '0 28px 56px rgba(46,139,122,0.14)' },
+              { img: publicAsset('images/calgary5.webp'), alt: 'Verified data', badge: 'Verified', badgeColor: 'text-amber-400 bg-amber-500/10', iconBg: 'bg-amber-500/90', Icon: ShieldCheck, title: 'Verified Data', desc: 'Each report shows its source: community-submitted or cross-referenced with police data, so you know exactly how much to trust it.', hoverShadow: '0 28px 56px rgba(212,168,67,0.14)' },
+              { img: publicAsset('images/calgary4.webp'), alt: 'Anonymous', badge: 'Private', badgeColor: 'text-purple-400 bg-purple-500/10', iconBg: 'bg-purple-500/90', Icon: Lock, title: 'Post Anonymously', desc: 'See something sensitive? Report it without revealing who you are. Your identity stays private by default.', hoverShadow: '0 28px 56px rgba(139,92,246,0.14)' },
             ].map((f, i) => (
               <motion.div key={i}
                 initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.65, delay: i * 0.08 }}

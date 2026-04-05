@@ -35,12 +35,24 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
   useEffect(() => {
     if (!isAuthReady) return;
+
     const fetchOpenData = async () => {
+      const trafficIncidents: Incident[] = [];
+      const three11Incidents: Incident[] = [];
+
+      // ── Traffic — isolated so a failure never blocks 311 ──────────────────
       try {
-        // Fetch Calgary Traffic
-        const trafficRes = await fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt DESC');
-        const trafficData = await trafficRes.json();
-        const trafficIncidents: Incident[] = trafficData.map((item: any) => {
+        const trafficRes = await fetch(
+          'https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt%20DESC'
+        );
+        if (!trafficRes.ok) throw new Error(`Traffic API ${trafficRes.status}`);
+        const trafficData: any[] = await trafficRes.json();
+
+        for (const item of trafficData) {
+          const lat = parseFloat(item.latitude);
+          const lng = parseFloat(item.longitude);
+          if (!isFinite(lat) || !isFinite(lng)) continue;
+
           const rawInfo = (item.incident_info || '').trim().toLowerCase();
           const rawDesc = (item.description || '').trim().toLowerCase();
           const combined = `${rawInfo} ${rawDesc}`;
@@ -48,280 +60,126 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
           let tTitle: string;
           let tDesc: string;
-
           if (combined.includes('collision') || combined.includes('accident')) {
-            tTitle = 'Vehicle Collision';
-            tDesc = `Multi-vehicle collision blocking traffic in ${quadrant}. Expect delays and use alternate routes.`;
+            tTitle = 'Vehicle Collision'; tDesc = `Multi-vehicle collision in ${quadrant}. Expect delays and use alternate routes.`;
           } else if (combined.includes('stalled') || combined.includes('disabled vehicle')) {
-            tTitle = 'Stalled Vehicle';
-            tDesc = `Stalled vehicle on the roadway in ${quadrant}. Lane restriction in effect.`;
+            tTitle = 'Stalled Vehicle'; tDesc = `Stalled vehicle on the roadway in ${quadrant}. Lane restriction in effect.`;
           } else if (combined.includes('signal') || combined.includes('light out')) {
-            tTitle = 'Traffic Signal Issue';
-            tDesc = `Traffic signal malfunction reported in ${quadrant}. Treat intersection as all-way stop.`;
+            tTitle = 'Traffic Signal Issue'; tDesc = `Traffic signal malfunction in ${quadrant}. Treat as all-way stop.`;
           } else if (combined.includes('road closure') || combined.includes('closed')) {
-            tTitle = 'Road Closure';
-            tDesc = `Road closure active in ${quadrant}. Check alternate routes before travelling.`;
+            tTitle = 'Road Closure'; tDesc = `Road closure active in ${quadrant}. Check alternate routes before travelling.`;
           } else if (combined.includes('construction') || combined.includes('paving') || combined.includes('utility')) {
-            tTitle = 'Construction Zone';
-            tDesc = `Active construction causing lane reductions in ${quadrant}. Reduce speed and allow extra travel time.`;
+            tTitle = 'Construction Zone'; tDesc = `Active construction causing lane reductions in ${quadrant}.`;
           } else if (combined.includes('spill') || combined.includes('debris') || combined.includes('hazard')) {
-            tTitle = 'Road Hazard';
-            tDesc = `Hazardous material or debris on roadway in ${quadrant}. Avoid area if possible.`;
+            tTitle = 'Road Hazard'; tDesc = `Hazardous material or debris on roadway in ${quadrant}.`;
           } else if (combined.includes('flood') || combined.includes('water')) {
-            tTitle = 'Flooded Roadway';
-            tDesc = `Water on roadway reported in ${quadrant}. Do not drive through flooded sections.`;
+            tTitle = 'Flooded Roadway'; tDesc = `Water on roadway in ${quadrant}. Do not drive through flooded sections.`;
           } else {
             tTitle = item.incident_info?.trim() || 'Traffic Disruption';
-            tDesc = `Traffic disruption reported in ${quadrant}. Conditions may change — check 511 Alberta for updates.`;
+            tDesc = `Traffic disruption in ${quadrant}. Check 511 Alberta for updates.`;
           }
 
-          return {
+          const ts = new Date(item.start_dt || new Date()).getTime();
+          trafficIncidents.push({
             id: `yyc-traffic-${item.id || String(item.incident_info || Math.random()).replace(/[^a-zA-Z0-9]/g, '')}`,
-            title: tTitle,
-            description: tDesc,
-          category: 'traffic',
-          neighborhood: item.quadrant ? `Calgary ${item.quadrant}` : 'Calgary',
-          lat: parseFloat(item.latitude),
-          lng: parseFloat(item.longitude),
-          timestamp: new Date(item.start_dt || new Date()).getTime(),
-          email: 'opendata@calgary.ca',
-          name: 'City of Calgary Traffic',
-          anonymous: false,
-          verified_status: 'community_confirmed',
-          report_count: 1,
-          data_source: 'official',
-          source_name: 'City of Calgary Open Data',
+            title: tTitle, description: tDesc, category: 'traffic' as IncidentCategory,
+            neighborhood: quadrant, lat, lng, timestamp: ts,
+            email: 'opendata@calgary.ca', name: 'City of Calgary Traffic',
+            anonymous: false, verified_status: 'community_confirmed' as const, report_count: 1,
+            data_source: 'official' as const, source_name: 'City of Calgary Open Data',
             source_url: 'https://data.calgary.ca/',
-            expires_at: new Date(item.start_dt || new Date()).getTime() + (8 * 60 * 60 * 1000), // Decay after 8 hours
-          };
-        });
-
-        // Fetch Calgary 311 (Recent issues for infrastructure / weather)
-        const three11Res = await fetch('https://data.calgary.ca/resource/iahh-g8bj.json?$limit=80&$where=status_description=\'Open\'&$order=requested_date DESC');
-        const three11Data = await three11Res.json();
-        
-        const three11Incidents: Incident[] = three11Data
-          .filter((item: any) => {
-            if (!item.latitude || !item.longitude) return false;
-            const sName = (item.service_name || '').toLowerCase();
-            // Filter out mundane bylaw/city tickets. We want incidents that feel like 'live watch' events.
-            const boring = ['tree', 'shrub', 'waste', 'recycling', 'snow and ice', 'grass', 'weeds', 'park', 'license', 'material on public', 'tax', 'inquiry'];
-            if (boring.some(b => sName.includes(b))) return false;
-            return true;
-          })
-          .map((item: any) => {
-            // Map 311 service names to our categories
-            const sName = (item.service_name || '').toLowerCase();
-            let category: IncidentCategory = 'infrastructure';
-            if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water')) category = 'weather';
-            if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise')) category = 'crime';
-            if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger')) category = 'emergency';
-            
-            const timestamp = new Date(item.requested_date || new Date()).getTime();
-
-            // Derive a human-readable title and contextual description from 311 service data
-            let cleanTitle = item.service_name || 'City Service Issue';
-            if (cleanTitle.startsWith('Bylaw - ')) cleanTitle = cleanTitle.replace('Bylaw - ', '');
-            if (cleanTitle.includes('Disturbance and Behavioural Concerns')) cleanTitle = 'Public Disturbance';
-
-            const area = item.comm_name ? `in ${item.comm_name}` : 'in Calgary';
-            let cleanDesc: string;
-
-            if (sName.includes('graffiti')) {
-              cleanDesc = `Graffiti reported on public property ${area}. City crews scheduled for removal.`;
-            } else if (sName.includes('pothole') || sName.includes('road surface') || sName.includes('pavement')) {
-              cleanDesc = `Road surface damage ${area}. Repair crews have been dispatched.`;
-            } else if (sName.includes('spill') || sName.includes('hazmat') || sName.includes('contamination')) {
-              cleanDesc = `Hazardous spill or contamination reported ${area}. Environmental response team notified.`;
-            } else if (sName.includes('noise') || sName.includes('disturbance') || sName.includes('nuisance')) {
-              cleanDesc = `Noise or public disturbance complaint filed ${area}. Bylaw officers have been dispatched.`;
-            } else if (sName.includes('bylaw') && sName.includes('animal')) {
-              cleanDesc = `Animal control complaint ${area}. Officers en route.`;
-            } else if (sName.includes('bylaw')) {
-              cleanDesc = `Bylaw violation reported ${area}. Officers assigned to investigate.`;
-            } else if (sName.includes('street light') || sName.includes('light out') || sName.includes('signal')) {
-              cleanDesc = `Street light or signal outage ${area}. Electrical crew scheduled for repair.`;
-            } else if (sName.includes('water main') || sName.includes('water break') || sName.includes('watermain')) {
-              cleanDesc = `Water main issue reported ${area}. Utilities crew dispatched — local service may be affected.`;
-            } else if (sName.includes('sewer') || sName.includes('drain') || sName.includes('flood')) {
-              cleanDesc = `Drainage or sewer problem ${area}. City utilities team has been notified.`;
-            } else if (sName.includes('fire') || sName.includes('danger') || sName.includes('emergency')) {
-              cleanDesc = `Emergency hazard reported ${area}. Response crews have been alerted.`;
-            } else if (sName.includes('bridge') || sName.includes('overpass') || sName.includes('infrastructure')) {
-              cleanDesc = `Infrastructure concern flagged ${area}. Engineering crew assigned to inspect.`;
-            } else if (sName.includes('sidewalk') || sName.includes('curb') || sName.includes('pedestrian')) {
-              cleanDesc = `Sidewalk or pedestrian path damage ${area}. Maintenance crew scheduled.`;
-            } else {
-              const responsible = item.agency_responsible?.replace('CS - ', '') || 'City Crews';
-              cleanDesc = `${cleanTitle} reported ${area}. ${responsible} assigned to respond.`;
-            }
-
-            return {
-              id: `yyc-311-${item.service_request_id}`,
-              title: cleanTitle,
-              description: cleanDesc,
-              category,
-              neighborhood: item.comm_name || 'Calgary',
-              lat: parseFloat(item.latitude),
-              lng: parseFloat(item.longitude),
-              timestamp,
-              email: 'opendata@calgary.ca',
-              name: 'Calgary 311 Sync',
-              anonymous: false,
-              verified_status: 'community_confirmed',
-              report_count: 1,
-              data_source: 'official',
-              source_name: 'Calgary 311',
-              source_url: 'https://data.calgary.ca/',
-              expires_at: timestamp + (24 * 60 * 60 * 1000), // Decay after 24 hours
-            };
-          });
-
-        // Fetch Calgary Community Crime Statistics (recent months)
-        // Dataset: Community Crime Statistics — has category, count, community, month
-        const now = new Date();
-        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const monthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
-        const crimeRes = await fetch(
-          `https://data.calgary.ca/resource/848s-4m4z.json?$limit=200&$where=month_year='${monthStr}'&$order=count DESC`
-        );
-        const crimeData = await crimeRes.json();
-
-        // Community centre coordinates for Calgary (approximate, used for incident placement)
-        const COMMUNITY_COORDS: Record<string, [number, number]> = {
-          'BELTLINE': [51.0413, -114.0747], 'DOWNTOWN COMMERCIAL CORE': [51.0501, -114.0706],
-          'INGLEWOOD': [51.0358, -114.0358], 'FOREST LAWN': [51.0302, -113.9988],
-          'MARLBOROUGH': [51.0470, -113.9860], 'FOREST HEIGHTS': [51.0237, -113.9932],
-          'SOUTHWOOD': [50.9836, -114.0788], 'ACADIA': [50.9883, -114.0688],
-          'DOVER': [51.0244, -114.0039], 'RADISSON HEIGHTS': [51.0414, -114.0025],
-          'PENBROOKE MEADOWS': [51.0313, -113.9923], 'ALBERT PARK/RADISSON HTS': [51.0403, -114.0007],
-          'RENFREW': [51.0590, -114.0415], 'BRIDGELAND/RIVERSIDE': [51.0570, -114.0567],
-          'CRESCENT HEIGHTS': [51.0617, -114.0666], 'MOUNT PLEASANT': [51.0722, -114.0836],
-          'HILLHURST': [51.0599, -114.0911], 'SUNNYSIDE': [51.0580, -114.0931],
-          'KENSINGTON': [51.0598, -114.0928], 'WESTGATE': [51.0511, -114.1666],
-          'SHAGANAPPI': [51.0671, -114.1400], 'KILLARNEY/GLENGARRY': [51.0407, -114.1472],
-          'GLENBROOK': [51.0381, -114.1639], 'LINCOLN PARK': [51.0217, -114.1602],
-          'LAKEVIEW': [51.0234, -114.1456], 'NORTH GLENMORE PARK': [51.0107, -114.1336],
-          'HAYSBORO': [50.9886, -114.0808], 'WILLOW PARK': [50.9828, -114.0388],
-          'LAKE BONAVISTA': [50.9693, -114.0567], 'OAKRIDGE': [51.0030, -114.1234],
-          'PALLISER': [50.9998, -114.1113], 'PUMP HILL': [51.0039, -114.0926],
-          'CANYON MEADOWS': [50.9810, -114.1090], 'BRAESIDE': [50.9780, -114.1227],
-          'CEDARBRAE': [50.9693, -114.1354], 'WOODBINE': [50.9655, -114.1093],
-          'SIGNAL HILL': [51.0083, -114.1752], 'COACH HILL': [51.0278, -114.2026],
-          'COUGAR RIDGE': [51.0374, -114.2199], 'SPRINGBANK HILL': [51.0282, -114.2192],
-          'VALLEY RIDGE': [51.0773, -114.2361], 'TUSCANY': [51.1219, -114.2189],
-          'SCENIC ACRES': [51.1098, -114.2023], 'RANCHLANDS': [51.1074, -114.1830],
-          'COUNTRY HILLS': [51.1506, -114.1149], 'COVENTRY HILLS': [51.1760, -114.0611],
-          'PANORAMA HILLS': [51.1610, -114.0425], 'HARVEST HILLS': [51.1516, -114.0703],
-          'HAMPTONS': [51.1414, -114.1861], 'ROYAL OAK': [51.1314, -114.1978],
-          'EVANSTON': [51.1879, -114.1115], 'SAGE HILL': [51.1712, -114.1601],
-          'NOLAN HILL': [51.1613, -114.1793], 'SHERWOOD': [51.1527, -114.1836],
-          'SILVERADO': [50.9265, -114.0802], 'LEGACY': [50.9112, -114.0546],
-          'CRANSTON': [50.9225, -114.0161], 'AUBURN BAY': [50.9326, -113.9977],
-          'MAHOGANY': [50.9276, -113.9756], 'NEW BRIGHTON': [50.9388, -113.9737],
-          'MCKENZIE TOWNE': [50.9405, -113.9969], 'COPPERFIELD': [50.9496, -113.9859],
-          'MCKENZIE LAKE': [50.9545, -114.0035], 'DOUGLASDALE/GLEN': [50.9633, -114.0218],
-          'CHAPARRAL': [50.9178, -114.0567], 'SHAWNESSY': [50.9373, -114.0852],
-          'EVERGREEN': [50.9509, -114.1259], 'BRIDLEWOOD': [50.9429, -114.1115],
-          'SOMERSET': [50.9456, -114.0803], 'MIDNAPORE': [50.9518, -114.0658],
-          'SUNDANCE': [50.9584, -114.0461], 'QUEENSLAND': [50.9698, -114.0255],
-          'RIVERBEND': [50.9767, -114.0455], 'OGDEN': [50.9893, -114.0170],
-          'APPLEWOOD PARK': [51.0310, -113.9767], 'TARADALE': [51.0950, -113.9550],
-          'MARTINDALE': [51.0907, -113.9557], 'SADDLETOWNE': [51.0970, -113.9390],
-          'CORAL SPRINGS': [51.0770, -113.9515], 'CASTLERIDGE': [51.0832, -113.9608],
-          'FALCONRIDGE': [51.0793, -113.9760], 'PINERIDGE': [51.0682, -113.9785],
-          'RUNDLE': [51.0639, -113.9921], 'TEMPLE': [51.0729, -113.9921],
-          'WHITEHORN': [51.0785, -113.9933], 'MONTEREY PARK': [51.0659, -113.9575],
-          'SADDLE RIDGE': [51.1113, -113.9626], 'CITYSCAPE': [51.1190, -113.9768],
-          'REDSTONE': [51.1329, -113.9773], 'SKYVIEW RANCH': [51.1414, -114.0010],
-          'LIVINGSTON': [51.1756, -114.0243], 'EDGEMONT': [51.1186, -114.1681],
-          'CITADEL': [51.1268, -114.2028], 'HIDDEN VALLEY': [51.1239, -114.1477],
-          'SANDSTONE VALLEY': [51.1192, -114.1135], 'BEDDINGTON HEIGHTS': [51.1018, -114.0893],
-          'THORNCLIFFE': [51.0859, -114.0804], 'HIGHLAND PARK': [51.0840, -114.0697],
-          'GREENVIEW': [51.0913, -114.0597], 'WINSTON HEIGHTS/MOUNTVIEW': [51.0782, -114.0435],
-        };
-
-        const crimeIncidents: Incident[] = [];
-        const seen = new Set<string>();
-
-        for (const item of crimeData) {
-          const commName: string = (item.community_name || '').toUpperCase().trim();
-          const coords = COMMUNITY_COORDS[commName];
-          if (!coords) continue;
-
-          const category = (item.category || '').toLowerCase();
-          const count = parseInt(item.count || '0', 10);
-          if (count < 3) continue; // skip trivial counts
-
-          // Deduplicate — one incident per community+category per fetch
-          const dedupKey = `crime-stat-${commName}-${category}-${monthStr}`;
-          if (seen.has(dedupKey)) continue;
-          seen.add(dedupKey);
-
-          let title = '';
-          let description = '';
-          let crimeCategory: IncidentCategory = 'crime';
-
-          const rawCat = (item.category || '').toLowerCase();
-          if (rawCat.includes('break') || rawCat.includes('b&e') || rawCat.includes('break and enter')) {
-            title = 'Break & Enter Activity';
-            description = `${count} break and enter incidents reported in ${item.community_name} last month. Secure doors, windows, and garages.`;
-          } else if (rawCat.includes('theft from vehicle') || rawCat.includes('vehicle')) {
-            title = 'Vehicle Break-In Reports';
-            description = `${count} vehicle thefts or break-ins in ${item.community_name} last month. Avoid leaving valuables visible in cars.`;
-          } else if (rawCat.includes('theft of vehicle') || rawCat.includes('auto theft')) {
-            title = 'Auto Theft Activity';
-            description = `${count} vehicle thefts reported in ${item.community_name} last month. Consider anti-theft measures.`;
-            crimeCategory = 'crime';
-          } else if (rawCat.includes('assault')) {
-            title = 'Assault Reports';
-            description = `${count} assault incidents in ${item.community_name} last month. Be aware of your surroundings in this area.`;
-          } else if (rawCat.includes('robbery')) {
-            title = 'Robbery Reports';
-            description = `${count} robbery incidents in ${item.community_name} last month. Stay in well-lit areas and stay alert.`;
-          } else if (rawCat.includes('disorder') || rawCat.includes('mischief')) {
-            title = 'Disorder & Mischief';
-            description = `${count} disorder or mischief calls in ${item.community_name} last month.`;
-          } else {
-            title = `${item.category || 'Crime'} Reports`;
-            description = `${count} ${(item.category || 'crime').toLowerCase()} incidents reported in ${item.community_name} last month.`;
-          }
-
-          // Slightly jitter coordinates so multiple communities don't all stack at same point
-          const jitterLat = (Math.random() - 0.5) * 0.004;
-          const jitterLng = (Math.random() - 0.5) * 0.006;
-
-          // Use end-of-last-month as timestamp so it appears "recent"
-          const monthTs = prevMonth.getTime();
-
-          crimeIncidents.push({
-            id: dedupKey,
-            title,
-            description,
-            category: crimeCategory,
-            neighborhood: item.community_name || commName,
-            lat: coords[0] + jitterLat,
-            lng: coords[1] + jitterLng,
-            timestamp: monthTs,
-            email: 'opendata@calgary.ca',
-            name: 'Calgary Police Service',
-            anonymous: false,
-            verified_status: 'community_confirmed',
-            report_count: count,
-            data_source: 'official',
-            source_name: 'Calgary Police Service Open Data',
-            source_url: 'https://data.calgary.ca/',
-            expires_at: monthTs + (60 * 24 * 60 * 60 * 1000), // 60 days
+            expires_at: ts + 8 * 60 * 60 * 1000,
           });
         }
-
-        setOfficialIncidents([...trafficIncidents, ...three11Incidents, ...crimeIncidents]);
       } catch (err) {
-        console.error('Failed to fetch official open data:', err);
+        console.warn('[CalgaryWatch] Traffic API failed:', err);
       }
+
+      // ── Calgary 311 — isolated so a failure never blocks traffic ──────────
+      try {
+        // Properly encoded — no raw single quotes or spaces in the query string
+        const three11Url =
+          'https://data.calgary.ca/resource/iahh-g8bj.json' +
+          '?$limit=100' +
+          '&$where=' + encodeURIComponent("status_description='Open'") +
+          '&$order=' + encodeURIComponent('requested_date DESC');
+
+        const three11Res = await fetch(three11Url);
+        if (!three11Res.ok) throw new Error(`311 API ${three11Res.status}`);
+        const three11Data: any[] = await three11Res.json();
+
+        const boring = ['tree', 'shrub', 'waste', 'recycling', 'snow and ice', 'grass', 'weeds', 'park', 'license', 'material on public', 'tax', 'inquiry', 'cart', 'backlane'];
+
+        for (const item of three11Data) {
+          const lat = parseFloat(item.latitude);
+          const lng = parseFloat(item.longitude);
+          if (!isFinite(lat) || !isFinite(lng)) continue;
+
+          const sName = (item.service_name || '').toLowerCase();
+          if (boring.some(b => sName.includes(b))) continue;
+
+          let category: IncidentCategory = 'infrastructure';
+          if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water')) category = 'weather';
+          if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise')) category = 'crime';
+          if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger')) category = 'emergency';
+
+          const timestamp = new Date(item.requested_date || new Date()).getTime();
+          let cleanTitle = item.service_name || 'City Service Issue';
+          if (cleanTitle.startsWith('Bylaw - ')) cleanTitle = cleanTitle.replace('Bylaw - ', '');
+          if (cleanTitle.includes('Disturbance and Behavioural Concerns')) cleanTitle = 'Public Disturbance';
+
+          const area = item.comm_name ? `in ${item.comm_name}` : 'in Calgary';
+          let cleanDesc: string;
+          if (sName.includes('graffiti')) {
+            cleanDesc = `Graffiti reported on public property ${area}. City crews scheduled for removal.`;
+          } else if (sName.includes('pothole') || sName.includes('road surface') || sName.includes('pavement')) {
+            cleanDesc = `Road surface damage ${area}. Repair crews have been dispatched.`;
+          } else if (sName.includes('spill') || sName.includes('hazmat') || sName.includes('contamination')) {
+            cleanDesc = `Hazardous spill or contamination reported ${area}. Environmental response team notified.`;
+          } else if (sName.includes('noise') || sName.includes('disturbance') || sName.includes('nuisance')) {
+            cleanDesc = `Noise or public disturbance complaint filed ${area}. Bylaw officers have been dispatched.`;
+          } else if (sName.includes('bylaw') && sName.includes('animal')) {
+            cleanDesc = `Animal control complaint ${area}. Officers en route.`;
+          } else if (sName.includes('bylaw')) {
+            cleanDesc = `Bylaw violation reported ${area}. Officers assigned to investigate.`;
+          } else if (sName.includes('street light') || sName.includes('light out') || sName.includes('signal')) {
+            cleanDesc = `Street light or signal outage ${area}. Electrical crew scheduled for repair.`;
+          } else if (sName.includes('water main') || sName.includes('water break') || sName.includes('watermain')) {
+            cleanDesc = `Water main issue reported ${area}. Utilities crew dispatched — local service may be affected.`;
+          } else if (sName.includes('sewer') || sName.includes('drain') || sName.includes('flood')) {
+            cleanDesc = `Drainage or sewer problem ${area}. City utilities team has been notified.`;
+          } else if (sName.includes('fire') || sName.includes('danger') || sName.includes('emergency')) {
+            cleanDesc = `Emergency hazard reported ${area}. Response crews have been alerted.`;
+          } else if (sName.includes('bridge') || sName.includes('overpass') || sName.includes('infrastructure')) {
+            cleanDesc = `Infrastructure concern flagged ${area}. Engineering crew assigned to inspect.`;
+          } else if (sName.includes('sidewalk') || sName.includes('curb') || sName.includes('pedestrian')) {
+            cleanDesc = `Sidewalk or pedestrian path damage ${area}. Maintenance crew scheduled.`;
+          } else {
+            const responsible = item.agency_responsible?.replace('CS - ', '') || 'City Crews';
+            cleanDesc = `${cleanTitle} reported ${area}. ${responsible} assigned to respond.`;
+          }
+
+          three11Incidents.push({
+            id: `yyc-311-${item.service_request_id}`,
+            title: cleanTitle, description: cleanDesc, category,
+            neighborhood: item.comm_name || 'Calgary', lat, lng, timestamp,
+            email: 'opendata@calgary.ca', name: 'Calgary 311 Sync',
+            anonymous: false, verified_status: 'community_confirmed' as const, report_count: 1,
+            data_source: 'official' as const, source_name: 'Calgary 311',
+            source_url: 'https://data.calgary.ca/',
+            expires_at: timestamp + 24 * 60 * 60 * 1000,
+          });
+        }
+      } catch (err) {
+        console.warn('[CalgaryWatch] 311 API failed:', err);
+      }
+
+      // Publish whatever succeeded — each source is independent
+      setOfficialIncidents([...trafficIncidents, ...three11Incidents]);
     };
+
     fetchOpenData();
-    const interval = setInterval(fetchOpenData, 5 * 60 * 1000); // 5 min
+    const interval = setInterval(fetchOpenData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [isAuthReady]);
 

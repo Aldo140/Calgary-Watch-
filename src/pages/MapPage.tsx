@@ -19,6 +19,17 @@ import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAf
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
 function useOfficialOpenData(isAuthReady: boolean) {
   const [officialIncidents, setOfficialIncidents] = useState<Incident[]>([]);
 
@@ -30,7 +41,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
         const trafficRes = await fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt DESC');
         const trafficData = await trafficRes.json();
         const trafficIncidents: Incident[] = trafficData.map((item: any) => ({
-          id: `yyc-traffic-${item.id || item.incident_info.replace(/[^a-zA-Z]/g, '')}`,
+          id: `yyc-traffic-${item.id || String(item.incident_info || Math.random()).replace(/[^a-zA-Z0-9]/g, '')}`,
           title: item.incident_info?.trim() || 'Traffic Issue',
           description: item.description || 'Traffic incident reported by City of Calgary.',
           category: 'traffic',
@@ -688,8 +699,27 @@ export default function MapPage() {
           <button
             type="button"
             onClick={() => {
-              if (userLocation) mapRef.current?.flyTo(userLocation.lat, userLocation.lng);
-              else mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
+              const loc = userLocation || CALGARY_CENTER;
+              mapRef.current?.flyTo(loc.lat, loc.lng, 13);
+              
+              // Find the closest important incident (emergency, crime, fire, etc.) within 5km
+              const nearbyImportant = incidents
+                .filter(i => i.category !== 'traffic')
+                .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
+                .filter(item => item.dist <= 5)
+                .sort((a, b) => {
+                  // Prioritize emergencies first, then distance
+                  if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
+                  if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
+                  return a.dist - b.dist;
+                })[0];
+
+              if (nearbyImportant) {
+                // Wait slightly for flyTo to begin
+                setTimeout(() => {
+                  setSelectedIncident(nearbyImportant.i);
+                }, 600);
+              }
             }}
             className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-sky-400 light:text-blue-600 shadow-lg pointer-events-auto"
             aria-label="Recenter on your location"

@@ -6,9 +6,10 @@ name: Community Pulse
 
 on:
   schedule:
-    - cron: '30 13 * * *'   # 07:30 MDT  (slot 0 — morning)
-    - cron: '0  19 * * *'   # 13:00 MDT  (slot 1 — afternoon)
-    - cron: '30  3 * * *'   # 21:30 MDT  (slot 2 — evening, next UTC day)
+    # GitHub Actions uses UTC. MDT is UTC-6.
+    - cron: '30 13 * * *'   # 07:30 MDT (slot 0 - morning)
+    - cron: '0  19 * * *'   # 13:00 MDT (slot 1 - afternoon)
+    - cron: '30  3 * * *'   # 21:30 MDT (slot 2 - evening, next UTC day)
   workflow_dispatch:
     inputs:
       slot:
@@ -20,6 +21,8 @@ jobs:
   pulse:
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout
@@ -28,7 +31,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -38,11 +41,15 @@ jobs:
         id: slot
         run: |
           HOUR=$(date -u +%H)
+          # Use manual input if provided, otherwise detect via UTC hour
           SLOT="${{ github.event.inputs.slot }}"
           if [ -z "$SLOT" ]; then
-            if [ "$HOUR" = "13" ]; then SLOT=0
-            elif [ "$HOUR" = "19" ]; then SLOT=1
-            else SLOT=2
+            if [ "$HOUR" = "13" ]; then 
+              SLOT=0
+            elif [ "$HOUR" = "19" ]; then 
+              SLOT=1
+            else 
+              SLOT=2
             fi
           fi
           echo "slot=$SLOT" >> $GITHUB_OUTPUT

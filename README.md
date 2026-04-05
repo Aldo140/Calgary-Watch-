@@ -21,7 +21,7 @@ Over time, Calgary Watch surfaces patterns and trends across neighbourhoods, mov
 The platform runs three data layers:
 
 - **Community Reports** - submitted by users in real time, labeled with trust indicators that improve as more users confirm them
-- **Official Data** - aggregated from Calgary Police Service open datasets for historical context and baselines
+- **Official Open Data** - Live integrations from **Calgary Open Data (SODA APIs)** pulling real-time **311 Service Requests** (Weather/Infrastructure) and live **Traffic Incidents**, updated every 5 minutes
 - **System Signals** - inferred from clustered activity to surface patterns even at low usage, clearly labeled as low-confidence and system-generated
 
 ---
@@ -83,7 +83,8 @@ Community reports are clearly labeled and gain confidence as more users confirm 
 
 - Anonymous reporting is on by default
 - User emails are never exposed publicly
-- Official data is sourced from Calgary Police Service open datasets and is not real-time
+- Official data is actively synced every 5 minutes from the **City of Calgary Open Data API** (Traffic Incidents & 311 Service Requests).
+- Historical data is aggregated from Calgary Police Service open datasets.
 - System signals are explicitly marked as low-confidence and machine-inferred
 
 ---

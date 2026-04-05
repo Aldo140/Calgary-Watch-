@@ -342,9 +342,11 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90" />
         </div>
 
-        {/* Large ambient glows uniting the space */}
-        <div className="absolute top-1/4 left-[10%] w-96 h-96 bg-[#4A90D9]/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-1/4 right-[20%] w-96 h-96 bg-[#2E8B7A]/10 blur-[120px] rounded-full pointer-events-none" />
+        {/* Large ambient glows — use radial-gradient to avoid paint-heavy blur filter */}
+        <div className="absolute top-1/4 left-[10%] w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(74,144,217,0.12) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-1/4 right-[20%] w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(46,139,122,0.10) 0%, transparent 70%)' }} />
 
         <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-16 lg:pb-20 min-h-dvh lg:min-h-[900px]">
 
@@ -443,10 +445,11 @@ export default function LandingPage() {
 
                    {/* Background Map filling top half completely seamlessly */}
                    <div className="absolute top-0 inset-x-0 h-[55%] bg-slate-900 overflow-hidden">
-                       <motion.img 
-                          animate={{ scale: [1, 1.05, 1], x: [0, -5, 0] }}
-                          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                          src={publicAsset('images/calgary_map.png')} className="absolute inset-0 w-[110%] h-[110%] object-cover opacity-90" alt="Calgary Top Down Neon Map" 
+                       <img
+                          src={publicAsset('images/calgary_map.png')}
+                          className="absolute inset-0 w-[110%] h-[110%] object-cover opacity-90"
+                          alt="Calgary Top Down Neon Map"
+                          loading="lazy"
                        />
                        
                        {/* Floating Action Buttons (Right side native map feel) */}
@@ -456,22 +459,22 @@ export default function LandingPage() {
                        </div>
 
                        {/* PING 1: User Location */}
-                       <motion.div animate={{ opacity: [0, 1, 0], scale: [0.5, 2.5, 0.5] }} transition={{ duration: 4, repeat: Infinity, ease: "easeOut" }} className="absolute top-[35%] left-[25%] w-16 h-16 bg-[#4A90D9]/30 rounded-full blur-md -translate-x-1/2 -translate-y-1/2" />
+                       <motion.div animate={{ opacity: [0, 0.6, 0], scale: [0.5, 2.5, 0.5] }} transition={{ duration: 4, repeat: Infinity, ease: "easeOut" }} className="absolute top-[35%] left-[25%] w-16 h-16 bg-[#4A90D9]/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
                        <div className="absolute top-[35%] left-[25%] w-3 h-3 bg-[#4A90D9] rounded-full shadow-[0_0_10px_#4A90D9] border-2 border-white -translate-x-1/2 -translate-y-1/2" />
-                       
+
                        {/* PING 2: Major Incident */}
-                       <motion.div animate={{ opacity: [0, 1, 0], scale: [0.5, 2, 0.5] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[25%] left-[65%] w-20 h-20 sm:w-24 sm:h-24 bg-red-500/20 rounded-full blur-md -translate-x-1/2 -translate-y-1/2" />
+                       <motion.div animate={{ opacity: [0, 0.5, 0], scale: [0.5, 2, 0.5] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[25%] left-[65%] w-20 h-20 sm:w-24 sm:h-24 bg-red-500/20 rounded-full -translate-x-1/2 -translate-y-1/2" />
                        <div className="absolute top-[25%] left-[65%] text-red-500 drop-shadow-[0_0_10px_#ef4444] -translate-x-1/2 -translate-y-1/2">
-                           <Activity size={22} className="text-white fill-red-500 animate-bounce" />
+                           <Activity size={22} className="text-white fill-red-500" />
                        </div>
 
                        {/* PING 3: Minor Warning */}
-                       <motion.div animate={{ opacity: [0, 1, 0], scale: [0.5, 1.5, 0.5] }} transition={{ duration: 2.5, repeat: Infinity, delay: 1.5 }} className="absolute top-[60%] left-[80%] w-12 h-12 bg-amber-500/30 rounded-full blur-sm -translate-x-1/2 -translate-y-1/2" />
+                       <motion.div animate={{ opacity: [0, 0.5, 0], scale: [0.5, 1.5, 0.5] }} transition={{ duration: 2.5, repeat: Infinity, delay: 1.5 }} className="absolute top-[60%] left-[80%] w-12 h-12 bg-amber-500/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
                        <div className="absolute top-[60%] left-[80%] text-amber-500 drop-shadow-[0_0_8px_#fbbf24] -translate-x-1/2 -translate-y-1/2"><AlertCircle size={16} className="fill-amber-500 text-slate-900" /></div>
                    </div>
 
                    {/* Native Bottom Sheet overlapping the map securely */}
-                   <div className="absolute bottom-0 inset-x-0 h-[50%] bg-slate-900/90 backdrop-blur-2xl rounded-t-[2rem] border-t border-white/10 flex flex-col pt-2 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-30">
+                   <div className="absolute bottom-0 inset-x-0 h-[50%] bg-slate-900/95 backdrop-blur-md rounded-t-[2rem] border-t border-white/10 flex flex-col pt-2 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-30">
                        
                        {/* Drag Handle */}
                        <div className="w-10 h-1.5 rounded-full bg-white/20 mx-auto mb-3" />
@@ -616,8 +619,10 @@ export default function LandingPage() {
           ================================================================ */}
       <section className="py-16 md:py-28 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -left-80 top-0 w-[500px] h-[500px] rounded-full blur-[80px] opacity-6 bg-[#4A90D9]" aria-hidden="true" />
-          <div className="absolute -right-80 bottom-0 w-[500px] h-[500px] rounded-full blur-[80px] opacity-6 bg-[#2E8B7A]" aria-hidden="true" />
+          <div className="absolute -left-80 top-0 w-[500px] h-[500px] rounded-full opacity-[0.06]"
+            style={{ background: 'radial-gradient(ellipse at center, #4A90D9 0%, transparent 70%)' }} aria-hidden="true" />
+          <div className="absolute -right-80 bottom-0 w-[500px] h-[500px] rounded-full opacity-[0.06]"
+            style={{ background: 'radial-gradient(ellipse at center, #2E8B7A 0%, transparent 70%)' }} aria-hidden="true" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -1057,7 +1062,8 @@ export default function LandingPage() {
                   </div>
                 </div>
               </motion.div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/30 blur-[80px] -z-10 rounded-full" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 -z-10 rounded-full"
+                style={{ background: 'radial-gradient(ellipse at center, rgba(168,85,247,0.25) 0%, transparent 70%)' }} />
             </div>
           </div>
 
@@ -1224,7 +1230,8 @@ export default function LandingPage() {
             {/* Sustainability Glass Card */}
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ delay: 0.2 }} className="flex flex-col h-full">
               <div className="h-full mt-10 lg:mt-0 p-8 rounded-[2rem] bg-gradient-to-br from-slate-900 via-slate-900 to-[#D4A843]/10 border border-[#D4A843]/30 shadow-[0_0_50px_rgba(212,168,67,0.1)] relative overflow-hidden flex flex-col">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4A843]/20 blur-[50px] rounded-full mix-blend-screen" />
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full"
+                  style={{ background: 'radial-gradient(ellipse at top right, rgba(212,168,67,0.22) 0%, transparent 70%)' }} />
                 <div className="w-14 h-14 rounded-2xl bg-[#D4A843]/20 border border-[#D4A843]/40 flex items-center justify-center mb-6 backdrop-blur-md">
                    <Briefcase className="text-[#D4A843]" size={24} />
                 </div>

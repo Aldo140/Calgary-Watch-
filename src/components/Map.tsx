@@ -333,21 +333,73 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     clusterGroup.current = lAny.markerClusterGroup({
       iconCreateFunction: (cluster: any) => {
         const count = cluster.getChildCount();
+        const children = cluster.getAllChildMarkers();
+        const hasEmergency = children.some((m: any) => m.cwCategory === 'emergency');
+
         const el = document.createElement('div');
-        el.style.cssText = [
-          'width:44px', 'height:44px',
-          'background:rgba(15,23,42,0.93)',
-          'border:2px solid rgba(34,211,238,0.60)',
-          'border-radius:14px',
-          'display:flex', 'align-items:center', 'justify-content:center',
-          'cursor:pointer',
-          'box-shadow:0 4px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(34,211,238,0.12)',
-        ].join(';');
-        const label = document.createElement('span');
-        label.style.cssText = 'color:white;font-size:12px;font-weight:900;letter-spacing:-0.01em;';
-        label.textContent = `+${count}`;
-        el.appendChild(label);
-        return L.divIcon({ html: el, className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+        
+        if (hasEmergency) {
+          // Outer ping ring
+          const ring = document.createElement('div');
+          ring.style.cssText = [
+            'position:absolute', 'inset:-10px',
+            'border-radius:22px',
+            'background:rgba(239,68,68,0.35)',
+            'animation:ping 1.2s cubic-bezier(0,0,0.2,1) infinite',
+          ].join(';');
+
+          el.style.cssText = [
+            'position:relative',
+            'width:56px', 'height:56px',
+            'background:rgba(239,68,68,0.97)',
+            'border:2.5px solid rgba(254,226,226,0.95)',
+            'border-radius:20px',
+            'display:flex', 'align-items:center', 'justify-content:center',
+            'cursor:pointer',
+            'box-shadow:0 0 0 4px rgba(239,68,68,0.25), 0 0 28px rgba(239,68,68,0.7)',
+          ].join(';');
+
+          // Siren SVG icon — no count, emergency takes full icon space
+          const sirenSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          sirenSvg.setAttribute('width', '26'); sirenSvg.setAttribute('height', '26');
+          sirenSvg.setAttribute('viewBox', '0 0 24 24');
+          sirenSvg.setAttribute('fill', 'none');
+          sirenSvg.setAttribute('stroke', 'white');
+          sirenSvg.setAttribute('stroke-width', '2.5');
+          sirenSvg.setAttribute('stroke-linecap', 'round');
+          sirenSvg.setAttribute('stroke-linejoin', 'round');
+          // Siren / alarm paths
+          [
+            'M7 12a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v6H7v-6Z',
+            'M5 20h14',
+            'M12 7V3',
+            'M5 10 3 9',
+            'M19 10l2-1',
+          ].forEach(d => {
+            const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p.setAttribute('d', d);
+            sirenSvg.appendChild(p);
+          });
+
+          el.appendChild(ring);
+          el.appendChild(sirenSvg);
+          return L.divIcon({ html: el, className: '', iconSize: [56, 56], iconAnchor: [28, 28] });
+        } else {
+          el.style.cssText = [
+            'width:44px', 'height:44px',
+            'background:rgba(15,23,42,0.93)',
+            'border:2px solid rgba(34,211,238,0.60)',
+            'border-radius:14px',
+            'display:flex', 'align-items:center', 'justify-content:center',
+            'cursor:pointer',
+            'box-shadow:0 4px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(34,211,238,0.12)',
+          ].join(';');
+          const label = document.createElement('span');
+          label.style.cssText = 'color:white;font-size:12px;font-weight:900;letter-spacing:-0.01em;';
+          label.textContent = `+${count}`;
+          el.appendChild(label);
+          return L.divIcon({ html: el, className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
+        }
       },
       maxClusterRadius: 48,
       zoomToBoundsOnClick: true,
@@ -573,6 +625,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           .on('click', () => {
             window.requestAnimationFrame(() => onMarkerClick(incident));
           });
+        
+        (marker as any).cwCategory = incident.category;
 
         if (clusterGroup.current) {
           clusterGroup.current.addLayer(marker);

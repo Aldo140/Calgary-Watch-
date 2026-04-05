@@ -40,10 +40,45 @@ function useOfficialOpenData(isAuthReady: boolean) {
         // Fetch Calgary Traffic
         const trafficRes = await fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt DESC');
         const trafficData = await trafficRes.json();
-        const trafficIncidents: Incident[] = trafficData.map((item: any) => ({
-          id: `yyc-traffic-${item.id || String(item.incident_info || Math.random()).replace(/[^a-zA-Z0-9]/g, '')}`,
-          title: item.incident_info?.trim() || 'Traffic Issue',
-          description: item.description || 'Traffic incident reported by City of Calgary.',
+        const trafficIncidents: Incident[] = trafficData.map((item: any) => {
+          const rawInfo = (item.incident_info || '').trim().toLowerCase();
+          const rawDesc = (item.description || '').trim().toLowerCase();
+          const combined = `${rawInfo} ${rawDesc}`;
+          const quadrant = item.quadrant ? `Calgary ${item.quadrant}` : 'Calgary';
+
+          let tTitle: string;
+          let tDesc: string;
+
+          if (combined.includes('collision') || combined.includes('accident')) {
+            tTitle = 'Vehicle Collision';
+            tDesc = `Multi-vehicle collision blocking traffic in ${quadrant}. Expect delays and use alternate routes.`;
+          } else if (combined.includes('stalled') || combined.includes('disabled vehicle')) {
+            tTitle = 'Stalled Vehicle';
+            tDesc = `Stalled vehicle on the roadway in ${quadrant}. Lane restriction in effect.`;
+          } else if (combined.includes('signal') || combined.includes('light out')) {
+            tTitle = 'Traffic Signal Issue';
+            tDesc = `Traffic signal malfunction reported in ${quadrant}. Treat intersection as all-way stop.`;
+          } else if (combined.includes('road closure') || combined.includes('closed')) {
+            tTitle = 'Road Closure';
+            tDesc = `Road closure active in ${quadrant}. Check alternate routes before travelling.`;
+          } else if (combined.includes('construction') || combined.includes('paving') || combined.includes('utility')) {
+            tTitle = 'Construction Zone';
+            tDesc = `Active construction causing lane reductions in ${quadrant}. Reduce speed and allow extra travel time.`;
+          } else if (combined.includes('spill') || combined.includes('debris') || combined.includes('hazard')) {
+            tTitle = 'Road Hazard';
+            tDesc = `Hazardous material or debris on roadway in ${quadrant}. Avoid area if possible.`;
+          } else if (combined.includes('flood') || combined.includes('water')) {
+            tTitle = 'Flooded Roadway';
+            tDesc = `Water on roadway reported in ${quadrant}. Do not drive through flooded sections.`;
+          } else {
+            tTitle = item.incident_info?.trim() || 'Traffic Disruption';
+            tDesc = `Traffic disruption reported in ${quadrant}. Conditions may change — check 511 Alberta for updates.`;
+          }
+
+          return {
+            id: `yyc-traffic-${item.id || String(item.incident_info || Math.random()).replace(/[^a-zA-Z0-9]/g, '')}`,
+            title: tTitle,
+            description: tDesc,
           category: 'traffic',
           neighborhood: item.quadrant ? `Calgary ${item.quadrant}` : 'Calgary',
           lat: parseFloat(item.latitude),
@@ -56,9 +91,10 @@ function useOfficialOpenData(isAuthReady: boolean) {
           report_count: 1,
           data_source: 'official',
           source_name: 'City of Calgary Open Data',
-          source_url: 'https://data.calgary.ca/',
-          expires_at: new Date(item.start_dt || new Date()).getTime() + (8 * 60 * 60 * 1000), // Decay after 8 hours
-        }));
+            source_url: 'https://data.calgary.ca/',
+            expires_at: new Date(item.start_dt || new Date()).getTime() + (8 * 60 * 60 * 1000), // Decay after 8 hours
+          };
+        });
 
         // Fetch Calgary 311 (Recent issues for infrastructure / weather)
         const three11Res = await fetch('https://data.calgary.ca/resource/iahh-g8bj.json?$limit=80&$where=status_description=\'Open\'&$order=requested_date DESC');
@@ -83,10 +119,47 @@ function useOfficialOpenData(isAuthReady: boolean) {
             
             const timestamp = new Date(item.requested_date || new Date()).getTime();
 
+            // Derive a human-readable title and contextual description from 311 service data
+            let cleanTitle = item.service_name || 'City Service Issue';
+            if (cleanTitle.startsWith('Bylaw - ')) cleanTitle = cleanTitle.replace('Bylaw - ', '');
+            if (cleanTitle.includes('Disturbance and Behavioural Concerns')) cleanTitle = 'Public Disturbance';
+
+            const area = item.comm_name ? `in ${item.comm_name}` : 'in Calgary';
+            let cleanDesc: string;
+
+            if (sName.includes('graffiti')) {
+              cleanDesc = `Graffiti reported on public property ${area}. City crews scheduled for removal.`;
+            } else if (sName.includes('pothole') || sName.includes('road surface') || sName.includes('pavement')) {
+              cleanDesc = `Road surface damage ${area}. Repair crews have been dispatched.`;
+            } else if (sName.includes('spill') || sName.includes('hazmat') || sName.includes('contamination')) {
+              cleanDesc = `Hazardous spill or contamination reported ${area}. Environmental response team notified.`;
+            } else if (sName.includes('noise') || sName.includes('disturbance') || sName.includes('nuisance')) {
+              cleanDesc = `Noise or public disturbance complaint filed ${area}. Bylaw officers have been dispatched.`;
+            } else if (sName.includes('bylaw') && sName.includes('animal')) {
+              cleanDesc = `Animal control complaint ${area}. Officers en route.`;
+            } else if (sName.includes('bylaw')) {
+              cleanDesc = `Bylaw violation reported ${area}. Officers assigned to investigate.`;
+            } else if (sName.includes('street light') || sName.includes('light out') || sName.includes('signal')) {
+              cleanDesc = `Street light or signal outage ${area}. Electrical crew scheduled for repair.`;
+            } else if (sName.includes('water main') || sName.includes('water break') || sName.includes('watermain')) {
+              cleanDesc = `Water main issue reported ${area}. Utilities crew dispatched — local service may be affected.`;
+            } else if (sName.includes('sewer') || sName.includes('drain') || sName.includes('flood')) {
+              cleanDesc = `Drainage or sewer problem ${area}. City utilities team has been notified.`;
+            } else if (sName.includes('fire') || sName.includes('danger') || sName.includes('emergency')) {
+              cleanDesc = `Emergency hazard reported ${area}. Response crews have been alerted.`;
+            } else if (sName.includes('bridge') || sName.includes('overpass') || sName.includes('infrastructure')) {
+              cleanDesc = `Infrastructure concern flagged ${area}. Engineering crew assigned to inspect.`;
+            } else if (sName.includes('sidewalk') || sName.includes('curb') || sName.includes('pedestrian')) {
+              cleanDesc = `Sidewalk or pedestrian path damage ${area}. Maintenance crew scheduled.`;
+            } else {
+              const responsible = item.agency_responsible?.replace('CS - ', '') || 'City Crews';
+              cleanDesc = `${cleanTitle} reported ${area}. ${responsible} assigned to respond.`;
+            }
+
             return {
               id: `yyc-311-${item.service_request_id}`,
-              title: item.service_name || '311 Service Request',
-              description: `Status: ${item.status_description}. Managed by: ${item.agency_responsible || 'City of Calgary'}.`,
+              title: cleanTitle,
+              description: cleanDesc,
               category,
               neighborhood: item.comm_name || 'Calgary',
               lat: parseFloat(item.latitude),
@@ -514,6 +587,12 @@ export default function MapPage() {
     [incidents, selectedCategory]
   );
 
+  // Incidents shown on the map — filtered by category, but emergencies always visible
+  const mapIncidents = useMemo(() => {
+    if (selectedCategory === 'all') return incidents;
+    return incidents.filter(i => i.category === selectedCategory || i.category === 'emergency');
+  }, [incidents, selectedCategory]);
+
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
     const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
@@ -630,7 +709,7 @@ export default function MapPage() {
       <main className="flex-1 relative min-w-0">
         <Map
           ref={mapRef}
-          incidents={incidents}
+          incidents={mapIncidents}
           onMarkerClick={handleMarkerClick}
           onMapClick={handleMapClick}
           onViewNeighborhood={handleViewNeighborhood}

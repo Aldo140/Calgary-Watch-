@@ -139,11 +139,19 @@ export default function AdminPage() {
   const unresolvedIncidents = incidents.filter((i) => i.verified_status !== 'community_confirmed').length;
   const todayIncidents = incidents.filter((i) => Date.now() - i.timestamp < 24 * 60 * 60 * 1000).length;
   const totalUsers = users.length;
+  const adminUsers = users.filter((u) => u.role === 'admin').length;
+  const viewOnlyUsers = totalUsers - adminUsers;
   const uniqueReporterEmails = new Set(incidents.map((i) => i.email).filter(Boolean)).size;
   const averageSafety = useMemo(() => {
     if (communityStats.length === 0) return 0;
     return Math.round(communityStats.reduce((sum, row) => sum + Number(row.safety_score || 0), 0) / communityStats.length);
   }, [communityStats]);
+
+  // API data source stats
+  const officialTrafficCount = incidents.filter((i) => i.id.startsWith('yyc-traffic-')).length;
+  const official311Count = incidents.filter((i) => i.id.startsWith('yyc-311-')).length;
+  const officialCrimeCount = incidents.filter((i) => i.id.startsWith('crime-stat-')).length;
+  const communityReportCount = incidents.filter((i) => !i.data_source || i.data_source === 'community').length;
 
   const refreshUsers = async () => {
     if (!db) return;
@@ -410,8 +418,10 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-48 -left-32 w-[36rem] h-[36rem] rounded-full bg-blue-600/10 blur-[140px]" />
-        <div className="absolute -bottom-56 right-0 w-[32rem] h-[32rem] rounded-full bg-indigo-600/10 blur-[140px]" />
+        <div className="absolute -top-48 -left-32 w-[36rem] h-[36rem] rounded-full"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(37,99,235,0.08) 0%, transparent 65%)' }} />
+        <div className="absolute -bottom-56 right-0 w-[32rem] h-[32rem] rounded-full"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(79,70,229,0.07) 0%, transparent 65%)' }} />
       </div>
       <div className="max-w-7xl mx-auto space-y-6 relative z-10">
         <div className="flex flex-wrap gap-3 items-center justify-between bg-slate-900/70 border border-white/10 rounded-[2rem] p-5 backdrop-blur-xl shadow-[0_24px_60px_-28px_rgba(0,0,0,0.7)]">
@@ -429,64 +439,110 @@ export default function AdminPage() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
-          <Card className="p-4 bg-red-950/40 border-red-500/30 rounded-2xl hover:border-red-500/60 transition-all shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-red-400 font-black tracking-widest uppercase">SOS / Emergencies</p>
-              <Siren size={14} className="text-red-500 animate-pulse" />
+        {/* KPI row 1 — Incident health */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Card className="p-4 bg-red-950/30 border-red-500/30 rounded-2xl hover:border-red-500/60 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <Siren size={13} className="text-red-400 animate-pulse shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-red-400">Active Emergencies</p>
             </div>
-            <p className="text-2xl font-black mt-2 text-red-500">{emergencyIncidents}</p>
-            <p className="text-[10px] text-red-400/70 mt-1 leading-tight">Critical priority incidents actively monitored on the platform</p>
+            <p className="text-3xl font-black text-red-400">{emergencyIncidents}</p>
+            <p className="text-[10px] text-red-400/50 mt-1">Critical priority — requires immediate review</p>
           </Card>
           <Card className="p-4 bg-amber-950/20 border-amber-500/20 rounded-2xl hover:border-amber-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Unresolved</p>
-              <AlertTriangle size={14} className="text-amber-400" />
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle size={13} className="text-amber-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Unresolved</p>
             </div>
-            <p className="text-2xl font-black text-amber-400 mt-2">{unresolvedIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Reports not yet community confirmed</p>
+            <p className="text-3xl font-black text-amber-400">{unresolvedIncidents}</p>
+            <p className="text-[10px] text-slate-600 mt-1">Awaiting community confirmation</p>
           </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Total Reports</p>
-              <Activity size={14} className="text-blue-400" />
+          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/30 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <Clock3 size={13} className="text-blue-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Last 24h</p>
             </div>
-            <p className="text-2xl font-black mt-2">{totalIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">All active reports in the system</p>
+            <p className="text-3xl font-black text-blue-400">{todayIncidents}</p>
+            <p className="text-[10px] text-slate-600 mt-1">New reports in the past 24 hours</p>
           </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Total Page Views</p>
-              <Activity size={14} className="text-pink-400" />
+          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/30 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity size={13} className="text-pink-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Page Views</p>
             </div>
-            <p className="text-2xl font-black mt-2">{totalPageViews === null ? '...' : totalPageViews}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Global interaction counts tracked across platform loads</p>
-          </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Last 24h</p>
-              <Clock3 size={14} className="text-blue-400" />
-            </div>
-            <p className="text-2xl font-black text-blue-400 mt-2">{todayIncidents}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">New reports in the past 24 hours</p>
-          </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-violet-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Total Users</p>
-              <Users size={14} className="text-violet-400" />
-            </div>
-            <p className="text-2xl font-black mt-2">{totalUsers}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Registered user accounts ({uniqueReporterEmails} active reporters)</p>
-          </Card>
-          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-emerald-400/40 transition-all">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-slate-400">Avg Safety</p>
-              <ShieldCheck size={14} className="text-emerald-400" />
-            </div>
-            <p className="text-2xl font-black text-emerald-400 mt-2">{averageSafety}</p>
-            <p className="text-[10px] text-slate-600 mt-1 leading-tight">Mean safety score (0-100) across all tracked neighborhoods</p>
+            <p className="text-3xl font-black">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
+            <p className="text-[10px] text-slate-600 mt-1">Lifetime platform loads tracked</p>
           </Card>
         </div>
+
+        {/* KPI row 2 — Users + Safety */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <Card className="p-4 bg-slate-900/80 border-violet-500/20 rounded-2xl hover:border-violet-400/40 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <Users size={13} className="text-violet-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Total Users</p>
+            </div>
+            <p className="text-3xl font-black text-violet-400">{totalUsers}</p>
+            <div className="flex gap-3 mt-2">
+              <span className="text-[10px] text-slate-500"><span className="text-[#4A90D9] font-black">{viewOnlyUsers}</span> View-Only</span>
+              <span className="text-[10px] text-slate-500"><span className="text-[#2E8B7A] font-black">{adminUsers}</span> Admin</span>
+            </div>
+          </Card>
+          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-amber-400/30 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <ChartPie size={13} className="text-amber-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Active Reporters</p>
+            </div>
+            <p className="text-3xl font-black text-amber-400">{uniqueReporterEmails}</p>
+            <p className="text-[10px] text-slate-600 mt-1">Distinct users who have filed a report</p>
+          </Card>
+          <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/30 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity size={13} className="text-blue-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Firebase Reports</p>
+            </div>
+            <p className="text-3xl font-black">{totalIncidents}</p>
+            <p className="text-[10px] text-slate-600 mt-1">Community + official in Firestore</p>
+          </Card>
+          <Card className="p-4 bg-slate-900/80 border-emerald-500/20 rounded-2xl hover:border-emerald-400/40 transition-all">
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldCheck size={13} className="text-emerald-400 shrink-0" />
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Avg Safety Score</p>
+            </div>
+            <p className="text-3xl font-black text-emerald-400">{averageSafety}</p>
+            <p className="text-[10px] text-slate-600 mt-1">Mean score (0–100) across tracked neighborhoods</p>
+          </Card>
+        </div>
+
+        {/* API Data Sources Panel */}
+        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+          <div className="flex items-center gap-2 mb-4">
+            <ChartNoAxesColumn size={14} className="text-sky-400" />
+            <h2 className="text-sm font-black uppercase tracking-widest text-sky-400">Live API Data Sources</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="flex flex-col gap-1 p-3.5 rounded-2xl bg-orange-500/5 border border-orange-500/20">
+              <p className="text-[10px] font-black uppercase tracking-widest text-orange-400">City Traffic</p>
+              <p className="text-2xl font-black text-orange-400">{officialTrafficCount}</p>
+              <p className="text-[10px] text-slate-600 leading-snug">Live incidents from City of Calgary Open Data traffic feed</p>
+            </div>
+            <div className="flex flex-col gap-1 p-3.5 rounded-2xl bg-blue-500/5 border border-blue-500/20">
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Calgary 311</p>
+              <p className="text-2xl font-black text-blue-400">{official311Count}</p>
+              <p className="text-[10px] text-slate-600 leading-snug">Open service requests synced from Calgary 311 portal</p>
+            </div>
+            <div className="flex flex-col gap-1 p-3.5 rounded-2xl bg-red-500/5 border border-red-500/20">
+              <p className="text-[10px] font-black uppercase tracking-widest text-red-400">Crime Stats</p>
+              <p className="text-2xl font-black text-red-400">{officialCrimeCount}</p>
+              <p className="text-[10px] text-slate-600 leading-snug">Monthly crime stats from Calgary Police Service Open Data</p>
+            </div>
+            <div className="flex flex-col gap-1 p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Community Reports</p>
+              <p className="text-2xl font-black text-emerald-400">{communityReportCount}</p>
+              <p className="text-[10px] text-slate-600 leading-snug">User-submitted incidents from the Calgary Watch community</p>
+            </div>
+          </div>
+        </Card>
 
         <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4">
@@ -721,59 +777,74 @@ export default function AdminPage() {
         {/* ── End Analytics ──────────────────────────────────────────────────── */}
 
         <div className="grid lg:grid-cols-3 gap-4">
-          <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto h-[400px]">
+          <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto h-[420px]">
             <div className="flex items-center justify-between mb-4 pr-1">
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <Users size={16} className="text-blue-400" />
-                User Directory
-              </h2>
-              <div className="flex items-center gap-2">
-                <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white" title="Force Refresh">
-                  <RefreshCw size={12} className={isRefreshingUsers ? "animate-spin" : ""} />
-                </Button>
-                <div className="flex flex-col items-end hidden md:flex">
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Directory</span>
-                </div>
+              <div>
+                <h2 className="text-base font-black flex items-center gap-2">
+                  <Users size={15} className="text-violet-400" />
+                  User Directory
+                </h2>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  <span className="text-violet-400 font-black">{totalUsers}</span> total ·{' '}
+                  <span className="text-[#4A90D9] font-black">{viewOnlyUsers}</span> view-only ·{' '}
+                  <span className="text-[#2E8B7A] font-black">{adminUsers}</span> admin ·{' '}
+                  <span className="text-amber-400 font-black">{uniqueReporterEmails}</span> reporters
+                </p>
               </div>
+              <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white" title="Force Refresh">
+                <RefreshCw size={12} className={isRefreshingUsers ? "animate-spin" : ""} />
+              </Button>
             </div>
-            <div className="overflow-y-auto custom-scrollbar h-[310px] pr-2">
+            <div className="overflow-y-auto custom-scrollbar h-[320px] pr-2">
               <table className="w-full text-xs min-w-[500px]">
-                <thead className="text-slate-400 bg-slate-900/90 top-0 sticky z-10 backdrop-blur-md">
-                  <tr>
-                    <th className="py-3 text-left pl-2 rounded-tl-lg font-bold uppercase text-[9px] tracking-wider">UID</th>
-                    <th className="py-3 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
-                    <th className="py-3 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
-                    <th className="py-3 text-left rounded-tr-lg font-bold uppercase text-[9px] tracking-wider">Role</th>
+                <thead className="text-slate-400 bg-slate-900/90 top-0 sticky z-10">
+                  <tr className="border-b border-white/8">
+                    <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
+                    <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
+                    <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
+                    <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Role</th>
+                    <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Reports</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((profile) => (
-                    <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-                      <td className="py-3 pl-2 text-slate-500 font-mono text-[10px]">{profile.uid.slice(0, 8)}...</td>
-                      <td className="py-3 font-medium text-white">{profile.displayName || 'Unknown'}</td>
-                      <td className="py-3 text-slate-300">{profile.email || 'No email'}</td>
-                      <td className="py-3">
-                        <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'bg-white/5 border border-white/10 text-slate-300'}`}>
-                          {profile.role}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {users.map((profile) => {
+                    const reportCount = incidents.filter(i => i.email === profile.email).length;
+                    return (
+                      <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                        <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>
+                        <td className="py-2.5 font-medium text-white text-xs">{profile.displayName || 'Unknown'}</td>
+                        <td className="py-2.5 text-slate-400 text-[11px]">{profile.email || '—'}</td>
+                        <td className="py-2.5">
+                          <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-[#2E8B7A]/20 border border-[#2E8B7A]/40 text-[#2E8B7A]' : 'bg-[#4A90D9]/10 border border-[#4A90D9]/20 text-[#4A90D9]'}`}>
+                            {profile.role === 'admin' ? 'Admin' : 'View-Only'}
+                          </span>
+                        </td>
+                        <td className="py-2.5">
+                          {reportCount > 0
+                            ? <span className="text-amber-400 font-black text-[11px]">{reportCount}</span>
+                            : <span className="text-slate-600 text-[11px]">0</span>
+                          }
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </Card>
 
-          <Card className="col-span-1 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] flex flex-col items-center justify-center h-[400px]">
-            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] w-full text-left">User Roles</p>
-            <p className="text-[10px] text-slate-600 mb-6 mt-1 w-full text-left">Breakdown of platform users vs administrators.</p>
+          <Card className="col-span-1 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] flex flex-col h-[420px]">
+            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">User Roles</p>
+            <p className="text-[10px] text-slate-600 mb-2 mt-1">
+              <span className="text-violet-400 font-black">{totalUsers}</span> total registered users across all roles.
+            </p>
             {userRoleChartData.length === 0 ? (
-              <p className="text-slate-600 text-xs py-8 text-center">No user data.</p>
+              <p className="text-slate-600 text-xs py-8 text-center flex-1 flex items-center justify-center">No user data.</p>
             ) : (
-              <div className="w-full flex-1 flex flex-col justify-center max-h-[220px]">
-                <ResponsiveContainer width="100%" height="100%">
+              <div className="flex-1 flex flex-col min-h-0">
+                <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
-                    <Pie data={userRoleChartData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" strokeWidth={0}>
+                    <Pie data={userRoleChartData} cx="50%" cy="50%" innerRadius={48} outerRadius={76} paddingAngle={3} dataKey="value" strokeWidth={0}>
                       {userRoleChartData.map((entry, i) => (
                         <Cell key={i} fill={entry.color} />
                       ))}
@@ -784,12 +855,15 @@ export default function AdminPage() {
                     />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+                <div className="flex flex-col gap-2 mt-3">
                   {userRoleChartData.map((d) => (
-                    <span key={d.name} className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                      <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
-                      {d.value} {d.name}
-                    </span>
+                    <div key={d.name} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/3 border border-white/5">
+                      <span className="flex items-center gap-2 text-xs text-slate-300">
+                        <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
+                        {d.name}
+                      </span>
+                      <span className="text-sm font-black" style={{ color: d.color }}>{d.value}</span>
+                    </div>
                   ))}
                 </div>
               </div>

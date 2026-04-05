@@ -177,7 +177,145 @@ function useOfficialOpenData(isAuthReady: boolean) {
             };
           });
 
-        setOfficialIncidents([...trafficIncidents, ...three11Incidents]);
+        // Fetch Calgary Community Crime Statistics (recent months)
+        // Dataset: Community Crime Statistics — has category, count, community, month
+        const now = new Date();
+        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const monthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, '0')}`;
+        const crimeRes = await fetch(
+          `https://data.calgary.ca/resource/848s-4m4z.json?$limit=200&$where=month_year='${monthStr}'&$order=count DESC`
+        );
+        const crimeData = await crimeRes.json();
+
+        // Community centre coordinates for Calgary (approximate, used for incident placement)
+        const COMMUNITY_COORDS: Record<string, [number, number]> = {
+          'BELTLINE': [51.0413, -114.0747], 'DOWNTOWN COMMERCIAL CORE': [51.0501, -114.0706],
+          'INGLEWOOD': [51.0358, -114.0358], 'FOREST LAWN': [51.0302, -113.9988],
+          'MARLBOROUGH': [51.0470, -113.9860], 'FOREST HEIGHTS': [51.0237, -113.9932],
+          'SOUTHWOOD': [50.9836, -114.0788], 'ACADIA': [50.9883, -114.0688],
+          'DOVER': [51.0244, -114.0039], 'RADISSON HEIGHTS': [51.0414, -114.0025],
+          'PENBROOKE MEADOWS': [51.0313, -113.9923], 'ALBERT PARK/RADISSON HTS': [51.0403, -114.0007],
+          'RENFREW': [51.0590, -114.0415], 'BRIDGELAND/RIVERSIDE': [51.0570, -114.0567],
+          'CRESCENT HEIGHTS': [51.0617, -114.0666], 'MOUNT PLEASANT': [51.0722, -114.0836],
+          'HILLHURST': [51.0599, -114.0911], 'SUNNYSIDE': [51.0580, -114.0931],
+          'KENSINGTON': [51.0598, -114.0928], 'WESTGATE': [51.0511, -114.1666],
+          'SHAGANAPPI': [51.0671, -114.1400], 'KILLARNEY/GLENGARRY': [51.0407, -114.1472],
+          'GLENBROOK': [51.0381, -114.1639], 'LINCOLN PARK': [51.0217, -114.1602],
+          'LAKEVIEW': [51.0234, -114.1456], 'NORTH GLENMORE PARK': [51.0107, -114.1336],
+          'HAYSBORO': [50.9886, -114.0808], 'WILLOW PARK': [50.9828, -114.0388],
+          'LAKE BONAVISTA': [50.9693, -114.0567], 'OAKRIDGE': [51.0030, -114.1234],
+          'PALLISER': [50.9998, -114.1113], 'PUMP HILL': [51.0039, -114.0926],
+          'CANYON MEADOWS': [50.9810, -114.1090], 'BRAESIDE': [50.9780, -114.1227],
+          'CEDARBRAE': [50.9693, -114.1354], 'WOODBINE': [50.9655, -114.1093],
+          'SIGNAL HILL': [51.0083, -114.1752], 'COACH HILL': [51.0278, -114.2026],
+          'COUGAR RIDGE': [51.0374, -114.2199], 'SPRINGBANK HILL': [51.0282, -114.2192],
+          'VALLEY RIDGE': [51.0773, -114.2361], 'TUSCANY': [51.1219, -114.2189],
+          'SCENIC ACRES': [51.1098, -114.2023], 'RANCHLANDS': [51.1074, -114.1830],
+          'COUNTRY HILLS': [51.1506, -114.1149], 'COVENTRY HILLS': [51.1760, -114.0611],
+          'PANORAMA HILLS': [51.1610, -114.0425], 'HARVEST HILLS': [51.1516, -114.0703],
+          'HAMPTONS': [51.1414, -114.1861], 'ROYAL OAK': [51.1314, -114.1978],
+          'EVANSTON': [51.1879, -114.1115], 'SAGE HILL': [51.1712, -114.1601],
+          'NOLAN HILL': [51.1613, -114.1793], 'SHERWOOD': [51.1527, -114.1836],
+          'SILVERADO': [50.9265, -114.0802], 'LEGACY': [50.9112, -114.0546],
+          'CRANSTON': [50.9225, -114.0161], 'AUBURN BAY': [50.9326, -113.9977],
+          'MAHOGANY': [50.9276, -113.9756], 'NEW BRIGHTON': [50.9388, -113.9737],
+          'MCKENZIE TOWNE': [50.9405, -113.9969], 'COPPERFIELD': [50.9496, -113.9859],
+          'MCKENZIE LAKE': [50.9545, -114.0035], 'DOUGLASDALE/GLEN': [50.9633, -114.0218],
+          'CHAPARRAL': [50.9178, -114.0567], 'SHAWNESSY': [50.9373, -114.0852],
+          'EVERGREEN': [50.9509, -114.1259], 'BRIDLEWOOD': [50.9429, -114.1115],
+          'SOMERSET': [50.9456, -114.0803], 'MIDNAPORE': [50.9518, -114.0658],
+          'SUNDANCE': [50.9584, -114.0461], 'QUEENSLAND': [50.9698, -114.0255],
+          'RIVERBEND': [50.9767, -114.0455], 'OGDEN': [50.9893, -114.0170],
+          'APPLEWOOD PARK': [51.0310, -113.9767], 'TARADALE': [51.0950, -113.9550],
+          'MARTINDALE': [51.0907, -113.9557], 'SADDLETOWNE': [51.0970, -113.9390],
+          'CORAL SPRINGS': [51.0770, -113.9515], 'CASTLERIDGE': [51.0832, -113.9608],
+          'FALCONRIDGE': [51.0793, -113.9760], 'PINERIDGE': [51.0682, -113.9785],
+          'RUNDLE': [51.0639, -113.9921], 'TEMPLE': [51.0729, -113.9921],
+          'WHITEHORN': [51.0785, -113.9933], 'MONTEREY PARK': [51.0659, -113.9575],
+          'SADDLE RIDGE': [51.1113, -113.9626], 'CITYSCAPE': [51.1190, -113.9768],
+          'REDSTONE': [51.1329, -113.9773], 'SKYVIEW RANCH': [51.1414, -114.0010],
+          'LIVINGSTON': [51.1756, -114.0243], 'EDGEMONT': [51.1186, -114.1681],
+          'CITADEL': [51.1268, -114.2028], 'HIDDEN VALLEY': [51.1239, -114.1477],
+          'SANDSTONE VALLEY': [51.1192, -114.1135], 'BEDDINGTON HEIGHTS': [51.1018, -114.0893],
+          'THORNCLIFFE': [51.0859, -114.0804], 'HIGHLAND PARK': [51.0840, -114.0697],
+          'GREENVIEW': [51.0913, -114.0597], 'WINSTON HEIGHTS/MOUNTVIEW': [51.0782, -114.0435],
+        };
+
+        const crimeIncidents: Incident[] = [];
+        const seen = new Set<string>();
+
+        for (const item of crimeData) {
+          const commName: string = (item.community_name || '').toUpperCase().trim();
+          const coords = COMMUNITY_COORDS[commName];
+          if (!coords) continue;
+
+          const category = (item.category || '').toLowerCase();
+          const count = parseInt(item.count || '0', 10);
+          if (count < 3) continue; // skip trivial counts
+
+          // Deduplicate — one incident per community+category per fetch
+          const dedupKey = `crime-stat-${commName}-${category}-${monthStr}`;
+          if (seen.has(dedupKey)) continue;
+          seen.add(dedupKey);
+
+          let title = '';
+          let description = '';
+          let crimeCategory: IncidentCategory = 'crime';
+
+          const rawCat = (item.category || '').toLowerCase();
+          if (rawCat.includes('break') || rawCat.includes('b&e') || rawCat.includes('break and enter')) {
+            title = 'Break & Enter Activity';
+            description = `${count} break and enter incidents reported in ${item.community_name} last month. Secure doors, windows, and garages.`;
+          } else if (rawCat.includes('theft from vehicle') || rawCat.includes('vehicle')) {
+            title = 'Vehicle Break-In Reports';
+            description = `${count} vehicle thefts or break-ins in ${item.community_name} last month. Avoid leaving valuables visible in cars.`;
+          } else if (rawCat.includes('theft of vehicle') || rawCat.includes('auto theft')) {
+            title = 'Auto Theft Activity';
+            description = `${count} vehicle thefts reported in ${item.community_name} last month. Consider anti-theft measures.`;
+            crimeCategory = 'crime';
+          } else if (rawCat.includes('assault')) {
+            title = 'Assault Reports';
+            description = `${count} assault incidents in ${item.community_name} last month. Be aware of your surroundings in this area.`;
+          } else if (rawCat.includes('robbery')) {
+            title = 'Robbery Reports';
+            description = `${count} robbery incidents in ${item.community_name} last month. Stay in well-lit areas and stay alert.`;
+          } else if (rawCat.includes('disorder') || rawCat.includes('mischief')) {
+            title = 'Disorder & Mischief';
+            description = `${count} disorder or mischief calls in ${item.community_name} last month.`;
+          } else {
+            title = `${item.category || 'Crime'} Reports`;
+            description = `${count} ${(item.category || 'crime').toLowerCase()} incidents reported in ${item.community_name} last month.`;
+          }
+
+          // Slightly jitter coordinates so multiple communities don't all stack at same point
+          const jitterLat = (Math.random() - 0.5) * 0.004;
+          const jitterLng = (Math.random() - 0.5) * 0.006;
+
+          // Use end-of-last-month as timestamp so it appears "recent"
+          const monthTs = prevMonth.getTime();
+
+          crimeIncidents.push({
+            id: dedupKey,
+            title,
+            description,
+            category: crimeCategory,
+            neighborhood: item.community_name || commName,
+            lat: coords[0] + jitterLat,
+            lng: coords[1] + jitterLng,
+            timestamp: monthTs,
+            email: 'opendata@calgary.ca',
+            name: 'Calgary Police Service',
+            anonymous: false,
+            verified_status: 'community_confirmed',
+            report_count: count,
+            data_source: 'official',
+            source_name: 'Calgary Police Service Open Data',
+            source_url: 'https://data.calgary.ca/',
+            expires_at: monthTs + (60 * 24 * 60 * 60 * 1000), // 60 days
+          });
+        }
+
+        setOfficialIncidents([...trafficIncidents, ...three11Incidents, ...crimeIncidents]);
       } catch (err) {
         console.error('Failed to fetch official open data:', err);
       }
@@ -212,6 +350,9 @@ export default function MapPage() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [nearMeOpen, setNearMeOpen] = useState(false);
+  const [nearMeIndex, setNearMeIndex] = useState(0);
+  const NEAR_ME_RADIUS_KM = 3;
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark';
@@ -413,12 +554,20 @@ export default function MapPage() {
     });
   }, []);
 
-  // Deep-link: /map?i=INCIDENT_ID — auto-open incident detail panel once incidents load
+  const MAP_DECAY_MS   = 24 * 60 * 60 * 1000;        // 24 hours  — hide from map
+  const SIDEBAR_DECAY_MS = 2.5 * 24 * 60 * 60 * 1000; // 60 hours  — hide from sidebar too
+
+  // All incidents for the sidebar (up to 2.5 days old)
   const incidents = useMemo(() => {
+    const now = Date.now();
     const combined = [...firebaseIncidents, ...officialOpenData];
-    // Deduplicate by id if needed, though they shouldn't conflict
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
-    return [...unique.values()].sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
+    return [...unique.values()]
+      .filter((i) => {
+        if (i.expires_at) return i.expires_at > now;
+        return now - i.timestamp < SIDEBAR_DECAY_MS;
+      })
+      .sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
   }, [firebaseIncidents, officialOpenData]);
 
   useEffect(() => {
@@ -587,11 +736,30 @@ export default function MapPage() {
     [incidents, selectedCategory]
   );
 
-  // Incidents shown on the map — filtered by category, but emergencies always visible
+  // Incidents shown on the map — max 24h old, filtered by category (emergencies always show)
   const mapIncidents = useMemo(() => {
-    if (selectedCategory === 'all') return incidents;
-    return incidents.filter(i => i.category === selectedCategory || i.category === 'emergency');
+    const now = Date.now();
+    const fresh = incidents.filter((i) => {
+      if (i.expires_at) return i.expires_at > now;
+      return now - i.timestamp < MAP_DECAY_MS;
+    });
+    if (selectedCategory === 'all') return fresh;
+    return fresh.filter(i => i.category === selectedCategory || i.category === 'emergency');
   }, [incidents, selectedCategory]);
+
+  // Incidents sorted by distance from user for the Near Me panel
+  const nearMeIncidents = useMemo(() => {
+    const loc = userLocation || CALGARY_CENTER;
+    return incidents
+      .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
+      .filter(x => x.dist <= NEAR_ME_RADIUS_KM)
+      .sort((a, b) => {
+        if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
+        if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
+        return a.dist - b.dist;
+      })
+      .map(x => ({ ...x.i, _dist: x.dist })) as (Incident & { _dist: number })[];
+  }, [incidents, userLocation]);
 
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
@@ -829,29 +997,30 @@ export default function MapPage() {
             type="button"
             onClick={() => {
               const loc = userLocation || CALGARY_CENTER;
-              mapRef.current?.flyTo(loc.lat, loc.lng, 13);
-              
-              // Find the closest important incident (emergency, crime, fire, etc.) within 5km
-              const nearbyImportant = incidents
-                .filter(i => i.category !== 'traffic')
-                .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
-                .filter(item => item.dist <= 5)
-                .sort((a, b) => {
-                  // Prioritize emergencies first, then distance
-                  if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
-                  if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
-                  return a.dist - b.dist;
-                })[0];
-
-              if (nearbyImportant) {
-                // Wait slightly for flyTo to begin
-                setTimeout(() => {
-                  setSelectedIncident(nearbyImportant.i);
-                }, 600);
-              }
+              if (nearMeOpen) { setNearMeOpen(false); return; }
+              mapRef.current?.flyTo(loc.lat, loc.lng, 14);
+              setNearMeIndex(0);
+              setNearMeOpen(true);
+              // Pan to first nearby incident after map settles
+              setTimeout(() => {
+                const nearMeList = incidents
+                  .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
+                  .filter(x => x.dist <= NEAR_ME_RADIUS_KM)
+                  .sort((a, b) => {
+                    if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
+                    if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
+                    return a.dist - b.dist;
+                  });
+                if (nearMeList[0]) mapRef.current?.flyTo(nearMeList[0].i.lat, nearMeList[0].i.lng, 15);
+              }, 600);
             }}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-sky-400 light:text-blue-600 shadow-lg pointer-events-auto"
-            aria-label="Recenter on your location"
+            className={cn(
+              "flex h-11 w-11 items-center justify-center rounded-2xl backdrop-blur-xl border shadow-lg pointer-events-auto transition-colors",
+              nearMeOpen
+                ? "bg-sky-500/20 border-sky-500/50 text-sky-400"
+                : "bg-black/45 light:bg-white/90 border-white/12 light:border-slate-200 text-sky-400 light:text-blue-600"
+            )}
+            aria-label="What's near me"
           >
             <Navigation size={18} />
           </button>
@@ -967,6 +1136,122 @@ export default function MapPage() {
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Near Me Panel — bottom sheet (mobile), centered card (desktop) */}
+        <AnimatePresence>
+          {nearMeOpen && (
+            <motion.div
+              key="near-me-panel"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+              className={cn(
+                'absolute z-40 pointer-events-auto lg:hidden',
+                'bottom-6 left-3 right-3'
+              )}
+            >
+              <div className="bg-slate-900/96 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Navigation size={14} className="text-sky-400" />
+                    <span className="text-xs font-black uppercase tracking-widest text-sky-400">Near You</span>
+                    <span className="text-[10px] text-slate-500 font-semibold">within {NEAR_ME_RADIUS_KM} km</span>
+                  </div>
+                  <button
+                    onClick={() => setNearMeOpen(false)}
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                    aria-label="Close near me panel"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+
+                {nearMeIncidents.length === 0 ? (
+                  <div className="px-4 pb-5 pt-2 text-center">
+                    <p className="text-sm font-bold text-slate-400">No incidents within {NEAR_ME_RADIUS_KM} km</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Your area looks clear right now.</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Incident card */}
+                    {(() => {
+                      const inc = nearMeIncidents[nearMeIndex];
+                      if (!inc) return null;
+                      const catColors: Record<string, string> = {
+                        emergency: 'text-red-400 bg-red-500/10 border-red-500/20',
+                        crime: 'text-red-300 bg-red-500/8 border-red-500/15',
+                        traffic: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
+                        infrastructure: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+                        weather: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+                      };
+                      const colClass = catColors[inc.category] ?? catColors.weather;
+                      const age = Date.now() - inc.timestamp;
+                      const ageStr = age < 60_000 ? 'Just now'
+                        : age < 3_600_000 ? `${Math.round(age / 60_000)}m ago`
+                        : age < 86_400_000 ? `${Math.round(age / 3_600_000)}h ago`
+                        : `${Math.round(age / 86_400_000)}d ago`;
+
+                      return (
+                        <div className="px-4 pb-3">
+                          <div
+                            className={cn('rounded-2xl border p-3.5 cursor-pointer', colClass)}
+                            onClick={() => {
+                              handleMarkerClick(inc);
+                              setNearMeOpen(false);
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-2 mb-1.5">
+                              <span className="text-[10px] font-black uppercase tracking-widest opacity-80">{inc.category}</span>
+                              <span className="text-[10px] text-slate-500 font-semibold shrink-0">{ageStr}</span>
+                            </div>
+                            <p className="text-sm font-black text-white leading-snug mb-1">{inc.title}</p>
+                            <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{inc.description}</p>
+                            <div className="flex items-center gap-1 mt-2">
+                              <span className="text-[10px] text-slate-500">{inc._dist < 1 ? `${Math.round(inc._dist * 1000)}m` : `${inc._dist.toFixed(1)} km`} away · {inc.neighborhood}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Arrow navigation + counter */}
+                    <div className="flex items-center justify-between px-4 pb-4 pt-1">
+                      <button
+                        onClick={() => {
+                          const next = Math.max(0, nearMeIndex - 1);
+                          setNearMeIndex(next);
+                          const inc = nearMeIncidents[next];
+                          if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
+                        }}
+                        disabled={nearMeIndex === 0}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs font-bold transition-colors"
+                      >
+                        ← Prev
+                      </button>
+                      <span className="text-[11px] text-slate-500 font-semibold">
+                        {nearMeIndex + 1} of {nearMeIncidents.length}
+                      </span>
+                      <button
+                        onClick={() => {
+                          const next = Math.min(nearMeIncidents.length - 1, nearMeIndex + 1);
+                          setNearMeIndex(next);
+                          const inc = nearMeIncidents[next];
+                          if (inc) mapRef.current?.flyTo(inc.lat, inc.lng, 15);
+                        }}
+                        disabled={nearMeIndex === nearMeIncidents.length - 1}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs font-bold transition-colors"
+                      >
+                        Next →
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Desktop top header - unchanged at lg+ */}
         <div className="absolute top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 items-center justify-between pointer-events-none z-30 hidden lg:flex">

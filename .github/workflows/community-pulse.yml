@@ -1,14 +1,14 @@
 name: Community Pulse
 
 # Posts up to 3 community reports per day at realistic Calgary times.
-# Each job passes a slot index (0=morning 7am, 1=afternoon 1pm, 2=evening 8pm MDT).
+# Each job passes a slot index (0=morning 7:30am, 1=afternoon 1pm, 2=evening 9:15pm MDT).
 # The script skips gracefully if the slot was already posted.
 
 on:
   schedule:
     - cron: '30 13 * * *'   # 07:30 MDT  (slot 0 — morning)
     - cron: '0  19 * * *'   # 13:00 MDT  (slot 1 — afternoon)
-    - cron: '0   2 * * *'   # 20:00 MDT  (slot 2 — evening, next UTC day)
+    - cron: '15  3 * * *'   # 21:15 MDT  (slot 2 — evening, next UTC day)
   workflow_dispatch:
     inputs:
       slot:

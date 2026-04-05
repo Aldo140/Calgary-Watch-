@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo, startTransition } fr
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Map, { MapRef } from '@/src/components/Map';
 import Sidebar from '@/src/components/Sidebar';
-import IncidentForm, { IncidentFormData, recordSubmission } from '@/src/components/IncidentForm';
+import IncidentForm, { IncidentFormData } from '@/src/components/IncidentForm';
 import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyModal';
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
-import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, where, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 
@@ -423,30 +423,17 @@ export default function MapPage() {
   const SIDEBAR_DECAY_MS = 2.5 * 24 * 60 * 60 * 1000; // 60 hours  — hide from sidebar too
 
   // All incidents for the sidebar (up to 2.5 days old)
-  const PENDING_REVIEW_WINDOW_MS = 10 * 60 * 1000; // 10 min before auto-promoting
-
   const incidents = useMemo(() => {
     const now = Date.now();
     const combined = [...firebaseIncidents, ...officialOpenData];
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     return [...unique.values()]
       .filter((i) => {
-        // Decay check
-        if (i.expires_at) { if (i.expires_at <= now) return false; }
-        else if (now - i.timestamp >= SIDEBAR_DECAY_MS) return false;
-
-        // Pending review: hide from others; owner + admins always see it;
-        // auto-promote after 10 minutes regardless
-        if (i.verified_status === 'pending_review') {
-          if (now - i.timestamp >= PENDING_REVIEW_WINDOW_MS) return true; // auto-promoted
-          if (isAdmin) return true;
-          if (user && (i as any).authorUid === user.uid) return true;
-          return false; // hidden from others during review window
-        }
-        return true;
+        if (i.expires_at) return i.expires_at > now;
+        return now - i.timestamp < SIDEBAR_DECAY_MS;
       })
       .sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
-  }, [firebaseIncidents, officialOpenData, user, isAdmin]);
+  }, [firebaseIncidents, officialOpenData]);
 
   useEffect(() => {
     const targetId = searchParams.get('i');
@@ -515,27 +502,7 @@ export default function MapPage() {
     startTransition(() => {
       (async () => {
         try {
-          // Server-side rate limit: check last submission by this user in Firestore
-          const SERVER_RATE_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
-          const recentQ = query(
-            collection(db!, path),
-            where('authorUid', '==', user.uid),
-            orderBy('timestamp', 'desc'),
-            limit(1)
-          );
-          const recentSnap = await getDocs(recentQ);
-          if (!recentSnap.empty) {
-            const lastTs = recentSnap.docs[0].data().timestamp as number;
-            if (Date.now() - lastTs < SERVER_RATE_LIMIT_MS) {
-              const minsLeft = Math.ceil((SERVER_RATE_LIMIT_MS - (Date.now() - lastTs)) / 60000);
-              console.warn(`[CalgaryWatch] Rate limited: ${minsLeft}m remaining`);
-              return; // silently drop — client-side already showed the message
-            }
-          }
-
           const { anonymous, ...incidentData } = data;
-
-          // Defensively ensure all strings match exactly Firestore Rules lengths
           const safeTitle = incidentData.title.trim().padEnd(5, ' ').slice(0, 100);
           const safeDesc = incidentData.description.trim().padEnd(10, ' ').slice(0, 1000);
           const safeNeighborhood = (incidentData.neighborhood || 'Calgary').trim().padEnd(2, ' ').slice(0, 80);
@@ -554,12 +521,10 @@ export default function MapPage() {
             source_name: safeName,
             anonymous: isAnonymous,
             timestamp: Date.now(),
-            verified_status: 'pending_review',
+            verified_status: 'unverified',
             report_count: 1,
             authorUid: user.uid,
           });
-          // Sync the server-confirmed submission time to localStorage
-          recordSubmission(user.uid);
         } catch (error) {
           handleFirestoreError(error, OperationType.CREATE, path);
         }
@@ -1450,7 +1415,6 @@ export default function MapPage() {
             email: user.email || 'No email',
             photoURL: user.photoURL || ''
           } : null}
-          userId={user?.uid}
         />
       </main>
 

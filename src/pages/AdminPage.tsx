@@ -150,7 +150,13 @@ export default function AdminPage() {
     return Math.round(communityStats.reduce((sum, row) => sum + Number(row.safety_score || 0), 0) / communityStats.length);
   }, [communityStats]);
 
-  const pendingReviewIncidents = incidents.filter((i) => i.verified_status === 'pending_review');
+  // Moderation queue: unverified community posts from the last 30 minutes
+  const MODERATION_WINDOW_MS = 30 * 60 * 1000;
+  const pendingReviewIncidents = incidents.filter((i) =>
+    i.verified_status === 'unverified' &&
+    !i.data_source &&
+    Date.now() - i.timestamp < MODERATION_WINDOW_MS
+  );
 
   // API data source stats
   const officialTrafficCount = incidents.filter((i) => i.id.startsWith('yyc-traffic-')).length;

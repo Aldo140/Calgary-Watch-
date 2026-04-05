@@ -78,9 +78,9 @@ const AuroraBackground = memo(function AuroraBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       <div className="aurora-drift absolute -top-20 left-[-15%] w-[60%] h-40 rounded-full opacity-25"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(46,139,122,0.5) 0%, transparent 70%)', filter: 'blur(32px)', willChange: 'transform' }} />
+        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(46,139,122,0.5) 0%, transparent 60%)' }} />
       <div className="aurora-drift-delay absolute -top-12 right-[-8%] w-[50%] h-36 rounded-full opacity-20"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(74,144,217,0.4) 0%, transparent 70%)', filter: 'blur(28px)', willChange: 'transform' }} />
+        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(74,144,217,0.4) 0%, transparent 60%)' }} />
     </div>
   );
 });
@@ -183,13 +183,9 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // GSAP pulse dots
+  // GSAP pulse dots removed for Safari memory optimization on iOS
   useEffect(() => {
-    if (reducedMotion) return;
-    const ctx = gsap.context(() => {
-      gsap.to('.pulse-dot', { scale: 1.6, opacity: 0, duration: 1.4, repeat: -1, stagger: 0.4, ease: 'power2.out' });
-    }, heroRef);
-    return () => ctx.revert();
+    // Keeping hook skeleton so React hook order stays identical if component unmounts
   }, [reducedMotion]);
 
   // Mountain parallax
@@ -583,7 +579,7 @@ export default function LandingPage() {
         </div>
 
         {/* Mountain silhouette */}
-        <div ref={mountainRef} className="relative w-full -mb-1 bg-slate-950 light:bg-slate-100" aria-hidden="true" style={{ willChange: 'transform' }}>
+        <div ref={mountainRef} className="relative w-full -mb-1 bg-slate-950 light:bg-slate-100" aria-hidden="true">
           <MountainSilhouette className={cn('w-full text-slate-900 light:text-slate-200', 'drop-shadow-[0_-4px_24px_rgba(74,144,217,0.12)]')} />
           <div className="absolute bottom-0 left-0 right-0 h-0.5 river-flow bg-gradient-to-r from-[#2E8B7A] via-[#4A90D9] to-[#2E8B7A] opacity-50" />
         </div>
@@ -593,10 +589,9 @@ export default function LandingPage() {
           VISION SECTION
           ================================================================ */}
       <section className="relative py-16 md:py-28 lg:py-40 overflow-hidden bg-slate-950 flex items-center justify-center border-t border-b border-white/5">
-        <motion.div 
-          animate={{ rotate: [0, 90, 180, 270, 360], scale: [1, 1.2, 1] }} 
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute w-[600px] md:w-[1000px] aspect-square rounded-full blur-[100px] md:blur-[180px] bg-gradient-to-tr from-[#4A90D9]/20 via-[#2E8B7A]/10 to-[#D4A843]/20 pointer-events-none"
+        <div 
+          className="absolute w-[600px] md:w-[1000px] aspect-square rounded-full bg-gradient-to-tr from-[#4A90D9]/10 via-[#2E8B7A]/5 to-[#D4A843]/10 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at center, rgba(74,144,217,0.08) 0%, transparent 60%)' }}
         />
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-8">

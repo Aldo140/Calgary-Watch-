@@ -594,6 +594,7 @@ export default function MapPage() {
     setIsEmergencyPinMode(false);
   }, []);
 
+  // filteredIncidentsCount is intentionally kept for the sidebar category badge
   const filteredIncidentsCount = useMemo(
     () =>
       incidents.filter((i) => selectedCategory === 'all' || i.category === selectedCategory).length,
@@ -840,12 +841,14 @@ export default function MapPage() {
           <div className="mt-2 flex justify-center pointer-events-none">
             <div className="inline-flex flex-col items-center rounded-2xl border border-white/8 bg-black/25 light:bg-white/50 px-4 py-2 backdrop-blur-md">
               <p className="text-center text-xl font-black tracking-tight text-amber-300 light:text-amber-700 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
-                {filteredIncidentsCount === 0
-                  ? 'No reports in view'
-                  : `${filteredIncidentsCount} live report${filteredIncidentsCount === 1 ? '' : 's'}`}
+                {mapIncidents.length === 0
+                  ? 'No markers today'
+                  : `${mapIncidents.length} map marker${mapIncidents.length === 1 ? '' : 's'}`}
               </p>
               <p className="text-center text-[10px] font-semibold uppercase tracking-wider text-slate-300/90 light:text-slate-600 mt-0.5">
-                Community-powered · verify before you act
+                {mapIncidents.length === 0
+                  ? `${incidents.length} in sidebar · be first to report`
+                  : 'Community-powered · verify before you act'}
               </p>
             </div>
           </div>
@@ -1348,15 +1351,15 @@ export default function MapPage() {
             <div className="relative flex items-center justify-center w-1.5 h-1.5 md:w-2 md:h-2">
               <div className={cn(
                 "absolute inset-0 rounded-full animate-ping opacity-75",
-                incidents.length > 0 ? "bg-green-500" : "bg-slate-500"
+                mapIncidents.length > 0 ? "bg-green-500" : "bg-slate-500"
               )} />
               <div className={cn(
                 "relative w-1.5 h-1.5 md:w-2 md:h-2 rounded-full",
-                incidents.length > 0 ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-slate-500"
+                mapIncidents.length > 0 ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-slate-500"
               )} />
             </div>
             <span className="text-[8px] md:text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-              {incidents.length} Live Reports
+              {mapIncidents.length} Map Markers
             </span>
           </div>
 

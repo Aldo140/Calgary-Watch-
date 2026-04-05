@@ -20,6 +20,8 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import type { Firestore } from 'firebase-admin/firestore';
 import { fetchEnvironmentCanadaAlerts } from './sources/environment-canada.js';
 import { fetch511AlbertaEvents } from './sources/511-alberta.js';
+import { fetchRedditCalgary } from './sources/reddit.js';
+import { fetchNewsFeedsCalgary } from './sources/rss.js';
 import type { NormalizedIncident } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -144,9 +146,11 @@ async function run(): Promise<void> {
   console.log(`[ingest] Pruned ${pruned} expired incident(s).`);
 
   // 2. Fetch all sources in parallel (failures are isolated).
-  const [ecAlerts, albertaTraffic] = await Promise.allSettled([
+  const [ecAlerts, albertaTraffic, reddit, newsFeeds] = await Promise.allSettled([
     fetchEnvironmentCanadaAlerts(),
     fetch511AlbertaEvents(),
+    fetchRedditCalgary(),
+    fetchNewsFeedsCalgary(),
   ]);
 
   const allIncidents: NormalizedIncident[] = [];
@@ -163,6 +167,20 @@ async function run(): Promise<void> {
     allIncidents.push(...albertaTraffic.value);
   } else {
     console.error('[ingest] 511 Alberta failed:', albertaTraffic.reason);
+  }
+
+  if (reddit.status === 'fulfilled') {
+    console.log(`[ingest] Reddit r/Calgary: ${reddit.value.length} post(s).`);
+    allIncidents.push(...reddit.value);
+  } else {
+    console.error('[ingest] Reddit failed:', reddit.reason);
+  }
+
+  if (newsFeeds.status === 'fulfilled') {
+    console.log(`[ingest] News RSS feeds: ${newsFeeds.value.length} article(s).`);
+    allIncidents.push(...newsFeeds.value);
+  } else {
+    console.error('[ingest] News RSS failed:', newsFeeds.reason);
   }
 
   if (allIncidents.length === 0) {

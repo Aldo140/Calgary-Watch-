@@ -261,19 +261,19 @@ export default function Sidebar({
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
               <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
-                {incidents.filter(i => i.verified_status === 'multiple_reports').length} Critical
+                {filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length} Critical
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
               <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
-                {incidents.filter(i => i.verified_status === 'unverified').length} Active
+                {filteredIncidents.filter(i => i.verified_status === 'unverified').length} Active
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
               <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
-                {incidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved
+                {filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved
               </span>
             </div>
           </div>
@@ -446,7 +446,17 @@ export default function Sidebar({
                                   <h3 className="text-white text-sm font-bold leading-tight group-hover:text-blue-400 transition-colors light:text-slate-900 line-clamp-2">{incident.title}</h3>
                                   <div className="flex items-center gap-1.5 shrink-0">
                                     {/* Data-source badge — only for non-community reports */}
-                                    {incident.data_source === 'official' && (
+                                    {incident.source_type === 'reddit_calgary' && (
+                                      <span className="px-1.5 py-0.5 rounded bg-orange-500/20 border border-orange-500/30 text-[8px] font-black text-orange-400 uppercase tracking-tighter">
+                                        Reddit
+                                      </span>
+                                    )}
+                                    {incident.source_type === 'news_rss' && (
+                                      <span className="px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-500/30 text-[8px] font-black text-purple-400 uppercase tracking-tighter">
+                                        News
+                                      </span>
+                                    )}
+                                    {incident.data_source === 'official' && incident.source_type !== 'reddit_calgary' && incident.source_type !== 'news_rss' && (
                                       <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[8px] font-black text-blue-400 uppercase tracking-tighter">
                                         Official
                                       </span>

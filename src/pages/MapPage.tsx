@@ -187,6 +187,145 @@ function useOfficialOpenData(isAuthReady: boolean) {
   return officialIncidents;
 }
 
+// ── WMO weather code → alert (returns null if conditions are unremarkable) ──
+const WMO_ALERTS: Record<number, { title: string; description: string; severity: 'advisory' | 'watch' | 'warning' }> = {
+  45: { title: 'Fog Advisory', description: 'Dense fog reducing visibility. Drive with headlights on and reduce speed.', severity: 'advisory' },
+  48: { title: 'Freezing Fog Warning', description: 'Freezing fog causing icy road surfaces. Extremely slippery conditions.', severity: 'warning' },
+  56: { title: 'Freezing Drizzle', description: 'Light freezing drizzle creating ice on roads and sidewalks. Use caution.', severity: 'watch' },
+  57: { title: 'Heavy Freezing Drizzle', description: 'Heavy freezing drizzle causing dangerous ice accumulation on all surfaces.', severity: 'warning' },
+  66: { title: 'Freezing Rain', description: 'Freezing rain producing significant ice build-up on roads. Travel not recommended.', severity: 'warning' },
+  67: { title: 'Heavy Freezing Rain', description: 'Heavy freezing rain. Dangerous driving conditions — travel only if necessary.', severity: 'warning' },
+  71: { title: 'Snow Advisory', description: 'Light snow reducing visibility and causing slippery road conditions.', severity: 'advisory' },
+  73: { title: 'Snowfall Warning', description: 'Moderate snowfall reducing visibility. Plows are active — allow extra travel time.', severity: 'watch' },
+  75: { title: 'Heavy Snowfall Warning', description: 'Heavy snowfall with significant accumulation expected. Expect major travel delays.', severity: 'warning' },
+  77: { title: 'Snow Pellets', description: 'Ice pellets reducing road traction. Treat intersections with extra caution.', severity: 'watch' },
+  85: { title: 'Snow Showers', description: 'Snow showers with gusty winds reducing visibility in exposed areas.', severity: 'advisory' },
+  86: { title: 'Heavy Snow Showers', description: 'Heavy snow showers causing rapidly deteriorating travel conditions.', severity: 'watch' },
+  95: { title: 'Thunderstorm Warning', description: 'Thunderstorm in the area. Seek shelter immediately — avoid open spaces.', severity: 'watch' },
+  96: { title: 'Thunderstorm with Hail', description: 'Thunderstorm producing hail. Move vehicles under cover and stay indoors.', severity: 'warning' },
+  99: { title: 'Severe Thunderstorm', description: 'Severe thunderstorm with large hail and heavy rain. Take shelter immediately.', severity: 'warning' },
+};
+
+// Calgary neighbourhood zones: [name, lat, lng]
+const CALGARY_WEATHER_ZONES: [string, number, number][] = [
+  ['Northwest Calgary',  51.128, -114.190],
+  ['Northeast Calgary',  51.128, -113.980],
+  ['Downtown Calgary',   51.048, -114.065],
+  ['Southwest Calgary',  50.975, -114.180],
+  ['Southeast Calgary',  50.975, -113.980],
+];
+
+function useWeatherAlerts(isAuthReady: boolean) {
+  const [weatherAlerts, setWeatherAlerts] = useState<Incident[]>([]);
+
+  useEffect(() => {
+    if (!isAuthReady) return;
+
+    const fetchWeather = async () => {
+      const alerts: Incident[] = [];
+      const now = Date.now();
+
+      await Promise.allSettled(
+        CALGARY_WEATHER_ZONES.map(async ([zoneName, lat, lng]) => {
+          try {
+            const url =
+              `https://api.open-meteo.com/v1/forecast` +
+              `?latitude=${lat}&longitude=${lng}` +
+              `&current=temperature_2m,weathercode,windspeed_10m,precipitation` +
+              `&timezone=America%2FEdmonton`;
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const data = await res.json();
+            const current = data.current;
+            if (!current) return;
+
+            const code: number = current.weathercode;
+            const windKph: number = current.windspeed_10m ?? 0;
+            const tempC: number = current.temperature_2m ?? 99;
+
+            // Check WMO code first
+            if (WMO_ALERTS[code]) {
+              const alert = WMO_ALERTS[code];
+              alerts.push({
+                id: `wx-${zoneName.replace(/\s+/g, '-').toLowerCase()}-${code}`,
+                title: alert.title,
+                description: `${alert.description} (${zoneName}, ${tempC.toFixed(0)}°C)`,
+                category: 'weather' as IncidentCategory,
+                neighborhood: zoneName,
+                lat, lng,
+                timestamp: now,
+                email: 'alerts@open-meteo.com',
+                name: 'Environment Canada (via Open-Meteo)',
+                anonymous: false,
+                verified_status: 'community_confirmed' as const,
+                report_count: 1,
+                data_source: 'official' as const,
+                source_name: 'Environment Canada',
+                source_url: 'https://weather.gc.ca/',
+                expires_at: now + 2 * 60 * 60 * 1000,
+              });
+            }
+
+            // Wind warning regardless of WMO code
+            if (windKph >= 70) {
+              alerts.push({
+                id: `wx-wind-${zoneName.replace(/\s+/g, '-').toLowerCase()}`,
+                title: windKph >= 90 ? 'Extreme Wind Warning' : 'Wind Warning',
+                description: `Sustained winds of ${Math.round(windKph)} km/h in ${zoneName}. Secure loose outdoor objects.`,
+                category: 'weather' as IncidentCategory,
+                neighborhood: zoneName,
+                lat, lng,
+                timestamp: now,
+                email: 'alerts@open-meteo.com',
+                name: 'Environment Canada (via Open-Meteo)',
+                anonymous: false,
+                verified_status: 'community_confirmed' as const,
+                report_count: 1,
+                data_source: 'official' as const,
+                source_name: 'Environment Canada',
+                source_url: 'https://weather.gc.ca/',
+                expires_at: now + 2 * 60 * 60 * 1000,
+              });
+            }
+
+            // Extreme cold warning
+            if (tempC <= -35) {
+              alerts.push({
+                id: `wx-cold-${zoneName.replace(/\s+/g, '-').toLowerCase()}`,
+                title: 'Extreme Cold Warning',
+                description: `Temperature of ${tempC.toFixed(0)}°C in ${zoneName}. Frostbite can occur within minutes of exposure.`,
+                category: 'weather' as IncidentCategory,
+                neighborhood: zoneName,
+                lat, lng,
+                timestamp: now,
+                email: 'alerts@open-meteo.com',
+                name: 'Environment Canada (via Open-Meteo)',
+                anonymous: false,
+                verified_status: 'community_confirmed' as const,
+                report_count: 1,
+                data_source: 'official' as const,
+                source_name: 'Environment Canada',
+                source_url: 'https://weather.gc.ca/',
+                expires_at: now + 2 * 60 * 60 * 1000,
+              });
+            }
+          } catch {
+            // Silent — partial failures are fine
+          }
+        })
+      );
+
+      setWeatherAlerts(alerts);
+    };
+
+    fetchWeather();
+    const interval = setInterval(fetchWeather, 30 * 60 * 1000); // refresh every 30 min
+    return () => clearInterval(interval);
+  }, [isAuthReady]);
+
+  return weatherAlerts;
+}
+
 export default function MapPage() {
   const INCIDENT_PAGE_SIZE = 60;
   const { user, signIn, logout, isAuthReady, isAdmin } = useAuth();
@@ -194,6 +333,7 @@ export default function MapPage() {
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
+  const weatherAlerts = useWeatherAlerts(isAuthReady);
   
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -226,6 +366,7 @@ export default function MapPage() {
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [locationError, setLocationError] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isEmergencyPinMode, setIsEmergencyPinMode] = useState(false);
   const [confirmedEmergencyPinLocation, setConfirmedEmergencyPinLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -419,21 +560,22 @@ export default function MapPage() {
     });
   }, []);
 
-  const MAP_DECAY_MS   = 24 * 60 * 60 * 1000;        // 24 hours  — hide from map
-  const SIDEBAR_DECAY_MS = 2.5 * 24 * 60 * 60 * 1000; // 60 hours  — hide from sidebar too
+  const MAP_DECAY_MS = 24 * 60 * 60 * 1000; // 24 hours — hide from map
 
-  // All incidents for the sidebar (up to 2.5 days old)
+  // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
     const now = Date.now();
-    const combined = [...firebaseIncidents, ...officialOpenData];
+    const combined = [...firebaseIncidents, ...officialOpenData, ...weatherAlerts];
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     return [...unique.values()]
       .filter((i) => {
+        // Official/ingest incidents respect their expires_at TTL
         if (i.expires_at) return i.expires_at > now;
-        return now - i.timestamp < SIDEBAR_DECAY_MS;
+        // Community posts: show as long as they're in the database (no client-side decay)
+        return true;
       })
       .sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
-  }, [firebaseIncidents, officialOpenData]);
+  }, [firebaseIncidents, officialOpenData, weatherAlerts]);
 
   useEffect(() => {
     const targetId = searchParams.get('i');
@@ -526,7 +668,9 @@ export default function MapPage() {
             authorUid: user.uid,
           });
         } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, path);
+          console.error('[CalgaryWatch] Report submission failed:', error);
+          setSubmitError('Your report could not be saved. Please try again.');
+          setTimeout(() => setSubmitError(null), 6000);
         }
       })();
     });
@@ -661,6 +805,24 @@ export default function MapPage() {
             <div className="flex-1 h-full relative">
               <MapShimmer />
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Submit error toast */}
+      <AnimatePresence>
+        {submitError && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-3 bg-red-900/90 border border-red-500/40 rounded-2xl shadow-xl backdrop-blur-xl text-red-200 text-xs font-bold"
+          >
+            <ShieldAlert size={14} className="shrink-0 text-red-400" />
+            {submitError}
+            <button onClick={() => setSubmitError(null)} className="ml-1 text-red-400 hover:text-white transition-colors">
+              <X size={14} />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

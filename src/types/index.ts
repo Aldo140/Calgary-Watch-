@@ -19,7 +19,9 @@ export type SourceType =
   | 'user_report'
   | 'env_canada_weather'
   | '511_alberta_traffic'
-  | 'calgary_open_data';
+  | 'calgary_open_data'
+  | 'reddit_calgary'
+  | 'news_rss';
 
 export const CATEGORY_ICONS = {
   crime: AlertCircle,

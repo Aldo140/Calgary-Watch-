@@ -100,7 +100,7 @@ service cloud.firestore {
              data.timestamp is number &&
              isValidEmail(data.email) &&
              data.name is string && data.name.size() >= 2 && data.name.size() <= 50 &&
-             data.verified_status in ['unverified', 'multiple_reports', 'community_confirmed'] &&
+             data.verified_status in ['unverified', 'multiple_reports', 'community_confirmed', 'pending_review'] &&
              data.authorUid is string;
     }
 
@@ -145,7 +145,7 @@ service cloud.firestore {
                     ]) &&
                     isValidIncident(request.resource.data) &&
                     request.resource.data.authorUid == request.auth.uid &&
-                    request.resource.data.verified_status == 'unverified' &&
+                    request.resource.data.verified_status in ['unverified', 'pending_review'] &&
                     request.resource.data.report_count == 1;
       allow update: if (
                       isAdmin() &&

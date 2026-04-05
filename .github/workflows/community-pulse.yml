@@ -1,0 +1,53 @@
+name: Community Pulse
+
+# Posts up to 3 community reports per day at realistic Calgary times.
+# Each job passes a slot index (0=morning 7am, 1=afternoon 1pm, 2=evening 8pm MDT).
+# The script skips gracefully if the slot was already posted.
+
+on:
+  schedule:
+    - cron: '30 13 * * *'   # 07:30 MDT  (slot 0 — morning)
+    - cron: '0  19 * * *'   # 13:00 MDT  (slot 1 — afternoon)
+    - cron: '0   2 * * *'   # 20:00 MDT  (slot 2 — evening, next UTC day)
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Slot to run (0=morning, 1=afternoon, 2=evening)'
+        required: false
+        default: '0'
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine slot from cron schedule
+        id: slot
+        run: |
+          HOUR=$(date -u +%H)
+          SLOT="${{ github.event.inputs.slot }}"
+          if [ -z "$SLOT" ]; then
+            if [ "$HOUR" = "13" ]; then SLOT=0
+            elif [ "$HOUR" = "19" ]; then SLOT=1
+            else SLOT=2
+            fi
+          fi
+          echo "slot=$SLOT" >> $GITHUB_OUTPUT
+
+      - name: Post community report
+        run: npx tsx scripts/seed/activity.ts ${{ steps.slot.outputs.slot }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

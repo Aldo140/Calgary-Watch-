@@ -109,9 +109,9 @@ const incidentSchema = z.object({
     .refine(v => !isKeyboardMash(v), 'Headline doesn\'t look like a real description')
     .refine(v => !containsSpam(v), 'Please describe a real incident'),
   description: z.string().trim()
-    .min(40, 'Description must be at least 40 characters')
+    .min(10, 'Description must be at least 10 characters')
     .max(1000, 'Description is too long')
-    .refine(v => wordCount(v) >= 8, 'Please describe what happened in at least 8 words')
+    .refine(v => wordCount(v) >= 4, 'Please describe what happened in at least 4 words')
     .refine(v => !isKeyboardMash(v), 'Description doesn\'t look like a real description')
     .refine(v => !containsSpam(v), 'Please describe a real incident'),
   category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'emergency']),

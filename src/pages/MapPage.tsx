@@ -57,6 +57,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
           data_source: 'official',
           source_name: 'City of Calgary Open Data',
           source_url: 'https://data.calgary.ca/',
+          expires_at: new Date(item.start_dt || new Date()).getTime() + (8 * 60 * 60 * 1000), // Decay after 8 hours
         }));
 
         // Fetch Calgary 311 (Recent issues for infrastructure / weather)
@@ -64,14 +65,24 @@ function useOfficialOpenData(isAuthReady: boolean) {
         const three11Data = await three11Res.json();
         
         const three11Incidents: Incident[] = three11Data
-          .filter((item: any) => item.latitude && item.longitude)
+          .filter((item: any) => {
+            if (!item.latitude || !item.longitude) return false;
+            const sName = (item.service_name || '').toLowerCase();
+            // Filter out mundane bylaw/city tickets. We want incidents that feel like 'live watch' events.
+            const boring = ['tree', 'shrub', 'waste', 'recycling', 'snow and ice', 'grass', 'weeds', 'park', 'license', 'material on public', 'tax', 'inquiry'];
+            if (boring.some(b => sName.includes(b))) return false;
+            return true;
+          })
           .map((item: any) => {
             // Map 311 service names to our categories
             const sName = (item.service_name || '').toLowerCase();
             let category: IncidentCategory = 'infrastructure';
-            if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain')) category = 'weather';
-            if (sName.includes('bylaw') || sName.includes('police')) category = 'crime';
+            if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water')) category = 'weather';
+            if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise')) category = 'crime';
+            if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger')) category = 'emergency';
             
+            const timestamp = new Date(item.requested_date || new Date()).getTime();
+
             return {
               id: `yyc-311-${item.service_request_id}`,
               title: item.service_name || '311 Service Request',
@@ -80,7 +91,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
               neighborhood: item.comm_name || 'Calgary',
               lat: parseFloat(item.latitude),
               lng: parseFloat(item.longitude),
-              timestamp: new Date(item.updated_date || item.requested_date).getTime(),
+              timestamp,
               email: 'opendata@calgary.ca',
               name: 'Calgary 311 Sync',
               anonymous: false,
@@ -89,6 +100,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
               data_source: 'official',
               source_name: 'Calgary 311',
               source_url: 'https://data.calgary.ca/',
+              expires_at: timestamp + (24 * 60 * 60 * 1000), // Decay after 24 hours
             };
           });
 

@@ -736,15 +736,17 @@ export default function MapPage() {
     [incidents, selectedCategory]
   );
 
-  // Incidents shown on the map — max 24h old, filtered by category (emergencies always show)
+  // Map shows ONLY community-submitted incidents (not official API data).
+  // Official data (traffic, 311, crime stats) lives in the sidebar feed only.
+  // Community incidents older than 24 h are hidden from the map.
   const mapIncidents = useMemo(() => {
     const now = Date.now();
-    const fresh = incidents.filter((i) => {
-      if (i.expires_at) return i.expires_at > now;
-      return now - i.timestamp < MAP_DECAY_MS;
+    const communityOnly = incidents.filter((i) => {
+      if (i.data_source === 'official') return false;       // never show API data on map
+      return now - i.timestamp < MAP_DECAY_MS;              // 24 h decay for community posts
     });
-    if (selectedCategory === 'all') return fresh;
-    return fresh.filter(i => i.category === selectedCategory || i.category === 'emergency');
+    if (selectedCategory === 'all') return communityOnly;
+    return communityOnly.filter(i => i.category === selectedCategory || i.category === 'emergency');
   }, [incidents, selectedCategory]);
 
   // Incidents sorted by distance from user for the Near Me panel

@@ -12,6 +12,7 @@ import {
   PieChart, Pie, Cell,
   AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
   BarChart, Bar, Legend,
+  LineChart, Line,
 } from 'recharts';
 
 type UserProfile = {
@@ -141,7 +142,9 @@ export default function AdminPage() {
   const totalUsers = users.length;
   const adminUsers = users.filter((u) => u.role === 'admin').length;
   const viewOnlyUsers = totalUsers - adminUsers;
-  const uniqueReporterEmails = new Set(incidents.map((i) => i.email).filter(Boolean)).size;
+  const uniqueReporterEmails = new Set(
+    incidents.map((i) => i.email).filter(e => e && e !== 'anonymous@calgarywatch.app' && e !== 'opendata@calgary.ca')
+  ).size;
   const averageSafety = useMemo(() => {
     if (communityStats.length === 0) return 0;
     return Math.round(communityStats.reduce((sum, row) => sum + Number(row.safety_score || 0), 0) / communityStats.length);
@@ -250,6 +253,51 @@ export default function AdminPage() {
         'Disorder Calls': row.disorder_calls,
       })),
   [communityStats]);
+
+  // Hourly distribution (0-23)
+  const hourlyChartData = useMemo(() => {
+    const buckets = Array.from({ length: 24 }, (_, h) => ({ hour: `${h}:00`, count: 0 }));
+    incidents.forEach((i) => {
+      const h = new Date(i.timestamp).getHours();
+      buckets[h].count++;
+    });
+    return buckets;
+  }, [incidents]);
+
+  // Stacked category-by-day (last 7 days)
+  const categoryByDayData = useMemo(() => {
+    const days = 7;
+    const now = Date.now();
+    const result: Record<string, Record<string, number>> = {};
+    for (let d = days - 1; d >= 0; d--) {
+      const date = new Date(now - d * 86400000).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+      result[date] = { emergency: 0, crime: 0, traffic: 0, infrastructure: 0, weather: 0 };
+    }
+    incidents.forEach((i) => {
+      const key = new Date(i.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+      if (result[key] && i.category in result[key]) result[key][i.category]++;
+    });
+    return Object.entries(result).map(([date, cats]) => ({ date, ...cats }));
+  }, [incidents]);
+
+  // Top reporters (by count)
+  const topReportersData = useMemo(() => {
+    const counts: Record<string, { name: string; count: number }> = {};
+    incidents.forEach((i) => {
+      const uid = (i as any).authorUid;
+      const key = uid || i.email || 'unknown';
+      if (!counts[key]) {
+        const user = users.find(u => u.uid === uid || u.email === i.email);
+        counts[key] = { name: user?.displayName || i.name || i.email || 'Unknown', count: 0 };
+      }
+      counts[key].count++;
+    });
+    return Object.values(counts)
+      .filter(r => r.name !== 'Calgary 311 Sync' && r.name !== 'City of Calgary Traffic' && r.name !== 'Calgary Police Service')
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8)
+      .map(r => ({ name: r.name.length > 14 ? r.name.slice(0, 14) + '…' : r.name, count: r.count }));
+  }, [incidents, users]);
 
   // ── End chart data ───────────────────────────────────────────────────────────
 
@@ -773,6 +821,66 @@ export default function AdminPage() {
               </ResponsiveContainer>
             </Card>
           )}
+
+          {/* Row 4: Hourly activity + stacked category by day */}
+          <div className="grid lg:grid-cols-2 gap-4">
+            <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+              <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Hourly Activity Pattern</p>
+              <p className="text-[10px] text-slate-600 mb-4 mt-0.5">When during the day most reports are filed. Useful for staffing moderation windows.</p>
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={hourlyChartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="hourGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff06" />
+                  <XAxis dataKey="hour" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} interval={2} />
+                  <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #ffffff15', borderRadius: 12, fontSize: 11 }} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#c084fc' }} />
+                  <Area type="monotone" dataKey="count" stroke="#a855f7" strokeWidth={2} fill="url(#hourGrad)" name="Reports" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Card>
+
+            <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+              <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Category Mix · Last 7 Days</p>
+              <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily stacked view of report categories. See how the mix shifts over time.</p>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={categoryByDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff06" />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #ffffff15', borderRadius: 12, fontSize: 11 }} itemStyle={{ color: '#e2e8f0' }} cursor={{ fill: '#ffffff05' }} />
+                  <Legend wrapperStyle={{ fontSize: 9, color: '#64748b', paddingTop: 8 }} />
+                  <Bar dataKey="emergency"      stackId="a" fill="#dc2626" radius={[0,0,0,0]} name="Emergency" />
+                  <Bar dataKey="crime"          stackId="a" fill="#ef4444" name="Crime" />
+                  <Bar dataKey="traffic"        stackId="a" fill="#f97316" name="Traffic" />
+                  <Bar dataKey="infrastructure" stackId="a" fill="#3b82f6" name="Infrastructure" />
+                  <Bar dataKey="weather"        stackId="a" fill="#a855f7" radius={[3,3,0,0]} name="Weather" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </div>
+
+          {/* Row 5: Top reporters bar */}
+          {topReportersData.length > 0 && (
+            <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+              <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Top Community Reporters</p>
+              <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Most active community members by report count. Anonymous and API-sourced entries excluded.</p>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={topReportersData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff06" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={90} tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #ffffff15', borderRadius: 12, fontSize: 11 }} itemStyle={{ color: '#fbbf24' }} cursor={{ fill: '#ffffff06' }} />
+                  <Bar dataKey="count" name="Reports" fill="#f59e0b" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          )}
+
         </div>
         {/* ── End Analytics ──────────────────────────────────────────────────── */}
 
@@ -808,7 +916,11 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {users.map((profile) => {
-                    const reportCount = incidents.filter(i => i.email === profile.email).length;
+                    // Match by authorUid (most reliable) or email fallback; exclude anonymous posts
+                    const reportCount = incidents.filter(i =>
+                      ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
+                      (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
+                    ).length;
                     return (
                       <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                         <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>

@@ -49,7 +49,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
         }));
 
         // Fetch Calgary 311 (Recent issues for infrastructure / weather)
-        const three11Res = await fetch('https://data.calgary.ca/resource/iahh-g8bj.json?$limit=80&$order=updated_date DESC');
+        const three11Res = await fetch('https://data.calgary.ca/resource/iahh-g8bj.json?$limit=80&$where=status_description=\'Open\'&$order=requested_date DESC');
         const three11Data = await three11Res.json();
         
         const three11Incidents: Incident[] = three11Data

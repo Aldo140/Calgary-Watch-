@@ -6,7 +6,7 @@ import { Incident, CommunityStats } from '@/src/types';
 import { addDoc, collection, doc, getDocs, getCountFromServer, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
-import { ArrowLeft, Loader2, Lock, Save, Trash2, Activity, AlertTriangle, Clock3, Users, ShieldCheck, ChartNoAxesColumn, Sparkles, RefreshCw, Siren, ChartPie } from 'lucide-react';
+import { ArrowLeft, Loader2, Lock, Save, Trash2, Activity, AlertTriangle, Clock3, Users, ShieldCheck, ChartNoAxesColumn, Sparkles, RefreshCw, Siren, ChartPie, ShieldQuestion, CheckCircle } from 'lucide-react';
 import {
   ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -149,6 +149,8 @@ export default function AdminPage() {
     if (communityStats.length === 0) return 0;
     return Math.round(communityStats.reduce((sum, row) => sum + Number(row.safety_score || 0), 0) / communityStats.length);
   }, [communityStats]);
+
+  const pendingReviewIncidents = incidents.filter((i) => i.verified_status === 'pending_review');
 
   // API data source stats
   const officialTrafficCount = incidents.filter((i) => i.id.startsWith('yyc-traffic-')).length;
@@ -387,6 +389,16 @@ export default function AdminPage() {
     } catch (err) {
       console.error('Failed to soft-delete incident:', err);
       alert('Could not delete this incident. Check your admin permissions and redeploy Firestore rules if needed.');
+    }
+  };
+
+  const approveIncident = async (incidentId: string) => {
+    if (!user || !db) return;
+    try {
+      await updateDoc(doc(db, 'incidents', incidentId), { verified_status: 'unverified' });
+      await writeAuditLog('incident_update', 'incidents', incidentId, { verified_status: 'unverified' });
+    } catch (err) {
+      console.error('Failed to approve incident:', err);
     }
   };
 
@@ -883,6 +895,64 @@ export default function AdminPage() {
 
         </div>
         {/* ── End Analytics ──────────────────────────────────────────────────── */}
+
+        {/* ── Moderation Queue ─────────────────────────────────────────────── */}
+        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-base font-black flex items-center gap-2">
+                <ShieldQuestion size={15} className="text-amber-400" />
+                Moderation Queue
+                {pendingReviewIncidents.length > 0 && (
+                  <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black">
+                    {pendingReviewIncidents.length} pending
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">New community reports awaiting review. Auto-approved after 10 min.</p>
+            </div>
+          </div>
+          {pendingReviewIncidents.length === 0 ? (
+            <div className="flex items-center gap-2 py-6 justify-center text-slate-500 text-sm">
+              <CheckCircle size={16} className="text-green-500" />
+              Queue is clear
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              {pendingReviewIncidents.map((incident) => {
+                const ageMin = Math.floor((Date.now() - incident.timestamp) / 60000);
+                return (
+                  <div key={incident.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 border border-white/5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white truncate">{incident.title}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{incident.description}</p>
+                      <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-500">
+                        <span>{incident.neighborhood}</span>
+                        <span>{incident.category}</span>
+                        <span>{ageMin < 1 ? 'just now' : `${ageMin}m ago`}</span>
+                        <span className="text-amber-400">auto-approves in {Math.max(0, 10 - ageMin)}m</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => approveIncident(incident.id)}
+                        className="px-3 py-1.5 rounded-lg bg-green-500/15 text-green-400 text-xs font-bold border border-green-500/25 hover:bg-green-500/25 transition-colors"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => softDeleteIncident(incident.id)}
+                        className="px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 text-xs font-bold border border-red-500/25 hover:bg-red-500/25 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
 
         <div className="grid lg:grid-cols-3 gap-4">
           <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto h-[420px]">

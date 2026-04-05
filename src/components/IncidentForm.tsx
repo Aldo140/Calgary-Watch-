@@ -5,7 +5,7 @@ import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
 import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useReducer } from 'react';
 
 // Approximate neighbourhood centres for Calgary.
 // Returns the closest neighbourhood name or '' if outside all radii.
@@ -44,28 +44,76 @@ function detectNeighbourhood(lat: number, lng: number): string {
   return best.name;
 }
 
-// Basic spam guard – block obvious joke/test submissions at the client level.
-// The list is intentionally short; backend moderation handles edge cases.
+const RATE_LIMIT_MS = 20 * 60 * 1000; // 20 minutes between submissions
+
+function getRateLimitKey(uid: string) { return `cw_ls_${uid}`; }
+
+export function getSecondsUntilNextSubmit(uid: string): number {
+  try {
+    const raw = localStorage.getItem(getRateLimitKey(uid));
+    if (!raw) return 0;
+    const elapsed = Date.now() - Number(raw);
+    return elapsed < RATE_LIMIT_MS ? Math.ceil((RATE_LIMIT_MS - elapsed) / 1000) : 0;
+  } catch { return 0; }
+}
+
+export function recordSubmission(uid: string) {
+  try { localStorage.setItem(getRateLimitKey(uid), String(Date.now())); } catch { /* ignore */ }
+}
+
+// Multi-layer spam guard
 const SPAM_PATTERNS = [
   /\btest(ing)?\b/i,
   /\bfake\b/i,
+  /\bjoke\b/i,
+  /\bspam\b/i,
   /\bpoop\b/i,
   /\btoilet\b/i,
   /\bshit\b/i,
-  /\bjoke\b/i,
-  /\bspam\b/i,
-  /^(aaa+|zzz+|xxx+|123+)$/i,
+  /\bfuck\b/i,
+  /\bass\b/i,
+  /\blol\b/i,
+  /\bhaha\b/i,
+  /\bnothing\b/i,
+  /\bblah\b/i,
+  /\bidk\b/i,
+  /\bwhatever\b/i,
+  /\bxyz\b/i,
 ];
+
+function wordCount(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function isKeyboardMash(text: string): boolean {
+  // Same character repeated 4+ times in a row
+  if (/(.)\1{3,}/.test(text)) return true;
+  // Less than 30% of characters are vowels/consonants in expected ratio
+  const letters = text.replace(/[^a-z]/gi, '').toLowerCase();
+  if (letters.length < 4) return false;
+  const vowels = (letters.match(/[aeiou]/g) || []).length;
+  const ratio = vowels / letters.length;
+  // Normal English text: 35-45% vowels. Mash: <10% or >70%
+  return ratio < 0.08 || ratio > 0.75;
+}
 
 function containsSpam(text: string): boolean {
   return SPAM_PATTERNS.some((re) => re.test(text.trim()));
 }
 
 const incidentSchema = z.object({
-  title: z.string().trim().min(5, 'Headline must be at least 5 characters')
-    .refine((v) => !containsSpam(v), 'Please describe a real incident'),
-  description: z.string().trim().min(10, 'Description must be at least 10 characters')
-    .refine((v) => !containsSpam(v), 'Please describe a real incident'),
+  title: z.string().trim()
+    .min(10, 'Headline must be at least 10 characters')
+    .max(100, 'Headline is too long')
+    .refine(v => wordCount(v) >= 3, 'Add at least 3 words to your headline')
+    .refine(v => !isKeyboardMash(v), 'Headline doesn\'t look like a real description')
+    .refine(v => !containsSpam(v), 'Please describe a real incident'),
+  description: z.string().trim()
+    .min(40, 'Description must be at least 40 characters')
+    .max(1000, 'Description is too long')
+    .refine(v => wordCount(v) >= 8, 'Please describe what happened in at least 8 words')
+    .refine(v => !isKeyboardMash(v), 'Description doesn\'t look like a real description')
+    .refine(v => !containsSpam(v), 'Please describe a real incident'),
   category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'emergency']),
   neighborhood: z.string().trim().min(2, 'Please choose a neighbourhood from the list'),
   image_url: z.union([z.string().url('Must be a valid URL'), z.literal('')]).optional(),
@@ -105,6 +153,8 @@ interface IncidentFormProps {
     email: string;
     photoURL: string;
   } | null;
+  /** Firebase UID — used to namespace the per-user rate limit key */
+  userId?: string;
   /** Called when user chooses "drop a pin" - parent enters crosshair mode */
   onRequestMapPin?: () => void;
   /** True while the crosshair pin overlay is active on the map */
@@ -122,11 +172,14 @@ export default function IncidentForm({
   pinLocation,
   locationAvailable,
   userProfile,
+  userId,
   onRequestMapPin,
   isPinMode = false,
   onClearPin,
 }: IncidentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rateLimitSecs, setRateLimitSecs] = useState(0);
+  const rateLimitTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const isLgUp = useLgUp();
   // 'choose'  = picking location method
   // 'pinning' = crosshair active on map; form hidden
@@ -177,10 +230,30 @@ export default function IncidentForm({
     }
   }, [pinLocation, step]);
 
-  // Reset when form is reopened
+  // Reset when form is reopened; also check rate limit
   useEffect(() => {
-    if (isOpen) { setStep('choose'); setUsingGPS(false); }
-  }, [isOpen]);
+    if (isOpen) {
+      setStep('choose');
+      setUsingGPS(false);
+      if (userId) {
+        const secs = getSecondsUntilNextSubmit(userId);
+        setRateLimitSecs(secs);
+        if (secs > 0) {
+          rateLimitTimer.current = setInterval(() => {
+            const remaining = getSecondsUntilNextSubmit(userId);
+            setRateLimitSecs(remaining);
+            if (remaining <= 0 && rateLimitTimer.current) {
+              clearInterval(rateLimitTimer.current);
+              rateLimitTimer.current = null;
+            }
+          }, 1000);
+        }
+      }
+    } else {
+      if (rateLimitTimer.current) { clearInterval(rateLimitTimer.current); rateLimitTimer.current = null; }
+    }
+    return () => { if (rateLimitTimer.current) { clearInterval(rateLimitTimer.current); rateLimitTimer.current = null; } };
+  }, [isOpen, userId]);
 
   // Resolution order: tapped pin > explicit GPS choice > Calgary centre fallback
   const activeLocation = pinLocation ?? (usingGPS ? (gpsLocation ?? location) : location);
@@ -201,11 +274,21 @@ export default function IncidentForm({
         setError('root', { type: 'manual', message: 'Location is missing. Tap Change and pick a location again.' });
         return;
       }
+      // Client-side rate limit check
+      if (userId) {
+        const secs = getSecondsUntilNextSubmit(userId);
+        if (secs > 0) {
+          const mins = Math.ceil(secs / 60);
+          setError('root', { type: 'manual', message: `You can submit again in ${mins} minute${mins === 1 ? '' : 's'}. This helps keep reports accurate.` });
+          return;
+        }
+      }
       if (submitLockRef.current) return;
       submitLockRef.current = true;
       setIsSubmitting(true);
       try {
         onSubmit({ ...data, ...activeLocation });
+        if (userId) recordSubmission(userId);
         reset({
           category: 'crime',
           anonymous: false,
@@ -222,7 +305,7 @@ export default function IncidentForm({
         setIsSubmitting(false);
       }
     },
-    [activeLocation, clearErrors, onClose, onSubmit, reset, setError]
+    [activeLocation, clearErrors, onClose, onSubmit, reset, setError, userId]
   );
 
   const handleClose = () => {
@@ -466,6 +549,13 @@ export default function IncidentForm({
               </div>
             </label>
 
+            {rateLimitSecs > 0 && (
+              <div className="flex items-center gap-2 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10">
+                <span className="text-amber-400 text-xs font-bold">
+                  Next report available in {Math.floor(rateLimitSecs / 60)}:{String(rateLimitSecs % 60).padStart(2, '0')}
+                </span>
+              </div>
+            )}
             {errors.root && (
               <p className="text-red-400 text-xs font-bold px-1" role="alert">
                 {errors.root.message}
@@ -486,7 +576,7 @@ export default function IncidentForm({
               </div>
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || rateLimitSecs > 0}
                 className="px-6 h-11 font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm shadow-lg whitespace-nowrap"
               >
                 {isSubmitting ? (
@@ -494,6 +584,8 @@ export default function IncidentForm({
                     <Loader2 size={16} className="animate-spin" />
                     Posting…
                   </span>
+                ) : rateLimitSecs > 0 ? (
+                  `Wait ${Math.ceil(rateLimitSecs / 60)}m`
                 ) : '🚀 Post Report'}
               </Button>
             </div>

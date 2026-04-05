@@ -300,8 +300,11 @@ export default function MapPage() {
     const q = query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(INCIDENT_PAGE_SIZE));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const incidentData = snapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() } as Incident))
-        .filter((incident) => incident.deleted !== true);
+        .map(doc => {
+          const d = doc.data();
+          return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
+        })
+        .filter((incident) => incident.deleted !== true && isFinite(incident.lat) && isFinite(incident.lng));
 
       if (hasInitializedIncidents.current) {
         const newIncidents = incidentData.filter((i) => !knownIncidentIds.current.has(i.id));
@@ -363,8 +366,11 @@ export default function MapPage() {
       );
       const nextPage = await getDocs(nextQuery);
       const olderIncidents = nextPage.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() } as Incident))
-        .filter((incident) => incident.deleted !== true);
+        .map((doc) => {
+          const d = doc.data();
+          return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
+        })
+        .filter((incident) => incident.deleted !== true && isFinite(incident.lat) && isFinite(incident.lng));
 
       setFirebaseIncidents((prev) => {
         const merged = new globalThis.Map(prev.map((incident) => [incident.id, incident]));

@@ -615,8 +615,15 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         iconAnchor: [markerSize[0] / 2, markerSize[1] / 2],
       });
 
+      const lat = Number(incident.lat);
+      const lng = Number(incident.lng);
+      if (!isFinite(lat) || !isFinite(lng)) {
+        console.warn('Skipping marker with invalid coords:', incident.id, incident.lat, incident.lng);
+        return;
+      }
+
       try {
-        const marker = L.marker([incident.lat, incident.lng], { icon })
+        const marker = L.marker([lat, lng], { icon })
           .bindTooltip(incident.title, {
             direction: 'top',
             offset: [0, -20],
@@ -647,12 +654,15 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       }
       
       const now = Date.now();
-      const heatPoints = incidents.map((incident) => {
+      const heatPoints = incidents.flatMap((incident) => {
+        const lat = Number(incident.lat);
+        const lng = Number(incident.lng);
+        if (!isFinite(lat) || !isFinite(lng)) return [];
         const recencyBoost = Math.max(0.15, 1 - (now - incident.timestamp) / (1000 * 60 * 60 * 24));
         const reportBoost = Math.min(1, Math.max(0.2, incident.report_count / 10));
         const categoryBoost = incident.category === 'crime' ? 0.25 : incident.category === 'traffic' ? 0.15 : 0.05;
         const intensity = Math.min(1, 0.35 + recencyBoost * 0.35 + reportBoost * 0.25 + categoryBoost);
-        return [incident.lat, incident.lng, intensity] as [number, number, number];
+        return [[lat, lng, intensity] as [number, number, number]];
       });
       
       // Ensure L.heatLayer is available (it's a plugin)

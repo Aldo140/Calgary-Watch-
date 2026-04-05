@@ -108,7 +108,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
         if (!three11Res.ok) throw new Error(`311 API ${three11Res.status}`);
         const three11Data: any[] = await three11Res.json();
 
-        const boring = ['tree', 'shrub', 'waste', 'recycling', 'snow and ice', 'grass', 'weeds', 'park', 'license', 'material on public', 'tax', 'inquiry', 'cart', 'backlane'];
+        const boring = ['tree', 'shrub', 'waste', 'recycling', 'grass', 'weeds', 'license', 'tax', 'inquiry', 'cart', 'backlane', 'contact us', 'feedback', 'missed collection'];
 
         for (const item of three11Data) {
           const lat = parseFloat(item.latitude);
@@ -119,9 +119,10 @@ function useOfficialOpenData(isAuthReady: boolean) {
           if (boring.some(b => sName.includes(b))) continue;
 
           let category: IncidentCategory = 'infrastructure';
-          if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water')) category = 'weather';
-          if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise')) category = 'crime';
-          if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger')) category = 'emergency';
+          if (sName.includes('road') || sName.includes('traffic') || sName.includes('pothole') || sName.includes('pavement') || sName.includes('sidewalk') || sName.includes('signal')) category = 'traffic';
+          if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water') || sName.includes('flood')) category = 'weather';
+          if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise') || sName.includes('graffiti')) category = 'crime';
+          if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger') || sName.includes('fire')) category = 'emergency';
 
           const timestamp = new Date(item.requested_date || new Date()).getTime();
           let cleanTitle = item.service_name || 'City Service Issue';
@@ -601,17 +602,18 @@ export default function MapPage() {
     [incidents, selectedCategory]
   );
 
-  // Map shows ONLY community-submitted incidents (not official API data).
-  // Official data (traffic, 311, crime stats) lives in the sidebar feed only.
-  // Community incidents older than 24 h are hidden from the map.
+  // Map shows all incidents: official API data (traffic, 311) + community posts.
+  // Official incidents use expires_at for decay; community posts use 24h rolling decay.
   const mapIncidents = useMemo(() => {
     const now = Date.now();
-    const communityOnly = incidents.filter((i) => {
-      if (i.data_source === 'official') return false;       // never show API data on map
-      return now - i.timestamp < MAP_DECAY_MS;              // 24 h decay for community posts
+    const visible = incidents.filter((i) => {
+      if (i.data_source === 'official') {
+        return !i.expires_at || i.expires_at > now;         // expires_at controls official lifetime
+      }
+      return now - i.timestamp < MAP_DECAY_MS;              // 24h decay for community posts
     });
-    if (selectedCategory === 'all') return communityOnly;
-    return communityOnly.filter(i => i.category === selectedCategory || i.category === 'emergency');
+    if (selectedCategory === 'all') return visible;
+    return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');
   }, [incidents, selectedCategory]);
 
   // Incidents sorted by distance from user for the Near Me panel

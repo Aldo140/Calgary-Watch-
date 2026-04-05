@@ -604,6 +604,15 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       }
 
       body.appendChild(svg);
+
+      // Official source badge (small "C" for City) — no user data interpolated
+      if ((incident as any).data_source === 'official') {
+        const badge = document.createElement('div');
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#0ea5e9;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:white;line-height:1;z-index:20;';
+        badge.textContent = 'C';
+        body.appendChild(badge);
+      }
+
       el.appendChild(body);
 
       // Create Leaflet divIcon

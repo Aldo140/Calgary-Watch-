@@ -7,10 +7,11 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
+import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, Filter, X, LogIn, Home, LayoutDashboard, Siren } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, X, LogIn, Home, LayoutDashboard, Siren } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -18,6 +19,7 @@ import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
+import { useCrimeStats } from '@/src/hooks/useCrimeStats';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -334,7 +336,8 @@ export default function MapPage() {
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
-  
+  const { stats: crimeStats } = useCrimeStats();
+
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<IncidentCategory | 'all'>('all');
@@ -347,8 +350,8 @@ export default function MapPage() {
   
   const [showLiveReports, setShowLiveReports] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [nearMeOpen, setNearMeOpen] = useState(false);
   const [nearMeIndex, setNearMeIndex] = useState(0);
   const NEAR_ME_RADIUS_KM = 3;
@@ -361,7 +364,7 @@ export default function MapPage() {
       return 'dark';
     }
   });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sheetSnap, setSheetSnap] = useState<SnapPoint>('80px');
   const [notifications, setNotifications] = useState<{ id: string; title: string; timestamp: number }[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -859,47 +862,6 @@ export default function MapPage() {
         />
       </div>
 
-      {/* Mobile Sidebar Drawer */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsSidebarOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
-            />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 w-[85%] max-w-sm z-[70] lg:hidden"
-            >
-              <Sidebar
-                incidents={incidents}
-                onIncidentClick={(incident) => {
-                  handleMarkerClick(incident);
-                  setIsSidebarOpen(false);
-                }}
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-                activeIncidentId={activeIncidentId}
-                hasMore={hasMoreIncidents}
-                isLoadingMore={isLoadingMoreIncidents}
-                onLoadMore={handleLoadMoreIncidents}
-              />
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="absolute top-6 right-[-50px] w-10 h-10 bg-slate-900 border border-white/10 rounded-full flex items-center justify-center text-white shadow-2xl"
-              >
-                <X size={24} />
-              </button>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* Main Map Area */}
       <main className="flex-1 relative min-w-0">
@@ -912,10 +874,33 @@ export default function MapPage() {
           onViewIncident={setSelectedIncident}
           showLiveReports={showLiveReports}
           showHeatmap={showHeatmap}
+          showCrimeLayer={showCrimeLayer}
+          crimeStats={crimeStats}
           theme={theme}
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
+        />
+
+        {/* Mobile Bottom Sheet */}
+        <MobileMapSheet
+          incidents={incidents}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          liveCount={mapIncidents.length}
+          mapRef={mapRef}
+          isPinMode={isPinMode || isEmergencyPinMode}
+          theme={theme}
+          snap={sheetSnap}
+          setSnap={setSheetSnap}
+          hasMore={hasMoreIncidents}
+          isLoadingMore={isLoadingMoreIncidents}
+          onLoadMore={handleLoadMoreIncidents}
+          onReportPress={() => {
+            setSheetSnap('80px');
+            setIsFormOpen(true);
+          }}
+          activeIncidentId={activeIncidentId}
         />
 
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
@@ -937,7 +922,7 @@ export default function MapPage() {
             </button>
             <button
               type="button"
-              onClick={() => setIsSidebarOpen(true)}
+              onClick={() => setSheetSnap(sheetSnap === '80px' ? 0.38 : 0.82)}
               className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 px-3.5 py-2.5 shadow-lg text-left active:scale-[0.99] transition-transform"
             >
               <Search size={16} className="shrink-0 text-sky-400/90 light:text-blue-600" />
@@ -953,52 +938,8 @@ export default function MapPage() {
                 {filteredIncidentsCount}
               </span>
             </button>
-            <button
-              type="button"
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className={cn(
-                "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl backdrop-blur-xl border shadow-lg transition-colors",
-                showMobileFilters 
-                  ? "bg-blue-500/20 border-blue-500/40 text-blue-400 light:bg-slate-900 light:text-white"
-                  : "bg-black/45 light:bg-white/90 border-white/12 light:border-slate-200 text-slate-200 light:text-slate-700"
-              )}
-              aria-label="Toggle map filters"
-            >
-              <Filter size={18} />
-            </button>
           </div>
           
-          {/* Mobile Category Filters Overflow */}
-          <AnimatePresence>
-            {showMobileFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -10 }}
-                className="overflow-hidden mt-3 pointer-events-auto"
-              >
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x padding-right-safe">
-                  {['all', 'crime', 'traffic', 'infrastructure', 'weather', 'emergency'].map((cat) => {
-                    const isSelected = selectedCategory === cat;
-                    return (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat as any)}
-                        className={cn(
-                          "shrink-0 snap-start px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-widest transition-colors",
-                          isSelected
-                            ? "bg-slate-900/90 light:bg-slate-900 text-white border-white/20 light:border-slate-800"
-                            : "bg-black/45 light:bg-white/90 text-slate-300 light:text-slate-700 border-white/12 light:border-slate-200 hover:bg-slate-800/80 light:hover:bg-slate-100"
-                        )}
-                      >
-                        {cat}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
           <div className="mt-2 flex justify-center pointer-events-none">
             <div className="inline-flex flex-col items-center rounded-2xl border border-white/8 bg-black/25 light:bg-white/50 px-4 py-2 backdrop-blur-md">
               <p className="text-center text-xl font-black tracking-tight text-amber-300 light:text-amber-700 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
@@ -1491,7 +1432,7 @@ export default function MapPage() {
               }
             }}
           >
-            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150" />
+            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150 text-white light:text-slate-900" />
             <div className="absolute right-full mr-4 px-3 py-1.5 bg-slate-950 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block">
               Report Incident
             </div>
@@ -1504,6 +1445,8 @@ export default function MapPage() {
           setShowLiveReports={setShowLiveReports}
           showHeatmap={showHeatmap}
           setShowHeatmap={setShowHeatmap}
+          showCrimeLayer={showCrimeLayer}
+          setShowCrimeLayer={setShowCrimeLayer}
         />
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}
@@ -1541,6 +1484,7 @@ export default function MapPage() {
         <AreaIntelligencePanel
           data={selectedArea}
           onClose={() => setSelectedArea(null)}
+          crimeStats={crimeStats}
         />
 
         {/* Emergency Modal */}

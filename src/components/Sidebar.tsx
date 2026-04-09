@@ -5,40 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
-
-type RiskLevel = 'clear' | 'active' | 'high';
-
-interface NeighborhoodRisk {
-  name: string;
-  count: number;
-  level: RiskLevel;
-}
-
-const RISK_CONFIG: Record<RiskLevel, { dot: string; label: string; bg: string; text: string }> = {
-  clear:  { dot: 'bg-emerald-500', label: 'Clear',  bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  active: { dot: 'bg-amber-400',   label: 'Active', bg: 'bg-amber-400/10',   text: 'text-amber-400'   },
-  high:   { dot: 'bg-red-500',     label: 'High',   bg: 'bg-red-500/10',     text: 'text-red-400'     },
-};
-
-function useNeighborhoodPulse(incidents: Incident[]): NeighborhoodRisk[] {
-  return useMemo(() => {
-    const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
-    const counts = new Map<string, number>();
-    for (const inc of incidents) {
-      if (inc.timestamp > twoHoursAgo && inc.deleted !== true && inc.neighborhood) {
-        counts.set(inc.neighborhood, (counts.get(inc.neighborhood) ?? 0) + 1);
-      }
-    }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4)
-      .map(([name, count]) => ({
-        name,
-        count,
-        level: count >= 3 ? 'high' : count >= 1 ? 'active' : 'clear',
-      }));
-  }, [incidents]);
-}
+import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 
 interface SidebarProps {
   incidents: Incident[];
@@ -146,7 +113,7 @@ export default function Sidebar({
         if (sortBy === 'newest') return b.timestamp - a.timestamp;
         if (sortBy === 'oldest') return a.timestamp - b.timestamp;
         if (sortBy === 'verified') {
-          const score = { community_confirmed: 3, multiple_reports: 2, unverified: 1 };
+          const score: Record<string, number> = { community_confirmed: 3, multiple_reports: 2, pending_review: 1, unverified: 0 };
           return score[b.verified_status] - score[a.verified_status];
         }
         return 0;

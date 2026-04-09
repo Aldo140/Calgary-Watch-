@@ -25,6 +25,8 @@ interface MapProps {
   isPinMode?: boolean;
   onPinConfirm?: (lat: number, lng: number) => void;
   onPinCancel?: () => void;
+  showCrimeLayer?: boolean;
+  crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
 }
 
 export interface MapRef {
@@ -39,7 +41,7 @@ export interface MapRef {
   getCenter: () => { lat: number; lng: number } | null;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, theme = 'dark', isPinMode = false, onPinConfirm, onPinCancel }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, theme = 'dark', isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
@@ -50,6 +52,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const serviceAreaLayer = useRef<L.LayerGroup | null>(null);
   const serviceAreaBounds = useRef<L.LatLngBounds | null>(null);
   const incidentsRef = useRef<Incident[]>(incidents);
+  const choroplethLayer = useRef<L.GeoJSON | null>(null);
+  const communityGeoJson = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
   // Live map centre - updated on every move event so the pin overlay shows real coords
@@ -158,16 +162,16 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       const actions = document.createElement('div');
       actions.className = 'flex items-center gap-2 pt-1';
-      const learnMore = document.createElement('button');
-      learnMore.className = 'learn-more-btn flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all';
-      learnMore.textContent = 'Area Intelligence';
-      learnMore.setAttribute('data-neighborhood', toLabel(incident.neighborhood, ''));
       const viewDetails = document.createElement('button');
-      viewDetails.className = 'view-details-btn py-2.5 px-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all border border-white/10 text-[10px] font-black uppercase tracking-widest';
+      viewDetails.className = 'view-details-btn flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all';
       viewDetails.setAttribute('data-id', toLabel(incident.id, ''));
       viewDetails.textContent = 'Details';
       viewDetails.setAttribute('aria-label', 'View details');
-      actions.append(learnMore, viewDetails);
+      const learnMore = document.createElement('button');
+      learnMore.className = 'learn-more-btn py-2.5 px-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all border border-white/10 text-[10px] font-black uppercase tracking-widest';
+      learnMore.textContent = 'Area Intel';
+      learnMore.setAttribute('data-neighborhood', toLabel(incident.neighborhood, ''));
+      actions.append(viewDetails, learnMore);
       content.appendChild(actions);
 
       wrapper.appendChild(content);
@@ -449,6 +453,78 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     }
   }, [theme, isMapLoaded, showHeatmap]);
 
+  // Fetch Calgary community boundaries once for choropleth
+  useEffect(() => {
+    if (communityGeoJson.current) return;
+    fetch('https://data.calgary.ca/resource/surr-xmvs.json?$limit=500')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) communityGeoJson.current = data; })
+      .catch(err => console.warn('[CalgaryWatch] Community boundaries fetch failed:', err));
+  }, []);
+
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+
+    if (choroplethLayer.current) {
+      map.current.removeLayer(choroplethLayer.current);
+      choroplethLayer.current = null;
+    }
+
+    if (!showCrimeLayer || !crimeStats || !communityGeoJson.current) return;
+
+    const geoData = communityGeoJson.current;
+
+    const features = geoData
+      .filter((row: any) => row.multipolygon)
+      .map((row: any) => ({
+        type: 'Feature',
+        properties: {
+          name: (row.name ?? row.comm_name ?? row.community_name ?? '').toLowerCase(),
+        },
+        geometry: row.multipolygon,
+      }));
+
+    if (!features.length) return;
+
+    const featureCollection = { type: 'FeatureCollection', features };
+
+    const getColor = (communityName: string): string => {
+      const entry = crimeStats.get(communityName);
+      if (!entry) return 'transparent';
+      const total = entry.crime + entry.disorder;
+      if (total >= 80) return 'rgba(239, 68, 68, 0.45)';
+      if (total >= 30) return 'rgba(245, 158, 11, 0.40)';
+      if (total >= 10) return 'rgba(59, 130, 246, 0.25)';
+      return 'rgba(34, 197, 94, 0.15)';
+    };
+
+    choroplethLayer.current = L.geoJSON(featureCollection as any, {
+      style: (feature) => ({
+        fillColor: getColor(feature?.properties?.name ?? ''),
+        weight: 0.5,
+        opacity: 0.6,
+        color: 'rgba(255,255,255,0.2)',
+        fillOpacity: 1,
+      }),
+      onEachFeature: (feature, layer) => {
+        const name = feature.properties?.name ?? '';
+        const entry = crimeStats.get(name);
+        if (entry) {
+          layer.bindTooltip(
+            `<strong>${name.replace(/\b\w/g, (c: string) => c.toUpperCase())}</strong><br/>` +
+            `Crime: ${entry.crime} · Disorder: ${entry.disorder} (${entry.year})`,
+            { className: 'custom-map-tooltip', sticky: true }
+          );
+        }
+        layer.on('click', () => {
+          if (onViewNeighborhood) onViewNeighborhood(name);
+        });
+      },
+    }).addTo(map.current);
+
+    choroplethLayer.current.bringToBack();
+  }, [showCrimeLayer, crimeStats, isMapLoaded]);
+
   // Update markers
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;
@@ -727,7 +803,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       />
 
       {isOutsideServiceArea && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(5.5rem+env(safe-area-inset-top))] lg:top-4">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(10rem+env(safe-area-inset-top))] lg:top-4">
           <div className="px-3 py-2 rounded-xl border border-amber-400/30 bg-slate-950/85 text-amber-300 text-[11px] font-bold tracking-wide shadow-lg">
             Zoom in to Calgary for full service coverage
           </div>

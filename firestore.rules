@@ -205,12 +205,14 @@ service cloud.firestore {
     // volunteers: anyone can submit interest; only admins can read.
     match /volunteers/{volunteerId} {
       allow read: if isAdmin();
-      allow create: if request.resource.data.keys().hasOnly(['name', 'email', 'role', 'createdAt']) &&
+      allow create: if request.resource.data.keys().hasOnly(['name', 'email', 'role', 'whyJoin', 'createdAt']) &&
                     request.resource.data.name is string &&
                     request.resource.data.name.size() >= 1 &&
                     request.resource.data.name.size() <= 100 &&
                     isValidEmail(request.resource.data.email) &&
-                    request.resource.data.role in ['Marketing', 'Development', 'Administration'];
+                    request.resource.data.role in ['Marketing', 'Development', 'Administration'] &&
+                    request.resource.data.whyJoin is string &&
+                    request.resource.data.whyJoin.size() <= 500;
       allow update, delete: if false;
     }
 

@@ -11,7 +11,7 @@ import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, Filter, X, LogIn, Home, LayoutDashboard, Siren } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, X, LogIn, Home, LayoutDashboard, Siren } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -352,7 +352,6 @@ export default function MapPage() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [nearMeOpen, setNearMeOpen] = useState(false);
   const [nearMeIndex, setNearMeIndex] = useState(0);
   const NEAR_ME_RADIUS_KM = 3;
@@ -897,6 +896,14 @@ export default function MapPage() {
           theme={theme}
           snap={sheetSnap}
           setSnap={setSheetSnap}
+          hasMore={hasMoreIncidents}
+          isLoadingMore={isLoadingMoreIncidents}
+          onLoadMore={handleLoadMoreIncidents}
+          onReportPress={() => {
+            setSheetSnap('80px');
+            setIsFormOpen(true);
+          }}
+          activeIncidentId={activeIncidentId}
         />
 
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
@@ -934,52 +941,8 @@ export default function MapPage() {
                 {filteredIncidentsCount}
               </span>
             </button>
-            <button
-              type="button"
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className={cn(
-                "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl backdrop-blur-xl border shadow-lg transition-colors",
-                showMobileFilters 
-                  ? "bg-blue-500/20 border-blue-500/40 text-blue-400 light:bg-slate-900 light:text-white"
-                  : "bg-black/45 light:bg-white/90 border-white/12 light:border-slate-200 text-slate-200 light:text-slate-700"
-              )}
-              aria-label="Toggle map filters"
-            >
-              <Filter size={18} />
-            </button>
           </div>
           
-          {/* Mobile Category Filters Overflow */}
-          <AnimatePresence>
-            {showMobileFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -10 }}
-                className="overflow-hidden mt-3 pointer-events-auto"
-              >
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x padding-right-safe">
-                  {['all', 'crime', 'traffic', 'infrastructure', 'weather', 'emergency'].map((cat) => {
-                    const isSelected = selectedCategory === cat;
-                    return (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat as any)}
-                        className={cn(
-                          "shrink-0 snap-start px-4 py-2 rounded-full border text-xs font-bold uppercase tracking-widest transition-colors",
-                          isSelected
-                            ? "bg-slate-900/90 light:bg-slate-900 text-white border-white/20 light:border-slate-800"
-                            : "bg-black/45 light:bg-white/90 text-slate-300 light:text-slate-700 border-white/12 light:border-slate-200 hover:bg-slate-800/80 light:hover:bg-slate-100"
-                        )}
-                      >
-                        {cat}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
           <div className="mt-2 flex justify-center pointer-events-none">
             <div className="inline-flex flex-col items-center rounded-2xl border border-white/8 bg-black/25 light:bg-white/50 px-4 py-2 backdrop-blur-md">
               <p className="text-center text-xl font-black tracking-tight text-amber-300 light:text-amber-700 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">

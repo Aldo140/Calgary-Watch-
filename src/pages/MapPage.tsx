@@ -347,6 +347,7 @@ export default function MapPage() {
   
   const [showLiveReports, setShowLiveReports] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [nearMeOpen, setNearMeOpen] = useState(false);
@@ -1504,6 +1505,8 @@ export default function MapPage() {
           setShowLiveReports={setShowLiveReports}
           showHeatmap={showHeatmap}
           setShowHeatmap={setShowHeatmap}
+          showCrimeLayer={showCrimeLayer}
+          setShowCrimeLayer={setShowCrimeLayer}
         />
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}

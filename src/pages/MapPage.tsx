@@ -540,14 +540,13 @@ export default function MapPage() {
     setSelectedArea(null);
     setActiveIncidentId(incident.id);
 
-    // Show popup immediately - no waiting for pan animation.
+    // Show popup first — user taps "Details" in the popup to open the full panel.
     window.requestAnimationFrame(() => {
       mapRef.current?.showPopup(incident);
     });
 
     const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
     if (isDesktop) {
-      // Pan in parallel with the popup appearing; use a shorter, snappier duration.
       mapRef.current?.flyToWithOffset(incident.lat, incident.lng, {
         zoom: 15,
         offsetX: 320,
@@ -556,12 +555,13 @@ export default function MapPage() {
     } else {
       mapRef.current?.flyTo(incident.lat, incident.lng, 15);
     }
-
-    // Open detail panel immediately via startTransition (non-blocking).
-    startTransition(() => {
-      setSelectedIncident(incident);
-    });
   }, []);
+
+  // Sidebar / list click: fly + popup + open detail panel immediately.
+  const handleSidebarIncidentClick = useCallback((incident: Incident) => {
+    handleMarkerClick(incident);
+    startTransition(() => setSelectedIncident(incident));
+  }, [handleMarkerClick]);
 
   const MAP_DECAY_MS = 24 * 60 * 60 * 1000; // 24 hours — hide from map
 
@@ -790,8 +790,25 @@ export default function MapPage() {
         });
       }
     }
-    setSelectedArea(getAreaIntelligence(neighborhood));
-  }, [incidents, mapRef]);
+    const base = getAreaIntelligence(neighborhood);
+    // Override safety score and trend using real crime data when available
+    if (crimeStats && crimeStats.size > 0) {
+      const key = neighborhood.toLowerCase();
+      const entry = crimeStats.get(key);
+      if (entry) {
+        const totals = [...crimeStats.values()].map(e => e.crime + e.disorder);
+        const cityAvg = totals.reduce((a, b) => a + b, 0) / totals.length;
+        const cityMax = Math.max(...totals);
+        const total = entry.crime + entry.disorder;
+        const score = Math.max(10, Math.round(100 - (total / Math.max(cityMax, 1)) * 75));
+        const delta = total - cityAvg;
+        const trend = delta < -cityAvg * 0.2 ? 'improving' : delta > cityAvg * 0.2 ? 'declining' : 'stable';
+        setSelectedArea({ ...base, safetyScore: score, trend });
+        return;
+      }
+    }
+    setSelectedArea(base);
+  }, [incidents, mapRef, crimeStats]);
 
   return (
     <div className="flex h-dvh w-full bg-slate-950 light:bg-slate-100 overflow-hidden font-sans relative">
@@ -852,7 +869,7 @@ export default function MapPage() {
       <div className="hidden lg:flex flex-col h-full shrink-0 z-40 relative shadow-2xl">
         <Sidebar
           incidents={incidents}
-          onIncidentClick={handleMarkerClick}
+          onIncidentClick={handleSidebarIncidentClick}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           activeIncidentId={activeIncidentId}
@@ -968,8 +985,13 @@ export default function MapPage() {
             type="button"
             onClick={() => {
               const loc = userLocation || CALGARY_CENTER;
-              if (nearMeOpen) { setNearMeOpen(false); return; }
+              if (nearMeOpen) {
+                setNearMeOpen(false);
+                mapRef.current?.clearUserLocation();
+                return;
+              }
               mapRef.current?.flyTo(loc.lat, loc.lng, 14);
+              if (userLocation) mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
               setNearMeIndex(0);
               setNearMeOpen(true);
               // Pan to first nearby incident after map settles
@@ -1131,7 +1153,7 @@ export default function MapPage() {
                     <span className="text-[10px] text-slate-500 font-semibold">within {NEAR_ME_RADIUS_KM} km</span>
                   </div>
                   <button
-                    onClick={() => setNearMeOpen(false)}
+                    onClick={() => { setNearMeOpen(false); mapRef.current?.clearUserLocation(); }}
                     className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
                     aria-label="Close near me panel"
                   >

@@ -157,6 +157,8 @@ export default function IncidentForm({
   });
 
   const isAnonymous = watch('anonymous');
+  const watchedNeighborhood = watch('neighborhood');
+  const [neighborhoodOverride, setNeighborhoodOverride] = useState(false);
 
   // When pin mode exits without confirmation (Cancel), return to choose step.
   // Do not run on successful confirm: parent sets pinLocation and clears isPinMode in the same
@@ -176,7 +178,7 @@ export default function IncidentForm({
 
   // Reset when form is reopened
   useEffect(() => {
-    if (isOpen) { setStep('choose'); setUsingGPS(false); }
+    if (isOpen) { setStep('choose'); setUsingGPS(false); setNeighborhoodOverride(false); }
   }, [isOpen]);
 
   // Resolution order: tapped pin > explicit GPS choice > Calgary centre fallback
@@ -188,6 +190,7 @@ export default function IncidentForm({
     const detected = detectNeighbourhood(activeLocation.lat, activeLocation.lng);
     if (detected) {
       setValue('neighborhood', detected, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+      setNeighborhoodOverride(false);
     }
   }, [activeLocation?.lat, activeLocation?.lng, setValue]);
 
@@ -375,33 +378,50 @@ export default function IncidentForm({
 
             <div>
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Neighbourhood</label>
-              <select
-                {...register('neighborhood')}
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Area</option>
-                <option value="Beltline">Beltline</option>
-                <option value="Kensington">Kensington</option>
-                <option value="Bridgeland">Bridgeland</option>
-                <option value="Mission">Mission</option>
-                <option value="Inglewood">Inglewood</option>
-                <option value="Bowness">Bowness</option>
-                <option value="Downtown">Downtown</option>
-                <option value="Saddleridge">Saddleridge</option>
-                <option value="Evanston">Evanston</option>
-                <option value="Mahogany">Mahogany</option>
-                <option value="Auburn Bay">Auburn Bay</option>
-                <option value="Signal Hill">Signal Hill</option>
-                <option value="Tuscany">Tuscany</option>
-                <option value="Royal Oak">Royal Oak</option>
-                <option value="Panorama Hills">Panorama Hills</option>
-                <option value="Midnapore">Midnapore</option>
-                <option value="Shawnessy">Shawnessy</option>
-                <option value="McKenzie Towne">McKenzie Towne</option>
-                <option value="Cranston">Cranston</option>
-                <option value="Copperfield">Copperfield</option>
-                <option value="Other">Other / Not Listed</option>
-              </select>
+              {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
+                <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-white font-bold text-sm">{watchedNeighborhood}</span>
+                    <span className="text-[10px] text-emerald-400 font-black uppercase tracking-wider">Auto-detected</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNeighborhoodOverride(true)}
+                    className="text-[10px] text-slate-400 hover:text-white font-bold uppercase tracking-wider transition-colors"
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : (
+                <select
+                  {...register('neighborhood')}
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Area</option>
+                  <option value="Beltline">Beltline</option>
+                  <option value="Kensington">Kensington</option>
+                  <option value="Bridgeland">Bridgeland</option>
+                  <option value="Mission">Mission</option>
+                  <option value="Inglewood">Inglewood</option>
+                  <option value="Bowness">Bowness</option>
+                  <option value="Downtown">Downtown</option>
+                  <option value="Saddleridge">Saddleridge</option>
+                  <option value="Evanston">Evanston</option>
+                  <option value="Mahogany">Mahogany</option>
+                  <option value="Auburn Bay">Auburn Bay</option>
+                  <option value="Signal Hill">Signal Hill</option>
+                  <option value="Tuscany">Tuscany</option>
+                  <option value="Royal Oak">Royal Oak</option>
+                  <option value="Panorama Hills">Panorama Hills</option>
+                  <option value="Midnapore">Midnapore</option>
+                  <option value="Shawnessy">Shawnessy</option>
+                  <option value="McKenzie Towne">McKenzie Towne</option>
+                  <option value="Cranston">Cranston</option>
+                  <option value="Copperfield">Copperfield</option>
+                  <option value="Other">Other / Not Listed</option>
+                </select>
+              )}
               {errors.neighborhood && (
                 <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.neighborhood.message}</p>
               )}

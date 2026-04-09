@@ -39,6 +39,10 @@ export interface MapRef {
   showPopup: (incident: Incident) => void;
   /** Returns the current map center - used by pin-mode to capture coordinates */
   getCenter: () => { lat: number; lng: number } | null;
+  /** Show a pulsing blue dot at the user's location */
+  showUserLocation: (lat: number, lng: number) => void;
+  /** Remove the user location marker */
+  clearUserLocation: () => void;
 }
 
 const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, theme = 'dark', isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats }, ref) => {
@@ -54,6 +58,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const incidentsRef = useRef<Incident[]>(incidents);
   const choroplethLayer = useRef<L.GeoJSON | null>(null);
   const communityGeoJson = useRef<any>(null);
+  const userLocationMarker = useRef<L.Marker | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
   // Live map centre - updated on every move event so the pin overlay shows real coords
@@ -119,6 +124,30 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       if (!map.current) return null;
       const c = map.current.getCenter();
       return { lat: c.lat, lng: c.lng };
+    },
+    showUserLocation: (lat: number, lng: number) => {
+      if (!map.current) return;
+      if (userLocationMarker.current) {
+        userLocationMarker.current.remove();
+      }
+      const el = document.createElement('div');
+      el.innerHTML = `
+        <div style="position:relative;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+          <div style="position:absolute;width:28px;height:28px;border-radius:50%;background:rgba(56,189,248,0.2);animation:location-pulse 2s ease-out infinite;"></div>
+          <div style="position:absolute;width:16px;height:16px;border-radius:50%;background:rgba(56,189,248,0.35);"></div>
+          <div style="position:relative;width:10px;height:10px;border-radius:50%;background:#38bdf8;border:2px solid white;box-shadow:0 0 8px rgba(56,189,248,0.8);"></div>
+        </div>`;
+      const style = document.createElement('style');
+      style.textContent = '@keyframes location-pulse{0%{transform:scale(1);opacity:0.8}70%{transform:scale(2.2);opacity:0}100%{transform:scale(2.2);opacity:0}}';
+      document.head.appendChild(style);
+      const icon = L.divIcon({ html: el.innerHTML, className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
+      userLocationMarker.current = L.marker([lat, lng], { icon, zIndexOffset: 1000, interactive: false }).addTo(map.current);
+    },
+    clearUserLocation: () => {
+      if (userLocationMarker.current) {
+        userLocationMarker.current.remove();
+        userLocationMarker.current = null;
+      }
     },
 
     showPopup: (incident: Incident) => {

@@ -887,9 +887,6 @@ export default function MapPage() {
           incidents={incidents}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          onIncidentClick={(incident) => {
-            handleMarkerClick(incident);
-          }}
           liveCount={mapIncidents.length}
           mapRef={mapRef}
           isPinMode={isPinMode || isEmergencyPinMode}

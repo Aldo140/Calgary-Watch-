@@ -53,7 +53,6 @@ interface MobileMapSheetProps {
   incidents: Incident[];
   selectedCategory: IncidentCategory | 'all';
   onCategoryChange: (cat: IncidentCategory | 'all') => void;
-  onIncidentClick: (incident: Incident) => void;
   liveCount: number;
   mapRef: RefObject<MapRef | null>;
   isPinMode: boolean;
@@ -521,7 +520,13 @@ export default function MobileMapSheet({
                       return (
                         <motion.button
                           key={incident.id}
-                          ref={(el: HTMLButtonElement | null) => { if (isActive) activeCardRef.current = el; }}
+                          ref={(el: HTMLButtonElement | null) => {
+                            if (isActive) {
+                              activeCardRef.current = el;
+                            } else if (activeCardRef.current === el) {
+                              activeCardRef.current = null;
+                            }
+                          }}
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}

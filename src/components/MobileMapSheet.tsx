@@ -7,8 +7,8 @@ import { Incident, IncidentCategory, CATEGORY_ICONS } from '@/src/types';
 import { cn } from '@/src/lib/utils';
 import { MapRef } from '@/src/components/Map';
 
-const SNAP_POINTS = ['80px', 0.38, 0.82] as const;
-type SnapPoint = (typeof SNAP_POINTS)[number];
+export const SNAP_POINTS = ['80px', 0.38, 0.82] as const;
+export type SnapPoint = (typeof SNAP_POINTS)[number];
 
 const CATEGORY_OPTIONS: (IncidentCategory | 'all')[] = [
   'all', 'crime', 'traffic', 'infrastructure', 'weather', 'emergency',
@@ -44,6 +44,8 @@ interface MobileMapSheetProps {
   mapRef: RefObject<MapRef | null>;
   isPinMode: boolean;
   theme?: 'dark' | 'light';
+  snap: SnapPoint;
+  setSnap: (s: SnapPoint) => void;
 }
 
 export default function MobileMapSheet({
@@ -55,8 +57,9 @@ export default function MobileMapSheet({
   mapRef,
   isPinMode,
   theme = 'dark',
+  snap,
+  setSnap,
 }: MobileMapSheetProps) {
-  const [snap, setSnap] = useState<SnapPoint>('80px');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);

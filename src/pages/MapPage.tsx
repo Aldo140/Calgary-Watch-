@@ -7,7 +7,7 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
-import MobileMapSheet from '@/src/components/MobileMapSheet';
+import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
@@ -365,6 +365,7 @@ export default function MapPage() {
       return 'dark';
     }
   });
+  const [sheetSnap, setSheetSnap] = useState<SnapPoint>('80px');
   const [notifications, setNotifications] = useState<{ id: string; title: string; timestamp: number }[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -894,6 +895,8 @@ export default function MapPage() {
           mapRef={mapRef}
           isPinMode={isPinMode || isEmergencyPinMode}
           theme={theme}
+          snap={sheetSnap}
+          setSnap={setSheetSnap}
         />
 
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
@@ -915,6 +918,7 @@ export default function MapPage() {
             </button>
             <button
               type="button"
+              onClick={() => setSheetSnap(sheetSnap === '80px' ? 0.38 : 0.82)}
               className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 px-3.5 py-2.5 shadow-lg text-left active:scale-[0.99] transition-transform"
             >
               <Search size={16} className="shrink-0 text-sky-400/90 light:text-blue-600" />

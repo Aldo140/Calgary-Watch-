@@ -318,7 +318,7 @@ export default function LandingPage() {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-              className="md:hidden border-t border-white/8 bg-slate-950/95 backdrop-blur-xl px-5 py-4 flex flex-col gap-1">
+              className="md:hidden border-t border-white/8 light:border-slate-200 bg-slate-950/95 light:bg-white/95 backdrop-blur-xl px-5 py-4 flex flex-col gap-1">
               <a href="#features" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">Features</a>
               <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">How it Works</a>
               <button type="button" onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="text-left px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">About</button>
@@ -333,13 +333,13 @@ export default function LandingPage() {
       {/* ================================================================
           HERO
           ================================================================ */}
-      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 w-full">
+      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 light:bg-slate-50 w-full">
         
         {/* Full-width seamless background image */}
         <div className="absolute inset-0 pointer-events-none">
             <img src={publicAsset('images/calgary2.jpg')} className="w-full h-full object-cover opacity-40 brightness-75 scale-105" alt="Calgary Skyline Ambient" />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-slate-950/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 light:from-slate-50 via-slate-950/70 light:via-slate-50/70 to-slate-950/40 light:to-slate-50/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 light:from-slate-50 via-transparent to-transparent opacity-90" />
         </div>
 
         {/* Large ambient glows — use radial-gradient to avoid paint-heavy blur filter */}
@@ -392,7 +392,7 @@ export default function LandingPage() {
                   Open Live Map
                   <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={17} />
                 </Button>
-                <Button variant="secondary" size="lg" className="bg-white/5 border border-white/15 hover:bg-white/10 rounded-xl px-8 h-14 text-base font-bold text-white" onClick={() => navigate('/map?report=true')}>
+                <Button variant="secondary" size="lg" className="bg-white/5 light:bg-slate-100 border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 rounded-xl px-8 h-14 text-base font-bold text-white light:text-slate-900" onClick={() => navigate('/map?report=true')}>
                   Report an Incident
                 </Button>
               </div>
@@ -553,7 +553,7 @@ export default function LandingPage() {
                 <Button size="lg" className="bg-[#4A90D9] hover:bg-blue-500 rounded-xl px-8 h-14 text-base font-bold shadow-[0_6px_24px_rgba(74,144,217,0.35)] w-full flex-1" onClick={() => navigate('/map')}>
                   Open Live Map
                 </Button>
-                <Button variant="secondary" size="lg" className="bg-white/5 border border-white/15 hover:bg-white/10 rounded-xl px-8 h-14 text-base font-bold text-white w-full flex-1" onClick={() => navigate('/map?report=true')}>
+                <Button variant="secondary" size="lg" className="bg-white/5 light:bg-slate-100 border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 rounded-xl px-8 h-14 text-base font-bold text-white light:text-slate-900 w-full flex-1" onClick={() => navigate('/map?report=true')}>
                   Report an Incident
                 </Button>
              </div>
@@ -591,7 +591,7 @@ export default function LandingPage() {
       {/* ================================================================
           VISION SECTION
           ================================================================ */}
-      <section className="relative py-16 md:py-28 lg:py-40 overflow-hidden bg-slate-950 flex items-center justify-center border-t border-b border-white/5">
+      <section className="relative py-16 md:py-28 lg:py-40 overflow-hidden bg-slate-950 light:bg-slate-50 flex items-center justify-center border-t border-b border-white/5 light:border-slate-200">
         <div 
           className="absolute w-[600px] md:w-[1000px] aspect-square rounded-full bg-gradient-to-tr from-[#4A90D9]/10 via-[#2E8B7A]/5 to-[#D4A843]/10 pointer-events-none"
           style={{ background: 'radial-gradient(circle at center, rgba(74,144,217,0.08) 0%, transparent 60%)' }}
@@ -997,7 +997,7 @@ export default function LandingPage() {
               ].map((item, i) => (
                 <motion.div key={i}
                   initial={reducedMotion ? undefined : { opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay:i*0.07 }}
-                  className="flex flex-col gap-2 p-4 rounded-2xl border border-white/8 bg-slate-900/60">
+                  className="flex flex-col gap-2 p-4 rounded-2xl border border-white/8 light:border-slate-200 bg-slate-900/60 light:bg-white">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background:`${item.color}18`, border:`1px solid ${item.color}30` }}>
                     <item.icon size={16} style={{ color:item.color }} />
                   </div>
@@ -1178,7 +1178,7 @@ export default function LandingPage() {
       {/* ================================================================
           ROADMAP & SUSTAINABILITY
           ================================================================ */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/10">
+      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/10 light:bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-[1fr_350px] gap-8">
             {/* Roadmap */}
@@ -1187,7 +1187,7 @@ export default function LandingPage() {
               <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6 md:mb-8">Building the app &amp; beyond</h2>
 
               {/* Mobile: compact timeline */}
-              <div className="sm:hidden space-y-0 border border-white/8 rounded-2xl overflow-hidden divide-y divide-white/8">
+              <div className="sm:hidden space-y-0 border border-white/8 light:border-slate-200 rounded-2xl overflow-hidden divide-y divide-white/8 light:divide-slate-200">
                 {[
                   { phase:'01', title:'Calgary Launch',  color:'#2E8B7A', active:true  },
                   { phase:'02', title:'Native App',      color:'#4A90D9', active:false },
@@ -1229,7 +1229,7 @@ export default function LandingPage() {
 
             {/* Sustainability Glass Card */}
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ delay: 0.2 }} className="flex flex-col h-full">
-              <div className="h-full mt-10 lg:mt-0 p-8 rounded-[2rem] bg-gradient-to-br from-slate-900 via-slate-900 to-[#D4A843]/10 border border-[#D4A843]/30 shadow-[0_0_50px_rgba(212,168,67,0.1)] relative overflow-hidden flex flex-col">
+              <div className="h-full mt-10 lg:mt-0 p-8 rounded-[2rem] bg-gradient-to-br from-slate-900 light:from-white via-slate-900 light:via-white to-[#D4A843]/10 border border-[#D4A843]/30 shadow-[0_0_50px_rgba(212,168,67,0.1)] relative overflow-hidden flex flex-col">
                 <div className="absolute top-0 right-0 w-32 h-32 rounded-full"
                   style={{ background: 'radial-gradient(ellipse at top right, rgba(212,168,67,0.22) 0%, transparent 70%)' }} />
                 <div className="w-14 h-14 rounded-2xl bg-[#D4A843]/20 border border-[#D4A843]/40 flex items-center justify-center mb-6 backdrop-blur-md">
@@ -1259,9 +1259,10 @@ export default function LandingPage() {
       {/* ================================================================
           TRUST, TRANSPARENCY & LEGAL
           ================================================================ */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 bg-slate-950 border-t border-white/5 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-4 sm:px-6 bg-slate-950 light:bg-white border-t border-white/5 light:border-slate-200 relative overflow-hidden">
         {/* Terminal/Hacker Grid background */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none light:hidden" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none hidden light:block" />
         
         <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} className="relative z-10 max-w-6xl mx-auto">
           <div className="flex flex-col items-center mb-10 md:mb-16">

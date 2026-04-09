@@ -22,6 +22,7 @@ The platform runs three data layers:
 
 - **Community Reports** - submitted by users in real time, labeled with trust indicators that improve as more users confirm them
 - **Official Open Data** - Live integrations from **Calgary Open Data (SODA APIs)** pulling real-time **311 Service Requests** (Weather/Infrastructure) and live **Traffic Incidents**, updated every 5 minutes
+- **Crime Intelligence** - Historical crime and disorder statistics from Calgary Police Service open data, visualised as a neighbourhood choropleth with per-area breakdowns in the Area Intelligence panel
 - **System Signals** - inferred from clustered activity to surface patterns even at low usage, clearly labeled as low-confidence and system-generated
 
 ---
@@ -39,7 +40,8 @@ The platform runs three data layers:
 - Real-time Firestore `onSnapshot` stream, zero reload needed
 - Custom incident markers with category icons, pulse rings, and severity-based sizing
 - Leaflet heatmap layer for historical density
-- Bottom-sheet incident detail panel (mobile native feel)
+- Crime choropleth overlay sourced from Calgary Police Service open data — tap any neighbourhood to open Area Intelligence
+- Full-featured mobile bottom sheet with search, category chips, sort/filter controls, Neighbourhood Pulse, and rich incident cards — desktop parity on mobile
 - Crosshair pin mode for precise location reporting
 - Floating action buttons: SOS, report, layer toggle, GPS
 

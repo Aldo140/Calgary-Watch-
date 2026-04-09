@@ -162,16 +162,16 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       const actions = document.createElement('div');
       actions.className = 'flex items-center gap-2 pt-1';
-      const learnMore = document.createElement('button');
-      learnMore.className = 'learn-more-btn flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all';
-      learnMore.textContent = 'Area Intelligence';
-      learnMore.setAttribute('data-neighborhood', toLabel(incident.neighborhood, ''));
       const viewDetails = document.createElement('button');
-      viewDetails.className = 'view-details-btn py-2.5 px-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all border border-white/10 text-[10px] font-black uppercase tracking-widest';
+      viewDetails.className = 'view-details-btn flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all';
       viewDetails.setAttribute('data-id', toLabel(incident.id, ''));
       viewDetails.textContent = 'Details';
       viewDetails.setAttribute('aria-label', 'View details');
-      actions.append(learnMore, viewDetails);
+      const learnMore = document.createElement('button');
+      learnMore.className = 'learn-more-btn py-2.5 px-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all border border-white/10 text-[10px] font-black uppercase tracking-widest';
+      learnMore.textContent = 'Area Intel';
+      learnMore.setAttribute('data-neighborhood', toLabel(incident.neighborhood, ''));
+      actions.append(viewDetails, learnMore);
       content.appendChild(actions);
 
       wrapper.appendChild(content);

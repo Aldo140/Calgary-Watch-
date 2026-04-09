@@ -7,6 +7,7 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
+import MobileMapSheet from '@/src/components/MobileMapSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
@@ -364,7 +365,6 @@ export default function MapPage() {
       return 'dark';
     }
   });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string; title: string; timestamp: number }[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -862,47 +862,6 @@ export default function MapPage() {
         />
       </div>
 
-      {/* Mobile Sidebar Drawer */}
-      <AnimatePresence>
-        {isSidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsSidebarOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
-            />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 w-[85%] max-w-sm z-[70] lg:hidden"
-            >
-              <Sidebar
-                incidents={incidents}
-                onIncidentClick={(incident) => {
-                  handleMarkerClick(incident);
-                  setIsSidebarOpen(false);
-                }}
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-                activeIncidentId={activeIncidentId}
-                hasMore={hasMoreIncidents}
-                isLoadingMore={isLoadingMoreIncidents}
-                onLoadMore={handleLoadMoreIncidents}
-              />
-              <button
-                onClick={() => setIsSidebarOpen(false)}
-                className="absolute top-6 right-[-50px] w-10 h-10 bg-slate-900 border border-white/10 rounded-full flex items-center justify-center text-white shadow-2xl"
-              >
-                <X size={24} />
-              </button>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* Main Map Area */}
       <main className="flex-1 relative min-w-0">
@@ -921,6 +880,20 @@ export default function MapPage() {
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
+        />
+
+        {/* Mobile Bottom Sheet */}
+        <MobileMapSheet
+          incidents={incidents}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          onIncidentClick={(incident) => {
+            handleMarkerClick(incident);
+          }}
+          liveCount={mapIncidents.length}
+          mapRef={mapRef}
+          isPinMode={isPinMode || isEmergencyPinMode}
+          theme={theme}
         />
 
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
@@ -942,7 +915,6 @@ export default function MapPage() {
             </button>
             <button
               type="button"
-              onClick={() => setIsSidebarOpen(true)}
               className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 px-3.5 py-2.5 shadow-lg text-left active:scale-[0.99] transition-transform"
             >
               <Search size={16} className="shrink-0 text-sky-400/90 light:text-blue-600" />

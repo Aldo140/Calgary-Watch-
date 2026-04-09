@@ -516,6 +516,9 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             { className: 'custom-map-tooltip', sticky: true }
           );
         }
+        layer.on('click', () => {
+          if (onViewNeighborhood) onViewNeighborhood(name);
+        });
       },
     }).addTo(map.current);
 
@@ -800,7 +803,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       />
 
       {isOutsideServiceArea && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(5.5rem+env(safe-area-inset-top))] lg:top-4">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(10rem+env(safe-area-inset-top))] lg:top-4">
           <div className="px-3 py-2 rounded-xl border border-amber-400/30 bg-slate-950/85 text-amber-300 text-[11px] font-bold tracking-wide shadow-lg">
             Zoom in to Calgary for full service coverage
           </div>

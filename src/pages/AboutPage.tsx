@@ -15,6 +15,7 @@
 import { useEffect, useRef, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView, animate } from 'motion/react';
+import emailjs from '@emailjs/browser';
 import { db } from '@/src/firebase';
 import { publicAsset } from '@/src/lib/utils';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -70,6 +71,21 @@ function VolunteerCard({ reducedMotion }: { reducedMotion: boolean }) {
         whyJoin: whyJoin.trim().slice(0, 500),
         createdAt: serverTimestamp(),
       });
+
+      // Send admin notification email (non-blocking — form succeeds regardless)
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_VOLUNTEER_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (serviceId && templateId && publicKey) {
+        emailjs.send(serviceId, templateId, {
+          volunteer_name: name.trim().slice(0, 100),
+          volunteer_email: email.trim().slice(0, 200),
+          volunteer_role: role,
+          volunteer_why: whyJoin.trim().slice(0, 500),
+          to_email: 'jorti104@mtroyal.ca',
+        }, publicKey).catch(() => { /* email failure is non-fatal */ });
+      }
+
       setStatus('done');
     } catch {
       setStatus('error');

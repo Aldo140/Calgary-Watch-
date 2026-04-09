@@ -146,7 +146,7 @@ export default function Sidebar({
         if (sortBy === 'newest') return b.timestamp - a.timestamp;
         if (sortBy === 'oldest') return a.timestamp - b.timestamp;
         if (sortBy === 'verified') {
-          const score = { community_confirmed: 3, multiple_reports: 2, unverified: 1 };
+          const score: Record<string, number> = { community_confirmed: 3, multiple_reports: 2, pending_review: 1, unverified: 0 };
           return score[b.verified_status] - score[a.verified_status];
         }
         return 0;

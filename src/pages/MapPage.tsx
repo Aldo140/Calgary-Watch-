@@ -790,24 +790,32 @@ export default function MapPage() {
         });
       }
     }
-    const base = getAreaIntelligence(neighborhood);
-    // Override safety score and trend using real crime data when available
+    // Title-case the name so the panel header looks correct regardless of input case
+    const displayName = neighborhood.replace(/\b\w/g, c => c.toUpperCase());
+    const base = getAreaIntelligence(displayName);
+
     if (crimeStats && crimeStats.size > 0) {
       const key = neighborhood.toLowerCase();
       const entry = crimeStats.get(key);
+      const totals = [...crimeStats.values()].map(e => e.crime + e.disorder);
+      const cityAvg = totals.reduce((a, b) => a + b, 0) / totals.length;
+      const cityMax = Math.max(...totals);
+
       if (entry) {
-        const totals = [...crimeStats.values()].map(e => e.crime + e.disorder);
-        const cityAvg = totals.reduce((a, b) => a + b, 0) / totals.length;
-        const cityMax = Math.max(...totals);
         const total = entry.crime + entry.disorder;
         const score = Math.max(10, Math.round(100 - (total / Math.max(cityMax, 1)) * 75));
         const delta = total - cityAvg;
-        const trend = delta < -cityAvg * 0.2 ? 'improving' : delta > cityAvg * 0.2 ? 'declining' : 'stable';
-        setSelectedArea({ ...base, safetyScore: score, trend });
-        return;
+        const trend: 'improving' | 'stable' | 'declining' =
+          delta < -cityAvg * 0.2 ? 'improving' : delta > cityAvg * 0.2 ? 'declining' : 'stable';
+        setSelectedArea({ ...base, communityName: displayName, safetyScore: score, trend });
+      } else {
+        // Neighbourhood not in crime dataset — use city-average (50) so every
+        // neighbourhood shows a distinct value rather than the mock fallback (68).
+        setSelectedArea({ ...base, communityName: displayName, safetyScore: 50, trend: 'stable' });
       }
+      return;
     }
-    setSelectedArea(base);
+    setSelectedArea({ ...base, communityName: displayName });
   }, [incidents, mapRef, crimeStats]);
 
   return (

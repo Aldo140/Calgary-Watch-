@@ -18,6 +18,7 @@ import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
+import { useCrimeStats } from '@/src/hooks/useCrimeStats';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -334,7 +335,8 @@ export default function MapPage() {
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
-  
+  const { stats: crimeStats } = useCrimeStats();
+
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<IncidentCategory | 'all'>('all');
@@ -913,6 +915,8 @@ export default function MapPage() {
           onViewIncident={setSelectedIncident}
           showLiveReports={showLiveReports}
           showHeatmap={showHeatmap}
+          showCrimeLayer={showCrimeLayer}
+          crimeStats={crimeStats}
           theme={theme}
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
@@ -1544,6 +1548,7 @@ export default function MapPage() {
         <AreaIntelligencePanel
           data={selectedArea}
           onClose={() => setSelectedArea(null)}
+          crimeStats={crimeStats}
         />
 
         {/* Emergency Modal */}

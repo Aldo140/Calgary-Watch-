@@ -9,9 +9,10 @@ import { Drawer } from 'vaul';
 interface AreaIntelligencePanelProps {
   data: AreaIntelligence | null;
   onClose: () => void;
+  crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
 }
 
-export default function AreaIntelligencePanel({ data, onClose }: AreaIntelligencePanelProps) {
+export default function AreaIntelligencePanel({ data, onClose, crimeStats }: AreaIntelligencePanelProps) {
   if (!data) return null;
 
   const chartData = data.monthlyTrends.map(trend => ({
@@ -80,6 +81,33 @@ export default function AreaIntelligencePanel({ data, onClose }: AreaIntelligenc
             {data.description}
           </p>
         </div>
+
+        {(() => {
+          const communityKey = data.communityName.toLowerCase();
+          const entry = crimeStats?.get(communityKey);
+          if (!entry) return null;
+          return (
+            <div className="bg-white/[0.02] light:bg-slate-50 rounded-[1.6rem] p-5 border border-white/5 light:border-slate-200 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-amber-500/50" />
+              <div className="pl-2">
+                <p className="text-[10px] font-black text-slate-500 light:text-slate-600 uppercase tracking-widest mb-3">
+                  City Crime Statistics · {entry.year}
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/[0.03] light:bg-white rounded-xl p-3 border border-white/5 light:border-slate-200">
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Crime Incidents</p>
+                    <p className="text-2xl font-black text-red-400 light:text-red-600">{entry.crime.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-white/[0.03] light:bg-white rounded-xl p-3 border border-white/5 light:border-slate-200">
+                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Disorder Calls</p>
+                    <p className="text-2xl font-black text-amber-400 light:text-amber-600">{entry.disorder.toLocaleString()}</p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-2">Source: City of Calgary Open Data</p>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.95fr] gap-5">
           <div className="space-y-5">

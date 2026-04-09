@@ -140,6 +140,9 @@ export default function MobileMapSheet({
           )}
           style={{ maxHeight: '85vh' }}
         >
+          <Drawer.Title className="sr-only">Incidents</Drawer.Title>
+          <Drawer.Description className="sr-only">Browse and search nearby Calgary incidents</Drawer.Description>
+
           <div className="flex justify-center pt-3 pb-1 shrink-0">
             <div className={cn(
               'w-10 h-1 rounded-full',

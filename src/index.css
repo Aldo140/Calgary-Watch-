@@ -130,23 +130,6 @@
   }
 
   /* ============================================================
-     Northern lights particle drift - optimized for performance
-     ============================================================ */
-  @keyframes aurora-drift {
-    0%   { transform: translate3d(-5%, 0, 0) scaleX(1); opacity: 0.35; }
-    50%  { transform: translate3d(5%, 0, 0) scaleX(1.05); opacity: 0.5; }
-    100% { transform: translate3d(-5%, 0, 0) scaleX(1); opacity: 0.35; }
-  }
-  .aurora-drift {
-    animation: aurora-drift 8s ease-in-out infinite;
-    backface-visibility: hidden;
-  }
-  .aurora-drift-delay {
-    animation: aurora-drift 11s ease-in-out infinite reverse;
-    backface-visibility: hidden;
-  }
-
-  /* ============================================================
      Scroll reveal — used on about & landing sections
      ============================================================ */
   @keyframes fade-up {

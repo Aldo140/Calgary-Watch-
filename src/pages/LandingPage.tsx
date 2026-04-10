@@ -72,20 +72,6 @@ const MountainSilhouette = memo(function MountainSilhouette({ className }: { cla
 });
 
 // ---------------------------------------------------------------------------
-// Aurora background overlay
-// ---------------------------------------------------------------------------
-const AuroraBackground = memo(function AuroraBackground() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div className="aurora-drift absolute -top-20 left-[-15%] w-[60%] h-40 rounded-full opacity-25"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(46,139,122,0.5) 0%, transparent 60%)' }} />
-      <div className="aurora-drift-delay absolute -top-12 right-[-8%] w-[50%] h-36 rounded-full opacity-20"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(74,144,217,0.4) 0%, transparent 60%)' }} />
-    </div>
-  );
-});
-
-// ---------------------------------------------------------------------------
 // Legal Modal
 // ---------------------------------------------------------------------------
 function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' | 'contact' | null; onClose: () => void }) {
@@ -352,7 +338,6 @@ export default function LandingPage() {
 
           {/* Left - content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-xl self-center pt-8 pb-4 lg:py-0">
-            <AuroraBackground />
 
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, x: -28 }}
@@ -376,9 +361,7 @@ export default function LandingPage() {
 
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black leading-[1.05] tracking-tight text-white mb-5">
-                Know what's happening<br />in{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">Calgary</span>
-                {' '}right now.
+                Know what's happening<br />in Calgary right now.
               </h1>
 
               {/* Description */}
@@ -601,11 +584,11 @@ export default function LandingPage() {
             <span className="text-[10px] uppercase font-black tracking-widest text-[#4A90D9]">Vision</span>
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-white mb-6 md:mb-8">
-            Calgary's real-time<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843] italic pr-2">urban intelligence layer.</span>
+            Calgary's public safety map.<br/>
+            <span className="text-[#4A90D9]">Free, live, and community-built.</span>
           </motion.h2>
           <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-lg md:text-xl lg:text-2xl text-slate-300 font-light max-w-4xl mx-auto leading-relaxed mb-6">
-            Where community-reported incidents and verified public data combine to provide immediate awareness into city activity.
+            Community-reported incidents and verified public data, all on one map. See what's happening before the news does.
           </motion.p>
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="h-px w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto my-8" />
           <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="hidden sm:block text-sm md:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
@@ -630,7 +613,7 @@ export default function LandingPage() {
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">The Problem</p>
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-5">
               The{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-red-600">
+              <span className="text-red-500">
                 Information Lag
               </span>
             </h2>
@@ -644,8 +627,8 @@ export default function LandingPage() {
             className="grid grid-cols-2 lg:grid-cols-4 gap-px mb-16 rounded-2xl overflow-hidden border border-white/8 light:border-slate-200 bg-white/8 light:bg-slate-200">
             {[
               { value: 40, suffix: ' min', label: 'Average news lag', sub: 'after an incident occurs', color: '#ef4444', bg: 'from-red-500/8' },
-              { value: 9, suffix: ' apps', label: 'Apps Calgarians check', sub: 'to piece together one incident', color: '#a855f7', bg: 'from-purple-500/8' },
-              { value: 74, suffix: '%', label: 'Missed a nearby event', sub: 'due to slow information reach', color: '#f59e0b', bg: 'from-amber-500/8' },
+              { value: 4, suffix: '', label: 'Live data sources', sub: 'community, open data, 511, CPS crime', color: '#a855f7', bg: 'from-purple-500/8' },
+              { value: 5, suffix: '', label: 'Incident types tracked', sub: 'crime, traffic, infrastructure, weather, emergency', color: '#f59e0b', bg: 'from-amber-500/8' },
               { value: 30, suffix: 's', prefix: '< ', label: 'Calgary Watch lag', sub: 'community report to live map', color: '#4A90D9', bg: 'from-[#4A90D9]/12' },
             ].map((stat, i) => (
               <div key={i} className={`relative bg-gradient-to-b ${stat.bg} to-transparent bg-slate-900/80 light:bg-white px-3 py-6 sm:px-6 sm:py-8 flex flex-col items-center text-center`}>
@@ -662,8 +645,8 @@ export default function LandingPage() {
           <div className="hidden md:block space-y-0 border border-white/8 light:border-slate-200 rounded-2xl overflow-hidden divide-y divide-white/8 light:divide-slate-200">
             {[
               { num: '01', tag: '30+ min delayed', tagColor: '#ef4444', title: "By the time it's in the news...", body: 'Local media reports incidents 30 or more minutes after they happen. That gap costs real decisions: a detour you could have taken, a street you would have avoided, a family member you could have warned.', icon: Radio, stat: '30+', statLabel: 'min delayed', reverse: false },
-              { num: '02', tag: 'Lost in noise', tagColor: '#a855f7', title: "r/Calgary won't cut it", body: 'Critical alerts drown three pages down in memes and off-topic threads. The signal is there, somewhere, buried under noise. You need what you need, when you need it.', icon: Users, stat: '100s', statLabel: 'posts to scan', reverse: true },
-              { num: '03', tag: 'Fragmented sources', tagColor: '#f59e0b', title: '9 apps. Still no answer.', body: '311, Twitter, Nextdoor, local news: each has one piece. Checking them all takes more time than the incident itself. Calgary Watch pulls every signal into a single live map.', icon: ShieldAlert, stat: '9', statLabel: 'apps to check', reverse: false },
+              { num: '02', tag: 'Lost in noise', tagColor: '#a855f7', title: "r/Calgary won't cut it", body: 'Critical alerts drown three pages down in memes and off-topic threads. The signal is there, somewhere, buried under noise. You need what you need, when you need it.', icon: Users, stat: '⌁', statLabel: 'buried in noise', reverse: true },
+              { num: '03', tag: 'Fragmented sources', tagColor: '#f59e0b', title: 'Scattered. No single answer.', body: '311, social media, local news: each has one piece. Checking them all takes longer than the incident itself. Calgary Watch pulls every signal into one live map.', icon: ShieldAlert, stat: '→1', statLabel: 'unified source', reverse: false },
             ].map((row, i) => (
               <motion.div key={i}
                 initial={reducedMotion ? undefined : { opacity: 0, x: row.reverse ? 24 : -24 }}
@@ -701,10 +684,10 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-3xl md:text-4xl font-black mb-4 leading-[1.1]">
                   Calgary Watch:<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">Real-time, together.</span>
+                  <span className="text-white">One place. All of Calgary.</span>
                 </h3>
                 <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-6 max-w-md">
-                  A live, community-powered incident map built specifically for this city. Calgarians report real-time incidents and they appear on the map in seconds.
+                  A live incident map built specifically for Calgary. Report something in under 30 seconds and it appears on the map for everyone nearby.
                 </p>
                 <div className="space-y-2 mb-7">
                   {['Live updates with no lag or delay', 'Verified with CPS data and community input', 'One map, every alert, all of Calgary'].map((point, i) => (
@@ -716,7 +699,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-                  className="w-fit rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
+                  className="w-fit rounded-xl px-7 py-3.5 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold flex items-center gap-2 cursor-pointer text-sm transition-colors">
                   <MapPin size={16} />View Live Map<ArrowRight size={15} />
                 </motion.button>
               </div>
@@ -745,7 +728,7 @@ export default function LandingPage() {
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Features</p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.06]">
               Built for how Calgarians{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">actually live.</span>
+              <span className="text-[#D4A843]">actually live.</span>
             </h2>
             <p className="mt-3 text-base text-slate-400 light:text-slate-600 leading-relaxed">
               Not a generic alert app. Every feature was designed around this city, its neighbourhoods, its patterns, and its people.
@@ -806,7 +789,7 @@ export default function LandingPage() {
                   <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds - no refresh, no lag.</p>
                 </div>
                 <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/5">
-                  <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community powered</span>
+                  <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community built</span>
                   <span className="text-2xl font-black text-[#4A90D9]">&lt;&nbsp;30s</span>
                 </div>
               </div>
@@ -967,7 +950,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-                  className="w-fit rounded-xl px-6 py-3 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
+                  className="w-fit rounded-xl px-6 py-3 bg-[#4A90D9] hover:bg-blue-500 transition-colors text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
                   <MapPin size={15} />Try Now<ArrowRight size={14} />
                 </motion.button>
               </div>
@@ -1024,7 +1007,7 @@ export default function LandingPage() {
               <div className="grid sm:grid-cols-2 gap-5">
                 {[
                   { icon: Layers, title: 'Bottom Sheet UI', desc: 'Gesture-driven incident browsing', color: '#8B5CF6' },
-                  { icon: Zap,    title: 'Instant Submit',  desc: 'Optimistic UI updates avoid lag',  color: '#4A90D9' },
+                  { icon: Zap,    title: 'Instant Submit',  desc: 'Your report appears before you close the form',  color: '#4A90D9' },
                   { icon: MapIcon,title: 'Fluid Maps',      desc: 'Hardware-accelerated panning',     color: '#2E8B7A' },
                   { icon: Lock,   title: 'No App Required', desc: 'Instant access via web browser',   color: '#D4A843' },
                 ].map((item, i) => (
@@ -1166,9 +1149,9 @@ export default function LandingPage() {
           </div>
 
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-14 text-center">
-            <p className="text-base text-slate-400 light:text-slate-600 mb-5">Ready to make Calgary smarter together?</p>
+            <p className="text-base text-slate-400 light:text-slate-600 mb-5">See what's happening before the news does.</p>
             <motion.button whileHover={!reducedMotion ? { scale: 1.04, boxShadow: '0 20px 50px rgba(74,144,217,0.35)' } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-              className="rounded-xl px-10 py-4 bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#8B5CF6] text-white font-bold transition-all flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
+              className="rounded-xl px-10 py-4 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold transition-colors flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
               <MapPin size={18} />Start Reporting<ArrowRight size={16} />
             </motion.button>
           </motion.div>

@@ -950,7 +950,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-                  className="w-fit rounded-xl px-6 py-3 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
+                  className="w-fit rounded-xl px-6 py-3 bg-[#4A90D9] hover:bg-blue-500 transition-colors text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
                   <MapPin size={15} />Try Now<ArrowRight size={14} />
                 </motion.button>
               </div>

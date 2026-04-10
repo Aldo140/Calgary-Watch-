@@ -699,7 +699,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-                  className="w-fit rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
+                  className="w-fit rounded-xl px-7 py-3.5 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold flex items-center gap-2 cursor-pointer text-sm transition-colors">
                   <MapPin size={16} />View Live Map<ArrowRight size={15} />
                 </motion.button>
               </div>
@@ -1151,7 +1151,7 @@ export default function LandingPage() {
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-14 text-center">
             <p className="text-base text-slate-400 light:text-slate-600 mb-5">Ready to make Calgary smarter together?</p>
             <motion.button whileHover={!reducedMotion ? { scale: 1.04, boxShadow: '0 20px 50px rgba(74,144,217,0.35)' } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-              className="rounded-xl px-10 py-4 bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#8B5CF6] text-white font-bold transition-all flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
+              className="rounded-xl px-10 py-4 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold transition-colors flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
               <MapPin size={18} />Start Reporting<ArrowRight size={16} />
             </motion.button>
           </motion.div>

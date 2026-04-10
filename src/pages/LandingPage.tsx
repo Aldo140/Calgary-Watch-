@@ -361,9 +361,7 @@ export default function LandingPage() {
 
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black leading-[1.05] tracking-tight text-white mb-5">
-                Know what's happening<br />in{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">Calgary</span>
-                {' '}right now.
+                Know what's happening<br />in Calgary right now.
               </h1>
 
               {/* Description */}
@@ -586,8 +584,8 @@ export default function LandingPage() {
             <span className="text-[10px] uppercase font-black tracking-widest text-[#4A90D9]">Vision</span>
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-white mb-6 md:mb-8">
-            Calgary's real-time<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843] italic pr-2">urban intelligence layer.</span>
+            Calgary's public safety map.<br/>
+            <span className="text-[#4A90D9]">Free, live, and community-built.</span>
           </motion.h2>
           <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-lg md:text-xl lg:text-2xl text-slate-300 font-light max-w-4xl mx-auto leading-relaxed mb-6">
             Where community-reported incidents and verified public data combine to provide immediate awareness into city activity.
@@ -615,7 +613,7 @@ export default function LandingPage() {
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">The Problem</p>
             <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-5">
               The{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-red-600">
+              <span className="text-red-500">
                 Information Lag
               </span>
             </h2>
@@ -686,7 +684,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-3xl md:text-4xl font-black mb-4 leading-[1.1]">
                   Calgary Watch:<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">Real-time, together.</span>
+                  <span className="text-white">One place. All of Calgary.</span>
                 </h3>
                 <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-6 max-w-md">
                   A live, community-powered incident map built specifically for this city. Calgarians report real-time incidents and they appear on the map in seconds.
@@ -730,7 +728,7 @@ export default function LandingPage() {
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Features</p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.06]">
               Built for how Calgarians{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">actually live.</span>
+              <span className="text-[#D4A843]">actually live.</span>
             </h2>
             <p className="mt-3 text-base text-slate-400 light:text-slate-600 leading-relaxed">
               Not a generic alert app. Every feature was designed around this city, its neighbourhoods, its patterns, and its people.

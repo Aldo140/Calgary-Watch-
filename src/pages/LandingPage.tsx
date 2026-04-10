@@ -588,7 +588,7 @@ export default function LandingPage() {
             <span className="text-[#4A90D9]">Free, live, and community-built.</span>
           </motion.h2>
           <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-lg md:text-xl lg:text-2xl text-slate-300 font-light max-w-4xl mx-auto leading-relaxed mb-6">
-            Where community-reported incidents and verified public data combine to provide immediate awareness into city activity.
+            Community-reported incidents and verified public data, all on one map. See what's happening before the news does.
           </motion.p>
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3 }} className="h-px w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto my-8" />
           <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="hidden sm:block text-sm md:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
@@ -687,7 +687,7 @@ export default function LandingPage() {
                   <span className="text-white">One place. All of Calgary.</span>
                 </h3>
                 <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-6 max-w-md">
-                  A live, community-powered incident map built specifically for this city. Calgarians report real-time incidents and they appear on the map in seconds.
+                  A live incident map built specifically for Calgary. Report something in under 30 seconds and it appears on the map for everyone nearby.
                 </p>
                 <div className="space-y-2 mb-7">
                   {['Live updates with no lag or delay', 'Verified with CPS data and community input', 'One map, every alert, all of Calgary'].map((point, i) => (
@@ -789,7 +789,7 @@ export default function LandingPage() {
                   <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds - no refresh, no lag.</p>
                 </div>
                 <div className="mt-5 flex items-center justify-between pt-4 border-t border-white/5">
-                  <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community powered</span>
+                  <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Community built</span>
                   <span className="text-2xl font-black text-[#4A90D9]">&lt;&nbsp;30s</span>
                 </div>
               </div>
@@ -1007,7 +1007,7 @@ export default function LandingPage() {
               <div className="grid sm:grid-cols-2 gap-5">
                 {[
                   { icon: Layers, title: 'Bottom Sheet UI', desc: 'Gesture-driven incident browsing', color: '#8B5CF6' },
-                  { icon: Zap,    title: 'Instant Submit',  desc: 'Optimistic UI updates avoid lag',  color: '#4A90D9' },
+                  { icon: Zap,    title: 'Instant Submit',  desc: 'Your report appears before you close the form',  color: '#4A90D9' },
                   { icon: MapIcon,title: 'Fluid Maps',      desc: 'Hardware-accelerated panning',     color: '#2E8B7A' },
                   { icon: Lock,   title: 'No App Required', desc: 'Instant access via web browser',   color: '#D4A843' },
                 ].map((item, i) => (
@@ -1149,7 +1149,7 @@ export default function LandingPage() {
           </div>
 
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-14 text-center">
-            <p className="text-base text-slate-400 light:text-slate-600 mb-5">Ready to make Calgary smarter together?</p>
+            <p className="text-base text-slate-400 light:text-slate-600 mb-5">See what's happening before the news does.</p>
             <motion.button whileHover={!reducedMotion ? { scale: 1.04, boxShadow: '0 20px 50px rgba(74,144,217,0.35)' } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
               className="rounded-xl px-10 py-4 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold transition-colors flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
               <MapPin size={18} />Start Reporting<ArrowRight size={16} />

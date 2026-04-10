@@ -74,16 +74,6 @@ const MountainSilhouette = memo(function MountainSilhouette({ className }: { cla
 // ---------------------------------------------------------------------------
 // Aurora background overlay
 // ---------------------------------------------------------------------------
-const AuroraBackground = memo(function AuroraBackground() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div className="aurora-drift absolute -top-20 left-[-15%] w-[60%] h-40 rounded-full opacity-25"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(46,139,122,0.5) 0%, transparent 60%)' }} />
-      <div className="aurora-drift-delay absolute -top-12 right-[-8%] w-[50%] h-36 rounded-full opacity-20"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(74,144,217,0.4) 0%, transparent 60%)' }} />
-    </div>
-  );
-});
 
 // ---------------------------------------------------------------------------
 // Legal Modal
@@ -352,7 +342,6 @@ export default function LandingPage() {
 
           {/* Left - content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-xl self-center pt-8 pb-4 lg:py-0">
-            <AuroraBackground />
 
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, x: -28 }}

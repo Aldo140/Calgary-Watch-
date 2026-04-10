@@ -285,7 +285,7 @@ export default function MobileMapSheet({
                     type="text"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    onFocus={() => { if (isCollapsed) setSnap(0.38); }}
+                    onFocus={() => setSnap(0.82)}
                     placeholder="Search reports or neighborhoods…"
                     className={cn(
                       'flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-slate-500 min-w-0',

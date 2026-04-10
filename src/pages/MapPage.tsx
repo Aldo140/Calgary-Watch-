@@ -910,6 +910,16 @@ export default function MapPage() {
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
         />
 
+        {/* Tap-to-close: transparent target covering exposed map when sheet is fully expanded */}
+        {sheetSnap === 0.82 && (
+          <div
+            className="fixed inset-x-0 top-0 z-[49] cursor-pointer lg:hidden"
+            style={{ bottom: '82vh' }}
+            onClick={() => setSheetSnap('80px')}
+            aria-label="Tap to close sheet"
+          />
+        )}
+
         {/* Mobile Bottom Sheet */}
         <MobileMapSheet
           incidents={incidents}

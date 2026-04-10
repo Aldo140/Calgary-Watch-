@@ -311,8 +311,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     if (!map.current || !isMapLoaded) return;
 
     const calgaryBounds = L.latLngBounds(
-      [50.88, -114.35], // SW
-      [51.22, -113.85], // NE
+      [50.71, -114.60], // SW — extends to Okotoks / Cochrane
+      [51.39, -113.60], // NE — extends to Airdrie / Chestermere
     );
     serviceAreaBounds.current = calgaryBounds;
 

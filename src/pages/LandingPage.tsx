@@ -627,8 +627,8 @@ export default function LandingPage() {
             className="grid grid-cols-2 lg:grid-cols-4 gap-px mb-16 rounded-2xl overflow-hidden border border-white/8 light:border-slate-200 bg-white/8 light:bg-slate-200">
             {[
               { value: 40, suffix: ' min', label: 'Average news lag', sub: 'after an incident occurs', color: '#ef4444', bg: 'from-red-500/8' },
-              { value: 9, suffix: ' apps', label: 'Apps Calgarians check', sub: 'to piece together one incident', color: '#a855f7', bg: 'from-purple-500/8' },
-              { value: 74, suffix: '%', label: 'Missed a nearby event', sub: 'due to slow information reach', color: '#f59e0b', bg: 'from-amber-500/8' },
+              { value: 4, suffix: '', label: 'Live data sources', sub: 'community, open data, 511, CPS crime', color: '#a855f7', bg: 'from-purple-500/8' },
+              { value: 5, suffix: '', label: 'Incident types tracked', sub: 'crime, traffic, infrastructure, weather, emergency', color: '#f59e0b', bg: 'from-amber-500/8' },
               { value: 30, suffix: 's', prefix: '< ', label: 'Calgary Watch lag', sub: 'community report to live map', color: '#4A90D9', bg: 'from-[#4A90D9]/12' },
             ].map((stat, i) => (
               <div key={i} className={`relative bg-gradient-to-b ${stat.bg} to-transparent bg-slate-900/80 light:bg-white px-3 py-6 sm:px-6 sm:py-8 flex flex-col items-center text-center`}>

@@ -72,10 +72,6 @@ const MountainSilhouette = memo(function MountainSilhouette({ className }: { cla
 });
 
 // ---------------------------------------------------------------------------
-// Aurora background overlay
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
 // Legal Modal
 // ---------------------------------------------------------------------------
 function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' | 'contact' | null; onClose: () => void }) {

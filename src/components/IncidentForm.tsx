@@ -364,16 +364,21 @@ export default function IncidentForm({
 
             <div>
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Category</label>
-              <select
-                {...register('category')}
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="crime">Crime</option>
-                <option value="traffic">Traffic</option>
-                <option value="infrastructure">Infrastructure</option>
-                <option value="weather">Weather</option>
-                <option value="emergency">🚨 Emergency</option>
-              </select>
+              <div className="relative">
+                <select
+                  {...register('category')}
+                  className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="crime">Crime</option>
+                  <option value="traffic">Traffic</option>
+                  <option value="infrastructure">Infrastructure</option>
+                  <option value="weather">Weather</option>
+                  <option value="emergency">🚨 Emergency</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -394,33 +399,38 @@ export default function IncidentForm({
                   </button>
                 </div>
               ) : (
-                <select
-                  {...register('neighborhood')}
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Area</option>
-                  <option value="Beltline">Beltline</option>
-                  <option value="Kensington">Kensington</option>
-                  <option value="Bridgeland">Bridgeland</option>
-                  <option value="Mission">Mission</option>
-                  <option value="Inglewood">Inglewood</option>
-                  <option value="Bowness">Bowness</option>
-                  <option value="Downtown">Downtown</option>
-                  <option value="Saddleridge">Saddleridge</option>
-                  <option value="Evanston">Evanston</option>
-                  <option value="Mahogany">Mahogany</option>
-                  <option value="Auburn Bay">Auburn Bay</option>
-                  <option value="Signal Hill">Signal Hill</option>
-                  <option value="Tuscany">Tuscany</option>
-                  <option value="Royal Oak">Royal Oak</option>
-                  <option value="Panorama Hills">Panorama Hills</option>
-                  <option value="Midnapore">Midnapore</option>
-                  <option value="Shawnessy">Shawnessy</option>
-                  <option value="McKenzie Towne">McKenzie Towne</option>
-                  <option value="Cranston">Cranston</option>
-                  <option value="Copperfield">Copperfield</option>
-                  <option value="Other">Other / Not Listed</option>
-                </select>
+                <div className="relative">
+                  <select
+                    {...register('neighborhood')}
+                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Area</option>
+                    <option value="Beltline">Beltline</option>
+                    <option value="Kensington">Kensington</option>
+                    <option value="Bridgeland">Bridgeland</option>
+                    <option value="Mission">Mission</option>
+                    <option value="Inglewood">Inglewood</option>
+                    <option value="Bowness">Bowness</option>
+                    <option value="Downtown">Downtown</option>
+                    <option value="Saddleridge">Saddleridge</option>
+                    <option value="Evanston">Evanston</option>
+                    <option value="Mahogany">Mahogany</option>
+                    <option value="Auburn Bay">Auburn Bay</option>
+                    <option value="Signal Hill">Signal Hill</option>
+                    <option value="Tuscany">Tuscany</option>
+                    <option value="Royal Oak">Royal Oak</option>
+                    <option value="Panorama Hills">Panorama Hills</option>
+                    <option value="Midnapore">Midnapore</option>
+                    <option value="Shawnessy">Shawnessy</option>
+                    <option value="McKenzie Towne">McKenzie Towne</option>
+                    <option value="Cranston">Cranston</option>
+                    <option value="Copperfield">Copperfield</option>
+                    <option value="Other">Other / Not Listed</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
               )}
               {errors.neighborhood && (
                 <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.neighborhood.message}</p>

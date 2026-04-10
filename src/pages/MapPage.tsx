@@ -615,7 +615,10 @@ export default function MapPage() {
   }, []);
 
   const handlePinCancel = useCallback(() => {
+    // Cancel closes the whole form — user pressed Cancel while in crosshair mode
     setIsPinMode(false);
+    setConfirmedPinLocation(null);
+    setIsFormOpen(false);
   }, []);
 
   const handleFormClose = useCallback(() => {

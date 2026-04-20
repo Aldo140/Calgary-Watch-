@@ -68,13 +68,7 @@ const RULES: { patterns: RegExp[]; category: IncidentCategory }[] = [
 // Minimum score to accept a post (prevents noise)
 const MIN_SCORE = 1;
 
-// ---------------------------------------------------------------------------
-// Calgary centre coordinate for fallback
-// ---------------------------------------------------------------------------
-
-const CALGARY_CENTER: [number, number] = [51.0447, -114.0719];
-
-function extractLocationFromText(text: string): { neighborhood: string; lat: number; lng: number } {
+function extractLocationFromText(text: string): { neighborhood: string; lat: number; lng: number } | null {
   const lower = text.toLowerCase();
   for (const [name, coords] of Object.entries(NEIGHBOURHOOD_COORDS)) {
     if (lower.includes(name)) {
@@ -86,7 +80,6 @@ function extractLocationFromText(text: string): { neighborhood: string; lat: num
     }
   }
 
-  // Quadrant detection as fallback
   if (/\bnw\s+calgary|\bcalgary\s+nw\b/i.test(text)) {
     return { neighborhood: 'Northwest Calgary', lat: 51.128, lng: -114.190 };
   }
@@ -100,7 +93,7 @@ function extractLocationFromText(text: string): { neighborhood: string; lat: num
     return { neighborhood: 'Southeast Calgary', lat: 50.975, lng: -113.980 };
   }
 
-  return { neighborhood: 'Calgary', lat: CALGARY_CENTER[0], lng: CALGARY_CENTER[1] };
+  return null;
 }
 
 function classifyPost(title: string, selftext: string): IncidentCategory | null {
@@ -178,6 +171,7 @@ export async function fetchRedditCalgary(): Promise<NormalizedIncident[]> {
     if (!category) continue;
 
     const location = extractLocationFromText(`${post.title} ${post.selftext}`);
+    if (!location) continue;
 
     // Build a concise description
     const bodyText = post.is_self && post.selftext.length > 20

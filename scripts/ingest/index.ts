@@ -78,11 +78,7 @@ async function loadAndPrune(
 
     const expiresAt = data.expires_at as number | undefined;
     if (expiresAt && expiresAt < now) {
-      batch.update(doc.ref, {
-        deleted: true,
-        deletedAt: now,
-        deletedBy: 'system-ingest',
-      });
+      batch.delete(doc.ref);
       pruned++;
     } else {
       const key = data.dedup_key as string | undefined;

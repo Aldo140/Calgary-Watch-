@@ -2,9 +2,8 @@ name: Ingest Live Data
 
 on:
   schedule:
-    # Every 15 minutes — GitHub Actions minimum granularity is 5 min.
-    # In practice runs may be slightly delayed under load.
-    - cron: '*/15 * * * *'
+    # Every 30 minutes — halves daily Firestore reads vs the prior 15-min schedule.
+    - cron: '*/30 * * * *'
   # Allow a manual trigger from the Actions tab for testing.
   workflow_dispatch:
 

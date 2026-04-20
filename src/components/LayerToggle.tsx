@@ -16,7 +16,7 @@ export default function LayerToggle({ showLiveReports, setShowLiveReports, showH
   if (isPinMode) return null;
   return (
     <div className="absolute left-1/2 z-30 w-auto max-w-[min(94vw,22rem)] max-lg:max-w-[min(94vw,20rem)] -translate-x-1/2 max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] max-lg:px-1 md:max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] bottom-20 md:bottom-8">
-      <Card className="flex items-center gap-0.5 max-lg:gap-1 p-1 max-lg:p-1.5 md:gap-2 md:p-1.5 bg-black/55 max-lg:border-amber-500/15 max-lg:shadow-[0_8px_32px_rgba(0,0,0,0.45)] light:bg-white/95 backdrop-blur-2xl border-white/10 light:border-slate-300 shadow-2xl max-lg:rounded-[1.35rem] rounded-2xl whitespace-nowrap overflow-x-auto no-scrollbar">
+      <Card className="flex items-center gap-0.5 max-lg:gap-1 p-1 max-lg:p-1.5 md:gap-2 md:p-1.5 bg-black/55 max-lg:border-amber-500/15 max-lg:shadow-[0_8px_32px_rgba(0,0,0,0.45)] light:bg-[rgba(255,250,243,0.94)] backdrop-blur-2xl border-white/10 light:border-stone-200/80 shadow-2xl max-lg:rounded-[1.35rem] rounded-2xl whitespace-nowrap overflow-x-auto no-scrollbar">
         <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 border-r border-white/10 max-lg:hidden">
           <Layers size={14} className="text-blue-400 light:text-slate-900" />
           <span className="text-[9px] font-bold text-white uppercase tracking-widest">Layers</span>

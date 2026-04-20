@@ -240,7 +240,11 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-slate-950 light:bg-slate-50 text-white light:text-slate-900 font-sans overflow-x-hidden">
+    <div className="relative min-h-dvh bg-slate-950 light:bg-[#f8f3e8] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
+      <div className="pointer-events-none absolute inset-0 hidden light:block">
+        <div className="absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.18),transparent_42%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.2),transparent_30%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[28rem] bg-[radial-gradient(circle_at_30%_20%,rgba(46,139,122,0.14),transparent_28%),radial-gradient(circle_at_75%_35%,rgba(192,57,43,0.08),transparent_24%)]" />
+      </div>
 
       {/* ================================================================
           NAVIGATION - clean fixed bar, consistent h-16
@@ -249,7 +253,7 @@ export default function LandingPage() {
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         navVisible ? 'translate-y-0' : '-translate-y-full',
         navScrolled
-          ? 'bg-slate-950/85 light:bg-white/90 backdrop-blur-xl border-b border-white/8 light:border-slate-200'
+          ? 'bg-slate-950/85 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-xl border-b border-white/8 light:border-stone-200/80'
           : 'bg-transparent border-b border-transparent',
       )}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
@@ -319,7 +323,7 @@ export default function LandingPage() {
       {/* ================================================================
           HERO
           ================================================================ */}
-      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 light:bg-slate-50 w-full">
+      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 light:bg-transparent w-full">
         
         {/* Full-width seamless background image */}
         <div className="absolute inset-0 pointer-events-none">
@@ -574,7 +578,7 @@ export default function LandingPage() {
       {/* ================================================================
           VISION SECTION
           ================================================================ */}
-      <section className="relative py-16 md:py-28 lg:py-40 overflow-hidden bg-slate-950 light:bg-slate-50 flex items-center justify-center border-t border-b border-white/5 light:border-slate-200">
+      <section className="relative py-16 md:py-28 lg:py-40 overflow-hidden bg-slate-950 light:bg-transparent flex items-center justify-center border-t border-b border-white/5 light:border-stone-200/80">
         <div 
           className="absolute w-[600px] md:w-[1000px] aspect-square rounded-full bg-gradient-to-tr from-[#4A90D9]/10 via-[#2E8B7A]/5 to-[#D4A843]/10 pointer-events-none"
           style={{ background: 'radial-gradient(circle at center, rgba(74,144,217,0.08) 0%, transparent 60%)' }}
@@ -962,7 +966,7 @@ export default function LandingPage() {
       {/* ================================================================
           MOBILE EXPERIENCE SECTION
           ================================================================ */}
-      <section className="py-12 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-slate-50 overflow-hidden">
+      <section className="py-12 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto">
 
           {/* Mobile: compact 2×2 feature grid only */}
@@ -1161,7 +1165,7 @@ export default function LandingPage() {
       {/* ================================================================
           ROADMAP & SUSTAINABILITY
           ================================================================ */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-900/10 light:bg-slate-50">
+      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-900/10 light:bg-[rgba(255,250,243,0.6)]">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-[1fr_350px] gap-8">
             {/* Roadmap */}
@@ -1242,7 +1246,7 @@ export default function LandingPage() {
       {/* ================================================================
           TRUST, TRANSPARENCY & LEGAL
           ================================================================ */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 bg-slate-950 light:bg-white border-t border-white/5 light:border-slate-200 relative overflow-hidden">
+      <section className="py-16 md:py-24 px-4 sm:px-6 bg-slate-950 light:bg-[rgba(255,250,243,0.72)] border-t border-white/5 light:border-stone-200/80 relative overflow-hidden">
         {/* Terminal/Hacker Grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none light:hidden" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none hidden light:block" />
@@ -1355,7 +1359,7 @@ export default function LandingPage() {
       {/* ================================================================
           CITY EXPANSION REQUEST
           ================================================================ */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 border-t border-white/5 light:border-slate-200">
+      <section className="py-12 md:py-16 px-4 sm:px-6 border-t border-white/5 light:border-stone-200/80">
         <div className="max-w-md mx-auto text-center space-y-5">
           <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Want this in your city?</h4>
           <div className="flex gap-2">
@@ -1376,7 +1380,7 @@ export default function LandingPage() {
       {/* ================================================================
           FOOTER
           ================================================================ */}
-      <footer className="py-10 px-4 sm:px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-white">
+      <footer className="py-10 px-4 sm:px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-[#fffaf2]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="text-[#4A90D9]" size={20} />

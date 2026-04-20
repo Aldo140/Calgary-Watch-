@@ -235,12 +235,16 @@ export default function AboutPage() {
   const reducedMotion = prefersReducedMotion();
 
   return (
-    <div className="min-h-dvh bg-slate-950 light:bg-white text-white light:text-slate-900 font-sans overflow-x-hidden">
+    <div className="relative min-h-dvh bg-slate-950 light:bg-[#f8f3e8] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
+      <div className="pointer-events-none absolute inset-0 hidden light:block">
+        <div className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(circle_at_15%_10%,rgba(74,144,217,0.16),transparent_34%),radial-gradient(circle_at_85%_5%,rgba(212,168,67,0.16),transparent_28%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-[radial-gradient(circle_at_30%_30%,rgba(46,139,122,0.14),transparent_30%),radial-gradient(circle_at_75%_45%,rgba(192,57,43,0.08),transparent_24%)]" />
+      </div>
 
       {/* ================================================================
           NAVIGATION
           ================================================================ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 light:bg-white/95 backdrop-blur-xl border-b border-white/5 light:border-slate-200">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 light:bg-[rgba(255,250,242,0.92)] backdrop-blur-xl border-b border-white/5 light:border-stone-200/80">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <motion.div className="flex items-center gap-3" whileHover={{ scale: 1.02 }}>
             <img
@@ -363,7 +367,7 @@ export default function AboutPage() {
         {/* ================================================================
             ABOUT SECTION - Who we are
             ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-white">
+        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-transparent">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
@@ -456,7 +460,7 @@ export default function AboutPage() {
         {/* ================================================================
             STORY SECTION - How it works with 3D cards & images
             ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50">
+        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-[rgba(255,250,243,0.68)]">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
@@ -569,7 +573,7 @@ export default function AboutPage() {
         {/* ================================================================
             MISSION SECTION - What drives us
             ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-white">
+        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-transparent">
           <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
             {/* Left: Image */}
             <motion.div
@@ -632,7 +636,7 @@ export default function AboutPage() {
         {/* ================================================================
             GET INVOLVED - Team, Volunteers, Business Partners
             ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50">
+        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-[rgba(255,250,243,0.68)]">
           <div className="max-w-7xl mx-auto">
 
             <motion.div
@@ -775,7 +779,7 @@ export default function AboutPage() {
         {/* ================================================================
             CONTACT SECTION - Get in touch
             ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50">
+        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-[rgba(255,250,243,0.68)]">
           <div className="max-w-3xl mx-auto text-center">
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
@@ -810,7 +814,7 @@ export default function AboutPage() {
         {/* ================================================================
             FINAL CTA
             ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-white relative overflow-hidden">
+        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-transparent relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
             <div
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-[140px] opacity-15"
@@ -864,7 +868,7 @@ export default function AboutPage() {
       {/* ================================================================
           FOOTER
           ================================================================ */}
-      <footer className="py-8 px-6 border-t border-white/5 light:border-slate-200 bg-slate-950 light:bg-white text-center">
+      <footer className="py-8 px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-[#fffaf2] text-center">
         <motion.p
           className="text-xs text-slate-600 light:text-slate-500 uppercase font-bold tracking-widest"
           initial={{ opacity: 0 }}

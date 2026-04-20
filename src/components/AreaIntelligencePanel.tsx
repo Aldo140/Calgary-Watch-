@@ -23,13 +23,13 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats }: Are
   }));
 
   const Content = () => (
-    <div className="flex flex-col h-full bg-slate-950/95 light:bg-white backdrop-blur-3xl overflow-hidden relative light:text-slate-900">
+    <div className="flex flex-col h-full bg-slate-950/95 light:bg-[rgb(255,250,243)] backdrop-blur-3xl overflow-hidden relative light:text-slate-900">
       {/* Background Decorative Elements */}
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Header */}
-      <div className="p-8 border-b border-white/5 light:border-slate-200 flex items-center justify-between relative z-10 sticky top-0 bg-slate-950/95 light:bg-white/95 backdrop-blur-xl">
+      <div className="p-8 border-b border-white/5 light:border-stone-200/80 flex items-center justify-between relative z-10 sticky top-0 bg-slate-950/95 light:bg-[rgba(255,250,243,0.94)] backdrop-blur-xl">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <MapPin size={14} className="text-blue-400" />
@@ -47,15 +47,15 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats }: Are
 
       <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 no-scrollbar relative z-10">
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="bg-white/[0.03] light:bg-slate-50 rounded-[1.4rem] p-4 border border-white/10 light:border-slate-200">
+          <div className="bg-white/[0.03] light:bg-white/72 rounded-[1.4rem] p-4 border border-white/10 light:border-stone-200/80">
             <p className="text-[10px] font-black text-slate-500 light:text-slate-600 uppercase tracking-widest mb-2">Safety Score</p>
             <div className="text-4xl font-black text-blue-300">{data.safetyScore}</div>
           </div>
-          <div className="bg-white/[0.03] light:bg-slate-50 rounded-[1.4rem] p-4 border border-white/10 light:border-slate-200">
+          <div className="bg-white/[0.03] light:bg-white/72 rounded-[1.4rem] p-4 border border-white/10 light:border-stone-200/80">
             <p className="text-[10px] font-black text-slate-500 light:text-slate-600 uppercase tracking-widest mb-2">Active Incidents</p>
             <div className="text-4xl font-black text-orange-300">{data.activeIncidents}</div>
           </div>
-          <div className="bg-white/[0.03] light:bg-slate-50 rounded-[1.4rem] p-4 border border-white/10 light:border-slate-200">
+          <div className="bg-white/[0.03] light:bg-white/72 rounded-[1.4rem] p-4 border border-white/10 light:border-stone-200/80">
             <p className="text-[10px] font-black text-slate-500 light:text-slate-600 uppercase tracking-widest mb-2">Trend</p>
             <div className={cn(
               "text-3xl font-black uppercase",
@@ -64,7 +64,7 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats }: Are
               {data.trend}
             </div>
           </div>
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-[1.4rem] p-4 flex gap-3">
+          <div className="bg-blue-500/10 light:bg-gradient-to-br light:from-sky-50 light:to-teal-50 border border-blue-500/20 light:border-sky-200/80 rounded-[1.4rem] p-4 flex gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/30">
               <Activity className="text-blue-400" size={20} />
             </div>

@@ -20,6 +20,8 @@ export type SourceType =
   | 'env_canada_weather'
   | '511_alberta_traffic'
   | 'calgary_open_data'
+  | 'calgary_water_main_breaks'
+  | 'alberta_emergency_alert'
   | 'reddit_calgary'
   | 'news_rss';
 

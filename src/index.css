@@ -91,7 +91,11 @@
   }
 
   .light body {
-    @apply bg-slate-100 text-slate-900;
+    background:
+      radial-gradient(circle at top left, rgba(74, 144, 217, 0.12), transparent 28%),
+      radial-gradient(circle at top right, rgba(212, 168, 67, 0.16), transparent 24%),
+      linear-gradient(180deg, #f8f4eb 0%, #eef5f7 46%, #f6efe2 100%);
+    color: #1f2937;
   }
 }
 
@@ -243,102 +247,104 @@
 
   /* Light mode system for map-heavy screens */
   .light .bg-slate-950 {
-    background-color: #f8fafc !important;
+    background-color: rgba(246, 239, 226, 0.96) !important;
   }
   .light .bg-slate-900,
   .light .bg-slate-900\/95 {
-    background-color: #ffffff !important;
+    background-color: rgba(255, 251, 245, 0.96) !important;
   }
   .light .bg-slate-900\/80,
   .light .bg-slate-950\/80,
   .light .bg-slate-950\/60,
   .light .bg-slate-950\/50 {
-    background-color: rgba(255, 255, 255, 0.92) !important;
+    background-color: rgba(255, 250, 243, 0.86) !important;
   }
   .light .border-white\/10,
   .light .border-white\/5,
   .light .border-white\/20 {
-    border-color: rgba(15, 23, 42, 0.12) !important;
+    border-color: rgba(120, 113, 108, 0.18) !important;
   }
   .light .text-white {
-    color: #0f172a !important;
+    color: #1f2937 !important;
   }
   .light .text-slate-400 {
-    color: #64748b !important;
+    color: #6b7280 !important;
   }
   .light .text-slate-500 {
-    color: #475569 !important;
+    color: #78716c !important;
   }
   .light .text-slate-300 {
-    color: #334155 !important;
+    color: #44403c !important;
   }
   .light .bg-white\/5 {
-    background-color: rgba(15, 23, 42, 0.04) !important;
+    background-color: rgba(255, 255, 255, 0.58) !important;
   }
   .light .bg-white\/10 {
-    background-color: rgba(15, 23, 42, 0.08) !important;
+    background-color: rgba(255, 255, 255, 0.72) !important;
   }
   .light .bg-white\/\[0\.03\],
   .light .bg-white\/\[0\.02\] {
-    background-color: rgba(15, 23, 42, 0.03) !important;
+    background-color: rgba(255, 251, 245, 0.78) !important;
   }
   .light .text-blue-400,
   .light .text-blue-500,
   .light .text-blue-600 {
-    color: #111827 !important;
+    color: #2563eb !important;
   }
   .light .border-blue-500\/20,
   .light .border-blue-500\/30,
   .light .border-blue-500\/50,
   .light .border-blue-400 {
-    border-color: rgba(17, 24, 39, 0.25) !important;
+    border-color: rgba(37, 99, 235, 0.24) !important;
   }
   .light .bg-blue-500\/10,
   .light .bg-blue-600\/10 {
-    background-color: rgba(17, 24, 39, 0.08) !important;
+    background-color: rgba(59, 130, 246, 0.1) !important;
   }
   .light .group-hover\:text-blue-400:hover,
   .light .hover\:text-blue-400:hover {
-    color: #111827 !important;
+    color: #1d4ed8 !important;
   }
 
   /* Force strong contrast for selected dashboard chips in light mode */
   .light .category-chip-selected,
   .light .layer-chip-selected {
-    background-color: #111827 !important;
-    border-color: #111827 !important;
+    background: linear-gradient(135deg, #1d4ed8, #0f766e) !important;
+    border-color: rgba(29, 78, 216, 0.6) !important;
     color: #ffffff !important;
-    box-shadow: 0 10px 20px -10px rgba(2, 6, 23, 0.75) !important;
+    box-shadow: 0 18px 28px -18px rgba(29, 78, 216, 0.55) !important;
   }
   .light .category-chip-selected .category-chip-icon,
   .light .category-chip-selected .category-chip-count {
     color: #ffffff !important;
   }
   .light .category-chip-selected .category-chip-count {
-    background-color: rgba(255, 255, 255, 0.2) !important;
+    background-color: rgba(255, 255, 255, 0.18) !important;
   }
 
   /* Leaflet controls / popups in light mode */
   .light .leaflet-bar a {
-    background-color: rgba(255, 255, 255, 0.96) !important;
-    color: #334155 !important;
-    border-color: rgba(15, 23, 42, 0.14) !important;
+    background-color: rgba(255, 251, 245, 0.95) !important;
+    color: #57534e !important;
+    border-color: rgba(120, 113, 108, 0.18) !important;
+    box-shadow: 0 14px 28px -20px rgba(120, 113, 108, 0.45) !important;
   }
   .light .leaflet-bar a:hover {
-    background-color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
     color: #2563eb !important;
-    border-color: rgba(37, 99, 235, 0.45) !important;
+    border-color: rgba(37, 99, 235, 0.35) !important;
   }
   .light .custom-leaflet-popup .leaflet-popup-tip {
-    background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: #fffaf3 !important;
+    border: 1px solid rgba(120, 113, 108, 0.16);
   }
   .light .custom-map-tooltip {
-    background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.12) !important;
-    color: #0f172a !important;
+    background: #fffaf3 !important;
+    border: 1px solid rgba(120, 113, 108, 0.16) !important;
+    color: #1f2937 !important;
+    box-shadow: 0 18px 30px -24px rgba(120, 113, 108, 0.45) !important;
   }
   .light .custom-map-tooltip:before {
-    border-top-color: #ffffff !important;
+    border-top-color: #fffaf3 !important;
   }
 }

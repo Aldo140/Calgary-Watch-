@@ -144,13 +144,13 @@ export default function EmergencyModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 bg-black/70 light:bg-[rgba(124,111,100,0.18)] backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 40 }}
             transition={{ duration: 0.15 }}
-            className="w-full max-w-md bg-slate-950 border border-red-500/40 rounded-[2rem] shadow-[0_0_80px_rgba(239,68,68,0.25)] overflow-hidden"
+            className="w-full max-w-md bg-slate-950 light:bg-[rgb(255,248,244)] border border-red-500/40 light:border-red-200 rounded-[2rem] shadow-[0_0_80px_rgba(239,68,68,0.25)] light:shadow-[0_24px_60px_-32px_rgba(127,29,29,0.28)] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Pulsing top bar */}
@@ -164,12 +164,12 @@ export default function EmergencyModal({
                     <Siren size={16} className="text-red-400 animate-pulse" />
                     <span className="text-[10px] font-black uppercase tracking-[0.25em] text-red-400">Emergency Report</span>
                   </div>
-                  <h2 className="text-xl font-black text-white leading-tight">
+                  <h2 className="text-xl font-black text-white light:text-slate-900 leading-tight">
                     {step === 'choose' ? 'Where is it?' : "What's happening?"}
                   </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Goes live instantly for everyone nearby</p>
+                  <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Goes live instantly for everyone nearby</p>
                 </div>
-                <button onClick={handleClose} className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                <button onClick={handleClose} className="p-2 text-slate-500 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
                   <X size={18} />
                 </button>
               </div>
@@ -196,8 +196,8 @@ export default function EmergencyModal({
                           <Navigation size={16} className="text-white" />
                         </div>
                         <div>
-                          <p className="text-sm font-black text-white">Use My Location</p>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="text-sm font-black text-white light:text-slate-900">Use My Location</p>
+                          <p className="text-[11px] text-slate-400 light:text-stone-500">
                             {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'GPS active'}
                           </p>
                         </div>
@@ -220,8 +220,8 @@ export default function EmergencyModal({
                         <MapPin size={16} className="text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-black text-white">Drop a Pin</p>
-                        <p className="text-[11px] text-slate-400">Pan the map to the exact spot</p>
+                        <p className="text-sm font-black text-white light:text-slate-900">Drop a Pin</p>
+                        <p className="text-[11px] text-slate-400 light:text-stone-500">Pan the map to the exact spot</p>
                       </div>
                     </div>
                     <span className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
@@ -233,10 +233,10 @@ export default function EmergencyModal({
               {step === 'form' && (
                 <>
                   {/* Active location display */}
-                  <div className="flex items-center justify-between px-3 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl">
+                  <div className="flex items-center justify-between px-3 py-2.5 bg-white/[0.04] light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-xl">
                     <div className="flex items-center gap-2">
                       <MapPin size={13} className={activeLocation ? 'text-green-400' : 'text-red-400'} />
-                      <span className="text-xs text-slate-300 font-mono">
+                      <span className="text-xs text-slate-300 light:text-stone-700 font-mono">
                         {activeLocation
                           ? `${activeLocation.lat.toFixed(5)}, ${activeLocation.lng.toFixed(5)}`
                           : 'No location set'}
@@ -244,7 +244,7 @@ export default function EmergencyModal({
                     </div>
                     <button
                       onClick={() => setStep('choose')}
-                      className="text-[11px] font-bold text-blue-400 hover:text-white transition-colors"
+                      className="text-[11px] font-bold text-blue-400 hover:text-white light:hover:text-slate-900 transition-colors"
                     >
                       Change
                     </button>
@@ -261,7 +261,7 @@ export default function EmergencyModal({
                           className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
                             selectedType === id
                               ? `${color} border-transparent ring-2 ${ring} text-white`
-                              : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                              : 'bg-white/5 light:bg-white/70 border-white/10 light:border-stone-200/80 text-slate-400 light:text-stone-600 hover:bg-white/10 light:hover:bg-white'
                           }`}
                         >
                           <Icon size={16} />
@@ -277,7 +277,7 @@ export default function EmergencyModal({
                     <select
                       value={neighborhood}
                       onChange={(e) => setNeighborhood(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 font-bold"
+                      className="w-full px-4 py-2.5 bg-white/5 light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-xl text-white light:text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 font-bold"
                     >
                       <option value="">Select area…</option>
                       <option value="Beltline">Beltline</option>
@@ -313,17 +313,17 @@ export default function EmergencyModal({
                       placeholder="e.g. Collision blocking intersection, smoke from building, person needs help…"
                       rows={3}
                       autoFocus
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-slate-600 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/5 light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-2xl text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
                     />
                     <p className="text-[10px] text-slate-600 mt-1 text-right">{description.trim().length} / 5 min</p>
                   </div>
 
                   {/* Reporter */}
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-xl">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.04] light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-xl">
                     <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-black">
                       {userName.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-xs text-slate-400">Posting as <span className="text-white font-bold">{userName}</span></span>
+                    <span className="text-xs text-slate-400 light:text-stone-500">Posting as <span className="text-white light:text-slate-900 font-bold">{userName}</span></span>
                   </div>
 
                   {/* Submit */}
@@ -335,7 +335,7 @@ export default function EmergencyModal({
                         ? 'bg-green-600 text-white'
                         : canSubmit
                         ? 'bg-red-600 hover:bg-red-500 text-white shadow-2xl shadow-red-600/40 active:scale-[0.98]'
-                        : 'bg-white/10 text-slate-600 cursor-not-allowed'
+                        : 'bg-white/10 light:bg-stone-200/80 text-slate-600 light:text-stone-500 cursor-not-allowed'
                     }`}
                   >
                     {isSubmitting ? (

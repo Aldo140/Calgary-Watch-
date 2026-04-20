@@ -140,7 +140,7 @@ export default function Sidebar({
   }, [activeIncidentId]);
 
   return (
-    <div className="flex flex-col h-full w-full lg:w-[22rem] bg-slate-950/50 light:bg-white/95 backdrop-blur-2xl border-r border-white/5 light:border-slate-200 overflow-hidden shadow-2xl z-20">
+    <div className="flex flex-col h-full w-full lg:w-[22rem] bg-slate-950/50 light:bg-[rgba(255,250,243,0.92)] backdrop-blur-2xl border-r border-white/5 light:border-stone-200/80 overflow-hidden shadow-2xl z-20">
       {/* Calgary Watch brand gradient - sky blue → Bow River teal (dark) / mountain stone → night (light) */}
       <div
         className="h-1.5 w-full shrink-0"
@@ -149,8 +149,8 @@ export default function Sidebar({
         }}
       />
       
-      <div className="p-6 border-b border-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-purple-600/10 z-0" />
+      <div className="p-6 border-b border-white/5 light:border-stone-200/80 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-purple-600/10 light:from-sky-500/12 light:via-transparent light:to-amber-400/12 z-0" />
         <div className="relative z-10">
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             <ShieldCheck className="text-blue-400 light:text-slate-900" />
@@ -159,9 +159,9 @@ export default function Sidebar({
           <div className="flex items-center justify-between mt-1">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Feed</span>
+              <span className="text-[10px] font-black text-slate-400 light:text-stone-600 uppercase tracking-widest">Live Feed</span>
             </div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-slate-500 light:text-stone-500 uppercase tracking-widest">
               Updated {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -180,7 +180,7 @@ export default function Sidebar({
             className="w-full bg-white/5 border border-white/10 light:bg-white light:border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 light:focus:ring-slate-900/40 focus:border-blue-500/50 light:focus:border-slate-900/40 transition-all"
           />
         </div>
-        <div className="flex flex-col items-center justify-center bg-blue-500/10 border border-blue-500/20 light:bg-slate-900 light:border-slate-900 rounded-xl px-3 py-2 min-w-[56px]">
+        <div className="flex flex-col items-center justify-center bg-blue-500/10 border border-blue-500/20 light:bg-gradient-to-br light:from-sky-600 light:to-teal-700 light:border-sky-600 rounded-xl px-3 py-2 min-w-[56px]">
           <span className="text-[10px] font-bold text-blue-400 light:text-white uppercase tracking-tighter leading-none">Total</span>
           <motion.span className="text-lg font-black text-white leading-none mt-1">
             {displayCount}
@@ -222,7 +222,7 @@ export default function Sidebar({
       </div>
 
       {/* Stats and Sorting */}
-      <div className="px-4 py-3 bg-slate-900/40 light:bg-slate-100 border-b border-white/5 light:border-slate-200 space-y-3">
+      <div className="px-4 py-3 bg-slate-900/40 light:bg-white/60 border-b border-white/5 light:border-stone-200/80 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">

@@ -181,6 +181,13 @@ export default function IncidentForm({
     if (isOpen) { setStep('choose'); setUsingGPS(false); setNeighborhoodOverride(false); }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen && pinLocation) {
+      setStep('form');
+      setUsingGPS(false);
+    }
+  }, [isOpen, pinLocation]);
+
   // Resolution order: tapped pin > explicit GPS choice > Calgary centre fallback
   const activeLocation = pinLocation ?? (usingGPS ? (gpsLocation ?? location) : location);
 
@@ -367,7 +374,7 @@ export default function IncidentForm({
               <div className="relative">
                 <select
                   {...register('category')}
-                  className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 light:border-stone-200/80 bg-slate-900 light:bg-white/80 text-white light:text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="crime">Crime</option>
                   <option value="traffic">Traffic</option>
@@ -376,7 +383,7 @@ export default function IncidentForm({
                   <option value="emergency">🚨 Emergency</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><polyline points="6 9 12 15 18 9"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 light:text-stone-500"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
               </div>
             </div>
@@ -387,13 +394,13 @@ export default function IncidentForm({
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-white font-bold text-sm">{watchedNeighborhood}</span>
+                    <span className="text-white light:text-slate-900 font-bold text-sm">{watchedNeighborhood}</span>
                     <span className="text-[10px] text-emerald-400 font-black uppercase tracking-wider">Auto-detected</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setNeighborhoodOverride(true)}
-                    className="text-[10px] text-slate-400 hover:text-white font-bold uppercase tracking-wider transition-colors"
+                    className="text-[10px] text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 font-bold uppercase tracking-wider transition-colors"
                   >
                     Change
                   </button>
@@ -402,7 +409,7 @@ export default function IncidentForm({
                 <div className="relative">
                   <select
                     {...register('neighborhood')}
-                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 bg-slate-900 text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 light:border-stone-200/80 bg-slate-900 light:bg-white/80 text-white light:text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Area</option>
                     <option value="Beltline">Beltline</option>
@@ -428,7 +435,7 @@ export default function IncidentForm({
                     <option value="Other">Other / Not Listed</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400"><polyline points="6 9 12 15 18 9"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 light:text-stone-500"><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
               )}
@@ -442,7 +449,7 @@ export default function IncidentForm({
               <Input
                 {...register('title')}
                 placeholder="e.g., Major collision on 17th Ave SW"
-                className="bg-slate-900 border-white/10 text-white placeholder:text-slate-600 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
+                className="bg-slate-900 light:bg-white/80 border-white/10 light:border-stone-200/80 text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
               />
               {errors.title && (
                 <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.title.message}</p>
@@ -455,7 +462,7 @@ export default function IncidentForm({
                 {...register('description')}
                 placeholder="Give neighbours the details they need to know..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-slate-900 text-white placeholder:text-slate-600 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 rounded-xl border border-white/10 light:border-stone-200/80 bg-slate-900 light:bg-white/80 text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.description && (
                 <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.description.message}</p>
@@ -467,22 +474,22 @@ export default function IncidentForm({
               <Input
                 {...register('image_url')}
                 placeholder="e.g. imgur.com/photo.jpg"
-                className="bg-slate-900 border-white/10 text-white placeholder:text-slate-600 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
+                className="bg-slate-900 light:bg-white/80 border-white/10 light:border-stone-200/80 text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
               />
               {errors.image_url && (
                 <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.image_url.message}</p>
               )}
             </div>
 
-            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/8 cursor-pointer transition-colors">
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 light:border-stone-200/80 bg-white/5 light:bg-white/68 hover:bg-white/8 light:hover:bg-white cursor-pointer transition-colors">
               <input
                 type="checkbox"
                 {...register('anonymous', { setValueAs: (v) => v === true })}
-                className="h-4 w-4 rounded border-white/20 bg-slate-900 accent-blue-500 cursor-pointer"
+                className="h-4 w-4 rounded border-white/20 light:border-stone-300 bg-slate-900 light:bg-white accent-blue-500 cursor-pointer"
               />
               <div>
-                <p className="text-xs font-bold text-white">Post Anonymously</p>
-                <p className="text-[10px] text-slate-400">Your name won&apos;t appear</p>
+                <p className="text-xs font-bold text-white light:text-slate-900">Post Anonymously</p>
+                <p className="text-[10px] text-slate-400 light:text-stone-500">Your name won&apos;t appear</p>
               </div>
             </label>
 
@@ -492,7 +499,7 @@ export default function IncidentForm({
               </p>
             )}
 
-            <div className="flex items-center gap-3 pt-2 border-t border-white/8">
+            <div className="flex items-center gap-3 pt-2 border-t border-white/8 light:border-stone-200/80">
               <img
                 src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1e293b&color=fff'}
                 alt=""
@@ -532,7 +539,7 @@ export default function IncidentForm({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xl"
+            className="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-slate-950/60 light:bg-[#7c6f64]/18 backdrop-blur-xl"
             onClick={handleClose}
           >
             <motion.div
@@ -540,15 +547,15 @@ export default function IncidentForm({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.93, y: 16 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-50 w-full max-w-xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 rounded-3xl border border-white/10 shadow-2xl shadow-blue-900/40 overflow-hidden flex flex-col"
+              className="relative z-50 w-full max-w-xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 light:from-[rgb(255,250,243)] light:via-[rgb(255,247,237)] light:to-[rgb(242,251,248)] rounded-3xl border border-white/10 light:border-stone-200/80 shadow-2xl shadow-blue-900/40 light:shadow-[0_24px_60px_-32px_rgba(120,113,108,0.35)] overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-gradient-to-r from-slate-900/80 to-blue-900/15 flex-shrink-0">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 light:border-stone-200/80 bg-gradient-to-r from-slate-900/80 to-blue-900/15 light:from-white/85 light:to-sky-50 flex-shrink-0">
                 <div>
-                  <h2 className="text-xl font-black text-white">Keep Calgary Safe</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Report what&apos;s happening in real-time</p>
+                  <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
+                  <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report what&apos;s happening in real-time</p>
                 </div>
-                <button type="button" onClick={handleClose} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+                <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-lg transition-all">
                   <X size={20} />
                 </button>
               </div>
@@ -567,7 +574,7 @@ export default function IncidentForm({
             />
             <motion.div
               key="report-mobile-sheet"
-              className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[2.5rem] bg-slate-950 border-t border-white/10 flex flex-col"
+              className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[2.5rem] bg-slate-950 light:bg-[rgb(255,250,243)] border-t border-white/10 light:border-stone-200/80 flex flex-col"
               style={{ maxHeight: '92dvh' }}
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
@@ -580,10 +587,10 @@ export default function IncidentForm({
               </div>
               <div className="flex items-center justify-between px-6 pb-4 flex-shrink-0">
                 <div>
-                  <h2 className="text-xl font-black text-white">Keep Calgary Safe</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Report in real-time</p>
+                  <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
+                  <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report in real-time</p>
                 </div>
-                <button type="button" onClick={handleClose} className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
                   <X size={20} />
                 </button>
               </div>

@@ -222,7 +222,7 @@ export default function MobileMapSheet({
             'transition-colors duration-200',
             dark
               ? 'bg-slate-950 border-t border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.45)]'
-              : 'bg-white border-t border-slate-200 shadow-[0_-8px_32px_rgba(0,0,0,0.10)]',
+              : 'bg-[#fffaf3] border-t border-stone-200/80 shadow-[0_-8px_32px_rgba(120,113,108,0.16)]',
           )}
           style={{ maxHeight: '85vh', ...(isFormOpen ? { visibility: 'hidden', pointerEvents: 'none' } : {}) }}
         >

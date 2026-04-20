@@ -1,6 +1,6 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
@@ -24,9 +24,10 @@ interface IncidentDetailPanelProps {
   incident: Incident | null;
   onClose: () => void;
   onViewNeighborhood: (neighborhood: string) => void;
+  onReportIncident: (incident: Incident) => void;
 }
 
-export default function IncidentDetailPanel({ incident, onClose, onViewNeighborhood }: IncidentDetailPanelProps) {
+export default function IncidentDetailPanel({ incident, onClose, onViewNeighborhood, onReportIncident }: IncidentDetailPanelProps) {
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
   );
@@ -102,6 +103,10 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
     }
   };
 
+  const handleOpenShareWindow = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer,width=640,height=720');
+  };
+
   // Native Web Share API (mobile) — fall back to X share on desktop.
   const handleNativeShare = async () => {
     const shareData = { title: `Calgary Watch: ${incident.title}`, text: tweetText, url: incidentUrl };
@@ -115,6 +120,13 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
       // cancelled — fail silently
     }
   };
+
+  const encodedUrl = encodeURIComponent(incidentUrl);
+  const encodedTitle = encodeURIComponent(`Calgary Watch: ${incident.title}`);
+  const encodedBody = encodeURIComponent(`${incident.title}\n${incident.neighborhood || 'Calgary'} · ${timeAgo} ago\n\n${incidentUrl}`);
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${incident.title} — ${incidentUrl}`)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  const emailUrl = `mailto:?subject=${encodedTitle}&body=${encodedBody}`;
 
   const sheetMotion = isMobileSheet
     ? { initial: { y: '100%', opacity: 0 }, animate: { y: 0, opacity: 1 }, exit: { y: '100%', opacity: 0 } }
@@ -139,7 +151,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
         >
           <Card
             className={cn(
-              'flex flex-col bg-slate-950/97 light:bg-white backdrop-blur-md border-white/10 light:border-slate-200 shadow-[0_16px_48px_-20px_rgba(0,0,0,0.55)] overflow-hidden p-0 relative min-h-0',
+              'flex flex-col bg-slate-950/97 light:bg-[rgb(255,250,243)] backdrop-blur-md border-white/10 light:border-stone-200/80 shadow-[0_16px_48px_-20px_rgba(0,0,0,0.55)] overflow-hidden p-0 relative min-h-0',
               isMobileSheet
                 ? 'max-h-[88dvh] w-full rounded-t-[1.75rem] rounded-b-none border-x-0 border-b-0'
                 : 'h-full rounded-none sm:rounded-[2.5rem]'
@@ -177,7 +189,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                 loading="eager"
                 decoding="async"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent light:from-white light:via-white/70" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent light:from-[rgb(255,250,243)] light:via-[rgba(255,250,243,0.74)]" />
               
               <button
                 onClick={onClose}
@@ -226,14 +238,14 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
             <div className="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/[0.03] light:bg-slate-50 rounded-3xl p-5 border border-white/10 light:border-slate-200 hover:bg-white/[0.05] light:hover:bg-slate-100 transition-colors group">
+                <div className="bg-white/[0.03] light:bg-white/72 rounded-3xl p-5 border border-white/10 light:border-stone-200/80 hover:bg-white/[0.05] light:hover:bg-white transition-colors group">
                   <div className="flex items-center gap-2 mb-2">
                     <Clock size={16} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Time Ago</span>
                   </div>
                   <p className="text-white text-lg font-black">{formatDistanceToNow(incident.timestamp)}</p>
                 </div>
-                <div className="bg-white/[0.03] light:bg-slate-50 rounded-3xl p-5 border border-white/10 light:border-slate-200 hover:bg-white/[0.05] light:hover:bg-slate-100 transition-colors group">
+                <div className="bg-white/[0.03] light:bg-white/72 rounded-3xl p-5 border border-white/10 light:border-stone-200/80 hover:bg-white/[0.05] light:hover:bg-white transition-colors group">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin size={16} className="text-slate-500 group-hover:text-red-400 transition-colors" />
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Location</span>
@@ -346,6 +358,14 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-4">
+                <button
+                  onClick={() => onReportIncident(incident)}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-2xl h-12 font-black tracking-wide text-sm text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all active:scale-95 shadow-lg shadow-red-950/40"
+                >
+                  <Siren size={18} />
+                  Report Related Incident
+                </button>
+
                 {/* Share row */}
                 <div className="flex gap-2">
                   {/* Post on X — primary CTA */}
@@ -379,6 +399,30 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                   >
                     <Share2 size={17} />
                   </button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => handleOpenShareWindow(whatsappUrl)}
+                    className="flex items-center justify-center gap-2 rounded-2xl h-11 border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-white light:text-slate-900 text-xs font-black tracking-wide transition-all active:scale-95"
+                  >
+                    <MessageCircle size={15} />
+                    WhatsApp
+                  </button>
+                  <button
+                    onClick={() => handleOpenShareWindow(facebookUrl)}
+                    className="flex items-center justify-center gap-2 rounded-2xl h-11 border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-white light:text-slate-900 text-xs font-black tracking-wide transition-all active:scale-95"
+                  >
+                    <Facebook size={15} />
+                    Facebook
+                  </button>
+                  <a
+                    href={emailUrl}
+                    className="flex items-center justify-center gap-2 rounded-2xl h-11 border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-white light:text-slate-900 text-xs font-black tracking-wide transition-all active:scale-95"
+                  >
+                    <Mail size={15} />
+                    Email
+                  </a>
                 </div>
 
                 {/* Navigate */}

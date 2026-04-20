@@ -268,6 +268,8 @@ export default function LandingPage() {
             <img
               src={publicAsset('icon.svg')}
               alt=""
+              width={32}
+              height={32}
               className="w-8 h-8 object-contain drop-shadow-md"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
             />
@@ -327,7 +329,7 @@ export default function LandingPage() {
         
         {/* Full-width seamless background image */}
         <div className="absolute inset-0 pointer-events-none">
-            <img src={publicAsset('images/calgary2.jpg')} className="w-full h-full object-cover opacity-40 brightness-75 scale-105" alt="Calgary Skyline Ambient" />
+            <img src={publicAsset('images/calgary2.webp')} fetchPriority="high" width={1920} height={1080} className="w-full h-full object-cover opacity-40 brightness-75 scale-105" alt="Calgary Skyline Ambient" />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950 light:from-slate-50 via-slate-950/70 light:via-slate-50/70 to-slate-950/40 light:to-slate-50/40" />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 light:from-slate-50 via-transparent to-transparent opacity-90" />
         </div>
@@ -388,7 +390,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-3 pt-3">
                 <div className="flex -space-x-2.5 shrink-0" aria-hidden="true">
                   {AVATARS.map((av, i) => (
-                    <img key={i} src={av.src} alt="" className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover shrink-0"
+                    <img key={i} src={av.src} alt="" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover shrink-0"
                       loading="lazy"
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                   ))}
@@ -434,6 +436,7 @@ export default function LandingPage() {
                    <div className="absolute top-0 inset-x-0 h-[55%] bg-slate-900 overflow-hidden">
                        <img
                           src={publicAsset('images/calgary_map.png')}
+                          width={800} height={600}
                           className="absolute inset-0 w-[110%] h-[110%] object-cover opacity-90"
                           alt="Calgary Top Down Neon Map"
                           loading="lazy"
@@ -525,7 +528,7 @@ export default function LandingPage() {
 
                        {/* Logo watermark - bottom right of phone */}
                        <div className="absolute bottom-3 right-4 flex items-center gap-1.5 opacity-40 pointer-events-none">
-                         <img src={publicAsset('icon.svg')} alt="" className="w-4 h-4 object-contain" />
+                         <img src={publicAsset('icon.svg')} alt="" width={16} height={16} className="w-4 h-4 object-contain" />
                          <span className="text-[9px] font-black tracking-tight"
                            style={{ background: 'linear-gradient(to right,#4A90D9,#2E8B7A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                            Calgary Watch
@@ -677,7 +680,7 @@ export default function LandingPage() {
             className="mt-12 relative rounded-2xl overflow-hidden shadow-2xl border border-[#4A90D9]/25">
             <picture>
               <source srcSet={publicAsset('images/calgary3.webp')} type="image/webp" />
-              <img src={publicAsset('images/calgary3.webp')} alt="Calgary skyline" className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
+              <img src={publicAsset('images/calgary3.webp')} alt="Calgary skyline" width={1200} height={380} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
             </picture>
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40" />
             <div className="relative z-10 grid md:grid-cols-2 gap-0 min-h-[380px]">
@@ -936,7 +939,7 @@ export default function LandingPage() {
             className="hidden md:block rounded-2xl border border-white/10 light:border-slate-200 overflow-hidden shadow-xl">
             <div className="grid md:grid-cols-2 gap-0">
               <div className="relative h-48 md:h-full overflow-hidden">
-                <motion.img src={publicAsset('images/calgary1.webp')} alt="Calgary neighbourhood" className="w-full h-full object-cover" loading="lazy" whileHover={!reducedMotion ? { scale: 1.04 } : undefined} transition={{ duration: 0.5 }} />
+                <motion.img src={publicAsset('images/calgary1.webp')} alt="Calgary neighbourhood" width={600} height={400} className="w-full h-full object-cover" loading="lazy" whileHover={!reducedMotion ? { scale: 1.04 } : undefined} transition={{ duration: 0.5 }} />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 to-transparent" />
               </div>
               <div className="p-6 md:p-8 lg:p-12 flex flex-col justify-center bg-slate-900/60 light:bg-white">
@@ -1031,7 +1034,7 @@ export default function LandingPage() {
               <motion.div style={{ rotateY:-15, rotateX:5 }} whileHover={{ rotateY:0, rotateX:0, scale:1.05 }} transition={{ type:'spring', stiffness:100, damping:20 }}
                 className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-slate-900 bg-slate-950 shadow-[-30px_30px_80px_rgba(168,85,247,0.2)] overflow-hidden ring-1 ring-white/10">
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30" />
-                <div className="absolute inset-0 bg-slate-900"><img src={publicAsset('images/calgary7.webp')} className="w-full h-full object-cover opacity-60 mix-blend-screen" alt="" /></div>
+                <div className="absolute inset-0 bg-slate-900"><img src={publicAsset('images/calgary7.webp')} width={320} height={680} className="w-full h-full object-cover opacity-60 mix-blend-screen" alt="" /></div>
                 <div className="absolute top-16 left-4 right-4 flex gap-2 z-20">
                   <div className="h-10 flex-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20" />
                   <div className="h-10 w-10 bg-white/10 backdrop-blur-md rounded-xl border border-white/20" />
@@ -1329,7 +1332,7 @@ export default function LandingPage() {
       <section className="py-12 md:py-24 px-4 sm:px-6">
         <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55 }}
           className="max-w-6xl mx-auto relative overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-white/10 light:border-slate-300 bg-slate-900/70 light:bg-white px-6 py-10 md:px-12 md:py-14">
-          <img src={publicAsset('images/calgary8.webp')} alt="" loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-8 light:opacity-5" />
+          <img src={publicAsset('images/calgary8.webp')} alt="" width={1200} height={400} loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-8 light:opacity-5" />
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 10% 15%,rgba(46,139,122,0.12),transparent 35%),radial-gradient(circle at 90% 85%,rgba(74,144,217,0.12),transparent 45%)' }} aria-hidden="true" />
           <div className="relative z-10 grid lg:grid-cols-[1.2fr_auto] gap-8 items-center">
             <div>

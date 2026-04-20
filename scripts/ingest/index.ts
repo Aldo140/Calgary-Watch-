@@ -48,27 +48,50 @@ function initFirebase(): Firestore {
 }
 
 // ---------------------------------------------------------------------------
-// Deduplication
+// Deduplication + pruning (single Firestore read)
 // ---------------------------------------------------------------------------
 
 /**
- * Returns a map of dedup_key → document ID for all currently-active
- * ingested incidents in Firestore.
+ * Single-pass over all ingested incidents:
+ *  - Soft-deletes any doc whose expires_at is in the past
+ *  - Returns a dedup_key → doc-ID map for all still-active docs
+ *
+ * This replaces the former separate loadExistingKeys + pruneExpiredIncidents
+ * calls, halving the number of Firestore reads per ingest run.
  */
-async function loadExistingKeys(
+async function loadAndPrune(
   db: Firestore
-): Promise<Map<string, string>> {
+): Promise<{ existing: Map<string, string>; pruned: number }> {
+  const now = Date.now();
   const snapshot = await db
     .collection('incidents')
     .where('dedup_key', '!=', null)
     .get();
 
-  const map = new Map<string, string>();
+  const existing = new Map<string, string>();
+  const batch = db.batch();
+  let pruned = 0;
+
   for (const doc of snapshot.docs) {
-    const key = doc.data().dedup_key as string | undefined;
-    if (key) map.set(key, doc.id);
+    const data = doc.data();
+    if (data.deleted) continue;
+
+    const expiresAt = data.expires_at as number | undefined;
+    if (expiresAt && expiresAt < now) {
+      batch.update(doc.ref, {
+        deleted: true,
+        deletedAt: now,
+        deletedBy: 'system-ingest',
+      });
+      pruned++;
+    } else {
+      const key = data.dedup_key as string | undefined;
+      if (key) existing.set(key, doc.id);
+    }
   }
-  return map;
+
+  if (pruned > 0) await batch.commit();
+  return { existing, pruned };
 }
 
 // ---------------------------------------------------------------------------
@@ -104,37 +127,6 @@ async function upsertIncident(
   return 'created';
 }
 
-/**
- * Soft-delete incidents whose expires_at is in the past and that
- * originated from the pipeline (dedup_key present).
- */
-async function pruneExpiredIncidents(db: Firestore): Promise<number> {
-  const now = Date.now();
-  const snapshot = await db
-    .collection('incidents')
-    .where('dedup_key', '!=', null)
-    .get();
-
-  const batch = db.batch();
-  let count = 0;
-
-  for (const doc of snapshot.docs) {
-    const data = doc.data();
-    if (data.deleted) continue; // skip already-deleted docs in JS (avoids composite index)
-    const expiresAt = data.expires_at as number | undefined;
-    if (expiresAt && expiresAt < now) {
-      batch.update(doc.ref, {
-        deleted: true,
-        deletedAt: now,
-        deletedBy: 'system-ingest',
-      });
-      count++;
-    }
-  }
-
-  if (count > 0) await batch.commit();
-  return count;
-}
 
 // ---------------------------------------------------------------------------
 // Main
@@ -144,10 +136,6 @@ async function run(): Promise<void> {
   console.log(`[ingest] Starting — ${new Date().toISOString()}`);
 
   const db = initFirebase();
-
-  // 1. Prune stale incidents first.
-  const pruned = await pruneExpiredIncidents(db);
-  console.log(`[ingest] Pruned ${pruned} expired incident(s).`);
 
   // 2. Fetch all sources in parallel (failures are isolated).
   const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced, cpsData, infrastructure] = await Promise.allSettled([
@@ -224,9 +212,9 @@ async function run(): Promise<void> {
     return;
   }
 
-  // 3. Load existing dedup keys.
-  const existing = await loadExistingKeys(db);
-  console.log(`[ingest] ${existing.size} existing ingested key(s) in Firestore.`);
+  // 3. Load existing dedup keys and prune expired incidents in a single read.
+  const { existing, pruned } = await loadAndPrune(db);
+  console.log(`[ingest] ${existing.size} active key(s); pruned ${pruned} expired incident(s).`);
 
   // 4. Upsert in series (avoids Firestore write-rate bursts).
   let created = 0;

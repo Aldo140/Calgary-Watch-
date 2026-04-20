@@ -258,7 +258,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20,
-        className: 'dark-map-tiles'
+        className: theme === 'dark' ? 'dark-map-tiles' : undefined
       }).addTo(map.current);
 
       // Use refs so this single handler always calls the latest callbacks.

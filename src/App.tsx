@@ -8,6 +8,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import SeoManager from '@/src/components/SeoManager';
 import { db } from '@/src/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { getSessionId, getTrafficSource } from '@/src/lib/analytics';
 
 // Lazy-load every page so the initial bundle stays minimal and module-eval
 // failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
@@ -39,8 +40,21 @@ function PageTracker() {
   const location = useLocation();
   useEffect(() => {
     if (!db || location.pathname === '/admin') return; // Exclude admin page from views
+
+    const params = new URLSearchParams(window.location.search);
+    const trafficSource = getTrafficSource(document.referrer, params);
+
     // Fire-and-forget – ignore permission/adblock rejections
-    addDoc(collection(db, 'page_views'), { timestamp: Date.now(), path: location.pathname }).catch(() => {});
+    addDoc(collection(db, 'page_views'), {
+      timestamp: Date.now(),
+      path: location.pathname,
+      referrer: document.referrer || '',
+      source: trafficSource,
+      utmSource: params.get('utm_source') ?? undefined,
+      utmMedium: params.get('utm_medium') ?? undefined,
+      sessionId: getSessionId(),
+      userAgent: navigator.userAgent,
+    }).catch(() => {});
   }, [location.pathname]);
   return null;
 }

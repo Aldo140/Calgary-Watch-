@@ -11,7 +11,7 @@ import {
   signOut
 } from 'firebase/auth';
 import { auth, db, isFirebaseConfigured } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 
 interface AuthContextType {
@@ -60,6 +60,11 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         const userRef = doc(db, 'users', currentUser.uid);
         try {
           const role = isApprovedAdmin ? 'admin' : 'user';
+
+          // Check if user document already exists to preserve createdAt
+          const existingDoc = await getDoc(userRef);
+          const createdAt = existingDoc.exists() ? existingDoc.data().createdAt : serverTimestamp();
+
           await setDoc(
             userRef,
             {
@@ -68,6 +73,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
               email: currentUser.email || '',
               photoURL: currentUser.photoURL || '',
               role,
+              createdAt,
             },
             { merge: true }
           );

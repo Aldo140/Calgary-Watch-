@@ -15,7 +15,7 @@ import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Searc
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import { db } from '@/src/firebase';
+import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
@@ -530,7 +530,7 @@ export default function MapPage() {
       lastVisibleIncidentDoc.current = nextPage.docs.length > 0 ? nextPage.docs[nextPage.docs.length - 1] : lastVisibleIncidentDoc.current;
       setHasMoreIncidents(nextPage.docs.length === INCIDENT_PAGE_SIZE);
     } catch (error) {
-      console.error('[CalgaryWatch] Load more incidents failed:', error);
+      handleFirestoreError(error, OperationType.LIST, path);
     } finally {
       setIsLoadingMoreIncidents(false);
     }
@@ -721,7 +721,7 @@ export default function MapPage() {
             authorUid: user.uid,
           });
         } catch (error) {
-          console.error('[CalgaryWatch] Emergency submit failed:', error);
+          handleFirestoreError(error, OperationType.CREATE, path);
         }
       })();
     });

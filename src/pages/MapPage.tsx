@@ -18,6 +18,7 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
+import { checkRateLimit, recordSubmission } from '@/src/lib/rateLimit';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats } from '@/src/hooks/useCrimeStats';
 
@@ -646,6 +647,14 @@ export default function MapPage() {
       console.warn('Cannot post report: Firebase env vars were not set at build time.');
       return;
     }
+
+    const rl = checkRateLimit(user.uid);
+    if (!rl.allowed) {
+      setSubmitError(rl.reason ?? 'Too many posts. Please wait before submitting again.');
+      setTimeout(() => setSubmitError(null), 6000);
+      return;
+    }
+
     startTransition(() => {
       (async () => {
         try {
@@ -672,6 +681,7 @@ export default function MapPage() {
             report_count: 1,
             authorUid: user.uid,
           });
+          recordSubmission(user.uid);
         } catch (error) {
           console.error('[CalgaryWatch] Report submission failed:', error);
           setSubmitError('Your report could not be saved. Please try again.');
@@ -692,6 +702,13 @@ export default function MapPage() {
     setConfirmedEmergencyPinLocation(null);
     if (!db) {
       console.warn('Cannot submit emergency report: Firebase env vars were not set at build time.');
+      return;
+    }
+
+    const rl = checkRateLimit(user.uid);
+    if (!rl.allowed) {
+      setSubmitError(rl.reason ?? 'Too many posts. Please wait before submitting again.');
+      setTimeout(() => setSubmitError(null), 6000);
       return;
     }
 
@@ -720,6 +737,7 @@ export default function MapPage() {
             report_count: 1,
             authorUid: user.uid,
           });
+          recordSubmission(user.uid);
         } catch (error) {
           handleFirestoreError(error, OperationType.CREATE, path);
         }

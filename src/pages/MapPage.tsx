@@ -907,6 +907,7 @@ export default function MapPage() {
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
+          isMapInteractive={!isFormOpen || isPinMode || isEmergencyPinMode}
         />
 
         {/* Tap-to-close: transparent target covering exposed map when sheet is fully expanded */}

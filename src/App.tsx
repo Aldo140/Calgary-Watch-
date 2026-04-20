@@ -35,12 +35,69 @@ function RedirectHandler() {
   return null;
 }
 
+/**
+ * PageTracker — enhanced analytics document written to `page_views` on every
+ * unique pathname visit.  Fields collected:
+ *   path         – current pathname
+ *   referrer     – document.referrer (empty string when none)
+ *   utm_source   – ?utm_source param, if present
+ *   utm_medium   – ?utm_medium param, if present
+ *   utm_campaign – ?utm_campaign param, if present
+ *   traffic_source – bucketed label derived from referrer / UTM
+ *   sessionId    – stable per-tab random ID (stored in sessionStorage)
+ *   timestamp    – Unix ms
+ */
 function PageTracker() {
   const location = useLocation();
   useEffect(() => {
-    if (!db || location.pathname === '/admin') return; // Exclude admin page from views
-    // Fire-and-forget – ignore permission/adblock rejections
-    addDoc(collection(db, 'page_views'), { timestamp: Date.now(), path: location.pathname }).catch(() => {});
+    if (!db || location.pathname === '/admin') return;
+
+    // ── Session ID ──────────────────────────────────────────────────────────
+    // Stable for the browser tab's lifetime; regenerated on new tab/session.
+    let sessionId = sessionStorage.getItem('cw_session_id');
+    if (!sessionId) {
+      sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('cw_session_id', sessionId);
+    }
+
+    // ── UTM params ──────────────────────────────────────────────────────────
+    const searchParams = new URLSearchParams(location.search);
+    const utm_source   = searchParams.get('utm_source')   ?? '';
+    const utm_medium   = searchParams.get('utm_medium')   ?? '';
+    const utm_campaign = searchParams.get('utm_campaign') ?? '';
+
+    // ── Traffic source bucket ────────────────────────────────────────────────
+    const referrer = typeof document !== 'undefined' ? document.referrer : '';
+    let traffic_source = 'direct';
+    if (utm_source) {
+      traffic_source = utm_source.toLowerCase().includes('email')
+        ? 'email'
+        : utm_medium === 'social' || ['facebook','twitter','instagram','linkedin','tiktok'].includes(utm_source.toLowerCase())
+          ? 'social'
+          : 'campaign';
+    } else if (referrer) {
+      try {
+        const refHost = new URL(referrer).hostname.replace(/^www\./, '');
+        if (['google.com','bing.com','duckduckgo.com','yahoo.com','ecosia.org'].some(s => refHost.includes(s))) {
+          traffic_source = 'organic_search';
+        } else if (['facebook.com','twitter.com','x.com','instagram.com','linkedin.com','reddit.com','tiktok.com'].some(s => refHost.includes(s))) {
+          traffic_source = 'social';
+        } else if (refHost !== window.location.hostname.replace(/^www\./, '')) {
+          traffic_source = 'referral';
+        }
+      } catch {}
+    }
+
+    addDoc(collection(db, 'page_views'), {
+      timestamp: Date.now(),
+      path: location.pathname,
+      referrer,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      traffic_source,
+      sessionId,
+    }).catch(() => {});
   }, [location.pathname]);
   return null;
 }

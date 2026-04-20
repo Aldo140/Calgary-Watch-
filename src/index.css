@@ -21,6 +21,11 @@
   --color-cw-night:      #1A1E2E;   /* Alberta deep-night sky     */
 }
 
+/* Lighten dark-mode map tiles for better visibility at low brightness */
+.dark-map-tiles {
+  filter: brightness(1.6) contrast(0.85);
+}
+
 /* Custom Leaflet Popup Styling */
 .custom-leaflet-popup .leaflet-popup-content-wrapper {
   background: transparent !important;

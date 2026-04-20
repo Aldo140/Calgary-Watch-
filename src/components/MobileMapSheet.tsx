@@ -64,6 +64,7 @@ interface MobileMapSheetProps {
   onLoadMore: () => void;
   onReportPress: () => void;
   activeIncidentId?: string | null;
+  isFormOpen?: boolean;
 }
 
 export default function MobileMapSheet({
@@ -81,6 +82,7 @@ export default function MobileMapSheet({
   onLoadMore,
   onReportPress,
   activeIncidentId,
+  isFormOpen = false,
 }: MobileMapSheetProps) {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -222,7 +224,7 @@ export default function MobileMapSheet({
               ? 'bg-slate-950 border-t border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.45)]'
               : 'bg-white border-t border-slate-200 shadow-[0_-8px_32px_rgba(0,0,0,0.10)]',
           )}
-          style={{ maxHeight: '85vh' }}
+          style={{ maxHeight: '85vh', ...(isFormOpen ? { visibility: 'hidden', pointerEvents: 'none' } : {}) }}
         >
           <Drawer.Title className="sr-only">Incidents</Drawer.Title>
           <Drawer.Description className="sr-only">Browse and search Calgary incidents</Drawer.Description>

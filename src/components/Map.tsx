@@ -254,7 +254,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       baseTileLayer.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
-        maxZoom: 20
+        maxZoom: 20,
+        className: 'dark-map-tiles'
       }).addTo(map.current);
 
       // Use refs so this single handler always calls the latest callbacks.
@@ -463,8 +464,12 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;
 
-    if (baseTileLayer.current) {
-      map.current.removeLayer(baseTileLayer.current);
+    try {
+      if (baseTileLayer.current && map.current.hasLayer(baseTileLayer.current)) {
+        map.current.removeLayer(baseTileLayer.current);
+      }
+    } catch (e) {
+      console.warn('[CalgaryWatch] Could not remove base tile layer:', e);
     }
 
     const tileUrl = theme === 'light'
@@ -474,7 +479,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     baseTileLayer.current = L.tileLayer(tileUrl, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
-      maxZoom: 20
+      maxZoom: 20,
+      className: theme === 'dark' ? 'dark-map-tiles' : undefined
     }).addTo(map.current);
 
     if (showHeatmap && heatmapLayer.current) {
@@ -827,7 +833,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           'absolute inset-0 pointer-events-none z-10 bg-gradient-to-t to-transparent',
           theme === 'light'
             ? 'from-white/55 via-white/10 max-lg:from-white/50 max-lg:via-white/5 lg:from-white/40'
-            : 'from-slate-950/70 via-slate-950/15 max-lg:from-slate-950/80 max-lg:via-slate-900/25 lg:from-slate-950/20'
+            : 'from-slate-950/45 via-slate-950/10 max-lg:from-slate-950/55 max-lg:via-slate-900/15 lg:from-slate-950/15'
         )}
       />
 
@@ -850,7 +856,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
           {/* Pin - rendered in its own stacking layer so the shadow ellipse
               doesn't clip the crosshair lines above */}
-          <div className="absolute inset-0 z-21 pointer-events-none select-none">
+          <div className="absolute inset-0 z-[21] pointer-events-none select-none">
             {/*
               The entire pin graphic is a column of:
                 [pulse ring + pin head] → stem → tip dot (= map centre)

@@ -614,7 +614,7 @@ export default function AdminPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold">Incidents (Editable)</h2>
             <div className="flex flex-col items-end">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Moderation Queue</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">All Incidents</span>
               <span className="text-[10px] text-amber-500 md:hidden mt-0.5">Swipe table &rarr;</span>
             </div>
           </div>
@@ -902,26 +902,26 @@ export default function AdminPage() {
         </div>
         {/* ── End Analytics ──────────────────────────────────────────────────── */}
 
-        {/* ── Moderation Queue ─────────────────────────────────────────────── */}
+        {/* ── Recent Posts (Live) ─────────────────────────────────────────────── */}
         <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-base font-black flex items-center gap-2">
                 <ShieldQuestion size={15} className="text-amber-400" />
-                Moderation Queue
+                Recent Posts (Live)
                 {pendingReviewIncidents.length > 0 && (
                   <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black">
-                    {pendingReviewIncidents.length} pending
+                    {pendingReviewIncidents.length} new
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">New community reports awaiting review. Auto-approved after 10 min.</p>
+              <p className="text-xs text-slate-500 mt-0.5">New community reports go live immediately. Review and remove anything suspicious.</p>
             </div>
           </div>
           {pendingReviewIncidents.length === 0 ? (
             <div className="flex items-center gap-2 py-6 justify-center text-slate-500 text-sm">
               <CheckCircle size={16} className="text-green-500" />
-              Queue is clear
+              No recent posts to review
             </div>
           ) : (
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
@@ -936,16 +936,10 @@ export default function AdminPage() {
                         <span>{incident.neighborhood}</span>
                         <span>{incident.category}</span>
                         <span>{ageMin < 1 ? 'just now' : `${ageMin}m ago`}</span>
-                        <span className="text-amber-400">auto-approves in {Math.max(0, 10 - ageMin)}m</span>
+                        <span className="text-green-400">live now</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        onClick={() => approveIncident(incident.id)}
-                        className="px-3 py-1.5 rounded-lg bg-green-500/15 text-green-400 text-xs font-bold border border-green-500/25 hover:bg-green-500/25 transition-colors"
-                      >
-                        Approve
-                      </button>
                       <button
                         onClick={() => softDeleteIncident(incident.id)}
                         className="px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 text-xs font-bold border border-red-500/25 hover:bg-red-500/25 transition-colors"

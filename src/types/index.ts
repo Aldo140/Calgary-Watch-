@@ -23,7 +23,9 @@ export type SourceType =
   | 'calgary_water_main_breaks'
   | 'alberta_emergency_alert'
   | 'reddit_calgary'
-  | 'news_rss';
+  | 'news_rss'
+  | 'calgary_police_crime'
+  | 'calgary_infrastructure';
 
 export const CATEGORY_ICONS = {
   crime: AlertCircle,

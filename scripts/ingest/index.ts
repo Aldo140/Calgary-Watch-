@@ -23,6 +23,9 @@ import { fetch511AlbertaEvents } from './sources/511-alberta.js';
 import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.js';
 import { fetchRedditCalgary } from './sources/reddit.js';
 import { fetchNewsFeedsCalgary } from './sources/rss.js';
+import { fetchEnvironmentCanadaEnhanced } from './sources/environment-canada-enhanced.js';
+import { fetchCalgaryPoliceData } from './sources/calgary-police.js';
+import { fetchCalgaryInfrastructureAlerts } from './sources/calgary-infrastructure.js';
 import type { NormalizedIncident } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -147,12 +150,15 @@ async function run(): Promise<void> {
   console.log(`[ingest] Pruned ${pruned} expired incident(s).`);
 
   // 2. Fetch all sources in parallel (failures are isolated).
-  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds] = await Promise.allSettled([
+  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced, cpsData, infrastructure] = await Promise.allSettled([
     fetchEnvironmentCanadaAlerts(),
     fetch511AlbertaEvents(),
     fetchAlbertaEmergencyAlerts(),
     fetchRedditCalgary(),
     fetchNewsFeedsCalgary(),
+    fetchEnvironmentCanadaEnhanced(),
+    fetchCalgaryPoliceData(),
+    fetchCalgaryInfrastructureAlerts(),
   ]);
 
   const allIncidents: NormalizedIncident[] = [];
@@ -190,6 +196,27 @@ async function run(): Promise<void> {
     allIncidents.push(...newsFeeds.value);
   } else {
     console.error('[ingest] News RSS failed:', newsFeeds.reason);
+  }
+
+  if (ecEnhanced.status === 'fulfilled') {
+    console.log(`[ingest] Environment Canada Enhanced: ${ecEnhanced.value.length} alert(s).`);
+    allIncidents.push(...ecEnhanced.value);
+  } else {
+    console.error('[ingest] Environment Canada Enhanced failed:', ecEnhanced.reason);
+  }
+
+  if (cpsData.status === 'fulfilled') {
+    console.log(`[ingest] Calgary Police Service: ${cpsData.value.length} incident(s).`);
+    allIncidents.push(...cpsData.value);
+  } else {
+    console.error('[ingest] Calgary Police Service failed:', cpsData.reason);
+  }
+
+  if (infrastructure.status === 'fulfilled') {
+    console.log(`[ingest] Calgary Infrastructure: ${infrastructure.value.length} alert(s).`);
+    allIncidents.push(...infrastructure.value);
+  } else {
+    console.error('[ingest] Calgary Infrastructure failed:', infrastructure.reason);
   }
 
   if (allIncidents.length === 0) {

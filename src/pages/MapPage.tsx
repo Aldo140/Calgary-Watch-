@@ -106,12 +106,12 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
       // ── Calgary 311 — isolated so a failure never blocks traffic ──────────
       try {
-        // Properly encoded — no raw single quotes or spaces in the query string
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        // Socrata API — simplified query without date filtering (less likely to fail)
+        // Note: data.calgary.ca may have rate limits or field structure issues
         const three11Url =
           'https://data.calgary.ca/resource/iahh-g8bj.json' +
-          '?$limit=30' +
-          '&$where=' + encodeURIComponent(`status_description='Open' AND requested_date > '${sevenDaysAgo}'`) +
+          '?$limit=50' +
+          '&$where=' + encodeURIComponent("status_description='Open'") +
           '&$order=' + encodeURIComponent('requested_date DESC');
 
         const three11Res = await fetch(three11Url);
@@ -265,19 +265,35 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
 // ── WMO weather code → alert (returns null if conditions are unremarkable) ──
 const WMO_ALERTS: Record<number, { title: string; description: string; severity: 'advisory' | 'watch' | 'warning' }> = {
+  // Drizzle
+  51: { title: 'Drizzle', description: 'Light drizzle in the area. Roads may be slippery — allow extra stopping distance.', severity: 'advisory' },
+  53: { title: 'Drizzle', description: 'Moderate drizzle. Wet roads and reduced visibility in this part of the city.', severity: 'advisory' },
+  55: { title: 'Heavy Drizzle', description: 'Dense drizzle reducing visibility. Drive with headlights on.', severity: 'advisory' },
+  // Rain
+  61: { title: 'Rain', description: 'Light rain falling in this area. Wet roads — slow down and increase following distance.', severity: 'advisory' },
+  63: { title: 'Moderate Rain', description: 'Moderate rainfall in this quadrant. Standing water possible on roadways.', severity: 'advisory' },
+  65: { title: 'Heavy Rain', description: 'Heavy rain falling. Reduced visibility and possible localized flooding.', severity: 'watch' },
+  // Rain showers
+  80: { title: 'Rain Showers', description: 'Scattered rain showers moving through this area. Intermittent wet conditions on roads.', severity: 'advisory' },
+  81: { title: 'Rain Showers', description: 'Moderate rain showers with gusty winds possible in this quadrant.', severity: 'advisory' },
+  82: { title: 'Heavy Rain Showers', description: 'Heavy rain showers moving through. Ponding water on roads — slow down.', severity: 'watch' },
+  // Fog
   45: { title: 'Fog Advisory', description: 'Dense fog reducing visibility. Drive with headlights on and reduce speed.', severity: 'advisory' },
   48: { title: 'Freezing Fog Warning', description: 'Freezing fog causing icy road surfaces. Extremely slippery conditions.', severity: 'warning' },
+  // Freezing precip
   56: { title: 'Freezing Drizzle', description: 'Light freezing drizzle creating ice on roads and sidewalks. Use caution.', severity: 'watch' },
   57: { title: 'Heavy Freezing Drizzle', description: 'Heavy freezing drizzle causing dangerous ice accumulation on all surfaces.', severity: 'warning' },
   66: { title: 'Freezing Rain', description: 'Freezing rain producing significant ice build-up on roads. Travel not recommended.', severity: 'warning' },
   67: { title: 'Heavy Freezing Rain', description: 'Heavy freezing rain. Dangerous driving conditions — travel only if necessary.', severity: 'warning' },
-  71: { title: 'Snow Advisory', description: 'Light snow reducing visibility and causing slippery road conditions.', severity: 'advisory' },
-  73: { title: 'Snowfall Warning', description: 'Moderate snowfall reducing visibility. Plows are active — allow extra travel time.', severity: 'watch' },
-  75: { title: 'Heavy Snowfall Warning', description: 'Heavy snowfall with significant accumulation expected. Expect major travel delays.', severity: 'warning' },
+  // Snow
+  71: { title: 'Snow', description: 'Light snow falling in this quadrant. Slippery road conditions developing.', severity: 'advisory' },
+  73: { title: 'Snowfall', description: 'Moderate snowfall in this area. Plows are active — allow extra travel time.', severity: 'watch' },
+  75: { title: 'Heavy Snowfall', description: 'Heavy snowfall with significant accumulation expected. Expect major travel delays.', severity: 'warning' },
   77: { title: 'Snow Pellets', description: 'Ice pellets reducing road traction. Treat intersections with extra caution.', severity: 'watch' },
-  85: { title: 'Snow Showers', description: 'Snow showers with gusty winds reducing visibility in exposed areas.', severity: 'advisory' },
-  86: { title: 'Heavy Snow Showers', description: 'Heavy snow showers causing rapidly deteriorating travel conditions.', severity: 'watch' },
-  95: { title: 'Thunderstorm Warning', description: 'Thunderstorm in the area. Seek shelter immediately — avoid open spaces.', severity: 'watch' },
+  85: { title: 'Snow Showers', description: 'Snow showers moving through this part of the city. Reduced visibility in exposed areas.', severity: 'advisory' },
+  86: { title: 'Heavy Snow Showers', description: 'Heavy snow showers causing rapidly deteriorating travel conditions in this quadrant.', severity: 'watch' },
+  // Thunderstorm
+  95: { title: 'Thunderstorm', description: 'Thunderstorm in this area. Seek shelter immediately — avoid open spaces.', severity: 'watch' },
   96: { title: 'Thunderstorm with Hail', description: 'Thunderstorm producing hail. Move vehicles under cover and stay indoors.', severity: 'warning' },
   99: { title: 'Severe Thunderstorm', description: 'Severe thunderstorm with large hail and heavy rain. Take shelter immediately.', severity: 'warning' },
 };

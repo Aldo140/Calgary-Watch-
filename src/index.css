@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 @import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 
@@ -34,8 +33,13 @@
 }
 
 .custom-leaflet-popup .leaflet-popup-tip {
-  background: #0f172a !important; /* slate-900 */
+  background: #0f172a !important; /* slate-900 - dark mode */
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .custom-leaflet-popup .leaflet-popup-tip {
+  background: #faf8f4 !important; /* stone-50 - light mode */
+  border: 1px solid rgba(120, 113, 108, 0.15);
 }
 
 .custom-leaflet-popup .leaflet-popup-content {
@@ -58,7 +62,7 @@
 }
 
 .leaflet-bar a {
-  background-color: rgba(2, 6, 23, 0.8) !important; /* slate-950/80 */
+  background-color: rgba(2, 6, 23, 0.8) !important; /* slate-950/80 - dark mode */
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   color: #94a3b8 !important; /* slate-400 */
@@ -69,10 +73,22 @@
   transition: all 0.2s !important;
 }
 
+.light .leaflet-bar a {
+  background-color: rgba(255, 250, 243, 0.95) !important; /* stone-50/95 - light mode */
+  color: #78716c !important; /* stone-600 */
+  border: 1px solid rgba(120, 113, 108, 0.2) !important;
+}
+
 .leaflet-bar a:hover {
   background-color: rgba(2, 6, 23, 0.95) !important;
   color: #3b82f6 !important; /* blue-500 */
   border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+.light .leaflet-bar a:hover {
+  background-color: rgba(255, 250, 243, 1) !important; /* stone-50 - light mode */
+  color: #059669 !important; /* emerald-600 */
+  border-color: rgba(5, 150, 105, 0.4) !important;
 }
 
 .leaflet-bar a:first-child {

@@ -965,7 +965,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
                 const c = map.current.getCenter();
                 onPinConfirm?.(c.lat, c.lng);
               }}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all whitespace-nowrap shrink-0 flex-[2]"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all whitespace-nowrap shrink-0 flex-[2]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               Set Pin Here

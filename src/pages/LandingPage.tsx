@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView, animate, AnimatePresence } from 'motion/react';
-import { gsap } from 'gsap';
 import {
   ShieldCheck,
   Map as MapIcon,
@@ -92,7 +91,7 @@ function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' |
         <h3 className="text-2xl font-black text-white light:text-slate-900">{content.title}</h3>
         <p className="mt-4 text-sm text-slate-300 light:text-slate-700 leading-relaxed">{content.body}</p>
         <div className="mt-6 flex justify-end">
-          <Button onClick={onClose} className="bg-[#4A90D9] hover:bg-blue-600 px-5">Close</Button>
+          <Button onClick={onClose} className="bg-blue-600 hover:bg-blue-700 px-5">Close</Button>
         </div>
       </motion.div>
     </motion.div>
@@ -296,7 +295,7 @@ export default function LandingPage() {
               aria-label="Toggle theme">
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
-            <Button variant="primary" className="hidden md:flex bg-[#4A90D9] hover:bg-blue-500 rounded-full px-5 h-9 text-sm font-bold" onClick={() => navigate('/map')}>
+            <Button variant="primary" className="hidden md:flex bg-blue-600 hover:bg-blue-700 rounded-full px-5 h-9 text-sm font-bold" onClick={() => navigate('/map')}>
               Open Map
             </Button>
             <button type="button" className="md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-slate-400"
@@ -315,7 +314,7 @@ export default function LandingPage() {
               <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">How it Works</a>
               <button type="button" onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="text-left px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">About</button>
               <div className="pt-2 border-t border-white/8 mt-1">
-                <Button variant="primary" className="w-full bg-[#4A90D9] hover:bg-blue-500 rounded-xl h-11 font-bold" onClick={() => { navigate('/map'); setMobileMenuOpen(false); }}>Open Live Map</Button>
+                <Button variant="primary" className="w-full bg-blue-600 hover:bg-blue-700 rounded-xl h-11 font-bold" onClick={() => { navigate('/map'); setMobileMenuOpen(false); }}>Open Live Map</Button>
               </div>
             </motion.div>
           )}
@@ -377,7 +376,7 @@ export default function LandingPage() {
 
               {/* CTAs (Desktop Only - Mobile buttons moved below phone) */}
               <div className="hidden lg:flex flex-wrap gap-3 mb-8">
-                <Button size="lg" className="bg-[#4A90D9] hover:bg-blue-500 rounded-xl px-8 h-14 text-base font-bold group shadow-[0_6px_24px_rgba(74,144,217,0.35)]" onClick={() => navigate('/map')}>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 h-14 text-base font-bold group shadow-[0_6px_24px_rgba(74,144,217,0.35)]" onClick={() => navigate('/map')}>
                   Open Live Map
                   <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={17} />
                 </Button>
@@ -540,7 +539,7 @@ export default function LandingPage() {
 
              {/* CTAs (Mobile Only - Readily accessible below phone layout) */}
              <div className="flex lg:hidden flex-col sm:flex-row gap-3 mt-8 w-full max-w-sm z-10 px-2 shrink-0">
-                <Button size="lg" className="bg-[#4A90D9] hover:bg-blue-500 rounded-xl px-8 h-14 text-base font-bold shadow-[0_6px_24px_rgba(74,144,217,0.35)] w-full flex-1" onClick={() => navigate('/map')}>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 h-14 text-base font-bold shadow-[0_6px_24px_rgba(74,144,217,0.35)] w-full flex-1" onClick={() => navigate('/map')}>
                   Open Live Map
                 </Button>
                 <Button variant="secondary" size="lg" className="bg-white/5 light:bg-slate-100 border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 rounded-xl px-8 h-14 text-base font-bold text-white light:text-slate-900 w-full flex-1" onClick={() => navigate('/map?report=true')}>
@@ -552,7 +551,7 @@ export default function LandingPage() {
 
         {/* Live ticker */}
         <div className="relative z-20 bg-slate-900/90 backdrop-blur-md border-t border-white/10 px-4 sm:px-8 py-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
-          <span className="inline-flex items-center gap-2 bg-[#4A90D9] text-white text-[11px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-lg shrink-0">
+          <span className="inline-flex items-center gap-2 bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-lg shrink-0">
             <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-white" /></span>
             Live Feed
           </span>
@@ -706,7 +705,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-                  className="w-fit rounded-xl px-7 py-3.5 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold flex items-center gap-2 cursor-pointer text-sm transition-colors">
+                  className="w-fit rounded-xl px-7 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-2 cursor-pointer text-sm transition-colors">
                   <MapPin size={16} />View Live Map<ArrowRight size={15} />
                 </motion.button>
               </div>
@@ -957,7 +956,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-                  className="w-fit rounded-xl px-6 py-3 bg-[#4A90D9] hover:bg-blue-500 transition-colors text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
+                  className="w-fit rounded-xl px-6 py-3 bg-blue-600 hover:bg-blue-700 transition-colors text-white font-bold flex items-center gap-2 cursor-pointer text-sm">
                   <MapPin size={15} />Try Now<ArrowRight size={14} />
                 </motion.button>
               </div>
@@ -1158,7 +1157,7 @@ export default function LandingPage() {
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-14 text-center">
             <p className="text-base text-slate-400 light:text-slate-600 mb-5">See what's happening before the news does.</p>
             <motion.button whileHover={!reducedMotion ? { scale: 1.04, boxShadow: '0 20px 50px rgba(74,144,217,0.35)' } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
-              className="rounded-xl px-10 py-4 bg-[#4A90D9] hover:bg-blue-500 text-white font-bold transition-colors flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
+              className="rounded-xl px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors flex items-center gap-2 cursor-pointer mx-auto text-base shadow-lg">
               <MapPin size={18} />Start Reporting<ArrowRight size={16} />
             </motion.button>
           </motion.div>

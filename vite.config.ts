@@ -34,7 +34,7 @@ export default defineConfig(() => {
             'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
             'vendor-leaflet': ['leaflet'],
             'vendor-recharts': ['recharts'],
-            'vendor-animation': ['gsap', 'motion/react', 'vaul'],
+            'vendor-animation': ['motion/react', 'vaul'],
             'vendor-date': ['date-fns'],
           },
         },

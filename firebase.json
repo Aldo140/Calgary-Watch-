@@ -40,6 +40,18 @@
             "value": "max-age=63072000; includeSubDomains; preload"
           },
           {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin"
+          },
+          {
+            "key": "Cross-Origin-Resource-Policy",
+            "value": "same-origin"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "0"
+          },
+          {
             "key": "Content-Security-Policy",
             "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.pexels.com https://picsum.photos https://fastly.picsum.photos https://ui-avatars.com https://lh3.googleusercontent.com https://www.gstatic.com https://*.basemaps.cartocdn.com https://images.unsplash.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.basemaps.cartocdn.com https://data.calgary.ca https://api.open-meteo.com https://geo.weather.gc.ca https://511.alberta.ca https://www.alberta.ca; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; worker-src blob:;"
           }

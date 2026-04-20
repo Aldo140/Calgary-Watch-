@@ -412,7 +412,7 @@ export default function MapPage() {
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
   const { stats: crimeStats } = useCrimeStats();
-  const crimeStatIncidents = useCrimeStatIncidents(isAuthReady);
+  const crimeStatIncidents = useCrimeStatIncidents(crimeStats);
 
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);

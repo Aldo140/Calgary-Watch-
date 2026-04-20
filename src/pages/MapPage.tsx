@@ -15,7 +15,7 @@ import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Searc
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import { db, handleFirestoreError, OperationType } from '@/src/firebase';
+import { db } from '@/src/firebase';
 import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
@@ -530,7 +530,7 @@ export default function MapPage() {
       lastVisibleIncidentDoc.current = nextPage.docs.length > 0 ? nextPage.docs[nextPage.docs.length - 1] : lastVisibleIncidentDoc.current;
       setHasMoreIncidents(nextPage.docs.length === INCIDENT_PAGE_SIZE);
     } catch (error) {
-      handleFirestoreError(error, OperationType.LIST, path);
+      console.error('[CalgaryWatch] Load more incidents failed:', error);
     } finally {
       setIsLoadingMoreIncidents(false);
     }
@@ -615,10 +615,9 @@ export default function MapPage() {
   }, []);
 
   const handlePinCancel = useCallback(() => {
-    // Cancel closes the whole form — user pressed Cancel while in crosshair mode
+    // Cancel returns to choose step; IncidentForm's useEffect handles the transition
     setIsPinMode(false);
     setConfirmedPinLocation(null);
-    setIsFormOpen(false);
   }, []);
 
   const handleFormClose = useCallback(() => {
@@ -722,7 +721,7 @@ export default function MapPage() {
             authorUid: user.uid,
           });
         } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, path);
+          console.error('[CalgaryWatch] Emergency submit failed:', error);
         }
       })();
     });
@@ -928,6 +927,7 @@ export default function MapPage() {
           liveCount={mapIncidents.length}
           mapRef={mapRef}
           isPinMode={isPinMode || isEmergencyPinMode}
+          isFormOpen={isFormOpen}
           theme={theme}
           snap={sheetSnap}
           setSnap={setSheetSnap}
@@ -1490,6 +1490,7 @@ export default function MapPage() {
           setShowHeatmap={setShowHeatmap}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
+          isPinMode={isPinMode || isEmergencyPinMode}
         />
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}

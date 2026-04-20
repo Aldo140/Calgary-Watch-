@@ -92,7 +92,6 @@ const INCIDENT_CATEGORIES: Incident['category'][] = [
   'traffic',
   'infrastructure',
   'weather',
-  'gas',
 ];
 
 const VERIFIED_STATUSES: Incident['verified_status'][] = [
@@ -664,7 +663,7 @@ export default function AdminPage() {
 
   if (!isAuthReady) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white flex items-center justify-center">
         <Loader2 className="animate-spin" />
       </div>
     );
@@ -672,7 +671,7 @@ export default function AdminPage() {
 
   if (!isFirebaseConfigured) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
         <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-white/10 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
           <h1 className="text-2xl font-black">Admin unavailable</h1>
           <p className="text-slate-300 text-sm leading-relaxed">
@@ -689,7 +688,7 @@ export default function AdminPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
         <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-white/10 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
           <h1 className="text-2xl font-black">Admin Portal</h1>
           <p className="text-slate-300 text-sm">Sign in with Google using the approved admin account to continue.</p>
@@ -702,7 +701,7 @@ export default function AdminPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
         <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-red-500/40 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
           <div className="flex items-center gap-2 text-red-400">
             <Lock size={18} />
@@ -1855,7 +1854,7 @@ export default function AdminPage() {
   // ── Shell ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col md:flex-row relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white flex flex-col md:flex-row relative overflow-hidden">
 
       {/* Ambient gradient blobs */}
       <div className="pointer-events-none fixed inset-0 z-0">
@@ -1863,15 +1862,16 @@ export default function AdminPage() {
           style={{ background: 'radial-gradient(ellipse at center, rgba(37,99,235,0.07) 0%, transparent 65%)' }} />
         <div className="absolute -bottom-56 right-0 w-[32rem] h-[32rem] rounded-full"
           style={{ background: 'radial-gradient(ellipse at center, rgba(79,70,229,0.06) 0%, transparent 65%)' }} />
+        <div className="absolute inset-x-0 top-0 hidden h-[24rem] light:block bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.16),transparent_36%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.18),transparent_26%)]" />
       </div>
 
       {/* ── Sidebar — desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-white/[0.06] bg-slate-950/80 backdrop-blur-xl relative z-10 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-white/[0.06] light:border-stone-200/80 bg-slate-950/80 light:bg-[rgba(255,250,242,0.86)] backdrop-blur-xl relative z-10 sticky top-0 h-screen">
         {/* Logo / wordmark */}
-        <div className="p-5 border-b border-white/[0.06]">
+        <div className="p-5 border-b border-white/[0.06] light:border-stone-200/80">
           <div className="inline-flex items-center gap-2 mb-1">
             <Sparkles size={13} className="text-blue-400" />
-            <span className="text-[9px] font-black uppercase tracking-[0.24em] text-slate-500">Control Center</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.24em] text-slate-500 light:text-stone-500">Control Center</span>
           </div>
           <h1 className="text-base font-black tracking-tight leading-tight">Calgary Watch</h1>
           <p className="text-[10px] text-slate-500 mt-0.5">Admin Portal</p>
@@ -1892,7 +1892,7 @@ export default function AdminPage() {
                   'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border',
                   isActive
                     ? 'bg-gradient-to-r from-blue-500/20 to-blue-600/10 text-blue-300 border-blue-500/30 shadow-[inset_0_1px_0_rgba(147,197,253,0.1),0_0_12px_rgba(59,130,246,0.08)]'
-                    : 'text-slate-400 border-transparent hover:text-white hover:bg-white/[0.05]'
+                    : 'text-slate-400 light:text-stone-600 border-transparent hover:text-white light:hover:text-slate-900 hover:bg-white/[0.05] light:hover:bg-white/70'
                 )}
               >
                 <Icon size={14} className={isActive ? 'text-blue-400' : 'text-slate-500'} />
@@ -1908,14 +1908,14 @@ export default function AdminPage() {
         </nav>
 
         {/* Bottom: user + back link */}
-        <div className="p-3 border-t border-white/[0.06] space-y-2">
-          <div className="px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-            <p className="text-[10px] font-black text-slate-300 truncate">{user.displayName || 'Admin'}</p>
-            <p className="text-[9px] text-slate-600 truncate">{user.email}</p>
+        <div className="p-3 border-t border-white/[0.06] light:border-stone-200/80 space-y-2">
+          <div className="px-3 py-2 rounded-xl bg-white/[0.03] light:bg-white/70 border border-white/[0.06] light:border-stone-200/80">
+            <p className="text-[10px] font-black text-slate-300 light:text-slate-800 truncate">{user.displayName || 'Admin'}</p>
+            <p className="text-[9px] text-slate-600 light:text-stone-500 truncate">{user.email}</p>
           </div>
           <button
             onClick={() => navigate('/map')}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-500 hover:text-slate-300 hover:bg-white/[0.05] transition-all"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-500 light:text-stone-500 hover:text-slate-300 light:hover:text-slate-900 hover:bg-white/[0.05] light:hover:bg-white/70 transition-all"
           >
             <ArrowLeft size={13} />
             Back to map
@@ -1926,11 +1926,11 @@ export default function AdminPage() {
       {/* ── Main content area ─────────────────────────────────────────────── */}
       <main className="flex-1 min-w-0 relative z-10 pb-8 md:pb-0">
         {/* Top bar — mobile header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-4 border-b border-white/[0.06] bg-slate-950/80 backdrop-blur-xl sticky top-0 z-20">
+        <div className="md:hidden flex items-center justify-between px-4 py-4 border-b border-white/[0.06] light:border-stone-200/80 bg-slate-950/80 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-xl sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.28em] text-slate-500">Calgary Watch</p>
-              <h2 className="text-sm font-black leading-tight text-white">Admin Control</h2>
+              <p className="text-[9px] font-black uppercase tracking-[0.28em] text-slate-500 light:text-stone-500">Calgary Watch</p>
+              <h2 className="text-sm font-black leading-tight text-white light:text-slate-900">Admin Control</h2>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -1942,7 +1942,7 @@ export default function AdminPage() {
             )}
             <button
               onClick={() => navigate('/map')}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-slate-300 transition-all active:scale-95"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 light:border-stone-200/80 bg-white/[0.05] light:bg-white/72 text-slate-300 light:text-slate-800 transition-all active:scale-95"
               aria-label="Back to map"
             >
               <ArrowLeft size={15} />

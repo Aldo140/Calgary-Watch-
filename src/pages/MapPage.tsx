@@ -32,6 +32,12 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   return R * c;
 }
 
+function getCalgaryQuadrant(lat: number, lng: number) {
+  const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
+  const eastWest = lng >= CALGARY_CENTER.lng ? 'E' : 'W';
+  return `${northSouth}${eastWest}`;
+}
+
 function useOfficialOpenData(isAuthReady: boolean) {
   const [officialIncidents, setOfficialIncidents] = useState<Incident[]>([]);
 
@@ -41,6 +47,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
     const fetchOpenData = async () => {
       const trafficIncidents: Incident[] = [];
       const three11Incidents: Incident[] = [];
+      const infrastructureIncidents: Incident[] = [];
 
       // ── Traffic — isolated so a failure never blocks 311 ──────────────────
       try {
@@ -100,10 +107,11 @@ function useOfficialOpenData(isAuthReady: boolean) {
       // ── Calgary 311 — isolated so a failure never blocks traffic ──────────
       try {
         // Properly encoded — no raw single quotes or spaces in the query string
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         const three11Url =
           'https://data.calgary.ca/resource/iahh-g8bj.json' +
-          '?$limit=100' +
-          '&$where=' + encodeURIComponent("status_description='Open'") +
+          '?$limit=30' +
+          '&$where=' + encodeURIComponent(`status_description='Open' AND requested_date > '${sevenDaysAgo}'`) +
           '&$order=' + encodeURIComponent('requested_date DESC');
 
         const three11Res = await fetch(three11Url);
@@ -125,6 +133,8 @@ function useOfficialOpenData(isAuthReady: boolean) {
           if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water') || sName.includes('flood')) category = 'weather';
           if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise') || sName.includes('graffiti')) category = 'crime';
           if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger') || sName.includes('fire')) category = 'emergency';
+
+          if (category === 'traffic') continue;
 
           const timestamp = new Date(item.requested_date || new Date()).getTime();
           let cleanTitle = item.service_name || 'City Service Issue';
@@ -177,8 +187,72 @@ function useOfficialOpenData(isAuthReady: boolean) {
         console.warn('[CalgaryWatch] 311 API failed:', err);
       }
 
+      // ── Calgary Water Main Breaks — dedicated infrastructure feed ────────
+      try {
+        const waterMainUrl =
+          'https://data.calgary.ca/resource/dpcu-jr23.json' +
+          '?$limit=60' +
+          '&$order=' + encodeURIComponent('break_date DESC') +
+          '&status=ACTIVE';
+
+        const waterMainRes = await fetch(waterMainUrl);
+        if (!waterMainRes.ok) throw new Error(`Water Main Breaks API ${waterMainRes.status}`);
+        const waterMainData: any[] = await waterMainRes.json();
+        const now = Date.now();
+        const recentThreshold = now - 7 * 24 * 60 * 60 * 1000;
+
+        for (const item of waterMainData) {
+          const coords = item.point?.coordinates;
+          if (!Array.isArray(coords) || coords.length < 2) continue;
+
+          const [lngRaw, latRaw] = coords;
+          const lat = Number(latRaw);
+          const lng = Number(lngRaw);
+          if (!isFinite(lat) || !isFinite(lng)) continue;
+
+          const timestamp = new Date(item.break_date || now).getTime();
+          if (!Number.isFinite(timestamp) || timestamp < recentThreshold) continue;
+
+          const quadrant = getCalgaryQuadrant(lat, lng);
+          const materialCode = String(item.break_type || '').toUpperCase();
+          const materialLabel = ({
+            AC: 'asbestos cement',
+            CI: 'cast iron',
+            DI: 'ductile iron',
+            PVC: 'PVC',
+            S: 'steel',
+            G: 'galvanized',
+            A: 'unknown main',
+            CG: 'cast iron / galvanized',
+          } as Record<string, string>)[materialCode] || 'water infrastructure';
+
+          infrastructureIncidents.push({
+            id: `yyc-water-main-${item.break_date || now}-${lat}-${lng}`,
+            title: 'Water Main Break',
+            description: `Active water main break affecting Calgary ${quadrant}. Utility crews are responding. Pipe type: ${materialLabel}. Expect local service and road impacts nearby.`,
+            category: 'infrastructure' as IncidentCategory,
+            neighborhood: `Calgary ${quadrant}`,
+            lat,
+            lng,
+            timestamp,
+            email: 'opendata@calgary.ca',
+            name: 'Calgary Water Services',
+            anonymous: false,
+            verified_status: 'community_confirmed' as const,
+            report_count: 1,
+            data_source: 'official' as const,
+            source_name: 'Calgary Water Main Breaks',
+            source_type: 'calgary_water_main_breaks',
+            source_url: 'https://data.calgary.ca/',
+            expires_at: now + 24 * 60 * 60 * 1000,
+          });
+        }
+      } catch (err) {
+        console.warn('[CalgaryWatch] Water Main Breaks API failed:', err);
+      }
+
       // Publish whatever succeeded — each source is independent
-      setOfficialIncidents([...trafficIncidents, ...three11Incidents]);
+      setOfficialIncidents([...trafficIncidents, ...three11Incidents, ...infrastructureIncidents]);
     };
 
     fetchOpenData();
@@ -331,7 +405,7 @@ function useWeatherAlerts(isAuthReady: boolean) {
 export default function MapPage() {
   const INCIDENT_PAGE_SIZE = 60;
   const { user, signIn, logout, isAuthReady, isAdmin } = useAuth();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
@@ -563,6 +637,16 @@ export default function MapPage() {
     startTransition(() => setSelectedIncident(incident));
   }, [handleMarkerClick]);
 
+  const handleReportFromIncident = useCallback((incident: Incident) => {
+    setSelectedIncident(null);
+    setSelectedArea(null);
+    setSelectedLocation({ lat: incident.lat, lng: incident.lng });
+    setConfirmedPinLocation({ lat: incident.lat, lng: incident.lng });
+    setIsPinMode(false);
+    setIsFormOpen(true);
+    setSheetSnap('80px');
+  }, []);
+
   const MAP_DECAY_MS = 24 * 60 * 60 * 1000; // 24 hours — hide from map
 
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
@@ -587,8 +671,26 @@ export default function MapPage() {
     if (target) {
       deepLinkHandledRef.current = true;
       handleMarkerClick(target);
+      startTransition(() => setSelectedIncident(target));
     }
   }, [searchParams, incidents, handleMarkerClick]);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams(searchParams);
+    const currentId = nextParams.get('i');
+
+    if (selectedIncident) {
+      if (currentId === selectedIncident.id) return;
+      nextParams.set('i', selectedIncident.id);
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    if (currentId && deepLinkHandledRef.current) {
+      nextParams.delete('i');
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [selectedIncident, searchParams, setSearchParams]);
 
   const [isPinMode, setIsPinMode] = useState(false);
   // Coordinates captured the moment "Set Pin Here" fires - stored in MapPage
@@ -821,7 +923,11 @@ export default function MapPage() {
   }, [incidents, mapRef, crimeStats]);
 
   return (
-    <div className="flex h-dvh w-full bg-slate-950 light:bg-slate-100 overflow-hidden font-sans relative">
+    <div className="flex h-dvh w-full bg-slate-950 light:bg-[#eef3ea] overflow-hidden font-sans relative">
+      <div className="pointer-events-none absolute inset-0 hidden light:block">
+        <div className="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.16),transparent_38%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.16),transparent_28%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-72 bg-[radial-gradient(circle_at_25%_20%,rgba(46,139,122,0.12),transparent_26%),radial-gradient(circle_at_80%_30%,rgba(192,57,43,0.08),transparent_22%)]" />
+      </div>
       <AnimatePresence>
         {isLoading && (
           <motion.div
@@ -1070,7 +1176,7 @@ export default function MapPage() {
                   initial={{ opacity: 0, x: 8, scale: 0.96 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 8, scale: 0.96 }}
-                  className="absolute right-full mr-3 top-0 w-[min(18rem,calc(100vw-5rem))] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-white light:border-slate-300"
+              className="absolute right-full mr-3 top-0 w-[min(18rem,calc(100vw-5rem))] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-[rgb(255,250,243)] light:border-stone-200/80"
                 >
                   <div className="p-3 border-b border-white/5 light:border-slate-100">
                     <h3 className="text-xs font-bold text-white light:text-slate-900">Notifications</h3>
@@ -1122,7 +1228,7 @@ export default function MapPage() {
                   initial={{ opacity: 0, x: 8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 8 }}
-                  className="absolute right-full mr-3 top-0 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-white light:border-slate-300 pointer-events-auto"
+                  className="absolute right-full mr-3 top-0 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-[rgb(255,250,243)] light:border-stone-200/80 pointer-events-auto"
                 >
                   <div className="p-3 border-b border-white/5">
                     <p className="text-xs font-bold text-white truncate light:text-slate-900">{user.displayName}</p>
@@ -1166,7 +1272,7 @@ export default function MapPage() {
                 'bottom-6 left-3 right-3'
               )}
             >
-              <div className="bg-slate-900/96 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-slate-900/96 light:bg-[rgba(255,250,243,0.95)] backdrop-blur-md border border-white/10 light:border-stone-200/80 rounded-3xl shadow-2xl overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                   <div className="flex items-center gap-2">
@@ -1525,6 +1631,7 @@ export default function MapPage() {
           incident={selectedIncident}
           onClose={() => setSelectedIncident(null)}
           onViewNeighborhood={handleViewNeighborhood}
+          onReportIncident={handleReportFromIncident}
         />
         <AreaIntelligencePanel
           data={selectedArea}

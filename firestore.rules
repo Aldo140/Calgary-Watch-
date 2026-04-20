@@ -244,6 +244,16 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // incident_flags: authenticated users can flag an incident once.
+    // Compound doc ID {incidentId}_{uid} prevents double-flagging.
+    match /incident_flags/{flagId} {
+      allow create: if request.auth != null
+        && request.resource.data.flaggedBy == request.auth.uid
+        && request.resource.data.reason in ['inaccurate','spam_duplicate','inappropriate','misleading','other']
+        && (!('details' in request.resource.data) || request.resource.data.details.size() <= 200);
+      allow read, delete: if request.auth.token.email in ['jorti104@mtroyal.ca'];
+    }
+
     match /{path=**} {
       allow read, write: if false;
     }

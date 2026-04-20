@@ -1,11 +1,14 @@
-import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
+import { Incident, IncidentFlag, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/src/components/FirebaseProvider';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/src/firebase';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   crime:          '🚨',
@@ -32,6 +35,16 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   );
   // Must be declared before any early return to satisfy Rules of Hooks
   const [copied, setCopied] = useState(false);
+
+  // Flag/report state — all must be declared before any early return (Rules of Hooks)
+  const [isFlagModalOpen, setIsFlagModalOpen] = useState(false);
+  const [flagReason, setFlagReason] = useState<IncidentFlag['reason'] | ''>('');
+  const [flagDetails, setFlagDetails] = useState('');
+  const [flagSubmitting, setFlagSubmitting] = useState(false);
+  const [flagSuccess, setFlagSuccess] = useState(false);
+  const [flagError, setFlagError] = useState<string | null>(null);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 1023px)');
@@ -113,6 +126,50 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
       }
     } catch {
       // cancelled — fail silently
+    }
+  };
+
+  const handleFlagOpen = () => {
+    setFlagReason('');
+    setFlagDetails('');
+    setFlagError(null);
+    setFlagSuccess(false);
+    setIsFlagModalOpen(true);
+  };
+
+  const handleFlagClose = () => {
+    if (flagSubmitting) return;
+    setIsFlagModalOpen(false);
+    setFlagSuccess(false);
+    setFlagError(null);
+  };
+
+  const handleFlagSubmit = async () => {
+    if (!flagReason || !user || !db) return;
+    if (flagReason === 'other' && flagDetails.trim().length === 0) {
+      setFlagError('Please describe the issue in the details field.');
+      return;
+    }
+    setFlagSubmitting(true);
+    setFlagError(null);
+    try {
+      const flagData: IncidentFlag = {
+        incidentId: incident!.id,
+        flaggedBy: user.uid,
+        reason: flagReason,
+        timestamp: Date.now(),
+        ...(flagReason === 'other' && flagDetails.trim() ? { details: flagDetails.trim() } : {}),
+      };
+      await setDoc(doc(db, 'incident_flags', `${incident!.id}_${user.uid}`), flagData);
+      setFlagSuccess(true);
+      setTimeout(() => {
+        setIsFlagModalOpen(false);
+        setFlagSuccess(false);
+      }, 1800);
+    } catch {
+      setFlagError('Failed to submit report. Please try again.');
+    } finally {
+      setFlagSubmitting(false);
     }
   };
 
@@ -393,6 +450,20 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     Open in Google Maps
                   </a>
                 ) : null}
+
+                {/* Flag / Report — subtle secondary action, only shown to authenticated users */}
+                {user && (
+                  <div className="flex justify-end pt-1">
+                    <button
+                      onClick={handleFlagOpen}
+                      title="Report this post"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-slate-500 light:text-slate-400 hover:text-red-400 light:hover:text-red-500 hover:bg-red-500/10 light:hover:bg-red-50 border border-transparent hover:border-red-500/20 transition-all"
+                    >
+                      <Flag size={13} />
+                      Report
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -412,6 +483,127 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               </p>
             </div>
           </Card>
+        </motion.div>
+      )}
+      {/* Flag / Report Modal */}
+      {isFlagModalOpen && (
+        <motion.div
+          key="flag-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={handleFlagClose}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 8 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 8 }}
+            transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="w-full max-w-sm bg-slate-900 light:bg-white rounded-3xl border border-white/10 light:border-slate-200 shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-white/5 light:border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 bg-red-500/15 rounded-xl">
+                  <Flag size={15} className="text-red-400" />
+                </div>
+                <h3 className="text-base font-black text-white light:text-slate-900">Report this post</h3>
+              </div>
+              <button
+                onClick={handleFlagClose}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-slate-100 transition-all"
+                disabled={flagSubmitting}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {flagSuccess ? (
+                <div className="flex flex-col items-center gap-3 py-4 text-center">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center">
+                    <ShieldCheck size={24} className="text-emerald-400" />
+                  </div>
+                  <p className="text-white light:text-slate-900 font-black text-base">Report submitted</p>
+                  <p className="text-slate-400 light:text-slate-500 text-xs">Thank you for helping keep the community accurate.</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-slate-400 light:text-slate-500">Why are you reporting this post?</p>
+
+                  {/* Reason options */}
+                  <div className="space-y-2">
+                    {(
+                      [
+                        { value: 'inaccurate',       label: 'Inaccurate' },
+                        { value: 'spam_duplicate',   label: 'Spam or Duplicate' },
+                        { value: 'inappropriate',    label: 'Inappropriate Content' },
+                        { value: 'misleading',       label: 'Misleading' },
+                        { value: 'other',            label: 'Other' },
+                      ] as { value: IncidentFlag['reason']; label: string }[]
+                    ).map(({ value, label }) => (
+                      <button
+                        key={value}
+                        onClick={() => { setFlagReason(value); setFlagError(null); }}
+                        className={cn(
+                          'w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all',
+                          flagReason === value
+                            ? 'bg-red-500/20 text-red-300 border-red-500/40 light:bg-red-50 light:text-red-600 light:border-red-200'
+                            : 'bg-white/[0.03] text-slate-300 border-white/8 hover:bg-white/[0.06] light:bg-slate-50 light:text-slate-700 light:border-slate-200 light:hover:bg-slate-100'
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Details textarea — shown when "Other" selected */}
+                  {flagReason === 'other' && (
+                    <div className="space-y-1.5">
+                      <textarea
+                        value={flagDetails}
+                        onChange={(e) => setFlagDetails(e.target.value.slice(0, 200))}
+                        placeholder="Describe the issue (required)…"
+                        rows={3}
+                        className="w-full bg-white/[0.04] light:bg-slate-50 border border-white/10 light:border-slate-200 rounded-xl px-4 py-3 text-sm text-white light:text-slate-900 placeholder:text-slate-500 resize-none focus:outline-none focus:ring-1 focus:ring-red-500/50 transition-all"
+                      />
+                      <p className="text-right text-[10px] text-slate-500">{flagDetails.length}/200</p>
+                    </div>
+                  )}
+
+                  {/* Inline error */}
+                  {flagError && (
+                    <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                      {flagError}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {!flagSuccess && (
+              <div className="flex gap-2 px-6 pb-6">
+                <button
+                  onClick={handleFlagClose}
+                  disabled={flagSubmitting}
+                  className="flex-1 h-11 rounded-2xl border border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 text-sm font-black hover:bg-white/5 light:hover:bg-slate-50 transition-all disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => void handleFlagSubmit()}
+                  disabled={!flagReason || flagSubmitting}
+                  className="flex-1 h-11 rounded-2xl bg-red-500/90 hover:bg-red-500 text-white text-sm font-black transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {flagSubmitting ? 'Submitting…' : 'Submit Report'}
+                </button>
+              </div>
+            )}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

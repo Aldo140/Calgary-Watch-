@@ -74,6 +74,16 @@ export interface Incident {
    * Ingestion sets this; undefined = never expires (user reports).
    */
   expires_at?: number;
+  /** Number of times this incident has been flagged by users. */
+  flag_count?: number;
+}
+
+export interface IncidentFlag {
+  incidentId: string;
+  flaggedBy: string;    // uid
+  reason: 'inaccurate' | 'spam_duplicate' | 'inappropriate' | 'misleading' | 'other';
+  details?: string;     // required when reason === 'other', max 200 chars
+  timestamp: number;
 }
 
 export interface CommunityStats {

@@ -20,7 +20,6 @@ import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAf
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats } from '@/src/hooks/useCrimeStats';
-import { useCrimeStatIncidents } from '@/src/hooks/useCrimeStatIncidents';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -412,7 +411,6 @@ export default function MapPage() {
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
   const { stats: crimeStats } = useCrimeStats();
-  const crimeStatIncidents = useCrimeStatIncidents(crimeStats);
 
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -654,7 +652,7 @@ export default function MapPage() {
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
     const now = Date.now();
-    const combined = [...firebaseIncidents, ...officialOpenData, ...weatherAlerts, ...crimeStatIncidents];
+    const combined = [...firebaseIncidents, ...officialOpenData, ...weatherAlerts];
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     return [...unique.values()]
       .filter((i) => {
@@ -664,7 +662,7 @@ export default function MapPage() {
         return true;
       })
       .sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
-  }, [firebaseIncidents, officialOpenData, weatherAlerts, crimeStatIncidents]);
+  }, [firebaseIncidents, officialOpenData, weatherAlerts]);
 
   useEffect(() => {
     const targetId = searchParams.get('i');

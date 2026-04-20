@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
-import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, runTransaction, doc } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { checkRateLimit, recordSubmission } from '@/src/lib/rateLimit';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
@@ -327,6 +327,19 @@ function useWeatherAlerts(isAuthReady: boolean) {
   }, [isAuthReady]);
 
   return weatherAlerts;
+}
+
+// ── Server-side rate limit helpers ───────────────────────────────────────────
+
+/**
+ * Returns the Firestore document ID for the current user's hourly rate-limit
+ * window: `{uid}_{YYYYMMDD_HH}` (e.g. `abc123_20260420_14`).
+ */
+function getRateLimitDocId(uid: string): string {
+  const now = new Date();
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}`;
+  return `${uid}_${dateStr}`;
 }
 
 export default function MapPage() {
@@ -665,7 +678,7 @@ export default function MapPage() {
           const nameToUse = isAnonymous ? 'Anonymous' : firstName;
           const safeName = nameToUse.trim().padEnd(2, ' ').slice(0, 50);
 
-          await addDoc(collection(db!, path), {
+          const incidentPayload = {
             title: safeTitle,
             description: safeDesc,
             category: incidentData.category,
@@ -680,11 +693,39 @@ export default function MapPage() {
             verified_status: 'unverified',
             report_count: 1,
             authorUid: user.uid,
-          });
+          };
+
+          // Authenticated users: use a transaction to enforce the server-side
+          // hourly rate limit (3 posts/hr). Anonymous/unauthenticated fall back
+          // to a direct addDoc (client-side localStorage check is still the
+          // first line of defence for those cases).
+          if (user) {
+            const incidentRef = doc(collection(db!, path));
+            const rateLimitRef = doc(db!, 'user_rate_limits', getRateLimitDocId(user.uid));
+            await runTransaction(db!, async (tx) => {
+              const rlSnap = await tx.get(rateLimitRef);
+              const currentCount = rlSnap.exists() ? (rlSnap.data().count ?? 0) : 0;
+              if (currentCount >= 3) {
+                throw new Error('RATE_LIMIT_EXCEEDED');
+              }
+              tx.set(incidentRef, incidentPayload);
+              tx.set(rateLimitRef, {
+                count: currentCount + 1,
+                uid: user.uid,
+                windowStart: rlSnap.exists() ? rlSnap.data().windowStart : Date.now(),
+              });
+            });
+          } else {
+            await addDoc(collection(db!, path), incidentPayload);
+          }
           recordSubmission(user.uid);
         } catch (error) {
-          console.error('[CalgaryWatch] Report submission failed:', error);
-          setSubmitError('Your report could not be saved. Please try again.');
+          if (error instanceof Error && error.message === 'RATE_LIMIT_EXCEEDED') {
+            setSubmitError('Hourly limit reached (3 posts/hour). Please wait before submitting again.');
+          } else {
+            console.error('[CalgaryWatch] Report submission failed:', error);
+            setSubmitError('Your report could not be saved. Please try again.');
+          }
           setTimeout(() => setSubmitError(null), 6000);
         }
       })();
@@ -721,7 +762,7 @@ export default function MapPage() {
           const safeNeighborhood = (data.neighborhood || 'Calgary').trim().padEnd(2, ' ').slice(0, 80);
           const safeName = firstName.trim().padEnd(2, ' ').slice(0, 50);
 
-          await addDoc(collection(db!, path), {
+          const emergencyPayload = {
             title: safeTitle,
             description: safeDesc,
             category: data.category,
@@ -736,10 +777,33 @@ export default function MapPage() {
             verified_status: 'unverified',
             report_count: 1,
             authorUid: user.uid,
+          };
+
+          // Enforce server-side hourly rate limit via Firestore transaction.
+          // user is guaranteed non-null here (checked at function entry).
+          const incidentRef = doc(collection(db!, path));
+          const rateLimitRef = doc(db!, 'user_rate_limits', getRateLimitDocId(user.uid));
+          await runTransaction(db!, async (tx) => {
+            const rlSnap = await tx.get(rateLimitRef);
+            const currentCount = rlSnap.exists() ? (rlSnap.data().count ?? 0) : 0;
+            if (currentCount >= 3) {
+              throw new Error('RATE_LIMIT_EXCEEDED');
+            }
+            tx.set(incidentRef, emergencyPayload);
+            tx.set(rateLimitRef, {
+              count: currentCount + 1,
+              uid: user.uid,
+              windowStart: rlSnap.exists() ? rlSnap.data().windowStart : Date.now(),
+            });
           });
           recordSubmission(user.uid);
         } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, path);
+          if (error instanceof Error && error.message === 'RATE_LIMIT_EXCEEDED') {
+            setSubmitError('Hourly limit reached (3 posts/hour). Please wait before submitting again.');
+            setTimeout(() => setSubmitError(null), 6000);
+          } else {
+            handleFirestoreError(error, OperationType.CREATE, path);
+          }
         }
       })();
     });

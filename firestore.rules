@@ -216,6 +216,25 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── Server-side rate limiting ────────────────────────────────────────────
+    // One document per user per hour window. Document ID: {uid}_{YYYYMMDD_HH}.
+    // The transaction in MapPage.tsx reads + writes this atomically; Firestore
+    // security rules enforce the max count so a tampered client cannot bypass it.
+    match /user_rate_limits/{docId} {
+      // Users can read only their own rate-limit doc (uid stored in the document).
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      // Allow creating a new window doc (count starts at 1 on first post).
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.count <= 3;
+      // Allow incrementing an existing window doc while staying within the cap.
+      allow update: if request.auth != null
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.count <= 3;
+      // Admin bypass for read/write (auditing / manual resets).
+      allow read, write: if isApprovedAdminToken();
+    }
+
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
       allow create: if request.resource.data.keys().hasOnly(['timestamp', 'path']) &&

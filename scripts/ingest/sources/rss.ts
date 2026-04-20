@@ -20,10 +20,6 @@ import { NEIGHBOURHOOD_COORDS } from '../../../src/data/neighbourhoodCoords.js';
 
 const FEEDS = [
   {
-    name: 'CTV News Calgary',
-    url: 'https://calgary.ctvnews.ca/rss/ctv-news-calgary-1.822551',
-  },
-  {
     name: 'Global News Calgary',
     url: 'https://globalnews.ca/calgary/feed/',
   },
@@ -98,16 +94,16 @@ function extractLocationFromText(text: string): { neighborhood: string; lat: num
       };
     }
   }
-  if (/\bnw\s+calgary|\bcalgary[,\s]+nw\b/i.test(text)) {
+  if (/\bnw\s+calgary|\bcalgary[,\s]+nw\b|\bnorthwest\s+calgary|\bcalgary[,\s]+northwest\b/i.test(text)) {
     return { neighborhood: 'Northwest Calgary', lat: 51.128, lng: -114.190 };
   }
-  if (/\bne\s+calgary|\bcalgary[,\s]+ne\b/i.test(text)) {
+  if (/\bne\s+calgary|\bcalgary[,\s]+ne\b|\bnortheast\s+calgary|\bcalgary[,\s]+northeast\b/i.test(text)) {
     return { neighborhood: 'Northeast Calgary', lat: 51.128, lng: -113.980 };
   }
-  if (/\bsw\s+calgary|\bcalgary[,\s]+sw\b/i.test(text)) {
+  if (/\bsw\s+calgary|\bcalgary[,\s]+sw\b|\bsouthwest\s+calgary|\bcalgary[,\s]+southwest\b/i.test(text)) {
     return { neighborhood: 'Southwest Calgary', lat: 50.975, lng: -114.180 };
   }
-  if (/\bse\s+calgary|\bcalgary[,\s]+se\b/i.test(text)) {
+  if (/\bse\s+calgary|\bcalgary[,\s]+se\b|\bsoutheast\s+calgary|\bcalgary[,\s]+southeast\b/i.test(text)) {
     return { neighborhood: 'Southeast Calgary', lat: 50.975, lng: -113.980 };
   }
   return null;

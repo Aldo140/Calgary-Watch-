@@ -199,7 +199,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
         if (!waterMainRes.ok) throw new Error(`Water Main Breaks API ${waterMainRes.status}`);
         const waterMainData: any[] = await waterMainRes.json();
         const now = Date.now();
-        const recentThreshold = now - 7 * 24 * 60 * 60 * 1000;
+        const recentThreshold = now - 60 * 24 * 60 * 60 * 1000;
 
         for (const item of waterMainData) {
           const coords = item.point?.coordinates;

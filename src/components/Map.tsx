@@ -950,8 +950,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             )}
           </div>
 
-          {/* Action buttons - sit above the LayerToggle (bottom-20 mobile, bottom-8 desktop) and status bar */}
-          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center flex-wrap gap-2 md:gap-3 w-[90vw] max-w-sm max-lg:bottom-[7.25rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
+          {/* Action buttons - when LayerToggle is hidden (isPinMode), sit above collapsed MobileMapSheet */}
+          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center flex-wrap gap-2 md:gap-3 w-[90vw] max-w-sm max-lg:bottom-[5.5rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
             <button
               onClick={(e) => { e.stopPropagation(); onPinCancel?.(); }}
               className="px-5 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-slate-300 text-sm font-bold backdrop-blur-md hover:bg-slate-800 active:scale-95 transition-all shadow-xl whitespace-nowrap shrink-0 flex-1 max-w-[120px]"

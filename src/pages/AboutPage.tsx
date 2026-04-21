@@ -212,20 +212,13 @@ function VolunteerForm() {
         createdAt: serverTimestamp(),
       });
 
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_VOLUNTEER_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-      if (serviceId && templateId && publicKey) {
-        emailjs.init({ publicKey });
-        emailjs.send(serviceId, templateId, {
-          name: name.trim().slice(0, 100),
-          email: email.trim().slice(0, 200),
-          subject: role,
-          message: `Role: ${role}\n\nWhy they want to join:\n${whyJoin.trim().slice(0, 500)}`,
-        }).catch((err) => { console.error('EmailJS error:', JSON.stringify(err)); });
-      } else {
-        console.warn('[CalgaryWatch] EmailJS keys missing — email notification skipped', { serviceId: !!serviceId, templateId: !!templateId, publicKey: !!publicKey });
-      }
+      emailjs.init({ publicKey: 'SwfXJ-eXi92R0m_nV' });
+      emailjs.send('service_77g2o0a', 'template_sx463hg', {
+        name: name.trim().slice(0, 100),
+        email: email.trim().slice(0, 200),
+        subject: role,
+        message: `Role: ${role}\n\nWhy they want to join:\n${whyJoin.trim().slice(0, 500)}`,
+      }).catch((err) => { console.error('EmailJS error:', JSON.stringify(err)); });
 
       setStatus('done');
     } catch {

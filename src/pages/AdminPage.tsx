@@ -1290,6 +1290,24 @@ export default function AdminPage() {
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">{incident.category}</p>
                         <p className="mt-1 text-sm font-black text-white">{incident.neighborhood || 'Unknown area'}</p>
+                        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                          {(() => {
+                            const isSystemInc = incident.data_source != null && incident.data_source !== 'community';
+                            if (isSystemInc) return <span className="text-[10px] text-slate-500">{incident.source_name || 'System'}</span>;
+                            const isAnon = Boolean(incident.anonymous);
+                            if (isAnon) {
+                              const real = users.find(u => u.uid === incident.authorUid);
+                              return (
+                                <>
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-400 uppercase tracking-wider">Anon</span>
+                                  <span className="text-[10px] text-slate-300">{real?.displayName || '—'}</span>
+                                  <span className="text-[10px] text-slate-500">{real?.email || incident.authorUid || '?'}</span>
+                                </>
+                              );
+                            }
+                            return <span className="text-[10px] text-slate-400">{incident.name || '—'}</span>;
+                          })()}
+                        </div>
                       </div>
                       <div className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-black text-slate-300">
                         {formatRelativeMinutes(incident.timestamp)}
@@ -1337,6 +1355,7 @@ export default function AdminPage() {
                   <th className="py-2 text-left">Status</th>
                   <th className="py-2 text-left">Reports</th>
                   <th className="py-2 text-left">Time</th>
+                  <th className="py-2 text-left">Reporter</th>
                   <th className="py-2 text-left">Description</th>
                   <th className="py-2 text-left">Source</th>
                   <th className="py-2 text-left">Actions</th>
@@ -1373,6 +1392,24 @@ export default function AdminPage() {
                               <span className="block text-slate-600">{new Date(incident.timestamp).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}</span>
                             </span>
                           : <span className="text-slate-700 text-[10px]">—</span>}
+                      </td>
+                      <td className="py-2 pr-3 whitespace-nowrap">
+                        {(() => {
+                          const isSystemInc = incident.data_source != null && incident.data_source !== 'community';
+                          if (isSystemInc) return <span className="text-[10px] text-slate-500">{incident.source_name || 'System'}</span>;
+                          const isAnon = Boolean(incident.anonymous);
+                          if (isAnon) {
+                            const real = users.find(u => u.uid === incident.authorUid);
+                            return (
+                              <div>
+                                <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-400 uppercase tracking-wider mb-1">Anon</span>
+                                <span className="block text-[10px] text-slate-300">{real?.displayName || '—'}</span>
+                                <span className="block text-[10px] text-slate-500 font-mono">{real?.email || incident.authorUid || '?'}</span>
+                              </div>
+                            );
+                          }
+                          return <span className="text-[10px] text-slate-300">{incident.name || '—'}</span>;
+                        })()}
                       </td>
                       <td className="py-2 pr-2"><textarea className="w-full h-20 bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} /></td>
                       <td className="py-2 pr-2">

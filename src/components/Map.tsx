@@ -837,11 +837,14 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded]);
 
   return (
-    <div className={cn(
-      "relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center",
-      theme === 'light' ? 'bg-slate-100' : 'bg-slate-900',
-      !isMapInteractive && 'pointer-events-none select-none'
-    )}>
+    <div
+      className={cn(
+        "relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center",
+        theme === 'light' ? 'bg-slate-100' : 'bg-slate-900',
+        !isMapInteractive && 'pointer-events-none select-none'
+      )}
+      style={{ touchAction: 'none', overscrollBehavior: 'none' }}
+    >
       <div ref={mapContainer} className="absolute inset-0 w-full h-full z-0" />
       
       {/* Map Loading State */}

@@ -496,7 +496,7 @@ export default function MapPage() {
         setSelectedLocation(CALGARY_CENTER);
       }
     }
-  }, [searchParams, isAuthReady, user, userLocation, signIn]);
+  }, [searchParams, isAuthReady, user, signIn]);
 
 
   useEffect(() => {
@@ -515,6 +515,30 @@ export default function MapPage() {
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Lock the document against browser-level scroll and pull-to-refresh while on the map page.
+  // The map root div already has overflow-hidden, but without this the browser can still
+  // trigger pull-to-refresh or show the URL bar on vertical swipes over the Leaflet canvas.
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: body.style.overflow,
+      htmlOverscroll: html.style.overscrollBehavior,
+      bodyOverscroll: body.style.overscrollBehavior,
+    };
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    html.style.overscrollBehavior = 'none';
+    body.style.overscrollBehavior = 'none';
+    return () => {
+      html.style.overflow = prev.htmlOverflow;
+      body.style.overflow = prev.bodyOverflow;
+      html.style.overscrollBehavior = prev.htmlOverscroll;
+      body.style.overscrollBehavior = prev.bodyOverscroll;
+    };
   }, []);
 
   useEffect(() => {
@@ -770,7 +794,12 @@ export default function MapPage() {
     setIsPinMode(false);
     setConfirmedPinLocation(null);
     setIsFormOpen(false);
-  }, []);
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('report');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const handleIncidentSubmit = useCallback((data: IncidentFormData & { lat: number; lng: number; image_url?: string }) => {
     if (!user) {

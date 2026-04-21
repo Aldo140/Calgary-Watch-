@@ -1,13 +1,13 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -41,11 +41,16 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   const [flagConfirm, setFlagConfirm] = useState(false);
   const [flagging, setFlagging] = useState(false);
   const [flagError, setFlagError] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   useEffect(() => {
     setFlagged(false);
     setFlagConfirm(false);
     setFlagError(false);
+    setDeleteConfirm(false);
+    setDeleteError(false);
   }, [incident?.id]);
 
   useEffect(() => {
@@ -59,6 +64,21 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
   const isSystem = (incident.data_source != null && incident.data_source !== 'community') || incident.authorUid === 'system';
   const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged && user?.uid !== incident.authorUid;
+  const canDelete = Boolean(user) && !isSystem && user?.uid === incident.authorUid;
+
+  const handleDelete = async () => {
+    if (!user || !db || !incident.id) return;
+    setDeleteError(false);
+    setDeleting(true);
+    try {
+      await deleteDoc(doc(db, 'incidents', incident.id));
+      onClose();
+    } catch {
+      setDeleteError(true);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleFlag = async () => {
     if (!user || !db || !incident.id) return;
@@ -473,6 +493,40 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     Email
                   </a>
                 </div>
+
+                {canDelete && (
+                  <div>
+                    {deleteConfirm ? (
+                      <div className="rounded-2xl border border-red-500/30 bg-red-500/10 overflow-hidden">
+                        <div className="flex gap-2 items-center p-3">
+                          <p className="text-xs text-red-300 font-bold flex-1">Delete your report permanently?</p>
+                          <button
+                            onClick={() => void handleDelete()}
+                            disabled={deleting}
+                            className="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-black transition-all disabled:opacity-50"
+                          >
+                            {deleting ? 'Deleting…' : 'Delete'}
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirm(false)}
+                            className="px-3 py-1.5 rounded-xl bg-white/10 light:bg-slate-200 hover:bg-white/20 light:hover:bg-slate-300 text-white light:text-slate-900 text-xs font-black transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                        {deleteError && <p className="text-xs text-red-400 px-3 pb-3">Failed to delete. Try again.</p>}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirm(true)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-2xl h-11 font-black tracking-wide text-xs text-slate-400 hover:text-red-400 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 transition-all"
+                      >
+                        <Trash2 size={15} />
+                        Delete My Report
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {canFlag && (
                   <div>

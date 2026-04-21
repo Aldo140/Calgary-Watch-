@@ -66,6 +66,7 @@ export interface Incident {
   flagged?: boolean;
   flagged_at?: number;
   flagged_by?: string;
+  authorUid?: string;
   // ── Provenance fields (set by ingestion pipeline or client) ──────────────
   /** Who created this record. Defaults to 'community' when absent. */
   data_source?: DataSource;

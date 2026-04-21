@@ -566,7 +566,7 @@ export default function MapPage() {
           : Date.now();
 
         prev.forEach((incident) => {
-          if (!merged.has(incident.id) && incident.timestamp < oldestTimestamp) {
+          if (!merged.has(incident.id) && incident.timestamp < oldestTimestamp && !incident.flagged) {
             merged.set(incident.id, incident);
           }
         });

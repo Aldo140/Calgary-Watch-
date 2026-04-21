@@ -40,6 +40,13 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   const [flagged, setFlagged] = useState(false);
   const [flagConfirm, setFlagConfirm] = useState(false);
   const [flagging, setFlagging] = useState(false);
+  const [flagError, setFlagError] = useState(false);
+
+  useEffect(() => {
+    setFlagged(false);
+    setFlagConfirm(false);
+    setFlagError(false);
+  }, [incident?.id]);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 1023px)');
@@ -50,11 +57,12 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
   if (!incident) return null;
 
-  const isSystem = incident.data_source === 'system' || (incident as Incident & { authorUid?: string }).authorUid === 'system';
+  const isSystem = incident.data_source !== 'community' || incident.authorUid === 'system';
   const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged;
 
   const handleFlag = async () => {
     if (!user || !db || !incident.id) return;
+    setFlagError(false);
     setFlagging(true);
     try {
       await updateDoc(doc(db, 'incidents', incident.id), {
@@ -66,7 +74,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
       setFlagConfirm(false);
       onClose();
     } catch {
-      // silent fail
+      setFlagError(true);
     } finally {
       setFlagging(false);
     }
@@ -484,6 +492,9 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                         >
                           Cancel
                         </button>
+                        {flagError && (
+                          <p className="text-xs text-red-400 font-bold mt-2">Could not submit report. Please try again.</p>
+                        )}
                       </div>
                     ) : (
                       <button

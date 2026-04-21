@@ -744,7 +744,7 @@ export default function MapPage() {
     setIsFormOpen(false);
   }, []);
 
-  const handleIncidentSubmit = useCallback((data: IncidentFormData & { lat: number; lng: number }) => {
+  const handleIncidentSubmit = useCallback((data: IncidentFormData & { lat: number; lng: number; image_url?: string }) => {
     if (!user) {
       signIn();
       return;
@@ -767,7 +767,7 @@ export default function MapPage() {
     startTransition(() => {
       (async () => {
         try {
-          const { anonymous, ...incidentData } = data;
+          const { anonymous, image_url, ...incidentData } = data;
           const safeTitle = incidentData.title.trim().padEnd(5, ' ').slice(0, 100);
           const safeDesc = incidentData.description.trim().padEnd(10, ' ').slice(0, 1000);
           const safeNeighborhood = (incidentData.neighborhood || 'Calgary').trim().padEnd(2, ' ').slice(0, 80);
@@ -789,6 +789,7 @@ export default function MapPage() {
             verified_status: 'unverified',
             report_count: 1,
             authorUid: user.uid,
+            ...(image_url ? { image_url } : {}),
           });
         } catch (error) {
           console.error('[CalgaryWatch] Report submission failed:', error);
@@ -1689,6 +1690,7 @@ export default function MapPage() {
             email: user.email || 'No email',
             photoURL: user.photoURL || ''
           } : null}
+          userUid={user?.uid ?? ''}
         />
       </main>
 

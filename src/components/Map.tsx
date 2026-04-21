@@ -246,6 +246,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         center: [CALGARY_CENTER.lat, CALGARY_CENTER.lng],
         zoom: 11,
         zoomControl: true,
+        tap: false,
       });
 
       // Move zoom control to bottom left

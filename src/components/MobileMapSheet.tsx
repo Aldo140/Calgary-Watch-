@@ -213,7 +213,7 @@ export default function MobileMapSheet({
       setActiveSnapPoint={(s) => setSnap(s as SnapPoint)}
       modal={false}
       dismissible={false}
-      open={!isPinMode}
+      open={!isPinMode && !isFormOpen}
     >
       <Drawer.Portal>
         <Drawer.Content

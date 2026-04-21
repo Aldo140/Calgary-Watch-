@@ -57,7 +57,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
 
   if (!incident) return null;
 
-  const isSystem = incident.data_source !== 'community' || incident.authorUid === 'system';
+  const isSystem = (incident.data_source != null && incident.data_source !== 'community') || incident.authorUid === 'system';
   const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged && user?.uid !== incident.authorUid;
 
   const handleFlag = async () => {

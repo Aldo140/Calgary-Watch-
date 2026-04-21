@@ -539,7 +539,7 @@ export default function MapPage() {
           const d = doc.data();
           return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
         })
-        .filter((incident) => incident.deleted !== true && isFinite(incident.lat) && isFinite(incident.lng));
+        .filter((incident) => incident.deleted !== true && !incident.flagged && isFinite(incident.lat) && isFinite(incident.lng));
 
       if (hasInitializedIncidents.current) {
         const newIncidents = incidentData.filter((i) => !knownIncidentIds.current.has(i.id));
@@ -605,7 +605,7 @@ export default function MapPage() {
           const d = doc.data();
           return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
         })
-        .filter((incident) => incident.deleted !== true && isFinite(incident.lat) && isFinite(incident.lng));
+        .filter((incident) => incident.deleted !== true && !incident.flagged && isFinite(incident.lat) && isFinite(incident.lng));
 
       setFirebaseIncidents((prev) => {
         const merged = new globalThis.Map(prev.map((incident) => [incident.id, incident]));

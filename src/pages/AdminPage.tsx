@@ -186,12 +186,12 @@ function MiniSparkline({ data, color = '#3b82f6' }: { data: number[]; color?: st
 function SectionHeader({ icon: Icon, title, subtitle }: { icon: React.ElementType; title: string; subtitle?: string }) {
   return (
     <div className="flex items-center gap-3 mb-6">
-      <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-        <Icon size={15} className="text-blue-400" />
+      <div className="w-8 h-8 rounded-xl bg-blue-500/10 light:bg-blue-50 border border-blue-500/20 light:border-blue-200 flex items-center justify-center shrink-0">
+        <Icon size={15} className="text-blue-400 light:text-blue-600" />
       </div>
       <div>
-        <h2 className="text-base font-black text-white">{title}</h2>
-        {subtitle && <p className="text-[10px] text-slate-500 mt-0.5">{subtitle}</p>}
+        <h2 className="text-base font-black text-white light:text-slate-900">{title}</h2>
+        {subtitle && <p className="text-[10px] text-slate-500 light:text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
     </div>
   );
@@ -724,13 +724,13 @@ export default function AdminPage() {
   if (!isFirebaseConfigured) {
     return (
       <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-white/10 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <h1 className="text-2xl font-black">Admin unavailable</h1>
-          <p className="text-slate-300 text-sm leading-relaxed">
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 light:bg-white border-white/10 light:border-slate-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+          <h1 className="text-2xl font-black light:text-slate-900">Admin unavailable</h1>
+          <p className="text-slate-300 light:text-slate-600 text-sm leading-relaxed">
             This deployment was built without Firebase environment variables. Add the{' '}
-            <code className="text-amber-300/90">VITE_FIREBASE_*</code> secrets to your GitHub repository
-            and re-run the Pages workflow, or run <code className="text-amber-300/90">npm run build</code>{' '}
-            with a local <code className="text-amber-300/90">.env</code> file.
+            <code className="text-amber-300/90 light:text-amber-700">VITE_FIREBASE_*</code> secrets to your GitHub repository
+            and re-run the Pages workflow, or run <code className="text-amber-300/90 light:text-amber-700">npm run build</code>{' '}
+            with a local <code className="text-amber-300/90 light:text-amber-700">.env</code> file.
           </p>
           <Button onClick={() => navigate('/map')} className="w-full">Back to map</Button>
         </Card>
@@ -741,9 +741,9 @@ export default function AdminPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-white/10 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <h1 className="text-2xl font-black">Admin Portal</h1>
-          <p className="text-slate-300 text-sm">Sign in with Google using the approved admin account to continue.</p>
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 light:bg-white border-white/10 light:border-slate-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+          <h1 className="text-2xl font-black light:text-slate-900">Admin Portal</h1>
+          <p className="text-slate-300 light:text-slate-600 text-sm">Sign in with Google using the approved admin account to continue.</p>
           <Button onClick={signIn} className="w-full">Sign in with Google</Button>
           <Button variant="secondary" onClick={() => navigate('/map')} className="w-full">Back to map</Button>
         </Card>
@@ -754,12 +754,12 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 border-red-500/40 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <div className="flex items-center gap-2 text-red-400">
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 light:bg-white border-red-500/40 light:border-red-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+          <div className="flex items-center gap-2 text-red-400 light:text-red-600">
             <Lock size={18} />
             <h1 className="text-2xl font-black">Access denied</h1>
           </div>
-          <p className="text-slate-300 text-sm">This portal is restricted to approved admin accounts.</p>
+          <p className="text-slate-300 light:text-slate-600 text-sm">This portal is restricted to approved admin accounts.</p>
           <Button variant="secondary" onClick={() => navigate('/map')} className="w-full">Back to map</Button>
         </Card>
       </div>
@@ -767,7 +767,10 @@ export default function AdminPage() {
   }
 
   // ── Shared tooltip style ──────────────────────────────────────────────────
-  const ttStyle = { background: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, fontSize: 11 };
+  const isLightMode = typeof document !== 'undefined' && document.documentElement.classList.contains('light');
+  const ttStyle = isLightMode
+    ? { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, fontSize: 11, color: '#1e293b' }
+    : { background: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, fontSize: 11 };
 
   const renderMobileHero = () => {
     const ActiveIcon = activeNavItem.icon;
@@ -779,7 +782,7 @@ export default function AdminPage() {
 
     return (
       <div className="md:hidden px-4 pt-4">
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 p-5 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.95)]">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 light:border-stone-200 bg-slate-950/90 light:bg-white/80 p-5 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.95)]">
           <div
             className={cn('absolute inset-0 bg-gradient-to-br opacity-90', activeSectionTheme.accent)}
             style={{ boxShadow: `inset 0 0 120px ${activeSectionTheme.glow}` }}
@@ -830,7 +833,7 @@ export default function AdminPage() {
   };
 
   const renderMobileCommandDeck = () => (
-    <div className="md:hidden sticky top-[72px] z-[19] border-b border-white/[0.06] bg-slate-950/70 px-4 py-3 backdrop-blur-xl">
+    <div className="md:hidden sticky top-[72px] z-[19] border-b border-white/[0.06] light:border-stone-200/80 bg-slate-950/70 light:bg-[rgba(255,250,242,0.86)] px-4 py-3 backdrop-blur-xl">
       <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
           const isActive = activeSection === id;
@@ -868,7 +871,7 @@ export default function AdminPage() {
 
       {/* KPI row 1 — Incident health */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-red-950/30 border-red-500/30 rounded-2xl hover:border-red-500/60 transition-all">
+        <Card className="p-4 bg-red-950/30 light:bg-red-50 border-red-500/30 light:border-red-200 rounded-2xl hover:border-red-500/60 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Siren size={13} className="text-red-400 animate-pulse shrink-0" />
             <p className="text-[10px] font-black tracking-widest uppercase text-red-400">Active Emergencies</p>
@@ -877,20 +880,20 @@ export default function AdminPage() {
           <p className="text-[10px] text-red-400/50 mt-1">Critical — immediate review required</p>
         </Card>
 
-        <Card className="p-4 bg-amber-950/20 border-amber-500/20 rounded-2xl hover:border-amber-400/40 transition-all">
+        <Card className="p-4 bg-amber-950/20 light:bg-amber-50 border-amber-500/20 light:border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle size={13} className="text-amber-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Unresolved</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Unresolved</p>
           </div>
           <p className="text-3xl font-black text-amber-400">{unresolvedIncidents}</p>
           <p className="text-[10px] text-slate-600 mt-1">Awaiting community confirmation</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/30 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Clock3 size={13} className="text-blue-400 shrink-0" />
-              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Last 24h</p>
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Last 24h</p>
             </div>
             <MiniSparkline data={incidentSparklineData} color="#60a5fa" />
           </div>
@@ -899,26 +902,26 @@ export default function AdminPage() {
         </Card>
 
         {/* Page Views KPI — enhanced with sparkline */}
-        <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-pink-400/30 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-pink-400/30 transition-all">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Activity size={13} className="text-pink-400 shrink-0" />
-              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Page Views</p>
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Page Views</p>
             </div>
             <MiniSparkline data={pageViewsSparklineData} color="#f472b6" />
           </div>
-          <p className="text-3xl font-black mt-2">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
+          <p className="text-3xl font-black mt-2 light:text-slate-900">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">14-day trend above · lifetime total</p>
         </Card>
       </div>
 
       {/* KPI row 2 — Users + Safety */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-slate-900/80 border-violet-500/20 rounded-2xl hover:border-violet-400/40 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-violet-500/20 light:border-violet-200 rounded-2xl hover:border-violet-400/40 transition-all">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Users size={13} className="text-violet-400 shrink-0" />
-              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Total Users</p>
+              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Total Users</p>
             </div>
             <MiniSparkline data={userGrowthSparklineData} color="#a78bfa" />
           </div>
@@ -929,28 +932,28 @@ export default function AdminPage() {
           </div>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-amber-400/30 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-amber-400/30 light:hover:border-amber-300 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <ChartPie size={13} className="text-amber-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Active Reporters</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Active Reporters</p>
           </div>
           <p className="text-3xl font-black text-amber-400">{uniqueReporterEmails}</p>
           <p className="text-[10px] text-slate-600 mt-1">Distinct users who filed a report</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-white/10 rounded-2xl hover:border-blue-400/30 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Activity size={13} className="text-blue-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Firebase Reports</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Firebase Reports</p>
           </div>
-          <p className="text-3xl font-black">{totalIncidents}</p>
+          <p className="text-3xl font-black light:text-slate-900">{totalIncidents}</p>
           <p className="text-[10px] text-slate-600 mt-1">Community + official in Firestore</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-emerald-500/20 rounded-2xl hover:border-emerald-400/40 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-emerald-500/20 light:border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <ShieldCheck size={13} className="text-emerald-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Avg Safety Score</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Avg Safety Score</p>
           </div>
           <p className="text-3xl font-black text-emerald-400">{averageSafety}</p>
           <p className="text-[10px] text-slate-600 mt-1">Mean score (0–100) across tracked neighborhoods</p>
@@ -960,7 +963,7 @@ export default function AdminPage() {
       <div className="border-t border-white/[0.04]" />
 
       {/* API Data Sources Panel */}
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
         <div className="flex items-center gap-2 mb-4">
           <ChartNoAxesColumn size={14} className="text-sky-400" />
           <h3 className="text-sm font-black uppercase tracking-widest text-sky-400">Live API Data Sources</h3>
@@ -984,7 +987,7 @@ export default function AdminPage() {
       <div className="border-t border-white/[0.04]" />
 
       {/* Moderation Queue */}
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-black flex items-center gap-2">
@@ -1008,9 +1011,9 @@ export default function AdminPage() {
             {pendingReviewIncidents.map((incident) => {
               const ageMin = Math.floor((Date.now() - incident.timestamp) / 60000);
               return (
-                <div key={incident.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 border border-white/5">
+                <div key={incident.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 light:bg-slate-50 border border-white/5 light:border-slate-200">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">{incident.title}</p>
+                    <p className="text-sm font-bold text-white light:text-slate-900 truncate">{incident.title}</p>
                     <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{incident.description}</p>
                     <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-500">
                       <span>{incident.neighborhood}</span>
@@ -1031,8 +1034,8 @@ export default function AdminPage() {
       </Card>
 
       {/* User growth chart — Task 5 */}
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">New Contributor Activity · Last 30 Days</p>
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">New Contributor Activity · Last 30 Days</p>
         <p className="text-[10px] text-slate-600 mb-4 mt-0.5">First-time reporters appearing each day (proxied from first incident submission). Reflects organic community growth.</p>
         {userGrowthData.every(d => d.count === 0) ? (
           <p className="text-slate-600 text-xs py-8 text-center">No contributor data yet.</p>
@@ -1057,7 +1060,7 @@ export default function AdminPage() {
 
       {/* Elevated user directory — Task 5 */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto h-[420px]">
+        <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto h-[420px]">
           <div className="flex items-center justify-between mb-4 pr-1">
             <div>
               <h3 className="text-base font-black flex items-center gap-2">
@@ -1071,14 +1074,14 @@ export default function AdminPage() {
                 <span className="text-amber-400 font-black">{uniqueReporterEmails}</span> reporters
               </p>
             </div>
-            <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white" title="Force Refresh">
+            <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 light:bg-slate-100 border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 hover:bg-white/10 light:hover:bg-slate-200 hover:text-white light:hover:text-slate-900" title="Force Refresh">
               <RefreshCw size={12} className={isRefreshingUsers ? 'animate-spin' : ''} />
             </Button>
           </div>
           <div className="overflow-y-auto h-[320px] pr-2">
             <table className="w-full text-xs min-w-[500px]">
-              <thead className="text-slate-400 bg-slate-900/90 top-0 sticky z-10">
-                <tr className="border-b border-white/8">
+              <thead className="text-slate-400 light:text-slate-600 bg-slate-900/90 light:bg-slate-50 top-0 sticky z-10">
+                <tr className="border-b border-white/8 light:border-slate-200">
                   <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
@@ -1093,9 +1096,9 @@ export default function AdminPage() {
                     (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
                   ).length;
                   return (
-                    <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                    <tr key={profile.uid} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.03] light:hover:bg-slate-50 transition-colors">
                       <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>
-                      <td className="py-2.5 font-medium text-white text-xs">{profile.displayName || 'Unknown'}</td>
+                      <td className="py-2.5 font-medium text-white light:text-slate-900 text-xs">{profile.displayName || 'Unknown'}</td>
                       <td className="py-2.5 text-slate-400 text-[11px]">{profile.email || '—'}</td>
                       <td className="py-2.5">
                         <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-[#2E8B7A]/20 border border-[#2E8B7A]/40 text-[#2E8B7A]' : 'bg-[#4A90D9]/10 border border-[#4A90D9]/20 text-[#4A90D9]'}`}>
@@ -1116,8 +1119,8 @@ export default function AdminPage() {
         </Card>
 
         <div className="col-span-1 flex flex-col gap-4 h-[420px]">
-          <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] flex flex-col flex-1 min-h-0">
-            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">User Roles</p>
+          <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] flex flex-col flex-1 min-h-0">
+            <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">User Roles</p>
             <p className="text-[10px] text-slate-600 mb-2 mt-1">
               <span className="text-violet-400 font-black">{totalUsers}</span> total registered users.
             </p>
@@ -1135,8 +1138,8 @@ export default function AdminPage() {
                 </ResponsiveContainer>
                 <div className="flex flex-col gap-1.5 mt-2">
                   {userRoleChartData.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-white/3 border border-white/5">
-                      <span className="flex items-center gap-2 text-xs text-slate-300">
+                    <div key={d.name} className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-white/3 light:bg-slate-50 border border-white/5 light:border-slate-200">
+                      <span className="flex items-center gap-2 text-xs text-slate-300 light:text-slate-700">
                         <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
                         {d.name}
                       </span>
@@ -1149,8 +1152,8 @@ export default function AdminPage() {
           </Card>
 
           {topReportersData.length > 0 && (
-            <Card className="p-4 bg-slate-900/80 border-amber-500/15 rounded-[1.6rem]">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.18em] mb-3">Top Contributors</p>
+            <Card className="p-4 bg-slate-900/80 light:bg-white border-amber-500/15 light:border-amber-200 rounded-[1.6rem]">
+              <p className="text-[10px] font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em] mb-3">Top Contributors</p>
               <div className="space-y-1.5">
                 {topReportersData.slice(0, 5).map((r, i) => (
                   <div key={r.name} className="flex items-center gap-2">
@@ -1170,7 +1173,7 @@ export default function AdminPage() {
   const renderIncidents = () => (
     <div className="space-y-5">
       <SectionHeader icon={FileText} title="Incidents" subtitle="Edit, moderate, and soft-delete community and official incident records" />
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">
             {totalIncidents} records · {pendingReviewIncidents.length} in queue
@@ -1191,7 +1194,7 @@ export default function AdminPage() {
                   source_name: incident.source_name || '', source_url: incident.source_url || '',
                 };
                 return (
-                  <div key={incident.id} className="rounded-[1.6rem] border border-white/10 bg-gradient-to-br from-slate-900 to-slate-950 p-4 shadow-[0_20px_70px_-40px_rgba(15,23,42,0.95)]">
+                  <div key={incident.id} className="rounded-[1.6rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-slate-900 to-slate-950 light:from-white light:to-slate-50 p-4 shadow-[0_20px_70px_-40px_rgba(15,23,42,0.95)]">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">{incident.category}</p>
@@ -1202,22 +1205,22 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <div className="mt-4 grid gap-3">
-                      <input className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} />
-                      <textarea className="h-24 w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} />
+                      <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} />
+                      <textarea className="h-24 w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} />
                       <div className="grid grid-cols-2 gap-2">
-                        <select className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
+                        <select className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
                           {INCIDENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                         </select>
-                        <select className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
+                        <select className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
                           {VERIFIED_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
                         </select>
                       </div>
                       <div className="grid grid-cols-[1fr_auto] gap-2">
-                        <input className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} />
-                        <input type="number" className="w-24 rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} />
+                        <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} />
+                        <input type="number" className="w-24 rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} />
                       </div>
-                      <input className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
-                      <input className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
+                      <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
+                      <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
                       <div className="grid grid-cols-2 gap-2">
                         <Button onClick={() => saveIncident(incident.id)} className="h-11 rounded-2xl bg-blue-600 text-sm hover:bg-blue-700" disabled={savingIncidentId === incident.id}>
                           {savingIncidentId === incident.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
@@ -1235,8 +1238,8 @@ export default function AdminPage() {
             </div>
 
             <table className="hidden md:table w-full text-xs min-w-[1280px]">
-              <thead className="text-slate-400">
-                <tr className="border-b border-white/10">
+              <thead className="text-slate-400 light:text-slate-600">
+                <tr className="border-b border-white/10 light:border-slate-200">
                   <th className="py-2 text-left">Title</th>
                   <th className="py-2 text-left">Category</th>
                   <th className="py-2 text-left">Neighborhood</th>
@@ -1258,20 +1261,20 @@ export default function AdminPage() {
                     source_name: incident.source_name || '', source_url: incident.source_url || '',
                   };
                   return (
-                    <tr key={incident.id} className="border-b border-white/5 align-top hover:bg-white/[0.02] transition-colors">
-                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} /></td>
+                    <tr key={incident.id} className="border-b border-white/5 light:border-slate-100 align-top hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
+                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} /></td>
                       <td className="py-2 pr-2">
-                        <select className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
+                        <select className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
                           {INCIDENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                         </select>
                       </td>
-                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} /></td>
+                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} /></td>
                       <td className="py-2 pr-2">
-                        <select className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
+                        <select className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
                           {VERIFIED_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
                         </select>
                       </td>
-                      <td className="py-2 pr-2"><input type="number" className="w-24 bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} /></td>
+                      <td className="py-2 pr-2"><input type="number" className="w-24 bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} /></td>
                       <td className="py-2 pr-2 whitespace-nowrap">
                         {incident.timestamp
                           ? <span className="text-[10px] text-slate-400 font-mono leading-tight">
@@ -1280,10 +1283,10 @@ export default function AdminPage() {
                             </span>
                           : <span className="text-slate-700 text-[10px]">—</span>}
                       </td>
-                      <td className="py-2 pr-2"><textarea className="w-full h-20 bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} /></td>
+                      <td className="py-2 pr-2"><textarea className="w-full h-20 bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} /></td>
                       <td className="py-2 pr-2">
-                        <input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2 mb-2" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
-                        <input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
+                        <input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 mb-2 light:text-slate-900" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
+                        <input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
                       </td>
                       <td className="py-2 flex gap-2">
                         <Button onClick={() => saveIncident(incident.id)} className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700" disabled={savingIncidentId === incident.id}>
@@ -1308,7 +1311,7 @@ export default function AdminPage() {
     <div className="space-y-5">
       <SectionHeader icon={Users} title="User Directory" subtitle="Registered users, roles, and contribution activity" />
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
+        <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4 pr-1">
             <p className="text-[10px] text-slate-500">
               <span className="text-violet-400 font-black">{totalUsers}</span> total ·{' '}
@@ -1316,7 +1319,7 @@ export default function AdminPage() {
               <span className="text-[#2E8B7A] font-black">{adminUsers}</span> admin ·{' '}
               <span className="text-amber-400 font-black">{uniqueReporterEmails}</span> reporters
             </p>
-            <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white">
+            <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 light:bg-slate-100 border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 hover:bg-white/10 light:hover:bg-slate-200 hover:text-white light:hover:text-slate-900">
               <RefreshCw size={12} className={isRefreshingUsers ? 'animate-spin' : ''} />
             </Button>
           </div>
@@ -1327,11 +1330,11 @@ export default function AdminPage() {
                 (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
               ).length;
               return (
-                <div key={profile.uid} className="rounded-[1.35rem] border border-white/10 bg-gradient-to-br from-slate-900 to-slate-950 p-4">
+                <div key={profile.uid} className="rounded-[1.35rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-slate-900 to-slate-950 light:from-white light:to-slate-50 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-black text-white truncate">{profile.displayName || 'Unknown'}</p>
-                      <p className="mt-1 truncate text-[11px] text-slate-400">{profile.email || '—'}</p>
+                      <p className="text-sm font-black text-white light:text-slate-900 truncate">{profile.displayName || 'Unknown'}</p>
+                      <p className="mt-1 truncate text-[11px] text-slate-400 light:text-slate-600">{profile.email || '—'}</p>
                     </div>
                     <span className={cn(
                       'rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em]',
@@ -1343,11 +1346,11 @@ export default function AdminPage() {
                     </span>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-2">
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3">
+                    <div className="rounded-2xl border border-white/8 light:border-slate-200 bg-white/[0.03] light:bg-slate-50 p-3">
                       <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">UID</p>
                       <p className="mt-2 font-mono text-xs text-slate-300">{profile.uid.slice(0, 8)}…</p>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-3">
+                    <div className="rounded-2xl border border-white/8 light:border-slate-200 bg-white/[0.03] light:bg-slate-50 p-3">
                       <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Reports</p>
                       <p className="mt-2 text-xl font-black text-amber-300">{reportCount}</p>
                     </div>
@@ -1358,8 +1361,8 @@ export default function AdminPage() {
           </div>
           <div className="hidden md:block overflow-y-auto max-h-[540px] pr-2">
             <table className="w-full text-xs min-w-[500px]">
-              <thead className="text-slate-400 bg-slate-900/90 top-0 sticky z-10">
-                <tr className="border-b border-white/8">
+              <thead className="text-slate-400 light:text-slate-600 bg-slate-900/90 light:bg-slate-50 top-0 sticky z-10">
+                <tr className="border-b border-white/8 light:border-slate-200">
                   <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
@@ -1374,9 +1377,9 @@ export default function AdminPage() {
                     (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
                   ).length;
                   return (
-                    <tr key={profile.uid} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                    <tr key={profile.uid} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.03] light:hover:bg-slate-50 transition-colors">
                       <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>
-                      <td className="py-2.5 font-medium text-white text-xs">{profile.displayName || 'Unknown'}</td>
+                      <td className="py-2.5 font-medium text-white light:text-slate-900 text-xs">{profile.displayName || 'Unknown'}</td>
                       <td className="py-2.5 text-slate-400 text-[11px]">{profile.email || '—'}</td>
                       <td className="py-2.5">
                         <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-[#2E8B7A]/20 border border-[#2E8B7A]/40 text-[#2E8B7A]' : 'bg-[#4A90D9]/10 border border-[#4A90D9]/20 text-[#4A90D9]'}`}>
@@ -1397,7 +1400,7 @@ export default function AdminPage() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+          <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
             <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] mb-3">User Roles</p>
             {userRoleChartData.length === 0 ? (
               <p className="text-slate-600 text-xs py-4 text-center">No user data.</p>
@@ -1413,8 +1416,8 @@ export default function AdminPage() {
                 </ResponsiveContainer>
                 <div className="flex flex-col gap-2 mt-3">
                   {userRoleChartData.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/3 border border-white/5">
-                      <span className="flex items-center gap-2 text-xs text-slate-300">
+                    <div key={d.name} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/3 light:bg-slate-50 border border-white/5 light:border-slate-200">
+                      <span className="flex items-center gap-2 text-xs text-slate-300 light:text-slate-700">
                         <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
                         {d.name}
                       </span>
@@ -1428,7 +1431,7 @@ export default function AdminPage() {
 
           {/* Top reporters */}
           {topReportersData.length > 0 && (
-            <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+            <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
               <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] mb-3">Top Reporters</p>
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={topReportersData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
@@ -1448,7 +1451,7 @@ export default function AdminPage() {
   const renderStats = () => (
     <div className="space-y-5">
       <SectionHeader icon={Map} title="City Stats" subtitle="Edit community safety scores and crime metrics" />
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem] overflow-x-auto">
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">City Intelligence · {communityStats.length} communities</span>
           <span className="text-[10px] text-amber-500 md:hidden">Swipe table &rarr;</span>
@@ -1462,7 +1465,7 @@ export default function AdminPage() {
               disorder_calls: row.disorder_calls, safety_score: row.safety_score,
             };
             return (
-              <div key={row.id} className="rounded-[1.6rem] border border-white/10 bg-gradient-to-br from-slate-900 to-slate-950 p-4">
+              <div key={row.id} className="rounded-[1.6rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-slate-900 to-slate-950 light:from-white light:to-slate-50 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-300/70">{draft.month || 'Month'}</p>
@@ -1474,15 +1477,15 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div className="mt-4 grid gap-2">
-                  <input className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.community} onChange={(e) => setStatsDraft(row, { community: e.target.value })} />
-                  <input className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.month} onChange={(e) => setStatsDraft(row, { month: e.target.value })} />
+                  <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.community} onChange={(e) => setStatsDraft(row, { community: e.target.value })} />
+                  <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.month} onChange={(e) => setStatsDraft(row, { month: e.target.value })} />
                   <div className="grid grid-cols-2 gap-2">
-                    <input type="number" className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.violent_crime} onChange={(e) => setStatsDraft(row, { violent_crime: Number(e.target.value) })} />
-                    <input type="number" className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.property_crime} onChange={(e) => setStatsDraft(row, { property_crime: Number(e.target.value) })} />
+                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.violent_crime} onChange={(e) => setStatsDraft(row, { violent_crime: Number(e.target.value) })} />
+                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.property_crime} onChange={(e) => setStatsDraft(row, { property_crime: Number(e.target.value) })} />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <input type="number" className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.disorder_calls} onChange={(e) => setStatsDraft(row, { disorder_calls: Number(e.target.value) })} />
-                    <input type="number" className="w-full rounded-2xl border border-white/10 bg-slate-800/80 p-3 text-sm" value={draft.safety_score} onChange={(e) => setStatsDraft(row, { safety_score: Number(e.target.value) })} />
+                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.disorder_calls} onChange={(e) => setStatsDraft(row, { disorder_calls: Number(e.target.value) })} />
+                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.safety_score} onChange={(e) => setStatsDraft(row, { safety_score: Number(e.target.value) })} />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <Button onClick={() => saveCommunityStats(row.id)} className="h-11 rounded-2xl bg-blue-600 text-sm hover:bg-blue-700" disabled={savingStatsId === row.id}>
@@ -1501,7 +1504,7 @@ export default function AdminPage() {
         </div>
         <table className="hidden md:table w-full text-xs min-w-[980px]">
           <thead className="text-slate-400">
-            <tr className="border-b border-white/10">
+            <tr className="border-b border-white/10 light:border-slate-200">
               <th className="py-2 text-left">Community</th>
               <th className="py-2 text-left">Month</th>
               <th className="py-2 text-left">Violent</th>
@@ -1520,13 +1523,13 @@ export default function AdminPage() {
                 disorder_calls: row.disorder_calls, safety_score: row.safety_score,
               };
               return (
-                <tr key={row.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                  <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.community} onChange={(e) => setStatsDraft(row, { community: e.target.value })} /></td>
-                  <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.month} onChange={(e) => setStatsDraft(row, { month: e.target.value })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.violent_crime} onChange={(e) => setStatsDraft(row, { violent_crime: Number(e.target.value) })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.property_crime} onChange={(e) => setStatsDraft(row, { property_crime: Number(e.target.value) })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.disorder_calls} onChange={(e) => setStatsDraft(row, { disorder_calls: Number(e.target.value) })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 border border-white/10 rounded-xl p-2" value={draft.safety_score} onChange={(e) => setStatsDraft(row, { safety_score: Number(e.target.value) })} /></td>
+                <tr key={row.id} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
+                  <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.community} onChange={(e) => setStatsDraft(row, { community: e.target.value })} /></td>
+                  <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.month} onChange={(e) => setStatsDraft(row, { month: e.target.value })} /></td>
+                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.violent_crime} onChange={(e) => setStatsDraft(row, { violent_crime: Number(e.target.value) })} /></td>
+                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.property_crime} onChange={(e) => setStatsDraft(row, { property_crime: Number(e.target.value) })} /></td>
+                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.disorder_calls} onChange={(e) => setStatsDraft(row, { disorder_calls: Number(e.target.value) })} /></td>
+                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.safety_score} onChange={(e) => setStatsDraft(row, { safety_score: Number(e.target.value) })} /></td>
                   <td className="py-2 flex gap-2">
                     <Button onClick={() => saveCommunityStats(row.id)} className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700" disabled={savingStatsId === row.id}>
                       {savingStatsId === row.id ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
@@ -1543,8 +1546,8 @@ export default function AdminPage() {
       </Card>
 
       {safetyChartData.length > 0 && (
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Community Safety vs Crime Breakdown</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Community Safety vs Crime Breakdown</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Compares safety score against violent crime, property crime, and disorder calls per neighborhood.</p>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={safetyChartData} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
@@ -1569,8 +1572,8 @@ export default function AdminPage() {
       <SectionHeader icon={BarChart3} title="Analytics" subtitle="Incident patterns, geographic distribution, and temporal trends" />
 
       {/* Incidents timeline — 14 days */}
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Incidents: Last 14 Days</p>
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Incidents: Last 14 Days</p>
         <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily report volume. Spikes indicate high-activity periods worth reviewing.</p>
         {timelineChartData.every((d) => d.count === 0) ? (
           <p className="text-slate-600 text-xs py-8 text-center">No incident data yet.</p>
@@ -1595,8 +1598,8 @@ export default function AdminPage() {
 
       {/* Category donut + Trust donut + Top Neighborhoods */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">By Category</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">By Category</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">How reports break down by type.</p>
           {categoryChartData.length === 0 ? (
             <p className="text-slate-600 text-xs py-8 text-center">No data yet.</p>
@@ -1612,9 +1615,9 @@ export default function AdminPage() {
               </ResponsiveContainer>
               <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-3">
                 {categoryChartData.map((d) => (
-                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400 light:text-slate-600">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    {d.name} <span className="font-black text-white">{d.value}</span>
+                    {d.name} <span className="font-black text-white light:text-slate-900">{d.value}</span>
                   </span>
                 ))}
               </div>
@@ -1622,8 +1625,8 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Trust Status</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Trust Status</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Verification breakdown across all reports.</p>
           {trustChartData.length === 0 ? (
             <p className="text-slate-600 text-xs py-8 text-center">No data yet.</p>
@@ -1639,9 +1642,9 @@ export default function AdminPage() {
               </ResponsiveContainer>
               <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-3">
                 {trustChartData.map((d) => (
-                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400 light:text-slate-600">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    {d.name} <span className="font-black text-white">{d.value}</span>
+                    {d.name} <span className="font-black text-white light:text-slate-900">{d.value}</span>
                   </span>
                 ))}
               </div>
@@ -1649,8 +1652,8 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Top Neighborhoods</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Neighborhoods</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Areas with the highest incident count.</p>
           {neighborhoodChartData.length === 0 ? (
             <p className="text-slate-600 text-xs py-8 text-center">No data yet.</p>
@@ -1669,8 +1672,8 @@ export default function AdminPage() {
 
       {/* Hourly + Category by day */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Hourly Activity Pattern</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Hourly Activity Pattern</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">When during the day most reports are filed.</p>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={hourlyChartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
@@ -1689,8 +1692,8 @@ export default function AdminPage() {
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Category Mix · Last 7 Days</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Category Mix · Last 7 Days</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily stacked view of report categories.</p>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={categoryByDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
@@ -1719,37 +1722,37 @@ export default function AdminPage() {
 
       {/* Traffic KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-slate-900/80 border-blue-500/20 rounded-2xl hover:border-blue-400/40 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-blue-500/20 light:border-blue-200 rounded-2xl hover:border-blue-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <MousePointerClick size={13} className="text-blue-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Total Views</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Total Views</p>
           </div>
           <p className="text-3xl font-black text-blue-400">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">Lifetime page loads tracked</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-emerald-500/20 rounded-2xl hover:border-emerald-400/40 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-emerald-500/20 light:border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Wifi size={13} className="text-emerald-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Sessions (Sample)</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Sessions (Sample)</p>
           </div>
           <p className="text-3xl font-black text-emerald-400">{uniqueSessions.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">Unique browser sessions in sample</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-amber-500/20 rounded-2xl hover:border-amber-400/40 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-amber-500/20 light:border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={13} className="text-amber-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Pages / Session</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Pages / Session</p>
           </div>
           <p className="text-3xl font-black text-amber-400">{avgPagesPerSession}</p>
           <p className="text-[10px] text-slate-600 mt-1">Avg depth across sampled sessions</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 border-pink-500/20 rounded-2xl hover:border-pink-400/40 transition-all">
+        <Card className="p-4 bg-slate-900/80 light:bg-white border-pink-500/20 light:border-pink-200 rounded-2xl hover:border-pink-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Activity size={13} className="text-pink-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400">Sample Size</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Sample Size</p>
           </div>
           <p className="text-3xl font-black text-pink-400">{pageViewDocs.length.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">Recent docs loaded (last 2 000)</p>
@@ -1757,8 +1760,8 @@ export default function AdminPage() {
       </div>
 
       {/* Page views over time — 30 days */}
-      <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Page Views · Last 30 Days</p>
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Page Views · Last 30 Days</p>
         <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily volume from the <code className="text-slate-400">page_views</code> collection. Excludes admin sessions.</p>
         {pageViewsByDayData.every(d => d.views === 0) ? (
           <p className="text-slate-600 text-xs py-8 text-center">No page view data in the sample window.</p>
@@ -1784,8 +1787,8 @@ export default function AdminPage() {
       {/* Traffic sources + Top pages */}
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Traffic source donut */}
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Acquisition Channels</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Acquisition Channels</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">How visitors arrive — bucketed from referrer and UTM params.</p>
           {trafficSourceData.length === 0 ? (
             <p className="text-slate-600 text-xs py-8 text-center">
@@ -1803,9 +1806,9 @@ export default function AdminPage() {
               </ResponsiveContainer>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3">
                 {trafficSourceData.map((d) => (
-                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400 light:text-slate-600">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    {d.name} <span className="font-black text-white ml-auto">{d.value}</span>
+                    {d.name} <span className="font-black text-white light:text-slate-900 ml-auto">{d.value}</span>
                   </span>
                 ))}
               </div>
@@ -1814,8 +1817,8 @@ export default function AdminPage() {
         </Card>
 
         {/* Top pages */}
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Top Pages by Views</p>
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Pages by Views</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Which routes drive the most traffic in the sampled window.</p>
           {topPagesData.length === 0 ? (
             <p className="text-slate-600 text-xs py-8 text-center">No page data yet.</p>
@@ -1829,8 +1832,8 @@ export default function AdminPage() {
                     <span className="text-[10px] text-slate-600 w-4 text-right shrink-0">{i + 1}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-xs text-slate-300 font-mono truncate">{path}</span>
-                        <span className="text-xs font-black text-white ml-2 shrink-0">{views.toLocaleString()}</span>
+                        <span className="text-xs text-slate-300 light:text-slate-700 font-mono truncate">{path}</span>
+                        <span className="text-xs font-black text-white light:text-slate-900 ml-2 shrink-0">{views.toLocaleString()}</span>
                       </div>
                       <div className="h-1 rounded-full bg-white/5">
                         <div className="h-1 rounded-full bg-[#4A90D9]" style={{ width: `${pct}%` }} />
@@ -1846,10 +1849,10 @@ export default function AdminPage() {
 
       {/* Top referrers + UTM campaigns */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
           <div className="flex items-center gap-2 mb-1">
             <Link size={12} className="text-purple-400" />
-            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">Top Referrers</p>
+            <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Referrers</p>
           </div>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">External domains driving inbound traffic to Calgary Watch.</p>
           {topReferrersData.length === 0 ? (
@@ -1866,10 +1869,10 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 border-white/10 rounded-[1.6rem]">
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
           <div className="flex items-center gap-2 mb-1">
             <Megaphone size={12} className="text-orange-400" />
-            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em]">UTM Campaigns</p>
+            <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">UTM Campaigns</p>
           </div>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Views attributed to <code className="text-slate-400">utm_campaign</code> tagged links.</p>
           {utmCampaignData.length === 0 ? (
@@ -1899,23 +1902,23 @@ export default function AdminPage() {
         </div>
       ) : (
         flaggedIncidents.map((incident) => (
-          <div key={incident.id} className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-6 space-y-4">
+          <div key={incident.id} className="rounded-3xl border border-amber-500/20 light:border-amber-200 bg-amber-500/5 light:bg-amber-50 p-6 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-black text-amber-400 uppercase tracking-widest mb-1">
                   Flagged {incident.flagged_at ? formatRelativeMinutes(incident.flagged_at) : ''}
                 </p>
-                <h3 className="text-white font-black text-lg leading-tight truncate">{incident.title}</h3>
-                <p className="text-slate-400 text-sm mt-1 line-clamp-2">{incident.description}</p>
+                <h3 className="text-white light:text-slate-900 font-black text-lg leading-tight truncate">{incident.title}</h3>
+                <p className="text-slate-400 light:text-slate-600 text-sm mt-1 line-clamp-2">{incident.description}</p>
               </div>
               {incident.image_url && (
                 <img src={incident.image_url} alt="" className="w-20 h-20 rounded-2xl object-cover border border-white/10 shrink-0" />
               )}
             </div>
             <div className="text-xs text-slate-500 space-y-0.5">
-              <p>Neighborhood: <span className="text-slate-300">{incident.neighborhood}</span></p>
-              <p>Flagged by UID: <span className="text-slate-300 font-mono">{incident.flagged_by}</span></p>
-              <p>Reporter: <span className="text-slate-300">{incident.name}</span></p>
+              <p>Neighborhood: <span className="text-slate-300 light:text-slate-700">{incident.neighborhood}</span></p>
+              <p>Flagged by UID: <span className="text-slate-300 light:text-slate-700 font-mono">{incident.flagged_by}</span></p>
+              <p>Reporter: <span className="text-slate-300 light:text-slate-700">{incident.name}</span></p>
             </div>
             <div className="flex gap-3">
               <button

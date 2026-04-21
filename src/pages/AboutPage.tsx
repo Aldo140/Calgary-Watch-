@@ -14,7 +14,7 @@
 
 import { useEffect, useRef, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useInView, animate } from 'motion/react';
+import { motion, useInView, animate, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
 import emailjs from '@emailjs/browser';
 import { db } from '@/src/firebase';
 import { publicAsset } from '@/src/lib/utils';
@@ -230,9 +230,75 @@ const AnimatedCounter = memo(function AnimatedCounter({
   return <span ref={ref}>{prefix}0{suffix}</span>;
 });
 
+// ---------------------------------------------------------------------------
+// 3D Tilt card — mouse-driven perspective tilt
+// ---------------------------------------------------------------------------
+function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rotX = useMotionValue(0);
+  const rotY = useMotionValue(0);
+  const springRotX = useSpring(rotX, { stiffness: 200, damping: 18 });
+  const springRotY = useSpring(rotY, { stiffness: 200, damping: 18 });
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (prefersReducedMotion()) return;
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    rotX.set(-dy * 8);
+    rotY.set(dx * 8);
+  }
+
+  function handleMouseLeave() {
+    rotX.set(0);
+    rotY.set(0);
+  }
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className={className}
+      style={{ rotateX: springRotX, rotateY: springRotY, transformStyle: 'preserve-3d', perspective: 1000 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Scroll-driven floating element (parallax offset)
+// ---------------------------------------------------------------------------
+function ParallaxFloat({ children, speed = 0.15, className }: { children: React.ReactNode; speed?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 1200], [0, -1200 * speed]);
+  const smoothY = useSpring(y, { stiffness: 80, damping: 20 });
+  if (prefersReducedMotion()) return <div className={className}>{children}</div>;
+  return (
+    <motion.div className={className} style={{ y: smoothY }}>
+      {children}
+    </motion.div>
+  );
+}
+
 export default function AboutPage() {
   const navigate = useNavigate();
   const reducedMotion = prefersReducedMotion();
+
+  // Scroll-driven hero parallax
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: heroScrollProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroImgY = useTransform(heroScrollProgress, [0, 1], ['0%', '25%']);
+  const heroTextY = useTransform(heroScrollProgress, [0, 1], ['0%', '40%']);
+  const heroOpacity = useTransform(heroScrollProgress, [0, 0.65], [1, 0]);
 
   return (
     <div className="relative min-h-dvh bg-slate-950 light:bg-[#f8f3e8] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
@@ -275,17 +341,19 @@ export default function AboutPage() {
       <main className="pt-24 pb-20">
 
         {/* ================================================================
-            HERO SECTION - Full width with image background
+            HERO SECTION - Full width with image background + scroll parallax
             ================================================================ */}
         <motion.section
+          ref={heroRef}
           initial={reducedMotion ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
           className="relative h-dvh md:h-[85vh] overflow-hidden flex items-end"
         >
-          {/* Background image with overlay */}
+          {/* Background image with scroll-driven parallax */}
           <motion.div
             className="absolute inset-0"
+            style={reducedMotion ? undefined : { y: heroImgY }}
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
             transition={{ duration: 1, ease: 'easeOut' }}
@@ -302,9 +370,10 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#1a2a3a]/40 via-transparent to-[#2a1f1f]/30" />
           </motion.div>
 
-          {/* Hero content */}
+          {/* Hero content — scroll-driven fade + lift */}
           <motion.div
             className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-16 md:pb-20"
+            style={reducedMotion ? undefined : { y: heroTextY, opacity: heroOpacity }}
             initial={reducedMotion ? undefined : { opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -406,17 +475,17 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.15 }}
                   transition={{ duration: 0.35, delay: i * 0.06 }}
-                  whileHover={{ scale: 1.06, y: -8 }}
-                  className="rounded-2xl border border-white/10 light:border-slate-300 bg-gradient-to-br from-slate-900/70 to-slate-950/50 light:from-white light:to-slate-50 p-8 group cursor-pointer transition-all"
                 >
-                  <motion.div
-                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center mb-4"
-                    whileHover={{ scale: 1.15, rotate: 10 }}
-                  >
-                    <item.icon className="text-white" size={24} />
-                  </motion.div>
-                  <h3 className="text-xl font-black mb-2">{item.label}</h3>
-                  <p className="text-slate-400 light:text-slate-600">{item.desc}</p>
+                  <TiltCard className="rounded-2xl border border-white/10 light:border-slate-300 bg-gradient-to-br from-slate-900/70 to-slate-950/50 light:from-white light:to-slate-50 p-8 group cursor-pointer transition-all h-full">
+                    <motion.div
+                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center mb-4"
+                      whileHover={{ scale: 1.15, rotate: 10 }}
+                    >
+                      <item.icon className="text-white" size={24} />
+                    </motion.div>
+                    <h3 className="text-xl font-black mb-2">{item.label}</h3>
+                    <p className="text-slate-400 light:text-slate-600">{item.desc}</p>
+                  </TiltCard>
                 </motion.div>
               ))}
             </motion.div>
@@ -477,7 +546,7 @@ export default function AboutPage() {
               </h2>
             </motion.div>
 
-            {/* 3 Step Cards with Images */}
+            {/* 3 Step Cards with Images — 3D tilt on hover */}
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
@@ -508,10 +577,9 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
                   viewport={{ once: true, amount: 0.15 }}
                   transition={{ duration: 0.7, delay: i * 0.065 }}
-                  whileHover={{ y: -12 }}
-                  style={{ perspective: '1200px' }}
                   className="group"
                 >
+                  <TiltCard className="h-full">
                   <div className="rounded-[1.5rem] border border-white/10 light:border-slate-300 overflow-hidden bg-gradient-to-br from-slate-900/80 to-slate-950/60 light:from-white light:to-slate-50 shadow-2xl h-full flex flex-col transition-all duration-300 hover:shadow-2xl hover:border-white/20 light:hover:border-slate-400">
                     {/* Image top */}
                     <div className="relative h-48 overflow-hidden">
@@ -564,6 +632,7 @@ export default function AboutPage() {
                       </motion.div>
                     </div>
                   </div>
+                  </TiltCard>
                 </motion.div>
               ))}
             </div>

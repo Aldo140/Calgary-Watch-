@@ -2,11 +2,11 @@
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
 
-Real-time incident map for Calgary.
+Real-time incident map for Calgary, Alberta.
 
 Calgarians report incidents the moment they happen. Road closures, fires, flooding, and safety alerts appear on the map in under 30 seconds. Check what's happening near you before heading out.
 
-**[Live Site](https://aldo140.github.io/Calgary-Watch-/)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
+**[Live Site](https://calgarywatch.ca)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
 
 > Calgary Watch is a non-profit initiative. We are actively seeking volunteers and partners to grow the platform.
 
@@ -14,16 +14,14 @@ Calgarians report incidents the moment they happen. Road closures, fires, floodi
 
 ## What It Does
 
-Calgary Watch is a live, community-powered safety map. Drop a pin, pick a category, submit in under 30 seconds. The report goes live instantly with no moderation delay. No app install needed — it works on any phone from the browser.
+Calgary Watch is a live, community-powered safety map. Drop a pin, pick a category, attach an optional photo, and submit in under 30 seconds. The report goes live instantly. No app install needed — it works on any phone from the browser.
 
-Over time, Calgary Watch surfaces patterns and trends across neighbourhoods, moving from a real-time map toward a full city intelligence layer.
+The platform runs four data layers:
 
-The platform runs three data layers:
-
-- **Community Reports** - submitted by users in real time, labeled with trust indicators that improve as more users confirm them
-- **Official Open Data** - Live integrations from **Calgary Open Data (SODA APIs)** pulling real-time **311 Service Requests** (Weather/Infrastructure) and live **Traffic Incidents**, updated every 5 minutes
-- **Crime Intelligence** - Historical crime and disorder statistics from Calgary Police Service open data, visualised as a neighbourhood choropleth with per-area breakdowns in the Area Intelligence panel
-- **System Signals** - inferred from clustered activity to surface patterns even at low usage, clearly labeled as low-confidence and system-generated
+- **Community Reports** — submitted by users in real time, labeled with trust indicators that improve as more users confirm them
+- **511 Alberta Traffic** — live traffic incidents from 511.alberta.ca, refreshed every 30 minutes
+- **Environment Canada Alerts** — official weather warnings and special statements for the Calgary region
+- **Calgary Infrastructure & Police** — service requests and crime statistics from Calgary Open Data (SODA API)
 
 ---
 
@@ -31,112 +29,169 @@ The platform runs three data layers:
 
 ### Landing Page
 - Transparent nav that blends into the hero, hides on scroll-down, reappears on scroll-up
-- Full-screen hero with live Calgary background, phone mockup simulation, and live incident feed
-- Bento feature grid with animated visuals: radar rings (Live Map), zone heatmap (Neighbourhood Intelligence), verification pipeline (Verified Reports), redacted report doc (Anonymous posting)
-- Horizontal snap-scroll How It Works on mobile
-- Compact mobile layouts throughout, no duplicate sections
+- Full-screen hero with WebP Calgary background image (`fetchPriority="high"` for fast LCP)
+- Feature grid, How It Works section, volunteer/city-expansion CTAs
 
 ### Map
-- Real-time Firestore `onSnapshot` stream, zero reload needed
+- Real-time Firestore `onSnapshot` stream — zero reload needed
 - Custom incident markers with category icons, pulse rings, and severity-based sizing
 - Leaflet heatmap layer for historical density
-- Crime choropleth overlay sourced from Calgary Police Service open data — tap any neighbourhood to open Area Intelligence
-- Full-featured mobile bottom sheet with search, category chips, sort/filter controls, Neighbourhood Pulse, and rich incident cards — desktop parity on mobile
+- Crime choropleth overlay from Calgary Police Service open data
+- Mobile bottom sheet with search, category chips, sort/filter, and rich incident cards
 - Crosshair pin mode for precise location reporting
 - Floating action buttons: SOS, report, layer toggle, GPS
 
 ### Reporting
-- 7 incident categories
-- Anonymous option by default
+- 5 incident categories: Crime, Traffic, Infrastructure, Weather, Emergency
+- Optional photo attachment (JPEG/PNG/WebP, max 5 MB) — stored in Firebase Storage
+- Anonymous posting option
 - GPS or manual pin placement
-- Optimistic UI, form submits in under 100ms perceived
+- Profanity filter on title and description
 
-### Admin
-- Live operations control center with priority queue for SOS/Emergency posts
-- Live Page Views and user growth tracker separating administrative, active, and view-only users
-- Analytics: incidents over time, community safety breakdown, and high-frequency reporting areas
-- In-place moderation queue for quick incident review, categorization, and trust verification
+### Moderation
+- Any signed-in user can flag an incident as inappropriate
+- Single flag = immediate takedown (incident disappears from map and feed)
+- Admin review queue shows all flagged content with Restore / Delete Permanently actions
+- System-ingested incidents (weather, traffic, police) cannot be flagged
 
-### Tech & Performance
-- **PWA Ready**: Installable as a standalone app on iOS and Android without an App Store
-- **SEO Optimized**: Fully defined canonical sitemaps, robots.txt crawl policies, and dynamically injected OpenGraph headers
-- **Cross-Browser Stability**: Advanced fallback support and dynamic viewport units ensures the UI doesn't crash on restrictive browsers like Safari (Privacy Mode)
-
----
-
-## Roadmap
-
-| Phase | Title | Status |
-|---|---|---|
-| 01 | Calgary Launch | Active |
-| 02 | Native App | Upcoming |
-| 03 | More Cities | Planned |
-| 04 | Enterprise | Planned |
-
-Phase 2 targets iOS and Android apps with push notifications for nearby incidents and activity spikes, along with an enhanced credibility system. Phase 3 expands to other Canadian cities on demand.
-
----
-
-## Trust and Data
-
-Calgary Watch is not an emergency service. Always call 911.
-
-Community reports are clearly labeled and gain confidence as more users confirm them. The system tracks confirmation counts, time decay, and proximity clustering to surface a trust score on every incident.
-
-- Anonymous reporting is on by default
-- User emails are never exposed publicly
-- Official data is actively synced every 5 minutes from the **City of Calgary Open Data API** (Traffic Incidents & 311 Service Requests).
-- Historical data is aggregated from Calgary Police Service open datasets.
-- System signals are explicitly marked as low-confidence and machine-inferred
+### Admin Panel
+- Live incident stream with in-place editing and moderation controls
+- Flagged Content section for reviewing community-reported inappropriate posts
+- Analytics: incidents over time, category breakdown, community safety scores, top reporters
+- Traffic analytics: page views, referrer breakdown, UTM campaign tracking
+- User directory with role management
+- Community Stats editor for neighbourhood safety scores
 
 ---
 
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Frontend | React 19 + TypeScript |
-| Build | Vite 6 + Tailwind CSS v4 |
-| Database | Google Cloud Firestore |
-| Animation | Framer Motion + GSAP |
-| Maps | Leaflet + CARTO tiles + Leaflet.heat |
-| Auth | Firebase Authentication |
-| Icons | Lucide React |
+|-------|-----------|
+| Frontend | React 19 + TypeScript + Vite |
+| Styling | Tailwind CSS v4 |
+| Maps | Leaflet + react-leaflet |
+| Database | Firebase Firestore |
+| Storage | Firebase Storage |
+| Auth | Firebase Auth (Google Sign-In) |
+| Hosting | Firebase Hosting (calgarywatch.ca) |
+| CI/CD | GitHub Actions |
+| Charts | Recharts |
+| Animation | Motion (Framer Motion) |
 
 ---
 
-## Get Involved
+## Infrastructure
 
-Calgary Watch runs entirely on volunteers.
+### Firebase Hosting
 
-- **Engineering** - React, TypeScript, Firebase, mapping
-- **Design** - UX, mobile patterns, data visualization
-- **Operations** - community outreach, moderation, partnerships
+The site is deployed to Firebase Hosting at **calgarywatch.ca** via the `.github/workflows/deploy-firebase.yml` GitHub Actions workflow on every push to `main`.
 
-Contact: `jorti104@mtroyal.ca`
+Security headers are configured in `firebase.json` and served by Firebase Hosting on every response:
+- `Content-Security-Policy` — restricts scripts, styles, fonts, images, and connections
+- `Strict-Transport-Security` — HSTS with 2-year max-age and preload
+- `Cross-Origin-Opener-Policy: same-origin-allow-popups` — allows Google Sign-In popup
+- `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`
+
+### Ingest Pipeline
+
+`scripts/ingest/index.ts` runs via GitHub Actions (`ingest-live-data.yml`) on a 30-minute cron schedule.
+
+**Data sources:**
+
+| Source | Type |
+|--------|------|
+| Environment Canada Alerts | Weather warnings |
+| Environment Canada Enhanced | Detailed weather |
+| 511 Alberta | Traffic incidents |
+| Alberta Emergency Alert | Provincial emergencies |
+| Reddit r/Calgary | Community signals |
+| News RSS (CBC, CTV, Global) | Local news |
+| Calgary Police Service | Crime statistics |
+| Calgary Open Data Infrastructure | 311 service requests / water main breaks |
+
+**Firestore optimisation:** A single `loadAndPrune()` read handles both deduplication and expiry cleanup in one collection scan per run. Expired incidents are hard-deleted (not soft-deleted) so the collection stays small. At 30-minute intervals = 48 runs/day, leaving ~1,000 reads per run within the 50,000/day free tier.
 
 ---
 
-## Local Setup
+## Local Development
+
+### Prerequisites
+- Node.js 20+
+- A Firebase project with Firestore, Storage, and Google Auth enabled
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Aldo140/Calgary-Watch-.git
+   cd Calgary-Watch-
+   npm install
+   ```
+
+2. Create a `.env` file at the project root:
+   ```env
+   VITE_FIREBASE_API_KEY=...
+   VITE_FIREBASE_AUTH_DOMAIN=...
+   VITE_FIREBASE_PROJECT_ID=...
+   VITE_FIREBASE_STORAGE_BUCKET=...
+   VITE_FIREBASE_MESSAGING_SENDER_ID=...
+   VITE_FIREBASE_APP_ID=...
+   ```
+
+3. Start the dev server:
+   ```bash
+   npm run dev
+   ```
+
+### Running the Ingest Pipeline Locally
 
 ```bash
-git clone https://github.com/Aldo140/Calgary-Watch-.git
-cd Calgary-Watch--main
-npm install
-
-# Create .env with your Firebase config
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-
-npm run dev
+export FIREBASE_SERVICE_ACCOUNT='{"type":"service_account",...}'
+export VITE_FIREBASE_PROJECT_ID=your-project-id
+npx tsx scripts/ingest/index.ts
 ```
-
-See [IMAGE_SETUP.md](IMAGE_SETUP.md) for adding local image assets.
 
 ---
 
-*Built for Calgary. Non-profit, community-powered, real-time.*
+## Deployment
+
+### GitHub Actions Secrets Required
+
+| Secret | Description |
+|--------|-------------|
+| `FIREBASE_SERVICE_ACCOUNT` | Full JSON of a Firebase service-account key |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `VITE_FIREBASE_API_KEY` | Firebase web API key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase Storage bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
+| `VITE_FIREBASE_APP_ID` | Firebase app ID |
+
+### Workflows
+
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| `deploy-firebase.yml` | Push to `main` | Build + deploy to Firebase Hosting |
+| `ingest-live-data.yml` | Every 30 min + manual | Run ingest pipeline |
+
+### Firebase Setup (first-time)
+
+1. Enable Firestore, Storage, and Google Sign-In in Firebase Console
+2. Deploy security rules: `npx firebase-tools deploy --only firestore:rules,storage:rules`
+3. Add `https://calgarywatch.ca` to Authorized Domains in Firebase Console → Authentication → Settings
+4. Add `https://calgarywatch.ca/__/auth/handler` to OAuth Redirect URIs in Google Cloud Console
+
+---
+
+## Contributing
+
+Calgary Watch is a non-profit community project. Contributions welcome.
+
+To volunteer, visit [calgarywatch.ca](https://calgarywatch.ca) and submit the volunteer form, or open an issue on GitHub.
+
+---
+
+## License
+
+Apache 2.0 — see `LICENSE`.

@@ -63,6 +63,10 @@ export interface Incident {
   deleted?: boolean;
   deletedAt?: number;
   deletedBy?: string;
+  flagged?: boolean;
+  flagged_at?: number;
+  flagged_by?: string;
+  authorUid?: string;
   // ── Provenance fields (set by ingestion pipeline or client) ──────────────
   /** Who created this record. Defaults to 'community' when absent. */
   data_source?: DataSource;

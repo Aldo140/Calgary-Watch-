@@ -1,11 +1,14 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, MessageSquare, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/src/components/FirebaseProvider';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/src/firebase';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   crime:          '🚨',
@@ -33,6 +36,17 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   );
   // Must be declared before any early return to satisfy Rules of Hooks
   const [copied, setCopied] = useState(false);
+  const { user } = useAuth();
+  const [flagged, setFlagged] = useState(false);
+  const [flagConfirm, setFlagConfirm] = useState(false);
+  const [flagging, setFlagging] = useState(false);
+  const [flagError, setFlagError] = useState(false);
+
+  useEffect(() => {
+    setFlagged(false);
+    setFlagConfirm(false);
+    setFlagError(false);
+  }, [incident?.id]);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 1023px)');
@@ -42,6 +56,29 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   }, []);
 
   if (!incident) return null;
+
+  const isSystem = incident.data_source !== 'community' || incident.authorUid === 'system';
+  const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged && user?.uid !== incident.authorUid;
+
+  const handleFlag = async () => {
+    if (!user || !db || !incident.id) return;
+    setFlagError(false);
+    setFlagging(true);
+    try {
+      await updateDoc(doc(db, 'incidents', incident.id), {
+        flagged: true,
+        flagged_at: Date.now(),
+        flagged_by: user.uid,
+      });
+      setFlagged(true);
+      setFlagConfirm(false);
+      onClose();
+    } catch {
+      setFlagError(true);
+    } finally {
+      setFlagging(false);
+    }
+  };
 
   const Icon = CATEGORY_ICONS[incident.category as keyof typeof CATEGORY_ICONS] || AlertCircle;
   const StatusIcon = STATUS_ICONS[incident.verified_status];
@@ -254,6 +291,18 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                 </div>
               </div>
 
+              {incident.image_url && (
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Photo</h3>
+                  <img
+                    src={incident.image_url}
+                    alt="Incident photo"
+                    loading="lazy"
+                    className="w-full rounded-3xl object-cover max-h-60 border border-white/10"
+                  />
+                </div>
+              )}
+
               {/* Source Information - NEW & PREMIUM */}
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -424,6 +473,42 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     Email
                   </a>
                 </div>
+
+                {canFlag && (
+                  <div>
+                    {flagConfirm ? (
+                      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 overflow-hidden">
+                        <div className="flex gap-2 items-center p-3">
+                          <p className="text-xs text-amber-300 font-bold flex-1">Report as inappropriate?</p>
+                          <button
+                            onClick={() => void handleFlag()}
+                            disabled={flagging}
+                            className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black transition-all disabled:opacity-50"
+                          >
+                            {flagging ? 'Reporting…' : 'Confirm'}
+                          </button>
+                          <button
+                            onClick={() => setFlagConfirm(false)}
+                            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                        {flagError && (
+                          <p className="text-xs text-red-400 font-bold px-3 pb-3">Could not submit report. Please try again.</p>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setFlagConfirm(true)}
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-2xl h-11 font-black tracking-wide text-xs text-slate-400 hover:text-amber-400 bg-white/5 hover:bg-amber-500/10 border border-white/10 hover:border-amber-500/30 transition-all"
+                      >
+                        <Flag size={15} />
+                        Report Inappropriate
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {/* Navigate */}
                 {canNavigate && directionsUrl ? (

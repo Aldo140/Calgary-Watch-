@@ -3,7 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
-import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink } from 'lucide-react';
+import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image } from 'lucide-react';
+import { uploadIncidentImage } from '@/src/lib/storage';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 
@@ -65,7 +66,6 @@ const incidentSchema = z.object({
     .refine(v => !hasProfanity(v), 'Please keep it clean'),
   category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'emergency']),
   neighborhood: z.string().trim().min(2, 'Please choose a neighbourhood from the list'),
-  image_url: z.union([z.string().url('Must be a valid URL'), z.literal('')]).optional(),
   anonymous: z.boolean(),
 });
 
@@ -88,7 +88,9 @@ function useLgUp() {
 interface IncidentFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: IncidentFormData & { lat: number; lng: number }) => void;
+  /** Called after Storage upload succeeds. Firestore write happens in MapPage — errors there surface via MapPage's error state, not here. */
+  onSubmit: (data: IncidentFormData & { lat: number; lng: number; image_url?: string }) => void;
+  userUid: string;
   /** Neutral fallback coordinates (Calgary centre) */
   location: { lat: number; lng: number } | null;
   /** Actual GPS coordinates - only used when user explicitly taps "Use My Location" */
@@ -122,8 +124,12 @@ export default function IncidentForm({
   onRequestMapPin,
   isPinMode = false,
   onClearPin,
+  userUid,
 }: IncidentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const isLgUp = useLgUp();
   // 'choose'  = picking location method
   // 'pinning' = crosshair active on map; form hidden
@@ -152,7 +158,6 @@ export default function IncidentForm({
       title: '',
       description: '',
       neighborhood: '',
-      image_url: '',
     },
   });
 
@@ -201,6 +206,13 @@ export default function IncidentForm({
     }
   }, [activeLocation?.lat, activeLocation?.lng, setValue]);
 
+  // Revoke blob URL to prevent memory leak when image changes
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
   const handleFormSubmit = useCallback(
     async (data: IncidentFormData) => {
       clearErrors('root');
@@ -212,17 +224,27 @@ export default function IncidentForm({
       submitLockRef.current = true;
       setIsSubmitting(true);
       try {
-        onSubmit({ ...data, ...activeLocation });
-        reset({ category: 'crime', anonymous: false, title: '', description: '', neighborhood: '', image_url: '' });
+        let image_url: string | undefined;
+        if (imageFile) {
+          image_url = await uploadIncidentImage(userUid, imageFile);
+        }
+        onSubmit({ ...data, ...activeLocation, ...(image_url ? { image_url } : {}) });
+        reset({ category: 'crime', anonymous: false, title: '', description: '', neighborhood: '' });
+        setImageFile(null);
+        setImagePreview(null);
+        setImageError(null);
         setStep('choose');
         setUsingGPS(false);
         onClose();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+        setError('root', { type: 'manual', message: msg });
       } finally {
         submitLockRef.current = false;
         setIsSubmitting(false);
       }
     },
-    [activeLocation, clearErrors, onClose, onSubmit, reset, setError]
+    [activeLocation, clearErrors, imageFile, onClose, onSubmit, reset, setError, userUid]
   );
 
   const handleClose = () => {
@@ -234,6 +256,9 @@ export default function IncidentForm({
       description: '',
       neighborhood: '',
     });
+    setImageFile(null);
+    setImagePreview(null);
+    setImageError(null);
     setStep('choose');
     setUsingGPS(false);
     onClose();
@@ -470,15 +495,45 @@ export default function IncidentForm({
             </div>
 
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 cursor-pointer flex justify-between">Photo URL <span className="text-slate-600 font-normal normal-case tracking-normal">Optional</span></label>
-              <Input
-                {...register('image_url')}
-                placeholder="e.g. imgur.com/photo.jpg"
-                className="bg-slate-900 light:bg-white/80 border-white/10 light:border-stone-200/80 text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.image_url && (
-                <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.image_url.message}</p>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 flex justify-between">
+                Photo <span className="text-slate-600 font-normal normal-case tracking-normal">Optional · JPEG/PNG/WebP · max 5 MB</span>
+              </label>
+              {imagePreview ? (
+                <div className="relative rounded-xl overflow-hidden border border-white/10">
+                  <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
+                    className="absolute top-2 right-2 p-1.5 bg-slate-900/80 hover:bg-slate-900 rounded-lg text-slate-300 hover:text-white transition-all"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center justify-center gap-3 w-full h-20 rounded-xl border border-dashed border-white/20 hover:border-blue-500/50 bg-white/5 hover:bg-blue-600/10 cursor-pointer transition-all">
+                  <Image size={20} className="text-slate-500" />
+                  <span className="text-sm text-slate-400 font-bold">Click to attach a photo</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] ?? null;
+                      setImageError(null);
+                      if (!file) { setImageFile(null); setImagePreview(null); return; }
+                      if (file.size > 5 * 1024 * 1024) {
+                        setImageError('Photo must be under 5 MB.');
+                        setImageFile(null);
+                        setImagePreview(null);
+                        return;
+                      }
+                      setImageFile(file);
+                      setImagePreview(URL.createObjectURL(file));
+                    }}
+                  />
+                </label>
               )}
+              {imageError && <p className="text-red-400 text-xs mt-1.5 font-bold">{imageError}</p>}
             </div>
 
             <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 light:border-stone-200/80 bg-white/5 light:bg-white/68 hover:bg-white/8 light:hover:bg-white cursor-pointer transition-colors">

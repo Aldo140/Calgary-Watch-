@@ -88,6 +88,7 @@ function useLgUp() {
 interface IncidentFormProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Called after Storage upload succeeds. Firestore write happens in MapPage — errors there surface via MapPage's error state, not here. */
   onSubmit: (data: IncidentFormData & { lat: number; lng: number; image_url?: string }) => void;
   userUid: string;
   /** Neutral fallback coordinates (Calgary centre) */
@@ -204,6 +205,13 @@ export default function IncidentForm({
       setNeighborhoodOverride(false);
     }
   }, [activeLocation?.lat, activeLocation?.lng, setValue]);
+
+  // Revoke blob URL to prevent memory leak when image changes
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
   const handleFormSubmit = useCallback(
     async (data: IncidentFormData) => {

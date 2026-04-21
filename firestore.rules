@@ -177,6 +177,7 @@ service cloud.firestore {
       allow update: if isAuthenticated()
                     && request.resource.data.diff(resource.data).changedKeys().hasOnly(['flagged', 'flagged_at', 'flagged_by'])
                     && request.resource.data.flagged == true
+                    && request.resource.data.flagged_by == request.auth.uid
                     && resource.data.get('authorUid', '') != 'system';
       allow delete: if isAdmin();
     }

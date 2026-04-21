@@ -8,7 +8,7 @@ export async function uploadIncidentImage(uid: string, file: File): Promise<stri
   if (!storage) throw new Error('Firebase Storage is not configured.');
   if (!ALLOWED_TYPES.includes(file.type))
     throw new Error(`Unsupported file type: ${file.type}. Use JPEG, PNG, or WebP.`);
-  if (file.size >= MAX_BYTES)
+  if (file.size > MAX_BYTES)
     throw new Error('Image must be smaller than 5 MB.');
   const ext = file.type.split('/')[1]; // jpeg | png | webp
   const path = `incidents/${uid}/${Date.now()}.${ext}`;

@@ -246,6 +246,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         center: [CALGARY_CENTER.lat, CALGARY_CENTER.lng],
         zoom: 11,
         zoomControl: true,
+        // @ts-expect-error tap is a valid Leaflet MapOptions at runtime but missing from typedefs
         tap: false,
       });
 

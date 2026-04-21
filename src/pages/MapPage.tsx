@@ -426,7 +426,7 @@ export default function MapPage() {
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
-  const { stats: crimeStats } = useCrimeStats();
+  const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
 
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -1599,7 +1599,7 @@ export default function MapPage() {
               }
             }}
           >
-            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150 text-white light:text-slate-900" />
+            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150 text-white" />
             <div className="absolute right-full mr-4 px-3 py-1.5 bg-slate-950 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block">
               Report Incident
             </div>
@@ -1655,6 +1655,8 @@ export default function MapPage() {
           data={selectedArea}
           onClose={() => setSelectedArea(null)}
           crimeStats={crimeStats}
+          yearlyStats={crimeYearlyStats}
+          theme={theme}
         />
 
         {/* Emergency Modal */}

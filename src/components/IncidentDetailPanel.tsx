@@ -280,14 +280,14 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     <Clock size={16} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Time Ago</span>
                   </div>
-                  <p className="text-white text-lg font-black">{formatDistanceToNow(incident.timestamp)}</p>
+                  <p className="text-white light:text-slate-900 text-lg font-black">{formatDistanceToNow(incident.timestamp)}</p>
                 </div>
                 <div className="bg-white/[0.03] light:bg-white/72 rounded-3xl p-5 border border-white/10 light:border-stone-200/80 hover:bg-white/[0.05] light:hover:bg-white transition-colors group">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin size={16} className="text-slate-500 group-hover:text-red-400 transition-colors" />
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Location</span>
                   </div>
-                  <p className="text-white text-lg font-black truncate">{incident.neighborhood || 'Calgary'}</p>
+                  <p className="text-white light:text-slate-900 text-lg font-black truncate">{incident.neighborhood || 'Calgary'}</p>
                 </div>
               </div>
 
@@ -420,7 +420,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                   {/* Post on X — primary CTA */}
                   <button
                     onClick={handleShareToX}
-                    className="flex-1 flex items-center justify-center gap-2 bg-black hover:bg-neutral-900 border border-white/10 rounded-2xl h-12 text-white text-xs font-black tracking-wide transition-all active:scale-95"
+                    className="flex-1 flex items-center justify-center gap-2 bg-black light:bg-slate-900 hover:bg-neutral-900 light:hover:bg-slate-800 border border-white/10 light:border-slate-700 rounded-2xl h-12 text-white text-xs font-black tracking-wide transition-all active:scale-95"
                   >
                     <Twitter size={15} />
                     Post on X
@@ -489,7 +489,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                           </button>
                           <button
                             onClick={() => setFlagConfirm(false)}
-                            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition-all"
+                            className="px-3 py-1.5 rounded-xl bg-white/10 light:bg-slate-200 hover:bg-white/20 light:hover:bg-slate-300 text-white light:text-slate-900 text-xs font-black transition-all"
                           >
                             Cancel
                           </button>

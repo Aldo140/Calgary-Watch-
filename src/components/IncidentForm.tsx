@@ -6,7 +6,7 @@ import { Input } from '@/src/components/ui/Input';
 import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image } from 'lucide-react';
 import { uploadIncidentImage } from '@/src/lib/storage';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 // Approximate neighbourhood centres for Calgary.
 // Returns the closest neighbourhood name or '' if outside all radii.
@@ -278,7 +278,7 @@ export default function IncidentForm({
 
   // Single copy of steps in the DOM - never mount desktop + mobile forms together (breaks RHF / zod).
   const reportSteps = (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {step === 'choose' && (
         <motion.div key="choose" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
           <div className="space-y-4 p-6">
@@ -587,14 +587,15 @@ export default function IncidentForm({
 
   if (!isOpen) return null;
 
-  // Keep the modal mounted while pinning (just hidden) so react-hook-form
-  // refs and input state survive the pin flow without re-registration issues.
-  const hidden = step === 'pinning';
+  // Keep the modal mounted while pinning — visibility:hidden hides it but lets
+  // Framer Motion animations still complete in the background (display:none stops them).
+  const hiddenStyle: React.CSSProperties | undefined =
+    step === 'pinning' ? { visibility: 'hidden', pointerEvents: 'none' } : undefined;
 
   return isLgUp ? (
     <div
       className="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-slate-950/60 light:bg-[#7c6f64]/18 backdrop-blur-xl"
-      style={hidden ? { display: 'none' } : undefined}
+      style={hiddenStyle}
       onClick={handleClose}
     >
       <div
@@ -617,12 +618,12 @@ export default function IncidentForm({
     <>
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
-        style={hidden ? { display: 'none' } : undefined}
+        style={hiddenStyle}
         onClick={handleClose}
       />
       <div
         className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[2.5rem] bg-slate-950 light:bg-[rgb(255,250,243)] border-t border-white/10 light:border-stone-200/80 flex flex-col"
-        style={{ maxHeight: '92dvh', ...(hidden ? { display: 'none' } : {}) }}
+        style={{ maxHeight: '92dvh', ...hiddenStyle }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex-shrink-0 flex justify-center pt-4 pb-2">

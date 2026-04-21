@@ -5,7 +5,7 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, CommunityStats } from '@/src/types';
 import {
-  addDoc, collection, deleteDoc, doc, getDocs, getCountFromServer,
+  addDoc, collection, deleteDoc, doc, getDocs,
   onSnapshot, orderBy, query, updateDoc, limit, where, deleteField,
 } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
@@ -295,15 +295,15 @@ export default function AdminPage() {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
     });
 
-    // Page view total count
-    getCountFromServer(collection(db, 'page_views'))
-      .then(snap => setTotalPageViews(snap.data().count))
-      .catch(() => setTotalPageViews(0));
-
-    // Load up to 2000 recent page_view docs for traffic analytics
-    getDocs(query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(2000)))
-      .then(snap => setPageViewDocs(snap.docs.map(d => d.data() as PageViewDoc)))
-      .catch(() => {});
+    // Page views — real-time listener so new visits appear without a refresh
+    const unsubPageViews = onSnapshot(
+      query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(2000)),
+      (snapshot) => {
+        setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc));
+        setTotalPageViews(snapshot.size);
+      },
+      () => { setTotalPageViews(0); }
+    );
 
     const unsubFlagged = onSnapshot(
       query(collection(db, 'incidents'), where('flagged', '==', true), orderBy('flagged_at', 'desc')),
@@ -312,7 +312,7 @@ export default function AdminPage() {
       }
     );
 
-    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubFlagged(); };
+    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubPageViews(); unsubFlagged(); };
   }, [isAuthReady, isAdmin, user]);
 
   // ── KPI derivations ───────────────────────────────────────────────────────

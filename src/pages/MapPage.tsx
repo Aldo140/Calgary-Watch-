@@ -118,7 +118,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
         if (!three11Res.ok) throw new Error(`311 API ${three11Res.status}`);
         const three11Data: any[] = await three11Res.json();
 
-        const boring = ['tree', 'shrub', 'waste', 'recycling', 'grass', 'weeds', 'license', 'tax', 'inquiry', 'cart', 'backlane', 'contact us', 'feedback', 'missed collection'];
+        const boring = ['tree', 'shrub', 'waste', 'recycling', 'grass', 'weeds', 'license', 'tax', 'inquiry', 'cart', 'backlane', 'contact us', 'feedback', 'missed collection', 'water main', 'watermain', 'water break'];
 
         for (const item of three11Data) {
           const lat = parseFloat(item.latitude);
@@ -260,7 +260,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
       ];
       const byCoordCategory = new globalThis.Map<string, Incident>();
       allOfficial.forEach((inc) => {
-        const key = `${inc.category}-${inc.lat.toFixed(4)}-${inc.lng.toFixed(4)}`;
+        const key = `${inc.lat.toFixed(4)}-${inc.lng.toFixed(4)}`;
         const existing = byCoordCategory.get(key);
         if (!existing || inc.timestamp > existing.timestamp) {
           byCoordCategory.set(key, inc);

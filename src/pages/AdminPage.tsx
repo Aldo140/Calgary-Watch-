@@ -212,6 +212,8 @@ export default function AdminPage() {
   const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
   const [totalPageViews, setTotalPageViews] = useState<number | null>(null);
   const [flaggedIncidents, setFlaggedIncidents] = useState<Incident[]>([]);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [incidentDrafts, setIncidentDrafts] = useState<Record<string, EditableIncident>>({});
   const [statsDrafts, setStatsDrafts] = useState<Record<string, EditableCommunityStats>>({});
@@ -236,20 +238,34 @@ export default function AdminPage() {
   };
 
   const handleRestore = async (incidentId: string) => {
-    if (!db) return;
-    await updateDoc(doc(db, 'incidents', incidentId), {
-      flagged: false,
-      flagged_at: deleteField(),
-      flagged_by: deleteField(),
-    });
-    await writeAuditLog('incident_update', 'incidents', incidentId, { flagged: false });
+    if (!db || restoringId) return;
+    setRestoringId(incidentId);
+    try {
+      await updateDoc(doc(db, 'incidents', incidentId), {
+        flagged: false,
+        flagged_at: deleteField(),
+        flagged_by: deleteField(),
+      });
+      await writeAuditLog('incident_update', 'incidents', incidentId, { flagged: false });
+    } catch {
+      // silently fail — Firestore subscription will keep the item visible
+    } finally {
+      setRestoringId(null);
+    }
   };
 
   const handlePermanentDelete = async (incidentId: string) => {
     if (!window.confirm('Permanently delete this incident? This cannot be undone.')) return;
-    if (!db) return;
-    await deleteDoc(doc(db, 'incidents', incidentId));
-    await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });
+    if (!db || deletingId) return;
+    setDeletingId(incidentId);
+    try {
+      await deleteDoc(doc(db, 'incidents', incidentId));
+      await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });
+    } catch {
+      // silently fail
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   // ── Data subscriptions ────────────────────────────────────────────────────
@@ -1904,15 +1920,17 @@ export default function AdminPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => void handleRestore(incident.id)}
-                className="flex-1 h-10 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-black text-xs tracking-wide transition-all"
+                disabled={!!restoringId || !!deletingId}
+                className="flex-1 h-10 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-black text-xs tracking-wide transition-all disabled:opacity-50"
               >
-                Restore
+                {restoringId === incident.id ? 'Restoring…' : 'Restore'}
               </button>
               <button
                 onClick={() => void handlePermanentDelete(incident.id)}
-                className="flex-1 h-10 rounded-2xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 font-black text-xs tracking-wide transition-all"
+                disabled={!!restoringId || !!deletingId}
+                className="flex-1 h-10 rounded-2xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 font-black text-xs tracking-wide transition-all disabled:opacity-50"
               >
-                Delete Permanently
+                {deletingId === incident.id ? 'Deleting…' : 'Delete Permanently'}
               </button>
             </div>
           </div>

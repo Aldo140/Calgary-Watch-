@@ -178,7 +178,8 @@ service cloud.firestore {
                     && request.resource.data.diff(resource.data).changedKeys().hasOnly(['flagged', 'flagged_at', 'flagged_by'])
                     && request.resource.data.flagged == true
                     && request.resource.data.flagged_by == request.auth.uid
-                    && resource.data.get('authorUid', '') != 'system';
+                    && resource.data.get('authorUid', '') != 'system'
+                    && resource.data.get('authorUid', '') != request.auth.uid;
       allow delete: if isAdmin();
     }
 

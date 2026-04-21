@@ -58,7 +58,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   if (!incident) return null;
 
   const isSystem = incident.data_source !== 'community' || incident.authorUid === 'system';
-  const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged;
+  const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged && user?.uid !== incident.authorUid;
 
   const handleFlag = async () => {
     if (!user || !db || !incident.id) return;
@@ -477,23 +477,25 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                 {canFlag && (
                   <div>
                     {flagConfirm ? (
-                      <div className="flex gap-2 items-center p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10">
-                        <p className="text-xs text-amber-300 font-bold flex-1">Report as inappropriate?</p>
-                        <button
-                          onClick={() => void handleFlag()}
-                          disabled={flagging}
-                          className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black transition-all disabled:opacity-50"
-                        >
-                          {flagging ? 'Reporting…' : 'Confirm'}
-                        </button>
-                        <button
-                          onClick={() => setFlagConfirm(false)}
-                          className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition-all"
-                        >
-                          Cancel
-                        </button>
+                      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 overflow-hidden">
+                        <div className="flex gap-2 items-center p-3">
+                          <p className="text-xs text-amber-300 font-bold flex-1">Report as inappropriate?</p>
+                          <button
+                            onClick={() => void handleFlag()}
+                            disabled={flagging}
+                            className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black transition-all disabled:opacity-50"
+                          >
+                            {flagging ? 'Reporting…' : 'Confirm'}
+                          </button>
+                          <button
+                            onClick={() => setFlagConfirm(false)}
+                            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition-all"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                         {flagError && (
-                          <p className="text-xs text-red-400 font-bold mt-2">Could not submit report. Please try again.</p>
+                          <p className="text-xs text-red-400 font-bold px-3 pb-3">Could not submit report. Please try again.</p>
                         )}
                       </div>
                     ) : (

@@ -1614,6 +1614,7 @@ export default function MapPage() {
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
           isPinMode={isPinMode || isEmergencyPinMode}
+          theme={theme}
         />
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}

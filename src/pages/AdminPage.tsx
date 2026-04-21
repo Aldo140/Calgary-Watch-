@@ -701,6 +701,12 @@ export default function AdminPage() {
     return (pageViewDocs.length / uniqueSessions).toFixed(1);
   }, [pageViewDocs, uniqueSessions]);
 
+  const topCrimeCommunities = useMemo(() => {
+    const entries: { name: string; crime: number; disorder: number; year: number }[] = [];
+    crimeStats.forEach((v, k) => entries.push({ name: k, ...v }));
+    return entries.sort((a, b) => (b.crime + b.disorder) - (a.crime + a.disorder)).slice(0, 20);
+  }, [crimeStats]);
+
   // ── Mutations ─────────────────────────────────────────────────────────────
 
   const setIncidentDraft = (incident: Incident, patch?: Partial<EditableIncident>) => {
@@ -1575,12 +1581,6 @@ export default function AdminPage() {
       </div>
     </div>
   );
-
-  const topCrimeCommunities = useMemo(() => {
-    const entries: { name: string; crime: number; disorder: number; year: number }[] = [];
-    crimeStats.forEach((v, k) => entries.push({ name: k, ...v }));
-    return entries.sort((a, b) => (b.crime + b.disorder) - (a.crime + a.disorder)).slice(0, 20);
-  }, [crimeStats]);
 
   const renderStats = () => {
     return (

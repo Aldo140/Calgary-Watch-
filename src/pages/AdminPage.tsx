@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useCrimeStats } from '@/src/hooks/useCrimeStats';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -64,7 +65,19 @@ type AdminSection =
   | 'stats'
   | 'analytics'
   | 'traffic'
+  | 'apis'
   | 'flagged';
+
+type ApiHealth = {
+  id: string;
+  name: string;
+  url: string;
+  status: 'idle' | 'checking' | 'ok' | 'slow' | 'error';
+  recordCount: number | null;
+  responseMs: number | null;
+  lastChecked: number | null;
+  error: string | null;
+};
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -78,6 +91,13 @@ const emptyStatsDraft: EditableCommunityStats = {
   property_crime: 0, disorder_calls: 0, safety_score: 0,
 };
 
+const API_ENDPOINTS: Pick<ApiHealth, 'id' | 'name' | 'url'>[] = [
+  { id: 'traffic',   name: 'Calgary Traffic',     url: 'https://data.calgary.ca/resource/35ra-9556.json?$limit=10&$order=start_dt%20DESC' },
+  { id: '311',       name: 'Calgary 311',          url: "https://data.calgary.ca/resource/iahh-g8bj.json?$limit=10&$where=status_description%3D'Open'&$order=requested_date%20DESC" },
+  { id: 'watermain', name: 'Water Main Breaks',    url: 'https://data.calgary.ca/resource/dpcu-jr23.json?$limit=10&$order=break_date%20DESC&status=ACTIVE' },
+  { id: 'weather',   name: 'Open-Meteo Weather',   url: 'https://api.open-meteo.com/v1/forecast?latitude=51.048&longitude=-114.065&current=temperature_2m,weathercode&timezone=America%2FEdmonton' },
+];
+
 const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType; badge?: string }[] = [
   { id: 'dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
   { id: 'incidents',  label: 'Incidents',  icon: FileText },
@@ -85,6 +105,7 @@ const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType; bad
   { id: 'stats',      label: 'City Stats', icon: Map },
   { id: 'analytics',  label: 'Analytics',  icon: BarChart3 },
   { id: 'traffic',    label: 'Traffic',    icon: Globe },
+  { id: 'apis',       label: 'API Health', icon: Zap },
   { id: 'flagged' as AdminSection, label: 'Flagged', icon: Flag },
 ];
 
@@ -144,6 +165,13 @@ const SECTION_THEMES: Record<AdminSection, { eyebrow: string; title: string; des
     description: 'See what channels, routes, and campaigns are actually moving attention across Calgary Watch.',
     accent: 'from-pink-500/30 via-orange-500/10 to-amber-400/20',
     glow: 'rgba(244,114,182,0.22)',
+  },
+  apis: {
+    eyebrow: 'Infrastructure',
+    title: 'Monitor the data pipeline',
+    description: 'Real-time health of the Calgary Open Data and weather APIs that feed the live map.',
+    accent: 'from-cyan-500/30 via-blue-500/10 to-sky-400/20',
+    glow: 'rgba(34,211,238,0.22)',
   },
   flagged: {
     eyebrow: 'Moderation',
@@ -219,6 +247,11 @@ export default function AdminPage() {
   const [statsDrafts, setStatsDrafts] = useState<Record<string, EditableCommunityStats>>({});
   const [savingIncidentId, setSavingIncidentId] = useState<string | null>(null);
   const [savingStatsId, setSavingStatsId] = useState<string | null>(null);
+  const [apiHealths, setApiHealths] = useState<ApiHealth[]>(
+    API_ENDPOINTS.map(e => ({ ...e, status: 'idle', recordCount: null, responseMs: null, lastChecked: null, error: null }))
+  );
+
+  const { stats: crimeStats, isLoading: crimeLoading } = useCrimeStats();
 
   // ── Audit log ──────────────────────────────────────────────────────────────
 
@@ -314,6 +347,35 @@ export default function AdminPage() {
 
     return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubPageViews(); unsubFlagged(); };
   }, [isAuthReady, isAdmin, user]);
+
+  // ── API health polling ────────────────────────────────────────────────────
+
+  const checkApis = useCallback(async () => {
+    setApiHealths(prev => prev.map(h => ({ ...h, status: 'checking' as const })));
+    const results = await Promise.all(
+      API_ENDPOINTS.map(async (ep) => {
+        const start = Date.now();
+        try {
+          const res = await fetch(ep.url);
+          const ms = Date.now() - start;
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const count = Array.isArray(data) ? data.length : (data ? 1 : 0);
+          return { ...ep, status: (ms > 2000 ? 'slow' : 'ok') as ApiHealth['status'], recordCount: count, responseMs: ms, lastChecked: Date.now(), error: null };
+        } catch (err: any) {
+          return { ...ep, status: 'error' as const, recordCount: null, responseMs: Date.now() - start, lastChecked: Date.now(), error: err?.message ?? 'Unknown error' };
+        }
+      })
+    );
+    setApiHealths(results);
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthReady || !isAdmin) return;
+    checkApis();
+    const interval = setInterval(checkApis, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [isAuthReady, isAdmin, checkApis]);
 
   // ── KPI derivations ───────────────────────────────────────────────────────
 
@@ -1448,9 +1510,55 @@ export default function AdminPage() {
     </div>
   );
 
-  const renderStats = () => (
+  const topCrimeCommunities = useMemo(() => {
+    const entries: { name: string; crime: number; disorder: number; year: number }[] = [];
+    crimeStats.forEach((v, k) => entries.push({ name: k, ...v }));
+    return entries.sort((a, b) => (b.crime + b.disorder) - (a.crime + a.disorder)).slice(0, 20);
+  }, [crimeStats]);
+
+  const renderStats = () => {
+    return (
     <div className="space-y-5">
-      <SectionHeader icon={Map} title="City Stats" subtitle="Edit community safety scores and crime metrics" />
+      <SectionHeader icon={Map} title="City Stats" subtitle="Live crime data from Calgary Open Data API + editable community safety scores" />
+
+      {/* Live crime data from API */}
+      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Crime Stats · Calgary Open Data API</p>
+            <p className="text-[10px] text-slate-600 mt-0.5">Top 20 communities by total incidents — latest year available</p>
+          </div>
+          {crimeLoading && <Loader2 size={14} className="animate-spin text-slate-400 shrink-0" />}
+        </div>
+        {crimeStats.size === 0 && !crimeLoading ? (
+          <p className="text-slate-500 text-xs py-6 text-center">No crime data loaded yet. Check API Health section.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs min-w-[600px]">
+              <thead>
+                <tr className="border-b border-white/10 light:border-slate-200 text-slate-400">
+                  <th className="py-2 text-left">Community</th>
+                  <th className="py-2 text-right">Crime</th>
+                  <th className="py-2 text-right">Disorder</th>
+                  <th className="py-2 text-right">Total</th>
+                  <th className="py-2 text-right">Year</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topCrimeCommunities.map((row) => (
+                  <tr key={row.name} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.02]">
+                    <td className="py-2 pr-3 font-medium text-white light:text-slate-900 capitalize">{row.name}</td>
+                    <td className="py-2 pr-3 text-right text-red-400">{row.crime.toLocaleString()}</td>
+                    <td className="py-2 pr-3 text-right text-amber-400">{row.disorder.toLocaleString()}</td>
+                    <td className="py-2 pr-3 text-right font-black text-white light:text-slate-900">{(row.crime + row.disorder).toLocaleString()}</td>
+                    <td className="py-2 text-right text-slate-500">{row.year}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
       <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">City Intelligence · {communityStats.length} communities</span>
@@ -1565,7 +1673,8 @@ export default function AdminPage() {
         </Card>
       )}
     </div>
-  );
+    );
+  };
 
   const renderAnalytics = () => (
     <div className="space-y-5">
@@ -1942,6 +2051,78 @@ export default function AdminPage() {
     </section>
   );
 
+  // ── API Health section ────────────────────────────────────────────────────
+
+  const renderApiHealth = () => {
+    const statusColor: Record<ApiHealth['status'], string> = {
+      idle:     'bg-slate-600',
+      checking: 'bg-amber-400 animate-pulse',
+      ok:       'bg-emerald-400',
+      slow:     'bg-amber-400',
+      error:    'bg-red-500',
+    };
+    const statusLabel: Record<ApiHealth['status'], string> = {
+      idle: 'Not checked', checking: 'Checking…', ok: 'OK', slow: 'Slow', error: 'Error',
+    };
+    const allOk = apiHealths.every(h => h.status === 'ok' || h.status === 'idle');
+    const anyError = apiHealths.some(h => h.status === 'error');
+    return (
+      <div className="space-y-5">
+        <SectionHeader icon={Zap} title="API Health" subtitle="Live status of the Calgary Open Data and weather APIs that power the map" />
+        <div className="flex items-center justify-between">
+          <span className={cn('text-xs font-black uppercase tracking-widest', anyError ? 'text-red-400' : allOk ? 'text-emerald-400' : 'text-amber-400')}>
+            {anyError ? 'Degraded — one or more APIs are failing' : allOk ? 'All systems operational' : 'Checking…'}
+          </span>
+          <button
+            onClick={checkApis}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition-all border border-white/10"
+          >
+            <RefreshCw size={12} className={apiHealths.some(h => h.status === 'checking') ? 'animate-spin' : ''} />
+            Test Now
+          </button>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {apiHealths.map((h) => (
+            <Card key={h.id} className={cn('p-4 bg-slate-900/80 light:bg-white rounded-2xl border transition-all', h.status === 'error' ? 'border-red-500/40' : h.status === 'slow' ? 'border-amber-400/30' : 'border-white/10 light:border-slate-200')}>
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className={cn('w-2.5 h-2.5 rounded-full shrink-0', statusColor[h.status])} />
+                  <span className="text-sm font-black text-white light:text-slate-900">{h.name}</span>
+                </div>
+                <span className={cn('text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg', h.status === 'ok' ? 'bg-emerald-500/15 text-emerald-300' : h.status === 'error' ? 'bg-red-500/15 text-red-300' : h.status === 'slow' ? 'bg-amber-500/15 text-amber-300' : 'bg-slate-700 text-slate-400')}>
+                  {statusLabel[h.status]}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div>
+                  <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Records</p>
+                  <p className="text-white light:text-slate-900 font-black">{h.recordCount !== null ? h.recordCount : '—'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Response</p>
+                  <p className={cn('font-black', h.responseMs && h.responseMs > 2000 ? 'text-amber-300' : 'text-white light:text-slate-900')}>
+                    {h.responseMs !== null ? `${h.responseMs} ms` : '—'}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Last checked</p>
+                  <p className="text-slate-400">{h.lastChecked ? new Date(h.lastChecked).toLocaleTimeString() : 'Never'}</p>
+                </div>
+                {h.error && (
+                  <div className="col-span-2">
+                    <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Error</p>
+                    <p className="text-red-400 truncate">{h.error}</p>
+                  </div>
+                )}
+              </div>
+              <p className="mt-3 text-[9px] text-slate-600 font-mono truncate">{h.url}</p>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // ── Section content router ─────────────────────────────────────────────────
 
   const renderSection = () => {
@@ -1952,6 +2133,7 @@ export default function AdminPage() {
       case 'stats':     return renderStats();
       case 'analytics': return renderAnalytics();
       case 'traffic':   return renderTrafficAnalytics();
+      case 'apis':      return renderApiHealth();
       case 'flagged':   return renderFlagged();
       default:          return renderDashboard();
     }

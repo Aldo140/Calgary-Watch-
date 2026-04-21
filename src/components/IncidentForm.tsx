@@ -586,7 +586,7 @@ export default function IncidentForm({
   );
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       {isOpen && step !== 'pinning' && (
         isLgUp ? (
           <motion.div

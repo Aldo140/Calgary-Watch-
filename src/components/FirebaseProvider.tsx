@@ -111,8 +111,6 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       const code = (error instanceof Error ? (error as { code?: string }).code : undefined) ?? '';
       const shouldFallbackToRedirect = [
         'auth/popup-blocked',
-        'auth/popup-closed-by-user',
-        'auth/cancelled-popup-request',
         'auth/operation-not-supported-in-this-environment',
       ].includes(code);
 

@@ -141,7 +141,8 @@ service cloud.firestore {
       allow create: if isAuthenticated() &&
                     hasOnlyAllowedFields([
                       'title', 'description', 'category', 'neighborhood', 'lat', 'lng', 'timestamp',
-                      'email', 'name', 'source_name', 'anonymous', 'verified_status', 'authorUid', 'report_count'
+                      'email', 'name', 'source_name', 'anonymous', 'verified_status', 'authorUid', 'report_count',
+                      'image_url'
                     ]) &&
                     isValidIncident(request.resource.data) &&
                     request.resource.data.authorUid == request.auth.uid &&
@@ -154,7 +155,8 @@ service cloud.firestore {
                         'email', 'name', 'verified_status', 'authorUid', 'report_count',
                         'source_name', 'source_url', 'source_logo', 'image_url',
                         'deleted', 'deletedAt', 'deletedBy',
-                        'anonymous'  // present on all incidents submitted via the form
+                        'anonymous',  // present on all incidents submitted via the form
+                        'flagged', 'flagged_at', 'flagged_by'
                       ]) &&
                       isValidIncident(request.resource.data)
                     ) || (
@@ -172,6 +174,10 @@ service cloud.firestore {
                       request.resource.data.timestamp == resource.data.timestamp &&
                       isValidAuthorIncidentPatch(request.resource.data)
                     );
+      allow update: if isAuthenticated()
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(['flagged', 'flagged_at', 'flagged_by'])
+                    && request.resource.data.flagged == true
+                    && resource.data.get('authorUid', '') != 'system';
       allow delete: if isAdmin();
     }
 

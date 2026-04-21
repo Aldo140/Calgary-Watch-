@@ -485,7 +485,9 @@ export default function MapPage() {
   const buttonClickDebounceRef = useRef(0); // Prevent rapid button clicks
   const deepLinkHandledRef = useRef(false); // Ensure ?i= deep-link opens only once
 
-  // Check for report=true in URL
+  // Check for report=true in URL — open the form and strip the param immediately
+  // so that (a) the param doesn't linger after close and (b) closing the form
+  // needs no URL manipulation at all (pure state update, no extra Router render).
   useEffect(() => {
     if (searchParams.get('report') === 'true' && isAuthReady) {
       if (!user) {
@@ -494,9 +496,14 @@ export default function MapPage() {
         setIsFormOpen(true);
         setConfirmedPinLocation(null);
         setSelectedLocation(CALGARY_CENTER);
+        setSearchParams(prev => {
+          const next = new URLSearchParams(prev);
+          next.delete('report');
+          return next;
+        }, { replace: true });
       }
     }
-  }, [searchParams, isAuthReady, user, signIn]);
+  }, [searchParams, isAuthReady, user, signIn, setSearchParams]);
 
 
   useEffect(() => {
@@ -794,12 +801,7 @@ export default function MapPage() {
     setIsPinMode(false);
     setConfirmedPinLocation(null);
     setIsFormOpen(false);
-    setSearchParams(prev => {
-      const next = new URLSearchParams(prev);
-      next.delete('report');
-      return next;
-    }, { replace: true });
-  }, [setSearchParams]);
+  }, []);
 
   const handleIncidentSubmit = useCallback((data: IncidentFormData & { lat: number; lng: number; image_url?: string }) => {
     if (!user) {

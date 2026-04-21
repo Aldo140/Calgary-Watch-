@@ -770,11 +770,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       try {
         const marker = L.marker([lat, lng], { icon })
-          .bindTooltip(incident.title, {
-            direction: 'top',
-            offset: [0, -20],
-            className: 'custom-map-tooltip'
-          })
           .on('click', () => {
             window.requestAnimationFrame(() => onMarkerClick(incident));
           });

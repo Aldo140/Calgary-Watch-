@@ -251,22 +251,25 @@ function useOfficialOpenData(isAuthReady: boolean) {
         console.warn('[CalgaryWatch] Water Main Breaks API failed:', err);
       }
 
-      // Deduplicate: first by ID within each source, then by category+coords across sources.
-      // Same-type incidents within ~11m (0.0001°) are treated as the same real-world event.
+      // Deduplicate within each source by ID, then proximity-dedup across all sources.
+      // Same-category incidents within 50m are the same real-world event (multiple 311 reports).
+      // Cross-category incidents within 15m are also the same event (water main in 2 APIs).
       const allOfficial = [
         ...new globalThis.Map(trafficIncidents.map(i => [i.id, i])).values(),
         ...new globalThis.Map(three11Incidents.map(i => [i.id, i])).values(),
         ...new globalThis.Map(infrastructureIncidents.map(i => [i.id, i])).values(),
       ];
-      const byCoordCategory = new globalThis.Map<string, Incident>();
-      allOfficial.forEach((inc) => {
-        const key = `${inc.lat.toFixed(4)}-${inc.lng.toFixed(4)}`;
-        const existing = byCoordCategory.get(key);
-        if (!existing || inc.timestamp > existing.timestamp) {
-          byCoordCategory.set(key, inc);
-        }
-      });
-      setOfficialIncidents([...byCoordCategory.values()]);
+      // Sort newest-first so the most recent report wins when two are within the radius.
+      allOfficial.sort((a, b) => b.timestamp - a.timestamp);
+      const kept: Incident[] = [];
+      for (const inc of allOfficial) {
+        const isDup = kept.some(k =>
+          getDistance(k.lat, k.lng, inc.lat, inc.lng) <
+            (k.category === inc.category ? 0.05 : 0.015)
+        );
+        if (!isDup) kept.push(inc);
+      }
+      setOfficialIncidents(kept);
     };
 
     fetchOpenData();

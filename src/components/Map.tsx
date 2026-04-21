@@ -27,8 +27,6 @@ interface MapProps {
   onPinCancel?: () => void;
   showCrimeLayer?: boolean;
   crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
-  /** When false, the map container becomes non-interactive (pointer-events-none).
-   *  Use to prevent Leaflet from stealing touch/pointer events from overlaid forms. */
   isMapInteractive?: boolean;
 }
 
@@ -450,26 +448,11 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     clusterGroup.current.addTo(map.current);
   }, [isMapLoaded]);
 
-  // Disable/enable Leaflet touch+drag handlers based on isMapInteractive.
-  // CSS pointer-events-none alone does not stop Leaflet's document-level touch
-  // listeners, so we must call the Leaflet APIs directly.
-  useEffect(() => {
-    if (!map.current || !isMapLoaded) return;
-    const m = map.current;
-    if (isMapInteractive) {
-      m.dragging.enable();
-      m.touchZoom.enable();
-      m.scrollWheelZoom.enable();
-      m.doubleClickZoom.enable();
-      m.boxZoom.enable();
-    } else {
-      m.dragging.disable();
-      m.touchZoom.disable();
-      m.scrollWheelZoom.disable();
-      m.doubleClickZoom.disable();
-      m.boxZoom.disable();
-    }
-  }, [isMapInteractive, isMapLoaded]);
+  // No Leaflet dragging.disable() here — the form modal's fixed inset-0 backdrop
+  // already intercepts all touch/pointer events when the form is open, so we never
+  // need to tell Leaflet the map is "inactive". Calling disable() removes Leaflet's
+  // touch-action:none from the mapPane; subsequent enable() doesn't reliably restore
+  // native gesture state, leaving drag broken until a full page reload.
 
   // Track live map centre while in pin mode
   useEffect(() => {

@@ -333,6 +333,7 @@ function useWeatherAlerts(isAuthReady: boolean) {
     const fetchWeather = async () => {
       const alerts: Incident[] = [];
       const now = Date.now();
+      const SEVERITY_RANK: Record<string, number> = { advisory: 1, watch: 2, warning: 3 };
 
       await Promise.allSettled(
         CALGARY_WEATHER_ZONES.map(async ([zoneName, lat, lng]) => {
@@ -352,71 +353,67 @@ function useWeatherAlerts(isAuthReady: boolean) {
             const windKph: number = current.windspeed_10m ?? 0;
             const tempC: number = current.temperature_2m ?? 99;
 
-            // Check WMO code first
+            // Collect all candidate alerts for this zone, then emit only the most severe.
+            // Multiple alerts at the same coordinates stack on the map — one per zone prevents that.
+            const candidates: Array<{ incident: Incident; severity: number }> = [];
+
+            const base = {
+              category: 'weather' as IncidentCategory,
+              neighborhood: zoneName,
+              lat, lng,
+              timestamp: now,
+              email: 'alerts@open-meteo.com',
+              name: 'Environment Canada (via Open-Meteo)',
+              anonymous: false,
+              verified_status: 'community_confirmed' as const,
+              report_count: 1,
+              data_source: 'official' as const,
+              source_name: 'Environment Canada',
+              source_url: 'https://weather.gc.ca/',
+              expires_at: now + 2 * 60 * 60 * 1000,
+            };
+
             if (WMO_ALERTS[code]) {
               const alert = WMO_ALERTS[code];
-              alerts.push({
-                id: `wx-${zoneName.replace(/\s+/g, '-').toLowerCase()}-${code}`,
-                title: alert.title,
-                description: `${alert.description} (${zoneName}, ${tempC.toFixed(0)}°C)`,
-                category: 'weather' as IncidentCategory,
-                neighborhood: zoneName,
-                lat, lng,
-                timestamp: now,
-                email: 'alerts@open-meteo.com',
-                name: 'Environment Canada (via Open-Meteo)',
-                anonymous: false,
-                verified_status: 'community_confirmed' as const,
-                report_count: 1,
-                data_source: 'official' as const,
-                source_name: 'Environment Canada',
-                source_url: 'https://weather.gc.ca/',
-                expires_at: now + 2 * 60 * 60 * 1000,
+              candidates.push({
+                severity: SEVERITY_RANK[alert.severity] ?? 1,
+                incident: {
+                  ...base,
+                  id: `wx-${zoneName.replace(/\s+/g, '-').toLowerCase()}-${code}`,
+                  title: alert.title,
+                  description: `${alert.description} (${zoneName}, ${tempC.toFixed(0)}°C)`,
+                },
               });
             }
 
-            // Wind warning regardless of WMO code
             if (windKph >= 70) {
-              alerts.push({
-                id: `wx-wind-${zoneName.replace(/\s+/g, '-').toLowerCase()}`,
-                title: windKph >= 90 ? 'Extreme Wind Warning' : 'Wind Warning',
-                description: `Sustained winds of ${Math.round(windKph)} km/h in ${zoneName}. Secure loose outdoor objects.`,
-                category: 'weather' as IncidentCategory,
-                neighborhood: zoneName,
-                lat, lng,
-                timestamp: now,
-                email: 'alerts@open-meteo.com',
-                name: 'Environment Canada (via Open-Meteo)',
-                anonymous: false,
-                verified_status: 'community_confirmed' as const,
-                report_count: 1,
-                data_source: 'official' as const,
-                source_name: 'Environment Canada',
-                source_url: 'https://weather.gc.ca/',
-                expires_at: now + 2 * 60 * 60 * 1000,
+              const sev = windKph >= 90 ? 3 : 2;
+              candidates.push({
+                severity: sev,
+                incident: {
+                  ...base,
+                  id: `wx-wind-${zoneName.replace(/\s+/g, '-').toLowerCase()}`,
+                  title: windKph >= 90 ? 'Extreme Wind Warning' : 'Wind Warning',
+                  description: `Sustained winds of ${Math.round(windKph)} km/h in ${zoneName}. Secure loose outdoor objects.`,
+                },
               });
             }
 
-            // Extreme cold warning
             if (tempC <= -35) {
-              alerts.push({
-                id: `wx-cold-${zoneName.replace(/\s+/g, '-').toLowerCase()}`,
-                title: 'Extreme Cold Warning',
-                description: `Temperature of ${tempC.toFixed(0)}°C in ${zoneName}. Frostbite can occur within minutes of exposure.`,
-                category: 'weather' as IncidentCategory,
-                neighborhood: zoneName,
-                lat, lng,
-                timestamp: now,
-                email: 'alerts@open-meteo.com',
-                name: 'Environment Canada (via Open-Meteo)',
-                anonymous: false,
-                verified_status: 'community_confirmed' as const,
-                report_count: 1,
-                data_source: 'official' as const,
-                source_name: 'Environment Canada',
-                source_url: 'https://weather.gc.ca/',
-                expires_at: now + 2 * 60 * 60 * 1000,
+              candidates.push({
+                severity: 3,
+                incident: {
+                  ...base,
+                  id: `wx-cold-${zoneName.replace(/\s+/g, '-').toLowerCase()}`,
+                  title: 'Extreme Cold Warning',
+                  description: `Temperature of ${tempC.toFixed(0)}°C in ${zoneName}. Frostbite can occur within minutes of exposure.`,
+                },
               });
+            }
+
+            if (candidates.length > 0) {
+              candidates.sort((a, b) => b.severity - a.severity);
+              alerts.push(candidates[0].incident);
             }
           } catch {
             // Silent — partial failures are fine
@@ -687,14 +684,28 @@ export default function MapPage() {
     const now = Date.now();
     const combined = [...firebaseIncidents, ...officialOpenData, ...weatherAlerts];
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
-    return [...unique.values()]
+    const filtered = [...unique.values()]
       .filter((i) => {
-        // Official/ingest incidents respect their expires_at TTL
         if (i.expires_at) return i.expires_at > now;
-        // Community posts: show as long as they're in the database (no client-side decay)
         return true;
       })
       .sort((a: Incident, b: Incident) => b.timestamp - a.timestamp);
+
+    // Final catch-all proximity dedup for official/weather API incidents.
+    // Community reports (no data_source field) always show — never merged.
+    const kept: Incident[] = [];
+    for (const inc of filtered) {
+      if (inc.data_source !== 'official') {
+        kept.push(inc);
+        continue;
+      }
+      const isDup = kept.some(
+        (k) => k.data_source === 'official' &&
+          getDistance(k.lat, k.lng, inc.lat, inc.lng) < 0.03
+      );
+      if (!isDup) kept.push(inc);
+    }
+    return kept;
   }, [firebaseIncidents, officialOpenData, weatherAlerts]);
 
   useEffect(() => {

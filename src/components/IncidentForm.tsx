@@ -585,75 +585,60 @@ export default function IncidentForm({
     </AnimatePresence>
   );
 
-  return (
-    <AnimatePresence>
-      {isOpen && step !== 'pinning' && (
-        isLgUp ? (
-          <motion.div
-            key="report-desktop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-slate-950/60 light:bg-[#7c6f64]/18 backdrop-blur-xl"
-            onClick={handleClose}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.93, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.93, y: 16 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-50 w-full max-w-xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 light:from-[rgb(255,250,243)] light:via-[rgb(255,247,237)] light:to-[rgb(242,251,248)] rounded-3xl border border-white/10 light:border-stone-200/80 shadow-2xl shadow-blue-900/40 light:shadow-[0_24px_60px_-32px_rgba(120,113,108,0.35)] overflow-hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 light:border-stone-200/80 bg-gradient-to-r from-slate-900/80 to-blue-900/15 light:from-white/85 light:to-sky-50 flex-shrink-0">
-                <div>
-                  <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
-                  <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report what&apos;s happening in real-time</p>
-                </div>
-                <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-lg transition-all">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto">{reportSteps}</div>
-            </motion.div>
-          </motion.div>
-        ) : (
-          <>
-            <motion.div
-              key="report-mobile-backdrop"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={handleClose}
-            />
-            <motion.div
-              key="report-mobile-sheet"
-              className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[2.5rem] bg-slate-950 light:bg-[rgb(255,250,243)] border-t border-white/10 light:border-stone-200/80 flex flex-col"
-              style={{ maxHeight: '92dvh' }}
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 32, stiffness: 280 }}
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <div className="flex-shrink-0 flex justify-center pt-4 pb-2">
-                <div className="w-10 h-1.5 rounded-full bg-white/15" />
-              </div>
-              <div className="flex items-center justify-between px-6 pb-4 flex-shrink-0">
-                <div>
-                  <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
-                  <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report in real-time</p>
-                </div>
-                <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto">{reportSteps}</div>
-            </motion.div>
-          </>
-        )
-      )}
-    </AnimatePresence>
+  if (!isOpen) return null;
+
+  // Keep the modal mounted while pinning (just hidden) so react-hook-form
+  // refs and input state survive the pin flow without re-registration issues.
+  const hidden = step === 'pinning';
+
+  return isLgUp ? (
+    <div
+      className="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-slate-950/60 light:bg-[#7c6f64]/18 backdrop-blur-xl"
+      style={hidden ? { display: 'none' } : undefined}
+      onClick={handleClose}
+    >
+      <div
+        className="relative z-50 w-full max-w-xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 light:from-[rgb(255,250,243)] light:via-[rgb(255,247,237)] light:to-[rgb(242,251,248)] rounded-3xl border border-white/10 light:border-stone-200/80 shadow-2xl shadow-blue-900/40 light:shadow-[0_24px_60px_-32px_rgba(120,113,108,0.35)] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 light:border-stone-200/80 bg-gradient-to-r from-slate-900/80 to-blue-900/15 light:from-white/85 light:to-sky-50 flex-shrink-0">
+          <div>
+            <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
+            <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report what&apos;s happening in real-time</p>
+          </div>
+          <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-lg transition-all">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">{reportSteps}</div>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
+        style={hidden ? { display: 'none' } : undefined}
+        onClick={handleClose}
+      />
+      <div
+        className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[2.5rem] bg-slate-950 light:bg-[rgb(255,250,243)] border-t border-white/10 light:border-stone-200/80 flex flex-col"
+        style={{ maxHeight: '92dvh', ...(hidden ? { display: 'none' } : {}) }}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <div className="flex-shrink-0 flex justify-center pt-4 pb-2">
+          <div className="w-10 h-1.5 rounded-full bg-white/15" />
+        </div>
+        <div className="flex items-center justify-between px-6 pb-4 flex-shrink-0">
+          <div>
+            <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
+            <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report in real-time</p>
+          </div>
+          <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">{reportSteps}</div>
+      </div>
+    </>
   );
 }

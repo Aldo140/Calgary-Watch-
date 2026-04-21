@@ -188,7 +188,7 @@ export async function fetchCalgaryInfrastructureAlerts(): Promise<NormalizedInci
         lng: event.lng,
         source_name: 'Streets Calgary / Water Services',
         source_url: 'https://www.calgary.ca/transportation',
-        source_type: 'calgary_open_data',
+        source_type: 'calgary_infrastructure',
         data_source: 'official',
         dedup_key: dedupKey,
         expires_at: expiresAt,

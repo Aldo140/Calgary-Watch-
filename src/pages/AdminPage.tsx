@@ -6,7 +6,7 @@ import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, CommunityStats } from '@/src/types';
 import {
   addDoc, collection, deleteDoc, doc, getDocs, getCountFromServer,
-  onSnapshot, orderBy, query, updateDoc, limit, where,
+  onSnapshot, orderBy, query, updateDoc, limit, where, deleteField,
 } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
@@ -239,13 +239,14 @@ export default function AdminPage() {
     if (!db) return;
     await updateDoc(doc(db, 'incidents', incidentId), {
       flagged: false,
-      flagged_at: null,
-      flagged_by: null,
+      flagged_at: deleteField(),
+      flagged_by: deleteField(),
     });
     await writeAuditLog('incident_update', 'incidents', incidentId, { flagged: false });
   };
 
   const handlePermanentDelete = async (incidentId: string) => {
+    if (!window.confirm('Permanently delete this incident? This cannot be undone.')) return;
     if (!db) return;
     await deleteDoc(doc(db, 'incidents', incidentId));
     await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });

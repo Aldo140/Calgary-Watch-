@@ -5,8 +5,8 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, CommunityStats } from '@/src/types';
 import {
-  addDoc, collection, doc, getDocs, getCountFromServer,
-  onSnapshot, orderBy, query, updateDoc, limit,
+  addDoc, collection, deleteDoc, doc, getDocs, getCountFromServer,
+  onSnapshot, orderBy, query, updateDoc, limit, where,
 } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
@@ -16,7 +16,7 @@ import {
   ChartNoAxesColumn, Sparkles, RefreshCw, Siren, ChartPie,
   ShieldQuestion, CheckCircle, LayoutDashboard, FileText,
   BarChart3, Map, Globe, TrendingUp, MousePointerClick,
-  Wifi, Link, Megaphone, Zap,
+  Wifi, Link, Megaphone, Zap, Flag,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -63,7 +63,8 @@ type AdminSection =
   | 'users'
   | 'stats'
   | 'analytics'
-  | 'traffic';
+  | 'traffic'
+  | 'flagged';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType; bad
   { id: 'stats',      label: 'City Stats', icon: Map },
   { id: 'analytics',  label: 'Analytics',  icon: BarChart3 },
   { id: 'traffic',    label: 'Traffic',    icon: Globe },
+  { id: 'flagged' as AdminSection, label: 'Flagged', icon: Flag },
 ];
 
 const INCIDENT_CATEGORIES: Incident['category'][] = [
@@ -142,6 +144,13 @@ const SECTION_THEMES: Record<AdminSection, { eyebrow: string; title: string; des
     description: 'See what channels, routes, and campaigns are actually moving attention across Calgary Watch.',
     accent: 'from-pink-500/30 via-orange-500/10 to-amber-400/20',
     glow: 'rgba(244,114,182,0.22)',
+  },
+  flagged: {
+    eyebrow: 'Moderation',
+    title: 'Review flagged content',
+    description: 'Incidents taken down by community flags. Restore clean reports or permanently remove harmful ones.',
+    accent: 'from-amber-500/30 via-orange-500/10 to-yellow-400/20',
+    glow: 'rgba(245,158,11,0.22)',
   },
 };
 
@@ -202,6 +211,7 @@ export default function AdminPage() {
   const [loadingData, setLoadingData] = useState(true);
   const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
   const [totalPageViews, setTotalPageViews] = useState<number | null>(null);
+  const [flaggedIncidents, setFlaggedIncidents] = useState<Incident[]>([]);
 
   const [incidentDrafts, setIncidentDrafts] = useState<Record<string, EditableIncident>>({});
   const [statsDrafts, setStatsDrafts] = useState<Record<string, EditableCommunityStats>>({});
@@ -223,6 +233,22 @@ export default function AdminPage() {
       timestamp: Date.now(), changes,
       metadata: { userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown' },
     });
+  };
+
+  const handleRestore = async (incidentId: string) => {
+    if (!db) return;
+    await updateDoc(doc(db, 'incidents', incidentId), {
+      flagged: false,
+      flagged_at: null,
+      flagged_by: null,
+    });
+    await writeAuditLog('incident_update', 'incidents', incidentId, { flagged: false });
+  };
+
+  const handlePermanentDelete = async (incidentId: string) => {
+    if (!db) return;
+    await deleteDoc(doc(db, 'incidents', incidentId));
+    await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });
   };
 
   // ── Data subscriptions ────────────────────────────────────────────────────
@@ -262,7 +288,14 @@ export default function AdminPage() {
       .then(snap => setPageViewDocs(snap.docs.map(d => d.data() as PageViewDoc)))
       .catch(() => {});
 
-    return () => { unsubIncidents(); unsubStats(); unsubUsers(); };
+    const unsubFlagged = onSnapshot(
+      query(collection(db, 'incidents'), where('flagged', '==', true), orderBy('flagged_at', 'desc')),
+      (snapshot) => {
+        setFlaggedIncidents(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Incident)));
+      }
+    );
+
+    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubFlagged(); };
   }, [isAuthReady, isAdmin, user]);
 
   // ── KPI derivations ───────────────────────────────────────────────────────
@@ -284,12 +317,14 @@ export default function AdminPage() {
 
   const MODERATION_WINDOW_MS = 30 * 60 * 1000;
   const pendingReviewIncidents = incidents.filter((i) =>
-    i.verified_status === 'unverified' && !i.data_source && Date.now() - i.timestamp < MODERATION_WINDOW_MS
+    i.verified_status === 'unverified' &&
+    i.data_source !== 'system' &&
+    Date.now() - i.timestamp < MODERATION_WINDOW_MS
   );
 
-  const officialTrafficCount   = incidents.filter((i) => i.id.startsWith('yyc-traffic-')).length;
-  const official311Count       = incidents.filter((i) => i.id.startsWith('yyc-311-')).length;
-  const officialCrimeCount     = incidents.filter((i) => i.id.startsWith('crime-stat-')).length;
+  const officialTrafficCount   = incidents.filter((i) => i.source_type === '511_alberta_traffic').length;
+  const official311Count       = incidents.filter((i) => i.source_type === 'calgary_infrastructure').length;
+  const officialCrimeCount     = incidents.filter((i) => i.source_type === 'calgary_police_crime').length;
   const communityReportCount   = incidents.filter((i) => !i.data_source || i.data_source === 'community').length;
   const activeSectionTheme = SECTION_THEMES[activeSection];
   const activeNavItem = NAV_ITEMS.find((item) => item.id === activeSection) ?? NAV_ITEMS[0];
@@ -1837,6 +1872,54 @@ export default function AdminPage() {
     </div>
   );
 
+  const renderFlagged = () => (
+    <section className="space-y-6">
+      {flaggedIncidents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Flag size={48} className="text-slate-700 mb-4" />
+          <p className="text-slate-400 font-bold">No flagged incidents</p>
+          <p className="text-slate-600 text-sm mt-1">Community moderation is clean.</p>
+        </div>
+      ) : (
+        flaggedIncidents.map((incident) => (
+          <div key={incident.id} className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-6 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-amber-400 uppercase tracking-widest mb-1">
+                  Flagged {incident.flagged_at ? formatRelativeMinutes(incident.flagged_at) : ''}
+                </p>
+                <h3 className="text-white font-black text-lg leading-tight truncate">{incident.title}</h3>
+                <p className="text-slate-400 text-sm mt-1 line-clamp-2">{incident.description}</p>
+              </div>
+              {incident.image_url && (
+                <img src={incident.image_url} alt="" className="w-20 h-20 rounded-2xl object-cover border border-white/10 shrink-0" />
+              )}
+            </div>
+            <div className="text-xs text-slate-500 space-y-0.5">
+              <p>Neighborhood: <span className="text-slate-300">{incident.neighborhood}</span></p>
+              <p>Flagged by UID: <span className="text-slate-300 font-mono">{incident.flagged_by}</span></p>
+              <p>Reporter: <span className="text-slate-300">{incident.name}</span></p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => void handleRestore(incident.id)}
+                className="flex-1 h-10 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-black text-xs tracking-wide transition-all"
+              >
+                Restore
+              </button>
+              <button
+                onClick={() => void handlePermanentDelete(incident.id)}
+                className="flex-1 h-10 rounded-2xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 font-black text-xs tracking-wide transition-all"
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        ))
+      )}
+    </section>
+  );
+
   // ── Section content router ─────────────────────────────────────────────────
 
   const renderSection = () => {
@@ -1847,6 +1930,7 @@ export default function AdminPage() {
       case 'stats':     return renderStats();
       case 'analytics': return renderAnalytics();
       case 'traffic':   return renderTrafficAnalytics();
+      case 'flagged':   return renderFlagged();
       default:          return renderDashboard();
     }
   };

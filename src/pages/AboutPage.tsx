@@ -216,13 +216,13 @@ function VolunteerForm() {
       const templateId = import.meta.env.VITE_EMAILJS_VOLUNTEER_TEMPLATE_ID;
       const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
       if (serviceId && templateId && publicKey) {
+        emailjs.init({ publicKey });
         emailjs.send(serviceId, templateId, {
-          volunteer_name: name.trim().slice(0, 100),
-          volunteer_email: email.trim().slice(0, 200),
-          volunteer_role: role,
-          volunteer_why: whyJoin.trim().slice(0, 500),
-          to_email: 'jorti104@mtroyal.ca',
-        }, publicKey).catch(() => { /* non-fatal */ });
+          name: name.trim().slice(0, 100),
+          email: email.trim().slice(0, 200),
+          subject: role,
+          message: `Role: ${role}\n\nWhy they want to join:\n${whyJoin.trim().slice(0, 500)}`,
+        }).catch((err) => { console.error('EmailJS error:', JSON.stringify(err)); });
       }
 
       setStatus('done');

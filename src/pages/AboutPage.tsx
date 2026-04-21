@@ -1,20 +1,29 @@
 /**
  * AboutPage.tsx
  *
- * Calgary Watch - Redesigned About page with premium desktop/mobile UI
+ * Calgary Watch — Full visual rework with 3D scroll-driven animations
  *
- * Features:
- *  - Full-width hero with background image
- *  - 3D card animations with image integration
- *  - Professional section layout
- *  - Responsive grid designs
- *  - Glassmorphism + depth effects
- *  - Full dark/light theme support
+ * Design philosophy:
+ *  - Every section has a unique, non-generic layout
+ *  - 3D perspective transforms driven by scroll position via Framer Motion
+ *  - Dramatic typographic scale and creative visual hierarchy
+ *  - Calgary design language: sky, mountains, Bow River, Stampede energy
+ *  - Full dark/light mode with `light:` Tailwind variant
+ *  - prefers-reduced-motion respected throughout
  */
 
 import { useEffect, useRef, memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useInView, animate, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
+import {
+  motion,
+  useInView,
+  animate,
+  useScroll,
+  useTransform,
+  useMotionValue,
+  useSpring,
+  AnimatePresence,
+} from 'motion/react';
 import emailjs from '@emailjs/browser';
 import { db } from '@/src/firebase';
 import { publicAsset } from '@/src/lib/utils';
@@ -24,177 +33,31 @@ import {
   MapPin,
   Zap,
   Mail,
-  Sparkles,
   Users,
-  Rocket,
   ArrowRight,
   Clock,
   Shield,
-  Briefcase,
-  MapIcon,
   Eye,
   HeartHandshake,
   Handshake,
-  SectionIcon,
+  ChevronDown,
+  CheckCircle2,
+  Cpu,
+  Globe,
+  TrendingUp,
 } from 'lucide-react';
 
+// ---------------------------------------------------------------------------
+// Utility
+// ---------------------------------------------------------------------------
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 // ---------------------------------------------------------------------------
-// Volunteer form card
+// AnimatedCounter — counts up when scrolled into view
 // ---------------------------------------------------------------------------
-function VolunteerCard({ reducedMotion }: { reducedMotion: boolean }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('');
-  const [whyJoin, setWhyJoin] = useState('');
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
-
-  const roles = ['Marketing', 'Development', 'Administration'];
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim() || !email.trim() || !role || !whyJoin.trim()) return;
-    setStatus('submitting');
-    if (!db) {
-      setStatus('error');
-      return;
-    }
-    try {
-      await addDoc(collection(db, 'volunteers'), {
-        name: name.trim().slice(0, 100),
-        email: email.trim().slice(0, 200),
-        role,
-        whyJoin: whyJoin.trim().slice(0, 500),
-        createdAt: serverTimestamp(),
-      });
-
-      // Send admin notification email (non-blocking — form succeeds regardless)
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_VOLUNTEER_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-      if (serviceId && templateId && publicKey) {
-        emailjs.send(serviceId, templateId, {
-          volunteer_name: name.trim().slice(0, 100),
-          volunteer_email: email.trim().slice(0, 200),
-          volunteer_role: role,
-          volunteer_why: whyJoin.trim().slice(0, 500),
-          to_email: 'jorti104@mtroyal.ca',
-        }, publicKey).catch(() => { /* email failure is non-fatal */ });
-      }
-
-      setStatus('done');
-    } catch {
-      setStatus('error');
-    }
-  }
-
-  return (
-    <motion.div
-      initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.6, delay: 0.1 }}
-      className="rounded-2xl border border-[#2E8B7A]/40 bg-gradient-to-br from-[#2E8B7A]/10 to-slate-950/60 light:from-teal-50 light:to-white p-8 flex flex-col gap-5 relative overflow-hidden"
-    >
-      <div className="absolute top-4 right-4 text-[10px] font-black uppercase tracking-wider text-[#2E8B7A] bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-2 py-1 rounded-full">
-        Open
-      </div>
-      <div className="w-12 h-12 rounded-xl bg-[#2E8B7A]/15 flex items-center justify-center">
-        <HeartHandshake size={24} className="text-[#2E8B7A]" />
-      </div>
-      <div>
-        <span className="text-[10px] font-black uppercase tracking-widest text-[#2E8B7A] bg-[#2E8B7A]/10 px-2 py-1 rounded">
-          Volunteers
-        </span>
-        <h3 className="text-xl font-black mt-3 mb-2">Help keep Calgary informed</h3>
-        <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed">
-          We're looking for passionate Calgarians to join us. As a trusted community platform, every volunteer shapes the integrity of Calgary Watch. Your contributions ensure we remain accurate, responsive, and worthy of the community's trust.
-        </p>
-      </div>
-
-      {status === 'done' ? (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mt-2 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-5 py-6 text-center"
-        >
-          <p className="text-[#2E8B7A] font-bold text-sm">Thanks, {name.split(' ')[0]}! We'll be in touch.</p>
-          <p className="text-slate-400 text-xs mt-1">Your interest has been recorded.</p>
-        </motion.div>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3 mt-1">
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={100}
-            required
-            className="w-full bg-white/5 light:bg-white border border-white/15 light:border-slate-300 rounded-xl px-4 py-2.5 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-[#2E8B7A]/60 transition-colors"
-          />
-          <input
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            maxLength={200}
-            required
-            className="w-full bg-white/5 light:bg-white border border-white/15 light:border-slate-300 rounded-xl px-4 py-2.5 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-[#2E8B7A]/60 transition-colors"
-          />
-          <div>
-            <p className="text-[11px] text-slate-500 mb-2 uppercase tracking-widest font-semibold">I want to help with</p>
-            <div className="flex flex-wrap gap-2">
-              {roles.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setRole(r)}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-                    role === r
-                      ? 'bg-[#2E8B7A] border-[#2E8B7A] text-white'
-                      : 'bg-transparent border-white/20 light:border-slate-300 text-slate-400 light:text-slate-600 hover:border-[#2E8B7A]/50'
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-[11px] text-slate-500 mb-2 uppercase tracking-widest font-semibold">Why do you want to join?</p>
-            <textarea
-              placeholder="Tell us why you're interested in building a trusted platform for Calgary..."
-              value={whyJoin}
-              onChange={(e) => setWhyJoin(e.target.value)}
-              maxLength={500}
-              required
-              rows={3}
-              className="w-full bg-white/5 light:bg-white border border-white/15 light:border-slate-300 rounded-xl px-4 py-2.5 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-[#2E8B7A]/60 transition-colors resize-none"
-            />
-            <p className="text-[10px] text-slate-600 mt-1 text-right">{whyJoin.length}/500</p>
-          </div>
-          {status === 'error' && (
-            <p className="text-red-400 text-xs">Something went wrong. Try emailing us directly.</p>
-          )}
-          <motion.button
-            type="submit"
-            disabled={status === 'submitting' || !name.trim() || !email.trim() || !role || !whyJoin.trim()}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            className="w-full rounded-xl py-2.5 bg-[#2E8B7A] text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
-          >
-            {status === 'submitting' ? 'Sending…' : 'Express Interest'}
-          </motion.button>
-        </form>
-      )}
-    </motion.div>
-  );
-}
-
 const AnimatedCounter = memo(function AnimatedCounter({
   to,
   suffix = '',
@@ -231,132 +94,717 @@ const AnimatedCounter = memo(function AnimatedCounter({
 });
 
 // ---------------------------------------------------------------------------
-// 3D Tilt card — mouse-driven perspective tilt
+// MagneticButton — cursor-following micro-motion
 // ---------------------------------------------------------------------------
-function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const rotX = useMotionValue(0);
-  const rotY = useMotionValue(0);
-  const springRotX = useSpring(rotX, { stiffness: 200, damping: 18 });
-  const springRotY = useSpring(rotY, { stiffness: 200, damping: 18 });
+function MagneticButton({
+  children,
+  className,
+  onClick,
+  href,
+  tag = 'button',
+}: {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+  href?: string;
+  tag?: 'button' | 'a';
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 300, damping: 20 });
+  const sy = useSpring(y, { stiffness: 300, damping: 20 });
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+  function onMove(e: React.MouseEvent) {
     if (prefersReducedMotion()) return;
-    const rect = cardRef.current?.getBoundingClientRect();
+    const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width / 2);
-    const dy = (e.clientY - cy) / (rect.height / 2);
-    rotX.set(-dy * 8);
-    rotY.set(dx * 8);
+    x.set((e.clientX - cx) * 0.22);
+    y.set((e.clientY - cy) * 0.22);
+  }
+  function onLeave() { x.set(0); y.set(0); }
+
+  const Tag = tag === 'a' ? motion.a : motion.button;
+
+  return (
+    <Tag
+      ref={ref as React.Ref<HTMLButtonElement & HTMLAnchorElement>}
+      className={className}
+      style={{ x: sx, y: sy }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      onClick={onClick}
+      href={href}
+      whileTap={{ scale: 0.95 }}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// SplitTextReveal — each word staggers in on scroll
+// ---------------------------------------------------------------------------
+function SplitTextReveal({
+  text,
+  className,
+  delay = 0,
+}: {
+  text: string;
+  className?: string;
+  delay?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const words = text.split(' ');
+
+  return (
+    <div ref={ref} className={`flex flex-wrap ${className ?? ''}`} aria-label={text}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          className="mr-[0.28em] overflow-hidden"
+          aria-hidden="true"
+        >
+          <motion.span
+            className="inline-block"
+            initial={prefersReducedMotion() ? undefined : { y: '110%', opacity: 0 }}
+            animate={inView ? { y: '0%', opacity: 1 } : {}}
+            transition={{
+              duration: 0.65,
+              delay: delay + i * 0.055,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            {word}
+          </motion.span>
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Volunteer Form — preserved exactly, new visual treatment
+// ---------------------------------------------------------------------------
+function VolunteerForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
+  const [whyJoin, setWhyJoin] = useState('');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
+
+  const roles = ['Reporter', 'Analyst', 'Developer', 'Community Advocate', 'Other'];
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !role || !whyJoin.trim()) return;
+    setStatus('submitting');
+    if (!db) { setStatus('error'); return; }
+    try {
+      await addDoc(collection(db, 'volunteers'), {
+        name: name.trim().slice(0, 100),
+        email: email.trim().slice(0, 200),
+        role,
+        whyJoin: whyJoin.trim().slice(0, 500),
+        createdAt: serverTimestamp(),
+      });
+
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_VOLUNTEER_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+      if (serviceId && templateId && publicKey) {
+        emailjs.send(serviceId, templateId, {
+          volunteer_name: name.trim().slice(0, 100),
+          volunteer_email: email.trim().slice(0, 200),
+          volunteer_role: role,
+          volunteer_why: whyJoin.trim().slice(0, 500),
+          to_email: 'jorti104@mtroyal.ca',
+        }, publicKey).catch(() => { /* non-fatal */ });
+      }
+
+      setStatus('done');
+    } catch {
+      setStatus('error');
+    }
   }
 
-  function handleMouseLeave() {
-    rotX.set(0);
-    rotY.set(0);
+  const inputClass =
+    'w-full bg-white/5 light:bg-white/80 border border-white/12 light:border-slate-300 rounded-lg px-4 py-3 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-[#2E8B7A]/70 focus:bg-white/8 light:focus:bg-white transition-all';
+
+  return (
+    <AnimatePresence mode="wait">
+      {status === 'done' ? (
+        <motion.div
+          key="done"
+          initial={{ opacity: 0, scale: 0.92, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col items-center justify-center gap-4 py-12 text-center"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
+            className="w-16 h-16 rounded-full bg-[#2E8B7A]/20 border border-[#2E8B7A]/40 flex items-center justify-center"
+          >
+            <CheckCircle2 size={32} className="text-[#2E8B7A]" />
+          </motion.div>
+          <div>
+            <p className="text-xl font-black text-white light:text-slate-900">
+              Thanks, {name.split(' ')[0]}!
+            </p>
+            <p className="text-slate-400 light:text-slate-600 text-sm mt-1">
+              We'll be in touch soon.
+            </p>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.form
+          key="form"
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4"
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0, y: -8 }}
+        >
+          <input
+            type="text"
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={100}
+            required
+            className={inputClass}
+          />
+          <input
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            maxLength={200}
+            required
+            className={inputClass}
+          />
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2.5">
+              I want to help with
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {roles.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`text-xs font-bold px-3.5 py-1.5 rounded-full border transition-all cursor-pointer ${
+                    role === r
+                      ? 'bg-[#2E8B7A] border-[#2E8B7A] text-white shadow-lg shadow-[#2E8B7A]/25'
+                      : 'bg-transparent border-white/15 light:border-slate-300 text-slate-400 light:text-slate-600 hover:border-[#2E8B7A]/50 hover:text-[#2E8B7A]'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2.5">
+              Why do you want to join?
+            </p>
+            <textarea
+              placeholder="Tell us why you're interested in building a trusted platform for Calgary..."
+              value={whyJoin}
+              onChange={(e) => setWhyJoin(e.target.value)}
+              maxLength={500}
+              required
+              rows={3}
+              className={`${inputClass} resize-none`}
+            />
+            <p className="text-[10px] text-slate-600 mt-1 text-right tabular-nums">
+              {whyJoin.length}/500
+            </p>
+          </div>
+          {status === 'error' && (
+            <p className="text-red-400 text-xs">
+              Something went wrong. Try emailing us directly.
+            </p>
+          )}
+          <motion.button
+            type="submit"
+            disabled={
+              status === 'submitting' ||
+              !name.trim() ||
+              !email.trim() ||
+              !role ||
+              !whyJoin.trim()
+            }
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full rounded-xl py-3.5 bg-gradient-to-r from-[#2E8B7A] to-[#246b5f] text-white text-sm font-black disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer tracking-wide shadow-lg shadow-[#2E8B7A]/20"
+          >
+            {status === 'submitting' ? 'Sending…' : 'Express Interest'}
+          </motion.button>
+        </motion.form>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// HeroPerspectiveTitle — letters tilt in 3D as hero scrolls
+// ---------------------------------------------------------------------------
+function HeroPerspectiveTitle({ scrollProgress }: { scrollProgress: ReturnType<typeof useScroll>['scrollYProgress'] }) {
+  const rotateX = useTransform(scrollProgress, [0, 0.5], [0, -25]);
+  const scale = useTransform(scrollProgress, [0, 0.5], [1, 0.88]);
+  const opacity = useTransform(scrollProgress, [0, 0.55], [1, 0]);
+  const springRotX = useSpring(rotateX, { stiffness: 60, damping: 18 });
+  const springScale = useSpring(scale, { stiffness: 60, damping: 18 });
+
+  if (prefersReducedMotion()) {
+    return (
+      <h1 className="text-[clamp(3rem,10vw,8.5rem)] font-black tracking-tight leading-[0.92] select-none">
+        <span className="block text-white">Real-time</span>
+        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
+          city
+        </span>
+        <span className="block text-white">intelligence.</span>
+      </h1>
+    );
   }
 
   return (
     <motion.div
-      ref={cardRef}
-      className={className}
-      style={{ rotateX: springRotX, rotateY: springRotY, transformStyle: 'preserve-3d', perspective: 1000 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX: springRotX,
+        scale: springScale,
+        opacity,
+        transformStyle: 'preserve-3d',
+        perspective: '1200px',
+      }}
     >
-      {children}
+      <h1 className="text-[clamp(3rem,10vw,8.5rem)] font-black tracking-tight leading-[0.92] select-none">
+        <motion.span
+          className="block text-white"
+          initial={{ opacity: 0, x: -60 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
+          Real-time
+        </motion.span>
+        <motion.span
+          className="block text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]"
+          initial={{ opacity: 0, x: 60 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        >
+          city
+        </motion.span>
+        <motion.span
+          className="block text-white"
+          initial={{ opacity: 0, x: -60 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          intelligence.
+        </motion.span>
+      </h1>
     </motion.div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Scroll-driven floating element (parallax offset)
+// ScrollingMarquee — horizontal ticker strip
 // ---------------------------------------------------------------------------
-function ParallaxFloat({ children, speed = 0.15, className }: { children: React.ReactNode; speed?: number; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 1200], [0, -1200 * speed]);
-  const smoothY = useSpring(y, { stiffness: 80, damping: 20 });
-  if (prefersReducedMotion()) return <div className={className}>{children}</div>;
+function ScrollingMarquee() {
+  const items = [
+    '2000+ Incidents Mapped',
+    '47 Neighbourhoods',
+    '<30s Report to Map',
+    '100+ Contributors',
+    'Real-Time Awareness',
+    'Calgary-First Platform',
+  ];
+  const doubled = [...items, ...items];
+
   return (
-    <motion.div className={className} style={{ y: smoothY }}>
-      {children}
-    </motion.div>
+    <div className="relative overflow-hidden py-5 border-y border-white/6 light:border-slate-200 bg-white/[0.02] light:bg-slate-50/60">
+      <motion.div
+        className="flex gap-12 whitespace-nowrap w-max"
+        animate={prefersReducedMotion() ? {} : { x: [0, '-50%'] }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          ease: 'linear',
+        }}
+      >
+        {doubled.map((item, i) => (
+          <span
+            key={i}
+            className="text-xs font-black uppercase tracking-[0.22em] text-slate-500 light:text-slate-400 flex items-center gap-4"
+          >
+            <span
+              className="inline-block w-1.5 h-1.5 rounded-full"
+              style={{
+                background: ['#4A90D9', '#2E8B7A', '#D4A843'][i % 3],
+              }}
+            />
+            {item}
+          </span>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
+// ---------------------------------------------------------------------------
+// DiagonalImageBlock — full-bleed image with clipped diagonal edge
+// ---------------------------------------------------------------------------
+function DiagonalImageBlock({ src, alt }: { src: string; alt: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const imgY = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
+  const smoothY = useSpring(imgY, { stiffness: 50, damping: 18 });
+
+  return (
+    <div
+      ref={ref}
+      className="relative overflow-hidden rounded-2xl"
+      style={{ clipPath: 'polygon(0 0, 100% 0, 100% 88%, 88% 100%, 0 100%)' }}
+    >
+      <motion.img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className="w-full h-80 md:h-[28rem] object-cover"
+        style={prefersReducedMotion() ? undefined : { y: smoothY }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// OrbitingBadges — stat badges orbiting a central icon
+// ---------------------------------------------------------------------------
+function OrbitingBadges() {
+  const reduced = prefersReducedMotion();
+  const badges = [
+    { label: '2000+', sub: 'incidents', color: '#4A90D9', angle: 0 },
+    { label: '47', sub: 'areas', color: '#2E8B7A', angle: 90 },
+    { label: '<30s', sub: 'latency', color: '#D4A843', angle: 180 },
+    { label: '100+', sub: 'contributors', color: '#a855f7', angle: 270 },
+  ];
+
+  return (
+    <div className="relative w-64 h-64 mx-auto flex items-center justify-center">
+      {/* Central glow */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#4A90D9]/15 via-[#2E8B7A]/10 to-[#D4A843]/15 blur-xl" />
+      {/* Central icon */}
+      <motion.div
+        className="relative z-10 w-20 h-20 rounded-2xl bg-gradient-to-br from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center shadow-2xl shadow-[#4A90D9]/30"
+        animate={reduced ? {} : { rotate: [0, 5, -5, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <img
+          src={publicAsset('icon.svg')}
+          alt="Calgary Watch"
+          className="w-12 h-12 object-contain"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+        />
+      </motion.div>
+      {/* Orbit ring */}
+      <motion.div
+        className="absolute inset-0 rounded-full border border-white/8 light:border-slate-300/50"
+        animate={reduced ? {} : { rotate: 360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+      />
+      {/* Badges */}
+      {badges.map((b) => {
+        const rad = (b.angle * Math.PI) / 180;
+        const r = 112;
+        const bx = Math.cos(rad) * r;
+        const by = Math.sin(rad) * r;
+        return (
+          <motion.div
+            key={b.label}
+            className="absolute flex flex-col items-center pointer-events-none"
+            style={{ left: `calc(50% + ${bx}px - 2rem)`, top: `calc(50% + ${by}px - 1.5rem)` }}
+            animate={reduced ? {} : { rotate: -360 }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+          >
+            <span className="text-base font-black tabular-nums" style={{ color: b.color }}>
+              {b.label}
+            </span>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 light:text-slate-400">
+              {b.sub}
+            </span>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// TimelineStep — connected node for "How It Works"
+// ---------------------------------------------------------------------------
+function TimelineStep({
+  num,
+  title,
+  desc,
+  color,
+  image,
+  isLast,
+  index,
+}: {
+  num: string;
+  title: string;
+  desc: string;
+  color: string;
+  image: string;
+  isLast: boolean;
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const reduced = prefersReducedMotion();
+
+  const isEven = index % 2 === 0;
+
+  return (
+    <div ref={ref} className={`flex flex-col md:flex-row items-center gap-0 md:gap-0 relative ${isEven ? '' : 'md:flex-row-reverse'}`}>
+      {/* Image side */}
+      <motion.div
+        className="w-full md:w-5/12"
+        initial={reduced ? undefined : { opacity: 0, x: isEven ? -60 : 60, rotateY: isEven ? -15 : 15 }}
+        animate={inView ? { opacity: 1, x: 0, rotateY: 0 } : {}}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        style={{ perspective: '1000px' }}
+      >
+        <div
+          className="relative overflow-hidden rounded-2xl border border-white/8 light:border-slate-200 group"
+          style={{ boxShadow: `0 24px 60px ${color}18` }}
+        >
+          <img
+            src={image}
+            alt={title}
+            loading="lazy"
+            className="w-full h-60 md:h-72 object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+          <div
+            className="absolute bottom-4 left-4 text-5xl font-black opacity-20"
+            style={{ color }}
+          >
+            {num}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Center connector */}
+      <div className="hidden md:flex flex-col items-center w-2/12 relative z-10 self-stretch">
+        <motion.div
+          className="w-12 h-12 rounded-full border-2 flex items-center justify-center font-black text-sm shrink-0 mt-8"
+          style={{ borderColor: color, color, background: `${color}15` }}
+          initial={reduced ? undefined : { scale: 0, opacity: 0 }}
+          animate={inView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 260 }}
+        >
+          {num}
+        </motion.div>
+        {!isLast && (
+          <motion.div
+            className="flex-1 w-px mt-2"
+            style={{ background: `linear-gradient(to bottom, ${color}60, transparent)` }}
+            initial={reduced ? undefined : { scaleY: 0, originY: 0 }}
+            animate={inView ? { scaleY: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          />
+        )}
+      </div>
+
+      {/* Text side */}
+      <motion.div
+        className="w-full md:w-5/12 pt-6 md:pt-0 pb-12 md:pb-0"
+        initial={reduced ? undefined : { opacity: 0, x: isEven ? 60 : -60 }}
+        animate={inView ? { opacity: 1, x: 0 } : {}}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+      >
+        <div className={`max-w-sm ${isEven ? 'md:pl-2' : 'md:pr-2 md:text-right md:ml-auto'}`}>
+          <span
+            className="inline-block text-[10px] font-black uppercase tracking-[0.2em] mb-3 px-2.5 py-1 rounded"
+            style={{ color, background: `${color}18` }}
+          >
+            Step {num}
+          </span>
+          <h3 className="text-3xl md:text-4xl font-black mb-3 tracking-tight">{title}</h3>
+          <p className="text-slate-400 light:text-slate-600 leading-relaxed">{desc}</p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// MorphingStat — large number with animated underline morphing on scroll
+// ---------------------------------------------------------------------------
+function MorphingStat({
+  value,
+  suffix,
+  prefix,
+  label,
+  color,
+  delay,
+}: {
+  value: number;
+  suffix: string;
+  prefix: string;
+  label: string;
+  color: string;
+  delay: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <div ref={ref} className="flex flex-col items-center gap-2 py-8 px-4">
+      <motion.div
+        className="text-[clamp(2.8rem,6vw,5rem)] font-black tabular-nums leading-none tracking-tight"
+        style={{ color }}
+        initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <AnimatedCounter to={value} suffix={suffix} prefix={prefix} duration={1.8 + delay} />
+      </motion.div>
+      <motion.div
+        className="h-px w-12 rounded-full"
+        style={{ background: color }}
+        initial={{ width: 0 }}
+        animate={inView ? { width: 48 } : {}}
+        transition={{ duration: 0.5, delay: delay + 0.2 }}
+      />
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 light:text-slate-500 text-center">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// NorthernLightsBackground — decorative ambient gradient layer
+// ---------------------------------------------------------------------------
+function NorthernLightsBackground() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div
+        className="absolute -top-32 left-1/4 w-[40rem] h-[20rem] rounded-full opacity-[0.07] blur-[80px]"
+        style={{ background: 'linear-gradient(135deg, #4A90D9, #2E8B7A)' }}
+      />
+      <div
+        className="absolute top-1/3 -right-24 w-[28rem] h-[16rem] rounded-full opacity-[0.055] blur-[60px]"
+        style={{ background: 'linear-gradient(135deg, #D4A843, #C0392B)' }}
+      />
+      <div
+        className="absolute bottom-0 left-1/3 w-[32rem] h-[18rem] rounded-full opacity-[0.06] blur-[70px]"
+        style={{ background: 'linear-gradient(135deg, #2E8B7A, #4A90D9)' }}
+      />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main Page Component
+// ---------------------------------------------------------------------------
 export default function AboutPage() {
   const navigate = useNavigate();
-  const reducedMotion = prefersReducedMotion();
 
-  // Scroll-driven hero parallax
+  /* ---------- hero scroll ---------- */
   const heroRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: heroScrollProgress } = useScroll({
+  const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
   });
-  const heroImgY = useTransform(heroScrollProgress, [0, 1], ['0%', '25%']);
-  const heroTextY = useTransform(heroScrollProgress, [0, 1], ['0%', '40%']);
-  const heroOpacity = useTransform(heroScrollProgress, [0, 0.65], [1, 0]);
+  const heroBgY = useTransform(heroProgress, [0, 1], ['0%', '28%']);
+  const smoothBgY = useSpring(heroBgY, { stiffness: 50, damping: 18 });
+
+  /* ---------- "who we are" section parallax ---------- */
+  const whoRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: whoProgress } = useScroll({
+    target: whoRef,
+    offset: ['start end', 'end start'],
+  });
+  const whoImgScale = useTransform(whoProgress, [0, 0.5], [1.08, 1]);
+
+  /* ---------- mission section ---------- */
+  const missionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: missionProgress } = useScroll({
+    target: missionRef,
+    offset: ['start end', 'end start'],
+  });
+  const missionImgY = useTransform(missionProgress, [0, 1], ['6%', '-6%']);
+  const smoothMissionY = useSpring(missionImgY, { stiffness: 50, damping: 18 });
 
   return (
-    <div className="relative min-h-dvh bg-slate-950 light:bg-[#f8f3e8] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
-      <div className="pointer-events-none absolute inset-0 hidden light:block">
-        <div className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(circle_at_15%_10%,rgba(74,144,217,0.16),transparent_34%),radial-gradient(circle_at_85%_5%,rgba(212,168,67,0.16),transparent_28%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-[radial-gradient(circle_at_30%_30%,rgba(46,139,122,0.14),transparent_30%),radial-gradient(circle_at_75%_45%,rgba(192,57,43,0.08),transparent_24%)]" />
+    <div className="relative min-h-dvh bg-slate-950 light:bg-[rgb(255,250,243)] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
+      {/* Ambient light mode gradients */}
+      <div className="pointer-events-none absolute inset-0 hidden light:block" aria-hidden="true">
+        <div className="absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_15%_10%,rgba(74,144,217,0.14),transparent_34%),radial-gradient(circle_at_85%_5%,rgba(212,168,67,0.14),transparent_28%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-[32rem] bg-[radial-gradient(circle_at_30%_30%,rgba(46,139,122,0.12),transparent_30%)]" />
       </div>
 
       {/* ================================================================
-          NAVIGATION
+          NAVIGATION — fixed glassy bar
           ================================================================ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 light:bg-[rgba(255,250,242,0.92)] backdrop-blur-xl border-b border-white/5 light:border-stone-200/80">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <motion.div className="flex items-center gap-3" whileHover={{ scale: 1.02 }}>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-2xl border-b border-white/5 light:border-stone-200/70">
+        <div className="max-w-7xl mx-auto px-5 h-[4.5rem] flex items-center justify-between">
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <img
               src={publicAsset('icon.svg')}
               alt="Calgary Watch"
-              className="w-16 h-16 object-contain drop-shadow-lg flex-shrink-0"
-              onError={(e) => {
-                const el = e.currentTarget as HTMLImageElement;
-                const fallback = document.createElement('div');
-                fallback.className = 'w-16 h-16 rounded-lg bg-gradient-to-br from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center';
-                el.replaceWith(fallback);
-              }}
+              className="w-10 h-10 object-contain drop-shadow-md flex-shrink-0"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
             />
-            <span className="text-xl font-bold tracking-tight">Calgary Watch</span>
+            <span className="text-base font-black tracking-tight">Calgary Watch</span>
           </motion.div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/')}
-            className="rounded-full px-6 py-2 bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <ArrowLeft size={18} />
-            Home
-          </motion.button>
+            <MagneticButton
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-sm font-bold rounded-full px-5 py-2.5 bg-white/5 light:bg-slate-100/80 border border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 transition-colors cursor-pointer"
+            >
+              <ArrowLeft size={15} />
+              Back to Home
+            </MagneticButton>
+          </motion.div>
         </div>
       </nav>
 
-      <main className="pt-24 pb-20">
+      <main className="pt-[4.5rem]">
 
-        {/* ================================================================
-            HERO SECTION - Full width with image background + scroll parallax
-            ================================================================ */}
+        {/* ==============================================================
+            HERO — full-viewport, 3D perspective title, deep parallax
+            ============================================================== */}
         <motion.section
           ref={heroRef}
-          initial={reducedMotion ? undefined : { opacity: 0 }}
+          className="relative h-[100dvh] min-h-[600px] flex flex-col justify-end overflow-hidden"
+          initial={prefersReducedMotion() ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative h-dvh md:h-[85vh] overflow-hidden flex items-end"
+          transition={{ duration: 0.7 }}
         >
-          {/* Background image with scroll-driven parallax */}
+          {/* Background image — parallax layer */}
           <motion.div
-            className="absolute inset-0"
-            style={reducedMotion ? undefined : { y: heroImgY }}
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1, ease: 'easeOut' }}
+            className="absolute inset-0 scale-110"
+            style={prefersReducedMotion() ? undefined : { y: smoothBgY }}
           >
             <img
               src={publicAsset('images/hero-wide.webp')}
@@ -364,319 +812,340 @@ export default function AboutPage() {
               className="w-full h-full object-cover"
               loading="eager"
             />
-            {/* Dark gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent" />
-            {/* Additional color gradient for depth */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1a2a3a]/40 via-transparent to-[#2a1f1f]/30" />
           </motion.div>
 
-          {/* Hero content — scroll-driven fade + lift */}
-          <motion.div
-            className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-16 md:pb-20"
-            style={reducedMotion ? undefined : { y: heroTextY, opacity: heroOpacity }}
-            initial={reducedMotion ? undefined : { opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div className="max-w-3xl">
+          {/* Gradient overlays — depth stack */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-transparent" />
+          {/* Top fade for nav */}
+          <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-slate-950/60 to-transparent" />
+
+          {/* Hero content */}
+          <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-20 md:pb-28">
+            <div className="max-w-4xl">
+              {/* Eyebrow badge */}
               <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-md mb-6"
-                whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(74,144,217,0.3)' }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 bg-white/8 backdrop-blur-sm mb-8"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.05 }}
               >
-                <Sparkles size={16} className="text-[#4A90D9]" />
-                <span className="text-xs font-black uppercase tracking-wider">Designed for Calgary</span>
-              </motion.div>
-
-              <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
-                Real-time{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
-                  city intelligence
+                <span className="w-2 h-2 rounded-full bg-[#4A90D9] animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-200">
+                  Designed for Calgary
                 </span>
-              </h1>
+              </motion.div>
 
-              <p className="text-lg md:text-xl text-slate-200 leading-relaxed max-w-2xl mb-8">
-                Calgary Watch turns community reports and verified data into actionable awareness. See what's happening on the map, right now.
-              </p>
+              {/* 3D perspective title */}
+              <HeroPerspectiveTitle scrollProgress={heroProgress} />
 
-              <motion.div className="flex flex-wrap gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: '0 20px 50px rgba(74,144,217,0.4)' }}
-                  whileTap={{ scale: 0.95 }}
+              {/* Subtitle */}
+              <motion.p
+                className="mt-6 text-base md:text-xl text-slate-300 leading-relaxed max-w-xl"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.6 }}
+              >
+                Calgary Watch turns community reports and verified data into
+                actionable awareness. See what's happening on the map, right now.
+              </motion.p>
+
+              {/* CTAs */}
+              <motion.div
+                className="mt-10 flex flex-wrap gap-4"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.75 }}
+              >
+                <MagneticButton
                   onClick={() => navigate('/map')}
-                  className="rounded-xl px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] hover:from-blue-600 hover:to-teal-600 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-xl px-7 py-4 font-black text-sm text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] shadow-xl shadow-[#4A90D9]/25 hover:shadow-[#4A90D9]/40 transition-shadow cursor-pointer"
                 >
-                  <MapPin size={20} />
+                  <MapPin size={17} />
                   View Live Map
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                </MagneticButton>
+                <MagneticButton
                   onClick={() => navigate('/map?report=true')}
-                  className="rounded-xl px-8 py-4 text-lg font-bold bg-white/10 border-2 border-white/30 hover:bg-white/15 text-white transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-xl px-7 py-4 font-black text-sm bg-white/10 border border-white/20 hover:bg-white/15 text-white transition-colors cursor-pointer backdrop-blur-sm"
                 >
-                  <Zap size={20} />
+                  <Zap size={17} />
                   Report Now
-                </motion.button>
+                </MagneticButton>
               </motion.div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Scroll indicator */}
+          {/* Scroll cue */}
           <motion.div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4, duration: 0.6 }}
           >
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-              <motion.div className="w-1 h-2 bg-white/60 rounded-full" />
-            </div>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">
+              Scroll
+            </span>
+            <motion.div
+              animate={prefersReducedMotion() ? {} : { y: [0, 6, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <ChevronDown size={18} className="text-white/30" />
+            </motion.div>
           </motion.div>
         </motion.section>
 
-        {/* ================================================================
-            ABOUT SECTION - Who we are
-            ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-transparent">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
-              className="max-w-3xl mb-16"
-            >
-              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#4A90D9] mb-4">
-                Who We Are
-              </span>
-              <h2 className="text-4xl md:text-6xl font-black leading-[1.15] mb-6">
-                Built for Calgarians, by Calgarians
-              </h2>
-              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed">
-                Calgary Watch is built specifically for this city. We understand its neighbourhoods, its geography, its rhythm. We built a platform that turns local awareness into action, connecting people with the information they need to stay safe and informed.
-              </p>
-            </motion.div>
+        {/* Marquee ticker strip */}
+        <ScrollingMarquee />
 
-            {/* Stats or Values Grid */}
-            <motion.div
-              className="grid md:grid-cols-3 gap-6"
-              initial={reducedMotion ? undefined : { opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7, staggerChildren: 0.1 }}
-            >
-              {[
-                { icon: Clock, label: 'Real-Time', desc: 'Incidents appear on the map in seconds' },
-                { icon: Shield, label: 'Verified', desc: 'Community reports + official CPS data' },
-                { icon: Users, label: 'Community', desc: 'Powered by Calgary residents' },
-              ].map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+        {/* ==============================================================
+            WHO WE ARE — asymmetric layout, orbiting stats orb
+            ============================================================== */}
+        <section
+          ref={whoRef}
+          className="relative py-24 md:py-40 px-6 overflow-hidden"
+        >
+          <NorthernLightsBackground />
+
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-center">
+
+              {/* Left: text content */}
+              <div>
+                <motion.span
+                  className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-5"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  Who We Are
+                </motion.span>
+
+                <SplitTextReveal
+                  text="Built for Calgarians, by Calgarians"
+                  className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-6"
+                />
+
+                <motion.p
+                  className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8 max-w-lg"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.15 }}
-                  transition={{ duration: 0.35, delay: i * 0.06 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
                 >
-                  <TiltCard className="rounded-2xl border border-white/10 light:border-slate-300 bg-gradient-to-br from-slate-900/70 to-slate-950/50 light:from-white light:to-slate-50 p-8 group cursor-pointer transition-all h-full">
-                    <motion.div
-                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center mb-4"
-                      whileHover={{ scale: 1.15, rotate: 10 }}
-                    >
-                      <item.icon className="text-white" size={24} />
-                    </motion.div>
-                    <h3 className="text-xl font-black mb-2">{item.label}</h3>
-                    <p className="text-slate-400 light:text-slate-600">{item.desc}</p>
-                  </TiltCard>
-                </motion.div>
-              ))}
-            </motion.div>
+                  Calgary Watch is built specifically for this city. We understand
+                  its neighbourhoods, its geography, its rhythm. We built a platform
+                  that turns local awareness into action, connecting people with the
+                  information they need to stay safe and informed.
+                </motion.p>
 
-            {/* Animated platform numbers */}
-            <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/8 light:bg-slate-200 rounded-2xl overflow-hidden border border-white/10 light:border-slate-200"
-            >
-              {[
-                { value: 2000, suffix: '+', label: 'Incidents mapped', color: '#4A90D9' },
-                { value: 47, suffix: '', label: 'Neighbourhoods covered', color: '#2E8B7A' },
-                { value: 30, suffix: 's', prefix: '< ', label: 'Report to map', color: '#D4A843' },
-                { value: 100, suffix: '+', label: 'Active contributors', color: '#a855f7' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="bg-slate-950 light:bg-white px-6 py-10 flex flex-col items-center text-center"
-                >
-                  <div
-                    className="text-5xl md:text-6xl font-black tabular-nums mb-3 tracking-tight"
-                    style={{ color: stat.color }}
-                  >
-                    <AnimatedCounter
-                      to={stat.value}
-                      suffix={stat.suffix}
-                      prefix={stat.prefix ?? ''}
-                      duration={1.8 + i * 0.25}
+                {/* Values — staggered diagonal reveal */}
+                <div className="space-y-3">
+                  {[
+                    { icon: Clock, label: 'Real-Time', desc: 'Incidents appear on the map in seconds', color: '#4A90D9' },
+                    { icon: Shield, label: 'Verified', desc: 'Community reports + official CPS data', color: '#2E8B7A' },
+                    { icon: Users, label: 'Community', desc: 'Powered by Calgary residents', color: '#D4A843' },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-white/6 light:border-slate-200 bg-white/[0.03] light:bg-white/70 group hover:border-white/12 light:hover:border-slate-300 transition-colors"
+                      initial={prefersReducedMotion() ? undefined : { opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{ duration: 0.55, delay: 0.35 + i * 0.08 }}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
+                        style={{ background: `${item.color}18`, border: `1px solid ${item.color}30` }}
+                      >
+                        <item.icon size={18} style={{ color: item.color }} />
+                      </div>
+                      <div>
+                        <p className="font-black text-sm">{item.label}</p>
+                        <p className="text-xs text-slate-500 light:text-slate-500">{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: orbiting stats orb */}
+              <motion.div
+                className="flex items-center justify-center"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, scale: 0.85 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="relative">
+                  {/* Subtle radial glow */}
+                  <div className="absolute inset-0 -m-8 rounded-full bg-[radial-gradient(circle,rgba(74,144,217,0.06),transparent_70%)]" />
+                  {/* Image behind orb */}
+                  <div className="absolute -bottom-4 -right-4 -left-4 -top-4 rounded-3xl overflow-hidden opacity-20 light:opacity-30">
+                    <motion.img
+                      src={publicAsset('images/calgary3.webp')}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      style={prefersReducedMotion() ? undefined : { scale: whoImgScale }}
+                      loading="lazy"
+                      aria-hidden="true"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-slate-400 light:text-slate-500">{stat.label}</p>
+                  <OrbitingBadges />
                 </div>
-              ))}
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </section>
 
-        {/* ================================================================
-            STORY SECTION - How it works with 3D cards & images
-            ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-[rgba(255,250,243,0.68)]">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
-              className="mb-16"
-            >
-              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#4A90D9] mb-4">
-                How It Works
-              </span>
-              <h2 className="text-4xl md:text-6xl font-black leading-[1.15] max-w-3xl">
-                Three steps to live city intelligence
-              </h2>
-            </motion.div>
+        {/* ==============================================================
+            STATS — dramatic full-width typographic number bar
+            ============================================================== */}
+        <section className="relative py-4 bg-slate-900/60 light:bg-slate-50/70 border-y border-white/5 light:border-slate-200 overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#4A90D9/3,#2E8B7A/3,#D4A843/3,#a855f7/3)] opacity-5" aria-hidden="true" />
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/5 light:divide-slate-200">
+              {[
+                { value: 2000, suffix: '+', prefix: '', label: 'Incidents Mapped', color: '#4A90D9' },
+                { value: 47,   suffix: '',  prefix: '', label: 'Neighbourhoods',   color: '#2E8B7A' },
+                { value: 30,   suffix: 's', prefix: '<', label: 'Report to Map',   color: '#D4A843' },
+                { value: 100,  suffix: '+', prefix: '', label: 'Contributors',     color: '#a855f7' },
+              ].map((s, i) => (
+                <MorphingStat key={i} {...s} delay={i * 0.12} />
+              ))}
+            </div>
+          </div>
+        </section>
 
-            {/* 3 Step Cards with Images — 3D tilt on hover */}
-            <div className="grid md:grid-cols-3 gap-8">
+        {/* ==============================================================
+            HOW IT WORKS — vertical timeline with alternating sides
+            ============================================================== */}
+        <section className="py-24 md:py-40 px-6 relative overflow-hidden">
+          <NorthernLightsBackground />
+          <div className="max-w-5xl mx-auto relative z-10">
+            <div className="mb-16 md:mb-24">
+              <motion.span
+                className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                How It Works
+              </motion.span>
+              <SplitTextReveal
+                text="Three steps to live city intelligence"
+                className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] max-w-3xl"
+              />
+            </div>
+
+            <div className="space-y-0">
               {[
                 {
                   num: '01',
                   title: 'Report',
-                  desc: 'Spot something? Drop a pin and report it. Under 30 seconds.',
+                  desc: 'Spot something? Drop a pin and report it in under 30 seconds. Our streamlined form gets your incident on the map before you put your phone away.',
                   image: publicAsset('images/calgary2.webp'),
                   color: '#4A90D9',
                 },
                 {
                   num: '02',
                   title: 'Share',
-                  desc: 'Your report appears on the live map instantly for all Calgarians.',
+                  desc: 'Your report appears on the live map instantly for all Calgarians. Real-time awareness, city-wide. No delay, no middleman.',
                   image: publicAsset('images/calgary3.webp'),
                   color: '#2E8B7A',
                 },
                 {
                   num: '03',
                   title: 'Decide',
-                  desc: 'Context and verified data help you decide what to do next.',
+                  desc: "Context and verified data help you decide what to do next. Adjust your route, stay informed, or simply know what's happening around you.",
                   image: publicAsset('images/calgary5.webp'),
                   color: '#D4A843',
                 },
-              ].map((step, i) => (
-                <motion.div
+              ].map((step, i, arr) => (
+                <TimelineStep
                   key={step.num}
-                  initial={reducedMotion ? undefined : { opacity: 0, y: 40, rotateX: 20 }}
-                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                  viewport={{ once: true, amount: 0.15 }}
-                  transition={{ duration: 0.7, delay: i * 0.065 }}
-                  className="group"
-                >
-                  <TiltCard className="h-full">
-                  <div className="rounded-[1.5rem] border border-white/10 light:border-slate-300 overflow-hidden bg-gradient-to-br from-slate-900/80 to-slate-950/60 light:from-white light:to-slate-50 shadow-2xl h-full flex flex-col transition-all duration-300 hover:shadow-2xl hover:border-white/20 light:hover:border-slate-400">
-                    {/* Image top */}
-                    <div className="relative h-48 overflow-hidden">
-                      <motion.img
-                        src={step.image}
-                        alt={step.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.35 }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950" />
-
-                      {/* Step number badge */}
-                      <motion.div
-                        className="absolute top-4 right-4 w-12 h-12 rounded-xl border-2 backdrop-blur-md"
-                        style={{
-                          borderColor: step.color,
-                          background: `${step.color}20`,
-                        }}
-                        whileHover={{ scale: 1.2, rotate: 8 }}
-                      >
-                        <div className="w-full h-full flex items-center justify-center font-black text-lg" style={{ color: step.color }}>
-                          {step.num}
-                        </div>
-                      </motion.div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="mb-3">
-                        <motion.div
-                          className="inline-block h-1 rounded-full mb-3"
-                          style={{ background: step.color }}
-                          initial={{ width: 0 }}
-                          whileInView={{ width: 32 }}
-                          transition={{ duration: 0.35, delay: i * 0.065 }}
-                        />
-                      </div>
-                      <h3 className="text-2xl font-black mb-2">{step.title}</h3>
-                      <p className="text-slate-400 light:text-slate-600 flex-1">{step.desc}</p>
-                      <motion.div
-                        className="mt-4 inline-flex items-center gap-2 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ color: step.color }}
-                      >
-                        <span>Learn more</span>
-                        <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                          →
-                        </motion.div>
-                      </motion.div>
-                    </div>
-                  </div>
-                  </TiltCard>
-                </motion.div>
+                  {...step}
+                  index={i}
+                  isLast={i === arr.length - 1}
+                />
               ))}
             </div>
           </div>
         </section>
 
-        {/* ================================================================
-            MISSION SECTION - What drives us
-            ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-transparent">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            {/* Left: Image */}
+        {/* ==============================================================
+            MISSION — full-bleed image with diagonal clip, checklist
+            ============================================================== */}
+        <motion.section
+          ref={missionRef}
+          className="py-24 md:py-40 px-6 bg-slate-900/40 light:bg-slate-50/50 relative overflow-hidden"
+        >
+          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-14 md:gap-20 items-center">
+
+            {/* Image column — diagonal clip with parallax */}
             <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, x: -40 }}
+              className="order-2 md:order-1"
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, x: -32 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
-              className="rounded-2xl overflow-hidden border border-white/10 light:border-slate-300"
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              <img
-                src={publicAsset('images/calgary8.webp')}
-                alt="Calgary downtown"
-                className="w-full h-96 object-cover"
-                loading="lazy"
-              />
+              <div
+                className="relative overflow-hidden rounded-2xl border border-white/8 light:border-slate-200"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 100% 90%, 92% 100%, 0 100%)',
+                }}
+              >
+                <motion.img
+                  src={publicAsset('images/calgary8.webp')}
+                  alt="Calgary downtown"
+                  loading="lazy"
+                  className="w-full h-80 md:h-[32rem] object-cover"
+                  style={prefersReducedMotion() ? undefined : { y: smoothMissionY }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent" />
+                {/* Floating stat overlay */}
+                <motion.div
+                  className="absolute bottom-6 left-6 bg-slate-950/80 light:bg-white/90 backdrop-blur-md border border-white/10 light:border-slate-200 rounded-xl px-5 py-4"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  <p className="text-2xl font-black text-[#4A90D9]">2,000+</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 light:text-slate-500">
+                    incidents tracked
+                  </p>
+                </motion.div>
+              </div>
             </motion.div>
 
-            {/* Right: Content */}
+            {/* Text column */}
             <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, x: 40 }}
+              className="order-1 md:order-2"
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, x: 32 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
             >
-              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#4A90D9] mb-4">
+              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4">
                 Our Mission
               </span>
-              <h2 className="text-4xl md:text-5xl font-black leading-[1.15] mb-6">
-                Connected, aware, informed
+              <h2 className="text-4xl md:text-5xl font-black leading-[1.08] tracking-tight mb-5">
+                Connected, aware,{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">
+                  informed
+                </span>
               </h2>
-              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-6">
-                We believe Calgarians deserve real-time awareness of what's happening around them. Not endless notifications. Not algorithmic feeds. Just clear, trustworthy information that helps you decide.
+              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8">
+                We believe Calgarians deserve real-time awareness of what's happening
+                around them. Not endless notifications. Not algorithmic feeds. Just
+                clear, trustworthy information that helps you decide.
               </p>
-              <div className="space-y-4 mb-8">
+
+              {/* Checklist */}
+              <div className="space-y-3.5">
                 {[
                   'Community-powered incident reporting',
                   'Real-time map updates and context',
@@ -685,250 +1154,340 @@ export default function AboutPage() {
                 ].map((point, i) => (
                   <motion.div
                     key={i}
-                    className="flex items-start gap-3"
-                    initial={reducedMotion ? undefined : { opacity: 0, x: -10 }}
+                    className="flex items-start gap-3.5"
+                    initial={prefersReducedMotion() ? undefined : { opacity: 0, x: 12 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.06 }}
+                    transition={{ duration: 0.5, delay: 0.2 + i * 0.07 }}
                   >
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-white text-sm font-black">✓</span>
-                    </div>
-                    <span className="text-slate-300 light:text-slate-700">{point}</span>
+                    <CheckCircle2
+                      size={18}
+                      className="text-[#2E8B7A] shrink-0 mt-0.5"
+                    />
+                    <span className="text-slate-300 light:text-slate-700 text-sm leading-relaxed">
+                      {point}
+                    </span>
                   </motion.div>
                 ))}
               </div>
             </motion.div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* ================================================================
-            GET INVOLVED - Team, Volunteers, Business Partners
-            ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-[rgba(255,250,243,0.68)]">
-          <div className="max-w-7xl mx-auto">
+        {/* ==============================================================
+            GET INVOLVED — dramatic split layout
+            ============================================================== */}
+        <section className="py-24 md:py-40 px-6 relative overflow-hidden">
+          <NorthernLightsBackground />
+          <div className="max-w-7xl mx-auto relative z-10">
 
-            <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
-              className="max-w-2xl mb-16"
-            >
-              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#4A90D9] mb-4">
+            {/* Section header */}
+            <div className="mb-16 md:mb-20 max-w-3xl">
+              <motion.span
+                className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
                 Get Involved
-              </span>
-              <h2 className="text-4xl md:text-5xl font-black leading-[1.15] mb-4">
-                Calgary Watch is built by the community, and it grows with it.
-              </h2>
-              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-4">
-                We're a small but dedicated team, and we're always looking for people who care about this city.
-              </p>
-              <p className="text-base text-slate-400 light:text-slate-600 leading-relaxed border-l-4 border-[#4A90D9]/40 pl-4 py-2">
-                <span className="font-bold text-white light:text-slate-900">Trust is everything.</span> When Calgarians rely on us to stay informed about what's happening in their neighbourhoods, we accept a responsibility to be accurate, responsive, and transparent. Every volunteer, every verification, every decision shapes whether Calgary Watch remains a platform they can depend on. Join us in building something our city can trust.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-
-              {/* Card 1: Our Team */}
+              </motion.span>
+              <SplitTextReveal
+                text="Calgary Watch is built by the community, and it grows with it."
+                className="text-4xl md:text-5xl font-black tracking-tight leading-[1.05] mb-6"
+              />
               <motion.div
-                initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-4">
+                  We're a small but dedicated team, and we're always looking for people who care about this city.
+                </p>
+                <blockquote className="border-l-4 border-[#4A90D9]/50 pl-5 py-1">
+                  <p className="text-base text-slate-400 light:text-slate-600 leading-relaxed">
+                    <span className="font-black text-white light:text-slate-900">Trust is everything.</span>{' '}
+                    When Calgarians rely on us to stay informed about what's happening
+                    in their neighbourhoods, we accept a responsibility to be accurate,
+                    responsive, and transparent. Every volunteer, every verification,
+                    every decision shapes whether Calgary Watch remains a platform they
+                    can depend on. Join us in building something our city can trust.
+                  </p>
+                </blockquote>
+              </motion.div>
+            </div>
+
+            {/* Three involvement cards */}
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+
+              {/* Our Team */}
+              <motion.div
+                className="relative rounded-2xl border border-[#4A90D9]/20 bg-gradient-to-br from-[#4A90D9]/6 to-slate-950/80 light:from-blue-50 light:to-white p-8 flex flex-col gap-6 overflow-hidden group"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.6, delay: 0 }}
-                className="rounded-2xl border border-white/10 light:border-slate-300 bg-gradient-to-br from-slate-900/80 to-slate-950/60 light:from-white light:to-slate-50 p-8 flex flex-col gap-5"
+                transition={{ duration: 0.65, delay: 0 }}
+                whileHover={prefersReducedMotion() ? undefined : { y: -4 }}
               >
-                <div className="w-12 h-12 rounded-xl bg-[#4A90D9]/15 flex items-center justify-center">
-                  <Eye size={24} className="text-[#4A90D9]" />
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#4A90D9]/6 blur-2xl" aria-hidden="true" />
+                <div className="w-11 h-11 rounded-xl bg-[#4A90D9]/15 border border-[#4A90D9]/25 flex items-center justify-center">
+                  <Eye size={20} className="text-[#4A90D9]" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2 py-1 rounded">
+                <div className="flex-1">
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2.5 py-1 rounded mb-3">
                     Our Team
                   </span>
-                  <h3 className="text-xl font-black mt-3 mb-2">Always watching, always here</h3>
+                  <h3 className="text-xl font-black mb-2 tracking-tight">Always watching, always here</h3>
                   <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed">
-                    A dedicated team actively monitors Calgary Watch around the clock, reviewing reports, verifying incidents, and making sure the map stays accurate and trustworthy. Every pin you see has a real person behind it.
+                    A dedicated team actively monitors Calgary Watch around the clock,
+                    reviewing reports, verifying incidents, and making sure the map
+                    stays accurate and trustworthy. Every pin you see has a real person
+                    behind it.
                   </p>
                 </div>
               </motion.div>
 
-              {/* Card 2: Volunteers - inline form */}
-              <VolunteerCard reducedMotion={reducedMotion} />
-
-              {/* Card 3: Business Partners */}
+              {/* Volunteer Form */}
               <motion.div
-                initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
+                className="relative rounded-2xl border border-[#2E8B7A]/25 bg-gradient-to-br from-[#2E8B7A]/8 to-slate-950/80 light:from-teal-50 light:to-white p-8 flex flex-col gap-5 overflow-hidden"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="rounded-2xl border border-[#D4A843]/30 bg-gradient-to-br from-[#D4A843]/8 to-slate-950/60 light:from-amber-50 light:to-white p-8 flex flex-col gap-5 relative overflow-hidden"
+                transition={{ duration: 0.65, delay: 0.1 }}
               >
-                <div className="absolute top-4 right-4 text-[10px] font-black uppercase tracking-wider text-[#D4A843] bg-[#D4A843]/15 border border-[#D4A843]/30 px-2 py-1 rounded-full">
-                  Open
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-[#D4A843]/15 flex items-center justify-center">
-                  <Handshake size={24} className="text-[#D4A843]" />
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#2E8B7A]/6 blur-2xl" aria-hidden="true" />
+                <div className="flex items-center justify-between">
+                  <div className="w-11 h-11 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/25 flex items-center justify-center">
+                    <HeartHandshake size={20} className="text-[#2E8B7A]" />
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-[#2E8B7A] bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-2.5 py-1 rounded-full">
+                    Open
+                  </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2 py-1 rounded">
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#2E8B7A] bg-[#2E8B7A]/10 px-2.5 py-1 rounded mb-2">
+                    Volunteers
+                  </span>
+                  <h3 className="text-xl font-black mb-2 tracking-tight">Help keep Calgary informed</h3>
+                  <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed mb-4">
+                    We're looking for passionate Calgarians to join us. Your
+                    contributions ensure we remain accurate, responsive, and worthy of
+                    the community's trust.
+                  </p>
+                </div>
+                <VolunteerForm />
+              </motion.div>
+
+              {/* Business Partners */}
+              <motion.div
+                className="relative rounded-2xl border border-[#D4A843]/20 bg-gradient-to-br from-[#D4A843]/6 to-slate-950/80 light:from-amber-50 light:to-white p-8 flex flex-col gap-6 overflow-hidden group"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.65, delay: 0.2 }}
+                whileHover={prefersReducedMotion() ? undefined : { y: -4 }}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#D4A843]/6 blur-2xl" aria-hidden="true" />
+                <div className="flex items-center justify-between">
+                  <div className="w-11 h-11 rounded-xl bg-[#D4A843]/15 border border-[#D4A843]/25 flex items-center justify-center">
+                    <Handshake size={20} className="text-[#D4A843]" />
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-[#D4A843] bg-[#D4A843]/15 border border-[#D4A843]/30 px-2.5 py-1 rounded-full">
+                    Open
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2.5 py-1 rounded mb-3">
                     Business Partners
                   </span>
-                  <h3 className="text-xl font-black mt-3 mb-2">Grow with Calgary</h3>
+                  <h3 className="text-xl font-black mb-2 tracking-tight">Grow with Calgary</h3>
                   <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed mb-4">
-                    We're looking for Calgary-based businesses and organizations who want to be part of a platform that thousands of residents rely on. Sponsorship, integrations, local partnerships. Let's build something together.
+                    We're looking for Calgary-based businesses and organizations who
+                    want to be part of a platform that thousands of residents rely on.
+                    Sponsorship, integrations, local partnerships. Let's build
+                    something together.
                   </p>
-                  <ul className="space-y-1.5 text-sm text-slate-300 light:text-slate-700">
+                  <ul className="space-y-2">
                     {['Sponsored neighbourhood alerts', 'Data & API integration', 'Co-branding opportunities'].map((item) => (
-                      <li key={item} className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#D4A843] flex-shrink-0" />
+                      <li key={item} className="flex items-center gap-2.5 text-sm text-slate-300 light:text-slate-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#D4A843] shrink-0" />
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <motion.a
+                <MagneticButton
+                  tag="a"
                   href="mailto:jorti104@mtroyal.ca?subject=Partnership%20Inquiry"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="mt-auto inline-flex items-center gap-2 text-sm font-bold text-[#D4A843] hover:text-amber-400 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 text-sm font-black text-[#D4A843] hover:text-amber-300 transition-colors cursor-pointer"
                 >
-                  <Mail size={15} />
+                  <Mail size={14} />
                   Get in touch
-                  <ArrowRight size={14} />
-                </motion.a>
+                  <ArrowRight size={13} />
+                </MagneticButton>
               </motion.div>
-
             </div>
 
-            {/* ---- Funding / Investor Banner ---- */}
+            {/* Funding / Investor Banner */}
             <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, y: 24 }}
+              className="rounded-2xl border border-[#4A90D9]/25 relative overflow-hidden"
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="mt-8 rounded-2xl border border-[#4A90D9]/30 bg-gradient-to-r from-[#4A90D9]/8 via-[#2E8B7A]/5 to-[#D4A843]/8 light:from-blue-50 light:to-amber-50 p-8 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden"
+              transition={{ duration: 0.65, delay: 0.15 }}
             >
-              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-[#4A90D9]/10 blur-[60px]" />
-                <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-[#D4A843]/10 blur-[60px]" />
-              </div>
-              <div className="relative flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2 py-1 rounded">Funding</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2 py-1 rounded">Seeking Investors</span>
+              {/* Background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#4A90D9]/6 via-[#2E8B7A]/4 to-[#D4A843]/6 light:from-blue-50 light:to-amber-50" />
+              <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-[#4A90D9]/8 blur-3xl" aria-hidden="true" />
+              <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#D4A843]/8 blur-3xl" aria-hidden="true" />
+
+              <div className="relative p-8 flex flex-col md:flex-row md:items-center gap-8">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2.5 py-1 rounded">
+                      Funding
+                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2.5 py-1 rounded">
+                      Seeking Investors
+                    </span>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-black mb-2 tracking-tight">
+                    We're looking for funding to build the app.
+                  </h3>
+                  <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed max-w-2xl mb-5">
+                    Calgary Watch has proven community demand. The next step is a native
+                    iOS and Android app with push alerts, an enhanced trust system, and
+                    expansion to other cities. We're actively seeking investors, grants,
+                    and strategic partners who believe in community-first public safety
+                    technology.
+                  </p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {[
+                      { label: 'Native app development', icon: Cpu },
+                      { label: 'Push notification infrastructure', icon: Zap },
+                      { label: 'Multi-city expansion', icon: Globe },
+                      { label: 'Trust & AI layer', icon: TrendingUp },
+                    ].map(({ label, icon: Icon }) => (
+                      <span
+                        key={label}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 light:text-slate-700 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 px-3 py-1.5 rounded-full"
+                      >
+                        <Icon size={11} />
+                        {label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <h3 className="text-xl md:text-2xl font-black mb-2">We're looking for funding to build the app.</h3>
-                <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed max-w-2xl">
-                  Calgary Watch has proven community demand. The next step is a native iOS and Android app with push alerts, an enhanced trust system, and expansion to other cities. We're actively seeking investors, grants, and strategic partners who believe in community-first public safety technology.
-                </p>
-                <ul className="mt-4 flex flex-wrap gap-3">
-                  {['Native app development', 'Push notification infrastructure', 'Multi-city expansion', 'Trust & AI layer'].map((item) => (
-                    <li key={item} className="text-xs font-semibold text-slate-300 light:text-slate-700 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 px-3 py-1.5 rounded-full">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <MagneticButton
+                  tag="a"
+                  href="mailto:jorti104@mtroyal.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
+                  className="shrink-0 inline-flex items-center gap-2.5 rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white text-sm font-black shadow-xl shadow-[#4A90D9]/20 hover:shadow-[#4A90D9]/35 transition-shadow cursor-pointer whitespace-nowrap"
+                >
+                  <Mail size={15} />
+                  Reach Out
+                  <ArrowRight size={13} />
+                </MagneticButton>
               </div>
-              <motion.a
-                href="mailto:jorti104@mtroyal.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
-                whileHover={{ scale: 1.04, boxShadow: '0 20px 40px rgba(74,144,217,0.25)' }}
-                whileTap={{ scale: 0.97 }}
-                className="relative shrink-0 rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white text-sm font-bold flex items-center gap-2 cursor-pointer whitespace-nowrap"
-              >
-                <Mail size={16} />
-                Reach Out
-                <ArrowRight size={14} />
-              </motion.a>
             </motion.div>
 
           </div>
         </section>
 
-        {/* ================================================================
-            CONTACT SECTION - Get in touch
-            ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-900/50 light:bg-[rgba(255,250,243,0.68)]">
-          <div className="max-w-3xl mx-auto text-center">
+        {/* ==============================================================
+            CONTACT — centered, dramatic
+            ============================================================== */}
+        <section className="py-24 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50/60 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(74,144,217,0.05),transparent_60%)]" aria-hidden="true" />
+          <div className="max-w-2xl mx-auto text-center relative z-10">
             <motion.div
-              initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.7 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.65 }}
             >
-              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#4A90D9] mb-4">
+              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4">
                 Get In Touch
               </span>
-              <h2 className="text-4xl md:text-5xl font-black leading-[1.15] mb-6">
-                Questions? Ideas? Let's talk.
+              <h2 className="text-4xl md:text-5xl font-black leading-[1.08] tracking-tight mb-4">
+                Questions? Ideas?{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">
+                  Let's talk.
+                </span>
               </h2>
-              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-12">
-                Whether you want to partner, have suggestions, or just want to chat about the platform, we'd love to hear from you.
+              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-10">
+                Whether you want to partner, have suggestions, or just want to chat
+                about the platform, we'd love to hear from you.
               </p>
-
-              <motion.a
+              <MagneticButton
+                tag="a"
                 href="mailto:jorti104@mtroyal.ca"
-                whileHover={{ scale: 1.08, boxShadow: '0 30px 60px rgba(74,144,217,0.3)' }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] hover:from-blue-600 hover:to-teal-600 transition-all duration-300 cursor-pointer"
+                className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-base font-black text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] shadow-xl shadow-[#4A90D9]/20 hover:shadow-[#4A90D9]/35 transition-shadow cursor-pointer"
               >
-                <Mail size={20} />
+                <Mail size={18} />
                 jorti104@mtroyal.ca
-                <ArrowRight size={18} />
-              </motion.a>
+                <ArrowRight size={16} />
+              </MagneticButton>
             </motion.div>
           </div>
         </section>
 
-        {/* ================================================================
-            FINAL CTA
-            ================================================================ */}
-        <section className="py-20 md:py-32 px-6 bg-slate-950 light:bg-transparent relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-[140px] opacity-15"
-              style={{
-                background: 'linear-gradient(135deg, #4A90D9, #2E8B7A)',
-              }}
+        {/* ==============================================================
+            FINAL CTA — full-bleed with background image
+            ============================================================== */}
+        <section className="relative py-28 md:py-40 px-6 overflow-hidden">
+          {/* Background image */}
+          <div className="absolute inset-0">
+            <img
+              src={publicAsset('images/calgary5.webp')}
+              alt=""
+              aria-hidden="true"
+              className="w-full h-full object-cover opacity-20 light:opacity-25"
+              loading="lazy"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/70 light:from-[rgb(255,250,243)] light:via-[rgba(255,250,243,0.9)] light:to-[rgba(255,250,243,0.8)]" />
           </div>
 
+          {/* Center glow */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[20rem] rounded-full blur-[120px] opacity-10"
+            style={{ background: 'linear-gradient(135deg, #4A90D9, #2E8B7A)' }}
+            aria-hidden="true"
+          />
+
           <motion.div
-            className="max-w-4xl mx-auto text-center relative z-10"
-            initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+            className="relative z-10 max-w-4xl mx-auto text-center"
+            initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.15 }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7 }}
           >
-            <h2 className="text-4xl md:text-6xl font-black leading-[1.15] mb-6">
+            <h2 className="text-5xl md:text-7xl font-black leading-[1] tracking-tight mb-6">
               See Calgary{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
                 live right now
               </span>
             </h2>
-            <p className="text-lg text-slate-400 light:text-slate-600 mb-10 max-w-2xl mx-auto">
-              Open the map, explore incidents in your neighbourhood, and join a community that's building real-time awareness for Calgary.
+            <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-12 max-w-xl mx-auto">
+              Open the map, explore incidents in your neighbourhood, and join a
+              community that's building real-time awareness for Calgary.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <motion.button
-                whileHover={{ scale: 1.08, boxShadow: '0 30px 60px rgba(74,144,217,0.35)' }}
-                whileTap={{ scale: 0.95 }}
+              <MagneticButton
                 onClick={() => navigate('/map')}
-                className="rounded-xl px-10 py-4 text-lg font-bold text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] hover:from-blue-600 hover:to-teal-600 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 rounded-xl px-10 py-4 font-black text-base text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] shadow-2xl shadow-[#4A90D9]/25 hover:shadow-[#4A90D9]/40 transition-shadow cursor-pointer"
               >
-                <MapPin size={20} />
+                <MapPin size={18} />
                 Open Live Map
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
+              </MagneticButton>
+              <MagneticButton
                 onClick={() => navigate('/map?report=true')}
-                className="rounded-xl px-10 py-4 text-lg font-bold bg-white/10 light:bg-slate-100 border-2 border-white/20 light:border-slate-300 hover:bg-white/15 light:hover:bg-slate-200 text-white light:text-slate-900 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 rounded-xl px-10 py-4 font-black text-base bg-white/10 light:bg-slate-100/80 border-2 border-white/20 light:border-slate-300 hover:bg-white/15 light:hover:bg-slate-200 text-white light:text-slate-900 transition-colors cursor-pointer backdrop-blur-sm"
               >
-                <Zap size={20} />
+                <Zap size={18} />
                 Report Incident
-              </motion.button>
+              </MagneticButton>
             </div>
           </motion.div>
         </section>
@@ -937,15 +1496,38 @@ export default function AboutPage() {
       {/* ================================================================
           FOOTER
           ================================================================ */}
-      <footer className="py-8 px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-[#fffaf2] text-center">
-        <motion.p
-          className="text-xs text-slate-600 light:text-slate-500 uppercase font-bold tracking-widest"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          Calgary Watch &bull; Built for Real-Time Awareness &bull; &copy; 2026
-        </motion.p>
+      <footer className="relative py-10 px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-[rgb(255,250,243)] overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(74,144,217,0.04),transparent_60%)]" aria-hidden="true" />
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img
+              src={publicAsset('icon.svg')}
+              alt="Calgary Watch"
+              className="w-7 h-7 object-contain opacity-60"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            />
+            <span className="text-xs font-black uppercase tracking-widest text-slate-600 light:text-slate-500">
+              Calgary Watch
+            </span>
+          </div>
+          <p className="text-xs text-slate-700 light:text-slate-500 font-bold uppercase tracking-widest text-center">
+            Built for Real-Time Awareness &bull; &copy; 2026
+          </p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/map')}
+              className="text-xs text-slate-600 light:text-slate-500 hover:text-[#4A90D9] transition-colors font-bold uppercase tracking-wider cursor-pointer"
+            >
+              Live Map
+            </button>
+            <a
+              href="mailto:jorti104@mtroyal.ca"
+              className="text-xs text-slate-600 light:text-slate-500 hover:text-[#4A90D9] transition-colors font-bold uppercase tracking-wider"
+            >
+              Contact
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

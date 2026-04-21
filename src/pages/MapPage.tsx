@@ -90,7 +90,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
           const ts = new Date(item.start_dt || new Date()).getTime();
           trafficIncidents.push({
-            id: `yyc-traffic-${item.id || String(item.incident_info || Math.random()).replace(/[^a-zA-Z0-9]/g, '')}`,
+            id: `yyc-traffic-${item.id || `${String(item.incident_info || 'unk').replace(/[^a-zA-Z0-9]/g, '').slice(0, 32)}-${lat.toFixed(3)}-${lng.toFixed(3)}`}`,
             title: tTitle, description: tDesc, category: 'traffic' as IncidentCategory,
             neighborhood: quadrant, lat, lng, timestamp: ts,
             email: 'opendata@calgary.ca', name: 'City of Calgary Traffic',
@@ -227,7 +227,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
           } as Record<string, string>)[materialCode] || 'water infrastructure';
 
           infrastructureIncidents.push({
-            id: `yyc-water-main-${item.break_date || now}-${lat}-${lng}`,
+            id: `yyc-water-main-${item.break_date || 'nodate'}-${lat.toFixed(4)}-${lng.toFixed(4)}`,
             title: 'Water Main Break',
             description: `Active water main break affecting Calgary ${quadrant}. Utility crews are responding. Pipe type: ${materialLabel}. Expect local service and road impacts nearby.`,
             category: 'infrastructure' as IncidentCategory,

@@ -448,6 +448,27 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     clusterGroup.current.addTo(map.current);
   }, [isMapLoaded]);
 
+  // Disable/enable Leaflet touch+drag handlers based on isMapInteractive.
+  // CSS pointer-events-none alone does not stop Leaflet's document-level touch
+  // listeners, so we must call the Leaflet APIs directly.
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+    const m = map.current;
+    if (isMapInteractive) {
+      m.dragging.enable();
+      m.touchZoom.enable();
+      m.scrollWheelZoom.enable();
+      m.doubleClickZoom.enable();
+      m.boxZoom.enable();
+    } else {
+      m.dragging.disable();
+      m.touchZoom.disable();
+      m.scrollWheelZoom.disable();
+      m.doubleClickZoom.disable();
+      m.boxZoom.disable();
+    }
+  }, [isMapInteractive, isMapLoaded]);
+
   // Track live map centre while in pin mode
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;

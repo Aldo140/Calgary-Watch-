@@ -251,8 +251,22 @@ function useOfficialOpenData(isAuthReady: boolean) {
         console.warn('[CalgaryWatch] Water Main Breaks API failed:', err);
       }
 
-      // Publish whatever succeeded — each source is independent
-      setOfficialIncidents([...trafficIncidents, ...three11Incidents, ...infrastructureIncidents]);
+      // Deduplicate: first by ID within each source, then by category+coords across sources.
+      // Same-type incidents within ~11m (0.0001°) are treated as the same real-world event.
+      const allOfficial = [
+        ...new globalThis.Map(trafficIncidents.map(i => [i.id, i])).values(),
+        ...new globalThis.Map(three11Incidents.map(i => [i.id, i])).values(),
+        ...new globalThis.Map(infrastructureIncidents.map(i => [i.id, i])).values(),
+      ];
+      const byCoordCategory = new globalThis.Map<string, Incident>();
+      allOfficial.forEach((inc) => {
+        const key = `${inc.category}-${inc.lat.toFixed(4)}-${inc.lng.toFixed(4)}`;
+        const existing = byCoordCategory.get(key);
+        if (!existing || inc.timestamp > existing.timestamp) {
+          byCoordCategory.set(key, inc);
+        }
+      });
+      setOfficialIncidents([...byCoordCategory.values()]);
     };
 
     fetchOpenData();

@@ -476,6 +476,7 @@ function DiagonalImageBlock({ src, alt }: { src: string; alt: string }) {
         src={src}
         alt={alt}
         loading="lazy"
+        width={1200} height={448}
         className="w-full h-80 md:h-[28rem] object-cover"
         style={prefersReducedMotion() ? undefined : { y: smoothY }}
       />
@@ -509,6 +510,7 @@ function OrbitingBadges() {
         <img
           src={publicAsset('icon.svg')}
           alt="Calgary Watch"
+          width={48} height={48}
           className="w-12 h-12 object-contain"
           onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
         />
@@ -589,6 +591,7 @@ function TimelineStep({
           <img
             src={image}
             alt={title}
+            width={800} height={288}
             loading="lazy"
             className="w-full h-60 md:h-72 object-cover transition-transform duration-700 group-hover:scale-105"
           />
@@ -768,6 +771,7 @@ export default function AboutPage() {
             <img
               src={publicAsset('icon.svg')}
               alt="Calgary Watch"
+              width={40} height={40}
               className="w-10 h-10 object-contain drop-shadow-md flex-shrink-0"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
             />
@@ -809,8 +813,10 @@ export default function AboutPage() {
             <img
               src={publicAsset('images/hero-wide.webp')}
               alt="Calgary skyline panorama"
+              width={1920} height={1080}
               className="w-full h-full object-cover"
               loading="eager"
+              fetchPriority="high"
             />
           </motion.div>
 
@@ -936,6 +942,7 @@ export default function AboutPage() {
                   <motion.img
                     src={publicAsset('images/calgary3.webp')}
                     alt="Calgary community"
+                    width={800} height={600}
                     className="w-full h-full object-cover"
                     style={prefersReducedMotion() ? undefined : { scale: whoImgScale }}
                     loading="lazy"
@@ -955,6 +962,7 @@ export default function AboutPage() {
                   <img
                     src={publicAsset('images/calgary5.webp')}
                     alt="Calgary neighbourhoods"
+                    width={800} height={600}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
@@ -1181,6 +1189,7 @@ export default function AboutPage() {
                 <motion.img
                   src={publicAsset('images/calgary8.webp')}
                   alt="Calgary downtown"
+                  width={1200} height={512}
                   loading="lazy"
                   className="w-full h-80 md:h-[32rem] object-cover"
                   style={prefersReducedMotion() ? undefined : { y: smoothMissionY }}
@@ -1417,6 +1426,7 @@ export default function AboutPage() {
                   <img
                     src={publicAsset('images/calgary2.webp')}
                     alt=""
+                    width={800} height={400}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                     aria-hidden="true"
@@ -1453,6 +1463,7 @@ export default function AboutPage() {
                   <img
                     src={publicAsset('images/calgary8.webp')}
                     alt=""
+                    width={800} height={400}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                     aria-hidden="true"
@@ -1608,6 +1619,7 @@ export default function AboutPage() {
             <img
               src={publicAsset('images/calgary5.webp')}
               alt=""
+              width={1200} height={600}
               aria-hidden="true"
               className="w-full h-full object-cover opacity-20 light:opacity-25"
               loading="lazy"
@@ -1670,6 +1682,7 @@ export default function AboutPage() {
             <img
               src={publicAsset('icon.svg')}
               alt="Calgary Watch"
+              width={28} height={28}
               className="w-7 h-7 object-contain opacity-60"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
             />

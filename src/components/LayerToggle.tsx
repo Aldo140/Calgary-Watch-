@@ -49,7 +49,7 @@ export default function LayerToggle({
           className={cn(
             'layer-chip flex items-center gap-1.5 md:gap-2 px-3 max-lg:px-3 py-2 rounded-xl transition-all shrink-0 max-lg:flex-1 max-lg:justify-center md:px-4',
             showLiveReports 
-              ? 'layer-chip-selected bg-blue-500 text-white shadow-lg shadow-blue-500/20' 
+              ? 'layer-chip-selected bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
               : dark
                 ? 'text-slate-400 hover:bg-white/5'
                 : 'text-slate-700 hover:bg-slate-100'
@@ -66,7 +66,7 @@ export default function LayerToggle({
           className={cn(
             'layer-chip flex items-center gap-1.5 md:gap-2 px-3 max-lg:px-3 py-2 rounded-xl transition-all shrink-0 max-lg:flex-1 max-lg:justify-center md:px-4',
             showHeatmap 
-              ? 'layer-chip-selected bg-blue-500 text-white shadow-lg shadow-blue-500/20' 
+              ? 'layer-chip-selected bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
               : dark
                 ? 'text-slate-400 hover:bg-white/5'
                 : 'text-slate-700 hover:bg-slate-100'
@@ -82,7 +82,7 @@ export default function LayerToggle({
           className={cn(
             'layer-chip flex items-center gap-1.5 md:gap-2 px-3 max-lg:px-3 py-2 rounded-xl transition-all shrink-0 max-lg:flex-1 max-lg:justify-center md:px-4',
             showCrimeLayer
-              ? 'layer-chip-selected bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+              ? 'layer-chip-selected bg-blue-600 text-white shadow-lg shadow-blue-600/20'
               : dark
                 ? 'text-slate-400 hover:bg-white/5'
                 : 'text-slate-700 hover:bg-slate-100'

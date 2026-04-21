@@ -250,6 +250,8 @@ export default function AdminPage() {
   const [apiHealths, setApiHealths] = useState<ApiHealth[]>(
     API_ENDPOINTS.map(e => ({ ...e, status: 'idle', recordCount: null, responseMs: null, lastChecked: null, error: null }))
   );
+  const [liveTrafficCount, setLiveTrafficCount] = useState<number | null>(null);
+  const [live311Count, setLive311Count] = useState<number | null>(null);
 
   const { stats: crimeStats, isLoading: crimeLoading } = useCrimeStats();
 
@@ -376,6 +378,33 @@ export default function AdminPage() {
     const interval = setInterval(checkApis, 2 * 60 * 1000);
     return () => clearInterval(interval);
   }, [isAuthReady, isAdmin, checkApis]);
+
+  // Fetch live counts from Calgary Open Data APIs for dashboard KPI cards.
+  // These incidents are never written to Firestore, so they must be counted directly.
+  useEffect(() => {
+    if (!isAuthReady || !isAdmin) return;
+    const fetchLiveCounts = async () => {
+      try {
+        const [trafficRes, res311] = await Promise.allSettled([
+          fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt%20DESC'),
+          fetch("https://data.calgary.ca/resource/iahh-g8bj.json?$limit=50&$where=status_description%3D'Open'&$order=requested_date%20DESC"),
+        ]);
+        if (trafficRes.status === 'fulfilled' && trafficRes.value.ok) {
+          const data = await trafficRes.value.json();
+          setLiveTrafficCount(Array.isArray(data) ? data.length : 0);
+        }
+        if (res311.status === 'fulfilled' && res311.value.ok) {
+          const data = await res311.value.json();
+          setLive311Count(Array.isArray(data) ? data.length : 0);
+        }
+      } catch {
+        // non-critical — dashboard still works without these counts
+      }
+    };
+    fetchLiveCounts();
+    const interval = setInterval(fetchLiveCounts, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [isAuthReady, isAdmin]);
 
   // ── KPI derivations ───────────────────────────────────────────────────────
 
@@ -1032,8 +1061,8 @@ export default function AdminPage() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'City Traffic', count: officialTrafficCount, color: 'orange', desc: 'Live incidents from City of Calgary Open Data traffic feed' },
-            { label: 'Calgary 311', count: official311Count, color: 'blue', desc: 'Open service requests synced from Calgary 311 portal' },
+            { label: 'City Traffic', count: liveTrafficCount ?? officialTrafficCount, color: 'orange', desc: 'Live incidents from City of Calgary Open Data traffic feed' },
+            { label: 'Calgary 311', count: live311Count ?? official311Count, color: 'blue', desc: 'Open service requests synced from Calgary 311 portal' },
             { label: 'Crime Stats', count: officialCrimeCount, color: 'red', desc: 'Monthly crime stats from Calgary Police Service Open Data' },
             { label: 'Community', count: communityReportCount, color: 'emerald', desc: 'User-submitted incidents from the Calgary Watch community' },
           ].map(({ label, count, color, desc }) => (

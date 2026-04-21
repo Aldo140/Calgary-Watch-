@@ -218,7 +218,7 @@ service cloud.firestore {
                     request.resource.data.name.size() >= 1 &&
                     request.resource.data.name.size() <= 100 &&
                     isValidEmail(request.resource.data.email) &&
-                    request.resource.data.role in ['Marketing', 'Development', 'Administration'] &&
+                    request.resource.data.role in ['Reporter', 'Analyst', 'Developer', 'Community Advocate', 'Other'] &&
                     request.resource.data.whyJoin is string &&
                     request.resource.data.whyJoin.size() <= 500;
       allow update, delete: if false;

@@ -898,40 +898,136 @@ export default function AboutPage() {
         <ScrollingMarquee />
 
         {/* ==============================================================
-            WHO WE ARE — asymmetric layout, orbiting stats orb
+            WHO WE ARE — editorial cinematic split
             ============================================================== */}
         <section
           ref={whoRef}
-          className="relative py-24 md:py-40 px-6 overflow-hidden"
+          className="relative py-28 md:py-44 px-6 overflow-hidden"
         >
           <NorthernLightsBackground />
-
           <div className="max-w-7xl mx-auto relative z-10">
-            <div className="grid md:grid-cols-2 gap-16 md:gap-24 items-center">
 
-              {/* Left: text content */}
-              <div>
-                <motion.span
-                  className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-5"
-                  initial={prefersReducedMotion() ? undefined : { opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.5 }}
+            {/* Eyebrow */}
+            <motion.div
+              className="flex items-center gap-4 mb-16 md:mb-24"
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <span className="w-10 h-px bg-[#4A90D9]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4A90D9]">
+                Who We Are
+              </span>
+            </motion.div>
+
+            <div className="grid md:grid-cols-[1fr_1.15fr] gap-14 md:gap-20 items-start">
+
+              {/* Left — stacked offset images with floating stats (desktop only) */}
+              <div className="relative h-[32rem] hidden md:block shrink-0">
+                {/* Image 1 — top-left */}
+                <motion.div
+                  className="absolute top-0 left-0 w-[56%] h-[58%] rounded-2xl overflow-hidden border border-white/8 light:border-slate-200 shadow-2xl"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  Who We Are
-                </motion.span>
+                  <motion.img
+                    src={publicAsset('images/calgary3.webp')}
+                    alt="Calgary community"
+                    className="w-full h-full object-cover"
+                    style={prefersReducedMotion() ? undefined : { scale: whoImgScale }}
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#4A90D9]/25 via-transparent to-transparent mix-blend-overlay" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+                </motion.div>
 
-                <SplitTextReveal
-                  text="Built for Calgarians, by Calgarians"
-                  className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-6"
-                />
+                {/* Image 2 — bottom-right */}
+                <motion.div
+                  className="absolute bottom-0 right-0 w-[60%] h-[62%] rounded-2xl overflow-hidden border border-white/8 light:border-slate-200 shadow-2xl"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: -24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+                >
+                  <img
+                    src={publicAsset('images/calgary5.webp')}
+                    alt="Calgary neighbourhoods"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#2E8B7A]/20 via-transparent to-transparent mix-blend-overlay" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+                </motion.div>
+
+                {/* Floating stat badge — overlaps both images */}
+                <motion.div
+                  className="absolute top-[46%] left-[34%] bg-slate-950/90 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-200 rounded-2xl px-5 py-4 shadow-2xl z-20"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, scale: 0.75 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
+                >
+                  <p className="text-3xl font-black text-[#4A90D9] tabular-nums leading-none mb-1">
+                    <AnimatedCounter to={47} />
+                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Neighbourhoods
+                  </p>
+                </motion.div>
+
+                {/* Second floating stat */}
+                <motion.div
+                  className="absolute top-[8%] right-[4%] bg-slate-950/90 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-200 rounded-2xl px-4 py-3 shadow-xl z-20"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, scale: 0.75 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.7, type: 'spring', stiffness: 200, damping: 20 }}
+                >
+                  <p className="text-2xl font-black text-[#D4A843] tabular-nums leading-none mb-0.5">
+                    <AnimatedCounter to={2000} suffix="+" />
+                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    Incidents
+                  </p>
+                </motion.div>
+              </div>
+
+              {/* Right — stacked headline + editorial values */}
+              <div>
+                {/* Headline — each word on its own line */}
+                <h2 className="text-[clamp(3rem,7vw,5.5rem)] font-black leading-[0.92] tracking-tight mb-8 select-none">
+                  {[
+                    { word: 'Built', gradient: false },
+                    { word: 'for', gradient: true },
+                    { word: 'Calgarians,', gradient: false },
+                    { word: 'by', gradient: true },
+                    { word: 'Calgarians', gradient: false },
+                  ].map(({ word, gradient }, i) => (
+                    <motion.span
+                      key={i}
+                      className={`block ${gradient
+                        ? 'text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] italic'
+                        : 'text-white light:text-slate-900'
+                      }`}
+                      initial={prefersReducedMotion() ? undefined : { opacity: 0, x: i % 2 === 0 ? -28 : 28 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.7, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                </h2>
 
                 <motion.p
-                  className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8 max-w-lg"
-                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 12 }}
+                  className="text-base md:text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-10 max-w-md"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.38 }}
                 >
                   Calgary Watch is built specifically for this city. We understand
                   its neighbourhoods, its geography, its rhythm. We built a platform
@@ -939,61 +1035,46 @@ export default function AboutPage() {
                   information they need to stay safe and informed.
                 </motion.p>
 
-                {/* Values — staggered diagonal reveal */}
-                <div className="space-y-3">
+                {/* Values — editorial numbered rows */}
+                <div className="border-t border-white/8 light:border-slate-200">
                   {[
-                    { icon: Clock, label: 'Real-Time', desc: 'Incidents appear on the map in seconds', color: '#4A90D9' },
-                    { icon: Shield, label: 'Verified', desc: 'Community reports + official CPS data', color: '#2E8B7A' },
-                    { icon: Users, label: 'Community', desc: 'Powered by Calgary residents', color: '#D4A843' },
+                    { icon: Clock, num: '01', label: 'Real-Time', desc: 'Incidents appear on the map in seconds', color: '#4A90D9' },
+                    { icon: Shield, num: '02', label: 'Verified', desc: 'Community reports + official CPS data', color: '#2E8B7A' },
+                    { icon: Users, num: '03', label: 'Community', desc: 'Powered by Calgary residents', color: '#D4A843' },
                   ].map((item, i) => (
                     <motion.div
-                      key={item.label}
-                      className="flex items-center gap-4 p-4 rounded-xl border border-white/6 light:border-slate-200 bg-white/[0.03] light:bg-white/70 group hover:border-white/12 light:hover:border-slate-300 transition-colors"
-                      initial={prefersReducedMotion() ? undefined : { opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true, amount: 0.2 }}
-                      transition={{ duration: 0.55, delay: 0.35 + i * 0.08 }}
+                      key={item.num}
+                      className="flex items-center gap-4 py-5 border-b border-white/8 light:border-slate-200 group cursor-default"
+                      initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 14 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.48 + i * 0.09 }}
+                      whileHover={prefersReducedMotion() ? undefined : { x: 5 }}
                     >
+                      <span className="text-[11px] font-black tabular-nums text-slate-600 w-6 shrink-0">
+                        {item.num}
+                      </span>
                       <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
-                        style={{ background: `${item.color}18`, border: `1px solid ${item.color}30` }}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
+                        style={{ background: `${item.color}18`, border: `1px solid ${item.color}28` }}
                       >
-                        <item.icon size={18} style={{ color: item.color }} />
+                        <item.icon size={16} style={{ color: item.color }} />
                       </div>
-                      <div>
-                        <p className="font-black text-sm">{item.label}</p>
-                        <p className="text-xs text-slate-500 light:text-slate-500">{item.desc}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-black text-sm tracking-tight mb-0.5">{item.label}</p>
+                        <p className="text-xs text-slate-500 light:text-slate-500 truncate">{item.desc}</p>
                       </div>
+                      <motion.div
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ color: item.color }}
+                      >
+                        <ArrowRight size={14} />
+                      </motion.div>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* Right: orbiting stats orb */}
-              <motion.div
-                className="flex items-center justify-center"
-                initial={prefersReducedMotion() ? undefined : { opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="relative">
-                  {/* Subtle radial glow */}
-                  <div className="absolute inset-0 -m-8 rounded-full bg-[radial-gradient(circle,rgba(74,144,217,0.06),transparent_70%)]" />
-                  {/* Image behind orb */}
-                  <div className="absolute -bottom-4 -right-4 -left-4 -top-4 rounded-3xl overflow-hidden opacity-20 light:opacity-30">
-                    <motion.img
-                      src={publicAsset('images/calgary3.webp')}
-                      alt=""
-                      className="w-full h-full object-cover"
-                      style={prefersReducedMotion() ? undefined : { scale: whoImgScale }}
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <OrbitingBadges />
-                </div>
-              </motion.div>
             </div>
           </div>
         </section>
@@ -1175,71 +1256,183 @@ export default function AboutPage() {
         </motion.section>
 
         {/* ==============================================================
-            GET INVOLVED — dramatic split layout
+            GET INVOLVED — trust-forward immersive panels
             ============================================================== */}
         <section className="py-24 md:py-40 px-6 relative overflow-hidden">
           <NorthernLightsBackground />
-          <div className="max-w-7xl mx-auto relative z-10">
+          <div className="max-w-7xl mx-auto relative z-10 space-y-16 md:space-y-24">
 
             {/* Section header */}
-            <div className="mb-16 md:mb-20 max-w-3xl">
-              <motion.span
-                className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4"
-                initial={prefersReducedMotion() ? undefined : { opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+            <div className="max-w-4xl">
+              <motion.div
+                className="flex items-center gap-4 mb-8"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
               >
-                Get Involved
-              </motion.span>
+                <span className="w-10 h-px bg-[#4A90D9]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4A90D9]">
+                  Get Involved
+                </span>
+              </motion.div>
               <SplitTextReveal
                 text="Calgary Watch is built by the community, and it grows with it."
-                className="text-4xl md:text-5xl font-black tracking-tight leading-[1.05] mb-6"
+                className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-6"
               />
-              <motion.div
+              <motion.p
+                className="text-lg text-slate-400 light:text-slate-600 leading-relaxed"
                 initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-4">
-                  We're a small but dedicated team, and we're always looking for people who care about this city.
-                </p>
-                <blockquote className="border-l-4 border-[#4A90D9]/50 pl-5 py-1">
-                  <p className="text-base text-slate-400 light:text-slate-600 leading-relaxed">
-                    <span className="font-black text-white light:text-slate-900">Trust is everything.</span>{' '}
-                    When Calgarians rely on us to stay informed about what's happening
-                    in their neighbourhoods, we accept a responsibility to be accurate,
-                    responsive, and transparent. Every volunteer, every verification,
-                    every decision shapes whether Calgary Watch remains a platform they
-                    can depend on. Join us in building something our city can trust.
-                  </p>
-                </blockquote>
-              </motion.div>
+                We're a small but dedicated team, and we're always looking for people who care about this city.
+              </motion.p>
             </div>
 
-            {/* Three involvement cards */}
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {/* Trust pull-quote — full-width dramatic block */}
+            <motion.div
+              className="relative rounded-2xl overflow-hidden"
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#4A90D9]/8 via-[#2E8B7A]/5 to-transparent light:from-blue-50/80 light:to-teal-50/50" />
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]" />
+              <div className="relative px-8 md:px-14 py-10 md:py-14 pl-10 md:pl-16">
+                <span className="text-[5rem] leading-none font-black text-[#4A90D9]/15 select-none absolute top-2 left-6 md:left-10">"</span>
+                <p className="text-xl md:text-2xl lg:text-3xl font-black leading-[1.3] tracking-tight text-white light:text-slate-900 mb-3">
+                  Trust is everything.
+                </p>
+                <p className="text-base md:text-lg text-slate-400 light:text-slate-600 leading-relaxed max-w-4xl">
+                  When Calgarians rely on us to stay informed about what's happening
+                  in their neighbourhoods, we accept a responsibility to be accurate,
+                  responsive, and transparent. Every volunteer, every verification,
+                  every decision shapes whether Calgary Watch remains a platform they
+                  can depend on.{' '}
+                  <span className="font-semibold text-white light:text-slate-900">
+                    Join us in building something our city can trust.
+                  </span>
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Volunteer form — wide 2-column immersive panel */}
+            <motion.div
+              className="relative rounded-3xl overflow-hidden border border-[#2E8B7A]/20 light:border-teal-200"
+              initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="absolute inset-0 bg-slate-900/80 light:bg-white/85 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#2E8B7A]/10 via-transparent to-[#4A90D9]/6" />
+              <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#2E8B7A]/8 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full bg-[#4A90D9]/6 blur-2xl pointer-events-none" />
+
+              <div className="relative grid md:grid-cols-[1fr_1.1fr]">
+                {/* Left: description */}
+                <div className="p-8 md:p-12 md:border-r border-white/6 light:border-slate-200 flex flex-col justify-center gap-7">
+                  <div>
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/25 flex items-center justify-center">
+                        <HeartHandshake size={20} className="text-[#2E8B7A]" />
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider text-[#2E8B7A] bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-2.5 py-1 rounded-full">
+                        Open Positions
+                      </span>
+                    </div>
+                    <h3 className="text-3xl md:text-4xl font-black tracking-tight leading-[1.05] mb-4">
+                      Help keep<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2E8B7A] to-[#4A90D9]">
+                        Calgary informed
+                      </span>
+                    </h3>
+                    <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed">
+                      We're looking for passionate Calgarians to join us. Your
+                      contributions ensure we remain accurate, responsive, and worthy of
+                      the community's trust.
+                    </p>
+                  </div>
+
+                  {/* Role badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {['Reporter', 'Analyst', 'Developer', 'Advocate'].map((r, i) => (
+                      <motion.span
+                        key={r}
+                        className="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 light:border-slate-200 text-slate-400 light:text-slate-600"
+                        initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 8 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 + i * 0.07, duration: 0.4 }}
+                      >
+                        {r}
+                      </motion.span>
+                    ))}
+                  </div>
+
+                  {/* Social proof */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      {['#4A90D9', '#2E8B7A', '#D4A843'].map((color, i) => (
+                        <div
+                          key={i}
+                          className="w-8 h-8 rounded-full border-2 flex items-center justify-center"
+                          style={{ background: `${color}25`, borderColor: `${color}50` }}
+                        >
+                          <Users size={10} style={{ color }} />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-500 light:text-slate-500">
+                      <span className="font-black text-white light:text-slate-900">100+</span> contributors and growing
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right: form */}
+                <div className="p-8 md:p-12">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6">
+                    Express your interest
+                  </p>
+                  <VolunteerForm />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Our Team + Business Partners — two image-backed cards */}
+            <div className="grid md:grid-cols-2 gap-6">
 
               {/* Our Team */}
               <motion.div
-                className="relative rounded-2xl border border-[#4A90D9]/20 bg-gradient-to-br from-[#4A90D9]/6 to-slate-950/80 light:from-blue-50 light:to-white p-8 flex flex-col gap-6 overflow-hidden group"
-                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
+                className="relative rounded-2xl overflow-hidden group min-h-[300px]"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.65, delay: 0 }}
-                whileHover={prefersReducedMotion() ? undefined : { y: -4 }}
+                transition={{ duration: 0.65 }}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#4A90D9]/6 blur-2xl" aria-hidden="true" />
-                <div className="w-11 h-11 rounded-xl bg-[#4A90D9]/15 border border-[#4A90D9]/25 flex items-center justify-center">
-                  <Eye size={20} className="text-[#4A90D9]" />
+                <div className="absolute inset-0">
+                  <img
+                    src={publicAsset('images/calgary2.webp')}
+                    alt=""
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    aria-hidden="true"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/25" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#4A90D9]/15 to-transparent" />
                 </div>
-                <div className="flex-1">
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2.5 py-1 rounded mb-3">
+                <div className="relative p-8 md:p-10 flex flex-col gap-3 h-full justify-end">
+                  <div className="w-10 h-10 rounded-xl bg-[#4A90D9]/20 border border-[#4A90D9]/35 flex items-center justify-center mb-1">
+                    <Eye size={18} className="text-[#4A90D9]" />
+                  </div>
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/15 px-2.5 py-1 rounded w-fit">
                     Our Team
                   </span>
-                  <h3 className="text-xl font-black mb-2 tracking-tight">Always watching, always here</h3>
-                  <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed">
+                  <h3 className="text-2xl font-black tracking-tight">Always watching, always here</h3>
+                  <p className="text-slate-300 light:text-slate-200 text-sm leading-relaxed">
                     A dedicated team actively monitors Calgary Watch around the clock,
                     reviewing reports, verifying incidents, and making sure the map
                     stays accurate and trustworthy. Every pin you see has a real person
@@ -1248,84 +1441,60 @@ export default function AboutPage() {
                 </div>
               </motion.div>
 
-              {/* Volunteer Form */}
-              <motion.div
-                className="relative rounded-2xl border border-[#2E8B7A]/25 bg-gradient-to-br from-[#2E8B7A]/8 to-slate-950/80 light:from-teal-50 light:to-white p-8 flex flex-col gap-5 overflow-hidden"
-                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.65, delay: 0.1 }}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#2E8B7A]/6 blur-2xl" aria-hidden="true" />
-                <div className="flex items-center justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/25 flex items-center justify-center">
-                    <HeartHandshake size={20} className="text-[#2E8B7A]" />
-                  </div>
-                  <span className="text-[9px] font-black uppercase tracking-wider text-[#2E8B7A] bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-2.5 py-1 rounded-full">
-                    Open
-                  </span>
-                </div>
-                <div>
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#2E8B7A] bg-[#2E8B7A]/10 px-2.5 py-1 rounded mb-2">
-                    Volunteers
-                  </span>
-                  <h3 className="text-xl font-black mb-2 tracking-tight">Help keep Calgary informed</h3>
-                  <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed mb-4">
-                    We're looking for passionate Calgarians to join us. Your
-                    contributions ensure we remain accurate, responsive, and worthy of
-                    the community's trust.
-                  </p>
-                </div>
-                <VolunteerForm />
-              </motion.div>
-
               {/* Business Partners */}
               <motion.div
-                className="relative rounded-2xl border border-[#D4A843]/20 bg-gradient-to-br from-[#D4A843]/6 to-slate-950/80 light:from-amber-50 light:to-white p-8 flex flex-col gap-6 overflow-hidden group"
-                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 28 }}
+                className="relative rounded-2xl overflow-hidden group min-h-[300px]"
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.65, delay: 0.2 }}
-                whileHover={prefersReducedMotion() ? undefined : { y: -4 }}
+                transition={{ duration: 0.65, delay: 0.12 }}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#D4A843]/6 blur-2xl" aria-hidden="true" />
-                <div className="flex items-center justify-between">
-                  <div className="w-11 h-11 rounded-xl bg-[#D4A843]/15 border border-[#D4A843]/25 flex items-center justify-center">
-                    <Handshake size={20} className="text-[#D4A843]" />
-                  </div>
-                  <span className="text-[9px] font-black uppercase tracking-wider text-[#D4A843] bg-[#D4A843]/15 border border-[#D4A843]/30 px-2.5 py-1 rounded-full">
-                    Open
-                  </span>
+                <div className="absolute inset-0">
+                  <img
+                    src={publicAsset('images/calgary8.webp')}
+                    alt=""
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                    aria-hidden="true"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/25" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#D4A843]/15 to-transparent" />
                 </div>
-                <div className="flex-1">
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2.5 py-1 rounded mb-3">
+                <div className="relative p-8 md:p-10 flex flex-col gap-3 h-full justify-end">
+                  <div className="flex items-start justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-[#D4A843]/20 border border-[#D4A843]/35 flex items-center justify-center mb-1">
+                      <Handshake size={18} className="text-[#D4A843]" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#D4A843] bg-[#D4A843]/15 border border-[#D4A843]/30 px-2.5 py-1 rounded-full">
+                      Open
+                    </span>
+                  </div>
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/15 px-2.5 py-1 rounded w-fit">
                     Business Partners
                   </span>
-                  <h3 className="text-xl font-black mb-2 tracking-tight">Grow with Calgary</h3>
-                  <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed mb-4">
-                    We're looking for Calgary-based businesses and organizations who
-                    want to be part of a platform that thousands of residents rely on.
-                    Sponsorship, integrations, local partnerships. Let's build
-                    something together.
+                  <h3 className="text-2xl font-black tracking-tight">Grow with Calgary</h3>
+                  <p className="text-slate-300 light:text-slate-200 text-sm leading-relaxed mb-2">
+                    Looking for Calgary-based businesses who want to be part of a
+                    platform thousands rely on. Sponsorship, integrations, partnerships.
                   </p>
-                  <ul className="space-y-2">
+                  <ul className="space-y-1.5 mb-4">
                     {['Sponsored neighbourhood alerts', 'Data & API integration', 'Co-branding opportunities'].map((item) => (
-                      <li key={item} className="flex items-center gap-2.5 text-sm text-slate-300 light:text-slate-700">
+                      <li key={item} className="flex items-center gap-2 text-xs text-slate-300">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#D4A843] shrink-0" />
                         {item}
                       </li>
                     ))}
                   </ul>
+                  <MagneticButton
+                    tag="a"
+                    href="mailto:jorti104@mtroyal.ca?subject=Partnership%20Inquiry"
+                    className="inline-flex items-center gap-2 text-sm font-black text-[#D4A843] hover:text-amber-300 transition-colors cursor-pointer w-fit"
+                  >
+                    <Mail size={14} />
+                    Get in touch
+                    <ArrowRight size={13} />
+                  </MagneticButton>
                 </div>
-                <MagneticButton
-                  tag="a"
-                  href="mailto:jorti104@mtroyal.ca?subject=Partnership%20Inquiry"
-                  className="inline-flex items-center gap-2 text-sm font-black text-[#D4A843] hover:text-amber-300 transition-colors cursor-pointer"
-                >
-                  <Mail size={14} />
-                  Get in touch
-                  <ArrowRight size={13} />
-                </MagneticButton>
               </motion.div>
             </div>
 
@@ -1337,11 +1506,9 @@ export default function AboutPage() {
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.65, delay: 0.15 }}
             >
-              {/* Background gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-[#4A90D9]/6 via-[#2E8B7A]/4 to-[#D4A843]/6 light:from-blue-50 light:to-amber-50" />
               <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-[#4A90D9]/8 blur-3xl" aria-hidden="true" />
               <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#D4A843]/8 blur-3xl" aria-hidden="true" />
-
               <div className="relative p-8 flex flex-col md:flex-row md:items-center gap-8">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-4">

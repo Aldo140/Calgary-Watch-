@@ -223,6 +223,8 @@ function VolunteerForm() {
           subject: role,
           message: `Role: ${role}\n\nWhy they want to join:\n${whyJoin.trim().slice(0, 500)}`,
         }).catch((err) => { console.error('EmailJS error:', JSON.stringify(err)); });
+      } else {
+        console.warn('[CalgaryWatch] EmailJS keys missing — email notification skipped', { serviceId: !!serviceId, templateId: !!templateId, publicKey: !!publicKey });
       }
 
       setStatus('done');

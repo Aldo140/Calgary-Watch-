@@ -391,6 +391,7 @@ export default function LandingPage() {
                   {AVATARS.map((av, i) => (
                     <img key={i} src={av.src} alt="" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover shrink-0"
                       loading="lazy"
+                      crossOrigin="anonymous"
                       onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                   ))}
                 </div>

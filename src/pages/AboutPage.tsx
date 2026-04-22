@@ -212,8 +212,15 @@ function VolunteerForm() {
         createdAt: serverTimestamp(),
       });
 
-      emailjs.init({ publicKey: 'SwfXJ-eXi92R0m_nV' });
-      emailjs.send('service_77g2o0a', 'template_sx463hg', {
+      // EmailJS public key is a browser-side credential — intentional by design.
+      // Abuse protection: restrict allowed domains in the EmailJS dashboard to
+      // your production origin. The service/template IDs are read from env vars
+      // so they don't have to be rotated via a code push.
+      const ejsPublicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY ?? 'SwfXJ-eXi92R0m_nV';
+      const ejsServiceId = import.meta.env.VITE_EMAILJS_SERVICE_ID ?? 'service_77g2o0a';
+      const ejsTemplateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? 'template_sx463hg';
+      emailjs.init({ publicKey: ejsPublicKey });
+      emailjs.send(ejsServiceId, ejsTemplateId, {
         name: name.trim().slice(0, 100),
         email: email.trim().slice(0, 200),
         subject: role,

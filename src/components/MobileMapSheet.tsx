@@ -29,6 +29,45 @@ const CATEGORY_OPTIONS = [
   { id: 'weather' as const,        label: 'Weather', Icon: CloudRain    },
 ] as const;
 
+// ─── Vaul open-state invariant ────────────────────────────────────────────────
+// Vaul mutates global touch-action/overflow during its spring open/close
+// animations. A close→open cycle while the form is visible breaks Leaflet touch
+// tracking and freezes form inputs on mobile (regressed 3× in project history).
+//
+// INVARIANT: the drawer must never become `false` while `isFormOpen` is true.
+//
+// This hook encodes that rule and fires a loud dev-mode warning if anything
+// violates it, so a future refactor can't silently reintroduce the bug.
+function useDrawerOpen(isPinMode: boolean, isFormOpen: boolean): boolean {
+  // When form is open, keep vaul "open" regardless of pin mode so no
+  // transition runs. Visual hide/show is handled by CSS on Drawer.Content.
+  const open = !isPinMode || isFormOpen;
+
+  const prevOpenRef = useRef(open);
+  const prevFormOpenRef = useRef(isFormOpen);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const didClose = prevOpenRef.current && !open;
+      const formWasOpen = prevFormOpenRef.current;
+      if (didClose && formWasOpen) {
+        // eslint-disable-next-line no-console
+        console.error(
+          '[MobileMapSheet] REGRESSION: vaul drawer closed while isFormOpen=true.\n' +
+          'This causes vaul to mutate global touch-action/overflow, freezing form\n' +
+          'inputs on mobile after pin drop. Fix: open={!isPinMode || isFormOpen}.\n' +
+          'See project history: 5cc5d0b → b60d6fa → 8b3a5e1 → current.',
+        );
+      }
+    }
+    prevOpenRef.current = open;
+    prevFormOpenRef.current = isFormOpen;
+  });
+
+  return open;
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 function getReporterDisplay(incident: Incident) {
   const rawName = incident.name?.trim() || 'Community Member';
   const anonymous = Boolean(incident.anonymous) || rawName.toLowerCase() === 'anonymous' || rawName.toLowerCase().includes('anonymous');
@@ -91,6 +130,8 @@ export default function MobileMapSheet({
   const [recentOnly, setRecentOnly] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const activeCardRef = useRef<HTMLButtonElement | null>(null);
+
+  const drawerOpen = useDrawerOpen(isPinMode, isFormOpen);
 
   const isExpanded = snap === 0.82;
   const isPeek    = snap === 0.38;
@@ -213,7 +254,7 @@ export default function MobileMapSheet({
       setActiveSnapPoint={(s) => setSnap(s as SnapPoint)}
       modal={false}
       dismissible={false}
-      open={!isPinMode}
+      open={drawerOpen}
     >
       <Drawer.Portal>
         <Drawer.Content

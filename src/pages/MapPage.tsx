@@ -792,9 +792,9 @@ export default function MapPage() {
   }, []);
 
   const handlePinCancel = useCallback(() => {
-    // Cancel returns to choose step; IncidentForm's useEffect handles the transition
     setIsPinMode(false);
     setConfirmedPinLocation(null);
+    setIsFormOpen(false);
   }, []);
 
   const handleFormClose = useCallback(() => {

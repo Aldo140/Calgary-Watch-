@@ -165,9 +165,9 @@ export default function IncidentForm({
   const watchedNeighborhood = watch('neighborhood');
   const [neighborhoodOverride, setNeighborhoodOverride] = useState(false);
 
-  // When pin mode exits without confirmation (Cancel), return to choose step.
-  // Do not run on successful confirm: parent sets pinLocation and clears isPinMode in the same
-  // update - without the !pinLocation guard, we'd race setStep('choose') vs setStep('form').
+  // When pin mode exits without confirmation (Cancel), the parent closes the form entirely.
+  // Guard against the race on successful confirm: parent sets pinLocation and clears isPinMode
+  // in the same update - without !pinLocation we'd race setStep('choose') vs setStep('form').
   useEffect(() => {
     if (!isPinMode && step === 'pinning' && !pinLocation) {
       setStep('choose');
@@ -181,17 +181,17 @@ export default function IncidentForm({
     }
   }, [pinLocation, step]);
 
-  // Reset when form is reopened
+  // Reset when form is reopened.
+  // If a confirmed pin already exists (user tapped pin → returned to form state),
+  // skip straight to 'form' so the choose-location step never flashes.
   useEffect(() => {
-    if (isOpen) { setStep('choose'); setUsingGPS(false); setNeighborhoodOverride(false); }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen && pinLocation) {
-      setStep('form');
+    if (isOpen) {
+      setStep(pinLocation ? 'form' : 'choose');
       setUsingGPS(false);
+      setNeighborhoodOverride(false);
     }
-  }, [isOpen, pinLocation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // intentionally omit pinLocation — only re-run when the form opens
 
   // Resolution order: tapped pin > explicit GPS choice > Calgary centre fallback
   const activeLocation = pinLocation ?? (usingGPS ? (gpsLocation ?? location) : location);
@@ -365,7 +365,7 @@ export default function IncidentForm({
             <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-600/25 to-indigo-600/25 border border-blue-500/40 flex items-center justify-between gap-3">
               <div>
                 <p className="text-[10px] font-black text-blue-300 uppercase tracking-wide">
-                  {pinLocation ? '📍 Pin Set' : usingGPS ? '📡 GPS Location' : '🏙 City Centre (approx.)'}
+                  {pinLocation ? 'Pin Set' : usingGPS ? 'GPS Location' : 'City Centre (approx.)'}
                 </p>
                 <p className="text-xs text-slate-200 mt-0.5 font-mono">
                   {activeLocation?.lat.toFixed(5)}, {activeLocation?.lng.toFixed(5)}
@@ -387,7 +387,7 @@ export default function IncidentForm({
             <div className="p-3.5 rounded-xl border border-red-500/30 bg-gradient-to-br from-red-600/10 to-red-900/20 flex items-start gap-3">
               <AlertTriangle className="text-red-400 mt-0.5 shrink-0" size={16} />
               <div>
-                <p className="text-[10px] items-center gap-2 font-black tracking-widest uppercase text-red-400">🚨 Not Sent To Police</p>
+                <p className="text-[10px] items-center gap-2 font-black tracking-widest uppercase text-red-400">Not Sent To Police</p>
                 <p className="text-xs text-red-200/80 mt-1 font-medium leading-relaxed">
                   Calgary Watch is peer-to-peer and <b>does NOT</b> dispatch emergency services. If you require immediate police or medical assistance, please call <b>911</b>.
                 </p>
@@ -576,7 +576,7 @@ export default function IncidentForm({
                     <Loader2 size={16} className="animate-spin" />
                     Posting…
                   </span>
-                ) : '🚀 Post Report'}
+                ) : 'Post Report'}
               </Button>
             </div>
           </form>

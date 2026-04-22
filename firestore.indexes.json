@@ -7,6 +7,14 @@
         { "fieldPath": "flagged", "order": "ASCENDING" },
         { "fieldPath": "flagged_at", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "incidents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "authorUid", "order": "ASCENDING" },
+        { "fieldPath": "expires_at", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

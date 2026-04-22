@@ -137,6 +137,13 @@ async function fetchEnhancedWeatherAlerts(): Promise<NormalizedIncident[]> {
       return incidents;
     }
 
+    const contentType = response.headers.get('content-type') ?? '';
+    if (!contentType.includes('json')) {
+      const body = await response.text();
+      console.error(`[EC Enhanced] Unexpected content-type "${contentType}": ${body.substring(0, 120)}`);
+      return incidents;
+    }
+
     const json: EcFeatureCollection = await response.json();
     const now = Date.now();
 

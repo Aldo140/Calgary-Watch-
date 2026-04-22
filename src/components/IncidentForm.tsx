@@ -165,14 +165,17 @@ export default function IncidentForm({
   const watchedNeighborhood = watch('neighborhood');
   const [neighborhoodOverride, setNeighborhoodOverride] = useState(false);
 
-  // When pin mode exits without confirmation (Cancel), the parent closes the form entirely.
-  // Guard against the race on successful confirm: parent sets pinLocation and clears isPinMode
-  // in the same update - without !pinLocation we'd race setStep('choose') vs setStep('form').
+  // When pin mode exits without confirmation (Cancel), close the form via onClose so
+  // the parent can clean up in a separate render from when isPinMode cleared.
+  // This avoids flipping isFormOpen and isPinMode in one batch (which opens the
+  // MobileMapSheet while Leaflet is still processing the cancel touch event).
+  // Guard on !pinLocation so a successful confirm (parent sets pinLocation + clears
+  // isPinMode atomically) doesn't race into a close.
   useEffect(() => {
     if (!isPinMode && step === 'pinning' && !pinLocation) {
-      setStep('choose');
+      onClose();
     }
-  }, [isPinMode, step, pinLocation]);
+  }, [isPinMode, step, pinLocation, onClose]);
 
   // When a confirmed pin arrives while we're in pinning step, advance to form
   useEffect(() => {

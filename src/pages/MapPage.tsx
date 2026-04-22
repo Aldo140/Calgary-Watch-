@@ -792,9 +792,12 @@ export default function MapPage() {
   }, []);
 
   const handlePinCancel = useCallback(() => {
+    // Only clear pin state — the IncidentForm's useEffect calls onClose() which
+    // closes the form one render later. This avoids flipping isFormOpen and
+    // isPinMode in the same batch, which causes the MobileMapSheet to open while
+    // Leaflet is still processing the cancel touch event.
     setIsPinMode(false);
     setConfirmedPinLocation(null);
-    setIsFormOpen(false);
   }, []);
 
   const handleFormClose = useCallback(() => {
@@ -917,6 +920,8 @@ export default function MapPage() {
 
   const handleEmergencyPinCancel = useCallback(() => {
     setIsEmergencyPinMode(false);
+    setConfirmedEmergencyPinLocation(null);
+    setIsEmergencyOpen(false);
   }, []);
 
   // filteredIncidentsCount is intentionally kept for the sidebar category badge

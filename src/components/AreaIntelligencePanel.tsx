@@ -1,16 +1,22 @@
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, TrendingUp, TrendingDown, ShieldCheck, MapPin, Activity, Zap } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, ShieldCheck, MapPin, Activity, Info, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, Legend } from 'recharts';
 import { cn } from '@/src/lib/utils';
 import { Drawer } from 'vaul';
 import { CrimeYearEntry } from '@/src/hooks/useCrimeStats';
 
+/** Abbreviate large tick numbers: 1200 → 1.2k, 15000 → 15k */
+function fmtTick(v: number): string {
+  if (v >= 1000) return `${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k`;
+  return String(v);
+}
+
 interface AreaIntelligencePanelProps {
   data: AreaIntelligence | null;
   onClose: () => void;
-  crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
+  crimeStats?: Map<string, { crime: number; violent: number; property: number; disorder: number; year: number }>;
   yearlyStats?: Map<string, CrimeYearEntry[]>;
   theme?: 'dark' | 'light';
 }
@@ -20,13 +26,13 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
 
   const isLight = theme === 'light';
 
-  // Prefer real yearly data from Open Data API; fall back to mock monthly trends
   const communityKey = data.communityName.toLowerCase();
   const realYearly = yearlyStats?.get(communityKey);
-  const chartData = realYearly && realYearly.length > 0
-    ? realYearly.map(e => ({ name: String(e.year), Violent: e.crime, Property: 0, Disorder: e.disorder }))
+  const hasRealData = realYearly && realYearly.length > 0;
+
+  const chartData = hasRealData
+    ? realYearly.map(e => ({ name: String(e.year), Violent: e.violent, Property: e.property, Disorder: e.disorder }))
     : data.monthlyTrends.map(t => ({ name: t.month, Violent: t.violent_crime, Property: t.property_crime, Disorder: t.disorder_calls }));
-  const chartXLabel = realYearly && realYearly.length > 0 ? 'Year' : 'Month';
 
   const tooltipStyle = {
     backgroundColor: isLight ? '#ffffff' : '#020617',
@@ -50,7 +56,6 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
       'flex flex-col h-full backdrop-blur-3xl overflow-hidden relative',
       isLight ? 'bg-[rgb(255,250,243)] text-slate-900' : 'bg-slate-950/95'
     )}>
-      {/* Background Decorative Elements */}
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
 
@@ -89,10 +94,12 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
           <div className={cn('rounded-[1.4rem] p-4 border', isLight ? 'bg-white/72 border-stone-200/80' : 'bg-white/[0.03] border-white/10')}>
             <p className={cn('text-[10px] font-black uppercase tracking-widest mb-2', isLight ? 'text-slate-600' : 'text-slate-500')}>Safety Score</p>
             <div className="text-4xl font-black text-blue-400">{data.safetyScore}</div>
+            <p className={cn('text-[9px] mt-1', isLight ? 'text-slate-500' : 'text-slate-600')}>Out of 100 · weighted vs city avg</p>
           </div>
           <div className={cn('rounded-[1.4rem] p-4 border', isLight ? 'bg-white/72 border-stone-200/80' : 'bg-white/[0.03] border-white/10')}>
             <p className={cn('text-[10px] font-black uppercase tracking-widest mb-2', isLight ? 'text-slate-600' : 'text-slate-500')}>Active Incidents</p>
             <div className="text-4xl font-black text-orange-400">{data.activeIncidents}</div>
+            <p className={cn('text-[9px] mt-1', isLight ? 'text-slate-500' : 'text-slate-600')}>Reported in last 2 hours</p>
           </div>
           <div className={cn('rounded-[1.4rem] p-4 border', isLight ? 'bg-white/72 border-stone-200/80' : 'bg-white/[0.03] border-white/10')}>
             <p className={cn('text-[10px] font-black uppercase tracking-widest mb-2', isLight ? 'text-slate-600' : 'text-slate-500')}>Trend</p>
@@ -102,6 +109,7 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
             )}>
               {data.trend}
             </div>
+            <p className={cn('text-[9px] mt-1', isLight ? 'text-slate-500' : 'text-slate-600')}>Recent months vs prior period</p>
           </div>
           <div className={cn(
             'rounded-[1.4rem] p-4 flex gap-3 border',
@@ -132,20 +140,51 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
           <div className={cn('rounded-[1.6rem] p-5 border relative overflow-hidden', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
             <div className="absolute top-0 left-0 w-1 h-full bg-amber-500/50" />
             <div className="pl-2">
-              <p className={cn('text-[10px] font-black uppercase tracking-widest mb-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                City Crime Statistics · {crimeEntry.year}
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
-                  <p className={cn('text-[9px] font-black uppercase tracking-widest mb-1', isLight ? 'text-slate-500' : 'text-slate-500')}>Crime Incidents</p>
-                  <p className={cn('text-2xl font-black', isLight ? 'text-red-600' : 'text-red-400')}>{crimeEntry.crime.toLocaleString()}</p>
-                </div>
-                <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
-                  <p className={cn('text-[9px] font-black uppercase tracking-widest mb-1', isLight ? 'text-slate-500' : 'text-slate-500')}>Disorder Calls</p>
-                  <p className={cn('text-2xl font-black', isLight ? 'text-amber-600' : 'text-amber-400')}>{crimeEntry.disorder.toLocaleString()}</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className={cn('text-[10px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                  City Crime Statistics · {crimeEntry.year}
+                </p>
+                <div className="flex items-center gap-1">
+                  <Database size={10} className={isLight ? 'text-slate-400' : 'text-slate-600'} />
+                  <span className={cn('text-[9px]', isLight ? 'text-slate-400' : 'text-slate-600')}>Calgary Open Data</span>
                 </div>
               </div>
-              <p className={cn('text-[10px] mt-2', isLight ? 'text-slate-500' : 'text-slate-500')}>Source: City of Calgary Open Data</p>
+              <p className={cn('text-[9px] mb-3', isLight ? 'text-slate-500' : 'text-slate-600')}>
+                Criminal offences reported to Calgary Police Service for this community in {crimeEntry.year}
+              </p>
+              {/* Show a gentle notice when violent + property both read zero —
+                  usually means the CPS dataset uses a slightly different community name
+                  than the Open Data crime dataset (e.g. "Downtown West" vs "West Village").
+                  We still show disorder if it has data. */}
+              {crimeEntry.violent === 0 && crimeEntry.property === 0 && crimeEntry.disorder === 0 ? (
+                <div className={cn('rounded-xl p-3 border flex items-start gap-2.5', isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20')}>
+                  <Info size={13} className="text-amber-500 shrink-0 mt-0.5" />
+                  <p className={cn('text-[9px] leading-relaxed', isLight ? 'text-amber-800' : 'text-amber-300')}>
+                    Detailed crime breakdowns are not available for this community in the current Open Data snapshot.
+                    The community name may differ between data sources. Totals shown above reflect the matched record from the crime dataset.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
+                      <p className={cn('text-[9px] font-black uppercase tracking-widest mb-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>Violent Crime</p>
+                      <p className={cn('text-2xl font-black', isLight ? 'text-red-600' : 'text-red-400')}>{crimeEntry.violent.toLocaleString()}</p>
+                      <p className={cn('text-[8px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>Assault · robbery · threats</p>
+                    </div>
+                    <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
+                      <p className={cn('text-[9px] font-black uppercase tracking-widest mb-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>Property Crime</p>
+                      <p className={cn('text-2xl font-black', isLight ? 'text-blue-600' : 'text-blue-400')}>{crimeEntry.property.toLocaleString()}</p>
+                      <p className={cn('text-[8px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>Break &amp; enter · theft</p>
+                    </div>
+                  </div>
+                  <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
+                    <p className={cn('text-[9px] font-black uppercase tracking-widest mb-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>Disorder Calls</p>
+                    <p className={cn('text-2xl font-black', isLight ? 'text-amber-600' : 'text-amber-400')}>{crimeEntry.disorder.toLocaleString()}</p>
+                    <p className={cn('text-[8px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>Non-criminal police calls: noise, suspicious activity, nuisance</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -154,30 +193,37 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
           <div className="space-y-5">
             {/* Crime / Disorder trend chart */}
             <div>
-              <div className="flex items-center justify-between mb-3 px-1">
-                <h3 className={cn('text-[10px] font-black uppercase tracking-[0.3em]', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                  {realYearly ? 'Year-over-Year Trends' : 'Crime Trends'}
-                </h3>
-                <div className="flex gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
-                    <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                      {realYearly ? 'Crime' : 'Violent'}
-                    </span>
-                  </div>
-                  {!realYearly && (
+              <div className="mb-3 px-1">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className={cn('text-[10px] font-black uppercase tracking-[0.3em]', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                    {hasRealData ? 'Year-over-Year Trends' : 'Crime Trends'}
+                  </h3>
+                  <div className="flex gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-red-500" />
+                      <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Violent</span>
+                    </div>
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full bg-blue-500" />
                       <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Property</span>
                     </div>
-                  )}
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-amber-500" />
-                    <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Disorder</span>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-amber-500" />
+                      <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Disorder</span>
+                    </div>
                   </div>
                 </div>
+                <p className={cn('text-[9px]', isLight ? 'text-slate-500' : 'text-slate-600')}>
+                  {hasRealData
+                    ? 'Annual criminal offences reported to Calgary Police (left axis) alongside non-criminal disorder service calls — sourced from City of Calgary Open Data'
+                    : 'Estimated monthly breakdown across violent, property, and disorder categories based on available community data'}
+                </p>
               </div>
-              <div className={cn('h-[280px] w-full rounded-[1.6rem] p-5 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
+              <div
+                className={cn('h-[280px] w-full rounded-[1.6rem] p-5 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+                role="img"
+                aria-label={`${hasRealData ? 'Year-over-year' : 'Monthly'} crime trend chart for ${data.communityName}: violent crime (red), property crime (blue), disorder calls (amber)`}
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData}>
                     <defs>
@@ -196,39 +242,48 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={8} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} />
                     <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
                     <Area type="monotone" dataKey="Violent" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorViolent)" />
-                    {!realYearly && <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorProperty)" />}
+                    <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorProperty)" />
                     <Area type="monotone" dataKey="Disorder" stroke="#f59e0b" strokeWidth={3} fillOpacity={1} fill="url(#colorDisorder)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Incident mix bar chart */}
-            {!realYearly && (
-              <div>
-                <div className="flex items-center justify-between mb-3 px-1">
+            {/* Incident mix bar chart — show for both real and mock data */}
+            <div>
+              <div className="mb-3 px-1">
+                <div className="flex items-center justify-between mb-1">
                   <h3 className={cn('text-[10px] font-black uppercase tracking-[0.3em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Incident Mix</h3>
-                  <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Added View</span>
+                  <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-400' : 'text-slate-600')}>Stacked comparison</span>
                 </div>
-                <div className={cn('h-[240px] w-full rounded-[1.6rem] p-5 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} />
-                      <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
-                      <Legend wrapperStyle={{ fontSize: 10, fontWeight: 700, color: isLight ? '#475569' : '#64748b' }} />
-                      <Bar dataKey="Violent" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="Property" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="Disorder" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                <p className={cn('text-[9px]', isLight ? 'text-slate-500' : 'text-slate-600')}>
+                  Side-by-side bars show the relative proportion of violent crime, property crime, and disorder calls each {hasRealData ? 'year' : 'month'} — useful for spotting which category is driving any overall change
+                </p>
               </div>
-            )}
+              <div
+                className={cn('h-[240px] w-full rounded-[1.6rem] p-5 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+                role="img"
+                aria-label={`Stacked bar chart showing incident mix by ${hasRealData ? 'year' : 'month'} for ${data.communityName}: violent (red), property (blue), disorder (amber)`}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  {/* stackId groups the three series into one stacked column per period —
+                      makes proportional comparison far clearer at this chart height */}
+                  <BarChart data={chartData} barCategoryGap="28%">
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} />
+                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
+                    <Legend wrapperStyle={{ fontSize: 10, fontWeight: 700, color: isLight ? '#475569' : '#64748b' }} />
+                    <Bar dataKey="Violent"  fill="#ef4444" stackId="a" />
+                    <Bar dataKey="Property" fill="#3b82f6" stackId="a" />
+                    <Bar dataKey="Disorder" fill="#f59e0b" stackId="a" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -255,25 +310,65 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
               ))}
             </div>
 
-            <div className={cn('pt-2 border-t', isLight ? 'border-slate-200' : 'border-white/10')}>
+            {/* Data Glossary */}
+            <div className={cn('rounded-2xl p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.03] border-white/10')}>
               <div className="flex items-center gap-2 mb-3">
-                <ShieldCheck size={14} className="text-emerald-500" />
-                <span className={cn('text-[9px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-500')}>Verified System Data</span>
+                <Info size={13} className="text-blue-400 shrink-0" />
+                <p className={cn('text-[10px] font-black uppercase tracking-[0.2em]', isLight ? 'text-slate-600' : 'text-slate-500')}>What Each Category Means</p>
               </div>
-              <p className={cn('text-[10px] leading-relaxed font-medium', isLight ? 'text-slate-700' : 'text-slate-500')}>
-                Safety score uses weighted incident density and trend movement across recent months, normalized against city baseline.
-              </p>
+              <div className="space-y-2.5">
+                <div>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                    <p className={cn('text-[9px] font-black uppercase tracking-wide', isLight ? 'text-red-700' : 'text-red-400')}>Violent Crime</p>
+                  </div>
+                  <p className={cn('text-[9px] leading-relaxed pl-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                    Assault (non-domestic), commercial robbery, street robbery, and other violent offences reported to police. Domestic violence is tracked separately by CPS and is not included here.
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                    <p className={cn('text-[9px] font-black uppercase tracking-wide', isLight ? 'text-blue-700' : 'text-blue-400')}>Property Crime</p>
+                  </div>
+                  <p className={cn('text-[9px] leading-relaxed pl-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                    Break &amp; enter (commercial, dwelling, other premises), theft from vehicle, and theft of vehicle. Counts the number of reported incidents, not individual items stolen.
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                    <p className={cn('text-[9px] font-black uppercase tracking-wide', isLight ? 'text-amber-700' : 'text-amber-400')}>Disorder Calls</p>
+                  </div>
+                  <p className={cn('text-[9px] leading-relaxed pl-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                    Non-criminal service calls dispatched to CPS: noise complaints, suspicious persons or vehicles, nuisance behaviour, and similar quality-of-life concerns. High disorder does not necessarily indicate criminal activity.
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {/* Data source */}
             <div className={cn('rounded-2xl p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.03] border-white/10')}>
               <div className="flex items-center gap-2 mb-2">
-                <Zap size={14} className="text-blue-400" />
-                <p className={cn('text-[10px] font-black uppercase tracking-[0.2em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Operator Note</p>
+                <Database size={13} className="text-slate-400 shrink-0" />
+                <p className={cn('text-[10px] font-black uppercase tracking-[0.2em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Data Sources</p>
               </div>
-              <p className={cn('text-xs leading-relaxed', isLight ? 'text-slate-700' : 'text-slate-300')}>
-                {realYearly
-                  ? 'Year-over-year trends use live Calgary Open Data. Crime and disorder totals reflect annual reported incidents per community.'
-                  : 'Use Incident Mix with Crime Trends to detect short spikes versus sustained pressure in this neighborhood.'}
+              <div className={cn('space-y-1.5 text-[9px] leading-relaxed', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                <p><span className="font-bold">Crime:</span> City of Calgary — Community Crime Statistics (dataset 78gh-n26t). Includes UCR-classified criminal offences by community, year, and month.</p>
+                <p><span className="font-bold">Disorder:</span> City of Calgary — Community Disorder Statistics (dataset h3h6-kgme). Counts non-criminal CPS dispatch events.</p>
+                <p className={cn('pt-1 border-t', isLight ? 'border-slate-200' : 'border-white/10')}>
+                  Both datasets update quarterly. Figures reflect reported incidents only — not all crime is reported.
+                </p>
+              </div>
+            </div>
+
+            <div className={cn('pt-2 border-t', isLight ? 'border-slate-200' : 'border-white/10')}>
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck size={14} className="text-emerald-500" />
+                <span className={cn('text-[9px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-500')}>Safety Score Method</span>
+              </div>
+              <p className={cn('text-[9px] leading-relaxed font-medium', isLight ? 'text-slate-700' : 'text-slate-500')}>
+                Weighted incident density and trend direction across recent periods, normalized against the city-wide baseline. Higher = safer relative to Calgary average.
               </p>
             </div>
           </div>

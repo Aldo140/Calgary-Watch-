@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { X, MapPin, Activity, TrendingUp, TrendingDown, ShieldCheck, Info, Database, ChevronDown } from 'lucide-react';
@@ -619,10 +619,106 @@ function TrendChartSection({
   );
 }
 
-function DonutSection(_: {
+function DonutSection({
+  crimeEntry, isLight,
+}: {
   crimeEntry: CrimeStatEntry | undefined;
   isLight: boolean;
-}) { return null; }
+}) {
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  if (!crimeEntry || (crimeEntry.violent + crimeEntry.property + crimeEntry.disorder) === 0) return null;
+
+  const total  = crimeEntry.violent + crimeEntry.property + crimeEntry.disorder;
+  const slices = [
+    { name: 'Violent',  value: crimeEntry.violent,  color: '#ef4444', description: 'Assault, robbery, threats' },
+    { name: 'Property', value: crimeEntry.property, color: '#3b82f6', description: 'Break & enter, theft' },
+    { name: 'Disorder', value: crimeEntry.disorder, color: '#f59e0b', description: 'Non-criminal service calls' },
+  ];
+
+  const renderActiveShape = (props: any) => {
+    const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
+    return (
+      <g>
+        <text x={cx} y={cy - 10} textAnchor="middle" fill={isLight ? '#0f172a' : '#fff'} style={{ fontSize: 22, fontWeight: 900 }}>
+          {payload.value.toLocaleString()}
+        </text>
+        <text x={cx} y={cy + 14} textAnchor="middle" fill="#64748b" style={{ fontSize: 11, fontWeight: 700 }}>
+          {(percent * 100).toFixed(0)}% of total
+        </text>
+        <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 8} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+        <Sector cx={cx} cy={cy} innerRadius={outerRadius + 12} outerRadius={outerRadius + 16} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+      </g>
+    );
+  };
+
+  return (
+    <Section
+      title="What's Driving Activity"
+      subtitle={`Proportional breakdown · ${crimeEntry.year}`}
+      isLight={isLight}
+    >
+      <div className="flex flex-col md:flex-row gap-6 items-center">
+        <div className="w-full md:w-auto flex justify-center">
+          <PieChart width={240} height={240}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {React.createElement(Pie as any, {
+              activeIndex: activeIdx,
+              activeShape: renderActiveShape,
+              data: slices,
+              cx: 120, cy: 120,
+              innerRadius: 68, outerRadius: 100,
+              dataKey: 'value',
+              onMouseEnter: (_: unknown, idx: number) => setActiveIdx(idx),
+              onClick: (_: unknown, idx: number) => setActiveIdx(idx),
+              isAnimationActive: true,
+              animationBegin: 200,
+              animationDuration: 800,
+            }, slices.map(({ color }, i) => (
+              <Cell key={i} fill={color} />
+            )))}
+          </PieChart>
+        </div>
+
+        {/* Legend */}
+        <div className="flex-1 space-y-3 w-full">
+          <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-500">
+            Total: {total.toLocaleString()} incidents
+          </p>
+          {slices.map(({ name, value, color, description }, i) => (
+            <button
+              key={name}
+              onClick={() => setActiveIdx(i)}
+              className={cn(
+                'w-full flex items-center gap-3 rounded-xl p-3 border text-left transition-all',
+                activeIdx === i
+                  ? (isLight ? 'border-slate-300 bg-slate-100' : 'border-white/15 bg-white/[0.06]')
+                  : (isLight ? 'border-slate-200 bg-white hover:bg-slate-50' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]')
+              )}
+            >
+              <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className={cn('text-sm font-bold', isLight ? 'text-slate-900' : 'text-white')}>{name}</span>
+                  <span className={cn('text-sm font-black', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between mt-0.5">
+                  <span className="text-[11px] text-slate-500">{description}</span>
+                  <span className="text-[11px] font-bold" style={{ color }}>
+                    {total > 0 ? `${Math.round((value / total) * 100)}%` : '–'}
+                  </span>
+                </div>
+              </div>
+            </button>
+          ))}
+          <p className={cn('text-[10px] pt-1', isLight ? 'text-slate-400' : 'text-slate-600')}>
+            Tap a slice or row to highlight
+          </p>
+        </div>
+      </div>
+    </Section>
+  );
+}
 
 function PropertyValueSection(_: {
   propertyData: PropertyYearEntry[];

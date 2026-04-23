@@ -1000,7 +1000,8 @@ export default function MapPage() {
         const sortedTotals = [...crimeStats.entries()]
           .map(([, e]) => e.crime + e.disorder)
           .sort((a, b) => b - a);
-        const rank = sortedTotals.findIndex(v => v <= total) + 1;
+        const rawIdx = sortedTotals.findIndex(v => v <= total);
+        const rank = rawIdx === -1 ? sortedTotals.length : rawIdx + 1;
         const totalCommunities = crimeStats.size;
 
         const propPct = entry.violent + entry.property > 0
@@ -1017,7 +1018,7 @@ export default function MapPage() {
 
         const computedInsights = [
           `This community ranks #${rank} of ${totalCommunities} Calgary neighbourhoods by total incident volume`,
-          `Property crime accounts for ${propPct}% of all incidents — ${propVsCityText}`,
+          `Property crime accounts for ${propPct}% of all criminal offences — ${propVsCityText}`,
         ];
 
         setSelectedArea({
@@ -1033,7 +1034,7 @@ export default function MapPage() {
       return;
     }
     setSelectedArea({ ...base, communityName: displayName });
-  }, [incidents, mapRef, crimeStats]);
+  }, [incidents, mapRef, crimeStats, cityAverages]);
 
   return (
     <div className="flex h-dvh w-full bg-slate-950 light:bg-[#eef3ea] overflow-hidden font-sans relative">

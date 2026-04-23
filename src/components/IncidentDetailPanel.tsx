@@ -18,6 +18,14 @@ const CATEGORY_EMOJI: Record<string, string> = {
   emergency:      '🆘',
 };
 
+const BANNER_GRAD: Record<string, string> = {
+  crime:          'from-red-950 via-red-900 to-slate-950 light:from-red-50 light:via-red-100 light:to-stone-50',
+  traffic:        'from-orange-950 via-orange-900 to-slate-950 light:from-orange-50 light:via-orange-100 light:to-stone-50',
+  infrastructure: 'from-blue-950 via-blue-900 to-slate-950 light:from-blue-50 light:via-blue-100 light:to-stone-50',
+  weather:        'from-sky-950 via-sky-900 to-slate-950 light:from-sky-50 light:via-sky-100 light:to-stone-50',
+  emergency:      'from-red-900 via-rose-900 to-slate-950 light:from-rose-50 light:via-red-100 light:to-stone-50',
+};
+
 function buildIncidentUrl(incidentId: string): string {
   if (typeof window === 'undefined') return `https://calgarywatch.ca/map?i=${incidentId}`;
   return `${window.location.origin}/map?i=${encodeURIComponent(incidentId)}`;
@@ -230,67 +238,115 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
               </div>
             )}
 
-            {/* Header / Hero Section */}
-            <div
-              className={cn(
-                'relative w-full shrink-0 overflow-hidden',
-                isMobileSheet ? 'h-40' : 'h-64'
-              )}
-            >
-              {/* Background image - local WebP, no network round-trip */}
-              <img
-                src={publicAsset('images/calgary7.webp')}
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 w-full h-full object-cover grayscale opacity-25 light:opacity-15"
-                loading="eager"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent light:from-[rgb(255,250,243)] light:via-[rgba(255,250,243,0.74)]" />
-              
-              <button
-                onClick={onClose}
-                className="absolute top-6 right-6 p-3 text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 transition-all bg-white/5 light:bg-white/90 hover:bg-white/10 light:hover:bg-slate-100 backdrop-blur-xl rounded-2xl border border-white/10 light:border-slate-200 z-20 group"
-              >
-                <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-              </button>
-
-              <div className="absolute bottom-8 left-8 right-8 z-10">
-                <div className="flex flex-wrap items-center gap-3 mb-4">
-                  <motion.div 
+            {/* Header / Banner — mobile dispatch card vs desktop hero */}
+            {isMobileSheet ? (
+              /* Mobile: gradient dispatch card, natural height, no overflow-hidden */
+              <div className={cn('relative min-h-[140px] p-6 bg-gradient-to-br', BANNER_GRAD[incident.category] ?? BANNER_GRAD.crime)}>
+                {/* Category watermark */}
+                <div className="absolute bottom-2 right-4 text-[80px] opacity-[0.08] pointer-events-none select-none" aria-hidden="true">
+                  {CATEGORY_EMOJI[incident.category] ?? '📍'}
+                </div>
+                {/* Close button */}
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 p-3 text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 transition-all bg-white/10 light:bg-white/90 hover:bg-white/20 light:hover:bg-slate-100 backdrop-blur-xl rounded-2xl border border-white/20 light:border-slate-200 z-20 group"
+                >
+                  <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                </button>
+                {/* Tags — always visible, never clipped */}
+                <div className="flex flex-wrap gap-2 mb-3 pr-14">
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className={cn(
                       'px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border',
-                      incident.category === 'crime' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                      incident.category === 'traffic' ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' :
-                      incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                      'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                      incident.category === 'crime'          ? 'bg-red-500/20 text-red-400 border-red-500/30 light:bg-red-100 light:text-red-700 light:border-red-200' :
+                      incident.category === 'traffic'        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 light:bg-orange-100 light:text-orange-700 light:border-orange-200' :
+                      incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 light:bg-blue-100 light:text-blue-700 light:border-blue-200' :
+                      incident.category === 'emergency'      ? 'bg-rose-500/20 text-rose-400 border-rose-500/30 light:bg-rose-100 light:text-rose-700 light:border-rose-200' :
+                                                               'bg-purple-500/20 text-purple-400 border-purple-500/30 light:bg-purple-100 light:text-purple-700 light:border-purple-200'
                     )}
                   >
                     <Icon size={14} />
                     {incident.category}
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.1 }}
                     className={cn(
                       'px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border',
-                      incident.verified_status === 'community_confirmed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
-                      incident.verified_status === 'multiple_reports' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
-                      'bg-slate-500/20 text-slate-400 border-slate-500/30'
+                      incident.verified_status === 'community_confirmed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 light:bg-emerald-100 light:text-emerald-700 light:border-emerald-200' :
+                      incident.verified_status === 'multiple_reports'    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 light:bg-amber-100 light:text-amber-700 light:border-amber-200' :
+                                                                           'bg-slate-500/20 text-slate-400 border-slate-500/30 light:bg-slate-100 light:text-slate-600 light:border-slate-300'
                     )}
                   >
                     {StatusIcon && <StatusIcon size={14} />}
                     {incident.verified_status?.replace('_', ' ')}
                   </motion.div>
                 </div>
-                <h2 className="text-3xl font-black text-white tracking-tight leading-[1.1] drop-shadow-lg">
+                {/* Title */}
+                <h2 className="text-2xl font-black text-white light:text-slate-900 tracking-tight leading-[1.1]">
                   {incident.title}
                 </h2>
+                {/* Location + time sub-line */}
+                <p className="text-[11px] text-white/60 light:text-slate-600 mt-1.5 font-bold">
+                  {incident.neighborhood || 'Calgary'} · {timeAgo} ago
+                </p>
               </div>
-            </div>
+            ) : (
+              /* Desktop: original hero with image; tags moved below overflow-hidden */
+              <>
+                <div className="relative w-full shrink-0 overflow-hidden h-64">
+                  <img
+                    src={publicAsset('images/calgary7.webp')}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 w-full h-full object-cover grayscale opacity-25 light:opacity-15"
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent light:from-[rgb(255,250,243)] light:via-[rgba(255,250,243,0.74)]" />
+                  <button
+                    onClick={onClose}
+                    className="absolute top-6 right-6 p-3 text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 transition-all bg-white/5 light:bg-white/90 hover:bg-white/10 light:hover:bg-slate-100 backdrop-blur-xl rounded-2xl border border-white/10 light:border-slate-200 z-20 group"
+                  >
+                    <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                  </button>
+                  <div className="absolute bottom-8 left-8 right-8 z-10">
+                    <h2 className="text-3xl font-black text-white tracking-tight leading-[1.1] drop-shadow-lg">
+                      {incident.title}
+                    </h2>
+                  </div>
+                </div>
+                {/* Tags outside overflow-hidden — never clip */}
+                <div className="px-8 pt-4 flex flex-wrap items-center gap-3">
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border',
+                      incident.category === 'crime'          ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                      incident.category === 'traffic'        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' :
+                      incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                                                               'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                    )}
+                  >
+                    <Icon size={14} />
+                    {incident.category}
+                  </div>
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border',
+                      incident.verified_status === 'community_confirmed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                      incident.verified_status === 'multiple_reports'    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                                                                           'bg-slate-500/20 text-slate-400 border-slate-500/30'
+                    )}
+                  >
+                    {StatusIcon && <StatusIcon size={14} />}
+                    {incident.verified_status?.replace('_', ' ')}
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
               {/* Stats Grid */}

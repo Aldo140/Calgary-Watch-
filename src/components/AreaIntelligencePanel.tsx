@@ -1,384 +1,306 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
-import { X, TrendingUp, TrendingDown, ShieldCheck, MapPin, Activity, Info, Database } from 'lucide-react';
+import { X, MapPin, Activity, TrendingUp, TrendingDown, ShieldCheck, Info, Database, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, Legend } from 'recharts';
+import {
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, Sector,
+  ComposedChart, Line,
+} from 'recharts';
 import { cn } from '@/src/lib/utils';
 import { Drawer } from 'vaul';
-import { CrimeYearEntry } from '@/src/hooks/useCrimeStats';
+import { CrimeStatEntry, CrimeYearEntry } from '@/src/hooks/useCrimeStats';
+import { PropertyYearEntry } from '@/src/hooks/usePropertyAssessments';
+import { useInView } from '@/src/hooks/useInView';
+import { useCountUp } from '@/src/hooks/useCountUp';
 
-/** Abbreviate large tick numbers: 1200 → 1.2k, 15000 → 15k */
+/** Abbreviate large tick numbers: 1200 → 1.2k */
 function fmtTick(v: number): string {
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1000) return `${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k`;
   return String(v);
+}
+
+/** Format dollar amounts: 487000 → $487k */
+function fmtDollars(v: number): string {
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
+  if (v >= 1000) return `$${Math.round(v / 1000)}k`;
+  return `$${v}`;
 }
 
 interface AreaIntelligencePanelProps {
   data: AreaIntelligence | null;
   onClose: () => void;
-  crimeStats?: Map<string, { crime: number; violent: number; property: number; disorder: number; year: number }>;
+  crimeStats?: Map<string, CrimeStatEntry>;
   yearlyStats?: Map<string, CrimeYearEntry[]>;
+  propertyData?: PropertyYearEntry[];
+  cityAverages?: { avgViolent: number; avgProperty: number; avgDisorder: number };
   theme?: 'dark' | 'light';
 }
 
-export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearlyStats, theme = 'dark' }: AreaIntelligencePanelProps) {
-  const [mobileTab, setMobileTab] = useState<'crime' | 'trend' | 'intel'>('crime');
+// ── Shared tooltip styles ────────────────────────────────────────────────────
 
-  useEffect(() => {
-    setMobileTab('crime');
-  }, [data?.communityName]);
-
-  if (!data) return null;
-
-  const isLight = theme === 'light';
-
-  const communityKey = data.communityName.toLowerCase();
-  const realYearly = yearlyStats?.get(communityKey);
-  const hasRealData = realYearly && realYearly.length > 0;
-
-  const chartData = hasRealData
-    ? realYearly.map(e => ({ name: String(e.year), Violent: e.violent, Property: e.property, Disorder: e.disorder }))
-    : data.monthlyTrends.map(t => ({ name: t.month, Violent: t.violent_crime, Property: t.property_crime, Disorder: t.disorder_calls }));
-
-  const tooltipStyle = {
+function makeTooltipStyle(isLight: boolean) {
+  return {
     backgroundColor: isLight ? '#ffffff' : '#020617',
     borderRadius: '14px',
     border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)',
     boxShadow: isLight ? '0 8px 32px -4px rgba(0,0,0,0.18)' : '0 18px 25px -5px rgba(0,0,0,0.45)',
   };
-  const tooltipLabelStyle = {
-    fontSize: 10,
+}
+
+function makeTooltipLabelStyle(isLight: boolean) {
+  return {
+    fontSize: 11,
     fontWeight: 900,
     color: isLight ? '#1e293b' : '#fff',
     marginBottom: 4,
     textTransform: 'uppercase' as const,
     letterSpacing: '0.1em',
   };
+}
 
-  const crimeEntry = crimeStats?.get(communityKey);
+// ── Section wrapper ──────────────────────────────────────────────────────────
 
-  const Content = () => (
-    <div className={cn(
-      'flex flex-col h-full backdrop-blur-3xl overflow-hidden relative',
-      isLight ? 'bg-[rgb(255,250,243)] text-slate-900' : 'bg-slate-950/95'
-    )}>
-      <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
+function Section({
+  title, subtitle, children, isLight,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  isLight: boolean;
+}) {
+  const [ref, inView] = useInView();
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+    >
+      <div className="mb-4">
+        <h3 className={cn('text-xl font-black leading-tight', isLight ? 'text-slate-900' : 'text-white')}>{title}</h3>
+        {subtitle && (
+          <p className={cn('text-[11px] uppercase tracking-widest font-bold mt-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>{subtitle}</p>
+        )}
+      </div>
+      {children}
+    </motion.div>
+  );
+}
 
-      {/* Header */}
-      <div className={cn(
-        'p-8 border-b flex items-center justify-between relative z-10 sticky top-0 backdrop-blur-xl',
-        isLight ? 'border-stone-200/80 bg-[rgba(255,250,243,0.94)]' : 'border-white/5 bg-slate-950/95'
-      )}>
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <MapPin size={14} className="text-blue-400" />
-            <span className={cn('text-[10px] font-black uppercase tracking-[0.3em]', isLight ? 'text-slate-600' : 'text-slate-500')}>
-              Neighborhood Intelligence
-            </span>
-          </div>
-          <h2 className={cn('text-3xl font-black tracking-tight leading-none', isLight ? 'text-slate-900' : 'text-white')}>
-            {data.communityName}
-          </h2>
+// ── Hero ─────────────────────────────────────────────────────────────────────
+
+function HeroSection({
+  data, onClose, glowColor, gaugeColor,
+}: {
+  data: AreaIntelligence;
+  onClose: () => void;
+  glowColor: string;
+  gaugeColor: string;
+}) {
+  const score = data.safetyScore ?? 0;
+  const r = 26;
+  const circ = 2 * Math.PI * r;
+  const [gaugeRef, gaugeInView] = useInView(0);
+  const animatedScore = useCountUp(score, 900, gaugeInView);
+  const dash = gaugeInView ? (score / 100) * circ : 0;
+
+  return (
+    <div
+      className="relative px-5 pt-5 pb-6 md:px-8 overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #0f1e3d 0%, #0a1628 100%)' }}
+    >
+      {/* Score-keyed glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: `radial-gradient(ellipse at 20% 50%, ${glowColor}, transparent 60%)` }}
+      />
+
+      {/* Eyebrow + close */}
+      <div className="flex items-center justify-between mb-3 relative z-10">
+        <div className="flex items-center gap-1.5">
+          <MapPin size={11} className="text-slate-500" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Neighbourhood Intelligence</span>
         </div>
         <button
           onClick={onClose}
-          className={cn(
-            'p-3 transition-all rounded-2xl border group',
-            isLight
-              ? 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-300'
-              : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10'
-          )}
+          className="p-2.5 rounded-xl border text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10 transition-all group"
         >
-          <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+          <X size={17} className="group-hover:rotate-90 transition-transform duration-300" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 no-scrollbar relative z-10">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className={cn('rounded-[1.4rem] p-4 border', isLight ? 'bg-white/72 border-stone-200/80' : 'bg-white/[0.03] border-white/10')}>
-            <p className={cn('text-[10px] font-black uppercase tracking-widest mb-2', isLight ? 'text-slate-600' : 'text-slate-500')}>Safety Score</p>
-            <div className="text-4xl font-black text-blue-400">{data.safetyScore}</div>
-            <p className={cn('text-[9px] mt-1', isLight ? 'text-slate-500' : 'text-slate-600')}>Out of 100 · weighted vs city avg</p>
+      {/* Community name */}
+      <h2
+        className="text-[clamp(26px,6vw,40px)] font-black text-white leading-none mb-4 relative z-10 truncate"
+        title={data.communityName}
+      >
+        {data.communityName}
+      </h2>
+
+      {/* Gauge + quick stats row */}
+      <div ref={gaugeRef} className="flex items-center gap-4 relative z-10">
+        {/* Animated SVG gauge */}
+        <div className="relative shrink-0 w-[64px] h-[64px] md:w-[72px] md:h-[72px]">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
+            <circle
+              cx="32" cy="32" r={r} fill="none"
+              stroke={gaugeColor}
+              strokeWidth="7"
+              strokeLinecap="round"
+              strokeDasharray={`${dash} ${circ}`}
+              transform="rotate(-90 32 32)"
+              style={{ transition: gaugeInView ? 'stroke-dasharray 0.9s cubic-bezier(0.33,1,0.68,1)' : 'none' }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[15px] font-black text-white leading-none">{animatedScore}</span>
+            <span className="text-[7px] text-slate-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
           </div>
-          <div className={cn('rounded-[1.4rem] p-4 border', isLight ? 'bg-white/72 border-stone-200/80' : 'bg-white/[0.03] border-white/10')}>
-            <p className={cn('text-[10px] font-black uppercase tracking-widest mb-2', isLight ? 'text-slate-600' : 'text-slate-500')}>Active Incidents</p>
-            <div className="text-4xl font-black text-orange-400">{data.activeIncidents}</div>
-            <p className={cn('text-[9px] mt-1', isLight ? 'text-slate-500' : 'text-slate-600')}>Reported in last 2 hours</p>
-          </div>
-          <div className={cn('rounded-[1.4rem] p-4 border', isLight ? 'bg-white/72 border-stone-200/80' : 'bg-white/[0.03] border-white/10')}>
-            <p className={cn('text-[10px] font-black uppercase tracking-widest mb-2', isLight ? 'text-slate-600' : 'text-slate-500')}>Trend</p>
-            <div className={cn(
-              'text-3xl font-black uppercase',
-              data.trend === 'improving' ? 'text-emerald-400' : data.trend === 'declining' ? 'text-red-400' : isLight ? 'text-slate-600' : 'text-slate-300'
+        </div>
+
+        {/* 3-col quick stat chips */}
+        <div className="grid grid-cols-3 gap-2 flex-1">
+          {[
+            { label: 'Incidents', value: String(data.activeIncidents ?? 0), color: 'text-orange-400' },
+            {
+              label: 'Trend',
+              value: data.trend ?? '–',
+              color: data.trend === 'improving' ? 'text-emerald-400' : data.trend === 'declining' ? 'text-red-400' : 'text-slate-300',
+            },
+            {
+              label: 'Risk',
+              value: score >= 70 ? 'Low' : score >= 40 ? 'Medium' : 'High',
+              color: score >= 70 ? 'text-emerald-400' : score >= 40 ? 'text-amber-400' : 'text-red-400',
+            },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="bg-white/[0.04] border border-white/[0.07] rounded-xl p-2 text-center">
+              <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-1">{label}</p>
+              <p className={cn('text-[11px] font-black truncate leading-none capitalize', color)}>{value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Live overlay insight */}
+      {data.liveOverlayInsight && (
+        <div className="mt-4 flex items-start gap-2.5 bg-blue-500/10 border border-blue-500/20 rounded-2xl px-3 py-2.5 relative z-10">
+          <Activity size={13} className="text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-[12px] text-blue-100 font-medium leading-relaxed">{data.liveOverlayInsight}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main panel ───────────────────────────────────────────────────────────────
+
+export default function AreaIntelligencePanel({
+  data, onClose, crimeStats, yearlyStats, propertyData, cityAverages, theme = 'dark',
+}: AreaIntelligencePanelProps) {
+  const isLight = theme === 'light';
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [miniBarVisible, setMiniBarVisible] = useState(false);
+
+  // Reset mini-bar when community changes
+  useEffect(() => { setMiniBarVisible(false); }, [data?.communityName]);
+
+  // Show mini-bar once hero scrolls out of view
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setMiniBarVisible(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [data?.communityName]);
+
+  if (!data) return null;
+
+  const communityKey   = data.communityName.toLowerCase();
+  const crimeEntry     = crimeStats?.get(communityKey);
+  const realYearly     = yearlyStats?.get(communityKey) ?? [];
+  const hasRealData    = realYearly.length > 0;
+  const score          = data.safetyScore ?? 0;
+  const gaugeColor     = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
+  const glowColor      = score >= 70 ? 'rgba(52,211,153,0.12)' : score >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)';
+
+  const chartData = hasRealData
+    ? realYearly.map(e => ({ name: String(e.year), Violent: e.violent, Property: e.property, Disorder: e.disorder }))
+    : data.monthlyTrends.map(t => ({ name: t.month, Violent: t.violent_crime, Property: t.property_crime, Disorder: t.disorder_calls }));
+
+  const tooltipStyle      = makeTooltipStyle(isLight);
+  const tooltipLabelStyle = makeTooltipLabelStyle(isLight);
+
+  const Content = () => (
+    <div className={cn('flex flex-col h-full overflow-hidden relative', isLight ? 'text-slate-900' : 'text-white')}>
+      {/* Sticky mini-bar */}
+      <AnimatePresence>
+        {miniBarVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className={cn(
+              'sticky top-0 z-20 flex items-center justify-between px-5 py-3 border-b backdrop-blur-xl',
+              isLight ? 'bg-white/90 border-slate-200' : 'bg-slate-950/90 border-white/10'
+            )}
+          >
+            <span className="text-sm font-black truncate">{data.communityName}</span>
+            <span className={cn(
+              'text-xs font-black px-2.5 py-1 rounded-full border',
+              score >= 70 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                : score >= 40 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                : 'bg-red-500/10 text-red-400 border-red-500/20'
             )}>
-              {data.trend}
-            </div>
-            <p className={cn('text-[9px] mt-1', isLight ? 'text-slate-500' : 'text-slate-600')}>Recent months vs prior period</p>
-          </div>
-          <div className={cn(
-            'rounded-[1.4rem] p-4 flex gap-3 border',
-            isLight ? 'bg-gradient-to-br from-sky-50 to-teal-50 border-sky-200/80' : 'bg-blue-500/10 border-blue-500/20'
-          )}>
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/30">
-              <Activity className="text-blue-400" size={20} />
-            </div>
-            <div>
-              <h4 className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Live Context</h4>
-              <p className={cn('text-xs leading-relaxed font-medium line-clamp-3', isLight ? 'text-blue-900' : 'text-blue-100')}>
-                {data.liveOverlayInsight}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className={cn('rounded-[1.6rem] p-5 border relative overflow-hidden', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/50" />
-          <p className={cn('text-sm leading-relaxed font-medium pl-2', isLight ? 'text-slate-700' : 'text-slate-300')}>
-            {data.description}
-          </p>
-        </div>
-
-        {/* Live crime stats from Open Data */}
-        {crimeEntry && (
-          <div className={cn('rounded-[1.6rem] p-5 border relative overflow-hidden', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500/50" />
-            <div className="pl-2">
-              <div className="flex items-center justify-between mb-1">
-                <p className={cn('text-[10px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                  City Crime Statistics · {crimeEntry.year}
-                </p>
-                <div className="flex items-center gap-1">
-                  <Database size={10} className={isLight ? 'text-slate-400' : 'text-slate-600'} />
-                  <span className={cn('text-[9px]', isLight ? 'text-slate-400' : 'text-slate-600')}>Calgary Open Data</span>
-                </div>
-              </div>
-              <p className={cn('text-[9px] mb-3', isLight ? 'text-slate-500' : 'text-slate-600')}>
-                Criminal offences reported to Calgary Police Service for this community in {crimeEntry.year}
-              </p>
-              {/* Show a gentle notice when violent + property both read zero —
-                  usually means the CPS dataset uses a slightly different community name
-                  than the Open Data crime dataset (e.g. "Downtown West" vs "West Village").
-                  We still show disorder if it has data. */}
-              {crimeEntry.violent === 0 && crimeEntry.property === 0 && crimeEntry.disorder === 0 ? (
-                <div className={cn('rounded-xl p-3 border flex items-start gap-2.5', isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20')}>
-                  <Info size={13} className="text-amber-500 shrink-0 mt-0.5" />
-                  <p className={cn('text-[9px] leading-relaxed', isLight ? 'text-amber-800' : 'text-amber-300')}>
-                    Detailed crime breakdowns are not available for this community in the current Open Data snapshot.
-                    The community name may differ between data sources. Totals shown above reflect the matched record from the crime dataset.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
-                      <p className={cn('text-[9px] font-black uppercase tracking-widest mb-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>Violent Crime</p>
-                      <p className={cn('text-2xl font-black', isLight ? 'text-red-600' : 'text-red-400')}>{crimeEntry.violent.toLocaleString()}</p>
-                      <p className={cn('text-[8px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>Assault · robbery · threats</p>
-                    </div>
-                    <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
-                      <p className={cn('text-[9px] font-black uppercase tracking-widest mb-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>Property Crime</p>
-                      <p className={cn('text-2xl font-black', isLight ? 'text-blue-600' : 'text-blue-400')}>{crimeEntry.property.toLocaleString()}</p>
-                      <p className={cn('text-[8px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>Break &amp; enter · theft</p>
-                    </div>
-                  </div>
-                  <div className={cn('rounded-xl p-3 border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/5')}>
-                    <p className={cn('text-[9px] font-black uppercase tracking-widest mb-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>Disorder Calls</p>
-                    <p className={cn('text-2xl font-black', isLight ? 'text-amber-600' : 'text-amber-400')}>{crimeEntry.disorder.toLocaleString()}</p>
-                    <p className={cn('text-[8px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>Non-criminal police calls: noise, suspicious activity, nuisance</p>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+              {score} / 100
+            </span>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.95fr] gap-5">
-          <div className="space-y-5">
-            {/* Crime / Disorder trend chart */}
-            <div>
-              <div className="mb-3 px-1">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className={cn('text-[10px] font-black uppercase tracking-[0.3em]', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                    {hasRealData ? 'Year-over-Year Trends' : 'Crime Trends'}
-                  </h3>
-                  <div className="flex gap-3">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Violent</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />
-                      <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Property</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
-                      <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-600' : 'text-slate-500')}>Disorder</span>
-                    </div>
-                  </div>
-                </div>
-                <p className={cn('text-[9px]', isLight ? 'text-slate-500' : 'text-slate-600')}>
-                  {hasRealData
-                    ? 'Annual criminal offences reported to Calgary Police (left axis) alongside non-criminal disorder service calls — sourced from City of Calgary Open Data'
-                    : 'Estimated monthly breakdown across violent, property, and disorder categories based on available community data'}
-                </p>
-              </div>
-              <div
-                className={cn('h-[280px] w-full rounded-[1.6rem] p-5 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
-                role="img"
-                aria-label={`${hasRealData ? 'Year-over-year' : 'Monthly'} crime trend chart for ${data.communityName}: violent crime (red), property crime (blue), disorder calls (amber)`}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <defs>
-                      <linearGradient id="colorViolent" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorDisorder" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorProperty" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={8} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} />
-                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
-                    <Area type="monotone" dataKey="Violent" stroke="#ef4444" strokeWidth={3} fillOpacity={1} fill="url(#colorViolent)" />
-                    <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorProperty)" />
-                    <Area type="monotone" dataKey="Disorder" stroke="#f59e0b" strokeWidth={3} fillOpacity={1} fill="url(#colorDisorder)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto no-scrollbar">
+        <div ref={heroRef}>
+          <HeroSection data={data} onClose={onClose} glowColor={glowColor} gaugeColor={gaugeColor} />
+        </div>
 
-            {/* Incident mix bar chart — show for both real and mock data */}
-            <div>
-              <div className="mb-3 px-1">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className={cn('text-[10px] font-black uppercase tracking-[0.3em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Incident Mix</h3>
-                  <span className={cn('text-[8px] font-bold uppercase', isLight ? 'text-slate-400' : 'text-slate-600')}>Stacked comparison</span>
-                </div>
-                <p className={cn('text-[9px]', isLight ? 'text-slate-500' : 'text-slate-600')}>
-                  Side-by-side bars show the relative proportion of violent crime, property crime, and disorder calls each {hasRealData ? 'year' : 'month'} — useful for spotting which category is driving any overall change
-                </p>
-              </div>
-              <div
-                className={cn('h-[240px] w-full rounded-[1.6rem] p-5 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
-                role="img"
-                aria-label={`Stacked bar chart showing incident mix by ${hasRealData ? 'year' : 'month'} for ${data.communityName}: violent (red), property (blue), disorder (amber)`}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  {/* stackId groups the three series into one stacked column per period —
-                      makes proportional comparison far clearer at this chart height */}
-                  <BarChart data={chartData} barCategoryGap="28%">
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} />
-                    <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 11, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
-                    <Legend wrapperStyle={{ fontSize: 10, fontWeight: 700, color: isLight ? '#475569' : '#64748b' }} />
-                    <Bar dataKey="Violent"  fill="#ef4444" stackId="a" />
-                    <Bar dataKey="Property" fill="#3b82f6" stackId="a" />
-                    <Bar dataKey="Disorder" fill="#f59e0b" stackId="a" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className={cn('text-[10px] font-black uppercase tracking-[0.3em] ml-1', isLight ? 'text-slate-600' : 'text-slate-500')}>Key Insights</h3>
-            <div className="grid grid-cols-1 gap-3">
-              {data.insights.map((insight, idx) => (
-                <div key={idx} className={cn(
-                  'rounded-2xl p-4 border flex items-center gap-3 transition-all',
-                  isLight
-                    ? 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                    : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.05]'
-                )}>
-                  <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border', isLight ? 'bg-slate-100 border-slate-300' : 'bg-white/5 border-white/10')}>
-                    {insight.includes('↑') ? (
-                      <TrendingUp className="text-red-400" size={16} />
-                    ) : insight.includes('↓') ? (
-                      <TrendingDown className="text-emerald-400" size={16} />
-                    ) : (
-                      <ShieldCheck className="text-blue-400" size={16} />
-                    )}
-                  </div>
-                  <p className={cn('text-xs font-bold leading-snug', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Data Glossary */}
-            <div className={cn('rounded-2xl p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.03] border-white/10')}>
-              <div className="flex items-center gap-2 mb-3">
-                <Info size={13} className="text-blue-400 shrink-0" />
-                <p className={cn('text-[10px] font-black uppercase tracking-[0.2em]', isLight ? 'text-slate-600' : 'text-slate-500')}>What Each Category Means</p>
-              </div>
-              <div className="space-y-2.5">
-                <div>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                    <p className={cn('text-[9px] font-black uppercase tracking-wide', isLight ? 'text-red-700' : 'text-red-400')}>Violent Crime</p>
-                  </div>
-                  <p className={cn('text-[9px] leading-relaxed pl-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                    Assault (non-domestic), commercial robbery, street robbery, and other violent offences reported to police. Domestic violence is tracked separately by CPS and is not included here.
-                  </p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                    <p className={cn('text-[9px] font-black uppercase tracking-wide', isLight ? 'text-blue-700' : 'text-blue-400')}>Property Crime</p>
-                  </div>
-                  <p className={cn('text-[9px] leading-relaxed pl-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                    Break &amp; enter (commercial, dwelling, other premises), theft from vehicle, and theft of vehicle. Counts the number of reported incidents, not individual items stolen.
-                  </p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                    <p className={cn('text-[9px] font-black uppercase tracking-wide', isLight ? 'text-amber-700' : 'text-amber-400')}>Disorder Calls</p>
-                  </div>
-                  <p className={cn('text-[9px] leading-relaxed pl-3', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                    Non-criminal service calls dispatched to CPS: noise complaints, suspicious persons or vehicles, nuisance behaviour, and similar quality-of-life concerns. High disorder does not necessarily indicate criminal activity.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Data source */}
-            <div className={cn('rounded-2xl p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.03] border-white/10')}>
-              <div className="flex items-center gap-2 mb-2">
-                <Database size={13} className="text-slate-400 shrink-0" />
-                <p className={cn('text-[10px] font-black uppercase tracking-[0.2em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Data Sources</p>
-              </div>
-              <div className={cn('space-y-1.5 text-[9px] leading-relaxed', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                <p><span className="font-bold">Crime:</span> City of Calgary — Community Crime Statistics (dataset 78gh-n26t). Includes UCR-classified criminal offences by community, year, and month.</p>
-                <p><span className="font-bold">Disorder:</span> City of Calgary — Community Disorder Statistics (dataset h3h6-kgme). Counts non-criminal CPS dispatch events.</p>
-                <p className={cn('pt-1 border-t', isLight ? 'border-slate-200' : 'border-white/10')}>
-                  Both datasets update quarterly. Figures reflect reported incidents only — not all crime is reported.
-                </p>
-              </div>
-            </div>
-
-            <div className={cn('pt-2 border-t', isLight ? 'border-slate-200' : 'border-white/10')}>
-              <div className="flex items-center gap-2 mb-2">
-                <ShieldCheck size={14} className="text-emerald-500" />
-                <span className={cn('text-[9px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-500')}>Safety Score Method</span>
-              </div>
-              <p className={cn('text-[9px] leading-relaxed font-medium', isLight ? 'text-slate-700' : 'text-slate-500')}>
-                Weighted incident density and trend direction across recent periods, normalized against the city-wide baseline. Higher = safer relative to Calgary average.
-              </p>
-            </div>
-          </div>
+        <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[rgb(255,250,243)]' : 'bg-slate-950')}>
+          <CrimeThisYearSection
+            crimeEntry={crimeEntry}
+            cityAverages={cityAverages}
+            isLight={isLight}
+          />
+          <TrendChartSection
+            chartData={chartData}
+            hasRealData={hasRealData}
+            yearlyStats={realYearly}
+            isLight={isLight}
+            tooltipStyle={tooltipStyle}
+            tooltipLabelStyle={tooltipLabelStyle}
+          />
+          <DonutSection
+            crimeEntry={crimeEntry}
+            isLight={isLight}
+          />
+          <PropertyValueSection
+            propertyData={propertyData ?? []}
+            yearlyStats={realYearly}
+            isLight={isLight}
+            tooltipStyle={tooltipStyle}
+            tooltipLabelStyle={tooltipLabelStyle}
+          />
+          <KeySignalsSection
+            insights={data.insights}
+            isLight={isLight}
+          />
+          <DataSourcesSection isLight={isLight} />
         </div>
       </div>
     </div>
@@ -386,7 +308,7 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
 
   return (
     <>
-      {/* Desktop Panel */}
+      {/* Desktop panel */}
       <div className="hidden lg:block">
         <AnimatePresence>
           {data && (
@@ -408,7 +330,7 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
         </AnimatePresence>
       </div>
 
-      {/* Mobile Drawer — Mission Briefing layout */}
+      {/* Mobile drawer */}
       <div className="lg:hidden">
         <Drawer.Root open={!!data} onClose={onClose}>
           <Drawer.Portal>
@@ -418,222 +340,10 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
                 'h-full rounded-t-[3rem] overflow-hidden border-t flex flex-col',
                 isLight ? 'bg-[rgb(255,250,243)] border-stone-200/80' : 'bg-slate-950 border-white/10'
               )}>
-                {/* Drag handle */}
-                <div className={cn('mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-2', isLight ? 'bg-slate-300' : 'bg-white/10')} />
+                <div className={cn('mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-0', isLight ? 'bg-slate-300' : 'bg-white/10')} />
                 <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
-
-                {/* ── Mission Briefing header (always dark navy) ── */}
-                {(() => {
-                  const score = data.safetyScore ?? 0;
-                  const r = 22;
-                  const circ = 2 * Math.PI * r;
-                  const dash = (score / 100) * circ;
-                  const gaugeColor = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
-                  return (
-                    <div className="bg-gradient-to-br from-[#0f1e3d] to-[#0a1628] px-5 pt-3 pb-5 shrink-0">
-                      <p className="text-[8px] font-black uppercase tracking-[0.35em] text-slate-500 mb-1">Area Intelligence</p>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <h2 className="text-[18px] font-black text-white leading-none mb-3 truncate">{data.communityName}</h2>
-                          <div className="flex items-center gap-3">
-                            {/* SVG Safety Gauge */}
-                            <div className="relative shrink-0 w-[60px] h-[60px]">
-                              <svg width="60" height="60" viewBox="0 0 60 60">
-                                <circle cx="30" cy="30" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" />
-                                <circle
-                                  cx="30" cy="30" r={r} fill="none"
-                                  stroke={gaugeColor}
-                                  strokeWidth="6"
-                                  strokeLinecap="round"
-                                  strokeDasharray={`${dash} ${circ}`}
-                                  transform="rotate(-90 30 30)"
-                                />
-                              </svg>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-[13px] font-black text-white">{score}</span>
-                              </div>
-                            </div>
-                            {/* 2×2 quick-stats */}
-                            <div className="grid grid-cols-2 gap-1.5 flex-1">
-                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
-                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Incidents</p>
-                                <p className="text-sm font-black text-orange-400 leading-none">{data.activeIncidents ?? 0}</p>
-                              </div>
-                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
-                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Trend</p>
-                                <p className={cn('text-[11px] font-black uppercase truncate leading-none',
-                                  data.trend === 'improving' ? 'text-emerald-400' :
-                                  data.trend === 'declining' ? 'text-red-400' : 'text-slate-300'
-                                )}>{data.trend ?? '–'}</p>
-                              </div>
-                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
-                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Data Year</p>
-                                <p className="text-sm font-black text-white leading-none">{crimeEntry?.year ?? '–'}</p>
-                              </div>
-                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
-                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Risk</p>
-                                <p className={cn('text-[11px] font-black leading-none',
-                                  score >= 70 ? 'text-emerald-400' : score >= 40 ? 'text-amber-400' : 'text-red-400'
-                                )}>{score >= 70 ? 'Low' : score >= 40 ? 'Medium' : 'High'}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Close button */}
-                        <button
-                          onClick={onClose}
-                          className={cn('p-2.5 transition-all rounded-xl shrink-0 mt-1 border', isLight ? 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-300' : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10')}
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Tab bar */}
-                <div className={cn(
-                  'flex border-b shrink-0',
-                  isLight ? 'border-stone-200/80 bg-[rgb(255,250,243)]' : 'border-white/5 bg-slate-950'
-                )}>
-                  {(['crime', 'trend', 'intel'] as const).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setMobileTab(tab)}
-                      className={cn(
-                        'flex-1 py-3 text-[11px] font-black uppercase tracking-[0.2em] transition-all border-t-2',
-                        mobileTab === tab
-                          ? 'bg-blue-500/15 text-blue-400 border-blue-500'
-                          : isLight
-                            ? 'text-slate-500 border-transparent hover:text-slate-700'
-                            : 'text-slate-500 border-transparent hover:text-slate-400'
-                      )}
-                    >
-                      {tab === 'crime' ? 'Crime' : tab === 'trend' ? 'Trend' : 'Intel'}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Tab content */}
-                <div className={cn(
-                  'flex-1 overflow-y-auto p-5 no-scrollbar',
-                  isLight ? 'bg-[rgb(255,250,243)]' : 'bg-slate-950'
-                )}>
-                  {mobileTab === 'crime' && (() => {
-                    const maxVal = Math.max(crimeEntry?.violent ?? 0, crimeEntry?.property ?? 0, crimeEntry?.disorder ?? 0, 1);
-                    const hasBars = crimeEntry && (crimeEntry.violent + crimeEntry.property + crimeEntry.disorder) > 0;
-                    return (
-                      <div className="space-y-4">
-                        {hasBars ? (
-                          <>
-                            {[
-                              { label: 'Violent',  value: crimeEntry!.violent,  color: 'bg-red-500' },
-                              { label: 'Property', value: crimeEntry!.property, color: 'bg-orange-500' },
-                              { label: 'Disorder', value: crimeEntry!.disorder, color: 'bg-amber-500' },
-                            ].map(({ label, value, color }) => (
-                              <div key={label} className="space-y-1.5">
-                                <div className="flex items-center justify-between">
-                                  <span className={cn('text-[11px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-400')}>{label}</span>
-                                  <span className={cn('text-[11px] font-black', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
-                                </div>
-                                <div className={cn('h-2 rounded-full overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
-                                  <div className={cn('h-full rounded-full', color)} style={{ width: `${Math.round((value / maxVal) * 100)}%` }} />
-                                </div>
-                              </div>
-                            ))}
-                          </>
-                        ) : (
-                          <p className={cn('text-xs text-center py-8', isLight ? 'text-slate-500' : 'text-slate-600')}>
-                            Detailed breakdown not available for this community.
-                          </p>
-                        )}
-                        <div className="pt-2 space-y-2">
-                          {data.insights.slice(0, 3).map((insight, idx) => (
-                            <div key={idx} className={cn('rounded-2xl p-4 border flex items-center gap-3',
-                              isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10'
-                            )}>
-                              <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border',
-                                isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'
-                              )}>
-                                {insight.includes('↑') ? <TrendingUp className="text-red-400" size={14} /> :
-                                 insight.includes('↓') ? <TrendingDown className="text-emerald-400" size={14} /> :
-                                 <ShieldCheck className="text-blue-400" size={14} />}
-                              </div>
-                              <p className={cn('text-xs font-bold leading-snug', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {mobileTab === 'trend' && (
-                    <div>
-                      <div
-                        className={cn('h-[160px] w-full rounded-[1.4rem] p-4 border mb-3', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
-                        role="img"
-                        aria-label={`Crime trend chart for ${data.communityName}`}
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData}>
-                            <defs>
-                              <linearGradient id="mbV" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/><stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                              </linearGradient>
-                              <linearGradient id="mbP" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                              </linearGradient>
-                              <linearGradient id="mbD" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/><stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
-                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={4} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} width={32} />
-                            <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 10, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
-                            <Area type="monotone" dataKey="Violent"  stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#mbV)" />
-                            <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#mbP)" />
-                            <Area type="monotone" dataKey="Disorder" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#mbD)" />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <p className={cn('text-[9px] text-center', isLight ? 'text-slate-500' : 'text-slate-600')}>
-                        {hasRealData ? 'Annual crime data · Calgary Open Data' : 'Estimated monthly trend'}
-                      </p>
-                    </div>
-                  )}
-
-                  {mobileTab === 'intel' && (
-                    <div className="space-y-3">
-                      {data.insights.map((insight, idx) => (
-                        <div key={idx} className={cn('rounded-2xl p-4 border flex items-center gap-3',
-                          isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10'
-                        )}>
-                          <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border',
-                            isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'
-                          )}>
-                            {insight.includes('↑') ? <TrendingUp className="text-red-400" size={14} /> :
-                             insight.includes('↓') ? <TrendingDown className="text-emerald-400" size={14} /> :
-                             <ShieldCheck className="text-blue-400" size={14} />}
-                          </div>
-                          <p className={cn('text-xs font-bold leading-snug', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
-                        </div>
-                      ))}
-                      {crimeEntry && (
-                        <div className={cn('rounded-2xl p-4 border mt-2', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10')}>
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <Database size={11} className="text-slate-400" />
-                            <p className={cn('text-[9px] font-black uppercase tracking-[0.15em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Data Year: {crimeEntry.year}</p>
-                          </div>
-                          <p className={cn('text-[9px] leading-relaxed', isLight ? 'text-slate-600' : 'text-slate-500')}>
-                            Source: City of Calgary Open Data (datasets 78gh-n26t, h3h6-kgme). Updates quarterly.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <Content />
               </div>
             </Drawer.Content>
           </Drawer.Portal>
@@ -642,3 +352,42 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
     </>
   );
 }
+
+// ── Section stubs (filled in Tasks 7–11) ─────────────────────────────────────
+
+function CrimeThisYearSection(_: {
+  crimeEntry: CrimeStatEntry | undefined;
+  cityAverages: { avgViolent: number; avgProperty: number; avgDisorder: number } | undefined;
+  isLight: boolean;
+}) { return null; }
+
+function TrendChartSection(_: {
+  chartData: { name: string; Violent: number; Property: number; Disorder: number }[];
+  hasRealData: boolean;
+  yearlyStats: CrimeYearEntry[];
+  isLight: boolean;
+  tooltipStyle: object;
+  tooltipLabelStyle: object;
+}) { return null; }
+
+function DonutSection(_: {
+  crimeEntry: CrimeStatEntry | undefined;
+  isLight: boolean;
+}) { return null; }
+
+function PropertyValueSection(_: {
+  propertyData: PropertyYearEntry[];
+  yearlyStats: CrimeYearEntry[];
+  isLight: boolean;
+  tooltipStyle: object;
+  tooltipLabelStyle: object;
+}) { return null; }
+
+function KeySignalsSection(_: {
+  insights: string[];
+  isLight: boolean;
+}) { return null; }
+
+function DataSourcesSection(_: {
+  isLight: boolean;
+}) { return null; }

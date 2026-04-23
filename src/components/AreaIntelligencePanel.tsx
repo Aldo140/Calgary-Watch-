@@ -756,10 +756,10 @@ function PropertyValueSection({
     AvgValue:   propByYear.get(year)?.avgValue ?? 0,
   }));
 
-  const latest   = propertyData[propertyData.length - 1];
-  const earliest = propertyData[0];
-  const valueChange = earliest.avgValue > 0
-    ? Math.round(((latest.avgValue - earliest.avgValue) / earliest.avgValue) * 100)
+  const latestEntry   = combined[combined.length - 1];
+  const earliestEntry = combined[0];
+  const valueChange = earliestEntry.AvgValue > 0
+    ? Math.round(((latestEntry.AvgValue - earliestEntry.AvgValue) / earliestEntry.AvgValue) * 100)
     : null;
 
   return (
@@ -806,11 +806,11 @@ function PropertyValueSection({
       {/* Insight row */}
       <div className="grid grid-cols-2 gap-3 mt-4">
         <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Avg. Assessed Value ({latest.year})</p>
-          <p className="text-xl font-black text-indigo-400">{fmtDollars(latest.avgValue)}</p>
+          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Avg. Assessed Value ({latestEntry.name})</p>
+          <p className="text-xl font-black text-indigo-400">{fmtDollars(latestEntry.AvgValue)}</p>
         </div>
         <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Change vs {earliest.year}</p>
+          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Change vs {earliestEntry.name}</p>
           {valueChange !== null ? (
             <p className={cn('text-xl font-black', valueChange >= 0 ? 'text-emerald-400' : 'text-red-400')}>
               {valueChange >= 0 ? '↑' : '↓'} {Math.abs(valueChange)}%

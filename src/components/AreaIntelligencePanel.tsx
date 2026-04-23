@@ -626,10 +626,9 @@ function DonutSection({
   isLight: boolean;
 }) {
   const [activeIdx, setActiveIdx] = useState(0);
+  const total = crimeEntry ? crimeEntry.violent + crimeEntry.property + crimeEntry.disorder : 0;
 
-  if (!crimeEntry || (crimeEntry.violent + crimeEntry.property + crimeEntry.disorder) === 0) return null;
-
-  const total  = crimeEntry.violent + crimeEntry.property + crimeEntry.disorder;
+  if (!crimeEntry || total === 0) return null;
   const slices = [
     { name: 'Violent',  value: crimeEntry.violent,  color: '#ef4444', description: 'Assault, robbery, threats' },
     { name: 'Property', value: crimeEntry.property, color: '#3b82f6', description: 'Break & enter, theft' },
@@ -675,8 +674,8 @@ function DonutSection({
               animationBegin={200}
               animationDuration={800}
             >
-              {slices.map(({ color }, i) => (
-                <Cell key={i} fill={color} />
+              {slices.map(({ name, color }) => (
+                <Cell key={name} fill={color} />
               ))}
             </Pie>
           </PieChart>

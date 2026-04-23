@@ -472,7 +472,7 @@ function CrimeThisYearSection({
             <div key={label}>
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2">
-                  <span className={cn('text-sm font-bold', isLight ? 'text-slate-700' : 'text-slate-300')}>{label}</span>
+                  <span className={cn('text-[13px] font-bold', isLight ? 'text-slate-700' : 'text-slate-300')}>{label}</span>
                   {vsCity > 0 && (
                     <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-full border', vsColor)}>{vsLabel}</span>
                   )}
@@ -491,21 +491,133 @@ function CrimeThisYearSection({
           );
         })}
       </div>
-      <p className={cn('text-[11px] mt-4', isLight ? 'text-slate-500' : 'text-slate-500')}>
+      <p className="text-[11px] mt-4 text-slate-500">
         Criminal offences reported to Calgary Police · {crimeEntry.year} · City of Calgary Open Data (78gh-n26t, h3h6-kgme)
       </p>
     </Section>
   );
 }
 
-function TrendChartSection(_: {
+function TrendChartSection({
+  chartData, hasRealData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle,
+}: {
   chartData: { name: string; Violent: number; Property: number; Disorder: number }[];
   hasRealData: boolean;
   yearlyStats: CrimeYearEntry[];
   isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
-}) { return null; }
+}) {
+  const [showViolent,  setShowViolent]  = useState(true);
+  const [showProperty, setShowProperty] = useState(true);
+  const [showDisorder, setShowDisorder] = useState(true);
+
+  // Year-over-year deltas for most recent year
+  const deltaRow = (() => {
+    if (yearlyStats.length < 2) return null;
+    const latest = yearlyStats[yearlyStats.length - 1];
+    const prior  = yearlyStats[yearlyStats.length - 2];
+    const pct = (a: number, b: number) => b === 0 ? null : Math.round(((a - b) / b) * 100);
+    return {
+      violent:  pct(latest.violent,  prior.violent),
+      property: pct(latest.property, prior.property),
+      disorder: pct(latest.disorder, prior.disorder),
+      year: latest.year,
+    };
+  })();
+
+  const startYear = chartData[0]?.name ?? '';
+  const endYear   = chartData[chartData.length - 1]?.name ?? '';
+
+  const pills = [
+    { key: 'violent' as const,  label: 'Violent',  active: showViolent,  toggle: () => setShowViolent(p  => !p), color: 'border-red-500 bg-red-500/15 text-red-400',   inactive: isLight ? 'border-slate-300 bg-slate-100 text-slate-500' : 'border-white/10 bg-white/5 text-slate-500' },
+    { key: 'property' as const, label: 'Property', active: showProperty, toggle: () => setShowProperty(p => !p), color: 'border-blue-500 bg-blue-500/15 text-blue-400',  inactive: isLight ? 'border-slate-300 bg-slate-100 text-slate-500' : 'border-white/10 bg-white/5 text-slate-500' },
+    { key: 'disorder' as const, label: 'Disorder', active: showDisorder, toggle: () => setShowDisorder(p => !p), color: 'border-amber-500 bg-amber-500/15 text-amber-400', inactive: isLight ? 'border-slate-300 bg-slate-100 text-slate-500' : 'border-white/10 bg-white/5 text-slate-500' },
+  ];
+
+  return (
+    <Section
+      title="6-Year Picture"
+      subtitle={`${startYear} – ${endYear} · Annual reported incidents${hasRealData ? ' · Calgary Open Data' : ' · Estimated'}`}
+      isLight={isLight}
+    >
+      {/* Toggle pills */}
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {pills.map(({ key, label, active, toggle, color, inactive }) => (
+          <button
+            key={key}
+            onClick={toggle}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wide border transition-all',
+              active ? color : inactive
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Area chart */}
+      <div
+        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+        role="img"
+        aria-label={`Crime trend chart for ${startYear}–${endYear}`}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="aiV" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%"  stopColor="#ef4444" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="aiP" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="aiD" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%"  stopColor="#f59e0b" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={8} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} />
+            <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 12, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
+            {showViolent  && <Area type="monotone" dataKey="Violent"  stroke="#ef4444" strokeWidth={2.5} fillOpacity={1} fill="url(#aiV)" isAnimationActive animationBegin={200} animationDuration={800} />}
+            {showProperty && <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#aiP)" isAnimationActive animationBegin={200} animationDuration={800} />}
+            {showDisorder && <Area type="monotone" dataKey="Disorder" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#aiD)" isAnimationActive animationBegin={200} animationDuration={800} />}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Year-delta row */}
+      {deltaRow && (
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          {[
+            { label: 'Violent',  delta: deltaRow.violent  },
+            { label: 'Property', delta: deltaRow.property },
+            { label: 'Disorder', delta: deltaRow.disorder },
+          ].map(({ label, delta }) => {
+            if (delta === null) return null;
+            const isUp  = delta > 0;
+            const color = isUp
+              ? (isLight ? 'text-red-600' : 'text-red-400')
+              : (isLight ? 'text-emerald-700' : 'text-emerald-400');
+            return (
+              <div key={label} className={cn('rounded-xl p-3 border text-center', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.03] border-white/5')}>
+                <p className="text-[10px] font-black uppercase tracking-wide mb-0.5 text-slate-500">{label}</p>
+                <p className={cn('text-sm font-black', color)}>
+                  {isUp ? '↑' : '↓'} {Math.abs(delta)}%
+                </p>
+                <p className={cn('text-[9px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>vs prior year</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Section>
+  );
+}
 
 function DonutSection(_: {
   crimeEntry: CrimeStatEntry | undefined;

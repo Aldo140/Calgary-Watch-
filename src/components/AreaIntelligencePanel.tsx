@@ -407,11 +407,96 @@ export default function AreaIntelligencePanel({
 
 // ── Section stubs (filled in Tasks 7–11) ─────────────────────────────────────
 
-function CrimeThisYearSection(_: {
+function CrimeThisYearSection({
+  crimeEntry, cityAverages, isLight,
+}: {
   crimeEntry: CrimeStatEntry | undefined;
   cityAverages: { avgViolent: number; avgProperty: number; avgDisorder: number } | undefined;
   isLight: boolean;
-}) { return null; }
+}) {
+  const [barsRef, barsInView] = useInView();
+
+  if (!crimeEntry) {
+    return (
+      <Section title="Crime This Year" isLight={isLight}>
+        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20')}>
+          <Info size={14} className="text-amber-500 shrink-0 mt-0.5" />
+          <p className={cn('text-sm leading-relaxed', isLight ? 'text-amber-800' : 'text-amber-300')}>
+            Detailed breakdown not available for this community. The community name may differ between datasets.
+          </p>
+        </div>
+      </Section>
+    );
+  }
+
+  const maxVal = Math.max(crimeEntry.violent, crimeEntry.property, crimeEntry.disorder, 1);
+
+  const rows = [
+    {
+      label: 'Violent Crime',
+      value: crimeEntry.violent,
+      avg: cityAverages?.avgViolent ?? 0,
+      color: 'bg-red-500',
+    },
+    {
+      label: 'Property Crime',
+      value: crimeEntry.property,
+      avg: cityAverages?.avgProperty ?? 0,
+      color: 'bg-blue-500',
+    },
+    {
+      label: 'Disorder Calls',
+      value: crimeEntry.disorder,
+      avg: cityAverages?.avgDisorder ?? 0,
+      color: 'bg-amber-500',
+    },
+  ];
+
+  return (
+    <Section
+      title="Crime This Year"
+      subtitle={`${crimeEntry.year} · Calgary Police Service · Open Data`}
+      isLight={isLight}
+    >
+      <div ref={barsRef} className="space-y-5">
+        {rows.map(({ label, value, avg, color }, i) => {
+          const pct = Math.round((value / maxVal) * 100);
+          const vsCity = avg > 0 ? Math.round((value / avg) * 100) : 0;
+          const vsLabel = vsCity > 0 ? `${vsCity}% of city avg` : '–';
+          const vsColor =
+            vsCity > 120 ? (isLight ? 'text-red-600 bg-red-50 border-red-200' : 'text-red-400 bg-red-500/10 border-red-500/20') :
+            vsCity > 80  ? (isLight ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-amber-400 bg-amber-500/10 border-amber-500/20') :
+                           (isLight ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20');
+
+          return (
+            <div key={label}>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className={cn('text-sm font-bold', isLight ? 'text-slate-700' : 'text-slate-300')}>{label}</span>
+                  {vsCity > 0 && (
+                    <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-full border', vsColor)}>{vsLabel}</span>
+                  )}
+                </div>
+                <span className={cn('text-base font-black', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
+              </div>
+              <div className={cn('h-[10px] rounded-full overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
+                <motion.div
+                  className={cn('h-full rounded-full', color)}
+                  initial={{ width: '0%' }}
+                  animate={{ width: barsInView ? `${pct}%` : '0%' }}
+                  transition={{ duration: 0.7, ease: 'easeOut', delay: i * 0.08 }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className={cn('text-[11px] mt-4', isLight ? 'text-slate-500' : 'text-slate-500')}>
+        Criminal offences reported to Calgary Police · {crimeEntry.year} · City of Calgary Open Data (78gh-n26t, h3h6-kgme)
+      </p>
+    </Section>
+  );
+}
 
 function TrendChartSection(_: {
   chartData: { name: string; Violent: number; Property: number; Disorder: number }[];

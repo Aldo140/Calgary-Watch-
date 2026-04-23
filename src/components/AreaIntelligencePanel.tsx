@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { X, TrendingUp, TrendingDown, ShieldCheck, MapPin, Activity, Info, Database } from 'lucide-react';
@@ -23,6 +23,12 @@ interface AreaIntelligencePanelProps {
 }
 
 export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearlyStats, theme = 'dark' }: AreaIntelligencePanelProps) {
+  const [mobileTab, setMobileTab] = useState<'crime' | 'trend' | 'intel'>('crime');
+
+  useEffect(() => {
+    setMobileTab('crime');
+  }, [data?.communityName]);
+
   if (!data) return null;
 
   const isLight = theme === 'light';
@@ -51,8 +57,6 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
   };
 
   const crimeEntry = crimeStats?.get(communityKey);
-
-  const [mobileTab, setMobileTab] = useState<'crime' | 'trend' | 'intel'>('crime');
 
   const Content = () => (
     <div className={cn(
@@ -415,7 +419,7 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
                 isLight ? 'bg-[rgb(255,250,243)] border-stone-200/80' : 'bg-slate-950 border-white/10'
               )}>
                 {/* Drag handle */}
-                <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-2 bg-white/10" />
+                <div className={cn('mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-2', isLight ? 'bg-slate-300' : 'bg-white/10')} />
                 <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
 
@@ -426,7 +430,6 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
                   const circ = 2 * Math.PI * r;
                   const dash = (score / 100) * circ;
                   const gaugeColor = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
-                  const maxVal = Math.max(crimeEntry?.violent ?? 0, crimeEntry?.property ?? 0, crimeEntry?.disorder ?? 0, 1);
                   return (
                     <div className="bg-gradient-to-br from-[#0f1e3d] to-[#0a1628] px-5 pt-3 pb-5 shrink-0">
                       <p className="text-[8px] font-black uppercase tracking-[0.35em] text-slate-500 mb-1">Area Intelligence</p>
@@ -480,13 +483,11 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
                         {/* Close button */}
                         <button
                           onClick={onClose}
-                          className="p-2.5 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all shrink-0 mt-1"
+                          className={cn('p-2.5 transition-all rounded-xl shrink-0 mt-1 border', isLight ? 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border-slate-300' : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10')}
                         >
                           <X size={18} />
                         </button>
                       </div>
-                      {/* maxVal is used in tab content below — keep in scope via closure */}
-                      <span className="hidden" aria-hidden="true">{maxVal}</span>
                     </div>
                   );
                 })()}

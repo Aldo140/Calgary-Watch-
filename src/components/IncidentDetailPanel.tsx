@@ -264,6 +264,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                       incident.category === 'traffic'        ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 light:bg-orange-100 light:text-orange-700 light:border-orange-200' :
                       incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 light:bg-blue-100 light:text-blue-700 light:border-blue-200' :
                       incident.category === 'emergency'      ? 'bg-rose-500/20 text-rose-400 border-rose-500/30 light:bg-rose-100 light:text-rose-700 light:border-rose-200' :
+                      incident.category === 'weather'        ? 'bg-sky-500/20 text-sky-400 border-sky-500/30 light:bg-sky-100 light:text-sky-700 light:border-sky-200' :
                                                                'bg-purple-500/20 text-purple-400 border-purple-500/30 light:bg-purple-100 light:text-purple-700 light:border-purple-200'
                     )}
                   >

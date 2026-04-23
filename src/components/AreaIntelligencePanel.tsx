@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { X, TrendingUp, TrendingDown, ShieldCheck, MapPin, Activity, Info, Database } from 'lucide-react';
@@ -50,6 +51,8 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
   };
 
   const crimeEntry = crimeStats?.get(communityKey);
+
+  const [mobileTab, setMobileTab] = useState<'crime' | 'trend' | 'intel'>('crime');
 
   const Content = () => (
     <div className={cn(
@@ -401,7 +404,7 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
         </AnimatePresence>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer — Mission Briefing layout */}
       <div className="lg:hidden">
         <Drawer.Root open={!!data} onClose={onClose}>
           <Drawer.Portal>
@@ -411,11 +414,224 @@ export default function AreaIntelligencePanel({ data, onClose, crimeStats, yearl
                 'h-full rounded-t-[3rem] overflow-hidden border-t flex flex-col',
                 isLight ? 'bg-[rgb(255,250,243)] border-stone-200/80' : 'bg-slate-950 border-white/10'
               )}>
-                <div className={cn('mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-2', isLight ? 'bg-slate-300' : 'bg-white/10')} />
-                <Drawer.Title className="sr-only">{data.communityName} Neighborhood Intelligence</Drawer.Title>
+                {/* Drag handle */}
+                <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-2 bg-white/10" />
+                <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
-                <div className="flex-1 overflow-hidden">
-                  <Content />
+
+                {/* ── Mission Briefing header (always dark navy) ── */}
+                {(() => {
+                  const score = data.safetyScore ?? 0;
+                  const r = 22;
+                  const circ = 2 * Math.PI * r;
+                  const dash = (score / 100) * circ;
+                  const gaugeColor = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
+                  const maxVal = Math.max(crimeEntry?.violent ?? 0, crimeEntry?.property ?? 0, crimeEntry?.disorder ?? 0, 1);
+                  return (
+                    <div className="bg-gradient-to-br from-[#0f1e3d] to-[#0a1628] px-5 pt-3 pb-5 shrink-0">
+                      <p className="text-[8px] font-black uppercase tracking-[0.35em] text-slate-500 mb-1">Area Intelligence</p>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h2 className="text-[18px] font-black text-white leading-none mb-3 truncate">{data.communityName}</h2>
+                          <div className="flex items-center gap-3">
+                            {/* SVG Safety Gauge */}
+                            <div className="relative shrink-0 w-[60px] h-[60px]">
+                              <svg width="60" height="60" viewBox="0 0 60 60">
+                                <circle cx="30" cy="30" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" />
+                                <circle
+                                  cx="30" cy="30" r={r} fill="none"
+                                  stroke={gaugeColor}
+                                  strokeWidth="6"
+                                  strokeLinecap="round"
+                                  strokeDasharray={`${dash} ${circ}`}
+                                  transform="rotate(-90 30 30)"
+                                />
+                              </svg>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-[13px] font-black text-white">{score}</span>
+                              </div>
+                            </div>
+                            {/* 2×2 quick-stats */}
+                            <div className="grid grid-cols-2 gap-1.5 flex-1">
+                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
+                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Incidents</p>
+                                <p className="text-sm font-black text-orange-400 leading-none">{data.activeIncidents ?? 0}</p>
+                              </div>
+                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
+                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Trend</p>
+                                <p className={cn('text-[11px] font-black uppercase truncate leading-none',
+                                  data.trend === 'improving' ? 'text-emerald-400' :
+                                  data.trend === 'declining' ? 'text-red-400' : 'text-slate-300'
+                                )}>{data.trend ?? '–'}</p>
+                              </div>
+                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
+                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Data Year</p>
+                                <p className="text-sm font-black text-white leading-none">{crimeEntry?.year ?? '–'}</p>
+                              </div>
+                              <div className="bg-white/[0.04] border border-white/[0.07] rounded-lg p-2">
+                                <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-0.5">Risk</p>
+                                <p className={cn('text-[11px] font-black leading-none',
+                                  score >= 70 ? 'text-emerald-400' : score >= 40 ? 'text-amber-400' : 'text-red-400'
+                                )}>{score >= 70 ? 'Low' : score >= 40 ? 'Medium' : 'High'}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Close button */}
+                        <button
+                          onClick={onClose}
+                          className="p-2.5 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all shrink-0 mt-1"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                      {/* maxVal is used in tab content below — keep in scope via closure */}
+                      <span className="hidden" aria-hidden="true">{maxVal}</span>
+                    </div>
+                  );
+                })()}
+
+                {/* Tab bar */}
+                <div className={cn(
+                  'flex border-b shrink-0',
+                  isLight ? 'border-stone-200/80 bg-[rgb(255,250,243)]' : 'border-white/5 bg-slate-950'
+                )}>
+                  {(['crime', 'trend', 'intel'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setMobileTab(tab)}
+                      className={cn(
+                        'flex-1 py-3 text-[11px] font-black uppercase tracking-[0.2em] transition-all border-t-2',
+                        mobileTab === tab
+                          ? 'bg-blue-500/15 text-blue-400 border-blue-500'
+                          : isLight
+                            ? 'text-slate-500 border-transparent hover:text-slate-700'
+                            : 'text-slate-500 border-transparent hover:text-slate-400'
+                      )}
+                    >
+                      {tab === 'crime' ? 'Crime' : tab === 'trend' ? 'Trend' : 'Intel'}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab content */}
+                <div className={cn(
+                  'flex-1 overflow-y-auto p-5 no-scrollbar',
+                  isLight ? 'bg-[rgb(255,250,243)]' : 'bg-slate-950'
+                )}>
+                  {mobileTab === 'crime' && (() => {
+                    const maxVal = Math.max(crimeEntry?.violent ?? 0, crimeEntry?.property ?? 0, crimeEntry?.disorder ?? 0, 1);
+                    const hasBars = crimeEntry && (crimeEntry.violent + crimeEntry.property + crimeEntry.disorder) > 0;
+                    return (
+                      <div className="space-y-4">
+                        {hasBars ? (
+                          <>
+                            {[
+                              { label: 'Violent',  value: crimeEntry!.violent,  color: 'bg-red-500' },
+                              { label: 'Property', value: crimeEntry!.property, color: 'bg-orange-500' },
+                              { label: 'Disorder', value: crimeEntry!.disorder, color: 'bg-amber-500' },
+                            ].map(({ label, value, color }) => (
+                              <div key={label} className="space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <span className={cn('text-[11px] font-black uppercase tracking-widest', isLight ? 'text-slate-600' : 'text-slate-400')}>{label}</span>
+                                  <span className={cn('text-[11px] font-black', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
+                                </div>
+                                <div className={cn('h-2 rounded-full overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
+                                  <div className={cn('h-full rounded-full', color)} style={{ width: `${Math.round((value / maxVal) * 100)}%` }} />
+                                </div>
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <p className={cn('text-xs text-center py-8', isLight ? 'text-slate-500' : 'text-slate-600')}>
+                            Detailed breakdown not available for this community.
+                          </p>
+                        )}
+                        <div className="pt-2 space-y-2">
+                          {data.insights.slice(0, 3).map((insight, idx) => (
+                            <div key={idx} className={cn('rounded-2xl p-4 border flex items-center gap-3',
+                              isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10'
+                            )}>
+                              <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border',
+                                isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'
+                              )}>
+                                {insight.includes('↑') ? <TrendingUp className="text-red-400" size={14} /> :
+                                 insight.includes('↓') ? <TrendingDown className="text-emerald-400" size={14} /> :
+                                 <ShieldCheck className="text-blue-400" size={14} />}
+                              </div>
+                              <p className={cn('text-xs font-bold leading-snug', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {mobileTab === 'trend' && (
+                    <div>
+                      <div
+                        className={cn('h-[160px] w-full rounded-[1.4rem] p-4 border mb-3', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+                        role="img"
+                        aria-label={`Crime trend chart for ${data.communityName}`}
+                      >
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={chartData}>
+                            <defs>
+                              <linearGradient id="mbV" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/><stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                              </linearGradient>
+                              <linearGradient id="mbP" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                              </linearGradient>
+                              <linearGradient id="mbD" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/><stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(148,163,184,0.2)'} />
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={4} />
+                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} width={32} />
+                            <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 10, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
+                            <Area type="monotone" dataKey="Violent"  stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#mbV)" />
+                            <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#mbP)" />
+                            <Area type="monotone" dataKey="Disorder" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#mbD)" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <p className={cn('text-[9px] text-center', isLight ? 'text-slate-500' : 'text-slate-600')}>
+                        {hasRealData ? 'Annual crime data · Calgary Open Data' : 'Estimated monthly trend'}
+                      </p>
+                    </div>
+                  )}
+
+                  {mobileTab === 'intel' && (
+                    <div className="space-y-3">
+                      {data.insights.map((insight, idx) => (
+                        <div key={idx} className={cn('rounded-2xl p-4 border flex items-center gap-3',
+                          isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10'
+                        )}>
+                          <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border',
+                            isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'
+                          )}>
+                            {insight.includes('↑') ? <TrendingUp className="text-red-400" size={14} /> :
+                             insight.includes('↓') ? <TrendingDown className="text-emerald-400" size={14} /> :
+                             <ShieldCheck className="text-blue-400" size={14} />}
+                          </div>
+                          <p className={cn('text-xs font-bold leading-snug', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
+                        </div>
+                      ))}
+                      {crimeEntry && (
+                        <div className={cn('rounded-2xl p-4 border mt-2', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10')}>
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <Database size={11} className="text-slate-400" />
+                            <p className={cn('text-[9px] font-black uppercase tracking-[0.15em]', isLight ? 'text-slate-600' : 'text-slate-500')}>Data Year: {crimeEntry.year}</p>
+                          </div>
+                          <p className={cn('text-[9px] leading-relaxed', isLight ? 'text-slate-600' : 'text-slate-500')}>
+                            Source: City of Calgary Open Data (datasets 78gh-n26t, h3h6-kgme). Updates quarterly.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </Drawer.Content>

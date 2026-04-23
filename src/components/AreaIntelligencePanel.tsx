@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { X, MapPin, Activity, TrendingUp, TrendingDown, ShieldCheck, Info, Database, ChevronDown } from 'lucide-react';
@@ -661,22 +661,24 @@ function DonutSection({
       <div className="flex flex-col md:flex-row gap-6 items-center">
         <div className="w-full md:w-auto flex justify-center">
           <PieChart width={240} height={240}>
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {React.createElement(Pie as any, {
-              activeIndex: activeIdx,
-              activeShape: renderActiveShape,
-              data: slices,
-              cx: 120, cy: 120,
-              innerRadius: 68, outerRadius: 100,
-              dataKey: 'value',
-              onMouseEnter: (_: unknown, idx: number) => setActiveIdx(idx),
-              onClick: (_: unknown, idx: number) => setActiveIdx(idx),
-              isAnimationActive: true,
-              animationBegin: 200,
-              animationDuration: 800,
-            }, slices.map(({ color }, i) => (
-              <Cell key={i} fill={color} />
-            )))}
+            {/* activeIndex is untyped in recharts 3.x — cast required */}
+            <Pie
+              {...{ activeIndex: activeIdx } as object}
+              activeShape={renderActiveShape}
+              data={slices}
+              cx={120} cy={120}
+              innerRadius={68} outerRadius={100}
+              dataKey="value"
+              onMouseEnter={(_: unknown, idx: number) => setActiveIdx(idx)}
+              onClick={(_: unknown, idx: number) => setActiveIdx(idx)}
+              isAnimationActive
+              animationBegin={200}
+              animationDuration={800}
+            >
+              {slices.map(({ color }, i) => (
+                <Cell key={i} fill={color} />
+              ))}
+            </Pie>
           </PieChart>
         </div>
 

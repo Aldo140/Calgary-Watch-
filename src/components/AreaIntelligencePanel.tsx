@@ -844,7 +844,7 @@ function KeySignalsSection({
           const isDown = insight.includes('↓');
           return (
             <motion.div
-              key={idx}
+              key={insight}
               initial={{ opacity: 0, y: 12 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.35, ease: 'easeOut', delay: idx * 0.08 }}
@@ -902,7 +902,7 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
       <div className="space-y-2">
         {DATA_SOURCES.map(({ title, content }, idx) => (
           <div
-            key={idx}
+            key={title}
             className={cn('rounded-2xl border overflow-hidden', isLight ? 'border-slate-200' : 'border-white/10')}
           >
             <button

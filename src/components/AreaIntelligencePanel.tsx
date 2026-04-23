@@ -5,7 +5,7 @@ import { X, MapPin, Activity, TrendingUp, TrendingDown, ShieldCheck, Info, Datab
 import { motion, AnimatePresence } from 'motion/react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, Sector,
+  AreaChart, Area, PieChart, Pie, Cell, Sector,
   ComposedChart, Line,
 } from 'recharts';
 import { cn } from '@/src/lib/utils';

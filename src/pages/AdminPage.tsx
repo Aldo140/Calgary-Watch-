@@ -343,10 +343,10 @@ export default function AdminPage() {
     // True total count — not capped by the snapshot limit
     const fetchTotalCount = async () => {
       try {
-        const snap = await getCountFromServer(collection(db, 'page_views'));
+        const snap = await getCountFromServer(collection(db!, 'page_views'));
         setTotalPageViews(snap.data().count);
       } catch {
-        setTotalPageViews(0);
+        setTotalPageViews(null);
       }
     };
     fetchTotalCount();

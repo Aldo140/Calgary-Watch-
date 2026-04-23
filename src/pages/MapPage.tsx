@@ -19,7 +19,8 @@ import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
-import { useCrimeStats } from '@/src/hooks/useCrimeStats';
+import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
+import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -441,6 +442,7 @@ export default function MapPage() {
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
+  const cityAverages = useMemo(() => computeCityAverages(crimeStats), [crimeStats]);
 
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -449,6 +451,7 @@ export default function MapPage() {
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   
   const [selectedArea, setSelectedArea] = useState<AreaIntelligence | null>(null);
+  const { data: propertyData } = usePropertyAssessments(selectedArea?.communityName ?? null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [activeIncidentId, setActiveIncidentId] = useState<string | null>(null);
   
@@ -992,10 +995,39 @@ export default function MapPage() {
         const delta = total - cityAvg;
         const trend: 'improving' | 'stable' | 'declining' =
           delta < -cityAvg * 0.2 ? 'improving' : delta > cityAvg * 0.2 ? 'declining' : 'stable';
-        setSelectedArea({ ...base, communityName: displayName, safetyScore: score, trend });
+
+        // Computed insights from real data
+        const sortedTotals = [...crimeStats.entries()]
+          .map(([, e]) => e.crime + e.disorder)
+          .sort((a, b) => b - a);
+        const rank = sortedTotals.findIndex(v => v <= total) + 1;
+        const totalCommunities = crimeStats.size;
+
+        const propPct = entry.violent + entry.property > 0
+          ? Math.round((entry.property / (entry.violent + entry.property)) * 100)
+          : 0;
+        const cityPropPct = cityAverages.avgProperty + cityAverages.avgViolent > 0
+          ? Math.round((cityAverages.avgProperty / (cityAverages.avgProperty + cityAverages.avgViolent)) * 100)
+          : 0;
+        const propVsCityText = propPct > cityPropPct
+          ? `above the city average of ${cityPropPct}%`
+          : propPct < cityPropPct
+          ? `below the city average of ${cityPropPct}%`
+          : `equal to the city average of ${cityPropPct}%`;
+
+        const computedInsights = [
+          `This community ranks #${rank} of ${totalCommunities} Calgary neighbourhoods by total incident volume`,
+          `Property crime accounts for ${propPct}% of all incidents — ${propVsCityText}`,
+        ];
+
+        setSelectedArea({
+          ...base,
+          communityName: displayName,
+          safetyScore: score,
+          trend,
+          insights: [...computedInsights, ...base.insights],
+        });
       } else {
-        // Neighbourhood not in crime dataset — use city-average (50) so every
-        // neighbourhood shows a distinct value rather than the mock fallback (68).
         setSelectedArea({ ...base, communityName: displayName, safetyScore: 50, trend: 'stable' });
       }
       return;
@@ -1720,6 +1752,8 @@ export default function MapPage() {
           onClose={() => setSelectedArea(null)}
           crimeStats={crimeStats}
           yearlyStats={crimeYearlyStats}
+          propertyData={propertyData}
+          cityAverages={cityAverages}
           theme={theme}
         />
 

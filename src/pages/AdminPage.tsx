@@ -8,6 +8,7 @@ import { Incident, CommunityStats } from '@/src/types';
 import {
   addDoc, collection, deleteDoc, doc, getDocs,
   onSnapshot, orderBy, query, updateDoc, limit, where, deleteField,
+  getCountFromServer,
 } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
@@ -330,15 +331,26 @@ export default function AdminPage() {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
     });
 
-    // Page views — real-time listener so new visits appear without a refresh
+    // Page views — real-time listener for chart/breakdown data (last 2000 docs)
     const unsubPageViews = onSnapshot(
       query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(2000)),
       (snapshot) => {
         setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc));
-        setTotalPageViews(snapshot.size);
       },
-      () => { setTotalPageViews(0); }
+      () => {}
     );
+
+    // True total count — not capped by the snapshot limit
+    const fetchTotalCount = async () => {
+      try {
+        const snap = await getCountFromServer(collection(db, 'page_views'));
+        setTotalPageViews(snap.data().count);
+      } catch {
+        setTotalPageViews(0);
+      }
+    };
+    fetchTotalCount();
+    const countInterval = setInterval(fetchTotalCount, 5 * 60 * 1000);
 
     const unsubFlagged = onSnapshot(
       query(collection(db, 'incidents'), where('flagged', '==', true), orderBy('flagged_at', 'desc')),
@@ -347,7 +359,7 @@ export default function AdminPage() {
       }
     );
 
-    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubPageViews(); unsubFlagged(); };
+    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubPageViews(); unsubFlagged(); clearInterval(countInterval); };
   }, [isAuthReady, isAdmin, user]);
 
   // ── API health polling ────────────────────────────────────────────────────

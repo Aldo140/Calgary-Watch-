@@ -82,7 +82,7 @@ function Section({
       <div className="mb-4">
         <h3 className={cn('text-xl font-black leading-tight', isLight ? 'text-slate-900' : 'text-white')}>{title}</h3>
         {subtitle && (
-          <p className={cn('text-[11px] uppercase tracking-widest font-bold mt-0.5', isLight ? 'text-slate-500' : 'text-slate-500')}>{subtitle}</p>
+          <p className="text-[11px] uppercase tracking-widest font-bold mt-0.5 text-slate-500">{subtitle}</p>
         )}
       </div>
       {children}
@@ -126,6 +126,7 @@ function HeroSection({
         </div>
         <button
           onClick={onClose}
+          aria-label="Close"
           className="p-2.5 rounded-xl border text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10 transition-all group"
         >
           <X size={17} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -144,7 +145,7 @@ function HeroSection({
       <div ref={gaugeRef} className="flex items-center gap-4 relative z-10">
         {/* Animated SVG gauge */}
         <div className="relative shrink-0 w-[64px] h-[64px] md:w-[72px] md:h-[72px]">
-          <svg width="64" height="64" viewBox="0 0 64 64">
+          <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
             <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
             <circle
               cx="32" cy="32" r={r} fill="none"
@@ -196,17 +197,46 @@ function HeroSection({
   );
 }
 
-// ── Main panel ───────────────────────────────────────────────────────────────
+// ── Content (module-level) ────────────────────────────────────────────────────
 
-export default function AreaIntelligencePanel({
-  data, onClose, crimeStats, yearlyStats, propertyData, cityAverages, theme = 'dark',
-}: AreaIntelligencePanelProps) {
-  const isLight = theme === 'light';
+interface ContentProps {
+  data: AreaIntelligence;
+  onClose: () => void;
+  isLight: boolean;
+  crimeEntry: CrimeStatEntry | undefined;
+  realYearly: CrimeYearEntry[];
+  hasRealData: boolean;
+  score: number;
+  glowColor: string;
+  gaugeColor: string;
+  chartData: { name: string; Violent: number; Property: number; Disorder: number }[];
+  tooltipStyle: React.CSSProperties;
+  tooltipLabelStyle: React.CSSProperties;
+  propertyData: PropertyYearEntry[];
+  cityAverages?: { avgViolent: number; avgProperty: number; avgDisorder: number };
+}
+
+function Content({
+  data,
+  onClose,
+  isLight,
+  crimeEntry,
+  realYearly,
+  hasRealData,
+  score,
+  glowColor,
+  gaugeColor,
+  chartData,
+  tooltipStyle,
+  tooltipLabelStyle,
+  propertyData,
+  cityAverages,
+}: ContentProps) {
   const heroRef = useRef<HTMLDivElement>(null);
   const [miniBarVisible, setMiniBarVisible] = useState(false);
 
   // Reset mini-bar when community changes
-  useEffect(() => { setMiniBarVisible(false); }, [data?.communityName]);
+  useEffect(() => { setMiniBarVisible(false); }, [data.communityName]);
 
   // Show mini-bar once hero scrolls out of view
   useEffect(() => {
@@ -218,26 +248,9 @@ export default function AreaIntelligencePanel({
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [data?.communityName]);
+  }, [data.communityName]);
 
-  if (!data) return null;
-
-  const communityKey   = data.communityName.toLowerCase();
-  const crimeEntry     = crimeStats?.get(communityKey);
-  const realYearly     = yearlyStats?.get(communityKey) ?? [];
-  const hasRealData    = realYearly.length > 0;
-  const score          = data.safetyScore ?? 0;
-  const gaugeColor     = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
-  const glowColor      = score >= 70 ? 'rgba(52,211,153,0.12)' : score >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)';
-
-  const chartData = hasRealData
-    ? realYearly.map(e => ({ name: String(e.year), Violent: e.violent, Property: e.property, Disorder: e.disorder }))
-    : data.monthlyTrends.map(t => ({ name: t.month, Violent: t.violent_crime, Property: t.property_crime, Disorder: t.disorder_calls }));
-
-  const tooltipStyle      = makeTooltipStyle(isLight);
-  const tooltipLabelStyle = makeTooltipLabelStyle(isLight);
-
-  const Content = () => (
+  return (
     <div className={cn('flex flex-col h-full overflow-hidden relative', isLight ? 'text-slate-900' : 'text-white')}>
       {/* Sticky mini-bar */}
       <AnimatePresence>
@@ -290,7 +303,7 @@ export default function AreaIntelligencePanel({
             isLight={isLight}
           />
           <PropertyValueSection
-            propertyData={propertyData ?? []}
+            propertyData={propertyData}
             yearlyStats={realYearly}
             isLight={isLight}
             tooltipStyle={tooltipStyle}
@@ -305,28 +318,67 @@ export default function AreaIntelligencePanel({
       </div>
     </div>
   );
+}
+
+// ── Main panel ───────────────────────────────────────────────────────────────
+
+export default function AreaIntelligencePanel({
+  data, onClose, crimeStats, yearlyStats, propertyData, cityAverages, theme = 'dark',
+}: AreaIntelligencePanelProps) {
+  if (!data) return null;
+
+  const isLight = theme === 'light';
+  const communityKey   = data.communityName.toLowerCase();
+  const crimeEntry     = crimeStats?.get(communityKey);
+  const realYearly     = yearlyStats?.get(communityKey) ?? [];
+  const hasRealData    = realYearly.length > 0;
+  const score          = data.safetyScore ?? 0;
+  const gaugeColor     = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
+  const glowColor      = score >= 70 ? 'rgba(52,211,153,0.12)' : score >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)';
+
+  const chartData = hasRealData
+    ? realYearly.map(e => ({ name: String(e.year), Violent: e.violent, Property: e.property, Disorder: e.disorder }))
+    : data.monthlyTrends.map(t => ({ name: t.month, Violent: t.violent_crime, Property: t.property_crime, Disorder: t.disorder_calls }));
+
+  const tooltipStyle      = makeTooltipStyle(isLight);
+  const tooltipLabelStyle = makeTooltipLabelStyle(isLight);
+
+  const contentProps: ContentProps = {
+    data,
+    onClose,
+    isLight,
+    crimeEntry,
+    realYearly,
+    hasRealData,
+    score,
+    glowColor,
+    gaugeColor,
+    chartData,
+    tooltipStyle,
+    tooltipLabelStyle,
+    propertyData: propertyData ?? [],
+    cityAverages,
+  };
 
   return (
     <>
       {/* Desktop panel */}
       <div className="hidden lg:block">
         <AnimatePresence>
-          {data && (
-            <motion.div
-              initial={{ x: '100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 h-full z-[90] p-5 md:p-6"
-            >
-              <Card className={cn(
-                'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_0_60px_-8px_rgba(0,0,0,0.6)] overflow-hidden rounded-[2.25rem]',
-                isLight ? 'border-slate-200 bg-[rgb(255,250,243)]' : 'border-white/10'
-              )}>
-                <Content />
-              </Card>
-            </motion.div>
-          )}
+          <motion.div
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed inset-y-0 right-0 h-full z-[90] p-5 md:p-6"
+          >
+            <Card className={cn(
+              'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_0_60px_-8px_rgba(0,0,0,0.6)] overflow-hidden rounded-[2.25rem]',
+              isLight ? 'border-slate-200 bg-[rgb(255,250,243)]' : 'border-white/10'
+            )}>
+              <Content {...contentProps} />
+            </Card>
+          </motion.div>
         </AnimatePresence>
       </div>
 
@@ -343,7 +395,7 @@ export default function AreaIntelligencePanel({
                 <div className={cn('mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-0', isLight ? 'bg-slate-300' : 'bg-white/10')} />
                 <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
-                <Content />
+                <Content {...contentProps} />
               </div>
             </Drawer.Content>
           </Drawer.Portal>
@@ -366,8 +418,8 @@ function TrendChartSection(_: {
   hasRealData: boolean;
   yearlyStats: CrimeYearEntry[];
   isLight: boolean;
-  tooltipStyle: object;
-  tooltipLabelStyle: object;
+  tooltipStyle: React.CSSProperties;
+  tooltipLabelStyle: React.CSSProperties;
 }) { return null; }
 
 function DonutSection(_: {
@@ -379,8 +431,8 @@ function PropertyValueSection(_: {
   propertyData: PropertyYearEntry[];
   yearlyStats: CrimeYearEntry[];
   isLight: boolean;
-  tooltipStyle: object;
-  tooltipLabelStyle: object;
+  tooltipStyle: React.CSSProperties;
+  tooltipLabelStyle: React.CSSProperties;
 }) { return null; }
 
 function KeySignalsSection(_: {

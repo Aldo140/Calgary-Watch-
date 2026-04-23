@@ -721,13 +721,113 @@ function DonutSection({
   );
 }
 
-function PropertyValueSection(_: {
+function PropertyValueSection({
+  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle,
+}: {
   propertyData: PropertyYearEntry[];
   yearlyStats: CrimeYearEntry[];
   isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
-}) { return null; }
+}) {
+  if (propertyData.length === 0) {
+    return (
+      <Section title="Property Value vs Safety" isLight={isLight}>
+        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
+          <Info size={14} className={isLight ? 'text-slate-400 shrink-0 mt-0.5' : 'text-slate-600 shrink-0 mt-0.5'} />
+          <p className="text-sm text-slate-500">
+            Property assessment data not available for this community in the current dataset snapshot.
+          </p>
+        </div>
+      </Section>
+    );
+  }
+
+  // Build combined chart data on shared years
+  const propByYear  = new Map(propertyData.map(e => [e.year, e]));
+  const crimeByYear = new Map(yearlyStats.map(e => [e.year, e]));
+  const sharedYears = [...propByYear.keys()].filter(y => crimeByYear.has(y)).sort((a, b) => a - b).slice(-6);
+
+  if (sharedYears.length < 2) return null;
+
+  const combined = sharedYears.map(year => ({
+    name:       String(year),
+    TotalCrime: (crimeByYear.get(year)?.violent ?? 0) + (crimeByYear.get(year)?.property ?? 0) + (crimeByYear.get(year)?.disorder ?? 0),
+    AvgValue:   propByYear.get(year)?.avgValue ?? 0,
+  }));
+
+  const latest   = propertyData[propertyData.length - 1];
+  const earliest = propertyData[0];
+  const valueChange = earliest.avgValue > 0
+    ? Math.round(((latest.avgValue - earliest.avgValue) / earliest.avgValue) * 100)
+    : null;
+
+  return (
+    <Section
+      title="Property Value vs Safety"
+      subtitle="Assessed values · City of Calgary · Cross-referenced with crime data"
+      isLight={isLight}
+    >
+      <div
+        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+        role="img"
+        aria-label="Property value versus total crime by year"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart data={combined}>
+            <defs>
+              <linearGradient id="aiCrime" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%"  stopColor="#ef4444" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={8} />
+            <YAxis yAxisId="crime" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#94a3b8' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} orientation="left" />
+            <YAxis yAxisId="value" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#818cf8', fontWeight: 700 }} tickFormatter={fmtDollars} orientation="right" />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              labelStyle={tooltipLabelStyle}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(val: any, name: any) => {
+                const n: number = typeof val === 'number' ? val : 0;
+                return name === 'AvgValue'
+                  ? [fmtDollars(n), 'Avg. Assessed Value']
+                  : [n.toLocaleString(), 'Total Incidents'];
+              }}
+              itemStyle={{ fontSize: 12, fontWeight: 'bold' }}
+            />
+            <Area yAxisId="crime" type="monotone" dataKey="TotalCrime" stroke="#ef4444" strokeWidth={2} fill="url(#aiCrime)" fillOpacity={1} isAnimationActive animationBegin={200} animationDuration={800} />
+            <Line  yAxisId="value" type="monotone" dataKey="AvgValue"   stroke="#818cf8" strokeWidth={3} dot={{ r: 4, fill: '#818cf8', strokeWidth: 2, stroke: isLight ? '#fff' : '#0f172a' }} isAnimationActive animationBegin={200} animationDuration={800} />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Insight row */}
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
+          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Avg. Assessed Value ({latest.year})</p>
+          <p className="text-xl font-black text-indigo-400">{fmtDollars(latest.avgValue)}</p>
+        </div>
+        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
+          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Change vs {earliest.year}</p>
+          {valueChange !== null ? (
+            <p className={cn('text-xl font-black', valueChange >= 0 ? 'text-emerald-400' : 'text-red-400')}>
+              {valueChange >= 0 ? '↑' : '↓'} {Math.abs(valueChange)}%
+            </p>
+          ) : (
+            <p className="text-xl font-black text-slate-500">–</p>
+          )}
+        </div>
+      </div>
+
+      {/* Methodology note */}
+      <p className="text-[12px] leading-relaxed mt-3 italic text-slate-500">
+        Assessed values are the City of Calgary's annual tax appraisal — they typically lag the real estate market by approximately one year. Cross-referencing with crime trends can reveal whether safety changes precede or follow property value shifts.
+      </p>
+    </Section>
+  );
+}
 
 function KeySignalsSection(_: {
   insights: string[];

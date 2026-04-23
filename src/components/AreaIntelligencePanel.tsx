@@ -829,11 +829,118 @@ function PropertyValueSection({
   );
 }
 
-function KeySignalsSection(_: {
+function KeySignalsSection({
+  insights, isLight,
+}: {
   insights: string[];
   isLight: boolean;
-}) { return null; }
+}) {
+  const [ref, inView] = useInView();
+  return (
+    <Section title="Key Signals" isLight={isLight}>
+      <div ref={ref} className="space-y-3">
+        {insights.map((insight, idx) => {
+          const isUp   = insight.includes('↑');
+          const isDown = insight.includes('↓');
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 12 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.35, ease: 'easeOut', delay: idx * 0.08 }}
+              whileHover={{ y: -2, boxShadow: isLight ? '0 4px 16px -2px rgba(0,0,0,0.12)' : '0 4px 20px -4px rgba(0,0,0,0.5)' }}
+              className={cn(
+                'flex items-start gap-3 rounded-2xl p-4 border transition-colors cursor-default',
+                isLight ? 'bg-white border-slate-200 hover:bg-slate-50' : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.05]'
+              )}
+              style={{
+                borderLeft: `2px solid ${isUp ? '#ef4444' : isDown ? '#34d399' : '#3b82f6'}`,
+              }}
+            >
+              <div className={cn(
+                'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border',
+                isUp
+                  ? (isLight ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20')
+                  : isDown
+                  ? (isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20')
+                  : (isLight ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20')
+              )}>
+                {isUp
+                  ? <TrendingUp size={20} className="text-red-400" />
+                  : isDown
+                  ? <TrendingDown size={20} className="text-emerald-400" />
+                  : <ShieldCheck size={20} className="text-blue-400" />}
+              </div>
+              <p className={cn('text-sm font-bold leading-relaxed', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
+            </motion.div>
+          );
+        })}
+      </div>
+    </Section>
+  );
+}
 
-function DataSourcesSection(_: {
-  isLight: boolean;
-}) { return null; }
+const DATA_SOURCES = [
+  {
+    title: 'Calgary Crime Statistics',
+    content: 'Dataset 78gh-n26t. UCR-classified criminal offences reported to Calgary Police Service, broken down by community, year, and crime category. Updates quarterly.',
+  },
+  {
+    title: 'Calgary Disorder Statistics',
+    content: 'Dataset h3h6-kgme. Non-criminal CPS dispatch events such as noise complaints, suspicious persons, and nuisance behaviour. Updates quarterly.',
+  },
+  {
+    title: 'Calgary Property Assessments',
+    content: 'Dataset 4ur7-wsgn. Annual tax assessment values per property, averaged by community. Reflects appraised value approximately one year behind current market prices.',
+  },
+];
+
+function DataSourcesSection({ isLight }: { isLight: boolean }) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  return (
+    <Section title="Data Sources" isLight={isLight}>
+      <div className="space-y-2">
+        {DATA_SOURCES.map(({ title, content }, idx) => (
+          <div
+            key={idx}
+            className={cn('rounded-2xl border overflow-hidden', isLight ? 'border-slate-200' : 'border-white/10')}
+          >
+            <button
+              onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
+              className={cn(
+                'w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors',
+                isLight ? 'bg-white hover:bg-slate-50' : 'bg-white/[0.02] hover:bg-white/[0.04]'
+              )}
+            >
+              <div className="flex items-center gap-2.5">
+                <Database size={13} className={isLight ? 'text-slate-400' : 'text-slate-500'} />
+                <span className={cn('text-sm font-bold', isLight ? 'text-slate-800' : 'text-white')}>{title}</span>
+              </div>
+              <motion.div animate={{ rotate: openIdx === idx ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                <ChevronDown size={15} className={isLight ? 'text-slate-400' : 'text-slate-500'} />
+              </motion.div>
+            </button>
+            <AnimatePresence initial={false}>
+              {openIdx === idx && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  <p className={cn('px-4 pb-4 pt-1 text-[13px] leading-relaxed', isLight ? 'text-slate-600' : 'text-slate-400')}>
+                    {content}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
+      <p className={cn('text-[12px] mt-4 pt-4 border-t leading-relaxed', isLight ? 'text-slate-400 border-slate-200' : 'text-slate-600 border-white/5')}>
+        All figures reflect reported incidents only — not all crime is reported to police. Safety scores are normalized against the Calgary city-wide average.
+      </p>
+    </Section>
+  );
+}

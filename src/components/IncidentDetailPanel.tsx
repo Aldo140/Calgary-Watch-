@@ -440,7 +440,7 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                   {/* Post on X — primary CTA */}
                   <button
                     onClick={handleShareToX}
-                    className="flex-1 flex items-center justify-center gap-2 bg-black light:bg-slate-900 hover:bg-neutral-900 light:hover:bg-slate-800 border border-white/10 light:border-slate-700 rounded-2xl h-12 text-white text-xs font-black tracking-wide transition-all active:scale-95"
+                    className="flex-1 flex items-center justify-center gap-2 bg-black light:bg-slate-900 hover:bg-neutral-900 light:hover:bg-slate-800 border border-white/10 light:border-slate-700 rounded-2xl h-12 [color:white] text-xs font-black tracking-wide transition-all active:scale-95"
                   >
                     <Twitter size={15} />
                     Post on X

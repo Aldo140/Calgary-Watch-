@@ -303,7 +303,7 @@ export default function MobileMapSheet({
                   'flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors',
                   dark
                     ? 'bg-blue-600/20 border-blue-500/40 text-blue-400 hover:bg-blue-600/30'
-                    : 'bg-slate-900 border-slate-900 text-white hover:bg-slate-800',
+                    : 'bg-slate-900 border-slate-900 [color:white] hover:bg-slate-800',
                 )}
               >
                 <Plus size={10} />

@@ -1663,7 +1663,7 @@ export default function MapPage() {
               }
             }}
           >
-            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150 text-white" />
+            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150 [color:white]" />
             <div className="absolute right-full mr-4 px-3 py-1.5 bg-slate-950 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block">
               Report Incident
             </div>

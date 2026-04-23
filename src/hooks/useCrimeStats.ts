@@ -163,3 +163,29 @@ export function useCrimeStats(): {
 
   return { stats, yearlyStats, isLoading };
 }
+
+/**
+ * Derives city-wide average crime/disorder counts from the full stats Map.
+ * Used by AreaIntelligencePanel to show % of city average badges.
+ */
+export function computeCityAverages(stats: Map<string, CrimeStatEntry>): {
+  avgViolent: number;
+  avgProperty: number;
+  avgDisorder: number;
+} {
+  if (stats.size === 0) return { avgViolent: 0, avgProperty: 0, avgDisorder: 0 };
+  let totalViolent = 0;
+  let totalProperty = 0;
+  let totalDisorder = 0;
+  stats.forEach(e => {
+    totalViolent  += e.violent;
+    totalProperty += e.property;
+    totalDisorder += e.disorder;
+  });
+  const n = stats.size;
+  return {
+    avgViolent:  Math.round(totalViolent  / n),
+    avgProperty: Math.round(totalProperty / n),
+    avgDisorder: Math.round(totalDisorder / n),
+  };
+}

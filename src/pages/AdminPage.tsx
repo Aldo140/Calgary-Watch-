@@ -889,10 +889,10 @@ export default function AdminPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-300/75">{activeSectionTheme.eyebrow}</p>
-                <h1 className="mt-2 max-w-[14rem] text-[1.65rem] font-black leading-none text-white">{activeSectionTheme.title}</h1>
+                <h1 className="mt-2 max-w-[14rem] text-[1.65rem] font-black leading-none text-white light:text-slate-900">{activeSectionTheme.title}</h1>
               </div>
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
-                <ActiveIcon size={20} className="text-white" />
+                <ActiveIcon size={20} className="text-white light:text-slate-700" />
               </div>
             </div>
 
@@ -913,14 +913,14 @@ export default function AdminPage() {
                 className="rounded-2xl border border-white/15 bg-white/10 px-3 py-3 text-left backdrop-blur-sm transition-all active:scale-[0.98]"
               >
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/60">Priority</p>
-                <p className="mt-1 text-sm font-bold text-white">Review incidents</p>
+                <p className="mt-1 text-sm font-bold text-white light:text-slate-800">Review incidents</p>
               </button>
               <button
                 onClick={() => navigate('/map')}
                 className="rounded-2xl border border-white/15 bg-slate-950/60 px-3 py-3 text-left backdrop-blur-sm transition-all active:scale-[0.98]"
               >
                 <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Live Surface</p>
-                <p className="mt-1 text-sm font-bold text-white">Open public map</p>
+                <p className="mt-1 text-sm font-bold text-white light:text-slate-800">Open public map</p>
               </button>
             </div>
           </div>
@@ -1295,7 +1295,7 @@ export default function AdminPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">{incident.category}</p>
-                        <p className="mt-1 text-sm font-black text-white">{incident.neighborhood || 'Unknown area'}</p>
+                        <p className="mt-1 text-sm font-black text-white light:text-slate-900">{incident.neighborhood || 'Unknown area'}</p>
                         <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                           {(() => {
                             const isSystemInc = incident.data_source != null && incident.data_source !== 'community';
@@ -1643,7 +1643,7 @@ export default function AdminPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-300/70">{draft.month || 'Month'}</p>
-                    <p className="mt-1 text-sm font-black text-white">{draft.community || 'Community'}</p>
+                    <p className="mt-1 text-sm font-black text-white light:text-slate-900">{draft.community || 'Community'}</p>
                   </div>
                   <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2">
                     <p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-200/70">Safety</p>

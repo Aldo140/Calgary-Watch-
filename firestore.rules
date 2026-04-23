@@ -226,7 +226,11 @@ service cloud.firestore {
 
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
-      allow create: if request.resource.data.keys().hasOnly(['timestamp', 'path']) &&
+      allow create: if request.resource.data.keys().hasOnly([
+                      'timestamp', 'path', 'referrer',
+                      'utm_source', 'utm_medium', 'utm_campaign',
+                      'traffic_source', 'sessionId'
+                    ]) &&
                     request.resource.data.timestamp is number &&
                     request.resource.data.path is string &&
                     request.resource.data.path.size() <= 200;

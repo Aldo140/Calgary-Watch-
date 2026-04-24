@@ -891,7 +891,7 @@ const DATA_SOURCES = [
   },
   {
     title: 'Calgary Property Assessments',
-    content: 'Dataset 4ur7-wsgn. Annual tax assessment values per property, averaged by community. Reflects appraised value approximately one year behind current market prices.',
+    content: 'Dataset 4ur7-wsgc. Annual tax assessment values per property, averaged by community. Reflects appraised value approximately one year behind current market prices.',
   },
 ];
 

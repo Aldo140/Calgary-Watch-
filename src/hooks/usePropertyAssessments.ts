@@ -36,7 +36,7 @@ export function usePropertyAssessments(communityName: string | null): {
     // Calgary Open Data expects the community name in UPPER CASE
     const encoded = encodeURIComponent(communityName.toUpperCase());
     const url =
-      `https://data.calgary.ca/resource/4ur7-wsgn.json` +
+      `https://data.calgary.ca/resource/4ur7-wsgc.json` +
       `?$where=comm_name='${encoded}'` +
       `&$select=assessed_value,roll_year` +
       `&$limit=50000`;

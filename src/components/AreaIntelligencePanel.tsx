@@ -289,6 +289,7 @@ function Content({
             crimeEntry={crimeEntry}
             cityAverages={cityAverages}
             isLight={isLight}
+            yearlyStats={realYearly}
           />
           <TrendChartSection
             chartData={chartData}
@@ -407,12 +408,43 @@ export default function AreaIntelligencePanel({
 
 // ── Section stubs (filled in Tasks 7–11) ─────────────────────────────────────
 
+function Sparkline({ values }: { values: number[] }) {
+  if (values.length < 2) return null;
+  const W = 48, H = 20;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const pts = values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * W;
+      const y = H - ((v - min) / range) * (H - 2) - 1;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+  const first = values[0], last = values[values.length - 1];
+  const delta = first > 0 ? ((last - first) / first) * 100 : 0;
+  const color = delta < -5 ? '#34d399' : delta > 5 ? '#ef4444' : '#64748b';
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="shrink-0">
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function CrimeThisYearSection({
-  crimeEntry, cityAverages, isLight,
+  crimeEntry, cityAverages, isLight, yearlyStats,
 }: {
   crimeEntry: CrimeStatEntry | undefined;
   cityAverages: { avgViolent: number; avgProperty: number; avgDisorder: number } | undefined;
   isLight: boolean;
+  yearlyStats: CrimeYearEntry[];
 }) {
   const [barsRef, barsInView] = useInView();
 
@@ -431,24 +463,28 @@ function CrimeThisYearSection({
 
   const maxVal = Math.max(crimeEntry.violent, crimeEntry.property, crimeEntry.disorder, 1);
 
+  const last6 = yearlyStats.slice(-6);
   const rows = [
     {
       label: 'Violent Crime',
       value: crimeEntry.violent,
       avg: cityAverages?.avgViolent ?? 0,
       color: 'bg-red-500',
+      sparkValues: last6.map(e => e.violent),
     },
     {
       label: 'Property Crime',
       value: crimeEntry.property,
       avg: cityAverages?.avgProperty ?? 0,
       color: 'bg-blue-500',
+      sparkValues: last6.map(e => e.property),
     },
     {
       label: 'Disorder Calls',
       value: crimeEntry.disorder,
       avg: cityAverages?.avgDisorder ?? 0,
       color: 'bg-amber-500',
+      sparkValues: last6.map(e => e.disorder),
     },
   ];
 
@@ -459,7 +495,7 @@ function CrimeThisYearSection({
       isLight={isLight}
     >
       <div ref={barsRef} className="space-y-5">
-        {rows.map(({ label, value, avg, color }, i) => {
+        {rows.map(({ label, value, avg, color, sparkValues }, i) => {
           const pct = Math.round((value / maxVal) * 100);
           const vsCity = avg > 0 ? Math.round((value / avg) * 100) : 0;
           const vsLabel = vsCity > 0 ? `${vsCity}% of city avg` : '–';
@@ -470,14 +506,15 @@ function CrimeThisYearSection({
 
           return (
             <div key={label}>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2">
-                  <span className={cn('text-[13px] font-bold', isLight ? 'text-slate-700' : 'text-slate-300')}>{label}</span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className={cn('text-[13px] font-bold truncate', isLight ? 'text-slate-700' : 'text-slate-300')}>{label}</span>
                   {vsCity > 0 && (
-                    <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-full border', vsColor)}>{vsLabel}</span>
+                    <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-full border shrink-0', vsColor)}>{vsLabel}</span>
                   )}
                 </div>
-                <span className={cn('text-base font-black', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
+                <Sparkline values={sparkValues} />
+                <span className={cn('text-base font-black shrink-0', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
               </div>
               <div className={cn('h-[10px] rounded-full overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
                 <motion.div

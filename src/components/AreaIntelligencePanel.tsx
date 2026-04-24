@@ -335,6 +335,7 @@ function Content({
             isLight={isLight}
             tooltipStyle={tooltipStyle}
             tooltipLabelStyle={tooltipLabelStyle}
+            score={score}
           />
           <KeySignalsSection
             insights={data.insights}
@@ -787,13 +788,14 @@ function DonutSection({
 }
 
 function PropertyValueSection({
-  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle,
+  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score,
 }: {
   propertyData: PropertyYearEntry[];
   yearlyStats: CrimeYearEntry[];
   isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
+  score: number;
 }) {
   if (propertyData.length === 0) {
     return (
@@ -827,12 +829,103 @@ function PropertyValueSection({
     ? Math.round(((latestEntry.AvgValue - earliestEntry.AvgValue) / earliestEntry.AvgValue) * 100)
     : null;
 
+  const [valueRef, valueInView] = useInView();
+  const animatedValue  = useCountUp(latestEntry.AvgValue, 1200, valueInView);
+  const animatedChange = useCountUp(Math.abs(valueChange ?? 0), 1000, valueInView);
+
+  const gaugeColor  = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
+  const CHART_W     = 216;
+  const CHART_H     = 216;
+  const PAD         = 32;
+  const dotX        = PAD + (score / 100) * CHART_W;
+  const dotY        = PAD + (1 - Math.min(latestEntry.AvgValue / 1_000_000, 1)) * CHART_H;
+
+  const crimeFirst  = combined[0].TotalCrime;
+  const crimeLast   = combined[combined.length - 1].TotalCrime;
+  const valuFirst   = combined[0].AvgValue;
+  const valueLast   = combined[combined.length - 1].AvgValue;
+  const crimeDelta  = crimeFirst > 0 ? Math.round(((crimeLast - crimeFirst) / crimeFirst) * 100) : null;
+  const valuDelta   = valuFirst  > 0 ? Math.round(((valueLast  - valuFirst)  / valuFirst)  * 100) : null;
+  const startYear   = combined[0].name;
+  const endYear     = combined[combined.length - 1].name;
+
+  const correlationText = (() => {
+    if (crimeDelta === null || valuDelta === null) return null;
+    if (crimeDelta < 0 && valuDelta > 0)
+      return `As incidents fell ${Math.abs(crimeDelta)}% (${startYear}–${endYear}), assessed values climbed ${valuDelta}% — values tracked the safety improvement.`;
+    if (crimeDelta > 0 && valuDelta > 0)
+      return `Despite a ${crimeDelta}% rise in incidents, values grew ${valuDelta}% — demand outpaced safety concerns.`;
+    if (crimeDelta < 0 && valuDelta < 0)
+      return `Incidents fell ${Math.abs(crimeDelta)}% but values also declined ${Math.abs(valuDelta)}% — other factors drove the market.`;
+    return `Property values and crime trends moved independently over this period.`;
+  })();
+
   return (
     <Section
       title="Property Value vs Safety"
       subtitle="Assessed values · City of Calgary · Cross-referenced with crime data"
       isLight={isLight}
     >
+      {/* Quadrant plot */}
+      <div
+        ref={valueRef}
+        className={cn('rounded-[1.6rem] border p-4 mb-4', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+        role="img"
+        aria-label="Safety score vs property value quadrant"
+      >
+        <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-slate-500">
+          Safety Score vs Assessed Value
+        </p>
+        <svg
+          width="100%"
+          viewBox={`0 0 ${CHART_W + PAD * 2} ${CHART_H + PAD * 2}`}
+          style={{ display: 'block' }}
+        >
+          {/* Quadrant zones */}
+          <rect x={PAD} y={PAD} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(248,250,252,0.8)' : 'rgba(255,255,255,0.01)'} />
+          <rect x={PAD + CHART_W / 2} y={PAD} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(240,253,244,0.8)' : 'rgba(52,211,153,0.02)'} />
+          <rect x={PAD} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(254,242,242,0.8)' : 'rgba(239,68,68,0.02)'} />
+          <rect x={PAD + CHART_W / 2} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(239,246,255,0.8)' : 'rgba(59,130,246,0.02)'} />
+          {/* Dividing lines */}
+          <line x1={PAD} y1={PAD + CHART_H / 2} x2={PAD + CHART_W} y2={PAD + CHART_H / 2} stroke={isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
+          <line x1={PAD + CHART_W / 2} y1={PAD} x2={PAD + CHART_W / 2} y2={PAD + CHART_H} stroke={isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
+          {/* Quadrant labels */}
+          <text x={PAD + 6} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Transitioning</text>
+          <text x={PAD + CHART_W / 2 + 4} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Premier</text>
+          <text x={PAD + 6} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Challenged</text>
+          <text x={PAD + CHART_W / 2 + 4} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Hidden Gem</text>
+          {/* City avg crosshair */}
+          <line x1={PAD + CHART_W / 2 - 6} y1={PAD + CHART_H / 2} x2={PAD + CHART_W / 2 + 6} y2={PAD + CHART_H / 2} stroke="#64748b" strokeWidth="1.5" />
+          <line x1={PAD + CHART_W / 2} y1={PAD + CHART_H / 2 - 6} x2={PAD + CHART_W / 2} y2={PAD + CHART_H / 2 + 6} stroke="#64748b" strokeWidth="1.5" />
+          <text x={PAD + CHART_W / 2 + 8} y={PAD + CHART_H / 2 - 4} fontSize="9" fill="#64748b" fontWeight="700">City Avg</text>
+          {/* Community dot with pulsing ring */}
+          <motion.g
+            initial={{ scale: 0, opacity: 0 }}
+            animate={valueInView ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+            transition={{ delay: 0.4, type: 'spring', damping: 14, stiffness: 250 }}
+            style={{ transformOrigin: `${dotX}px ${dotY}px` } as React.CSSProperties}
+          >
+            <circle cx={dotX} cy={dotY} r="14" fill={gaugeColor} opacity="0.15">
+              <animate attributeName="r" values="10;16;10" dur="1.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.15;0;0.15" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx={dotX} cy={dotY} r="7" fill={gaugeColor} />
+          </motion.g>
+          {/* Axis labels */}
+          <text x={PAD + CHART_W / 2} y={PAD + CHART_H + 18} fontSize="9" fill="#64748b" textAnchor="middle" fontWeight="700">Safety Score →</text>
+          <text x={PAD - 20} y={PAD + CHART_H / 2} fontSize="9" fill="#64748b" textAnchor="middle" transform={`rotate(-90, ${PAD - 20}, ${PAD + CHART_H / 2})`} fontWeight="700">Value →</text>
+        </svg>
+      </div>
+
+      {/* Correlation callout */}
+      {correlationText && combined.length >= 2 && (
+        <div className={cn('rounded-2xl border px-4 py-3 mb-4', isLight ? 'bg-indigo-50 border-indigo-100' : 'bg-indigo-500/5 border-indigo-500/15')}>
+          <p className={cn('text-[13px] italic leading-relaxed', isLight ? 'text-indigo-700' : 'text-indigo-300')}>
+            {correlationText}
+          </p>
+        </div>
+      )}
+
       <div
         className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
         role="img"
@@ -872,13 +965,13 @@ function PropertyValueSection({
       <div className="grid grid-cols-2 gap-3 mt-4">
         <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
           <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Avg. Assessed Value ({latestEntry.name})</p>
-          <p className="text-xl font-black text-indigo-400">{fmtDollars(latestEntry.AvgValue)}</p>
+          <p className="text-xl font-black text-indigo-400">{fmtDollars(animatedValue)}</p>
         </div>
         <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
           <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Change vs {earliestEntry.name}</p>
           {valueChange !== null ? (
             <p className={cn('text-xl font-black', valueChange >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-              {valueChange >= 0 ? '↑' : '↓'} {Math.abs(valueChange)}%
+              {valueChange >= 0 ? '↑' : '↓'} {animatedChange}%
             </p>
           ) : (
             <p className="text-xl font-black text-slate-500">–</p>

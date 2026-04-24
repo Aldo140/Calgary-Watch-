@@ -422,7 +422,9 @@ function Sparkline({ values }: { values: number[] }) {
     })
     .join(' ');
   const first = values[0], last = values[values.length - 1];
-  const delta = first > 0 ? ((last - first) / first) * 100 : 0;
+  const delta = first > 0 ? ((last - first) / first) * 100
+              : last > 0  ? 100
+              : 0;
   const color = delta < -5 ? '#34d399' : delta > 5 ? '#ef4444' : '#64748b';
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="shrink-0">

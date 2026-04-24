@@ -905,6 +905,11 @@ function KeySignalsSection({
   const dragX = useMotionValue(0);
   const rotate = useTransform(dragX, [-200, 200], [-6, 6]);
 
+  useEffect(() => {
+    setCurrentIdx(0);
+    dragX.set(0);
+  }, [insights]);
+
   if (insights.length === 0) return null;
 
   function getCardType(insight: string): 'up' | 'down' | 'neutral' {
@@ -914,9 +919,9 @@ function KeySignalsSection({
   }
 
   function cardColors(type: 'up' | 'down' | 'neutral', light: boolean) {
-    if (type === 'up')   return { border: '#ef4444', iconBg: light ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20',         icon: <TrendingUp size={24} className="text-red-400" />,     statColor: '#ef4444', progressColor: '#ef4444' };
-    if (type === 'down') return { border: '#34d399', iconBg: light ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20', icon: <TrendingDown size={24} className="text-emerald-400" />, statColor: '#34d399', progressColor: '#34d399' };
-    return { border: '#3b82f6', iconBg: light ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20',           icon: <ShieldCheck size={24} className="text-blue-400" />,  statColor: '#3b82f6', progressColor: '#3b82f6' };
+    if (type === 'up')   return { border: '#ef4444', iconBg: light ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20',         icon: <TrendingUp size={24} className="text-red-400" />,     statColor: '#ef4444' };
+    if (type === 'down') return { border: '#34d399', iconBg: light ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20', icon: <TrendingDown size={24} className="text-emerald-400" />, statColor: '#34d399' };
+    return { border: '#3b82f6', iconBg: light ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20',           icon: <ShieldCheck size={24} className="text-blue-400" />,  statColor: '#3b82f6' };
   }
 
   function extractStat(text: string): string | null {

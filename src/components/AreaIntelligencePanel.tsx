@@ -330,6 +330,7 @@ function Content({
             isLight={isLight}
           />
           <PropertyValueSection
+            key={`pv-${data.communityName}`}
             propertyData={propertyData}
             yearlyStats={realYearly}
             isLight={isLight}

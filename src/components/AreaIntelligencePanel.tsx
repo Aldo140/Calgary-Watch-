@@ -101,6 +101,11 @@ function HeroSection({
   gaugeColor: string;
 }) {
   const score = data.safetyScore ?? 0;
+  const rankMatch = (data.insights[0] ?? '').match(/#(\d+) of (\d+)/);
+  const rank  = rankMatch ? parseInt(rankMatch[1], 10) : 0;
+  const total = rankMatch ? parseInt(rankMatch[2], 10) : 0;
+  const rankPct = rank > 0 && total > 0 ? Math.round((rank / total) * 100) : 0;
+  const rankColor = rankPct <= 30 ? '#34d399' : rankPct <= 60 ? '#f59e0b' : '#ef4444';
   const r = 26;
   const circ = 2 * Math.PI * r;
   const [gaugeRef, gaugeInView] = useInView(0);
@@ -185,6 +190,25 @@ function HeroSection({
           ))}
         </div>
       </div>
+
+      {/* City rank bar */}
+      {rank > 0 && total > 0 && (
+        <div className="mt-4 relative z-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-1">City Rank</p>
+          <p className="text-[11px] text-white font-medium mb-1.5">
+            #{rank} out of {total} neighbourhoods
+          </p>
+          <div className="h-[4px] rounded-full overflow-hidden bg-white/10">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ backgroundColor: rankColor }}
+              initial={{ width: '0%' }}
+              animate={{ width: `${rankPct}%` }}
+              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Live overlay insight */}
       {data.liveOverlayInsight && (

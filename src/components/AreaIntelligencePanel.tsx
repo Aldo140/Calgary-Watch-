@@ -104,7 +104,9 @@ function HeroSection({
   const rankMatch = (data.insights[0] ?? '').match(/#(\d+) of (\d+)/);
   const rank  = rankMatch ? parseInt(rankMatch[1], 10) : 0;
   const total = rankMatch ? parseInt(rankMatch[2], 10) : 0;
-  const rankPct = rank > 0 && total > 0 ? Math.round((rank / total) * 100) : 0;
+  const rankPct = rank > 0 && total > 0
+    ? Math.round(((total - rank + 1) / total) * 100)
+    : 0;
   const rankColor = rankPct <= 30 ? '#34d399' : rankPct <= 60 ? '#f59e0b' : '#ef4444';
   const r = 26;
   const circ = 2 * Math.PI * r;

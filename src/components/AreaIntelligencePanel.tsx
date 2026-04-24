@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { AreaIntelligence } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { X, MapPin, Activity, TrendingUp, TrendingDown, ShieldCheck, Info, Database, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'motion/react';
 import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area, PieChart, Pie, Cell, Sector,
@@ -900,46 +900,181 @@ function KeySignalsSection({
   insights: string[];
   isLight: boolean;
 }) {
-  const [ref, inView] = useInView();
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const isAnimating = useRef(false);
+  const dragX = useMotionValue(0);
+  const rotate = useTransform(dragX, [-200, 200], [-6, 6]);
+
+  if (insights.length === 0) return null;
+
+  function getCardType(insight: string): 'up' | 'down' | 'neutral' {
+    if (insight.includes('↑')) return 'up';
+    if (insight.includes('↓')) return 'down';
+    return 'neutral';
+  }
+
+  function cardColors(type: 'up' | 'down' | 'neutral', light: boolean) {
+    if (type === 'up')   return { border: '#ef4444', iconBg: light ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20',         icon: <TrendingUp size={24} className="text-red-400" />,     statColor: '#ef4444', progressColor: '#ef4444' };
+    if (type === 'down') return { border: '#34d399', iconBg: light ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20', icon: <TrendingDown size={24} className="text-emerald-400" />, statColor: '#34d399', progressColor: '#34d399' };
+    return { border: '#3b82f6', iconBg: light ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20',           icon: <ShieldCheck size={24} className="text-blue-400" />,  statColor: '#3b82f6', progressColor: '#3b82f6' };
+  }
+
+  function extractStat(text: string): string | null {
+    const m = text.match(/#?\d+[\.\d]*%?/);
+    return m ? m[0] : null;
+  }
+
+  function dismiss() {
+    if (isAnimating.current || insights.length === 0) return;
+    isAnimating.current = true;
+    setCurrentIdx(prev => (prev + 1) % insights.length);
+    setTimeout(() => { isAnimating.current = false; }, 350);
+  }
+
+  function previous() {
+    if (isAnimating.current || insights.length === 0) return;
+    isAnimating.current = true;
+    setCurrentIdx(prev => (prev - 1 + insights.length) % insights.length);
+    setTimeout(() => { isAnimating.current = false; }, 350);
+  }
+
+  const n = insights.length;
+  const visibleCards = Math.min(3, n);
+
   return (
     <Section title="Key Signals" isLight={isLight}>
-      <div ref={ref} className="space-y-3">
-        {insights.map((insight, idx) => {
-          const isUp   = insight.includes('↑');
-          const isDown = insight.includes('↓');
-          return (
-            <motion.div
-              key={insight}
-              initial={{ opacity: 0, y: 12 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.35, ease: 'easeOut', delay: idx * 0.08 }}
-              whileHover={{ y: -2, boxShadow: isLight ? '0 4px 16px -2px rgba(0,0,0,0.12)' : '0 4px 20px -4px rgba(0,0,0,0.5)' }}
-              className={cn(
-                'flex items-start gap-3 rounded-2xl p-4 border transition-colors cursor-default',
-                isLight ? 'bg-white border-slate-200 hover:bg-slate-50' : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.05]'
-              )}
-              style={{
-                borderLeft: `2px solid ${isUp ? '#ef4444' : isDown ? '#34d399' : '#3b82f6'}`,
-              }}
-            >
-              <div className={cn(
-                'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border',
-                isUp
-                  ? (isLight ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20')
-                  : isDown
-                  ? (isLight ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20')
-                  : (isLight ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20')
-              )}>
-                {isUp
-                  ? <TrendingUp size={20} className="text-red-400" />
-                  : isDown
-                  ? <TrendingDown size={20} className="text-emerald-400" />
-                  : <ShieldCheck size={20} className="text-blue-400" />}
-              </div>
-              <p className={cn('text-sm font-bold leading-relaxed', isLight ? 'text-slate-800' : 'text-white')}>{insight}</p>
-            </motion.div>
-          );
-        })}
+      {/* Counter + progress bar above stack */}
+      <div className="flex items-center mb-3">
+        <p className="text-[11px] uppercase tracking-widest font-black text-slate-500 shrink-0">
+          {currentIdx + 1} / {n}
+        </p>
+        <div className={cn('h-[3px] rounded-full flex-1 mx-3 overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
+          <motion.div
+            className="h-full rounded-full bg-blue-500"
+            animate={{ width: `${((currentIdx + 1) / n) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+      </div>
+
+      {/* Card stack */}
+      <div className="relative" style={{ minHeight: 240 }}>
+        {/* Ghost card 2 (furthest back) */}
+        {visibleCards >= 3 && (
+          <div
+            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10')}
+            style={{
+              height: 200,
+              transform: 'scale(0.90) translateY(16px) rotate(1.5deg)',
+              transformOrigin: 'bottom center',
+              opacity: 0.5,
+              zIndex: 1,
+            }}
+          />
+        )}
+        {/* Ghost card 1 (middle) */}
+        {visibleCards >= 2 && (
+          <div
+            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10')}
+            style={{
+              height: 200,
+              transform: 'scale(0.95) translateY(8px) rotate(-2deg)',
+              transformOrigin: 'bottom center',
+              opacity: 0.7,
+              zIndex: 2,
+            }}
+          />
+        )}
+
+        {/* Top (active) card */}
+        <AnimatePresence mode="wait">
+          {(() => {
+            const insight = insights[currentIdx];
+            const type = getCardType(insight);
+            const colors = cardColors(type, isLight);
+            const stat = extractStat(insight);
+
+            return (
+              <motion.div
+                key={currentIdx}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.15}
+                style={{
+                  x: dragX,
+                  rotate,
+                  zIndex: 3,
+                  position: 'relative',
+                  borderLeft: `3px solid ${colors.border}`,
+                }}
+                initial={{ y: 40, scale: 0.9, opacity: 0 }}
+                animate={{ y: 0, scale: 1, opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                onDragEnd={(_, info) => {
+                  const { offset, velocity } = info;
+                  if (Math.abs(offset.x) > 80 || Math.abs(velocity.x) > 400) {
+                    dismiss();
+                  }
+                  dragX.set(0);
+                }}
+                className={cn(
+                  'rounded-3xl border p-5 cursor-grab active:cursor-grabbing select-none',
+                  isLight ? 'bg-white border-slate-200' : 'bg-white/[0.04] border-white/10'
+                )}
+              >
+                <div className="flex items-start gap-4">
+                  {/* Icon badge */}
+                  <div className={cn('w-[52px] h-[52px] rounded-2xl flex items-center justify-center shrink-0 border', colors.iconBg)}>
+                    {colors.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {/* Big stat */}
+                    {stat && (
+                      <p className="text-[40px] font-black leading-none mb-1" style={{ color: colors.statColor }}>
+                        {stat}
+                      </p>
+                    )}
+                    {/* Insight text */}
+                    <p className={cn('text-[14px] font-bold leading-[1.6]', isLight ? 'text-slate-800' : 'text-white')}>
+                      {insight}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-3 font-medium">← swipe to see next →</p>
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
+      </div>
+
+      {/* Desktop arrow buttons */}
+      <div className="hidden md:flex items-center justify-center gap-3 mt-4">
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={previous}
+          className={cn(
+            'w-10 h-10 rounded-full border flex items-center justify-center text-lg font-black transition-colors',
+            isLight ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+          )}
+          aria-label="Previous insight"
+        >
+          ←
+        </motion.button>
+        <span className="text-[11px] font-black text-slate-500">{currentIdx + 1} / {n}</span>
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={dismiss}
+          className={cn(
+            'w-10 h-10 rounded-full border flex items-center justify-center text-lg font-black transition-colors',
+            isLight ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+          )}
+          aria-label="Next insight"
+        >
+          →
+        </motion.button>
       </div>
     </Section>
   );

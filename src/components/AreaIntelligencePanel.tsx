@@ -787,48 +787,20 @@ function DonutSection({
   );
 }
 
-function PropertyValueSection({
-  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score,
-}: {
-  propertyData: PropertyYearEntry[];
-  yearlyStats: CrimeYearEntry[];
+interface PropertyValueContentProps {
+  combined: { name: string; TotalCrime: number; AvgValue: number }[];
+  latestEntry: { name: string; TotalCrime: number; AvgValue: number };
+  earliestEntry: { name: string; TotalCrime: number; AvgValue: number };
+  valueChange: number | null;
+  score: number;
   isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
-  score: number;
-}) {
-  if (propertyData.length === 0) {
-    return (
-      <Section title="Property Value vs Safety" isLight={isLight}>
-        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <Info size={14} className={isLight ? 'text-slate-400 shrink-0 mt-0.5' : 'text-slate-600 shrink-0 mt-0.5'} />
-          <p className="text-sm text-slate-500">
-            Property assessment data not available for this community in the current dataset snapshot.
-          </p>
-        </div>
-      </Section>
-    );
-  }
+}
 
-  // Build combined chart data on shared years
-  const propByYear  = new Map(propertyData.map(e => [e.year, e]));
-  const crimeByYear = new Map(yearlyStats.map(e => [e.year, e]));
-  const sharedYears = [...propByYear.keys()].filter(y => crimeByYear.has(y)).sort((a, b) => a - b).slice(-6);
-
-  if (sharedYears.length < 2) return null;
-
-  const combined = sharedYears.map(year => ({
-    name:       String(year),
-    TotalCrime: (crimeByYear.get(year)?.violent ?? 0) + (crimeByYear.get(year)?.property ?? 0) + (crimeByYear.get(year)?.disorder ?? 0),
-    AvgValue:   propByYear.get(year)?.avgValue ?? 0,
-  }));
-
-  const latestEntry   = combined[combined.length - 1];
-  const earliestEntry = combined[0];
-  const valueChange = earliestEntry.AvgValue > 0
-    ? Math.round(((latestEntry.AvgValue - earliestEntry.AvgValue) / earliestEntry.AvgValue) * 100)
-    : null;
-
+function PropertyValueContent({
+  combined, latestEntry, earliestEntry, valueChange, score, isLight, tooltipStyle, tooltipLabelStyle,
+}: PropertyValueContentProps) {
   const [valueRef, valueInView] = useInView();
   const animatedValue  = useCountUp(latestEntry.AvgValue, 1200, valueInView);
   const animatedChange = useCountUp(Math.abs(valueChange ?? 0), 1000, valueInView);
@@ -984,6 +956,61 @@ function PropertyValueSection({
         Assessed values are the City of Calgary's annual tax appraisal — they typically lag the real estate market by approximately one year. Cross-referencing with crime trends can reveal whether safety changes precede or follow property value shifts.
       </p>
     </Section>
+  );
+}
+
+function PropertyValueSection({
+  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score,
+}: {
+  propertyData: PropertyYearEntry[];
+  yearlyStats: CrimeYearEntry[];
+  isLight: boolean;
+  tooltipStyle: React.CSSProperties;
+  tooltipLabelStyle: React.CSSProperties;
+  score: number;
+}) {
+  if (propertyData.length === 0) {
+    return (
+      <Section title="Property Value vs Safety" isLight={isLight}>
+        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
+          <Info size={14} className={isLight ? 'text-slate-400 shrink-0 mt-0.5' : 'text-slate-600 shrink-0 mt-0.5'} />
+          <p className="text-sm text-slate-500">
+            Property assessment data not available for this community in the current dataset snapshot.
+          </p>
+        </div>
+      </Section>
+    );
+  }
+
+  const propByYear  = new Map(propertyData.map(e => [e.year, e]));
+  const crimeByYear = new Map(yearlyStats.map(e => [e.year, e]));
+  const sharedYears = [...propByYear.keys()].filter(y => crimeByYear.has(y)).sort((a, b) => a - b).slice(-6);
+
+  if (sharedYears.length < 2) return null;
+
+  const combined = sharedYears.map(year => ({
+    name:       String(year),
+    TotalCrime: (crimeByYear.get(year)?.violent ?? 0) + (crimeByYear.get(year)?.property ?? 0) + (crimeByYear.get(year)?.disorder ?? 0),
+    AvgValue:   propByYear.get(year)?.avgValue ?? 0,
+  }));
+
+  const latestEntry   = combined[combined.length - 1];
+  const earliestEntry = combined[0];
+  const valueChange = earliestEntry.AvgValue > 0
+    ? Math.round(((latestEntry.AvgValue - earliestEntry.AvgValue) / earliestEntry.AvgValue) * 100)
+    : null;
+
+  return (
+    <PropertyValueContent
+      combined={combined}
+      latestEntry={latestEntry}
+      earliestEntry={earliestEntry}
+      valueChange={valueChange}
+      score={score}
+      isLight={isLight}
+      tooltipStyle={tooltipStyle}
+      tooltipLabelStyle={tooltipLabelStyle}
+    />
   );
 }
 

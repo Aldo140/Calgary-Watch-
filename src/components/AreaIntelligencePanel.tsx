@@ -1029,7 +1029,7 @@ function KeySignalsSection({
   useEffect(() => {
     setCurrentIdx(0);
     dragX.set(0);
-  }, [insights]);
+  }, [insights, dragX]);
 
   if (insights.length === 0) return null;
 
@@ -1046,7 +1046,7 @@ function KeySignalsSection({
   }
 
   function extractStat(text: string): string | null {
-    const m = text.match(/#?\d+[\.\d]*%?/);
+    const m = text.match(/#?\d+(\.\d+)?%?/);
     return m ? m[0] : null;
   }
 

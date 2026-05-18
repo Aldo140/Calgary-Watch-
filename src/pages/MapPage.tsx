@@ -547,6 +547,7 @@ export default function MapPage() {
   const [profileDraft, setProfileDraft] = useState({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: true });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
+  const [isEditingPreferences, setIsEditingPreferences] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
@@ -565,6 +566,7 @@ export default function MapPage() {
     setAuthPanelMode(mode);
     setAuthPanelOpen(true);
     setShowUserMenu(false);
+    setIsEditingPreferences(false);
   }, []);
 
   useEffect(() => {
@@ -900,6 +902,11 @@ export default function MapPage() {
     user && userProfile !== null && !userProfile.onboardingCompletedAt
   );
 
+  const isDirty =
+    profileDraft.address !== (userProfile?.address ?? '') ||
+    profileDraft.neighborhood !== (userProfile?.neighborhood ?? '') ||
+    profileDraft.weeklyDigestOptIn !== (userProfile?.weeklyDigestOptIn ?? true);
+
   const preferredNeighborhood = (userProfile?.neighborhood || '').trim();
   const preferredInferredNeighborhood = (userProfile?.inferredNeighborhood || '').trim();
   const preferredAddress = (userProfile?.address || '').trim();
@@ -935,6 +942,7 @@ export default function MapPage() {
           : [],
         profileUpdatedAt: Date.now(),
       }, { merge: true });
+      setIsEditingPreferences(false);
       setAuthPanelOpen(false);
       setAuthPanelMode('signin');
     } catch (error) {
@@ -952,6 +960,7 @@ export default function MapPage() {
     } catch (error) {
       console.error('Failed to skip onboarding:', error);
     }
+    setIsEditingPreferences(false);
     setAuthPanelOpen(false);
     setAuthPanelMode('signin');
   }, [user]);

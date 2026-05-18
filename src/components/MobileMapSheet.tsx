@@ -15,8 +15,7 @@ export const SNAP_POINTS = ['80px', 0.38, 0.82] as const;
 export type SnapPoint = (typeof SNAP_POINTS)[number];
 
 const SORT_KEY = 'cw_sortBy';
-const VERIFIED_KEY = 'cw_verifiedOnly';
-const RECENT_KEY = 'cw_recentOnly';
+const FEED_FILTER_KEY = 'cw_feedFilter';
 
 type SortBy = 'newest' | 'oldest' | 'verified';
 
@@ -126,8 +125,7 @@ export default function MobileMapSheet({
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('newest');
-  const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [recentOnly, setRecentOnly] = useState(false);
+  const [feedFilter, setFeedFilter] = useState<'community' | 'recent' | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const activeCardRef = useRef<HTMLButtonElement | null>(null);
 
@@ -143,13 +141,19 @@ export default function MobileMapSheet({
     try {
       const s = localStorage.getItem(SORT_KEY);
       if (s === 'newest' || s === 'oldest' || s === 'verified') setSortBy(s);
-      if (localStorage.getItem(VERIFIED_KEY) === 'true') setVerifiedOnly(true);
-      if (localStorage.getItem(RECENT_KEY) === 'true') setRecentOnly(true);
+      const f = localStorage.getItem(FEED_FILTER_KEY);
+      if (f === 'community' || f === 'recent') setFeedFilter(f);
     } catch {}
   }, []);
   useEffect(() => { try { localStorage.setItem(SORT_KEY, sortBy); } catch {} }, [sortBy]);
-  useEffect(() => { try { localStorage.setItem(VERIFIED_KEY, String(verifiedOnly)); } catch {} }, [verifiedOnly]);
-  useEffect(() => { try { localStorage.setItem(RECENT_KEY, String(recentOnly)); } catch {} }, [recentOnly]);
+  useEffect(() => {
+    try {
+      if (feedFilter) localStorage.setItem(FEED_FILTER_KEY, feedFilter);
+      else localStorage.removeItem(FEED_FILTER_KEY);
+      localStorage.removeItem('cw_verifiedOnly');
+      localStorage.removeItem('cw_recentOnly');
+    } catch {}
+  }, [feedFilter]);
 
   // Collapse + clear when pin mode activates
   useEffect(() => {
@@ -186,8 +190,13 @@ export default function MobileMapSheet({
     return incidents
       .filter(i => !i.deleted)
       .filter(i => selectedCategory === 'all' || i.category === selectedCategory)
-      .filter(i => !verifiedOnly || i.verified_status === 'community_confirmed')
-      .filter(i => !recentOnly || (Date.now() - i.timestamp) <= 2 * 60 * 60 * 1000)
+      .filter(i =>
+        feedFilter === 'community'
+          ? (!i.data_source || i.data_source === 'community')
+          : feedFilter === 'recent'
+            ? (Date.now() - i.timestamp) <= 2 * 60 * 60 * 1000
+            : true
+      )
       .filter(i =>
         !q ||
         i.title.toLowerCase().includes(q) ||
@@ -205,16 +214,15 @@ export default function MobileMapSheet({
         }
         return 0;
       });
-  }, [incidents, selectedCategory, verifiedOnly, recentOnly, debouncedSearch, sortBy]);
+  }, [incidents, selectedCategory, feedFilter, debouncedSearch, sortBy]);
 
   // Peek shows top 5 by recency from filtered list; expanded shows all
   const visibleIncidents = isPeek ? filteredIncidents.slice(0, 5) : filteredIncidents;
 
-  const hasActiveFilters = verifiedOnly || recentOnly || !!search || selectedCategory !== 'all';
+  const hasActiveFilters = !!feedFilter || !!search || selectedCategory !== 'all';
 
   const clearAllFilters = useCallback(() => {
-    setVerifiedOnly(false);
-    setRecentOnly(false);
+    setFeedFilter(null);
     setSearch('');
     onCategoryChange('all');
   }, [onCategoryChange]);
@@ -435,30 +443,30 @@ export default function MobileMapSheet({
                   {/* Toggle pills row */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
-                      onClick={() => setVerifiedOnly(v => !v)}
+                      onClick={() => setFeedFilter((value) => value === 'community' ? null : 'community')}
                       className={cn(
                         'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all',
-                        verifiedOnly
+                        feedFilter === 'community'
                           ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                           : dark
                             ? 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'
                             : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50',
                       )}
                     >
-                      Verified Only {verifiedOnly ? 'On' : 'Off'}
+                      Community {feedFilter === 'community' ? 'On' : 'Off'}
                     </button>
                     <button
-                      onClick={() => setRecentOnly(r => !r)}
+                      onClick={() => setFeedFilter((value) => value === 'recent' ? null : 'recent')}
                       className={cn(
                         'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all',
-                        recentOnly
+                        feedFilter === 'recent'
                           ? dark ? 'bg-blue-500/20 text-blue-400 border-blue-500/40' : 'bg-slate-900 text-white border-slate-900'
                           : dark
                             ? 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'
                             : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50',
                       )}
                     >
-                      Recent 2h {recentOnly ? 'On' : 'Off'}
+                      Recent 2h {feedFilter === 'recent' ? 'On' : 'Off'}
                     </button>
                     {hasActiveFilters && (
                       <button
@@ -649,12 +657,22 @@ export default function MobileMapSheet({
                               </p>
 
                               {/* Description */}
-                              <p className={cn(
-                                'text-[11px] leading-relaxed line-clamp-2 mb-2',
-                                dark ? 'text-slate-400' : 'text-slate-600',
-                              )}>
-                                {incident.description}
-                              </p>
+                              <div className="mb-2 flex gap-2">
+                                {incident.image_url && (
+                                  <img
+                                    src={incident.image_url}
+                                    alt=""
+                                    className="h-14 w-14 shrink-0 rounded-xl border border-white/10 object-cover"
+                                    loading="lazy"
+                                  />
+                                )}
+                                <p className={cn(
+                                  'text-[11px] leading-relaxed line-clamp-3',
+                                  dark ? 'text-slate-400' : 'text-slate-600',
+                                )}>
+                                  {incident.description}
+                                </p>
+                              </div>
 
                               {/* Bottom row: status + avatar */}
                               <div className="flex items-center justify-between">

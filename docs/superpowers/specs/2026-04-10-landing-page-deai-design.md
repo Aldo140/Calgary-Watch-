@@ -10,7 +10,8 @@
 
 The landing page has been flagged as looking "AI-generated." Three root causes:
 
-1. **Copy** — generic SaaS marketing language ("community-powered", "urban intelligence layer", "make Calgary smarter together") repeated throughout.
+1. **Copy** — generic SaaS marketing language ("community-powered", "urban intelligence layer", "make Calgary smarter togeth
+er") repeated throughout.
 2. **Visual style** — gradient text on 7+ headlines; aurora glow backgrounds; rainbow multi-stop CTA buttons.
 3. **Stats** — two fabricated numbers ("74% missed a nearby event", "9 apps Calgarians check") that undermine trust on a civic platform.
 

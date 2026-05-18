@@ -35,6 +35,8 @@ type UserProfile = {
   email: string;
   displayName: string;
   role: 'user' | 'admin';
+  createdAt?: number;
+  updatedAt?: number;
 };
 
 type EditableIncident = Pick<
@@ -56,6 +58,7 @@ type PageViewDoc = {
   utm_medium?: string;
   utm_campaign?: string;
   traffic_source?: string;
+  organic_query?: string;
   sessionId?: string;
 };
 
@@ -190,6 +193,38 @@ function formatRelativeMinutes(timestamp: number) {
   const ageHours = Math.floor(ageMin / 60);
   if (ageHours < 24) return `${ageHours}h ago`;
   return `${Math.floor(ageHours / 24)}d ago`;
+}
+
+function coerceTimestamp(value: unknown): number {
+  if (typeof value === 'number') return value;
+  if (value && typeof value === 'object') {
+    const maybeTimestamp = value as { toMillis?: () => number; seconds?: number };
+    if (typeof maybeTimestamp.toMillis === 'function') return maybeTimestamp.toMillis();
+    if (typeof maybeTimestamp.seconds === 'number') return maybeTimestamp.seconds * 1000;
+  }
+  return 0;
+}
+
+function formatSignupTime(timestamp?: number) {
+  if (!timestamp) return { relative: 'Unknown', absolute: 'No timestamp stored' };
+  const ageMs = Date.now() - timestamp;
+  const absolute = new Date(timestamp).toLocaleString('en-CA', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  if (ageMs < 2 * 24 * 60 * 60 * 1000) {
+    const hours = Math.max(0, Math.floor(ageMs / 3_600_000));
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    const parts = [];
+    if (days) parts.push(`${days}d`);
+    parts.push(`${remHours}h`);
+    return { relative: `${parts.join(' ')} ago`, absolute };
+  }
+  return { relative: absolute, absolute };
 }
 
 // ── Mini sparkline (inline, no deps) ─────────────────────────────────────────
@@ -585,6 +620,29 @@ export default function AdminPage() {
       .map(r => ({ name: r.name.length > 14 ? r.name.slice(0, 14) + '…' : r.name, count: r.count }));
   }, [incidents, users]);
 
+  const newestSignups = useMemo(() => {
+    const firstReportByUser = new globalThis.Map<string, number>();
+    incidents.forEach((incident) => {
+      const keys = [(incident as any).authorUid, incident.email].filter(Boolean) as string[];
+      keys.forEach((key) => {
+        const existing = firstReportByUser.get(key);
+        if (!existing || incident.timestamp < existing) firstReportByUser.set(key, incident.timestamp);
+      });
+    });
+
+    return users
+      .map((profile) => ({
+        ...profile,
+        joinedAt: coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || firstReportByUser.get(profile.uid) || firstReportByUser.get(profile.email) || 0,
+        reports: incidents.filter((i) =>
+          ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
+          (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
+        ).length,
+      }))
+      .sort((a, b) => b.joinedAt - a.joinedAt)
+      .slice(0, 5);
+  }, [users, incidents]);
+
   // User growth sparkline (registrations per day, last 14 days)
   // We don't have createdAt on UserProfile, so we proxy via first report date
   const userGrowthData = useMemo(() => {
@@ -701,6 +759,40 @@ export default function AdminPage() {
       .sort((a, b) => b[1] - a[1]).slice(0, 8)
       .map(([referrer, views]) => ({ referrer: referrer.length > 22 ? referrer.slice(0, 22) + '…' : referrer, views }));
   }, [pageViewDocs]);
+
+  const organicSearchDocs = useMemo(
+    () => pageViewDocs.filter((pv) => pv.traffic_source === 'organic_search'),
+    [pageViewDocs]
+  );
+
+  const organicShare = useMemo(() => {
+    if (!pageViewDocs.length) return 0;
+    return Math.round((organicSearchDocs.length / pageViewDocs.length) * 100);
+  }, [organicSearchDocs.length, pageViewDocs.length]);
+
+  const organicSearchByDayData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    organicSearchDocs.forEach((pv) => {
+      const key = new Date(pv.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+      counts[key] = (counts[key] ?? 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([date, searches]) => ({ date, searches }))
+      .sort((a, b) => b.searches - a.searches)
+      .slice(0, 7);
+  }, [organicSearchDocs]);
+
+  const organicQueryData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    organicSearchDocs.forEach((pv) => {
+      const queryText = pv.organic_query?.trim() || 'Keyword hidden by search engine';
+      counts[queryText] = (counts[queryText] ?? 0) + 1;
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([queryText, views]) => ({ queryText, views }));
+  }, [organicSearchDocs]);
 
   // Unique sessions (approximate)
   const uniqueSessions = useMemo(() => {
@@ -884,9 +976,9 @@ export default function AdminPage() {
   const renderMobileHero = () => {
     const ActiveIcon = activeNavItem.icon;
     const mobileKpis = [
-      { label: 'Open Issues', value: unresolvedIncidents, tone: 'text-amber-300', chip: 'bg-amber-500/15 border-amber-400/20' },
-      { label: 'Pending Review', value: pendingReviewIncidents.length, tone: 'text-rose-300', chip: 'bg-rose-500/15 border-rose-400/20' },
-      { label: 'Active Users', value: totalUsers, tone: 'text-sky-300', chip: 'bg-sky-500/15 border-sky-400/20' },
+      { label: 'Open Issues', value: unresolvedIncidents, tone: 'text-amber-300 light:text-amber-700', chip: 'bg-amber-500/15 light:bg-amber-50 border-amber-400/20 light:border-amber-200' },
+      { label: 'Pending Review', value: pendingReviewIncidents.length, tone: 'text-rose-300 light:text-rose-700', chip: 'bg-rose-500/15 light:bg-rose-50 border-rose-400/20 light:border-rose-200' },
+      { label: 'Active Users', value: totalUsers, tone: 'text-sky-300 light:text-sky-700', chip: 'bg-sky-500/15 light:bg-sky-50 border-sky-400/20 light:border-sky-200' },
     ];
 
     return (
@@ -900,7 +992,7 @@ export default function AdminPage() {
           <div className="relative space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-300/75">{activeSectionTheme.eyebrow}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-300/75 light:text-slate-600">{activeSectionTheme.eyebrow}</p>
                 <h1 className="mt-2 max-w-[14rem] text-[1.65rem] font-black leading-none text-white light:text-slate-900">{activeSectionTheme.title}</h1>
               </div>
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
@@ -908,12 +1000,12 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <p className="max-w-[18rem] text-xs leading-relaxed text-slate-200/80">{activeSectionTheme.description}</p>
+            <p className="max-w-[18rem] text-xs leading-relaxed text-slate-200/80 light:text-slate-700">{activeSectionTheme.description}</p>
 
             <div className="grid grid-cols-3 gap-2">
               {mobileKpis.map((kpi) => (
                 <div key={kpi.label} className={cn('rounded-2xl border px-3 py-3 backdrop-blur-sm', kpi.chip)}>
-                  <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-300/70">{kpi.label}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-300/70 light:text-slate-600">{kpi.label}</p>
                   <p className={cn('mt-2 text-lg font-black', kpi.tone)}>{kpi.value}</p>
                 </div>
               ))}
@@ -1167,14 +1259,14 @@ export default function AdminPage() {
         )}
       </Card>
 
-      {/* Elevated user directory — Task 5 */}
+      {/* Latest signups + route to the full directory */}
       <div className="grid lg:grid-cols-3 gap-4">
         <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto h-[420px]">
           <div className="flex items-center justify-between mb-4 pr-1">
             <div>
               <h3 className="text-base font-black flex items-center gap-2">
                 <Users size={15} className="text-violet-400" />
-                User Directory
+                Newest Signups
               </h3>
               <p className="text-[10px] text-slate-500 mt-0.5">
                 <span className="text-violet-400 font-black">{totalUsers}</span> total ·{' '}
@@ -1183,8 +1275,8 @@ export default function AdminPage() {
                 <span className="text-amber-400 font-black">{uniqueReporterEmails}</span> reporters
               </p>
             </div>
-            <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 light:bg-slate-100 border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 hover:bg-white/10 light:hover:bg-slate-200 hover:text-white light:hover:text-slate-900" title="Force Refresh">
-              <RefreshCw size={12} className={isRefreshingUsers ? 'animate-spin' : ''} />
+            <Button variant="secondary" onClick={() => navigate('/admin/users')} className="h-8 px-3 text-[10px] uppercase font-bold tracking-widest bg-white/5 light:bg-slate-100 border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 hover:bg-white/10 light:hover:bg-slate-200 hover:text-white light:hover:text-slate-900">
+              Full Directory
             </Button>
           </div>
           <div className="overflow-y-auto h-[320px] pr-2">
@@ -1195,15 +1287,13 @@ export default function AdminPage() {
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Role</th>
+                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Joined</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Reports</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((profile) => {
-                  const reportCount = incidents.filter(i =>
-                    ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
-                    (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
-                  ).length;
+                {newestSignups.map((profile) => {
+                  const joined = formatSignupTime(profile.joinedAt);
                   return (
                     <tr key={profile.uid} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.03] light:hover:bg-slate-50 transition-colors">
                       <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>
@@ -1215,8 +1305,12 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="py-2.5">
-                        {reportCount > 0
-                          ? <span className="text-amber-400 font-black text-[11px]">{reportCount}</span>
+                        <span className="block text-[11px] font-black text-slate-300 light:text-slate-800">{joined.relative}</span>
+                        <span className="block text-[9px] text-slate-600">{joined.absolute}</span>
+                      </td>
+                      <td className="py-2.5">
+                        {profile.reports > 0
+                          ? <span className="text-amber-400 font-black text-[11px]">{profile.reports}</span>
                           : <span className="text-slate-600 text-[11px]">0</span>}
                       </td>
                     </tr>
@@ -1274,6 +1368,9 @@ export default function AdminPage() {
               </div>
             </Card>
           )}
+          <Button onClick={() => navigate('/admin/users')} className="h-11 rounded-2xl bg-violet-600 hover:bg-violet-700 text-sm">
+            Open Full User Directory
+          </Button>
         </div>
       </div>
     </div>
@@ -1282,6 +1379,29 @@ export default function AdminPage() {
   const renderIncidents = () => (
     <div className="space-y-5">
       <SectionHeader icon={FileText} title="Incidents" subtitle="Edit, moderate, and soft-delete community and official incident records" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: 'All Records', value: totalIncidents, tone: 'text-sky-400', note: 'Visible Firestore incidents' },
+          { label: 'Pending', value: pendingReviewIncidents.length, tone: 'text-amber-400', note: 'Needs moderation' },
+          { label: 'Community', value: communityReportCount, tone: 'text-emerald-400', note: 'User-posted reports' },
+          { label: 'Flagged', value: flaggedIncidents.length, tone: 'text-rose-400', note: 'Hidden by reports' },
+        ].map((item) => (
+          <Card key={item.label} className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{item.label}</p>
+            <p className={cn('mt-2 text-3xl font-black', item.tone)}>{item.value}</p>
+            <p className="mt-1 text-[10px] text-slate-600">{item.note}</p>
+          </Card>
+        ))}
+      </div>
+      <Card className="p-4 bg-orange-500/10 light:bg-orange-50 border-orange-500/20 light:border-orange-200 rounded-[1.6rem] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <p className="text-sm font-black text-white light:text-slate-900">Open the full incident workspace</p>
+          <p className="text-xs text-slate-400 light:text-slate-600 mt-0.5">Search all incidents, newest first, inspect raw data, edit fields, and review attached images on a dedicated page.</p>
+        </div>
+        <Button onClick={() => navigate('/admin/incidents')} className="h-10 rounded-2xl bg-orange-600 hover:bg-orange-700 text-sm shrink-0">
+          Full Incident List
+        </Button>
+      </Card>
       <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">
@@ -1456,6 +1576,15 @@ export default function AdminPage() {
   const renderUsers = () => (
     <div className="space-y-5">
       <SectionHeader icon={Users} title="User Directory" subtitle="Registered users, roles, and contribution activity" />
+      <Card className="p-4 bg-violet-500/10 light:bg-violet-50 border-violet-500/20 light:border-violet-200 rounded-[1.6rem] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <p className="text-sm font-black text-white light:text-slate-900">Need the full admin directory?</p>
+          <p className="text-xs text-slate-400 light:text-slate-600 mt-0.5">Search by name, email, or notes, inspect raw profile data, and review every user report.</p>
+        </div>
+        <Button onClick={() => navigate('/admin/users')} className="h-10 rounded-2xl bg-violet-600 hover:bg-violet-700 text-sm shrink-0">
+          Open Full Directory
+        </Button>
+      </Card>
       <div className="grid lg:grid-cols-3 gap-4">
         <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4 pr-1">
@@ -1939,10 +2068,53 @@ export default function AdminPage() {
         <Card className="p-4 bg-slate-900/80 light:bg-white border-pink-500/20 light:border-pink-200 rounded-2xl hover:border-pink-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Activity size={13} className="text-pink-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Sample Size</p>
+            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Organic Share</p>
           </div>
-          <p className="text-3xl font-black text-pink-400">{pageViewDocs.length.toLocaleString()}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Recent docs loaded (last 2 000)</p>
+          <p className="text-3xl font-black text-pink-400">{organicShare}%</p>
+          <p className="text-[10px] text-slate-600 mt-1">{organicSearchDocs.length.toLocaleString()} search visits in sample</p>
+        </Card>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-emerald-500/20 light:border-emerald-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Organic Search Days</p>
+          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Best sampled days for search traffic, useful for spotting content or news-driven spikes.</p>
+          {organicSearchByDayData.length === 0 ? (
+            <p className="text-slate-600 text-xs py-8 text-center">No organic search visits in the sample yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {organicSearchByDayData.map((row) => {
+                const max = organicSearchByDayData[0]?.searches || 1;
+                const pct = Math.round((row.searches / max) * 100);
+                return (
+                  <div key={row.date} className="flex items-center gap-3">
+                    <span className="w-16 text-[11px] font-bold text-slate-400 light:text-slate-600">{row.date}</span>
+                    <div className="h-2 flex-1 rounded-full bg-white/5 light:bg-slate-100">
+                      <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="w-10 text-right text-xs font-black text-emerald-400">{row.searches}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Search Terms</p>
+          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Most modern search engines hide the exact phrase, but any available query values appear here.</p>
+          {organicQueryData.length === 0 ? (
+            <p className="text-slate-600 text-xs py-8 text-center">No search terms available yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {organicQueryData.map((row) => (
+                <div key={row.queryText} className="flex items-center justify-between gap-3 rounded-xl border border-white/5 light:border-slate-200 bg-white/[0.03] light:bg-slate-50 px-3 py-2">
+                  <span className="truncate text-xs text-slate-300 light:text-slate-700">{row.queryText}</span>
+                  <span className="text-xs font-black text-white light:text-slate-900">{row.views}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
@@ -2147,13 +2319,13 @@ export default function AdminPage() {
     return (
       <div className="space-y-5">
         <SectionHeader icon={Zap} title="API Health" subtitle="Live status of the Calgary Open Data and weather APIs that power the map" />
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className={cn('text-xs font-black uppercase tracking-widest', anyError ? 'text-red-400' : allOk ? 'text-emerald-400' : 'text-amber-400')}>
             {anyError ? 'Degraded — one or more APIs are failing' : allOk ? 'All systems operational' : 'Checking…'}
           </span>
           <button
             onClick={checkApis}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition-all border border-white/10"
+            className="flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 light:bg-white hover:bg-white/10 light:hover:bg-slate-50 text-slate-300 light:text-slate-700 text-xs font-bold transition-all border border-white/10 light:border-slate-200"
           >
             <RefreshCw size={12} className={apiHealths.some(h => h.status === 'checking') ? 'animate-spin' : ''} />
             Test Now
@@ -2171,7 +2343,7 @@ export default function AdminPage() {
                   {statusLabel[h.status]}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                 <div>
                   <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Records</p>
                   <p className="text-white light:text-slate-900 font-black">{h.recordCount !== null ? h.recordCount : '—'}</p>
@@ -2193,7 +2365,7 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
-              <p className="mt-3 text-[9px] text-slate-600 font-mono truncate">{h.url}</p>
+              <p className="mt-3 text-[9px] text-slate-600 font-mono break-all">{h.url}</p>
             </Card>
           ))}
         </div>

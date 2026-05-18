@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView, animate, AnimatePresence } from 'motion/react';
 import {
@@ -109,6 +110,43 @@ const AVATARS = [
   { src: 'https://i.pravatar.cc/40?img=23', alt: 'Community member' },
 ];
 
+const LANDING_TAG_TONES = {
+  sky: 'text-[#4A90D9]',
+  teal: 'text-[#2E8B7A]',
+  gold: 'text-[#B88920] light:text-[#8A6A16]',
+  violet: 'text-violet-300 light:text-violet-700',
+  slate: 'text-slate-400 light:text-slate-600',
+};
+
+function LandingTag({
+  children,
+  tone = 'sky',
+  pulse = false,
+  className,
+}: {
+  children: ReactNode;
+  tone?: keyof typeof LANDING_TAG_TONES;
+  pulse?: boolean;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex min-h-6 items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em]',
+        LANDING_TAG_TONES[tone],
+        className,
+      )}
+    >
+      <span className={cn('h-px w-6 bg-current opacity-70', pulse && 'animate-pulse')} aria-hidden="true" />
+      {children}
+    </span>
+  );
+}
+
+function landingTagTone(index: number): keyof typeof LANDING_TAG_TONES {
+  return (['sky', 'teal', 'gold', 'violet'] as const)[index % 4];
+}
+
 // ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
@@ -125,11 +163,11 @@ export default function LandingPage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const lastNavScrollY = useRef(0);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'dark';
+    if (typeof window === 'undefined') return 'light';
     try {
-      return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
+      return localStorage.getItem('cw-theme') === 'dark' ? 'dark' : 'light';
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
 
@@ -324,25 +362,20 @@ export default function LandingPage() {
       {/* ================================================================
           HERO
           ================================================================ */}
-      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 light:bg-transparent w-full">
+      <section ref={heroRef} className="relative flex flex-col overflow-hidden bg-slate-950 light:bg-[#eef5f7] w-full">
         
         {/* Full-width seamless background image */}
         <div className="absolute inset-0 pointer-events-none">
-            <img src={publicAsset('images/calgary2.webp')} fetchPriority="high" width={1920} height={1080} className="w-full h-full object-cover opacity-40 brightness-75 scale-105" alt="Calgary Skyline Ambient" />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 light:from-slate-50 via-slate-950/70 light:via-slate-50/70 to-slate-950/40 light:to-slate-50/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 light:from-slate-50 via-transparent to-transparent opacity-90" />
+            <img src={publicAsset('images/calgary2.webp')} fetchPriority="high" width={1200} height={1641} className="h-full w-full object-cover opacity-55 brightness-[0.72] saturate-[1.1] light:opacity-70 light:brightness-[1.08]" alt="Calgary skyline" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.96)_0%,rgba(2,6,23,0.78)_38%,rgba(2,6,23,0.34)_72%,rgba(2,6,23,0.68)_100%)] light:bg-[linear-gradient(90deg,rgba(238,245,247,0.98)_0%,rgba(238,245,247,0.82)_40%,rgba(238,245,247,0.28)_72%,rgba(238,245,247,0.76)_100%)]" />
+            <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-950 light:from-[#eef5f7] to-transparent" />
+            <div className="absolute inset-0 opacity-[0.08] light:opacity-[0.1]" style={{ backgroundImage: 'linear-gradient(90deg,rgba(255,255,255,.4) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.4) 1px,transparent 1px)', backgroundSize: '84px 84px' }} />
         </div>
 
-        {/* Large ambient glows — use radial-gradient to avoid paint-heavy blur filter */}
-        <div className="absolute top-1/4 left-[10%] w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(74,144,217,0.12) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-1/4 right-[20%] w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(46,139,122,0.10) 0%, transparent 70%)' }} />
-
-        <div className="relative z-10 flex flex-col lg:grid lg:grid-cols-[45fr_55fr] gap-4 lg:gap-12 px-6 sm:px-12 lg:px-16 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-16 lg:pb-20 min-h-dvh lg:min-h-[900px]">
+        <div className="relative z-10 flex min-h-dvh flex-col lg:grid lg:min-h-[900px] lg:grid-cols-[52fr_48fr] gap-4 lg:gap-10 px-5 sm:px-10 lg:px-14 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-14 lg:pb-16">
 
           {/* Left - content (Text naturally comes first on mobile) */}
-          <div className="flex flex-col justify-center max-w-xl self-center pt-8 pb-4 lg:py-0">
+          <div className="flex flex-col justify-center max-w-3xl self-center pt-8 pb-4 lg:py-0">
 
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, x: -28 }}
@@ -351,211 +384,155 @@ export default function LandingPage() {
               className="relative z-10"
             >
               {/* Badges */}
-              <div className="flex flex-wrap items-center gap-2 mb-7">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#4A90D9]/10 border border-[#4A90D9]/30 rounded-full">
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4A90D9] opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4A90D9]" />
-                  </span>
-                  <span className="text-[11px] font-bold text-[#4A90D9] uppercase tracking-widest">Live · Calgary, AB</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2E8B7A]/10 border border-[#2E8B7A]/30 rounded-full">
-                  <span className="text-[11px] font-bold text-[#2E8B7A] uppercase tracking-widest">Non-Profit</span>
-                </div>
+              <div className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <LandingTag pulse>Live · Calgary, AB</LandingTag>
+                <LandingTag tone="teal">Non-Profit</LandingTag>
+                <LandingTag tone="gold" className="hidden sm:inline-flex">Community Signal</LandingTag>
               </div>
 
               {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black leading-[1.05] tracking-tight text-white mb-5">
-                Know what's happening<br />in Calgary right now.
+              <h1 className="mb-6 max-w-[11ch] text-[clamp(3rem,12vw,7.4rem)] font-black leading-[0.9] tracking-tight text-white light:text-slate-950 lg:text-[clamp(4.6rem,7vw,7.4rem)]">
+                Know Calgary.
+                <span className="mt-2 block text-[#4A90D9]">Right now.</span>
               </h1>
 
               {/* Description */}
-              <p className="text-base sm:text-lg text-slate-400 leading-relaxed mb-9 max-w-lg">
+              <p className="mb-8 max-w-2xl border-l-4 border-[#4A90D9] pl-5 text-base leading-relaxed text-slate-300 light:text-slate-700 sm:text-xl">
                 A live map where Calgarians report incidents the moment they happen. Road closures, fires, flooding, safety alerts - all in one place, verified and real-time.
               </p>
 
               {/* CTAs (Desktop Only - Mobile buttons moved below phone) */}
               <div className="hidden lg:flex flex-wrap gap-3 mb-8">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 h-14 text-base font-bold group shadow-[0_6px_24px_rgba(74,144,217,0.35)]" onClick={() => navigate('/map')}>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-2xl px-8 h-14 text-base font-black group shadow-[0_14px_34px_-18px_rgba(74,144,217,0.9)]" onClick={() => navigate('/map')}>
                   Open Live Map
                   <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={17} />
                 </Button>
-                <Button variant="secondary" size="lg" className="bg-white/5 light:bg-slate-100 border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 rounded-xl px-8 h-14 text-base font-bold text-white light:text-slate-900" onClick={() => navigate('/map?report=true')}>
+                <Button variant="secondary" size="lg" className="bg-white/[0.08] light:bg-white border border-white/15 light:border-slate-300 hover:bg-white/[0.12] light:hover:bg-slate-50 rounded-2xl px-8 h-14 text-base font-black text-white light:text-slate-900" onClick={() => navigate('/map?report=true')}>
                   Report an Incident
                 </Button>
               </div>
 
               {/* Social proof */}
-              <div className="flex items-center gap-3 pt-3">
-                <div className="flex -space-x-2.5 shrink-0" aria-hidden="true">
-                  {AVATARS.map((av, i) => (
-                    <img key={i} src={av.src} alt="" width={32} height={32} className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover shrink-0"
-                      loading="lazy"
-                      crossOrigin="anonymous"
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+              <div className="grid max-w-2xl gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2.5 shrink-0" aria-hidden="true">
+                    {AVATARS.map((av, i) => (
+                      <img key={i} src={av.src} alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-slate-950 light:border-white object-cover shrink-0"
+                        loading="lazy"
+                        crossOrigin="anonymous"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+                    ))}
+                  </div>
+                  <p className="text-sm text-slate-300 light:text-slate-700">
+                    <span className="text-white light:text-slate-950 font-black">2,400+</span> Calgarians this week
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.04] light:bg-white/80">
+                  {[
+                    ['5', 'types'],
+                    ['4', 'zones'],
+                    ['30s', 'target'],
+                  ].map(([value, label]) => (
+                    <div key={label} className="border-r border-white/10 light:border-slate-200 px-3 py-2.5 last:border-r-0">
+                      <p className="text-lg font-black text-white light:text-slate-950">{value}</p>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">{label}</p>
+                    </div>
                   ))}
                 </div>
-                <p className="text-sm text-slate-400">
-                  <span className="text-white font-bold">2,400+</span> Calgarians this week
-                </p>
               </div>
             </motion.div>
           </div>
 
-          {/* Right - Interactive Visual Simulation (Phone) */}
-          <div className="relative w-full flex flex-col items-center justify-center pt-8 pb-10 lg:py-0 self-center">
-             
-             {/* Dynamic Floating iPhone Mockup */}
-             <motion.div 
-               initial={reducedMotion ? undefined : { opacity: 0, y: 40, scale: 0.95 }}
-               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-               viewport={{ once: true, margin: "0px" }}
-               transition={{ duration: 0.9, ease: 'easeOut' }}
-               className="relative w-full max-w-[300px] sm:max-w-[340px] aspect-[9/19.5] mx-auto rounded-[2.5rem] sm:rounded-[3rem] bg-slate-950 border-[6px] sm:border-[8px] border-slate-900 shadow-[0_30px_80px_rgba(0,0,0,0.9)] overflow-hidden ring-1 ring-white/10 shrink-0"
-             >
-                {/* The iPhone Notch */}
-                <div className="absolute top-0 inset-x-0 h-6 sm:h-7 flex justify-center z-50">
-                   <div className="w-28 sm:w-32 h-[90%] bg-slate-900 rounded-b-2xl sm:rounded-b-3xl shadow-inner" />
+          {/* Right - responsive live command surface */}
+          <div className="relative flex w-full flex-col justify-start self-start pb-8 pt-4 lg:sticky lg:top-24 lg:py-0">
+            <motion.div
+              initial={reducedMotion ? undefined : { opacity: 0, y: 28, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.75, ease: 'easeOut', delay: 0.08 }}
+              className="relative mx-auto w-full max-w-[42rem]"
+            >
+              <div className="absolute -inset-4 rounded-[2.25rem] border border-white/10 bg-white/[0.03] light:bg-white/45" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/12 light:border-white/80 bg-slate-950/85 light:bg-white/80 shadow-[0_30px_90px_-40px_rgba(15,23,42,0.95)] backdrop-blur-xl">
+                <div className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-white/10 light:border-slate-200 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <img src={publicAsset('icon.svg')} alt="" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
+                    <div>
+                      <p className="text-xs font-black text-white light:text-slate-950">Calgary Watch Live</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Community operations view</p>
+                    </div>
+                  </div>
+                  <LandingTag tone="teal" pulse className="hidden justify-end sm:inline-flex">Sync Live</LandingTag>
                 </div>
 
-                {/* iPhone Screen Content: NATIVE FULL REAL-ESTATE UI */}
-                <div className="absolute inset-0 bg-slate-950 flex flex-col">
-                   
-                   {/* Floating Top UI (Native feel, no fake headers) */}
-                   <div className="absolute top-9 inset-x-4 flex items-center justify-between z-20 pointer-events-none">
-                       <div className="w-9 h-9 rounded-full bg-slate-900/90 backdrop-blur-xl border border-white/5 flex items-center justify-center shadow-lg">
-                           <Menu size={16} className="text-white" />
-                       </div>
-                       <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1 }} className="px-3 py-1.5 rounded-full bg-green-500/10 backdrop-blur-xl border border-green-500/20 shadow-lg flex items-center gap-1.5">
-                           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                           <span className="text-[10px] font-bold text-green-400 tracking-wide">Sync Live</span>
-                       </motion.div>
-                   </div>
+                <div className="grid gap-3 p-3 sm:p-4">
+                  <div className="relative aspect-square min-h-[210px] overflow-hidden rounded-[1.45rem] border border-white/10 light:border-slate-200 bg-slate-900 sm:min-h-[270px]">
+                    <img
+                      src={publicAsset('images/calgary_map.png')}
+                      width={1024}
+                      height={1024}
+                      className="absolute inset-0 h-full w-full object-cover opacity-90 saturate-[1.12]"
+                      alt="Calgary live incident map preview"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/70 light:to-white/50" />
+                    <div className="absolute left-[18%] top-[28%] h-4 w-4 rounded-full border-2 border-white bg-[#4A90D9] shadow-[0_0_0_10px_rgba(74,144,217,0.24),0_0_34px_rgba(74,144,217,0.8)]" />
+                    <div className="absolute left-[62%] top-[24%] flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl bg-red-600 text-white shadow-[0_0_0_16px_rgba(239,68,68,0.14),0_18px_46px_rgba(239,68,68,0.35)]">
+                      <AlertCircle size={22} />
+                    </div>
+                    <div className="absolute bottom-[29%] right-[16%] flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400 text-slate-950 shadow-[0_0_0_13px_rgba(251,191,36,0.16)]">
+                      <ShieldAlert size={18} />
+                    </div>
 
-                   {/* Background Map filling top half completely seamlessly */}
-                   <div className="absolute top-0 inset-x-0 h-[55%] bg-slate-900 overflow-hidden">
-                       <img
-                          src={publicAsset('images/calgary_map.png')}
-                          width={800} height={600}
-                          className="absolute inset-0 w-[110%] h-[110%] object-cover opacity-90"
-                          alt="Calgary Top Down Neon Map"
-                          loading="lazy"
-                       />
-                       
-                       {/* Floating Action Buttons (Right side native map feel) */}
-                       <div className="absolute top-[25%] right-3 flex flex-col gap-2 z-20">
-                           <motion.div whileHover={{ scale: 1.1 }} className="w-9 h-9 rounded-full bg-[#4A90D9] shadow-[0_0_15px_rgba(74,144,217,0.5)] flex items-center justify-center text-white cursor-pointer"><MapPin size={16} className="fill-white" /></motion.div>
-                           <div className="w-9 h-9 rounded-full bg-slate-800/90 backdrop-blur-md border border-white/5 shadow-lg flex items-center justify-center text-slate-300"><Layers size={16} /></div>
-                       </div>
+                    <div className="absolute left-4 top-4 rounded-2xl border border-white/12 bg-slate-950/72 px-4 py-3 backdrop-blur-xl light:bg-white/80">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live reports</p>
+                      <p className="mt-1 text-3xl font-black text-white light:text-slate-950">12</p>
+                    </div>
 
-                       {/* PING 1: User Location */}
-                       <motion.div animate={{ opacity: [0, 0.6, 0], scale: [0.5, 2.5, 0.5] }} transition={{ duration: 4, repeat: Infinity, ease: "easeOut" }} className="absolute top-[35%] left-[25%] w-16 h-16 bg-[#4A90D9]/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                       <div className="absolute top-[35%] left-[25%] w-3 h-3 bg-[#4A90D9] rounded-full shadow-[0_0_10px_#4A90D9] border-2 border-white -translate-x-1/2 -translate-y-1/2" />
+                    <div className="absolute bottom-4 left-4 right-4 grid gap-2 sm:grid-cols-3">
+                      {[
+                        { label: 'Collision', area: 'Deerfoot Trail', tone: 'text-red-300 bg-red-500/12 border-red-400/20' },
+                        { label: 'Flooding', area: 'Memorial Dr', tone: 'text-amber-300 bg-amber-500/12 border-amber-400/20' },
+                        { label: 'All clear', area: 'Beltline', tone: 'text-emerald-300 bg-emerald-500/12 border-emerald-400/20' },
+                      ].map((item) => (
+                        <div key={item.label} className={cn('rounded-2xl border px-3 py-2 backdrop-blur-xl', item.tone)}>
+                          <p className="truncate text-[11px] font-black">{item.label}</p>
+                          <p className="truncate text-[10px] text-slate-300 light:text-slate-700">{item.area}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-                       {/* PING 2: Major Incident */}
-                       <motion.div animate={{ opacity: [0, 0.5, 0], scale: [0.5, 2, 0.5] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[25%] left-[65%] w-20 h-20 sm:w-24 sm:h-24 bg-red-500/20 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                       <div className="absolute top-[25%] left-[65%] text-red-500 drop-shadow-[0_0_10px_#ef4444] -translate-x-1/2 -translate-y-1/2">
-                           <Activity size={22} className="text-white fill-red-500" />
-                       </div>
-
-                       {/* PING 3: Minor Warning */}
-                       <motion.div animate={{ opacity: [0, 0.5, 0], scale: [0.5, 1.5, 0.5] }} transition={{ duration: 2.5, repeat: Infinity, delay: 1.5 }} className="absolute top-[60%] left-[80%] w-12 h-12 bg-amber-500/30 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                       <div className="absolute top-[60%] left-[80%] text-amber-500 drop-shadow-[0_0_8px_#fbbf24] -translate-x-1/2 -translate-y-1/2"><AlertCircle size={16} className="fill-amber-500 text-slate-900" /></div>
-                   </div>
-
-                   {/* Native Bottom Sheet overlapping the map securely */}
-                   <div className="absolute bottom-0 inset-x-0 h-[50%] bg-slate-900/95 backdrop-blur-md rounded-t-[2rem] border-t border-white/10 flex flex-col pt-2 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-30">
-                       
-                       {/* Drag Handle */}
-                       <div className="w-10 h-1.5 rounded-full bg-white/20 mx-auto mb-3" />
-                       
-                       <div className="px-4 pb-2 flex justify-between items-end border-b border-white/5">
-                           <span className="text-white font-bold text-sm">Nearby Activity</span>
-                           <span className="text-[10px] text-slate-400 font-semibold bg-white/5 px-2 py-0.5 rounded-full">3 Active</span>
-                       </div>
-
-                       {/* Scrolling Feed Container */}
-                       <div className="flex-1 overflow-hidden px-3 pt-3 flex flex-col gap-2.5 relative">
-                           
-                           {/* Item 1: High Priority */}
-                           <motion.div 
-                              initial={{ x: -20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4, type: "spring" }} 
-                              className="p-3 bg-red-500/5 rounded-[1rem] border border-red-500/20 flex gap-3 relative overflow-hidden"
-                           >
-                               <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-red-500 shadow-[0_0_10px_#ef4444]" />
-                               <div className="p-1.5 rounded-full bg-red-500/10 text-red-400 shrink-0 self-start"><AlertCircle size={14} /></div>
-                               <div className="flex-1 min-w-0">
-                                   <div className="flex justify-between items-start gap-1">
-                                      <h4 className="text-white font-bold text-[11px] sm:text-xs truncate">Major Collision</h4>
-                                      <span className="text-[8px] text-red-400 font-black animate-pulse bg-red-500/10 px-1 rounded whitespace-nowrap">JUST NOW</span>
-                                   </div>
-                                   <p className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate">Deerfoot Tr & 16 Ave block...</p>
-                               </div>
-                           </motion.div>
-
-                           {/* Item 2: Warning */}
-                           <motion.div 
-                              initial={{ x: -20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6, type: "spring" }} 
-                              className="p-3 bg-slate-800/40 rounded-[1rem] border border-slate-700/50 flex gap-3 relative"
-                           >
-                               <div className="p-1.5 rounded-full bg-amber-500/10 text-amber-500 shrink-0 self-start"><ShieldAlert size={14} /></div>
-                               <div className="flex-1 min-w-0">
-                                   <div className="flex justify-between items-start gap-1">
-                                      <h4 className="text-white font-bold text-[11px] sm:text-xs truncate">Flood Hazard</h4>
-                                      <span className="text-[8px] text-slate-500 font-bold whitespace-nowrap">15m ago</span>
-                                   </div>
-                                   <p className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate">Memorial Dr pooling rapid...</p>
-                               </div>
-                           </motion.div>
-
-                           {/* Item 3: Information */}
-                           <motion.div 
-                              initial={{ x: -20, opacity: 0 }} whileInView={{ x: 0, opacity: 0.5 }} viewport={{ once: true }} transition={{ delay: 0.8, type: "spring" }} 
-                              className="p-3 bg-slate-800/20 rounded-[1rem] border border-slate-700/30 flex gap-3 relative grayscale-[30%]"
-                           >
-                               <div className="p-1.5 rounded-full bg-[#4A90D9]/10 text-[#4A90D9] shrink-0 self-start"><CheckCircle2 size={14} /></div>
-                               <div className="flex-1 min-w-0">
-                                   <div className="flex justify-between items-start gap-1">
-                                      <h4 className="text-white font-bold text-[11px] sm:text-xs truncate">Road Cleared</h4>
-                                      <span className="text-[8px] text-slate-500 font-bold whitespace-nowrap">1h ago</span>
-                                   </div>
-                               </div>
-                           </motion.div>
-
-                           {/* Bottom fade */}
-                           <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
-                       </div>
-
-                       {/* Logo watermark - bottom right of phone */}
-                       <div className="absolute bottom-3 right-4 flex items-center gap-1.5 opacity-40 pointer-events-none">
-                         <img src={publicAsset('icon.svg')} alt="" width={16} height={16} className="w-4 h-4 object-contain" />
-                         <span className="text-[9px] font-black tracking-tight"
-                           style={{ background: 'linear-gradient(to right,#4A90D9,#2E8B7A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                           Calgary Watch
-                         </span>
-                       </div>
-                   </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {[
+                      { value: '<30s', label: 'report to map', color: 'text-[#4A90D9]' },
+                      { value: '5', label: 'alert categories', color: 'text-[#D4A843]' },
+                      { value: '24/7', label: 'community pulse', color: 'text-[#2E8B7A]' },
+                    ].map((stat) => (
+                      <div key={stat.label} className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.04] light:bg-white/80 px-4 py-3">
+                        <p className={cn('text-2xl font-black', stat.color)}>{stat.value}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{stat.label}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-             </motion.div>
+              </div>
+            </motion.div>
 
-             {/* CTAs (Mobile Only - Readily accessible below phone layout) */}
-             <div className="flex lg:hidden flex-col sm:flex-row gap-3 mt-8 w-full max-w-sm z-10 px-2 shrink-0">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8 h-14 text-base font-bold shadow-[0_6px_24px_rgba(74,144,217,0.35)] w-full flex-1" onClick={() => navigate('/map')}>
-                  Open Live Map
-                </Button>
-                <Button variant="secondary" size="lg" className="bg-white/5 light:bg-slate-100 border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 rounded-xl px-8 h-14 text-base font-bold text-white light:text-slate-900 w-full flex-1" onClick={() => navigate('/map?report=true')}>
-                  Report an Incident
-                </Button>
-             </div>
+            {/* CTAs (Mobile Only) */}
+            <div className="flex lg:hidden flex-col sm:flex-row gap-3 mt-5 w-full max-w-xl mx-auto z-10 px-0 shrink-0">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 rounded-2xl px-8 h-[52px] text-sm font-black shadow-[0_6px_24px_rgba(74,144,217,0.35)] w-full flex-1" onClick={() => navigate('/map')}>
+                Open Live Map
+              </Button>
+              <Button variant="secondary" size="lg" className="bg-white/[0.08] light:bg-white border border-white/15 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50 rounded-2xl px-8 h-[52px] text-sm font-black text-white light:text-slate-900 w-full flex-1" onClick={() => navigate('/map?report=true')}>
+                Report an Incident
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Live ticker */}
         <div className="relative z-20 bg-slate-900/90 backdrop-blur-md border-t border-white/10 px-4 sm:px-8 py-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
-          <span className="inline-flex items-center gap-2 bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-lg shrink-0">
-            <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-white" /></span>
-            Live Feed
-          </span>
+          <LandingTag pulse className="shrink-0">Live Feed</LandingTag>
           <div className="flex items-center gap-5 shrink-0">
             {[
               { color: 'bg-red-500', glow: 'rgba(239,68,68,0.9)', text: '3 active alerts in Calgary' },
@@ -587,8 +564,8 @@ export default function LandingPage() {
           style={{ background: 'radial-gradient(circle at center, rgba(74,144,217,0.08) 0%, transparent 60%)' }}
         />
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-8">
-            <span className="text-[10px] uppercase font-black tracking-widest text-[#4A90D9]">Vision</span>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="mb-8 flex justify-center">
+            <LandingTag>Vision</LandingTag>
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-white mb-6 md:mb-8">
             Calgary's public safety map.<br/>
@@ -667,7 +644,7 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="flex-1 px-8 py-8 flex flex-col justify-center">
-                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded w-fit mb-3" style={{ color: row.tagColor, background: `${row.tagColor}15` }}>{row.tag}</span>
+                  <LandingTag tone={landingTagTone(i)} className="mb-3 w-fit">{row.tag}</LandingTag>
                   <h3 className="text-xl md:text-2xl font-black mb-2 text-white light:text-slate-900">{row.title}</h3>
                   <p className="text-sm text-slate-400 light:text-slate-600 leading-relaxed max-w-xl">{row.body}</p>
                 </div>
@@ -677,23 +654,14 @@ export default function LandingPage() {
 
           {/* Solution pivot */}
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.65 }}
-            className="mt-12 relative rounded-2xl overflow-hidden shadow-2xl border border-[#4A90D9]/25">
-            <picture>
-              <source srcSet={publicAsset('images/calgary3.webp')} type="image/webp" />
-              <img src={publicAsset('images/calgary3.webp')} alt="Calgary skyline" width={1200} height={380} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
-            </picture>
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40" />
-            <div className="relative z-10 grid md:grid-cols-2 gap-0 min-h-[380px]">
-              <div className="p-6 md:p-10 lg:p-12 flex flex-col justify-center">
-                <div className="inline-flex items-center gap-2 mb-4 w-fit">
-                  <div className="w-2 h-2 rounded-full bg-[#4A90D9] shadow-[0_0_8px_#4A90D9]" />
-                  <span className="text-xs font-black uppercase tracking-wider text-[#4A90D9]">The Solution</span>
-                </div>
-                <h3 className="text-3xl md:text-4xl font-black mb-4 leading-[1.1]">
+            className="mt-12 grid gap-0 overflow-hidden rounded-2xl border border-[#4A90D9]/25 bg-slate-900/90 light:bg-white shadow-2xl md:grid-cols-[0.9fr_1.1fr]">
+            <div className="p-6 md:p-10 lg:p-12 flex flex-col justify-center bg-slate-950/80 light:bg-white">
+                <LandingTag pulse className="mb-4 w-fit">The Solution</LandingTag>
+                <h3 className="text-3xl md:text-4xl font-black mb-4 leading-[1.1] text-white light:text-slate-900">
                   Calgary Watch:<br />
-                  <span className="text-white">One place. All of Calgary.</span>
+                  <span className="text-white light:text-slate-900">One place. All of Calgary.</span>
                 </h3>
-                <p className="text-sm md:text-base text-slate-300 leading-relaxed mb-6 max-w-md">
+                <p className="text-sm md:text-base text-slate-300 light:text-slate-600 leading-relaxed mb-6 max-w-md">
                   A live incident map built specifically for Calgary. Report something in under 30 seconds and it appears on the map for everyone nearby.
                 </p>
                 <div className="space-y-2 mb-7">
@@ -701,25 +669,35 @@ export default function LandingPage() {
                     <motion.div key={i} className="flex items-center gap-2.5 text-sm"
                       initial={reducedMotion ? undefined : { opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.4 + i * 0.08 }}>
                       <CheckCircle2 size={15} className="text-[#4A90D9] flex-shrink-0" />
-                      <span className="text-slate-300">{point}</span>
+                      <span className="text-slate-300 light:text-slate-700">{point}</span>
                     </motion.div>
                   ))}
                 </div>
                 <motion.button whileHover={!reducedMotion ? { scale: 1.04 } : undefined} whileTap={!reducedMotion ? { scale: 0.96 } : undefined} onClick={() => navigate('/map')}
                   className="w-fit rounded-xl px-7 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-2 cursor-pointer text-sm transition-colors">
-                  <MapPin size={16} />View Live Map<ArrowRight size={15} />
+                  <MapPin size={16} />Explore Now<ArrowRight size={15} />
                 </motion.button>
+            </div>
+            <div className="flex flex-col justify-center gap-4 border-t border-white/8 light:border-slate-200 bg-slate-900/60 light:bg-slate-50 p-4 sm:p-6 md:border-l md:border-t-0 lg:p-8">
+              <div className="overflow-hidden rounded-2xl border border-white/10 light:border-slate-200 bg-slate-950 light:bg-white shadow-2xl">
+                <div className="flex h-10 items-center gap-2 border-b border-white/10 light:border-slate-200 bg-slate-900 light:bg-slate-100 px-4">
+                  <span className="h-3 w-3 rounded-full bg-red-400" />
+                  <span className="h-3 w-3 rounded-full bg-amber-400" />
+                  <span className="h-3 w-3 rounded-full bg-emerald-400" />
+                  <span className="ml-2 h-5 flex-1 rounded-md bg-white/5 light:bg-white" />
+                </div>
+                <picture>
+                  <source srcSet={publicAsset('images/calgary3.webp')} type="image/webp" />
+                  <img src={publicAsset('images/calgary3.webp')} alt="Calgary skyline" width={1200} height={801} className="block aspect-[1200/801] w-full object-cover" loading="lazy" decoding="async" />
+                </picture>
               </div>
-              <div className="hidden md:flex flex-col items-center justify-center gap-2 px-12">
-                <div className="text-[88px] font-black leading-none text-[#4A90D9] drop-shadow-[0_0_40px_rgba(74,144,217,0.55)]">
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <div className="mr-2 text-3xl font-black leading-none text-[#4A90D9]">
                   <AnimatedCounter to={30} suffix="s" prefix="< " duration={1.5} />
                 </div>
-                <p className="text-base font-bold text-white/60 text-center">From report to live map</p>
-                <div className="mt-3 flex gap-2 flex-wrap justify-center">
-                  {['Under 30s to report', 'Anonymous option', 'Real-time sync'].map((tag) => (
-                    <span key={tag} className="text-xs px-3 py-1.5 rounded-full border border-[#4A90D9]/35 text-[#4A90D9] bg-[#4A90D9]/8 font-semibold">{tag}</span>
-                  ))}
-                </div>
+                {['Under 30s to report', 'Anonymous option', 'Real-time sync'].map((tag) => (
+                  <LandingTag key={tag} tone={tag === 'Anonymous option' ? 'violet' : 'sky'}>{tag}</LandingTag>
+                ))}
               </div>
             </div>
           </motion.div>
@@ -787,10 +765,7 @@ export default function LandingPage() {
               </div>
 
               <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full w-[55%] sm:w-full">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4A90D9]/12 border border-[#4A90D9]/25 w-fit">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4A90D9] animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#4A90D9]">Real-time</span>
-                </div>
+                <LandingTag pulse className="w-fit">Real-time</LandingTag>
                 <div className="mt-auto pt-6 sm:pt-0">
                   <h3 className="text-xl font-black text-white mb-1.5 leading-tight sm:leading-normal">Live Community Map</h3>
                   <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-[24ch]">Incidents hit the map in under 30 seconds - no refresh, no lag.</p>
@@ -918,10 +893,7 @@ export default function LandingPage() {
               </div>
 
               <div className="relative z-10 p-6 sm:p-7 flex flex-col h-full w-[55%] sm:w-full">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full w-fit" style={{ background:'rgba(139,92,246,0.10)', border:'1px solid rgba(139,92,246,0.22)' }}>
-                  <Lock size={10} className="text-purple-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">Privacy First</span>
-                </div>
+                <LandingTag tone="violet" className="w-fit"><Lock size={10} />Privacy First</LandingTag>
                 <div className="mt-auto pt-6 sm:pt-0">
                   <h3 className="text-xl font-black text-white mb-1.5 leading-tight sm:leading-normal">Post Anonymously</h3>
                   <p className="text-[11px] sm:text-sm text-slate-400 leading-relaxed max-w-[26ch]">Report anything sensitive with zero identity attached. Yours by default.</p>
@@ -939,7 +911,7 @@ export default function LandingPage() {
             className="hidden md:block rounded-2xl border border-white/10 light:border-slate-200 overflow-hidden shadow-xl">
             <div className="grid md:grid-cols-2 gap-0">
               <div className="relative h-48 md:h-full overflow-hidden">
-                <motion.img src={publicAsset('images/calgary1.webp')} alt="Calgary neighbourhood" width={600} height={400} className="w-full h-full object-cover" loading="lazy" whileHover={!reducedMotion ? { scale: 1.04 } : undefined} transition={{ duration: 0.5 }} />
+                <motion.img src={publicAsset('images/calgary1.webp')} alt="Calgary neighbourhood" width={910} height={607} className="w-full h-full object-cover" loading="lazy" whileHover={!reducedMotion ? { scale: 1.04 } : undefined} transition={{ duration: 0.5 }} />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 to-transparent" />
               </div>
               <div className="p-6 md:p-8 lg:p-12 flex flex-col justify-center bg-slate-900/60 light:bg-white">
@@ -975,8 +947,8 @@ export default function LandingPage() {
           {/* Mobile: compact 2×2 feature grid only */}
           <div className="md:hidden">
             <div className="mb-6">
-              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-2">Mobile First</p>
-              <h2 className="text-2xl font-black tracking-tight leading-tight">Built for one-handed use</h2>
+              <LandingTag tone="violet" className="mb-3">Mobile First</LandingTag>
+              <h2 className="text-2xl font-black tracking-tight leading-tight text-white light:text-slate-950">Built for one-handed use</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -991,8 +963,8 @@ export default function LandingPage() {
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background:`${item.color}18`, border:`1px solid ${item.color}30` }}>
                     <item.icon size={16} style={{ color:item.color }} />
                   </div>
-                  <h4 className="text-white font-bold text-sm leading-tight">{item.title}</h4>
-                  <p className="text-[11px] text-slate-500 leading-tight">{item.desc}</p>
+                  <h4 className="text-white light:text-slate-950 font-bold text-sm leading-tight">{item.title}</h4>
+                  <p className="text-[11px] text-slate-500 light:text-slate-600 leading-tight">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -1001,14 +973,11 @@ export default function LandingPage() {
           {/* Desktop: original two-column layout */}
           <div className="hidden md:grid md:grid-cols-2 gap-16 items-center">
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/20 mb-6">
-                <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400">Mobile First Layout</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6">
+              <LandingTag tone="teal" pulse className="mb-6">Mobile First Layout</LandingTag>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6 text-white light:text-slate-950">
                 Optimized for real-time usage on the go
               </h2>
-              <p className="text-lg text-slate-400 leading-relaxed mb-8 max-w-xl">
+              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8 max-w-xl">
                 Calgary Watch uses a modern bottom-sheet interface designed for quick, one-handed use. It feels like a native app right in your browser.
               </p>
               <div className="grid sm:grid-cols-2 gap-5">
@@ -1018,42 +987,42 @@ export default function LandingPage() {
                   { icon: MapIcon,title: 'Fluid Maps',      desc: 'Hardware-accelerated panning',     color: '#2E8B7A' },
                   { icon: Lock,   title: 'No App Required', desc: 'Instant access via web browser',   color: '#D4A843' },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-white/5 border border-white/5">
+                  <div key={i} className="flex items-start gap-3 p-4 rounded-2xl bg-white/5 light:bg-white border border-white/5 light:border-slate-200 shadow-none light:shadow-sm">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background:`${item.color}15`, border:`1px solid ${item.color}25` }}>
                       <item.icon size={16} style={{ color:item.color }} />
                     </div>
                     <div>
-                      <h4 className="text-white font-bold text-sm">{item.title}</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+                      <h4 className="text-white light:text-slate-950 font-bold text-sm">{item.title}</h4>
+                      <p className="text-xs text-slate-500 light:text-slate-600 mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </motion.div>
-            <div className="relative flex justify-center perspective-[1200px]">
-              <motion.div style={{ rotateY:-15, rotateX:5 }} whileHover={{ rotateY:0, rotateX:0, scale:1.05 }} transition={{ type:'spring', stiffness:100, damping:20 }}
-                className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-slate-900 bg-slate-950 shadow-[-30px_30px_80px_rgba(168,85,247,0.2)] overflow-hidden ring-1 ring-white/10">
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-30" />
-                <div className="absolute inset-0 bg-slate-900"><img src={publicAsset('images/calgary7.webp')} width={320} height={680} className="w-full h-full object-cover opacity-60 mix-blend-screen" alt="" /></div>
-                <div className="absolute top-16 left-4 right-4 flex gap-2 z-20">
-                  <div className="h-10 flex-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/20" />
-                  <div className="h-10 w-10 bg-white/10 backdrop-blur-md rounded-xl border border-white/20" />
+            <div className="relative flex justify-center">
+              <motion.div whileHover={{ y: -8 }} transition={{ type:'spring', stiffness:120, damping:20 }}
+                className="relative w-full max-w-[320px] aspect-[9/19] overflow-hidden rounded-[2.35rem] border-[8px] border-slate-900 light:border-white bg-slate-950 light:bg-white shadow-[0_32px_90px_-42px_rgba(15,23,42,0.95)] light:shadow-[0_30px_80px_-44px_rgba(15,23,42,0.45)] ring-1 ring-white/10 light:ring-slate-200">
+                <div className="absolute top-2 left-1/2 z-30 h-6 w-24 -translate-x-1/2 rounded-full bg-black light:bg-slate-900" />
+                <div className="absolute inset-0 bg-slate-900 light:bg-slate-100">
+                  <img src={publicAsset('images/calgary7.webp')} width={1920} height={1080} className="h-full w-full object-cover opacity-80 light:opacity-95" alt="" />
                 </div>
-                <motion.div animate={{ y:[0,-8,0] }} transition={{ repeat:Infinity, duration:4 }} className="absolute bottom-40 right-4 w-12 h-12 bg-purple-500 rounded-full z-20 flex items-center justify-center shadow-lg shadow-purple-500/40">
+                <div className="absolute top-16 left-4 right-4 flex gap-2 z-20">
+                  <div className="h-10 flex-1 bg-white/15 light:bg-white/90 backdrop-blur-md rounded-xl border border-white/20 light:border-slate-200" />
+                  <div className="h-10 w-10 bg-white/15 light:bg-white/90 backdrop-blur-md rounded-xl border border-white/20 light:border-slate-200" />
+                </div>
+                <motion.div animate={{ y:[0,-8,0] }} transition={{ repeat:Infinity, duration:4 }} className="absolute bottom-40 right-4 w-12 h-12 bg-[#4A90D9] rounded-2xl z-20 flex items-center justify-center shadow-lg shadow-blue-500/30">
                   <Zap size={20} className="text-white" />
                 </motion.div>
-                <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-slate-900/95 backdrop-blur-xl rounded-t-3xl border-t border-white/20 p-5 z-20">
-                  <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4" />
-                  <div className="h-4 w-2/3 bg-white/10 rounded-md mb-3" />
-                  <div className="h-4 w-1/2 bg-white/10 rounded-md mb-4" />
+                <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-slate-900/95 light:bg-white/95 backdrop-blur-xl rounded-t-3xl border-t border-white/20 light:border-slate-200 p-5 z-20">
+                  <div className="w-12 h-1 bg-white/20 light:bg-slate-300 rounded-full mx-auto mb-4" />
+                  <div className="h-4 w-2/3 bg-white/10 light:bg-slate-200 rounded-md mb-3" />
+                  <div className="h-4 w-1/2 bg-white/10 light:bg-slate-200 rounded-md mb-4" />
                   <div className="flex gap-3">
-                    <div className="h-10 flex-1 bg-blue-500/20 rounded-xl border border-blue-500/50" />
-                    <div className="h-10 flex-1 bg-teal-500/20 rounded-xl border border-teal-500/50" />
+                    <div className="h-10 flex-1 bg-blue-500/20 light:bg-blue-500/12 rounded-xl border border-blue-500/50 light:border-blue-500/30" />
+                    <div className="h-10 flex-1 bg-teal-500/20 light:bg-teal-500/12 rounded-xl border border-teal-500/50 light:border-teal-500/30" />
                   </div>
                 </div>
               </motion.div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 -z-10 rounded-full"
-                style={{ background: 'radial-gradient(ellipse at center, rgba(168,85,247,0.25) 0%, transparent 70%)' }} />
             </div>
           </div>
 
@@ -1088,7 +1057,7 @@ export default function LandingPage() {
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background:`${item.accentColor}18`, border:`1.5px solid ${item.accentColor}35` }}>
                       <item.Icon size={22} style={{ color:item.accentColor }} />
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ color:item.accentColor, background:`${item.accentColor}12`, border:`1px solid ${item.accentColor}22` }}>Step {item.step}</span>
+                    <LandingTag tone={landingTagTone(i)}>Step {item.step}</LandingTag>
                   </div>
                   <div>
                     <span className="text-2xl font-black" style={{ color:item.accentColor }}>{item.metric}</span>
@@ -1173,7 +1142,7 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-[1fr_350px] gap-8">
             {/* Roadmap */}
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }}>
-              <span className="inline-block px-3 py-1 rounded bg-[#2E8B7A]/10 text-[10px] font-black uppercase tracking-[0.25em] text-[#2E8B7A] mb-4">Scalability Roadmap</span>
+              <LandingTag tone="teal" className="mb-4">Scalability Roadmap</LandingTag>
               <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-[1.1] mb-6 md:mb-8">Building the app &amp; beyond</h2>
 
               {/* Mobile: compact timeline */}
@@ -1187,7 +1156,7 @@ export default function LandingPage() {
                   <div key={p.phase} className="flex items-center gap-4 px-4 py-3.5" style={{ background: p.active ? `${p.color}08` : 'transparent' }}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black" style={{ background:`${p.color}18`, color:p.color, border:`1px solid ${p.color}30` }}>{p.phase}</div>
                     <span className="text-sm font-bold text-white flex-1">{p.title}</span>
-                    {p.active && <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ color:p.color, background:`${p.color}15` }}>Live</span>}
+                    {p.active && <LandingTag tone="teal">Live</LandingTag>}
                   </div>
                 ))}
               </div>
@@ -1272,15 +1241,15 @@ export default function LandingPage() {
             <div className="p-5 sm:p-8 rounded-2xl md:rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#4A90D9]/50 transition-colors">
               <div className="flex items-center justify-between mb-6">
                  <h3 className="text-2xl font-black text-white">Community Engine</h3>
-                 <span className="px-3 py-1 bg-[#4A90D9]/10 text-[#4A90D9] text-[10px] uppercase font-black tracking-widest rounded-full border border-[#4A90D9]/20">Real-Time</span>
+                 <LandingTag>Real-Time</LandingTag>
               </div>
               <ul className="space-y-4">
                 <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><Users size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-1">User Submitted</p><p className="text-xs text-slate-400">Reports appear instantly. May be unverified at the time of posting.</p></div></li>
                 <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><ShieldCheck size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-2">Trust Indicators</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-2 py-1 bg-slate-800 text-slate-300 rounded text-[10px] font-mono border border-slate-700">Unverified</span>
-                    <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded text-[10px] font-mono border border-blue-500/20">Multiple Reports</span>
-                    <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded text-[10px] font-mono border border-green-500/20">Community Confirmed</span>
+                    <LandingTag tone="slate">Unverified</LandingTag>
+                    <LandingTag>Multiple Reports</LandingTag>
+                    <LandingTag tone="teal">Community Confirmed</LandingTag>
                   </div>
                 </div></li>
               </ul>
@@ -1290,7 +1259,7 @@ export default function LandingPage() {
             <div className="p-5 sm:p-8 rounded-2xl md:rounded-[2rem] bg-slate-900 border border-white/10 group hover:border-[#2E8B7A]/50 transition-colors">
               <div className="flex items-center justify-between mb-6">
                  <h3 className="text-2xl font-black text-white">Official Data</h3>
-                 <span className="px-3 py-1 bg-[#2E8B7A]/10 text-[#2E8B7A] text-[10px] uppercase font-black tracking-widest rounded-full border border-[#2E8B7A]/20">Verified</span>
+                 <LandingTag tone="teal">Verified</LandingTag>
               </div>
               <ul className="space-y-4">
                 <li className="flex items-start gap-4"><div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-white/5"><ShieldCheck size={14} className="text-slate-400" /></div><div><p className="text-sm font-bold text-white mb-1">Calgary Police Service</p><p className="text-xs text-slate-400">Sourced from open datasets. Not intended to represent or replace emergency services.</p></div></li>
@@ -1332,7 +1301,7 @@ export default function LandingPage() {
       <section className="py-12 md:py-24 px-4 sm:px-6">
         <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55 }}
           className="max-w-6xl mx-auto relative overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-white/10 light:border-slate-300 bg-slate-900/70 light:bg-white px-6 py-10 md:px-12 md:py-14">
-          <img src={publicAsset('images/calgary8.webp')} alt="" width={1200} height={400} loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-8 light:opacity-5" />
+          <img src={publicAsset('images/calgary8.webp')} alt="" width={800} height={614} loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-8 light:opacity-5" />
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 10% 15%,rgba(46,139,122,0.12),transparent 35%),radial-gradient(circle at 90% 85%,rgba(74,144,217,0.12),transparent 45%)' }} aria-hidden="true" />
           <div className="relative z-10 grid lg:grid-cols-[1.2fr_auto] gap-8 items-center">
             <div>

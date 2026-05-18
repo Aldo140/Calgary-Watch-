@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
-import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity } from 'lucide-react';
+import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
@@ -39,8 +39,8 @@ export default function Sidebar({
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'verified'>('newest');
-  const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [recentOnly, setRecentOnly] = useState(false);
+  const [feedFilter, setFeedFilter] = useState<'community' | 'recent' | null>(null);
+  const [controlsCollapsed, setControlsCollapsed] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -57,17 +57,13 @@ export default function Sidebar({
   useEffect(() => {
     try {
       const persistedSort = localStorage.getItem('cw_sortBy');
-      const persistedVerifiedOnly = localStorage.getItem('cw_verifiedOnly');
-      const persistedRecentOnly = localStorage.getItem('cw_recentOnly');
+      const persistedFeedFilter = localStorage.getItem('cw_feedFilter');
 
       if (persistedSort === 'newest' || persistedSort === 'oldest' || persistedSort === 'verified') {
         setSortBy(persistedSort);
       }
-      if (persistedVerifiedOnly === 'true') {
-        setVerifiedOnly(true);
-      }
-      if (persistedRecentOnly === 'true') {
-        setRecentOnly(true);
+      if (persistedFeedFilter === 'community' || persistedFeedFilter === 'recent') {
+        setFeedFilter(persistedFeedFilter);
       }
     } catch {}
   }, []);
@@ -77,12 +73,13 @@ export default function Sidebar({
   }, [sortBy]);
 
   useEffect(() => {
-    try { localStorage.setItem('cw_verifiedOnly', String(verifiedOnly)); } catch {}
-  }, [verifiedOnly]);
-
-  useEffect(() => {
-    try { localStorage.setItem('cw_recentOnly', String(recentOnly)); } catch {}
-  }, [recentOnly]);
+    try {
+      if (feedFilter) localStorage.setItem('cw_feedFilter', feedFilter);
+      else localStorage.removeItem('cw_feedFilter');
+      localStorage.removeItem('cw_verifiedOnly');
+      localStorage.removeItem('cw_recentOnly');
+    } catch {}
+  }, [feedFilter]);
 
   // Debounce search input by 200ms to avoid filtering on every keystroke
   useEffect(() => {
@@ -102,9 +99,13 @@ export default function Sidebar({
           i.title.toLowerCase().includes(q) ||
           i.description.toLowerCase().includes(q) ||
           (i.neighborhood || '').toLowerCase().includes(q);
-        const matchesVerified = !verifiedOnly || i.verified_status === 'community_confirmed';
-        const matchesRecent = !recentOnly || (Date.now() - i.timestamp) <= 2 * 60 * 60 * 1000;
-        return matchesCategory && matchesSearch && matchesVerified && matchesRecent;
+        const matchesFeedFilter =
+          feedFilter === 'community'
+            ? (!i.data_source || i.data_source === 'community')
+            : feedFilter === 'recent'
+              ? (Date.now() - i.timestamp) <= 2 * 60 * 60 * 1000
+              : true;
+        return matchesCategory && matchesSearch && matchesFeedFilter;
       })
       .sort((a, b) => {
         // Emergencies always float to top regardless of sort mode
@@ -118,9 +119,12 @@ export default function Sidebar({
         }
         return 0;
       });
-  }, [incidents, debouncedSearch, selectedCategory, verifiedOnly, recentOnly, sortBy]);
+  }, [incidents, debouncedSearch, selectedCategory, feedFilter, sortBy]);
 
   const neighborhoodPulse = useNeighborhoodPulse(incidents);
+  const criticalCount = filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length;
+  const activeCount = filteredIncidents.filter(i => i.verified_status === 'unverified').length;
+  const resolvedCount = filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length;
 
   // Count-up animation for total count
   const countValue = useSpring(0, { stiffness: 50, damping: 20 });
@@ -221,116 +225,159 @@ export default function Sidebar({
         <div className="w-8 shrink-0" />
       </div>
 
-      {/* Stats and Sorting */}
-      <div className="px-4 py-3 bg-slate-900/40 light:bg-white/60 border-b border-white/5 light:border-stone-200/80 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-              <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
-                {filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length} Critical
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-              <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
-                {filteredIncidents.filter(i => i.verified_status === 'unverified').length} Active
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-              <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
-                {filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved
-              </span>
-            </div>
+      {/* Collapsible desktop feed controls */}
+      <div className="bg-slate-900/40 light:bg-white/60 border-b border-white/5 light:border-stone-200/80">
+        <button
+          type="button"
+          onClick={() => setControlsCollapsed((prev) => !prev)}
+          className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/5 light:hover:bg-white transition-colors"
+          aria-expanded={!controlsCollapsed}
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white text-blue-400 light:text-slate-700">
+            <SlidersHorizontal size={15} />
           </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-slate-500 light:text-slate-700 uppercase tracking-widest">Sort by</span>
-          <select 
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="bg-slate-900 light:bg-white border border-white/10 light:border-slate-300 rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-slate-300 light:text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500/50 light:focus:ring-slate-900/40 cursor-pointer hover:border-white/20 light:hover:border-slate-400 transition-colors"
-          >
-            <option value="newest" className="bg-slate-900">Newest First</option>
-            <option value="oldest" className="bg-slate-900">Oldest First</option>
-            <option value="verified" className="bg-slate-900">Most Verified</option>
-          </select>
-        </div>
-
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <button
-            onClick={() => setVerifiedOnly((prev) => !prev)}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black text-white light:text-slate-900">Feed controls</span>
+              {(feedFilter || searchQuery || selectedCategory !== 'all') && (
+                <span className="rounded-md bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-300 light:text-blue-700">
+                  Filtered
+                </span>
+              )}
+            </div>
+            <p className="mt-0.5 truncate text-[10px] font-bold text-slate-500 light:text-slate-600">
+              {sortBy === 'newest' ? 'Newest first' : sortBy === 'oldest' ? 'Oldest first' : 'Most verified'} · {feedFilter ? `${feedFilter === 'community' ? 'Community' : 'Recent 2h'} on` : 'All posts'} · {neighborhoodPulse.length} pulse areas
+            </p>
+          </div>
+          <ChevronDown
+            size={16}
             className={cn(
-              "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all",
-              verifiedOnly
-                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                : "bg-white/5 light:bg-white text-slate-400 light:text-slate-700 border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50"
+              'shrink-0 text-slate-500 transition-transform',
+              !controlsCollapsed && 'rotate-180'
             )}
-            title="Show only community-confirmed incidents (V)"
-          >
-            Verified Only {verifiedOnly ? 'On' : 'Off'}
-          </button>
+          />
+        </button>
 
-          <button
-            onClick={() => setRecentOnly((prev) => !prev)}
-            className={cn(
-              "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all",
-              recentOnly
-                ? "bg-blue-500/20 text-blue-400 border-blue-500/40 light:bg-slate-900 light:text-white light:border-slate-900"
-                : "bg-white/5 light:bg-white text-slate-400 light:text-slate-700 border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50"
-            )}
-            title="Show incidents from the last 2 hours (R)"
-          >
-            Recent 2h {recentOnly ? 'On' : 'Off'}
-          </button>
-
-          {(verifiedOnly || recentOnly || searchQuery || selectedCategory !== 'all') && (
-            <button
-              onClick={() => {
-                setVerifiedOnly(false);
-                setRecentOnly(false);
-                setSearchQuery('');
-                onCategoryChange('all');
-              }}
-              className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border border-white/10 light:border-slate-300 text-slate-400 light:text-slate-700 hover:bg-white/10 light:hover:bg-slate-50 transition-all"
+        <AnimatePresence initial={false}>
+          {!controlsCollapsed && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="overflow-hidden"
             >
-              Clear Filters
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Neighborhood Pulse — top areas with activity in the last 2h */}
-      {neighborhoodPulse.length > 0 && (
-        <div className="px-4 py-3 border-b border-white/5 light:border-slate-200">
-          <div className="flex items-center gap-1.5 mb-2.5">
-            <Activity size={12} className="text-blue-400" />
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Area Pulse · 2h</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {neighborhoodPulse.map(({ name, count, level }) => {
-              const cfg = RISK_CONFIG[level];
-              return (
-                <div
-                  key={name}
-                  className={cn(
-                    'flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold',
-                    cfg.bg,
-                    'border-white/5 light:border-slate-200'
-                  )}
-                  title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
-                >
-                  <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dot)} />
-                  <span className="text-white light:text-slate-800 truncate max-w-[90px]">{name}</span>
-                  <span className={cn('font-black', cfg.text)}>{count}</span>
+              <div className="px-4 pb-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                      <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
+                        {criticalCount} Critical
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                      <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
+                        {activeCount} Active
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                      <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
+                        {resolvedCount} Resolved
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-500 light:text-slate-700 uppercase tracking-widest">Sort by</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="bg-slate-900 light:bg-white border border-white/10 light:border-slate-300 rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-slate-300 light:text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500/50 light:focus:ring-slate-900/40 cursor-pointer hover:border-white/20 light:hover:border-slate-400 transition-colors"
+                  >
+                    <option value="newest" className="bg-slate-900">Newest First</option>
+                    <option value="oldest" className="bg-slate-900">Oldest First</option>
+                    <option value="verified" className="bg-slate-900">Most Verified</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <button
+                    onClick={() => setFeedFilter((prev) => prev === 'community' ? null : 'community')}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all",
+                      feedFilter === 'community'
+                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                        : "bg-white/5 light:bg-white text-slate-400 light:text-slate-700 border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50"
+                    )}
+                    title="Show only real community user posts, including older posts that are still stored"
+                  >
+                    Community {feedFilter === 'community' ? 'On' : 'Off'}
+                  </button>
+
+                  <button
+                    onClick={() => setFeedFilter((prev) => prev === 'recent' ? null : 'recent')}
+                    className={cn(
+                      "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all",
+                      feedFilter === 'recent'
+                        ? "bg-blue-500/20 text-blue-400 border-blue-500/40 light:bg-slate-900 light:text-white light:border-slate-900"
+                        : "bg-white/5 light:bg-white text-slate-400 light:text-slate-700 border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50"
+                    )}
+                    title="Show incidents from the last 2 hours (R)"
+                  >
+                    Recent 2h {feedFilter === 'recent' ? 'On' : 'Off'}
+                  </button>
+
+                  {(feedFilter || searchQuery || selectedCategory !== 'all') && (
+                    <button
+                      onClick={() => {
+                        setFeedFilter(null);
+                        setSearchQuery('');
+                        onCategoryChange('all');
+                      }}
+                      className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border border-white/10 light:border-slate-300 text-slate-400 light:text-slate-700 hover:bg-white/10 light:hover:bg-slate-50 transition-all"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                </div>
+
+                {neighborhoodPulse.length > 0 && (
+                  <div className="pt-2 border-t border-white/5 light:border-slate-200">
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <Activity size={12} className="text-blue-400" />
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Area Pulse · 2h</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {neighborhoodPulse.map(({ name, count, level }) => {
+                        const cfg = RISK_CONFIG[level];
+                        return (
+                          <div
+                            key={name}
+                            className={cn(
+                              'flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold',
+                              cfg.bg,
+                              'border-white/5 light:border-slate-200'
+                            )}
+                            title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
+                          >
+                            <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dot)} />
+                            <span className="text-white light:text-slate-800 truncate max-w-[90px]">{name}</span>
+                            <span className={cn('font-black', cfg.text)}>{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         <motion.div
@@ -450,7 +497,17 @@ export default function Sidebar({
                             </div>
                           </div>
                           
-                          <p className="text-slate-400 text-xs mt-2 leading-relaxed light:text-slate-600 line-clamp-2">{incident.description}</p>
+                          <div className="mt-2 flex gap-3">
+                            {incident.image_url && (
+                              <img
+                                src={incident.image_url}
+                                alt=""
+                                className="h-16 w-16 shrink-0 rounded-xl border border-white/10 object-cover light:border-slate-200"
+                                loading="lazy"
+                              />
+                            )}
+                            <p className="text-slate-400 text-xs leading-relaxed light:text-slate-600 line-clamp-3">{incident.description}</p>
+                          </div>
                           
                           <div className="flex items-center justify-between mt-3">
                             <div className={cn(
@@ -497,7 +554,7 @@ export default function Sidebar({
                   <Search size={32} className="text-slate-600" />
                 </div>
                 <div className="space-y-2">
-                  {(debouncedSearch || selectedCategory !== 'all' || verifiedOnly || recentOnly) ? (
+                  {(debouncedSearch || selectedCategory !== 'all' || feedFilter) ? (
                     <>
                       <h3 className="text-white font-bold">No reports match</h3>
                       <p className="text-slate-500 text-xs leading-relaxed">
@@ -507,8 +564,7 @@ export default function Sidebar({
                         onClick={() => {
                           setSearchQuery('');
                           onCategoryChange('all');
-                          setVerifiedOnly(false);
-                          setRecentOnly(false);
+                          setFeedFilter(null);
                         }}
                         className="text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-300 transition-colors"
                       >

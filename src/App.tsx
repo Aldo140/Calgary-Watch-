@@ -15,6 +15,8 @@ const LandingPage = lazy(() => import('@/src/pages/LandingPage'));
 const MapPage     = lazy(() => import('@/src/pages/MapPage'));
 const AboutPage   = lazy(() => import('@/src/pages/AboutPage'));
 const AdminPage   = lazy(() => import('@/src/pages/AdminPage'));
+const AdminUserListPage = lazy(() => import('@/src/pages/admin/AdminUserListPage'));
+const AdminIncidentListPage = lazy(() => import('@/src/pages/admin/AdminIncidentListPage'));
 
 /**
  * Handles redirects from the 404.html hack.
@@ -50,7 +52,7 @@ function RedirectHandler() {
 function PageTracker() {
   const location = useLocation();
   useEffect(() => {
-    if (!db || location.pathname === '/admin') return;
+    if (!db || location.pathname.startsWith('/admin')) return;
 
     // ── Session ID ──────────────────────────────────────────────────────────
     // Stable for the browser tab's lifetime; regenerated on new tab/session.
@@ -68,6 +70,7 @@ function PageTracker() {
 
     // ── Traffic source bucket ────────────────────────────────────────────────
     const referrer = typeof document !== 'undefined' ? document.referrer : '';
+    let organic_query = '';
     let traffic_source = 'direct';
     if (utm_source) {
       traffic_source = utm_source.toLowerCase().includes('email')
@@ -80,6 +83,7 @@ function PageTracker() {
         const refHost = new URL(referrer).hostname.replace(/^www\./, '');
         if (['google.com','bing.com','duckduckgo.com','yahoo.com','ecosia.org'].some(s => refHost.includes(s))) {
           traffic_source = 'organic_search';
+          organic_query = new URL(referrer).searchParams.get('q') || new URL(referrer).searchParams.get('p') || '';
         } else if (['facebook.com','twitter.com','x.com','instagram.com','linkedin.com','reddit.com','tiktok.com'].some(s => refHost.includes(s))) {
           traffic_source = 'social';
         } else if (refHost !== window.location.hostname.replace(/^www\./, '')) {
@@ -96,6 +100,7 @@ function PageTracker() {
       utm_medium,
       utm_campaign,
       traffic_source,
+      organic_query,
       sessionId,
     }).catch(() => {});
   }, [location.pathname]);
@@ -104,7 +109,7 @@ function PageTracker() {
 
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+    <div className="min-h-screen bg-[#f5efe3] light:bg-[#f5efe3] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className="w-10 h-10 rounded-full border-2 border-[#4A90D9] border-t-transparent animate-spin" />
         <p className="text-sm text-slate-500 font-medium">Loading…</p>
@@ -114,6 +119,16 @@ function PageLoader() {
 }
 
 export default function App() {
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem('cw-theme');
+      if (!savedTheme) localStorage.setItem('cw-theme', 'light');
+      if (savedTheme !== 'dark') document.documentElement.classList.add('light');
+    } catch {
+      document.documentElement.classList.add('light');
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <RedirectHandler />
@@ -125,6 +140,8 @@ export default function App() {
           <Route path="/map" element={<MapPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/users" element={<AdminUserListPage />} />
+          <Route path="/admin/incidents" element={<AdminIncidentListPage />} />
           {/* Redirect unknown paths to landing page */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

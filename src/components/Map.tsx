@@ -61,6 +61,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const communityGeoJson = useRef<any>(null);
   const userLocationMarker = useRef<L.Marker | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isHeatPluginReady, setIsHeatPluginReady] = useState(false);
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
   // Live map centre - updated on every move event so the pin overlay shows real coords
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
@@ -224,13 +225,26 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
   // Load leaflet.heat plugin after component mounts
   useEffect(() => {
-    if (typeof window !== 'undefined' && !(window as any).L?.heatLayer) {
-      Promise.resolve().then(() => {
-        import('leaflet.heat').catch(() => {
-          console.debug('leaflet.heat plugin loaded');
-        });
-      });
+    if (typeof window === 'undefined') return;
+    if (typeof (L as any).heatLayer === 'function' || typeof (window as any).L?.heatLayer === 'function') {
+      setIsHeatPluginReady(true);
+      return;
     }
+
+    let cancelled = false;
+    import('leaflet.heat')
+      .then(() => {
+        if (!cancelled) {
+          setIsHeatPluginReady(typeof (L as any).heatLayer === 'function' || typeof (window as any).L?.heatLayer === 'function');
+        }
+      })
+      .catch((error) => {
+        console.warn('Leaflet.heat plugin failed to load.', error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -585,10 +599,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       }
     });
 
-    if (!showLiveReports) return;
-
-    // Add new markers
-    incidents.forEach((incident) => {
+    // Add new markers when the live reports layer is active.
+    if (showLiveReports) incidents.forEach((incident) => {
       if (markers.current[incident.id]) return;
 
       const isEmergency = incident.category === 'emergency';
@@ -790,8 +802,9 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       });
       
       // Ensure L.heatLayer is available (it's a plugin)
-      if (typeof (L as any).heatLayer === 'function') {
-        heatmapLayer.current = (L as any).heatLayer(heatPoints, {
+      const heatLayerFactory = (L as any).heatLayer || (window as any).L?.heatLayer;
+      if (typeof heatLayerFactory === 'function') {
+        heatmapLayer.current = heatLayerFactory(heatPoints, {
           radius: 48,
           blur: 28,
           maxZoom: 17,
@@ -812,7 +825,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       map.current.removeLayer(heatmapLayer.current);
       heatmapLayer.current = null;
     }
-  }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded]);
+  }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded, isHeatPluginReady]);
 
   return (
     <div className={cn(

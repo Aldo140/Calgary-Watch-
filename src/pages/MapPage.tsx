@@ -11,12 +11,12 @@ import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, X, LogIn, Home, LayoutDashboard, Siren } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
-import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
@@ -37,6 +37,71 @@ function getCalgaryQuadrant(lat: number, lng: number) {
   const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
   const eastWest = lng >= CALGARY_CENTER.lng ? 'E' : 'W';
   return `${northSouth}${eastWest}`;
+}
+
+type MapNotification = {
+  id: string;
+  title: string;
+  timestamp: number;
+  neighborhood?: string;
+  kind?: 'incident' | 'neighborhood_report';
+};
+
+type UserProfileSettings = {
+  uid?: string;
+  displayName?: string;
+  email?: string;
+  photoURL?: string;
+  role?: string;
+  neighborhood?: string;
+  inferredNeighborhood?: string;
+  address?: string;
+  locationPreferenceType?: 'address' | 'neighborhood';
+  piiConsentAt?: number;
+  weeklyDigestOptIn?: boolean;
+  weeklyDigestTopics?: string[];
+  profileUpdatedAt?: number;
+};
+
+const FALLBACK_NEIGHBORHOODS = [
+  'Beltline',
+  'Downtown Calgary',
+  'Bridgeland/Riverside',
+  'Kensington',
+  'Inglewood',
+  'Marda Loop',
+  'Mission',
+  'Sunnyside',
+  'Forest Lawn',
+  'Bowness',
+  'Seton',
+  'Mahogany',
+];
+
+const ADDRESS_GUESSES = [
+  { label: '17 Avenue SW, Calgary', neighborhood: 'Beltline' },
+  { label: 'Stephen Avenue, Calgary', neighborhood: 'Downtown Calgary' },
+  { label: 'Kensington Road NW, Calgary', neighborhood: 'Kensington' },
+  { label: '9 Avenue SE, Calgary', neighborhood: 'Inglewood' },
+  { label: '4 Street SW, Calgary', neighborhood: 'Mission' },
+  { label: '33 Avenue SW, Calgary', neighborhood: 'Marda Loop' },
+  { label: 'Memorial Drive NW, Calgary', neighborhood: 'Sunnyside' },
+  { label: 'International Avenue SE, Calgary', neighborhood: 'Forest Lawn' },
+  { label: 'Bowness Road NW, Calgary', neighborhood: 'Bowness' },
+  { label: 'Seton Boulevard SE, Calgary', neighborhood: 'Seton' },
+  { label: 'Mahogany Boulevard SE, Calgary', neighborhood: 'Mahogany' },
+  { label: 'Signal Hill Centre SW, Calgary', neighborhood: 'Signal Hill' },
+];
+
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.31 9.14 5.38 12 5.38z" />
+    </svg>
+  );
 }
 
 function useOfficialOpenData(isAuthReady: boolean) {
@@ -464,17 +529,23 @@ export default function MapPage() {
   const NEAR_ME_RADIUS_KM = 3;
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'dark';
+    if (typeof window === 'undefined') return 'light';
     try {
-      return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark';
+      return localStorage.getItem('cw-theme') === 'dark' ? 'dark' : 'light';
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
   const [sheetSnap, setSheetSnap] = useState<SnapPoint>('80px');
-  const [notifications, setNotifications] = useState<{ id: string; title: string; timestamp: number }[]>([]);
+  const [notifications, setNotifications] = useState<MapNotification[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [authPanelOpen, setAuthPanelOpen] = useState(false);
+  const [authPanelMode, setAuthPanelMode] = useState<'signin' | 'settings'>('signin');
+  const [userProfile, setUserProfile] = useState<UserProfileSettings | null>(null);
+  const [profileDraft, setProfileDraft] = useState({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: true });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
   const [locationError, setLocationError] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
@@ -487,6 +558,38 @@ export default function MapPage() {
   const lastVisibleIncidentDoc = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
   const buttonClickDebounceRef = useRef(0); // Prevent rapid button clicks
   const deepLinkHandledRef = useRef(false); // Ensure ?i= deep-link opens only once
+  const lastNeighborhoodReportUidRef = useRef<string | null>(null);
+
+  const openAuthPanel = useCallback((mode: 'signin' | 'settings' = 'signin') => {
+    setAuthPanelMode(mode);
+    setAuthPanelOpen(true);
+    setShowUserMenu(false);
+  }, []);
+
+  useEffect(() => {
+    if (!user || !db) {
+      setUserProfile(null);
+      setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: true });
+      if (!user) lastNeighborhoodReportUidRef.current = null;
+      return;
+    }
+
+    const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (snapshot) => {
+      const profile = (snapshot.exists() ? snapshot.data() : {}) as UserProfileSettings;
+      setUserProfile(profile);
+      setProfileDraft({
+        neighborhood: profile.neighborhood || '',
+        address: profile.address || '',
+        inferredNeighborhood: profile.inferredNeighborhood || '',
+        piiConsent: Boolean(profile.piiConsentAt),
+        weeklyDigestOptIn: profile.weeklyDigestOptIn !== false,
+      });
+    }, (error) => {
+      console.error('Failed to load user profile:', error);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   // Check for report=true in URL — open the form and strip the param immediately
   // so that (a) the param doesn't linger after close and (b) closing the form
@@ -494,7 +597,7 @@ export default function MapPage() {
   useEffect(() => {
     if (searchParams.get('report') === 'true' && isAuthReady) {
       if (!user) {
-        signIn();
+        openAuthPanel('signin');
       } else {
         setIsFormOpen(true);
         setConfirmedPinLocation(null);
@@ -506,7 +609,7 @@ export default function MapPage() {
         }, { replace: true });
       }
     }
-  }, [searchParams, isAuthReady, user, signIn, setSearchParams]);
+  }, [searchParams, isAuthReady, user, openAuthPanel, setSearchParams]);
 
 
   useEffect(() => {
@@ -742,6 +845,105 @@ export default function MapPage() {
     return kept;
   }, [firebaseIncidents, officialOpenData, weatherAlerts]);
 
+  const neighborhoodSuggestions = useMemo(() => {
+    const names = new Set<string>(FALLBACK_NEIGHBORHOODS);
+    incidents.forEach((incident) => {
+      const name = incident.neighborhood?.trim();
+      if (name && !/^Calgary\s+[NSEW]{1,2}$/i.test(name)) names.add(name);
+    });
+    crimeStats?.forEach((_, key) => {
+      if (key) names.add(key.replace(/\b\w/g, c => c.toUpperCase()));
+    });
+    return [...names].sort((a, b) => a.localeCompare(b)).slice(0, 36);
+  }, [incidents, crimeStats]);
+
+  const addressQuery = profileDraft.address.trim().toLowerCase();
+  const neighborhoodQuery = profileDraft.neighborhood.trim().toLowerCase();
+  const addressSuggestions = useMemo(() => {
+    const query = addressQuery;
+    const hasEnoughSignal = query.length >= 4 || (/\d/.test(query) && query.length >= 3);
+    if (!hasEnoughSignal) return [];
+
+    const matches = ADDRESS_GUESSES
+      .filter((item) => {
+        const haystack = `${item.label} ${item.neighborhood}`.toLowerCase();
+        return haystack.includes(query);
+      })
+      .sort((a, b) => {
+        const aStarts = a.label.toLowerCase().startsWith(query) ? 0 : 1;
+        const bStarts = b.label.toLowerCase().startsWith(query) ? 0 : 1;
+        return aStarts - bStarts || a.label.localeCompare(b.label);
+      })
+      .slice(0, 4);
+
+    if (matches.length === 0 && /\d/.test(query) && query.length >= 5) {
+      return [{ label: `${profileDraft.address.trim()}, Calgary, AB`, neighborhood: '' }];
+    }
+    return matches;
+  }, [addressQuery, profileDraft.address]);
+
+  const filteredNeighborhoodSuggestions = useMemo(() => {
+    const query = neighborhoodQuery;
+    if (query.length < 3) return [];
+    return neighborhoodSuggestions
+      .filter((name) => name.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const aStarts = a.toLowerCase().startsWith(query) ? 0 : 1;
+        const bStarts = b.toLowerCase().startsWith(query) ? 0 : 1;
+        return aStarts - bStarts || a.localeCompare(b);
+      })
+      .slice(0, 5);
+  }, [neighborhoodQuery, neighborhoodSuggestions]);
+
+  const profileNeedsSetup = Boolean(
+    user &&
+    (!userProfile?.piiConsentAt || !(userProfile?.neighborhood || userProfile?.address))
+  );
+
+  const preferredNeighborhood = (userProfile?.neighborhood || '').trim();
+  const preferredInferredNeighborhood = (userProfile?.inferredNeighborhood || '').trim();
+  const preferredAddress = (userProfile?.address || '').trim();
+  const preferredReportArea = preferredNeighborhood || preferredInferredNeighborhood || preferredAddress;
+
+  const saveProfileSettings = useCallback(async () => {
+    if (!user || !db) return;
+    const neighborhood = profileDraft.neighborhood.trim().slice(0, 80);
+    const address = profileDraft.address.trim().slice(0, 160);
+    const inferredNeighborhood = profileDraft.inferredNeighborhood.trim().slice(0, 80);
+    if (!profileDraft.piiConsent || (!neighborhood && !address)) {
+      setProfileSaveError('Please agree to the privacy obligations and add a neighbourhood or address.');
+      return;
+    }
+
+    setIsSavingProfile(true);
+    setProfileSaveError(null);
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        displayName: user.displayName || userProfile?.displayName || 'Calgary User',
+        email: user.email || userProfile?.email || '',
+        photoURL: user.photoURL || userProfile?.photoURL || '',
+        neighborhood,
+        address,
+        inferredNeighborhood,
+        locationPreferenceType: address ? 'address' : 'neighborhood',
+        piiConsentAt: userProfile?.piiConsentAt || Date.now(),
+        weeklyDigestOptIn: profileDraft.weeklyDigestOptIn,
+        weeklyDigestTopics: profileDraft.weeklyDigestOptIn
+          ? ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates']
+          : [],
+        profileUpdatedAt: Date.now(),
+      }, { merge: true });
+      setAuthPanelOpen(false);
+      setAuthPanelMode('signin');
+    } catch (error) {
+      console.error('Failed to save profile settings:', error);
+      setProfileSaveError('Could not save your settings. Please try again.');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  }, [profileDraft, user, userProfile]);
+
   useEffect(() => {
     const targetId = searchParams.get('i');
     if (!targetId || deepLinkHandledRef.current || incidents.length === 0) return;
@@ -811,7 +1013,7 @@ export default function MapPage() {
 
   const handleIncidentSubmit = useCallback((data: IncidentFormData & { lat: number; lng: number; image_url?: string }) => {
     if (!user) {
-      signIn();
+      openAuthPanel('signin');
       return;
     }
     setIsPinMode(false);
@@ -863,10 +1065,10 @@ export default function MapPage() {
         }
       })();
     });
-  }, [user, signIn]);
+  }, [user, openAuthPanel]);
 
   const handleEmergencySubmit = useCallback((data: EmergencySubmitData) => {
-    if (!user) { signIn(); return; }
+    if (!user) { openAuthPanel('signin'); return; }
     const fallbackName = (user.email?.split('@')[0] || 'Calgary User').slice(0, 50);
     const fullName = (user.displayName && user.displayName.trim().length >= 2)
       ? user.displayName.trim()
@@ -909,7 +1111,7 @@ export default function MapPage() {
         }
       })();
     });
-  }, [user, signIn]);
+  }, [user, openAuthPanel]);
 
   const handleEmergencyRequestPin = useCallback(() => {
     setConfirmedEmergencyPinLocation(null);
@@ -925,6 +1127,12 @@ export default function MapPage() {
     setIsEmergencyPinMode(false);
     setConfirmedEmergencyPinLocation(null);
     setIsEmergencyOpen(false);
+  }, []);
+
+  const setExclusiveLayer = useCallback((layer: 'live' | 'heatmap' | 'crime', next: boolean) => {
+    setShowLiveReports(layer === 'live' ? next : false);
+    setShowHeatmap(layer === 'heatmap' ? next : false);
+    setShowCrimeLayer(layer === 'crime' ? next : false);
   }, []);
 
   // filteredIncidentsCount is intentionally kept for the sidebar category badge
@@ -1036,6 +1244,35 @@ export default function MapPage() {
     setSelectedArea({ ...base, communityName: displayName });
   }, [incidents, mapRef, crimeStats, cityAverages]);
 
+  useEffect(() => {
+    if (!user || !preferredReportArea || profileNeedsSetup) return;
+    if (lastNeighborhoodReportUidRef.current === user.uid) return;
+    lastNeighborhoodReportUidRef.current = user.uid;
+
+    const notification: MapNotification = {
+      id: `neighborhood-report-${user.uid}-${Date.now()}`,
+      title: `Neighbourhood report ready: ${preferredReportArea}`,
+      timestamp: Date.now(),
+      neighborhood: preferredNeighborhood || preferredInferredNeighborhood || 'Calgary',
+      kind: 'neighborhood_report',
+    };
+    setNotifications((prev) => [notification, ...prev].slice(0, 20));
+    setUnreadNotifications((prev) => prev + 1);
+  }, [user, preferredNeighborhood, preferredInferredNeighborhood, preferredReportArea, profileNeedsSetup]);
+
+  const handleNotificationClick = useCallback((notification: MapNotification) => {
+    if (notification.neighborhood) {
+      handleViewNeighborhood(notification.neighborhood);
+      setShowNotifications(false);
+      setSheetSnap('80px');
+    }
+  }, [handleViewNeighborhood]);
+
+  const showProfileStep = Boolean(user);
+  const authPanelVisible = authPanelOpen || profileNeedsSetup;
+  const canCloseAuthPanel = !profileNeedsSetup || authPanelMode === 'settings';
+  const locationLabel = preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'your local report area';
+
   return (
     <div className="flex h-dvh w-full bg-slate-950 light:bg-[#eef3ea] overflow-hidden font-sans relative">
       <div className="pointer-events-none absolute inset-0 hidden light:block">
@@ -1055,6 +1292,237 @@ export default function MapPage() {
             <div className="flex-1 h-full relative">
               <MapShimmer />
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Auth and profile onboarding */}
+      <AnimatePresence>
+        {authPanelVisible && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[180] flex items-center justify-center bg-slate-950/72 p-3 backdrop-blur-xl sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label={showProfileStep ? 'Calgary Watch profile settings' : 'Sign in to Calgary Watch'}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 22, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 22, scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 24 }}
+              className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl overflow-y-auto rounded-[2rem] border border-white/12 bg-slate-950 shadow-2xl light:border-slate-200 light:bg-white"
+            >
+              {canCloseAuthPanel && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthPanelOpen(false);
+                    setAuthPanelMode('signin');
+                    setProfileSaveError(null);
+                  }}
+                  className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 light:border-slate-200 light:bg-white light:text-slate-700 light:hover:bg-slate-50"
+                  aria-label="Close sign in panel"
+                >
+                  <X size={16} />
+                </button>
+              )}
+
+              <div className="grid lg:grid-cols-[0.82fr_1.18fr]">
+                <div className="bg-[linear-gradient(145deg,rgba(74,144,217,0.24),rgba(46,139,122,0.16)_52%,rgba(212,168,67,0.12))] p-6 text-white light:text-slate-950 md:p-8">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 shadow-sm light:bg-white">
+                    {showProfileStep ? <Home size={22} className="text-sky-300 light:text-sky-700" /> : <GoogleIcon />}
+                  </div>
+                  <h2 className="mt-6 text-2xl font-black tracking-tight">
+                    {showProfileStep
+                      ? authPanelMode === 'settings' ? 'Account settings' : 'Finish your profile'
+                      : 'Sign in to Calgary Watch'}
+                  </h2>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-300 light:text-slate-700">
+                    {showProfileStep
+                      ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
+                      : 'Use Google to post reports, save preferences, and receive neighbourhood-specific safety updates.'}
+                  </p>
+
+                  {showProfileStep && (
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/35 p-4 light:border-slate-200 light:bg-white/75">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 light:text-slate-500">Current report area</p>
+                      <p className="mt-1 text-lg font-black">{locationLabel}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-slate-400 light:text-slate-600">
+                        Weekly digest: {profileDraft.weeklyDigestOptIn ? 'enabled' : 'off'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-5 sm:p-6 md:p-8">
+                  {!showProfileStep ? (
+                    <div className="space-y-5">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-sky-400">Google account required</p>
+                        <h3 className="mt-2 text-2xl font-black text-white light:text-slate-950">Continue securely</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-400 light:text-slate-600">
+                          After Google sign-in, this same panel will ask for your privacy consent and your neighbourhood or address.
+                        </p>
+                      </div>
+
+                      <Button
+                        onClick={signIn}
+                        className="h-12 w-full rounded-2xl bg-white text-slate-950 hover:bg-slate-100 light:border light:border-slate-200 light:bg-slate-950 light:text-white light:hover:bg-slate-800"
+                      >
+                        <GoogleIcon />
+                        Sign in with Google
+                      </Button>
+
+                      <p className="text-[11px] leading-relaxed text-slate-500">
+                        Calgary Watch uses your account to reduce spam, support report moderation, and connect neighbourhood reports to your saved preferences.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-5">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-sky-400">{profileNeedsSetup ? 'Required setup' : 'Profile controls'}</p>
+                        <h3 className="mt-2 text-2xl font-black text-white light:text-slate-950">Local report preferences</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-400 light:text-slate-600">
+                          Add either an address or a neighbourhood. Address is first because it gives better guesses; neighbourhood is the broader fallback.
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-sky-400/20 bg-sky-400/8 p-3 text-xs leading-relaxed text-slate-300 light:text-slate-700">
+                        Choose one: use an address for a tighter report area, or use a neighbourhood name if you prefer not to store an address.
+                      </div>
+
+                      <div className="grid gap-4">
+                        <label className="space-y-2">
+                          <span className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Address or nearby landmark</span>
+                            <span className="text-[10px] font-bold text-sky-400">Recommended</span>
+                          </span>
+                          <input
+                            value={profileDraft.address}
+                            onChange={(e) => {
+                              const address = e.target.value;
+                              setProfileDraft((prev) => ({ ...prev, address, inferredNeighborhood: '', neighborhood: address.trim() ? '' : prev.neighborhood }));
+                            }}
+                            placeholder="Start typing an address, street, or landmark"
+                            className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
+                          />
+                          <div className="min-h-6">
+                            {profileDraft.address.trim().length > 0 && addressSuggestions.length === 0 && addressQuery.length < 4 && (
+                              <p className="text-[11px] font-medium text-slate-500">Keep typing for address guesses.</p>
+                            )}
+                            {addressSuggestions.length > 0 && (
+                              <div className="grid gap-2 sm:grid-cols-2">
+                                {addressSuggestions.map((item) => (
+                                  <button
+                                    key={`${item.label}-${item.neighborhood}`}
+                                    type="button"
+                                    onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
+                                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
+                                  >
+                                    <span className="block truncate">{item.label}</span>
+                                    {item.neighborhood && <span className="mt-0.5 block text-[10px] font-medium text-slate-500">Best area: {item.neighborhood}</span>}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </label>
+
+                        <div className="flex items-center gap-3">
+                          <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">or</span>
+                          <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
+                        </div>
+
+                        <label className="space-y-2">
+                          <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Neighbourhood only</span>
+                          <input
+                            value={profileDraft.neighborhood}
+                            onChange={(e) => {
+                              const neighborhood = e.target.value;
+                              setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
+                            }}
+                            placeholder="Start typing a Calgary neighbourhood"
+                            className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
+                          />
+                          <div className="min-h-6">
+                            {profileDraft.neighborhood.trim().length > 0 && filteredNeighborhoodSuggestions.length === 0 && neighborhoodQuery.length < 3 && (
+                              <p className="text-[11px] font-medium text-slate-500">Type at least 3 letters for neighbourhood guesses.</p>
+                            )}
+                            {filteredNeighborhoodSuggestions.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {filteredNeighborhoodSuggestions.map((name) => (
+                                  <button
+                                    key={name}
+                                    type="button"
+                                    onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
+                                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
+                                  >
+                                    {name}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </label>
+                      </div>
+
+                      <label className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 light:border-slate-200 light:bg-slate-50">
+                        <input
+                          type="checkbox"
+                          checked={profileDraft.piiConsent}
+                          onChange={(e) => setProfileDraft((prev) => ({ ...prev, piiConsent: e.target.checked }))}
+                          className="mt-1 h-4 w-4 rounded border-slate-400"
+                        />
+                        <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
+                          I agree Calgary Watch may store my profile details and location preference as personal information for account, safety, moderation, and neighbourhood-report features.
+                        </span>
+                      </label>
+
+                      <label className="flex gap-3 rounded-2xl border border-teal-400/20 bg-teal-400/8 p-4">
+                        <input
+                          type="checkbox"
+                          checked={profileDraft.weeklyDigestOptIn}
+                          onChange={(e) => setProfileDraft((prev) => ({ ...prev, weeklyDigestOptIn: e.target.checked }))}
+                          className="mt-1 h-4 w-4 rounded border-slate-400"
+                        />
+                        <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
+                          Send me weekly crime stats, interesting reports, market/events, and relevant community updates for my neighbourhood.
+                        </span>
+                      </label>
+
+                      {profileSaveError && <p className="text-sm font-bold text-red-400">{profileSaveError}</p>}
+
+                      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        {canCloseAuthPanel && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => {
+                              setAuthPanelOpen(false);
+                              setAuthPanelMode('signin');
+                              setProfileSaveError(null);
+                            }}
+                            className="rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                        <Button
+                          onClick={saveProfileSettings}
+                          disabled={isSavingProfile}
+                          className="rounded-2xl bg-sky-600 hover:bg-sky-700"
+                        >
+                          {isSavingProfile ? 'Saving...' : 'Save and continue'}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1300,12 +1768,17 @@ export default function MapPage() {
                       <div className="p-3 text-[10px] text-slate-500 text-center">No new alerts.</div>
                     ) : (
                       notifications.map((n) => (
-                        <div key={n.id} className="px-3 py-2.5 border-b border-white/5 light:border-slate-100">
+                        <button
+                          key={n.id}
+                          type="button"
+                          onClick={() => handleNotificationClick(n)}
+                          className="block w-full px-3 py-2.5 border-b border-white/5 light:border-slate-100 text-left hover:bg-white/5 light:hover:bg-slate-100"
+                        >
                           <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{n.title}</p>
                           <p className="text-[9px] text-slate-500 mt-0.5">
                             {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
-                        </div>
+                        </button>
                       ))
                     )}
                   </div>
@@ -1330,10 +1803,11 @@ export default function MapPage() {
             ) : (
               <button
                 type="button"
-                onClick={signIn}
-                className="h-11 px-3.5 rounded-2xl bg-sky-600 text-white text-[10px] font-black uppercase tracking-wide shadow-lg border border-sky-400/30"
+                onClick={() => openAuthPanel('signin')}
+                className="h-11 w-11 md:w-auto md:px-3.5 rounded-2xl bg-slate-950/85 light:bg-white text-sky-300 light:text-slate-900 text-[10px] font-black uppercase tracking-wide shadow-lg border border-white/12 light:border-slate-200 flex items-center justify-center gap-2"
               >
-                Sign in
+                <LogIn size={16} />
+                <span className="hidden md:inline">Sign in</span>
               </button>
             )}
             <AnimatePresence>
@@ -1358,6 +1832,14 @@ export default function MapPage() {
                       Admin
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => openAuthPanel('settings')}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-300 light:text-slate-700 hover:bg-white/5 light:hover:bg-slate-100 text-left"
+                  >
+                    <Settings size={14} />
+                    Settings
+                  </button>
                   <button
                     type="button"
                     onClick={() => { logout(); setShowUserMenu(false); }}
@@ -1563,12 +2045,17 @@ export default function MapPage() {
                         </div>
                       ) : (
                         notifications.map((notification) => (
-                          <div key={notification.id} className="px-4 py-3 border-b border-white/5 light:border-slate-100">
+                          <button
+                            key={notification.id}
+                            type="button"
+                            onClick={() => handleNotificationClick(notification)}
+                            className="block w-full px-4 py-3 border-b border-white/5 light:border-slate-100 text-left hover:bg-white/5 light:hover:bg-slate-100"
+                          >
                             <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{notification.title}</p>
                             <p className="text-[10px] text-slate-500 mt-1">
                               {new Date(notification.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </p>
-                          </div>
+                          </button>
                         ))
                       )}
                     </div>
@@ -1622,6 +2109,13 @@ export default function MapPage() {
                           Admin Portal
                         </button>
                       )}
+                      <button
+                        onClick={() => openAuthPanel('settings')}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-slate-300 light:text-slate-700 hover:bg-white/5 light:hover:bg-slate-100 transition-colors text-left"
+                      >
+                        <Settings size={14} />
+                        Settings
+                      </button>
                       <button 
                         onClick={() => {
                           logout();
@@ -1639,8 +2133,8 @@ export default function MapPage() {
             ) : (
               <Button
                 variant="secondary"
-                className="rounded-full h-12 px-6 flex items-center gap-2 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
-                onClick={signIn}
+                className="h-12 rounded-2xl px-5 flex items-center gap-2 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
+                onClick={() => openAuthPanel('signin')}
               >
                 <LogIn size={18} className="text-blue-400" />
                 <span className="text-sm font-bold">Sign In</span>
@@ -1664,7 +2158,7 @@ export default function MapPage() {
               if (now - buttonClickDebounceRef.current < 300) return;
               buttonClickDebounceRef.current = now;
               
-              if (!user) { signIn(); return; }
+              if (!user) { openAuthPanel('signin'); return; }
               setIsEmergencyOpen(true);
             }}
           >
@@ -1686,7 +2180,7 @@ export default function MapPage() {
               buttonClickDebounceRef.current = now;
               
               if (!user) {
-                signIn();
+                openAuthPanel('signin');
               } else {
                 setIsFormOpen(true);
                 setConfirmedPinLocation(null);
@@ -1706,11 +2200,11 @@ export default function MapPage() {
         {/* Layer Toggle */}
         <LayerToggle
           showLiveReports={showLiveReports}
-          setShowLiveReports={setShowLiveReports}
+          setShowLiveReports={(show) => setExclusiveLayer('live', show)}
           showHeatmap={showHeatmap}
-          setShowHeatmap={setShowHeatmap}
+          setShowHeatmap={(show) => setExclusiveLayer('heatmap', show)}
           showCrimeLayer={showCrimeLayer}
-          setShowCrimeLayer={setShowCrimeLayer}
+          setShowCrimeLayer={(show) => setExclusiveLayer('crime', show)}
           isPinMode={isPinMode || isEmergencyPinMode}
           theme={theme}
         />

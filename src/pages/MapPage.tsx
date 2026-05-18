@@ -1291,7 +1291,7 @@ export default function MapPage() {
 
   const showProfileStep = Boolean(user);
   const authPanelVisible = authPanelOpen || profileNeedsSetup;
-  const canCloseAuthPanel = Boolean(user);
+  const canCloseAuthPanel = Boolean(user) && !profileNeedsSetup;
   const locationLabel = preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'your local report area';
 
   return (

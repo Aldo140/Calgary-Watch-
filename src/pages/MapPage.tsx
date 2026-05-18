@@ -1340,6 +1340,7 @@ export default function MapPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    setIsEditingPreferences(false);
                     setAuthPanelOpen(false);
                     setAuthPanelMode('signin');
                     setProfileSaveError(null);

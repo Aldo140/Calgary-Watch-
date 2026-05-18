@@ -1373,7 +1373,7 @@ export default function MapPage() {
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 light:text-slate-500">Current report area</p>
                       <p className="mt-1 text-lg font-black">{locationLabel}</p>
                       <p className="mt-2 text-xs leading-relaxed text-slate-400 light:text-slate-600">
-                        Weekly digest: {profileDraft.weeklyDigestOptIn ? 'enabled' : 'off'}
+                        Weekly digest: {userProfile?.weeklyDigestOptIn !== false ? 'enabled' : 'off'}
                       </p>
                     </div>
                   )}

@@ -1291,7 +1291,7 @@ export default function MapPage() {
 
   const showProfileStep = Boolean(user);
   const authPanelVisible = authPanelOpen || profileNeedsSetup;
-  const canCloseAuthPanel = !profileNeedsSetup || authPanelMode === 'settings';
+  const canCloseAuthPanel = Boolean(user);
   const locationLabel = preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'your local report area';
 
   return (
@@ -1518,12 +1518,27 @@ export default function MapPage() {
                       {profileSaveError && <p className="text-sm font-bold text-red-400">{profileSaveError}</p>}
 
                       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                        {canCloseAuthPanel && (
+                        {profileNeedsSetup && (
+                          <Button
+                            variant="secondary"
+                            onClick={skipOnboarding}
+                            className="rounded-2xl border-white/10 bg-white/5 text-slate-400 light:border-slate-200 light:bg-white light:text-slate-500"
+                          >
+                            Skip for now
+                          </Button>
+                        )}
+                        {!profileNeedsSetup && (
                           <Button
                             variant="secondary"
                             onClick={() => {
-                              setAuthPanelOpen(false);
-                              setAuthPanelMode('signin');
+                              setIsEditingPreferences(false);
+                              setProfileDraft({
+                                neighborhood: userProfile?.neighborhood || '',
+                                address: userProfile?.address || '',
+                                inferredNeighborhood: userProfile?.inferredNeighborhood || '',
+                                piiConsent: Boolean(userProfile?.piiConsentAt),
+                                weeklyDigestOptIn: userProfile?.weeklyDigestOptIn !== false,
+                              });
                               setProfileSaveError(null);
                             }}
                             className="rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
@@ -1531,13 +1546,15 @@ export default function MapPage() {
                             Cancel
                           </Button>
                         )}
-                        <Button
-                          onClick={saveProfileSettings}
-                          disabled={isSavingProfile}
-                          className="rounded-2xl bg-sky-600 hover:bg-sky-700"
-                        >
-                          {isSavingProfile ? 'Saving...' : 'Save and continue'}
-                        </Button>
+                        {(profileNeedsSetup || isDirty) && (
+                          <Button
+                            onClick={saveProfileSettings}
+                            disabled={isSavingProfile}
+                            className="rounded-2xl bg-sky-600 hover:bg-sky-700"
+                          >
+                            {isSavingProfile ? 'Saving...' : 'Save and continue'}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}

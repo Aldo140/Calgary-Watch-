@@ -1404,159 +1404,217 @@ export default function MapPage() {
                     </div>
                   ) : (
                     <div className="space-y-5">
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-sky-400">{profileNeedsSetup ? 'Required setup' : 'Profile controls'}</p>
-                        <h3 className="mt-2 text-2xl font-black text-white light:text-slate-950">Local report preferences</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-400 light:text-slate-600">
-                          Add either an address or a neighbourhood. Address is first because it gives better guesses; neighbourhood is the broader fallback.
-                        </p>
-                      </div>
-
-                      <div className="rounded-2xl border border-sky-400/20 bg-sky-400/8 p-3 text-xs leading-relaxed text-slate-300 light:text-slate-700">
-                        Choose one: use an address for a tighter report area, or use a neighbourhood name if you prefer not to store an address.
-                      </div>
-
-                      <div className="grid gap-4">
-                        <label className="space-y-2">
-                          <span className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Address or nearby landmark</span>
-                            <span className="text-[10px] font-bold text-sky-400">Recommended</span>
-                          </span>
-                          <input
-                            value={profileDraft.address}
-                            onChange={(e) => {
-                              const address = e.target.value;
-                              setProfileDraft((prev) => ({ ...prev, address, inferredNeighborhood: '', neighborhood: address.trim() ? '' : prev.neighborhood }));
-                            }}
-                            placeholder="Start typing an address, street, or landmark"
-                            className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
-                          />
-                          <div className="min-h-6">
-                            {profileDraft.address.trim().length > 0 && addressSuggestions.length === 0 && addressQuery.length < 4 && (
-                              <p className="text-[11px] font-medium text-slate-500">Keep typing for address guesses.</p>
-                            )}
-                            {addressSuggestions.length > 0 && (
-                              <div className="grid gap-2 sm:grid-cols-2">
-                                {addressSuggestions.map((item) => (
-                                  <button
-                                    key={`${item.label}-${item.neighborhood}`}
-                                    type="button"
-                                    onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
-                                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
-                                  >
-                                    <span className="block truncate">{item.label}</span>
-                                    {item.neighborhood && <span className="mt-0.5 block text-[10px] font-medium text-slate-500">Best area: {item.neighborhood}</span>}
-                                  </button>
-                                ))}
+                      {/* ── Summary view (returning users, not editing) ─────── */}
+                      {!profileNeedsSetup && !isEditingPreferences ? (
+                        <>
+                          {/* Google profile header */}
+                          <div className="flex items-center gap-4">
+                            {user?.photoURL ? (
+                              <img
+                                src={user.photoURL}
+                                alt={user.displayName || 'Profile'}
+                                referrerPolicy="no-referrer"
+                                className="h-14 w-14 rounded-full object-cover ring-2 ring-sky-400/30"
+                              />
+                            ) : (
+                              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-600 text-xl font-black text-white">
+                                {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
                               </div>
                             )}
+                            <div className="min-w-0">
+                              <p className="truncate text-lg font-black text-white light:text-slate-950">
+                                {user?.displayName || 'Calgary User'}
+                              </p>
+                              <p className="truncate text-xs text-slate-400 light:text-slate-500">
+                                {user?.email}
+                              </p>
+                            </div>
                           </div>
-                        </label>
 
-                        <div className="flex items-center gap-3">
-                          <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">or</span>
-                          <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
-                        </div>
+                          {/* Preferences summary */}
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3 light:border-slate-200 light:bg-slate-50">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Report area</p>
+                              <p className="mt-0.5 text-sm font-bold text-white light:text-slate-950">
+                                {preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'No location set'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Weekly digest</p>
+                              <p className="mt-0.5 text-sm font-bold text-white light:text-slate-950">
+                                {userProfile?.weeklyDigestOptIn !== false ? 'Enabled' : 'Off'}
+                              </p>
+                            </div>
+                          </div>
 
-                        <label className="space-y-2">
-                          <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Neighbourhood only</span>
-                          <input
-                            value={profileDraft.neighborhood}
-                            onChange={(e) => {
-                              const neighborhood = e.target.value;
-                              setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
-                            }}
-                            placeholder="Start typing a Calgary neighbourhood"
-                            className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
-                          />
-                          <div className="min-h-6">
-                            {profileDraft.neighborhood.trim().length > 0 && filteredNeighborhoodSuggestions.length === 0 && neighborhoodQuery.length < 3 && (
-                              <p className="text-[11px] font-medium text-slate-500">Type at least 3 letters for neighbourhood guesses.</p>
-                            )}
-                            {filteredNeighborhoodSuggestions.length > 0 && (
-                              <div className="flex flex-wrap gap-2">
-                                {filteredNeighborhoodSuggestions.map((name) => (
-                                  <button
-                                    key={name}
-                                    type="button"
-                                    onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
-                                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
-                                  >
-                                    {name}
-                                  </button>
-                                ))}
+                          <Button
+                            variant="secondary"
+                            onClick={() => setIsEditingPreferences(true)}
+                            className="w-full rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
+                          >
+                            Edit preferences
+                          </Button>
+                        </>
+                      ) : (
+                        /* ── Edit / onboarding form ─────────────────────────── */
+                        <>
+                          <div>
+                            <p className="text-xs font-black uppercase tracking-widest text-sky-400">
+                              {profileNeedsSetup ? 'Required setup' : 'Edit preferences'}
+                            </p>
+                            <h3 className="mt-2 text-2xl font-black text-white light:text-slate-950">Local report preferences</h3>
+                            <p className="mt-2 text-sm leading-relaxed text-slate-400 light:text-slate-600">
+                              Add either an address or a neighbourhood. Address is first because it gives better guesses; neighbourhood is the broader fallback.
+                            </p>
+                          </div>
+
+                          <div className="rounded-2xl border border-sky-400/20 bg-sky-400/8 p-3 text-xs leading-relaxed text-slate-300 light:text-slate-700">
+                            Choose one: use an address for a tighter report area, or use a neighbourhood name if you prefer not to store an address.
+                          </div>
+
+                          <div className="grid gap-4">
+                            <label className="space-y-2">
+                              <span className="flex items-center justify-between gap-3">
+                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Address or nearby landmark</span>
+                                <span className="text-[10px] font-bold text-sky-400">Recommended</span>
+                              </span>
+                              <input
+                                value={profileDraft.address}
+                                onChange={(e) => {
+                                  const address = e.target.value;
+                                  setProfileDraft((prev) => ({ ...prev, address, inferredNeighborhood: '', neighborhood: address.trim() ? '' : prev.neighborhood }));
+                                }}
+                                placeholder="Start typing an address, street, or landmark"
+                                className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
+                              />
+                              <div className="min-h-6">
+                                {profileDraft.address.trim().length > 0 && addressSuggestions.length === 0 && addressQuery.length < 4 && (
+                                  <p className="text-[11px] font-medium text-slate-500">Keep typing for address guesses.</p>
+                                )}
+                                {addressSuggestions.length > 0 && (
+                                  <div className="grid gap-2 sm:grid-cols-2">
+                                    {addressSuggestions.map((item) => (
+                                      <button
+                                        key={`${item.label}-${item.neighborhood}`}
+                                        type="button"
+                                        onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
+                                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
+                                      >
+                                        <span className="block truncate">{item.label}</span>
+                                        {item.neighborhood && <span className="mt-0.5 block text-[10px] font-medium text-slate-500">Best area: {item.neighborhood}</span>}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
+                            </label>
+
+                            <div className="flex items-center gap-3">
+                              <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">or</span>
+                              <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
+                            </div>
+
+                            <label className="space-y-2">
+                              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Neighbourhood only</span>
+                              <input
+                                value={profileDraft.neighborhood}
+                                onChange={(e) => {
+                                  const neighborhood = e.target.value;
+                                  setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
+                                }}
+                                placeholder="Start typing a Calgary neighbourhood"
+                                className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
+                              />
+                              <div className="min-h-6">
+                                {profileDraft.neighborhood.trim().length > 0 && filteredNeighborhoodSuggestions.length === 0 && neighborhoodQuery.length < 3 && (
+                                  <p className="text-[11px] font-medium text-slate-500">Type at least 3 letters for neighbourhood guesses.</p>
+                                )}
+                                {filteredNeighborhoodSuggestions.length > 0 && (
+                                  <div className="flex flex-wrap gap-2">
+                                    {filteredNeighborhoodSuggestions.map((name) => (
+                                      <button
+                                        key={name}
+                                        type="button"
+                                        onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
+                                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
+                                      >
+                                        {name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </label>
+                          </div>
+
+                          <label className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 light:border-slate-200 light:bg-slate-50">
+                            <input
+                              type="checkbox"
+                              checked={profileDraft.piiConsent}
+                              onChange={(e) => setProfileDraft((prev) => ({ ...prev, piiConsent: e.target.checked }))}
+                              className="mt-1 h-4 w-4 rounded border-slate-400"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
+                              I agree Calgary Watch may store my profile details and location preference as personal information for account, safety, moderation, and neighbourhood-report features.
+                            </span>
+                          </label>
+
+                          <label className="flex gap-3 rounded-2xl border border-teal-400/20 bg-teal-400/8 p-4">
+                            <input
+                              type="checkbox"
+                              checked={profileDraft.weeklyDigestOptIn}
+                              onChange={(e) => setProfileDraft((prev) => ({ ...prev, weeklyDigestOptIn: e.target.checked }))}
+                              className="mt-1 h-4 w-4 rounded border-slate-400"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
+                              Send me weekly crime stats, interesting reports, market/events, and relevant community updates for my neighbourhood.
+                            </span>
+                          </label>
+
+                          {profileSaveError && <p className="text-sm font-bold text-red-400">{profileSaveError}</p>}
+
+                          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            {profileNeedsSetup && (
+                              <Button
+                                variant="secondary"
+                                onClick={skipOnboarding}
+                                className="rounded-2xl border-white/10 bg-white/5 text-slate-400 light:border-slate-200 light:bg-white light:text-slate-500"
+                              >
+                                Skip for now
+                              </Button>
+                            )}
+                            {!profileNeedsSetup && (
+                              <Button
+                                variant="secondary"
+                                onClick={() => {
+                                  setIsEditingPreferences(false);
+                                  setProfileDraft({
+                                    neighborhood: userProfile?.neighborhood || '',
+                                    address: userProfile?.address || '',
+                                    inferredNeighborhood: userProfile?.inferredNeighborhood || '',
+                                    piiConsent: Boolean(userProfile?.piiConsentAt),
+                                    weeklyDigestOptIn: userProfile?.weeklyDigestOptIn !== false,
+                                  });
+                                  setProfileSaveError(null);
+                                }}
+                                className="rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
+                              >
+                                Cancel
+                              </Button>
+                            )}
+                            {(profileNeedsSetup || isDirty) && (
+                              <Button
+                                onClick={saveProfileSettings}
+                                disabled={isSavingProfile}
+                                className="rounded-2xl bg-sky-600 hover:bg-sky-700"
+                              >
+                                {isSavingProfile ? 'Saving...' : 'Save and continue'}
+                              </Button>
                             )}
                           </div>
-                        </label>
-                      </div>
-
-                      <label className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 light:border-slate-200 light:bg-slate-50">
-                        <input
-                          type="checkbox"
-                          checked={profileDraft.piiConsent}
-                          onChange={(e) => setProfileDraft((prev) => ({ ...prev, piiConsent: e.target.checked }))}
-                          className="mt-1 h-4 w-4 rounded border-slate-400"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
-                          I agree Calgary Watch may store my profile details and location preference as personal information for account, safety, moderation, and neighbourhood-report features.
-                        </span>
-                      </label>
-
-                      <label className="flex gap-3 rounded-2xl border border-teal-400/20 bg-teal-400/8 p-4">
-                        <input
-                          type="checkbox"
-                          checked={profileDraft.weeklyDigestOptIn}
-                          onChange={(e) => setProfileDraft((prev) => ({ ...prev, weeklyDigestOptIn: e.target.checked }))}
-                          className="mt-1 h-4 w-4 rounded border-slate-400"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
-                          Send me weekly crime stats, interesting reports, market/events, and relevant community updates for my neighbourhood.
-                        </span>
-                      </label>
-
-                      {profileSaveError && <p className="text-sm font-bold text-red-400">{profileSaveError}</p>}
-
-                      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                        {profileNeedsSetup && (
-                          <Button
-                            variant="secondary"
-                            onClick={skipOnboarding}
-                            className="rounded-2xl border-white/10 bg-white/5 text-slate-400 light:border-slate-200 light:bg-white light:text-slate-500"
-                          >
-                            Skip for now
-                          </Button>
-                        )}
-                        {!profileNeedsSetup && (
-                          <Button
-                            variant="secondary"
-                            onClick={() => {
-                              setIsEditingPreferences(false);
-                              setProfileDraft({
-                                neighborhood: userProfile?.neighborhood || '',
-                                address: userProfile?.address || '',
-                                inferredNeighborhood: userProfile?.inferredNeighborhood || '',
-                                piiConsent: Boolean(userProfile?.piiConsentAt),
-                                weeklyDigestOptIn: userProfile?.weeklyDigestOptIn !== false,
-                              });
-                              setProfileSaveError(null);
-                            }}
-                            className="rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
-                          >
-                            Cancel
-                          </Button>
-                        )}
-                        {(profileNeedsSetup || isDirty) && (
-                          <Button
-                            onClick={saveProfileSettings}
-                            disabled={isSavingProfile}
-                            className="rounded-2xl bg-sky-600 hover:bg-sky-700"
-                          >
-                            {isSavingProfile ? 'Saving...' : 'Save and continue'}
-                          </Button>
-                        )}
-                      </div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

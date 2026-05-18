@@ -61,6 +61,7 @@ type UserProfileSettings = {
   weeklyDigestOptIn?: boolean;
   weeklyDigestTopics?: string[];
   profileUpdatedAt?: number;
+  onboardingCompletedAt?: number;
 };
 
 const FALLBACK_NEIGHBORHOODS = [
@@ -896,8 +897,7 @@ export default function MapPage() {
   }, [neighborhoodQuery, neighborhoodSuggestions]);
 
   const profileNeedsSetup = Boolean(
-    user &&
-    (!userProfile?.piiConsentAt || !(userProfile?.neighborhood || userProfile?.address))
+    user && userProfile !== null && !userProfile.onboardingCompletedAt
   );
 
   const preferredNeighborhood = (userProfile?.neighborhood || '').trim();

@@ -928,6 +928,7 @@ export default function MapPage() {
         inferredNeighborhood,
         locationPreferenceType: address ? 'address' : 'neighborhood',
         piiConsentAt: userProfile?.piiConsentAt || Date.now(),
+        onboardingCompletedAt: userProfile?.onboardingCompletedAt || Date.now(),
         weeklyDigestOptIn: profileDraft.weeklyDigestOptIn,
         weeklyDigestTopics: profileDraft.weeklyDigestOptIn
           ? ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates']
@@ -943,6 +944,17 @@ export default function MapPage() {
       setIsSavingProfile(false);
     }
   }, [profileDraft, user, userProfile]);
+
+  const skipOnboarding = useCallback(async () => {
+    if (!user || !db) return;
+    try {
+      await setDoc(doc(db, 'users', user.uid), { onboardingCompletedAt: Date.now() }, { merge: true });
+    } catch (error) {
+      console.error('Failed to skip onboarding:', error);
+    }
+    setAuthPanelOpen(false);
+    setAuthPanelMode('signin');
+  }, [user]);
 
   useEffect(() => {
     const targetId = searchParams.get('i');

@@ -2,9 +2,9 @@
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
 
-Real-time incident map for Calgary, Alberta.
+Real-time incident map for Calgary, Edmonton, and surrounding Alberta communities.
 
-Calgarians report incidents the moment they happen. Road closures, fires, flooding, and safety alerts appear on the map in under 30 seconds. Check what's happening near you before heading out.
+Residents report incidents the moment they happen. Road closures, fires, flooding, and safety alerts appear on the map in under 30 seconds. Check what's happening near you before heading out.
 
 **[Live Site](https://calgarywatch.ca)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
 
@@ -20,8 +20,9 @@ The platform runs four data layers:
 
 - **Community Reports** — submitted by users in real time, labeled with trust indicators that improve as more users confirm them
 - **511 Alberta Traffic** — live traffic incidents from 511.alberta.ca, refreshed every 30 minutes
-- **Environment Canada Alerts** — official weather warnings and special statements for the Calgary region
-- **Calgary Infrastructure & Police** — service requests and crime statistics from Calgary Open Data (SODA API)
+- **Environment Canada Alerts** — official weather warnings and special statements covering 15 zones across Alberta
+- **Calgary & Edmonton Open Data** — service requests, bylaw, 311, and crime statistics via SODA API
+- **Statistics Canada Baselines** — annual crime data for RCMP-policed towns (Airdrie, Cochrane, Okotoks, Canmore, High River, Strathmore, Chestermere)
 
 ---
 
@@ -101,7 +102,7 @@ Security headers are configured in `firebase.json` and served by Firebase Hostin
 
 | Source | Type |
 |--------|------|
-| Environment Canada Alerts | Weather warnings |
+| Environment Canada Alerts | Weather warnings (15 Alberta zones) |
 | Environment Canada Enhanced | Detailed weather |
 | 511 Alberta | Traffic incidents |
 | Alberta Emergency Alert | Provincial emergencies |
@@ -109,6 +110,9 @@ Security headers are configured in `firebase.json` and served by Firebase Hostin
 | News RSS (CBC, CTV, Global) | Local news |
 | Calgary Police Service | Crime statistics |
 | Calgary Open Data Infrastructure | 311 service requests / water main breaks |
+| Edmonton Open Data (bylaw, 311, traffic) | Live Edmonton incidents |
+| Edmonton Police Service (EPS) Dashboard | Edmonton neighbourhood crime stats |
+| Statistics Canada WDS (Table 35-10-0183-01) | Annual crime baselines for RCMP towns |
 
 **Firestore optimisation:** A single `loadAndPrune()` read handles both deduplication and expiry cleanup in one collection scan per run. Expired incidents are hard-deleted (not soft-deleted) so the collection stays small. At 30-minute intervals = 48 runs/day, leaving ~1,000 reads per run within the 50,000/day free tier.
 

@@ -113,7 +113,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
               data_source: 'official',
               source_type: 'edmonton_open_data',
               source_name: 'City of Edmonton Open Data',
-              source_url: 'https://data.edmonton.ca/',
+              source_url: 'https://data.edmonton.ca/dataset/Bylaw-Complaints/ypje-j649',
               expires_at: now + 2 * 60 * 60 * 1000,
             });
           }
@@ -150,7 +150,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
               data_source: 'official',
               source_type: 'edmonton_open_data',
               source_name: 'City of Edmonton Open Data',
-              source_url: 'https://data.edmonton.ca/',
+              source_url: 'https://data.edmonton.ca/dataset/Edmonton-311/q7ua-agfg',
               expires_at: now + 2 * 60 * 60 * 1000,
             });
           }
@@ -191,7 +191,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
               data_source: 'official',
               source_type: 'edmonton_open_data',
               source_name: 'City of Edmonton Open Data',
-              source_url: 'https://data.edmonton.ca/',
+              source_url: 'https://www.edmonton.ca/transportation/road_system/traffic-disruptions',
               expires_at: now + 2 * 60 * 60 * 1000,
             });
           }

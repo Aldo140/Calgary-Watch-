@@ -24,6 +24,7 @@ interface AlbertaEvent {
   Status?: string;
   Headline?: string;
   Description?: string;
+  Details?: string;
   StartDate?: string;
   ExpectedEndDate?: string;
   Geography?: {
@@ -131,6 +132,8 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
     const headline = (event.Headline ?? event.EventType ?? 'Traffic incident').slice(0, 100);
     const description = (event.Description ?? headline).slice(0, 1000);
     const eventId = event.ID ?? `${event.Headline ?? ''}:${event.StartDate ?? ''}`;
+    const detailsUrlMatch = event.Details?.match(/https?:\/\/[^\s"'>]+/);
+    const sourceUrl = detailsUrlMatch ? detailsUrlMatch[0] : 'https://511.alberta.ca';
 
     results.push({
       title: headline,
@@ -140,7 +143,7 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
       lat: coords.lat,
       lng: coords.lng,
       source_name: '511 Alberta',
-      source_url: 'https://511.alberta.ca',
+      source_url: sourceUrl,
       source_type: '511_alberta_traffic',
       data_source: 'official',
       dedup_key: `511_alberta_traffic:${eventId}`,

@@ -146,7 +146,7 @@ async function fetchCalgaryPoliceCrimeData(): Promise<NormalizedIncident[]> {
       lat: crime.lat,
       lng: crime.lng,
       source_name: 'Calgary Police Service',
-      source_url: 'https://www.calgary.ca/police',
+      source_url: 'https://data.calgary.ca/dataset/Community-Crime-and-Disorder-Statistics/78gh-n26t',
       source_type: 'calgary_police_crime',
       data_source: 'official',
       dedup_key: dedupKey,

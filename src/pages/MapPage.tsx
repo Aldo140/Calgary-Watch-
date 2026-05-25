@@ -188,7 +188,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
             email: 'opendata@calgary.ca', name: 'City of Calgary Traffic',
             anonymous: false, verified_status: 'community_confirmed' as const, report_count: 1,
             data_source: 'official' as const, source_name: 'City of Calgary Open Data',
-            source_url: 'https://data.calgary.ca/',
+            source_url: 'https://data.calgary.ca/dataset/Traffic-Incidents/35ra-9556',
             expires_at: ts + 8 * 60 * 60 * 1000,
           });
         }
@@ -271,7 +271,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
             email: 'opendata@calgary.ca', name: 'Calgary 311 Sync',
             anonymous: false, verified_status: 'community_confirmed' as const, report_count: 1,
             data_source: 'official' as const, source_name: 'Calgary 311',
-            source_url: 'https://data.calgary.ca/',
+            source_url: 'https://data.calgary.ca/dataset/311-Service-Requests/iahh-g8bj',
             expires_at: timestamp + 24 * 60 * 60 * 1000,
           });
         }
@@ -335,7 +335,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
             data_source: 'official' as const,
             source_name: 'Calgary Water Main Breaks',
             source_type: 'calgary_water_main_breaks',
-            source_url: 'https://data.calgary.ca/',
+            source_url: 'https://data.calgary.ca/dataset/Water-Main-Breaks/dpcu-jr23',
             expires_at: now + 24 * 60 * 60 * 1000,
           });
         }

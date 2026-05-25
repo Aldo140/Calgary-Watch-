@@ -665,7 +665,7 @@ export default function LandingPage() {
           ? 'bg-slate-950/85 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-xl border-b border-white/8 light:border-stone-200/80'
           : 'bg-transparent border-b border-transparent',
       )}>
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="w-full px-5 sm:px-8 lg:px-[5%] xl:px-[7%] h-16 flex items-center justify-between gap-4">
 
           {/* Logo */}
           <button
@@ -755,7 +755,7 @@ export default function LandingPage() {
         />
 
         {/* Desktop hero grid — hidden on mobile */}
-        <div className="hidden lg:grid relative z-10 min-h-[820px] xl:min-h-[880px] grid-cols-[55fr_45fr] gap-10 xl:gap-14 px-14 xl:px-20 2xl:px-24 pt-28 xl:pt-32 pb-14 max-w-[1600px] mx-auto w-full">
+        <div className="hidden lg:grid relative z-10 min-h-[820px] xl:min-h-[880px] grid-cols-[55fr_45fr] gap-10 xl:gap-14 px-[5%] xl:px-[7%] 2xl:px-[9%] pt-28 xl:pt-32 pb-14 w-full">
 
           {/* Left - content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-3xl xl:max-w-[44rem] self-center pt-8 pb-4 lg:py-0 lg:text-left">
@@ -838,7 +838,7 @@ export default function LandingPage() {
               initial={reducedMotion ? undefined : { opacity: 0, y: 28, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.75, ease: 'easeOut', delay: 0.08 }}
-              className="relative mx-auto w-full max-w-[42rem]"
+              className="relative w-full"
             >
               <div className="absolute -inset-4 rounded-[2.25rem] border border-white/10 bg-white/[0.03] light:bg-white/45" />
               <div className="relative overflow-hidden rounded-[2rem] border border-white/12 light:border-white/80 bg-slate-950/85 light:bg-white/80 shadow-[0_30px_90px_-40px_rgba(15,23,42,0.95)] backdrop-blur-xl">
@@ -1051,7 +1051,7 @@ export default function LandingPage() {
           className="absolute w-[600px] md:w-[1000px] aspect-square rounded-full bg-gradient-to-tr from-[#4A90D9]/10 via-[#2E8B7A]/5 to-[#D4A843]/10 pointer-events-none"
           style={{ background: 'radial-gradient(circle at center, rgba(74,144,217,0.08) 0%, transparent 60%)' }}
         />
-        <div className="relative z-10 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 lg:px-8 text-center">
+        <div className="relative z-10 w-full px-6 lg:px-[5%] xl:px-[7%] text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="mb-8 lg:mb-6 flex justify-center">
             <LandingTag>Vision</LandingTag>
           </motion.div>
@@ -1072,7 +1072,7 @@ export default function LandingPage() {
       {/* ================================================================
           PROBLEM SECTION
           ================================================================ */}
-      <section className="py-16 md:py-28 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <section className="py-16 md:py-28 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -left-80 top-0 w-[500px] h-[500px] rounded-full opacity-[0.06]"
             style={{ background: 'radial-gradient(ellipse at center, #4A90D9 0%, transparent 70%)' }} aria-hidden="true" />
@@ -1080,7 +1080,7 @@ export default function LandingPage() {
             style={{ background: 'radial-gradient(ellipse at center, #2E8B7A 0%, transparent 70%)' }} aria-hidden="true" />
         </div>
 
-        <div className="max-w-7xl xl:max-w-screen-xl mx-auto relative z-10">
+        <div className="w-full relative z-10">
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.7 }} className="max-w-4xl lg:max-w-5xl mb-10 md:mb-16 lg:mb-12">
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">The Problem</p>
             <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.05] lg:leading-[1] mb-5 lg:mb-6">
@@ -1195,8 +1195,8 @@ export default function LandingPage() {
       {/* ================================================================
           FEATURES SECTION
           ================================================================ */}
-      <section className="py-16 md:py-28 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8" id="features">
-        <div className="max-w-7xl xl:max-w-screen-xl mx-auto">
+      <section className="py-16 md:py-28 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%]" id="features">
+        <div className="w-full">
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="max-w-3xl lg:max-w-5xl mb-10 md:mb-12 lg:mb-14">
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Features</p>
             <h2 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.06] lg:leading-[1]">
@@ -1429,8 +1429,8 @@ export default function LandingPage() {
       {/* ================================================================
           MOBILE EXPERIENCE SECTION
           ================================================================ */}
-      <section className="py-12 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-transparent overflow-hidden">
-        <div className="max-w-7xl xl:max-w-screen-xl mx-auto">
+      <section className="py-12 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-transparent overflow-hidden">
+        <div className="w-full">
 
           {/* Mobile: compact 2×2 feature grid only */}
           <div className="md:hidden">
@@ -1520,12 +1520,12 @@ export default function LandingPage() {
       {/* ================================================================
           HOW IT WORKS
           ================================================================ */}
-      <section className="py-16 md:py-28 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" id="how-it-works">
+      <section className="py-16 md:py-28 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] relative overflow-hidden" id="how-it-works">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 opacity-[0.035] light:opacity-[0.025]" style={{ backgroundImage: 'linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px)', backgroundSize: '72px 72px' }} aria-hidden="true" />
         </div>
 
-        <div className="max-w-7xl xl:max-w-screen-xl mx-auto relative z-10">
+        <div className="w-full relative z-10">
           <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.6 }} className="mb-10 md:mb-16 lg:mb-14">
             <p className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 mb-4">Workflow</p>
             <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-[5rem] font-black tracking-tight leading-[1.05] lg:leading-[0.98] mb-3 lg:mb-4">How it Works</h2>
@@ -1625,8 +1625,8 @@ export default function LandingPage() {
       {/* ================================================================
           ROADMAP & SUSTAINABILITY
           ================================================================ */}
-      <section className="py-16 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 border-t border-white/5 light:border-stone-200/80 bg-slate-900/10 light:bg-[rgba(255,250,243,0.6)]">
-        <div className="max-w-7xl xl:max-w-screen-xl mx-auto">
+      <section className="py-16 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] border-t border-white/5 light:border-stone-200/80 bg-slate-900/10 light:bg-[rgba(255,250,243,0.6)]">
+        <div className="w-full">
           <div className="grid lg:grid-cols-[1fr_350px] xl:grid-cols-[1fr_400px] gap-8 lg:gap-10">
             {/* Roadmap */}
             <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }}>
@@ -1706,12 +1706,12 @@ export default function LandingPage() {
       {/* ================================================================
           TRUST, TRANSPARENCY & LEGAL
           ================================================================ */}
-      <section className="py-16 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8 bg-slate-950 light:bg-[rgba(255,250,243,0.72)] border-t border-white/5 light:border-stone-200/80 relative overflow-hidden">
+      <section className="py-16 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] bg-slate-950 light:bg-[rgba(255,250,243,0.72)] border-t border-white/5 light:border-stone-200/80 relative overflow-hidden">
         {/* Terminal/Hacker Grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none light:hidden" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none hidden light:block" />
 
-        <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} className="relative z-10 max-w-6xl lg:max-w-7xl xl:max-w-screen-xl mx-auto">
+        <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} className="relative z-10 max-w-6xl lg:w-full">
           <div className="flex flex-col items-center mb-10 md:mb-16 lg:mb-14">
             <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
                <ShieldCheck size={28} className="text-blue-400" />
@@ -1786,9 +1786,9 @@ export default function LandingPage() {
       {/* ================================================================
           FINAL CTA
           ================================================================ */}
-      <section className="py-12 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 md:py-24 lg:py-20 xl:py-24 px-4 sm:px-6 lg:px-[5%] xl:px-[7%]">
         <motion.div initial={reducedMotion ? undefined : { opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.55 }}
-          className="max-w-6xl lg:max-w-7xl xl:max-w-screen-xl mx-auto relative overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-white/10 light:border-slate-300 bg-slate-900/70 light:bg-white px-6 py-10 md:px-12 md:py-14 lg:px-16 lg:py-16">
+          className="max-w-6xl lg:w-full relative overflow-hidden rounded-2xl md:rounded-[2.5rem] border border-white/10 light:border-slate-300 bg-slate-900/70 light:bg-white px-6 py-10 md:px-12 md:py-14 lg:px-16 lg:py-16">
           <img src={publicAsset('images/calgary8.webp')} alt="" width={800} height={614} loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover opacity-8 light:opacity-5" />
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 10% 15%,rgba(46,139,122,0.12),transparent 35%),radial-gradient(circle at 90% 85%,rgba(74,144,217,0.12),transparent 45%)' }} aria-hidden="true" />
           <div className="relative z-10 grid lg:grid-cols-[1.2fr_auto] gap-8 items-center">
@@ -1819,7 +1819,7 @@ export default function LandingPage() {
       {/* ================================================================
           CITY EXPANSION REQUEST
           ================================================================ */}
-      <section className="py-12 md:py-16 lg:py-14 px-4 sm:px-6 lg:px-8 border-t border-white/5 light:border-stone-200/80">
+      <section className="py-12 md:py-16 lg:py-14 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] border-t border-white/5 light:border-stone-200/80">
         <div className="max-w-md lg:max-w-xl mx-auto text-center space-y-5">
           <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Want this in your city?</h4>
           <div className="flex gap-2">
@@ -1840,7 +1840,7 @@ export default function LandingPage() {
       {/* ================================================================
           COVERAGE TEASER — compact link to /coverage page
           ================================================================ */}
-      <section className="py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5 light:border-stone-200/80 bg-slate-950/60 light:bg-[#f4ede0]/60">
+      <section className="py-12 md:py-16 lg:py-20 px-4 sm:px-6 lg:px-[5%] xl:px-[7%] border-t border-white/5 light:border-stone-200/80 bg-slate-950/60 light:bg-[#f4ede0]/60">
         <div className="max-w-3xl lg:max-w-5xl mx-auto text-center">
           <LandingTag tone="teal" className="justify-center mb-4">Coverage Area</LandingTag>
           <h2 className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-black tracking-tight text-white light:text-slate-900 mb-3 lg:mb-5 lg:leading-[1.05]">
@@ -1880,7 +1880,7 @@ export default function LandingPage() {
           FOOTER
           ================================================================ */}
       <footer className="py-10 px-4 sm:px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-[#fffaf2]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="text-[#4A90D9]" size={20} />
             <span className="text-base font-bold tracking-tight light:text-slate-900">Calgary Watch</span>
@@ -1892,7 +1892,7 @@ export default function LandingPage() {
           </div>
           <p className="text-xs text-slate-600 light:text-slate-400">&copy; 2026 Calgary Watch. Community Safety Platform.</p>
         </div>
-        <div className="max-w-7xl mx-auto mt-6 p-3 bg-red-500/5 light:bg-red-50 border border-red-500/8 light:border-red-200 rounded-2xl text-center">
+        <div className="w-full mt-6 p-3 bg-red-500/5 light:bg-red-50 border border-red-500/8 light:border-red-200 rounded-2xl text-center">
           <p className="text-[10px] text-red-400/70 uppercase font-bold tracking-widest">Disclaimer: User-generated content. Always verify with official sources before taking action.</p>
         </div>
       </footer>

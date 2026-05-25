@@ -21,6 +21,7 @@ import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
+import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -78,6 +79,29 @@ const FALLBACK_NEIGHBORHOODS = [
   'Seton',
   'Mahogany',
 ];
+
+// ---------------------------------------------------------------------------
+// Geocode a Calgary address → official community name via Nominatim (OSM).
+// Returns the suburb / neighbourhood string from the structured address, or ''.
+// Called at profile-save time so results are stored — not on every report view.
+// ---------------------------------------------------------------------------
+async function geocodeToCalgarySuburb(address: string): Promise<string> {
+  try {
+    const q = encodeURIComponent(`${address.trim()}, Calgary, Alberta, Canada`);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${q}&format=json&addressdetails=1&limit=1&countrycodes=ca`,
+      { headers: { 'User-Agent': 'CalgaryWatch/1.0 (community-safety-app)' } }
+    );
+    if (!res.ok) return '';
+    const data: Array<{ address: Record<string, string> }> = await res.json();
+    const addr = data[0]?.address;
+    if (!addr) return '';
+    // Nominatim returns Calgary communities under suburb or neighbourhood
+    return (addr.suburb || addr.neighbourhood || addr.city_district || addr.quarter || '').trim();
+  } catch {
+    return '';
+  }
+}
 
 const ADDRESS_GUESSES = [
   { label: '17 Avenue SW, Calgary', neighborhood: 'Beltline' },
@@ -507,6 +531,7 @@ export default function MapPage() {
   const mapRef = useRef<MapRef>(null);
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
+  const edmontonOpenData = useEdmontonOpenData(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
   const cityAverages = useMemo(() => computeCityAverages(crimeStats), [crimeStats]);
 
@@ -548,6 +573,7 @@ export default function MapPage() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
+  const [onboardingDismissedThisSession, setOnboardingDismissedThisSession] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
@@ -587,6 +613,16 @@ export default function MapPage() {
         piiConsent: Boolean(profile.piiConsentAt),
         weeklyDigestOptIn: profile.weeklyDigestOptIn !== false,
       });
+
+      // Back-fill inferredNeighborhood for existing users who saved before geocoding was added
+      if (profile.address && !profile.inferredNeighborhood && db) {
+        const dbRef = db;
+        geocodeToCalgarySuburb(profile.address).then((geocoded) => {
+          if (geocoded) {
+            setDoc(doc(dbRef, 'users', user.uid), { inferredNeighborhood: geocoded.slice(0, 80) }, { merge: true }).catch(() => {});
+          }
+        });
+      }
     }, (error) => {
       console.error('Failed to load user profile:', error);
     });
@@ -822,7 +858,7 @@ export default function MapPage() {
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
     const now = Date.now();
-    const combined = [...firebaseIncidents, ...officialOpenData, ...weatherAlerts];
+    const combined = [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts];
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     const filtered = [...unique.values()]
       .filter((i) => {
@@ -846,7 +882,7 @@ export default function MapPage() {
       if (!isDup) kept.push(inc);
     }
     return kept;
-  }, [firebaseIncidents, officialOpenData, weatherAlerts]);
+  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts]);
 
   const neighborhoodSuggestions = useMemo(() => {
     const names = new Set<string>(FALLBACK_NEIGHBORHOODS);
@@ -899,7 +935,7 @@ export default function MapPage() {
   }, [neighborhoodQuery, neighborhoodSuggestions]);
 
   const profileNeedsSetup = Boolean(
-    user && userProfile !== null && !userProfile.onboardingCompletedAt
+    user && userProfile !== null && !userProfile.onboardingCompletedAt && !userProfile.piiConsentAt
   );
 
   const isDirty =
@@ -910,13 +946,15 @@ export default function MapPage() {
   const preferredNeighborhood = (userProfile?.neighborhood || '').trim();
   const preferredInferredNeighborhood = (userProfile?.inferredNeighborhood || '').trim();
   const preferredAddress = (userProfile?.address || '').trim();
-  const preferredReportArea = preferredNeighborhood || preferredInferredNeighborhood || preferredAddress;
+
 
   const saveProfileSettings = useCallback(async () => {
     if (!user || !db) return;
     const neighborhood = profileDraft.neighborhood.trim().slice(0, 80);
     const address = profileDraft.address.trim().slice(0, 160);
-    const inferredNeighborhood = profileDraft.inferredNeighborhood.trim().slice(0, 80);
+    // inferredNeighborhood is set when user picks from ADDRESS_GUESSES autocomplete.
+    // If they typed an address manually (no autocomplete pick), geocode it instead.
+    let inferredNeighborhood = profileDraft.inferredNeighborhood.trim().slice(0, 80);
     if (!profileDraft.piiConsent || (!neighborhood && !address)) {
       setProfileSaveError('Please agree to the privacy obligations and add a neighbourhood or address.');
       return;
@@ -924,6 +962,13 @@ export default function MapPage() {
 
     setIsSavingProfile(true);
     setProfileSaveError(null);
+
+    // Geocode the address if we don't already have an inferred neighborhood
+    if (address && !inferredNeighborhood) {
+      const geocoded = await geocodeToCalgarySuburb(address);
+      if (geocoded) inferredNeighborhood = geocoded.slice(0, 80);
+    }
+
     try {
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
@@ -955,14 +1000,15 @@ export default function MapPage() {
 
   const skipOnboarding = useCallback(async () => {
     if (!user || !db) return;
+    setOnboardingDismissedThisSession(true);
+    setIsEditingPreferences(false);
+    setAuthPanelOpen(false);
+    setAuthPanelMode('signin');
     try {
       await setDoc(doc(db, 'users', user.uid), { onboardingCompletedAt: Date.now() }, { merge: true });
     } catch (error) {
       console.error('Failed to skip onboarding:', error);
     }
-    setIsEditingPreferences(false);
-    setAuthPanelOpen(false);
-    setAuthPanelMode('signin');
   }, [user]);
 
   useEffect(() => {
@@ -1150,11 +1196,6 @@ export default function MapPage() {
     setIsEmergencyOpen(false);
   }, []);
 
-  const setExclusiveLayer = useCallback((layer: 'live' | 'heatmap' | 'crime', next: boolean) => {
-    setShowLiveReports(layer === 'live' ? next : false);
-    setShowHeatmap(layer === 'heatmap' ? next : false);
-    setShowCrimeLayer(layer === 'crime' ? next : false);
-  }, []);
 
   // filteredIncidentsCount is intentionally kept for the sidebar category badge
   const filteredIncidentsCount = useMemo(
@@ -1212,8 +1253,51 @@ export default function MapPage() {
     const base = getAreaIntelligence(displayName);
 
     if (crimeStats && crimeStats.size > 0) {
-      const key = neighborhood.toLowerCase();
-      const entry = crimeStats.get(key);
+      const rawKey = neighborhood.toLowerCase().trim();
+      const allKeys = [...crimeStats.keys()];
+      // Fuzzy resolve: exact → whole-word-only substring → word overlap (community name only)
+      // Street type words are stripped so "Stoney Trail NW" never matches community "stoney".
+      const STOP = new Set([
+        'the','and','of','in','at','sw','se','nw','ne','calgary','alberta','ab',
+        // street suffixes — present in addresses but NOT in community names
+        'trail','drive','avenue','ave','blvd','boulevard','road','rd','street','st',
+        'crescent','cres','way','place','pl','court','ct','close','lane','ln',
+        'mews','terrace','terr','grove','gate','view','ridge','heights','park',
+        'hill','hills','lake','lakes','bay','cove','green','landing','rise','run',
+        'bend','point','pointe','village','estate','estates','manor','meadows',
+      ]);
+      const resolveKey = (q: string): string | undefined => {
+        if (crimeStats.has(q)) return q;
+        // Strip leading street numbers (e.g. "1234 Banff Trail NW" → "banff trail nw")
+        const stripped = q.replace(/^\d+\s+/, '');
+        if (crimeStats.has(stripped)) return stripped;
+        // Only do substring containment on the cleaned string and only for multi-word keys
+        // (prevents single short community names like "stoney" matching long address strings)
+        const subFound = allKeys.find(k => {
+          if (k.split(' ').length < 2) return false; // skip single-word keys for substring
+          return stripped.includes(k) || k.includes(stripped);
+        });
+        if (subFound) return subFound;
+        // Word-overlap: use only meaningful words (after removing numbers + STOP words)
+        const qWords = stripped.split(/\s+/).filter(w => w.length > 2 && !STOP.has(w) && !/^\d+$/.test(w));
+        if (qWords.length === 0) return undefined;
+        let best: string | undefined;
+        let bestScore = 0;
+        for (const k of allKeys) {
+          const kWords = k.split(/\s+/).filter(w => !STOP.has(w));
+          // All community words must appear in the query — prevents partial road-name matches
+          const overlap = kWords.filter(kw => qWords.some(w => w === kw || w.startsWith(kw) || kw.startsWith(w))).length;
+          const score = overlap / Math.max(kWords.length, 1);
+          if (score > bestScore && overlap === kWords.length) { bestScore = score; best = k; }
+        }
+        return bestScore >= 0.5 ? best : undefined;
+      };
+      const resolvedKey = resolveKey(rawKey);
+      const entry = resolvedKey ? crimeStats.get(resolvedKey) : undefined;
+      // Use canonical name from the matched key when fuzzy resolution differs from input
+      const canonicalName = resolvedKey
+        ? resolvedKey.replace(/\b\w/g, c => c.toUpperCase())
+        : displayName;
       const totals = [...crimeStats.values()].map(e => e.crime + e.disorder);
       const cityAvg = totals.reduce((a, b) => a + b, 0) / totals.length;
       const cityMax = Math.max(...totals);
@@ -1252,7 +1336,7 @@ export default function MapPage() {
 
         setSelectedArea({
           ...base,
-          communityName: displayName,
+          communityName: canonicalName,
           safetyScore: score,
           trend,
           insights: [...computedInsights, ...base.insights],
@@ -1266,20 +1350,25 @@ export default function MapPage() {
   }, [incidents, mapRef, crimeStats, cityAverages]);
 
   useEffect(() => {
-    if (!user || !preferredReportArea || profileNeedsSetup) return;
+    // Require a registered address — neighborhood/inferred alone is not enough
+    if (!user || !preferredAddress || profileNeedsSetup) return;
     if (lastNeighborhoodReportUidRef.current === user.uid) return;
     lastNeighborhoodReportUidRef.current = user.uid;
 
+    // Priority: address-autocomplete inferred → user-typed neighborhood → raw address
+    // The raw address falls through to the fuzzy key resolver in handleViewNeighborhood
+    const neighborhoodLookup = preferredInferredNeighborhood || preferredNeighborhood || preferredAddress;
+
     const notification: MapNotification = {
       id: `neighborhood-report-${user.uid}-${Date.now()}`,
-      title: `Neighbourhood report ready: ${preferredReportArea}`,
+      title: `Neighbourhood report ready for ${preferredAddress}`,
       timestamp: Date.now(),
-      neighborhood: preferredNeighborhood || preferredInferredNeighborhood || 'Calgary',
+      neighborhood: neighborhoodLookup,
       kind: 'neighborhood_report',
     };
     setNotifications((prev) => [notification, ...prev].slice(0, 20));
     setUnreadNotifications((prev) => prev + 1);
-  }, [user, preferredNeighborhood, preferredInferredNeighborhood, preferredReportArea, profileNeedsSetup]);
+  }, [user, preferredAddress, preferredNeighborhood, preferredInferredNeighborhood, profileNeedsSetup]);
 
   const handleNotificationClick = useCallback((notification: MapNotification) => {
     if (notification.neighborhood) {
@@ -1290,8 +1379,8 @@ export default function MapPage() {
   }, [handleViewNeighborhood]);
 
   const showProfileStep = Boolean(user);
-  const authPanelVisible = authPanelOpen || profileNeedsSetup;
-  const canCloseAuthPanel = Boolean(user) && !profileNeedsSetup;
+  const authPanelVisible = authPanelOpen || (profileNeedsSetup && !onboardingDismissedThisSession);
+  const canCloseAuthPanel = Boolean(user);
   const locationLabel = preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'your local report area';
 
   return (
@@ -1340,6 +1429,7 @@ export default function MapPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    setOnboardingDismissedThisSession(true);
                     setIsEditingPreferences(false);
                     setAuthPanelOpen(false);
                     setAuthPanelMode('signin');
@@ -2297,11 +2387,11 @@ export default function MapPage() {
         {/* Layer Toggle */}
         <LayerToggle
           showLiveReports={showLiveReports}
-          setShowLiveReports={(show) => setExclusiveLayer('live', show)}
+          setShowLiveReports={setShowLiveReports}
           showHeatmap={showHeatmap}
-          setShowHeatmap={(show) => setExclusiveLayer('heatmap', show)}
+          setShowHeatmap={setShowHeatmap}
           showCrimeLayer={showCrimeLayer}
-          setShowCrimeLayer={(show) => setExclusiveLayer('crime', show)}
+          setShowCrimeLayer={setShowCrimeLayer}
           isPinMode={isPinMode || isEmergencyPinMode}
           theme={theme}
         />

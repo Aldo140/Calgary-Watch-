@@ -93,12 +93,13 @@ function Section({
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
 function HeroSection({
-  data, onClose, glowColor, gaugeColor,
+  data, onClose, glowColor, gaugeColor, isLight,
 }: {
   data: AreaIntelligence;
   onClose: () => void;
   glowColor: string;
   gaugeColor: string;
+  isLight: boolean;
 }) {
   const score = data.safetyScore ?? 0;
   const rankMatch = (data.insights[0] ?? '').match(/#(\d+) of (\d+)/);
@@ -117,24 +118,35 @@ function HeroSection({
   return (
     <div
       className="relative px-5 pt-5 pb-6 md:px-8 overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0f1e3d 0%, #0a1628 100%)' }}
+      style={{
+        background: isLight
+          ? 'linear-gradient(135deg, #e8f4fd 0%, #e6f7f5 100%)'
+          : 'linear-gradient(135deg, #0f1e3d 0%, #0a1628 100%)',
+      }}
     >
       {/* Score-keyed glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 20% 50%, ${glowColor}, transparent 60%)` }}
+        style={{
+          background: `radial-gradient(ellipse at 20% 50%, ${glowColor.replace('0.12)', isLight ? '0.22)' : '0.12)')}, transparent 60%)`,
+        }}
       />
 
       {/* Eyebrow + close */}
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-1.5">
-          <MapPin size={11} className="text-slate-500" />
+          <MapPin size={11} className={isLight ? 'text-slate-500' : 'text-slate-500'} />
           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Neighbourhood Intelligence</span>
         </div>
         <button
           onClick={onClose}
           aria-label="Close"
-          className="p-2.5 rounded-xl border text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10 transition-all group"
+          className={cn(
+            'p-2.5 rounded-xl border transition-all group',
+            isLight
+              ? 'text-slate-600 hover:text-slate-900 bg-black/5 hover:bg-black/10 border-black/10'
+              : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10',
+          )}
         >
           <X size={17} className="group-hover:rotate-90 transition-transform duration-300" />
         </button>
@@ -142,7 +154,10 @@ function HeroSection({
 
       {/* Community name */}
       <h2
-        className="text-[clamp(26px,6vw,40px)] font-black text-white leading-none mb-4 relative z-10 truncate"
+        className={cn(
+          'text-[clamp(26px,6vw,40px)] font-black leading-none mb-4 relative z-10 truncate',
+          isLight ? 'text-slate-900' : 'text-white',
+        )}
         title={data.communityName}
       >
         {data.communityName}
@@ -153,7 +168,7 @@ function HeroSection({
         {/* Animated SVG gauge */}
         <div className="relative shrink-0 w-[64px] h-[64px] md:w-[72px] md:h-[72px]">
           <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
-            <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="7" />
+            <circle cx="32" cy="32" r={r} fill="none" stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)'} strokeWidth="7" />
             <circle
               cx="32" cy="32" r={r} fill="none"
               stroke={gaugeColor}
@@ -165,7 +180,7 @@ function HeroSection({
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[15px] font-black text-white leading-none">{animatedScore}</span>
+            <span className={cn('text-[15px] font-black leading-none', isLight ? 'text-slate-900' : 'text-white')}>{animatedScore}</span>
             <span className="text-[7px] text-slate-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
           </div>
         </div>
@@ -173,19 +188,22 @@ function HeroSection({
         {/* 3-col quick stat chips */}
         <div className="grid grid-cols-3 gap-2 flex-1">
           {[
-            { label: 'Incidents', value: String(data.activeIncidents ?? 0), color: 'text-orange-400' },
+            { label: 'Incidents', value: String(data.activeIncidents ?? 0), color: 'text-orange-500' },
             {
               label: 'Trend',
               value: data.trend ?? '–',
-              color: data.trend === 'improving' ? 'text-emerald-400' : data.trend === 'declining' ? 'text-red-400' : 'text-slate-300',
+              color: data.trend === 'improving' ? 'text-emerald-600' : data.trend === 'declining' ? 'text-red-500' : (isLight ? 'text-slate-600' : 'text-slate-300'),
             },
             {
               label: 'Risk',
               value: score >= 70 ? 'Low' : score >= 40 ? 'Medium' : 'High',
-              color: score >= 70 ? 'text-emerald-400' : score >= 40 ? 'text-amber-400' : 'text-red-400',
+              color: score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-amber-600' : 'text-red-500',
             },
           ].map(({ label, value, color }) => (
-            <div key={label} className="bg-white/[0.04] border border-white/[0.07] rounded-xl p-2 text-center">
+            <div key={label} className={cn(
+              'rounded-xl p-2 text-center border',
+              isLight ? 'bg-white/60 border-black/10' : 'bg-white/[0.04] border-white/[0.07]',
+            )}>
               <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-1">{label}</p>
               <p className={cn('text-[11px] font-black truncate leading-none capitalize', color)}>{value}</p>
             </div>
@@ -197,10 +215,10 @@ function HeroSection({
       {rank > 0 && total > 0 && (
         <div className="mt-4 relative z-10">
           <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-1">City Rank</p>
-          <p className="text-[11px] text-white font-medium mb-1.5">
+          <p className={cn('text-[11px] font-medium mb-1.5', isLight ? 'text-slate-700' : 'text-white')}>
             #{rank} out of {total} neighbourhoods
           </p>
-          <div className="h-[4px] rounded-full overflow-hidden bg-white/10">
+          <div className={cn('h-[4px] rounded-full overflow-hidden', isLight ? 'bg-black/10' : 'bg-white/10')}>
             <motion.div
               className="h-full rounded-full"
               style={{ backgroundColor: rankColor }}
@@ -214,9 +232,14 @@ function HeroSection({
 
       {/* Live overlay insight */}
       {data.liveOverlayInsight && (
-        <div className="mt-4 flex items-start gap-2.5 bg-blue-500/10 border border-blue-500/20 rounded-2xl px-3 py-2.5 relative z-10">
-          <Activity size={13} className="text-blue-400 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-blue-100 font-medium leading-relaxed">{data.liveOverlayInsight}</p>
+        <div className={cn(
+          'mt-4 flex items-start gap-2.5 rounded-2xl px-3 py-2.5 relative z-10 border',
+          isLight ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20',
+        )}>
+          <Activity size={13} className="text-blue-500 shrink-0 mt-0.5" />
+          <p className={cn('text-[12px] font-medium leading-relaxed', isLight ? 'text-blue-800' : 'text-blue-100')}>
+            {data.liveOverlayInsight}
+          </p>
         </div>
       )}
     </div>
@@ -232,6 +255,7 @@ interface ContentProps {
   crimeEntry: CrimeStatEntry | undefined;
   realYearly: CrimeYearEntry[];
   hasRealData: boolean;
+  isStatcanData: boolean;
   score: number;
   glowColor: string;
   gaugeColor: string;
@@ -249,6 +273,7 @@ function Content({
   crimeEntry,
   realYearly,
   hasRealData,
+  isStatcanData,
   score,
   glowColor,
   gaugeColor,
@@ -307,7 +332,7 @@ function Content({
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <div ref={heroRef}>
-          <HeroSection data={data} onClose={onClose} glowColor={glowColor} gaugeColor={gaugeColor} />
+          <HeroSection data={data} onClose={onClose} glowColor={glowColor} gaugeColor={gaugeColor} isLight={isLight} />
         </div>
 
         <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[rgb(255,250,243)]' : 'bg-slate-950')}>
@@ -316,6 +341,7 @@ function Content({
             cityAverages={cityAverages}
             isLight={isLight}
             yearlyStats={realYearly}
+            isStatcanData={isStatcanData}
           />
           <TrendChartSection
             chartData={chartData}
@@ -357,10 +383,11 @@ export default function AreaIntelligencePanel({
   if (!data) return null;
 
   const isLight = theme === 'light';
-  const communityKey   = data.communityName.toLowerCase();
+  const communityKey   = data.crimeKey ?? data.communityName.toLowerCase();
   const crimeEntry     = crimeStats?.get(communityKey);
   const realYearly     = yearlyStats?.get(communityKey) ?? [];
   const hasRealData    = realYearly.length > 0;
+  const isStatcanData  = crimeEntry?.dataSource === 'statcan';
   const score          = data.safetyScore ?? 0;
   const gaugeColor     = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
   const glowColor      = score >= 70 ? 'rgba(52,211,153,0.12)' : score >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)';
@@ -379,6 +406,7 @@ export default function AreaIntelligencePanel({
     crimeEntry,
     realYearly,
     hasRealData,
+    isStatcanData,
     score,
     glowColor,
     gaugeColor,
@@ -469,12 +497,13 @@ function Sparkline({ values }: { values: number[] }) {
 }
 
 function CrimeThisYearSection({
-  crimeEntry, cityAverages, isLight, yearlyStats,
+  crimeEntry, cityAverages, isLight, yearlyStats, isStatcanData,
 }: {
   crimeEntry: CrimeStatEntry | undefined;
   cityAverages: { avgViolent: number; avgProperty: number; avgDisorder: number } | undefined;
   isLight: boolean;
   yearlyStats: CrimeYearEntry[];
+  isStatcanData: boolean;
 }) {
   const [barsRef, barsInView] = useInView();
 
@@ -524,6 +553,11 @@ function CrimeThisYearSection({
       subtitle={`${crimeEntry.year} · Calgary Police Service · Open Data`}
       isLight={isLight}
     >
+      {isStatcanData && (
+        <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium inline-block mb-3">
+          StatsCan
+        </span>
+      )}
       <div ref={barsRef} className="space-y-5">
         {rows.map(({ label, value, avg, color, sparkValues }, i) => {
           const pct = Math.round((value / maxVal) * 100);

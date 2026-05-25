@@ -20,6 +20,7 @@ import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAf
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
+import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipalityCrimeStats';
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 
@@ -533,6 +534,7 @@ export default function MapPage() {
   const weatherAlerts = useWeatherAlerts(isAuthReady);
   const edmontonOpenData = useEdmontonOpenData(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
+  const { stats: statcanStats, yearlyStats: statcanYearlyStats } = useAlbertaMunicipalityCrimeStats();
   const cityAverages = useMemo(() => computeCityAverages(crimeStats), [crimeStats]);
 
   const [firebaseIncidents, setFirebaseIncidents] = useState<Incident[]>([]);
@@ -2445,6 +2447,8 @@ export default function MapPage() {
           onClose={() => setSelectedArea(null)}
           crimeStats={crimeStats}
           yearlyStats={crimeYearlyStats}
+          statcanStats={statcanStats}
+          statcanYearlyStats={statcanYearlyStats}
           propertyData={propertyData}
           cityAverages={cityAverages}
           theme={theme}

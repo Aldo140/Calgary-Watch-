@@ -34,6 +34,8 @@ interface AreaIntelligencePanelProps {
   onClose: () => void;
   crimeStats?: Map<string, CrimeStatEntry>;
   yearlyStats?: Map<string, CrimeYearEntry[]>;
+  statcanStats?: Map<string, CrimeStatEntry>;
+  statcanYearlyStats?: Map<string, CrimeYearEntry[]>;
   propertyData?: PropertyYearEntry[];
   cityAverages?: { avgViolent: number; avgProperty: number; avgDisorder: number };
   theme?: 'dark' | 'light';
@@ -378,7 +380,7 @@ function Content({
 // ── Main panel ───────────────────────────────────────────────────────────────
 
 export default function AreaIntelligencePanel({
-  data, onClose, crimeStats, yearlyStats, propertyData, cityAverages, theme = 'dark',
+  data, onClose, crimeStats, yearlyStats, statcanStats, statcanYearlyStats, propertyData, cityAverages, theme = 'dark',
 }: AreaIntelligencePanelProps) {
   if (!data) return null;
 

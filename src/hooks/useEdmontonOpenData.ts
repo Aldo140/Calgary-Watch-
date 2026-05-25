@@ -25,7 +25,7 @@ function classifyBylaw(category: string, type: string): IncidentCategory | null 
   if (/traffic safety/i.test(cat)) return 'traffic';
   if (/abandon vehicle|parking/i.test(typ)) return 'traffic';
 
-  if (/snow|ice/i.test(cat)) return 'weather';
+  if (/\b(snow|ice)\b/i.test(cat)) return 'weather';
 
   if (/fire pit|firework|firecracker/i.test(typ)) return 'emergency';
 
@@ -49,8 +49,11 @@ function classify311(serviceCategory: string, serviceDesc: string): IncidentCate
   if (ADMIN_311_RE.test(serviceCategory)) return null;
   if (/general info|info provided|information provided|status update|incomplete call|non city service|duplicate/i.test(serviceDesc)) return null;
 
+  // Drop non-safety service requests that aren't relevant to the map
+  if (/missed.*garbage|garbage.*cart|missed.*collection|missed.*recycl|missed.*compost/i.test(serviceDesc)) return null;
+
   if (/parking/i.test(serviceCategory)) return 'traffic';
-  if (/snow|ice/i.test(serviceCategory)) return 'weather';
+  if (/\b(snow|ice)\b/i.test(serviceCategory)) return 'weather';
   if (/bylaw complaint|eps non.*emergency/i.test(serviceCategory)) return 'crime';
   if (/pothole|litter|collection.*dispos|drainage|hazard|graffiti|waste/i.test(serviceCategory)) return 'infrastructure';
   if (/pothole|graffiti|waste|hazard|drainage|flood/i.test(serviceDesc)) return 'infrastructure';

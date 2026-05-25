@@ -145,6 +145,62 @@ export function useCrimeStats(): {
           })));
         }
 
+        // ── Edmonton EPS Crime Stats ──────────────────────────────────────
+        try {
+          const epsRes = await fetch('https://dashboard.edmonton.ca/resource/xthe-mnvi.json?$limit=50000');
+          if (epsRes.ok && !cancelled) {
+            const epsData: any[] = await epsRes.json();
+            const epsCrimeByNbrYr    = new Map<string, Map<number, number>>();
+            const epsViolentByNbrYr  = new Map<string, Map<number, number>>();
+            const epsPropertyByNbrYr = new Map<string, Map<number, number>>();
+            let maxEpsYear = 0;
+
+            for (const row of epsData) {
+              const year = parseInt(row.year ?? row.occurrence_year ?? '0', 10);
+              const nbhd = (row.neighbourhood ?? row.neighborhood ?? '').toLowerCase().trim();
+              if (!nbhd || !year) continue;
+              if (year > maxEpsYear) maxEpsYear = year;
+              const count = parseInt(row.incident_count ?? row.crime_count ?? '1', 10);
+              const kind = classifyCategory(row.offence_category ?? row.category ?? '');
+
+              const addTo = (map: Map<string, Map<number, number>>) => {
+                if (!map.has(nbhd)) map.set(nbhd, new Map());
+                const yrMap = map.get(nbhd)!;
+                yrMap.set(year, (yrMap.get(year) ?? 0) + count);
+              };
+
+              addTo(epsCrimeByNbrYr);
+              if (kind === 'violent') addTo(epsViolentByNbrYr);
+              if (kind === 'property') addTo(epsPropertyByNbrYr);
+            }
+
+            for (const [nbhd, crimeYr] of epsCrimeByNbrYr) {
+              const key = `edmonton:${nbhd}`;
+              const violentYr  = epsViolentByNbrYr.get(nbhd)  ?? new Map<number, number>();
+              const propertyYr = epsPropertyByNbrYr.get(nbhd) ?? new Map<number, number>();
+              merged.set(key, {
+                crime:    crimeYr.get(maxEpsYear) ?? 0,
+                violent:  violentYr.get(maxEpsYear) ?? 0,
+                property: propertyYr.get(maxEpsYear) ?? 0,
+                disorder: 0,
+                year: maxEpsYear,
+              });
+
+              const allYears = new Set<number>(crimeYr.keys());
+              const sorted = [...allYears].filter(y => y > 0).sort((a, b) => a - b).slice(-6);
+              yearly.set(key, sorted.map(yr => ({
+                year: yr,
+                crime:    crimeYr.get(yr) ?? 0,
+                violent:  violentYr.get(yr) ?? 0,
+                property: propertyYr.get(yr) ?? 0,
+                disorder: 0,
+              })));
+            }
+          }
+        } catch (epsErr) {
+          console.warn('[CalgaryWatch] Edmonton EPS crime stats fetch failed:', epsErr);
+        }
+
         setStats(merged);
         setYearlyStats(yearly);
       } catch (err) {

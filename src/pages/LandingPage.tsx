@@ -801,34 +801,55 @@ export default function LandingPage() {
                 </Button>
               </div>
 
-              {/* Social proof */}
-              <div className="grid max-w-2xl gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2.5 shrink-0" aria-hidden="true">
-                    {AVATARS.map((av, i) => (
-                      <img key={i} src={av.src} alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-slate-950 light:border-white object-cover shrink-0"
-                        loading="lazy"
-                        crossOrigin="anonymous"
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                    ))}
-                  </div>
-                  <p className="text-sm text-slate-300 light:text-slate-700">
-                    <span className="text-white light:text-slate-950 font-black">2,400+</span> Calgarians this week
-                  </p>
-                </div>
-                <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.04] light:bg-white/80">
-                  {[
-                    ['5', 'types'],
-                    ['4', 'zones'],
-                    ['30s', 'target'],
-                  ].map(([value, label]) => (
-                    <div key={label} className="border-r border-white/10 light:border-slate-200 px-3 py-2.5 last:border-r-0">
-                      <p className="text-lg font-black text-white light:text-slate-950">{value}</p>
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">{label}</p>
-                    </div>
+              {/* Social proof — avatars + count only */}
+              <div className="flex items-center gap-3 max-w-2xl">
+                <div className="flex -space-x-2.5 shrink-0" aria-hidden="true">
+                  {AVATARS.map((av, i) => (
+                    <img key={i} src={av.src} alt="" width={34} height={34} className="h-[34px] w-[34px] rounded-full border-2 border-slate-950 light:border-white object-cover shrink-0"
+                      loading="lazy"
+                      crossOrigin="anonymous"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                   ))}
                 </div>
+                <p className="text-sm text-slate-300 light:text-slate-700">
+                  <span className="text-white light:text-slate-950 font-black">2,400+</span> Calgarians this week
+                </p>
               </div>
+            </motion.div>
+
+            {/* Big stat trio — scroll-triggered to fill left column vertical space */}
+            <motion.div
+              initial={{ opacity: 0, y: 48 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-14 lg:mt-16 grid grid-cols-3 gap-3"
+            >
+              {[
+                { value: '5', label: 'Incident Types', sub: 'Crime · Traffic · Weather · Infra · Emergency', color: '#4A90D9' },
+                { value: '4',  label: 'Coverage Zones', sub: 'NW · NE · SW · SE quadrants', color: '#2E8B7A' },
+                { value: '<30s', label: 'Update Speed', sub: 'Real-time community feed', color: '#D4A843' },
+              ].map(({ value, label, sub, color }, i) => (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.09, ease: 'easeOut' }}
+                  className="relative flex flex-col gap-2.5 p-5 xl:p-6 rounded-2xl border border-white/8 light:border-slate-200 bg-white/[0.03] light:bg-white/70 overflow-hidden group"
+                >
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{ background: `radial-gradient(circle at 30% 40%, ${color}10, transparent 70%)` }}
+                  />
+                  <div className="w-5 h-0.5 rounded-full" style={{ backgroundColor: color }} />
+                  <p className="text-5xl xl:text-[3.5rem] font-black text-white light:text-slate-950 tabular-nums leading-none">{value}</p>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{label}</p>
+                    <p className="text-[10px] text-slate-600 leading-snug">{sub}</p>
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
           </div>
 
@@ -938,10 +959,14 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  {/* Live activity feed — rotating window of 4 incidents.
-                      New rows slide in from the bottom; old rows slide upward,
-                      mimicking a real dispatcher feed. */}
-                  <div className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.03] light:bg-white/70 p-2">
+                  {/* Live activity feed — scroll-triggered reveal */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 18 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.55, ease: 'easeOut' }}
+                    className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.03] light:bg-white/70 p-2"
+                  >
                     <div className="flex items-center justify-between px-2 pb-2">
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live activity</p>
                       <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
@@ -983,10 +1008,16 @@ export default function LandingPage() {
                         })}
                       </AnimatePresence>
                     </div>
-                  </div>
+                  </motion.div>
 
-                  {/* Category pills — coloured legend for what the map covers. */}
-                  <div className="flex flex-wrap gap-1.5">
+                  {/* Category pills — scroll-triggered reveal */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
+                    className="flex flex-wrap gap-1.5"
+                  >
                     {CATEGORY_PILLS.map((c) => (
                       <div
                         key={c.label}
@@ -1001,7 +1032,7 @@ export default function LandingPage() {
                         {c.label}
                       </div>
                     ))}
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
@@ -1019,7 +1050,7 @@ export default function LandingPage() {
         </div>
 
         {/* Live ticker */}
-        <div className="relative z-20 bg-slate-900/90 backdrop-blur-md border-t border-white/10 px-4 sm:px-8 py-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
+        <div className="relative z-20 bg-slate-900/90 light:bg-slate-800/90 backdrop-blur-md border-t border-white/10 light:border-slate-700/60 px-4 sm:px-8 py-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
           <LandingTag pulse className="shrink-0">Live Feed</LandingTag>
           <div className="flex items-center gap-5 shrink-0">
             {[
@@ -1033,7 +1064,7 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-slate-600 shrink-0 ml-4 hidden sm:block">Updated in real time · Community-powered</p>
+          <p className="text-[11px] text-slate-500 shrink-0 ml-4 hidden sm:block">Updated in real time · Community-powered</p>
         </div>
 
         {/* Mountain silhouette */}

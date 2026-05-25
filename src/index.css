@@ -206,6 +206,15 @@
     backface-visibility: hidden;
   }
 
+  /* ============================================================
+     Radar scan line — used on landing page hero right panel.
+     Sweeps vertically across the map to suggest active sampling.
+     ============================================================ */
+  @keyframes scanline {
+    0%, 100% { top: 8%;  opacity: 0.2; }
+    50%      { top: 92%; opacity: 0.9; }
+  }
+
   @keyframes active-glow {
     0%, 100% {
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), inset 0 0 10px rgba(59, 130, 246, 0.1);

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, ElementType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView, animate, AnimatePresence } from 'motion/react';
 import {
@@ -23,6 +23,10 @@ import {
   Menu,
   Briefcase,
   Activity,
+  Car,
+  CloudRain,
+  Construction,
+  Siren,
 } from 'lucide-react';
 import { Button } from '@/src/components/ui/Button';
 import { cn, publicAsset } from '@/src/lib/utils';
@@ -33,6 +37,67 @@ function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
+
+// ---------------------------------------------------------------------------
+// Hero right-panel data — animated mission-control surface
+// ---------------------------------------------------------------------------
+type FeedIconName = 'AlertCircle' | 'Car' | 'Construction' | 'CloudRain' | 'Siren';
+
+const ICON_MAP: Record<FeedIconName, ElementType> = {
+  AlertCircle,
+  Car,
+  Construction,
+  CloudRain,
+  Siren,
+};
+
+const FEED_ITEMS: Array<{
+  id: number;
+  icon: FeedIconName;
+  color: string;
+  title: string;
+  area: string;
+  cat: 'crime' | 'traffic' | 'weather' | 'infrastructure' | 'emergency';
+}> = [
+  { id: 1, icon: 'AlertCircle', color: '#ef4444', title: 'Noise Complaint', area: 'Beltline', cat: 'crime' },
+  { id: 2, icon: 'Car', color: '#f59e0b', title: 'Vehicle Collision', area: 'Deerfoot Trail NB', cat: 'traffic' },
+  { id: 3, icon: 'CloudRain', color: '#60a5fa', title: 'Icy Road Conditions', area: 'NW Calgary', cat: 'weather' },
+  { id: 4, icon: 'Construction', color: '#f97316', title: 'Water Main Break', area: '17 Ave SW', cat: 'infrastructure' },
+  { id: 5, icon: 'Siren', color: '#a855f7', title: 'Structure Fire', area: 'Forest Lawn', cat: 'emergency' },
+  { id: 6, icon: 'AlertCircle', color: '#ef4444', title: 'Break & Enter', area: 'Inglewood', cat: 'crime' },
+  { id: 7, icon: 'Car', color: '#f59e0b', title: 'Stalled Vehicle', area: 'Macleod Trail', cat: 'traffic' },
+  { id: 8, icon: 'CloudRain', color: '#60a5fa', title: 'Blowing Snow Advisory', area: 'SE Calgary', cat: 'weather' },
+  { id: 9, icon: 'Construction', color: '#f97316', title: 'Pothole — Major', area: 'Memorial Dr NW', cat: 'infrastructure' },
+  { id: 10, icon: 'Siren', color: '#a855f7', title: 'Medical Emergency', area: 'Sunridge', cat: 'emergency' },
+  { id: 11, icon: 'AlertCircle', color: '#ef4444', title: 'Graffiti Report', area: 'Kensington', cat: 'crime' },
+  { id: 12, icon: 'Car', color: '#f59e0b', title: 'Road Closure', area: '9 Ave SE', cat: 'traffic' },
+];
+
+// 7 markers across all 5 categories, scattered with handpicked positions and
+// staggered animation delays so the pulse rings feel organic, not synchronized.
+const MAP_MARKERS: Array<{
+  left: string;
+  top: string;
+  color: string;
+  icon: FeedIconName;
+  delay: string;
+}> = [
+  { left: '14%', top: '32%', color: '#ef4444', icon: 'AlertCircle', delay: '0s' },
+  { left: '48%', top: '20%', color: '#f59e0b', icon: 'Car', delay: '0.4s' },
+  { left: '67%', top: '44%', color: '#f97316', icon: 'Construction', delay: '0.8s' },
+  { left: '28%', top: '62%', color: '#60a5fa', icon: 'CloudRain', delay: '1.2s' },
+  { left: '78%', top: '28%', color: '#a855f7', icon: 'Siren', delay: '1.6s' },
+  { left: '52%', top: '70%', color: '#ef4444', icon: 'AlertCircle', delay: '2.0s' },
+  { left: '36%', top: '18%', color: '#f59e0b', icon: 'Car', delay: '2.4s' },
+];
+
+const CATEGORY_PILLS: Array<{ label: string; color: string }> = [
+  { label: 'Crime', color: '#ef4444' },
+  { label: 'Traffic', color: '#f59e0b' },
+  { label: 'Weather', color: '#60a5fa' },
+  { label: 'Infrastructure', color: '#f97316' },
+  { label: 'Emergency', color: '#a855f7' },
+];
 
 // ---------------------------------------------------------------------------
 // Animated counter
@@ -456,6 +521,30 @@ export default function LandingPage() {
 
   const reducedMotion = prefersReducedMotion();
 
+  // Hero right-panel — rotating live feed window (4 visible items at a time).
+  // Rotates by shifting the start index forward every 3s; AnimatePresence
+  // handles the slide-in/out per row so the whole list doesn't re-mount.
+  const [feedIndex, setFeedIndex] = useState<number>(0);
+  // Animated "Live reports" counter — increments slowly so it feels like
+  // background activity, not a fake demo loop. Caps at 99 then resets to 13.
+  const [liveCount, setLiveCount] = useState<number>(12);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const id = window.setInterval(() => {
+      setFeedIndex((i) => (i + 1) % FEED_ITEMS.length);
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const id = window.setInterval(() => {
+      setLiveCount((c) => (c >= 99 ? 13 : c + 1));
+    }, 9000);
+    return () => window.clearInterval(id);
+  }, [reducedMotion]);
+
   useEffect(() => {
     if (theme === 'light') document.documentElement.classList.add('light');
     else document.documentElement.classList.remove('light');
@@ -775,42 +864,141 @@ export default function LandingPage() {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/70 light:to-white/50" />
-                    <div className="absolute left-[18%] top-[28%] h-4 w-4 rounded-full border-2 border-white bg-[#4A90D9] shadow-[0_0_0_10px_rgba(74,144,217,0.24),0_0_34px_rgba(74,144,217,0.8)]" />
-                    <div className="absolute left-[62%] top-[24%] flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl bg-red-600 text-white shadow-[0_0_0_16px_rgba(239,68,68,0.14),0_18px_46px_rgba(239,68,68,0.35)]">
-                      <AlertCircle size={22} />
-                    </div>
-                    <div className="absolute bottom-[29%] right-[16%] flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400 text-slate-950 shadow-[0_0_0_13px_rgba(251,191,36,0.16)]">
-                      <ShieldAlert size={18} />
-                    </div>
 
+                    {/* Radar sweep — slow rotating conic gradient over the map.
+                        Motion logic: a single bright arc rotates clockwise like a
+                        traditional radar, suggesting continuous area coverage. */}
+                    <div
+                      className="absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none"
+                      aria-hidden="true"
+                      style={{
+                        animation: reducedMotion ? undefined : 'spin 6s linear infinite',
+                        background:
+                          'conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(74,144,217,0.18) 88%, transparent 100%)',
+                      }}
+                    />
+
+                    {/* Horizontal scan line — fades left-to-right and breathes
+                        vertically to imply the radar is actively sampling.
+                        The `top` value is animated by the scanline keyframes. */}
+                    <div
+                      className="absolute inset-x-0 h-px pointer-events-none"
+                      aria-hidden="true"
+                      style={{
+                        background:
+                          'linear-gradient(to right, transparent, rgba(74,144,217,0.5), transparent)',
+                        animation: reducedMotion ? undefined : 'scanline 4s ease-in-out infinite',
+                        ...(reducedMotion ? { top: '50%' } : null),
+                      }}
+                    />
+
+                    {/* Incident markers — all 5 categories, scattered with
+                        staggered pulse delays so they ripple, not flash together. */}
+                    {MAP_MARKERS.map((m, idx) => {
+                      const Icon = ICON_MAP[m.icon];
+                      return (
+                        <div
+                          key={`marker-${idx}`}
+                          className="absolute -translate-x-1/2 -translate-y-1/2"
+                          style={{ left: m.left, top: m.top }}
+                          aria-hidden="true"
+                        >
+                          {/* Two pulse rings, slightly out of phase. */}
+                          <span
+                            className="absolute inset-0 rounded-full animate-ping"
+                            style={{
+                              backgroundColor: m.color,
+                              opacity: 0.35,
+                              animationDelay: m.delay,
+                            }}
+                          />
+                          <span
+                            className="absolute inset-0 rounded-full animate-ping"
+                            style={{
+                              backgroundColor: m.color,
+                              opacity: 0.2,
+                              animationDelay: `calc(${m.delay} + 0.6s)`,
+                            }}
+                          />
+                          {/* Marker chip */}
+                          <span
+                            className="relative flex h-6 w-6 items-center justify-center rounded-lg border border-white/40 shadow-[0_4px_14px_rgba(0,0,0,0.45)]"
+                            style={{ backgroundColor: m.color }}
+                          >
+                            <Icon size={12} className="text-white" />
+                          </span>
+                        </div>
+                      );
+                    })}
+
+                    {/* Live reports counter — slowly ticks up to imply activity. */}
                     <div className="absolute left-4 top-4 rounded-2xl border border-white/12 bg-slate-950/72 px-4 py-3 backdrop-blur-xl light:bg-white/80">
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live reports</p>
-                      <p className="mt-1 text-3xl font-black text-white light:text-slate-950">12</p>
-                    </div>
-
-                    <div className="absolute bottom-4 left-4 right-4 grid gap-2 sm:grid-cols-3">
-                      {[
-                        { label: 'Collision', area: 'Deerfoot Trail', tone: 'text-red-300 bg-red-500/12 border-red-400/20' },
-                        { label: 'Flooding', area: 'Memorial Dr', tone: 'text-amber-300 bg-amber-500/12 border-amber-400/20' },
-                        { label: 'All clear', area: 'Beltline', tone: 'text-emerald-300 bg-emerald-500/12 border-emerald-400/20' },
-                      ].map((item) => (
-                        <div key={item.label} className={cn('rounded-2xl border px-3 py-2 backdrop-blur-xl', item.tone)}>
-                          <p className="truncate text-[11px] font-black">{item.label}</p>
-                          <p className="truncate text-[10px] text-slate-300 light:text-slate-700">{item.area}</p>
-                        </div>
-                      ))}
+                      <p className="mt-1 text-3xl font-black tabular-nums text-white light:text-slate-950">{liveCount}</p>
                     </div>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {[
-                      { value: '<30s', label: 'report to map', color: 'text-[#4A90D9]' },
-                      { value: '5', label: 'alert categories', color: 'text-[#D4A843]' },
-                      { value: '24/7', label: 'community pulse', color: 'text-[#2E8B7A]' },
-                    ].map((stat) => (
-                      <div key={stat.label} className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.04] light:bg-white/80 px-4 py-3">
-                        <p className={cn('text-2xl font-black', stat.color)}>{stat.value}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{stat.label}</p>
+                  {/* Live activity feed — rotating window of 4 incidents.
+                      New rows slide in from the bottom; old rows slide upward,
+                      mimicking a real dispatcher feed. */}
+                  <div className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.03] light:bg-white/70 p-2">
+                    <div className="flex items-center justify-between px-2 pb-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live activity</p>
+                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        streaming
+                      </span>
+                    </div>
+                    <div className="grid gap-1.5">
+                      <AnimatePresence initial={false} mode="popLayout">
+                        {Array.from({ length: 4 }).map((_, slot) => {
+                          const item = FEED_ITEMS[(feedIndex + slot) % FEED_ITEMS.length];
+                          const IconComp = ICON_MAP[item.icon];
+                          return (
+                            <motion.div
+                              key={item.id}
+                              initial={{ opacity: 0, y: 14 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              transition={{ duration: 0.35 }}
+                              className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] light:bg-white/60 px-3 py-2"
+                            >
+                              <div
+                                className="shrink-0 h-7 w-7 rounded-lg flex items-center justify-center"
+                                style={{ background: item.color + '20', border: `1px solid ${item.color}40` }}
+                              >
+                                <IconComp size={13} style={{ color: item.color }} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-white light:text-slate-900 truncate">{item.title}</p>
+                                <p className="text-[10px] text-slate-500 truncate">{item.area}</p>
+                              </div>
+                              <span className="shrink-0 text-[10px] text-slate-600 font-mono">live</span>
+                              <span
+                                className="shrink-0 w-1.5 h-1.5 rounded-full animate-pulse"
+                                style={{ backgroundColor: item.color }}
+                              />
+                            </motion.div>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+
+                  {/* Category pills — coloured legend for what the map covers. */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {CATEGORY_PILLS.map((c) => (
+                      <div
+                        key={c.label}
+                        className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold"
+                        style={{
+                          background: c.color + '18',
+                          border: `1px solid ${c.color}35`,
+                          color: c.color,
+                        }}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: c.color }} />
+                        {c.label}
                       </div>
                     ))}
                   </div>

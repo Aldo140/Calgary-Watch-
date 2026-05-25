@@ -1268,23 +1268,32 @@ export default function MapPage() {
       ]);
       const resolveKey = (q: string): string | undefined => {
         if (crimeStats.has(q)) return q;
+        // Namespaced exact match (e.g. "edmonton:downtown" → bare "downtown" matches q)
+        for (const k of allKeys) {
+          const bare = k.replace(/^\w+:/, '');
+          if (bare === q) return k;
+        }
         // Strip leading street numbers (e.g. "1234 Banff Trail NW" → "banff trail nw")
         const stripped = q.replace(/^\d+\s+/, '');
         if (crimeStats.has(stripped)) return stripped;
         // Only do substring containment on the cleaned string and only for multi-word keys
         // (prevents single short community names like "stoney" matching long address strings)
+        // Strip namespace prefix before substring comparison
         const subFound = allKeys.find(k => {
-          if (k.split(' ').length < 2) return false; // skip single-word keys for substring
-          return stripped.includes(k) || k.includes(stripped);
+          const bare = k.replace(/^\w+:/, '');
+          if (bare.split(' ').length < 2) return false; // skip single-word keys for substring
+          return stripped.includes(bare) || bare.includes(stripped);
         });
         if (subFound) return subFound;
         // Word-overlap: use only meaningful words (after removing numbers + STOP words)
+        // Strip namespace prefix before splitting into words
         const qWords = stripped.split(/\s+/).filter(w => w.length > 2 && !STOP.has(w) && !/^\d+$/.test(w));
         if (qWords.length === 0) return undefined;
         let best: string | undefined;
         let bestScore = 0;
         for (const k of allKeys) {
-          const kWords = k.split(/\s+/).filter(w => !STOP.has(w));
+          const bare = k.replace(/^\w+:/, '');
+          const kWords = bare.split(/\s+/).filter(w => !STOP.has(w));
           // All community words must appear in the query — prevents partial road-name matches
           const overlap = kWords.filter(kw => qWords.some(w => w === kw || w.startsWith(kw) || kw.startsWith(w))).length;
           const score = overlap / Math.max(kWords.length, 1);
@@ -1294,9 +1303,10 @@ export default function MapPage() {
       };
       const resolvedKey = resolveKey(rawKey);
       const entry = resolvedKey ? crimeStats.get(resolvedKey) : undefined;
-      // Use canonical name from the matched key when fuzzy resolution differs from input
+      // Use canonical name from the matched key when fuzzy resolution differs from input.
+      // Strip namespace prefix (e.g. "edmonton:downtown" → "Downtown") for display.
       const canonicalName = resolvedKey
-        ? resolvedKey.replace(/\b\w/g, c => c.toUpperCase())
+        ? resolvedKey.replace(/^\w+:/, '').replace(/\b\w/g, c => c.toUpperCase())
         : displayName;
       const totals = [...crimeStats.values()].map(e => e.crime + e.disorder);
       const cityAvg = totals.reduce((a, b) => a + b, 0) / totals.length;
@@ -1337,6 +1347,7 @@ export default function MapPage() {
         setSelectedArea({
           ...base,
           communityName: canonicalName,
+          crimeKey: resolvedKey,
           safetyScore: score,
           trend,
           insights: [...computedInsights, ...base.insights],

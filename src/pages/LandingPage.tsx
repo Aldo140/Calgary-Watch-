@@ -758,7 +758,7 @@ export default function LandingPage() {
         <div className="hidden lg:grid relative z-10 min-h-[820px] xl:min-h-[880px] grid-cols-[55fr_45fr] gap-10 xl:gap-14 px-[5%] xl:px-[7%] 2xl:px-[9%] pt-28 xl:pt-32 pb-14 w-full">
 
           {/* Left - content (Text naturally comes first on mobile) */}
-          <div className="flex flex-col justify-center max-w-3xl xl:max-w-[44rem] self-center pt-8 pb-4 lg:py-0 lg:text-left">
+          <div className="flex flex-col justify-start max-w-3xl xl:max-w-[44rem] self-start pt-8 pb-4 lg:py-0 lg:text-left">
 
             <motion.div
               initial={reducedMotion ? undefined : { opacity: 0, x: -28 }}

@@ -861,17 +861,31 @@ export default function LandingPage() {
               transition={{ duration: 0.75, ease: 'easeOut', delay: 0.08 }}
               className="relative w-full"
             >
-              <div className="absolute -inset-4 rounded-[2.25rem] border border-white/10 bg-white/[0.03] light:bg-white/45" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/12 light:border-white/80 bg-slate-950/85 light:bg-white/80 shadow-[0_30px_90px_-40px_rgba(15,23,42,0.95)] backdrop-blur-xl">
-                <div className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-white/10 light:border-slate-200 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <img src={publicAsset('icon.svg')} alt="" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
+              {/* Ambient colour glow behind the card */}
+              <div className="absolute -inset-6 rounded-[2.5rem] pointer-events-none blur-2xl opacity-40"
+                style={{ background: 'radial-gradient(ellipse at 20% 10%, rgba(74,144,217,0.22) 0%, transparent 55%), radial-gradient(ellipse at 80% 90%, rgba(46,139,122,0.18) 0%, transparent 55%)' }} />
+              <div className="absolute -inset-4 rounded-[2.25rem] border border-white/8 light:border-slate-200/50 bg-white/[0.02] light:bg-white/25" />
+              <div className="relative overflow-hidden rounded-[2rem] border border-white/10 light:border-slate-200/80 bg-slate-950/90 light:bg-white/85 shadow-[0_32px_96px_-32px_rgba(15,23,42,0.95),0_0_0_1px_rgba(255,255,255,0.05)] backdrop-blur-xl">
+                {/* Gradient accent stripe */}
+                <div className="h-[2px] bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]" />
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 light:border-slate-200/70">
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#4A90D9]/20 to-[#2E8B7A]/20 border border-white/12 flex items-center justify-center">
+                        <img src={publicAsset('icon.svg')} alt="" width={18} height={18} className="h-[18px] w-[18px] object-contain" />
+                      </div>
+                      <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-[1.5px] border-slate-950 animate-pulse" />
+                    </div>
                     <div>
-                      <p className="text-xs font-black text-white light:text-slate-950">Calgary Watch Live</p>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Community operations view</p>
+                      <p className="text-[11px] font-black tracking-tight text-white light:text-slate-950 leading-none">Calgary Watch Live</p>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-500 mt-0.5">Operations Center</p>
                     </div>
                   </div>
-                  <LandingTag tone="teal" pulse className="hidden justify-end sm:inline-flex">Sync Live</LandingTag>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Live</span>
+                  </div>
                 </div>
 
                 <div className="grid gap-3 p-3 sm:p-4">
@@ -965,16 +979,16 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-40px' }}
                     transition={{ duration: 0.55, ease: 'easeOut' }}
-                    className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/[0.03] light:bg-white/70 p-2"
+                    className="rounded-2xl border border-white/8 light:border-slate-200/70 bg-white/[0.025] light:bg-white/60 overflow-hidden"
                   >
-                    <div className="flex items-center justify-between px-2 pb-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Live activity</p>
-                      <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
+                    <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/6 light:border-slate-100">
+                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 light:text-slate-500">Incident Feed</p>
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/8 border border-emerald-500/20">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        streaming
-                      </span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-500">Streaming</span>
+                      </div>
                     </div>
-                    <div className="grid gap-1.5">
+                    <div className="grid gap-px bg-white/[0.04] light:bg-slate-100/60">
                       <AnimatePresence initial={false} mode="popLayout">
                         {Array.from({ length: 4 }).map((_, slot) => {
                           const item = FEED_ITEMS[(feedIndex + slot) % FEED_ITEMS.length];
@@ -986,23 +1000,26 @@ export default function LandingPage() {
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -10 }}
                               transition={{ duration: 0.35 }}
-                              className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] light:bg-white/60 px-3 py-2"
+                              className="flex items-stretch bg-slate-950/90 light:bg-white/90"
                             >
-                              <div
-                                className="shrink-0 h-7 w-7 rounded-lg flex items-center justify-center"
-                                style={{ background: item.color + '20', border: `1px solid ${item.color}40` }}
-                              >
-                                <IconComp size={13} style={{ color: item.color }} />
+                              {/* Category colour bar */}
+                              <div className="w-[3px] shrink-0" style={{ backgroundColor: item.color + 'cc' }} />
+                              <div className="flex items-center gap-3 px-3 py-2.5 flex-1">
+                                <div
+                                  className="shrink-0 h-7 w-7 rounded-lg flex items-center justify-center"
+                                  style={{ background: item.color + '18', border: `1px solid ${item.color}35` }}
+                                >
+                                  <IconComp size={13} style={{ color: item.color }} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-bold text-white light:text-slate-900 truncate leading-tight">{item.title}</p>
+                                  <p className="text-[10px] text-slate-500 truncate mt-0.5">{item.area}</p>
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className="text-[9px] font-mono text-slate-600 light:text-slate-400">live</span>
+                                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: item.color }} />
+                                </div>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-white light:text-slate-900 truncate">{item.title}</p>
-                                <p className="text-[10px] text-slate-500 truncate">{item.area}</p>
-                              </div>
-                              <span className="shrink-0 text-[10px] text-slate-600 font-mono">live</span>
-                              <span
-                                className="shrink-0 w-1.5 h-1.5 rounded-full animate-pulse"
-                                style={{ backgroundColor: item.color }}
-                              />
                             </motion.div>
                           );
                         })}
@@ -1016,22 +1033,25 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-40px' }}
                     transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-                    className="flex flex-wrap gap-1.5"
+                    className="rounded-2xl border border-white/8 light:border-slate-200/70 bg-white/[0.025] light:bg-white/60 p-3"
                   >
-                    {CATEGORY_PILLS.map((c) => (
-                      <div
-                        key={c.label}
-                        className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold"
-                        style={{
-                          background: c.color + '18',
-                          border: `1px solid ${c.color}35`,
-                          color: c.color,
-                        }}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: c.color }} />
-                        {c.label}
-                      </div>
-                    ))}
+                    <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-500 mb-2.5 px-0.5">Coverage · All Incident Types</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {CATEGORY_PILLS.map((c) => (
+                        <div
+                          key={c.label}
+                          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-bold"
+                          style={{
+                            background: c.color + '14',
+                            border: `1px solid ${c.color}28`,
+                            color: c.color,
+                          }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c.color }} />
+                          {c.label}
+                        </div>
+                      ))}
+                    </div>
                   </motion.div>
                 </div>
               </div>
@@ -1049,22 +1069,26 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Live ticker */}
-        <div className="relative z-20 bg-slate-900/90 light:bg-slate-800/90 backdrop-blur-md border-t border-white/10 light:border-slate-700/60 px-4 sm:px-8 py-3 flex items-center gap-4 overflow-x-auto no-scrollbar">
-          <LandingTag pulse className="shrink-0">Live Feed</LandingTag>
-          <div className="flex items-center gap-5 shrink-0">
+        {/* Live ticker — always dark for legibility in both themes */}
+        <div className="relative z-20 bg-[rgba(4,10,26,0.96)] backdrop-blur-md border-t border-white/8 px-4 sm:px-8 py-2.5 flex items-center gap-5 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4A90D9] animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.22em] text-[#4A90D9]">Live</span>
+          </div>
+          <div className="w-px h-3 bg-white/10 shrink-0" />
+          <div className="flex items-center gap-6 shrink-0">
             {[
-              { color: 'bg-red-500', glow: 'rgba(239,68,68,0.9)', text: '3 active alerts in Calgary' },
-              { color: 'bg-amber-400', glow: 'rgba(251,191,36,0.9)', text: '12 community reports today' },
-              { color: 'bg-[#2E8B7A]', glow: 'rgba(46,139,122,0.9)', text: '30+ communities · Calgary metro' },
-            ].map(({ color, glow, text }) => (
+              { dot: '#ef4444', glow: 'rgba(239,68,68,0.7)', text: '3 active alerts in Calgary' },
+              { dot: '#f59e0b', glow: 'rgba(245,158,11,0.7)', text: '12 community reports today' },
+              { dot: '#2E8B7A', glow: 'rgba(46,139,122,0.7)', text: '30+ communities · Calgary metro' },
+            ].map(({ dot, glow, text }) => (
               <div key={text} className="flex items-center gap-2 shrink-0">
-                <div className={`w-2 h-2 rounded-full pulse-dot ${color}`} style={{ boxShadow: `0 0 8px ${glow}` }} />
-                <span className="text-xs font-medium text-slate-300 whitespace-nowrap">{text}</span>
+                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dot, boxShadow: `0 0 6px ${glow}` }} />
+                <span className="text-[11px] font-medium text-slate-300 whitespace-nowrap">{text}</span>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-slate-500 shrink-0 ml-4 hidden sm:block">Updated in real time · Community-powered</p>
+          <p className="text-[10px] text-slate-600 shrink-0 ml-auto hidden sm:block">Updated in real time · Community-powered</p>
         </div>
 
         {/* Mountain silhouette */}

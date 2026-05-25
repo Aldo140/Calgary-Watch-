@@ -1084,7 +1084,7 @@ export default function LandingPage() {
             ].map(({ dot, glow, text }) => (
               <div key={text} className="flex items-center gap-2 shrink-0">
                 <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dot, boxShadow: `0 0 6px ${glow}` }} />
-                <span className="text-[11px] font-medium text-white whitespace-nowrap">{text}</span>
+                <span className="text-[11px] font-medium whitespace-nowrap" style={{ color: '#fff' }}>{text}</span>
               </div>
             ))}
           </div>

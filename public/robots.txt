@@ -1,4 +1,22 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
 
-Sitemap: https://aldo140.github.io/Calgary-Watch-/sitemap.xml
+# Allow image bot full access to public images
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /icon.svg
+Allow: /icon.webp
+
+# Polite crawl delay for non-Google bots
+User-agent: Bingbot
+Crawl-delay: 5
+
+User-agent: Slurp
+Crawl-delay: 10
+
+User-agent: DuckDuckBot
+Crawl-delay: 5
+
+Sitemap: https://calgarywatch.ca/sitemap.xml

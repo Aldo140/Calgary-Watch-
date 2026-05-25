@@ -329,8 +329,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     if (!map.current || !isMapLoaded) return;
 
     const calgaryBounds = L.latLngBounds(
-      [50.71, -114.60], // SW — extends to Okotoks / Cochrane
-      [51.39, -113.60], // NE — extends to Airdrie / Chestermere
+      [49.90, -116.00], // SW — south of Lethbridge/Nanton, west of Canmore
+      [53.90, -112.75], // NE — Edmonton region north, Gleichen / Vulcan east
     );
     serviceAreaBounds.current = calgaryBounds;
 
@@ -857,7 +857,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       {isOutsideServiceArea && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(10rem+env(safe-area-inset-top))] lg:top-4">
           <div className="px-3 py-2 rounded-xl border border-amber-400/30 bg-slate-950/85 text-amber-300 text-[11px] font-bold tracking-wide shadow-lg">
-            Zoom in to Calgary for full service coverage
+            Zoom in for Calgary metro coverage
           </div>
         </div>
       )}

@@ -59,6 +59,109 @@ const AnimatedCounter = memo(function AnimatedCounter({
 });
 
 // ---------------------------------------------------------------------------
+// Hero animated canvas — radar sweep, 45° Calgary grid, signal rings, scan line
+// ---------------------------------------------------------------------------
+const HeroCanvas = memo(function HeroCanvas({ reducedMotion }: { reducedMotion: boolean }) {
+  if (reducedMotion) return null;
+
+  const nodes: { x: string; y: string; delay: string; size: number; color: string }[] = [
+    { x: '12%', y: '26%', delay: '0s',   size: 2.5, color: '#4A90D9' },
+    { x: '36%', y: '14%', delay: '1.2s', size: 2,   color: '#2E8B7A' },
+    { x: '20%', y: '60%', delay: '0.5s', size: 3,   color: '#D4A843' },
+    { x: '46%', y: '72%', delay: '1.9s', size: 2,   color: '#4A90D9' },
+    { x:  '7%', y: '42%', delay: '0.8s', size: 2,   color: '#2E8B7A' },
+    { x: '30%', y: '84%', delay: '2.6s', size: 1.5, color: '#4A90D9' },
+    { x: '78%', y: '18%', delay: '2.3s', size: 2,   color: '#4A90D9' },
+    { x: '88%', y: '53%', delay: '1.6s', size: 1.5, color: '#2E8B7A' },
+    { x: '64%', y: '80%', delay: '0.4s', size: 2,   color: '#D4A843' },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-[1]" aria-hidden="true">
+      <style>{`
+        @keyframes cw-radar  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes cw-ring   { 0%{transform:translate(-50%,-50%) scale(0.1);opacity:.75} 100%{transform:translate(-50%,-50%) scale(5);opacity:0} }
+        @keyframes cw-scan   { 0%{top:-2px;opacity:0} 6%{opacity:.9} 94%{opacity:.5} 100%{top:100%;opacity:0} }
+        @keyframes cw-node   { 0%,100%{opacity:.2} 50%{opacity:1} }
+      `}</style>
+
+      {/* 45° diagonal grid — Calgary downtown is famously rotated ~45° from cardinal */}
+      <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="cw-diag" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(45 0 0)">
+            <line x1="0" y1="0" x2="60" y2="0" stroke="#4A90D9" strokeWidth="0.4" />
+            <line x1="0" y1="0" x2="0"  y2="60" stroke="#4A90D9" strokeWidth="0.4" />
+          </pattern>
+          <radialGradient id="cw-vignette" cx="42%" cy="45%" r="65%">
+            <stop offset="0%"   stopColor="white" stopOpacity="1" />
+            <stop offset="52%"  stopColor="white" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
+          <mask id="cw-grid-mask">
+            <rect width="100%" height="100%" fill="url(#cw-vignette)" />
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#cw-diag)" mask="url(#cw-grid-mask)" opacity="0.08" />
+      </svg>
+
+      {/* Radar sweep — centered behind card column */}
+      <div style={{ position:'absolute', left:'60%', top:'44%', width:'min(720px,80vw)', height:'min(720px,80vw)', transform:'translate(-50%,-50%)' }}>
+        {/* Conic sweep sector */}
+        <div style={{
+          position:'absolute', inset:0, borderRadius:'50%',
+          background:'conic-gradient(from 0deg, transparent 250deg, rgba(46,139,122,0.04) 280deg, rgba(46,139,122,0.16) 340deg, rgba(74,144,217,0.06) 355deg, transparent 360deg)',
+          animation:'cw-radar 10s linear infinite',
+        }} />
+        {/* Concentric rings */}
+        {[0.16, 0.32, 0.50, 0.68, 0.86].map((f, i) => (
+          <div key={i} style={{
+            position:'absolute', left:'50%', top:'50%',
+            width:`${f*100}%`, height:`${f*100}%`,
+            transform:'translate(-50%,-50%)',
+            borderRadius:'50%',
+            border:`0.5px solid rgba(46,139,122,${0.18 - i * 0.026})`,
+          }} />
+        ))}
+        {/* Crosshairs */}
+        <div style={{ position:'absolute', left:'50%', top:0, bottom:0, width:'0.5px', background:'rgba(46,139,122,0.09)', transform:'translateX(-50%)' }} />
+        <div style={{ position:'absolute', top:'50%', left:0, right:0, height:'0.5px', background:'rgba(46,139,122,0.09)', transform:'translateY(-50%)' }} />
+      </div>
+
+      {/* Signal rings — pulse outward from radar center */}
+      {[0, 2, 4].map((delay, i) => (
+        <div key={i} style={{
+          position:'absolute', left:'60%', top:'44%',
+          width:140, height:140,
+          borderRadius:'50%',
+          border:'1px solid rgba(74,144,217,0.6)',
+          animation:`cw-ring 6s ease-out ${delay}s infinite`,
+        }} />
+      ))}
+
+      {/* Scan line */}
+      <div style={{
+        position:'absolute', left:0, right:0, height:'1px',
+        background:'linear-gradient(90deg, transparent 0%, rgba(74,144,217,0.12) 12%, rgba(74,144,217,0.55) 50%, rgba(74,144,217,0.12) 88%, transparent 100%)',
+        animation:'cw-scan 9s ease-in-out 1s infinite',
+        top:0,
+      }} />
+
+      {/* Glowing grid nodes */}
+      {nodes.map((n, i) => (
+        <div key={i} style={{
+          position:'absolute', left:n.x, top:n.y,
+          width: n.size * 2, height: n.size * 2,
+          borderRadius:'50%',
+          backgroundColor: n.color,
+          boxShadow:`0 0 ${n.size * 5}px ${n.color}`,
+          animation:`cw-node ${2.6 + i * 0.4}s ease-in-out ${n.delay} infinite`,
+        }} />
+      ))}
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
 // Mountain silhouette divider
 // ---------------------------------------------------------------------------
 const MountainSilhouette = memo(function MountainSilhouette({ className }: { className?: string }) {
@@ -145,6 +248,186 @@ function LandingTag({
 
 function landingTagTone(index: number): keyof typeof LANDING_TAG_TONES {
   return (['sky', 'teal', 'gold', 'violet'] as const)[index % 4];
+}
+
+// ---------------------------------------------------------------------------
+// Mobile Hero — full-viewport dispatch terminal layout
+// ---------------------------------------------------------------------------
+function MobileHero({
+  onOpenMap,
+  onReport,
+  reducedMotion,
+}: {
+  onOpenMap: () => void;
+  onReport: () => void;
+  reducedMotion: boolean;
+}) {
+  return (
+    <div className="lg:hidden relative z-10 flex flex-col min-h-dvh px-5 pt-20 pb-8">
+
+      {/* Scanning pre-badge */}
+      <motion.div
+        initial={reducedMotion ? undefined : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.45 }}
+        className="mb-5 font-mono text-[10px] tracking-[0.28em] text-[#2E8B7A] flex items-center gap-2 uppercase select-none"
+      >
+        <span className="inline-block w-1.5 h-3.5 bg-[#2E8B7A] animate-pulse rounded-sm" aria-hidden="true" />
+        Scanning YYC — 4 quadrants active
+      </motion.div>
+
+      {/* Headline — fills the width */}
+      <motion.h1
+        initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        className="mb-5 font-black leading-none tracking-tight flex-shrink-0"
+        style={{ fontSize: 'clamp(3.8rem, 20vw, 5rem)' }}
+      >
+        <span className="block text-white light:text-slate-900">Know</span>
+        <span className="block text-[#4A90D9]">Calgary.</span>
+        <span
+          className="block font-black tracking-[0.1em] text-slate-400 light:text-slate-500 mt-3"
+          style={{ fontSize: 'clamp(1rem, 5.4vw, 1.25rem)', lineHeight: 1 }}
+        >
+          Right now.
+        </span>
+      </motion.h1>
+
+      {/* Live stat strip */}
+      <motion.div
+        initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.22, duration: 0.4 }}
+        className="mb-5 flex items-stretch rounded-xl border border-white/10 light:border-slate-200 bg-white/[0.03] light:bg-white/60 overflow-hidden divide-x divide-white/10 light:divide-slate-200"
+      >
+        <div className="flex items-center gap-2 px-3 py-2.5 shrink-0">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-500">Live</span>
+        </div>
+        {[
+          { v: '5', l: 'types' },
+          { v: '4', l: 'zones' },
+          { v: '<30s', l: 'target' },
+        ].map(({ v, l }) => (
+          <div key={l} className="flex-1 flex flex-col items-center justify-center py-2.5 px-1">
+            <p className="text-[14px] font-black text-white light:text-slate-900 leading-none">{v}</p>
+            <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-slate-500 mt-0.5">{l}</p>
+          </div>
+        ))}
+        <div className="flex flex-col items-center justify-center px-3 py-2.5 shrink-0">
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-600 leading-none">YYC</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">AB</p>
+        </div>
+      </motion.div>
+
+      {/* Live dispatch feed — replaces the map card on mobile */}
+      <motion.div
+        initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.36, duration: 0.45 }}
+        className="mb-5 rounded-2xl border border-white/10 light:border-slate-200 overflow-hidden bg-slate-950/75 light:bg-white/85 backdrop-blur-xl"
+      >
+        {/* Feed header */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] light:border-slate-100 bg-white/[0.02] light:bg-slate-50/50">
+          <div className="flex items-center gap-2">
+            <Activity size={10} className="text-[#4A90D9]" />
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-400 light:text-slate-500">
+              Live Dispatch · YYC
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span className="font-mono text-[9px] font-black text-red-400 uppercase">3 active</span>
+          </div>
+        </div>
+
+        {/* Incident rows */}
+        {[
+          { dot: 'bg-red-500',     glow: 'rgba(239,68,68,0.6)',    cat: 'Major Collision', loc: 'Deerfoot Trl NB',   time: 'NOW',   tc: 'text-red-400 font-black',  pulse: true  },
+          { dot: 'bg-amber-400',   glow: 'rgba(245,158,11,0.45)',  cat: 'Road Closure',    loc: 'Memorial Dr NW',   time: '04:23', tc: 'text-slate-500',            pulse: false },
+          { dot: 'bg-emerald-400', glow: 'rgba(52,211,153,0.35)',  cat: 'All Clear',       loc: 'Beltline',         time: '12:07', tc: 'text-slate-600',            pulse: false },
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            initial={reducedMotion ? undefined : { opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 + i * 0.07, duration: 0.3 }}
+            className="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.04] light:border-slate-100 last:border-0"
+          >
+            <div
+              className={cn('w-2 h-2 rounded-full shrink-0', item.dot)}
+              style={{ boxShadow: `0 0 8px 2px ${item.glow}` }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] font-bold text-white light:text-slate-900 truncate leading-tight">{item.cat}</p>
+              <p className="font-mono text-[9px] text-slate-500 truncate mt-0.5">{item.loc}</p>
+            </div>
+            <span className={cn('font-mono text-[9px] shrink-0', item.tc, item.pulse && 'animate-pulse')}>
+              {item.time}
+            </span>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* CTAs */}
+      <motion.div
+        initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.4 }}
+        className="flex flex-col gap-3 mb-6"
+      >
+        <button
+          type="button"
+          onClick={onOpenMap}
+          className="w-full h-[52px] rounded-2xl text-white font-black text-sm flex items-center justify-center gap-2.5 active:scale-[0.98] transition-transform"
+          style={{
+            background: 'linear-gradient(135deg, #4A90D9 0%, #2E8B7A 100%)',
+            boxShadow: '0 8px 28px rgba(74,144,217,0.38), inset 0 1px 0 rgba(255,255,255,0.12)',
+          }}
+        >
+          <MapPin size={16} />
+          Open Live Map
+          <ArrowRight size={14} className="opacity-80" />
+        </button>
+        <button
+          type="button"
+          onClick={onReport}
+          className="w-full h-[46px] rounded-2xl border border-white/15 light:border-slate-300 bg-white/[0.05] light:bg-white text-white light:text-slate-900 font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all hover:bg-white/[0.08] light:hover:bg-slate-50"
+        >
+          Report an Incident
+        </button>
+      </motion.div>
+
+      {/* Social proof — anchored to bottom */}
+      <motion.div
+        initial={reducedMotion ? undefined : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.72 }}
+        className="flex items-center gap-3 mt-auto"
+      >
+        <div className="flex -space-x-2.5" aria-hidden="true">
+          {AVATARS.slice(0, 4).map((av, i) => (
+            <img
+              key={i}
+              src={av.src}
+              alt=""
+              width={28}
+              height={28}
+              className="h-7 w-7 rounded-full border-2 border-slate-950 light:border-white object-cover"
+              loading="lazy"
+              crossOrigin="anonymous"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+            />
+          ))}
+        </div>
+        <p className="text-xs text-slate-400 light:text-slate-600">
+          <span className="text-white light:text-slate-900 font-black">2,400+</span> Calgarians this week
+        </p>
+        <LandingTag tone="teal" className="ml-auto shrink-0">Non-Profit</LandingTag>
+      </motion.div>
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -324,6 +607,7 @@ export default function LandingPage() {
             <a href="#features" className="px-3 py-1.5 text-sm font-medium text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 rounded-lg hover:bg-white/5 light:hover:bg-slate-100 transition-all">Features</a>
             <a href="#how-it-works" className="px-3 py-1.5 text-sm font-medium text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 rounded-lg hover:bg-white/5 light:hover:bg-slate-100 transition-all">How it Works</a>
             <button type="button" onClick={() => navigate('/about')} className="px-3 py-1.5 text-sm font-medium text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 rounded-lg hover:bg-white/5 light:hover:bg-slate-100 transition-all">About</button>
+            <button type="button" onClick={() => navigate('/coverage')} className="px-3 py-1.5 text-sm font-medium text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 rounded-lg hover:bg-white/5 light:hover:bg-slate-100 transition-all">Coverage</button>
           </div>
 
           {/* Right actions */}
@@ -351,6 +635,7 @@ export default function LandingPage() {
               <a href="#features" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">Features</a>
               <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">How it Works</a>
               <button type="button" onClick={() => { navigate('/about'); setMobileMenuOpen(false); }} className="text-left px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">About</button>
+              <button type="button" onClick={() => { navigate('/coverage'); setMobileMenuOpen(false); }} className="text-left px-3 py-2.5 text-sm font-medium text-slate-300 hover:text-white rounded-xl hover:bg-white/5 transition-all">Coverage</button>
               <div className="pt-2 border-t border-white/8 mt-1">
                 <Button variant="primary" className="w-full bg-blue-600 hover:bg-blue-700 rounded-xl h-11 font-bold" onClick={() => { navigate('/map'); setMobileMenuOpen(false); }}>Open Live Map</Button>
               </div>
@@ -369,10 +654,19 @@ export default function LandingPage() {
             <img src={publicAsset('images/calgary2.webp')} fetchPriority="high" width={1200} height={1641} className="h-full w-full object-cover opacity-55 brightness-[0.72] saturate-[1.1] light:opacity-70 light:brightness-[1.08]" alt="Calgary skyline" />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.96)_0%,rgba(2,6,23,0.78)_38%,rgba(2,6,23,0.34)_72%,rgba(2,6,23,0.68)_100%)] light:bg-[linear-gradient(90deg,rgba(238,245,247,0.98)_0%,rgba(238,245,247,0.82)_40%,rgba(238,245,247,0.28)_72%,rgba(238,245,247,0.76)_100%)]" />
             <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-slate-950 light:from-[#eef5f7] to-transparent" />
-            <div className="absolute inset-0 opacity-[0.08] light:opacity-[0.1]" style={{ backgroundImage: 'linear-gradient(90deg,rgba(255,255,255,.4) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.4) 1px,transparent 1px)', backgroundSize: '84px 84px' }} />
+            <div className="absolute inset-0 opacity-[0.03] light:opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(90deg,rgba(255,255,255,.4) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.4) 1px,transparent 1px)', backgroundSize: '84px 84px' }} />
         </div>
 
-        <div className="relative z-10 flex min-h-dvh flex-col lg:grid lg:min-h-[900px] lg:grid-cols-[52fr_48fr] gap-4 lg:gap-10 px-5 sm:px-10 lg:px-14 xl:px-20 pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-14 lg:pb-16">
+        <HeroCanvas reducedMotion={reducedMotion} />
+
+        <MobileHero
+          onOpenMap={() => navigate('/map')}
+          onReport={() => navigate('/map?report=true')}
+          reducedMotion={reducedMotion}
+        />
+
+        {/* Desktop hero grid — hidden on mobile */}
+        <div className="hidden lg:grid relative z-10 min-h-[900px] grid-cols-[52fr_48fr] gap-10 px-14 xl:px-20 pt-32 pb-16">
 
           {/* Left - content (Text naturally comes first on mobile) */}
           <div className="flex flex-col justify-center max-w-3xl self-center pt-8 pb-4 lg:py-0">
@@ -383,6 +677,12 @@ export default function LandingPage() {
               transition={{ duration: 0.7, ease: 'easeOut' }}
               className="relative z-10"
             >
+              {/* Scanning pre-badge */}
+              <div className="mb-5 font-mono text-[10px] tracking-[0.28em] text-[#2E8B7A] flex items-center gap-2 uppercase">
+                <span className="inline-block w-1.5 h-3.5 bg-[#2E8B7A] animate-pulse" aria-hidden="true" />
+                Scanning YYC grid — 4 quadrants active
+              </div>
+
               {/* Badges */}
               <div className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-2">
                 <LandingTag pulse>Live · Calgary, AB</LandingTag>
@@ -537,7 +837,7 @@ export default function LandingPage() {
             {[
               { color: 'bg-red-500', glow: 'rgba(239,68,68,0.9)', text: '3 active alerts in Calgary' },
               { color: 'bg-amber-400', glow: 'rgba(251,191,36,0.9)', text: '12 community reports today' },
-              { color: 'bg-[#2E8B7A]', glow: 'rgba(46,139,122,0.9)', text: 'All quadrants monitored · YYC' },
+              { color: 'bg-[#2E8B7A]', glow: 'rgba(46,139,122,0.9)', text: '30+ communities · Calgary metro' },
             ].map(({ color, glow, text }) => (
               <div key={text} className="flex items-center gap-2 shrink-0">
                 <div className={`w-2 h-2 rounded-full pulse-dot ${color}`} style={{ boxShadow: `0 0 8px ${glow}` }} />
@@ -812,7 +1112,7 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-auto">
                   <h3 className="text-xl font-black text-white mb-1.5">Neighbourhood Intelligence</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">Safety trends and incident history by quadrant - live.</p>
+                  <p className="text-sm text-slate-400 leading-relaxed">Safety trends across Calgary's quadrants and 30+ surrounding communities — live.</p>
                 </div>
               </div>
             </motion.div>
@@ -1346,6 +1646,45 @@ export default function LandingPage() {
           </div>
           {cityRequestMessage && <p className="text-xs text-emerald-400 font-semibold">{cityRequestMessage}</p>}
           <p className="text-[10px] text-slate-600">In demand: Edmonton (420), Vancouver (310), Toronto (280)</p>
+        </div>
+      </section>
+
+      {/* ================================================================
+          COVERAGE TEASER — compact link to /coverage page
+          ================================================================ */}
+      <section className="py-12 md:py-16 px-4 sm:px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950/60 light:bg-[#f4ede0]/60">
+        <div className="max-w-3xl mx-auto text-center">
+          <LandingTag tone="teal" className="justify-center mb-4">Coverage Area</LandingTag>
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white light:text-slate-900 mb-3">
+            Calgary + 30 surrounding communities
+          </h2>
+          <p className="text-sm text-slate-400 light:text-slate-600 mb-6 max-w-xl mx-auto leading-relaxed">
+            From Airdrie to Okotoks, Cochrane to Canmore — one map covers the entire Calgary metro region within 100 km.
+          </p>
+
+          {/* Key community pills */}
+          <div className="flex flex-wrap justify-center gap-2 mb-7">
+            {['Airdrie', 'Cochrane', 'Okotoks', 'Chestermere', 'Strathmore', 'High River', 'Canmore'].map((name) => (
+              <span
+                key={name}
+                className="text-xs font-bold px-3 py-1.5 rounded-full border border-white/10 light:border-slate-200 bg-white/[0.04] light:bg-white/80 text-slate-300 light:text-slate-700"
+              >
+                {name}
+              </span>
+            ))}
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full border border-[#4A90D9]/30 bg-[#4A90D9]/8 text-[#4A90D9]">
+              +23 more
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate('/coverage')}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#4A90D9]/30 bg-[#4A90D9]/8 text-sm font-bold text-[#4A90D9] hover:bg-[#4A90D9]/18 light:hover:bg-blue-50 transition-all"
+          >
+            View full coverage guide
+            <ArrowRight size={14} />
+          </button>
         </div>
       </section>
 

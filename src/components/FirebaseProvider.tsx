@@ -11,7 +11,7 @@ import {
   signOut
 } from 'firebase/auth';
 import { auth, db, isFirebaseConfigured } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 
 interface AuthContextType {
@@ -60,6 +60,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         const userRef = doc(db, 'users', currentUser.uid);
         try {
           const role = isApprovedAdmin ? 'admin' : 'user';
+          const existing = await getDoc(userRef);
           await setDoc(
             userRef,
             {
@@ -68,6 +69,11 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
               email: currentUser.email || '',
               photoURL: currentUser.photoURL || '',
               role,
+              ...(existing.exists() && existing.data()?.createdAt ? {} : {
+                createdAt: currentUser.metadata.creationTime
+                  ? new Date(currentUser.metadata.creationTime).getTime()
+                  : Date.now(),
+              }),
             },
             { merge: true }
           );

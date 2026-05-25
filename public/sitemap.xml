@@ -1,18 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
   <url>
-    <loc>https://aldo140.github.io/Calgary-Watch-/</loc>
+    <loc>https://calgarywatch.ca/</loc>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:title>Calgary Watch — Real-Time Community Safety Map for Calgary and Surrounding Communities</image:title>
+      <image:caption>Interactive real-time crime and safety incident map covering Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, and 30+ Alberta communities</image:caption>
+      <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/icon.webp</image:loc>
+      <image:title>Calgary Watch Logo</image:title>
+      <image:caption>Calgary Watch community safety platform logo</image:caption>
+    </image:image>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/" />
   </url>
+
   <url>
-    <loc>https://aldo140.github.io/Calgary-Watch-/map</loc>
+    <loc>https://calgarywatch.ca/map</loc>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>hourly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:title>Live Calgary Crime and Incident Map | Calgary Watch</image:title>
+      <image:caption>Real-time interactive map showing community-reported safety incidents across the Calgary metro area</image:caption>
+      <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
+    </image:image>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/map" />
   </url>
+
   <url>
-    <loc>https://aldo140.github.io/Calgary-Watch-/about</loc>
+    <loc>https://calgarywatch.ca/about</loc>
+    <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/images/calgary1.webp</image:loc>
+      <image:title>About Calgary Watch — Community Safety Platform</image:title>
+      <image:caption>Calgary Watch team and mission: community-powered real-time safety data for Calgary and area</image:caption>
+      <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
+    </image:image>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/about" />
   </url>
+
+  <url>
+    <loc>https://calgarywatch.ca/coverage</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:title>Calgary Area Safety Guide — 30+ Communities Covered | Calgary Watch</image:title>
+      <image:caption>Community coverage directory for Calgary Watch — Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and all surrounding Alberta communities</image:caption>
+      <image:geo_location>Calgary Metropolitan Region, Alberta, Canada</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/images/calgary_map.png</image:loc>
+      <image:title>Calgary Metro Region Coverage Map</image:title>
+      <image:caption>Map showing Calgary Watch coverage across the greater Calgary metropolitan area including all surrounding communities</image:caption>
+      <image:geo_location>Calgary Metropolitan Region, Alberta, Canada</image:geo_location>
+    </image:image>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/coverage" />
+  </url>
+
 </urlset>

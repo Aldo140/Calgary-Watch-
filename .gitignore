@@ -9,3 +9,4 @@ coverage/
 .claude/
 .worktrees/
 .superpowers/
+*-firebase-adminsdk-*.json

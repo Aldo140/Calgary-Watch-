@@ -52,7 +52,7 @@ export default function AdminUserListPage() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<'newest' | 'name' | 'reports'>('newest');
+  const [sort, setSort] = useState<'newest' | 'oldest' | 'name' | 'reports'>('newest');
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user' | 'reporters'>('all');
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [draftProfiles, setDraftProfiles] = useState<Record<string, Pick<UserProfile, 'displayName' | 'role'>>>({});
@@ -111,6 +111,7 @@ export default function AdminUserListPage() {
       })
       .sort((a, b) => {
         if (sort === 'newest') return b.joinedAt - a.joinedAt;
+        if (sort === 'oldest') return a.joinedAt - b.joinedAt;
         if (sort === 'reports') return b.reports.length - a.reports.length;
         return (a.displayName || a.email || '').localeCompare(b.displayName || b.email || '');
       });
@@ -180,6 +181,7 @@ export default function AdminUserListPage() {
               </select>
               <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-slate-900">
                 <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
                 <option value="reports">Most reports</option>
                 <option value="name">Name</option>
               </select>

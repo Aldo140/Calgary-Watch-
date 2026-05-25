@@ -15,6 +15,16 @@
     -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
+    <!-- Geo / Local SEO — helps Google local pack + Bing local -->
+    <meta name="geo.region" content="CA-AB" />
+    <meta name="geo.placename" content="Calgary, Alberta, Canada" />
+    <meta name="geo.position" content="51.0447;-114.0719" />
+    <meta name="ICBM" content="51.0447, -114.0719" />
+    <meta http-equiv="content-language" content="en-CA" />
+    <meta name="language" content="English" />
+    <meta property="og:locale" content="en_CA" />
+    <meta property="og:locale:alternate" content="en_US" />
+
     <title>Calgary Watch | Real-Time Community Safety Map</title>
     
     <!-- Icons — relative paths work with Vite `base` (e.g. GitHub project Pages /RepoName/) -->
@@ -37,15 +47,17 @@
     
     <meta
       name="description"
-      content="Calgary Watch is a real-time community safety platform for Calgary. Explore live incident reports, map intelligence, and neighborhood context in one place."
+      content="Calgary Watch — real-time crime map and community safety platform for Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River and all surrounding communities. See live incidents, crime reports, and neighborhood safety alerts before the news does."
     />
     <meta
       name="keywords"
-      content="Calgary safety map, Calgary incidents, community reports, neighborhood safety, live alerts, Calgary Watch"
+      content="Calgary crime map, Calgary crime news, Calgary crime rate, Calgary crime statistics, Calgary safety map, Calgary incidents, Calgary break-ins, Calgary vehicle theft, Calgary neighborhood watch, Calgary community safety, Calgary live alerts, Calgary Watch, crime in Calgary, is Calgary safe, safest neighborhoods Calgary, most dangerous neighborhoods Calgary, Calgary police reports, Calgary crime today, Calgary crime 2025, Calgary crime 2026, Airdrie crime map, Airdrie crime news, Airdrie safety, is Airdrie safe, Airdrie incidents, Cochrane AB crime map, Cochrane crime news, Cochrane safety, is Cochrane safe, Chestermere crime map, Chestermere safety, Chestermere incidents, Okotoks crime map, Okotoks crime news, Okotoks safety, is Okotoks safe, Strathmore AB crime map, Strathmore safety, Strathmore incidents, High River crime map, High River safety, High River incidents, Langdon AB safety, Crossfield AB crime, Carstairs AB safety, Didsbury AB crime, Olds AB safety, Canmore crime map, Canmore safety, is Canmore safe, Black Diamond AB safety, Turner Valley safety, Nanton AB crime, Irricana AB safety, Beiseker safety, Gleichen AB crime, Vulcan AB safety, Balzac AB crime, Springbank AB safety, Bragg Creek incidents, Priddis safety, De Winton AB crime, Millarville AB safety, Bearspaw incidents, Bragg Creek crime, Rocky View County crime, Foothills County safety, Wheatland County incidents, community safety platform, real-time incident map, neighborhood safety alerts, live crime map Alberta, Alberta crime map, community watch Calgary, Calgary quadrants safety, NW Calgary crime, NE Calgary crime, SW Calgary crime, SE Calgary crime, Beltline crime, downtown Calgary crime, Deerfoot Trail incidents, Calgary traffic incidents, Calgary road closures, Calgary flooding alerts, Calgary fire reports"
     />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#020617" />
     <link rel="canonical" href="https://calgarywatch.ca/" />
+    <link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/" />
+    <link rel="alternate" hreflang="x-default" href="https://calgarywatch.ca/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -53,7 +65,7 @@
     <meta property="og:title" content="Calgary Watch | Real-Time Community Safety Map" />
     <meta
       property="og:description"
-      content="Explore Calgary incident updates in real time with community-sourced reports and neighborhood safety context."
+      content="Real-time crime map and community safety platform for Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River and surrounding Alberta communities. Free, live, and community-powered."
     />
     <meta property="og:url" content="https://calgarywatch.ca/" />
 
@@ -65,22 +77,400 @@
       content="Real-time Calgary community safety map with live reports and neighborhood intelligence."
     />
 
-    <!-- Structured Data -->
+    <!-- Structured Data: WebApplication -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Calgary Watch",
+      "url": "https://calgarywatch.ca/",
+      "description": "Real-time community safety and crime map for Calgary and surrounding communities including Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, and High River. Free, live, and community-powered.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "inLanguage": "en-CA",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CAD" },
+      "featureList": [
+        "Real-time crime reporting",
+        "Live incident map",
+        "Neighborhood safety intelligence",
+        "Community-powered alerts",
+        "Calgary area coverage"
+      ],
+      "screenshot": "https://calgarywatch.ca/images/hero-wide.webp",
+      "author": {
+        "@type": "Organization",
         "name": "Calgary Watch",
-        "url": "https://calgarywatch.ca/",
-        "description": "Real-time community safety platform for Calgary with live incident mapping and neighborhood awareness.",
-        "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "Any",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "CAD"
-        }
+        "url": "https://calgarywatch.ca/"
       }
+    }
+    </script>
+
+    <!-- Structured Data: LocalBusiness / Community Safety Service -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsMediaOrganization",
+      "name": "Calgary Watch",
+      "url": "https://calgarywatch.ca/",
+      "logo": "https://calgarywatch.ca/icon.svg",
+      "description": "Community-powered real-time crime and safety incident platform serving Calgary and surrounding Alberta communities.",
+      "foundingDate": "2024",
+      "areaServed": [
+        { "@type": "City",    "name": "Calgary",       "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Airdrie",       "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Cochrane",      "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Chestermere",   "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Okotoks",       "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Strathmore",    "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "High River",    "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Langdon",       "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Crossfield",    "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Carstairs",     "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Didsbury",      "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Olds",          "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Canmore",       "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Black Diamond", "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Turner Valley", "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Nanton",        "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Irricana",      "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "City",    "name": "Beiseker",      "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "AdministrativeArea", "name": "Rocky View County",  "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "AdministrativeArea", "name": "Foothills County",   "addressRegion": "AB", "addressCountry": "CA" },
+        { "@type": "AdministrativeArea", "name": "Wheatland County",   "addressRegion": "AB", "addressCountry": "CA" }
+      ],
+      "knowsAbout": [
+        "Crime reporting", "Community safety", "Incident mapping",
+        "Neighborhood watch", "Calgary crime statistics",
+        "Real-time alerts", "Public safety Alberta"
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: FAQPage — 24 Q&As targeting Google People Also Ask boxes -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is Calgary safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Calgary is generally considered one of Canada's safer major cities, consistently ranking below the national Crime Severity Index average. Property crime — vehicle theft, break-and-enter, and residential theft — is the most common category. Violent crime rates are significantly lower than comparable cities. Calgary Watch provides a real-time community map so residents can see exactly what is happening in their specific neighbourhood right now, not just city-wide annual averages."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the crime rate in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Calgary's Crime Severity Index has fluctuated in recent years, with property crime rising alongside population growth. The downtown core, Beltline, Forest Lawn, and parts of the northeast have historically higher incident density. Newer suburban communities in NW, SW, and south Calgary tend to have lower property crime rates. Calgary Watch surfaces community-reported incidents alongside official open data so you can track trends in your specific area over days and weeks — not just annual statistics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the most dangerous neighbourhoods in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Incident density on Calgary Watch tends to concentrate around the downtown core (especially along 17 Ave and Centre Street corridors), Forest Lawn in the NE, and parts of the NW industrial zones. These patterns shift over time and by crime category — vehicle break-ins may spike in one area while residential crime rises elsewhere. Open the live map and filter by incident category to see current hotspots in real time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the safest neighbourhoods in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Communities in SW Calgary — including Signal Hill, Cougar Ridge, Aspen Woods, and Springbank Hill — consistently report among the lowest incident rates in the city. NW Calgary neighbourhoods such as Tuscany, Rocky Ridge, Nolan Hill, and Hamptons also rank highly for safety. Use the Calgary Watch live map to check real-time activity in any specific neighbourhood before you move or visit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is vehicle theft a problem in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Vehicle theft is one of Calgary's most prevalent crimes, and Alberta has consistently ranked among the highest provinces for auto theft rates in Canada. Catalytic converter theft, carjackings, and vehicle break-ins are tracked in real time on Calgary Watch. Filter the live incident map by the Vehicle Theft category to see current high-risk areas, recent incidents, and neighbourhood-level trends."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is NW Calgary safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "NW Calgary is generally one of the city's safer quadrants, with family-oriented communities like Tuscany, Hamptons, Rocky Ridge, Nolan Hill, and Edgemont reporting relatively low crime rates. Older NW communities like Ranchlands and Citadel see some property crime but remain well below downtown Calgary levels. Calgary Watch tracks real-time incidents across all NW Calgary communities."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is NE Calgary safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "NE Calgary is a diverse quadrant with varying safety levels by neighbourhood. Newer communities like Panorama Hills, Saddleridge, and Cornerstone are generally safe, while older industrial areas and communities near the northeast corridor see higher property crime. Check the Calgary Watch live map to filter NE Calgary incidents by neighbourhood and category."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is downtown Calgary safe at night?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Downtown Calgary, including the Beltline and East Village, sees higher incident rates after dark compared to suburban areas, with street-level disorder, vehicle break-ins, and occasional assaults reported more frequently. The +15 skyway system offers a safer pedestrian route through the core at night. Calgary Watch shows live downtown incident reports in real time, helping you make informed decisions about where you're going."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the Beltline neighbourhood in Calgary safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Beltline is one of Calgary's densest and most vibrant urban neighbourhoods, but also one with higher crime rates — property crime, vehicle break-ins, and occasional street-level incidents are more common than in suburban Calgary. The area is generally safe during daytime and familiar to those comfortable with urban environments. Calgary Watch shows live Beltline incident reports so you always know current conditions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I report a crime or incident in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For emergencies, always call 911 first. For non-emergency reports in Calgary, contact Calgary Police Service at 403-266-1234. You can also submit a community report on Calgary Watch to alert your neighbours instantly — your identity can be kept fully anonymous, and your report appears on the live map within 30 seconds."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I do if my car is broken into in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If your vehicle is broken into in Calgary: (1) Call Calgary Police non-emergency at 403-266-1234 to file a report and get a report number for insurance. (2) Document everything with photos before touching anything. (3) Contact your insurance provider. (4) Submit a report on Calgary Watch to alert neighbours about the location and time — your community report helps others in the same area stay vigilant and can reveal patterns police may not yet have flagged."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Calgary compare to Edmonton for crime?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Calgary typically has a lower Crime Severity Index than Edmonton. Edmonton has consistently ranked higher on national crime severity metrics, while Calgary ranks among Canada's safer major cities. Both cities face challenges with property crime and vehicle theft. Calgary Watch is focused specifically on real-time community reporting for the Calgary metro area."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Calgary's Crime Severity Index?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Crime Severity Index (CSI) is a Statistics Canada measure that weighs both the volume and seriousness of crimes reported to police. Calgary's CSI is typically below the national average for major cities and significantly lower than Edmonton's. Property crime — especially vehicle theft and break-and-enter — tends to be the primary driver of Calgary's CSI fluctuations year to year."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Airdrie safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Airdrie is a rapidly growing city north of Calgary with a generally low crime rate relative to its size. As the city has expanded — now approaching 80,000 residents — property crime has increased proportionally, particularly vehicle theft and residential break-ins in newer subdivisions. Calgary Watch monitors community-reported incidents across Airdrie and Rocky View County."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Cochrane AB safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cochrane maintains one of the lowest crime rates among Alberta's satellite cities of its size. Most reported incidents involve property crime in residential areas. The rural highway corridors between Cochrane and Calgary (Highway 1A and Highway 22) see occasional traffic incidents. Calgary Watch covers Cochrane and the surrounding Rocky View County area with real-time community incident reports."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Chestermere safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Chestermere is a lakeside city east of Calgary with a growing population and a generally low crime profile. Property crime — particularly vehicle theft — has increased as the city grows. Calgary Watch provides real-time community-reported incident data for Chestermere and surrounding Wheatland County communities."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Strathmore Alberta safe?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Strathmore is a small city about 45 km east of Calgary in Wheatland County with a low overall crime rate typical of rural Alberta. Property crime occasionally occurs, particularly vehicle theft. Calgary Watch covers Strathmore and surrounding Wheatland County communities with real-time community-reported incident data."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Calgary Watch cover Canmore?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Calgary Watch covers Canmore and the Bow Valley corridor, including communities along the Trans-Canada Highway within approximately 100 kilometres of Calgary. Canmore has a very low overall crime rate, though vehicle break-ins at trailhead parking lots are occasionally reported. Community members in Canmore can submit and view real-time incident reports on Calgary Watch."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Calgary Watch cover Okotoks and High River?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Calgary Watch covers the full Calgary metropolitan region including Okotoks, High River, Strathmore, Chestermere, Langdon, Crossfield, Carstairs, and all communities within approximately 100 kilometres of Calgary. Community members in these areas can submit reports and view incidents from the same shared map."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What types of incidents does Calgary Watch track?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Calgary Watch tracks a wide range of community incidents: property crime (break-and-enter, vehicle theft, vandalism, theft from vehicle), violent crime, traffic collisions and road closures, infrastructure issues (water main breaks, utility outages, flooding), weather emergencies (icy roads, hail, flash flooding), and general community safety concerns. Community members submit reports in real time, and official City of Calgary open data is also integrated."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I submit a report on Calgary Watch anonymously?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Calgary Watch supports anonymous community reporting. A free account is needed to submit reports (to prevent spam and false reports), but your personal details are never shown publicly on incident markers. Your privacy is fully respected, and no personal information is displayed on the live map."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are there neighbourhood watch programs in Calgary?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Calgary Police Service supports Block Watch programs throughout Calgary, where neighbours coordinate to watch for and report suspicious activity. Calgary Watch serves as a digital complement to these programs — community members can submit and view real-time incident reports for their neighbourhood, creating a continuous, city-wide digital neighbourhood watch that operates 24 hours a day."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does Calgary Watch show traffic incidents and road closures?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Calgary Watch tracks community-reported traffic incidents, collisions, road closures, and infrastructure issues across Calgary and surrounding communities — including Deerfoot Trail, Stoney Trail, Glenmore Trail, and major arterials. Filter the live map by incident category to view traffic-related reports alongside crime and safety incidents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Calgary Watch work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Calgary Watch combines community-submitted reports with official public safety data from the City of Calgary open data portal, Environment Canada weather alerts, and 511 Alberta traffic feeds. Residents sign in to submit geolocated incident reports in under 30 seconds. Reports appear on the live map immediately and are visible to anyone in the community. Anonymous reporting is fully supported and no personal information is displayed publicly."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",          "item": "https://calgarywatch.ca/" },
+        { "@type": "ListItem", "position": 2, "name": "Live Map",      "item": "https://calgarywatch.ca/map" },
+        { "@type": "ListItem", "position": 3, "name": "About",         "item": "https://calgarywatch.ca/about" },
+        { "@type": "ListItem", "position": 4, "name": "Coverage Guide","item": "https://calgarywatch.ca/coverage" }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: WebSite + SearchAction — enables Google Sitelinks search box -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Calgary Watch",
+      "alternateName": "Calgary Watch — Real-Time Community Safety",
+      "url": "https://calgarywatch.ca/",
+      "description": "Free real-time crime and community safety platform for Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and all surrounding Alberta communities.",
+      "inLanguage": "en-CA",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://calgarywatch.ca/map?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Structured Data: HowTo — targets featured snippets for crime reporting queries -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Report a Crime or Safety Incident in Calgary",
+      "description": "Step-by-step guide to reporting a crime, traffic incident, or community safety concern in Calgary and surrounding areas using Calgary Watch and official channels.",
+      "totalTime": "PT2M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": "1",
+          "name": "Ensure your immediate safety",
+          "text": "If there is immediate danger or a crime is in progress, move to a safe location first. Call 911 immediately — do not confront suspects.",
+          "url": "https://calgarywatch.ca/coverage"
+        },
+        {
+          "@type": "HowToStep",
+          "position": "2",
+          "name": "Determine emergency vs. non-emergency",
+          "text": "For emergencies — assault in progress, robbery, break-in in progress, fire, or medical — call 911. For non-emergencies — vandalism discovered after the fact, a completed theft, or suspicious activity — call Calgary Police Service at 403-266-1234.",
+          "url": "https://calgarywatch.ca/coverage"
+        },
+        {
+          "@type": "HowToStep",
+          "position": "3",
+          "name": "Document the incident details",
+          "text": "Note the exact time, address, description of any suspects or vehicles (licence plate, make, model, colour), and what occurred. Take photos if it is safe to do so. This information is essential for police and helps the community.",
+          "url": "https://calgarywatch.ca/map"
+        },
+        {
+          "@type": "HowToStep",
+          "position": "4",
+          "name": "Submit a report on Calgary Watch",
+          "text": "Open Calgary Watch at calgarywatch.ca, sign in or create a free account, tap the report button on the live map, select the appropriate incident category, drop a pin on the exact location, add a description, and submit. Your report appears on the community map immediately and alerts nearby residents.",
+          "url": "https://calgarywatch.ca/map?report=true"
+        },
+        {
+          "@type": "HowToStep",
+          "position": "5",
+          "name": "Alert your neighbours",
+          "text": "Share the Calgary Watch map link with your neighbourhood group, Block Watch program, or community association so others in the area can stay informed and watchful. Community awareness helps prevent repeat incidents.",
+          "url": "https://calgarywatch.ca/"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Structured Data: Organization — enables Google Knowledge Panel and E-E-A-T signals -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Calgary Watch",
+      "legalName": "Calgary Watch",
+      "url": "https://calgarywatch.ca/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://calgarywatch.ca/icon.webp",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://calgarywatch.ca/images/hero-wide.webp",
+      "description": "Calgary Watch is a free community-powered real-time crime and safety platform serving Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and all communities in the greater Calgary metropolitan area.",
+      "foundingDate": "2024",
+      "areaServed": {
+        "@type": "AdministrativeArea",
+        "name": "Calgary Metropolitan Region",
+        "addressRegion": "AB",
+        "addressCountry": "CA",
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 51.0447,
+          "longitude": -114.0719
+        }
+      },
+      "knowsAbout": [
+        "Crime reporting", "Community safety", "Incident mapping",
+        "Neighbourhood watch", "Calgary crime statistics", "Real-time alerts",
+        "Public safety Alberta", "Vehicle theft", "Property crime"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "availableLanguage": "English"
+      }
+    }
     </script>
 
     <script type="text/javascript">
@@ -101,6 +491,9 @@
       Using crossorigin on CORS-capable origins to allow credential-free
       connection reuse and reduce first-byte latency.
     -->
+    <!-- Preload LCP hero image — direct Core Web Vitals / LCP improvement -->
+    <link rel="preload" as="image" href="/images/hero-wide.webp" fetchpriority="high" type="image/webp" />
+
     <!-- Leaflet tile CDN -->
     <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
     <!-- Google Fonts — non-blocking load via media swap -->

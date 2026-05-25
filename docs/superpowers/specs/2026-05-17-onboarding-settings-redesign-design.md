@@ -36,6 +36,8 @@ No migration needed. Existing users without this field are treated as "never com
 
 Backfill shortcut: in `saveProfileSettings`, if `userProfile?.piiConsentAt` already exists and `onboardingCompletedAt` is absent, include it in the write — so returning users who save any change get stamped automatically.
 
+**Existing production users** (have `piiConsentAt` but no `onboardingCompletedAt`) will see the panel once on their next sign-in. The new Skip button lets them dismiss in one tap; the backfill then stamps their record on that interaction. This is a one-time migration UX cost and is acceptable.
+
 ### 2. Onboarding Gate (`profileNeedsSetup`)
 
 **Before:**

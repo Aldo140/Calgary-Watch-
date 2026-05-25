@@ -407,13 +407,26 @@ const WMO_ALERTS: Record<number, { title: string; description: string; severity:
   99: { title: 'Severe Thunderstorm', description: 'Severe thunderstorm with large hail and heavy rain. Take shelter immediately.', severity: 'warning' },
 };
 
-// Calgary neighbourhood zones: [name, lat, lng]
-const CALGARY_WEATHER_ZONES: [string, number, number][] = [
+// Alberta weather zones: [name, lat, lng]
+const ALBERTA_WEATHER_ZONES: [string, number, number][] = [
+  // Calgary
   ['Northwest Calgary',  51.128, -114.190],
   ['Northeast Calgary',  51.128, -113.980],
   ['Downtown Calgary',   51.048, -114.065],
   ['Southwest Calgary',  50.975, -114.180],
   ['Southeast Calgary',  50.975, -113.980],
+  // Surrounding communities
+  ['Airdrie',            51.292, -114.014],
+  ['Cochrane',           51.189, -114.467],
+  ['Chestermere',        51.047, -113.821],
+  ['Okotoks',            50.726, -113.975],
+  ['High River',         50.580, -113.874],
+  ['Strathmore',         51.038, -113.400],
+  ['Canmore',            51.090, -115.359],
+  // Edmonton
+  ['Northwest Edmonton', 53.600, -113.650],
+  ['Central Edmonton',   53.544, -113.490],
+  ['Southeast Edmonton', 53.460, -113.370],
 ];
 
 function useWeatherAlerts(isAuthReady: boolean) {
@@ -428,7 +441,7 @@ function useWeatherAlerts(isAuthReady: boolean) {
       const SEVERITY_RANK: Record<string, number> = { advisory: 1, watch: 2, warning: 3 };
 
       await Promise.allSettled(
-        CALGARY_WEATHER_ZONES.map(async ([zoneName, lat, lng]) => {
+        ALBERTA_WEATHER_ZONES.map(async ([zoneName, lat, lng]) => {
           try {
             const url =
               `https://api.open-meteo.com/v1/forecast` +

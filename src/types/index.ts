@@ -25,7 +25,9 @@ export type SourceType =
   | 'reddit_calgary'
   | 'news_rss'
   | 'calgary_police_crime'
-  | 'calgary_infrastructure';
+  | 'calgary_infrastructure'
+  | 'edmonton_open_data'
+  | 'alberta_statcan_crime';
 
 export const CATEGORY_ICONS = {
   crime: AlertCircle,
@@ -95,6 +97,7 @@ export interface CommunityStats {
 
 export interface AreaIntelligence {
   communityName: string;
+  crimeKey?: string;        // stats map lookup key (e.g. "edmonton:downtown"); defaults to communityName.toLowerCase()
   safetyScore: number;
   description: string;
   activeIncidents: number;

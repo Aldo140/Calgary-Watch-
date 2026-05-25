@@ -6,6 +6,7 @@ export interface CrimeStatEntry {
   property: number;
   disorder: number;
   year: number;
+  dataSource?: 'statcan';
 }
 
 export interface CrimeYearEntry {

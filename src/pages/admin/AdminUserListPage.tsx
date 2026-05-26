@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import { ArrowLeft, Code2, Eye, FileText, Loader2, Lock, Save, Search, ShieldCheck, Trash2, Users } from 'lucide-react';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { Button } from '@/src/components/ui/Button';
@@ -61,12 +61,12 @@ export default function AdminUserListPage() {
 
   useEffect(() => {
     if (!db) return;
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+    const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
       const rows = snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as UserProfile));
       setUsers(rows);
       setSelectedUid((current) => current || rows[0]?.uid || null);
     });
-    const unsubIncidents = onSnapshot(query(collection(db, 'incidents'), orderBy('timestamp', 'desc')), (snapshot) => {
+    const unsubIncidents = onSnapshot(query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)), (snapshot) => {
       setIncidents(snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as Incident)).filter((row) => row.deleted !== true));
     });
     return () => { unsubUsers(); unsubIncidents(); };

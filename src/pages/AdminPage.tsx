@@ -345,7 +345,7 @@ export default function AdminPage() {
     if (!isAuthReady || !user || !isAdmin || !db) return;
 
     const unsubIncidents = onSnapshot(
-      query(collection(db, 'incidents'), orderBy('timestamp', 'desc')),
+      query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(500)),
       (snapshot) => {
         const rows = snapshot.docs
           .map((row) => ({ id: row.id, ...row.data() } as Incident))
@@ -362,13 +362,13 @@ export default function AdminPage() {
       setCommunityStats(rows);
     });
 
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+    const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
     });
 
     // Page views — real-time listener for chart/breakdown data (last 2000 docs)
     const unsubPageViews = onSnapshot(
-      query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(2000)),
+      query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(200)),
       (snapshot) => {
         setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc));
       },
@@ -385,7 +385,7 @@ export default function AdminPage() {
       }
     };
     fetchTotalCount();
-    const countInterval = setInterval(fetchTotalCount, 5 * 60 * 1000);
+    const countInterval = 0;
 
     const unsubFlagged = onSnapshot(
       query(collection(db, 'incidents'), where('flagged', '==', true), orderBy('flagged_at', 'desc')),

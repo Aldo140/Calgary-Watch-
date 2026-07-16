@@ -110,7 +110,7 @@ function PageTracker() {
 
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-[#f5efe3] light:bg-[#f5efe3] flex items-center justify-center">
+    <div className="min-h-screen bg-[#f5efe3] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className="w-10 h-10 rounded-full border-2 border-[#4A90D9] border-t-transparent animate-spin" />
         <p className="text-sm text-slate-500 font-medium">Loading…</p>
@@ -120,16 +120,6 @@ function PageLoader() {
 }
 
 export default function App() {
-  useEffect(() => {
-    try {
-      const savedTheme = localStorage.getItem('cw-theme');
-      if (!savedTheme) localStorage.setItem('cw-theme', 'light');
-      if (savedTheme !== 'dark') document.documentElement.classList.add('light');
-    } catch {
-      document.documentElement.classList.add('light');
-    }
-  }, []);
-
   return (
     <BrowserRouter>
       <RedirectHandler />

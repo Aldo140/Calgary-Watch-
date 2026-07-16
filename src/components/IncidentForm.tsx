@@ -1,12 +1,30 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/src/components/ui/Button';
-import { Input } from '@/src/components/ui/Input';
-import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image } from 'lucide-react';
+import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, Check } from 'lucide-react';
 import { uploadIncidentImage } from '@/src/lib/storage';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+// ── Field-atlas palette (explicit hexes: several Tailwind color utilities are
+//    globally remapped in index.css) ──────────────────────────────────────────
+const P = {
+  paper: '#FFFDF8',
+  card: '#F7F3EA',
+  ink: '#1C2B3A',
+  soft: '#5A6B7D',
+  line: '#E7E0D2',
+  bow: '#2E8B7A',
+  sky: '#4A90D9',
+};
+
+const CATEGORY_CHIPS = [
+  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#DC2626' },
+  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#EA580C' },
+  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#2563EB' },
+  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
+  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#E11D48' },
+];
 
 // Approximate neighbourhood centres for Calgary.
 // Returns the closest neighbourhood name or '' if outside all radii.
@@ -84,6 +102,17 @@ function useLgUp() {
   }, []);
   return lg;
 }
+
+function FieldLabel({ children, hint }: { children: React.ReactNode; hint?: string }) {
+  return (
+    <label className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2 flex items-baseline justify-between" style={{ color: P.soft }}>
+      <span>{children}</span>
+      {hint && <span className="normal-case tracking-normal font-medium text-[10px]" style={{ color: '#9AA6B2' }}>{hint}</span>}
+    </label>
+  );
+}
+
+const inputStyle: React.CSSProperties = { background: P.paper, border: `1.5px solid ${P.line}`, color: P.ink };
 
 interface IncidentFormProps {
   isOpen: boolean;
@@ -163,6 +192,8 @@ export default function IncidentForm({
 
   const isAnonymous = watch('anonymous');
   const watchedNeighborhood = watch('neighborhood');
+  const watchedCategory = watch('category');
+  const watchedDescription = watch('description');
   const [neighborhoodOverride, setNeighborhoodOverride] = useState(false);
 
   // When pin mode exits without confirmation (Cancel), close the form via onClose so
@@ -279,81 +310,121 @@ export default function IncidentForm({
     onRequestMapPin?.();
   };
 
+  // ── Header: progress dots make the promise explicit — 2 steps, <30 s ──────
+  const stepIndex = step === 'choose' ? 0 : 1;
+  const header = (
+    <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-4 shrink-0 relative" style={{ borderBottom: `1px solid ${P.line}` }}>
+      <div className="absolute top-0 inset-x-0 h-1" style={{ background: `linear-gradient(to right, ${P.sky}, ${P.bow})` }} aria-hidden="true" />
+      <div>
+        <p className="font-mono text-[9px] font-bold uppercase tracking-[0.28em]" style={{ color: P.bow }}>
+          New report · under 30 seconds
+        </p>
+        <h2 className="mt-1 font-display text-xl font-extrabold tracking-[-0.02em]" style={{ color: P.ink }}>
+          Put it on the map
+        </h2>
+        <div className="mt-2.5 flex items-center gap-2" aria-hidden="true">
+          {['Location', 'Details'].map((label, i) => (
+            <span key={label} className="flex items-center gap-1.5">
+              <span
+                className="flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-black transition-colors"
+                style={i <= stepIndex ? { background: P.ink, color: P.paper } : { background: P.card, color: P.soft, border: `1px solid ${P.line}` }}
+              >
+                {i < stepIndex ? <Check size={9} /> : i + 1}
+              </span>
+              <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.14em]" style={{ color: i <= stepIndex ? P.ink : P.soft }}>
+                {label}
+              </span>
+              {i === 0 && <span className="h-px w-5" style={{ background: P.line }} />}
+            </span>
+          ))}
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={handleClose}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5"
+        style={{ color: P.soft }}
+        aria-label="Close report form"
+      >
+        <X size={17} />
+      </button>
+    </div>
+  );
+
   // Single copy of steps in the DOM - never mount desktop + mobile forms together (breaks RHF / zod).
   const reportSteps = (
     <AnimatePresence>
       {step === 'choose' && (
         <motion.div key="choose" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
-          <div className="space-y-4 p-6">
-            <div>
-              <h3 className="text-lg font-black text-white mb-1">Step 1: Select Location</h3>
-              <p className="text-sm text-slate-400">Pin the exact spot where this happened</p>
-            </div>
-            <div className="space-y-3">
-              {locationAvailable ? (
-                <motion.button
-                  type="button"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleUseCurrentLocation}
-                  className="w-full p-5 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-blue-700/20 hover:from-blue-600/30 hover:to-blue-700/30 transition-all group text-left shadow-lg"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-black text-white text-base flex items-center gap-2">
-                        <Navigation size={16} className="text-blue-400" />
-                        Use My Current Location
-                      </p>
-                      <p className="text-xs text-slate-300 mt-1.5">Fast and accurate. Uses your device GPS.</p>
-                    </div>
-                    <div className="text-blue-400 group-hover:translate-x-1 transition-transform">→</div>
-                  </div>
-                </motion.button>
-              ) : (
-                <div className="p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-600/10 to-amber-700/10">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
-                    <div className="flex-1 space-y-2">
-                      <p className="font-black text-white text-sm">Location Access Unavailable</p>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        Your browser hasn&apos;t shared your location. You can enable it in your device settings, or just drop a pin on the map below.
-                      </p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        <a
-                          href="https://support.google.com/chrome/answer/142065"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-300 hover:text-white transition-colors underline underline-offset-2"
-                        >
-                          How to enable location
-                          <ExternalLink size={10} />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+          <div className="space-y-3 p-6">
+            <p className="text-sm font-semibold" style={{ color: P.soft }}>
+              Where did it happen?
+            </p>
+
+            {locationAvailable ? (
               <motion.button
                 type="button"
-                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={handlePinOnMap}
-                className="w-full p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-600/20 to-emerald-700/20 hover:from-emerald-600/30 hover:to-emerald-700/30 transition-all group text-left shadow-lg"
+                onClick={handleUseCurrentLocation}
+                className="w-full p-4 rounded-2xl text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
+                style={{ background: P.paper, border: `1.5px solid ${P.line}`, boxShadow: '0 10px 24px -18px rgba(28,43,58,0.4)' }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-black text-white text-base flex items-center gap-2">
-                      <MapPin size={16} className="text-emerald-400" />
-                      Drop a Pin on the Map
-                    </p>
-                    <p className="text-xs text-slate-300 mt-1.5">
-                      {locationAvailable ? 'Pan the map to any spot in Calgary' : 'Tap the map at the exact spot'}
-                    </p>
-                  </div>
-                  <div className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</div>
-                </div>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(74,144,217,0.12)' }}>
+                  <Navigation size={19} style={{ color: P.sky }} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14.5px] font-black" style={{ color: P.ink }}>Right where I'm standing</span>
+                  <span className="block text-xs mt-0.5" style={{ color: P.soft }}>Uses your device GPS — fastest option</span>
+                </span>
+                <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" style={{ color: P.sky }} />
               </motion.button>
-            </div>
+            ) : (
+              <div className="p-4 rounded-2xl" style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.3)' }}>
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={15} className="mt-0.5 shrink-0" style={{ color: '#B45309' }} />
+                  <div className="flex-1 space-y-1.5">
+                    <p className="text-[13px] font-black" style={{ color: '#92400E' }}>Location access is off</p>
+                    <p className="text-xs leading-relaxed" style={{ color: P.soft }}>
+                      Your browser hasn't shared your location — no problem, just drop a pin below.
+                    </p>
+                    <a
+                      href="https://support.google.com/chrome/answer/142065"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-bold underline underline-offset-2"
+                      style={{ color: '#92400E' }}
+                    >
+                      How to enable location
+                      <ExternalLink size={10} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              onClick={handlePinOnMap}
+              className="w-full p-4 rounded-2xl text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
+              style={{ background: P.paper, border: `1.5px solid ${P.line}`, boxShadow: '0 10px 24px -18px rgba(28,43,58,0.4)' }}
+            >
+              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(46,139,122,0.12)' }}>
+                <span className="absolute inset-2 rounded-full animate-ping opacity-25" style={{ background: P.bow }} aria-hidden="true" />
+                <MapPin size={19} style={{ color: P.bow }} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14.5px] font-black" style={{ color: P.ink }}>Drop a pin on the map</span>
+                <span className="block text-xs mt-0.5" style={{ color: P.soft }}>
+                  {locationAvailable ? 'Pan to any spot in Calgary' : 'Pan to the exact spot'}
+                </span>
+              </span>
+              <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" style={{ color: P.bow }} />
+            </motion.button>
+
+            <p className="pt-1 text-center font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: '#9AA6B2' }}>
+              The exact spot helps neighbours nearby
+            </p>
           </div>
         </motion.div>
       )}
@@ -365,14 +436,18 @@ export default function IncidentForm({
             onClick={(e) => e.stopPropagation()}
             noValidate
           >
-            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-600/25 to-indigo-600/25 border border-blue-500/40 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-black text-blue-300 uppercase tracking-wide">
-                  {pinLocation ? 'Pin Set' : usingGPS ? 'GPS Location' : 'City Centre (approx.)'}
-                </p>
-                <p className="text-xs text-slate-200 mt-0.5 font-mono">
-                  {activeLocation?.lat.toFixed(5)}, {activeLocation?.lng.toFixed(5)}
-                </p>
+            {/* Location confirmation bar */}
+            <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <MapPin size={14} className="shrink-0" style={{ color: P.bow }} />
+                <div className="min-w-0">
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: P.bow }}>
+                    {pinLocation ? 'Pin locked' : usingGPS ? 'GPS locked' : 'City centre (approx.)'}
+                  </p>
+                  <p className="font-mono text-[10.5px] mt-0.5 truncate tabular-nums" style={{ color: P.ink }}>
+                    {activeLocation?.lat.toFixed(5)}, {activeLocation?.lng.toFixed(5)}
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
@@ -381,54 +456,61 @@ export default function IncidentForm({
                   setStep('choose');
                   setUsingGPS(false);
                 }}
-                className="text-xs font-bold text-blue-300 hover:text-white bg-blue-600/20 hover:bg-blue-600/30 px-3 py-1.5 rounded-lg transition-all whitespace-nowrap"
+                className="shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors hover:bg-black/5"
+                style={{ color: P.ink, border: `1px solid ${P.line}`, background: P.paper }}
               >
                 Change
               </button>
             </div>
 
-            <div className="p-3.5 rounded-xl border border-red-500/30 bg-gradient-to-br from-red-600/10 to-red-900/20 flex items-start gap-3">
-              <AlertTriangle className="text-red-400 mt-0.5 shrink-0" size={16} />
-              <div>
-                <p className="text-[10px] items-center gap-2 font-black tracking-widest uppercase text-red-400">Not Sent To Police</p>
-                <p className="text-xs text-red-200/80 mt-1 font-medium leading-relaxed">
-                  Calgary Watch is peer-to-peer and <b>does NOT</b> dispatch emergency services. If you require immediate police or medical assistance, please call <b>911</b>.
-                </p>
+            {/* 911 notice — compact strip */}
+            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.25)' }}>
+              <AlertTriangle size={13} className="shrink-0" style={{ color: '#DC2626' }} />
+              <p className="text-[11px] leading-snug font-medium" style={{ color: '#7F1D1D' }}>
+                Not sent to police. Emergencies: call <b>911</b> — this alerts neighbours in parallel.
+              </p>
+            </div>
+
+            {/* Category — one-tap colour chips, same language as the map */}
+            <div>
+              <FieldLabel>Category</FieldLabel>
+              <div className="grid grid-cols-5 gap-1.5">
+                {CATEGORY_CHIPS.map(({ id, label, Icon, color }) => {
+                  const active = watchedCategory === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setValue('category', id, { shouldValidate: true, shouldDirty: true })}
+                      className="flex flex-col items-center gap-1 rounded-xl py-2.5 transition-all active:scale-95"
+                      style={active
+                        ? { background: color, border: `1.5px solid ${color}`, color: '#fff' }
+                        : { background: P.paper, border: `1.5px solid ${P.line}`, color: P.soft }}
+                      aria-pressed={active}
+                    >
+                      <Icon size={16} style={{ color: active ? '#fff' : color }} />
+                      <span className="text-[9.5px] font-black uppercase tracking-[0.06em]">{label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
+            {/* Neighbourhood */}
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Category</label>
-              <div className="relative">
-                <select
-                  {...register('category')}
-                  className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 light:border-stone-200/80 bg-slate-900 light:bg-white/80 text-white light:text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="crime">Crime</option>
-                  <option value="traffic">Traffic</option>
-                  <option value="infrastructure">Infrastructure</option>
-                  <option value="weather">Weather</option>
-                  <option value="emergency">🚨 Emergency</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 light:text-stone-500"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Neighbourhood</label>
+              <FieldLabel>Neighbourhood</FieldLabel>
               {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10">
+                <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-white light:text-slate-900 font-bold text-sm">{watchedNeighborhood}</span>
-                    <span className="text-[10px] text-emerald-400 font-black uppercase tracking-wider">Auto-detected</span>
+                    <span className="w-2 h-2 rounded-full" style={{ background: P.bow }} />
+                    <span className="font-bold text-sm" style={{ color: P.ink }}>{watchedNeighborhood}</span>
+                    <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.14em]" style={{ color: P.bow }}>Auto-detected</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setNeighborhoodOverride(true)}
-                    className="text-[10px] text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 font-bold uppercase tracking-wider transition-colors"
+                    className="text-[10px] font-bold uppercase tracking-wider transition-colors hover:opacity-70"
+                    style={{ color: P.soft }}
                   >
                     Change
                   </button>
@@ -437,85 +519,77 @@ export default function IncidentForm({
                 <div className="relative">
                   <select
                     {...register('neighborhood')}
-                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border border-white/10 light:border-stone-200/80 bg-slate-900 light:bg-white/80 text-white light:text-slate-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                    style={inputStyle}
                   >
-                    <option value="">Select Area</option>
-                    <option value="Beltline">Beltline</option>
-                    <option value="Kensington">Kensington</option>
-                    <option value="Bridgeland">Bridgeland</option>
-                    <option value="Mission">Mission</option>
-                    <option value="Inglewood">Inglewood</option>
-                    <option value="Bowness">Bowness</option>
-                    <option value="Downtown">Downtown</option>
-                    <option value="Saddleridge">Saddleridge</option>
-                    <option value="Evanston">Evanston</option>
-                    <option value="Mahogany">Mahogany</option>
-                    <option value="Auburn Bay">Auburn Bay</option>
-                    <option value="Signal Hill">Signal Hill</option>
-                    <option value="Tuscany">Tuscany</option>
-                    <option value="Royal Oak">Royal Oak</option>
-                    <option value="Panorama Hills">Panorama Hills</option>
-                    <option value="Midnapore">Midnapore</option>
-                    <option value="Shawnessy">Shawnessy</option>
-                    <option value="McKenzie Towne">McKenzie Towne</option>
-                    <option value="Cranston">Cranston</option>
-                    <option value="Copperfield">Copperfield</option>
-                    <option value="Other">Other / Not Listed</option>
+                    <option value="">Select area</option>
+                    {NEIGHBOURHOODS.map((n) => (
+                      <option key={n.name} value={n.name}>{n.name}</option>
+                    ))}
+                    <option value="Other">Other / Not listed</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 light:text-stone-500"><polyline points="6 9 12 15 18 9"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: P.soft }}><polyline points="6 9 12 15 18 9"/></svg>
                   </div>
                 </div>
               )}
               {errors.neighborhood && (
-                <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.neighborhood.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{errors.neighborhood.message}</p>
               )}
             </div>
 
+            {/* Headline */}
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Headline</label>
-              <Input
+              <FieldLabel>Headline</FieldLabel>
+              <input
                 {...register('title')}
-                placeholder="e.g., Major collision on 17th Ave SW"
-                className="bg-slate-900 light:bg-white/80 border-white/10 light:border-stone-200/80 text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 rounded-xl h-11 font-bold px-4 text-sm focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g. Stolen bike — blue Norco, 9 Ave SE"
+                className="w-full h-11 px-4 rounded-xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
+                style={inputStyle}
               />
               {errors.title && (
-                <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.title.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{errors.title.message}</p>
               )}
             </div>
 
+            {/* Description */}
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">What Happened?</label>
+              <FieldLabel hint={`${(watchedDescription ?? '').length}/1000`}>What happened?</FieldLabel>
               <textarea
                 {...register('description')}
-                placeholder="Give neighbours the details they need to know..."
+                placeholder="Give neighbours the details they need — what, when, anything identifying. Your bike's serial number. The truck's colour."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-white/10 light:border-stone-200/80 bg-slate-900 light:bg-white/80 text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
+                style={inputStyle}
               />
               {errors.description && (
-                <p className="text-red-400 text-xs mt-1.5 font-bold">{errors.description.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{errors.description.message}</p>
               )}
             </div>
 
+            {/* Photo */}
             <div>
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 flex justify-between">
-                Photo <span className="text-slate-600 font-normal normal-case tracking-normal">Optional · JPEG/PNG/WebP · max 5 MB</span>
-              </label>
+              <FieldLabel hint="Optional · JPEG/PNG/WebP · max 5 MB">Photo</FieldLabel>
               {imagePreview ? (
-                <div className="relative rounded-xl overflow-hidden border border-white/10">
+                <div className="relative rounded-xl overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
                   <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
                   <button
                     type="button"
                     onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
-                    className="absolute top-2 right-2 p-1.5 bg-slate-900/80 hover:bg-slate-900 rounded-lg text-slate-300 hover:text-white transition-all"
+                    className="absolute top-2 right-2 p-1.5 rounded-lg transition-all"
+                    style={{ background: 'rgba(28,43,58,0.8)', color: '#fff' }}
+                    aria-label="Remove photo"
                   >
                     <X size={14} />
                   </button>
                 </div>
               ) : (
-                <label className="flex items-center justify-center gap-3 w-full h-20 rounded-xl border border-dashed border-white/20 hover:border-blue-500/50 bg-white/5 hover:bg-blue-600/10 cursor-pointer transition-all">
-                  <Image size={20} className="text-slate-500" />
-                  <span className="text-sm text-slate-400 font-bold">Click to attach a photo</span>
+                <label
+                  className="flex items-center justify-center gap-3 w-full h-16 rounded-xl cursor-pointer transition-colors hover:bg-black/[0.02]"
+                  style={{ border: `1.5px dashed ${P.line}`, background: P.card }}
+                >
+                  <Image size={18} style={{ color: P.soft }} />
+                  <span className="text-sm font-bold" style={{ color: P.soft }}>Attach a photo</span>
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
@@ -536,51 +610,70 @@ export default function IncidentForm({
                   />
                 </label>
               )}
-              {imageError && <p className="text-red-400 text-xs mt-1.5 font-bold">{imageError}</p>}
+              {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{imageError}</p>}
             </div>
 
-            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 light:border-stone-200/80 bg-white/5 light:bg-white/68 hover:bg-white/8 light:hover:bg-white cursor-pointer transition-colors">
+            {/* Anonymous toggle */}
+            <label
+              className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors hover:bg-black/[0.02]"
+              style={{ background: P.card, border: `1px solid ${P.line}` }}
+            >
               <input
                 type="checkbox"
                 {...register('anonymous', { setValueAs: (v) => v === true })}
-                className="h-4 w-4 rounded border-white/20 light:border-stone-300 bg-slate-900 light:bg-white accent-blue-500 cursor-pointer"
+                className="h-4 w-4 rounded cursor-pointer accent-[#2E8B7A]"
               />
-              <div>
-                <p className="text-xs font-bold text-white light:text-slate-900">Post Anonymously</p>
-                <p className="text-[10px] text-slate-400 light:text-stone-500">Your name won&apos;t appear</p>
+              <div className="flex-1">
+                <p className="text-xs font-bold" style={{ color: P.ink }}>Post anonymously</p>
+                <p className="text-[10px]" style={{ color: P.soft }}>Your name won't appear on the report</p>
               </div>
+              <span
+                className="font-mono text-[8.5px] font-bold uppercase tracking-[0.12em] px-2 py-1 rounded-full"
+                style={isAnonymous ? { background: 'rgba(46,139,122,0.14)', color: P.bow } : { background: P.paper, color: '#9AA6B2', border: `1px solid ${P.line}` }}
+              >
+                {isAnonymous ? 'Anonymous' : 'Named'}
+              </span>
             </label>
 
             {errors.root && (
-              <p className="text-red-400 text-xs font-bold px-1" role="alert">
+              <p className="text-xs font-bold px-1" role="alert" style={{ color: '#DC2626' }}>
                 {errors.root.message}
               </p>
             )}
 
-            <div className="flex items-center gap-3 pt-2 border-t border-white/8 light:border-stone-200/80">
+            {/* Submit row */}
+            <div className="flex items-center gap-3 pt-3" style={{ borderTop: `1px solid ${P.line}` }}>
               <img
-                src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1e293b&color=fff'}
+                src={userProfile?.photoURL || 'https://ui-avatars.com/api/?name=Calgary+User&background=1C2B3A&color=fff'}
                 alt=""
-                className="w-8 h-8 rounded-lg border border-white/10 object-cover"
+                className="w-9 h-9 rounded-full object-cover"
+                style={{ border: `1px solid ${P.line}`, opacity: isAnonymous ? 0.4 : 1 }}
                 referrerPolicy="no-referrer"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-slate-200 truncate">
-                  {isAnonymous ? 'Anonymous' : userProfile?.displayName?.toUpperCase()}
+                <p className="text-xs font-bold truncate" style={{ color: P.ink }}>
+                  {isAnonymous ? 'Anonymous' : userProfile?.displayName || 'Calgary User'}
                 </p>
+                <p className="font-mono text-[8.5px] uppercase tracking-[0.14em]" style={{ color: P.soft }}>Reporting live</p>
               </div>
-              <Button
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 h-11 font-black bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm shadow-lg whitespace-nowrap"
+                className="h-12 px-6 rounded-2xl font-black text-sm flex items-center gap-2 transition-transform active:scale-[0.97] disabled:opacity-50 whitespace-nowrap"
+                style={{ background: P.ink, color: P.paper, boxShadow: '0 14px 28px -14px rgba(28,43,58,0.55)' }}
               >
                 {isSubmitting ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin" />
-                    Posting…
-                  </span>
-                ) : 'Post Report'}
-              </Button>
+                  <>
+                    <Loader2 size={15} className="animate-spin" />
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    Send it live
+                    <ArrowRight size={14} className="opacity-80" />
+                  </>
+                )}
+              </button>
             </div>
           </form>
         </motion.div>
@@ -597,51 +690,36 @@ export default function IncidentForm({
 
   return isLgUp ? (
     <div
-      className="fixed inset-0 z-[115] flex items-center justify-center p-4 bg-slate-950/60 light:bg-[#7c6f64]/18 backdrop-blur-xl"
-      style={hiddenStyle}
+      className="fixed inset-0 z-[115] flex items-center justify-center p-4 backdrop-blur-sm"
+      style={{ background: 'rgba(20,28,38,0.5)', ...hiddenStyle }}
       onClick={handleClose}
     >
       <div
-        className="relative z-50 w-full max-w-xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950 light:from-[rgb(255,250,243)] light:via-[rgb(255,247,237)] light:to-[rgb(242,251,248)] rounded-3xl border border-white/10 light:border-stone-200/80 shadow-2xl shadow-blue-900/40 light:shadow-[0_24px_60px_-32px_rgba(120,113,108,0.35)] overflow-hidden flex flex-col"
+        className="relative z-50 w-full max-w-xl max-h-[90vh] rounded-3xl overflow-hidden flex flex-col shadow-[0_32px_80px_-32px_rgba(28,43,58,0.6)]"
+        style={{ background: P.paper, border: `1px solid ${P.line}` }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 light:border-stone-200/80 bg-gradient-to-r from-slate-900/80 to-blue-900/15 light:from-white/85 light:to-sky-50 flex-shrink-0">
-          <div>
-            <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
-            <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report what&apos;s happening in real-time</p>
-          </div>
-          <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-lg transition-all">
-            <X size={20} />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto">{reportSteps}</div>
+        {header}
+        <div className="flex-1 overflow-y-auto no-scrollbar">{reportSteps}</div>
       </div>
     </div>
   ) : (
     <>
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
-        style={hiddenStyle}
+        className="fixed inset-0 backdrop-blur-sm z-[110]"
+        style={{ background: 'rgba(20,28,38,0.45)', ...hiddenStyle }}
         onClick={handleClose}
       />
       <div
-        className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[2.5rem] bg-slate-950 light:bg-[rgb(255,250,243)] border-t border-white/10 light:border-stone-200/80 flex flex-col"
-        style={{ maxHeight: '92dvh', ...hiddenStyle }}
+        className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[1.6rem] flex flex-col"
+        style={{ maxHeight: '92dvh', background: P.paper, borderTop: `1px solid ${P.line}`, ...hiddenStyle }}
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <div className="flex-shrink-0 flex justify-center pt-4 pb-2">
-          <div className="w-10 h-1.5 rounded-full bg-white/15" />
+        <div className="flex-shrink-0 flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full" style={{ background: P.line }} />
         </div>
-        <div className="flex items-center justify-between px-6 pb-4 flex-shrink-0">
-          <div>
-            <h2 className="text-xl font-black text-white light:text-slate-900">Keep Calgary Safe</h2>
-            <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Report in real-time</p>
-          </div>
-          <button type="button" onClick={handleClose} className="p-2 text-slate-400 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
-            <X size={20} />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto">{reportSteps}</div>
+        {header}
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-[max(0.5rem,env(safe-area-inset-bottom))]">{reportSteps}</div>
       </div>
     </>
   );

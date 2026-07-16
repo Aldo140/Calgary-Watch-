@@ -17,6 +17,10 @@ type UserProfile = {
   createdAt?: number;
   updatedAt?: number;
   notes?: string;
+  weeklyDigestOptIn?: boolean;
+  digestPromptedAt?: number;
+  neighborhood?: string;
+  inferredNeighborhood?: string;
 };
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -123,6 +127,7 @@ export default function AdminUserListPage() {
     admins: users.filter((profile) => profile.role === 'admin').length,
     reporters: enrichedUsers.filter((profile) => profile.reports.length > 0).length,
     notes: incidents.length,
+    digest: users.filter((profile) => profile.weeklyDigestOptIn === true).length,
   }), [users, enrichedUsers, incidents.length]);
 
   const saveNotes = async (profile: UserProfile) => {
@@ -190,12 +195,13 @@ export default function AdminUserListPage() {
         </header>
 
         <main className="mx-auto grid max-w-7xl gap-4 px-4 py-5">
-          <section className="grid gap-3 sm:grid-cols-4">
+          <section className="grid gap-3 grid-cols-2 sm:grid-cols-5">
             {[
               { label: 'Users', value: userStats.total, icon: Users, tone: 'text-slate-900' },
               { label: 'Admins', value: userStats.admins, icon: ShieldCheck, tone: 'text-emerald-700' },
               { label: 'Reporters', value: userStats.reporters, icon: FileText, tone: 'text-amber-700' },
               { label: 'Notes', value: userStats.notes, icon: Code2, tone: 'text-sky-700' },
+              { label: 'Digest opt-in', value: userStats.digest, icon: Users, tone: 'text-teal-700' },
             ].map(({ label, value, icon: Icon, tone }) => (
               <Card key={label} className="rounded-2xl border-slate-200 bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
@@ -219,7 +225,19 @@ export default function AdminUserListPage() {
                     <p className="truncate text-sm font-black">{profile.displayName || 'Unknown user'}</p>
                     <p className="truncate text-xs text-slate-600">{profile.email || 'No email'}</p>
                   </div>
-                  <span className={cn('rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-widest', profile.role === 'admin' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-sky-200 bg-sky-50 text-sky-700')}>{profile.role}</span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className={cn('rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-widest', profile.role === 'admin' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-sky-200 bg-sky-50 text-sky-700')}>{profile.role}</span>
+                    <span className={cn(
+                      'rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-widest',
+                      profile.weeklyDigestOptIn === true
+                        ? 'border-teal-200 bg-teal-50 text-teal-700'
+                        : profile.weeklyDigestOptIn === false
+                          ? 'border-red-200 bg-red-50 text-red-600'
+                          : 'border-amber-200 bg-amber-50 text-amber-700'
+                    )}>
+                      {profile.weeklyDigestOptIn === true ? '📬 Newsletter: yes' : profile.weeklyDigestOptIn === false ? 'Newsletter: no' : 'Not specified'}
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                   <span className="rounded-xl bg-slate-50 px-3 py-2 text-slate-600">{formatDateTime(profile.joinedAt)}</span>
@@ -249,11 +267,28 @@ export default function AdminUserListPage() {
                   <pre className="max-h-[70vh] overflow-auto bg-slate-950 p-5 text-xs text-slate-100">{JSON.stringify({ user: selectedUser, reports: selectedUser.reports }, null, 2)}</pre>
                 ) : (
                   <div className="grid gap-5 p-5">
-                    <div className="grid gap-3 sm:grid-cols-4">
+                    <div className="grid gap-3 grid-cols-2 sm:grid-cols-5">
                       <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">UID</p><p className="mt-2 break-all font-mono text-xs">{selectedUser.uid}</p></div>
                       <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Role</p><p className="mt-2 text-sm font-black">{selectedUser.role}</p></div>
                       <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes Posted</p><p className="mt-2 text-sm font-black">{selectedUser.reports.length}</p></div>
                       <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Anonymous Notes</p><p className="mt-2 text-sm font-black">{selectedUser.anonymousCount}</p></div>
+                      <div className={cn(
+                        'rounded-2xl p-4',
+                        selectedUser.weeklyDigestOptIn === true ? 'bg-teal-50' : selectedUser.weeklyDigestOptIn === false ? 'bg-red-50' : 'bg-amber-50'
+                      )}>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Weekly Newsletter</p>
+                        <p className={cn(
+                          'mt-2 text-sm font-black',
+                          selectedUser.weeklyDigestOptIn === true ? 'text-teal-700' : selectedUser.weeklyDigestOptIn === false ? 'text-red-600' : 'text-amber-700'
+                        )}>
+                          {selectedUser.weeklyDigestOptIn === true ? 'Yes' : selectedUser.weeklyDigestOptIn === false ? 'No' : 'Not specified'}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500 truncate">
+                          {selectedUser.weeklyDigestOptIn === undefined
+                            ? (selectedUser.digestPromptedAt ? 'Prompted, no answer saved' : 'Will be prompted on next sign-in')
+                            : (selectedUser.neighborhood || selectedUser.inferredNeighborhood || '')}
+                        </p>
+                      </div>
                     </div>
 
                     <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[1fr_12rem_auto] sm:items-end">

@@ -38,7 +38,6 @@ interface AreaIntelligencePanelProps {
   statcanYearlyStats?: Map<string, CrimeYearEntry[]>;
   propertyData?: PropertyYearEntry[];
   cityAverages?: { avgViolent: number; avgProperty: number; avgDisorder: number };
-  theme?: 'dark' | 'light';
 }
 
 // ── Shared tooltip styles ────────────────────────────────────────────────────
@@ -81,11 +80,14 @@ function Section({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-      <div className="mb-4">
-        <h3 className={cn('text-xl font-black leading-tight', isLight ? 'text-slate-900' : 'text-white')}>{title}</h3>
-        {subtitle && (
-          <p className="text-[11px] uppercase tracking-widest font-bold mt-0.5 text-slate-500">{subtitle}</p>
-        )}
+      <div className="mb-4 flex items-baseline gap-3">
+        <span className="h-px w-6 shrink-0 translate-y-[-4px]" style={{ background: '#2E8B7A' }} aria-hidden="true" />
+        <div>
+          <h3 className={cn('font-display text-xl font-bold leading-tight tracking-[-0.01em]', isLight ? 'text-[#1C2B3A]' : 'text-white')}>{title}</h3>
+          {subtitle && (
+            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] font-bold mt-1 text-slate-500">{subtitle}</p>
+          )}
+        </div>
       </div>
       {children}
     </motion.div>
@@ -122,7 +124,7 @@ function HeroSection({
       className="relative px-5 pt-5 pb-6 md:px-8 overflow-hidden"
       style={{
         background: isLight
-          ? 'linear-gradient(135deg, #e8f4fd 0%, #e6f7f5 100%)'
+          ? 'linear-gradient(135deg, #EFF5FA 0%, #F5F2E9 100%)'
           : 'linear-gradient(135deg, #0f1e3d 0%, #0a1628 100%)',
       }}
     >
@@ -136,9 +138,9 @@ function HeroSection({
 
       {/* Eyebrow + close */}
       <div className="flex items-center justify-between mb-3 relative z-10">
-        <div className="flex items-center gap-1.5">
-          <MapPin size={11} className={isLight ? 'text-slate-500' : 'text-slate-500'} />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Neighbourhood Intelligence</span>
+        <div className="flex items-center gap-2">
+          <MapPin size={11} style={{ color: '#2E8B7A' }} />
+          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.3em]" style={{ color: '#2E8B7A' }}>Area Intel · YYC</span>
         </div>
         <button
           onClick={onClose}
@@ -157,8 +159,8 @@ function HeroSection({
       {/* Community name */}
       <h2
         className={cn(
-          'text-[clamp(26px,6vw,40px)] font-black leading-none mb-4 relative z-10 truncate',
-          isLight ? 'text-slate-900' : 'text-white',
+          'font-display text-[clamp(26px,6vw,40px)] font-extrabold tracking-[-0.02em] leading-none mb-4 relative z-10 truncate',
+          isLight ? 'text-[#1C2B3A]' : 'text-white',
         )}
         title={data.communityName}
       >
@@ -268,6 +270,15 @@ interface ContentProps {
   cityAverages?: { avgViolent: number; avgProperty: number; avgDisorder: number };
 }
 
+const INTEL_SECTIONS = [
+  { id: 'sec-year', label: 'This year' },
+  { id: 'sec-trends', label: 'Trends' },
+  { id: 'sec-mix', label: 'Crime mix' },
+  { id: 'sec-property', label: 'Property' },
+  { id: 'sec-signals', label: 'Signals' },
+  { id: 'sec-sources', label: 'Sources' },
+] as const;
+
 function Content({
   data,
   onClose,
@@ -286,10 +297,12 @@ function Content({
   cityAverages,
 }: ContentProps) {
   const heroRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [miniBarVisible, setMiniBarVisible] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>(INTEL_SECTIONS[0].id);
 
   // Reset mini-bar when community changes
-  useEffect(() => { setMiniBarVisible(false); }, [data.communityName]);
+  useEffect(() => { setMiniBarVisible(false); setActiveSection(INTEL_SECTIONS[0].id); }, [data.communityName]);
 
   // Show mini-bar once hero scrolls out of view
   useEffect(() => {
@@ -297,14 +310,38 @@ function Content({
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => setMiniBarVisible(!entry.isIntersecting),
-      { threshold: 0 }
+      { threshold: 0, root: scrollRef.current }
     );
     obs.observe(el);
     return () => obs.disconnect();
   }, [data.communityName]);
 
+  // Scrollspy for the section navigator
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const hit = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if (hit) setActiveSection(hit.target.id);
+      },
+      { root, rootMargin: '-30% 0px -55% 0px' }
+    );
+    INTEL_SECTIONS.forEach(({ id }) => {
+      const el = root.querySelector(`#${id}`);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, [data.communityName]);
+
+  const jumpTo = (id: string) => {
+    scrollRef.current?.querySelector(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <div className={cn('flex flex-col h-full overflow-hidden relative', isLight ? 'text-slate-900' : 'text-white')}>
+    <div className={cn('flex flex-col h-full overflow-hidden relative', isLight ? 'text-[#1C2B3A]' : 'text-white')}>
       {/* Sticky mini-bar */}
       <AnimatePresence>
         {miniBarVisible && (
@@ -314,63 +351,111 @@ function Content({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
             className={cn(
-              'sticky top-0 z-20 flex items-center justify-between px-5 py-3 border-b backdrop-blur-xl',
-              isLight ? 'bg-white/90 border-slate-200' : 'bg-slate-950/90 border-white/10'
+              'sticky top-0 z-20 flex items-center justify-between px-5 py-2.5 border-b backdrop-blur-xl',
+              isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-slate-950/90 border-white/10'
             )}
           >
-            <span className="text-sm font-black truncate">{data.communityName}</span>
-            <span className={cn(
-              'text-xs font-black px-2.5 py-1 rounded-full border',
-              score >= 70 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : score >= 40 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                : 'bg-red-500/10 text-red-400 border-red-500/20'
-            )}>
-              {score} / 100
-            </span>
+            <span className="font-display text-sm font-bold truncate">{data.communityName}</span>
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                'text-xs font-black px-2.5 py-1 rounded-full border',
+                score >= 70 ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25'
+                  : score >= 40 ? 'bg-amber-500/10 text-amber-600 border-amber-500/25'
+                  : 'bg-red-500/10 text-red-500 border-red-500/25'
+              )}>
+                {score} / 100
+              </span>
+              <button
+                onClick={onClose}
+                aria-label="Close"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 hover:bg-black/5"
+              >
+                <X size={13} />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto no-scrollbar">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto no-scrollbar">
         <div ref={heroRef}>
           <HeroSection data={data} onClose={onClose} glowColor={glowColor} gaugeColor={gaugeColor} isLight={isLight} />
         </div>
 
-        <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[rgb(255,250,243)]' : 'bg-slate-950')}>
-          <CrimeThisYearSection
-            crimeEntry={crimeEntry}
-            cityAverages={cityAverages}
-            isLight={isLight}
-            yearlyStats={realYearly}
-            isStatcanData={isStatcanData}
-          />
-          <TrendChartSection
-            chartData={chartData}
-            hasRealData={hasRealData}
-            yearlyStats={realYearly}
-            isLight={isLight}
-            tooltipStyle={tooltipStyle}
-            tooltipLabelStyle={tooltipLabelStyle}
-          />
-          <DonutSection
-            crimeEntry={crimeEntry}
-            isLight={isLight}
-          />
-          <PropertyValueSection
-            key={`pv-${data.communityName}`}
-            propertyData={propertyData}
-            yearlyStats={realYearly}
-            isLight={isLight}
-            tooltipStyle={tooltipStyle}
-            tooltipLabelStyle={tooltipLabelStyle}
-            score={score}
-          />
-          <KeySignalsSection
-            insights={data.insights}
-            isLight={isLight}
-          />
-          <DataSourcesSection isLight={isLight} />
+        {/* Section navigator — sticks under the mini-bar, scrollspy-highlighted */}
+        <div
+          className={cn(
+            'sticky top-0 z-10 flex gap-1.5 overflow-x-auto no-scrollbar px-5 md:px-8 py-2.5 border-b backdrop-blur-xl',
+            isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-slate-950/92 border-white/10'
+          )}
+        >
+          {INTEL_SECTIONS.map(({ id, label }) => {
+            const active = activeSection === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => jumpTo(id)}
+                className="shrink-0 rounded-full px-3.5 h-8 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border transition-all"
+                style={active
+                  ? { background: '#1C2B3A', borderColor: '#1C2B3A', color: '#FFFDF8' }
+                  : isLight
+                    ? { background: '#F7F3EA', borderColor: '#E7E0D2', color: '#5A6B7D' }
+                    : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#94a3b8' }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[#FFFDF8]' : 'bg-slate-950')}>
+          <div id="sec-year" className="scroll-mt-16">
+            <CrimeThisYearSection
+              crimeEntry={crimeEntry}
+              cityAverages={cityAverages}
+              isLight={isLight}
+              yearlyStats={realYearly}
+              isStatcanData={isStatcanData}
+            />
+          </div>
+          <div id="sec-trends" className="scroll-mt-16">
+            <TrendChartSection
+              chartData={chartData}
+              hasRealData={hasRealData}
+              yearlyStats={realYearly}
+              isLight={isLight}
+              tooltipStyle={tooltipStyle}
+              tooltipLabelStyle={tooltipLabelStyle}
+            />
+          </div>
+          <div id="sec-mix" className="scroll-mt-16">
+            <DonutSection
+              crimeEntry={crimeEntry}
+              isLight={isLight}
+            />
+          </div>
+          <div id="sec-property" className="scroll-mt-16">
+            <PropertyValueSection
+              key={`pv-${data.communityName}`}
+              propertyData={propertyData}
+              yearlyStats={realYearly}
+              isLight={isLight}
+              tooltipStyle={tooltipStyle}
+              tooltipLabelStyle={tooltipLabelStyle}
+              score={score}
+            />
+          </div>
+          <div id="sec-signals" className="scroll-mt-16">
+            <KeySignalsSection
+              insights={data.insights}
+              isLight={isLight}
+            />
+          </div>
+          <div id="sec-sources" className="scroll-mt-16">
+            <DataSourcesSection isLight={isLight} />
+          </div>
         </div>
       </div>
     </div>
@@ -380,11 +465,11 @@ function Content({
 // ── Main panel ───────────────────────────────────────────────────────────────
 
 export default function AreaIntelligencePanel({
-  data, onClose, crimeStats, yearlyStats, statcanStats, statcanYearlyStats, propertyData, cityAverages, theme = 'dark',
+  data, onClose, crimeStats, yearlyStats, statcanStats, statcanYearlyStats, propertyData, cityAverages,
 }: AreaIntelligencePanelProps) {
   if (!data) return null;
 
-  const isLight = theme === 'light';
+  const isLight = true; // app is light-only
   const communityKey   = data.crimeKey ?? data.communityName.toLowerCase();
   const crimeEntry     = crimeStats?.get(communityKey);
   const realYearly     = yearlyStats?.get(communityKey) ?? [];
@@ -432,9 +517,10 @@ export default function AreaIntelligencePanel({
             className="fixed inset-y-0 right-0 h-full z-[90] p-5 md:p-6"
           >
             <Card className={cn(
-              'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_0_60px_-8px_rgba(0,0,0,0.6)] overflow-hidden rounded-[2.25rem]',
-              isLight ? 'border-slate-200 bg-[rgb(255,250,243)]' : 'border-white/10'
+              'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_24px_80px_-24px_rgba(28,43,58,0.55)] overflow-hidden rounded-[1.75rem] relative',
+              isLight ? 'border-[#E7E0D2] bg-[#FFFDF8]' : 'border-white/10'
             )}>
+              <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
               <Content {...contentProps} />
             </Card>
           </motion.div>
@@ -445,13 +531,15 @@ export default function AreaIntelligencePanel({
       <div className="lg:hidden">
         <Drawer.Root open={!!data} onClose={onClose}>
           <Drawer.Portal>
-            <Drawer.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" />
-            <Drawer.Content className="fixed bottom-0 left-0 right-0 h-[92vh] z-[101] outline-none">
+            <Drawer.Overlay className="fixed inset-0 bg-[rgba(20,28,38,0.5)] backdrop-blur-sm z-[100]" />
+            <Drawer.Content className="fixed bottom-0 left-0 right-0 h-[94dvh] z-[101] outline-none">
               <div className={cn(
-                'h-full rounded-t-[3rem] overflow-hidden border-t flex flex-col',
-                isLight ? 'bg-[rgb(255,250,243)] border-stone-200/80' : 'bg-slate-950 border-white/10'
+                'h-full rounded-t-[1.75rem] overflow-hidden flex flex-col relative',
+                isLight ? 'bg-[#FFFDF8]' : 'bg-slate-950 border-t border-white/10'
               )}>
-                <div className={cn('mx-auto w-12 h-1.5 flex-shrink-0 rounded-full mt-4 mb-0', isLight ? 'bg-slate-300' : 'bg-white/10')} />
+                {/* score-keyed accent spine */}
+                <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
+                <div className={cn('mx-auto w-10 h-1 flex-shrink-0 rounded-full mt-3 mb-0', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')} />
                 <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
                 <Content {...contentProps} />

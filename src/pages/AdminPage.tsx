@@ -127,62 +127,72 @@ const VERIFIED_STATUSES: Incident['verified_status'][] = [
   'community_confirmed',
 ];
 
-const SECTION_THEMES: Record<AdminSection, { eyebrow: string; title: string; description: string; accent: string; glow: string }> = {
+// Field-atlas operations-desk themes — one accent per desk, used by the hero,
+// section headers, nav states, and mobile chips so every view reads as one system.
+const SECTION_THEMES: Record<AdminSection, { eyebrow: string; title: string; description: string; accent: string; glow: string; color: string }> = {
   dashboard: {
-    eyebrow: 'Executive View',
-    title: 'Run the city pulse from one screen',
-    description: 'Critical incidents, growth signals, and moderation pressure are surfaced first for quick executive decisions.',
+    eyebrow: 'Ops desk',
+    title: 'The city, at a glance',
+    description: 'Critical incidents, growth signals, and moderation pressure surfaced first.',
     accent: 'from-sky-500/30 via-blue-500/10 to-cyan-400/20',
-    glow: 'rgba(56,189,248,0.24)',
+    glow: 'rgba(74,144,217,0.2)',
+    color: '#4A90D9',
   },
   incidents: {
-    eyebrow: 'Field Ops',
-    title: 'Moderate the live incident stream',
-    description: 'Edit reports fast, resolve trust issues, and keep the public signal clean without hunting through tables.',
+    eyebrow: 'Field ops',
+    title: 'Moderate the live stream',
+    description: 'Edit reports fast, resolve trust issues, keep the public signal clean.',
     accent: 'from-rose-500/30 via-orange-500/10 to-amber-400/20',
-    glow: 'rgba(251,113,133,0.22)',
+    glow: 'rgba(220,38,38,0.16)',
+    color: '#DC2626',
   },
   users: {
     eyebrow: 'Community',
-    title: 'See who powers the network',
-    description: 'Track admins, contributors, and top citizen reporters with a cleaner mobile-ready directory.',
+    title: 'Who powers the network',
+    description: 'Admins, contributors, top citizen reporters — and their newsletter status.',
     accent: 'from-violet-500/30 via-fuchsia-500/10 to-sky-400/20',
-    glow: 'rgba(167,139,250,0.24)',
+    glow: 'rgba(124,58,237,0.16)',
+    color: '#7C3AED',
   },
   stats: {
-    eyebrow: 'City Intel',
-    title: 'Tune neighborhood safety metrics',
-    description: 'Update community stats with a sharper editing flow designed for quick field review on mobile.',
+    eyebrow: 'City intel',
+    title: 'Tune neighbourhood metrics',
+    description: 'Update community stats with a quick field-review flow.',
     accent: 'from-emerald-500/30 via-teal-500/10 to-cyan-400/20',
-    glow: 'rgba(45,212,191,0.22)',
+    glow: 'rgba(46,139,122,0.18)',
+    color: '#2E8B7A',
   },
   analytics: {
     eyebrow: 'Insights',
-    title: 'Spot patterns before they become trends',
-    description: 'High-signal charts make it easier to read where reports are clustering across time and place.',
+    title: 'Patterns before trends',
+    description: 'Where reports cluster across time and place.',
     accent: 'from-indigo-500/30 via-blue-500/10 to-sky-400/20',
-    glow: 'rgba(99,102,241,0.22)',
+    glow: 'rgba(79,70,229,0.16)',
+    color: '#4F46E5',
   },
   traffic: {
     eyebrow: 'Growth',
-    title: 'Measure reach and campaign momentum',
-    description: 'See what channels, routes, and campaigns are actually moving attention across Calgary Watch.',
+    title: 'Reach and momentum',
+    description: 'Which channels, routes, and campaigns move attention.',
     accent: 'from-pink-500/30 via-orange-500/10 to-amber-400/20',
-    glow: 'rgba(244,114,182,0.22)',
+    glow: 'rgba(184,134,11,0.18)',
+    color: '#B8860B',
   },
   apis: {
     eyebrow: 'Infrastructure',
-    title: 'Monitor the data pipeline',
-    description: 'Real-time health of the Calgary Open Data and weather APIs that feed the live map.',
+    title: 'The data pipeline',
+    description: 'Live health of the open-data and weather feeds behind the map.',
     accent: 'from-cyan-500/30 via-blue-500/10 to-sky-400/20',
-    glow: 'rgba(34,211,238,0.22)',
+    glow: 'rgba(8,145,178,0.16)',
+    color: '#0891B2',
   },
   flagged: {
     eyebrow: 'Moderation',
-    title: 'Review flagged content',
-    description: 'Incidents taken down by community flags. Restore clean reports or permanently remove harmful ones.',
+    title: 'Flagged content review',
+    description: 'Restore clean reports, permanently remove harmful ones.',
     accent: 'from-amber-500/30 via-orange-500/10 to-yellow-400/20',
-    glow: 'rgba(245,158,11,0.22)',
+    glow: 'rgba(180,83,9,0.16)',
+    color: '#B45309',
   },
 };
 
@@ -247,16 +257,17 @@ function MiniSparkline({ data, color = '#3b82f6' }: { data: number[]; color?: st
 
 // ── Section header ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ icon: Icon, title, subtitle }: { icon: React.ElementType; title: string; subtitle?: string }) {
+function SectionHeader({ icon: Icon, title, subtitle, color = '#4A90D9' }: { icon: React.ElementType; title: string; subtitle?: string; color?: string }) {
   return (
     <div className="flex items-center gap-3 mb-6">
-      <div className="w-8 h-8 rounded-xl bg-blue-500/10 light:bg-blue-50 border border-blue-500/20 light:border-blue-200 flex items-center justify-center shrink-0">
-        <Icon size={15} className="text-blue-400 light:text-blue-600" />
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}14`, border: `1px solid ${color}33` }}>
+        <Icon size={15} style={{ color }} />
       </div>
       <div>
-        <h2 className="text-base font-black text-white light:text-slate-900">{title}</h2>
-        {subtitle && <p className="text-[10px] text-slate-500 light:text-slate-500 mt-0.5">{subtitle}</p>}
+        <h2 className="font-display text-base font-bold tracking-[-0.01em] text-white light:text-[#1C2B3A]">{title}</h2>
+        {subtitle && <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
+      <span className="hidden sm:block h-px flex-1" style={{ background: `linear-gradient(to right, ${color}40, transparent)` }} aria-hidden="true" />
     </div>
   );
 }
@@ -916,7 +927,7 @@ export default function AdminPage() {
 
   if (!isAuthReady) {
     return (
-      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 flex items-center justify-center">
         <Loader2 className="animate-spin" />
       </div>
     );
@@ -924,9 +935,9 @@ export default function AdminPage() {
 
   if (!isFirebaseConfigured) {
     return (
-      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 light:bg-white border-white/10 light:border-slate-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <h1 className="text-2xl font-black light:text-slate-900">Admin unavailable</h1>
+      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 p-6 flex items-center justify-center">
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+          <h1 className="font-display text-2xl font-extrabold tabular-nums light:text-slate-900">Admin unavailable</h1>
           <p className="text-slate-300 light:text-slate-600 text-sm leading-relaxed">
             This deployment was built without Firebase environment variables. Add the{' '}
             <code className="text-amber-300/90 light:text-amber-700">VITE_FIREBASE_*</code> secrets to your GitHub repository
@@ -941,9 +952,9 @@ export default function AdminPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 light:bg-white border-white/10 light:border-slate-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <h1 className="text-2xl font-black light:text-slate-900">Admin Portal</h1>
+      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 p-6 flex items-center justify-center">
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+          <h1 className="font-display text-2xl font-extrabold tabular-nums light:text-slate-900">Admin Portal</h1>
           <p className="text-slate-300 light:text-slate-600 text-sm">Sign in with Google using the approved admin account to continue.</p>
           <Button onClick={signIn} className="w-full">Sign in with Google</Button>
           <Button variant="secondary" onClick={() => navigate('/map')} className="w-full">Back to map</Button>
@@ -954,11 +965,11 @@ export default function AdminPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-slate-900/95 light:bg-white border-red-500/40 light:border-red-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
+      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 p-6 flex items-center justify-center">
+        <Card className="max-w-xl w-full p-8 space-y-4 bg-[#FFFDF8] border-red-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
           <div className="flex items-center gap-2 text-red-400 light:text-red-600">
             <Lock size={18} />
-            <h1 className="text-2xl font-black">Access denied</h1>
+            <h1 className="font-display text-2xl font-extrabold tabular-nums">Access denied</h1>
           </div>
           <p className="text-slate-300 light:text-slate-600 text-sm">This portal is restricted to approved admin accounts.</p>
           <Button variant="secondary" onClick={() => navigate('/map')} className="w-full">Back to map</Button>
@@ -968,10 +979,7 @@ export default function AdminPage() {
   }
 
   // ── Shared tooltip style ──────────────────────────────────────────────────
-  const isLightMode = typeof document !== 'undefined' && document.documentElement.classList.contains('light');
-  const ttStyle = isLightMode
-    ? { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, fontSize: 11, color: '#1e293b' }
-    : { background: '#0f172a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, fontSize: 11 };
+  const ttStyle = { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, fontSize: 11, color: '#1e293b' };
 
   const renderMobileHero = () => {
     const ActiveIcon = activeNavItem.icon;
@@ -983,30 +991,32 @@ export default function AdminPage() {
 
     return (
       <div className="md:hidden px-4 pt-4">
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 light:border-stone-200 bg-slate-950/90 light:bg-white/80 p-5 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.95)]">
-          <div
-            className={cn('absolute inset-0 bg-gradient-to-br opacity-90', activeSectionTheme.accent)}
-            style={{ boxShadow: `inset 0 0 120px ${activeSectionTheme.glow}` }}
-          />
-          <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+        <div
+          className="relative overflow-hidden rounded-3xl p-5 shadow-[0_24px_60px_-32px_rgba(28,43,58,0.5)]"
+          style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
+        >
+          {/* desk accent spine + tinted glow */}
+          <div className="absolute top-0 inset-x-0 h-1" style={{ background: activeSectionTheme.color }} aria-hidden="true" />
+          <div className="absolute -top-10 -right-10 h-36 w-36 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${activeSectionTheme.glow}, transparent 68%)` }} aria-hidden="true" />
+
           <div className="relative space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-300/75 light:text-slate-600">{activeSectionTheme.eyebrow}</p>
-                <h1 className="mt-2 max-w-[14rem] text-[1.65rem] font-black leading-none text-white light:text-slate-900">{activeSectionTheme.title}</h1>
+                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.28em]" style={{ color: activeSectionTheme.color }}>{activeSectionTheme.eyebrow}</p>
+                <h1 className="mt-1.5 max-w-[15rem] font-display text-[1.55rem] font-extrabold tracking-[-0.02em] leading-[1.05] text-[#1C2B3A]">{activeSectionTheme.title}</h1>
               </div>
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
-                <ActiveIcon size={20} className="text-white light:text-slate-700" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: `${activeSectionTheme.color}14`, border: `1px solid ${activeSectionTheme.color}33` }}>
+                <ActiveIcon size={19} style={{ color: activeSectionTheme.color }} />
               </div>
             </div>
 
-            <p className="max-w-[18rem] text-xs leading-relaxed text-slate-200/80 light:text-slate-700">{activeSectionTheme.description}</p>
+            <p className="max-w-[19rem] text-xs leading-relaxed text-[#5A6B7D]">{activeSectionTheme.description}</p>
 
             <div className="grid grid-cols-3 gap-2">
               {mobileKpis.map((kpi) => (
-                <div key={kpi.label} className={cn('rounded-2xl border px-3 py-3 backdrop-blur-sm', kpi.chip)}>
-                  <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-300/70 light:text-slate-600">{kpi.label}</p>
-                  <p className={cn('mt-2 text-lg font-black', kpi.tone)}>{kpi.value}</p>
+                <div key={kpi.label} className="rounded-2xl px-3 py-3" style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }}>
+                  <p className="font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-[#5A6B7D]">{kpi.label}</p>
+                  <p className={cn('mt-1.5 text-lg font-black tabular-nums', kpi.tone)}>{kpi.value}</p>
                 </div>
               ))}
             </div>
@@ -1014,17 +1024,19 @@ export default function AdminPage() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setActiveSection('incidents')}
-                className="rounded-2xl border border-white/15 bg-white/10 px-3 py-3 text-left backdrop-blur-sm transition-all active:scale-[0.98]"
+                className="rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98]"
+                style={{ background: '#1C2B3A' }}
               >
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/60">Priority</p>
-                <p className="mt-1 text-sm font-bold text-white light:text-slate-800">Review incidents</p>
+                <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.2em]" style={{ color: '#8FA3B5' }}>Priority</p>
+                <p className="mt-1 text-sm font-bold" style={{ color: '#FFFDF8' }}>Review incidents →</p>
               </button>
               <button
                 onClick={() => navigate('/map')}
-                className="rounded-2xl border border-white/15 bg-slate-950/60 px-3 py-3 text-left backdrop-blur-sm transition-all active:scale-[0.98]"
+                className="rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98]"
+                style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
               >
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Live Surface</p>
-                <p className="mt-1 text-sm font-bold text-white light:text-slate-800">Open public map</p>
+                <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Live surface</p>
+                <p className="mt-1 text-sm font-bold text-[#1C2B3A]">Open public map →</p>
               </button>
             </div>
           </div>
@@ -1034,26 +1046,28 @@ export default function AdminPage() {
   };
 
   const renderMobileCommandDeck = () => (
-    <div className="md:hidden sticky top-[72px] z-[19] border-b border-white/[0.06] light:border-stone-200/80 bg-slate-950/70 light:bg-[rgba(255,250,242,0.86)] px-4 py-3 backdrop-blur-xl">
-      <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+    <div className="md:hidden sticky top-[72px] z-[19] px-4 py-2.5 backdrop-blur-xl" style={{ background: 'rgba(255,253,248,0.92)', borderBottom: '1px solid #E7E0D2' }}>
+      <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-0.5">
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
           const isActive = activeSection === id;
+          const theme = SECTION_THEMES[id];
           const badge = id === 'incidents' && pendingReviewIncidents.length > 0 ? pendingReviewIncidents.length : null;
           return (
             <button
               key={id}
               onClick={() => setActiveSection(id)}
-              className={cn(
-                'relative inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-bold transition-all',
-                isActive
-                  ? 'border-sky-400/30 bg-sky-500/15 text-sky-200 shadow-[0_10px_30px_-18px_rgba(56,189,248,0.7)]'
-                  : 'border-white/10 bg-white/[0.04] text-slate-400'
-              )}
+              className="relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[11px] font-bold transition-all active:scale-95"
+              style={isActive
+                ? { background: theme.color, color: '#fff', border: `1px solid ${theme.color}` }
+                : { background: '#FFFDF8', color: '#5A6B7D', border: '1px solid #E7E0D2' }}
             >
-              <Icon size={14} className={isActive ? 'text-sky-300' : 'text-slate-500'} />
+              <Icon size={13} style={{ color: isActive ? '#fff' : theme.color }} />
               <span>{label}</span>
               {badge != null && (
-                <span className="rounded-full border border-amber-300/20 bg-amber-400/15 px-1.5 py-0.5 text-[9px] font-black text-amber-200">
+                <span
+                  className="rounded-full px-1.5 py-0.5 text-[9px] font-black tabular-nums"
+                  style={isActive ? { background: 'rgba(255,255,255,0.25)', color: '#fff' } : { background: 'rgba(180,83,9,0.14)', color: '#B45309' }}
+                >
                   {badge}
                 </span>
               )}
@@ -1068,103 +1082,103 @@ export default function AdminPage() {
 
   const renderDashboard = () => (
     <div className="space-y-5">
-      <SectionHeader icon={LayoutDashboard} title="Dashboard" subtitle="Live platform health and moderation queue" />
+      <SectionHeader color={activeSectionTheme.color} icon={LayoutDashboard} title="Dashboard" subtitle="Live platform health and moderation queue" />
 
       {/* KPI row 1 — Incident health */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-red-950/30 light:bg-red-50 border-red-500/30 light:border-red-200 rounded-2xl hover:border-red-500/60 transition-all">
+        <Card className="p-4 bg-red-50 border-red-200 rounded-2xl hover:border-red-500/60 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Siren size={13} className="text-red-400 animate-pulse shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-red-400">Active Emergencies</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-red-400">Active Emergencies</p>
           </div>
-          <p className="text-3xl font-black text-red-400">{emergencyIncidents}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-red-400">{emergencyIncidents}</p>
           <p className="text-[10px] text-red-400/50 mt-1">Critical — immediate review required</p>
         </Card>
 
-        <Card className="p-4 bg-amber-950/20 light:bg-amber-50 border-amber-500/20 light:border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
+        <Card className="p-4 bg-amber-50 border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle size={13} className="text-amber-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Unresolved</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Unresolved</p>
           </div>
-          <p className="text-3xl font-black text-amber-400">{unresolvedIncidents}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-amber-400">{unresolvedIncidents}</p>
           <p className="text-[10px] text-slate-600 mt-1">Awaiting community confirmation</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Clock3 size={13} className="text-blue-400 shrink-0" />
-              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Last 24h</p>
+              <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Last 24h</p>
             </div>
             <MiniSparkline data={incidentSparklineData} color="#60a5fa" />
           </div>
-          <p className="text-3xl font-black text-blue-400 mt-2">{todayIncidents}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-blue-400 mt-2">{todayIncidents}</p>
           <p className="text-[10px] text-slate-600 mt-1">14-day trend · today's reports</p>
         </Card>
 
         {/* Page Views KPI — enhanced with sparkline */}
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-pink-400/30 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-pink-400/30 transition-all">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Activity size={13} className="text-pink-400 shrink-0" />
-              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Page Views</p>
+              <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Page Views</p>
             </div>
             <MiniSparkline data={pageViewsSparklineData} color="#f472b6" />
           </div>
-          <p className="text-3xl font-black mt-2 light:text-slate-900">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums mt-2 light:text-slate-900">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">14-day trend above · lifetime total</p>
         </Card>
       </div>
 
       {/* KPI row 2 — Users + Safety */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-violet-500/20 light:border-violet-200 rounded-2xl hover:border-violet-400/40 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-violet-200 rounded-2xl hover:border-violet-400/40 transition-all">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <Users size={13} className="text-violet-400 shrink-0" />
-              <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Total Users</p>
+              <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Total Users</p>
             </div>
             <MiniSparkline data={userGrowthSparklineData} color="#a78bfa" />
           </div>
-          <p className="text-3xl font-black text-violet-400 mt-2">{totalUsers}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-violet-400 mt-2">{totalUsers}</p>
           <div className="flex gap-3 mt-1.5">
             <span className="text-[10px] text-slate-500"><span className="text-[#4A90D9] font-black">{viewOnlyUsers}</span> View-Only</span>
             <span className="text-[10px] text-slate-500"><span className="text-[#2E8B7A] font-black">{adminUsers}</span> Admin</span>
           </div>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-amber-400/30 light:hover:border-amber-300 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-amber-400/30 light:hover:border-amber-300 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <ChartPie size={13} className="text-amber-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Active Reporters</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Active Reporters</p>
           </div>
-          <p className="text-3xl font-black text-amber-400">{uniqueReporterEmails}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-amber-400">{uniqueReporterEmails}</p>
           <p className="text-[10px] text-slate-600 mt-1">Distinct users who filed a report</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Activity size={13} className="text-blue-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Firebase Reports</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Firebase Reports</p>
           </div>
-          <p className="text-3xl font-black light:text-slate-900">{totalIncidents}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums light:text-slate-900">{totalIncidents}</p>
           <p className="text-[10px] text-slate-600 mt-1">Community + official in Firestore</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-emerald-500/20 light:border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <ShieldCheck size={13} className="text-emerald-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Avg Safety Score</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Avg Safety Score</p>
           </div>
-          <p className="text-3xl font-black text-emerald-400">{averageSafety}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-emerald-400">{averageSafety}</p>
           <p className="text-[10px] text-slate-600 mt-1">Mean score (0–100) across tracked neighborhoods</p>
         </Card>
       </div>
 
-      <div className="border-t border-white/[0.04]" />
+      <div className="border-t border-[#E7E0D2]" />
 
       {/* API Data Sources Panel */}
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
         <div className="flex items-center gap-2 mb-4">
           <ChartNoAxesColumn size={14} className="text-sky-400" />
           <h3 className="text-sm font-black uppercase tracking-widest text-sky-400">Live API Data Sources</h3>
@@ -1178,17 +1192,17 @@ export default function AdminPage() {
           ].map(({ label, count, color, desc }) => (
             <div key={label} className={`flex flex-col gap-1 p-3.5 rounded-2xl bg-${color}-500/5 border border-${color}-500/20`}>
               <p className={`text-[10px] font-black uppercase tracking-widest text-${color}-400`}>{label}</p>
-              <p className={`text-2xl font-black text-${color}-400`}>{count}</p>
+              <p className={`font-display text-2xl font-extrabold tabular-nums text-${color}-400`}>{count}</p>
               <p className="text-[10px] text-slate-600 leading-snug">{desc}</p>
             </div>
           ))}
         </div>
       </Card>
 
-      <div className="border-t border-white/[0.04]" />
+      <div className="border-t border-[#E7E0D2]" />
 
       {/* Moderation Queue */}
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-black flex items-center gap-2">
@@ -1212,7 +1226,7 @@ export default function AdminPage() {
             {pendingReviewIncidents.map((incident) => {
               const ageMin = Math.floor((Date.now() - incident.timestamp) / 60000);
               return (
-                <div key={incident.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 light:bg-slate-50 border border-white/5 light:border-slate-200">
+                <div key={incident.id} className="flex items-start gap-3 p-3 rounded-xl bg-[#F7F3EA] border border-[#E7E0D2]">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-white light:text-slate-900 truncate">{incident.title}</p>
                     <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{incident.description}</p>
@@ -1235,7 +1249,7 @@ export default function AdminPage() {
       </Card>
 
       {/* User growth chart — Task 5 */}
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
         <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">New Contributor Activity · Last 30 Days</p>
         <p className="text-[10px] text-slate-600 mb-4 mt-0.5">First-time reporters appearing each day (proxied from first incident submission). Reflects organic community growth.</p>
         {userGrowthData.every(d => d.count === 0) ? (
@@ -1249,7 +1263,7 @@ export default function AdminPage() {
                   <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff06" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1C2B3A14" />
               <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} interval={4} />
               <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={ttStyle} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#a78bfa' }} />
@@ -1261,7 +1275,7 @@ export default function AdminPage() {
 
       {/* Latest signups + route to the full directory */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto h-[420px]">
+        <Card className="col-span-1 lg:col-span-2 p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto h-[420px]">
           <div className="flex items-center justify-between mb-4 pr-1">
             <div>
               <h3 className="text-base font-black flex items-center gap-2">
@@ -1281,7 +1295,7 @@ export default function AdminPage() {
           </div>
           <div className="overflow-y-auto h-[320px] pr-2">
             <table className="w-full text-xs min-w-[500px]">
-              <thead className="text-slate-400 light:text-slate-600 bg-slate-900/90 light:bg-slate-50 top-0 sticky z-10">
+              <thead className="text-[#5A6B7D] bg-[#F7F3EA] top-0 sticky z-10">
                 <tr className="border-b border-white/8 light:border-slate-200">
                   <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
@@ -1322,7 +1336,7 @@ export default function AdminPage() {
         </Card>
 
         <div className="col-span-1 flex flex-col gap-4 h-[420px]">
-          <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] flex flex-col flex-1 min-h-0">
+          <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] flex flex-col flex-1 min-h-0">
             <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">User Roles</p>
             <p className="text-[10px] text-slate-600 mb-2 mt-1">
               <span className="text-violet-400 font-black">{totalUsers}</span> total registered users.
@@ -1355,7 +1369,7 @@ export default function AdminPage() {
           </Card>
 
           {topReportersData.length > 0 && (
-            <Card className="p-4 bg-slate-900/80 light:bg-white border-amber-500/15 light:border-amber-200 rounded-[1.6rem]">
+            <Card className="p-4 bg-[#FFFDF8] border-amber-200 rounded-[1.6rem]">
               <p className="text-[10px] font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em] mb-3">Top Contributors</p>
               <div className="space-y-1.5">
                 {topReportersData.slice(0, 5).map((r, i) => (
@@ -1378,7 +1392,7 @@ export default function AdminPage() {
 
   const renderIncidents = () => (
     <div className="space-y-5">
-      <SectionHeader icon={FileText} title="Incidents" subtitle="Edit, moderate, and soft-delete community and official incident records" />
+      <SectionHeader color={activeSectionTheme.color} icon={FileText} title="Incidents" subtitle="Edit, moderate, and soft-delete community and official incident records" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: 'All Records', value: totalIncidents, tone: 'text-sky-400', note: 'Visible Firestore incidents' },
@@ -1386,9 +1400,9 @@ export default function AdminPage() {
           { label: 'Community', value: communityReportCount, tone: 'text-emerald-400', note: 'User-posted reports' },
           { label: 'Flagged', value: flaggedIncidents.length, tone: 'text-rose-400', note: 'Hidden by reports' },
         ].map((item) => (
-          <Card key={item.label} className="p-4 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-2xl">
+          <Card key={item.label} className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{item.label}</p>
-            <p className={cn('mt-2 text-3xl font-black', item.tone)}>{item.value}</p>
+            <p className={cn('mt-2 font-display text-3xl font-extrabold tabular-nums', item.tone)}>{item.value}</p>
             <p className="mt-1 text-[10px] text-slate-600">{item.note}</p>
           </Card>
         ))}
@@ -1402,7 +1416,7 @@ export default function AdminPage() {
           Full Incident List
         </Button>
       </Card>
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">
             {totalIncidents} records · {pendingReviewIncidents.length} in queue
@@ -1575,7 +1589,7 @@ export default function AdminPage() {
 
   const renderUsers = () => (
     <div className="space-y-5">
-      <SectionHeader icon={Users} title="User Directory" subtitle="Registered users, roles, and contribution activity" />
+      <SectionHeader color={activeSectionTheme.color} icon={Users} title="User Directory" subtitle="Registered users, roles, and contribution activity" />
       <Card className="p-4 bg-violet-500/10 light:bg-violet-50 border-violet-500/20 light:border-violet-200 rounded-[1.6rem] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <p className="text-sm font-black text-white light:text-slate-900">Need the full admin directory?</p>
@@ -1586,7 +1600,7 @@ export default function AdminPage() {
         </Button>
       </Card>
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="col-span-1 lg:col-span-2 p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
+        <Card className="col-span-1 lg:col-span-2 p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto">
           <div className="flex items-center justify-between mb-4 pr-1">
             <p className="text-[10px] text-slate-500">
               <span className="text-violet-400 font-black">{totalUsers}</span> total ·{' '}
@@ -1636,7 +1650,7 @@ export default function AdminPage() {
           </div>
           <div className="hidden md:block overflow-y-auto max-h-[540px] pr-2">
             <table className="w-full text-xs min-w-[500px]">
-              <thead className="text-slate-400 light:text-slate-600 bg-slate-900/90 light:bg-slate-50 top-0 sticky z-10">
+              <thead className="text-[#5A6B7D] bg-[#F7F3EA] top-0 sticky z-10">
                 <tr className="border-b border-white/8 light:border-slate-200">
                   <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
                   <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
@@ -1675,7 +1689,7 @@ export default function AdminPage() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+          <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
             <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] mb-3">User Roles</p>
             {userRoleChartData.length === 0 ? (
               <p className="text-slate-600 text-xs py-4 text-center">No user data.</p>
@@ -1706,7 +1720,7 @@ export default function AdminPage() {
 
           {/* Top reporters */}
           {topReportersData.length > 0 && (
-            <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+            <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
               <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] mb-3">Top Reporters</p>
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={topReportersData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
@@ -1726,10 +1740,10 @@ export default function AdminPage() {
   const renderStats = () => {
     return (
     <div className="space-y-5">
-      <SectionHeader icon={Map} title="City Stats" subtitle="Live crime data from Calgary Open Data API + editable community safety scores" />
+      <SectionHeader color={activeSectionTheme.color} icon={Map} title="City Stats" subtitle="Live crime data from Calgary Open Data API + editable community safety scores" />
 
       {/* Live crime data from API */}
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Crime Stats · Calgary Open Data API</p>
@@ -1766,7 +1780,7 @@ export default function AdminPage() {
           </div>
         )}
       </Card>
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem] overflow-x-auto">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto">
         <div className="flex items-center justify-between mb-4">
           <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">City Intelligence · {communityStats.length} communities</span>
           <span className="text-[10px] text-amber-500 md:hidden">Swipe table &rarr;</span>
@@ -1861,7 +1875,7 @@ export default function AdminPage() {
       </Card>
 
       {safetyChartData.length > 0 && (
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Community Safety vs Crime Breakdown</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Compares safety score against violent crime, property crime, and disorder calls per neighborhood.</p>
           <ResponsiveContainer width="100%" height={260}>
@@ -1885,10 +1899,10 @@ export default function AdminPage() {
 
   const renderAnalytics = () => (
     <div className="space-y-5">
-      <SectionHeader icon={BarChart3} title="Analytics" subtitle="Incident patterns, geographic distribution, and temporal trends" />
+      <SectionHeader color={activeSectionTheme.color} icon={BarChart3} title="Analytics" subtitle="Incident patterns, geographic distribution, and temporal trends" />
 
       {/* Incidents timeline — 14 days */}
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
         <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Incidents: Last 14 Days</p>
         <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily report volume. Spikes indicate high-activity periods worth reviewing.</p>
         {timelineChartData.every((d) => d.count === 0) ? (
@@ -1914,7 +1928,7 @@ export default function AdminPage() {
 
       {/* Category donut + Trust donut + Top Neighborhoods */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">By Category</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">How reports break down by type.</p>
           {categoryChartData.length === 0 ? (
@@ -1941,7 +1955,7 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Trust Status</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Verification breakdown across all reports.</p>
           {trustChartData.length === 0 ? (
@@ -1968,7 +1982,7 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Neighborhoods</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Areas with the highest incident count.</p>
           {neighborhoodChartData.length === 0 ? (
@@ -1988,7 +2002,7 @@ export default function AdminPage() {
 
       {/* Hourly + Category by day */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Hourly Activity Pattern</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">When during the day most reports are filed.</p>
           <ResponsiveContainer width="100%" height={180}>
@@ -1999,7 +2013,7 @@ export default function AdminPage() {
                   <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff06" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1C2B3A14" />
               <XAxis dataKey="hour" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} interval={2} />
               <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={ttStyle} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#c084fc' }} />
@@ -2008,12 +2022,12 @@ export default function AdminPage() {
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Category Mix · Last 7 Days</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily stacked view of report categories.</p>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={categoryByDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff06" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1C2B3A14" />
               <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
               <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} cursor={{ fill: '#ffffff05' }} />
@@ -2034,49 +2048,49 @@ export default function AdminPage() {
 
   const renderTrafficAnalytics = () => (
     <div className="space-y-5">
-      <SectionHeader icon={Globe} title="Traffic Analytics" subtitle="Page view patterns, acquisition channels, and session metrics from enhanced PageTracker" />
+      <SectionHeader color={activeSectionTheme.color} icon={Globe} title="Traffic Analytics" subtitle="Page view patterns, acquisition channels, and session metrics from enhanced PageTracker" />
 
       {/* Traffic KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-blue-500/20 light:border-blue-200 rounded-2xl hover:border-blue-400/40 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-blue-200 rounded-2xl hover:border-blue-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <MousePointerClick size={13} className="text-blue-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Total Views</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Total Views</p>
           </div>
-          <p className="text-3xl font-black text-blue-400">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-blue-400">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">Lifetime page loads tracked</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-emerald-500/20 light:border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Wifi size={13} className="text-emerald-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Sessions (Sample)</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Sessions (Sample)</p>
           </div>
-          <p className="text-3xl font-black text-emerald-400">{uniqueSessions.toLocaleString()}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-emerald-400">{uniqueSessions.toLocaleString()}</p>
           <p className="text-[10px] text-slate-600 mt-1">Unique browser sessions in sample</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-amber-500/20 light:border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={13} className="text-amber-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Pages / Session</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Pages / Session</p>
           </div>
-          <p className="text-3xl font-black text-amber-400">{avgPagesPerSession}</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-amber-400">{avgPagesPerSession}</p>
           <p className="text-[10px] text-slate-600 mt-1">Avg depth across sampled sessions</p>
         </Card>
 
-        <Card className="p-4 bg-slate-900/80 light:bg-white border-pink-500/20 light:border-pink-200 rounded-2xl hover:border-pink-400/40 transition-all">
+        <Card className="p-4 bg-[#FFFDF8] border-pink-200 rounded-2xl hover:border-pink-400/40 transition-all">
           <div className="flex items-center gap-2 mb-3">
             <Activity size={13} className="text-pink-400 shrink-0" />
-            <p className="text-[10px] font-black tracking-widest uppercase text-slate-400 light:text-slate-600">Organic Share</p>
+            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Organic Share</p>
           </div>
-          <p className="text-3xl font-black text-pink-400">{organicShare}%</p>
+          <p className="font-display text-3xl font-extrabold tabular-nums text-pink-400">{organicShare}%</p>
           <p className="text-[10px] text-slate-600 mt-1">{organicSearchDocs.length.toLocaleString()} search visits in sample</p>
         </Card>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-emerald-500/20 light:border-emerald-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-emerald-200 rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Organic Search Days</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Best sampled days for search traffic, useful for spotting content or news-driven spikes.</p>
           {organicSearchByDayData.length === 0 ? (
@@ -2100,7 +2114,7 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Search Terms</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Most modern search engines hide the exact phrase, but any available query values appear here.</p>
           {organicQueryData.length === 0 ? (
@@ -2119,7 +2133,7 @@ export default function AdminPage() {
       </div>
 
       {/* Page views over time — 30 days */}
-      <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
         <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Page Views · Last 30 Days</p>
         <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily volume from the <code className="text-slate-400">page_views</code> collection. Excludes admin sessions.</p>
         {pageViewsByDayData.every(d => d.views === 0) ? (
@@ -2146,7 +2160,7 @@ export default function AdminPage() {
       {/* Traffic sources + Top pages */}
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Traffic source donut */}
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Acquisition Channels</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">How visitors arrive — bucketed from referrer and UTM params.</p>
           {trafficSourceData.length === 0 ? (
@@ -2176,7 +2190,7 @@ export default function AdminPage() {
         </Card>
 
         {/* Top pages */}
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Pages by Views</p>
           <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Which routes drive the most traffic in the sampled window.</p>
           {topPagesData.length === 0 ? (
@@ -2208,7 +2222,7 @@ export default function AdminPage() {
 
       {/* Top referrers + UTM campaigns */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <div className="flex items-center gap-2 mb-1">
             <Link size={12} className="text-purple-400" />
             <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Referrers</p>
@@ -2228,7 +2242,7 @@ export default function AdminPage() {
           )}
         </Card>
 
-        <Card className="p-5 bg-slate-900/80 light:bg-white border-white/10 light:border-slate-200 rounded-[1.6rem]">
+        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
           <div className="flex items-center gap-2 mb-1">
             <Megaphone size={12} className="text-orange-400" />
             <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">UTM Campaigns</p>
@@ -2318,7 +2332,7 @@ export default function AdminPage() {
     const anyError = apiHealths.some(h => h.status === 'error');
     return (
       <div className="space-y-5">
-        <SectionHeader icon={Zap} title="API Health" subtitle="Live status of the Calgary Open Data and weather APIs that power the map" />
+        <SectionHeader color={activeSectionTheme.color} icon={Zap} title="API Health" subtitle="Live status of the Calgary Open Data and weather APIs that power the map" />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className={cn('text-xs font-black uppercase tracking-widest', anyError ? 'text-red-400' : allOk ? 'text-emerald-400' : 'text-amber-400')}>
             {anyError ? 'Degraded — one or more APIs are failing' : allOk ? 'All systems operational' : 'Checking…'}
@@ -2333,7 +2347,7 @@ export default function AdminPage() {
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           {apiHealths.map((h) => (
-            <Card key={h.id} className={cn('p-4 bg-slate-900/80 light:bg-white rounded-2xl border transition-all', h.status === 'error' ? 'border-red-500/40' : h.status === 'slow' ? 'border-amber-400/30' : 'border-white/10 light:border-slate-200')}>
+            <Card key={h.id} className={cn('p-4 bg-[#FFFDF8] rounded-2xl border transition-all', h.status === 'error' ? 'border-red-300' : h.status === 'slow' ? 'border-amber-300' : 'border-[#E7E0D2]')}>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
                   <span className={cn('w-2.5 h-2.5 rounded-full shrink-0', statusColor[h.status])} />
@@ -2392,33 +2406,35 @@ export default function AdminPage() {
   // ── Shell ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-slate-950 light:bg-[#f5efe3] light:text-slate-900 text-white flex flex-col md:flex-row relative overflow-hidden">
+    <div className="min-h-screen text-slate-900 flex flex-col md:flex-row relative overflow-hidden" style={{ background: '#F5EFE3' }}>
 
-      {/* Ambient gradient blobs */}
+      {/* Ambient brand washes */}
       <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute -top-48 -left-32 w-[36rem] h-[36rem] rounded-full"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(37,99,235,0.07) 0%, transparent 65%)' }} />
+        <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.14),transparent_36%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.16),transparent_26%)]" />
         <div className="absolute -bottom-56 right-0 w-[32rem] h-[32rem] rounded-full"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(79,70,229,0.06) 0%, transparent 65%)' }} />
-        <div className="absolute inset-x-0 top-0 hidden h-[24rem] light:block bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.16),transparent_36%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.18),transparent_26%)]" />
+          style={{ background: 'radial-gradient(ellipse at center, rgba(46,139,122,0.08) 0%, transparent 65%)' }} />
       </div>
 
       {/* ── Sidebar — desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-white/[0.06] light:border-stone-200/80 bg-slate-950/80 light:bg-[rgba(255,250,242,0.86)] backdrop-blur-xl relative z-10 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-56 shrink-0 backdrop-blur-xl relative z-10 sticky top-0 h-screen" style={{ background: 'rgba(255,253,248,0.92)', borderRight: '1px solid #E7E0D2' }}>
         {/* Logo / wordmark */}
-        <div className="p-5 border-b border-white/[0.06] light:border-stone-200/80">
+        <div className="p-5" style={{ borderBottom: '1px solid #E7E0D2' }}>
           <div className="inline-flex items-center gap-2 mb-1">
-            <Sparkles size={13} className="text-blue-400" />
-            <span className="text-[9px] font-black uppercase tracking-[0.24em] text-slate-500 light:text-stone-500">Control Center</span>
+            <span className="relative flex h-2 w-2" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-ping opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.26em] text-[#5A6B7D]">Ops desk</span>
           </div>
-          <h1 className="text-base font-black tracking-tight leading-tight">Calgary Watch</h1>
-          <p className="text-[10px] text-slate-500 mt-0.5">Admin Portal</p>
+          <h1 className="font-display text-base font-extrabold tracking-[-0.01em] leading-tight text-[#1C2B3A]">Calgary Watch</h1>
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#9AA6B2] mt-0.5">Admin portal</p>
         </div>
 
         {/* Nav items */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
             const isActive = activeSection === id;
+            const theme = SECTION_THEMES[id];
             // Badge for moderation queue
             const badge = id === 'incidents' && pendingReviewIncidents.length > 0
               ? pendingReviewIncidents.length : null;
@@ -2426,17 +2442,15 @@ export default function AdminPage() {
               <button
                 key={id}
                 onClick={() => setActiveSection(id)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all border',
-                  isActive
-                    ? 'bg-gradient-to-r from-blue-500/20 to-blue-600/10 text-blue-300 border-blue-500/30 shadow-[inset_0_1px_0_rgba(147,197,253,0.1),0_0_12px_rgba(59,130,246,0.08)]'
-                    : 'text-slate-400 light:text-stone-600 border-transparent hover:text-white light:hover:text-slate-900 hover:bg-white/[0.05] light:hover:bg-white/70'
-                )}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
+                style={isActive
+                  ? { background: `${theme.color}12`, color: theme.color, border: `1px solid ${theme.color}3a`, boxShadow: `inset 3px 0 0 ${theme.color}` }
+                  : { color: '#5A6B7D', border: '1px solid transparent' }}
               >
-                <Icon size={14} className={isActive ? 'text-blue-400' : 'text-slate-500'} />
+                <Icon size={14} style={{ color: isActive ? theme.color : '#9AA6B2' }} />
                 <span className="flex-1 text-left">{label}</span>
                 {badge != null && (
-                  <span className="w-4 h-4 rounded-full bg-amber-500/30 text-amber-300 text-[9px] font-black flex items-center justify-center">
+                  <span className="min-w-4 h-4 px-1 rounded-full text-[9px] font-black flex items-center justify-center tabular-nums" style={{ background: 'rgba(180,83,9,0.16)', color: '#B45309' }}>
                     {badge}
                   </span>
                 )}
@@ -2464,23 +2478,28 @@ export default function AdminPage() {
       {/* ── Main content area ─────────────────────────────────────────────── */}
       <main className="flex-1 min-w-0 relative z-10 pb-8 md:pb-0">
         {/* Top bar — mobile header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-4 border-b border-white/[0.06] light:border-stone-200/80 bg-slate-950/80 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-xl sticky top-0 z-20">
-          <div className="flex items-center gap-3">
+        <div className="md:hidden flex items-center justify-between px-4 py-3.5 backdrop-blur-xl sticky top-0 z-20" style={{ background: 'rgba(255,253,248,0.94)', borderBottom: '1px solid #E7E0D2' }}>
+          <div className="flex items-center gap-2.5">
+            <span className="relative flex h-2 w-2" aria-hidden="true">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-ping opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.28em] text-slate-500 light:text-stone-500">Calgary Watch</p>
-              <h2 className="text-sm font-black leading-tight text-white light:text-slate-900">Admin Control</h2>
+              <p className="font-mono text-[8px] font-bold uppercase tracking-[0.28em] text-[#5A6B7D]">Ops desk</p>
+              <h2 className="font-display text-sm font-extrabold leading-tight text-[#1C2B3A]">Calgary Watch Admin</h2>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {pendingReviewIncidents.length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-[9px] font-black text-amber-200">
+              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-black tabular-nums" style={{ background: 'rgba(180,83,9,0.12)', color: '#B45309', border: '1px solid rgba(180,83,9,0.3)' }}>
                 <Zap size={10} />
                 {pendingReviewIncidents.length} pending
               </span>
             )}
             <button
               onClick={() => navigate('/map')}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 light:border-stone-200/80 bg-white/[0.05] light:bg-white/72 text-slate-300 light:text-slate-800 transition-all active:scale-95"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl transition-all active:scale-95"
+              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
               aria-label="Back to map"
             >
               <ArrowLeft size={15} />

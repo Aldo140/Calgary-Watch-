@@ -8,10 +8,11 @@ import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
 import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
+import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Sun, Moon, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -65,6 +66,8 @@ type UserProfileSettings = {
   weeklyDigestTopics?: string[];
   profileUpdatedAt?: number;
   onboardingCompletedAt?: number;
+  /** Set the first (and only) time the weekly-digest prompt is shown */
+  digestPromptedAt?: number;
 };
 
 const FALLBACK_NEIGHBORHOODS = [
@@ -105,20 +108,78 @@ async function geocodeToCalgarySuburb(address: string): Promise<string> {
   }
 }
 
-const ADDRESS_GUESSES = [
-  { label: '17 Avenue SW, Calgary', neighborhood: 'Beltline' },
-  { label: 'Stephen Avenue, Calgary', neighborhood: 'Downtown Calgary' },
-  { label: 'Kensington Road NW, Calgary', neighborhood: 'Kensington' },
-  { label: '9 Avenue SE, Calgary', neighborhood: 'Inglewood' },
-  { label: '4 Street SW, Calgary', neighborhood: 'Mission' },
-  { label: '33 Avenue SW, Calgary', neighborhood: 'Marda Loop' },
-  { label: 'Memorial Drive NW, Calgary', neighborhood: 'Sunnyside' },
-  { label: 'International Avenue SE, Calgary', neighborhood: 'Forest Lawn' },
-  { label: 'Bowness Road NW, Calgary', neighborhood: 'Bowness' },
-  { label: 'Seton Boulevard SE, Calgary', neighborhood: 'Seton' },
-  { label: 'Mahogany Boulevard SE, Calgary', neighborhood: 'Mahogany' },
-  { label: 'Signal Hill Centre SW, Calgary', neighborhood: 'Signal Hill' },
-];
+// Title-case city-registry strings ("1125 17 AV SW" → "1125 17 Av SW",
+// "LOWER MOUNT ROYAL" → "Lower Mount Royal") keeping quadrants uppercase.
+function titleCaseAddress(raw: string): string {
+  return raw
+    .toLowerCase()
+    .split(/\s+/)
+    .map((w) => (/^(nw|ne|sw|se)$/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(' ')
+    .trim();
+}
+
+/**
+ * Live address autocomplete against the City of Calgary property registry
+ * (Property Assessments open dataset) — real addresses, each carrying its
+ * official community name.
+ */
+function useAddressSearch(query: string): Array<{ label: string; neighborhood: string }> {
+  const [results, setResults] = useState<Array<{ label: string; neighborhood: string }>>([]);
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 3) { setResults([]); return; }
+    const ctrl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        const url =
+          'https://data.calgary.ca/resource/4ur7-wsgc.json' +
+          '?$select=address,comm_name&$q=' + encodeURIComponent(q) + '&$limit=10';
+        const res = await fetch(url, { signal: ctrl.signal });
+        if (!res.ok) return;
+        const rows: Array<{ address?: string; comm_name?: string }> = await res.json();
+        const seen = new Set<string>();
+        const out: Array<{ label: string; neighborhood: string }> = [];
+        for (const row of rows) {
+          if (!row.address) continue;
+          const label = titleCaseAddress(row.address);
+          if (seen.has(label)) continue;
+          seen.add(label);
+          out.push({
+            label: `${label}, Calgary`,
+            neighborhood: row.comm_name ? titleCaseAddress(row.comm_name) : '',
+          });
+          if (out.length >= 4) break;
+        }
+        setResults(out);
+      } catch { /* aborted or offline — keep previous results */ }
+    }, 350);
+    return () => { clearTimeout(t); ctrl.abort(); };
+  }, [query]);
+  return results;
+}
+
+/** Full official community list (Community District Boundaries dataset). */
+let COMMUNITY_CACHE: string[] | null = null;
+function useCalgaryCommunities(enabled: boolean): string[] {
+  const [list, setList] = useState<string[]>(COMMUNITY_CACHE ?? []);
+  useEffect(() => {
+    if (!enabled || COMMUNITY_CACHE) return;
+    fetch('https://data.calgary.ca/resource/surr-xmvs.json?$select=name&$limit=400')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows: Array<{ name?: string }>) => {
+        const names = rows
+          .map((r) => r.name ?? '')
+          .filter((n) => n && !/^\d/.test(n))
+          .map(titleCaseAddress)
+          .sort((a, b) => a.localeCompare(b));
+        COMMUNITY_CACHE = names;
+        setList(names);
+      })
+      .catch(() => {});
+  }, [enabled]);
+  return list;
+}
 
 function GoogleIcon() {
   return (
@@ -568,16 +629,12 @@ export default function MapPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
   const [nearMeIndex, setNearMeIndex] = useState(0);
+  // Radar-scan moment before results reveal — the pause builds anticipation
+  // and makes the reveal land (Duolingo-style feedback loop).
+  const [nearMeScanning, setNearMeScanning] = useState(false);
+  const nearMeScanTimer = useRef<number | null>(null);
   const NEAR_ME_RADIUS_KM = 3;
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'light';
-    try {
-      return localStorage.getItem('cw-theme') === 'dark' ? 'dark' : 'light';
-    } catch {
-      return 'light';
-    }
-  });
   const [sheetSnap, setSheetSnap] = useState<SnapPoint>('80px');
   const [notifications, setNotifications] = useState<MapNotification[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
@@ -592,6 +649,14 @@ export default function MapPage() {
   const [onboardingDismissedThisSession, setOnboardingDismissedThisSession] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Post-submit celebration — the payoff beat after a report goes live
+  const [celebration, setCelebration] = useState<string | null>(null);
+  const celebrationTimer = useRef<number | null>(null);
+  const celebrate = useCallback((msg: string) => {
+    setCelebration(msg);
+    if (celebrationTimer.current) window.clearTimeout(celebrationTimer.current);
+    celebrationTimer.current = window.setTimeout(() => setCelebration(null), 4500);
+  }, []);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isEmergencyPinMode, setIsEmergencyPinMode] = useState(false);
   const [confirmedEmergencyPinLocation, setConfirmedEmergencyPinLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -668,19 +733,6 @@ export default function MapPage() {
     }
   }, [searchParams, isAuthReady, user, openAuthPanel, setSearchParams]);
 
-
-  useEffect(() => {
-    if (theme === 'light') {
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.remove('light');
-    }
-    try {
-      localStorage.setItem('cw-theme', theme);
-    } catch {
-      // Safari private mode might throw
-    }
-  }, [theme]);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
@@ -902,46 +954,38 @@ export default function MapPage() {
     return kept;
   }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts]);
 
+  // Official community list + names observed in live data
+  const officialCommunities = useCalgaryCommunities(Boolean(user));
   const neighborhoodSuggestions = useMemo(() => {
     const names = new Set<string>(FALLBACK_NEIGHBORHOODS);
+    officialCommunities.forEach((name) => names.add(name));
     incidents.forEach((incident) => {
       const name = incident.neighborhood?.trim();
       if (name && !/^Calgary\s+[NSEW]{1,2}$/i.test(name)) names.add(name);
     });
     crimeStats?.forEach((_, key) => {
-      if (key) names.add(key.replace(/\b\w/g, c => c.toUpperCase()));
+      if (key && !key.includes(':')) names.add(key.replace(/\b\w/g, c => c.toUpperCase()));
     });
-    return [...names].sort((a, b) => a.localeCompare(b)).slice(0, 36);
-  }, [incidents, crimeStats]);
+    return [...names].sort((a, b) => a.localeCompare(b));
+  }, [incidents, crimeStats, officialCommunities]);
 
   const addressQuery = profileDraft.address.trim().toLowerCase();
   const neighborhoodQuery = profileDraft.neighborhood.trim().toLowerCase();
+
+  // Real addresses from the city property registry; falls back to accepting
+  // the raw typed address (with a street number) if the registry has no hit.
+  const liveAddressResults = useAddressSearch(profileDraft.address);
   const addressSuggestions = useMemo(() => {
-    const query = addressQuery;
-    const hasEnoughSignal = query.length >= 4 || (/\d/.test(query) && query.length >= 3);
-    if (!hasEnoughSignal) return [];
-
-    const matches = ADDRESS_GUESSES
-      .filter((item) => {
-        const haystack = `${item.label} ${item.neighborhood}`.toLowerCase();
-        return haystack.includes(query);
-      })
-      .sort((a, b) => {
-        const aStarts = a.label.toLowerCase().startsWith(query) ? 0 : 1;
-        const bStarts = b.label.toLowerCase().startsWith(query) ? 0 : 1;
-        return aStarts - bStarts || a.label.localeCompare(b.label);
-      })
-      .slice(0, 4);
-
-    if (matches.length === 0 && /\d/.test(query) && query.length >= 5) {
+    if (liveAddressResults.length > 0) return liveAddressResults;
+    if (/\d/.test(addressQuery) && addressQuery.length >= 5) {
       return [{ label: `${profileDraft.address.trim()}, Calgary, AB`, neighborhood: '' }];
     }
-    return matches;
-  }, [addressQuery, profileDraft.address]);
+    return [];
+  }, [liveAddressResults, addressQuery, profileDraft.address]);
 
   const filteredNeighborhoodSuggestions = useMemo(() => {
     const query = neighborhoodQuery;
-    if (query.length < 3) return [];
+    if (query.length < 2) return [];
     return neighborhoodSuggestions
       .filter((name) => name.toLowerCase().includes(query))
       .sort((a, b) => {
@@ -949,7 +993,7 @@ export default function MapPage() {
         const bStarts = b.toLowerCase().startsWith(query) ? 0 : 1;
         return aStarts - bStarts || a.localeCompare(b);
       })
-      .slice(0, 5);
+      .slice(0, 6);
   }, [neighborhoodQuery, neighborhoodSuggestions]);
 
   const profileNeedsSetup = Boolean(
@@ -1154,7 +1198,7 @@ export default function MapPage() {
         }
       })();
     });
-  }, [user, openAuthPanel]);
+  }, [user, openAuthPanel, celebrate]);
 
   const handleEmergencySubmit = useCallback((data: EmergencySubmitData) => {
     if (!user) { openAuthPanel('signin'); return; }
@@ -1195,12 +1239,13 @@ export default function MapPage() {
             report_count: 1,
             authorUid: user.uid,
           });
+          celebrate('Emergency signal live — nearby watchers alerted.');
         } catch (error) {
           handleFirestoreError(error, OperationType.CREATE, path);
         }
       })();
     });
-  }, [user, openAuthPanel]);
+  }, [user, openAuthPanel, celebrate]);
 
   const handleEmergencyRequestPin = useCallback(() => {
     setConfirmedEmergencyPinLocation(null);
@@ -1411,10 +1456,168 @@ export default function MapPage() {
     }
   }, [handleViewNeighborhood]);
 
+  // ── Live area snapshot for the neighbourhood-report notification ──────────
+  // Registry-sourced inferredNeighborhood now matches 311 comm_name keys, so
+  // a direct lookup usually lands; ranks come from the same distribution the
+  // choropleth uses.
+  const areaTotalsDesc = useMemo(() => {
+    if (!crimeStats || crimeStats.size === 0) return [];
+    return [...crimeStats.entries()]
+      .filter(([k]) => !k.includes(':'))
+      .map(([, e]) => e.crime + e.disorder)
+      .sort((a, b) => b - a);
+  }, [crimeStats]);
+
+  const getAreaStats = useCallback((name?: string) => {
+    if (!name || !crimeStats || areaTotalsDesc.length === 0) return null;
+    const entry = crimeStats.get(name.toLowerCase().trim());
+    if (!entry) return null;
+    const total = entry.crime + entry.disorder;
+    const rank = Math.max(1, areaTotalsDesc.findIndex((t) => t <= total) + 1);
+    const pct = rank / areaTotalsDesc.length;
+    const band =
+      pct <= 0.1 ? { label: 'Hot', color: '#DC2626' } :
+      pct <= 0.25 ? { label: 'High', color: '#EA580C' } :
+      pct <= 0.5 ? { label: 'Elevated', color: '#B8860B' } :
+      { label: 'Calm', color: '#2E8B7A' };
+    return { entry, total, rank, count: areaTotalsDesc.length, band };
+  }, [crimeStats, areaTotalsDesc]);
+
+  // Featured card for "your neighbourhood report" — rendered in both dropdowns
+  const renderNotificationRow = useCallback((n: MapNotification, compact: boolean) => {
+    const stats = n.kind === 'neighborhood_report' ? getAreaStats(n.neighborhood) : null;
+    if (n.kind === 'neighborhood_report') {
+      const areaName = (n.neighborhood ?? 'Your area').replace(/\b\w/g, (c) => c.toUpperCase());
+      return (
+        <button
+          key={n.id}
+          type="button"
+          onClick={() => handleNotificationClick(n)}
+          className="block w-full text-left transition-transform active:scale-[0.99] p-2"
+        >
+          <div
+            className="relative overflow-hidden rounded-xl p-3.5"
+            style={{ background: 'linear-gradient(135deg, #1C2B3A 0%, #24466B 80%)', border: '1px solid rgba(46,139,122,0.45)' }}
+          >
+            <span className="absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #2E8B7A, transparent 70%)' }} aria-hidden="true" />
+            <p className="font-mono text-[8px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
+              Your area intel is ready
+            </p>
+            <p className={cn('font-black mt-1 truncate', compact ? 'text-[13px]' : 'text-[14.5px]')} style={{ color: '#FFFDF8' }}>
+              {areaName}
+            </p>
+            {stats ? (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="flex items-center gap-1.5 rounded-full px-2 py-1 font-mono text-[8.5px] font-bold uppercase tracking-[0.1em]" style={{ background: `${stats.band.color}2e`, color: '#FFFDF8' }}>
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: stats.band.color }} />
+                  {stats.band.label}
+                </span>
+                <span className="rounded-full px-2 py-1 font-mono text-[8.5px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#D9E2E8' }}>
+                  #{stats.rank} of {stats.count}
+                </span>
+                <span className="rounded-full px-2 py-1 font-mono text-[8.5px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#D9E2E8' }}>
+                  {stats.entry.crime} concerns · {stats.entry.year}
+                </span>
+              </div>
+            ) : (
+              <p className="mt-1.5 text-[10px] font-medium" style={{ color: '#8FA3B5' }}>
+                Safety score, trends and property data for your block
+              </p>
+            )}
+            <p className="mt-2 font-mono text-[8.5px] font-bold uppercase tracking-[0.16em]" style={{ color: '#7FB5A6' }}>
+              Open full intel →
+            </p>
+          </div>
+        </button>
+      );
+    }
+    return (
+      <button
+        key={n.id}
+        type="button"
+        onClick={() => handleNotificationClick(n)}
+        className="flex w-full items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-black/[0.03]"
+        style={{ borderBottom: '1px solid #F0EBDD' }}
+      >
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(74,144,217,0.12)' }}>
+          <Bell size={12} className="text-[#4A90D9]" />
+        </span>
+        <span className="min-w-0">
+          <span className={cn('block font-bold text-[#1C2B3A] line-clamp-2 leading-snug', compact ? 'text-[11.5px]' : 'text-[12px]')}>{n.title}</span>
+          <span className="block font-mono text-[9px] text-[#5A6B7D] mt-0.5">
+            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </span>
+      </button>
+    );
+  }, [getAreaStats, handleNotificationClick]);
+
   const showProfileStep = Boolean(user);
   const authPanelVisible = authPanelOpen || (profileNeedsSetup && !onboardingDismissedThisSession);
   const canCloseAuthPanel = Boolean(user);
   const locationLabel = preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'your local report area';
+
+  // ── First-run tour ─────────────────────────────────────────────────────────
+  // Auto-starts only for users who just signed up in THIS session (their
+  // profile-setup panel was shown here). Returning users are never interrupted
+  // — they can replay it from the avatar menu → "App tour".
+  const [tourOpen, setTourOpen] = useState(false);
+  const wasNewSignupRef = useRef(false);
+  useEffect(() => {
+    if (profileNeedsSetup) wasNewSignupRef.current = true;
+  }, [profileNeedsSetup]);
+
+  useEffect(() => {
+    if (!user || !isAuthReady || isLoading || authPanelVisible || isPinMode || isEmergencyPinMode) return;
+    if (!wasNewSignupRef.current) return;
+    let seen = true;
+    try { seen = localStorage.getItem('cw_tour_done_v1') === '1'; } catch { /* private mode */ }
+    if (seen) return;
+    const id = window.setTimeout(() => setTourOpen(true), 900);
+    return () => window.clearTimeout(id);
+  }, [user, isAuthReady, isLoading, authPanelVisible, isPinMode, isEmergencyPinMode]);
+
+  const finishTour = useCallback(() => {
+    setTourOpen(false);
+    try { localStorage.setItem('cw_tour_done_v1', '1'); } catch { /* private mode */ }
+  }, []);
+
+  const replayTour = useCallback(() => {
+    setShowUserMenu(false);
+    setShowNotifications(false);
+    setTourOpen(true);
+  }, []);
+
+  // ── One-time weekly-digest prompt ──────────────────────────────────────────
+  // Users who haven't turned the digest on get exactly one nudge after sign-in
+  // (after onboarding and the tour are out of the way). digestPromptedAt is
+  // written the moment it shows, so it can never nag twice — on any device.
+  const [digestPromptOpen, setDigestPromptOpen] = useState(false);
+  useEffect(() => {
+    if (!user || !db || !userProfile || isLoading || authPanelVisible || tourOpen || profileNeedsSetup) return;
+    if (userProfile.weeklyDigestOptIn === true) return;
+    if (userProfile.digestPromptedAt) return;
+    const uid = user.uid;
+    const id = window.setTimeout(() => {
+      setDigestPromptOpen(true);
+      setDoc(doc(db!, 'users', uid), { digestPromptedAt: Date.now() }, { merge: true }).catch(() => {});
+    }, 1400);
+    return () => window.clearTimeout(id);
+  }, [user, userProfile, isLoading, authPanelVisible, tourOpen, profileNeedsSetup]);
+
+  const enableDigest = useCallback(async () => {
+    setDigestPromptOpen(false);
+    if (!user || !db) return;
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        weeklyDigestOptIn: true,
+        weeklyDigestOptInAt: Date.now(),
+        weeklyDigestTopics: ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates'],
+        profileUpdatedAt: Date.now(),
+      }, { merge: true });
+      celebrate('Weekly digest on — your neighbourhood stats will land by email.');
+    } catch { /* profile listener will re-sync */ }
+  }, [user, celebrate]);
 
   return (
     <div className="flex h-dvh w-full bg-slate-950 light:bg-[#eef3ea] overflow-hidden font-sans relative">
@@ -1497,7 +1700,7 @@ export default function MapPage() {
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 light:text-slate-500">Current report area</p>
                       <p className="mt-1 text-lg font-black">{locationLabel}</p>
                       <p className="mt-2 text-xs leading-relaxed text-slate-400 light:text-slate-600">
-                        Weekly digest: {userProfile?.weeklyDigestOptIn !== false ? 'enabled' : 'off'}
+                        Weekly digest: {userProfile?.weeklyDigestOptIn === true ? 'enabled' : 'off'}
                       </p>
                     </div>
                   )}
@@ -1555,29 +1758,48 @@ export default function MapPage() {
                             </div>
                           </div>
 
-                          {/* Preferences summary */}
-                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3 light:border-slate-200 light:bg-slate-50">
-                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Report area</p>
-                              <p className="mt-0.5 text-sm font-bold text-white light:text-slate-950">
-                                {preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'No location set'}
-                              </p>
+                          {/* Preferences summary — ledger rows */}
+                          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #E7E0D2' }}>
+                            <div className="flex items-center gap-3 p-4" style={{ background: '#F7F3EA' }}>
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(46,139,122,0.14)' }}>
+                                <Home size={15} className="text-[#2E8B7A]" />
+                              </span>
+                              <div className="min-w-0">
+                                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Report area</p>
+                                <p className="mt-0.5 text-sm font-bold truncate text-[#1C2B3A]">
+                                  {preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'No location set'}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Weekly digest</p>
-                              <p className="mt-0.5 text-sm font-bold text-white light:text-slate-950">
-                                {userProfile?.weeklyDigestOptIn !== false ? 'Enabled' : 'Off'}
-                              </p>
+                            <div className="flex items-center gap-3 p-4" style={{ borderTop: '1px dashed #E7E0D2' }}>
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(74,144,217,0.12)' }}>
+                                <Bell size={15} className="text-[#4A90D9]" />
+                              </span>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Weekly digest</p>
+                                <p className="mt-0.5 text-sm font-bold text-[#1C2B3A]">
+                                  {userProfile?.weeklyDigestOptIn === true ? 'Neighbourhood stats + news, weekly' : 'Off'}
+                                </p>
+                              </div>
+                              <span
+                                className="shrink-0 font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] px-2 py-1 rounded-full"
+                                style={userProfile?.weeklyDigestOptIn === true
+                                  ? { background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }
+                                  : { background: '#F7F3EA', color: '#9AA6B2', border: '1px solid #E7E0D2' }}
+                              >
+                                {userProfile?.weeklyDigestOptIn === true ? 'On' : 'Off'}
+                              </span>
                             </div>
                           </div>
 
-                          <Button
-                            variant="secondary"
+                          <button
+                            type="button"
                             onClick={() => setIsEditingPreferences(true)}
-                            className="w-full rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
+                            className="w-full h-12 rounded-2xl font-bold text-sm transition-transform active:scale-[0.98]"
+                            style={{ background: '#1C2B3A', color: '#FFFDF8' }}
                           >
                             Edit preferences
-                          </Button>
+                          </button>
                         </>
                       ) : (
                         /* ── Edit / onboarding form ─────────────────────────── */
@@ -1612,8 +1834,8 @@ export default function MapPage() {
                                 className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
                               />
                               <div className="min-h-6">
-                                {profileDraft.address.trim().length > 0 && addressSuggestions.length === 0 && addressQuery.length < 4 && (
-                                  <p className="text-[11px] font-medium text-slate-500">Keep typing for address guesses.</p>
+                                {profileDraft.address.trim().length > 0 && addressSuggestions.length === 0 && addressQuery.length < 3 && (
+                                  <p className="text-[11px] font-medium text-slate-500">Keep typing — matched against the City of Calgary address registry.</p>
                                 )}
                                 {addressSuggestions.length > 0 && (
                                   <div className="grid gap-2 sm:grid-cols-2">
@@ -1718,7 +1940,7 @@ export default function MapPage() {
                                     address: userProfile?.address || '',
                                     inferredNeighborhood: userProfile?.inferredNeighborhood || '',
                                     piiConsent: Boolean(userProfile?.piiConsentAt),
-                                    weeklyDigestOptIn: userProfile?.weeklyDigestOptIn !== false,
+                                    weeklyDigestOptIn: userProfile?.weeklyDigestOptIn === true,
                                   });
                                   setProfileSaveError(null);
                                 }}
@@ -1744,6 +1966,112 @@ export default function MapPage() {
                 </div>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* One-time weekly digest prompt */}
+      <AnimatePresence>
+        {digestPromptOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[190] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm"
+            style={{ background: 'rgba(20,28,38,0.45)' }}
+            onClick={() => setDigestPromptOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Weekly digest"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 26, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+              className="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl"
+              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative px-6 pt-6 pb-5" style={{ background: 'linear-gradient(135deg, rgba(46,139,122,0.12), rgba(74,144,217,0.1))' }}>
+                <span className="text-2xl" aria-hidden="true">📬</span>
+                <h3 className="mt-2 font-display text-xl font-extrabold tracking-[-0.02em] text-[#1C2B3A]">
+                  {locationLabel !== 'your local report area' ? `${locationLabel}, weekly` : 'Your neighbourhood, weekly'}
+                </h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-[#5A6B7D]">
+                  One email a week: real crime and 311 stats for your area, notable
+                  reports, and community news. No spam, opt out anytime.
+                </p>
+              </div>
+              <div className="flex items-center gap-2.5 px-5 py-4">
+                <button
+                  type="button"
+                  onClick={() => setDigestPromptOpen(false)}
+                  className="flex-1 h-11 rounded-2xl text-[13px] font-bold transition-colors hover:bg-black/5"
+                  style={{ color: '#5A6B7D', border: '1px solid #E7E0D2' }}
+                >
+                  Not now
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void enableDigest()}
+                  className="flex-[1.4] h-11 rounded-2xl text-[13px] font-black transition-transform active:scale-[0.97]"
+                  style={{ background: '#1C2B3A', color: '#FFFDF8' }}
+                >
+                  Email me the digest
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Post-submit celebration toast */}
+      <AnimatePresence>
+        {celebration && (
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 20 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[210] pointer-events-none"
+          >
+            <div
+              className="relative flex items-center gap-3 pl-4 pr-5 py-3.5 rounded-2xl shadow-2xl overflow-visible"
+              style={{ background: '#1C2B3A', border: '1px solid rgba(46,139,122,0.5)' }}
+            >
+              {/* confetti burst */}
+              {['#4A90D9', '#2E8B7A', '#D4A843', '#ef4444', '#a855f7', '#2E8B7A', '#D4A843', '#4A90D9', '#ef4444', '#4A90D9'].map((c, i) => (
+                <motion.span
+                  key={i}
+                  className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
+                  style={{ background: c }}
+                  initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                  animate={{
+                    x: Math.cos((i / 10) * Math.PI * 2) * (52 + (i % 3) * 22),
+                    y: Math.sin((i / 10) * Math.PI * 2) * (36 + (i % 3) * 16),
+                    opacity: 0,
+                    scale: 0.4,
+                  }}
+                  transition={{ duration: 1, delay: 0.1, ease: 'easeOut' }}
+                  aria-hidden="true"
+                />
+              ))}
+              <motion.span
+                initial={{ scale: 0, rotate: -30 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 14, delay: 0.05 }}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base"
+                style={{ background: 'rgba(46,139,122,0.25)' }}
+                aria-hidden="true"
+              >
+                🎉
+              </motion.span>
+              <div>
+                <p className="text-[13px] font-black" style={{ color: '#FFFDF8' }}>On the map!</p>
+                <p className="text-[11px] font-medium" style={{ color: '#8FA3B5' }}>{celebration}</p>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1784,8 +2112,11 @@ export default function MapPage() {
         )}
       </AnimatePresence>
 
+      {/* First-run coach-mark tour */}
+      <MapTour open={tourOpen} onFinish={finishTour} />
+
       {/* Sidebar Feed - Desktop */}
-      <div className="hidden lg:flex flex-col h-full shrink-0 z-40 relative shadow-2xl">
+      <div className="hidden lg:flex flex-col h-full shrink-0 z-40 relative shadow-2xl" data-tour="feed">
         <Sidebar
           incidents={incidents}
           onIncidentClick={handleSidebarIncidentClick}
@@ -1812,7 +2143,6 @@ export default function MapPage() {
           showHeatmap={showHeatmap}
           showCrimeLayer={showCrimeLayer}
           crimeStats={crimeStats}
-          theme={theme}
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
@@ -1838,7 +2168,6 @@ export default function MapPage() {
           mapRef={mapRef}
           isPinMode={isPinMode || isEmergencyPinMode}
           isFormOpen={isFormOpen}
-          theme={theme}
           snap={sheetSnap}
           setSnap={setSheetSnap}
           hasMore={hasMoreIncidents}
@@ -1854,8 +2183,7 @@ export default function MapPage() {
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
         <div
           className={cn(
-            'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden transition-all duration-300',
-            theme === 'light' && 'text-slate-900',
+            'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden transition-all duration-300 text-slate-900',
             (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible -translate-y-4'
           )}
         >
@@ -1863,52 +2191,71 @@ export default function MapPage() {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 shadow-lg text-sky-400 light:text-blue-600"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-lg text-slate-700"
               aria-label="Back to home"
             >
               <Home size={18} />
             </button>
             <button
               type="button"
+              data-tour="m-feed"
               onClick={() => setSheetSnap(sheetSnap === '80px' ? 0.38 : 0.82)}
-              className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 px-3.5 py-2.5 shadow-lg text-left active:scale-[0.99] transition-transform"
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 px-3.5 h-12 shadow-lg text-left active:scale-[0.99] transition-transform"
             >
-              <Search size={16} className="shrink-0 text-sky-400/90 light:text-blue-600" />
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-sky-300/90 light:text-blue-700 truncate">
-                  Calgary Watch
+              <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
+                <span className={cn('absolute inline-flex h-full w-full rounded-full animate-ping opacity-60', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-slate-400')} />
+                <span className={cn('relative inline-flex h-2 w-2 rounded-full', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-slate-400')} />
+              </span>
+              <div className="min-w-0 flex-1 leading-none">
+                <p className="text-[12.5px] font-black tracking-tight text-slate-900 truncate">
+                  {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </p>
-                <p className="text-xs font-bold text-white/90 light:text-slate-800 truncate">
-                  {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory} reports`}
+                <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 truncate">
+                  {mapIncidents.length === 0 ? 'Be first to report' : 'Tap for the full feed'}
                 </p>
               </div>
-              <span className="shrink-0 rounded-full bg-amber-400/20 border border-amber-400/35 px-2 py-0.5 text-[10px] font-black tabular-nums text-amber-200 light:text-amber-800">
+              <span className="shrink-0 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-black tabular-nums text-[#fff]">
                 {filteredIncidentsCount}
               </span>
+              <Search size={15} className="shrink-0 text-slate-400" />
             </button>
           </div>
-          
-          <div className="mt-2 flex justify-center pointer-events-none">
-            <div className="inline-flex flex-col items-center rounded-2xl border border-white/8 bg-black/25 light:bg-white/50 px-4 py-2 backdrop-blur-md">
-              <p className="text-center text-xl font-black tracking-tight text-amber-300 light:text-amber-700 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
-                {mapIncidents.length === 0
-                  ? 'No markers today'
-                  : `${mapIncidents.length} map marker${mapIncidents.length === 1 ? '' : 's'}`}
-              </p>
-              <p className="text-center text-[10px] font-semibold uppercase tracking-wider text-slate-300/90 light:text-slate-600 mt-0.5">
-                {mapIncidents.length === 0
-                  ? `${incidents.length} in sidebar · be first to report`
-                  : 'Community-powered · verify before you act'}
-              </p>
-            </div>
+
+          {/* One-tap category filter — same state the sheet and sidebar use */}
+          <div className="mt-2 -mx-3 px-3 flex gap-1.5 overflow-x-auto no-scrollbar pointer-events-auto">
+            {([
+              { key: 'all', label: 'All', color: '#1C2B3A' },
+              { key: 'crime', label: 'Crime', color: '#DC2626' },
+              { key: 'traffic', label: 'Traffic', color: '#EA580C' },
+              { key: 'weather', label: 'Weather', color: '#0284C7' },
+              { key: 'infrastructure', label: 'Infra', color: '#2563EB' },
+              { key: 'emergency', label: 'SOS', color: '#E11D48' },
+            ] as Array<{ key: IncidentCategory | 'all'; label: string; color: string }>).map((c) => {
+              const active = selectedCategory === c.key;
+              return (
+                <button
+                  key={c.key}
+                  type="button"
+                  onClick={() => setSelectedCategory(c.key)}
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 h-8 text-[11px] font-bold border shadow-sm backdrop-blur-xl transition-all active:scale-95"
+                  style={active
+                    ? { background: c.color, borderColor: c.color, color: '#fff' }
+                    : { background: 'rgba(255,255,255,0.92)', borderColor: 'rgb(226,232,240)', color: 'rgb(51,65,85)' }}
+                >
+                  {c.key !== 'all' && (
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: active ? '#fff' : c.color }} aria-hidden="true" />
+                  )}
+                  {c.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Mobile vertical action buttons (right edge) */}
         <div
           className={cn(
-            'absolute right-3 top-28 flex flex-col gap-2.5 z-30 pointer-events-none lg:hidden transition-all duration-300',
-            theme === 'light' && 'text-slate-900',
+            'absolute right-3 top-28 flex flex-col gap-2.5 z-30 pointer-events-none lg:hidden transition-all duration-300 text-slate-900',
             (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible translate-x-4'
           )}
         >
@@ -1918,6 +2265,8 @@ export default function MapPage() {
               const loc = userLocation || CALGARY_CENTER;
               if (nearMeOpen) {
                 setNearMeOpen(false);
+                setNearMeScanning(false);
+                if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
                 mapRef.current?.clearUserLocation();
                 return;
               }
@@ -1925,6 +2274,9 @@ export default function MapPage() {
               if (userLocation) mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
               setNearMeIndex(0);
               setNearMeOpen(true);
+              setNearMeScanning(true);
+              if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
+              nearMeScanTimer.current = window.setTimeout(() => setNearMeScanning(false), 1600);
               // Pan to first nearby incident after map settles
               setTimeout(() => {
                 const nearMeList = incidents
@@ -1938,23 +2290,16 @@ export default function MapPage() {
                 if (nearMeList[0]) mapRef.current?.flyTo(nearMeList[0].i.lat, nearMeList[0].i.lng, 15);
               }, 600);
             }}
+            data-tour="near-me"
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-2xl backdrop-blur-xl border shadow-lg pointer-events-auto transition-colors",
+              "flex h-12 w-12 items-center justify-center rounded-2xl backdrop-blur-xl border shadow-lg pointer-events-auto transition-colors",
               nearMeOpen
-                ? "bg-sky-500/20 border-sky-500/50 text-sky-400"
-                : "bg-black/45 light:bg-white/90 border-white/12 light:border-slate-200 text-sky-400 light:text-blue-600"
+                ? "bg-slate-900 border-slate-900 text-[#fff]"
+                : "bg-white/95 border-slate-200 text-blue-600"
             )}
             aria-label="What's near me"
           >
             <Navigation size={18} />
-          </button>
-          <button
-            type="button"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-amber-300 light:text-amber-700 shadow-lg pointer-events-auto"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <div className="relative pointer-events-auto">
             <button
@@ -1963,7 +2308,8 @@ export default function MapPage() {
                 setShowNotifications(!showNotifications);
                 if (!showNotifications) setUnreadNotifications(0);
               }}
-              className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-black/45 light:bg-white/90 backdrop-blur-xl border border-white/12 light:border-slate-200 text-slate-200 light:text-slate-700 shadow-lg"
+              data-tour="m-alerts"
+              className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 text-slate-700 shadow-lg"
               aria-label="Notifications"
             >
               <Bell size={18} className={cn(unreadNotifications > 0 && 'text-sky-400')} />
@@ -1979,28 +2325,27 @@ export default function MapPage() {
                   initial={{ opacity: 0, x: 8, scale: 0.96 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 8, scale: 0.96 }}
-              className="absolute right-full mr-3 top-0 w-[min(18rem,calc(100vw-5rem))] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-[rgb(255,250,243)] light:border-stone-200/80"
+              className="absolute right-full mr-3 top-0 w-[min(18.5rem,calc(100vw-5rem))] rounded-2xl shadow-2xl overflow-hidden z-50"
+              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
                 >
-                  <div className="p-3 border-b border-white/5 light:border-slate-100">
-                    <h3 className="text-xs font-bold text-white light:text-slate-900">Notifications</h3>
+                  <div className="flex items-center justify-between px-3.5 py-3" style={{ borderBottom: '1px solid #E7E0D2' }}>
+                    <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#5A6B7D]">Alerts</h3>
+                    <span className="flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
+                      <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-[#2E8B7A]" />
+                      Live
+                    </span>
                   </div>
-                  <div className="max-h-52 overflow-y-auto">
+                  <div className="max-h-56 overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <div className="p-3 text-[10px] text-slate-500 text-center">No new alerts.</div>
+                      <div className="px-4 py-6 text-center">
+                        <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full" style={{ background: '#F7F3EA' }}>
+                          <Bell size={15} className="text-[#9AA6B2]" />
+                        </span>
+                        <p className="mt-2 text-[11.5px] font-bold text-[#1C2B3A]">All caught up</p>
+                        <p className="text-[10px] text-[#5A6B7D] mt-0.5">New reports will land here as they happen.</p>
+                      </div>
                     ) : (
-                      notifications.map((n) => (
-                        <button
-                          key={n.id}
-                          type="button"
-                          onClick={() => handleNotificationClick(n)}
-                          className="block w-full px-3 py-2.5 border-b border-white/5 light:border-slate-100 text-left hover:bg-white/5 light:hover:bg-slate-100"
-                        >
-                          <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{n.title}</p>
-                          <p className="text-[9px] text-slate-500 mt-0.5">
-                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </button>
-                      ))
+                      notifications.map((n) => renderNotificationRow(n, true))
                     )}
                   </div>
                 </motion.div>
@@ -2012,7 +2357,7 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden border border-white/15 light:border-slate-200 bg-black/45 light:bg-white shadow-lg"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden border border-slate-200 bg-white/95 shadow-lg"
                 aria-label="Account menu"
               >
                 {user.photoURL ? (
@@ -2025,7 +2370,7 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={() => openAuthPanel('signin')}
-                className="h-11 w-11 md:w-auto md:px-3.5 rounded-2xl bg-slate-950/85 light:bg-white text-sky-300 light:text-slate-900 text-[10px] font-black uppercase tracking-wide shadow-lg border border-white/12 light:border-slate-200 flex items-center justify-center gap-2"
+                className="h-12 w-12 md:w-auto md:px-3.5 rounded-2xl bg-white/95 text-slate-900 text-[10px] font-black uppercase tracking-wide shadow-lg border border-slate-200 flex items-center justify-center gap-2"
               >
                 <LogIn size={16} />
                 <span className="hidden md:inline">Sign in</span>
@@ -2063,6 +2408,14 @@ export default function MapPage() {
                   </button>
                   <button
                     type="button"
+                    onClick={replayTour}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-300 light:text-slate-700 hover:bg-white/5 light:hover:bg-slate-100 text-left"
+                  >
+                    <HelpCircle size={14} />
+                    App tour
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => { logout(); setShowUserMenu(false); }}
                     className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-red-400 hover:bg-red-500/10 text-left rounded-b-2xl"
                   >
@@ -2089,30 +2442,95 @@ export default function MapPage() {
                 'bottom-6 left-3 right-3'
               )}
             >
-              <div className="bg-slate-900/96 light:bg-[rgba(255,250,243,0.95)] backdrop-blur-md border border-white/10 light:border-stone-200/80 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-[rgba(255,253,248,0.97)] backdrop-blur-md border border-[#E7E0D2] rounded-3xl shadow-2xl overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                   <div className="flex items-center gap-2">
-                    <Navigation size={14} className="text-sky-400" />
-                    <span className="text-xs font-black uppercase tracking-widest text-sky-400">Near You</span>
+                    <Navigation size={14} className="text-blue-600" />
+                    <span className="text-xs font-black uppercase tracking-widest text-blue-700">Near You</span>
                     <span className="text-[10px] text-slate-500 font-semibold">within {NEAR_ME_RADIUS_KM} km</span>
                   </div>
                   <button
-                    onClick={() => { setNearMeOpen(false); mapRef.current?.clearUserLocation(); }}
-                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                    onClick={() => { setNearMeOpen(false); setNearMeScanning(false); mapRef.current?.clearUserLocation(); }}
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
                     aria-label="Close near me panel"
                   >
                     <X size={13} />
                   </button>
                 </div>
 
-                {nearMeIncidents.length === 0 ? (
-                  <div className="px-4 pb-5 pt-2 text-center">
-                    <p className="text-sm font-bold text-slate-400">No incidents within {NEAR_ME_RADIUS_KM} km</p>
-                    <p className="text-[11px] text-slate-600 mt-1">Your area looks clear right now.</p>
+                {nearMeScanning ? (
+                  /* ── Radar scan — anticipation beat before the reveal ── */
+                  <div className="px-4 pb-6 pt-1 flex flex-col items-center">
+                    <div className="relative h-24 w-24" aria-hidden="true">
+                      {[0, 0.45, 0.9].map((d) => (
+                        <motion.span
+                          key={d}
+                          className="absolute inset-0 rounded-full border-2"
+                          style={{ borderColor: '#2E8B7A' }}
+                          initial={{ scale: 0.25, opacity: 0.8 }}
+                          animate={{ scale: 1.15, opacity: 0 }}
+                          transition={{ duration: 1.3, delay: d, repeat: Infinity, ease: 'easeOut' }}
+                        />
+                      ))}
+                      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-[#4A90D9] border-2 border-[#fff] shadow-[0_0_12px_2px_rgba(74,144,217,0.6)]" />
+                    </div>
+                    <p className="mt-2 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[#2E8B7A]">
+                      Scanning your 3 km…
+                    </p>
+                    <p className="mt-1 text-[10.5px] text-slate-500 font-medium">
+                      Checking community + city + weather feeds
+                    </p>
                   </div>
+                ) : nearMeIncidents.length === 0 ? (
+                  /* ── All clear — celebrate it ── */
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                    className="relative px-4 pb-5 pt-2 text-center overflow-hidden"
+                  >
+                    {/* confetti burst */}
+                    {['#4A90D9', '#2E8B7A', '#D4A843', '#ef4444', '#a855f7', '#2E8B7A', '#D4A843', '#4A90D9'].map((c, i) => (
+                      <motion.span
+                        key={i}
+                        className="absolute left-1/2 top-8 h-1.5 w-1.5 rounded-full"
+                        style={{ background: c }}
+                        initial={{ x: 0, y: 0, opacity: 1 }}
+                        animate={{
+                          x: Math.cos((i / 8) * Math.PI * 2) * (44 + (i % 3) * 16),
+                          y: Math.sin((i / 8) * Math.PI * 2) * (30 + (i % 3) * 12),
+                          opacity: 0,
+                        }}
+                        transition={{ duration: 1, delay: 0.15, ease: 'easeOut' }}
+                        aria-hidden="true"
+                      />
+                    ))}
+                    <p className="text-2xl" aria-hidden="true">✨</p>
+                    <p className="mt-1 text-base font-black text-slate-900">All clear around you</p>
+                    <p className="text-[11px] text-slate-500 mt-1 font-medium">
+                      Zero open reports within {NEAR_ME_RADIUS_KM} km. That's the whole point of watching.
+                    </p>
+                  </motion.div>
                 ) : (
                   <>
+                    {/* Reveal headline — the payoff after the scan */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                      className="px-4 pb-2 flex items-center gap-2"
+                    >
+                      <span className="text-lg" aria-hidden="true">
+                        {nearMeIncidents.length <= 3 ? '👀' : '📡'}
+                      </span>
+                      <p className="text-[13.5px] font-black text-slate-900">
+                        {nearMeIncidents.length === 1
+                          ? '1 thing to know nearby'
+                          : `${nearMeIncidents.length} things to know nearby`}
+                      </p>
+                    </motion.div>
+
                     {/* Incident card */}
                     {(() => {
                       const inc = nearMeIncidents[nearMeIndex];
@@ -2186,28 +2604,66 @@ export default function MapPage() {
                     </div>
                   </>
                 )}
+
+                {/* Weekly digest opt-in — wired to the existing profile setting */}
+                {!nearMeScanning && (
+                  <motion.button
+                    type="button"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35, duration: 0.4 }}
+                    onClick={() => {
+                      setNearMeOpen(false);
+                      mapRef.current?.clearUserLocation();
+                      openAuthPanel(user ? 'settings' : 'signin');
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[rgba(46,139,122,0.14)]"
+                    style={{ background: 'rgba(46,139,122,0.09)', borderTop: '1px dashed #D9D2C3' }}
+                  >
+                    <span className="text-base shrink-0" aria-hidden="true">📬</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[12px] font-black text-slate-900 leading-tight">
+                        Want this weekly, without opening the app?
+                      </span>
+                      <span className="block text-[10.5px] text-slate-500 font-medium mt-0.5">
+                        Real stats for your neighbourhood + community news, by email. Free, opt out anytime.
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#2E8B7A]">
+                      {user ? 'Turn on' : 'Sign up'} →
+                    </span>
+                  </motion.button>
+                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Desktop top header - unchanged at lg+ */}
+        {/* Desktop top header — branded command bar */}
         <div className="absolute top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 items-center justify-between pointer-events-none z-30 hidden lg:flex">
-          <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-            <Button
-              variant="secondary"
-              size="icon"
-              className="rounded-full w-10 h-10 md:w-12 md:h-12 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
+          <div className="flex items-center pointer-events-auto rounded-full bg-white/95 backdrop-blur-xl border border-slate-300 shadow-2xl h-12 pl-4 pr-1.5 gap-1">
+            <div className="flex items-center gap-2.5 pr-3 border-r border-slate-200">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-ping opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <div className="leading-none">
+                <p className="text-[12px] font-black tracking-tight text-slate-900">Calgary Watch</p>
+                <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.24em] text-slate-500">Live map</p>
+              </div>
+            </div>
+            <button
+              type="button"
               onClick={() => navigate('/')}
-              title="Back to Landing Page"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              title="Back to landing page"
+              aria-label="Back to landing page"
             >
-              <Home size={18} className="text-blue-400" />
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="icon"
-              className="rounded-full w-10 h-10 md:w-12 md:h-12 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
+              <Home size={16} />
+            </button>
+            <button
+              type="button"
+              data-tour="locate"
               onClick={() => {
                 if (userLocation) {
                   mapRef.current?.flyTo(userLocation.lat, userLocation.lng);
@@ -2215,25 +2671,20 @@ export default function MapPage() {
                   mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
                 }
               }}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              title="Fly to my location"
+              aria-label="Fly to my location"
             >
-              <Navigation size={18} className="text-blue-400" />
-            </Button>
+              <Navigation size={16} />
+            </button>
           </div>
 
           <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-            <Button
-              variant="secondary"
-              size="icon"
-              className="rounded-full w-10 h-10 md:w-12 md:h-12 bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-blue-500/50 transition-all shadow-2xl dark:bg-slate-950/80 light:bg-white/95 light:text-slate-900 light:border-slate-300"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              {theme === 'dark' ? <Sun size={18} className="text-yellow-400" /> : <Moon size={18} className="text-blue-600" />}
-            </Button>
-
             <div className="relative">
               <Button
                 variant="secondary"
                 size="icon"
+                data-tour="alerts"
                 className="rounded-full w-12 h-12 bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-blue-500/50 transition-all shadow-2xl light:bg-white/95 light:text-slate-900 light:border-slate-300"
                 onClick={() => {
                   setShowNotifications(!showNotifications);
@@ -2254,30 +2705,27 @@ export default function MapPage() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-72 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 light:bg-white light:border-slate-300"
+                    className="absolute right-0 mt-2 w-80 rounded-2xl shadow-2xl overflow-hidden z-50"
+                    style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
                   >
-                    <div className="p-4 border-b border-white/5 light:border-slate-100">
-                      <h3 className="text-xs font-bold text-white light:text-slate-900">Notifications</h3>
+                    <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #E7E0D2' }}>
+                      <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#5A6B7D]">Alerts</h3>
+                      <span className="flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
+                        <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-[#2E8B7A]" />
+                        Live
+                      </span>
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <div className="p-4 text-[10px] text-slate-500 text-center">
-                          No new alerts in your area.
+                        <div className="px-4 py-7 text-center">
+                          <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full" style={{ background: '#F7F3EA' }}>
+                            <Bell size={15} className="text-[#9AA6B2]" />
+                          </span>
+                          <p className="mt-2 text-[12px] font-bold text-[#1C2B3A]">All caught up</p>
+                          <p className="text-[10.5px] text-[#5A6B7D] mt-0.5">New reports in your area will land here.</p>
                         </div>
                       ) : (
-                        notifications.map((notification) => (
-                          <button
-                            key={notification.id}
-                            type="button"
-                            onClick={() => handleNotificationClick(notification)}
-                            className="block w-full px-4 py-3 border-b border-white/5 light:border-slate-100 text-left hover:bg-white/5 light:hover:bg-slate-100"
-                          >
-                            <p className="text-[11px] font-bold text-white light:text-slate-900 line-clamp-2">{notification.title}</p>
-                            <p className="text-[10px] text-slate-500 mt-1">
-                              {new Date(notification.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </button>
-                        ))
+                        notifications.map((notification) => renderNotificationRow(notification, false))
                       )}
                     </div>
                   </motion.div>
@@ -2337,6 +2785,13 @@ export default function MapPage() {
                         <Settings size={14} />
                         Settings
                       </button>
+                      <button
+                        onClick={replayTour}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-slate-300 light:text-slate-700 hover:bg-white/5 light:hover:bg-slate-100 transition-colors text-left"
+                      >
+                        <HelpCircle size={14} />
+                        App tour
+                      </button>
                       <button 
                         onClick={() => {
                           logout();
@@ -2369,37 +2824,40 @@ export default function MapPage() {
           "absolute right-4 md:right-8 z-30 flex flex-col items-end gap-3 max-lg:bottom-[calc(7.25rem+env(safe-area-inset-bottom))] md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] bottom-28 md:bottom-32 transition-all duration-300",
           (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
         )}>
-          {/* SOS Emergency Button */}
+          {/* SOS Emergency Button — labelled pill on desktop, round FAB on mobile */}
           <Button
             variant="primary"
-            className="rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-red-600 hover:bg-red-500 shadow-2xl shadow-red-600/50 transition-all active:scale-90 group relative"
+            data-tour="sos"
+            className="rounded-full w-14 h-14 md:w-16 md:h-16 lg:w-auto lg:h-13 lg:px-5 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 shadow-2xl shadow-red-600/50 transition-all active:scale-90 group relative"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
               if (now - buttonClickDebounceRef.current < 300) return;
               buttonClickDebounceRef.current = now;
-              
+
               if (!user) { openAuthPanel('signin'); return; }
               setIsEmergencyOpen(true);
             }}
           >
-            <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30" />
-            <Siren size={24} className="relative z-10" />
-            <div className="absolute right-full mr-4 px-3 py-1.5 bg-red-950 text-red-200 text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-red-500/30 shadow-xl hidden md:block">
+            <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30 lg:hidden" />
+            <Siren size={22} className="relative z-10 shrink-0" />
+            <span className="hidden lg:inline text-sm font-black tracking-tight text-[#fff]">SOS</span>
+            <div className="absolute right-full mr-4 px-3 py-1.5 bg-red-950 text-red-200 text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-red-500/30 shadow-xl hidden md:block lg:hidden">
               Emergency Report
             </div>
           </Button>
 
-          {/* Regular Report Button */}
+          {/* Regular Report Button — labelled pill on desktop */}
           <Button
             variant="primary"
-            className="rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-blue-600 hover:bg-blue-700 light:bg-slate-900 light:hover:bg-slate-800 shadow-2xl shadow-blue-500/40 light:shadow-slate-900/30 transition-all active:scale-90 group"
+            data-tour="report"
+            className="rounded-full w-14 h-14 md:w-16 md:h-16 lg:w-auto lg:h-14 lg:px-6 flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-700 light:bg-slate-900 light:hover:bg-slate-800 shadow-2xl shadow-blue-500/40 light:shadow-slate-900/30 transition-all active:scale-90 group"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
               if (now - buttonClickDebounceRef.current < 300) return;
               buttonClickDebounceRef.current = now;
-              
+
               if (!user) {
                 openAuthPanel('signin');
               } else {
@@ -2411,8 +2869,9 @@ export default function MapPage() {
               }
             }}
           >
-            <Plus size={28} className="transition-transform group-hover:rotate-90 duration-150 [color:white]" />
-            <div className="absolute right-full mr-4 px-3 py-1.5 bg-slate-950 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block">
+            <Plus size={26} className="transition-transform group-hover:rotate-90 duration-150 [color:white] shrink-0" />
+            <span className="hidden lg:inline text-sm font-black tracking-tight text-[#fff]">Report an incident</span>
+            <div className="absolute right-full mr-4 px-3 py-1.5 bg-slate-950 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block lg:hidden">
               Report Incident
             </div>
           </Button>
@@ -2427,7 +2886,6 @@ export default function MapPage() {
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
           isPinMode={isPinMode || isEmergencyPinMode}
-          theme={theme}
         />
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}
@@ -2472,7 +2930,6 @@ export default function MapPage() {
           statcanYearlyStats={statcanYearlyStats}
           propertyData={propertyData}
           cityAverages={cityAverages}
-          theme={theme}
         />
 
         {/* Emergency Modal */}

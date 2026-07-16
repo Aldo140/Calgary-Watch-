@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, RefObject, useCallback } from 're
 import { Drawer } from 'vaul';
 import {
   Search, X, MapPin, Clock, Layers, Siren, AlertCircle, Car, Construction,
-  CloudRain, Activity, User, ChevronDown, Plus,
+  CloudRain, Activity, User, ChevronDown, ChevronRight, Plus,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
@@ -19,13 +19,31 @@ const FEED_FILTER_KEY = 'cw_feedFilter';
 
 type SortBy = 'newest' | 'oldest' | 'verified';
 
+// Field-atlas palette — explicit hexes on purpose (several Tailwind color
+// utilities are globally remapped in index.css).
+const P = {
+  paper: '#FFFDF8',
+  card: '#F7F3EA',
+  ink: '#1C2B3A',
+  soft: '#5A6B7D',
+  line: '#E7E0D2',
+};
+
+const CAT_COLOR: Record<string, string> = {
+  emergency: '#E11D48',
+  crime: '#DC2626',
+  traffic: '#EA580C',
+  infrastructure: '#2563EB',
+  weather: '#0284C7',
+};
+
 const CATEGORY_OPTIONS = [
-  { id: 'all' as const,            label: 'All',     Icon: Layers       },
-  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren        },
-  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle  },
-  { id: 'traffic' as const,        label: 'Traffic', Icon: Car          },
-  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction },
-  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain    },
+  { id: 'all' as const,            label: 'All',     Icon: Layers,       color: '#1C2B3A' },
+  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#E11D48' },
+  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#DC2626' },
+  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#EA580C' },
+  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#2563EB' },
+  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
 ] as const;
 
 // ─── Vaul open-state invariant ────────────────────────────────────────────────
@@ -94,7 +112,6 @@ interface MobileMapSheetProps {
   liveCount: number;
   mapRef: RefObject<MapRef | null>;
   isPinMode: boolean;
-  theme?: 'dark' | 'light';
   snap: SnapPoint;
   setSnap: (s: SnapPoint) => void;
   hasMore: boolean;
@@ -112,7 +129,6 @@ export default function MobileMapSheet({
   liveCount,
   mapRef,
   isPinMode,
-  theme = 'dark',
   snap,
   setSnap,
   hasMore,
@@ -253,8 +269,6 @@ export default function MobileMapSheet({
     }
   }, [isExpanded, activeIncidentId]);
 
-  const dark = theme !== 'light';
-
   return (
     <Drawer.Root
       snapPoints={[...SNAP_POINTS] as (string | number)[]}
@@ -266,27 +280,26 @@ export default function MobileMapSheet({
     >
       <Drawer.Portal>
         <Drawer.Content
-          className={cn(
-            'fixed bottom-0 left-0 right-0 z-[50] flex flex-col rounded-t-[1.6rem] outline-none lg:hidden',
-            'transition-colors duration-200',
-            dark
-              ? 'bg-slate-950 border-t border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.45)]'
-              : 'bg-[#fffaf3] border-t border-stone-200/80 shadow-[0_-8px_32px_rgba(120,113,108,0.16)]',
-          )}
-          style={{ maxHeight: '85vh', ...(isFormOpen ? { visibility: 'hidden', pointerEvents: 'none' } : {}) }}
+          className="fixed bottom-0 left-0 right-0 z-[50] flex flex-col rounded-t-[1.5rem] outline-none lg:hidden shadow-[0_-12px_40px_rgba(28,43,58,0.18)]"
+          style={{
+            maxHeight: '85vh',
+            background: P.paper,
+            borderTop: `1px solid ${P.line}`,
+            ...(isFormOpen ? { visibility: 'hidden', pointerEvents: 'none' } : {}),
+          }}
         >
           <Drawer.Title className="sr-only">Incidents</Drawer.Title>
           <Drawer.Description className="sr-only">Browse and search Calgary incidents</Drawer.Description>
 
-          {/* Brand gradient stripe */}
+          {/* Brand stripe */}
           <div
-            className="h-1.5 w-full shrink-0 rounded-t-[1.6rem]"
+            className="h-1 w-full shrink-0 rounded-t-[1.5rem]"
             style={{ background: 'linear-gradient(to right, #4A90D9, #2E8B7A, #D4A843)' }}
           />
 
           {/* Drag handle */}
           <div className="flex justify-center pt-2 pb-1 shrink-0">
-            <div className={cn('w-10 h-1 rounded-full', dark ? 'bg-slate-700' : 'bg-slate-300')} />
+            <div className="w-10 h-1 rounded-full" style={{ background: P.line }} />
           </div>
 
           {/* ── COLLAPSED BAR ── */}
@@ -295,26 +308,22 @@ export default function MobileMapSheet({
               className="flex items-center justify-between px-4 py-2 cursor-pointer"
               onClick={() => setSnap(0.38)}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <div className="relative flex items-center justify-center w-2 h-2">
-                  <div className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75" />
-                  <div className="relative w-2 h-2 rounded-full bg-green-500" />
+                  <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-70" />
+                  <div className="relative w-2 h-2 rounded-full bg-emerald-500" />
                 </div>
-                <span className={cn('text-xs font-black uppercase tracking-widest', dark ? 'text-slate-300' : 'text-slate-700')}>
+                <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: P.ink }}>
                   {liveCount} live report{liveCount !== 1 ? 's' : ''}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onReportPress(); }}
-                className={cn(
-                  'flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-colors',
-                  dark
-                    ? 'bg-blue-600/20 border-blue-500/40 text-blue-400 hover:bg-blue-600/30'
-                    : 'bg-slate-900 border-slate-900 [color:white] hover:bg-slate-800',
-                )}
+                className="flex items-center gap-1.5 px-3.5 h-8 rounded-full text-[10px] font-black uppercase tracking-[0.14em] transition-transform active:scale-95"
+                style={{ background: P.ink, color: P.paper }}
               >
-                <Plus size={10} />
+                <Plus size={11} />
                 Report
               </button>
             </div>
@@ -326,45 +335,42 @@ export default function MobileMapSheet({
 
               {/* Search + total count */}
               <div className="px-3 pt-1 pb-2 shrink-0 flex items-center gap-2">
-                <div className={cn(
-                  'flex items-center gap-2 rounded-2xl px-3 py-2.5 border flex-1',
-                  dark ? 'bg-white/5 border-white/10' : 'bg-slate-100 border-slate-200',
-                )}>
-                  <Search size={15} className="text-slate-500 shrink-0" />
+                <div
+                  className="flex items-center gap-2 rounded-2xl px-3 h-11 flex-1"
+                  style={{ background: P.card, border: `1px solid ${P.line}` }}
+                >
+                  <Search size={15} className="shrink-0" style={{ color: P.soft }} />
                   <input
                     ref={inputRef}
                     type="text"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     onFocus={() => setSnap(0.82)}
-                    placeholder="Search reports or neighborhoods…"
-                    className={cn(
-                      'flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-slate-500 min-w-0',
-                      dark ? 'text-white' : 'text-slate-900',
-                    )}
+                    placeholder="Search reports or neighbourhoods…"
+                    className="flex-1 bg-transparent text-sm font-medium outline-none min-w-0"
+                    style={{ color: P.ink }}
                   />
                   {search && (
-                    <button onClick={() => setSearch('')} className="shrink-0 text-slate-500 hover:text-slate-300 transition-colors">
+                    <button onClick={() => setSearch('')} className="shrink-0 transition-colors" style={{ color: P.soft }}>
                       <X size={14} />
                     </button>
                   )}
                 </div>
-                {/* Total count badge */}
-                <div className={cn(
-                  'flex flex-col items-center justify-center rounded-xl px-3 py-1.5 min-w-[48px] border shrink-0',
-                  dark ? 'bg-blue-500/10 border-blue-500/20' : 'bg-slate-900 border-slate-900',
-                )}>
-                  <span className={cn('text-[9px] font-bold uppercase tracking-tighter leading-none', dark ? 'text-blue-400' : 'text-white')}>Total</span>
-                  <span className={cn('text-base font-black leading-none mt-0.5', dark ? 'text-white' : 'text-white')}>
+                <div
+                  className="flex flex-col items-center justify-center rounded-2xl px-3 h-11 min-w-[52px] shrink-0"
+                  style={{ background: P.ink }}
+                >
+                  <span className="font-mono text-[7.5px] font-bold uppercase tracking-[0.14em] leading-none" style={{ color: 'rgba(255,253,248,0.6)' }}>Total</span>
+                  <span className="text-[15px] font-black leading-none mt-0.5 tabular-nums" style={{ color: P.paper }}>
                     {filteredIncidents.length}
                   </span>
                 </div>
               </div>
 
-              {/* Category chips */}
+              {/* Category chips — colour-coded, same system as the map chips */}
               <div className="px-3 pb-2 shrink-0">
                 <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-                  {CATEGORY_OPTIONS.map(({ id, label, Icon }) => {
+                  {CATEGORY_OPTIONS.map(({ id, label, Icon, color }) => {
                     const count = id === 'all'
                       ? incidents.filter(i => !i.deleted).length
                       : incidents.filter(i => i.category === id && !i.deleted).length;
@@ -373,21 +379,19 @@ export default function MobileMapSheet({
                       <button
                         key={id}
                         onClick={() => onCategoryChange(id as IncidentCategory | 'all')}
-                        className={cn(
-                          'category-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tight border transition-all whitespace-nowrap',
-                          isSelected
-                            ? 'category-chip-selected bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/20'
-                            : dark
-                              ? 'bg-slate-800/50 text-slate-400 border-white/5 hover:bg-slate-800'
-                              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100',
-                        )}
+                        className="category-chip shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-full text-[10.5px] font-bold border transition-all whitespace-nowrap active:scale-95"
+                        style={isSelected
+                          ? { background: color, borderColor: color, color: '#fff' }
+                          : { background: P.paper, borderColor: P.line, color: P.soft }}
                       >
-                        <Icon size={12} className={cn('category-chip-icon', isSelected ? 'text-white' : dark ? 'text-blue-400' : 'text-slate-700')} />
+                        <Icon size={12} className="category-chip-icon" style={{ color: isSelected ? '#fff' : color }} />
                         <span>{label}</span>
-                        <span className={cn(
-                          'category-chip-count text-[9px] px-1.5 py-0.5 rounded-full font-black',
-                          isSelected ? 'bg-white/20 text-white' : dark ? 'bg-white/10 text-slate-500' : 'bg-slate-200 text-slate-600',
-                        )}>
+                        <span
+                          className="category-chip-count text-[9px] px-1.5 py-0.5 rounded-full font-black tabular-nums"
+                          style={isSelected
+                            ? { background: 'rgba(255,255,255,0.22)', color: '#fff' }
+                            : { background: P.card, color: P.soft }}
+                        >
                           {count}
                         </span>
                       </button>
@@ -398,41 +402,25 @@ export default function MobileMapSheet({
 
               {/* Filter controls — expanded only */}
               {isExpanded && (
-                <div className={cn(
-                  'px-3 pb-3 shrink-0 border-b space-y-2',
-                  dark ? 'border-white/5' : 'border-slate-200',
-                )}>
-                  {/* Sort + status counts row */}
+                <div className="px-3 pb-3 shrink-0 space-y-2" style={{ borderBottom: `1px solid ${P.line}` }}>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                        <span className={cn('text-[9px] font-bold uppercase tracking-tighter', dark ? 'text-slate-400' : 'text-slate-600')}>
-                          {filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length} Critical
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-                        <span className={cn('text-[9px] font-bold uppercase tracking-tighter', dark ? 'text-slate-400' : 'text-slate-600')}>
-                          {filteredIncidents.filter(i => i.verified_status === 'unverified').length} Active
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        <span className={cn('text-[9px] font-bold uppercase tracking-tighter', dark ? 'text-slate-400' : 'text-slate-600')}>
-                          {filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved
-                        </span>
-                      </div>
+                      {[
+                        { dot: '#ef4444', label: `${filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length} Critical` },
+                        { dot: '#eab308', label: `${filteredIncidents.filter(i => i.verified_status === 'unverified').length} Active` },
+                        { dot: '#22c55e', label: `${filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved` },
+                      ].map(({ dot, label }) => (
+                        <div key={label} className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
+                          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.06em]" style={{ color: P.soft }}>{label}</span>
+                        </div>
+                      ))}
                     </div>
                     <select
                       value={sortBy}
                       onChange={e => setSortBy(e.target.value as SortBy)}
-                      className={cn(
-                        'rounded-lg px-2 py-1 text-[10px] font-bold border focus:outline-none cursor-pointer transition-colors',
-                        dark
-                          ? 'bg-slate-900 border-white/10 text-slate-300 hover:border-white/20'
-                          : 'bg-white border-slate-300 text-slate-800 hover:border-slate-400',
-                      )}
+                      className="rounded-lg px-2 h-7 text-[10px] font-bold focus:outline-none cursor-pointer"
+                      style={{ background: P.paper, border: `1px solid ${P.line}`, color: P.ink }}
                     >
                       <option value="newest">Newest First</option>
                       <option value="oldest">Oldest First</option>
@@ -440,45 +428,32 @@ export default function MobileMapSheet({
                     </select>
                   </div>
 
-                  {/* Toggle pills row */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={() => setFeedFilter((value) => value === 'community' ? null : 'community')}
-                      className={cn(
-                        'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all',
-                        feedFilter === 'community'
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                          : dark
-                            ? 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'
-                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50',
-                      )}
+                      className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
+                      style={feedFilter === 'community'
+                        ? { background: 'rgba(46,139,122,0.14)', borderColor: 'rgba(46,139,122,0.45)', color: '#1F6D5F' }
+                        : { background: P.paper, borderColor: P.line, color: P.soft }}
                     >
-                      Community {feedFilter === 'community' ? 'On' : 'Off'}
+                      Community only
                     </button>
                     <button
                       onClick={() => setFeedFilter((value) => value === 'recent' ? null : 'recent')}
-                      className={cn(
-                        'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all',
-                        feedFilter === 'recent'
-                          ? dark ? 'bg-blue-500/20 text-blue-400 border-blue-500/40' : 'bg-slate-900 text-white border-slate-900'
-                          : dark
-                            ? 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'
-                            : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50',
-                      )}
+                      className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
+                      style={feedFilter === 'recent'
+                        ? { background: P.ink, borderColor: P.ink, color: P.paper }
+                        : { background: P.paper, borderColor: P.line, color: P.soft }}
                     >
-                      Recent 2h {feedFilter === 'recent' ? 'On' : 'Off'}
+                      Last 2 h
                     </button>
                     {hasActiveFilters && (
                       <button
                         onClick={clearAllFilters}
-                        className={cn(
-                          'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all',
-                          dark
-                            ? 'border-white/10 text-slate-400 hover:bg-white/10'
-                            : 'border-slate-300 text-slate-700 hover:bg-slate-50',
-                        )}
+                        className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
+                        style={{ borderColor: P.line, color: '#B91C1C', background: P.paper }}
                       >
-                        Clear Filters
+                        Clear filters
                       </button>
                     )}
                   </div>
@@ -501,18 +476,15 @@ export default function MobileMapSheet({
                         <button
                           key={name}
                           onClick={() => handleNeighborhoodSelect(name)}
-                          className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 text-left transition-colors border',
-                            dark
-                              ? 'bg-blue-500/10 hover:bg-blue-500/15 border-blue-500/20'
-                              : 'bg-blue-50 hover:bg-blue-100 border-blue-200',
-                          )}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 text-left transition-colors"
+                          style={{ background: 'rgba(74,144,217,0.09)', border: '1px solid rgba(74,144,217,0.28)' }}
                         >
-                          <MapPin size={14} className="text-blue-400 shrink-0" />
-                          <div className="min-w-0">
-                            <p className={cn('text-xs font-black', dark ? 'text-white' : 'text-slate-900')}>{name}</p>
-                            <p className="text-[10px] text-slate-500">Fly to area</p>
+                          <MapPin size={14} className="shrink-0" style={{ color: '#2563EB' }} />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-black" style={{ color: P.ink }}>{name}</p>
+                            <p className="text-[10px]" style={{ color: P.soft }}>Fly to area</p>
                           </div>
+                          <ChevronRight size={14} style={{ color: P.soft }} />
                         </button>
                       ))}
                     </motion.div>
@@ -521,10 +493,10 @@ export default function MobileMapSheet({
 
                 {/* Neighborhood Pulse — expanded only, when no search query */}
                 {isExpanded && neighborhoodPulse.length > 0 && !debouncedSearch && (
-                  <div className={cn('py-3 mb-2 border-b', dark ? 'border-white/5' : 'border-slate-200')}>
+                  <div className="py-3 mb-2" style={{ borderBottom: `1px solid ${P.line}` }}>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <Activity size={12} className="text-blue-400" />
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Area Pulse · 2h</span>
+                      <Activity size={12} style={{ color: '#2E8B7A' }} />
+                      <span className="font-mono text-[9px] font-bold uppercase tracking-[0.22em]" style={{ color: P.soft }}>Live area pulse · 2 h</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {neighborhoodPulse.map(({ name, count, level }) => {
@@ -534,15 +506,15 @@ export default function MobileMapSheet({
                             key={name}
                             onClick={() => handleNeighborhoodSelect(name)}
                             className={cn(
-                              'flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold transition-opacity hover:opacity-80',
+                              'flex items-center gap-1.5 px-2.5 h-7 rounded-full text-[10px] font-bold transition-opacity hover:opacity-80',
                               cfg.bg,
-                              dark ? 'border-white/5' : 'border-slate-200',
                             )}
+                            style={{ border: `1px solid ${P.line}` }}
                             title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
                           >
                             <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dot)} />
-                            <span className={dark ? 'text-white' : 'text-slate-800'}>{name}</span>
-                            <span className={cn('font-black', cfg.text)}>{count}</span>
+                            <span style={{ color: P.ink }}>{name}</span>
+                            <span className={cn('font-black tabular-nums', cfg.text)}>{count}</span>
                           </button>
                         );
                       })}
@@ -551,13 +523,13 @@ export default function MobileMapSheet({
                 )}
 
                 {/* Incident count label */}
-                <p className="text-[10px] font-black uppercase tracking-widest mt-2 mb-2 text-slate-500">
+                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] mt-2 mb-2" style={{ color: P.soft }}>
                   {filteredIncidents.length === 0
                     ? 'No reports found'
-                    : `${filteredIncidents.length} report${filteredIncidents.length !== 1 ? 's' : ''}${isPeek && filteredIncidents.length > 5 ? ' · showing top 5' : ''}`}
+                    : `${filteredIncidents.length} report${filteredIncidents.length !== 1 ? 's' : ''}${isPeek && filteredIncidents.length > 5 ? ' · top 5' : ''}`}
                 </p>
 
-                {/* Incident list */}
+                {/* Incident list — peek = glance rows, expanded = full cards */}
                 {filteredIncidents.length > 0 ? (
                   <AnimatePresence>
                     {visibleIncidents.map((incident) => {
@@ -567,7 +539,46 @@ export default function MobileMapSheet({
                       const isEmergency = incident.category === 'emergency';
                       const isNew = Date.now() - incident.timestamp < 30 * 60 * 1000;
                       const reporter = getReporterDisplay(incident);
+                      const catColor = CAT_COLOR[incident.category] ?? '#0284C7';
 
+                      if (isPeek) {
+                        // ── Glance row: one tap-height line for fast scanning ──
+                        return (
+                          <motion.button
+                            key={incident.id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.97 }}
+                            onClick={() => handleIncidentSelect(incident)}
+                            className="w-full flex items-center gap-3 rounded-xl mb-1.5 px-3 py-2.5 text-left transition-transform active:scale-[0.99]"
+                            style={{
+                              background: isEmergency ? 'rgba(225,29,72,0.07)' : P.paper,
+                              border: `1px solid ${isEmergency ? 'rgba(225,29,72,0.35)' : P.line}`,
+                            }}
+                          >
+                            <span
+                              className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isEmergency && 'animate-pulse')}
+                              style={{ background: `${catColor}18`, color: catColor }}
+                            >
+                              <CategoryIcon size={14} />
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-[12.5px] font-bold leading-tight truncate" style={{ color: P.ink }}>
+                                {incident.title}
+                              </span>
+                              <span className="block font-mono text-[9px] mt-0.5 truncate" style={{ color: P.soft }}>
+                                {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'}
+                              </span>
+                            </span>
+                            {isNew && (
+                              <span className="shrink-0 rounded px-1.5 py-0.5 text-[7.5px] font-black uppercase" style={{ background: '#2563EB', color: '#fff' }}>New</span>
+                            )}
+                            <ChevronRight size={14} className="shrink-0" style={{ color: P.soft }} />
+                          </motion.button>
+                        );
+                      }
+
+                      // ── Full card (expanded) ──
                       return (
                         <motion.button
                           key={incident.id}
@@ -582,120 +593,91 @@ export default function MobileMapSheet({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           onClick={() => handleIncidentSelect(incident)}
-                          className={cn(
-                            'w-full text-left rounded-xl mb-2 border overflow-hidden transition-all active:scale-[0.99] relative',
-                            dark ? 'bg-white/[0.04]' : 'bg-white',
-                            isEmergency
-                              ? 'border-red-500/60 bg-red-950/30 ring-1 ring-red-500/30'
-                              : isActive
-                                ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/50 animate-active-glow'
-                                : dark
-                                  ? 'border-white/8 hover:bg-white/[0.07] hover:border-white/15'
-                                  : 'border-slate-200 hover:bg-slate-50',
-                          )}
+                          className="w-full text-left rounded-2xl mb-2 overflow-hidden transition-all active:scale-[0.99] relative"
+                          style={{
+                            background: isEmergency ? 'rgba(225,29,72,0.05)' : P.paper,
+                            border: `1px solid ${isEmergency ? 'rgba(225,29,72,0.4)' : isActive ? '#4A90D9' : P.line}`,
+                            boxShadow: isActive ? '0 0 0 2px rgba(74,144,217,0.25)' : undefined,
+                          }}
                         >
-                          {/* Emergency SOS banner */}
                           {isEmergency && (
-                            <div className="absolute top-0 right-0 flex items-center gap-1 bg-red-600 px-2 py-0.5 rounded-bl-xl">
-                              <span className="text-[8px] font-black uppercase tracking-widest text-white">SOS</span>
+                            <div className="absolute top-0 right-0 flex items-center gap-1 px-2 py-0.5 rounded-bl-xl" style={{ background: '#E11D48' }}>
+                              <span className="text-[8px] font-black uppercase tracking-widest text-[#fff]">SOS</span>
                             </div>
                           )}
 
-                          <div className="flex gap-2 p-3">
-                            {/* Left color stripe */}
-                            <div className={cn(
-                              'w-1 self-stretch rounded-full shrink-0',
-                              isEmergency ? 'bg-red-600 animate-pulse' :
-                              incident.category === 'crime' ? 'bg-red-500' :
-                              incident.category === 'traffic' ? 'bg-orange-500' :
-                              incident.category === 'infrastructure' ? 'bg-blue-500' :
-                              'bg-purple-500',
-                            )} />
-
-                            {/* Category icon */}
-                            <div className={cn(
-                              'w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
-                              isEmergency ? 'bg-red-600/30 text-red-400' :
-                              incident.category === 'crime' ? 'bg-red-500/20 text-red-400' :
-                              incident.category === 'traffic' ? 'bg-orange-500/20 text-orange-400' :
-                              incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400' :
-                              'bg-purple-500/20 text-purple-400',
-                            )}>
+                          <div className="flex gap-2.5 p-3">
+                            <div
+                              className={cn('w-1 self-stretch rounded-full shrink-0', isEmergency && 'animate-pulse')}
+                              style={{ background: catColor }}
+                            />
+                            <div
+                              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                              style={{ background: `${catColor}18`, color: catColor }}
+                            >
                               <CategoryIcon size={16} />
                             </div>
 
-                            {/* Content */}
                             <div className="flex-1 min-w-0">
-                              {/* Title row */}
                               <div className="flex items-start justify-between gap-1 mb-0.5">
-                                <p className={cn(
-                                  'text-xs font-black leading-tight line-clamp-2 flex-1',
-                                  dark ? 'text-white' : 'text-slate-900',
-                                )}>
+                                <p className="text-[12.5px] font-black leading-tight line-clamp-2 flex-1" style={{ color: P.ink }}>
                                   {incident.title}
                                 </p>
                                 <div className="flex items-center gap-1 shrink-0 ml-1">
                                   {incident.source_type === 'reddit_calgary' && (
-                                    <span className="px-1 py-0.5 rounded bg-orange-500/20 border border-orange-500/30 text-[7px] font-black text-orange-400 uppercase">Reddit</span>
+                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(234,88,12,0.12)', color: '#EA580C', border: '1px solid rgba(234,88,12,0.3)' }}>Reddit</span>
                                   )}
                                   {incident.source_type === 'news_rss' && (
-                                    <span className="px-1 py-0.5 rounded bg-purple-500/20 border border-purple-500/30 text-[7px] font-black text-purple-400 uppercase">News</span>
+                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(147,51,234,0.1)', color: '#7E22CE', border: '1px solid rgba(147,51,234,0.3)' }}>News</span>
                                   )}
                                   {incident.data_source === 'official' && incident.source_type !== 'reddit_calgary' && incident.source_type !== 'news_rss' && (
-                                    <span className="px-1 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[7px] font-black text-blue-400 uppercase">Official</span>
+                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(14,165,233,0.12)', color: '#0369A1', border: '1px solid rgba(14,165,233,0.3)' }}>Official</span>
                                   )}
                                   {isNew && (
-                                    <span className="px-1 py-0.5 rounded bg-blue-500 text-[7px] font-black text-white uppercase animate-pulse">New</span>
+                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase animate-pulse" style={{ background: '#2563EB', color: '#fff' }}>New</span>
                                   )}
                                 </div>
                               </div>
 
-                              {/* Meta line */}
-                              <p className="text-[10px] text-slate-500 mb-1">
+                              <p className="font-mono text-[9.5px] mb-1.5" style={{ color: P.soft }}>
                                 <Clock size={9} className="inline mr-0.5 -mt-px" />
                                 {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'} · by {reporter.firstName}
                               </p>
 
-                              {/* Description */}
                               <div className="mb-2 flex gap-2">
                                 {incident.image_url && (
                                   <img
                                     src={incident.image_url}
                                     alt=""
-                                    className="h-14 w-14 shrink-0 rounded-xl border border-white/10 object-cover"
+                                    className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                                    style={{ border: `1px solid ${P.line}` }}
                                     loading="lazy"
                                   />
                                 )}
-                                <p className={cn(
-                                  'text-[11px] leading-relaxed line-clamp-3',
-                                  dark ? 'text-slate-400' : 'text-slate-600',
-                                )}>
+                                <p className="text-[11px] leading-relaxed line-clamp-3" style={{ color: P.soft }}>
                                   {incident.description}
                                 </p>
                               </div>
 
-                              {/* Bottom row: status + avatar */}
                               <div className="flex items-center justify-between">
-                                <div className={cn(
-                                  'flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium',
-                                  incident.verified_status === 'community_confirmed' ? 'bg-green-500/20 text-green-400' :
-                                  incident.verified_status === 'multiple_reports' ? 'bg-yellow-500/20 text-yellow-400' :
-                                  'bg-slate-500/20 text-slate-400',
-                                )}>
+                                <div
+                                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold"
+                                  style={
+                                    incident.verified_status === 'community_confirmed' ? { background: 'rgba(34,197,94,0.12)', color: '#15803D' } :
+                                    incident.verified_status === 'multiple_reports' ? { background: 'rgba(234,179,8,0.14)', color: '#A16207' } :
+                                    { background: P.card, color: P.soft }
+                                  }
+                                >
                                   {StatusIcon && <StatusIcon size={10} />}
                                   <span>{(incident.verified_status ?? 'unverified').replace(/_/g, ' ')}</span>
                                 </div>
-                                <div className={cn(
-                                  'w-8 h-8 rounded-full flex items-center justify-center border border-white/20 shadow',
-                                  isEmergency ? 'bg-red-600 text-white' :
-                                  incident.category === 'crime' ? 'bg-red-500 text-white' :
-                                  incident.category === 'traffic' ? 'bg-orange-500 text-white' :
-                                  incident.category === 'infrastructure' ? 'bg-blue-500 text-white' :
-                                  'bg-purple-500 text-white',
-                                )}>
+                                <div
+                                  className="w-7 h-7 rounded-full flex items-center justify-center border border-[#fff] shadow"
+                                  style={{ background: catColor, color: '#fff' }}
+                                >
                                   {reporter.anonymous
-                                    ? <User size={14} />
-                                    : <span className="text-xs font-black">{reporter.initial}</span>
+                                    ? <User size={13} />
+                                    : <span className="text-[11px] font-black">{reporter.initial}</span>
                                   }
                                 </div>
                               </div>
@@ -712,26 +694,27 @@ export default function MobileMapSheet({
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center justify-center py-10 text-center space-y-3"
                   >
-                    <div className={cn('w-16 h-16 rounded-full flex items-center justify-center', dark ? 'bg-white/5' : 'bg-slate-100')}>
-                      <Search size={28} className="text-slate-500" />
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: P.card }}>
+                      <Search size={26} style={{ color: P.soft }} />
                     </div>
                     {hasActiveFilters ? (
                       <>
                         <div>
-                          <p className={cn('font-bold text-sm', dark ? 'text-white' : 'text-slate-900')}>No reports match</p>
-                          <p className="text-slate-500 text-xs mt-1">Try clearing your filters or searching a different term.</p>
+                          <p className="font-bold text-sm" style={{ color: P.ink }}>No reports match</p>
+                          <p className="text-xs mt-1" style={{ color: P.soft }}>Try clearing your filters or searching a different term.</p>
                         </div>
                         <button
                           onClick={clearAllFilters}
-                          className="text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-300 transition-colors"
+                          className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-colors"
+                          style={{ color: '#2563EB' }}
                         >
                           Clear all filters
                         </button>
                       </>
                     ) : (
                       <div>
-                        <p className={cn('font-bold text-sm', dark ? 'text-white' : 'text-slate-900')}>All clear right now</p>
-                        <p className="text-slate-500 text-xs mt-1 max-w-[200px]">No incidents in Calgary at the moment.</p>
+                        <p className="font-bold text-sm" style={{ color: P.ink }}>All clear right now</p>
+                        <p className="text-xs mt-1 max-w-[200px]" style={{ color: P.soft }}>No incidents in Calgary at the moment.</p>
                       </div>
                     )}
                   </motion.div>
@@ -742,14 +725,10 @@ export default function MobileMapSheet({
                   <button
                     onClick={onLoadMore}
                     disabled={isLoadingMore}
-                    className={cn(
-                      'w-full mt-2 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-60 disabled:cursor-not-allowed',
-                      dark
-                        ? 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
-                        : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50',
-                    )}
+                    className="w-full mt-2 py-2.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ border: `1px solid ${P.line}`, background: P.paper, color: P.ink }}
                   >
-                    {isLoadingMore ? 'Loading More...' : 'Load Older Reports'}
+                    {isLoadingMore ? 'Loading more…' : 'Load older reports'}
                   </button>
                 )}
 
@@ -757,7 +736,8 @@ export default function MobileMapSheet({
                 {isPeek && filteredIncidents.length > 5 && (
                   <button
                     onClick={() => setSnap(0.82)}
-                    className="w-full flex items-center justify-center gap-1 py-2 text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-colors"
+                    style={{ color: '#2563EB' }}
                   >
                     <ChevronDown size={12} className="rotate-180" />
                     Show all {filteredIncidents.length} reports
@@ -767,22 +747,15 @@ export default function MobileMapSheet({
 
               {/* Expanded footer: Report button */}
               {isExpanded && (
-                <div className={cn(
-                  'px-3 py-3 border-t shrink-0',
-                  dark ? 'border-white/5 bg-slate-950/60' : 'border-slate-200 bg-white',
-                )}>
+                <div className="px-3 py-3 shrink-0" style={{ borderTop: `1px solid ${P.line}`, background: P.paper }}>
                   <button
                     type="button"
                     onClick={onReportPress}
-                    className={cn(
-                      'w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-[0.99]',
-                      dark
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25'
-                        : 'bg-slate-900 hover:bg-slate-800 text-white',
-                    )}
+                    className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl font-black text-[12.5px] transition-transform active:scale-[0.98]"
+                    style={{ background: P.ink, color: P.paper }}
                   >
-                    <Plus size={14} />
-                    Report an Incident
+                    <Plus size={15} />
+                    Report an incident
                   </button>
                 </div>
               )}

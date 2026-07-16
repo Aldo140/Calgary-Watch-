@@ -3,26 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft, ArrowRight, MapPin, ChevronDown, Shield,
-  Radio, Sun, Moon, AlertCircle, Car, Construction,
+  Radio, AlertCircle, Car, Construction,
   CloudRain, Siren, ExternalLink, CheckCircle2,
 } from 'lucide-react';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { Button } from '@/src/components/ui/Button';
-
-// ─── Theme ──────────────────────────────────────────────────────────────────
-function useCwTheme() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    if (typeof window === 'undefined') return 'dark';
-    try { return localStorage.getItem('cw-theme') === 'light' ? 'light' : 'dark'; }
-    catch { return 'dark'; }
-  });
-  useEffect(() => {
-    if (theme === 'light') document.documentElement.classList.add('light');
-    else document.documentElement.classList.remove('light');
-    try { localStorage.setItem('cw-theme', theme); } catch {}
-  }, [theme]);
-  return [theme, setTheme] as const;
-}
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 const COMMUNITIES = [
@@ -256,7 +241,6 @@ const Section = memo(function Section({ children, className }: { children: React
 // ─── Main Page ────────────────────────────────────────────────────────────
 export default function CoveragePage() {
   const navigate = useNavigate();
-  const [theme, setTheme] = useCwTheme();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // ── Inject page-specific JSON-LD schemas ─────────────────────────────────
@@ -379,14 +363,6 @@ export default function CoveragePage() {
           </button>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-200 text-slate-400 hover:text-white light:hover:text-slate-900 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
-            </button>
             <Button
               size="sm"
               className="h-8 px-4 rounded-full text-xs font-bold bg-[#4A90D9] hover:bg-[#3a7fc8]"

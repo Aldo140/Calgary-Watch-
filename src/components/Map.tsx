@@ -20,7 +20,6 @@ interface MapProps {
   onViewIncident?: (incident: Incident) => void;
   showLiveReports: boolean;
   showHeatmap: boolean;
-  theme?: 'dark' | 'light';
   /** When true, renders a fixed crosshair pin at screen center for location picking */
   isPinMode?: boolean;
   onPinConfirm?: (lat: number, lng: number) => void;
@@ -46,7 +45,7 @@ export interface MapRef {
   clearUserLocation: () => void;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, theme = 'dark', isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats, isMapInteractive = true }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats, isMapInteractive = true }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
@@ -267,12 +266,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         map.current.zoomControl.setPosition('bottomleft');
       }
 
-      // Add default tiles (theme will be applied in a dedicated effect below)
-      baseTileLayer.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      baseTileLayer.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20,
-        className: theme === 'dark' ? 'dark-map-tiles' : undefined
       }).addTo(map.current);
 
       // Use refs so this single handler always calls the latest callbacks.
@@ -483,40 +480,15 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     return () => { map.current?.off('move', update); };
   }, [isPinMode, isMapLoaded]);
 
-  // Update base map style when theme changes
-  useEffect(() => {
-    if (!map.current || !isMapLoaded) return;
-
-    try {
-      if (baseTileLayer.current && map.current.hasLayer(baseTileLayer.current)) {
-        map.current.removeLayer(baseTileLayer.current);
-      }
-    } catch (e) {
-      console.warn('[CalgaryWatch] Could not remove base tile layer:', e);
-    }
-
-    const tileUrl = theme === 'light'
-      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-    baseTileLayer.current = L.tileLayer(tileUrl, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-      className: theme === 'dark' ? 'dark-map-tiles' : undefined
-    }).addTo(map.current);
-
-    if (showHeatmap && heatmapLayer.current) {
-      heatmapLayer.current.bringToFront();
-    }
-  }, [theme, isMapLoaded, showHeatmap]);
-
-  // Fetch Calgary community boundaries once for choropleth
+  // Fetch Calgary community boundaries once for choropleth.
+  // boundsReady re-fires the choropleth effect when data lands — previously,
+  // toggling the layer before this fetch finished rendered nothing forever.
+  const [boundsReady, setBoundsReady] = useState(false);
   useEffect(() => {
     if (communityGeoJson.current) return;
     fetch('https://data.calgary.ca/resource/surr-xmvs.json?$limit=500')
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) communityGeoJson.current = data; })
+      .then(data => { if (data) { communityGeoJson.current = data; setBoundsReady(true); } })
       .catch(err => console.warn('[CalgaryWatch] Community boundaries fetch failed:', err));
   }, []);
 
@@ -528,7 +500,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       choroplethLayer.current = null;
     }
 
-    if (!showCrimeLayer || !crimeStats || !communityGeoJson.current) return;
+    if (!showCrimeLayer || !crimeStats || crimeStats.size === 0 || !communityGeoJson.current) return;
 
     const geoData = communityGeoJson.current;
 
@@ -546,34 +518,69 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
     const featureCollection = { type: 'FeatureCollection', features };
 
-    const getColor = (communityName: string): string => {
-      const entry = crimeStats.get(communityName);
-      if (!entry) return 'transparent';
-      const total = entry.crime + entry.disorder;
-      if (total >= 80) return 'rgba(239, 68, 68, 0.45)';
-      if (total >= 30) return 'rgba(245, 158, 11, 0.40)';
-      if (total >= 10) return 'rgba(59, 130, 246, 0.25)';
-      return 'rgba(34, 197, 94, 0.15)';
+    // ── Quantile heat ramp ─────────────────────────────────────────────────
+    // Thresholds derive from the live distribution (p50/p75/p90), so the map
+    // stays meaningful whatever the absolute counts are.
+    const totalFor = (name: string): number | null => {
+      const entry = crimeStats.get(name);
+      return entry ? entry.crime + entry.disorder : null;
+    };
+    const totals = features
+      .map((f: any) => totalFor(f.properties.name))
+      .filter((v: number | null): v is number => v !== null && v > 0)
+      .sort((a: number, b: number) => a - b);
+    const q = (p: number) => totals[Math.min(totals.length - 1, Math.floor(totals.length * p))] ?? 0;
+    const p50 = q(0.5), p75 = q(0.75), p90 = q(0.9);
+
+    // Rank lookup for tooltips (1 = most concerns)
+    const ranked = [...totals].sort((a, b) => b - a);
+    const rankOf = (v: number) => ranked.findIndex((t) => t <= v) + 1;
+
+    const bandFor = (total: number | null): { fill: string; label: string } => {
+      if (total === null || total <= 0) return { fill: 'transparent', label: 'No data' };
+      if (total >= p90) return { fill: 'rgba(220,38,38,0.52)',  label: 'Hot' };
+      if (total >= p75) return { fill: 'rgba(234,88,12,0.42)',  label: 'High' };
+      if (total >= p50) return { fill: 'rgba(212,168,67,0.36)', label: 'Elevated' };
+      return { fill: 'rgba(46,139,122,0.2)', label: 'Calm' };
     };
 
     choroplethLayer.current = L.geoJSON(featureCollection as any, {
       style: (feature) => ({
-        fillColor: getColor(feature?.properties?.name ?? ''),
-        weight: 0.5,
-        opacity: 0.6,
-        color: 'rgba(255,255,255,0.2)',
+        fillColor: bandFor(totalFor(feature?.properties?.name ?? '')).fill,
+        weight: 1,
+        opacity: 0.7,
+        color: 'rgba(255,255,255,0.55)',
         fillOpacity: 1,
       }),
       onEachFeature: (feature, layer) => {
         const name = feature.properties?.name ?? '';
         const entry = crimeStats.get(name);
+        const displayName = name.replace(/\b\w/g, (c: string) => c.toUpperCase());
         if (entry) {
+          const total = entry.crime + entry.disorder;
+          const band = bandFor(total);
           layer.bindTooltip(
-            `<strong>${name.replace(/\b\w/g, (c: string) => c.toUpperCase())}</strong><br/>` +
-            `Crime: ${entry.crime} · Disorder: ${entry.disorder} (${entry.year})`,
+            `<div style="min-width:150px">` +
+            `<div style="font-weight:900;font-size:12px;margin-bottom:2px">${displayName}</div>` +
+            `<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px">` +
+            `<span style="width:8px;height:8px;border-radius:50%;background:${band.fill.replace(/0\.\d+\)/, '1)')};display:inline-block"></span>` +
+            `<span style="font-weight:700">${band.label}</span>` +
+            `<span style="opacity:0.65">· #${rankOf(total)} of ${totals.length}</span>` +
+            `</div>` +
+            `<div style="opacity:0.75">${entry.crime} concerns · ${entry.disorder} service calls (${entry.year})</div>` +
+            `<div style="margin-top:3px;font-weight:700;color:#2E8B7A">Tap for full area intel →</div>` +
+            `</div>`,
             { className: 'custom-map-tooltip', sticky: true }
           );
         }
+        // Hover lift — the polygon under the cursor pops forward
+        layer.on('mouseover', () => {
+          (layer as L.Path).setStyle({ weight: 2.5, color: '#1C2B3A', opacity: 1 });
+          (layer as L.Path).bringToFront();
+        });
+        layer.on('mouseout', () => {
+          choroplethLayer.current?.resetStyle(layer as L.Path);
+        });
         layer.on('click', () => {
           if (onViewNeighborhood) onViewNeighborhood(name);
         });
@@ -581,7 +588,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     }).addTo(map.current);
 
     choroplethLayer.current.bringToBack();
-  }, [showCrimeLayer, crimeStats, isMapLoaded]);
+  }, [showCrimeLayer, crimeStats, isMapLoaded, boundsReady]);
 
   // Update markers
   useEffect(() => {
@@ -766,6 +773,17 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       try {
         const marker = L.marker([lat, lng], { icon })
           .on('click', () => {
+            // Sonar burst at the tapped pin — the map "answers" the touch
+            if (map.current) {
+              const rippleEl = document.createElement('div');
+              rippleEl.className = 'cw-tap-ripple';
+              const ripple = L.marker([lat, lng], {
+                icon: L.divIcon({ html: rippleEl, className: '', iconSize: [12, 12], iconAnchor: [6, 6] }),
+                interactive: false,
+                zIndexOffset: 2000,
+              }).addTo(map.current);
+              window.setTimeout(() => { map.current?.removeLayer(ripple); }, 950);
+            }
             window.requestAnimationFrame(() => onMarkerClick(incident));
           });
         
@@ -828,10 +846,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded, isHeatPluginReady]);
 
   return (
-    <div className={cn(
-      "relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center",
-      theme === 'light' ? 'bg-slate-100' : 'bg-slate-900'
-    )}>
+    <div className="relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center bg-slate-100">
       <div ref={mapContainer} className="absolute inset-0 w-full h-full z-0" />
       
       {/* Map Loading State */}
@@ -845,14 +860,44 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       )}
 
       {/* Vignette: stronger on small screens so map chrome & cards read like a premium safety app; lg+ unchanged */}
-      <div
-        className={cn(
-          'absolute inset-0 pointer-events-none z-10 bg-gradient-to-t to-transparent',
-          theme === 'light'
-            ? 'from-white/55 via-white/10 max-lg:from-white/50 max-lg:via-white/5 lg:from-white/40'
-            : 'from-slate-950/45 via-slate-950/10 max-lg:from-slate-950/55 max-lg:via-slate-900/15 lg:from-slate-950/15'
-        )}
-      />
+      <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-t to-transparent from-white/55 via-white/10 max-lg:from-white/50 max-lg:via-white/5 lg:from-white/40" />
+
+      {/* Community concern legend — visible while the crime layer is on */}
+      {showCrimeLayer && isMapLoaded && (
+        <div className="absolute z-20 pointer-events-none left-1/2 -translate-x-1/2 bottom-[calc(9.6rem+env(safe-area-inset-bottom))] lg:left-20 lg:translate-x-0 lg:bottom-24">
+          <div
+            className="rounded-2xl px-3.5 py-2.5 lg:px-4 lg:py-3 shadow-xl backdrop-blur-xl"
+            style={{ background: 'rgba(255,253,248,0.94)', border: '1px solid #E7E0D2' }}
+          >
+            {(!crimeStats || crimeStats.size === 0) ? (
+              <div className="flex items-center gap-2.5 py-0.5">
+                <span className="h-3.5 w-3.5 rounded-full border-2 border-[#2E8B7A] border-t-transparent animate-spin" aria-hidden="true" />
+                <div>
+                  <p className="text-[10.5px] font-bold text-slate-800">Building the picture…</p>
+                  <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-slate-500">Aggregating 311 across 270+ communities</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-1.5">
+                  Community concern index
+                </p>
+                <div className="flex items-center gap-2.5">
+                  {([['#2E8B7A', 'Calm'], ['#D4A843', 'Elevated'], ['#EA580C', 'High'], ['#DC2626', 'Hot']] as const).map(([c, l]) => (
+                    <span key={l} className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: c, opacity: 0.85 }} />
+                      <span className="text-[9.5px] font-bold text-slate-700">{l}</span>
+                    </span>
+                  ))}
+                </div>
+                <p className="hidden lg:block mt-1.5 text-[9px] text-slate-500 font-medium">
+                  311 + community reports · tap a community for full intel
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {isOutsideServiceArea && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(10rem+env(safe-area-inset-top))] lg:top-4">

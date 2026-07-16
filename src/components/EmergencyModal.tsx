@@ -144,13 +144,14 @@ export default function EmergencyModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 bg-black/70 light:bg-[rgba(124,111,100,0.18)] backdrop-blur-sm">
+        <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center p-4 backdrop-blur-sm" style={{ background: 'rgba(30,15,15,0.5)' }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 40 }}
-            transition={{ duration: 0.15 }}
-            className="w-full max-w-md bg-slate-950 light:bg-[rgb(255,248,244)] border border-red-500/40 light:border-red-200 rounded-[2rem] shadow-[0_0_80px_rgba(239,68,68,0.25)] light:shadow-[0_24px_60px_-32px_rgba(127,29,29,0.28)] overflow-hidden"
+            transition={{ duration: 0.18 }}
+            className="w-full max-w-md rounded-[1.6rem] overflow-hidden shadow-[0_32px_80px_-24px_rgba(127,29,29,0.5)]"
+            style={{ background: '#FFFDF8', border: '1px solid rgba(220,38,38,0.35)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Pulsing top bar */}
@@ -161,13 +162,13 @@ export default function EmergencyModal({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <Siren size={16} className="text-red-400 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-red-400">Emergency Report</span>
+                    <Siren size={15} className="animate-pulse" style={{ color: '#DC2626' }} />
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.26em]" style={{ color: '#DC2626' }}>Emergency signal</span>
                   </div>
-                  <h2 className="text-xl font-black text-white light:text-slate-900 leading-tight">
+                  <h2 className="font-display text-xl font-extrabold tracking-[-0.02em] leading-tight" style={{ color: '#1C2B3A' }}>
                     {step === 'choose' ? 'Where is it?' : "What's happening?"}
                   </h2>
-                  <p className="text-xs text-slate-400 light:text-stone-500 mt-0.5">Goes live instantly for everyone nearby</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#5A6B7D' }}>Goes live instantly for everyone nearby</p>
                 </div>
                 <button onClick={handleClose} className="p-2 text-slate-500 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
                   <X size={18} />
@@ -175,9 +176,9 @@ export default function EmergencyModal({
               </div>
 
               {/* ── Disclaimer ── */}
-              <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-2xl bg-red-950/40 border border-red-500/25">
-                <AlertTriangle size={14} className="text-red-400 mt-0.5 shrink-0" />
-                <p className="text-[11px] text-red-200 leading-relaxed">
+              <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-2xl" style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.3)' }}>
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#DC2626' }} />
+                <p className="text-[11px] leading-relaxed" style={{ color: '#7F1D1D' }}>
                   <span className="font-black">For life-threatening emergencies call 911 first.</span>{' '}
                   This tool is for community awareness only, not a substitute for emergency services. Do not submit false reports.
                 </p>
@@ -189,42 +190,45 @@ export default function EmergencyModal({
                   {locationAvailable ? (
                     <button
                       onClick={() => setStep('form')}
-                      className="w-full flex items-center justify-between p-4 rounded-2xl border border-blue-500/30 bg-blue-600/10 hover:bg-blue-600/20 transition-all text-left group"
+                      className="w-full flex items-center justify-between p-4 rounded-2xl transition-all text-left group hover:-translate-y-0.5"
+                      style={{ background: '#FFFDF8', border: '1.5px solid #E7E0D2', boxShadow: '0 10px 24px -18px rgba(28,43,58,0.4)' }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center">
-                          <Navigation size={16} className="text-white" />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }}>
+                          <Navigation size={17} style={{ color: '#4A90D9' }} />
                         </div>
                         <div>
-                          <p className="text-sm font-black text-white light:text-slate-900">Use My Location</p>
-                          <p className="text-[11px] text-slate-400 light:text-stone-500">
+                          <p className="text-sm font-black" style={{ color: '#1C2B3A' }}>Right where I am</p>
+                          <p className="font-mono text-[10px] tabular-nums" style={{ color: '#5A6B7D' }}>
                             {location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'GPS active'}
                           </p>
                         </div>
                       </div>
-                      <span className="text-blue-400 group-hover:translate-x-1 transition-transform">→</span>
+                      <span className="transition-transform group-hover:translate-x-1" style={{ color: '#4A90D9' }}>→</span>
                     </button>
                   ) : (
-                    <div className="p-4 rounded-2xl border border-amber-500/25 bg-amber-950/20 flex items-start gap-3">
-                      <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
-                      <p className="text-xs text-amber-200">GPS unavailable. Use the pin below to mark the location.</p>
+                    <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.3)' }}>
+                      <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#B45309' }} />
+                      <p className="text-xs" style={{ color: '#92400E' }}>GPS unavailable. Use the pin below to mark the location.</p>
                     </div>
                   )}
 
                   <button
                     onClick={() => { onRequestMapPin?.(); }}
-                    className="w-full flex items-center justify-between p-4 rounded-2xl border border-emerald-500/30 bg-emerald-600/10 hover:bg-emerald-600/20 transition-all text-left group"
+                    className="w-full flex items-center justify-between p-4 rounded-2xl transition-all text-left group hover:-translate-y-0.5"
+                    style={{ background: '#FFFDF8', border: '1.5px solid #E7E0D2', boxShadow: '0 10px 24px -18px rgba(28,43,58,0.4)' }}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center">
-                        <MapPin size={16} className="text-white" />
+                      <div className="relative w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(46,139,122,0.12)' }}>
+                        <span className="absolute inset-2 rounded-full animate-ping opacity-25" style={{ background: '#2E8B7A' }} aria-hidden="true" />
+                        <MapPin size={17} style={{ color: '#2E8B7A' }} />
                       </div>
                       <div>
-                        <p className="text-sm font-black text-white light:text-slate-900">Drop a Pin</p>
-                        <p className="text-[11px] text-slate-400 light:text-stone-500">Pan the map to the exact spot</p>
+                        <p className="text-sm font-black" style={{ color: '#1C2B3A' }}>Drop a pin</p>
+                        <p className="text-[11px]" style={{ color: '#5A6B7D' }}>Pan the map to the exact spot</p>
                       </div>
                     </div>
-                    <span className="text-emerald-400 group-hover:translate-x-1 transition-transform">→</span>
+                    <span className="transition-transform group-hover:translate-x-1" style={{ color: '#2E8B7A' }}>→</span>
                   </button>
                 </div>
               )}
@@ -233,10 +237,10 @@ export default function EmergencyModal({
               {step === 'form' && (
                 <>
                   {/* Active location display */}
-                  <div className="flex items-center justify-between px-3 py-2.5 bg-white/[0.04] light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-xl">
+                  <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
                     <div className="flex items-center gap-2">
-                      <MapPin size={13} className={activeLocation ? 'text-green-400' : 'text-red-400'} />
-                      <span className="text-xs text-slate-300 light:text-stone-700 font-mono">
+                      <MapPin size={13} style={{ color: activeLocation ? '#2E8B7A' : '#DC2626' }} />
+                      <span className="text-xs font-mono tabular-nums" style={{ color: '#1C2B3A' }}>
                         {activeLocation
                           ? `${activeLocation.lat.toFixed(5)}, ${activeLocation.lng.toFixed(5)}`
                           : 'No location set'}
@@ -244,7 +248,8 @@ export default function EmergencyModal({
                     </div>
                     <button
                       onClick={() => setStep('choose')}
-                      className="text-[11px] font-bold text-blue-400 hover:text-white light:hover:text-slate-900 transition-colors"
+                      className="text-[11px] font-bold px-2.5 py-1 rounded-lg transition-colors hover:bg-black/5"
+                      style={{ color: '#1C2B3A', border: '1px solid #E7E0D2', background: '#FFFDF8' }}
                     >
                       Change
                     </button>
@@ -258,10 +263,10 @@ export default function EmergencyModal({
                         <button
                           key={id}
                           onClick={() => setSelectedType(id)}
-                          className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
+                          className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all active:scale-95 ${
                             selectedType === id
                               ? `${color} border-transparent ring-2 ${ring} text-white`
-                              : 'bg-white/5 light:bg-white/70 border-white/10 light:border-stone-200/80 text-slate-400 light:text-stone-600 hover:bg-white/10 light:hover:bg-white'
+                              : 'bg-[#FFFDF8] border-[#E7E0D2] text-[#5A6B7D] hover:bg-[#F7F3EA]'
                           }`}
                         >
                           <Icon size={16} />
@@ -277,29 +282,13 @@ export default function EmergencyModal({
                     <select
                       value={neighborhood}
                       onChange={(e) => setNeighborhood(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-xl text-white light:text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 font-bold"
+                      className="w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-400 font-bold"
+                      style={{ background: '#FFFDF8', border: '1.5px solid #E7E0D2', color: '#1C2B3A' }}
                     >
                       <option value="">Select area…</option>
-                      <option value="Beltline">Beltline</option>
-                      <option value="Kensington">Kensington</option>
-                      <option value="Bridgeland">Bridgeland</option>
-                      <option value="Mission">Mission</option>
-                      <option value="Inglewood">Inglewood</option>
-                      <option value="Bowness">Bowness</option>
-                      <option value="Downtown">Downtown</option>
-                      <option value="Saddleridge">Saddleridge</option>
-                      <option value="Evanston">Evanston</option>
-                      <option value="Mahogany">Mahogany</option>
-                      <option value="Auburn Bay">Auburn Bay</option>
-                      <option value="Signal Hill">Signal Hill</option>
-                      <option value="Tuscany">Tuscany</option>
-                      <option value="Royal Oak">Royal Oak</option>
-                      <option value="Panorama Hills">Panorama Hills</option>
-                      <option value="Midnapore">Midnapore</option>
-                      <option value="Shawnessy">Shawnessy</option>
-                      <option value="McKenzie Towne">McKenzie Towne</option>
-                      <option value="Cranston">Cranston</option>
-                      <option value="Copperfield">Copperfield</option>
+                      {NEIGHBOURHOODS.map((n) => (
+                        <option key={n.name} value={n.name}>{n.name}</option>
+                      ))}
                       <option value="Other">Other / Not Listed</option>
                     </select>
                   </div>
@@ -313,17 +302,20 @@ export default function EmergencyModal({
                       placeholder="e.g. Collision blocking intersection, smoke from building, person needs help…"
                       rows={3}
                       autoFocus
-                      className="w-full px-4 py-3 bg-white/5 light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-2xl text-white light:text-slate-900 placeholder:text-slate-600 light:placeholder:text-stone-400 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
+                      className="w-full px-4 py-3 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400 transition-all placeholder:font-medium"
+                      style={{ background: '#FFFDF8', border: '1.5px solid #E7E0D2', color: '#1C2B3A' }}
                     />
-                    <p className="text-[10px] text-slate-600 mt-1 text-right">{description.trim().length} / 5 min</p>
+                    <p className="font-mono text-[9px] mt-1 text-right uppercase tracking-[0.12em]" style={{ color: description.trim().length >= 5 ? '#2E8B7A' : '#9AA6B2' }}>
+                      {description.trim().length >= 5 ? '✓ Ready to send' : `${Math.max(0, 5 - description.trim().length)} more characters`}
+                    </p>
                   </div>
 
                   {/* Reporter */}
-                  <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.04] light:bg-white/72 border border-white/10 light:border-stone-200/80 rounded-xl">
-                    <div className="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center text-white text-[10px] font-black">
+                  <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl" style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black" style={{ background: '#DC2626', color: '#fff' }}>
                       {userName.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-xs text-slate-400 light:text-stone-500">Posting as <span className="text-white light:text-slate-900 font-bold">{userName}</span></span>
+                    <span className="text-xs" style={{ color: '#5A6B7D' }}>Posting as <span className="font-bold" style={{ color: '#1C2B3A' }}>{userName}</span> · never anonymous for SOS</span>
                   </div>
 
                   {/* Submit */}
@@ -332,18 +324,18 @@ export default function EmergencyModal({
                     disabled={!canSubmit || isSubmitting}
                     className={`w-full h-14 rounded-2xl font-black text-base tracking-wide transition-all flex items-center justify-center gap-3 ${
                       submitted
-                        ? 'bg-green-600 text-white'
+                        ? 'bg-emerald-600 text-[#fff]'
                         : canSubmit
-                        ? 'bg-red-600 hover:bg-red-500 text-white shadow-2xl shadow-red-600/40 active:scale-[0.98]'
-                        : 'bg-white/10 light:bg-stone-200/80 text-slate-600 light:text-stone-500 cursor-not-allowed'
+                        ? 'bg-red-600 hover:bg-red-500 text-[#fff] shadow-2xl shadow-red-600/40 active:scale-[0.98]'
+                        : 'bg-[#F7F3EA] text-[#9AA6B2] border border-[#E7E0D2] cursor-not-allowed'
                     }`}
                   >
                     {isSubmitting ? (
                       <><Loader2 size={20} className="animate-spin" /> Sending alert…</>
                     ) : submitted ? (
-                      'Reported. Stay safe.'
+                      <>✓ Live. Stay safe out there.</>
                     ) : (
-                      <><Siren size={20} /> Report Emergency Now</>
+                      <><Siren size={20} /> Send emergency signal</>
                     )}
                   </button>
                 </>

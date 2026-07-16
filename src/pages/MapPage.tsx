@@ -61,6 +61,7 @@ type UserProfileSettings = {
   locationPreferenceType?: 'address' | 'neighborhood';
   piiConsentAt?: number;
   weeklyDigestOptIn?: boolean;
+  weeklyDigestOptInAt?: number;
   weeklyDigestTopics?: string[];
   profileUpdatedAt?: number;
   onboardingCompletedAt?: number;
@@ -584,7 +585,7 @@ export default function MapPage() {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [authPanelMode, setAuthPanelMode] = useState<'signin' | 'settings'>('signin');
   const [userProfile, setUserProfile] = useState<UserProfileSettings | null>(null);
-  const [profileDraft, setProfileDraft] = useState({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: true });
+  const [profileDraft, setProfileDraft] = useState({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
@@ -613,7 +614,7 @@ export default function MapPage() {
   useEffect(() => {
     if (!user || !db) {
       setUserProfile(null);
-      setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: true });
+      setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false });
       if (!user) lastNeighborhoodReportUidRef.current = null;
       return;
     }
@@ -626,7 +627,9 @@ export default function MapPage() {
         address: profile.address || '',
         inferredNeighborhood: profile.inferredNeighborhood || '',
         piiConsent: Boolean(profile.piiConsentAt),
-        weeklyDigestOptIn: profile.weeklyDigestOptIn !== false,
+        // Newsletter consent must be an explicit opt-in. Missing legacy values
+        // are treated as no consent, not as permission to send email.
+        weeklyDigestOptIn: profile.weeklyDigestOptIn === true,
       });
 
       // Back-fill inferredNeighborhood for existing users who saved before geocoding was added
@@ -956,7 +959,7 @@ export default function MapPage() {
   const isDirty =
     profileDraft.address !== (userProfile?.address ?? '') ||
     profileDraft.neighborhood !== (userProfile?.neighborhood ?? '') ||
-    profileDraft.weeklyDigestOptIn !== (userProfile?.weeklyDigestOptIn ?? true);
+    profileDraft.weeklyDigestOptIn !== (userProfile?.weeklyDigestOptIn ?? false);
 
   const preferredNeighborhood = (userProfile?.neighborhood || '').trim();
   const preferredInferredNeighborhood = (userProfile?.inferredNeighborhood || '').trim();
@@ -997,6 +1000,9 @@ export default function MapPage() {
         piiConsentAt: userProfile?.piiConsentAt || Date.now(),
         onboardingCompletedAt: userProfile?.onboardingCompletedAt || Date.now(),
         weeklyDigestOptIn: profileDraft.weeklyDigestOptIn,
+        weeklyDigestOptInAt: profileDraft.weeklyDigestOptIn
+          ? (userProfile?.weeklyDigestOptInAt || Date.now())
+          : null,
         weeklyDigestTopics: profileDraft.weeklyDigestOptIn
           ? ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates']
           : [],
@@ -1140,6 +1146,7 @@ export default function MapPage() {
             authorUid: user.uid,
             ...(image_url ? { image_url } : {}),
           });
+          celebrate('Signal live — neighbours nearby can see it now.');
         } catch (error) {
           console.error('[CalgaryWatch] Report submission failed:', error);
           setSubmitError('Your report could not be saved. Please try again.');
@@ -1449,7 +1456,8 @@ export default function MapPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 22, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-              className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl overflow-y-auto rounded-[2rem] border border-white/12 bg-slate-950 shadow-2xl light:border-slate-200 light:bg-white"
+              className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl overflow-y-auto rounded-[1.75rem] shadow-[0_32px_80px_-32px_rgba(28,43,58,0.6)]"
+              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
             >
               {canCloseAuthPanel && (
                 <button
@@ -1643,8 +1651,8 @@ export default function MapPage() {
                                 className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
                               />
                               <div className="min-h-6">
-                                {profileDraft.neighborhood.trim().length > 0 && filteredNeighborhoodSuggestions.length === 0 && neighborhoodQuery.length < 3 && (
-                                  <p className="text-[11px] font-medium text-slate-500">Type at least 3 letters for neighbourhood guesses.</p>
+                                {profileDraft.neighborhood.trim().length > 0 && filteredNeighborhoodSuggestions.length === 0 && neighborhoodQuery.length < 2 && (
+                                  <p className="text-[11px] font-medium text-slate-500">Type 2+ letters — all {neighborhoodSuggestions.length || 300}+ official communities are searchable.</p>
                                 )}
                                 {filteredNeighborhoodSuggestions.length > 0 && (
                                   <div className="flex flex-wrap gap-2">
@@ -1684,7 +1692,7 @@ export default function MapPage() {
                               className="mt-1 h-4 w-4 rounded border-slate-400"
                             />
                             <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
-                              Send me weekly crime stats, interesting reports, market/events, and relevant community updates for my neighbourhood.
+                              I want Calgary Watch to email me weekly crime stats, interesting reports, market/events, and relevant community updates for my neighbourhood.
                             </span>
                           </label>
 

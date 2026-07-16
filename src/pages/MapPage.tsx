@@ -1684,12 +1684,12 @@ export default function MapPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 shadow-sm light:bg-white">
                     {showProfileStep ? <Home size={22} className="text-sky-300 light:text-sky-700" /> : <GoogleIcon />}
                   </div>
-                  <h2 className="mt-6 text-2xl font-black tracking-tight">
+                  <h2 className="mt-6 text-2xl font-black tracking-tight text-slate-950">
                     {showProfileStep
                       ? authPanelMode === 'settings' ? 'Account settings' : 'Finish your profile'
                       : 'Sign in to Calgary Watch'}
                   </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-300 light:text-slate-700">
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700">
                     {showProfileStep
                       ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
                       : 'Use Google to post reports, save preferences, and receive neighbourhood-specific safety updates.'}
@@ -1711,8 +1711,8 @@ export default function MapPage() {
                     <div className="space-y-5">
                       <div>
                         <p className="text-xs font-black uppercase tracking-widest text-sky-400">Google account required</p>
-                        <h3 className="mt-2 text-2xl font-black text-white light:text-slate-950">Continue securely</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-400 light:text-slate-600">
+                        <h3 className="mt-2 text-2xl font-black text-slate-950">Continue securely</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-700">
                           After Google sign-in, this same panel will ask for your privacy consent and your neighbourhood or address.
                         </p>
                       </div>
@@ -1725,7 +1725,7 @@ export default function MapPage() {
                         Sign in with Google
                       </Button>
 
-                      <p className="text-[11px] leading-relaxed text-slate-500">
+                      <p className="text-[11px] leading-relaxed text-slate-600">
                         Calgary Watch uses your account to reduce spam, support report moderation, and connect neighbourhood reports to your saved preferences.
                       </p>
                     </div>

@@ -631,12 +631,14 @@ export default function MapPage() {
   // Official ENMAX outages are opt-in, matching the heatmap/crime layers, so the
   // default map stays focused on community reports.
   const [showPowerOutages, setShowPowerOutages] = useState(false);
-  // Upcoming planned work starts off: ENMAX publishes scheduled outages months
-  // ahead, so showing them by default would bury what is happening right now.
+  // All three groups start on. Calgary usually has no unplanned outage in
+  // progress — scheduled work is effectively the entire feed — so defaulting
+  // "upcoming" off made the layer render zero markers and look broken. Users
+  // can narrow with the sub-filters; the layer itself is still opt-in.
   const [outageGroupFilter, setOutageGroupFilter] = useState<Record<OutageGroup, boolean>>({
     active_unplanned: true,
     active_planned: true,
-    upcoming_planned: false,
+    upcoming_planned: true,
   });
   const toggleOutageGroup = useCallback((group: OutageGroup) => {
     setOutageGroupFilter((prev) => ({ ...prev, [group]: !prev[group] }));

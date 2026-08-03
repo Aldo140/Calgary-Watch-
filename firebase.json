@@ -8,6 +8,7 @@
   },
   "hosting": {
     "public": "dist",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -80,7 +81,7 @@
         ]
       },
       {
-        "source": "**/index.html",
+        "source": "**/*.html",
         "headers": [
           {
             "key": "Cache-Control",

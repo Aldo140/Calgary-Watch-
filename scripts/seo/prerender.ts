@@ -23,7 +23,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PRERENDER_ROUTES, PRODUCTION_ORIGIN } from '../../src/lib/seo.js';
-import { renderRouteHtml } from './rewriteHtml.js';
+import { outputPathForRoute, renderRouteHtml } from './rewriteHtml.js';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const DIST = join(REPO_ROOT, 'dist');
@@ -43,11 +43,7 @@ async function run(): Promise<void> {
 
   for (const route of PRERENDER_ROUTES) {
     const html = renderRouteHtml(shell, route, PRODUCTION_ORIGIN);
-
-    // "/" overwrites dist/index.html itself; every other route gets its own
-    // directory so the host serves <route>/index.html for a clean URL.
-    const outPath =
-      route === '/' ? shellPath : join(DIST, route.replace(/^\//, ''), 'index.html');
+    const outPath = join(DIST, outputPathForRoute(route));
 
     await mkdir(dirname(outPath), { recursive: true });
     await writeFile(outPath, html, 'utf8');

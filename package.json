@@ -9,7 +9,9 @@
     "build:gh-pages": "vite build --base=/Calgary-Watch-/",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "ingest:outages": "tsx scripts/ingest/power-outages.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

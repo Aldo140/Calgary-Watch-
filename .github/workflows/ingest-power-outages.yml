@@ -1,0 +1,39 @@
+name: Ingest Power Outages
+
+on:
+  schedule:
+    # Every 5 minutes — the fastest cadence GitHub Actions allows, and the
+    # minimum polling interval we permit against the undocumented ENMAX feed.
+    # GitHub delays scheduled runs under load, so treat this as best-effort.
+    - cron: '*/5 * * * *'
+  # Allow a manual trigger from the Actions tab for testing.
+  workflow_dispatch:
+
+# A slow run must never overlap with the next tick.
+concurrency:
+  group: 'ingest-power-outages'
+  cancel-in-progress: false
+
+jobs:
+  outages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish ENMAX outage snapshot
+        run: npx tsx scripts/ingest/power-outages.ts
+        env:
+          # Same secret the main ingest pipeline uses.
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

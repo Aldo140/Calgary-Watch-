@@ -51,10 +51,17 @@ const TTL_MS = 7 * 24 * 60 * 60 * 1000;
 /**
  * Exact 311 service_name → category, display label, and per-run cap.
  *
- * Caps keep the mix balanced and current. Graffiti alone runs ~1,000 reports a
- * month and would otherwise be the entire map — which is what happened when
- * this source shipped matching only graffiti and vandalism. Each rule takes its
- * most recent N, so every type stays represented and recent.
+ * Caps are sized against a hard constraint: MapPage loads only the newest
+ * INCIDENT_PAGE_SIZE (60) incidents. Publishing more than that means the
+ * lowest-ranked types are silently cut — and since caps take the most RECENT N
+ * of each type, the rarest types carry the oldest timestamps and are always the
+ * ones dropped. That is why vandalism, transit safety, streetlight damage and
+ * water outages appeared nowhere despite being configured.
+ *
+ * Total here is ~38, leaving room for 511 and community reports inside the 60.
+ *
+ * High-volume types are capped low on purpose. Graffiti alone runs ~1,000
+ * reports a month; left uncapped it is the entire map.
  *
  * Volumes in trailing comments are per 30 days, from the sample above.
  */
@@ -67,26 +74,26 @@ interface ServiceRule {
 
 const SERVICE_RULES: ServiceRule[] = [
   // ── Crime: property offences and disorder ───────────────────────────────
-  { service: 'Bylaw - Disturbance and Behavioural Concerns', category: 'crime', label: 'Disturbance reported', cap: 10 }, // 510
-  { service: 'Corporate - Graffiti Concerns', category: 'crime', label: 'Graffiti', cap: 8 }, // 1030
-  { service: 'Bylaw - Vehicle Concerns', category: 'crime', label: 'Abandoned or problem vehicle', cap: 5 }, // 204
-  { service: 'Bylaw - Vandalism and Property Damage Concerns', category: 'crime', label: 'Vandalism', cap: 5 }, // 40
-  { service: 'DBBS - Unsafe Derelict or Unsecure Property', category: 'crime', label: 'Derelict or unsecured property', cap: 4 }, // 34
-  { service: 'CT - Transit Safety / Public Etiquette', category: 'crime', label: 'Transit safety concern', cap: 4 }, // 32
+  { service: 'Bylaw - Disturbance and Behavioural Concerns', category: 'crime', label: 'Disturbance reported', cap: 6 }, // 510
+  { service: 'Bylaw - Vandalism and Property Damage Concerns', category: 'crime', label: 'Vandalism', cap: 3 }, // 40
+  { service: 'Corporate - Graffiti Concerns', category: 'crime', label: 'Graffiti', cap: 3 }, // 1030 — deliberately small
+  { service: 'Bylaw - Vehicle Concerns', category: 'crime', label: 'Abandoned or problem vehicle', cap: 2 }, // 204
+  { service: 'DBBS - Unsafe Derelict or Unsecure Property', category: 'crime', label: 'Derelict or unsecured property', cap: 2 }, // 34
+  { service: 'CT - Transit Safety / Public Etiquette', category: 'crime', label: 'Transit safety concern', cap: 2 }, // 32
 
   // ── Infrastructure: failures and hazards ────────────────────────────────
-  { service: 'WATS - Water Main Break or Leak', category: 'infrastructure', label: 'Water main break', cap: 6 }, // 394
-  { service: 'Roads - Debris on Street/Sidewalk/Boulevard', category: 'infrastructure', label: 'Debris on the road', cap: 5 }, // 825
-  { service: 'WATS - Sewage Back-up', category: 'infrastructure', label: 'Sewage back-up', cap: 4 }, // 442
-  { service: 'WATS - Water Outage', category: 'infrastructure', label: 'Water outage', cap: 4 }, // 144
-  { service: 'Roads - Streetlight Damage', category: 'infrastructure', label: 'Streetlight damage', cap: 4 }, // 26
-  { service: 'DBBS - Safety Response', category: 'infrastructure', label: 'Building safety response', cap: 4 }, // 72
-  { service: 'WATS - Spills Entering Storm System', category: 'infrastructure', label: 'Spill into storm system', cap: 3 }, // 119
+  { service: 'WATS - Water Main Break or Leak', category: 'infrastructure', label: 'Water main break', cap: 3 }, // 394
+  { service: 'Roads - Debris on Street/Sidewalk/Boulevard', category: 'infrastructure', label: 'Debris on the road', cap: 3 }, // 825
+  { service: 'WATS - Sewage Back-up', category: 'infrastructure', label: 'Sewage back-up', cap: 2 }, // 442
+  { service: 'WATS - Water Outage', category: 'infrastructure', label: 'Water outage', cap: 2 }, // 144
+  { service: 'Roads - Streetlight Damage', category: 'infrastructure', label: 'Streetlight damage', cap: 2 }, // 26
+  { service: 'DBBS - Safety Response', category: 'infrastructure', label: 'Building safety response', cap: 2 }, // 72
+  { service: 'WATS - Spills Entering Storm System', category: 'infrastructure', label: 'Spill into storm system', cap: 1 }, // 119
 
   // ── Traffic ─────────────────────────────────────────────────────────────
-  { service: 'Roads - Traffic or Pedestrian Light Repair', category: 'traffic', label: 'Traffic or pedestrian signal fault', cap: 6 }, // 371
-  { service: 'Roads - Signs - Missing - Damaged', category: 'traffic', label: 'Missing or damaged road sign', cap: 5 }, // 446
-  { service: 'Roads - Pothole Maintenance', category: 'traffic', label: 'Pothole', cap: 4 }, // 744
+  { service: 'Roads - Traffic or Pedestrian Light Repair', category: 'traffic', label: 'Traffic or pedestrian signal fault', cap: 3 }, // 371
+  { service: 'Roads - Signs - Missing - Damaged', category: 'traffic', label: 'Missing or damaged road sign', cap: 3 }, // 446
+  { service: 'Roads - Pothole Maintenance', category: 'traffic', label: 'Pothole', cap: 2 }, // 744
 ];
 
 const RULES_BY_SERVICE = new Map(SERVICE_RULES.map((r) => [r.service, r]));

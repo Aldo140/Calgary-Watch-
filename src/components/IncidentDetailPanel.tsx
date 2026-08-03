@@ -154,7 +154,9 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   })();
 
   const hasCoords = Number.isFinite(incident.lat) && Number.isFinite(incident.lng);
-  const canNavigate = hasCoords && incident.category !== 'weather';
+  // Demo pins are deliberately approximate neighbourhood anchors. Offering
+  // directions would incorrectly imply that a real event happened there.
+  const canNavigate = hasCoords && incident.category !== 'weather' && incident.data_source !== 'demo';
   const isAnonymous = Boolean(incident.anonymous) || incident.name?.toLowerCase() === 'anonymous' || incident.name?.toLowerCase().includes('anonymous');
   const reporterName = isAnonymous ? 'Anonymous' : (incident.name?.trim() || 'Community Member');
   const reporterInitial = reporterName.charAt(0).toUpperCase() || 'C';
@@ -364,7 +366,11 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                         {incident.source_name || 'Community Source'}
                       </p>
                       <p className="text-[10.5px] font-medium" style={{ color: P.soft }}>
-                        {isSystem ? 'Official / synced feed' : 'Community report'}
+                        {incident.data_source === 'demo'
+                          ? 'Illustrative example — not a real report'
+                          : isSystem
+                            ? 'Official / synced feed'
+                            : 'Community report'}
                       </p>
                     </div>
                     {safeSourceUrl && (

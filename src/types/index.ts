@@ -94,6 +94,8 @@ export interface Incident {
    * Ingestion sets this; undefined = never expires (user reports).
    */
   expires_at?: number;
+  /** Precision of the displayed pin; demo reports use neighbourhood anchors. */
+  location_precision?: 'exact' | 'neighborhood';
 }
 
 export interface CommunityStats {

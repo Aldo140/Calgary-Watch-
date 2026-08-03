@@ -1,21 +1,18 @@
 name: Community Pulse
 
-# Posts up to 3 community reports per day at realistic Calgary times.
-# Each job passes a slot index (0=morning 7:30am, 1=afternoon 1pm, 2=evening 9:30pm MDT).
-# The script skips gracefully if the slot was already posted.
+# Checks the randomized Calgary-time daily plan once an hour. The publisher
+# emits only clearly badged example reports and atomically skips anything that
+# has already been posted. The UTC ranges cover 07:00-22:00 in Calgary through
+# both MST and MDT; the script itself owns the exact local-time guardrails.
 
 on:
   schedule:
-    # GitHub Actions uses UTC. MDT is UTC-6.
-    - cron: '30 13 * * *'   # 07:30 MDT (slot 0 - morning)
-    - cron: '0  19 * * *'   # 13:00 MDT (slot 1 - afternoon)
-    - cron: '30  3 * * *'   # 21:30 MDT (slot 2 - evening, next UTC day)
+    - cron: '17 0-5,13-23 * * *'
   workflow_dispatch:
-    inputs:
-      slot:
-        description: 'Slot to run (0=morning, 1=afternoon, 2=evening)'
-        required: false
-        default: '0'
+
+concurrency:
+  group: community-pulse
+  cancel-in-progress: false
 
 jobs:
   pulse:
@@ -37,9 +34,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # The slot is derived inside the script from the current Calgary hour.
-      # Matching exact UTC hours here was the bug: GitHub delays scheduled runs
-      # by tens of minutes, so the hour never matched and every run skipped.
       - name: Publish example report
         run: npx tsx scripts/seed/activity.ts
         env:

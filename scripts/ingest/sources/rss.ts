@@ -25,7 +25,7 @@ const FEEDS = [
   },
   {
     name: 'CBC Calgary',
-    url: 'https://www.cbc.ca/cmlink/rss-canada-calgary',
+    url: 'https://www.cbc.ca/webfeed/rss/rss-canada-calgary',
   },
 ];
 

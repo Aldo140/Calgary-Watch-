@@ -17,21 +17,37 @@ export type { NormalizedIncident };
 // 511 API shape
 // ---------------------------------------------------------------------------
 
+/**
+ * Actual v2 response shape, verified against the live endpoint.
+ *
+ * This previously described a GeoJSON `Geography` object plus `Status`,
+ * `Headline`, `Area` and `ExpectedEndDate`. None of those fields exist on the
+ * live feed — coordinates are flat `Latitude`/`Longitude` and dates are Unix
+ * seconds. Every event therefore failed coordinate extraction and the source
+ * silently contributed nothing while reporting success.
+ */
 interface AlbertaEvent {
-  ID?: string;
-  EventType?: string;
-  Severity?: string;
-  Status?: string;
-  Headline?: string;
+  ID?: number | string;
+  SourceId?: string;
+  Organization?: string;
+  RoadwayName?: string;
+  DirectionOfTravel?: string;
   Description?: string;
-  Details?: string;
-  StartDate?: string;
-  ExpectedEndDate?: string;
-  Geography?: {
-    type?: string;
-    coordinates?: number[] | number[][];
-  } | null;
-  Area?: Array<{ Name?: string }>;
+  /** Unix seconds. */
+  Reported?: number;
+  /** Unix seconds. */
+  LastUpdated?: number;
+  /** Unix seconds. */
+  StartDate?: number;
+  /** Unix seconds, or null when open-ended. */
+  PlannedEndDate?: number | null;
+  LanesAffected?: string;
+  Latitude?: number;
+  Longitude?: number;
+  EventType?: string;
+  EventSubType?: string;
+  IsFullClosure?: boolean;
+  Severity?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -62,47 +78,46 @@ function inCalgaryBounds(lat: number, lng: number): boolean {
 }
 
 function extractCoords(event: AlbertaEvent): { lat: number; lng: number } | null {
-  const geo = event.Geography;
-  if (!geo) return null;
-
-  if (geo.type === 'Point' && Array.isArray(geo.coordinates) && geo.coordinates.length >= 2) {
-    const [lng, lat] = geo.coordinates as number[];
-    return { lat, lng };
-  }
-
-  if (geo.type === 'LineString' && Array.isArray(geo.coordinates) && geo.coordinates.length > 0) {
-    // Take the midpoint of the line.
-    const mid = Math.floor((geo.coordinates as number[][]).length / 2);
-    const [lng, lat] = (geo.coordinates as number[][])[mid];
-    return { lat, lng };
-  }
-
-  return null;
+  const lat = Number(event.Latitude);
+  const lng = Number(event.Longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (lat === 0 && lng === 0) return null;
+  return { lat, lng };
 }
 
-function mapEventTypeToCategory(eventType: string | undefined): IncidentCategory {
-  const t = (eventType ?? '').toLowerCase();
-  if (t.includes('accident') || t.includes('collision') || t.includes('crash')) return 'traffic';
-  if (t.includes('closure') || t.includes('construction') || t.includes('road work')) return 'traffic';
-  if (t.includes('weather') || t.includes('wind') || t.includes('ice')) return 'weather';
+function mapEventTypeToCategory(event: AlbertaEvent): IncidentCategory {
+  const t = `${event.EventType ?? ''} ${event.EventSubType ?? ''}`.toLowerCase();
+  if (t.includes('weather') || t.includes('wind') || t.includes('ice') || t.includes('snow')) return 'weather';
+  // Roadwork and construction are infrastructure; incidents and closures are traffic.
+  if (t.includes('roadwork') || t.includes('construction') || t.includes('maintenance')) return 'infrastructure';
   return 'traffic';
 }
 
 function ttlForEvent(event: AlbertaEvent): number {
-  // Use the API's end date when available.
-  if (event.ExpectedEndDate) {
-    const t = Date.parse(event.ExpectedEndDate);
-    if (!Number.isNaN(t) && t > Date.now()) return t;
+  // PlannedEndDate is Unix seconds, and is null for open-ended events.
+  if (typeof event.PlannedEndDate === 'number' && event.PlannedEndDate > 0) {
+    const end = event.PlannedEndDate * 1000;
+    if (end > Date.now()) return end;
   }
   const t = (event.EventType ?? '').toLowerCase();
   return Date.now() + (t.includes('closure') ? CLOSURE_TTL_MS : TRAFFIC_TTL_MS);
 }
 
 function getNeighborhood(event: AlbertaEvent): string {
-  if (event.Area && event.Area.length > 0 && event.Area[0].Name) {
-    return event.Area[0].Name.slice(0, 80);
-  }
-  return 'Calgary';
+  // The feed has no area field; the roadway is the most useful locator we get.
+  return (event.RoadwayName ?? 'Calgary').slice(0, 80);
+}
+
+/** Readable headline, since the feed has no Headline field. */
+function buildHeadline(event: AlbertaEvent): string {
+  const road = event.RoadwayName?.trim();
+  const kind = event.IsFullClosure
+    ? 'Full closure'
+    : event.EventSubType === 'constructionWork'
+      ? 'Construction'
+      : (event.EventType ?? 'Traffic event');
+  const label = kind.charAt(0).toUpperCase() + kind.slice(1);
+  return (road ? `${label} on ${road}` : label).slice(0, 100);
 }
 
 // ---------------------------------------------------------------------------
@@ -123,22 +138,25 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
   const results: NormalizedIncident[] = [];
 
   for (const event of events ?? []) {
-    if (event.Status === 'Completed' || event.Status === 'Cancelled') continue;
-
     const coords = extractCoords(event);
     if (!coords) continue;
     if (!inCalgaryBounds(coords.lat, coords.lng)) continue;
 
-    const headline = (event.Headline ?? event.EventType ?? 'Traffic incident').slice(0, 100);
-    const description = (event.Description ?? headline).slice(0, 1000);
-    const eventId = event.ID ?? `${event.Headline ?? ''}:${event.StartDate ?? ''}`;
-    const detailsUrlMatch = event.Details?.match(/https?:\/\/[^\s"'>]+/);
-    const sourceUrl = detailsUrlMatch ? detailsUrlMatch[0] : 'https://511.alberta.ca';
+    // Skip anything whose planned end has already passed.
+    if (typeof event.PlannedEndDate === 'number' && event.PlannedEndDate > 0 &&
+        event.PlannedEndDate * 1000 < Date.now()) {
+      continue;
+    }
+
+    const headline = buildHeadline(event);
+    const description = (event.Description?.trim() || headline).slice(0, 1000);
+    const eventId = String(event.ID ?? event.SourceId ?? `${event.RoadwayName ?? ''}:${event.StartDate ?? ''}`);
+    const sourceUrl = 'https://511.alberta.ca';
 
     results.push({
       title: headline,
       description,
-      category: mapEventTypeToCategory(event.EventType),
+      category: mapEventTypeToCategory(event),
       neighborhood: getNeighborhood(event),
       lat: coords.lat,
       lng: coords.lng,

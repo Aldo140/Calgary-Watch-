@@ -23,6 +23,7 @@ The platform runs four data layers:
 - **Environment Canada Alerts** — official weather warnings and special statements covering 15 zones across Alberta
 - **Calgary & Edmonton Open Data** — service requests, bylaw, 311, and crime statistics via SODA API
 - **Statistics Canada Baselines** — annual crime data for RCMP-policed towns (Airdrie, Cochrane, Okotoks, Canmore, High River, Strathmore, Chestermere)
+- **ENMAX Power Outages** — live Calgary electricity outages, shown as an opt-in official layer separate from community reports
 
 ---
 
@@ -93,6 +94,38 @@ Security headers are configured in `firebase.json` and served by Firebase Hostin
 - `Strict-Transport-Security` — HSTS with 2-year max-age and preload
 - `Cross-Origin-Opener-Policy: same-origin-allow-popups` — allows Google Sign-In popup
 - `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`
+
+### Power Outage Ingest (ENMAX)
+
+`scripts/ingest/power-outages.ts` runs via GitHub Actions
+(`ingest-power-outages.yml`) on a ~5-minute cron. It fetches the ENMAX
+current-outage JSON feed once, validates that the payload is an array,
+normalizes each record, and publishes a single snapshot document to
+`live_data/power_outages`.
+
+Every visitor reads that one document, so ENMAX receives exactly one request per
+run regardless of traffic, and the browser never talks to ENMAX directly. No
+Cloud Functions and no Blaze plan required.
+
+**Failure policy:** if ENMAX is unreachable or changes shape, the run exits
+*without writing*. The previous snapshot stays in place and the map keeps
+showing the last known outages, flagged as stale by the client after 20 minutes.
+A bad fetch is never published as "zero outages".
+
+ENMAX records are **not** written to the `incidents` collection — this is an
+external live layer, not a community report. The ENMAX URL appears in exactly
+one file, `scripts/ingest/enmax/config.ts`, and is never bundled into the
+frontend. The feed is undocumented and is **not** a formally supported public
+API — it is polled read-only, at most every five minutes, with a descriptive
+User-Agent and a 9-second timeout.
+
+```bash
+FIREBASE_SERVICE_ACCOUNT='{...}' npm run ingest:outages   # publish a snapshot
+npm test                                                  # normalization + classification tests
+```
+
+**Firestore cost:** 1 document write per run (~288/day, free tier 20k) and 1
+document read per visitor who switches the layer on.
 
 ### Ingest Pipeline
 

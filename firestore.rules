@@ -237,6 +237,16 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Official third-party snapshots published by the ingest pipeline
+    // (e.g. live_data/power_outages from the ENMAX feed).
+    // Public read so the map layer works for signed-out visitors. Writes come
+    // only from the Admin SDK in GitHub Actions, which bypasses these rules —
+    // no client may ever write here.
+    match /live_data/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /{path=**} {
       allow read, write: if false;
     }

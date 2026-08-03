@@ -96,7 +96,10 @@ async function upsertIncident(
   await db.collection('incidents').doc(docId).set(
     {
       ...incident,
-      timestamp: Date.now(),
+      // Use the source's own report time. Overwriting this with Date.now() on
+      // every run made week-old records show as "just now" and re-surface as
+      // new on each 30-minute pass.
+      timestamp: incident.timestamp ?? Date.now(),
       updatedAt: now,
       verified_status: incident.verified_status,
       report_count: 1,

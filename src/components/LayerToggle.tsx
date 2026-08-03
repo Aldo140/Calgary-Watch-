@@ -42,7 +42,7 @@ export default function LayerToggle({
 }: LayerToggleProps) {
   if (isPinMode) return null;
   return (
-    <div data-tour="layers" className="absolute left-1/2 z-30 w-auto max-w-[min(94vw,24rem)] max-lg:max-w-[min(94vw,21rem)] -translate-x-1/2 max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] max-lg:px-1 md:max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] bottom-20 md:bottom-8">
+    <div data-tour="layers" className="absolute left-1/2 z-30 w-auto max-w-[min(94vw,22rem)] max-lg:max-w-[min(94vw,20rem)] -translate-x-1/2 max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] max-lg:px-1 md:max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] bottom-20 md:bottom-8">
       <Card
         className="flex flex-col gap-1 p-1 max-lg:p-1.5 md:p-1.5 max-lg:rounded-[1.35rem] rounded-2xl shadow-2xl bg-[rgba(255,250,243,0.94)] max-lg:border-stone-200/80"
       >
@@ -96,24 +96,34 @@ export default function LayerToggle({
           <span className="text-[10px] md:text-xs font-bold">Crime</span>
           <span className="hidden md:inline font-bold text-xs"> Stats</span>
         </button>
+      </div>
 
-        <button
-          type="button"
-          onClick={() => setShowPowerOutages(!showPowerOutages)}
-          aria-pressed={showPowerOutages}
-          aria-label="Toggle official ENMAX power outages layer"
+      {/* Official third-party data gets its own row. Row 1 was already at the
+          edge of its max-width with three chips — adding a fourth pushed it
+          into the hidden horizontal scroll area, where nobody could find it. */}
+      <button
+        type="button"
+        onClick={() => setShowPowerOutages(!showPowerOutages)}
+        aria-pressed={showPowerOutages}
+        aria-label="Toggle official ENMAX power outages layer"
+        className={cn(
+          'layer-chip flex w-full items-center justify-center gap-1.5 md:gap-2 px-3 py-2 rounded-xl transition-all',
+          showPowerOutages
+            ? 'layer-chip-selected bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+            : 'text-slate-700 hover:bg-slate-100'
+        )}
+      >
+        <Zap size={14} className="shrink-0" />
+        <span className="text-[10px] md:text-xs font-bold">Power Outages</span>
+        <span
           className={cn(
-            'layer-chip flex items-center gap-1.5 md:gap-2 px-3 max-lg:px-3 py-2 rounded-xl transition-all shrink-0 max-lg:flex-1 max-lg:justify-center md:px-4',
-            showPowerOutages
-              ? 'layer-chip-selected bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-              : 'text-slate-700 hover:bg-slate-100'
+            'text-[8px] font-black uppercase tracking-[0.14em] px-1.5 py-0.5 rounded-md',
+            showPowerOutages ? 'bg-white/20 text-white' : 'bg-stone-200/70 text-slate-600'
           )}
         >
-          <Zap size={14} className="max-lg:shrink-0" />
-          <span className="text-[10px] md:text-xs font-bold">Power</span>
-          <span className="hidden md:inline font-bold text-xs"> Outages</span>
-        </button>
-      </div>
+          ENMAX
+        </span>
+      </button>
 
       {/* Outage sub-filters — only meaningful while the layer is on. */}
       {showPowerOutages && (

@@ -12,7 +12,7 @@ import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -50,6 +50,12 @@ type MapNotification = {
   timestamp: number;
   neighborhood?: string;
   kind?: 'incident' | 'neighborhood_report';
+  /**
+   * For neighbourhood reports: the saved profile setting this area was derived
+   * from. Shown to the user so it is obvious the report follows their location
+   * settings rather than their current GPS position.
+   */
+  basis?: string;
 };
 
 type UserProfileSettings = {
@@ -1497,6 +1503,10 @@ export default function MapPage() {
       timestamp: Date.now(),
       neighborhood: neighborhoodLookup,
       kind: 'neighborhood_report',
+      // The card renders the resolved community name, which on its own looks
+      // like it came from nowhere. Carrying the saved address through makes the
+      // connection to their location settings explicit.
+      basis: preferredAddress || preferredNeighborhood || '',
     };
     setNotifications((prev) => [notification, ...prev].slice(0, 20));
     setUnreadNotifications((prev) => prev + 1);
@@ -1543,15 +1553,15 @@ export default function MapPage() {
     if (n.kind === 'neighborhood_report') {
       const areaName = (n.neighborhood ?? 'Your area').replace(/\b\w/g, (c) => c.toUpperCase());
       return (
-        <button
-          key={n.id}
-          type="button"
-          onClick={() => handleNotificationClick(n)}
-          className="block w-full text-left transition-transform active:scale-[0.99] p-2"
-        >
+        <div key={n.id} className="p-2">
           <div
-            className="relative overflow-hidden rounded-xl p-3.5"
+            className="relative overflow-hidden rounded-xl"
             style={{ background: 'linear-gradient(135deg, #1C2B3A 0%, #24466B 80%)', border: '1px solid rgba(46,139,122,0.45)' }}
+          >
+          <button
+            type="button"
+            onClick={() => handleNotificationClick(n)}
+            className="block w-full text-left transition-transform active:scale-[0.99] p-3.5"
           >
             <span className="absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #2E8B7A, transparent 70%)' }} aria-hidden="true" />
             <p className="font-mono text-[8px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
@@ -1560,6 +1570,16 @@ export default function MapPage() {
             <p className={cn('font-black mt-1 truncate', compact ? 'text-[13px]' : 'text-[14.5px]')} style={{ color: '#FFFDF8' }}>
               {areaName}
             </p>
+            {/* Without this the card shows only the resolved community name and
+                the user has no idea where it came from. */}
+            {n.basis && (
+              <p className="mt-1 flex items-start gap-1.5 text-[10px] font-medium leading-snug" style={{ color: '#9FB8C9' }}>
+                <MapPin size={10} className="mt-[1px] shrink-0" aria-hidden="true" />
+                <span className="min-w-0">
+                  From your saved location · <span className="font-bold" style={{ color: '#D9E2E8' }}>{n.basis}</span>
+                </span>
+              </p>
+            )}
             {stats ? (
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 <span className="flex items-center gap-1.5 rounded-full px-2 py-1 font-mono text-[8.5px] font-bold uppercase tracking-[0.1em]" style={{ background: `${stats.band.color}2e`, color: '#FFFDF8' }}>
@@ -1581,8 +1601,24 @@ export default function MapPage() {
             <p className="mt-2 font-mono text-[8.5px] font-bold uppercase tracking-[0.16em]" style={{ color: '#7FB5A6' }}>
               Open full intel →
             </p>
+          </button>
+          {/* Sibling of the main button, not nested inside it — nesting
+              interactive elements breaks keyboard and screen-reader behaviour. */}
+          <div className="px-3.5 pb-3">
+            <button
+              type="button"
+              onClick={() => {
+                setShowNotifications(false);
+                openAuthPanel('settings');
+              }}
+              className="rounded-md text-[9.5px] font-bold underline underline-offset-2 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ color: '#7FB5A6' }}
+            >
+              Change location settings
+            </button>
           </div>
-        </button>
+          </div>
+        </div>
       );
     }
     return (

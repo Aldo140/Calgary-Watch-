@@ -61,6 +61,16 @@ const CALGARY = {
   maxLng: -113.8,
 };
 
+/**
+ * Cap on long-running roadwork.
+ *
+ * Most Calgary 511 events are construction projects that started months ago and
+ * run for months more. All 25 of them on the map at once buries everything else
+ * and fills a "recent incidents" view with things that are not recent. Genuine
+ * incidents — closures, crashes, weather events — are never capped.
+ */
+const ROADWORK_CAP = 10;
+
 const TRAFFIC_TTL_MS  = 6 * 60 * 60 * 1000;  // 6 hours
 const CLOSURE_TTL_MS  = 12 * 60 * 60 * 1000; // 12 hours
 
@@ -156,6 +166,12 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
     results.push({
       title: headline,
       description,
+      // Reported/StartDate are Unix seconds.
+      timestamp: typeof event.Reported === 'number' && event.Reported > 0
+        ? event.Reported * 1000
+        : typeof event.StartDate === 'number' && event.StartDate > 0
+          ? event.StartDate * 1000
+          : Date.now(),
       category: mapEventTypeToCategory(event),
       neighborhood: getNeighborhood(event),
       lat: coords.lat,
@@ -174,5 +190,13 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
     });
   }
 
-  return results;
+  // Keep every real incident, but only the most recently reported roadwork.
+  const isRoadwork = (i: NormalizedIncident) => i.category === 'infrastructure';
+  const byNewest = (a: NormalizedIncident, b: NormalizedIncident) =>
+    (b.timestamp ?? 0) - (a.timestamp ?? 0);
+
+  const incidents = results.filter((i) => !isRoadwork(i));
+  const roadwork = results.filter(isRoadwork).sort(byNewest).slice(0, ROADWORK_CAP);
+
+  return [...incidents, ...roadwork];
 }

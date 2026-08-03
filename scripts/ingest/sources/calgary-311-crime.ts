@@ -19,6 +19,7 @@
  * Everything here is genuine City data. Nothing is generated.
  */
 
+import type { IncidentCategory } from '../../../src/types/index.js';
 import type { NormalizedIncident } from '../types.js';
 
 export type { NormalizedIncident };
@@ -34,10 +35,37 @@ const LOOKBACK_DAYS = 7;
 const TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
- * 311 service_name values that describe an actual property crime.
- * Matched case-insensitively as SQL LIKE patterns against upper(service_name).
+ * Which 311 request types to surface, how to categorise them, and how many of
+ * each to publish per run.
+ *
+ * The caps exist for balance. Graffiti alone runs ~390 reports a fortnight and
+ * would otherwise bury every other kind of incident on the map — which is what
+ * happened when this source shipped with graffiti and vandalism only. Each rule
+ * takes its most recent N, so the mix stays varied and current.
+ *
+ * `like` is matched by the API against upper(service_name); `match` re-checks
+ * client-side, since one LIKE pattern can catch neighbouring request types.
  */
-const CRIME_SERVICES = ['%GRAFFITI%', '%VANDAL%'];
+interface ServiceRule {
+  like: string;
+  match: RegExp;
+  category: IncidentCategory;
+  label: string;
+  cap: number;
+}
+
+const SERVICE_RULES: ServiceRule[] = [
+  // ── Property crime ──────────────────────────────────────────────────────
+  { like: '%GRAFFITI%', match: /graffiti/i, category: 'crime', label: 'Graffiti', cap: 12 },
+  { like: '%VANDAL%', match: /vandal/i, category: 'crime', label: 'Vandalism', cap: 10 },
+  { like: '%DERELICT%', match: /derelict|unsecure/i, category: 'crime', label: 'Derelict or unsecured property', cap: 6 },
+  // ── Infrastructure ──────────────────────────────────────────────────────
+  { like: '%WATER MAIN%', match: /water main/i, category: 'infrastructure', label: 'Water main break', cap: 10 },
+  { like: '%STREETLIGHT%', match: /streetlight/i, category: 'infrastructure', label: 'Streetlight damage', cap: 8 },
+  { like: '%DEBRIS ON STREET%', match: /debris/i, category: 'infrastructure', label: 'Debris on the road', cap: 6 },
+  // ── Traffic ─────────────────────────────────────────────────────────────
+  { like: '%SIGNS - MISSING%', match: /sign/i, category: 'traffic', label: 'Missing or damaged road sign', cap: 8 },
+];
 
 interface ServiceRequest {
   service_request_id?: string;
@@ -59,22 +87,17 @@ function titleCase(value: string): string {
   return value.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/** "Corporate - Graffiti Concerns" → "Graffiti" */
-function shortLabel(serviceName: string): string {
-  if (/graffiti/i.test(serviceName)) return 'Graffiti';
-  if (/vandal/i.test(serviceName)) return 'Vandalism';
-  return 'Property damage';
+function ruleFor(serviceName: string): ServiceRule | null {
+  return SERVICE_RULES.find((rule) => rule.match.test(serviceName)) ?? null;
 }
 
-function buildTitle(row: ServiceRequest): string {
-  const label = shortLabel(row.service_name ?? '');
+function buildTitle(row: ServiceRequest, rule: ServiceRule): string {
   const where = row.comm_name ? titleCase(row.comm_name) : 'Calgary';
-  return `${label} reported in ${where}`.slice(0, 100);
+  return `${rule.label} reported in ${where}`.slice(0, 100);
 }
 
-function buildDescription(row: ServiceRequest): string {
-  const label = shortLabel(row.service_name ?? '');
-  const parts = [`${label} reported to City of Calgary 311.`];
+function buildDescription(row: ServiceRequest, rule: ServiceRule): string {
+  const parts = [`${rule.label} reported to City of Calgary 311.`];
   // 311 publishes a block-level address, never a precise civic address.
   if (row.address) parts.push(`Near ${titleCase(row.address)}.`);
   if (row.status_description) parts.push(`Status: ${row.status_description}.`);
@@ -92,14 +115,14 @@ function sinceIso(days: number): string {
  * silently contributing zero.
  */
 export async function fetchCalgary311Crime(): Promise<NormalizedIncident[]> {
-  const likeClause = CRIME_SERVICES
-    .map((pattern) => `upper(service_name) like '${pattern}'`)
+  const likeClause = SERVICE_RULES
+    .map((rule) => `upper(service_name) like '${rule.like}'`)
     .join(' OR ');
   const where = `requested_date > '${sinceIso(LOOKBACK_DAYS)}' AND (${likeClause})`;
 
   const url =
     `${DATASET_URL}?$where=${encodeURIComponent(where)}` +
-    `&$order=${encodeURIComponent('requested_date DESC')}&$limit=300`;
+    `&$order=${encodeURIComponent('requested_date DESC')}&$limit=1000`;
 
   const res = await fetch(url, {
     headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app)' },
@@ -111,6 +134,8 @@ export async function fetchCalgary311Crime(): Promise<NormalizedIncident[]> {
   if (!Array.isArray(rows)) throw new Error('Calgary 311 response was not an array');
 
   const results: NormalizedIncident[] = [];
+  // Rows arrive newest-first, so counting up to each cap keeps the most recent.
+  const published = new Map<string, number>();
 
   for (const raw of rows as ServiceRequest[]) {
     const lat = toNumber(raw.latitude);
@@ -120,12 +145,21 @@ export async function fetchCalgary311Crime(): Promise<NormalizedIncident[]> {
     const id = raw.service_request_id;
     if (!id) continue;
 
+    const rule = ruleFor(raw.service_name ?? '');
+    if (!rule) continue;
+
+    const used = published.get(rule.label) ?? 0;
+    if (used >= rule.cap) continue;
+    published.set(rule.label, used + 1);
+
     const reported = raw.requested_date ? Date.parse(raw.requested_date) : Date.now();
+    const reportedAt = Number.isFinite(reported) ? reported : Date.now();
 
     results.push({
-      title: buildTitle(raw),
-      description: buildDescription(raw),
-      category: 'crime',
+      title: buildTitle(raw, rule),
+      description: buildDescription(raw, rule),
+      timestamp: reportedAt,
+      category: rule.category,
       neighborhood: raw.comm_name ? titleCase(raw.comm_name) : 'Calgary',
       lat,
       lng,
@@ -134,7 +168,7 @@ export async function fetchCalgary311Crime(): Promise<NormalizedIncident[]> {
       source_type: 'calgary_open_data',
       data_source: 'official',
       dedup_key: `calgary_311_crime:${id}`,
-      expires_at: (Number.isFinite(reported) ? reported : Date.now()) + TTL_MS,
+      expires_at: reportedAt + TTL_MS,
       verified_status: 'community_confirmed',
       report_count: 1,
       email: 'system@calgarywatch.app',

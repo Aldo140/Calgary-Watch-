@@ -69,7 +69,7 @@ const CALGARY = {
  * and fills a "recent incidents" view with things that are not recent. Genuine
  * incidents — closures, crashes, weather events — are never capped.
  */
-const ROADWORK_CAP = 10;
+const ROADWORK_CAP = 5;
 
 const TRAFFIC_TTL_MS  = 6 * 60 * 60 * 1000;  // 6 hours
 const CLOSURE_TTL_MS  = 12 * 60 * 60 * 1000; // 12 hours

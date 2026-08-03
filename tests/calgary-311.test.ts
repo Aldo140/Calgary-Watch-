@@ -36,6 +36,24 @@ describe('311 service matching', () => {
     const caps = [...RULES.matchAll(/cap: \d+/g)].length;
     assert.equal(services, caps, 'each rule needs a cap or one type will dominate');
   });
+
+  it('total output fits inside the map window', () => {
+    // MapPage loads only the newest INCIDENT_PAGE_SIZE (60) incidents. Publish
+    // more and the lowest-ranked types are silently cut — and because caps take
+    // the most recent N of each type, the rarest types hold the oldest
+    // timestamps and are always the ones dropped. That is how vandalism,
+    // transit safety, streetlight damage and water outages ended up invisible
+    // despite being configured.
+    const total = [...RULES.matchAll(/cap: (\d+)/g)].reduce((sum, m) => sum + Number(m[1]), 0);
+    assert.ok(total <= 45, `311 caps total ${total}; leave room for 511 and community reports`);
+  });
+
+  it('caps high-volume types low so they cannot dominate', () => {
+    const graffiti = /Graffiti Concerns'[^}]*cap: (\d+)/.exec(RULES);
+    assert.ok(graffiti, 'graffiti rule should exist');
+    // ~1,000 reports a month. Uncapped it is the entire map.
+    assert.ok(Number(graffiti[1]) <= 3, `graffiti cap is ${graffiti[1]}, too high`);
+  });
 });
 
 describe('311 category coverage', () => {

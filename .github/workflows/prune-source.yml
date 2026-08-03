@@ -1,0 +1,38 @@
+name: Prune Source
+
+# Manual only — deletes production documents for one ingest source, so the
+# next ingest run repopulates them under current rules.
+on:
+  workflow_dispatch:
+    inputs:
+      source_name:
+        description: 'Exact source_name to delete (e.g. City of Calgary 311)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Count without deleting'
+        type: boolean
+        default: true
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prune source
+        run: npx tsx scripts/ingest/prune-source.ts "${{ inputs.source_name }}" ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

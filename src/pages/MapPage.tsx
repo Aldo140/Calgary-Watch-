@@ -25,7 +25,6 @@ import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipa
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
-import type { OutageGroup } from '@/src/types/powerOutage';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -610,6 +609,8 @@ export default function MapPage() {
   const officialOpenData = useOfficialOpenData(isAuthReady);
   const weatherAlerts = useWeatherAlerts(isAuthReady);
   const edmontonOpenData = useEdmontonOpenData(isAuthReady);
+  // ENMAX outages arrive already adapted into infrastructure incidents.
+  const powerOutageIncidents = usePowerOutages(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
   const { stats: statcanStats, yearlyStats: statcanYearlyStats } = useAlbertaMunicipalityCrimeStats();
   const cityAverages = useMemo(() => computeCityAverages(crimeStats), [crimeStats]);
@@ -628,22 +629,6 @@ export default function MapPage() {
   const [showLiveReports, setShowLiveReports] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
-  // Official ENMAX outages are opt-in, matching the heatmap/crime layers, so the
-  // default map stays focused on community reports.
-  const [showPowerOutages, setShowPowerOutages] = useState(false);
-  // All three groups start on. Calgary usually has no unplanned outage in
-  // progress — scheduled work is effectively the entire feed — so defaulting
-  // "upcoming" off made the layer render zero markers and look broken. Users
-  // can narrow with the sub-filters; the layer itself is still opt-in.
-  const [outageGroupFilter, setOutageGroupFilter] = useState<Record<OutageGroup, boolean>>({
-    active_unplanned: true,
-    active_planned: true,
-    upcoming_planned: true,
-  });
-  const toggleOutageGroup = useCallback((group: OutageGroup) => {
-    setOutageGroupFilter((prev) => ({ ...prev, [group]: !prev[group] }));
-  }, []);
-  const powerOutages = usePowerOutages(showPowerOutages);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
   const [nearMeIndex, setNearMeIndex] = useState(0);
@@ -955,7 +940,7 @@ export default function MapPage() {
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
     const now = Date.now();
-    const combined = [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts];
+    const combined = [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents];
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     const filtered = [...unique.values()]
       .filter((i) => {
@@ -979,7 +964,7 @@ export default function MapPage() {
       if (!isDup) kept.push(inc);
     }
     return kept;
-  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts]);
+  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents]);
 
   // Official community list + names observed in live data
   const officialCommunities = useCalgaryCommunities(Boolean(user));
@@ -2174,13 +2159,6 @@ export default function MapPage() {
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
           isMapInteractive={!isFormOpen || isPinMode || isEmergencyPinMode || isEmergencyOpen}
-          powerOutages={powerOutages.outages}
-          showPowerOutages={showPowerOutages}
-          outageGroupFilter={outageGroupFilter}
-          outagesUpdatedAt={powerOutages.updatedAt}
-          outagesLoading={powerOutages.isLoading}
-          outagesError={powerOutages.error}
-          onRetryOutages={powerOutages.refresh}
         />
 
         {/* Tap-to-close: transparent target covering exposed map when sheet is fully expanded */}
@@ -2919,10 +2897,6 @@ export default function MapPage() {
           setShowHeatmap={setShowHeatmap}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
-          showPowerOutages={showPowerOutages}
-          setShowPowerOutages={setShowPowerOutages}
-          outageGroupFilter={outageGroupFilter}
-          onToggleOutageGroup={toggleOutageGroup}
           isPinMode={isPinMode || isEmergencyPinMode}
         />
 

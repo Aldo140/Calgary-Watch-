@@ -19,9 +19,16 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { Firestore, Query } from 'firebase-admin/firestore';
 
-/** Only ever written by scripts/seed/*. Never by a real submission. */
+/**
+ * The only authorUid values the seed scripts ever wrote. A real submission
+ * carries the signed-in user's Firebase UID, so these cannot collide.
+ *
+ * Matching by email was removed: 'anonymous@calgarywatch.app' is NOT unique to
+ * the seeder — MapPage uses it for every genuine anonymous submission — so the
+ * email match relabelled real residents' reports as examples. authorUid alone
+ * is the safe identifier.
+ */
 const SEED_AUTHOR_UIDS = ['seed', 'community'];
-const SEED_EMAILS = ['seed@calgarywatch.app', 'anonymous@calgarywatch.app'];
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -70,14 +77,6 @@ async function run(): Promise<void> {
       `authorUid=${uid}`,
     );
   }
-  for (const email of SEED_EMAILS) {
-    total += await relabel(
-      db,
-      db.collection('incidents').where('email', '==', email),
-      `email=${email}`,
-    );
-  }
-
   console.log(`[relabel] ${DRY_RUN ? 'Would relabel' : 'Relabelled'} ${total} document(s).`);
 }
 

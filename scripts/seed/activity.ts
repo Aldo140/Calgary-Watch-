@@ -1,8 +1,19 @@
 /**
- * Calgary Watch — Community Activity Baseline
+ * Calgary Watch — Example Report Publisher
  *
- * Maintains a realistic baseline of community-submitted reports so the map
- * always reflects neighbourhood activity. 
+ * Publishes a small, rotating set of EXAMPLE reports so a first-time visitor
+ * can see what a report looks like and how the map behaves.
+ *
+ * These are written with data_source: 'demo'. Every surface that renders an
+ * incident badges them as examples, and every count, risk level and safety
+ * score skips them. They are illustrative, not evidence.
+ *
+ * Rules for anything added to the queue below:
+ *   - Everyday, low-stakes situations only. No assaults, no drug activity, no
+ *     descriptions of identifiable individuals, no claims about a specific
+ *     named business or transit stop.
+ *   - Coordinates land on public thoroughfares, jittered, never a private home.
+ *   - Nothing that would change how a resident judges a real block's safety.
  */
 
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
@@ -38,185 +49,92 @@ function slotTs(slotHour: number): number {
 }
 
 const QUEUE = [
+  // Voice varies on purpose: some hurried and lowercase, some careful and
+  // punctuated. Real feeds read that way, and the mix shows newcomers that a
+  // rough two-line report is just as welcome as a tidy one.
   {
-    title: 'car window smashed on 9 ave se',
-    description: `came out this morning and back window was completely gone. gym bag and my bluetooth speaker taken. this is the 3rd one on this block this month smh`,
-    category: 'crime', neighborhood: 'Inglewood',
-    lat: 51.0404 + j(), lng: -114.0199 + j(), name: 'Anonymous', anonymous: true,
+    title: 'pothole opening up on 14 st nw',
+    description: `southbound lane just past the lights, deep enough that the car ahead of me swerved into the next lane. worth avoiding until the city patches it`,
+    category: 'infrastructure', neighborhood: 'Briar Hill',
+    lat: 51.0682 + j(), lng: -114.0955 + j(),
   },
   {
-    title: 'Bike stolen outside Kensington Rec Centre',
-    description: `green trek marlin was locked to the rack with a kryptonite ulock. came back after an hour and the lock was cut clean off. if anyone sees it pls dm me`,
+    title: 'Bike stolen from the rack outside the library',
+    description: `Locked with a cable lock, gone within about an hour. Blue commuter with a rear basket. Posting mostly so people know the racks here get picked over — bring a U-lock.`,
     category: 'crime', neighborhood: 'Kensington',
-    lat: 51.0601 + j(), lng: -114.0906 + j(), name: 'Megan T.', anonymous: false,
+    lat: 51.0601 + j(), lng: -114.0906 + j(),
   },
   {
-    title: 'catalytic converter stolen overnight beltline',
-    description: `woke up at 6am to a loud noise then my car wouldnt start properly. mechanic confirmed converter is gone. parked on 11 ave sw. cost me $1800 to fix last time this happened`,
-    category: 'crime', neighborhood: 'Beltline',
-    lat: 51.0375 + j(), lng: -114.0741 + j(), name: 'Anonymous', anonymous: true,
+    title: 'water main work, whole block closed off',
+    description: `crews showed up early and 33 ave is down to one lane between the crescents. flaggers are on site, looks like theyll be a couple days`,
+    category: 'infrastructure', neighborhood: 'Marda Loop',
+    lat: 51.0245 + j(), lng: -114.0958 + j(),
   },
   {
-    title: 'Package stolen off porch - Forest Lawn',
-    description: `ring doorbell caught a woman in a red coat grabbing my amazon package around 1:30pm. she just walked up like she lived here. 3rd time this year on our street`,
-    category: 'crime', neighborhood: 'Forest Lawn',
-    lat: 51.0399 + j(), lng: -113.9638 + j(), name: 'Kyle M.', anonymous: false,
-  },
-  {
-    title: 'break in attempt on our back door - Marlborough',
-    description: `came home to scratches all around the lock and the frame is cracked. neighbour said they saw a guy in a grey jacket trying the door around 2pm. calling a locksmith now`,
-    category: 'crime', neighborhood: 'Marlborough',
-    lat: 51.0620 + j(), lng: -113.9618 + j(), name: 'Sandra K.', anonymous: false,
-  },
-  {
-    title: 'Suspicious guy trying car handles - Bridgeland',
-    description: `watched from my window around midnight as someone was pulling on car door handles on the whole street. called it in but cops didnt show for like 40 mins and he was gone`,
-    category: 'crime', neighborhood: 'Bridgeland',
-    lat: 51.0598 + j(), lng: -114.0407 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'car broken into Victoria Park last night',
-    description: `window punched in near the stampede grounds parking lot. nothing of value inside but still have to deal with replacing the window. happens so often around here`,
-    category: 'crime', neighborhood: 'Victoria Park',
-    lat: 51.0381 + j(), lng: -114.0476 + j(), name: 'Josh R.', anonymous: false,
-  },
-  {
-    title: 'graffiti tagged entire wall on edmonton trail',
-    description: `someone went to town overnight on the brick wall behind the strip mall. looks like the same crew doing the underpass tags. bright orange paint, hard to miss`,
-    category: 'crime', neighborhood: 'Bridgeland',
-    lat: 51.0608 + j(), lng: -114.0388 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'Assault outside bar on 17th Ave',
-    description: `big fight spilled out of a bar around 1:30am. one guy hit another with something, looked bad. ambulance came. avoid that block if ur heading out tonight`,
-    category: 'crime', neighborhood: 'Beltline',
-    lat: 51.0361 + j(), lng: -114.0828 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'truck stolen from parking lot overnight',
-    description: `my 2020 f-150 is gone from the lot on 12th ave sw. reported it to police. they said its the 4th this week in this area. insurance is gonna be a nightmare`,
-    category: 'crime', neighborhood: 'Beltline',
-    lat: 51.0378 + j(), lng: -114.0802 + j(), name: 'Dave H.', anonymous: false,
-  },
-  {
-    title: 'sketchy activity near east village pathway',
-    description: `guy selling what looked like drugs near the bow river pathway by the dog park. been there 3 days now. needles left on the ground nearby. not safe to bring kids`,
-    category: 'crime', neighborhood: 'East Village',
-    lat: 51.0461 + j(), lng: -114.0528 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'laptop stolen from car - downtown parkade',
-    description: `left my laptop bag on the back seat for 20 minutes. came back to smashed window. this is the 5th report ive seen from this parkade this month. security doesnt check`,
-    category: 'crime', neighborhood: 'Downtown',
-    lat: 51.0481 + j(), lng: -114.0622 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'catalytic converter off my prius - McKenzie Towne',
-    description: `broad daylight, like 10am. neighbour said a white truck pulled up and two guys did it in under 3 minutes. whole thing was on her ring cam. called police`,
-    category: 'crime', neighborhood: 'McKenzie Towne',
-    lat: 50.9085 + j(), lng: -113.9537 + j(), name: 'Tanya W.', anonymous: false,
-  },
-  {
-    title: 'multiple packages taken on our evanston street',
-    description: `saw on nextdoor that 4 houses got hit today between 12 and 2pm. same timeframe, think its one person. we need more of us with cameras facing the street`,
+    title: 'Package taken off the porch this afternoon',
+    description: `Doorbell camera shows it sitting there at 12:40 and gone by 1:15. Nothing dramatic, just a heads up that it is happening on this street — maybe get things held at a locker.`,
     category: 'crime', neighborhood: 'Evanston',
-    lat: 51.1899 + j(), lng: -114.0789 + j(), name: 'Chris L.', anonymous: false,
+    lat: 51.1899 + j(), lng: -114.0789 + j(),
   },
   {
-    title: 'break and enter while we were at work - Ogden',
-    description: `came home and back door was kicked in. they took electronics and went through all our drawers. cops came and took a report. no cameras in our alley so they probably know`,
+    title: 'black ice on the pathway by the river',
+    description: `pathway is a sheet of ice this morning near the pedestrian bridge. saw two people go down. take the street side until it gets sanded`,
+    category: 'weather', neighborhood: 'Sunnyside',
+    lat: 51.0553 + j(), lng: -114.0808 + j(),
+  },
+  {
+    title: 'Fender bender at the Deerfoot on-ramp',
+    description: `Two cars, everyone out and walking around so it looks minor. Right lane is blocked while they wait for a tow. Give yourself an extra ten minutes.`,
+    category: 'traffic', neighborhood: 'Coventry Hills',
+    lat: 51.1097 + j(), lng: -114.0169 + j(),
+  },
+  {
+    title: 'street light out for over a week now',
+    description: `whole stretch is dark between the park and the corner store. reported it to 311 twice already. adding it here in case someone else wants to log it too`,
+    category: 'infrastructure', neighborhood: 'Forest Lawn',
+    lat: 51.0399 + j(), lng: -113.9638 + j(),
+  },
+  {
+    title: 'Car window smashed overnight on the street',
+    description: `Nothing was taken as far as I can tell — I think they saw the empty cupholder and moved on. Still a $400 window. Do not leave anything visible, even a charger cable.`,
+    category: 'crime', neighborhood: 'Beltline',
+    lat: 51.0375 + j(), lng: -114.0741 + j(),
+  },
+  {
+    title: 'hail came through fast, watch your car',
+    description: `maybe ten minutes of pea sized hail then done. covered the lawns. if you park on the street you might want to check the roof`,
+    category: 'weather', neighborhood: 'McKenzie Towne',
+    lat: 50.9085 + j(), lng: -113.9537 + j(),
+  },
+  {
+    title: 'Construction detour is not signed well',
+    description: `The detour dumps you onto a residential crescent with no follow up sign, so everyone is doing three point turns in front of the houses. Someone is going to get clipped.`,
+    category: 'traffic', neighborhood: 'Bridgeland',
+    lat: 51.0598 + j(), lng: -114.0407 + j(),
+  },
+  {
+    title: 'graffiti on the back of the strip mall',
+    description: `went up sometime overnight along the alley wall. not offensive, just a lot of it. posting so the property owner sees it and gets it logged`,
     category: 'crime', neighborhood: 'Ogden',
-    lat: 50.9908 + j(), lng: -114.0009 + j(), name: 'Anonymous', anonymous: true,
+    lat: 50.9908 + j(), lng: -114.0009 + j(),
   },
   {
-    title: 'aggressive panhandler at C-train - Saddletowne',
-    description: `guy at the saddletowne station has been harassing commuters for 3 days. got in a woman face when she said no. transit security showed up but hes back the next day`,
-    category: 'crime', neighborhood: 'Saddleridge',
-    lat: 51.1258 + j(), lng: -113.9413 + j(), name: 'Priya N.', anonymous: false,
+    title: 'Snow windrow is blocking the corner sightline',
+    description: `The plow left a big ridge right at the intersection and you cannot see oncoming traffic until you are already into it. Rolling through slowly is the only way across right now.`,
+    category: 'infrastructure', neighborhood: 'Saddleridge',
+    lat: 51.1258 + j(), lng: -113.9413 + j(),
   },
   {
-    title: 'car window smashed - Kensington street parking',
-    description: `lock punched out on my car door on 10 st nw. they didnt even take anything, just destroyed the panel. probably looking for hidden spots. cost me more than anything i had inside`,
-    category: 'crime', neighborhood: 'Kensington',
-    lat: 51.0605 + j(), lng: -114.0912 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'Shed broken into - tools stolen in Ramsay',
-    description: `padlock was cut off our backyard shed. they took the lawnmower, a leaf blower and some power tools. must have scoped it out earlier in the week cause they knew exactly what to grab`,
-    category: 'crime', neighborhood: 'Ramsay',
-    lat: 51.0347 + j(), lng: -114.0248 + j(), name: 'Gary F.', anonymous: false,
-  },
-  {
-    title: 'graffiti on victoria park station walls again',
-    description: `new tags all over the station wall this morning. giant letters, looks like same crew as the 12th ave stuff. city just cleaned it like two weeks ago. waste of everyone time`,
+    title: 'catalytic converter taken off a parked car',
+    description: `neighbour came out to that awful noise this morning. theyre going for the higher clearance vehicles on this street. a cage or even an etch kit is worth it`,
     category: 'crime', neighborhood: 'Victoria Park',
-    lat: 51.0379 + j(), lng: -114.0491 + j(), name: 'Anonymous', anonymous: true,
+    lat: 51.0381 + j(), lng: -114.0476 + j(),
   },
   {
-    title: 'bike stolen from downtown library rack',
-    description: `had my bike for 3 weeks. kryptonite ulock was cut right off. only inside the library for about 45 mins. if you see a red specialized commuter please let me know`,
-    category: 'crime', neighborhood: 'Downtown',
-    lat: 51.0474 + j(), lng: -114.0629 + j(), name: 'Felix A.', anonymous: false,
-  },
-  {
-    title: 'suspicious car parked on our street for days - Hillhurst',
-    description: `white sedan with mismatched plates been parked in front of our house for 4 days. engine running at odd hours, different driver each time. something feels off`,
-    category: 'crime', neighborhood: 'Hillhurst',
-    lat: 51.0558 + j(), lng: -114.0872 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'fight in forest lawn walmart parking lot',
-    description: `big brawl went down around 9pm. like 6-7 people, couple had what looked like weapons. cops showed up fast but most ran. stay clear of that lot at night`,
-    category: 'crime', neighborhood: 'Forest Lawn',
-    lat: 51.0401 + j(), lng: -113.9659 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'attempted break in at night - Mount Pleasant',
-    description: `heard someone trying the door around 2:30am. turned the lights on and they ran. neighbours doorbell caught a guy in a black jacket trying multiple doors on the block`,
-    category: 'crime', neighborhood: 'Mount Pleasant',
-    lat: 51.0702 + j(), lng: -114.0628 + j(), name: 'Rachel D.', anonymous: false,
-  },
-  {
-    title: 'creep following woman near chinatown',
-    description: `saw a man following a woman closely for almost 2 blocks on centre st s. she ducked into a store. he waited outside. called non emergency line but he left before anyone came`,
-    category: 'crime', neighborhood: 'Downtown',
-    lat: 51.0499 + j(), lng: -114.0668 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'catalytic converter theft - Sunalta',
-    description: `third one on my street this month. loud noise woke me up at 4am but by the time i looked they were gone. police just told me to file a report. totally useless`,
-    category: 'crime', neighborhood: 'Sunalta',
-    lat: 51.0414 + j(), lng: -114.1057 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'garage broken into overnight - Auburn Bay',
-    description: `garage door was forced open. took bikes, camping gear and the garage door opener. now worried they'll use the opener to get back in. changing codes asap`,
-    category: 'crime', neighborhood: 'Auburn Bay',
-    lat: 50.9101 + j(), lng: -114.0013 + j(), name: 'Mark S.', anonymous: false,
-  },
-  {
-    title: 'needle found near playground - Inglewood',
-    description: `found a used needle right beside the benches at the park off 9 ave se. called 311. kids play there all the time. city needs to do more regular checks of this park`,
-    category: 'crime', neighborhood: 'Inglewood',
-    lat: 51.0409 + j(), lng: -114.0208 + j(), name: 'Emily R.', anonymous: false,
-  },
-  {
-    title: 'car stolen from driveway overnight - Tuscany',
-    description: `black honda civic gone when i woke up. keys were inside which was dumb but still. apparently they can clone the fob signal now. cops said car theft is up 40% this year`,
-    category: 'crime', neighborhood: 'Tuscany',
-    lat: 51.1305 + j(), lng: -114.2211 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'graffiti on underpass near stampede grounds',
-    description: `new tags on the macleod trail underpass again. this specific crew keeps hitting the same spots. city cleans it and within a week its back. need cameras down here`,
-    category: 'crime', neighborhood: 'Victoria Park',
-    lat: 51.0372 + j(), lng: -114.0502 + j(), name: 'Anonymous', anonymous: true,
-  },
-  {
-    title: 'porch pirate caught on camera - Bridgeland',
-    description: `guy grabbed two packages off our step around 3pm while i was at work. plate on the vehicle was obscured. sharing the clip on the bridgeland facebook group. recognize him?`,
-    category: 'crime', neighborhood: 'Bridgeland',
-    lat: 51.0594 + j(), lng: -114.0419 + j(), name: 'Anna P.', anonymous: false,
+    title: 'Flooding at the underpass after the rain',
+    description: `About a foot of standing water in the right lane. A small car ahead of me turned around rather than chance it. Should drain out once the storm passes, but avoid it for now.`,
+    category: 'infrastructure', neighborhood: 'Inglewood',
+    lat: 51.0404 + j(), lng: -114.0199 + j(),
   },
 ];
 
@@ -254,14 +172,18 @@ async function run() {
     lat: template.lat,
     lng: template.lng,
     timestamp: ts,
-    email: 'anonymous@calgarywatch.app',
-    name: template.name,
-    source_name: template.name,
-    anonymous: template.anonymous,
+    email: 'examples@calgarywatch.ca',
+    name: 'Calgary Watch',
+    source_name: 'Calgary Watch example',
+    anonymous: false,
     verified_status: 'unverified',
     report_count: 1,
-    authorUid: 'community',
-    data_source: 'community',
+    authorUid: 'demo',
+    // Drives the Example badge everywhere an incident renders, and the
+    // exclusion from pulse counts, risk levels and area intelligence.
+    data_source: 'demo',
+    // Examples roll off on their own if the publisher ever stops running.
+    expires_at: Date.now() + 14 * 24 * 60 * 60 * 1000,
   });
 
   await stateRef.set({
@@ -270,7 +192,7 @@ async function run() {
     idx: (idx + 1) % QUEUE.length,
   });
 
-  console.log(`[pulse] Posted slot \${slot}: "\${template.title}" (\${template.neighborhood})`);
+  console.log(`[pulse] Published example \${idx}: "\${template.title}" (\${template.neighborhood})`);
 }
 
 run().catch((err) => {

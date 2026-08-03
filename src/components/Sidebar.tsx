@@ -6,6 +6,7 @@ import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction,
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
+import DemoBadge from '@/src/components/DemoBadge';
 
 interface SidebarProps {
   incidents: Incident[];
@@ -459,6 +460,10 @@ export default function Sidebar({
                                 <div className="flex items-center justify-between gap-2">
                                   <h3 className="text-white text-sm font-bold leading-tight group-hover:text-blue-400 transition-colors light:text-slate-900 line-clamp-2">{incident.title}</h3>
                                   <div className="flex items-center gap-1.5 shrink-0">
+                                    {/* Sample reports are labelled before any other
+                                        source badge — it is the most important thing
+                                        to know about the row. */}
+                                    {incident.data_source === 'demo' && <DemoBadge size="xs" />}
                                     {/* Data-source badge — only for non-community reports */}
                                     {incident.source_type === 'reddit_calgary' && (
                                       <span className="px-1.5 py-0.5 rounded bg-orange-500/20 border border-orange-500/30 text-[8px] font-black text-orange-400 uppercase tracking-tighter">

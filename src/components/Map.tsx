@@ -174,6 +174,20 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       topRow.append(categoryPill, neighborhood);
       content.appendChild(topRow);
 
+      // Sample reports say so in the popup itself — the marker badge alone is
+      // easy to miss once the popup covers it.
+      if (incident.data_source === 'demo') {
+        const demoRow = document.createElement('div');
+        demoRow.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.4);';
+        const dot = document.createElement('span');
+        dot.style.cssText = 'width:5px;height:5px;border-radius:50%;background:#F59E0B;flex:0 0 auto;';
+        const label = document.createElement('span');
+        label.style.cssText = 'font-size:9.5px;font-weight:800;letter-spacing:0.04em;color:#FCD34D;line-height:1.3;';
+        label.textContent = 'Example report — shows how reporting works';
+        demoRow.append(dot, label);
+        content.appendChild(demoRow);
+      }
+
       const title = document.createElement('h3');
       title.className = 'text-sm font-black tracking-tight leading-tight text-white';
       title.textContent = toLabel(incident.title, 'Untitled report');
@@ -749,6 +763,19 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         const badge = document.createElement('div');
         badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#0ea5e9;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:white;line-height:1;z-index:20;';
         badge.textContent = 'C';
+        body.appendChild(badge);
+      }
+
+      // Sample-report treatment: amber corner badge plus a dashed outline, so a
+      // demo pin is distinguishable from a real report at a glance and without
+      // relying on colour alone.
+      if (incident.data_source === 'demo') {
+        body.style.borderStyle = 'dashed';
+        body.style.borderColor = 'rgba(245,158,11,0.95)';
+        const badge = document.createElement('div');
+        badge.style.cssText = 'position:absolute;top:-5px;right:-5px;padding:0 3px;height:13px;border-radius:7px;background:#F59E0B;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;color:#3B2705;line-height:1;letter-spacing:0.04em;z-index:20;';
+        badge.textContent = 'EG';
+        badge.title = 'Example report';
         body.appendChild(badge);
       }
 

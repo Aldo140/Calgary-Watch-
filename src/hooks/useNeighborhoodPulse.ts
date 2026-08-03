@@ -20,6 +20,9 @@ export function useNeighborhoodPulse(incidents: Incident[]): NeighborhoodRisk[] 
     const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
     const counts = new Map<string, number>();
     for (const inc of incidents) {
+      // Example reports illustrate the app; they must never raise a real
+      // neighbourhood's risk level or appear in "3 live reports" style counts.
+      if (inc.data_source === 'demo') continue;
       if (inc.timestamp > twoHoursAgo && inc.deleted !== true && inc.neighborhood) {
         counts.set(inc.neighborhood, (counts.get(inc.neighborhood) ?? 0) + 1);
       }

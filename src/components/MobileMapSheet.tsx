@@ -10,6 +10,7 @@ import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/
 import { cn } from '@/src/lib/utils';
 import { MapRef } from '@/src/components/Map';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
+import DemoBadge from '@/src/components/DemoBadge';
 
 export const SNAP_POINTS = ['80px', 0.38, 0.82] as const;
 export type SnapPoint = (typeof SNAP_POINTS)[number];
@@ -569,6 +570,11 @@ export default function MobileMapSheet({
                               <span className="block font-mono text-[9px] mt-0.5 truncate" style={{ color: P.soft }}>
                                 {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'}
                               </span>
+                              {incident.data_source === 'demo' && (
+                                <span className="mt-1 block">
+                                  <DemoBadge size="xs" />
+                                </span>
+                              )}
                             </span>
                             {isNew && (
                               <span className="shrink-0 rounded px-1.5 py-0.5 text-[7.5px] font-black uppercase" style={{ background: '#2563EB', color: '#fff' }}>New</span>

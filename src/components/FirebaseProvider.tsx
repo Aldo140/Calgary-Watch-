@@ -27,6 +27,44 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Mirror the signed-in user into the `users` collection.
+ *
+ * Runs in the background after auth state is published. Never block rendering
+ * or data subscriptions on this — it is bookkeeping, not something the UI reads
+ * before it can show the map.
+ */
+async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean): Promise<void> {
+  if (!db) return;
+  const userRef = doc(db, 'users', currentUser.uid);
+  try {
+    const existing = await getDoc(userRef);
+    await setDoc(
+      userRef,
+      {
+        uid: currentUser.uid,
+        displayName: currentUser.displayName || 'Anonymous',
+        email: currentUser.email || '',
+        photoURL: currentUser.photoURL || '',
+        role: isApprovedAdmin ? 'admin' : 'user',
+        ...(existing.exists() && existing.data()?.createdAt ? {} : {
+          createdAt: currentUser.metadata.creationTime
+            ? new Date(currentUser.metadata.creationTime).getTime()
+            : Date.now(),
+        }),
+      },
+      { merge: true }
+    );
+  } catch (error: unknown) {
+    const code = error instanceof Error ? (error as { code?: string }).code : undefined;
+    if (code === 'unavailable') {
+      console.warn('Firestore temporarily unavailable while syncing user profile. Retrying automatically when connectivity is restored.');
+    } else {
+      console.error('Error syncing user profile:', error);
+    }
+  }
+}
+
 export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,49 +88,28 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       console.error('Redirect sign-in result error:', error);
     });
 
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        const isApprovedAdmin = isApprovedAdminEmail(currentUser.email);
-        if (!db) {
-          console.error("Firestore is not initialized.");
-          return;
-        }
-        const userRef = doc(db, 'users', currentUser.uid);
-        try {
-          const role = isApprovedAdmin ? 'admin' : 'user';
-          const existing = await getDoc(userRef);
-          await setDoc(
-            userRef,
-            {
-              uid: currentUser.uid,
-              displayName: currentUser.displayName || 'Anonymous',
-              email: currentUser.email || '',
-              photoURL: currentUser.photoURL || '',
-              role,
-              ...(existing.exists() && existing.data()?.createdAt ? {} : {
-                createdAt: currentUser.metadata.creationTime
-                  ? new Date(currentUser.metadata.creationTime).getTime()
-                  : Date.now(),
-              }),
-            },
-            { merge: true }
-          );
-        } catch (error: unknown) {
-          const code = error instanceof Error ? (error as { code?: string }).code : undefined;
-          if (code === 'unavailable') {
-            console.warn('Firestore temporarily unavailable while syncing user profile. Retrying automatically when connectivity is restored.');
-          } else {
-            console.error('Error syncing user profile:', error);
-          }
-        }
-        setIsAdmin(isApprovedAdmin);
-      } else {
-        setIsAdmin(false);
-      }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const isApprovedAdmin = currentUser ? isApprovedAdminEmail(currentUser.email) : false;
+
+      // Publish auth state IMMEDIATELY.
+      //
+      // This used to happen only after awaiting a getDoc + setDoc profile sync.
+      // Because the incidents listener in MapPage is gated on isAuthReady, that
+      // made the whole map wait on two Firestore round-trips for signed-in
+      // users — and since Firestore retries a stalled request indefinitely
+      // rather than throwing, a flaky mobile connection could leave
+      // isAuthReady false forever and incidents would never load at all.
+      setIsAdmin(isApprovedAdmin);
       setUser(currentUser);
       setLoading(false);
       setIsAuthReady(true);
       setIsSigningIn(false);
+
+      // Profile sync is best-effort and deliberately not awaited — nothing the
+      // user sees depends on it completing.
+      if (currentUser && db) {
+        void syncUserProfile(currentUser, isApprovedAdmin);
+      }
     });
 
     return () => unsubscribe();

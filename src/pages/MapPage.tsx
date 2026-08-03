@@ -752,6 +752,10 @@ export default function MapPage() {
   }, [searchParams, isAuthReady, user, openAuthPanel, setSearchParams]);
 
 
+  // Upper bound on the skeleton only. The incidents listener clears isLoading
+  // as soon as the first snapshot lands, so a fast connection never waits the
+  // full 1.5s — this is just the fallback for when Firestore is slow or the
+  // build has no Firebase config at all.
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
@@ -807,6 +811,7 @@ export default function MapPage() {
       setFirebaseIncidents([]);
       setHasMoreIncidents(false);
       lastVisibleIncidentDoc.current = null;
+      setIsLoading(false);
       return;
     }
 
@@ -856,10 +861,14 @@ export default function MapPage() {
       });
       hasInitializedIncidents.current = true;
       knownIncidentIds.current = new Set(incidentData.map((i) => i.id));
+      // Data is on screen — drop the skeleton now rather than waiting out the
+      // 1.5s fallback timer.
+      setIsLoading(false);
     }, (error) => {
       console.error('Failed to subscribe to incidents:', error);
       // Show an empty map rather than stale/fake data on error.
       setFirebaseIncidents([]);
+      setIsLoading(false);
     });
 
     return () => unsubscribe();

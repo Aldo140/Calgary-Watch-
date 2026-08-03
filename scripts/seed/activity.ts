@@ -16,6 +16,7 @@
  *   - Nothing that would change how a resident judges a real block's safety.
  */
 
+import { pathToFileURL } from 'node:url';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
@@ -138,9 +139,31 @@ const QUEUE = [
   },
 ];
 
+/**
+ * Choose which slot to publish, given the current Calgary hour and the slots
+ * already published today.
+ *
+ * The caller used to pass a slot index derived from an exact UTC hour match in
+ * the workflow. GitHub routinely delays scheduled runs by tens of minutes, so
+ * the hour never matched, every run fell through to the evening slot, and the
+ * evening slot then failed its own "too early" check — the job skipped silently
+ * and exited 0 for sixteen days.
+ *
+ * Deriving it here instead is delay-proof: publish the most recent slot whose
+ * time has arrived and that has not gone out yet. A late run still publishes,
+ * and a run that misses a slot entirely catches up on the next one.
+ *
+ * @returns the slot index to publish, or null when there is nothing due.
+ */
+export function selectSlot(hour: number, publishedToday: number[]): number | null {
+  const due = SLOTS
+    .map((startHour, index) => ({ startHour, index }))
+    .filter(({ startHour, index }) => hour >= startHour && !publishedToday.includes(index));
+  return due.length ? due[due.length - 1].index : null;
+}
+
 async function run() {
   const db = initFirebase();
-  const slot = parseInt(process.argv[2] ?? '0', 10);
 
   const stateRef = db.collection('meta').doc('pulse');
   const today = todayMDT();
@@ -150,13 +173,9 @@ async function run() {
   const state = snap.exists ? snap.data()! : { date: '', slots: [], idx: 0 };
   const slots: number[] = state.date === today ? (state.slots as number[] ?? []) : [];
 
-  if (slots.includes(slot)) {
-    console.log(`[pulse] Slot \${slot} already ran today — skipping.`);
-    return;
-  }
-
-  if (hour < SLOTS[slot]) {
-    console.log(`[pulse] Too early for slot \${slot} (need \${SLOTS[slot]}h MDT, got \${hour}h) — skipping.`);
+  const slot = selectSlot(hour, slots);
+  if (slot === null) {
+    console.log(`[pulse] Nothing due at ${hour}h MDT (published today: [${slots.join(', ')}]) — skipping.`);
     return;
   }
 
@@ -192,10 +211,18 @@ async function run() {
     idx: (idx + 1) % QUEUE.length,
   });
 
-  console.log(`[pulse] Published example \${idx}: "\${template.title}" (\${template.neighborhood})`);
+  console.log(`[pulse] Published example ${idx} (slot ${slot}, ${hour}h MDT): "${template.title}" — ${template.neighborhood}`);
 }
 
-run().catch((err) => {
-  console.error('[pulse] Error:', err);
-  process.exit(1);
-});
+// Only publish when executed directly. Importing this module — which the slot
+// scheduling tests do — must never hit Firestore or require credentials.
+const executedDirectly =
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (executedDirectly) {
+  run().catch((err) => {
+    console.error('[pulse] Error:', err);
+    process.exit(1);
+  });
+}

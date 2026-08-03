@@ -24,7 +24,7 @@ import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.j
 import { fetchRedditCalgary } from './sources/reddit.js';
 import { fetchNewsFeedsCalgary } from './sources/rss.js';
 import { fetchEnvironmentCanadaEnhanced } from './sources/environment-canada-enhanced.js';
-import { fetchCalgary311Crime } from './sources/calgary-311-crime.js';
+import { fetchCalgary311Crime } from './sources/calgary-311.js';
 import type { NormalizedIncident } from './types.js';
 
 // ---------------------------------------------------------------------------

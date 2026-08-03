@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
@@ -10,15 +10,7 @@ if (typeof window !== 'undefined') {
 }
 import { CALGARY_CENTER } from '@/src/constants';
 import { Incident } from '@/src/types';
-import type { OutageGroup, PowerOutage } from '@/src/types/powerOutage';
 import { cn } from '@/src/lib/utils';
-import { OUTAGE_GROUP_STYLES, classifyOutage, formatOutageTime } from '@/src/lib/powerOutages';
-import {
-  createOutageClusterIcon,
-  createOutageIcon,
-  createOutagePopupContent,
-  outageMarkerLabel,
-} from '@/src/lib/powerOutageMarkers';
 
 interface MapProps {
   incidents: Incident[];
@@ -35,25 +27,7 @@ interface MapProps {
   showCrimeLayer?: boolean;
   crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
   isMapInteractive?: boolean;
-  // ── Official ENMAX power-outage layer ─────────────────────────────────────
-  /** Normalized outages from /api/power-outages. Never written to Firestore. */
-  powerOutages?: PowerOutage[];
-  showPowerOutages?: boolean;
-  /** Which of the three outage classifications should render. */
-  outageGroupFilter?: Record<OutageGroup, boolean>;
-  /** ISO timestamp of the last successful ENMAX fetch. */
-  outagesUpdatedAt?: string | null;
-  outagesLoading?: boolean;
-  /** User-safe message; presence switches the status chip into its error state. */
-  outagesError?: string | null;
-  onRetryOutages?: () => void;
 }
-
-const ALL_OUTAGE_GROUPS: Record<OutageGroup, boolean> = {
-  active_unplanned: true,
-  active_planned: true,
-  upcoming_planned: true,
-};
 
 export interface MapRef {
   flyTo: (lat: number, lng: number, zoom?: number) => void;
@@ -71,7 +45,7 @@ export interface MapRef {
   clearUserLocation: () => void;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats, isMapInteractive = true, powerOutages, showPowerOutages = false, outageGroupFilter = ALL_OUTAGE_GROUPS, outagesUpdatedAt = null, outagesLoading = false, outagesError = null, onRetryOutages }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats, isMapInteractive = true }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
@@ -84,10 +58,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const incidentsRef = useRef<Incident[]>(incidents);
   const choroplethLayer = useRef<L.GeoJSON | null>(null);
   const communityGeoJson = useRef<any>(null);
-  // The outage layer gets its own cluster group so official ENMAX pins never
-  // merge into community-report clusters.
-  const outageClusterGroup = useRef<any>(null);
-  const outageMarkers = useRef<{ [id: string]: L.Marker }>({});
   const userLocationMarker = useRef<L.Marker | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isHeatPluginReady, setIsHeatPluginReady] = useState(false);
@@ -346,9 +316,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       }
       clusterGroup.current?.remove();
       clusterGroup.current = null;
-      outageClusterGroup.current?.remove();
-      outageClusterGroup.current = null;
-      outageMarkers.current = {};
       map.current?.remove();
       map.current = null;
     };
@@ -491,102 +458,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     });
     clusterGroup.current.addTo(map.current);
   }, [isMapLoaded]);
-
-  // Dedicated cluster group for the official ENMAX outage layer. Mirrors the
-  // incident cluster settings so zoom/spiderfy behaviour feels identical.
-  useEffect(() => {
-    if (!map.current || !isMapLoaded) return;
-    if (outageClusterGroup.current) return;
-
-    const lAny = L as any;
-    if (typeof lAny.markerClusterGroup !== 'function') return;
-
-    outageClusterGroup.current = lAny.markerClusterGroup({
-      iconCreateFunction: (cluster: any) => {
-        const children = cluster.getAllChildMarkers();
-        const hasUnplanned = children.some((m: any) => m.cwOutageGroup === 'active_unplanned');
-        return createOutageClusterIcon(cluster.getChildCount(), hasUnplanned);
-      },
-      maxClusterRadius: 48,
-      zoomToBoundsOnClick: true,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      animate: true,
-      disableClusteringAtZoom: 17,
-    });
-    outageClusterGroup.current.addTo(map.current);
-  }, [isMapLoaded]);
-
-  // Render the ENMAX outage markers.
-  //
-  // Rebuilt wholesale on change: the feed is small (tens of records) and each
-  // marker's icon depends on its live classification, which can flip as a
-  // planned outage's start time passes. Keyed by ENMAX incidentID so a refresh
-  // that returns the same outages never produces duplicates.
-  useEffect(() => {
-    if (!map.current || !isMapLoaded) return;
-
-    const clearOutageMarkers = () => {
-      Object.values(outageMarkers.current).forEach((marker) => {
-        if (outageClusterGroup.current) outageClusterGroup.current.removeLayer(marker);
-        else marker.remove();
-      });
-      outageMarkers.current = {};
-    };
-
-    clearOutageMarkers();
-
-    if (!showPowerOutages || !powerOutages?.length) return;
-
-    const now = Date.now();
-
-    powerOutages.forEach((outage) => {
-      const group = classifyOutage(outage, now);
-      if (!group || !outageGroupFilter[group]) return;
-
-      const lat = Number(outage.latitude);
-      const lng = Number(outage.longitude);
-      if (!isFinite(lat) || !isFinite(lng)) return;
-
-      try {
-        const marker = L.marker([lat, lng], {
-          icon: createOutageIcon(group),
-          // Official data sits above community pins so it is never hidden.
-          zIndexOffset: 500,
-          keyboard: true,
-        });
-
-        (marker as any).cwOutageGroup = group;
-
-        marker.bindPopup(() => createOutagePopupContent(outage, group, outagesUpdatedAt), {
-          closeButton: true,
-          className: 'custom-leaflet-popup',
-          offset: [0, -8],
-          maxWidth: 340,
-        });
-
-        // Leaflet owns the focusable element, so the accessible name has to be
-        // applied to it after the marker joins the map.
-        const label = outageMarkerLabel(outage, group);
-        marker.on('add', () => {
-          const el = marker.getElement();
-          if (!el) return;
-          el.setAttribute('role', 'button');
-          el.setAttribute('aria-label', label);
-          el.setAttribute('title', label);
-        });
-
-        if (outageClusterGroup.current) outageClusterGroup.current.addLayer(marker);
-        else marker.addTo(map.current!);
-
-        outageMarkers.current[outage.id] = marker;
-      } catch (err) {
-        console.error('Error adding outage marker to map:', err);
-      }
-    });
-
-    return clearOutageMarkers;
-  }, [powerOutages, showPowerOutages, outageGroupFilter, outagesUpdatedAt, isMapLoaded]);
 
   // No Leaflet dragging.disable() here — the form modal's fixed inset-0 backdrop
   // already intercepts all touch/pointer events when the form is open, so we never
@@ -974,26 +845,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     }
   }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded, isHeatPluginReady]);
 
-  // Per-classification counts for the outage status chip / legend.
-  const outageSummary = useMemo(() => {
-    const counts: Record<OutageGroup, number> = {
-      active_unplanned: 0,
-      active_planned: 0,
-      upcoming_planned: 0,
-    };
-    const now = Date.now();
-    (powerOutages ?? []).forEach((outage) => {
-      const group = classifyOutage(outage, now);
-      if (group) counts[group] += 1;
-    });
-    const groups = Object.keys(counts) as OutageGroup[];
-    return {
-      counts,
-      total: groups.reduce((sum, g) => sum + counts[g], 0),
-      visible: groups.reduce((sum, g) => sum + (outageGroupFilter[g] ? counts[g] : 0), 0),
-    };
-  }, [powerOutages, outageGroupFilter]);
-
   return (
     <div className="relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center bg-slate-100">
       <div ref={mapContainer} className="absolute inset-0 w-full h-full z-0" />
@@ -1042,98 +893,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
                 <p className="hidden lg:block mt-1.5 text-[9px] text-slate-500 font-medium">
                   311 + community reports · tap a community for full intel
                 </p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ENMAX outage layer status — subtle, layer-level only. Never blocks the
-          rest of Calgary Watch, and never animates beyond a one-off spinner. */}
-      {showPowerOutages && isMapLoaded && (
-        <div className="absolute z-20 left-3 right-3 lg:left-4 lg:right-auto max-lg:bottom-[calc(13.5rem+env(safe-area-inset-bottom))] lg:top-4 lg:bottom-auto lg:w-60">
-          <div
-            className="rounded-2xl px-3.5 py-2.5 shadow-xl backdrop-blur-xl"
-            style={{ background: 'rgba(255,253,248,0.94)', border: '1px solid #E7E0D2' }}
-            role="status"
-            aria-live="polite"
-          >
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B45309" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
-              </svg>
-              <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.18em] text-slate-600">
-                ENMAX power outages
-              </p>
-            </div>
-
-            {outagesError && outageSummary.total === 0 ? (
-              <div>
-                <p className="text-[10.5px] font-semibold text-slate-800 leading-snug">
-                  ENMAX outage information is temporarily unavailable.
-                </p>
-                {onRetryOutages && (
-                  <button
-                    type="button"
-                    onClick={onRetryOutages}
-                    className="mt-1.5 rounded-lg px-2.5 py-1 text-[10px] font-bold text-white bg-slate-800 hover:bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 transition-colors"
-                  >
-                    Retry
-                  </button>
-                )}
-              </div>
-            ) : outagesLoading && outageSummary.total === 0 ? (
-              <div className="flex items-center gap-2 py-0.5">
-                <span className="h-3 w-3 rounded-full border-2 border-[#B45309] border-t-transparent animate-spin" aria-hidden="true" />
-                <p className="text-[10.5px] font-semibold text-slate-700">Checking ENMAX…</p>
-              </div>
-            ) : outageSummary.total === 0 ? (
-              <p className="text-[10.5px] font-semibold text-slate-700">No current ENMAX outages found</p>
-            ) : (
-              <>
-                <ul className="flex flex-col gap-1">
-                  {(Object.keys(OUTAGE_GROUP_STYLES) as OutageGroup[]).map((group) => {
-                    const style = OUTAGE_GROUP_STYLES[group];
-                    const active = outageGroupFilter[group];
-                    return (
-                      <li
-                        key={group}
-                        className={cn('flex items-center gap-1.5', !active && 'opacity-40')}
-                      >
-                        <span
-                          className="h-2.5 w-2.5 rounded-[3px] shrink-0"
-                          style={
-                            style.shape === 'dashed'
-                              ? { border: `1.5px dashed ${style.color}`, background: '#fff' }
-                              : style.shape === 'ringed'
-                                ? { background: style.color, boxShadow: `inset 0 0 0 1px #fff` }
-                                : { background: style.color }
-                          }
-                          aria-hidden="true"
-                        />
-                        <span className="text-[9.5px] font-bold text-slate-700 flex-1">{style.label}</span>
-                        <span className="text-[9.5px] font-mono font-bold text-slate-500">
-                          {outageSummary.counts[group]}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <p className="mt-1.5 text-[9px] font-medium text-slate-500">
-                  {outagesUpdatedAt
-                    ? `ENMAX outages updated ${formatOutageTime(outagesUpdatedAt)}`
-                    : 'Awaiting first ENMAX refresh'}
-                  {outagesError ? ' · showing last known data' : ''}
-                </p>
-                {outagesError && onRetryOutages && (
-                  <button
-                    type="button"
-                    onClick={onRetryOutages}
-                    className="mt-1 rounded-lg px-2 py-0.5 text-[9.5px] font-bold text-slate-700 underline underline-offset-2 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
-                  >
-                    Retry now
-                  </button>
-                )}
               </>
             )}
           </div>

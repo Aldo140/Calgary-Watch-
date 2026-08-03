@@ -27,7 +27,8 @@ export type SourceType =
   | 'calgary_police_crime'
   | 'calgary_infrastructure'
   | 'edmonton_open_data'
-  | 'alberta_statcan_crime';
+  | 'alberta_statcan_crime'
+  | 'enmax_power_outage';
 
 export const CATEGORY_ICONS = {
   crime: AlertCircle,

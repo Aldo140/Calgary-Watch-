@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import { isDemoIncident } from '../src/types/index.js';
+import { selectSlot } from '../scripts/seed/activity.js';
 import { useNeighborhoodPulse } from '../src/hooks/useNeighborhoodPulse.js';
 
 const ACTIVITY_SRC = readFileSync('scripts/seed/activity.ts', 'utf8');
@@ -49,6 +50,38 @@ describe('example report publisher', () => {
   it('demonstrates more than one category', () => {
     const categories = new Set([...QUEUE_SRC.matchAll(/category: '(\w+)'/g)].map((m) => m[1]));
     assert.ok(categories.size >= 3, `expected varied categories, got ${[...categories].join(', ')}`);
+  });
+});
+
+describe('selectSlot — publisher scheduling', () => {
+  // SLOTS = [7, 13, 20] (Calgary hours)
+  it('publishes nothing before the first slot', () => {
+    assert.equal(selectSlot(6, []), null);
+  });
+
+  it('publishes the morning slot once 7h passes', () => {
+    assert.equal(selectSlot(7, []), 0);
+    assert.equal(selectSlot(12, []), 0);
+  });
+
+  it('publishes a LATE run rather than skipping it', () => {
+    // The regression: a 19:00 UTC cron fired at 20:11, the workflow mapped it
+    // to the evening slot, and the "too early" guard skipped it. Every run.
+    assert.equal(selectSlot(14, [0]), 1, 'afternoon slot is still due at 14h');
+  });
+
+  it('catches up when an earlier slot was missed entirely', () => {
+    // Nothing went out all day; at 20h the evening slot publishes.
+    assert.equal(selectSlot(20, []), 2);
+  });
+
+  it('never republishes a slot already sent today', () => {
+    assert.equal(selectSlot(21, [0, 1, 2]), null);
+    assert.equal(selectSlot(21, [2]), 1, 'an earlier unsent slot still counts');
+  });
+
+  it('picks the most recent due slot, not the oldest', () => {
+    assert.equal(selectSlot(20, [0]), 2);
   });
 });
 

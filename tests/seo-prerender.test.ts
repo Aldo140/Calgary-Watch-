@@ -7,7 +7,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { renderRouteHtml, escapeAttr, escapeJsonLd, upsertMeta } from '../scripts/seo/rewriteHtml.js';
+import {
+  renderRouteHtml,
+  escapeAttr,
+  escapeJsonLd,
+  outputPathForRoute,
+  upsertMeta,
+} from '../scripts/seo/rewriteHtml.js';
 import { PRERENDER_ROUTES, PRODUCTION_ORIGIN, ROUTE_SEO } from '../src/lib/seo.js';
 
 /** Mirrors the real index.html, including its multi-line meta tags. */
@@ -86,6 +92,26 @@ describe('renderRouteHtml', () => {
   it('only prerenders indexable routes — /admin is excluded', () => {
     assert.ok(!PRERENDER_ROUTES.includes('/admin'));
     assert.equal(ROUTE_SEO['/admin'].index, false);
+  });
+});
+
+describe('outputPathForRoute', () => {
+  it('writes flat .html files, not directories', () => {
+    // A dist/map/ directory makes Firebase 301 /map -> /map/, which contradicts
+    // the canonical URL and the sitemap. Flat files + cleanUrls avoid that.
+    assert.equal(outputPathForRoute('/map'), 'map.html');
+    assert.equal(outputPathForRoute('/about'), 'about.html');
+    assert.equal(outputPathForRoute('/coverage'), 'coverage.html');
+  });
+
+  it('maps the root route onto index.html', () => {
+    assert.equal(outputPathForRoute('/'), 'index.html');
+  });
+
+  it('never emits a path ending in a slash', () => {
+    for (const route of PRERENDER_ROUTES) {
+      assert.doesNotMatch(outputPathForRoute(route), /\/$/);
+    }
   });
 });
 

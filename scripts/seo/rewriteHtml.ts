@@ -13,6 +13,20 @@ import {
   pageUrlFor,
 } from '../../src/lib/seo.js';
 
+/**
+ * Where a route's static HTML is written, relative to dist/.
+ *
+ * Flat `<route>.html` rather than `<route>/index.html` on purpose: a directory
+ * makes Firebase Hosting 301-redirect /map to /map/, which contradicts the
+ * canonical URL and the sitemap. With `cleanUrls: true` Firebase serves
+ * map.html at /map with no redirect, and GitHub Pages resolves extensionless
+ * URLs to the matching .html file natively.
+ */
+export function outputPathForRoute(route: string): string {
+  if (route === '/') return 'index.html';
+  return `${route.replace(/^\//, '').replace(/\/$/, '')}.html`;
+}
+
 /** Escape a string for safe use inside a double-quoted HTML attribute. */
 export function escapeAttr(value: string): string {
   return value

@@ -24,8 +24,6 @@ import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.j
 import { fetchRedditCalgary } from './sources/reddit.js';
 import { fetchNewsFeedsCalgary } from './sources/rss.js';
 import { fetchEnvironmentCanadaEnhanced } from './sources/environment-canada-enhanced.js';
-import { fetchCalgaryPoliceData } from './sources/calgary-police.js';
-import { fetchCalgaryInfrastructureAlerts } from './sources/calgary-infrastructure.js';
 import type { NormalizedIncident } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -119,15 +117,13 @@ async function run(): Promise<void> {
   const db = initFirebase();
 
   // 2. Fetch all sources in parallel (failures are isolated).
-  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced, cpsData, infrastructure] = await Promise.allSettled([
+  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced] = await Promise.allSettled([
     fetchEnvironmentCanadaAlerts(),
     fetch511AlbertaEvents(),
     fetchAlbertaEmergencyAlerts(),
     fetchRedditCalgary(),
     fetchNewsFeedsCalgary(),
     fetchEnvironmentCanadaEnhanced(),
-    fetchCalgaryPoliceData(),
-    fetchCalgaryInfrastructureAlerts(),
   ]);
 
   const allIncidents: NormalizedIncident[] = [];
@@ -174,19 +170,7 @@ async function run(): Promise<void> {
     console.error('[ingest] Environment Canada Enhanced failed:', ecEnhanced.reason);
   }
 
-  if (cpsData.status === 'fulfilled') {
-    console.log(`[ingest] Calgary Police Service: ${cpsData.value.length} incident(s).`);
-    allIncidents.push(...cpsData.value);
-  } else {
-    console.error('[ingest] Calgary Police Service failed:', cpsData.reason);
-  }
 
-  if (infrastructure.status === 'fulfilled') {
-    console.log(`[ingest] Calgary Infrastructure: ${infrastructure.value.length} alert(s).`);
-    allIncidents.push(...infrastructure.value);
-  } else {
-    console.error('[ingest] Calgary Infrastructure failed:', infrastructure.reason);
-  }
 
   // 3. Prune expired system incidents (targeted query, not a full-collection scan).
   const pruned = await pruneExpired(db);

@@ -24,6 +24,7 @@ import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.j
 import { fetchRedditCalgary } from './sources/reddit.js';
 import { fetchNewsFeedsCalgary } from './sources/rss.js';
 import { fetchEnvironmentCanadaEnhanced } from './sources/environment-canada-enhanced.js';
+import { fetchCalgary311Crime } from './sources/calgary-311-crime.js';
 import type { NormalizedIncident } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -117,16 +118,24 @@ async function run(): Promise<void> {
   const db = initFirebase();
 
   // 2. Fetch all sources in parallel (failures are isolated).
-  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced] = await Promise.allSettled([
+  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced, calgaryCrime] = await Promise.allSettled([
     fetchEnvironmentCanadaAlerts(),
     fetch511AlbertaEvents(),
     fetchAlbertaEmergencyAlerts(),
     fetchRedditCalgary(),
     fetchNewsFeedsCalgary(),
     fetchEnvironmentCanadaEnhanced(),
+    fetchCalgary311Crime(),
   ]);
 
   const allIncidents: NormalizedIncident[] = [];
+
+  if (calgaryCrime.status === 'fulfilled') {
+    console.log(`[ingest] Calgary 311 property crime: ${calgaryCrime.value.length} report(s).`);
+    allIncidents.push(...calgaryCrime.value);
+  } else {
+    console.error('[ingest] Calgary 311 property crime failed:', calgaryCrime.reason);
+  }
 
   if (ecAlerts.status === 'fulfilled') {
     console.log(`[ingest] Environment Canada: ${ecAlerts.value.length} alert(s).`);

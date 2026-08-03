@@ -25,6 +25,7 @@ import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipa
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
+import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -91,16 +92,42 @@ const FALLBACK_NEIGHBORHOODS = [
 // Returns the suburb / neighbourhood string from the structured address, or ''.
 // Called at profile-save time so results are stored — not on every report view.
 // ---------------------------------------------------------------------------
+async function geocodeOnce(query: string) {
+  const q = encodeURIComponent(`${query}, Calgary, Alberta, Canada`);
+  const res = await fetch(
+    `https://nominatim.openstreetmap.org/search?q=${q}&format=json&addressdetails=1&limit=1&countrycodes=ca`,
+    { headers: { 'User-Agent': 'CalgaryWatch/1.0 (community-safety-app)' } }
+  );
+  if (!res.ok) return null;
+  const data: Array<{ address: Record<string, string>; lat?: string; lon?: string }> = await res.json();
+  return data[0] ?? null;
+}
+
 async function geocodeToCalgarySuburb(address: string): Promise<string> {
   try {
-    const q = encodeURIComponent(`${address.trim()}, Calgary, Alberta, Canada`);
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${q}&format=json&addressdetails=1&limit=1&countrycodes=ca`,
-      { headers: { 'User-Agent': 'CalgaryWatch/1.0 (community-safety-app)' } }
-    );
-    if (!res.ok) return '';
-    const data: Array<{ address: Record<string, string> }> = await res.json();
-    const addr = data[0]?.address;
+    const raw = address.trim();
+    const normalized = normalizeCalgaryAddress(raw);
+
+    // Ordinal-stripped form first — the geocoder fails outright on "16th Ave"
+    // but resolves "16 Ave". Fall back to what the user typed if that misses.
+    let hit = await geocodeOnce(normalized);
+    if (!hit && normalized !== raw) hit = await geocodeOnce(raw);
+    if (!hit) return '';
+
+    // Prefer the authoritative answer: which City of Calgary community polygon
+    // actually contains this point. That name is the exact key crime stats and
+    // the choropleth use, so the area report can look it up with no guessing.
+    // Nominatim's own suburb label is only a fallback — it comes from a
+    // different dataset and often disagrees with the City's community names.
+    const lat = Number(hit.lat);
+    const lng = Number(hit.lon);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      const boundaries = await fetchCommunityBoundaries();
+      const community = findCommunityAt(lat, lng, boundaries);
+      if (community) return community;
+    }
+
+    const addr = hit.address;
     if (!addr) return '';
     // Nominatim returns Calgary communities under suburb or neighbourhood
     return (addr.suburb || addr.neighbourhood || addr.city_district || addr.quarter || '').trim();
@@ -700,14 +727,29 @@ export default function MapPage() {
         weeklyDigestOptIn: profile.weeklyDigestOptIn === true,
       });
 
-      // Back-fill inferredNeighborhood for existing users who saved before geocoding was added
-      if (profile.address && !profile.inferredNeighborhood && db) {
+      // Resolve inferredNeighborhood from the saved address.
+      //
+      // Also re-resolves values stored before community lookup was polygon-based:
+      // those came from Nominatim's suburb label, which frequently is not a real
+      // City of Calgary community name and so never matched the crime stats.
+      // Anything that isn't a recognised community gets geocoded again and
+      // written back, so the fix reaches existing users, not just new ones.
+      if (profile.address && db) {
         const dbRef = db;
-        geocodeToCalgarySuburb(profile.address).then((geocoded) => {
-          if (geocoded) {
+        const savedAddress = profile.address;
+        const stored = (profile.inferredNeighborhood || '').trim().toLowerCase();
+        void (async () => {
+          if (stored) {
+            const boundaries = await fetchCommunityBoundaries();
+            // Empty list means the boundary fetch failed — leave the stored
+            // value alone rather than churning it on a network blip.
+            if (!boundaries.length || boundaries.some((b) => b.name === stored)) return;
+          }
+          const geocoded = await geocodeToCalgarySuburb(savedAddress);
+          if (geocoded && geocoded.toLowerCase() !== stored) {
             setDoc(doc(dbRef, 'users', user.uid), { inferredNeighborhood: geocoded.slice(0, 80) }, { merge: true }).catch(() => {});
           }
-        });
+        })();
       }
     }, (error) => {
       console.error('Failed to load user profile:', error);

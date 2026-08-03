@@ -1,0 +1,25 @@
+name: Restore Mislabelled Reports
+
+# Manual only. Restores community reports that were wrongly tagged as examples.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'List matches without writing'
+        type: boolean
+        default: true
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/seed/restore-mislabelled.ts ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

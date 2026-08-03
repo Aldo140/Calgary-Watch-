@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/src/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
+import DemoBadge from '@/src/components/DemoBadge';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 
@@ -322,6 +323,27 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     className="w-full rounded-2xl object-cover max-h-64"
                     style={{ border: `1px solid ${P.line}` }}
                   />
+                </div>
+              )}
+
+              {/* Sample reports are called out before the source ledger — the
+                  detail panel is where someone goes to decide whether to act on
+                  a report, so it must be unmissable here. */}
+              {incident.data_source === 'demo' && (
+                <div
+                  className="rounded-2xl p-3.5 space-y-2"
+                  style={{
+                    backgroundImage: 'repeating-linear-gradient(135deg, rgba(180,83,9,0.10) 0 4px, transparent 4px 9px)',
+                    backgroundColor: 'rgba(245,158,11,0.10)',
+                    border: '1px solid rgba(180,83,9,0.42)',
+                  }}
+                >
+                  <DemoBadge size="md" />
+                  <p className="text-[11.5px] font-medium leading-relaxed" style={{ color: '#7A6642' }}>
+                    Calgary Watch publishes a small number of example reports to show how reporting
+                    works. This is not a real incident, nobody submitted it, and it is excluded from
+                    every safety score, count and neighbourhood statistic.
+                  </p>
                 </div>
               )}
 

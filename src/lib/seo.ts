@@ -1,4 +1,8 @@
 import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
+import {
+  AIRDRIE_GUIDE_FAQS,
+  AIRDRIE_GUIDE_PATH,
+} from '@/src/content/airdrieCrimeMapGuide';
 
 /**
  * Single source of truth for per-route SEO.
@@ -58,9 +62,9 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/coverage': {
-    title: 'Airdrie Crime Map & Calgary Area Coverage | Calgary Watch',
+    title: 'Calgary Area Safety Map Coverage | Calgary Watch',
     description:
-      'See crime and community incident coverage for Airdrie, Calgary, Cochrane, Okotoks, Chestermere and 25+ nearby communities on one free live map.',
+      'See where Calgary Watch can accept or display community and public-source incident reports across Calgary, Airdrie, Cochrane, Okotoks and nearby communities.',
     index: true,
     pageType: 'CollectionPage',
     dateModified: LAST_MOD,
@@ -70,6 +74,15 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     title: 'Calgary Neighbourhood Watch Guide | Crime Map & Reporting',
     description:
       'Check recent incidents near you, understand Calgary crime-map sources, learn how Block Watch differs, and choose 911 or police non-emergency when needed.',
+    index: true,
+    pageType: 'WebPage',
+    dateModified: LAST_MOD,
+    image: DEFAULT_IMAGE,
+  },
+  '/airdrie-crime-map': {
+    title: 'Airdrie Crime Map: Community Reports & Official Sources',
+    description:
+      'View recent Airdrie-area community reports, compare the official City of Airdrie crime map, and find the correct RCMP emergency and non-emergency contacts.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
@@ -101,6 +114,10 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
   '/calgary-neighbourhood-watch': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
     { name: 'Calgary Neighbourhood Watch Guide', item: `${PRODUCTION_ORIGIN}/calgary-neighbourhood-watch` },
+  ],
+  '/airdrie-crime-map': [
+    { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
+    { name: 'Airdrie Crime Map Guide', item: `${PRODUCTION_ORIGIN}/airdrie-crime-map` },
   ],
 };
 
@@ -170,6 +187,23 @@ export function buildPageJsonLd(pathname: string, origin: string): object {
             },
           })),
         }
+      : pathname === AIRDRIE_GUIDE_PATH
+        ? {
+            about: [
+              'Airdrie crime map',
+              'Airdrie community reports',
+              'Airdrie RCMP reporting',
+              'Airdrie police non-emergency contact',
+            ],
+            mainEntity: AIRDRIE_GUIDE_FAQS.map((faq) => ({
+              '@type': 'Question',
+              name: faq.question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: faq.answer,
+              },
+            })),
+          }
       : {}),
   };
 }

@@ -45,28 +45,28 @@ const COMMUNITIES = [
 
 const FAQS = [
   {
-    q: 'Is Calgary safe?',
-    a: "Calgary consistently ranks among Canada's safer major cities by Crime Severity Index. Property crime — vehicle theft, break-and-enter, and residential theft — is the most common category. Violent crime is significantly lower than many comparable cities. That said, incident hotspots exist around transit corridors, downtown entertainment areas, and certain suburban zones. Calgary Watch lets you see current conditions in your specific neighbourhood rather than relying on city-wide annual averages.",
+    q: 'Which communities does Calgary Watch cover?',
+    a: 'The map is designed to accept and display relevant reports across Calgary and nearby communities including Airdrie, Cochrane, Chestermere, Okotoks, Strathmore, High River, Canmore, and communities in Rocky View and Foothills counties. Coverage does not mean every place has a current report.',
   },
   {
-    q: 'What is the crime rate in Calgary?',
-    a: "Calgary's Crime Severity Index has fluctuated in recent years, with property crime rising alongside population growth. The downtown core, Beltline, Forest Lawn, and parts of the northeast have historically higher incident density. Newer suburban communities in the NW, SW, and south tend to have lower property crime rates. Calgary Watch surfaces community-reported incidents alongside official open data, so you can track your specific area's trend over days and weeks — not just annual statistics.",
+    q: 'Does map coverage mean an area currently has incidents?',
+    a: 'No. Coverage describes where the map can accept or display relevant reports. A community may have no markers in the selected time window, and marker count should not be treated as a crime rate.',
   },
   {
-    q: 'What are the most dangerous neighbourhoods in Calgary?',
-    a: "Incident density on Calgary Watch tends to concentrate around the downtown core (especially along 17 Ave and Centre Street corridors), Forest Lawn in the NE, and parts of the NW industrial zones. These patterns shift over time and by category — vehicle break-ins may spike in one area while residential crime rises elsewhere. Open the live map and filter by category to see current hotspots.",
+    q: 'Is Calgary Watch free to use?',
+    a: 'Yes. Anyone can browse the public map without an account. A free account is required only to submit a community report.',
   },
   {
     q: 'How do I report a crime or incident in Calgary?',
-    a: "For emergencies, always call 911 first. For non-emergency police matters in Calgary, contact Calgary Police Service at 403-266-1234 or submit online at Calgary Police. You can also submit a community report on Calgary Watch to alert your neighbours instantly — your identity can be kept fully anonymous, and your report appears on the live map within 30 seconds.",
+    a: 'Call 911 for an emergency or crime in progress. For a Calgary police matter that is not in progress, call Calgary Police non-emergency at 403-266-1234. A Calgary Watch community post can inform neighbours, but it does not create a police report.',
   },
   {
     q: 'Is Airdrie AB safe?',
-    a: "Airdrie is a rapidly growing city north of Calgary with a generally low crime rate relative to its size. As the city has expanded — now approaching 80,000 residents — property crime has increased proportionally, particularly vehicle theft and residential break-ins in newer subdivisions. Calgary Watch monitors community-reported incidents across Airdrie and Rocky View County.",
+    a: "A single map cannot fairly label an entire city as safe or dangerous. Check each incident's type, date, and source, and use the City of Airdrie's official crime map for crime reported to RCMP. Calgary Watch provides a separate view of community reports and selected public-source incidents in the Airdrie area.",
   },
   {
-    q: 'Is Cochrane AB safe?',
-    a: "Cochrane maintains one of the lowest crime rates among Alberta's satellite cities of its size. Most reported incidents involve property crime in residential areas. The rural highway corridors between Cochrane and Calgary (Highway 1A and Highway 22) see occasional traffic incidents. Calgary Watch covers Cochrane and surrounding Rocky View County communities.",
+    q: 'Are Calgary Watch reports confirmed by police?',
+    a: 'Not necessarily. Community reports are user-submitted observations. Selected public-source items show their attribution. Read each marker’s source, timestamp, and status, and use official police data when you need police-reported crime information.',
   },
   {
     q: 'Does Calgary Watch cover Okotoks, High River, and Strathmore?',
@@ -74,7 +74,7 @@ const FAQS = [
   },
   {
     q: 'How does Calgary Watch work?',
-    a: "Calgary Watch combines community-submitted reports with official public safety data from the City of Calgary open data portal, Environment Canada weather alerts, and 511 Alberta traffic feeds. Residents sign in to submit geolocated incident reports in under 30 seconds. Reports appear on the live map immediately and are visible to the entire community. Anonymous reporting is fully supported.",
+    a: 'Calgary Watch combines community-submitted observations with selected, attributed public-source information. Residents can browse the map freely and sign in to submit a report. It is an awareness tool, not a police dispatch feed or emergency-reporting service.',
   },
 ];
 
@@ -92,7 +92,7 @@ const OFFICIAL_LINKS = [
   { label: 'Alberta Emergency Alert',     url: 'https://www.alberta.ca/emergency-alerts',   desc: 'Province-wide emergency notifications' },
   { label: '511 Alberta Traffic',         url: 'https://511.alberta.ca',                    desc: 'Highway conditions & closures' },
   { label: 'Environment Canada Alerts',   url: 'https://weather.gc.ca/warnings/index_e.html?prov=ab', desc: 'Severe weather warnings for AB' },
-  { label: 'Airdrie RCMP',               url: 'https://www.rcmp-grc.gc.ca/en/airdrie',     desc: 'Airdrie & Rocky View County policing' },
+  { label: 'Airdrie RCMP',               url: 'https://www.rcmp-grc.gc.ca/detach/en/d/437?wbdisable=true', desc: 'Non-emergency: 403-945-7267' },
 ];
 
 // ─── FAQ Item ─────────────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ export default function CoveragePage() {
       '@context': 'https://schema.org',
       '@type': 'ItemList',
       name: 'Calgary Area Communities Covered by Calgary Watch',
-      description: '30+ communities across the Calgary metropolitan region where Calgary Watch provides real-time community safety reporting.',
+      description: 'Communities across the Calgary metropolitan region where Calgary Watch is designed to accept or display relevant community safety reports.',
       numberOfItems: COMMUNITIES.length,
       itemListElement: COMMUNITIES.map((c, i) => ({
         '@type': 'ListItem',
@@ -277,60 +277,19 @@ export default function CoveragePage() {
       })),
     });
 
-    // FAQPage — coverage-specific Q&As for PAA boxes
+    // FAQPage — generated from the questions visible on this page so search
+    // engines and visitors receive the same answers.
     inject('coverage-faq', {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'Which communities does Calgary Watch cover?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Calgary Watch covers Calgary and 30+ surrounding communities including Airdrie, Cochrane, Chestermere, Okotoks, Strathmore, High River, Canmore, Langdon, Crossfield, Carstairs, Didsbury, Olds, Black Diamond, Turner Valley, Nanton, Irricana, Beiseker, Vulcan, Balzac, Springbank, Bragg Creek, Priddis, De Winton, Millarville, Bearspaw, Conrich, Linden, Rocky View County, and Foothills County — all within approximately 100 km of Calgary.',
-          },
+      mainEntity: FAQS.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a,
         },
-        {
-          '@type': 'Question',
-          name: 'Does Calgary Watch cover Rocky View County?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. Calgary Watch covers all of Rocky View County including Cochrane, Airdrie, Balzac, Springbank, Bearspaw, Langdon, Conrich, and unincorporated rural areas. Rocky View County surrounds Calgary on most sides and all communities within the county can submit and view real-time safety reports.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How far from Calgary does Calgary Watch cover?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Calgary Watch covers communities within approximately 100 kilometres of Calgary city centre. This includes all cities, towns, villages, and hamlets in the greater Calgary metropolitan region — from Olds in the north (~90 km) to Nanton in the south (~90 km), Canmore to the west (~100 km), and Strathmore to the east (~45 km).',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Is Calgary Watch free to use?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. Calgary Watch is completely free for all community members. Viewing the live safety map, browsing incident reports, and submitting your own community reports are all free with no subscription required. A free account is needed only to submit reports.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What types of crimes and incidents are reported on Calgary Watch?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Calgary Watch tracks five main incident categories: (1) Crime — break-and-enter, vehicle theft, vandalism, suspicious activity, assault, robbery; (2) Traffic — collisions, road closures, Deerfoot Trail and Stoney Trail incidents; (3) Infrastructure — water main breaks, utility outages, flooding; (4) Weather — severe weather warnings, icy roads, hail, flash flooding; (5) Emergency — active fires, EMS activity, evacuation notices, Amber Alerts.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How do I report an incident in Airdrie, Cochrane, or other surrounding communities?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'The process is the same for all communities covered by Calgary Watch. Open the live map at calgarywatch.ca/map, sign in or create a free account, tap the report button, select your incident category, drop a pin on the location in your community, add a description, and submit. Your report is immediately visible to everyone viewing the map in that area.',
-          },
-        },
-      ],
+      })),
     });
 
     return () => {
@@ -398,9 +357,17 @@ export default function CoveragePage() {
             </h1>
 
             <p className="text-base sm:text-lg text-slate-400 light:text-slate-600 max-w-2xl leading-relaxed mb-10 border-l-2 border-[#4A90D9]/40 pl-4">
-              Real-time crime intelligence, community safety reports, and incident alerts for Calgary
-              and every town, city, and hamlet within 100 km — from Airdrie and Cochrane to Okotoks, Strathmore, and High River.
+              Community reports and selected public-source incident information for Calgary
+              and nearby places — from Airdrie and Cochrane to Okotoks, Strathmore, and High River.
             </p>
+
+            <a
+              href="/airdrie-crime-map"
+              className="mb-10 inline-flex items-center gap-2 text-sm font-bold text-[#7DB8F1] light:text-[#286FAF] underline decoration-[#4A90D9]/40 underline-offset-4 hover:text-white light:hover:text-slate-900"
+            >
+              Comparing Airdrie crime maps? Read the source guide
+              <ArrowRight size={15} aria-hidden="true" />
+            </a>
 
             {/* Stats strip */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -493,9 +460,9 @@ export default function CoveragePage() {
                 className="rounded-2xl border border-white/6 light:border-slate-200 bg-white/[0.02] light:bg-white p-5 flex flex-col justify-between"
               >
                 <div>
-                  <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-slate-500 mb-3">New reports</p>
-                  <p className="text-3xl font-black text-white light:text-slate-900">{'< 30s'}</p>
-                  <p className="text-xs text-slate-400 light:text-slate-600 mt-1">from submission to live map</p>
+                  <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-slate-500 mb-3">Every marker</p>
+                  <p className="text-3xl font-black text-white light:text-slate-900">Source</p>
+                  <p className="text-xs text-slate-400 light:text-slate-600 mt-1">shown on incident details</p>
                 </div>
                 <div className="mt-4 h-px bg-gradient-to-r from-[#4A90D9]/40 to-transparent" />
               </motion.div>
@@ -559,19 +526,19 @@ export default function CoveragePage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-slate-400 light:text-slate-600 leading-relaxed">
               <div>
                 <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Crime mapping for Calgary</h3>
-                <p>Calgary Watch tracks break-ins, vehicle theft, assault incidents, vandalism, and suspicious activity across all Calgary quadrants with community reports submitted within 30 seconds of an event. Unlike static annual crime statistics, the live map reflects conditions right now.</p>
+                <p>Calgary Watch displays recent community observations and selected public-source information across Calgary. Read every marker with its timestamp, source, and status; the map is not a complete record of police-reported crime.</p>
               </div>
               <div>
                 <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Airdrie &amp; Cochrane coverage</h3>
-                <p>As Calgary's fastest-growing satellite cities, Airdrie (30 km north) and Cochrane (45 km northwest) generate significant community safety activity. Calgary Watch monitors residential break-ins, traffic incidents, and community alerts across both cities and surrounding Rocky View County.</p>
+                <p>Calgary Watch accepts community reports across Airdrie, Cochrane, and surrounding Rocky View County. For Airdrie crime reported to police, use the City of Airdrie's official RCMP-reported crime map; Calgary Watch is a separate community-awareness source.</p>
               </div>
               <div>
                 <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Southern Alberta communities</h3>
-                <p>Okotoks, High River, and Strathmore along the Highway 2 and Highway 1 corridors rely on Calgary Watch for road condition alerts, crime news, and neighbourhood safety trends — particularly for the tens of thousands of daily commuters travelling between these communities and Calgary.</p>
+                <p>The map is designed to accept relevant community reports around Okotoks, High River, and Strathmore. Public-source coverage varies, so an empty map does not establish that an area has no incidents.</p>
               </div>
               <div>
                 <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Rural communities &amp; hamlets</h3>
-                <p>Rural Alberta communities like Bragg Creek, Springbank, Priddis, Millarville, De Winton, and Bearspaw are part of the Calgary metro ecosystem but often underserved by traditional news coverage. Calgary Watch gives residents in these areas the same real-time visibility as urban neighbourhoods.</p>
+                <p>Residents around Bragg Creek, Springbank, Priddis, Millarville, De Winton, and Bearspaw can use the same map and community-report flow. Availability and recency still depend on the reports and sources present.</p>
               </div>
               <div>
                 <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Anonymous community reporting</h3>
@@ -579,7 +546,7 @@ export default function CoveragePage() {
               </div>
               <div>
                 <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Official data integration</h3>
-                <p>Alongside community reports, Calgary Watch integrates official data feeds: City of Calgary open data for verified incidents, Environment Canada weather alerts for Alberta, and 511 Alberta for highway and road closures — giving you a complete picture from both community and official sources.</p>
+                <p>Alongside community reports, Calgary Watch displays selected attributed public-source items, including weather and highway information. It does not promise a complete picture; always follow the source link when official confirmation matters.</p>
               </div>
             </div>
           </Section>

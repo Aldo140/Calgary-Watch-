@@ -19,6 +19,13 @@ import {
   GUIDE_SOURCES,
   GUIDE_UPDATED,
 } from '../../src/content/neighbourhoodWatchGuide.js';
+import {
+  AIRDRIE_GUIDE_FAQS,
+  AIRDRIE_GUIDE_PATH,
+  AIRDRIE_GUIDE_SOURCES,
+  AIRDRIE_GUIDE_UPDATED,
+  AIRDRIE_MAP_COMPARISON,
+} from '../../src/content/airdrieCrimeMapGuide.js';
 
 /**
  * Where a route's static HTML is written, relative to dist/.
@@ -103,6 +110,53 @@ function staticLink(href: string, label: string): string {
  * it is not crawler-only content or a separate keyword variant.
  */
 export function buildStaticRouteBody(pathname: string): string {
+  if (pathname === AIRDRIE_GUIDE_PATH) {
+    const comparisons = AIRDRIE_MAP_COMPARISON.map((row) => `
+      <tr>
+        <td>${escapeText(row.need)}</td>
+        <td>${escapeText(row.source)}</td>
+        <td>${staticLink(row.action, row.actionLabel)}</td>
+      </tr>`).join('');
+    const faqs = AIRDRIE_GUIDE_FAQS.map((faq) => `
+      <details>
+        <summary>${escapeText(faq.question)}</summary>
+        <p>${escapeText(faq.answer)}</p>
+      </details>`).join('');
+    const sources = AIRDRIE_GUIDE_SOURCES.map((source) =>
+      `<li>${staticLink(source.url, source.name)}</li>`,
+    ).join('');
+
+    return `<main data-prerendered-route="${escapeAttr(pathname)}">
+      <article>
+        <header>
+          <p>Airdrie community safety guide · Reviewed ${escapeText(AIRDRIE_GUIDE_UPDATED)}</p>
+          <h1>Airdrie crime maps: know which map you’re reading.</h1>
+          <p>Check recent community reports around Airdrie, compare them with the City’s official RCMP-reported crime map, and use the right reporting channel when something needs action.</p>
+          <p>${staticLink('/map', 'View Airdrie-area reports')} · ${staticLink(AIRDRIE_GUIDE_SOURCES[0].url, 'Official Airdrie crime map')}</p>
+        </header>
+        <section>
+          <h2>Two maps answer different questions.</h2>
+          <p>Calgary Watch helps with recent local awareness. Its markers can come from community submissions or attributed public sources, so each one should be read with its time and source.</p>
+          <p>The City of Airdrie’s crime map is the official starting point for crime reported to Airdrie RCMP. Neither map is a public dispatch feed, and neither should be used to follow officers or confirm that a specific response is underway.</p>
+        </section>
+        <section>
+          <h2>Start with the source that matches the need.</h2>
+          <table><thead><tr><th>What you need</th><th>Best starting point</th><th>Action</th></tr></thead><tbody>${comparisons}</tbody></table>
+        </section>
+        <section>
+          <h2>Read an incident before drawing a conclusion.</h2>
+          <p>Start with the timestamp and then check whether the item was submitted by a community member or attributed to a public source. Marker counts are not crime rates: they depend on the selected time window, available sources, and what people choose to report.</p>
+        </section>
+        <section>
+          <h2>Report through the right channel first.</h2>
+          <p>Call 911 for immediate danger or a crime in progress. For an Airdrie police matter that is not in progress, call RCMP non-emergency at 403-945-7267. Calgary Watch posts are not police reports.</p>
+        </section>
+        <section><h2>Frequently asked questions</h2>${faqs}</section>
+        <section><h2>Official Airdrie references</h2><ul>${sources}</ul></section>
+      </article>
+    </main>`;
+  }
+
   if (pathname === GUIDE_PATH) {
     const comparisons = GUIDE_COMPARISON.map((row) => `
       <tr>
@@ -170,7 +224,7 @@ export function buildStaticRouteBody(pathname: string): string {
     '/coverage': {
       heading: 'Calgary-area community coverage',
       copy: 'Calgary Watch supports reports across Calgary, Airdrie, Cochrane, Okotoks, Chestermere, and other nearby Alberta communities.',
-      links: [['/map', 'View the Calgary-area incident map'], [GUIDE_PATH, 'Read the neighbourhood watch guide']],
+      links: [['/map', 'View the Calgary-area incident map'], [AIRDRIE_GUIDE_PATH, 'Read the Airdrie crime map guide'], [GUIDE_PATH, 'Read the neighbourhood watch guide']],
     },
   };
   const summary = summaries[pathname];

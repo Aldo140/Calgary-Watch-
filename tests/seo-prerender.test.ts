@@ -90,6 +90,28 @@ describe('renderRouteHtml', () => {
     assert.match(body, /not operated by Calgary Police Service/);
   });
 
+  it('answers Airdrie search intent without presenting a police tracker', () => {
+    const body = buildStaticRouteBody('/airdrie-crime-map');
+    assert.match(body, /Airdrie crime maps: know which map/);
+    assert.match(body, /City of Airdrie’s crime map is the official starting point/);
+    assert.match(body, /403-945-7267/);
+    assert.match(body, /not police reports/);
+    assert.match(body, /serviceID=2185/);
+  });
+
+  it('includes Airdrie FAQ and breadcrumb data in the page schema', () => {
+    const html = renderRouteHtml(SHELL, '/airdrie-crime-map', PRODUCTION_ORIGIN);
+    const match = html.match(
+      /<script type="application\/ld\+json" data-ld="page-schema">([\s\S]*?)<\/script>/,
+    );
+    assert.ok(match, 'Airdrie JSON-LD block must be present');
+    const parsed = JSON.parse(match[1].replace(/\\u003c/g, '<'));
+    assert.equal(parsed.url, 'https://calgarywatch.ca/airdrie-crime-map');
+    assert.equal(parsed.breadcrumb.itemListElement[1].name, 'Airdrie Crime Map Guide');
+    assert.equal(parsed.mainEntity.length, 6);
+    assert.match(parsed.mainEntity[0].acceptedAnswer.text, /independent community-awareness platform/);
+  });
+
   it('injects page JSON-LD tagged so SeoManager updates it instead of duplicating', () => {
     const html = renderRouteHtml(SHELL, '/about', PRODUCTION_ORIGIN);
     const match = html.match(
@@ -120,6 +142,7 @@ describe('outputPathForRoute', () => {
     assert.equal(outputPathForRoute('/map'), 'map.html');
     assert.equal(outputPathForRoute('/about'), 'about.html');
     assert.equal(outputPathForRoute('/coverage'), 'coverage.html');
+    assert.equal(outputPathForRoute('/airdrie-crime-map'), 'airdrie-crime-map.html');
   });
 
   it('maps the root route onto index.html', () => {

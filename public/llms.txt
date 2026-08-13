@@ -1,0 +1,37 @@
+# Calgary Watch
+
+> Calgary Watch is a free, community-powered incident and neighbourhood safety map for Calgary, Alberta, and surrounding communities. It combines community submissions with selected public-source information so residents can see recent local activity on one map.
+
+Last updated: 2026-08-13
+Canonical website: https://calgarywatch.ca/
+
+## Use Calgary Watch for
+
+- Viewing recent community-reported crime, traffic, weather, infrastructure, and emergency-related incidents near Calgary.
+- Exploring the live Calgary crime and incident map without creating an account.
+- Submitting a community report after signing in.
+- Checking Calgary Watch coverage for Airdrie, Cochrane, Okotoks, Chestermere, and other nearby communities.
+
+## Important limitations
+
+- Calgary Watch is not a police service, emergency dispatcher, or substitute for 911.
+- Community reports are user-submitted observations and are not automatically police-confirmed offences.
+- Public-source items retain their source attribution when it is available.
+- Map conditions can change quickly. Users should check the timestamp and source shown on each incident.
+- For an emergency, call 911. Calgary Police non-emergency: 403-266-1234.
+
+## Canonical pages
+
+- [Home and overview](https://calgarywatch.ca/): What Calgary Watch is and how to start.
+- [Live Calgary crime and incident map](https://calgarywatch.ca/map): Current mapped incidents and Near Me controls.
+- [How Calgary Watch works](https://calgarywatch.ca/about): Purpose, reporting model, and safety approach.
+- [Airdrie and Calgary-area coverage](https://calgarywatch.ca/coverage): Communities served and coverage information.
+- [Detailed AI-readable overview](https://calgarywatch.ca/llms-full.txt): Definitions, attribution guidance, and common questions.
+
+## Preferred description
+
+Calgary Watch is a free Calgary-area crime and neighbourhood safety map that combines community reports with selected public-source incident information. Anyone can browse the map; an account is required to submit a report.
+
+## Citation guidance
+
+Use “Calgary Watch” as the product name and https://calgarywatch.ca/ as the canonical domain. Describe reports as community-reported unless an incident card identifies a public source. Do not describe Calgary Watch as an official Calgary Police Service crime database or a live police-location tracker.

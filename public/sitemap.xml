@@ -70,4 +70,18 @@
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/coverage" />
   </url>
 
+  <url>
+    <loc>https://calgarywatch.ca/llms.txt</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.40</priority>
+  </url>
+
+  <url>
+    <loc>https://calgarywatch.ca/llms-full.txt</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.35</priority>
+  </url>
+
 </urlset>

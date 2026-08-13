@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
 import { Card } from '@/src/components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
@@ -10,6 +11,8 @@ import DemoBadge from '@/src/components/DemoBadge';
 
 interface SidebarProps {
   incidents: Incident[];
+  timeWindow?: TimeWindow;
+  onTimeWindowChange?: (v: TimeWindow) => void;
   onIncidentClick: (incident: Incident) => void;
   selectedCategory: IncidentCategory | 'all';
   onCategoryChange: (category: IncidentCategory | 'all') => void;
@@ -21,6 +24,8 @@ interface SidebarProps {
 
 export default function Sidebar({
   incidents,
+  timeWindow,
+  onTimeWindowChange,
   onIncidentClick,
   selectedCategory,
   onCategoryChange,
@@ -179,19 +184,25 @@ export default function Sidebar({
           <input
             ref={searchInputRef}
             type="text"
-            placeholder="Search reports or neighborhood... (Press /)"
+            placeholder="Search reports or areas"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white/5 border border-white/10 light:bg-white light:border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 light:focus:ring-slate-900/40 focus:border-blue-500/50 light:focus:border-slate-900/40 transition-all"
           />
         </div>
         <div className="flex flex-col items-center justify-center bg-blue-500/10 border border-blue-500/20 light:bg-gradient-to-br light:from-sky-600 light:to-teal-700 light:border-sky-600 rounded-xl px-3 py-2 min-w-[56px]">
-          <span className="text-[10px] font-bold text-blue-400 light:text-white uppercase tracking-tighter leading-none">Total</span>
+          <span className="text-[10px] font-bold text-blue-300 light:text-white/90 uppercase tracking-[0.08em] leading-none">Total</span>
           <motion.span className="text-lg font-black text-white leading-none mt-1">
             {displayCount}
           </motion.span>
         </div>
       </div>
+
+      {onTimeWindowChange && timeWindow && (
+        <div className="px-4 pt-3">
+          <TimeWindowFilter value={timeWindow} onChange={onTimeWindowChange} />
+        </div>
+      )}
 
       <div className="pl-8 pr-6 py-4 flex gap-2 overflow-x-auto no-scrollbar shrink-0 border-b border-white/5 light:border-slate-200 scroll-smooth items-center min-w-0 snap-x scroll-px-8">
         <div className="w-2 shrink-0" />

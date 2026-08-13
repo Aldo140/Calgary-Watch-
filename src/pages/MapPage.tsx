@@ -686,6 +686,28 @@ export default function MapPage() {
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
   const [onboardingDismissedThisSession, setOnboardingDismissedThisSession] = useState(false);
   const [locationError, setLocationError] = useState(false);
+
+  /**
+   * Time window applied to the feed.
+   *
+   * Every incident already carries a timestamp and nothing let a reader use it,
+   * so the feed mixed a collision from twenty minutes ago with a road
+   * restriction from last week and gave them equal weight. This is a pure
+   * client-side narrowing of data already loaded — it issues no additional
+   * requests and touches no ingest behaviour.
+   *
+   * Defaults to 'all' so the feed starts exactly as it did before.
+   */
+  const [timeWindow, setTimeWindow] = useState<'24h' | '7d' | 'all'>('all');
+
+  // Clear the geolocation notice on its own. Denied location is a fallback the
+  // map handles fine, not a condition worth occupying screen space until the
+  // user dismisses it by hand.
+  useEffect(() => {
+    if (!locationError) return;
+    const timer = setTimeout(() => setLocationError(false), 6000);
+    return () => clearTimeout(timer);
+  }, [locationError]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   // Post-submit celebration — the payoff beat after a report goes live
   const [celebration, setCelebration] = useState<string | null>(null);
@@ -1394,6 +1416,13 @@ export default function MapPage() {
     if (selectedCategory === 'all') return visible;
     return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');
   }, [incidents, selectedCategory]);
+
+  /** The feed's view of the world: category-independent, narrowed by time only. */
+  const feedIncidents = useMemo(() => {
+    if (timeWindow === 'all') return incidents;
+    const cutoff = Date.now() - (timeWindow === '24h' ? 24 : 24 * 7) * 60 * 60 * 1000;
+    return incidents.filter((i) => i.timestamp >= cutoff);
+  }, [incidents, timeWindow]);
 
   // Incidents sorted by distance from user for the Near Me panel
   const nearMeIncidents = useMemo(() => {
@@ -2234,19 +2263,38 @@ export default function MapPage() {
         )}
       </AnimatePresence>
 
-      {/* Geolocation error banner */}
+      {/*
+        Geolocation notice.
+
+        This used to sit centred at the very top, where on a phone it wrapped to
+        four lines and covered the search field, the home button and the whole
+        category chip row — the primary controls — until it was dismissed by
+        hand. It now sits above the bottom controls on mobile and below the
+        header on desktop, stays on one line, and clears itself, because a
+        denied location is a minor fallback rather than an error the map needs
+        to keep insisting on.
+      */}
       <AnimatePresence>
         {locationError && (
           <motion.div
-            initial={{ opacity: 0, y: -40 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40 }}
-            className="fixed top-4 max-lg:top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-2.5 bg-amber-900/90 border border-amber-500/40 rounded-2xl shadow-xl backdrop-blur-xl text-amber-200 text-xs font-bold"
+            exit={{ opacity: 0, y: 12 }}
+            role="status"
+            className="fixed z-[200] left-1/2 -translate-x-1/2 max-w-[calc(100vw-2rem)]
+                       bottom-[calc(6.5rem+env(safe-area-inset-bottom))]
+                       lg:bottom-auto lg:top-24
+                       flex items-center gap-2 px-3.5 py-2 rounded-full shadow-lg backdrop-blur-xl
+                       bg-slate-900/92 border border-amber-400/30 text-amber-100 text-[0.72rem] font-semibold whitespace-nowrap"
           >
-            <Navigation size={14} className="shrink-0" />
-            Location access denied. Showing Calgary center instead.
-            <button onClick={() => setLocationError(false)} className="ml-1 text-amber-400 hover:text-white transition-colors">
-              <X size={14} />
+            <Navigation size={13} className="shrink-0 text-amber-300" />
+            <span className="truncate">Location off — showing all of Calgary</span>
+            <button
+              onClick={() => setLocationError(false)}
+              aria-label="Dismiss"
+              className="shrink-0 -mr-1 p-1 text-amber-300/80 hover:text-white transition-colors"
+            >
+              <X size={13} />
             </button>
           </motion.div>
         )}
@@ -2258,7 +2306,9 @@ export default function MapPage() {
       {/* Sidebar Feed - Desktop */}
       <div className="hidden lg:flex flex-col h-full shrink-0 z-40 relative shadow-2xl" data-tour="feed">
         <Sidebar
-          incidents={incidents}
+          incidents={feedIncidents}
+          timeWindow={timeWindow}
+          onTimeWindowChange={setTimeWindow}
           onIncidentClick={handleSidebarIncidentClick}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
@@ -2301,7 +2351,9 @@ export default function MapPage() {
 
         {/* Mobile Bottom Sheet */}
         <MobileMapSheet
-          incidents={incidents}
+          incidents={feedIncidents}
+          timeWindow={timeWindow}
+          onTimeWindowChange={setTimeWindow}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
           liveCount={mapIncidents.length}
@@ -2354,7 +2406,13 @@ export default function MapPage() {
                   {mapIncidents.length === 0 ? 'Be first to report' : 'Tap for the full feed'}
                 </p>
               </div>
-              <span className="shrink-0 rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-black tabular-nums text-[#fff]">
+              {/* Colours are inline because the app's `light:` theme layer was
+                  overriding bg-slate-900 to a cream tone while the label stayed
+                  white, leaving the live count invisible on mobile. */}
+              <span
+                className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black tabular-nums"
+                style={{ background: '#1C2B3A', color: '#FFFFFF' }}
+              >
                 {filteredIncidentsCount}
               </span>
               <Search size={15} className="shrink-0 text-slate-400" />
@@ -2953,7 +3011,10 @@ export default function MapPage() {
                 onClick={() => openAuthPanel('signin')}
               >
                 <LogIn size={18} className="text-blue-400" />
-                <span className="text-sm font-bold">Sign In</span>
+                {/* The button turns white in light mode, so the label has to
+                    turn dark with it. Without this it inherits white and the
+                    primary sign-in call to action is invisible. */}
+                <span className="text-sm font-bold text-white light:text-slate-900">Sign In</span>
               </Button>
             )}
           </div>

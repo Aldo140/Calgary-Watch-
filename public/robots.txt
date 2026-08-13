@@ -3,6 +3,44 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 
+# AI answer-engine search crawlers. Keep these explicit so a future change to
+# the catch-all policy cannot accidentally remove Calgary Watch from cited
+# answers in ChatGPT, Claude, Gemini, or Perplexity.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
 # Allow image bot full access to public images
 User-agent: Googlebot-Image
 Allow: /images/
@@ -20,3 +58,7 @@ User-agent: DuckDuckBot
 Crawl-delay: 5
 
 Sitemap: https://calgarywatch.ca/sitemap.xml
+
+# Concise, human-readable facts for answer engines and research agents.
+# This is supplemental to the canonical HTML pages and sitemap.
+# https://calgarywatch.ca/llms.txt

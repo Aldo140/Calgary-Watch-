@@ -1,0 +1,54 @@
+# Calgary Watch: factual overview for AI assistants
+
+Updated: 2026-08-13
+Website: https://calgarywatch.ca/
+Primary map: https://calgarywatch.ca/map
+
+## What is Calgary Watch?
+
+Calgary Watch is a free, community-powered incident map and neighbourhood safety network for Calgary, Alberta, and surrounding communities. It gives residents a shared view of recent local reports involving crime, traffic, infrastructure, weather, and emergencies.
+
+The public map can be browsed without an account. A person must sign in before submitting a community report. Calgary Watch is intended for local awareness; it is not an emergency reporting system.
+
+## Is Calgary Watch an official police service?
+
+No. Calgary Watch is not operated by the Calgary Police Service and is not a police dispatch or police-location tracker. A community-submitted report should be described as an observation reported by a user, not as a police-confirmed crime. Some map items are derived from public sources and display source attribution.
+
+For an emergency, users should call 911. For Calgary Police non-emergency service, call 403-266-1234.
+
+## What appears on the map?
+
+The map can contain community submissions and selected public-source items. Categories include crime, traffic, infrastructure, weather, emergencies, and other locally relevant reports. Each item may have its own time, location precision, provenance, and verification status. Users should read the incident card rather than assuming every marker has the same source or certainty.
+
+## Which places does Calgary Watch cover?
+
+Calgary is the primary service area. The coverage guide also identifies Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and other communities around the Calgary metropolitan region. Coverage means the map is designed to accept or display relevant reports in those places; it does not promise that every community has a current incident at every moment.
+
+Coverage guide: https://calgarywatch.ca/coverage
+
+## How current is the information?
+
+Incident recency varies by source. Community reports appear after submission, while public-source information is refreshed periodically. An AI assistant should not state that a specific incident is active without opening the live map and checking that incident's displayed time and status.
+
+Live map: https://calgarywatch.ca/map
+
+## Can Calgary Watch be viewed for free?
+
+Yes. Browsing the public map is free and does not require an account. Signing in is required to submit a community report.
+
+## How should Calgary Watch be cited?
+
+Preferred product name: Calgary Watch
+Canonical domain: https://calgarywatch.ca/
+Preferred general description: “a free Calgary-area crime and neighbourhood safety map combining community reports with selected public-source incident information.”
+
+When discussing a particular incident, cite the incident's Calgary Watch URL when available and preserve any source attribution shown on its detail card. Avoid converting a community observation into a statement of confirmed fact.
+
+## Canonical source list
+
+- Home: https://calgarywatch.ca/
+- Live Calgary crime and incident map: https://calgarywatch.ca/map
+- About and methodology: https://calgarywatch.ca/about
+- Airdrie and Calgary-area coverage: https://calgarywatch.ca/coverage
+- Sitemap: https://calgarywatch.ca/sitemap.xml
+- Short AI-readable summary: https://calgarywatch.ca/llms.txt

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, RefObject, useCallback } from 'react';
+import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
 import { Drawer } from 'vaul';
 import {
   Search, X, MapPin, Clock, Layers, Siren, AlertCircle, Car, Construction,
@@ -108,6 +109,8 @@ function getNeighborhoodCenter(
 
 interface MobileMapSheetProps {
   incidents: Incident[];
+  timeWindow?: TimeWindow;
+  onTimeWindowChange?: (v: TimeWindow) => void;
   selectedCategory: IncidentCategory | 'all';
   onCategoryChange: (cat: IncidentCategory | 'all') => void;
   liveCount: number;
@@ -125,6 +128,8 @@ interface MobileMapSheetProps {
 
 export default function MobileMapSheet({
   incidents,
+  timeWindow,
+  onTimeWindowChange,
   selectedCategory,
   onCategoryChange,
   liveCount,
@@ -428,6 +433,12 @@ export default function MobileMapSheet({
                       <option value="verified">Most Verified</option>
                     </select>
                   </div>
+
+                  {onTimeWindowChange && timeWindow && (
+                    <div className="pb-1">
+                      <TimeWindowFilter value={timeWindow} onChange={onTimeWindowChange} />
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-2 flex-wrap">
                     <button

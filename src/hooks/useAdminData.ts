@@ -582,6 +582,7 @@ export function useAdminData() {
     const colorMap: Record<string, string> = {
       direct: '#4A90D9',
       organic_search: '#22c55e',
+      ai_referral: '#8b5cf6',
       social: '#f59e0b',
       referral: '#a855f7',
       campaign: '#f97316',
@@ -590,6 +591,7 @@ export function useAdminData() {
     const labelMap: Record<string, string> = {
       direct: 'Direct',
       organic_search: 'Organic Search',
+      ai_referral: 'AI Assistants',
       social: 'Social Media',
       referral: 'Referral',
       campaign: 'Campaign (UTM)',

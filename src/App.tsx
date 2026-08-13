@@ -79,17 +79,23 @@ function PageTracker() {
     const rawReferrer = typeof document !== 'undefined' ? document.referrer : '';
     let referrer = '';
     let traffic_source = 'direct';
+    const aiSources = ['chatgpt', 'openai', 'claude', 'anthropic', 'perplexity', 'copilot', 'gemini'];
     if (utm_source) {
-      traffic_source = utm_source.toLowerCase().includes('email')
+      const normalizedSource = utm_source.toLowerCase();
+      traffic_source = aiSources.some(source => normalizedSource.includes(source))
+        ? 'ai_referral'
+        : normalizedSource.includes('email')
         ? 'email'
-        : utm_medium === 'social' || ['facebook','twitter','instagram','linkedin','tiktok'].includes(utm_source.toLowerCase())
+        : utm_medium === 'social' || ['facebook','twitter','instagram','linkedin','tiktok'].includes(normalizedSource)
           ? 'social'
           : 'campaign';
     } else if (rawReferrer) {
       try {
         const refHost = new URL(rawReferrer).hostname.replace(/^www\./, '');
         referrer = refHost.slice(0, 200);
-        if (['google.com','bing.com','duckduckgo.com','yahoo.com','ecosia.org'].some(s => refHost.includes(s))) {
+        if (aiSources.some(source => refHost.includes(source))) {
+          traffic_source = 'ai_referral';
+        } else if (['google.com','bing.com','duckduckgo.com','yahoo.com','ecosia.org'].some(s => refHost.includes(s))) {
           traffic_source = 'organic_search';
         } else if (['facebook.com','twitter.com','x.com','instagram.com','linkedin.com','reddit.com','tiktok.com'].some(s => refHost.includes(s))) {
           traffic_source = 'social';

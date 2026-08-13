@@ -1,2586 +1,784 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import { useCrimeStats } from '@/src/hooks/useCrimeStats';
-import { useNavigate } from 'react-router-dom';
-import { cn } from '@/src/lib/utils';
-import { useAuth } from '@/src/components/FirebaseProvider';
-import { db, isFirebaseConfigured } from '@/src/firebase';
-import { Incident, CommunityStats, incidentVisibility } from '@/src/types';
-import { deleteIncidentImage } from '@/src/lib/storage';
-import { suppressionDocId } from '@/src/lib/suppression';
-import { INCIDENT_CATEGORIES, INCIDENT_CATEGORY_VALUES, LEGACY_INCIDENT_CATEGORIES } from '@/src/constants';
+/**
+ * Calgary Watch — admin console.
+ *
+ * Rebuilt as a watch desk rather than a report. The old console opened on a
+ * wall of charts and buried the two things an admin actually comes here to do:
+ * find work, and do it. This opens on the attention queue and treats analytics
+ * as reference material you go looking for.
+ *
+ * All data, KPIs, chart series and mutations come from useAdminData, so the
+ * record-level screens (/admin/incidents, /admin/users) read exactly the same
+ * numbers. Nothing is computed twice.
+ */
+
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  addDoc, collection, deleteDoc, doc, getDocs,
-  onSnapshot, orderBy, query, updateDoc, limit, where, deleteField,
-  getCountFromServer, setDoc,
-} from 'firebase/firestore';
-import { Button } from '@/src/components/ui/Button';
-import { Card } from '@/src/components/ui/Card';
-import {
-  ArrowLeft, Loader2, Lock, Save, Trash2,
-  Activity, AlertTriangle, Clock3, Users, ShieldCheck,
-  ChartNoAxesColumn, Sparkles, RefreshCw, Siren, ChartPie,
-  ShieldQuestion, CheckCircle, LayoutDashboard, FileText,
-  BarChart3, Map, Globe, TrendingUp, MousePointerClick,
-  Wifi, Link, Megaphone, Zap, Flag,
-} from 'lucide-react';
-import {
-  ResponsiveContainer,
-  PieChart, Pie, Sector,
+  ResponsiveContainer, PieChart, Pie, Cell,
   AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-  BarChart, Bar, Legend,
-  LineChart, Line,
+  BarChart, Bar,
 } from 'recharts';
+import {
+  ExternalLink, FileText, Globe, LayoutDashboard, Loader2, Lock,
+  Map as MapIcon, RefreshCw, Save, Trash2, Users, Zap,
+} from 'lucide-react';
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+import { useAuth } from '@/src/components/FirebaseProvider';
+import { isFirebaseConfigured } from '@/src/firebase';
+import { useAdminData } from '@/src/hooks/useAdminData';
+import { AdminShell, type NavItem } from '@/src/components/admin/AdminShell';
+import { AttentionQueue } from '@/src/components/admin/AttentionQueue';
+import {
+  AdminButton, Chip, EmptyState, Field, Figure, Panel, RecordList, SkeletonRows,
+  StatGrid, StatTile, StatusDot, T, TimeAgo, display, inputClass, inputStyle, mono,
+  type Tone,
+} from '@/src/components/admin/ui';
+import { INCIDENT_CATEGORIES } from '@/src/constants';
+import { cn } from '@/src/lib/utils';
 
-type UserProfile = {
-  uid: string;
-  email: string;
-  displayName: string;
-  role: 'user' | 'admin';
-  createdAt?: number;
-  updatedAt?: number;
-};
+type Section = 'desk' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city';
 
-type EditableIncident = Pick<
-  Incident,
-  | 'title' | 'description' | 'category' | 'neighborhood'
-  | 'verified_status' | 'report_count' | 'source_name' | 'source_url'
->;
+const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
 
-type EditableCommunityStats = Pick<
-  CommunityStats,
-  'community' | 'month' | 'violent_crime' | 'property_crime' | 'disorder_calls' | 'safety_score'
->;
+/** Shared Recharts styling, kept in one place so every chart matches. */
+const axis = { stroke: '#9AA1AC', fontSize: 10, tickLine: false, axisLine: false } as const;
+const tooltipStyle = {
+  background: '#FFFFFF',
+  border: `1px solid ${T.line}`,
+  borderRadius: 10,
+  fontSize: 12,
+  fontFamily: mono,
+  color: T.ink,
+} as const;
 
-type PageViewDoc = {
-  timestamp: number;
-  path: string;
-  referrer?: string;
-  utm_source?: string;
-  utm_medium?: string;
-  utm_campaign?: string;
-  traffic_source?: string;
-  sessionId?: string;
-};
-
-type AdminSection =
-  | 'dashboard'
-  | 'incidents'
-  | 'users'
-  | 'stats'
-  | 'analytics'
-  | 'traffic'
-  | 'apis'
-  | 'flagged';
-
-type ApiHealth = {
-  id: string;
-  name: string;
-  url: string;
-  status: 'idle' | 'checking' | 'ok' | 'slow' | 'error';
-  recordCount: number | null;
-  responseMs: number | null;
-  lastChecked: number | null;
-  error: string | null;
-};
-
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const emptyIncidentDraft: EditableIncident = {
-  title: '', description: '', category: 'crime', neighborhood: '',
-  verified_status: 'unverified', report_count: 1, source_name: '', source_url: '',
-};
-
-const emptyStatsDraft: EditableCommunityStats = {
-  community: '', month: '', violent_crime: 0,
-  property_crime: 0, disorder_calls: 0, safety_score: 0,
-};
-
-const API_ENDPOINTS: Pick<ApiHealth, 'id' | 'name' | 'url'>[] = [
-  { id: 'traffic',   name: 'Calgary Traffic',     url: 'https://data.calgary.ca/resource/35ra-9556.json?$limit=10&$order=start_dt%20DESC' },
-  { id: '311',       name: 'Calgary 311',          url: "https://data.calgary.ca/resource/iahh-g8bj.json?$limit=10&$where=status_description%3D'Open'&$order=requested_date%20DESC" },
-  { id: 'watermain', name: 'Water Main Breaks',    url: 'https://data.calgary.ca/resource/dpcu-jr23.json?$limit=10&$order=break_date%20DESC&status=ACTIVE' },
-  { id: 'weather',   name: 'Open-Meteo Weather',   url: 'https://api.open-meteo.com/v1/forecast?latitude=51.048&longitude=-114.065&current=temperature_2m,weathercode&timezone=America%2FEdmonton' },
-];
-
-const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType; badge?: string }[] = [
-  { id: 'dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
-  { id: 'incidents',  label: 'Incidents',  icon: FileText },
-  { id: 'users',      label: 'Users',      icon: Users },
-  { id: 'stats',      label: 'City Stats', icon: Map },
-  { id: 'analytics',  label: 'Analytics',  icon: BarChart3 },
-  { id: 'traffic',    label: 'Traffic',    icon: Globe },
-  { id: 'apis',       label: 'API Health', icon: Zap },
-  { id: 'flagged' as AdminSection, label: 'Flagged', icon: Flag },
-];
-
-
-/** How long a suppression entry blocks re-ingestion of a record. */
-const SUPPRESSION_TTL_MS = 180 * 24 * 60 * 60 * 1000; // 180 days
-
-const VERIFIED_STATUSES: Incident['verified_status'][] = [
-  'unverified',
-  'multiple_reports',
-  'community_confirmed',
-];
-
-// Field-atlas operations-desk themes — one accent per desk, used by the hero,
-// section headers, nav states, and mobile chips so every view reads as one system.
-const SECTION_THEMES: Record<AdminSection, { eyebrow: string; title: string; description: string; accent: string; glow: string; color: string }> = {
-  dashboard: {
-    eyebrow: 'Ops desk',
-    title: 'The city, at a glance',
-    description: 'Critical incidents, growth signals, and moderation pressure surfaced first.',
-    accent: 'from-sky-500/30 via-blue-500/10 to-cyan-400/20',
-    glow: 'rgba(74,144,217,0.2)',
-    color: '#4A90D9',
-  },
-  incidents: {
-    eyebrow: 'Field ops',
-    title: 'Moderate the live stream',
-    description: 'Edit reports fast, resolve trust issues, keep the public signal clean.',
-    accent: 'from-rose-500/30 via-orange-500/10 to-amber-400/20',
-    glow: 'rgba(220,38,38,0.16)',
-    color: '#DC2626',
-  },
-  users: {
-    eyebrow: 'Community',
-    title: 'Who powers the network',
-    description: 'Admins, contributors, top citizen reporters — and their newsletter status.',
-    accent: 'from-violet-500/30 via-fuchsia-500/10 to-sky-400/20',
-    glow: 'rgba(124,58,237,0.16)',
-    color: '#7C3AED',
-  },
-  stats: {
-    eyebrow: 'City intel',
-    title: 'Tune neighbourhood metrics',
-    description: 'Update community stats with a quick field-review flow.',
-    accent: 'from-emerald-500/30 via-teal-500/10 to-cyan-400/20',
-    glow: 'rgba(46,139,122,0.18)',
-    color: '#2E8B7A',
-  },
-  analytics: {
-    eyebrow: 'Insights',
-    title: 'Patterns before trends',
-    description: 'Where reports cluster across time and place.',
-    accent: 'from-indigo-500/30 via-blue-500/10 to-sky-400/20',
-    glow: 'rgba(79,70,229,0.16)',
-    color: '#4F46E5',
-  },
-  traffic: {
-    eyebrow: 'Growth',
-    title: 'Reach and momentum',
-    description: 'Which channels, routes, and campaigns move attention.',
-    accent: 'from-pink-500/30 via-orange-500/10 to-amber-400/20',
-    glow: 'rgba(184,134,11,0.18)',
-    color: '#B8860B',
-  },
-  apis: {
-    eyebrow: 'Infrastructure',
-    title: 'The data pipeline',
-    description: 'Live health of the open-data and weather feeds behind the map.',
-    accent: 'from-cyan-500/30 via-blue-500/10 to-sky-400/20',
-    glow: 'rgba(8,145,178,0.16)',
-    color: '#0891B2',
-  },
-  flagged: {
-    eyebrow: 'Moderation',
-    title: 'Flagged content review',
-    description: 'Restore clean reports, permanently remove harmful ones.',
-    accent: 'from-amber-500/30 via-orange-500/10 to-yellow-400/20',
-    glow: 'rgba(180,83,9,0.16)',
-    color: '#B45309',
-  },
-};
-
-function formatRelativeMinutes(timestamp: number) {
-  const ageMin = Math.floor((Date.now() - timestamp) / 60000);
-  if (ageMin < 1) return 'just now';
-  if (ageMin < 60) return `${ageMin}m ago`;
-  const ageHours = Math.floor(ageMin / 60);
-  if (ageHours < 24) return `${ageHours}h ago`;
-  return `${Math.floor(ageHours / 24)}d ago`;
+function ChartFrame({ height = 200, children }: { height?: number; children: React.ReactElement }) {
+  return <ResponsiveContainer width="100%" height={height}>{children}</ResponsiveContainer>;
 }
 
-function coerceTimestamp(value: unknown): number {
-  if (typeof value === 'number') return value;
-  if (value && typeof value === 'object') {
-    const maybeTimestamp = value as { toMillis?: () => number; seconds?: number };
-    if (typeof maybeTimestamp.toMillis === 'function') return maybeTimestamp.toMillis();
-    if (typeof maybeTimestamp.seconds === 'number') return maybeTimestamp.seconds * 1000;
-  }
-  return 0;
-}
-
-function formatSignupTime(timestamp?: number) {
-  if (!timestamp) return { relative: 'Unknown', absolute: 'No timestamp stored' };
-  const ageMs = Date.now() - timestamp;
-  const absolute = new Date(timestamp).toLocaleString('en-CA', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  if (ageMs < 2 * 24 * 60 * 60 * 1000) {
-    const hours = Math.max(0, Math.floor(ageMs / 3_600_000));
-    const days = Math.floor(hours / 24);
-    const remHours = hours % 24;
-    const parts = [];
-    if (days) parts.push(`${days}d`);
-    parts.push(`${remHours}h`);
-    return { relative: `${parts.join(' ')} ago`, absolute };
-  }
-  return { relative: absolute, absolute };
-}
-
-// ── Mini sparkline (inline, no deps) ─────────────────────────────────────────
-
-function MiniSparkline({ data, color = '#3b82f6' }: { data: number[]; color?: string }) {
+/** Inline sparkline — cheaper than a chart instance per tile. */
+function Spark({ data, tone = T.signal }: { data: number[]; tone?: string }) {
   if (!data.length) return null;
   const max = Math.max(...data, 1);
-  const W = 80; const H = 32;
-  const pts = data.map((v, i) => {
-    const x = (i / (data.length - 1)) * W;
-    const y = H - (v / max) * H;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(' ');
+  const min = Math.min(...data, 0);
+  const span = max - min || 1;
+  const pts = data
+    .map((v, i) => `${(i / Math.max(data.length - 1, 1)) * 100},${28 - ((v - min) / span) * 26}`)
+    .join(' ');
   return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none" className="opacity-70">
-      <polyline points={pts} stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    <svg viewBox="0 0 100 28" preserveAspectRatio="none" className="w-full h-7" aria-hidden>
+      <polyline points={pts} fill="none" stroke={tone} strokeWidth={1.75} vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
 
-// ── Section header ─────────────────────────────────────────────────────────────
-
-function SectionHeader({ icon: Icon, title, subtitle, color = '#4A90D9' }: { icon: React.ElementType; title: string; subtitle?: string; color?: string }) {
+function Legend({ items }: { items: { label: string; value?: number; color: string }[] }) {
   return (
-    <div className="flex items-center gap-3 mb-6">
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}14`, border: `1px solid ${color}33` }}>
-        <Icon size={15} style={{ color }} />
-      </div>
-      <div>
-        <h2 className="font-display text-base font-bold tracking-[-0.01em] text-white light:text-[#1C2B3A]">{title}</h2>
-        {subtitle && <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-slate-500 mt-0.5">{subtitle}</p>}
-      </div>
-      <span className="hidden sm:block h-px flex-1" style={{ background: `linear-gradient(to right, ${color}40, transparent)` }} aria-hidden="true" />
+    <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-3">
+      {items.map((i) => (
+        <span key={i.label} className="inline-flex items-center gap-1.5 text-[0.7rem]" style={{ color: T.muted }}>
+          <span className="h-2 w-2 rounded-sm shrink-0" style={{ background: i.color }} />
+          {i.label}
+          {i.value !== undefined && (
+            <span className="tabular-nums font-semibold" style={{ fontFamily: mono, color: T.ink }}>{i.value}</span>
+          )}
+        </span>
+      ))}
     </div>
   );
 }
 
-// ── Main component ─────────────────────────────────────────────────────────────
-
 export default function AdminPage() {
-  const navigate = useNavigate();
-  const { user, signIn, isAuthReady, isAdmin } = useAuth();
+  const { logout } = useAuth();
+  const [section, setSection] = useState<Section>('desk');
+  const d = useAdminData();
 
-  const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
-  const [incidents, setIncidents] = useState<Incident[]>([]);
-  const [communityStats, setCommunityStats] = useState<(CommunityStats & { id: string })[]>([]);
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [pageViewDocs, setPageViewDocs] = useState<PageViewDoc[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
-  const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
-  const [totalPageViews, setTotalPageViews] = useState<number | null>(null);
-  const [flaggedIncidents, setFlaggedIncidents] = useState<Incident[]>([]);
-  const [restoringId, setRestoringId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const failingFeeds = d.apiHealths.filter((a) => a.status === 'error').length;
 
-  const [incidentDrafts, setIncidentDrafts] = useState<Record<string, EditableIncident>>({});
-  const [statsDrafts, setStatsDrafts] = useState<Record<string, EditableCommunityStats>>({});
-  const [savingIncidentId, setSavingIncidentId] = useState<string | null>(null);
-  const [savingStatsId, setSavingStatsId] = useState<string | null>(null);
-  const [apiHealths, setApiHealths] = useState<ApiHealth[]>(
-    API_ENDPOINTS.map(e => ({ ...e, status: 'idle', recordCount: null, responseMs: null, lastChecked: null, error: null }))
-  );
-  const [liveTrafficCount, setLiveTrafficCount] = useState<number | null>(null);
-  const [live311Count, setLive311Count] = useState<number | null>(null);
-
-  const { stats: crimeStats, isLoading: crimeLoading } = useCrimeStats();
-
-  // ── Audit log ──────────────────────────────────────────────────────────────
-
-  const writeAuditLog = async (
-    action:
-      | 'incident_update'
-      | 'incident_soft_delete'
-      | 'incident_suppress'
-      | 'image_cleanup_failed'
-      | 'community_stats_update'
-      | 'community_stats_soft_delete',
-    targetCollection: 'incidents' | 'community_stats',
-    targetId: string,
-    changes: Record<string, unknown>,
-  ) => {
-    if (!user || !db) return;
-    await addDoc(collection(db, 'admin_audit_logs'), {
-      action, targetCollection, targetId,
-      adminUid: user.uid, adminEmail: user.email || '',
-      timestamp: Date.now(), changes,
-      metadata: { userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown' },
-    });
-  };
-
-  const handleRestore = async (incidentId: string) => {
-    if (!db || restoringId) return;
-    setRestoringId(incidentId);
-    try {
-      // Clearing the flagger list as well as the visibility, otherwise the
-      // same two accounts could not re-flag and a restored report would sit at
-      // or above the threshold forever.
-      await updateDoc(doc(db, 'incidents', incidentId), {
-        visibility: 'public',
-        flagged: false,
-        flagged_at: deleteField(),
-        flagged_by: [],
-        flag_count: 0,
-      });
-      await writeAuditLog('incident_update', 'incidents', incidentId, { visibility: 'public' });
-    } catch (err) {
-      // Surfaced rather than swallowed: this used to fail silently, which made
-      // a rules rejection look identical to a successful restore.
-      console.error('Failed to restore incident:', err);
-      alert('Could not restore this incident. Check your admin permissions.');
-    } finally {
-      setRestoringId(null);
-    }
-  };
-
-  const handlePermanentDelete = async (incidentId: string) => {
-    if (!window.confirm('Permanently delete this incident? This cannot be undone.')) return;
-    if (!db || deletingId) return;
-    setDeletingId(incidentId);
-    const target = incidents.find((i) => i.id === incidentId);
-    const isIngested =
-      target?.authorUid === 'system' ||
-      (target?.data_source != null && target.data_source !== 'community');
-    try {
-      // Suppress first, delete second. Deleting an ingested record on its own
-      // is undone by the next ingest run, which re-upserts by dedup_key; if the
-      // suppression write fails we want to have stopped before the delete
-      // rather than after it.
-      if (isIngested) {
-        await setDoc(doc(db, 'suppressed_incidents', suppressionDocId(incidentId)), {
-          suppressedAt: Date.now(),
-          // Expire the entry well past the point the upstream feed would have
-          // dropped the record, so the list cannot grow without bound.
-          expiresAt: Date.now() + SUPPRESSION_TTL_MS,
-        });
-        await writeAuditLog('incident_suppress', 'incidents', incidentId, {
-          reason: 'admin_permanent_delete',
-          source_type: target?.source_type ?? null,
-        });
-      }
-
-      await deleteDoc(doc(db, 'incidents', incidentId));
-      await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });
-
-      // The photo is removed after the record it belonged to is gone. A
-      // failure here leaves an orphan rather than an inconsistent takedown, so
-      // it is recorded for retry instead of aborting the deletion.
-      if (target?.image_url) {
-        const removed = await deleteIncidentImage(target.image_url);
-        if (!removed) {
-          await writeAuditLog('image_cleanup_failed', 'incidents', incidentId, {
-            image_url: target.image_url,
-          });
-        }
-      }
-    } catch (err) {
-      console.error('Failed to permanently delete incident:', err);
-      alert('Could not delete this incident. Check your admin permissions.');
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  // ── Data subscriptions ────────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (!isAuthReady || !user || !isAdmin || !db) return;
-
-    const unsubIncidents = onSnapshot(
-      query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(500)),
-      (snapshot) => {
-        const rows = snapshot.docs
-          .map((row) => ({ id: row.id, ...row.data() } as Incident))
-          .filter((row) => incidentVisibility(row) !== 'deleted');
-        setIncidents(rows);
-        setLoadingData(false);
-      }
-    );
-
-    const unsubStats = onSnapshot(collection(db, 'community_stats'), (snapshot) => {
-      const rows = snapshot.docs
-        .map((row) => ({ id: row.id, ...row.data() } as CommunityStats & { id: string; deleted?: boolean }))
-        .filter((row) => incidentVisibility(row) !== 'deleted');
-      setCommunityStats(rows);
-    });
-
-    const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
-      setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
-    });
-
-    // Page views — real-time listener for chart/breakdown data (last 2000 docs)
-    const unsubPageViews = onSnapshot(
-      query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(200)),
-      (snapshot) => {
-        setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc));
-      },
-      () => {}
-    );
-
-    // True total count — not capped by the snapshot limit
-    const fetchTotalCount = async () => {
-      try {
-        const snap = await getCountFromServer(collection(db!, 'page_views'));
-        setTotalPageViews(snap.data().count);
-      } catch {
-        setTotalPageViews(null);
-      }
-    };
-    fetchTotalCount();
-    const countInterval = 0;
-
-    const unsubFlagged = onSnapshot(
-      query(collection(db, 'incidents'), where('visibility', '==', 'flagged'), orderBy('flagged_at', 'desc')),
-      (snapshot) => {
-        setFlaggedIncidents(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Incident)));
-      }
-    );
-
-    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubPageViews(); unsubFlagged(); clearInterval(countInterval); };
-  }, [isAuthReady, isAdmin, user]);
-
-  // ── API health polling ────────────────────────────────────────────────────
-
-  const checkApis = useCallback(async () => {
-    setApiHealths(prev => prev.map(h => ({ ...h, status: 'checking' as const })));
-    const results = await Promise.all(
-      API_ENDPOINTS.map(async (ep) => {
-        const start = Date.now();
-        try {
-          const res = await fetch(ep.url);
-          const ms = Date.now() - start;
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          const count = Array.isArray(data) ? data.length : (data ? 1 : 0);
-          return { ...ep, status: (ms > 2000 ? 'slow' : 'ok') as ApiHealth['status'], recordCount: count, responseMs: ms, lastChecked: Date.now(), error: null };
-        } catch (err: any) {
-          return { ...ep, status: 'error' as const, recordCount: null, responseMs: Date.now() - start, lastChecked: Date.now(), error: err?.message ?? 'Unknown error' };
-        }
-      })
-    );
-    setApiHealths(results);
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthReady || !isAdmin) return;
-    checkApis();
-    const interval = setInterval(checkApis, 2 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [isAuthReady, isAdmin, checkApis]);
-
-  // Fetch live counts from Calgary Open Data APIs for dashboard KPI cards.
-  // These incidents are never written to Firestore, so they must be counted directly.
-  useEffect(() => {
-    if (!isAuthReady || !isAdmin) return;
-    const fetchLiveCounts = async () => {
-      try {
-        const [trafficRes, res311] = await Promise.allSettled([
-          fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt%20DESC'),
-          fetch("https://data.calgary.ca/resource/iahh-g8bj.json?$limit=50&$where=status_description%3D'Open'&$order=requested_date%20DESC"),
-        ]);
-        if (trafficRes.status === 'fulfilled' && trafficRes.value.ok) {
-          const data = await trafficRes.value.json();
-          setLiveTrafficCount(Array.isArray(data) ? data.length : 0);
-        }
-        if (res311.status === 'fulfilled' && res311.value.ok) {
-          const data = await res311.value.json();
-          setLive311Count(Array.isArray(data) ? data.length : 0);
-        }
-      } catch {
-        // non-critical — dashboard still works without these counts
-      }
-    };
-    fetchLiveCounts();
-    const interval = setInterval(fetchLiveCounts, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [isAuthReady, isAdmin]);
-
-  // ── KPI derivations ───────────────────────────────────────────────────────
-
-  const totalIncidents     = incidents.length;
-  const emergencyIncidents = incidents.filter((i) => i.category === 'emergency').length;
-  const unresolvedIncidents = incidents.filter((i) => i.verified_status !== 'community_confirmed').length;
-  const todayIncidents     = incidents.filter((i) => Date.now() - i.timestamp < 86_400_000).length;
-  const totalUsers         = users.length;
-  const adminUsers         = users.filter((u) => u.role === 'admin').length;
-  const viewOnlyUsers      = totalUsers - adminUsers;
-  const uniqueReporterEmails = new Set(
-    incidents.map((i) => i.email).filter(e => e && e !== 'anonymous@calgarywatch.app' && e !== 'opendata@calgary.ca')
-  ).size;
-  const averageSafety = useMemo(() => {
-    if (communityStats.length === 0) return 0;
-    return Math.round(communityStats.reduce((sum, r) => sum + Number(r.safety_score || 0), 0) / communityStats.length);
-  }, [communityStats]);
-
-  const MODERATION_WINDOW_MS = 30 * 60 * 1000;
-  const pendingReviewIncidents = incidents.filter((i) =>
-    i.verified_status === 'unverified' &&
-    i.data_source !== 'system' &&
-    Date.now() - i.timestamp < MODERATION_WINDOW_MS
-  );
-
-  const officialTrafficCount   = incidents.filter((i) => i.source_type === '511_alberta_traffic').length;
-  const official311Count       = incidents.filter((i) => i.source_type === 'calgary_infrastructure').length;
-  const officialCrimeCount     = incidents.filter((i) => i.source_type === 'calgary_police_crime').length;
-  const communityReportCount   = incidents.filter((i) => !i.data_source || i.data_source === 'community').length;
-  const activeSectionTheme = SECTION_THEMES[activeSection];
-  const activeNavItem = NAV_ITEMS.find((item) => item.id === activeSection) ?? NAV_ITEMS[0];
-
-  // ── Incident chart data ───────────────────────────────────────────────────
-
-  const categoryChartData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    incidents.forEach((i) => { counts[i.category] = (counts[i.category] ?? 0) + 1; });
-    // Series come from the shared category list, plus any legacy categories
-    // still present on old documents, so this chart cannot silently omit a
-    // category the rest of the app accepts.
+  const navItems: NavItem[] = useMemo(() => {
+    const needsAttention =
+      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds;
     return [
-      ...INCIDENT_CATEGORIES.map((c) => ({
-        name: c.label,
-        value: counts[c.value] ?? 0,
-        color: c.color as string,
-      })),
-      ...LEGACY_INCIDENT_CATEGORIES.map((value) => ({
-        name: `${value[0].toUpperCase()}${value.slice(1)} (legacy)`,
-        value: counts[value] ?? 0,
-        color: '#10b981',
-      })),
-    ].filter((d) => d.value > 0);
-  }, [incidents]);
-
-  const userRoleChartData = useMemo(() => {
-    let admins = 0, postingUsers = 0, lurkingUsers = 0;
-    const posterEmails = new Set(incidents.map(i => i.email).filter(Boolean));
-    const posterUids   = new Set(incidents.map(i => (i as any).uid).filter(Boolean));
-    users.forEach(u => {
-      if (u.role === 'admin') admins++;
-      else if (posterEmails.has(u.email) || posterUids.has(u.uid)) postingUsers++;
-      else lurkingUsers++;
-    });
-    return [
-      { name: 'Posting Users',   value: postingUsers, color: '#f59e0b' },
-      { name: 'View-Only Users', value: lurkingUsers, color: '#4A90D9' },
-      { name: 'Admins',          value: admins,       color: '#2E8B7A' },
-    ].filter((d) => d.value > 0);
-  }, [users, incidents]);
-
-  const trustChartData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    incidents.forEach((i) => { counts[i.verified_status] = (counts[i.verified_status] ?? 0) + 1; });
-    return [
-      { name: 'Unverified',          value: counts['unverified']          ?? 0, color: '#64748b' },
-      { name: 'Multiple Reports',    value: counts['multiple_reports']    ?? 0, color: '#f59e0b' },
-      { name: 'Community Confirmed', value: counts['community_confirmed'] ?? 0, color: '#22c55e' },
-    ].filter((d) => d.value > 0);
-  }, [incidents]);
-
-  const timelineChartData = useMemo(() => {
-    const days = 14;
-    const buckets: Record<string, number> = {};
-    const now = Date.now();
-    for (let d = days - 1; d >= 0; d--) {
-      const date = new Date(now - d * 86400000);
-      buckets[date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })] = 0;
-    }
-    incidents.forEach((i) => {
-      const key = new Date(i.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      if (key in buckets) buckets[key]++;
-    });
-    return Object.entries(buckets).map(([date, count]) => ({ date, count }));
-  }, [incidents]);
-
-  // Sparkline data for page views KPI (last 14 days daily buckets)
-  const pageViewsSparklineData = useMemo(() => {
-    const days = 14;
-    const buckets: Record<string, number> = {};
-    const now = Date.now();
-    for (let d = days - 1; d >= 0; d--) {
-      const date = new Date(now - d * 86400000).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      buckets[date] = 0;
-    }
-    pageViewDocs.forEach((pv) => {
-      const key = new Date(pv.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      if (key in buckets) buckets[key]++;
-    });
-    return Object.values(buckets);
-  }, [pageViewDocs]);
-
-  const incidentSparklineData = useMemo(
-    () => timelineChartData.map(d => d.count),
-    [timelineChartData]
-  );
-
-  const neighborhoodChartData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    incidents.forEach((i) => {
-      if (i.neighborhood) counts[i.neighborhood] = (counts[i.neighborhood] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1]).slice(0, 8)
-      .map(([name, count]) => ({ name, count }));
-  }, [incidents]);
-
-  const safetyChartData = useMemo(() =>
-    communityStats.slice().sort((a, b) => b.safety_score - a.safety_score).slice(0, 10)
-      .map((row) => ({
-        name: row.community.length > 12 ? row.community.slice(0, 12) + '…' : row.community,
-        'Safety Score': row.safety_score,
-        'Violent Crime': row.violent_crime,
-        'Property Crime': row.property_crime,
-        'Disorder Calls': row.disorder_calls,
-      })),
-  [communityStats]);
-
-  const hourlyChartData = useMemo(() => {
-    const buckets = Array.from({ length: 24 }, (_, h) => ({ hour: `${h}:00`, count: 0 }));
-    incidents.forEach((i) => { buckets[new Date(i.timestamp).getHours()].count++; });
-    return buckets;
-  }, [incidents]);
-
-  const categoryByDayData = useMemo(() => {
-    const days = 7;
-    const now = Date.now();
-    const result: Record<string, Record<string, number>> = {};
-    for (let d = days - 1; d >= 0; d--) {
-      const date = new Date(now - d * 86400000).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      result[date] = { emergency: 0, crime: 0, traffic: 0, infrastructure: 0, weather: 0 };
-    }
-    incidents.forEach((i) => {
-      const key = new Date(i.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      if (result[key] && i.category in result[key]) result[key][i.category]++;
-    });
-    return Object.entries(result).map(([date, cats]) => ({ date, ...cats }));
-  }, [incidents]);
-
-  const topReportersData = useMemo(() => {
-    const counts: Record<string, { name: string; count: number }> = {};
-    incidents.forEach((i) => {
-      const uid = (i as any).authorUid;
-      const key = uid || i.email || 'unknown';
-      if (!counts[key]) {
-        const u = users.find(u => u.uid === uid || u.email === i.email);
-        counts[key] = { name: u?.displayName || i.name || i.email || 'Unknown', count: 0 };
-      }
-      counts[key].count++;
-    });
-    return Object.values(counts)
-      .filter(r => r.name !== 'Calgary 311 Sync' && r.name !== 'City of Calgary Traffic' && r.name !== 'Calgary Police Service')
-      .sort((a, b) => b.count - a.count).slice(0, 8)
-      .map(r => ({ name: r.name.length > 14 ? r.name.slice(0, 14) + '…' : r.name, count: r.count }));
-  }, [incidents, users]);
-
-  const newestSignups = useMemo(() => {
-    const firstReportByUser = new globalThis.Map<string, number>();
-    incidents.forEach((incident) => {
-      const keys = [(incident as any).authorUid, incident.email].filter(Boolean) as string[];
-      keys.forEach((key) => {
-        const existing = firstReportByUser.get(key);
-        if (!existing || incident.timestamp < existing) firstReportByUser.set(key, incident.timestamp);
-      });
-    });
-
-    return users
-      .map((profile) => ({
-        ...profile,
-        joinedAt: coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || firstReportByUser.get(profile.uid) || firstReportByUser.get(profile.email) || 0,
-        reports: incidents.filter((i) =>
-          ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
-          (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
-        ).length,
-      }))
-      .sort((a, b) => b.joinedAt - a.joinedAt)
-      .slice(0, 5);
-  }, [users, incidents]);
-
-  // User growth sparkline (registrations per day, last 14 days)
-  // We don't have createdAt on UserProfile, so we proxy via first report date
-  const userGrowthData = useMemo(() => {
-    const days = 30;
-    const buckets: Record<string, number> = {};
-    const now = Date.now();
-    for (let d = days - 1; d >= 0; d--) {
-      const date = new Date(now - d * 86400000).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      buckets[date] = 0;
-    }
-    // Proxy: count distinct new authors each day from incidents
-    const seenAuthors = new Set<string>();
-    incidents.slice().sort((a, b) => a.timestamp - b.timestamp).forEach((i) => {
-      const uid = (i as any).authorUid || i.email;
-      if (!uid || seenAuthors.has(uid)) return;
-      seenAuthors.add(uid);
-      const key = new Date(i.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      if (key in buckets) buckets[key]++;
-    });
-    return Object.entries(buckets).map(([date, count]) => ({ date, count }));
-  }, [incidents]);
-
-  const userGrowthSparklineData = useMemo(
-    () => userGrowthData.map(d => d.count),
-    [userGrowthData]
-  );
-
-  // ── Traffic analytics chart data ──────────────────────────────────────────
-
-  // Page views per day — last 30 days
-  const pageViewsByDayData = useMemo(() => {
-    const days = 30;
-    const buckets: Record<string, number> = {};
-    const now = Date.now();
-    for (let d = days - 1; d >= 0; d--) {
-      const date = new Date(now - d * 86400000).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      buckets[date] = 0;
-    }
-    pageViewDocs.forEach((pv) => {
-      const key = new Date(pv.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      if (key in buckets) buckets[key]++;
-    });
-    return Object.entries(buckets).map(([date, views]) => ({ date, views }));
-  }, [pageViewDocs]);
-
-  // Traffic source breakdown
-  const trafficSourceData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    pageViewDocs.forEach((pv) => {
-      const src = pv.traffic_source || 'direct';
-      counts[src] = (counts[src] ?? 0) + 1;
-    });
-    const colorMap: Record<string, string> = {
-      direct: '#4A90D9',
-      organic_search: '#22c55e',
-      social: '#f59e0b',
-      referral: '#a855f7',
-      campaign: '#f97316',
-      email: '#ec4899',
-    };
-    const labelMap: Record<string, string> = {
-      direct: 'Direct',
-      organic_search: 'Organic Search',
-      social: 'Social Media',
-      referral: 'Referral',
-      campaign: 'Campaign (UTM)',
-      email: 'Email',
-    };
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([src, value]) => ({
-        name: labelMap[src] || src,
-        value,
-        color: colorMap[src] || '#64748b',
-      }));
-  }, [pageViewDocs]);
-
-  // Top pages by views
-  const topPagesData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    pageViewDocs.forEach((pv) => {
-      const p = pv.path || '/';
-      counts[p] = (counts[p] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1]).slice(0, 8)
-      .map(([path, views]) => ({ path, views }));
-  }, [pageViewDocs]);
-
-  // UTM campaign performance
-  const utmCampaignData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    pageViewDocs.forEach((pv) => {
-      if (pv.utm_campaign) counts[pv.utm_campaign] = (counts[pv.utm_campaign] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1]).slice(0, 6)
-      .map(([campaign, views]) => ({ campaign: campaign.length > 18 ? campaign.slice(0, 18) + '…' : campaign, views }));
-  }, [pageViewDocs]);
-
-  // Top referrers
-  const topReferrersData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    pageViewDocs.forEach((pv) => {
-      if (!pv.referrer) return;
-      // Stored as a bare hostname since the analytics sanitisation pass.
-      // Older documents may still hold a full URL, so accept both.
-      let host = pv.referrer.replace(/^www\./, '');
-      if (host.includes('/') || host.includes(':')) {
-        try {
-          host = new URL(pv.referrer).hostname.replace(/^www\./, '');
-        } catch {
-          return;
-        }
-      }
-      if (host && host !== window.location.hostname.replace(/^www\./, '')) {
-        counts[host] = (counts[host] ?? 0) + 1;
-      }
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1]).slice(0, 8)
-      .map(([referrer, views]) => ({ referrer: referrer.length > 22 ? referrer.slice(0, 22) + '…' : referrer, views }));
-  }, [pageViewDocs]);
-
-  const organicSearchDocs = useMemo(
-    () => pageViewDocs.filter((pv) => pv.traffic_source === 'organic_search'),
-    [pageViewDocs]
-  );
-
-  const organicShare = useMemo(() => {
-    if (!pageViewDocs.length) return 0;
-    return Math.round((organicSearchDocs.length / pageViewDocs.length) * 100);
-  }, [organicSearchDocs.length, pageViewDocs.length]);
-
-  const organicSearchByDayData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    organicSearchDocs.forEach((pv) => {
-      const key = new Date(pv.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
-      counts[key] = (counts[key] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .map(([date, searches]) => ({ date, searches }))
-      .sort((a, b) => b.searches - a.searches)
-      .slice(0, 7);
-  }, [organicSearchDocs]);
-
-  const organicQueryData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    organicSearchDocs.forEach((pv) => {
-      // Search keywords are intentionally not collected (PII). This panel
-      // reports organic-search volume only.
-      const queryText = 'Keyword not collected';
-      counts[queryText] = (counts[queryText] ?? 0) + 1;
-    });
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([queryText, views]) => ({ queryText, views }));
-  }, [organicSearchDocs]);
-
-  // Unique sessions (approximate)
-  const uniqueSessions = useMemo(() => {
-    return new Set(pageViewDocs.map(pv => pv.sessionId).filter(Boolean)).size;
-  }, [pageViewDocs]);
-
-  // Avg pages per session
-  const avgPagesPerSession = useMemo(() => {
-    if (!uniqueSessions) return 0;
-    return (pageViewDocs.length / uniqueSessions).toFixed(1);
-  }, [pageViewDocs, uniqueSessions]);
-
-  const topCrimeCommunities = useMemo(() => {
-    const entries: { name: string; crime: number; disorder: number; year: number }[] = [];
-    crimeStats.forEach((v, k) => entries.push({ name: k, ...v }));
-    return entries.sort((a, b) => (b.crime + b.disorder) - (a.crime + a.disorder)).slice(0, 20);
-  }, [crimeStats]);
-
-  // ── Mutations ─────────────────────────────────────────────────────────────
-
-  const setIncidentDraft = (incident: Incident, patch?: Partial<EditableIncident>) => {
-    setIncidentDrafts((prev) => ({
-      ...prev,
-      [incident.id]: {
-        ...(prev[incident.id] || {
-          ...emptyIncidentDraft,
-          title: incident.title, description: incident.description,
-          category: incident.category, neighborhood: incident.neighborhood,
-          verified_status: incident.verified_status, report_count: incident.report_count,
-          source_name: incident.source_name || '', source_url: incident.source_url || '',
-        }),
-        ...patch,
-      },
-    }));
-  };
-
-  const setStatsDraft = (row: CommunityStats & { id: string }, patch?: Partial<EditableCommunityStats>) => {
-    setStatsDrafts((prev) => ({
-      ...prev,
-      [row.id]: {
-        ...(prev[row.id] || {
-          ...emptyStatsDraft,
-          community: row.community, month: row.month,
-          violent_crime: row.violent_crime, property_crime: row.property_crime,
-          disorder_calls: row.disorder_calls, safety_score: row.safety_score,
-        }),
-        ...patch,
-      },
-    }));
-  };
-
-  const saveIncident = async (incidentId: string) => {
-    const draft = incidentDrafts[incidentId];
-    if (!draft || !db) return;
-    setSavingIncidentId(incidentId);
-    try {
-      await updateDoc(doc(db, 'incidents', incidentId), { ...draft, report_count: Number(draft.report_count || 0) });
-      await writeAuditLog('incident_update', 'incidents', incidentId, draft);
-    } finally { setSavingIncidentId(null); }
-  };
-
-  const saveCommunityStats = async (statsId: string) => {
-    const draft = statsDrafts[statsId];
-    if (!draft || !db) return;
-    setSavingStatsId(statsId);
-    try {
-      await updateDoc(doc(db, 'community_stats', statsId), {
-        ...draft,
-        violent_crime: Number(draft.violent_crime || 0),
-        property_crime: Number(draft.property_crime || 0),
-        disorder_calls: Number(draft.disorder_calls || 0),
-        safety_score: Number(draft.safety_score || 0),
-      });
-      await writeAuditLog('community_stats_update', 'community_stats', statsId, draft);
-    } finally { setSavingStatsId(null); }
-  };
-
-  const softDeleteIncident = async (incidentId: string) => {
-    if (!user || !db) return;
-    if (!window.confirm('Soft-delete this incident? It will be hidden from the live feed.')) return;
-    try {
-      await updateDoc(doc(db, 'incidents', incidentId), {
-        visibility: 'deleted',
-        deleted: true,
-        deletedAt: Date.now(),
-        deletedBy: user.uid,
-      });
-      await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { visibility: 'deleted' });
-    } catch (err) {
-      console.error('Failed to soft-delete incident:', err);
-      alert('Could not delete this incident. Check your admin permissions.');
-    }
-  };
-
-  const approveIncident = async (incidentId: string) => {
-    if (!user || !db) return;
-    try {
-      await updateDoc(doc(db, 'incidents', incidentId), { verified_status: 'unverified' });
-      await writeAuditLog('incident_update', 'incidents', incidentId, { verified_status: 'unverified' });
-    } catch (err) { console.error('Failed to approve incident:', err); }
-  };
-
-  const softDeleteCommunityStats = async (statsId: string) => {
-    if (!user || !db) return;
-    if (!window.confirm('Soft-delete this community stats row?')) return;
-    try {
-      await updateDoc(doc(db, 'community_stats', statsId), { deleted: true, deletedAt: Date.now(), deletedBy: user.uid });
-      await writeAuditLog('community_stats_soft_delete', 'community_stats', statsId, { deleted: true });
-    } catch (err) {
-      console.error('Failed to soft-delete community stats:', err);
-      alert('Could not delete this row. Check your admin permissions.');
-    }
-  };
-
-  const refreshUsers = async () => {
-    if (!db) return;
-    setIsRefreshingUsers(true);
-    try {
-      const snap = await getDocs(collection(db, 'users'));
-      setUsers(snap.docs.map(d => d.data() as UserProfile));
-    } catch {}
-    setIsRefreshingUsers(false);
-  };
-
-  // ── Auth gates ────────────────────────────────────────────────────────────
-
-  if (!isAuthReady) {
-    return (
-      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 flex items-center justify-center">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isFirebaseConfigured) {
-    return (
-      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <h1 className="font-display text-2xl font-extrabold tabular-nums light:text-slate-900">Admin unavailable</h1>
-          <p className="text-slate-300 light:text-slate-600 text-sm leading-relaxed">
-            This deployment was built without Firebase environment variables. Add the{' '}
-            <code className="text-amber-300/90 light:text-amber-700">VITE_FIREBASE_*</code> secrets to your GitHub repository
-            and re-run the Pages workflow, or run <code className="text-amber-300/90 light:text-amber-700">npm run build</code>{' '}
-            with a local <code className="text-amber-300/90 light:text-amber-700">.env</code> file.
-          </p>
-          <Button onClick={() => navigate('/map')} className="w-full">Back to map</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <h1 className="font-display text-2xl font-extrabold tabular-nums light:text-slate-900">Admin Portal</h1>
-          <p className="text-slate-300 light:text-slate-600 text-sm">Sign in with Google using the approved admin account to continue.</p>
-          <Button onClick={signIn} className="w-full">Sign in with Google</Button>
-          <Button variant="secondary" onClick={() => navigate('/map')} className="w-full">Back to map</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-[#F5EFE3] text-slate-900 p-6 flex items-center justify-center">
-        <Card className="max-w-xl w-full p-8 space-y-4 bg-[#FFFDF8] border-red-200 rounded-[2rem] shadow-[0_25px_80px_-30px_rgba(0,0,0,0.7)]">
-          <div className="flex items-center gap-2 text-red-400 light:text-red-600">
-            <Lock size={18} />
-            <h1 className="font-display text-2xl font-extrabold tabular-nums">Access denied</h1>
-          </div>
-          <p className="text-slate-300 light:text-slate-600 text-sm">This portal is restricted to approved admin accounts.</p>
-          <Button variant="secondary" onClick={() => navigate('/map')} className="w-full">Back to map</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  // ── Shared tooltip style ──────────────────────────────────────────────────
-  const ttStyle = { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, fontSize: 11, color: '#1e293b' };
-
-  const renderMobileHero = () => {
-    const ActiveIcon = activeNavItem.icon;
-    const mobileKpis = [
-      { label: 'Open Issues', value: unresolvedIncidents, tone: 'text-amber-300 light:text-amber-700', chip: 'bg-amber-500/15 light:bg-amber-50 border-amber-400/20 light:border-amber-200' },
-      { label: 'Pending Review', value: pendingReviewIncidents.length, tone: 'text-rose-300 light:text-rose-700', chip: 'bg-rose-500/15 light:bg-rose-50 border-rose-400/20 light:border-rose-200' },
-      { label: 'Active Users', value: totalUsers, tone: 'text-sky-300 light:text-sky-700', chip: 'bg-sky-500/15 light:bg-sky-50 border-sky-400/20 light:border-sky-200' },
+      { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined },
+      { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText },
+      { id: 'people', label: 'People', short: 'People', icon: Users },
+      { id: 'feeds', label: 'Data feeds', short: 'Feeds', icon: Zap, count: failingFeeds, tone: 'critical' },
+      { id: 'visitors', label: 'Visitors', short: 'Visitors', icon: Globe },
+      { id: 'city', label: 'City stats', short: 'City', icon: MapIcon },
     ];
+  }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds]);
 
+  const titles: Record<Section, { title: string; subtitle: string }> = {
+    desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
+    reports: { title: 'Reports', subtitle: 'What is being reported, where, and when' },
+    people: { title: 'People', subtitle: 'Who is signed up and who is contributing' },
+    feeds: { title: 'Data feeds', subtitle: 'Live status of the sources behind the map' },
+    visitors: { title: 'Visitors', subtitle: 'How people find and move through the site' },
+    city: { title: 'City stats', subtitle: 'Open-data crime figures and community safety scores' },
+  };
+
+  if (!d.isAuthReady) {
     return (
-      <div className="md:hidden px-4 pt-4">
-        <div
-          className="relative overflow-hidden rounded-3xl p-5 shadow-[0_24px_60px_-32px_rgba(28,43,58,0.5)]"
-          style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
-        >
-          {/* desk accent spine + tinted glow */}
-          <div className="absolute top-0 inset-x-0 h-1" style={{ background: activeSectionTheme.color }} aria-hidden="true" />
-          <div className="absolute -top-10 -right-10 h-36 w-36 rounded-full pointer-events-none" style={{ background: `radial-gradient(circle, ${activeSectionTheme.glow}, transparent 68%)` }} aria-hidden="true" />
+      <div className="min-h-screen grid place-items-center" style={{ background: T.surface }}>
+        <Loader2 className="animate-spin" style={{ color: T.muted }} />
+      </div>
+    );
+  }
 
-          <div className="relative space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.28em]" style={{ color: activeSectionTheme.color }}>{activeSectionTheme.eyebrow}</p>
-                <h1 className="mt-1.5 max-w-[15rem] font-display text-[1.55rem] font-extrabold tracking-[-0.02em] leading-[1.05] text-[#1C2B3A]">{activeSectionTheme.title}</h1>
-              </div>
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: `${activeSectionTheme.color}14`, border: `1px solid ${activeSectionTheme.color}33` }}>
-                <ActiveIcon size={19} style={{ color: activeSectionTheme.color }} />
-              </div>
-            </div>
-
-            <p className="max-w-[19rem] text-xs leading-relaxed text-[#5A6B7D]">{activeSectionTheme.description}</p>
-
-            <div className="grid grid-cols-3 gap-2">
-              {mobileKpis.map((kpi) => (
-                <div key={kpi.label} className="rounded-2xl px-3 py-3" style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }}>
-                  <p className="font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-[#5A6B7D]">{kpi.label}</p>
-                  <p className={cn('mt-1.5 text-lg font-black tabular-nums', kpi.tone)}>{kpi.value}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setActiveSection('incidents')}
-                className="rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98]"
-                style={{ background: '#1C2B3A' }}
-              >
-                <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.2em]" style={{ color: '#8FA3B5' }}>Priority</p>
-                <p className="mt-1 text-sm font-bold" style={{ color: '#FFFDF8' }}>Review incidents →</p>
-              </button>
-              <button
-                onClick={() => navigate('/map')}
-                className="rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98]"
-                style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
-              >
-                <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Live surface</p>
-                <p className="mt-1 text-sm font-bold text-[#1C2B3A]">Open public map →</p>
-              </button>
-            </div>
-          </div>
+  if (!isFirebaseConfigured || !d.user || !d.isAdmin) {
+    return (
+      <div className="min-h-screen grid place-items-center p-6" style={{ background: T.surface }}>
+        <div className="max-w-sm w-full rounded-2xl border p-6 text-center" style={{ background: T.card, borderColor: T.line }}>
+          <Lock size={22} className="mx-auto mb-3" style={{ color: T.muted }} />
+          <h1 className="text-lg font-bold mb-1" style={{ fontFamily: display, color: T.ink }}>
+            {!isFirebaseConfigured ? 'Admin is unavailable' : 'Admins only'}
+          </h1>
+          <p className="text-sm mb-4" style={{ color: T.muted }}>
+            {!isFirebaseConfigured
+              ? 'This build has no Firebase configuration, so there is nothing to administer.'
+              : 'Sign in with an approved admin account to open the watch desk.'}
+          </p>
+          <Link to="/map"><AdminButton tone="signal">Back to map</AdminButton></Link>
         </div>
       </div>
     );
-  };
-
-  const renderMobileCommandDeck = () => (
-    <div className="md:hidden sticky top-[72px] z-[19] px-4 py-2.5 backdrop-blur-xl" style={{ background: 'rgba(255,253,248,0.92)', borderBottom: '1px solid #E7E0D2' }}>
-      <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-0.5">
-        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
-          const isActive = activeSection === id;
-          const theme = SECTION_THEMES[id];
-          const badge = id === 'incidents' && pendingReviewIncidents.length > 0 ? pendingReviewIncidents.length : null;
-          return (
-            <button
-              key={id}
-              onClick={() => setActiveSection(id)}
-              className="relative inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[11px] font-bold transition-all active:scale-95"
-              style={isActive
-                ? { background: theme.color, color: '#fff', border: `1px solid ${theme.color}` }
-                : { background: '#FFFDF8', color: '#5A6B7D', border: '1px solid #E7E0D2' }}
-            >
-              <Icon size={13} style={{ color: isActive ? '#fff' : theme.color }} />
-              <span>{label}</span>
-              {badge != null && (
-                <span
-                  className="rounded-full px-1.5 py-0.5 text-[9px] font-black tabular-nums"
-                  style={isActive ? { background: 'rgba(255,255,255,0.25)', color: '#fff' } : { background: 'rgba(180,83,9,0.14)', color: '#B45309' }}
-                >
-                  {badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  // ── Section renderers ─────────────────────────────────────────────────────
-
-  const renderDashboard = () => (
-    <div className="space-y-5">
-      <SectionHeader color={activeSectionTheme.color} icon={LayoutDashboard} title="Dashboard" subtitle="Live platform health and moderation queue" />
-
-      {/* KPI row 1 — Incident health */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-red-50 border-red-200 rounded-2xl hover:border-red-500/60 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <Siren size={13} className="text-red-400 animate-pulse shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-red-400">Active Emergencies</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-red-400">{emergencyIncidents}</p>
-          <p className="text-[10px] text-red-400/50 mt-1">Critical — immediate review required</p>
-        </Card>
-
-        <Card className="p-4 bg-amber-50 border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle size={13} className="text-amber-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Unresolved</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-amber-400">{unresolvedIncidents}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Awaiting community confirmation</p>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <Clock3 size={13} className="text-blue-400 shrink-0" />
-              <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Last 24h</p>
-            </div>
-            <MiniSparkline data={incidentSparklineData} color="#60a5fa" />
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-blue-400 mt-2">{todayIncidents}</p>
-          <p className="text-[10px] text-slate-600 mt-1">14-day trend · today's reports</p>
-        </Card>
-
-        {/* Page Views KPI — enhanced with sparkline */}
-        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-pink-400/30 transition-all">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <Activity size={13} className="text-pink-400 shrink-0" />
-              <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Page Views</p>
-            </div>
-            <MiniSparkline data={pageViewsSparklineData} color="#f472b6" />
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums mt-2 light:text-slate-900">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
-          <p className="text-[10px] text-slate-600 mt-1">14-day trend above · lifetime total</p>
-        </Card>
-      </div>
-
-      {/* KPI row 2 — Users + Safety */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-[#FFFDF8] border-violet-200 rounded-2xl hover:border-violet-400/40 transition-all">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <Users size={13} className="text-violet-400 shrink-0" />
-              <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Total Users</p>
-            </div>
-            <MiniSparkline data={userGrowthSparklineData} color="#a78bfa" />
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-violet-400 mt-2">{totalUsers}</p>
-          <div className="flex gap-3 mt-1.5">
-            <span className="text-[10px] text-slate-500"><span className="text-[#4A90D9] font-black">{viewOnlyUsers}</span> View-Only</span>
-            <span className="text-[10px] text-slate-500"><span className="text-[#2E8B7A] font-black">{adminUsers}</span> Admin</span>
-          </div>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-amber-400/30 light:hover:border-amber-300 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <ChartPie size={13} className="text-amber-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Active Reporters</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-amber-400">{uniqueReporterEmails}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Distinct users who filed a report</p>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl hover:border-blue-400/30 light:hover:border-blue-300 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity size={13} className="text-blue-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Firebase Reports</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums light:text-slate-900">{totalIncidents}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Community + official in Firestore</p>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <ShieldCheck size={13} className="text-emerald-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Avg Safety Score</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-emerald-400">{averageSafety}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Mean score (0–100) across tracked neighborhoods</p>
-        </Card>
-      </div>
-
-      <div className="border-t border-[#E7E0D2]" />
-
-      {/* API Data Sources Panel */}
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-        <div className="flex items-center gap-2 mb-4">
-          <ChartNoAxesColumn size={14} className="text-sky-400" />
-          <h3 className="text-sm font-black uppercase tracking-widest text-sky-400">Live API Data Sources</h3>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: 'City Traffic', count: liveTrafficCount ?? officialTrafficCount, color: 'orange', desc: 'Live incidents from City of Calgary Open Data traffic feed' },
-            { label: 'Calgary 311', count: live311Count ?? official311Count, color: 'blue', desc: 'Open service requests synced from Calgary 311 portal' },
-            { label: 'Crime Stats', count: officialCrimeCount, color: 'red', desc: 'Monthly crime stats from Calgary Police Service Open Data' },
-            { label: 'Community', count: communityReportCount, color: 'emerald', desc: 'User-submitted incidents from the Calgary Watch community' },
-          ].map(({ label, count, color, desc }) => (
-            <div key={label} className={`flex flex-col gap-1 p-3.5 rounded-2xl bg-${color}-500/5 border border-${color}-500/20`}>
-              <p className={`text-[10px] font-black uppercase tracking-widest text-${color}-400`}>{label}</p>
-              <p className={`font-display text-2xl font-extrabold tabular-nums text-${color}-400`}>{count}</p>
-              <p className="text-[10px] text-slate-600 leading-snug">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      <div className="border-t border-[#E7E0D2]" />
-
-      {/* Moderation Queue */}
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base font-black flex items-center gap-2">
-              <ShieldQuestion size={15} className="text-amber-400" />
-              Moderation Queue
-              {pendingReviewIncidents.length > 0 && (
-                <span className="ml-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black">
-                  {pendingReviewIncidents.length} pending
-                </span>
-              )}
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">New community reports awaiting review. Auto-approved after 10 min.</p>
-          </div>
-        </div>
-        {pendingReviewIncidents.length === 0 ? (
-          <div className="flex items-center gap-2 py-6 justify-center text-slate-500 text-sm">
-            <CheckCircle size={16} className="text-green-500" /> Queue is clear
-          </div>
-        ) : (
-          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-            {pendingReviewIncidents.map((incident) => {
-              const ageMin = Math.floor((Date.now() - incident.timestamp) / 60000);
-              return (
-                <div key={incident.id} className="flex items-start gap-3 p-3 rounded-xl bg-[#F7F3EA] border border-[#E7E0D2]">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white light:text-slate-900 truncate">{incident.title}</p>
-                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{incident.description}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-500">
-                      <span>{incident.neighborhood}</span>
-                      <span>{incident.category}</span>
-                      <span>{ageMin < 1 ? 'just now' : `${ageMin}m ago`}</span>
-                      <span className="text-amber-400">auto-approves in {Math.max(0, 10 - ageMin)}m</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => approveIncident(incident.id)} className="px-3 py-1.5 rounded-lg bg-green-500/15 text-green-400 text-xs font-bold border border-green-500/25 hover:bg-green-500/25 transition-colors">Approve</button>
-                    <button onClick={() => softDeleteIncident(incident.id)} className="px-3 py-1.5 rounded-lg bg-red-500/15 text-red-400 text-xs font-bold border border-red-500/25 hover:bg-red-500/25 transition-colors">Remove</button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Card>
-
-      {/* User growth chart — Task 5 */}
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-        <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">New Contributor Activity · Last 30 Days</p>
-        <p className="text-[10px] text-slate-600 mb-4 mt-0.5">First-time reporters appearing each day (proxied from first incident submission). Reflects organic community growth.</p>
-        {userGrowthData.every(d => d.count === 0) ? (
-          <p className="text-slate-600 text-xs py-8 text-center">No contributor data yet.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={160}>
-            <AreaChart data={userGrowthData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="userGrowthGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1C2B3A14" />
-              <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} interval={4} />
-              <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={ttStyle} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#a78bfa' }} />
-              <Area type="monotone" dataKey="count" stroke="#8b5cf6" strokeWidth={2} fill="url(#userGrowthGrad)" name="New Contributors" />
-            </AreaChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-
-      {/* Latest signups + route to the full directory */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="col-span-1 lg:col-span-2 p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto h-[420px]">
-          <div className="flex items-center justify-between mb-4 pr-1">
-            <div>
-              <h3 className="text-base font-black flex items-center gap-2">
-                <Users size={15} className="text-violet-400" />
-                Newest Signups
-              </h3>
-              <p className="text-[10px] text-slate-500 mt-0.5">
-                <span className="text-violet-400 font-black">{totalUsers}</span> total ·{' '}
-                <span className="text-[#4A90D9] font-black">{viewOnlyUsers}</span> view-only ·{' '}
-                <span className="text-[#2E8B7A] font-black">{adminUsers}</span> admin ·{' '}
-                <span className="text-amber-400 font-black">{uniqueReporterEmails}</span> reporters
-              </p>
-            </div>
-            <Button variant="secondary" onClick={() => navigate('/admin/users')} className="h-8 px-3 text-[10px] uppercase font-bold tracking-widest bg-white/5 light:bg-slate-100 border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 hover:bg-white/10 light:hover:bg-slate-200 hover:text-white light:hover:text-slate-900">
-              Full Directory
-            </Button>
-          </div>
-          <div className="overflow-y-auto h-[320px] pr-2">
-            <table className="w-full text-xs min-w-[500px]">
-              <thead className="text-[#5A6B7D] bg-[#F7F3EA] top-0 sticky z-10">
-                <tr className="border-b border-white/8 light:border-slate-200">
-                  <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Role</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Joined</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Reports</th>
-                </tr>
-              </thead>
-              <tbody>
-                {newestSignups.map((profile) => {
-                  const joined = formatSignupTime(profile.joinedAt);
-                  return (
-                    <tr key={profile.uid} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.03] light:hover:bg-slate-50 transition-colors">
-                      <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>
-                      <td className="py-2.5 font-medium text-white light:text-slate-900 text-xs">{profile.displayName || 'Unknown'}</td>
-                      <td className="py-2.5 text-slate-400 text-[11px]">{profile.email || '—'}</td>
-                      <td className="py-2.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-[#2E8B7A]/20 border border-[#2E8B7A]/40 text-[#2E8B7A]' : 'bg-[#4A90D9]/10 border border-[#4A90D9]/20 text-[#4A90D9]'}`}>
-                          {profile.role === 'admin' ? 'Admin' : 'View-Only'}
-                        </span>
-                      </td>
-                      <td className="py-2.5">
-                        <span className="block text-[11px] font-black text-slate-300 light:text-slate-800">{joined.relative}</span>
-                        <span className="block text-[9px] text-slate-600">{joined.absolute}</span>
-                      </td>
-                      <td className="py-2.5">
-                        {profile.reports > 0
-                          ? <span className="text-amber-400 font-black text-[11px]">{profile.reports}</span>
-                          : <span className="text-slate-600 text-[11px]">0</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-
-        <div className="col-span-1 flex flex-col gap-4 h-[420px]">
-          <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] flex flex-col flex-1 min-h-0">
-            <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">User Roles</p>
-            <p className="text-[10px] text-slate-600 mb-2 mt-1">
-              <span className="text-violet-400 font-black">{totalUsers}</span> total registered users.
-            </p>
-            {userRoleChartData.length === 0 ? (
-              <p className="text-slate-600 text-xs flex-1 flex items-center justify-center">No user data.</p>
-            ) : (
-              <div className="flex-1 flex flex-col min-h-0">
-                <ResponsiveContainer width="100%" height={130}>
-                  <PieChart>
-                    <Pie data={userRoleChartData} cx="50%" cy="50%" innerRadius={36} outerRadius={58} paddingAngle={3} dataKey="value" strokeWidth={0}
-                      shape={(props: any, i: number) => <Sector {...props} fill={userRoleChartData[i]?.color ?? props.fill} />}
-                    />
-                    <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-col gap-1.5 mt-2">
-                  {userRoleChartData.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-white/3 light:bg-slate-50 border border-white/5 light:border-slate-200">
-                      <span className="flex items-center gap-2 text-xs text-slate-300 light:text-slate-700">
-                        <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
-                        {d.name}
-                      </span>
-                      <span className="text-sm font-black" style={{ color: d.color }}>{d.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </Card>
-
-          {topReportersData.length > 0 && (
-            <Card className="p-4 bg-[#FFFDF8] border-amber-200 rounded-[1.6rem]">
-              <p className="text-[10px] font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em] mb-3">Top Contributors</p>
-              <div className="space-y-1.5">
-                {topReportersData.slice(0, 5).map((r, i) => (
-                  <div key={r.name} className="flex items-center gap-2">
-                    <span className="text-[9px] text-slate-600 w-3 text-right shrink-0">{i + 1}</span>
-                    <span className="flex-1 text-[11px] text-slate-300 truncate">{r.name}</span>
-                    <span className="text-[11px] font-black text-amber-400">{r.count}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-          <Button onClick={() => navigate('/admin/users')} className="h-11 rounded-2xl bg-violet-600 hover:bg-violet-700 text-sm">
-            Open Full User Directory
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderIncidents = () => (
-    <div className="space-y-5">
-      <SectionHeader color={activeSectionTheme.color} icon={FileText} title="Incidents" subtitle="Edit, moderate, and soft-delete community and official incident records" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {[
-          { label: 'All Records', value: totalIncidents, tone: 'text-sky-400', note: 'Visible Firestore incidents' },
-          { label: 'Pending', value: pendingReviewIncidents.length, tone: 'text-amber-400', note: 'Needs moderation' },
-          { label: 'Community', value: communityReportCount, tone: 'text-emerald-400', note: 'User-posted reports' },
-          { label: 'Flagged', value: flaggedIncidents.length, tone: 'text-rose-400', note: 'Hidden by reports' },
-        ].map((item) => (
-          <Card key={item.label} className="p-4 bg-[#FFFDF8] border-[#E7E0D2] rounded-2xl">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{item.label}</p>
-            <p className={cn('mt-2 font-display text-3xl font-extrabold tabular-nums', item.tone)}>{item.value}</p>
-            <p className="mt-1 text-[10px] text-slate-600">{item.note}</p>
-          </Card>
-        ))}
-      </div>
-      <Card className="p-4 bg-orange-500/10 light:bg-orange-50 border-orange-500/20 light:border-orange-200 rounded-[1.6rem] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <p className="text-sm font-black text-white light:text-slate-900">Open the full incident workspace</p>
-          <p className="text-xs text-slate-400 light:text-slate-600 mt-0.5">Search all incidents, newest first, inspect raw data, edit fields, and review attached images on a dedicated page.</p>
-        </div>
-        <Button onClick={() => navigate('/admin/incidents')} className="h-10 rounded-2xl bg-orange-600 hover:bg-orange-700 text-sm shrink-0">
-          Full Incident List
-        </Button>
-      </Card>
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">
-            {totalIncidents} records · {pendingReviewIncidents.length} in queue
-          </span>
-          <span className="text-[10px] text-amber-500 md:hidden">Swipe table &rarr;</span>
-        </div>
-        {loadingData ? (
-          <div className="py-8 flex items-center justify-center"><Loader2 className="animate-spin" /></div>
-        ) : (
-          <>
-            <div className="space-y-4 md:hidden">
-              {incidents.map((incident) => {
-                const draft = incidentDrafts[incident.id] || {
-                  ...emptyIncidentDraft,
-                  title: incident.title, description: incident.description,
-                  category: incident.category, neighborhood: incident.neighborhood,
-                  verified_status: incident.verified_status, report_count: incident.report_count,
-                  source_name: incident.source_name || '', source_url: incident.source_url || '',
-                };
-                return (
-                  <div key={incident.id} className="rounded-[1.6rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-slate-900 to-slate-950 light:from-white light:to-slate-50 p-4 shadow-[0_20px_70px_-40px_rgba(15,23,42,0.95)]">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">{incident.category}</p>
-                        <p className="mt-1 text-sm font-black text-white light:text-slate-900">{incident.neighborhood || 'Unknown area'}</p>
-                        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                          {(() => {
-                            const isSystemInc = incident.data_source != null && incident.data_source !== 'community';
-                            if (isSystemInc) return <span className="text-[10px] text-slate-500">{incident.source_name || 'System'}</span>;
-                            const isAnon = Boolean(incident.anonymous);
-                            if (isAnon) {
-                              const real = users.find(u => u.uid === incident.authorUid);
-                              return (
-                                <>
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-400 uppercase tracking-wider">Anon</span>
-                                  <span className="text-[10px] text-slate-300">{real?.displayName || '—'}</span>
-                                  <span className="text-[10px] text-slate-500">{real?.email || incident.authorUid || '?'}</span>
-                                </>
-                              );
-                            }
-                            return <span className="text-[10px] text-slate-400">{incident.name || '—'}</span>;
-                          })()}
-                        </div>
-                      </div>
-                      <div className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-black text-slate-300">
-                        {formatRelativeMinutes(incident.timestamp)}
-                      </div>
-                    </div>
-                    <div className="mt-4 grid gap-3">
-                      <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} />
-                      <textarea className="h-24 w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} />
-                      <div className="grid grid-cols-2 gap-2">
-                        <select className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
-                          {INCIDENT_CATEGORY_VALUES.map((category) => <option key={category} value={category}>{category}</option>)}
-                        </select>
-                        <select className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
-                          {VERIFIED_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
-                        </select>
-                      </div>
-                      <div className="grid grid-cols-[1fr_auto] gap-2">
-                        <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} />
-                        <input type="number" className="w-24 rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} />
-                      </div>
-                      <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
-                      <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button onClick={() => saveIncident(incident.id)} className="h-11 rounded-2xl bg-blue-600 text-sm hover:bg-blue-700" disabled={savingIncidentId === incident.id}>
-                          {savingIncidentId === incident.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                          <span className="ml-2">Save</span>
-                        </Button>
-                        <Button variant="secondary" onClick={() => softDeleteIncident(incident.id)} className="h-11 rounded-2xl border border-red-500/30 bg-red-500/10 text-sm text-red-300 hover:bg-red-500/15">
-                          <Trash2 size={16} />
-                          <span className="ml-2">Remove</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <table className="hidden md:table w-full text-xs min-w-[1280px]">
-              <thead className="text-slate-400 light:text-slate-600">
-                <tr className="border-b border-white/10 light:border-slate-200">
-                  <th className="py-2 text-left">Title</th>
-                  <th className="py-2 text-left">Category</th>
-                  <th className="py-2 text-left">Neighborhood</th>
-                  <th className="py-2 text-left">Status</th>
-                  <th className="py-2 text-left">Reports</th>
-                  <th className="py-2 text-left">Time</th>
-                  <th className="py-2 text-left">Reporter</th>
-                  <th className="py-2 text-left">Description</th>
-                  <th className="py-2 text-left">Source</th>
-                  <th className="py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {incidents.map((incident) => {
-                  const draft = incidentDrafts[incident.id] || {
-                    ...emptyIncidentDraft,
-                    title: incident.title, description: incident.description,
-                    category: incident.category, neighborhood: incident.neighborhood,
-                    verified_status: incident.verified_status, report_count: incident.report_count,
-                    source_name: incident.source_name || '', source_url: incident.source_url || '',
-                  };
-                  return (
-                    <tr key={incident.id} className="border-b border-white/5 light:border-slate-100 align-top hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
-                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} /></td>
-                      <td className="py-2 pr-2">
-                        <select className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
-                          {INCIDENT_CATEGORY_VALUES.map((category) => <option key={category} value={category}>{category}</option>)}
-                        </select>
-                      </td>
-                      <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} /></td>
-                      <td className="py-2 pr-2">
-                        <select className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
-                          {VERIFIED_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
-                        </select>
-                      </td>
-                      <td className="py-2 pr-2"><input type="number" className="w-24 bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.report_count} onChange={(e) => setIncidentDraft(incident, { report_count: Number(e.target.value) })} /></td>
-                      <td className="py-2 pr-2 whitespace-nowrap">
-                        {incident.timestamp
-                          ? <span className="text-[10px] text-slate-400 font-mono leading-tight">
-                              <span className="block">{new Date(incident.timestamp).toLocaleDateString('en-CA')}</span>
-                              <span className="block text-slate-600">{new Date(incident.timestamp).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}</span>
-                            </span>
-                          : <span className="text-slate-700 text-[10px]">—</span>}
-                      </td>
-                      <td className="py-2 pr-3 whitespace-nowrap">
-                        {(() => {
-                          const isSystemInc = incident.data_source != null && incident.data_source !== 'community';
-                          if (isSystemInc) return <span className="text-[10px] text-slate-500">{incident.source_name || 'System'}</span>;
-                          const isAnon = Boolean(incident.anonymous);
-                          if (isAnon) {
-                            const real = users.find(u => u.uid === incident.authorUid);
-                            return (
-                              <div>
-                                <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-400 uppercase tracking-wider mb-1">Anon</span>
-                                <span className="block text-[10px] text-slate-300">{real?.displayName || '—'}</span>
-                                <span className="block text-[10px] text-slate-500 font-mono">{real?.email || incident.authorUid || '?'}</span>
-                              </div>
-                            );
-                          }
-                          return <span className="text-[10px] text-slate-300">{incident.name || '—'}</span>;
-                        })()}
-                      </td>
-                      <td className="py-2 pr-2"><textarea className="w-full h-20 bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} /></td>
-                      <td className="py-2 pr-2">
-                        <input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 mb-2 light:text-slate-900" placeholder="Source name" value={draft.source_name || ''} onChange={(e) => setIncidentDraft(incident, { source_name: e.target.value })} />
-                        <input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" placeholder="Source URL" value={draft.source_url || ''} onChange={(e) => setIncidentDraft(incident, { source_url: e.target.value })} />
-                      </td>
-                      <td className="py-2 flex gap-2">
-                        <Button onClick={() => saveIncident(incident.id)} className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700" disabled={savingIncidentId === incident.id}>
-                          {savingIncidentId === incident.id ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                        </Button>
-                        <Button variant="secondary" onClick={() => softDeleteIncident(incident.id)} className="h-9 px-3 text-xs text-red-400 border-red-500/30 hover:bg-red-500/10">
-                          <Trash2 size={14} />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </>
-        )}
-      </Card>
-    </div>
-  );
-
-  const renderUsers = () => (
-    <div className="space-y-5">
-      <SectionHeader color={activeSectionTheme.color} icon={Users} title="User Directory" subtitle="Registered users, roles, and contribution activity" />
-      <Card className="p-4 bg-violet-500/10 light:bg-violet-50 border-violet-500/20 light:border-violet-200 rounded-[1.6rem] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <p className="text-sm font-black text-white light:text-slate-900">Need the full admin directory?</p>
-          <p className="text-xs text-slate-400 light:text-slate-600 mt-0.5">Search by name, email, or notes, inspect raw profile data, and review every user report.</p>
-        </div>
-        <Button onClick={() => navigate('/admin/users')} className="h-10 rounded-2xl bg-violet-600 hover:bg-violet-700 text-sm shrink-0">
-          Open Full Directory
-        </Button>
-      </Card>
-      <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="col-span-1 lg:col-span-2 p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto">
-          <div className="flex items-center justify-between mb-4 pr-1">
-            <p className="text-[10px] text-slate-500">
-              <span className="text-violet-400 font-black">{totalUsers}</span> total ·{' '}
-              <span className="text-[#4A90D9] font-black">{viewOnlyUsers}</span> view-only ·{' '}
-              <span className="text-[#2E8B7A] font-black">{adminUsers}</span> admin ·{' '}
-              <span className="text-amber-400 font-black">{uniqueReporterEmails}</span> reporters
-            </p>
-            <Button variant="secondary" onClick={refreshUsers} disabled={isRefreshingUsers} className="h-8 px-2.5 text-[10px] uppercase font-bold tracking-widest bg-white/5 light:bg-slate-100 border-white/10 light:border-slate-200 text-slate-300 light:text-slate-600 hover:bg-white/10 light:hover:bg-slate-200 hover:text-white light:hover:text-slate-900">
-              <RefreshCw size={12} className={isRefreshingUsers ? 'animate-spin' : ''} />
-            </Button>
-          </div>
-          <div className="space-y-3 md:hidden">
-            {users.map((profile) => {
-              const reportCount = incidents.filter(i =>
-                ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
-                (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
-              ).length;
-              return (
-                <div key={profile.uid} className="rounded-[1.35rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-slate-900 to-slate-950 light:from-white light:to-slate-50 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-sm font-black text-white light:text-slate-900 truncate">{profile.displayName || 'Unknown'}</p>
-                      <p className="mt-1 truncate text-[11px] text-slate-400 light:text-slate-600">{profile.email || '—'}</p>
-                    </div>
-                    <span className={cn(
-                      'rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em]',
-                      profile.role === 'admin'
-                        ? 'border-emerald-400/30 bg-emerald-500/15 text-emerald-200'
-                        : 'border-sky-400/25 bg-sky-500/10 text-sky-200'
-                    )}>
-                      {profile.role === 'admin' ? 'Admin' : 'View'}
-                    </span>
-                  </div>
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    <div className="rounded-2xl border border-white/8 light:border-slate-200 bg-white/[0.03] light:bg-slate-50 p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">UID</p>
-                      <p className="mt-2 font-mono text-xs text-slate-300">{profile.uid.slice(0, 8)}…</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/8 light:border-slate-200 bg-white/[0.03] light:bg-slate-50 p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Reports</p>
-                      <p className="mt-2 text-xl font-black text-amber-300">{reportCount}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="hidden md:block overflow-y-auto max-h-[540px] pr-2">
-            <table className="w-full text-xs min-w-[500px]">
-              <thead className="text-[#5A6B7D] bg-[#F7F3EA] top-0 sticky z-10">
-                <tr className="border-b border-white/8 light:border-slate-200">
-                  <th className="py-2.5 text-left pl-2 font-bold uppercase text-[9px] tracking-wider">UID</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Name</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Email</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Role</th>
-                  <th className="py-2.5 text-left font-bold uppercase text-[9px] tracking-wider">Reports</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((profile) => {
-                  const reportCount = incidents.filter(i =>
-                    ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
-                    (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
-                  ).length;
-                  return (
-                    <tr key={profile.uid} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.03] light:hover:bg-slate-50 transition-colors">
-                      <td className="py-2.5 pl-2 text-slate-600 font-mono text-[10px]">{profile.uid.slice(0, 8)}…</td>
-                      <td className="py-2.5 font-medium text-white light:text-slate-900 text-xs">{profile.displayName || 'Unknown'}</td>
-                      <td className="py-2.5 text-slate-400 text-[11px]">{profile.email || '—'}</td>
-                      <td className="py-2.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${profile.role === 'admin' ? 'bg-[#2E8B7A]/20 border border-[#2E8B7A]/40 text-[#2E8B7A]' : 'bg-[#4A90D9]/10 border border-[#4A90D9]/20 text-[#4A90D9]'}`}>
-                          {profile.role === 'admin' ? 'Admin' : 'View-Only'}
-                        </span>
-                      </td>
-                      <td className="py-2.5">
-                        {reportCount > 0
-                          ? <span className="text-amber-400 font-black text-[11px]">{reportCount}</span>
-                          : <span className="text-slate-600 text-[11px]">0</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-
-        <div className="space-y-4">
-          <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] mb-3">User Roles</p>
-            {userRoleChartData.length === 0 ? (
-              <p className="text-slate-600 text-xs py-4 text-center">No user data.</p>
-            ) : (
-              <>
-                <ResponsiveContainer width="100%" height={160}>
-                  <PieChart>
-                    <Pie data={userRoleChartData} cx="50%" cy="50%" innerRadius={42} outerRadius={68} paddingAngle={3} dataKey="value" strokeWidth={0}
-                      shape={(props: any, i: number) => <Sector {...props} fill={userRoleChartData[i]?.color ?? props.fill} />}
-                    />
-                    <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="flex flex-col gap-2 mt-3">
-                  {userRoleChartData.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/3 light:bg-slate-50 border border-white/5 light:border-slate-200">
-                      <span className="flex items-center gap-2 text-xs text-slate-300 light:text-slate-700">
-                        <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
-                        {d.name}
-                      </span>
-                      <span className="text-sm font-black" style={{ color: d.color }}>{d.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </Card>
-
-          {/* Top reporters */}
-          {topReportersData.length > 0 && (
-            <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-              <p className="text-xs font-black text-slate-400 uppercase tracking-[0.18em] mb-3">Top Reporters</p>
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={topReportersData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-                  <XAxis type="number" allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="name" width={90} tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#fbbf24' }} cursor={{ fill: '#ffffff06' }} />
-                  <Bar dataKey="count" name="Reports" fill="#f59e0b" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </Card>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderStats = () => {
-    return (
-    <div className="space-y-5">
-      <SectionHeader color={activeSectionTheme.color} icon={Map} title="City Stats" subtitle="Live crime data from Calgary Open Data API + editable community safety scores" />
-
-      {/* Live crime data from API */}
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">Live Crime Stats · Calgary Open Data API</p>
-            <p className="text-[10px] text-slate-600 mt-0.5">Top 20 communities by total incidents — latest year available</p>
-          </div>
-          {crimeLoading && <Loader2 size={14} className="animate-spin text-slate-400 shrink-0" />}
-        </div>
-        {crimeStats.size === 0 && !crimeLoading ? (
-          <p className="text-slate-500 text-xs py-6 text-center">No crime data loaded yet. Check API Health section.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs min-w-[600px]">
-              <thead>
-                <tr className="border-b border-white/10 light:border-slate-200 text-slate-400">
-                  <th className="py-2 text-left">Community</th>
-                  <th className="py-2 text-right">Crime</th>
-                  <th className="py-2 text-right">Disorder</th>
-                  <th className="py-2 text-right">Total</th>
-                  <th className="py-2 text-right">Year</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topCrimeCommunities.map((row) => (
-                  <tr key={row.name} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.02]">
-                    <td className="py-2 pr-3 font-medium text-white light:text-slate-900 capitalize">{row.name}</td>
-                    <td className="py-2 pr-3 text-right text-red-400">{row.crime.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right text-amber-400">{row.disorder.toLocaleString()}</td>
-                    <td className="py-2 pr-3 text-right font-black text-white light:text-slate-900">{(row.crime + row.disorder).toLocaleString()}</td>
-                    <td className="py-2 text-right text-slate-500">{row.year}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem] overflow-x-auto">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-500">City Intelligence · {communityStats.length} communities</span>
-          <span className="text-[10px] text-amber-500 md:hidden">Swipe table &rarr;</span>
-        </div>
-        <div className="space-y-4 md:hidden">
-          {communityStats.map((row) => {
-            const draft = statsDrafts[row.id] || {
-              ...emptyStatsDraft,
-              community: row.community, month: row.month,
-              violent_crime: row.violent_crime, property_crime: row.property_crime,
-              disorder_calls: row.disorder_calls, safety_score: row.safety_score,
-            };
-            return (
-              <div key={row.id} className="rounded-[1.6rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-slate-900 to-slate-950 light:from-white light:to-slate-50 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-300/70">{draft.month || 'Month'}</p>
-                    <p className="mt-1 text-sm font-black text-white light:text-slate-900">{draft.community || 'Community'}</p>
-                  </div>
-                  <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-3 py-2">
-                    <p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-200/70">Safety</p>
-                    <p className="mt-1 text-lg font-black text-emerald-200">{draft.safety_score}</p>
-                  </div>
-                </div>
-                <div className="mt-4 grid gap-2">
-                  <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.community} onChange={(e) => setStatsDraft(row, { community: e.target.value })} />
-                  <input className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.month} onChange={(e) => setStatsDraft(row, { month: e.target.value })} />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.violent_crime} onChange={(e) => setStatsDraft(row, { violent_crime: Number(e.target.value) })} />
-                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.property_crime} onChange={(e) => setStatsDraft(row, { property_crime: Number(e.target.value) })} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.disorder_calls} onChange={(e) => setStatsDraft(row, { disorder_calls: Number(e.target.value) })} />
-                    <input type="number" className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.safety_score} onChange={(e) => setStatsDraft(row, { safety_score: Number(e.target.value) })} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button onClick={() => saveCommunityStats(row.id)} className="h-11 rounded-2xl bg-blue-600 text-sm hover:bg-blue-700" disabled={savingStatsId === row.id}>
-                      {savingStatsId === row.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                      <span className="ml-2">Save</span>
-                    </Button>
-                    <Button variant="secondary" onClick={() => softDeleteCommunityStats(row.id)} className="h-11 rounded-2xl border border-red-500/30 bg-red-500/10 text-sm text-red-300 hover:bg-red-500/15">
-                      <Trash2 size={16} />
-                      <span className="ml-2">Remove</span>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <table className="hidden md:table w-full text-xs min-w-[980px]">
-          <thead className="text-slate-400">
-            <tr className="border-b border-white/10 light:border-slate-200">
-              <th className="py-2 text-left">Community</th>
-              <th className="py-2 text-left">Month</th>
-              <th className="py-2 text-left">Violent</th>
-              <th className="py-2 text-left">Property</th>
-              <th className="py-2 text-left">Disorder</th>
-              <th className="py-2 text-left">Safety</th>
-              <th className="py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {communityStats.map((row) => {
-              const draft = statsDrafts[row.id] || {
-                ...emptyStatsDraft,
-                community: row.community, month: row.month,
-                violent_crime: row.violent_crime, property_crime: row.property_crime,
-                disorder_calls: row.disorder_calls, safety_score: row.safety_score,
-              };
-              return (
-                <tr key={row.id} className="border-b border-white/5 light:border-slate-100 hover:bg-white/[0.02] light:hover:bg-slate-50 transition-colors">
-                  <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.community} onChange={(e) => setStatsDraft(row, { community: e.target.value })} /></td>
-                  <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.month} onChange={(e) => setStatsDraft(row, { month: e.target.value })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.violent_crime} onChange={(e) => setStatsDraft(row, { violent_crime: Number(e.target.value) })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.property_crime} onChange={(e) => setStatsDraft(row, { property_crime: Number(e.target.value) })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.disorder_calls} onChange={(e) => setStatsDraft(row, { disorder_calls: Number(e.target.value) })} /></td>
-                  <td className="py-2 pr-2"><input type="number" className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.safety_score} onChange={(e) => setStatsDraft(row, { safety_score: Number(e.target.value) })} /></td>
-                  <td className="py-2 flex gap-2">
-                    <Button onClick={() => saveCommunityStats(row.id)} className="h-9 px-3 text-xs bg-blue-600 hover:bg-blue-700" disabled={savingStatsId === row.id}>
-                      {savingStatsId === row.id ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                    </Button>
-                    <Button variant="secondary" onClick={() => softDeleteCommunityStats(row.id)} className="h-9 px-3 text-xs text-red-400 border-red-500/30 hover:bg-red-500/10">
-                      <Trash2 size={14} />
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </Card>
-
-      {safetyChartData.length > 0 && (
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Community Safety vs Crime Breakdown</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Compares safety score against violent crime, property crime, and disorder calls per neighborhood.</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={safetyChartData} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
-              <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} cursor={{ fill: '#ffffff05' }} />
-              <Legend wrapperStyle={{ fontSize: 10, color: '#64748b', paddingTop: 12 }} />
-              <Bar dataKey="Safety Score"   fill="#22c55e" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="Violent Crime"  fill="#ef4444" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="Property Crime" fill="#f97316" radius={[3, 3, 0, 0]} />
-              <Bar dataKey="Disorder Calls" fill="#a855f7" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-      )}
-    </div>
-    );
-  };
-
-  const renderAnalytics = () => (
-    <div className="space-y-5">
-      <SectionHeader color={activeSectionTheme.color} icon={BarChart3} title="Analytics" subtitle="Incident patterns, geographic distribution, and temporal trends" />
-
-      {/* Incidents timeline — 14 days */}
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-        <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Incidents: Last 14 Days</p>
-        <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily report volume. Spikes indicate high-activity periods worth reviewing.</p>
-        {timelineChartData.every((d) => d.count === 0) ? (
-          <p className="text-slate-600 text-xs py-8 text-center">No incident data yet.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={timelineChartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="incidentGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
-              <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={ttStyle} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#60a5fa' }} />
-              <Area type="monotone" dataKey="count" stroke="#3b82f6" strokeWidth={2} fill="url(#incidentGrad)" name="Incidents" />
-            </AreaChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-
-      {/* Category donut + Trust donut + Top Neighborhoods */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">By Category</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">How reports break down by type.</p>
-          {categoryChartData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No data yet.</p>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={categoryChartData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value" strokeWidth={0}
-                    shape={(props: any, i: number) => <Sector {...props} fill={categoryChartData[i]?.color ?? props.fill} />}
-                  />
-                  <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-3">
-                {categoryChartData.map((d) => (
-                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400 light:text-slate-600">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    {d.name} <span className="font-black text-white light:text-slate-900">{d.value}</span>
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
-        </Card>
-
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Trust Status</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Verification breakdown across all reports.</p>
-          {trustChartData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No data yet.</p>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={trustChartData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value" strokeWidth={0}
-                    shape={(props: any, i: number) => <Sector {...props} fill={trustChartData[i]?.color ?? props.fill} />}
-                  />
-                  <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex flex-wrap gap-x-3 gap-y-1.5 mt-3">
-                {trustChartData.map((d) => (
-                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400 light:text-slate-600">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    {d.name} <span className="font-black text-white light:text-slate-900">{d.value}</span>
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
-        </Card>
-
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Neighborhoods</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Areas with the highest incident count.</p>
-          {neighborhoodChartData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No data yet.</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={neighborhoodChartData} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
-                <XAxis type="number" allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" width={80} tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#60a5fa' }} cursor={{ fill: '#ffffff08' }} />
-                <Bar dataKey="count" name="Incidents" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </Card>
-      </div>
-
-      {/* Hourly + Category by day */}
-      <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Hourly Activity Pattern</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">When during the day most reports are filed.</p>
-          <ResponsiveContainer width="100%" height={180}>
-            <AreaChart data={hourlyChartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="hourGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1C2B3A14" />
-              <XAxis dataKey="hour" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} interval={2} />
-              <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={ttStyle} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#c084fc' }} />
-              <Area type="monotone" dataKey="count" stroke="#a855f7" strokeWidth={2} fill="url(#hourGrad)" name="Reports" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </Card>
-
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Category Mix · Last 7 Days</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily stacked view of report categories.</p>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={categoryByDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1C2B3A14" />
-              <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 9 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} cursor={{ fill: '#ffffff05' }} />
-              <Legend wrapperStyle={{ fontSize: 9, color: '#64748b', paddingTop: 8 }} />
-              <Bar dataKey="emergency"      stackId="a" fill="#dc2626" name="Emergency" />
-              <Bar dataKey="crime"          stackId="a" fill="#ef4444" name="Crime" />
-              <Bar dataKey="traffic"        stackId="a" fill="#f97316" name="Traffic" />
-              <Bar dataKey="infrastructure" stackId="a" fill="#3b82f6" name="Infrastructure" />
-              <Bar dataKey="weather"        stackId="a" fill="#a855f7" radius={[3, 3, 0, 0]} name="Weather" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-      </div>
-    </div>
-  );
-
-  // ── Task 4.2 — Traffic analytics section ─────────────────────────────────
-
-  const renderTrafficAnalytics = () => (
-    <div className="space-y-5">
-      <SectionHeader color={activeSectionTheme.color} icon={Globe} title="Traffic Analytics" subtitle="Page view patterns, acquisition channels, and session metrics from enhanced PageTracker" />
-
-      {/* Traffic KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className="p-4 bg-[#FFFDF8] border-blue-200 rounded-2xl hover:border-blue-400/40 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <MousePointerClick size={13} className="text-blue-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Total Views</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-blue-400">{totalPageViews === null ? '–' : totalPageViews.toLocaleString()}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Lifetime page loads tracked</p>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-emerald-200 rounded-2xl hover:border-emerald-400/40 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <Wifi size={13} className="text-emerald-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Sessions (Sample)</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-emerald-400">{uniqueSessions.toLocaleString()}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Unique browser sessions in sample</p>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-amber-200 rounded-2xl hover:border-amber-400/40 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp size={13} className="text-amber-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Pages / Session</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-amber-400">{avgPagesPerSession}</p>
-          <p className="text-[10px] text-slate-600 mt-1">Avg depth across sampled sessions</p>
-        </Card>
-
-        <Card className="p-4 bg-[#FFFDF8] border-pink-200 rounded-2xl hover:border-pink-400/40 transition-all">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity size={13} className="text-pink-400 shrink-0" />
-            <p className="font-mono text-[9px] font-bold tracking-[0.18em] uppercase text-slate-400 light:text-slate-600">Organic Share</p>
-          </div>
-          <p className="font-display text-3xl font-extrabold tabular-nums text-pink-400">{organicShare}%</p>
-          <p className="text-[10px] text-slate-600 mt-1">{organicSearchDocs.length.toLocaleString()} search visits in sample</p>
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-[#FFFDF8] border-emerald-200 rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Organic Search Days</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Best sampled days for search traffic, useful for spotting content or news-driven spikes.</p>
-          {organicSearchByDayData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No organic search visits in the sample yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {organicSearchByDayData.map((row) => {
-                const max = organicSearchByDayData[0]?.searches || 1;
-                const pct = Math.round((row.searches / max) * 100);
-                return (
-                  <div key={row.date} className="flex items-center gap-3">
-                    <span className="w-16 text-[11px] font-bold text-slate-400 light:text-slate-600">{row.date}</span>
-                    <div className="h-2 flex-1 rounded-full bg-white/5 light:bg-slate-100">
-                      <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="w-10 text-right text-xs font-black text-emerald-400">{row.searches}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </Card>
-
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Search Terms</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Most modern search engines hide the exact phrase, but any available query values appear here.</p>
-          {organicQueryData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No search terms available yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {organicQueryData.map((row) => (
-                <div key={row.queryText} className="flex items-center justify-between gap-3 rounded-xl border border-white/5 light:border-slate-200 bg-white/[0.03] light:bg-slate-50 px-3 py-2">
-                  <span className="truncate text-xs text-slate-300 light:text-slate-700">{row.queryText}</span>
-                  <span className="text-xs font-black text-white light:text-slate-900">{row.views}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {/* Page views over time — 30 days */}
-      <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-        <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Page Views · Last 30 Days</p>
-        <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Daily volume from the <code className="text-slate-400">page_views</code> collection. Excludes admin sessions.</p>
-        {pageViewsByDayData.every(d => d.views === 0) ? (
-          <p className="text-slate-600 text-xs py-8 text-center">No page view data in the sample window.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={pageViewsByDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="pvGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4A90D9" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#4A90D9" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
-              <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} interval={4} />
-              <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={ttStyle} labelStyle={{ color: '#94a3b8' }} itemStyle={{ color: '#4A90D9' }} />
-              <Area type="monotone" dataKey="views" stroke="#4A90D9" strokeWidth={2} fill="url(#pvGrad)" name="Page Views" />
-            </AreaChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
-
-      {/* Traffic sources + Top pages */}
-      <div className="grid lg:grid-cols-2 gap-4">
-        {/* Traffic source donut */}
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Acquisition Channels</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">How visitors arrive — bucketed from referrer and UTM params.</p>
-          {trafficSourceData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">
-              No traffic source data yet. The enhanced PageTracker needs to collect sessions first.
-            </p>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={trafficSourceData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value" strokeWidth={0}
-                    shape={(props: any, i: number) => <Sector {...props} fill={trafficSourceData[i]?.color ?? props.fill} />}
-                  />
-                  <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#e2e8f0' }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3">
-                {trafficSourceData.map((d) => (
-                  <span key={d.name} className="flex items-center gap-1.5 text-[10px] text-slate-400 light:text-slate-600">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    {d.name} <span className="font-black text-white light:text-slate-900 ml-auto">{d.value}</span>
-                  </span>
-                ))}
-              </div>
-            </>
-          )}
-        </Card>
-
-        {/* Top pages */}
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Pages by Views</p>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Which routes drive the most traffic in the sampled window.</p>
-          {topPagesData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No page data yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {topPagesData.map(({ path, views }, i) => {
-                const maxViews = topPagesData[0]?.views || 1;
-                const pct = Math.round((views / maxViews) * 100);
-                return (
-                  <div key={path} className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-600 w-4 text-right shrink-0">{i + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-xs text-slate-300 light:text-slate-700 font-mono truncate">{path}</span>
-                        <span className="text-xs font-black text-white light:text-slate-900 ml-2 shrink-0">{views.toLocaleString()}</span>
-                      </div>
-                      <div className="h-1 rounded-full bg-white/5">
-                        <div className="h-1 rounded-full bg-[#4A90D9]" style={{ width: `${pct}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {/* Top referrers + UTM campaigns */}
-      <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <div className="flex items-center gap-2 mb-1">
-            <Link size={12} className="text-purple-400" />
-            <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">Top Referrers</p>
-          </div>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">External domains driving inbound traffic to Calgary Watch.</p>
-          {topReferrersData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No referral data in the sample. Most traffic may be direct.</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={topReferrersData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-                <XAxis type="number" allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="referrer" width={110} tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#c084fc' }} cursor={{ fill: '#ffffff06' }} />
-                <Bar dataKey="views" name="Visits" fill="#a855f7" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </Card>
-
-        <Card className="p-5 bg-[#FFFDF8] border-[#E7E0D2] rounded-[1.6rem]">
-          <div className="flex items-center gap-2 mb-1">
-            <Megaphone size={12} className="text-orange-400" />
-            <p className="text-xs font-black text-slate-400 light:text-slate-600 uppercase tracking-[0.18em]">UTM Campaigns</p>
-          </div>
-          <p className="text-[10px] text-slate-600 mb-4 mt-0.5">Views attributed to <code className="text-slate-400">utm_campaign</code> tagged links.</p>
-          {utmCampaignData.length === 0 ? (
-            <p className="text-slate-600 text-xs py-8 text-center">No UTM campaign data yet. Tag your links with <code className="text-slate-400">?utm_campaign=name</code> to track campaigns here.</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={utmCampaignData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-                <XAxis type="number" allowDecimals={false} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="campaign" width={110} tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={ttStyle} itemStyle={{ color: '#fb923c' }} cursor={{ fill: '#ffffff06' }} />
-                <Bar dataKey="views" name="Views" fill="#f97316" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </Card>
-      </div>
-    </div>
-  );
-
-  const renderFlagged = () => (
-    <section className="space-y-6">
-      {flaggedIncidents.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Flag size={48} className="text-slate-700 mb-4" />
-          <p className="text-slate-400 font-bold">No flagged incidents</p>
-          <p className="text-slate-600 text-sm mt-1">Community moderation is clean.</p>
-        </div>
-      ) : (
-        flaggedIncidents.map((incident) => (
-          <div key={incident.id} className="rounded-3xl border border-amber-500/20 light:border-amber-200 bg-amber-500/5 light:bg-amber-50 p-6 space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-amber-400 uppercase tracking-widest mb-1">
-                  Flagged {incident.flagged_at ? formatRelativeMinutes(incident.flagged_at) : ''}
-                </p>
-                <h3 className="text-white light:text-slate-900 font-black text-lg leading-tight truncate">{incident.title}</h3>
-                <p className="text-slate-400 light:text-slate-600 text-sm mt-1 line-clamp-2">{incident.description}</p>
-              </div>
-              {incident.image_url && (
-                <img src={incident.image_url} alt="" className="w-20 h-20 rounded-2xl object-cover border border-white/10 shrink-0" />
-              )}
-            </div>
-            <div className="text-xs text-slate-500 space-y-0.5">
-              <p>Neighborhood: <span className="text-slate-300 light:text-slate-700">{incident.neighborhood}</span></p>
-              <p>Flagged by UID: <span className="text-slate-300 light:text-slate-700 font-mono">{incident.flagged_by}</span></p>
-              <p>Reporter: <span className="text-slate-300 light:text-slate-700">{incident.name}</span></p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => void handleRestore(incident.id)}
-                disabled={!!restoringId || !!deletingId}
-                className="flex-1 h-10 rounded-2xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-black text-xs tracking-wide transition-all disabled:opacity-50"
-              >
-                {restoringId === incident.id ? 'Restoring…' : 'Restore'}
-              </button>
-              <button
-                onClick={() => void handlePermanentDelete(incident.id)}
-                disabled={!!restoringId || !!deletingId}
-                className="flex-1 h-10 rounded-2xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 font-black text-xs tracking-wide transition-all disabled:opacity-50"
-              >
-                {deletingId === incident.id ? 'Deleting…' : 'Delete Permanently'}
-              </button>
-            </div>
-          </div>
-        ))
-      )}
-    </section>
-  );
-
-  // ── API Health section ────────────────────────────────────────────────────
-
-  const renderApiHealth = () => {
-    const statusColor: Record<ApiHealth['status'], string> = {
-      idle:     'bg-slate-600',
-      checking: 'bg-amber-400 animate-pulse',
-      ok:       'bg-emerald-400',
-      slow:     'bg-amber-400',
-      error:    'bg-red-500',
-    };
-    const statusLabel: Record<ApiHealth['status'], string> = {
-      idle: 'Not checked', checking: 'Checking…', ok: 'OK', slow: 'Slow', error: 'Error',
-    };
-    const allOk = apiHealths.every(h => h.status === 'ok' || h.status === 'idle');
-    const anyError = apiHealths.some(h => h.status === 'error');
-    return (
-      <div className="space-y-5">
-        <SectionHeader color={activeSectionTheme.color} icon={Zap} title="API Health" subtitle="Live status of the Calgary Open Data and weather APIs that power the map" />
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className={cn('text-xs font-black uppercase tracking-widest', anyError ? 'text-red-400' : allOk ? 'text-emerald-400' : 'text-amber-400')}>
-            {anyError ? 'Degraded — one or more APIs are failing' : allOk ? 'All systems operational' : 'Checking…'}
-          </span>
-          <button
-            onClick={checkApis}
-            className="flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 light:bg-white hover:bg-white/10 light:hover:bg-slate-50 text-slate-300 light:text-slate-700 text-xs font-bold transition-all border border-white/10 light:border-slate-200"
-          >
-            <RefreshCw size={12} className={apiHealths.some(h => h.status === 'checking') ? 'animate-spin' : ''} />
-            Test Now
-          </button>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {apiHealths.map((h) => (
-            <Card key={h.id} className={cn('p-4 bg-[#FFFDF8] rounded-2xl border transition-all', h.status === 'error' ? 'border-red-300' : h.status === 'slow' ? 'border-amber-300' : 'border-[#E7E0D2]')}>
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2">
-                  <span className={cn('w-2.5 h-2.5 rounded-full shrink-0', statusColor[h.status])} />
-                  <span className="text-sm font-black text-white light:text-slate-900">{h.name}</span>
-                </div>
-                <span className={cn('text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg', h.status === 'ok' ? 'bg-emerald-500/15 text-emerald-300' : h.status === 'error' ? 'bg-red-500/15 text-red-300' : h.status === 'slow' ? 'bg-amber-500/15 text-amber-300' : 'bg-slate-700 text-slate-400')}>
-                  {statusLabel[h.status]}
-                </span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                <div>
-                  <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Records</p>
-                  <p className="text-white light:text-slate-900 font-black">{h.recordCount !== null ? h.recordCount : '—'}</p>
-                </div>
-                <div>
-                  <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Response</p>
-                  <p className={cn('font-black', h.responseMs && h.responseMs > 2000 ? 'text-amber-300' : 'text-white light:text-slate-900')}>
-                    {h.responseMs !== null ? `${h.responseMs} ms` : '—'}
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Last checked</p>
-                  <p className="text-slate-400">{h.lastChecked ? new Date(h.lastChecked).toLocaleTimeString() : 'Never'}</p>
-                </div>
-                {h.error && (
-                  <div className="col-span-2">
-                    <p className="text-slate-500 uppercase tracking-wider font-bold text-[9px]">Error</p>
-                    <p className="text-red-400 truncate">{h.error}</p>
-                  </div>
-                )}
-              </div>
-              <p className="mt-3 text-[9px] text-slate-600 font-mono break-all">{h.url}</p>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // ── Section content router ─────────────────────────────────────────────────
-
-  const renderSection = () => {
-    switch (activeSection) {
-      case 'dashboard': return renderDashboard();
-      case 'incidents': return renderIncidents();
-      case 'users':     return renderUsers();
-      case 'stats':     return renderStats();
-      case 'analytics': return renderAnalytics();
-      case 'traffic':   return renderTrafficAnalytics();
-      case 'apis':      return renderApiHealth();
-      case 'flagged':   return renderFlagged();
-      default:          return renderDashboard();
-    }
-  };
-
-  // ── Shell ──────────────────────────────────────────────────────────────────
+  }
 
   return (
-    <div className="min-h-screen text-slate-900 flex flex-col md:flex-row relative overflow-hidden" style={{ background: '#F5EFE3' }}>
+    <AdminShell
+      items={navItems}
+      activeId={section}
+      onSelect={(id) => setSection(id as Section)}
+      title={titles[section].title}
+      subtitle={titles[section].subtitle}
+      onSignOut={logout}
+      actions={
+        <Chip tone={d.loadingData ? 'attention' : 'ok'}>
+          <StatusDot tone={d.loadingData ? 'attention' : 'ok'} pulse={d.loadingData} />
+          {d.loadingData ? 'Syncing' : 'Live'}
+        </Chip>
+      }
+    >
+      {section === 'desk' && <DeskSection d={d} />}
+      {section === 'reports' && <ReportsSection d={d} />}
+      {section === 'people' && <PeopleSection d={d} />}
+      {section === 'feeds' && <FeedsSection d={d} />}
+      {section === 'visitors' && <VisitorsSection d={d} />}
+      {section === 'city' && <CitySection d={d} />}
+    </AdminShell>
+  );
+}
 
-      {/* Ambient brand washes */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.14),transparent_36%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.16),transparent_26%)]" />
-        <div className="absolute -bottom-56 right-0 w-[32rem] h-[32rem] rounded-full"
-          style={{ background: 'radial-gradient(ellipse at center, rgba(46,139,122,0.08) 0%, transparent 65%)' }} />
+type D = ReturnType<typeof useAdminData>;
+
+// ── Watch desk ────────────────────────────────────────────────────────────────
+
+function DeskSection({ d }: { d: D }) {
+  return (
+    <>
+      <AttentionQueue
+        flagged={d.flaggedIncidents}
+        pendingReview={d.pendingReviewIncidents}
+        apiHealths={d.apiHealths}
+        incidents={d.incidents}
+        onRestore={d.handleRestore}
+        onDelete={d.handlePermanentDelete}
+        onApprove={d.approveIncident}
+        onHide={d.softDeleteIncident}
+        restoringId={d.restoringId}
+        deletingId={d.deletingId}
+      />
+
+      <StatGrid>
+        <StatTile label="Reports today" value={d.todayIncidents} tone="signal" hint="Last 24 hours" />
+        <StatTile label="Total reports" value={d.totalIncidents} hint="Loaded in console" />
+        <StatTile label="Registered users" value={d.totalUsers} hint={`${d.adminUsers} admin`} />
+        <StatTile label="Page views" value={d.totalPageViews} hint={`${d.uniqueSessions} sessions`} />
+      </StatGrid>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Panel title="Reports over time" subtitle="Daily volume" className="lg:col-span-2">
+          <ChartFrame height={200}>
+            <AreaChart data={d.timelineChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gReports" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={T.signal} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={T.signal} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+              <XAxis dataKey="date" {...axis} />
+              <YAxis allowDecimals={false} {...axis} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Area type="monotone" dataKey="count" stroke={T.signal} strokeWidth={2} fill="url(#gReports)" />
+            </AreaChart>
+          </ChartFrame>
+        </Panel>
+
+        <div className="space-y-4">
+          <Panel title="Live civic feeds" subtitle="Counted straight from the city APIs">
+            <div className="space-y-3">
+              <FeedCount label="Calgary traffic events" value={d.liveTrafficCount} />
+              <FeedCount label="Open 311 requests" value={d.live311Count} />
+            </div>
+          </Panel>
+
+          <Panel title="Momentum" subtitle="Recent direction">
+            <div className="space-y-3">
+              <TrendRow label="Reports" data={d.incidentSparklineData} tone={T.signal} />
+              <TrendRow label="Page views" data={d.pageViewsSparklineData} tone={T.ok} />
+              <TrendRow label="Signups" data={d.userGrowthSparklineData} tone={T.attention} />
+            </div>
+          </Panel>
+        </div>
       </div>
 
-      {/* ── Sidebar — desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col w-56 shrink-0 backdrop-blur-xl relative z-10 sticky top-0 h-screen" style={{ background: 'rgba(255,253,248,0.92)', borderRight: '1px solid #E7E0D2' }}>
-        {/* Logo / wordmark */}
-        <div className="p-5" style={{ borderBottom: '1px solid #E7E0D2' }}>
-          <div className="inline-flex items-center gap-2 mb-1">
-            <span className="relative flex h-2 w-2" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-ping opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.26em] text-[#5A6B7D]">Ops desk</span>
-          </div>
-          <h1 className="font-display text-base font-extrabold tracking-[-0.01em] leading-tight text-[#1C2B3A]">Calgary Watch</h1>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#9AA6B2] mt-0.5">Admin portal</p>
-        </div>
+      <StatGrid>
+        <StatTile label="Emergency reports" value={d.emergencyIncidents} tone={d.emergencyIncidents > 0 ? 'critical' : 'neutral'} hint="Category: emergency" />
+        <StatTile label="Unconfirmed" value={d.unresolvedIncidents} tone="attention" hint="Not yet community-confirmed" />
+        <StatTile label="Distinct reporters" value={d.uniqueReporterEmails} hint="Excludes anonymous and system" />
+        <StatTile label="Avg safety score" value={d.averageSafety} unit="/100" tone="ok" hint="Across tracked communities" />
+      </StatGrid>
+    </>
+  );
+}
 
-        {/* Nav items */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
-            const isActive = activeSection === id;
-            const theme = SECTION_THEMES[id];
-            // Badge for moderation queue
-            const badge = id === 'incidents' && pendingReviewIncidents.length > 0
-              ? pendingReviewIncidents.length : null;
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveSection(id)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
-                style={isActive
-                  ? { background: `${theme.color}12`, color: theme.color, border: `1px solid ${theme.color}3a`, boxShadow: `inset 3px 0 0 ${theme.color}` }
-                  : { color: '#5A6B7D', border: '1px solid transparent' }}
-              >
-                <Icon size={14} style={{ color: isActive ? theme.color : '#9AA6B2' }} />
-                <span className="flex-1 text-left">{label}</span>
-                {badge != null && (
-                  <span className="min-w-4 h-4 px-1 rounded-full text-[9px] font-black flex items-center justify-center tabular-nums" style={{ background: 'rgba(180,83,9,0.16)', color: '#B45309' }}>
-                    {badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Bottom: user + back link */}
-        <div className="p-3 border-t border-white/[0.06] light:border-stone-200/80 space-y-2">
-          <div className="px-3 py-2 rounded-xl bg-white/[0.03] light:bg-white/70 border border-white/[0.06] light:border-stone-200/80">
-            <p className="text-[10px] font-black text-slate-300 light:text-slate-800 truncate">{user.displayName || 'Admin'}</p>
-            <p className="text-[9px] text-slate-600 light:text-stone-500 truncate">{user.email}</p>
-          </div>
-          <button
-            onClick={() => navigate('/map')}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-500 light:text-stone-500 hover:text-slate-300 light:hover:text-slate-900 hover:bg-white/[0.05] light:hover:bg-white/70 transition-all"
-          >
-            <ArrowLeft size={13} />
-            Back to map
-          </button>
-        </div>
-      </aside>
-
-      {/* ── Main content area ─────────────────────────────────────────────── */}
-      <main className="flex-1 min-w-0 relative z-10 pb-8 md:pb-0">
-        {/* Top bar — mobile header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3.5 backdrop-blur-xl sticky top-0 z-20" style={{ background: 'rgba(255,253,248,0.94)', borderBottom: '1px solid #E7E0D2' }}>
-          <div className="flex items-center gap-2.5">
-            <span className="relative flex h-2 w-2" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-ping opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <div>
-              <p className="font-mono text-[8px] font-bold uppercase tracking-[0.28em] text-[#5A6B7D]">Ops desk</p>
-              <h2 className="font-display text-sm font-extrabold leading-tight text-[#1C2B3A]">Calgary Watch Admin</h2>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {pendingReviewIncidents.length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[9px] font-black tabular-nums" style={{ background: 'rgba(180,83,9,0.12)', color: '#B45309', border: '1px solid rgba(180,83,9,0.3)' }}>
-                <Zap size={10} />
-                {pendingReviewIncidents.length} pending
-              </span>
-            )}
-            <button
-              onClick={() => navigate('/map')}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl transition-all active:scale-95"
-              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
-              aria-label="Back to map"
-            >
-              <ArrowLeft size={15} />
-            </button>
-          </div>
-        </div>
-        {renderMobileCommandDeck()}
-        {renderMobileHero()}
-
-        {/* Content scroll area */}
-        <div className="p-4 pt-5 md:p-6 lg:p-8">
-          {renderSection()}
-        </div>
-      </main>
+function FeedCount({ label, value }: { label: string; value: number | null }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-sm" style={{ color: T.muted }}>{label}</span>
+      <span className="flex items-center gap-2">
+        <StatusDot tone={value === null ? 'attention' : 'ok'} />
+        <Figure value={value} size="md" />
+      </span>
     </div>
+  );
+}
+
+function TrendRow({ label, data, tone }: { label: string; data: number[]; tone: string }) {
+  const total = data.reduce((a, b) => a + b, 0);
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-xs w-20 shrink-0" style={{ color: T.muted }}>{label}</span>
+      <span className="flex-1 min-w-0"><Spark data={data} tone={tone} /></span>
+      <Figure value={total} size="sm" />
+    </div>
+  );
+}
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+
+function ReportsSection({ d }: { d: D }) {
+  return (
+    <>
+      <Panel
+        title="Every report"
+        subtitle="Search, edit and moderate individual records"
+        action={
+          <Link to="/admin/incidents">
+            <AdminButton size="sm" tone="signal">Open list <ExternalLink size={13} /></AdminButton>
+          </Link>
+        }
+      >
+        <div className="flex items-center gap-5 flex-wrap">
+          <span className="flex items-baseline gap-1.5">
+            <Figure value={d.totalIncidents} size="lg" />
+            <span className="text-xs" style={{ color: T.muted }}>records</span>
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <Figure value={d.pendingReviewIncidents.length} size="lg" tone="attention" />
+            <span className="text-xs" style={{ color: T.muted }}>unreviewed</span>
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <Figure value={d.flaggedIncidents.length} size="lg" tone="critical" />
+            <span className="text-xs" style={{ color: T.muted }}>flagged</span>
+          </span>
+        </div>
+      </Panel>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Panel title="By category" subtitle="Share of all reports">
+          <ChartFrame height={210}>
+            <PieChart>
+              <Pie data={d.categoryChartData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2}>
+                {d.categoryChartData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={tooltipStyle} />
+            </PieChart>
+          </ChartFrame>
+          <Legend items={d.categoryChartData.map((c, i) => ({ label: c.name, value: c.value, color: c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
+        </Panel>
+
+        <Panel title="By trust level" subtitle="How reports get verified">
+          <ChartFrame height={210}>
+            <PieChart>
+              <Pie data={d.trustChartData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2}>
+                {d.trustChartData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={tooltipStyle} />
+            </PieChart>
+          </ChartFrame>
+          <Legend items={d.trustChartData.map((c, i) => ({ label: c.name, value: c.value, color: c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
+        </Panel>
+
+        <Panel title="Busiest neighbourhoods" subtitle="Most reports filed">
+          <ChartFrame height={220}>
+            <BarChart data={d.neighborhoodChartData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
+              <XAxis type="number" hide />
+              <YAxis type="category" dataKey="name" width={104} {...axis} />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+              <Bar dataKey="count" fill={T.signal} radius={[0, 5, 5, 0]} />
+            </BarChart>
+          </ChartFrame>
+        </Panel>
+
+        <Panel title="Reports by hour" subtitle="When incidents get filed">
+          <ChartFrame height={220}>
+            <AreaChart data={d.hourlyChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gHour" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={T.attention} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={T.attention} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+              <XAxis dataKey="hour" {...axis} />
+              <YAxis allowDecimals={false} {...axis} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Area type="monotone" dataKey="count" stroke={T.attention} strokeWidth={2} fill="url(#gHour)" />
+            </AreaChart>
+          </ChartFrame>
+        </Panel>
+
+        <Panel title="Category mix by day" subtitle="Recent daily breakdown" className="lg:col-span-2">
+          <ChartFrame height={200}>
+            <BarChart data={d.categoryByDayData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+              <XAxis dataKey="date" {...axis} />
+              <YAxis allowDecimals={false} {...axis} />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+              {INCIDENT_CATEGORIES.map((c, i) => (
+                <Bar key={c.value} dataKey={c.value} stackId="a" fill={CHART_COLORS[i % CHART_COLORS.length]} />
+              ))}
+            </BarChart>
+          </ChartFrame>
+          <Legend items={INCIDENT_CATEGORIES.map((c, i) => ({ label: c.label, color: CHART_COLORS[i % CHART_COLORS.length] }))} />
+        </Panel>
+
+        <Panel title="Top reporters" subtitle="Most reports submitted" className="lg:col-span-2">
+          {d.topReportersData.length === 0 ? (
+            <EmptyState title="No reporters yet" body="Reports submitted by signed-in neighbours will rank here." />
+          ) : (
+            <ChartFrame height={200}>
+              <BarChart data={d.topReportersData} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
+                <XAxis type="number" hide />
+                <YAxis type="category" dataKey="name" width={128} {...axis} />
+                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                <Bar dataKey="count" fill={T.ok} radius={[0, 5, 5, 0]} />
+              </BarChart>
+            </ChartFrame>
+          )}
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+// ── People ────────────────────────────────────────────────────────────────────
+
+function PeopleSection({ d }: { d: D }) {
+  return (
+    <>
+      <Panel
+        title="User directory"
+        subtitle="Search accounts, edit roles and add notes"
+        action={
+          <Link to="/admin/users">
+            <AdminButton size="sm" tone="signal">Open directory <ExternalLink size={13} /></AdminButton>
+          </Link>
+        }
+      >
+        <StatGrid>
+          <StatTile label="Total users" value={d.totalUsers} />
+          <StatTile label="Admins" value={d.adminUsers} tone="signal" />
+          <StatTile label="View only" value={d.viewOnlyUsers} />
+          <StatTile label="Reporters" value={d.uniqueReporterEmails} hint="Filed at least one report" />
+        </StatGrid>
+      </Panel>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Panel title="Signups over time" subtitle="Accounts created" className="lg:col-span-2">
+          <ChartFrame height={200}>
+            <AreaChart data={d.userGrowthData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gUsers" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={T.ok} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={T.ok} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+              <XAxis dataKey="date" {...axis} />
+              <YAxis allowDecimals={false} {...axis} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Area type="monotone" dataKey="count" stroke={T.ok} strokeWidth={2} fill="url(#gUsers)" />
+            </AreaChart>
+          </ChartFrame>
+        </Panel>
+
+        <Panel title="Roles" subtitle="Account permissions">
+          <ChartFrame height={170}>
+            <PieChart>
+              <Pie data={d.userRoleChartData} dataKey="value" nameKey="name" innerRadius={40} outerRadius={66} paddingAngle={2}>
+                {d.userRoleChartData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={tooltipStyle} />
+            </PieChart>
+          </ChartFrame>
+          <Legend items={d.userRoleChartData.map((c, i) => ({ label: c.name, value: c.value, color: c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
+        </Panel>
+      </div>
+
+      <Panel
+        title="Newest signups"
+        subtitle="Most recent accounts"
+        action={
+          <AdminButton size="sm" variant="outline" onClick={d.refreshUsers} disabled={d.isRefreshingUsers}>
+            <RefreshCw size={13} className={cn(d.isRefreshingUsers && 'animate-spin')} /> Refresh
+          </AdminButton>
+        }
+      >
+        {d.newestSignups.length === 0 ? (
+          <EmptyState title="No accounts yet" body="New signups appear here as soon as someone signs in." />
+        ) : (
+          <ul className="divide-y" style={{ borderColor: T.line }}>
+            {d.newestSignups.map((u) => (
+              <li key={u.uid} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
+                <span className="h-8 w-8 shrink-0 grid place-items-center rounded-full text-xs font-bold" style={{ background: `${T.signal}18`, color: T.signal }}>
+                  {(u.displayName || u.email || '?').charAt(0).toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold truncate" style={{ color: T.ink }}>{u.displayName || 'Unnamed'}</p>
+                  <p className="text-xs truncate" style={{ color: T.muted }}>{u.email}</p>
+                </span>
+                {u.role === 'admin' && <Chip tone="signal">Admin</Chip>}
+                <TimeAgo ts={u.joinedAt} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+    </>
+  );
+}
+
+// ── Data feeds ────────────────────────────────────────────────────────────────
+
+function FeedsSection({ d }: { d: D }) {
+  const toneFor = (s: string): Tone =>
+    s === 'ok' ? 'ok' : s === 'slow' ? 'attention' : s === 'error' ? 'critical' : 'neutral';
+  return (
+    <>
+      <Panel
+        title="Source health"
+        subtitle="Checked automatically every two minutes"
+        action={
+          <AdminButton size="sm" variant="outline" onClick={d.checkApis}>
+            <RefreshCw size={13} /> Check now
+          </AdminButton>
+        }
+        padded={false}
+      >
+        <ul className="divide-y" style={{ borderColor: T.line }}>
+          {d.apiHealths.map((api) => (
+            <li key={api.id} className="p-3 flex items-center gap-3">
+              <StatusDot tone={toneFor(api.status)} pulse={api.status === 'checking'} />
+              <span className="min-w-0 flex-1">
+                <p className="text-sm font-semibold truncate" style={{ color: T.ink }}>{api.name}</p>
+                <p className="text-xs truncate" style={{ color: T.muted }}>
+                  {api.status === 'error'
+                    ? (api.error ?? 'Not responding')
+                    : api.status === 'checking'
+                      ? 'Checking…'
+                      : `${api.recordCount ?? 0} records`}
+                </p>
+              </span>
+              <span className="text-right shrink-0">
+                <Figure value={api.responseMs} unit="ms" size="sm" tone={toneFor(api.status)} />
+                <p className="text-[0.65rem] mt-0.5"><TimeAgo ts={api.lastChecked ?? undefined} /></p>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+
+      <StatGrid>
+        <StatTile label="Traffic events" value={d.liveTrafficCount} hint="Live from Calgary open data" />
+        <StatTile label="Open 311 requests" value={d.live311Count} hint="Live from Calgary open data" />
+        <StatTile label="Feeds healthy" value={`${d.apiHealths.filter((a) => a.status === 'ok').length}/${d.apiHealths.length}`} tone="ok" />
+        <StatTile label="Feeds failing" value={d.apiHealths.filter((a) => a.status === 'error').length} tone="critical" />
+      </StatGrid>
+    </>
+  );
+}
+
+// ── Visitors ──────────────────────────────────────────────────────────────────
+
+function VisitorsSection({ d }: { d: D }) {
+  return (
+    <>
+      <StatGrid>
+        <StatTile label="Page views" value={d.totalPageViews} hint="All time" />
+        <StatTile label="Sessions" value={d.uniqueSessions} hint="Unique visits" />
+        <StatTile label="Pages per session" value={d.avgPagesPerSession} hint="Average depth" />
+        <StatTile label="From search" value={d.organicShare} unit="%" tone="ok" hint="Share of traffic" />
+      </StatGrid>
+
+      <Panel title="Views by day" subtitle="Daily traffic">
+        <ChartFrame height={200}>
+          <AreaChart data={d.pageViewsByDayData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+            <defs>
+              <linearGradient id="gViews" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={T.signal} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={T.signal} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+            <XAxis dataKey="date" {...axis} />
+            <YAxis allowDecimals={false} {...axis} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Area type="monotone" dataKey="views" stroke={T.signal} strokeWidth={2} fill="url(#gViews)" />
+          </AreaChart>
+        </ChartFrame>
+      </Panel>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Panel title="How people arrive" subtitle="Bucketed from referrer and UTM tags">
+          <ChartFrame height={190}>
+            <PieChart>
+              <Pie data={d.trafficSourceData} dataKey="value" nameKey="name" innerRadius={44} outerRadius={72} paddingAngle={2}>
+                {d.trafficSourceData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={tooltipStyle} />
+            </PieChart>
+          </ChartFrame>
+          <Legend items={d.trafficSourceData.map((c, i) => ({ label: c.name, value: c.value, color: c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
+        </Panel>
+
+        {/*
+          This series is ranked by volume and capped at seven, so it is the
+          busiest days rather than a timeline. Drawing it as a trend line would
+          imply an order the data does not have.
+        */}
+        <Panel title="Busiest search days" subtitle="Days with the most visits arriving from a search engine">
+          {d.organicSearchByDayData.length === 0 ? (
+            <EmptyState title="No search traffic yet" body="Visits arriving from Google or Bing will be counted here." />
+          ) : (
+            <ChartFrame height={190}>
+              <BarChart data={d.organicSearchByDayData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+                <XAxis dataKey="date" {...axis} />
+                <YAxis allowDecimals={false} {...axis} />
+                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                <Bar dataKey="searches" fill={T.ok} radius={[5, 5, 0, 0]} />
+              </BarChart>
+            </ChartFrame>
+          )}
+          <p className="text-[0.7rem] mt-2 leading-relaxed" style={{ color: T.muted }}>
+            Search keywords are deliberately not collected — they can carry personal information, so only the volume is recorded.
+          </p>
+        </Panel>
+
+        <Panel title="Top pages" subtitle="Most viewed">
+          {d.topPagesData.length === 0 ? (
+            <EmptyState title="No views recorded yet" body="Page views appear here once visitors land on the site." />
+          ) : (
+            <ul className="space-y-1.5">
+              {d.topPagesData.map((p) => (
+                <li key={p.path} className="flex items-center justify-between gap-3">
+                  <span className="text-sm truncate" style={{ fontFamily: mono, color: T.ink }}>{p.path}</span>
+                  <Figure value={p.views} size="sm" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+
+        <Panel title="Top referrers" subtitle="Sites sending traffic">
+          {d.topReferrersData.length === 0 ? (
+            <EmptyState title="No referrers yet" body="When another site links to Calgary Watch, it shows up here." />
+          ) : (
+            <ChartFrame height={190}>
+              <BarChart data={d.topReferrersData} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
+                <XAxis type="number" hide />
+                <YAxis type="category" dataKey="referrer" width={118} {...axis} />
+                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                <Bar dataKey="views" fill={T.attention} radius={[0, 5, 5, 0]} />
+              </BarChart>
+            </ChartFrame>
+          )}
+        </Panel>
+
+        <Panel title="Campaigns" subtitle="Views from utm_campaign tagged links" className="lg:col-span-2">
+          {d.utmCampaignData.length === 0 ? (
+            <EmptyState
+              title="No campaign data yet"
+              body="Tag a shared link with ?utm_campaign=name and its traffic will be tracked here."
+            />
+          ) : (
+            <ChartFrame height={190}>
+              <BarChart data={d.utmCampaignData} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
+                <XAxis type="number" hide />
+                <YAxis type="category" dataKey="campaign" width={118} {...axis} />
+                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                <Bar dataKey="views" fill={T.signal} radius={[0, 5, 5, 0]} />
+              </BarChart>
+            </ChartFrame>
+          )}
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+// ── City stats ────────────────────────────────────────────────────────────────
+
+function CitySection({ d }: { d: D }) {
+  return (
+    <>
+      <StatGrid>
+        <StatTile label="Avg safety score" value={d.averageSafety} unit="/100" tone="ok" />
+        <StatTile label="Communities tracked" value={d.communityStats.length} />
+        <StatTile label="Crime records" value={d.crimeStats.size} hint="From Calgary open data" />
+        <StatTile label="Traffic events" value={d.liveTrafficCount} hint="Live now" />
+      </StatGrid>
+
+      <Panel title="Safety scores" subtitle="The scores shown on the map's area panel">
+        {d.safetyChartData.length === 0 ? (
+          <EmptyState title="No safety scores yet" body="Add a community below and it will chart here." />
+        ) : (
+          <ChartFrame height={240}>
+            <BarChart data={d.safetyChartData} margin={{ top: 4, right: 8, left: -14, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="2 4" stroke={T.line} vertical={false} />
+              <XAxis dataKey="name" {...axis} />
+              <YAxis domain={[0, 100]} {...axis} />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+              {/* Series key is "Safety Score" — it is the label shown in the tooltip. */}
+              <Bar dataKey="Safety Score" fill={T.ok} radius={[5, 5, 0, 0]} />
+            </BarChart>
+          </ChartFrame>
+        )}
+      </Panel>
+
+      <Panel title="Highest reported crime" subtitle="From the Calgary Police open dataset">
+        {d.crimeLoading ? (
+          <SkeletonRows rows={4} />
+        ) : d.topCrimeCommunities.length === 0 ? (
+          <EmptyState title="Crime data unavailable" body="The Calgary open-data endpoint returned no records. Check the Data feeds tab." />
+        ) : (
+          <ul className="divide-y" style={{ borderColor: T.line }}>
+            {d.topCrimeCommunities.map((c) => (
+              <li key={c.name} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <span className="text-sm font-medium truncate" style={{ color: T.ink }}>{c.name}</span>
+                <span className="flex items-center gap-2.5 shrink-0">
+                  <span className="text-[0.68rem]" style={{ color: T.muted }}>crime</span>
+                  <Figure value={c.crime} size="sm" tone="critical" />
+                  <span className="text-[0.68rem]" style={{ color: T.muted }}>disorder</span>
+                  <Figure value={c.disorder} size="sm" tone="attention" />
+                  <span className="text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{c.year}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Panel title="Community safety scores" subtitle="Edit the values that feed the map" padded={false}>
+        <div className="p-4">
+          <RecordList
+            rows={d.communityStats}
+            keyOf={(r) => r.id}
+            empty={<EmptyState title="No community scores yet" body="Rows in the community_stats collection appear here for editing." />}
+            columns={[
+              { header: 'Community', cell: (row) => <StatsInput d={d} row={row} field="community" /> },
+              { header: 'Month', width: '7rem', cell: (row) => <StatsInput d={d} row={row} field="month" /> },
+              { header: 'Violent', width: '6rem', cell: (row) => <StatsInput d={d} row={row} field="violent_crime" numeric /> },
+              { header: 'Property', width: '6rem', cell: (row) => <StatsInput d={d} row={row} field="property_crime" numeric /> },
+              { header: 'Disorder', width: '6rem', cell: (row) => <StatsInput d={d} row={row} field="disorder_calls" numeric /> },
+              { header: 'Score', width: '6rem', cell: (row) => <StatsInput d={d} row={row} field="safety_score" numeric /> },
+              {
+                header: 'Actions',
+                width: '9rem',
+                cell: (row) => (
+                  <div className="flex gap-1.5">
+                    <AdminButton size="sm" tone="signal" onClick={() => d.saveCommunityStats(row.id)} disabled={d.savingStatsId === row.id}>
+                      <Save size={13} /> Save
+                    </AdminButton>
+                    <AdminButton size="sm" variant="outline" tone="critical" onClick={() => d.softDeleteCommunityStats(row.id)} title="Delete row">
+                      <Trash2 size={13} />
+                    </AdminButton>
+                  </div>
+                ),
+              },
+            ]}
+            card={(row) => (
+              <div className="rounded-xl border p-3 space-y-2.5" style={{ borderColor: T.line, background: T.card }}>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <Field label="Community"><StatsInput d={d} row={row} field="community" /></Field>
+                  <Field label="Month"><StatsInput d={d} row={row} field="month" /></Field>
+                  <Field label="Violent"><StatsInput d={d} row={row} field="violent_crime" numeric /></Field>
+                  <Field label="Property"><StatsInput d={d} row={row} field="property_crime" numeric /></Field>
+                  <Field label="Disorder"><StatsInput d={d} row={row} field="disorder_calls" numeric /></Field>
+                  <Field label="Safety score"><StatsInput d={d} row={row} field="safety_score" numeric /></Field>
+                </div>
+                <div className="flex gap-2">
+                  <AdminButton size="sm" tone="signal" onClick={() => d.saveCommunityStats(row.id)} disabled={d.savingStatsId === row.id} className="flex-1">
+                    <Save size={13} /> {d.savingStatsId === row.id ? 'Saving' : 'Save'}
+                  </AdminButton>
+                  <AdminButton size="sm" variant="outline" tone="critical" onClick={() => d.softDeleteCommunityStats(row.id)}>
+                    <Trash2 size={13} /> Delete
+                  </AdminButton>
+                </div>
+              </div>
+            )}
+          />
+        </div>
+      </Panel>
+    </>
+  );
+}
+
+function StatsInput({
+  d,
+  row,
+  field,
+  numeric,
+}: {
+  d: D;
+  row: D['communityStats'][number];
+  field: 'community' | 'month' | 'violent_crime' | 'property_crime' | 'disorder_calls' | 'safety_score';
+  numeric?: boolean;
+}) {
+  const draft = d.statsDrafts[row.id] ?? {
+    community: row.community, month: row.month,
+    violent_crime: row.violent_crime, property_crime: row.property_crime,
+    disorder_calls: row.disorder_calls, safety_score: row.safety_score,
+  };
+  return (
+    <input
+      className={inputClass}
+      style={{ ...inputStyle, fontFamily: numeric ? mono : undefined }}
+      type={numeric ? 'number' : 'text'}
+      value={draft[field]}
+      onChange={(e) =>
+        d.setStatsDraft(row, { [field]: numeric ? Number(e.target.value) : e.target.value })
+      }
+    />
   );
 }

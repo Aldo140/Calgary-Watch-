@@ -1,12 +1,26 @@
+/**
+ * User directory.
+ *
+ * Same master–detail shape as the incident list, deliberately: an admin moving
+ * between the two screens should not have to relearn where anything is. Each
+ * account carries its own reporting history, so moderation decisions can be
+ * made with the person's full record in view rather than one report at a time.
+ */
+
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, Code2, Eye, FileText, Loader2, Lock, Save, Search, ShieldCheck, Trash2, Users } from 'lucide-react';
+import {
+  ArrowLeft, FileText, Loader2, Lock, Save, Search, Trash2, Users, X,
+} from 'lucide-react';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import { Button } from '@/src/components/ui/Button';
-import { Card } from '@/src/components/ui/Card';
 import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, incidentVisibility } from '@/src/types';
+import {
+  AdminButton, Chip, EmptyState, Field, Figure, FilterChip, FilterRow, Panel,
+  SearchField, SkeletonRows, StatGrid, StatTile, T, TimeAgo, display,
+  inputClass, inputStyle, mono,
+} from '@/src/components/admin/ui';
 import { cn } from '@/src/lib/utils';
 
 type UserProfile = {
@@ -23,83 +37,115 @@ type UserProfile = {
   inferredNeighborhood?: string;
 };
 
+type ProfileDraft = { displayName: string; role: 'user' | 'admin' };
+
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { user, signIn, isAuthReady, isAdmin } = useAuth();
 
-  if (!isAuthReady) return <div className="min-h-screen bg-[#f5efe3] light:bg-[#f5efe3] text-slate-900 flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
-  if (!isFirebaseConfigured) return <div className="min-h-screen bg-[#f5efe3] p-6 flex items-center justify-center"><Card className="max-w-xl w-full p-8 bg-white border-slate-200"><h1 className="text-2xl font-black text-slate-900">Admin unavailable</h1><p className="mt-2 text-sm text-slate-600">Firebase is not configured.</p><Button onClick={() => navigate('/map')} className="mt-4 w-full">Back to map</Button></Card></div>;
-  if (!user) return <div className="min-h-screen bg-[#f5efe3] p-6 flex items-center justify-center"><Card className="max-w-xl w-full p-8 bg-white border-slate-200"><h1 className="text-2xl font-black text-slate-900">Admin Portal</h1><p className="mt-2 text-sm text-slate-600">Sign in with an approved admin account.</p><Button onClick={signIn} className="mt-4 w-full">Sign in</Button></Card></div>;
-  if (!isAdmin) return <div className="min-h-screen bg-[#f5efe3] p-6 flex items-center justify-center"><Card className="max-w-xl w-full p-8 bg-white border-red-200"><div className="flex items-center gap-2 text-red-600"><Lock size={18} /><h1 className="text-2xl font-black">Access denied</h1></div><Button variant="secondary" onClick={() => navigate('/map')} className="mt-4 w-full">Back to map</Button></Card></div>;
+  if (!isAuthReady) {
+    return (
+      <div className="min-h-screen grid place-items-center" style={{ background: T.surface }}>
+        <Loader2 className="animate-spin" style={{ color: T.muted }} />
+      </div>
+    );
+  }
 
-  return <>{children}</>;
+  const blocked = !isFirebaseConfigured
+    ? { title: 'Admin unavailable', body: 'This build has no Firebase configuration.', cta: null }
+    : !user
+      ? { title: 'Sign in required', body: 'Sign in with an approved admin account to open the directory.', cta: 'signin' as const }
+      : !isAdmin
+        ? { title: 'Access denied', body: 'This account is not an approved admin.', cta: null }
+        : null;
+
+  if (!blocked) return <>{children}</>;
+
+  return (
+    <div className="min-h-screen grid place-items-center p-6" style={{ background: T.surface }}>
+      <div className="max-w-sm w-full rounded-2xl border p-6 text-center" style={{ background: T.card, borderColor: T.line }}>
+        <Lock size={22} className="mx-auto mb-3" style={{ color: T.muted }} />
+        <h1 className="text-lg font-bold mb-1" style={{ fontFamily: display, color: T.ink }}>{blocked.title}</h1>
+        <p className="text-sm mb-4" style={{ color: T.muted }}>{blocked.body}</p>
+        <div className="flex gap-2 justify-center">
+          {blocked.cta === 'signin' && <AdminButton tone="signal" onClick={signIn}>Sign in</AdminButton>}
+          <AdminButton variant="outline" onClick={() => navigate('/admin')}>Back to admin</AdminButton>
+        </div>
+      </div>
+    </div>
+  );
 }
 
+/** Firestore stores these as a number, a Timestamp, or {seconds}. */
 function coerceTimestamp(value: unknown): number {
   if (typeof value === 'number') return value;
   if (value && typeof value === 'object') {
-    const maybeTimestamp = value as { toMillis?: () => number; seconds?: number };
-    if (typeof maybeTimestamp.toMillis === 'function') return maybeTimestamp.toMillis();
-    if (typeof maybeTimestamp.seconds === 'number') return maybeTimestamp.seconds * 1000;
+    const t = value as { toMillis?: () => number; seconds?: number };
+    if (typeof t.toMillis === 'function') return t.toMillis();
+    if (typeof t.seconds === 'number') return t.seconds * 1000;
   }
   return 0;
 }
 
-function formatDateTime(ts?: number) {
-  if (!ts) return 'No timestamp stored';
-  return new Date(ts).toLocaleString('en-CA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-
 export default function AdminUserListPage() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const uidParam = params.get('uid');
+
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
-  const [selectedUid, setSelectedUid] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedUid, setSelectedUid] = useState<string | null>(uidParam);
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<'newest' | 'oldest' | 'name' | 'reports'>('newest');
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user' | 'reporters'>('all');
+  const [sort, setSort] = useState<'newest' | 'oldest' | 'reports' | 'name'>('newest');
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
-  const [draftProfiles, setDraftProfiles] = useState<Record<string, Pick<UserProfile, 'displayName' | 'role'>>>({});
+  const [draftProfiles, setDraftProfiles] = useState<Record<string, ProfileDraft>>({});
   const [savingUid, setSavingUid] = useState<string | null>(null);
-  const [rawView, setRawView] = useState(false);
 
   useEffect(() => {
-    if (!db) return;
+    if (!db) { setLoading(false); return; }
     const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
-      const rows = snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as UserProfile));
-      setUsers(rows);
-      setSelectedUid((current) => current || rows[0]?.uid || null);
+      setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
+      setLoading(false);
     });
-    const unsubIncidents = onSnapshot(query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)), (snapshot) => {
-      setIncidents(snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as Incident)).filter((row) => incidentVisibility(row) !== 'deleted'));
-    });
+    const unsubIncidents = onSnapshot(
+      query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)),
+      (snapshot) => {
+        setIncidents(
+          snapshot.docs
+            .map((row) => ({ id: row.id, ...row.data() } as Incident))
+            .filter((row) => incidentVisibility(row) !== 'deleted'),
+        );
+      },
+    );
     return () => { unsubUsers(); unsubIncidents(); };
   }, []);
 
   const reportsByUserKey = useMemo(() => {
     const map = new globalThis.Map<string, Incident[]>();
     incidents.forEach((incident) => {
-      const keys = [incident.authorUid, incident.email && incident.email !== 'anonymous@calgarywatch.app' ? incident.email : null].filter(Boolean) as string[];
+      const keys = [
+        incident.authorUid,
+        incident.email && incident.email !== 'anonymous@calgarywatch.app' ? incident.email : null,
+      ].filter(Boolean) as string[];
       keys.forEach((key) => {
-        const bucket = map.get(key) || [];
-        bucket.push(incident);
-        map.set(key, bucket);
+        const list = map.get(key) ?? [];
+        list.push(incident);
+        map.set(key, list);
       });
     });
     return map;
   }, [incidents]);
 
   const enrichedUsers = useMemo(() => users.map((profile) => {
-    const byUid = reportsByUserKey.get(profile.uid) || [];
-    const byEmail = reportsByUserKey.get(profile.email) || [];
-    const reportMap = new globalThis.Map([...byUid, ...byEmail].map((incident) => [incident.id, incident]));
-    const reports = [...reportMap.values()].sort((a, b) => b.timestamp - a.timestamp);
-    const firstReport = reports.length ? Math.min(...reports.map((incident) => incident.timestamp)) : 0;
-    const joinedAt = coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || firstReport || 0;
-    const anonymousCount = reports.filter((incident) => incident.anonymous).length;
-    const searchBlob = [profile.displayName, profile.email, profile.notes, ...reports.map((incident) => `${incident.title} ${incident.description} ${incident.neighborhood}`)]
-      .join(' ')
-      .toLowerCase();
+    const reports = reportsByUserKey.get(profile.uid) ?? reportsByUserKey.get(profile.email) ?? [];
+    const joinedAt = coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || 0;
+    const anonymousCount = reports.filter((r) => r.anonymous).length;
+    const searchBlob = [
+      profile.displayName, profile.email, profile.notes,
+      ...reports.map((i) => `${i.title} ${i.description} ${i.neighborhood}`),
+    ].join(' ').toLowerCase();
     return { ...profile, joinedAt, reports, anonymousCount, searchBlob };
   }), [users, reportsByUserKey]);
 
@@ -121,20 +167,25 @@ export default function AdminUserListPage() {
       });
   }, [enrichedUsers, search, sort, roleFilter]);
 
-  const selectedUser = filteredUsers.find((profile) => profile.uid === selectedUid) || filteredUsers[0] || null;
+  const selectedUser = filteredUsers.find((p) => p.uid === selectedUid) || filteredUsers[0] || null;
+
   const userStats = useMemo(() => ({
     total: users.length,
-    admins: users.filter((profile) => profile.role === 'admin').length,
-    reporters: enrichedUsers.filter((profile) => profile.reports.length > 0).length,
-    notes: incidents.length,
-    digest: users.filter((profile) => profile.weeklyDigestOptIn === true).length,
-  }), [users, enrichedUsers, incidents.length]);
+    admins: users.filter((p) => p.role === 'admin').length,
+    reporters: enrichedUsers.filter((p) => p.reports.length > 0).length,
+    digest: users.filter((p) => p.weeklyDigestOptIn === true).length,
+  }), [users, enrichedUsers]);
+
+  const getProfileDraft = (profile: UserProfile): ProfileDraft =>
+    draftProfiles[profile.uid] || { displayName: profile.displayName || '', role: profile.role || 'user' };
 
   const saveNotes = async (profile: UserProfile) => {
     if (!db) return;
     setSavingUid(profile.uid);
     try {
-      await updateDoc(doc(db, 'users', profile.uid), { notes: draftNotes[profile.uid] ?? profile.notes ?? '' });
+      await updateDoc(doc(db, 'users', profile.uid), {
+        notes: draftNotes[profile.uid] ?? profile.notes ?? '',
+      });
     } finally {
       setSavingUid(null);
     }
@@ -142,10 +193,9 @@ export default function AdminUserListPage() {
 
   const saveProfile = async (profile: UserProfile) => {
     if (!db) return;
-    const draft = draftProfiles[profile.uid] || { displayName: profile.displayName || '', role: profile.role || 'user' };
     setSavingUid(profile.uid);
     try {
-      await updateDoc(doc(db, 'users', profile.uid), draft);
+      await updateDoc(doc(db, 'users', profile.uid), getProfileDraft(profile));
       setDraftProfiles((prev) => {
         const next = { ...prev };
         delete next[profile.uid];
@@ -164,197 +214,292 @@ export default function AdminUserListPage() {
       'This deletes their profile record only. Their sign-in account still exists and they can sign in again.'
     )) return;
     await deleteDoc(doc(db, 'users', profile.uid));
+    setSelectedUid(null);
   };
+
+  const hasFilters = Boolean(search || roleFilter !== 'all');
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#f5efe3] light:bg-[#f5efe3] text-slate-900">
-        <header className="sticky top-0 z-20 border-b border-slate-200 bg-[#fffaf2]/90 backdrop-blur-xl px-4 py-4">
-          <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="min-h-screen" style={{ background: T.surface }}>
+        <header className="sticky top-0 z-30 border-b backdrop-blur" style={{ background: 'rgba(247,246,243,0.94)', borderColor: T.line }}>
+          <div className="px-4 lg:px-7 py-3 max-w-[1500px]">
             <div className="flex items-center gap-3">
-              <Button variant="secondary" onClick={() => navigate('/admin')} className="h-9 border-slate-200 bg-white text-slate-700"><ArrowLeft size={14} /> Admin</Button>
-              <div>
-                <h1 className="text-lg font-black">Full User Directory</h1>
-                <p className="text-xs text-slate-600">{filteredUsers.length} of {users.length} users · newest first available</p>
+              <button
+                onClick={() => navigate('/admin')}
+                className="shrink-0 h-9 w-9 grid place-items-center rounded-lg border"
+                style={{ borderColor: T.line, color: T.muted, background: T.card }}
+                aria-label="Back to admin"
+              >
+                <ArrowLeft size={16} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-[1.05rem] lg:text-[1.3rem] font-bold leading-tight" style={{ fontFamily: display, color: T.ink }}>
+                  User directory
+                </h1>
+                <p className="text-xs" style={{ color: T.muted }}>
+                  <span className="tabular-nums" style={{ fontFamily: mono }}>{filteredUsers.length}</span>
+                  {' of '}
+                  <span className="tabular-nums" style={{ fontFamily: mono }}>{users.length}</span>
+                  {' accounts'}
+                </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative min-w-0">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, email, notes..." className="h-10 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-sm outline-none focus:border-slate-900 sm:w-72" />
-              </div>
-              <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as any)} className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-slate-900">
-                <option value="all">All users</option>
-                <option value="reporters">Reporters</option>
-                <option value="admin">Admins</option>
-                <option value="user">View-only</option>
-              </select>
-              <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-sm outline-none focus:border-slate-900">
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
+
+            <div className="flex gap-2 mt-3">
+              <SearchField
+                value={search}
+                onChange={setSearch}
+                placeholder="Search name, email, notes or their reports"
+                icon={<Search size={15} />}
+              />
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as typeof sort)}
+                className={cn(inputClass, 'w-auto shrink-0 pr-8')}
+                style={inputStyle}
+                aria-label="Sort order"
+              >
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
                 <option value="reports">Most reports</option>
                 <option value="name">Name</option>
               </select>
             </div>
+
+            <FilterRow>
+              <FilterChip active={roleFilter === 'all'} onClick={() => setRoleFilter('all')} count={userStats.total}>Everyone</FilterChip>
+              <FilterChip active={roleFilter === 'admin'} onClick={() => setRoleFilter('admin')} count={userStats.admins}>Admins</FilterChip>
+              <FilterChip active={roleFilter === 'user'} onClick={() => setRoleFilter('user')}>View only</FilterChip>
+              <FilterChip active={roleFilter === 'reporters'} onClick={() => setRoleFilter('reporters')} count={userStats.reporters}>Reporters</FilterChip>
+              {hasFilters && (
+                <FilterChip active={false} onClick={() => { setSearch(''); setRoleFilter('all'); }}>
+                  <X size={12} /> Clear
+                </FilterChip>
+              )}
+            </FilterRow>
           </div>
         </header>
 
-        <main className="mx-auto grid max-w-7xl gap-4 px-4 py-5">
-          <section className="grid gap-3 grid-cols-2 sm:grid-cols-5">
-            {[
-              { label: 'Users', value: userStats.total, icon: Users, tone: 'text-slate-900' },
-              { label: 'Admins', value: userStats.admins, icon: ShieldCheck, tone: 'text-emerald-700' },
-              { label: 'Reporters', value: userStats.reporters, icon: FileText, tone: 'text-amber-700' },
-              { label: 'Notes', value: userStats.notes, icon: Code2, tone: 'text-sky-700' },
-              { label: 'Digest opt-in', value: userStats.digest, icon: Users, tone: 'text-teal-700' },
-            ].map(({ label, value, icon: Icon, tone }) => (
-              <Card key={label} className="rounded-2xl border-slate-200 bg-white p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</p>
-                  <Icon size={15} className={tone} />
-                </div>
-                <p className={cn('mt-2 text-3xl font-black', tone)}>{value}</p>
-              </Card>
-            ))}
-          </section>
+        <main className="px-4 lg:px-7 py-4 max-w-[1500px] space-y-4">
+          <StatGrid>
+            <StatTile label="Accounts" value={userStats.total} />
+            <StatTile label="Admins" value={userStats.admins} tone="signal" />
+            <StatTile label="Have reported" value={userStats.reporters} tone="ok" />
+            <StatTile label="Weekly digest" value={userStats.digest} hint="Opted in" />
+          </StatGrid>
 
-          <section className="grid gap-4 lg:grid-cols-[24rem_1fr]">
-          <div className="space-y-3 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
-            {filteredUsers.length === 0 && (
-              <Card className="rounded-2xl border-slate-200 bg-white p-6 text-center text-sm text-slate-500">No users match your filters.</Card>
-            )}
-            {filteredUsers.map((profile) => (
-              <button key={profile.uid} onClick={() => setSelectedUid(profile.uid)} className={cn('w-full rounded-2xl border bg-white p-4 text-left shadow-sm transition-all', selectedUser?.uid === profile.uid ? 'border-slate-900 ring-2 ring-slate-900/10' : 'border-slate-200 hover:border-slate-300')}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-black">{profile.displayName || 'Unknown user'}</p>
-                    <p className="truncate text-xs text-slate-600">{profile.email || 'No email'}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span className={cn('rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-widest', profile.role === 'admin' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-sky-200 bg-sky-50 text-sky-700')}>{profile.role}</span>
-                    <span className={cn(
-                      'rounded-full border px-2 py-1 text-[9px] font-black uppercase tracking-widest',
-                      profile.weeklyDigestOptIn === true
-                        ? 'border-teal-200 bg-teal-50 text-teal-700'
-                        : profile.weeklyDigestOptIn === false
-                          ? 'border-red-200 bg-red-50 text-red-600'
-                          : 'border-amber-200 bg-amber-50 text-amber-700'
-                    )}>
-                      {profile.weeklyDigestOptIn === true ? '📬 Newsletter: yes' : profile.weeklyDigestOptIn === false ? 'Newsletter: no' : 'Not specified'}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                  <span className="rounded-xl bg-slate-50 px-3 py-2 text-slate-600">{formatDateTime(profile.joinedAt)}</span>
-                  <span className="rounded-xl bg-amber-50 px-3 py-2 font-black text-amber-700">{profile.reports.length} notes</span>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          <section className="min-w-0">
-            {selectedUser ? (
-              <Card className="overflow-hidden rounded-2xl border-slate-200 bg-white">
-                <div className="border-b border-slate-200 p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <h2 className="text-xl font-black">{selectedUser.displayName || 'Unknown user'}</h2>
-                      <p className="text-sm text-slate-600">{selectedUser.email || 'No email'} · member since {formatDateTime(selectedUser.joinedAt)}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="secondary" onClick={() => setRawView((value) => !value)} className="h-9 border-slate-200 bg-white text-slate-700">{rawView ? <Eye size={14} /> : <Code2 size={14} />}{rawView ? 'Structured' : 'Raw'}</Button>
-                      <Button variant="secondary" onClick={() => deleteUser(selectedUser)} className="h-9 border-red-200 bg-red-50 text-red-700"><Trash2 size={14} />Remove profile</Button>
-                    </div>
-                  </div>
-                </div>
-
-                {rawView ? (
-                  <pre className="max-h-[70vh] overflow-auto bg-slate-950 p-5 text-xs text-slate-100">{JSON.stringify({ user: selectedUser, reports: selectedUser.reports }, null, 2)}</pre>
-                ) : (
-                  <div className="grid gap-5 p-5">
-                    <div className="grid gap-3 grid-cols-2 sm:grid-cols-5">
-                      <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">UID</p><p className="mt-2 break-all font-mono text-xs">{selectedUser.uid}</p></div>
-                      <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Role</p><p className="mt-2 text-sm font-black">{selectedUser.role}</p></div>
-                      <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Notes Posted</p><p className="mt-2 text-sm font-black">{selectedUser.reports.length}</p></div>
-                      <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Anonymous Notes</p><p className="mt-2 text-sm font-black">{selectedUser.anonymousCount}</p></div>
-                      <div className={cn(
-                        'rounded-2xl p-4',
-                        selectedUser.weeklyDigestOptIn === true ? 'bg-teal-50' : selectedUser.weeklyDigestOptIn === false ? 'bg-red-50' : 'bg-amber-50'
-                      )}>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Weekly Newsletter</p>
-                        <p className={cn(
-                          'mt-2 text-sm font-black',
-                          selectedUser.weeklyDigestOptIn === true ? 'text-teal-700' : selectedUser.weeklyDigestOptIn === false ? 'text-red-600' : 'text-amber-700'
-                        )}>
-                          {selectedUser.weeklyDigestOptIn === true ? 'Yes' : selectedUser.weeklyDigestOptIn === false ? 'No' : 'Not specified'}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500 truncate">
-                          {selectedUser.weeklyDigestOptIn === undefined
-                            ? (selectedUser.digestPromptedAt ? 'Prompted, no answer saved' : 'Will be prompted on next sign-in')
-                            : (selectedUser.neighborhood || selectedUser.inferredNeighborhood || '')}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
-                      <label className="grid gap-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Display Name
-                        <input
-                          value={draftProfiles[selectedUser.uid]?.displayName ?? selectedUser.displayName ?? ''}
-                          onChange={(e) => setDraftProfiles((prev) => ({ ...prev, [selectedUser.uid]: { displayName: e.target.value, role: prev[selectedUser.uid]?.role ?? selectedUser.role } }))}
-                          className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium normal-case tracking-normal text-slate-900 outline-none focus:border-slate-900"
-                        />
-                      </label>
-                      <label className="grid gap-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Role
-                        <select
-                          value={draftProfiles[selectedUser.uid]?.role ?? selectedUser.role}
-                          onChange={(e) => setDraftProfiles((prev) => ({ ...prev, [selectedUser.uid]: { displayName: prev[selectedUser.uid]?.displayName ?? selectedUser.displayName ?? '', role: e.target.value as UserProfile['role'] } }))}
-                          className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-sm font-medium normal-case tracking-normal text-slate-900 outline-none focus:border-slate-900"
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem]">
+            <Panel title="Accounts" subtitle={`Sorted by ${sort}`} padded={false}>
+              {loading ? (
+                <div className="p-4"><SkeletonRows rows={6} /></div>
+              ) : filteredUsers.length === 0 ? (
+                <EmptyState
+                  icon={<Users size={26} />}
+                  title="No accounts match"
+                  body={hasFilters ? 'Try a different search or clear the filters.' : 'Accounts appear here as soon as someone signs in.'}
+                  action={hasFilters ? <AdminButton size="sm" variant="outline" onClick={() => { setSearch(''); setRoleFilter('all'); }}>Clear filters</AdminButton> : undefined}
+                />
+              ) : (
+                <ul className="divide-y max-h-[62vh] overflow-y-auto" style={{ borderColor: T.line }}>
+                  {filteredUsers.map((profile) => {
+                    const active = selectedUser?.uid === profile.uid;
+                    return (
+                      <li key={profile.uid}>
+                        <button
+                          onClick={() => setSelectedUid(profile.uid)}
+                          className="w-full text-left p-3 flex items-center gap-3 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2"
+                          style={{ background: active ? `${T.signal}0D` : 'transparent', outlineColor: T.signal }}
                         >
-                          <option value="user">User</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                      </label>
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        <Button onClick={() => saveProfile(selectedUser)} disabled={savingUid === selectedUser.uid} className="h-10 rounded-xl"><Save size={14} />Save</Button>
-                        <Button variant="secondary" onClick={() => navigate(`/admin/incidents?uid=${selectedUser.uid}`)} className="h-10 rounded-xl border-slate-200 bg-white text-slate-700"><FileText size={14} />Posts</Button>
-                      </div>
-                    </div>
+                          <span
+                            className="h-8 w-8 shrink-0 grid place-items-center rounded-full text-xs font-bold"
+                            style={{ background: `${T.signal}18`, color: T.signal }}
+                          >
+                            {(profile.displayName || profile.email || '?').charAt(0).toUpperCase()}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="flex items-center gap-1.5">
+                              <p className="text-sm font-semibold truncate" style={{ color: T.ink }}>
+                                {profile.displayName || 'Unnamed'}
+                              </p>
+                              {profile.role === 'admin' && <Chip tone="signal">admin</Chip>}
+                            </span>
+                            <p className="text-xs truncate" style={{ color: T.muted }}>{profile.email}</p>
+                          </span>
+                          <span className="shrink-0 text-right">
+                            <Figure value={profile.reports.length} size="sm" tone={profile.reports.length > 0 ? 'ok' : 'neutral'} />
+                            <p className="text-[0.62rem]" style={{ color: T.muted }}>reports</p>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </Panel>
 
-                    <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Admin Notes</label>
-                      <textarea value={draftNotes[selectedUser.uid] ?? selectedUser.notes ?? ''} onChange={(e) => setDraftNotes((prev) => ({ ...prev, [selectedUser.uid]: e.target.value }))} className="mt-2 h-24 w-full rounded-2xl border border-slate-300 bg-white p-3 text-sm outline-none focus:border-slate-900" />
-                      <Button onClick={() => saveNotes(selectedUser)} disabled={savingUid === selectedUser.uid} className="mt-2 h-9 rounded-xl"><Save size={14} />{savingUid === selectedUser.uid ? 'Saving...' : 'Save Notes'}</Button>
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-black">Posted Notes</h3>
-                      <div className="mt-3 space-y-3">
-                        {selectedUser.reports.length === 0 ? <p className="text-sm text-slate-500">No notes posted yet.</p> : selectedUser.reports.map((incident) => (
-                          <div key={incident.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                              <div>
-                                <p className="font-black">{incident.title}</p>
-                                <p className="mt-1 text-sm text-slate-600">{incident.description}</p>
-                              </div>
-                              <span className={cn('rounded-full px-2 py-1 text-[10px] font-black', incident.anonymous ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')}>{incident.anonymous ? 'Anonymous' : 'Named'}</span>
-                            </div>
-                            <p className="mt-2 text-xs text-slate-500">{formatDateTime(incident.timestamp)} · {incident.neighborhood} · {incident.category}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </Card>
-            ) : (
-              <Card className="rounded-2xl border-slate-200 bg-white p-10 text-center text-slate-500">No users match your search.</Card>
-            )}
-          </section>
-          </section>
+            <div className="lg:sticky lg:top-[12rem] lg:self-start">
+              {selectedUser ? (
+                <UserEditor
+                  profile={selectedUser}
+                  draft={getProfileDraft(selectedUser)}
+                  notes={draftNotes[selectedUser.uid] ?? selectedUser.notes ?? ''}
+                  saving={savingUid === selectedUser.uid}
+                  dirty={Boolean(draftProfiles[selectedUser.uid])}
+                  onPatch={(patch) =>
+                    setDraftProfiles((prev) => ({
+                      ...prev,
+                      [selectedUser.uid]: { ...getProfileDraft(selectedUser), ...patch },
+                    }))
+                  }
+                  onNotes={(v) => setDraftNotes((prev) => ({ ...prev, [selectedUser.uid]: v }))}
+                  onSaveProfile={() => saveProfile(selectedUser)}
+                  onSaveNotes={() => saveNotes(selectedUser)}
+                  onDelete={() => deleteUser(selectedUser)}
+                  onViewReports={() => navigate(`/admin/incidents?uid=${selectedUser.uid}`)}
+                />
+              ) : (
+                <Panel title="No account selected">
+                  <EmptyState title="Pick an account" body="Select someone from the list to see their record." />
+                </Panel>
+              )}
+            </div>
+          </div>
         </main>
       </div>
     </AdminGuard>
+  );
+}
+
+function UserEditor({
+  profile,
+  draft,
+  notes,
+  saving,
+  dirty,
+  onPatch,
+  onNotes,
+  onSaveProfile,
+  onSaveNotes,
+  onDelete,
+  onViewReports,
+}: {
+  profile: UserProfile & { joinedAt: number; reports: Incident[]; anonymousCount: number };
+  draft: ProfileDraft;
+  notes: string;
+  saving: boolean;
+  dirty: boolean;
+  onPatch: (patch: Partial<ProfileDraft>) => void;
+  onNotes: (v: string) => void;
+  onSaveProfile: () => void;
+  onSaveNotes: () => void;
+  onDelete: () => void;
+  onViewReports: () => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <Panel
+        title={profile.displayName || 'Unnamed account'}
+        subtitle={profile.email}
+        action={dirty ? <Chip tone="attention">Unsaved</Chip> : undefined}
+      >
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <Metric label="Reports" value={profile.reports.length} tone="ok" />
+            <Metric label="Anonymous" value={profile.anonymousCount} />
+            <Metric label="Joined" value={profile.joinedAt ? <TimeAgo ts={profile.joinedAt} /> : '—'} />
+          </div>
+
+          <Field label="Display name">
+            <input className={inputClass} style={inputStyle} value={draft.displayName} onChange={(e) => onPatch({ displayName: e.target.value })} />
+          </Field>
+
+          <Field label="Role">
+            <select className={inputClass} style={inputStyle} value={draft.role} onChange={(e) => onPatch({ role: e.target.value as 'user' | 'admin' })}>
+              <option value="user">View only</option>
+              <option value="admin">Admin</option>
+            </select>
+          </Field>
+
+          <AdminButton tone="signal" onClick={onSaveProfile} disabled={saving || !dirty} className="w-full">
+            <Save size={14} /> {saving ? 'Saving' : dirty ? 'Save profile' : 'Saved'}
+          </AdminButton>
+
+          <div className="rounded-lg border p-3 space-y-1.5 text-xs" style={{ borderColor: T.line, background: T.surface }}>
+            <InfoRow label="UID" value={profile.uid} mono />
+            <InfoRow label="Neighbourhood" value={profile.neighborhood || profile.inferredNeighborhood || '—'} />
+            <InfoRow label="Weekly digest" value={profile.weeklyDigestOptIn ? 'Opted in' : 'Not subscribed'} />
+          </div>
+        </div>
+      </Panel>
+
+      <Panel
+        title="Admin notes"
+        subtitle="Only visible to admins"
+        action={
+          <AdminButton size="sm" variant="outline" onClick={onSaveNotes} disabled={saving}>
+            <Save size={13} /> Save
+          </AdminButton>
+        }
+      >
+        <textarea
+          rows={3}
+          value={notes}
+          onChange={(e) => onNotes(e.target.value)}
+          placeholder="Context worth keeping about this account."
+          className="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors focus:border-slate-500 resize-y"
+          style={inputStyle}
+        />
+      </Panel>
+
+      <Panel
+        title="Their reports"
+        subtitle={profile.reports.length === 0 ? 'None filed yet' : `${profile.reports.length} filed`}
+        action={
+          profile.reports.length > 0 ? (
+            <AdminButton size="sm" variant="outline" onClick={onViewReports}>
+              <FileText size={13} /> Open
+            </AdminButton>
+          ) : undefined
+        }
+      >
+        {profile.reports.length === 0 ? (
+          <EmptyState title="No reports yet" body="This account has not filed anything." />
+        ) : (
+          <ul className="space-y-1.5 max-h-44 overflow-y-auto">
+            {profile.reports.slice(0, 12).map((incident) => (
+              <li key={incident.id} className="flex items-center justify-between gap-2">
+                <span className="text-xs truncate" style={{ color: T.ink }}>{incident.title}</span>
+                <TimeAgo ts={incident.timestamp} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <Panel title="Danger zone" subtitle="Removes the profile record, not the sign-in account">
+        <AdminButton variant="outline" tone="critical" onClick={onDelete} className="w-full">
+          <Trash2 size={14} /> Remove profile
+        </AdminButton>
+      </Panel>
+    </div>
+  );
+}
+
+function Metric({ label, value, tone }: { label: string; value: React.ReactNode; tone?: 'ok' }) {
+  return (
+    <div className="rounded-lg border p-2 text-center" style={{ borderColor: T.line, background: T.surface }}>
+      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.07em] mb-1" style={{ color: T.muted }}>{label}</p>
+      {typeof value === 'number' ? <Figure value={value} size="md" tone={tone} /> : <span className="text-xs">{value}</span>}
+    </div>
+  );
+}
+
+function InfoRow({ label, value, mono: useMono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <span className="shrink-0" style={{ color: T.muted }}>{label}</span>
+      <span className="text-right break-all" style={{ color: T.ink, fontFamily: useMono ? mono : undefined }}>{value}</span>
+    </div>
   );
 }

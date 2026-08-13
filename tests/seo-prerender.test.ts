@@ -11,6 +11,7 @@ import {
   renderRouteHtml,
   escapeAttr,
   escapeJsonLd,
+  buildStaticRouteBody,
   outputPathForRoute,
   upsertMeta,
 } from '../scripts/seo/rewriteHtml.js';
@@ -66,10 +67,27 @@ describe('renderRouteHtml', () => {
     assert.match(html, /<meta property="og:title" content="Calgary Crime Map: Live Incidents Near You \| Calgary Watch" \/>/);
   });
 
-  it('leaves the script tags and app shell untouched', () => {
+  it('leaves the module script intact and places readable content in the app shell', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
     assert.match(html, /<script type="module" src="\/assets\/index-abc123\.js"><\/script>/);
-    assert.match(html, /<div id="root"><\/div>/);
+    assert.match(html, /<div id="root"><main data-prerendered-route="\/map">/);
+    assert.match(html, /<h1>Calgary Crime Map<\/h1>/);
+  });
+
+  it('provides substantive non-JavaScript content for every indexable route', () => {
+    for (const route of PRERENDER_ROUTES) {
+      const body = buildStaticRouteBody(route);
+      assert.match(body, /<h1>/, `${route} needs a first-response heading`);
+      assert.ok(body.length > 250, `${route} first-response content is too thin`);
+    }
+  });
+
+  it('answers neighbourhood-watch search intent in the guide HTML', () => {
+    const body = buildStaticRouteBody('/calgary-neighbourhood-watch');
+    assert.match(body, /Current police activity near me/);
+    assert.match(body, /Block Watch Calgary/);
+    assert.match(body, /403-266-1234/);
+    assert.match(body, /not operated by Calgary Police Service/);
   });
 
   it('injects page JSON-LD tagged so SeoManager updates it instead of duplicating', () => {

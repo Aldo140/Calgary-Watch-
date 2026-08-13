@@ -1,3 +1,5 @@
+import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
+
 /**
  * Single source of truth for per-route SEO.
  *
@@ -64,6 +66,15 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     dateModified: LAST_MOD,
     image: DEFAULT_IMAGE,
   },
+  '/calgary-neighbourhood-watch': {
+    title: 'Calgary Neighbourhood Watch Guide | Crime Map & Reporting',
+    description:
+      'Check recent incidents near you, understand Calgary crime-map sources, learn how Block Watch differs, and choose 911 or police non-emergency when needed.',
+    index: true,
+    pageType: 'WebPage',
+    dateModified: LAST_MOD,
+    image: DEFAULT_IMAGE,
+  },
   '/admin': {
     title: 'Admin Portal | Calgary Watch',
     description: 'Administrative dashboard for Calgary Watch operations and moderation.',
@@ -86,6 +97,10 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
   '/coverage': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
     { name: 'Coverage Guide', item: `${PRODUCTION_ORIGIN}/coverage` },
+  ],
+  '/calgary-neighbourhood-watch': [
+    { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
+    { name: 'Calgary Neighbourhood Watch Guide', item: `${PRODUCTION_ORIGIN}/calgary-neighbourhood-watch` },
   ],
 };
 
@@ -138,5 +153,23 @@ export function buildPageJsonLd(pathname: string, origin: string): object {
         item: c.item,
       })),
     },
+    ...(pathname === GUIDE_PATH
+      ? {
+          about: [
+            'Calgary neighbourhood watch',
+            'Calgary crime map',
+            'Block Watch Calgary',
+            'Calgary police non-emergency reporting',
+          ],
+          mainEntity: GUIDE_FAQS.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer,
+            },
+          })),
+        }
+      : {}),
   };
 }

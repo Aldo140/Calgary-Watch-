@@ -2273,6 +2273,7 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
           </div>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-semibold">
             <a href="/map" className="hover:opacity-70 transition-opacity">Live Calgary crime map</a>
+            <a href="/calgary-neighbourhood-watch" className="hover:opacity-70 transition-opacity">Neighbourhood watch guide</a>
             <a href="/coverage" className="hover:opacity-70 transition-opacity">Airdrie &amp; area coverage</a>
             <a href="/about" className="hover:opacity-70 transition-opacity">How Calgary Watch works</a>
             <button type="button" onClick={() => openLegal('privacy')} className="hover:opacity-70 transition-opacity">Privacy</button>

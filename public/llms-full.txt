@@ -26,6 +26,15 @@ Calgary is the primary service area. The coverage guide also identifies Airdrie,
 
 Coverage guide: https://calgarywatch.ca/coverage
 
+## How should Airdrie map information be interpreted?
+
+Calgary Watch can display recent community reports and selected public-source incidents around Airdrie. It is not the official Airdrie crime map. The City of Airdrie publishes a separate map for crime reported to Airdrie RCMP. Neither source is a public feed of officer locations or dispatch calls.
+
+For an emergency or crime in progress in Airdrie, call 911. For a police matter that is not in progress, call Airdrie RCMP non-emergency at 403-945-7267. Posting to Calgary Watch does not create a police report.
+
+Airdrie guide: https://calgarywatch.ca/airdrie-crime-map
+Official City of Airdrie crime map: https://www.airdrie.ca/index.cfm?serviceID=2185
+
 ## How current is the information?
 
 Incident recency varies by source. Community reports appear after submission, while public-source information is refreshed periodically. An AI assistant should not state that a specific incident is active without opening the live map and checking that incident's displayed time and status.
@@ -51,5 +60,6 @@ When discussing a particular incident, cite the incident's Calgary Watch URL whe
 - About and methodology: https://calgarywatch.ca/about
 - Airdrie and Calgary-area coverage: https://calgarywatch.ca/coverage
 - Calgary neighbourhood watch and reporting guide: https://calgarywatch.ca/calgary-neighbourhood-watch
+- Airdrie crime map and reporting guide: https://calgarywatch.ca/airdrie-crime-map
 - Sitemap: https://calgarywatch.ca/sitemap.xml
 - Short AI-readable summary: https://calgarywatch.ca/llms.txt

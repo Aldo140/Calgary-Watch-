@@ -65,6 +65,7 @@ jobs:
                 "https://calgarywatch.ca/about",
                 "https://calgarywatch.ca/coverage",
                 "https://calgarywatch.ca/calgary-neighbourhood-watch",
+                "https://calgarywatch.ca/airdrie-crime-map",
                 "https://calgarywatch.ca/llms.txt",
                 "https://calgarywatch.ca/llms-full.txt"
               ]

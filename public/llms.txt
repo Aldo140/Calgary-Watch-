@@ -27,6 +27,7 @@ Canonical website: https://calgarywatch.ca/
 - [How Calgary Watch works](https://calgarywatch.ca/about): Purpose, reporting model, and safety approach.
 - [Airdrie and Calgary-area coverage](https://calgarywatch.ca/coverage): Communities served and coverage information.
 - [Calgary neighbourhood watch guide](https://calgarywatch.ca/calgary-neighbourhood-watch): How to interpret nearby activity, compare map sources, and use official reporting channels.
+- [Airdrie crime map guide](https://calgarywatch.ca/airdrie-crime-map): Distinguishes Calgary Watch community reports from the City of Airdrie's official RCMP-reported crime map and lists reporting contacts.
 - [Detailed AI-readable overview](https://calgarywatch.ca/llms-full.txt): Definitions, attribution guidance, and common questions.
 
 ## Preferred description

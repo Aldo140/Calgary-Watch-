@@ -366,11 +366,11 @@ function HeroPerspectiveTitle({ scrollProgress }: { scrollProgress: ReturnType<t
   if (prefersReducedMotion()) {
     return (
       <h1 className="text-[clamp(3rem,10vw,8.5rem)] font-black tracking-tight leading-[0.92] select-none">
-        <span className="block text-white">Real-time</span>
+        <span className="block text-[#FFFFFF]">Real-time</span>
         <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
           city
         </span>
-        <span className="block text-white">intelligence.</span>
+        <span className="block text-[#FFFFFF]">intelligence.</span>
       </h1>
     );
   }
@@ -387,7 +387,7 @@ function HeroPerspectiveTitle({ scrollProgress }: { scrollProgress: ReturnType<t
     >
       <h1 className="text-[clamp(3rem,10vw,8.5rem)] font-black tracking-tight leading-[0.92] select-none">
         <motion.span
-          className="block text-white"
+          className="block text-[#FFFFFF]"
           initial={{ opacity: 0, x: -60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
@@ -403,7 +403,7 @@ function HeroPerspectiveTitle({ scrollProgress }: { scrollProgress: ReturnType<t
           city
         </motion.span>
         <motion.span
-          className="block text-white"
+          className="block text-[#FFFFFF]"
           initial={{ opacity: 0, x: -60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}

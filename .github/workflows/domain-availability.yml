@@ -1,0 +1,46 @@
+name: Domain Availability
+
+on:
+  schedule:
+    - cron: '23 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: domain-availability
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify public endpoints, DNS, and Xfinity reputation
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          apex_code="$(curl --fail --silent --show-error --retry 2 --max-time 20 \
+            --output /dev/null --write-out '%{http_code}' https://calgarywatch.ca/)"
+          test "$apex_code" = "200"
+
+          www_code="$(curl --fail --silent --show-error --retry 2 --max-time 20 \
+            --output /dev/null --write-out '%{http_code}' https://www.calgarywatch.ca/)"
+          test "$www_code" = "200"
+
+          dns_answer="$(curl --fail --silent --show-error --retry 2 --max-time 20 \
+            'https://dns.google/resolve?name=calgarywatch.ca&type=A')"
+          echo "$dns_answer" | jq -e \
+            '.Status == 0 and any(.Answer[]?; .data == "199.36.158.100")' >/dev/null
+
+          xfinity_status="$(curl --fail --silent --show-error --retry 2 --max-time 20 \
+            'https://spa.xfinity.com/api/domain_status?domain=https%3A%2F%2Fcalgarywatch.ca%2F' \
+            | jq -r '.block_status')"
+          if [ "$xfinity_status" != "not_blocked" ]; then
+            echo "::error::Xfinity Advanced Security classifies calgarywatch.ca as: $xfinity_status"
+            exit 1
+          fi
+
+          echo "calgarywatch.ca is reachable, resolves to Firebase Hosting, and is not blocked by Xfinity."

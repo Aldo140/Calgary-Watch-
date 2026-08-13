@@ -2788,8 +2788,8 @@ export default function MapPage() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
               <div className="leading-none">
-                <p className="text-[12px] font-black tracking-tight text-slate-900">Calgary Watch</p>
-                <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.24em] text-slate-500">Live map</p>
+                <h1 className="text-[12px] font-black tracking-tight text-slate-900">Calgary Crime Map</h1>
+                <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.24em] text-slate-500">Calgary Watch · Live near you</p>
               </div>
             </div>
             <button

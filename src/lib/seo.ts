@@ -25,40 +25,40 @@ export interface SeoConfig {
 
 export const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
 export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero-wide.webp';
-const LAST_MOD = '2026-05-24';
+const LAST_MOD = '2026-08-13';
 
 export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/': {
-    title: 'Calgary Watch | Real-Time Crime Map & Community Safety — Calgary, Airdrie, Cochrane, Okotoks',
+    title: 'Calgary Crime Watch & Neighbourhood Safety Map',
     description:
-      'Calgary Watch is a free real-time crime map and community safety platform for Calgary and surrounding communities — Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, and more. See live incident reports, crime alerts, and neighborhood safety data before the news does.',
+      'See live Calgary crime, traffic, weather and community incident reports on a free neighbourhood map. Browse without an account; sign in to report or get updates.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
     image: DEFAULT_IMAGE,
   },
   '/map': {
-    title: 'Live Calgary Crime & Incident Map | Calgary Watch',
+    title: 'Calgary Crime Map: Live Incidents Near You | Calgary Watch',
     description:
-      'View and report live crime incidents across Calgary, Airdrie, Cochrane, Okotoks, and surrounding Alberta communities. Filter by crime category, inspect neighbourhood context, and stay informed as events unfold in real time.',
+      'Explore current community-reported crime, traffic, weather and emergency incidents across Calgary and Airdrie. Free to view; use Near Me or sign in to report.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
     image: DEFAULT_IMAGE,
   },
   '/about': {
-    title: 'About Calgary Watch | Free Community Crime & Safety Platform for Calgary Area',
+    title: 'About Calgary Watch | Community Crime & Safety Map',
     description:
-      'Learn how Calgary Watch combines community reporting and open data to deliver real-time crime maps and safety awareness for Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, and all surrounding communities.',
+      'Learn how Calgary Watch combines community reports and public data to help Calgary-area neighbours see local incidents, share updates and stay informed.',
     index: true,
     pageType: 'AboutPage',
     dateModified: LAST_MOD,
     image: DEFAULT_IMAGE,
   },
   '/coverage': {
-    title: 'Calgary Area Safety Guide | Coverage Map & Community Directory | Calgary Watch',
+    title: 'Airdrie Crime Map & Calgary Area Coverage | Calgary Watch',
     description:
-      'Explore Calgary Watch coverage across 30+ communities — Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and more. Your complete guide to community safety resources across the Calgary metro region.',
+      'See crime and community incident coverage for Airdrie, Calgary, Cochrane, Okotoks, Chestermere and 25+ nearby communities on one free live map.',
     index: true,
     pageType: 'CollectionPage',
     dateModified: LAST_MOD,
@@ -103,7 +103,7 @@ export function pageUrlFor(pathname: string, origin: string): string {
   return `${origin}${pathname === '/' ? '/' : pathname}`;
 }
 
-export const ROBOTS_INDEX = 'index, follow, max-image-preview:large';
+export const ROBOTS_INDEX = 'index, follow, max-image-preview:large, max-snippet:-1';
 export const ROBOTS_NOINDEX = 'noindex, nofollow';
 
 /**

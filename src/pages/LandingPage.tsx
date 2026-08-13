@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, memo } from 'react';
 import type { ReactNode, ElementType, CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   motion,
   useScroll,
@@ -224,24 +223,34 @@ function RiverRail({ progress }: { progress: MotionValue<number> }) {
 // Buttons — landing-specific, explicit colors
 // ---------------------------------------------------------------------------
 function InkButton({
-  children, onClick, tone = 'ink', className,
-}: { children: ReactNode; onClick?: () => void; tone?: 'ink' | 'outline' | 'paper'; className?: string }) {
+  children, onClick, href, tone = 'ink', className,
+}: { children: ReactNode; onClick?: () => void; href?: string; tone?: 'ink' | 'outline' | 'paper'; className?: string }) {
   const styles: Record<string, CSSProperties> = {
     ink: { background: T.ink, color: T.panel },
     outline: { background: 'transparent', color: T.ink, border: `1.5px solid ${T.ink}` },
     paper: { background: T.panel, color: T.ink },
   };
+  const classes = cn(
+    'group inline-flex items-center justify-center gap-2.5 rounded-full px-7 h-[52px] text-[15px] font-bold tracking-tight',
+    'transition-transform duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
+    'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4A90D9]',
+    className,
+  );
+
+  if (href) {
+    return (
+      <a href={href} onClick={onClick} style={styles[tone]} className={classes}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
       type="button"
       onClick={onClick}
       style={styles[tone]}
-      className={cn(
-        'group inline-flex items-center justify-center gap-2.5 rounded-full px-7 h-[52px] text-[15px] font-bold tracking-tight',
-        'transition-transform duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
-        'focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4A90D9]',
-        className,
-      )}
+      className={classes}
     >
       {children}
     </button>
@@ -285,7 +294,7 @@ function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' |
 // ---------------------------------------------------------------------------
 // Navigation
 // ---------------------------------------------------------------------------
-function Nav({ onNavigate }: { onNavigate: (path: string) => void }) {
+function Nav() {
   const [visible, setVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -339,20 +348,19 @@ function Nav({ onNavigate }: { onNavigate: (path: string) => void }) {
         <div className="hidden md:flex items-center gap-1" style={{ color: T.ink }}>
           <a href="#features" className={link}>What we track</a>
           <a href="#how-it-works" className={link}>How it works</a>
-          <button type="button" className={link} onClick={() => onNavigate('/about')}>About</button>
-          <button type="button" className={link} onClick={() => onNavigate('/coverage')}>Coverage</button>
+          <a href="/about" className={link}>About</a>
+          <a href="/coverage" className={link}>Airdrie &amp; area coverage</a>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onNavigate('/map')}
+          <a
+            href="/map"
             className="hidden md:inline-flex items-center gap-2 rounded-full h-10 px-5 text-sm font-bold transition-transform hover:-translate-y-0.5"
             style={{ background: T.ink, color: T.panel }}
           >
             <MapPin size={14} />
             Open the live map
-          </button>
+          </a>
           <button
             type="button"
             className="md:hidden w-10 h-10 flex items-center justify-center rounded-full"
@@ -374,16 +382,16 @@ function Nav({ onNavigate }: { onNavigate: (path: string) => void }) {
           >
             <a href="#features" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 text-sm font-semibold rounded-xl">What we track</a>
             <a href="#how-it-works" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 text-sm font-semibold rounded-xl">How it works</a>
-            <button type="button" onClick={() => { onNavigate('/about'); setMenuOpen(false); }} className="text-left px-3 py-2.5 text-sm font-semibold rounded-xl">About</button>
-            <button type="button" onClick={() => { onNavigate('/coverage'); setMenuOpen(false); }} className="text-left px-3 py-2.5 text-sm font-semibold rounded-xl">Coverage</button>
-            <button
-              type="button"
-              onClick={() => { onNavigate('/map'); setMenuOpen(false); }}
+            <a href="/about" onClick={() => setMenuOpen(false)} className="text-left px-3 py-2.5 text-sm font-semibold rounded-xl">About</a>
+            <a href="/coverage" onClick={() => setMenuOpen(false)} className="text-left px-3 py-2.5 text-sm font-semibold rounded-xl">Airdrie &amp; area coverage</a>
+            <a
+              href="/map"
+              onClick={() => setMenuOpen(false)}
               className="mt-2 h-12 rounded-2xl font-bold text-sm"
               style={{ background: T.ink, color: T.panel }}
             >
               Open the live map
-            </button>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -395,16 +403,16 @@ function Nav({ onNavigate }: { onNavigate: (path: string) => void }) {
 // HERO — parallax skyline plate + staggered display type + live dispatch card
 // ---------------------------------------------------------------------------
 const HERO_LINES = [
-  { text: 'A city that', color: T.ink },
-  { text: 'looks out', color: T.sky },
-  { text: 'for itself.', color: T.ink },
+  { text: 'Calgary crime.', color: T.ink },
+  { text: 'Mapped live.', color: T.sky },
+  { text: 'By neighbours.', color: T.ink },
 ];
 
 /**
  * Mobile hero — "pocket dispatch": boot line, staggered headline, a full-bleed
  * city window with live rotating dispatch chip, and thumb-zone CTAs.
  */
-function MobileHero({ onNavigate, reduced }: { onNavigate: (p: string) => void; reduced: boolean }) {
+function MobileHero({ reduced }: { reduced: boolean }) {
   const [feedIdx, setFeedIdx] = useState(0);
   useEffect(() => {
     if (reduced) return;
@@ -467,8 +475,8 @@ function MobileHero({ onNavigate, reduced }: { onNavigate: (p: string) => void; 
           className="mt-4 text-[14.5px] leading-relaxed max-w-[32ch]"
           style={{ color: T.inkSoft }}
         >
-          Break-ins, stolen bikes, closures — your street reports it, and
-          everyone nearby sees it. Free, run by Calgarians.
+          See current crime and safety reports near you, then alert your
+          neighbours when something happens. Free, run by Calgarians.
         </motion.p>
       </div>
 
@@ -564,24 +572,22 @@ function MobileHero({ onNavigate, reduced }: { onNavigate: (p: string) => void; 
         transition={{ duration: 0.55, delay: 0.95, ease: EASE }}
         className="px-5 mt-3.5 flex flex-col gap-2.5"
       >
-        <button
-          type="button"
-          onClick={() => onNavigate('/map')}
+        <a
+          href="/map"
           className="w-full h-14 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-transform"
           style={{ background: T.ink, color: T.panel, boxShadow: '0 16px 34px -18px rgba(28,43,58,0.6)' }}
         >
           <MapPin size={16} />
           Open the live map
           <ArrowRight size={14} className="opacity-80" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate('/map?report=true')}
+        </a>
+        <a
+          href="/map?report=true"
           className="w-full h-12 rounded-2xl font-bold text-[14px] flex items-center justify-center active:scale-[0.98] transition-transform"
           style={{ border: `1.5px solid ${T.ink}`, color: T.ink }}
         >
-          Report an incident
-        </button>
+          Sign in to report
+        </a>
         <p className="mt-1.5 text-center font-mono text-[8.5px] uppercase tracking-[0.26em]" style={{ color: T.inkSoft }}>
           Free · Non-profit · Built by Calgarians
         </p>
@@ -590,7 +596,7 @@ function MobileHero({ onNavigate, reduced }: { onNavigate: (p: string) => void; 
   );
 }
 
-function Hero({ onNavigate, reduced }: { onNavigate: (p: string) => void; reduced: boolean }) {
+function Hero({ reduced }: { reduced: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const imgY = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
@@ -628,7 +634,7 @@ function Hero({ onNavigate, reduced }: { onNavigate: (p: string) => void; reduce
         <rect width="100%" height="100%" fill="url(#lp-grid)" mask="url(#lp-grid-mask)" opacity="0.07" />
       </svg>
 
-      <MobileHero onNavigate={onNavigate} reduced={reduced} />
+      <MobileHero reduced={reduced} />
 
       <div className="relative z-10 mx-auto w-full max-w-[88rem] px-5 sm:px-8 pt-28 lg:pt-32 pb-16 hidden lg:grid lg:grid-cols-[7fr_5fr] gap-12 lg:gap-8 items-center flex-1">
         {/* Left — thesis */}
@@ -686,10 +692,10 @@ function Hero({ onNavigate, reduced }: { onNavigate: (p: string) => void; reduce
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.65, ease: EASE }}
           >
-            Calgary Watch is a free, community-run live map of what's happening
-            in your neighbourhood — break-ins, stolen bikes and vehicles,
-            traffic, weather and emergencies — reported by the people who live
-            on your street.
+            Calgary Watch is a free Calgary crime map and neighbourhood safety
+            network. See current community reports near you — break-ins, stolen
+            vehicles, traffic, weather and emergencies — then sign in to alert
+            your neighbours.
           </motion.p>
 
           <motion.div
@@ -698,13 +704,13 @@ function Hero({ onNavigate, reduced }: { onNavigate: (p: string) => void; reduce
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.8, ease: EASE }}
           >
-            <InkButton onClick={() => onNavigate('/map')}>
+            <InkButton href="/map">
               <MapPin size={16} />
               Open the live map
               <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
             </InkButton>
-            <InkButton tone="outline" onClick={() => onNavigate('/map?report=true')}>
-              Report an incident
+            <InkButton href="/map?report=true" tone="outline">
+              Sign in to report
             </InkButton>
           </motion.div>
 
@@ -1727,7 +1733,7 @@ function Categories({ reduced }: { reduced: boolean }) {
 // NEAR ME — "It starts on your street": neighbourhood radius view with
 // community posts (stolen bike with a contact number, car break-ins, …)
 // ---------------------------------------------------------------------------
-function NearMe({ onNavigate, reduced }: { onNavigate: (p: string) => void; reduced: boolean }) {
+function NearMe({ reduced }: { reduced: boolean }) {
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid lg:grid-cols-[6fr_5fr] gap-12 lg:gap-16 items-center">
@@ -1789,7 +1795,7 @@ function NearMe({ onNavigate, reduced }: { onNavigate: (p: string) => void; redu
           </div>
 
           <Reveal delay={0.2} className="mt-10">
-            <InkButton onClick={() => onNavigate('/map')}>
+            <InkButton href="/map">
               <Crosshair size={16} />
               See what's near you
               <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -2006,7 +2012,7 @@ function NightWatch({ reduced }: { reduced: boolean }) {
 // ---------------------------------------------------------------------------
 // COVERAGE — beyond city limits + city request (behaviour preserved)
 // ---------------------------------------------------------------------------
-function Coverage({ onNavigate }: { onNavigate: (p: string) => void }) {
+function Coverage() {
   const [cityRequest, setCityRequest] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -2073,15 +2079,14 @@ function Coverage({ onNavigate }: { onNavigate: (p: string) => void }) {
             {message && (
               <p className="mt-3 text-sm font-semibold" style={{ color: T.bow }} role="status">{message}</p>
             )}
-            <button
-              type="button"
-              onClick={() => onNavigate('/coverage')}
+            <a
+              href="/coverage"
               className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold transition-colors hover:opacity-75"
               style={{ color: T.sky }}
             >
-              See the full coverage map
+              See the Airdrie and Calgary area coverage map
               <ArrowUpRight size={15} />
-            </button>
+            </a>
           </Reveal>
         </div>
 
@@ -2194,7 +2199,7 @@ function FilmStrip({ reduced }: { reduced: boolean }) {
 // ---------------------------------------------------------------------------
 // FINAL CTA + FOOTER
 // ---------------------------------------------------------------------------
-function Finale({ onNavigate, openLegal, reduced }: { onNavigate: (p: string) => void; openLegal: (m: 'privacy' | 'terms' | 'contact') => void; reduced: boolean }) {
+function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | 'contact') => void; reduced: boolean }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end end'] });
   const y = useTransform(scrollYProgress, [0, 1], [60, 0]);
@@ -2238,19 +2243,18 @@ function Finale({ onNavigate, openLegal, reduced }: { onNavigate: (p: string) =>
               report of your own.
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-3.5">
-              <InkButton tone="paper" onClick={() => onNavigate('/map')} className="px-9">
+              <InkButton href="/map" tone="paper" className="px-9">
                 <MapPin size={16} />
                 Open the live map
                 <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
               </InkButton>
-              <button
-                type="button"
-                onClick={() => onNavigate('/map?report=true')}
+              <a
+                href="/map?report=true"
                 className="inline-flex items-center justify-center rounded-full px-7 h-[52px] text-[15px] font-bold transition-transform hover:-translate-y-0.5"
                 style={{ border: '1.5px solid rgba(247,243,234,0.5)', color: T.paper }}
               >
-                Report an incident
-              </button>
+                Sign in to report
+              </a>
             </div>
           </div>
         </motion.div>
@@ -2268,8 +2272,9 @@ function Finale({ onNavigate, openLegal, reduced }: { onNavigate: (p: string) =>
             </p>
           </div>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-semibold">
-            <button type="button" onClick={() => onNavigate('/about')} className="hover:opacity-70 transition-opacity">About</button>
-            <button type="button" onClick={() => onNavigate('/coverage')} className="hover:opacity-70 transition-opacity">Coverage</button>
+            <a href="/map" className="hover:opacity-70 transition-opacity">Live Calgary crime map</a>
+            <a href="/coverage" className="hover:opacity-70 transition-opacity">Airdrie &amp; area coverage</a>
+            <a href="/about" className="hover:opacity-70 transition-opacity">How Calgary Watch works</a>
             <button type="button" onClick={() => openLegal('privacy')} className="hover:opacity-70 transition-opacity">Privacy</button>
             <button type="button" onClick={() => openLegal('terms')} className="hover:opacity-70 transition-opacity">Terms</button>
             <button type="button" onClick={() => openLegal('contact')} className="hover:opacity-70 transition-opacity">Contact</button>
@@ -2291,7 +2296,6 @@ function Finale({ onNavigate, openLegal, reduced }: { onNavigate: (p: string) =>
 // PAGE
 // ---------------------------------------------------------------------------
 export default function LandingPage() {
-  const navigate = useNavigate();
   const reduced = usePrefersReducedMotion();
   const [legalModal, setLegalModal] = useState<'privacy' | 'terms' | 'contact' | null>(null);
   const { scrollYProgress } = useScroll();
@@ -2305,21 +2309,21 @@ export default function LandingPage() {
         @keyframes lp-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
       `}</style>
 
-      <Nav onNavigate={navigate} />
+      <Nav />
       {!reduced && <RiverRail progress={scrollYProgress} />}
 
       <main>
-        <Hero onNavigate={navigate} reduced={reduced} />
+        <Hero reduced={reduced} />
         <Ticker reduced={reduced} />
         <DayTunnel reduced={reduced} />
         <Quadrants reduced={reduced} />
         <HowItWorks reduced={reduced} />
         <Categories reduced={reduced} />
-        <NearMe onNavigate={navigate} reduced={reduced} />
+        <NearMe reduced={reduced} />
         <NightWatch reduced={reduced} />
-        <Coverage onNavigate={navigate} />
+        <Coverage />
         <FilmStrip reduced={reduced} />
-        <Finale onNavigate={navigate} openLegal={setLegalModal} reduced={reduced} />
+        <Finale openLegal={setLegalModal} reduced={reduced} />
       </main>
 
       <AnimatePresence>

@@ -5,12 +5,12 @@
 
   <url>
     <loc>https://calgarywatch.ca/</loc>
-    <lastmod>2026-05-24</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
-      <image:title>Calgary Watch — Real-Time Community Safety Map for Calgary and Surrounding Communities</image:title>
+      <image:title>Calgary Crime Watch and Neighbourhood Safety Map</image:title>
       <image:caption>Interactive real-time crime and safety incident map covering Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, and 30+ Alberta communities</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
     </image:image>
@@ -24,12 +24,12 @@
 
   <url>
     <loc>https://calgarywatch.ca/map</loc>
-    <lastmod>2026-05-24</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.95</priority>
     <image:image>
       <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
-      <image:title>Live Calgary Crime and Incident Map | Calgary Watch</image:title>
+      <image:title>Calgary Crime Map — Live Incidents Near You</image:title>
       <image:caption>Real-time interactive map showing community-reported safety incidents across the Calgary metro area</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
     </image:image>
@@ -38,7 +38,7 @@
 
   <url>
     <loc>https://calgarywatch.ca/about</loc>
-    <lastmod>2026-05-24</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
@@ -52,12 +52,12 @@
 
   <url>
     <loc>https://calgarywatch.ca/coverage</loc>
-    <lastmod>2026-05-24</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
       <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
-      <image:title>Calgary Area Safety Guide — 30+ Communities Covered | Calgary Watch</image:title>
+      <image:title>Airdrie Crime Map and Calgary Area Coverage</image:title>
       <image:caption>Community coverage directory for Calgary Watch — Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and all surrounding Alberta communities</image:caption>
       <image:geo_location>Calgary Metropolitan Region, Alberta, Canada</image:geo_location>
     </image:image>

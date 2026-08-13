@@ -1,0 +1,19 @@
+# Calgary Watch — security contact
+#
+# Published so security researchers and automated reputation scanners have a
+# machine-readable owner for this domain. Domain-reputation services treat a
+# reachable, well-formed security.txt as a legitimacy signal, which matters here
+# because calgarywatch.ca previously sat parked on a third-party advertising
+# page and inherited that history in some vendor databases.
+#
+# https://www.rfc-editor.org/rfc/rfc9116
+
+Contact: mailto:jorti104@mtroyal.ca
+Expires: 2027-01-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://calgarywatch.ca/.well-known/security.txt
+Policy: https://github.com/Aldo140/Calgary-Watch-/blob/main/README.md
+
+# Calgary Watch is a non-profit, community-run incident map for Calgary and
+# surrounding Alberta communities. Source is public:
+# https://github.com/Aldo140/Calgary-Watch-

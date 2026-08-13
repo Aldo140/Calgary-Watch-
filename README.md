@@ -178,6 +178,59 @@ Deploy order:
 3. `firebase deploy --only firestore:rules`
 4. Deploy the client
 
+### Domain Reputation and ISP-Level Blocking
+
+`calgarywatch.ca` was a parked Namecheap domain serving third-party ads through
+ParkingCrew before this project existed. Some vendor reputation databases still
+carry that history, and a few ISP-level protection services (Plume Online
+Protection among them) have resolved the hostname to their block address
+**18.204.152.241** instead of Firebase.
+
+This is a **DNS-level decision made before the site is ever fetched**, so no
+amount of application code changes it. How to tell it apart from an outage:
+
+```bash
+# Authoritative DNS — should be Firebase Hosting
+curl -s "https://dns.google/resolve?name=calgarywatch.ca&type=A"   # 199.36.158.100
+
+# What the local network resolves — if this differs, DNS is being intercepted
+getent hosts calgarywatch.ca
+```
+
+A blocked host resolves to 18.204.152.241, fails the TLS handshake with
+`wrong version number` (the interceptor is not serving real TLS), and answers
+plain HTTP with `204`. A working host returns `200` with a valid certificate.
+
+**Status:** the apex has cleared on the networks tested. `www` has been observed
+still intercepted, which is the stronger argument for the change below.
+
+**Reduce the blast radius — point `www` at Firebase.** Today `www` is a separate
+host on GitHub Pages that only redirects to the apex. That is a second hostname
+with its own reputation and its own certificate, and it is the one still getting
+blocked. Serving both names from Firebase leaves one host to establish
+reputation, one certificate, and a real edge redirect:
+
+1. Firebase Console → Hosting → Add custom domain → `www.calgarywatch.ca`,
+   choosing the redirect-to-apex option.
+2. Replace the `www` A records at the registrar with the values Firebase gives.
+3. Delete `.github/workflows/deploy-pages.yml` and `www-redirect/`.
+
+**Reputation review** (needed once per vendor; none are fixable in code):
+
+| Vendor | Where |
+|---|---|
+| BrightCloud / Webroot | https://www.brightcloud.com/tools/url-ip-lookup.php |
+| Google Safe Browsing | https://search.google.com/search-console (Security Issues) |
+| Norton Safe Web | https://safeweb.norton.com/report-a-site |
+| Trellix (McAfee) | https://sitelookup.trellix.com |
+| Fortinet | https://www.fortiguard.com/webfilter |
+
+`public/.well-known/security.txt` publishes a machine-readable owner and contact,
+which several of these scanners weigh as a legitimacy signal.
+
+**Users blocked right now** can reach the identical application at
+`https://calgary-map-e70bb.web.app` — same Firebase project, same data.
+
 ### Ingest Pipeline
 
 `scripts/ingest/index.ts` runs via GitHub Actions (`ingest-live-data.yml`) on a 30-minute cron schedule.

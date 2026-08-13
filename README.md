@@ -180,11 +180,27 @@ Deploy order:
 
 ### Domain Reputation and ISP-Level Blocking
 
-`calgarywatch.ca` was a parked Namecheap domain serving third-party ads through
-ParkingCrew before this project existed. Some vendor reputation databases still
-carry that history, and a few ISP-level protection services (Plume Online
-Protection among them) have resolved the hostname to their block address
-**18.204.152.241** instead of Firebase.
+`calgarywatch.ca` was registered on **2026-04-04**. An earlier theory held that
+it had been a parked advertising domain under prior ownership and had inherited
+that reputation; the WhoIs record disproves it, and a BrightCloud lookup shows
+the real cause:
+
+```
+Reputation:  Suspicious (40/100)
+Category:    Uncategorized
+Influences:  No infections past 12 months   (+)
+             Unknown popularity             (-)
+             0 months old (not established) (-)
+```
+
+Nothing has ever been found wrong with the site. The score is the standard
+penalty for a domain that is new and **uncategorised** — vendors treat unknown
+as suspicious — and ISP-level filters such as Plume Online Protection act on
+that score, resolving the hostname to their block address **18.204.152.241**
+instead of Firebase.
+
+The remedy is therefore to get the domain *categorised*, not to clear a bad
+history.
 
 This is a **DNS-level decision made before the site is ever fetched**, so no
 amount of application code changes it. How to tell it apart from an outage:
@@ -217,9 +233,14 @@ reputation, one certificate, and a real edge redirect:
 
 **Reputation review** (needed once per vendor; none are fixable in code):
 
+Each hostname carries its own reputation record, so `calgarywatch.ca` and
+`www.calgarywatch.ca` must be submitted separately — and BrightCloud keeps
+*category* and *reputation* in separate queues, so that is four submissions.
+The comment field caps at 150 characters.
+
 | Vendor | Where |
 |---|---|
-| BrightCloud / Webroot | https://www.brightcloud.com/tools/url-ip-lookup.php |
+| BrightCloud / Webroot (category first) | https://www.brightcloud.com/tools/url-ip-lookup.php |
 | Google Safe Browsing | https://search.google.com/search-console (Security Issues) |
 | Norton Safe Web | https://safeweb.norton.com/report-a-site |
 | Trellix (McAfee) | https://sitelookup.trellix.com |

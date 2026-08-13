@@ -50,7 +50,7 @@ describe('renderRouteHtml', () => {
     const html = renderRouteHtml(SHELL, '/about', PRODUCTION_ORIGIN);
     const matches = html.match(/<meta[^>]*name=["']description["'][^>]*>/g) ?? [];
     assert.equal(matches.length, 1, 'exactly one description meta must remain');
-    assert.match(html, /Learn how Calgary Watch combines community reporting/);
+    assert.match(html, /Learn how Calgary Watch combines community reports and public data/);
   });
 
   it('sets canonical and og:url to the route, not the homepage', () => {

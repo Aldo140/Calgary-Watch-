@@ -59,6 +59,26 @@ function dedupKeyToDocId(key: string): string {
 }
 
 /**
+ * Load the moderator suppression list.
+ *
+ * Without this, deleting an ingested incident is theatre: `upsertIncident`
+ * writes by `dedup_key` with `merge: true` and unconditionally sets
+ * `deleted: false`, so anything a moderator removed reappears on the next run
+ * as long as the upstream feed still lists it.
+ */
+async function loadSuppressedIds(db: Firestore): Promise<Set<string>> {
+  const snapshot = await db.collection('suppressed_incidents').get();
+  const now = Date.now();
+  const ids = new Set<string>();
+  for (const doc of snapshot.docs) {
+    const expiresAt = doc.data()?.expiresAt;
+    if (typeof expiresAt === 'number' && expiresAt < now) continue;
+    ids.add(doc.id);
+  }
+  return ids;
+}
+
+/**
  * Delete all system-ingested incidents whose expires_at has passed.
  * Only reads expired docs instead of scanning the full collection.
  */
@@ -103,6 +123,10 @@ async function upsertIncident(
       updatedAt: now,
       verified_status: incident.verified_status,
       report_count: 1,
+      // The public map filters on `visibility`; a record written without it is
+      // invisible. `deleted` is kept in step for documents and code paths that
+      // predate the visibility migration.
+      visibility: 'public',
       deleted: false,
       authorUid: 'system',
     },
@@ -193,12 +217,22 @@ async function run(): Promise<void> {
     return;
   }
 
-  // 4. Upsert in series (avoids Firestore write-rate bursts).
+  // 4. Drop anything a moderator has suppressed, then upsert in series
+  //    (avoids Firestore write-rate bursts).
+  const suppressed = await loadSuppressedIds(db);
+  let skipped = 0;
   for (const incident of allIncidents) {
+    if (suppressed.has(dedupKeyToDocId(incident.dedup_key))) {
+      skipped++;
+      continue;
+    }
     await upsertIncident(db, incident);
   }
 
-  console.log(`[ingest] Done — upserted ${allIncidents.length} incident(s).`);
+  console.log(
+    `[ingest] Done — upserted ${allIncidents.length - skipped} incident(s), ` +
+      `skipped ${skipped} suppressed.`,
+  );
 }
 
 run().catch((err) => {

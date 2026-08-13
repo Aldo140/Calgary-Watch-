@@ -52,8 +52,20 @@ The platform runs four data layers:
 
 ### Moderation
 - Any signed-in user can flag an incident as inappropriate
-- Single flag = immediate takedown (incident disappears from map and feed)
+- **Two distinct users** must flag a report before it is hidden — one account
+  cannot take the feed down on its own. The flagger list is stored on the
+  document and checked by the Firestore rules, so the threshold is enforced
+  server-side rather than by client convention
+- Visibility is a single field (`public` / `flagged` / `deleted`) and the public
+  map queries `where('visibility','==','public')`. Firestore rules filter
+  queries rather than rows, so this constraint — not client-side filtering — is
+  what makes a takedown a genuine data-access takedown
+- Reporter email is never stored on the world-readable incident document; it
+  lives in `incident_reporters/{incidentId}`, readable only by its author and
+  admins, and written in the same batch as the incident
 - Admin review queue shows all flagged content with Restore / Delete Permanently actions
+- Deleting an incident also removes its Storage image; a failed cleanup is
+  recorded in `admin_audit_logs` rather than silently orphaning the file
 - System-ingested incidents (weather, traffic, police) cannot be flagged
 
 ### Admin Panel
@@ -126,6 +138,45 @@ npm test                                                  # normalization + clas
 
 **Firestore cost:** 1 document write per run (~288/day, free tier 20k) and 1
 document read per visitor who switches the layer on.
+
+### Moderation Suppression
+
+Two classes of record survive an ordinary delete:
+
+- **Ingested records** are upserted by `dedup_key`, which doubles as the
+  document ID. Deleting one just means the next 30-minute run recreates it.
+- **Browser-derived records** (Edmonton open data, weather, ENMAX) are rebuilt
+  from their upstream APIs on every page load and are never persisted at all,
+  so there is no document to delete.
+
+`suppressed_incidents/{id}` is the durable answer. Both the ingest pipeline and
+the client consult it before publishing a record. It is world-readable because
+the browser has to read it, which is exactly why it holds **nothing but IDs and
+timestamps** — the reason, the moderator, and any notes go to
+`admin_audit_logs`, which only admins can read. Entries carry an `expiresAt` so
+the list cannot grow without bound.
+
+### Visibility Migration
+
+`scripts/backfill-visibility.ts` must run **once, before** the rules and client
+that filter on `visibility` are deployed.
+
+Community reports have never carried `flagged` or `deleted` — the create
+allowlist did not permit them — and Firestore equality queries do not match
+documents missing the field. Deploying the new query against un-backfilled data
+returns zero incidents and the public map goes blank.
+
+```bash
+FIREBASE_SERVICE_ACCOUNT='{...}' npm run backfill:visibility            # dry run
+FIREBASE_SERVICE_ACCOUNT='{...}' npm run backfill:visibility -- --commit
+```
+
+Deploy order:
+
+1. `npm run backfill:visibility -- --commit`
+2. `firebase deploy --only firestore:indexes` — wait for the indexes to finish building
+3. `firebase deploy --only firestore:rules`
+4. Deploy the client
 
 ### Ingest Pipeline
 

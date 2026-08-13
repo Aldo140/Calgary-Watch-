@@ -1,6 +1,25 @@
 {
   "indexes": [
     {
+      "_comment": "Public map + feed query. Takedown is enforced as a query constraint, so this index is what keeps the map working after the visibility migration.",
+      "collectionGroup": "incidents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Admin moderation queue: reports hidden by community flags, newest first.",
+      "collectionGroup": "incidents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "flagged_at", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Retained for documents predating the visibility migration.",
       "collectionGroup": "incidents",
       "queryScope": "COLLECTION",
       "fields": [
@@ -9,6 +28,7 @@
       ]
     },
     {
+      "_comment": "Ingest pruner: expired system records.",
       "collectionGroup": "incidents",
       "queryScope": "COLLECTION",
       "fields": [

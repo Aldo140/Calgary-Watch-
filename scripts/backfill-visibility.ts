@@ -30,8 +30,17 @@
 import { initializeApp, getApps, cert, applicationDefault } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
-const COMMIT = process.argv.includes('--commit');
+// An explicit --dry-run always wins over --commit. A caller that manages to
+// pass both has a bug, and the safe interpretation of an ambiguous instruction
+// to write to production is: don't. (The first CI run of this script passed
+// --commit unintentionally because of a workflow expression bug.)
+const DRY_RUN_REQUESTED = process.argv.includes('--dry-run');
+const COMMIT = process.argv.includes('--commit') && !DRY_RUN_REQUESTED;
 const BATCH_SIZE = 400;
+
+if (DRY_RUN_REQUESTED && process.argv.includes('--commit')) {
+  console.warn('[backfill] Both --dry-run and --commit given; treating as a DRY RUN.');
+}
 
 const PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID ?? 'calgary-map-e70bb';
 

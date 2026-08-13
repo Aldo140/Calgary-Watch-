@@ -42,7 +42,7 @@ function RedirectHandler() {
  * PageTracker — enhanced analytics document written to `page_views` on every
  * unique pathname visit.  Fields collected:
  *   path         – current pathname
- *   referrer     – document.referrer (empty string when none)
+ *   referrer     – referring HOSTNAME only, never the full URL
  *   utm_source   – ?utm_source param, if present
  *   utm_medium   – ?utm_medium param, if present
  *   utm_campaign – ?utm_campaign param, if present
@@ -65,13 +65,19 @@ function PageTracker() {
 
     // ── UTM params ──────────────────────────────────────────────────────────
     const searchParams = new URLSearchParams(location.search);
-    const utm_source   = searchParams.get('utm_source')   ?? '';
-    const utm_medium   = searchParams.get('utm_medium')   ?? '';
-    const utm_campaign = searchParams.get('utm_campaign') ?? '';
+    const utm = (key: string) => (searchParams.get(key) ?? '').slice(0, 100);
+    const utm_source   = utm('utm_source');
+    const utm_medium   = utm('utm_medium');
+    const utm_campaign = utm('utm_campaign');
 
     // ── Traffic source bucket ────────────────────────────────────────────────
-    const referrer = typeof document !== 'undefined' ? document.referrer : '';
-    let organic_query = '';
+    // Store only the referring hostname. The full referrer URL can carry search
+    // terms, session tokens, and other PII in its query string, and the admin
+    // panel only ever renders the hostname anyway. Search keywords are
+    // deliberately NOT captured — see the organic-search panel in AdminPage,
+    // which reports them as withheld.
+    const rawReferrer = typeof document !== 'undefined' ? document.referrer : '';
+    let referrer = '';
     let traffic_source = 'direct';
     if (utm_source) {
       traffic_source = utm_source.toLowerCase().includes('email')
@@ -79,12 +85,12 @@ function PageTracker() {
         : utm_medium === 'social' || ['facebook','twitter','instagram','linkedin','tiktok'].includes(utm_source.toLowerCase())
           ? 'social'
           : 'campaign';
-    } else if (referrer) {
+    } else if (rawReferrer) {
       try {
-        const refHost = new URL(referrer).hostname.replace(/^www\./, '');
+        const refHost = new URL(rawReferrer).hostname.replace(/^www\./, '');
+        referrer = refHost.slice(0, 200);
         if (['google.com','bing.com','duckduckgo.com','yahoo.com','ecosia.org'].some(s => refHost.includes(s))) {
           traffic_source = 'organic_search';
-          organic_query = new URL(referrer).searchParams.get('q') || new URL(referrer).searchParams.get('p') || '';
         } else if (['facebook.com','twitter.com','x.com','instagram.com','linkedin.com','reddit.com','tiktok.com'].some(s => refHost.includes(s))) {
           traffic_source = 'social';
         } else if (refHost !== window.location.hostname.replace(/^www\./, '')) {
@@ -101,7 +107,6 @@ function PageTracker() {
       utm_medium,
       utm_campaign,
       traffic_source,
-      organic_query,
       sessionId,
     }).catch(() => {});
   }, [location.pathname]);

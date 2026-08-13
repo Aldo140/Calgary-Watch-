@@ -26,7 +26,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx tsx scripts/backfill-visibility.ts ${{ inputs.dry_run && '' || '--commit' }}
+      # NOTE: never put the empty string in the true branch of this idiom.
+      # GitHub treats '' as falsy, so `inputs.dry_run && '' || '--commit'`
+      # collapses to '--commit' even when dry_run is true — which is how the
+      # first run of this workflow wrote to production while reporting itself
+      # as a dry run. Keep both branches non-empty.
+      - run: npx tsx scripts/backfill-visibility.ts ${{ inputs.dry_run && '--dry-run' || '--commit' }}
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}

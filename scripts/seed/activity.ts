@@ -314,6 +314,7 @@ async function run() {
       source_name: 'Calgary Watch example',
       anonymous: false,
       verified_status: 'unverified',
+      visibility: 'public',
       report_count: 1,
       authorUid: 'demo',
       data_source: 'demo',

@@ -1,4 +1,4 @@
-import { Incident, STATUS_ICONS, CATEGORY_ICONS } from '@/src/types';
+import { Incident, STATUS_ICONS, CATEGORY_ICONS, FLAG_THRESHOLD, isPubliclyVisible } from '@/src/types';
 import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, Trash2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -90,7 +90,15 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   if (!incident) return null;
 
   const isSystem = (incident.data_source != null && incident.data_source !== 'community') || incident.authorUid === 'system';
-  const canFlag = Boolean(user) && !isSystem && !flagged && !incident.flagged && user?.uid !== incident.authorUid;
+  const existingFlaggers = incident.flagged_by ?? [];
+  const alreadyFlaggedByMe = Boolean(user && existingFlaggers.includes(user.uid));
+  const canFlag =
+    Boolean(user) &&
+    !isSystem &&
+    !flagged &&
+    !alreadyFlaggedByMe &&
+    isPubliclyVisible(incident) &&
+    user?.uid !== incident.authorUid;
   const canDelete = Boolean(user) && !isSystem && user?.uid === incident.authorUid;
 
   const handleDelete = async () => {
@@ -112,10 +120,16 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
     setFlagError(false);
     setFlagging(true);
     try {
+      // A report hides only once FLAG_THRESHOLD distinct users flag it, so one
+      // account cannot take down the feed on its own. `flagged_by` is the list
+      // the rules check for membership, which is what makes the threshold
+      // enforceable server-side rather than a client convention.
+      const nextFlaggers = [...existingFlaggers, user.uid];
       await updateDoc(doc(db, 'incidents', incident.id), {
-        flagged: true,
+        flagged_by: nextFlaggers,
+        flag_count: nextFlaggers.length,
         flagged_at: Date.now(),
-        flagged_by: user.uid,
+        visibility: nextFlaggers.length >= FLAG_THRESHOLD ? 'flagged' : 'public',
       });
       setFlagged(true);
       setFlagConfirm(false);
@@ -506,7 +520,11 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                     flagConfirm ? (
                       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(180,83,9,0.35)', background: 'rgba(180,83,9,0.07)' }}>
                         <div className="flex gap-2 items-center p-3">
-                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#92400E' }}>Report as inappropriate?</p>
+                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#92400E' }}>
+                            {existingFlaggers.length + 1 >= FLAG_THRESHOLD
+                              ? 'Report as inappropriate? This hides it from the map now.'
+                              : `Report as inappropriate? It stays visible until ${FLAG_THRESHOLD} neighbours flag it.`}
+                          </p>
                           <button
                             onClick={() => void handleFlag()}
                             disabled={flagging}

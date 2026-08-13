@@ -10,14 +10,14 @@ import LayerToggle from '@/src/components/LayerToggle';
 import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
 import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
-import { Incident, IncidentCategory, AreaIntelligence } from '@/src/types';
+import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
 import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
-import { collection, onSnapshot, query, addDoc, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
@@ -26,6 +26,7 @@ import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
+import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 
 function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; // km
@@ -644,6 +645,7 @@ export default function MapPage() {
   const edmontonOpenData = useEdmontonOpenData(isAuthReady);
   // ENMAX outages arrive already adapted into infrastructure incidents.
   const powerOutageIncidents = usePowerOutages(isAuthReady);
+  const suppressedIds = useSuppressedIds(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
   const { stats: statcanStats, yearlyStats: statcanYearlyStats } = useAlbertaMunicipalityCrimeStats();
   const cityAverages = useMemo(() => computeCityAverages(crimeStats), [crimeStats]);
@@ -848,14 +850,23 @@ export default function MapPage() {
       return;
     }
 
-    const q = query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(INCIDENT_PAGE_SIZE));
+    // Hidden reports are excluded by the *query*, not by the client. Firestore
+    // rules filter queries rather than rows, so this constraint is what makes
+    // the matching rule enforceable — without it the listener is rejected
+    // outright rather than silently returning less.
+    const q = query(
+      collection(db, 'incidents'),
+      where('visibility', '==', 'public'),
+      orderBy('timestamp', 'desc'),
+      limit(INCIDENT_PAGE_SIZE),
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const incidentData = snapshot.docs
         .map(doc => {
           const d = doc.data();
           return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
         })
-        .filter((incident) => incident.deleted !== true && !incident.flagged && isFinite(incident.lat) && isFinite(incident.lng));
+        .filter((incident) => isPubliclyVisible(incident) && isFinite(incident.lat) && isFinite(incident.lng));
 
       if (hasInitializedIncidents.current) {
         const newIncidents = incidentData.filter((i) => !knownIncidentIds.current.has(i.id));
@@ -882,7 +893,7 @@ export default function MapPage() {
           : Date.now();
 
         prev.forEach((incident) => {
-          if (!merged.has(incident.id) && incident.timestamp < oldestTimestamp && !incident.flagged) {
+          if (!merged.has(incident.id) && incident.timestamp < oldestTimestamp && isPubliclyVisible(incident)) {
             merged.set(incident.id, incident);
           }
         });
@@ -915,6 +926,7 @@ export default function MapPage() {
     try {
       const nextQuery = query(
         collection(db, path),
+        where('visibility', '==', 'public'),
         orderBy('timestamp', 'desc'),
         startAfter(lastVisibleIncidentDoc.current),
         limit(INCIDENT_PAGE_SIZE)
@@ -925,7 +937,7 @@ export default function MapPage() {
           const d = doc.data();
           return { id: doc.id, ...d, lat: Number(d.lat), lng: Number(d.lng) } as Incident;
         })
-        .filter((incident) => incident.deleted !== true && !incident.flagged && isFinite(incident.lat) && isFinite(incident.lng));
+        .filter((incident) => isPubliclyVisible(incident) && isFinite(incident.lat) && isFinite(incident.lng));
 
       setFirebaseIncidents((prev) => {
         const merged = new globalThis.Map(prev.map((incident) => [incident.id, incident]));
@@ -988,7 +1000,14 @@ export default function MapPage() {
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
     const now = Date.now();
-    const combined = [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents];
+    // Browser-derived civic records are rebuilt from their upstream APIs on
+    // every load, so a moderator's decision about them can only live in the
+    // suppression list. Applied here, after the merge, so it covers every
+    // source uniformly.
+    const combined = applySuppression(
+      [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents],
+      suppressedIds,
+    );
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
     const filtered = [...unique.values()]
       .filter((i) => {
@@ -1012,7 +1031,7 @@ export default function MapPage() {
       if (!isDup) kept.push(inc);
     }
     return kept;
-  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents]);
+  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, suppressedIds]);
 
   // Official community list + names observed in live data
   const officialCommunities = useCalgaryCommunities(Boolean(user));
@@ -1233,14 +1252,19 @@ export default function MapPage() {
           const nameToUse = isAnonymous ? 'Anonymous' : firstName;
           const safeName = nameToUse.trim().padEnd(2, ' ').slice(0, 50);
 
-          await addDoc(collection(db!, path), {
+          // The public incident and the private reporter record are written in
+          // one batch. A partial write would either publish a report with no
+          // way to trace it, or strand reporter identity against an incident
+          // that does not exist.
+          const incidentRef = doc(collection(db!, path));
+          const batch = writeBatch(db!);
+          batch.set(incidentRef, {
             title: safeTitle,
             description: safeDesc,
             category: incidentData.category,
             neighborhood: safeNeighborhood,
             lat: incidentData.lat,
             lng: incidentData.lng,
-            email: isAnonymous ? 'anonymous@calgarywatch.app' : (user.email || 'unknown@example.com'),
             name: safeName,
             source_name: safeName,
             anonymous: isAnonymous,
@@ -1248,8 +1272,21 @@ export default function MapPage() {
             verified_status: 'unverified',
             report_count: 1,
             authorUid: user.uid,
+            visibility: 'public',
+            flag_count: 0,
+            flagged_by: [],
             ...(image_url ? { image_url } : {}),
           });
+          // Reporter email never touches the world-readable incident document.
+          if (user.email) {
+            batch.set(doc(db!, 'incident_reporters', incidentRef.id), {
+              incidentId: incidentRef.id,
+              authorUid: user.uid,
+              email: user.email,
+              createdAt: Date.now(),
+            });
+          }
+          await batch.commit();
           celebrate('Signal live — neighbours nearby can see it now.');
         } catch (error) {
           console.error('[CalgaryWatch] Report submission failed:', error);
@@ -1283,14 +1320,15 @@ export default function MapPage() {
           const safeNeighborhood = (data.neighborhood || 'Calgary').trim().padEnd(2, ' ').slice(0, 80);
           const safeName = firstName.trim().padEnd(2, ' ').slice(0, 50);
 
-          await addDoc(collection(db!, path), {
+          const incidentRef = doc(collection(db!, path));
+          const batch = writeBatch(db!);
+          batch.set(incidentRef, {
             title: safeTitle,
             description: safeDesc,
             category: data.category,
             neighborhood: safeNeighborhood,
             lat: data.lat,
             lng: data.lng,
-            email: user.email || 'unknown@example.com',
             name: safeName,
             source_name: safeName,
             anonymous: false,
@@ -1298,7 +1336,19 @@ export default function MapPage() {
             verified_status: 'unverified',
             report_count: 1,
             authorUid: user.uid,
+            visibility: 'public',
+            flag_count: 0,
+            flagged_by: [],
           });
+          if (user.email) {
+            batch.set(doc(db!, 'incident_reporters', incidentRef.id), {
+              incidentId: incidentRef.id,
+              authorUid: user.uid,
+              email: user.email,
+              createdAt: Date.now(),
+            });
+          }
+          await batch.commit();
           celebrate('Emergency signal live — nearby watchers alerted.');
         } catch (error) {
           handleFirestoreError(error, OperationType.CREATE, path);

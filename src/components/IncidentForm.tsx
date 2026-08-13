@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image, Siren, AlertCircle, Car, Construction, CloudRain, ArrowRight, Check } from 'lucide-react';
+import { INCIDENT_CATEGORY_VALUES } from '@/src/constants';
 import { uploadIncidentImage } from '@/src/lib/storage';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -82,7 +83,7 @@ const incidentSchema = z.object({
     .min(10, 'Description must be at least 10 characters')
     .max(1000, 'Description is too long')
     .refine(v => !hasProfanity(v), 'Please keep it clean'),
-  category: z.enum(['crime', 'traffic', 'infrastructure', 'weather', 'emergency']),
+  category: z.enum(INCIDENT_CATEGORY_VALUES),
   neighborhood: z.string().trim().min(2, 'Please choose a neighbourhood from the list'),
   anonymous: z.boolean(),
 });

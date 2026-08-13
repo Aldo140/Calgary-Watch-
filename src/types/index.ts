@@ -1,6 +1,10 @@
 import { AlertCircle, Car, Construction, CloudRain, ShieldCheck, ShieldAlert, ShieldQuestion, Siren, Clock } from 'lucide-react';
+import { INCIDENT_CATEGORY_VALUES } from '@/src/constants';
 
-export type IncidentCategory = 'crime' | 'traffic' | 'infrastructure' | 'weather' | 'emergency';
+// Derived from the single source of truth so a new category cannot be added
+// to the UI list without the type, the form enum, and the rules contract
+// test all seeing it. See src/constants/index.ts.
+export type IncidentCategory = (typeof INCIDENT_CATEGORY_VALUES)[number];
 
 export type CredibilityStatus = 'unverified' | 'multiple_reports' | 'community_confirmed' | 'pending_review';
 
@@ -39,7 +43,9 @@ export type SourceType =
   | 'alberta_statcan_crime'
   | 'enmax_power_outage';
 
-export const CATEGORY_ICONS = {
+// Typed as a total Record so adding a category to INCIDENT_CATEGORIES fails
+// the typecheck here until an icon is supplied.
+export const CATEGORY_ICONS: Record<IncidentCategory, typeof AlertCircle> = {
   crime: AlertCircle,
   traffic: Car,
   infrastructure: Construction,
@@ -54,6 +60,21 @@ export const STATUS_ICONS = {
   pending_review: Clock,
 };
 
+/**
+ * Public visibility of an incident, and the single field the map query filters
+ * on.
+ *
+ * Replaces the old `flagged` / `deleted` boolean pair. Two booleans allowed
+ * four states for three meanings, needed two indexes, and could not be
+ * expressed as one query constraint — which meant takedown could only ever be
+ * enforced in the client. One field gives Firestore rules something to
+ * validate and the map one `where()` clause.
+ */
+export type IncidentVisibility = 'public' | 'flagged' | 'deleted';
+
+/** Distinct flags required before a community report is hidden from the map. */
+export const FLAG_THRESHOLD = 2;
+
 export interface Incident {
   id: string;
   title: string;
@@ -63,7 +84,12 @@ export interface Incident {
   lat: number;
   lng: number;
   timestamp: number;
-  email: string;
+  /**
+   * Present only on ingested/system records, where it is a synthetic service
+   * address. Reporter email for community reports lives in the admin-only
+   * `incident_reporters/{incidentId}` document and is never published here.
+   */
+  email?: string;
   name: string;
   anonymous?: boolean;
   verified_status: CredibilityStatus;
@@ -72,12 +98,21 @@ export interface Incident {
   source_url?: string;
   source_logo?: string;
   source_name?: string;
-  deleted?: boolean;
+  /**
+   * Authoritative visibility. Absent on documents written before the
+   * visibility migration — treat a missing value as 'public'.
+   */
+  visibility?: IncidentVisibility;
+  /** Distinct users who have flagged this report; length drives the takedown. */
+  flagged_by?: string[];
+  flag_count?: number;
+  flagged_at?: number;
   deletedAt?: number;
   deletedBy?: string;
+  /** @deprecated Superseded by `visibility`. Retained for old documents. */
+  deleted?: boolean;
+  /** @deprecated Superseded by `visibility`. Retained for old documents. */
   flagged?: boolean;
-  flagged_at?: number;
-  flagged_by?: string;
   authorUid?: string;
   // ── Provenance fields (set by ingestion pipeline or client) ──────────────
   /** Who created this record. Defaults to 'community' when absent. */
@@ -122,4 +157,35 @@ export interface AreaIntelligence {
   }[];
   insights: string[];
   liveOverlayInsight: string;
+}
+
+/**
+ * Private reporter metadata, split out of the public incident document.
+ *
+ * `incidents` is world-readable so the map works signed-out; anything that
+ * identifies the reporter has to live somewhere else. Written in the same
+ * batch as the incident so the two can never diverge.
+ */
+export interface IncidentReporter {
+  incidentId: string;
+  authorUid: string;
+  email: string;
+  createdAt: number;
+}
+
+/** Resolves visibility for documents written before the migration. */
+export function incidentVisibility(
+  incident: Pick<Incident, 'visibility' | 'deleted' | 'flagged'>,
+): IncidentVisibility {
+  if (incident.visibility) return incident.visibility;
+  if (incident.deleted) return 'deleted';
+  if (incident.flagged) return 'flagged';
+  return 'public';
+}
+
+/** True when an incident should appear on the public map and feed. */
+export function isPubliclyVisible(
+  incident: Pick<Incident, 'visibility' | 'deleted' | 'flagged'>,
+): boolean {
+  return incidentVisibility(incident) === 'public';
 }

@@ -26,7 +26,7 @@ import { VERIFIED_STATUSES } from '@/src/hooks/useAdminData';
 import {
   AdminButton, Chip, EmptyState, Field, Figure, FilterChip, FilterRow, Panel,
   SearchField, SkeletonRows, StatGrid, StatTile, T, TimeAgo, display,
-  inputClass, inputStyle, mono, type Tone,
+  inputClass, inputStyle, mono, CategoryChip,
 } from '@/src/components/admin/ui';
 import { cn } from '@/src/lib/utils';
 
@@ -35,11 +35,6 @@ type IncidentDraft = Pick<
   Incident,
   'title' | 'description' | 'category' | 'neighborhood' | 'verified_status' | 'report_count'
 >;
-
-const CATEGORY_TONE: Record<string, Tone> = {
-  emergency: 'critical', crime: 'critical', traffic: 'attention',
-  infrastructure: 'signal', weather: 'signal',
-};
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -323,7 +318,7 @@ export default function AdminIncidentListPage() {
             <StatTile label="With a photo" value={incidentStats.images} />
           </StatGrid>
 
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem]">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem] items-start">
             {/* List */}
             <Panel title="Records" subtitle={`Sorted by ${sort}`} padded={false}>
               {loading ? (
@@ -336,7 +331,7 @@ export default function AdminIncidentListPage() {
                   action={hasFilters ? <AdminButton size="sm" variant="outline" onClick={clearFilters}>Clear filters</AdminButton> : undefined}
                 />
               ) : (
-                <ul className="divide-y max-h-[62vh] overflow-y-auto" style={{ borderColor: T.line }}>
+                <ul className="divide-y divide-[#E4E2DC] max-h-[62vh] overflow-y-auto">
                   {filteredIncidents.map((incident) => {
                     const active = selectedIncident?.id === incident.id;
                     return (
@@ -352,7 +347,7 @@ export default function AdminIncidentListPage() {
                           />
                           <span className="min-w-0 flex-1">
                             <span className="flex items-center gap-1.5 flex-wrap">
-                              <Chip tone={CATEGORY_TONE[incident.category] ?? 'neutral'}>{incident.category}</Chip>
+                              <CategoryChip category={incident.category} />
                               {incident.anonymous && <Chip>anon</Chip>}
                               {incident.image_url && <Chip><ImageIcon size={10} /> photo</Chip>}
                               {incidentVisibility(incident) === 'flagged' && <Chip tone="critical"><EyeOff size={10} /> hidden</Chip>}
@@ -517,8 +512,14 @@ function IncidentEditor({
 
         <div className="space-y-2 pt-1">
           <div className="flex gap-2">
-            <AdminButton tone="signal" onClick={onSave} disabled={saving || !dirty} className="flex-1">
-              <Save size={14} /> {saving ? 'Saving' : dirty ? 'Save changes' : 'Saved'}
+            <AdminButton
+              tone={dirty ? 'signal' : 'neutral'}
+              variant={dirty ? 'solid' : 'outline'}
+              onClick={onSave}
+              disabled={saving || !dirty}
+              className="flex-1"
+            >
+              <Save size={14} /> {saving ? 'Saving' : dirty ? 'Save changes' : 'No changes'}
             </AdminButton>
             {onViewReporter && (
               <AdminButton variant="outline" onClick={onViewReporter} title="View this reporter">
@@ -526,7 +527,7 @@ function IncidentEditor({
               </AdminButton>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {visible && (
               <AdminButton variant="outline" tone="attention" onClick={onHide} disabled={saving} className="flex-1">
                 <EyeOff size={14} /> Hide from map

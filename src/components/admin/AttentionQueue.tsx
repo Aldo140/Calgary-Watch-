@@ -188,7 +188,7 @@ export function AttentionQueue({
           body="No flagged content, no unreviewed reports, and every data feed is answering. New work will appear here first."
         />
       ) : (
-        <ul className="divide-y" style={{ borderColor: T.line }}>
+        <ul className="divide-y divide-[#E4E2DC]">
           {shown.map((item) => {
             const Icon = item.icon;
             return (

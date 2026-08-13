@@ -39,6 +39,36 @@ export const mono = "'IBM Plex Mono', ui-monospace, monospace";
 
 export type Tone = 'neutral' | 'signal' | 'attention' | 'critical' | 'ok';
 
+/**
+ * One colour per incident category, for every chart, chip and legend.
+ *
+ * A category must read as the same colour everywhere or the legend actively
+ * misleads. These hues are also spaced further apart than the map's palette,
+ * whose emergency and crime reds are near-identical — fine on a map where an
+ * icon carries the meaning, useless in a pie or a chip.
+ */
+export const CATEGORY_COLOR: Record<string, string> = {
+  emergency: '#C0392B',
+  crime: '#2C6FB5',
+  traffic: '#C77F18',
+  infrastructure: '#2F855A',
+  weather: '#7C5CBF',
+  gas: '#0F8B8D',
+};
+
+/** Chip coloured by the shared category palette. */
+export function CategoryChip({ category }: { category: string }) {
+  const c = CATEGORY_COLOR[category] ?? T.muted;
+  return (
+    <span
+      className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[0.68rem] font-semibold border whitespace-nowrap"
+      style={{ color: c, borderColor: `${c}33`, background: `${c}0F` }}
+    >
+      {category}
+    </span>
+  );
+}
+
 export const toneColor: Record<Tone, string> = {
   neutral: T.ink,
   signal: T.signal,
@@ -260,7 +290,7 @@ export function AdminButton({
 }) {
   const c = toneColor[tone];
   const base =
-    'inline-flex items-center justify-center gap-1.5 rounded-lg font-semibold transition-colors disabled:opacity-45 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2';
+    'inline-flex items-center justify-center gap-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2';
   const sizes = { sm: 'h-8 px-2.5 text-xs', md: 'h-10 px-3.5 text-[0.82rem]' };
   const styles: Record<string, React.CSSProperties> = {
     solid: { background: c, color: '#fff', borderColor: c },

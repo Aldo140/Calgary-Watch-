@@ -77,9 +77,13 @@ export function AdminShell({
           >
             Calgary Watch
           </p>
-          <h1 className="text-[1.1rem] font-bold text-white" style={{ fontFamily: display }}>
-            Watch desk
-          </h1>
+          {/* Colour is set inline, not via text-white: a global heading rule in
+              index.css was winning and rendering this near-black on the rail.
+              The name is fixed ("Admin console") so it does not echo the
+              section title already shown in the workspace header. */}
+          <p className="text-[1.1rem] font-bold" style={{ fontFamily: display, color: '#FFFFFF' }}>
+            Admin console
+          </p>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2.5 pb-4 space-y-0.5">

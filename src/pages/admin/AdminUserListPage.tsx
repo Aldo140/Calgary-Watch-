@@ -289,7 +289,7 @@ export default function AdminUserListPage() {
             <StatTile label="Weekly digest" value={userStats.digest} hint="Opted in" />
           </StatGrid>
 
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem]">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem] items-start">
             <Panel title="Accounts" subtitle={`Sorted by ${sort}`} padded={false}>
               {loading ? (
                 <div className="p-4"><SkeletonRows rows={6} /></div>
@@ -301,7 +301,7 @@ export default function AdminUserListPage() {
                   action={hasFilters ? <AdminButton size="sm" variant="outline" onClick={() => { setSearch(''); setRoleFilter('all'); }}>Clear filters</AdminButton> : undefined}
                 />
               ) : (
-                <ul className="divide-y max-h-[62vh] overflow-y-auto" style={{ borderColor: T.line }}>
+                <ul className="divide-y divide-[#E4E2DC] max-h-[62vh] overflow-y-auto">
                   {filteredUsers.map((profile) => {
                     const active = selectedUser?.uid === profile.uid;
                     return (
@@ -421,8 +421,14 @@ function UserEditor({
             </select>
           </Field>
 
-          <AdminButton tone="signal" onClick={onSaveProfile} disabled={saving || !dirty} className="w-full">
-            <Save size={14} /> {saving ? 'Saving' : dirty ? 'Save profile' : 'Saved'}
+          <AdminButton
+            tone={dirty ? 'signal' : 'neutral'}
+            variant={dirty ? 'solid' : 'outline'}
+            onClick={onSaveProfile}
+            disabled={saving || !dirty}
+            className="w-full"
+          >
+            <Save size={14} /> {saving ? 'Saving' : dirty ? 'Save profile' : 'No changes'}
           </AdminButton>
 
           <div className="rounded-lg border p-3 space-y-1.5 text-xs" style={{ borderColor: T.line, background: T.surface }}>

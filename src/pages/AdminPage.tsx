@@ -31,7 +31,7 @@ import { AttentionQueue } from '@/src/components/admin/AttentionQueue';
 import {
   AdminButton, Chip, EmptyState, Field, Figure, Panel, RecordList, SkeletonRows,
   StatGrid, StatTile, StatusDot, T, TimeAgo, display, inputClass, inputStyle, mono,
-  type Tone,
+  CATEGORY_COLOR, type Tone,
 } from '@/src/components/admin/ui';
 import { INCIDENT_CATEGORIES } from '@/src/constants';
 import { cn } from '@/src/lib/utils';
@@ -39,6 +39,7 @@ import { cn } from '@/src/lib/utils';
 type Section = 'desk' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city';
 
 const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
+
 
 /** Shared Recharts styling, kept in one place so every chart matches. */
 const axis = { stroke: '#9AA1AC', fontSize: 10, tickLine: false, axisLine: false } as const;
@@ -195,7 +196,7 @@ function DeskSection({ d }: { d: D }) {
         <StatTile label="Page views" value={d.totalPageViews} hint={`${d.uniqueSessions} sessions`} />
       </StatGrid>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3 items-start">
         <Panel title="Reports over time" subtitle="Daily volume" className="lg:col-span-2">
           <ChartFrame height={200}>
             <AreaChart data={d.timelineChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
@@ -301,13 +302,13 @@ function ReportsSection({ d }: { d: D }) {
             <PieChart>
               <Pie data={d.categoryChartData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2}>
                 {d.categoryChartData.map((entry, i) => (
-                  <Cell key={i} fill={entry.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
+                  <Cell key={i} fill={CATEGORY_COLOR[entry.name.toLowerCase()] ?? entry.color ?? CHART_COLORS[i % CHART_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip contentStyle={tooltipStyle} />
             </PieChart>
           </ChartFrame>
-          <Legend items={d.categoryChartData.map((c, i) => ({ label: c.name, value: c.value, color: c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
+          <Legend items={d.categoryChartData.map((c, i) => ({ label: c.name, value: c.value, color: CATEGORY_COLOR[c.name.toLowerCase()] ?? c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
         </Panel>
 
         <Panel title="By trust level" subtitle="How reports get verified">
@@ -360,12 +361,12 @@ function ReportsSection({ d }: { d: D }) {
               <XAxis dataKey="date" {...axis} />
               <YAxis allowDecimals={false} {...axis} />
               <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-              {INCIDENT_CATEGORIES.map((c, i) => (
-                <Bar key={c.value} dataKey={c.value} stackId="a" fill={CHART_COLORS[i % CHART_COLORS.length]} />
+              {INCIDENT_CATEGORIES.map((c) => (
+                <Bar key={c.value} dataKey={c.value} stackId="a" fill={CATEGORY_COLOR[c.value]} />
               ))}
             </BarChart>
           </ChartFrame>
-          <Legend items={INCIDENT_CATEGORIES.map((c, i) => ({ label: c.label, color: CHART_COLORS[i % CHART_COLORS.length] }))} />
+          <Legend items={INCIDENT_CATEGORIES.map((c) => ({ label: c.label, color: CATEGORY_COLOR[c.value] }))} />
         </Panel>
 
         <Panel title="Top reporters" subtitle="Most reports submitted" className="lg:col-span-2">
@@ -455,7 +456,7 @@ function PeopleSection({ d }: { d: D }) {
         {d.newestSignups.length === 0 ? (
           <EmptyState title="No accounts yet" body="New signups appear here as soon as someone signs in." />
         ) : (
-          <ul className="divide-y" style={{ borderColor: T.line }}>
+          <ul className="divide-y divide-[#E4E2DC]">
             {d.newestSignups.map((u) => (
               <li key={u.uid} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
                 <span className="h-8 w-8 shrink-0 grid place-items-center rounded-full text-xs font-bold" style={{ background: `${T.signal}18`, color: T.signal }}>
@@ -493,7 +494,7 @@ function FeedsSection({ d }: { d: D }) {
         }
         padded={false}
       >
-        <ul className="divide-y" style={{ borderColor: T.line }}>
+        <ul className="divide-y divide-[#E4E2DC]">
           {d.apiHealths.map((api) => (
             <li key={api.id} className="p-3 flex items-center gap-3">
               <StatusDot tone={toneFor(api.status)} pulse={api.status === 'checking'} />
@@ -682,7 +683,7 @@ function CitySection({ d }: { d: D }) {
         ) : d.topCrimeCommunities.length === 0 ? (
           <EmptyState title="Crime data unavailable" body="The Calgary open-data endpoint returned no records. Check the Data feeds tab." />
         ) : (
-          <ul className="divide-y" style={{ borderColor: T.line }}>
+          <ul className="divide-y divide-[#E4E2DC]">
             {d.topCrimeCommunities.map((c) => (
               <li key={c.name} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
                 <span className="text-sm font-medium truncate" style={{ color: T.ink }}>{c.name}</span>

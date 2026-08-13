@@ -1,0 +1,32 @@
+name: Backfill Incident Visibility
+
+# Manual only — one-time migration that adds `visibility`, `flag_count`, and
+# `flagged_by` to every incident document.
+#
+# MUST be run (with dry_run unchecked) BEFORE the new firestore.rules and the
+# new client are deployed. The public map filters on `visibility`, and Firestore
+# equality queries do not match documents missing the field, so deploying first
+# would return zero incidents and blank the map.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Count without writing (leave checked for the first run)'
+        type: boolean
+        default: true
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scripts/backfill-visibility.ts ${{ inputs.dry_run && '' || '--commit' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}

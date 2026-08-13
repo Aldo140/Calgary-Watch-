@@ -6,7 +6,7 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { db, isFirebaseConfigured } from '@/src/firebase';
-import { Incident } from '@/src/types';
+import { Incident, incidentVisibility } from '@/src/types';
 import { cn } from '@/src/lib/utils';
 
 type UserProfile = {
@@ -71,7 +71,7 @@ export default function AdminUserListPage() {
       setSelectedUid((current) => current || rows[0]?.uid || null);
     });
     const unsubIncidents = onSnapshot(query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)), (snapshot) => {
-      setIncidents(snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as Incident)).filter((row) => row.deleted !== true));
+      setIncidents(snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as Incident)).filter((row) => incidentVisibility(row) !== 'deleted'));
     });
     return () => { unsubUsers(); unsubIncidents(); };
   }, []);
@@ -157,7 +157,12 @@ export default function AdminUserListPage() {
   };
 
   const deleteUser = async (profile: UserProfile) => {
-    if (!db || !window.confirm(`Delete ${profile.displayName || profile.email || 'this user'} from the user directory?`)) return;
+    // Removes the Firestore profile document only. The Firebase Auth account
+    // survives and can still sign in — deleting it requires the Admin SDK.
+    if (!db || !window.confirm(
+      `Remove ${profile.displayName || profile.email || 'this user'} from the user directory?\n\n` +
+      'This deletes their profile record only. Their sign-in account still exists and they can sign in again.'
+    )) return;
     await deleteDoc(doc(db, 'users', profile.uid));
   };
 
@@ -258,7 +263,7 @@ export default function AdminUserListPage() {
                     </div>
                     <div className="flex gap-2">
                       <Button variant="secondary" onClick={() => setRawView((value) => !value)} className="h-9 border-slate-200 bg-white text-slate-700">{rawView ? <Eye size={14} /> : <Code2 size={14} />}{rawView ? 'Structured' : 'Raw'}</Button>
-                      <Button variant="secondary" onClick={() => deleteUser(selectedUser)} className="h-9 border-red-200 bg-red-50 text-red-700"><Trash2 size={14} />Delete</Button>
+                      <Button variant="secondary" onClick={() => deleteUser(selectedUser)} className="h-9 border-red-200 bg-red-50 text-red-700"><Trash2 size={14} />Remove profile</Button>
                     </div>
                   </div>
                 </div>

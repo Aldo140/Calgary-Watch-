@@ -187,6 +187,7 @@ async function run() {
       ...inc,
       email: 'seed@calgarywatch.app',
       verified_status: 'unverified',
+      visibility: 'public',
       deleted: false,
       data_source: 'community',
       expires_at: EXPIRES,

@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, isFirebaseConfigured } from '@/src/firebase';
-import { Incident, CommunityStats } from '@/src/types';
+import { Incident, CommunityStats, incidentVisibility } from '@/src/types';
+import { deleteIncidentImage } from '@/src/lib/storage';
+import { suppressionDocId } from '@/src/lib/suppression';
+import { INCIDENT_CATEGORIES, INCIDENT_CATEGORY_VALUES, LEGACY_INCIDENT_CATEGORIES } from '@/src/constants';
 import {
   addDoc, collection, deleteDoc, doc, getDocs,
   onSnapshot, orderBy, query, updateDoc, limit, where, deleteField,
-  getCountFromServer,
+  getCountFromServer, setDoc,
 } from 'firebase/firestore';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
@@ -58,7 +61,6 @@ type PageViewDoc = {
   utm_medium?: string;
   utm_campaign?: string;
   traffic_source?: string;
-  organic_query?: string;
   sessionId?: string;
 };
 
@@ -113,13 +115,9 @@ const NAV_ITEMS: { id: AdminSection; label: string; icon: React.ElementType; bad
   { id: 'flagged' as AdminSection, label: 'Flagged', icon: Flag },
 ];
 
-const INCIDENT_CATEGORIES: Incident['category'][] = [
-  'emergency',
-  'crime',
-  'traffic',
-  'infrastructure',
-  'weather',
-];
+
+/** How long a suppression entry blocks re-ingestion of a record. */
+const SUPPRESSION_TTL_MS = 180 * 24 * 60 * 60 * 1000; // 180 days
 
 const VERIFIED_STATUSES: Incident['verified_status'][] = [
   'unverified',
@@ -305,7 +303,13 @@ export default function AdminPage() {
   // ── Audit log ──────────────────────────────────────────────────────────────
 
   const writeAuditLog = async (
-    action: 'incident_update' | 'incident_soft_delete' | 'community_stats_update' | 'community_stats_soft_delete',
+    action:
+      | 'incident_update'
+      | 'incident_soft_delete'
+      | 'incident_suppress'
+      | 'image_cleanup_failed'
+      | 'community_stats_update'
+      | 'community_stats_soft_delete',
     targetCollection: 'incidents' | 'community_stats',
     targetId: string,
     changes: Record<string, unknown>,
@@ -323,14 +327,22 @@ export default function AdminPage() {
     if (!db || restoringId) return;
     setRestoringId(incidentId);
     try {
+      // Clearing the flagger list as well as the visibility, otherwise the
+      // same two accounts could not re-flag and a restored report would sit at
+      // or above the threshold forever.
       await updateDoc(doc(db, 'incidents', incidentId), {
+        visibility: 'public',
         flagged: false,
         flagged_at: deleteField(),
-        flagged_by: deleteField(),
+        flagged_by: [],
+        flag_count: 0,
       });
-      await writeAuditLog('incident_update', 'incidents', incidentId, { flagged: false });
-    } catch {
-      // silently fail — Firestore subscription will keep the item visible
+      await writeAuditLog('incident_update', 'incidents', incidentId, { visibility: 'public' });
+    } catch (err) {
+      // Surfaced rather than swallowed: this used to fail silently, which made
+      // a rules rejection look identical to a successful restore.
+      console.error('Failed to restore incident:', err);
+      alert('Could not restore this incident. Check your admin permissions.');
     } finally {
       setRestoringId(null);
     }
@@ -340,11 +352,45 @@ export default function AdminPage() {
     if (!window.confirm('Permanently delete this incident? This cannot be undone.')) return;
     if (!db || deletingId) return;
     setDeletingId(incidentId);
+    const target = incidents.find((i) => i.id === incidentId);
+    const isIngested =
+      target?.authorUid === 'system' ||
+      (target?.data_source != null && target.data_source !== 'community');
     try {
+      // Suppress first, delete second. Deleting an ingested record on its own
+      // is undone by the next ingest run, which re-upserts by dedup_key; if the
+      // suppression write fails we want to have stopped before the delete
+      // rather than after it.
+      if (isIngested) {
+        await setDoc(doc(db, 'suppressed_incidents', suppressionDocId(incidentId)), {
+          suppressedAt: Date.now(),
+          // Expire the entry well past the point the upstream feed would have
+          // dropped the record, so the list cannot grow without bound.
+          expiresAt: Date.now() + SUPPRESSION_TTL_MS,
+        });
+        await writeAuditLog('incident_suppress', 'incidents', incidentId, {
+          reason: 'admin_permanent_delete',
+          source_type: target?.source_type ?? null,
+        });
+      }
+
       await deleteDoc(doc(db, 'incidents', incidentId));
       await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });
-    } catch {
-      // silently fail
+
+      // The photo is removed after the record it belonged to is gone. A
+      // failure here leaves an orphan rather than an inconsistent takedown, so
+      // it is recorded for retry instead of aborting the deletion.
+      if (target?.image_url) {
+        const removed = await deleteIncidentImage(target.image_url);
+        if (!removed) {
+          await writeAuditLog('image_cleanup_failed', 'incidents', incidentId, {
+            image_url: target.image_url,
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to permanently delete incident:', err);
+      alert('Could not delete this incident. Check your admin permissions.');
     } finally {
       setDeletingId(null);
     }
@@ -360,7 +406,7 @@ export default function AdminPage() {
       (snapshot) => {
         const rows = snapshot.docs
           .map((row) => ({ id: row.id, ...row.data() } as Incident))
-          .filter((row) => row.deleted !== true);
+          .filter((row) => incidentVisibility(row) !== 'deleted');
         setIncidents(rows);
         setLoadingData(false);
       }
@@ -369,7 +415,7 @@ export default function AdminPage() {
     const unsubStats = onSnapshot(collection(db, 'community_stats'), (snapshot) => {
       const rows = snapshot.docs
         .map((row) => ({ id: row.id, ...row.data() } as CommunityStats & { id: string; deleted?: boolean }))
-        .filter((row) => row.deleted !== true);
+        .filter((row) => incidentVisibility(row) !== 'deleted');
       setCommunityStats(rows);
     });
 
@@ -399,7 +445,7 @@ export default function AdminPage() {
     const countInterval = 0;
 
     const unsubFlagged = onSnapshot(
-      query(collection(db, 'incidents'), where('flagged', '==', true), orderBy('flagged_at', 'desc')),
+      query(collection(db, 'incidents'), where('visibility', '==', 'flagged'), orderBy('flagged_at', 'desc')),
       (snapshot) => {
         setFlaggedIncidents(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Incident)));
       }
@@ -500,13 +546,20 @@ export default function AdminPage() {
   const categoryChartData = useMemo(() => {
     const counts: Record<string, number> = {};
     incidents.forEach((i) => { counts[i.category] = (counts[i.category] ?? 0) + 1; });
+    // Series come from the shared category list, plus any legacy categories
+    // still present on old documents, so this chart cannot silently omit a
+    // category the rest of the app accepts.
     return [
-      { name: 'Emergency',      value: counts['emergency']      ?? 0, color: '#dc2626' },
-      { name: 'Crime',          value: counts['crime']          ?? 0, color: '#ef4444' },
-      { name: 'Traffic',        value: counts['traffic']        ?? 0, color: '#f97316' },
-      { name: 'Infrastructure', value: counts['infrastructure'] ?? 0, color: '#3b82f6' },
-      { name: 'Weather',        value: counts['weather']        ?? 0, color: '#a855f7' },
-      { name: 'Gas',            value: counts['gas']            ?? 0, color: '#10b981' },
+      ...INCIDENT_CATEGORIES.map((c) => ({
+        name: c.label,
+        value: counts[c.value] ?? 0,
+        color: c.color as string,
+      })),
+      ...LEGACY_INCIDENT_CATEGORIES.map((value) => ({
+        name: `${value[0].toUpperCase()}${value.slice(1)} (legacy)`,
+        value: counts[value] ?? 0,
+        color: '#10b981',
+      })),
     ].filter((d) => d.value > 0);
   }, [incidents]);
 
@@ -759,12 +812,19 @@ export default function AdminPage() {
     const counts: Record<string, number> = {};
     pageViewDocs.forEach((pv) => {
       if (!pv.referrer) return;
-      try {
-        const host = new URL(pv.referrer).hostname.replace(/^www\./, '');
-        if (host && host !== window.location.hostname.replace(/^www\./, '')) {
-          counts[host] = (counts[host] ?? 0) + 1;
+      // Stored as a bare hostname since the analytics sanitisation pass.
+      // Older documents may still hold a full URL, so accept both.
+      let host = pv.referrer.replace(/^www\./, '');
+      if (host.includes('/') || host.includes(':')) {
+        try {
+          host = new URL(pv.referrer).hostname.replace(/^www\./, '');
+        } catch {
+          return;
         }
-      } catch {}
+      }
+      if (host && host !== window.location.hostname.replace(/^www\./, '')) {
+        counts[host] = (counts[host] ?? 0) + 1;
+      }
     });
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1]).slice(0, 8)
@@ -796,7 +856,9 @@ export default function AdminPage() {
   const organicQueryData = useMemo(() => {
     const counts: Record<string, number> = {};
     organicSearchDocs.forEach((pv) => {
-      const queryText = pv.organic_query?.trim() || 'Keyword hidden by search engine';
+      // Search keywords are intentionally not collected (PII). This panel
+      // reports organic-search volume only.
+      const queryText = 'Keyword not collected';
       counts[queryText] = (counts[queryText] ?? 0) + 1;
     });
     return Object.entries(counts)
@@ -885,8 +947,13 @@ export default function AdminPage() {
     if (!user || !db) return;
     if (!window.confirm('Soft-delete this incident? It will be hidden from the live feed.')) return;
     try {
-      await updateDoc(doc(db, 'incidents', incidentId), { deleted: true, deletedAt: Date.now(), deletedBy: user.uid });
-      await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { deleted: true });
+      await updateDoc(doc(db, 'incidents', incidentId), {
+        visibility: 'deleted',
+        deleted: true,
+        deletedAt: Date.now(),
+        deletedBy: user.uid,
+      });
+      await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { visibility: 'deleted' });
     } catch (err) {
       console.error('Failed to soft-delete incident:', err);
       alert('Could not delete this incident. Check your admin permissions.');
@@ -1470,7 +1537,7 @@ export default function AdminPage() {
                       <textarea className="h-24 w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.description} onChange={(e) => setIncidentDraft(incident, { description: e.target.value })} />
                       <div className="grid grid-cols-2 gap-2">
                         <select className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
-                          {INCIDENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                          {INCIDENT_CATEGORY_VALUES.map((category) => <option key={category} value={category}>{category}</option>)}
                         </select>
                         <select className="w-full rounded-2xl border border-white/10 light:border-slate-300 bg-slate-800/80 light:bg-white p-3 text-sm light:text-slate-900" value={draft.verified_status} onChange={(e) => setIncidentDraft(incident, { verified_status: e.target.value as Incident['verified_status'] })}>
                           {VERIFIED_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
@@ -1527,7 +1594,7 @@ export default function AdminPage() {
                       <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.title} onChange={(e) => setIncidentDraft(incident, { title: e.target.value })} /></td>
                       <td className="py-2 pr-2">
                         <select className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.category} onChange={(e) => setIncidentDraft(incident, { category: e.target.value as Incident['category'] })}>
-                          {INCIDENT_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
+                          {INCIDENT_CATEGORY_VALUES.map((category) => <option key={category} value={category}>{category}</option>)}
                         </select>
                       </td>
                       <td className="py-2 pr-2"><input className="w-full bg-slate-800/80 light:bg-white border border-white/10 light:border-slate-300 rounded-xl p-2 light:text-slate-900" value={draft.neighborhood} onChange={(e) => setIncidentDraft(incident, { neighborhood: e.target.value })} /></td>

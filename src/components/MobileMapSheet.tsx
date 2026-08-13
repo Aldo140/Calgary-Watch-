@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
-import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
+import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS, isPubliclyVisible } from '@/src/types';
 import { cn } from '@/src/lib/utils';
 import { MapRef } from '@/src/components/Map';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
@@ -205,7 +205,7 @@ export default function MobileMapSheet({
   const filteredIncidents = useMemo(() => {
     const q = debouncedSearch.toLowerCase().trim();
     return incidents
-      .filter(i => !i.deleted)
+      .filter(i => isPubliclyVisible(i))
       .filter(i => selectedCategory === 'all' || i.category === selectedCategory)
       .filter(i =>
         feedFilter === 'community'
@@ -373,8 +373,8 @@ export default function MobileMapSheet({
                 <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
                   {CATEGORY_OPTIONS.map(({ id, label, Icon, color }) => {
                     const count = id === 'all'
-                      ? incidents.filter(i => !i.deleted).length
-                      : incidents.filter(i => i.category === id && !i.deleted).length;
+                      ? incidents.filter(i => isPubliclyVisible(i)).length
+                      : incidents.filter(i => i.category === id && isPubliclyVisible(i)).length;
                     const isSelected = selectedCategory === id;
                     return (
                       <button

@@ -7,6 +7,24 @@ function isoMinus(hours: number): string {
   return new Date(Date.now() - hours * 60 * 60 * 1000).toISOString().slice(0, 19);
 }
 
+/**
+ * Stable identifier for an upstream row.
+ *
+ * These records are rebuilt from the Edmonton API on every page load and never
+ * stored, so their IDs are the only handle moderation has on them. A
+ * `Math.random()` fallback gave a row a fresh identity on every fetch, which
+ * made suppressing it impossible — precisely for the rows most likely to need
+ * suppressing, since a missing upstream ID correlates with malformed data.
+ * Hashing the row's own content instead keeps the ID stable across fetches.
+ */
+function stableRowId(prefix: string, upstreamId: string | undefined, ...parts: (string | number | undefined)[]): string {
+  if (upstreamId) return `${prefix}-${upstreamId}`;
+  const seed = parts.map((p) => String(p ?? '')).join('|');
+  let hash = 5381;
+  for (let i = 0; i < seed.length; i++) hash = ((hash * 33) ^ seed.charCodeAt(i)) >>> 0;
+  return `${prefix}-h${hash.toString(36)}`;
+}
+
 // ── Bylaw classifier ─────────────────────────────────────────────────────────
 // complaint_category / type_of_complaint → IncidentCategory
 // Returns null to drop the row entirely (e.g. business licensing).
@@ -100,7 +118,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
             const title = bylawTitle(row.complaint_category ?? 'Bylaw Complaint', row.type_of_complaint ?? '');
             const street = row.full_name_of_street ? ` on ${toTitleCase(row.full_name_of_street)}` : '';
             results.push({
-              id: `edm-bylaw-${row.row_id ?? String(Math.random())}`,
+              id: stableRowId('edm-bylaw', row.row_id, row.complaint_category, row.type_of_complaint, row.full_name_of_street, row.neighbourhood, row.date_created, lat, lng),
               title,
               description: `${title}${street} in ${row.neighbourhood ?? 'Edmonton'}`,
               category,
@@ -137,7 +155,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
             if (!category) continue;
             const title = row.service_description ?? row.service_category ?? '311 Request';
             results.push({
-              id: `edm-311-${row.row_id ?? String(Math.random())}`,
+              id: stableRowId('edm-311', row.row_id, row.description, row.neighbourhood, row.date_created, lat, lng),
               title,
               description: `${row.service_category ?? '311 request'}: ${title} in ${row.neighbourhood ?? 'Edmonton'}`,
               category,
@@ -178,7 +196,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
             const street = row.on_street ? ` on ${toTitleCase(row.on_street)}` : '';
             const impact = row.impact ? `${row.impact}${street}` : street.trim();
             results.push({
-              id: `edm-traffic-${row.disruption_id ?? String(Math.random())}`,
+              id: stableRowId('edm-traffic', row.disruption_id, row.activity_type, row.description, row.on_street, row.traffic_district, lat, lng),
               title,
               description: impact || `${title} in Edmonton`,
               category,

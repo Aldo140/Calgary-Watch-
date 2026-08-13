@@ -11,12 +11,14 @@ service cloud.firestore {
     // Fields:
     //   - title: string (required, 5-100 chars)
     //   - description: string (required, 10-1000 chars)
-    //   - category: string (required, enum: crime, traffic, infrastructure, weather, gas)
+    //   - category: string (required, see allowedCategories())
     //   - lat: number (required)
     //   - lng: number (required)
     //   - timestamp: number (required)
-    //   - email: string (required, format: email)
     //   - name: string (required, 2-50 chars)
+    //   - visibility: string (required, enum: public, flagged, deleted)
+    //   - flagged_by: list of uids; flag_count: number
+    //   - NOTE: reporter email lives in incident_reporters/{incidentId}
     //   - verified_status: string (required, enum: unverified, multiple_reports, community_confirmed)
     //   - authorUid: string (required, immutable)
     //   - report_count: number (optional, default 1)
@@ -72,12 +74,13 @@ service cloud.firestore {
       return request.auth.token.email == "jorti104@mtroyal.ca" && request.auth.token.email_verified == true;
     }
 
-    // System ingestion service account (authorUid = 'system').
-    // The ingest script uses the Firebase Admin SDK which bypasses these rules,
-    // but this function is kept here for documentation purposes.
-    function isSystemIngestion() {
-      return isAuthenticated() && request.auth.token.firebase.sign_in_provider == 'custom';
-    }
+    // NOTE ON SYSTEM INGESTION
+    // Ingested records are written with authorUid == 'system' by
+    // scripts/ingest/index.ts, which uses the Firebase Admin SDK and therefore
+    // bypasses these rules entirely. There is deliberately no rule granting
+    // ingestion write access — no client credential can ever impersonate it.
+    // (A former isSystemIngestion() helper lived here; it was unreachable and
+    // did not compile cleanly, so it is documentation now rather than code.)
 
     function isValidEmail(email) {
       return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
@@ -91,14 +94,23 @@ service cloud.firestore {
     // Domain Validators
     // ===============================================================
 
+    // Categories must stay in sync with INCIDENT_CATEGORIES +
+    // LEGACY_INCIDENT_CATEGORIES in src/constants/index.ts.
+    // tests/rules-contract.test.ts fails the build if they drift.
+    function allowedCategories() {
+      return ['emergency', 'crime', 'traffic', 'infrastructure', 'weather', 'gas'];
+    }
+
+    // Content fields an incident may carry. `email` is deliberately absent:
+    // reporter email lives in the admin-only incident_reporters collection.
     function isValidIncident(data) {
       return data.title is string && data.title.size() >= 5 && data.title.size() <= 100 &&
              data.description is string && data.description.size() >= 10 && data.description.size() <= 1000 &&
-             data.category in ['crime', 'traffic', 'infrastructure', 'weather', 'gas', 'emergency'] &&
+             data.category in allowedCategories() &&
              data.neighborhood is string && data.neighborhood.size() >= 2 && data.neighborhood.size() <= 80 &&
-             data.lat is number && data.lng is number &&
+             data.lat is number && data.lat >= -90 && data.lat <= 90 &&
+             data.lng is number && data.lng >= -180 && data.lng <= 180 &&
              data.timestamp is number &&
-             isValidEmail(data.email) &&
              data.name is string && data.name.size() >= 2 && data.name.size() <= 50 &&
              data.verified_status in ['unverified', 'multiple_reports', 'community_confirmed', 'pending_review'] &&
              data.authorUid is string;
@@ -107,9 +119,33 @@ service cloud.firestore {
     function isValidAuthorIncidentPatch(data) {
       return data.title is string && data.title.size() >= 5 && data.title.size() <= 100 &&
              data.description is string && data.description.size() >= 10 && data.description.size() <= 1000 &&
-             data.category in ['crime', 'traffic', 'infrastructure', 'weather', 'gas', 'emergency'] &&
+             data.category in allowedCategories() &&
              data.neighborhood is string && data.neighborhood.size() >= 2 && data.neighborhood.size() <= 80 &&
              data.lat is number && data.lng is number;
+    }
+
+    // ── Flagging ────────────────────────────────────────────────────────────
+    // A report hides only after FLAG_THRESHOLD distinct users flag it. The
+    // flagger list is the enforcement mechanism: rules can check membership,
+    // so one account cannot flag the same report twice and cannot drive the
+    // count on its own. Keep in sync with FLAG_THRESHOLD in src/types/index.ts.
+    function flagThreshold() { return 2; }
+
+    function existingFlaggers() {
+      return resource.data.get('flagged_by', []);
+    }
+
+    function addsExactlyOwnFlag() {
+      return request.resource.data.flagged_by == existingFlaggers().concat([request.auth.uid]) &&
+             !(request.auth.uid in existingFlaggers()) &&
+             request.resource.data.flag_count == existingFlaggers().size() + 1;
+    }
+
+    // Visibility must follow from the new flag count, so a flagger cannot jump
+    // straight to hiding a report that is still below the threshold.
+    function visibilityMatchesFlagCount() {
+      return request.resource.data.visibility ==
+             (request.resource.data.flag_count >= flagThreshold() ? 'flagged' : 'public');
     }
 
     function isValidUser(data) {
@@ -129,58 +165,123 @@ service cloud.firestore {
                     isValidUser(request.resource.data) &&
                     (request.resource.data.role == 'user' ||
                      (request.resource.data.role == 'admin' && isApprovedAdminToken()));
+      // Self-service profile update.
       allow update: if isOwner(userId) &&
                     isValidUser(request.resource.data) &&
                     (request.resource.data.role == resource.data.role ||
                      (request.resource.data.role == 'admin' && isApprovedAdminToken()));
+      // Admin directory edits. isValidUser() cannot be reused here because it
+      // asserts uid == request.auth.uid, which is false by definition when an
+      // admin edits somebody else — that mismatch silently rejected every
+      // admin write from the user directory. Scoped by changedKeys() so an
+      // admin can annotate a profile without rewriting identity fields, and
+      // role escalation still requires the approved admin token.
+      allow update: if isAdmin() &&
+                    request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'displayName', 'notes', 'role'
+                    ]) &&
+                    request.resource.data.uid == resource.data.uid &&
+                    request.resource.data.email == resource.data.email &&
+                    request.resource.data.get('notes', '') is string &&
+                    request.resource.data.get('notes', '').size() <= 2000 &&
+                    request.resource.data.role in ['user', 'admin'] &&
+                    (request.resource.data.role == resource.data.role || isApprovedAdminToken());
+      // Removes the profile document only. The Firebase Auth account itself
+      // survives and must be deleted with the Admin SDK.
       allow delete: if isAdmin();
     }
 
     match /incidents/{incidentId} {
-      allow read: if true;
+      // Public read is required for a signed-out map. Takedown is therefore
+      // enforced as a *query constraint*: rules filter queries, not rows, so
+      // the client must ask for visibility == 'public' and the rule below
+      // requires it. Anything hidden is unreachable, not merely unrendered.
+      allow get: if true;
+      allow list: if isAdmin() ||
+                  request.query.limit <= 200 &&
+                  resource.data.visibility == 'public';
+
       allow create: if isAuthenticated() &&
                     hasOnlyAllowedFields([
                       'title', 'description', 'category', 'neighborhood', 'lat', 'lng', 'timestamp',
-                      'email', 'name', 'source_name', 'anonymous', 'verified_status', 'authorUid', 'report_count',
-                      'image_url'
+                      'name', 'source_name', 'anonymous', 'verified_status', 'authorUid', 'report_count',
+                      'image_url', 'visibility', 'flag_count', 'flagged_by'
                     ]) &&
                     isValidIncident(request.resource.data) &&
                     request.resource.data.authorUid == request.auth.uid &&
                     request.resource.data.verified_status in ['unverified', 'pending_review'] &&
-                    request.resource.data.report_count == 1;
-      allow update: if (
-                      isAdmin() &&
-                      hasOnlyAllowedFields([
-                        'title', 'description', 'category', 'neighborhood', 'lat', 'lng', 'timestamp',
-                        'email', 'name', 'verified_status', 'authorUid', 'report_count',
-                        'source_name', 'source_url', 'source_logo', 'image_url',
-                        'deleted', 'deletedAt', 'deletedBy',
-                        'anonymous',  // present on all incidents submitted via the form
-                        'flagged', 'flagged_at', 'flagged_by'
-                      ]) &&
-                      isValidIncident(request.resource.data)
-                    ) || (
-                      isAuthenticated() &&
-                      request.auth.uid == resource.data.authorUid &&
-                      request.resource.data.diff(resource.data).changedKeys().hasOnly([
-                        'title', 'description', 'category', 'neighborhood', 'lat', 'lng'
-                      ]) &&
-                      request.resource.data.authorUid == resource.data.authorUid &&
-                      request.resource.data.authorUid == request.auth.uid &&
-                      request.resource.data.email == resource.data.email &&
-                      request.resource.data.name == resource.data.name &&
-                      request.resource.data.verified_status == resource.data.verified_status &&
-                      request.resource.data.report_count == resource.data.report_count &&
-                      request.resource.data.timestamp == resource.data.timestamp &&
-                      isValidAuthorIncidentPatch(request.resource.data)
-                    );
-      allow update: if isAuthenticated()
-                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(['flagged', 'flagged_at', 'flagged_by'])
-                    && request.resource.data.flagged == true
-                    && request.resource.data.flagged_by == request.auth.uid
-                    && resource.data.get('authorUid', '') != 'system'
-                    && resource.data.get('authorUid', '') != request.auth.uid;
+                    request.resource.data.report_count == 1 &&
+                    // New reports start public with a clean flag slate.
+                    request.resource.data.visibility == 'public' &&
+                    request.resource.data.flag_count == 0 &&
+                    request.resource.data.flagged_by == [];
+
+      // Admin moderation. Scoped by changedKeys() rather than a whole-document
+      // allowlist: ingested records legitimately carry provenance fields
+      // (dedup_key, source_type, expires_at, updatedAt) that must survive an
+      // edit without ever becoming client-writable. A whole-document allowlist
+      // rejected every admin write to an ingested incident.
+      allow update: if isAdmin() &&
+                    request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'title', 'description', 'category', 'neighborhood', 'lat', 'lng',
+                      'verified_status', 'report_count', 'source_name', 'source_url',
+                      'source_logo', 'image_url', 'visibility', 'flagged_by', 'flag_count',
+                      'flagged_at', 'deletedAt', 'deletedBy', 'deleted', 'flagged'
+                    ]) &&
+                    request.resource.data.visibility in ['public', 'flagged', 'deleted'] &&
+                    request.resource.data.authorUid == resource.data.authorUid;
+
+      // Author edits: content only, never provenance, visibility, or flags.
+      allow update: if isAuthenticated() &&
+                    request.auth.uid == resource.data.authorUid &&
+                    request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'title', 'description', 'category', 'neighborhood', 'lat', 'lng'
+                    ]) &&
+                    isValidAuthorIncidentPatch(request.resource.data);
+
+      // Community flagging. Adds exactly the caller's own uid, and only flips
+      // visibility once the threshold is reached.
+      allow update: if isAuthenticated() &&
+                    request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'flagged_by', 'flag_count', 'flagged_at', 'visibility'
+                    ]) &&
+                    addsExactlyOwnFlag() &&
+                    visibilityMatchesFlagCount() &&
+                    resource.data.get('visibility', 'public') == 'public' &&
+                    resource.data.get('authorUid', '') != 'system' &&
+                    resource.data.get('authorUid', '') != request.auth.uid;
+
       allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.authorUid);
+    }
+
+    // Reporter identity, split out of the public incident document.
+    // Written in the same batch as the incident; readable only by its author
+    // and admins. This is what makes a world-readable `incidents` collection
+    // safe to keep.
+    match /incident_reporters/{incidentId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.authorUid == request.auth.uid);
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['incidentId', 'authorUid', 'email', 'createdAt']) &&
+                    request.resource.data.authorUid == request.auth.uid &&
+                    request.resource.data.incidentId == incidentId &&
+                    isValidEmail(request.resource.data.email) &&
+                    request.resource.data.createdAt is number;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // Durable suppression for records the moderator cannot delete for good:
+    // ingest re-upserts by dedup_key on every run, and browser-derived civic
+    // records are rebuilt from the upstream API on every page load. Both
+    // consult this list, so it must be world-readable — which is exactly why
+    // it holds nothing but IDs. The reason, the moderator, and any notes go to
+    // admin_audit_logs instead.
+    match /suppressed_incidents/{suppressionId} {
+      allow read: if true;
+      allow create, update: if isAdmin() &&
+                            hasOnlyAllowedFields(['suppressedAt', 'expiresAt']) &&
+                            request.resource.data.suppressedAt is number;
+      allow delete: if isAdmin();
     }
 
     match /community_stats/{statsId} {
@@ -226,6 +327,10 @@ service cloud.firestore {
 
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
+      // Every field is bounded and type-checked. `referrer` holds a bare
+      // hostname, never a full URL, and search keywords are not collected at
+      // all — a full referrer URL carries query strings that can contain search
+      // terms and session tokens, which this collection must never accumulate.
       allow create: if request.resource.data.keys().hasOnly([
                       'timestamp', 'path', 'referrer',
                       'utm_source', 'utm_medium', 'utm_campaign',
@@ -233,7 +338,20 @@ service cloud.firestore {
                     ]) &&
                     request.resource.data.timestamp is number &&
                     request.resource.data.path is string &&
-                    request.resource.data.path.size() <= 200;
+                    request.resource.data.path.size() <= 200 &&
+                    request.resource.data.get('referrer', '') is string &&
+                    request.resource.data.get('referrer', '').size() <= 200 &&
+                    !request.resource.data.get('referrer', '').matches('.*[?#/].*') &&
+                    request.resource.data.get('utm_source', '') is string &&
+                    request.resource.data.get('utm_source', '').size() <= 100 &&
+                    request.resource.data.get('utm_medium', '') is string &&
+                    request.resource.data.get('utm_medium', '').size() <= 100 &&
+                    request.resource.data.get('utm_campaign', '') is string &&
+                    request.resource.data.get('utm_campaign', '').size() <= 100 &&
+                    request.resource.data.get('traffic_source', '') is string &&
+                    request.resource.data.get('traffic_source', '').size() <= 40 &&
+                    request.resource.data.get('sessionId', '') is string &&
+                    request.resource.data.get('sessionId', '').size() <= 64;
       allow read, update, delete: if isAdmin();
     }
 

@@ -2,7 +2,7 @@
  * Sets CORS on the Firebase Storage bucket via the Admin SDK.
  * Run once: FIREBASE_SERVICE_ACCOUNT='<json>' npx tsx scripts/set-storage-cors.ts
  */
-import { initializeApp, cert, deleteApp } from 'firebase-admin/app';
+import { initializeApp, cert, deleteApp, type ServiceAccount } from 'firebase-admin/app';
 import { getStorage } from 'firebase-admin/storage';
 
 const SA_JSON = process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -11,7 +11,13 @@ if (!SA_JSON) {
   process.exit(1);
 }
 
-const sa = JSON.parse(SA_JSON) as { project_id: string; client_email: string; private_key: string };
+const raw = JSON.parse(SA_JSON) as { project_id: string; client_email: string; private_key: string };
+/** Service-account JSON uses snake_case; the ServiceAccount type is camelCase. */
+const sa: ServiceAccount = {
+  projectId: raw.project_id,
+  clientEmail: raw.client_email,
+  privateKey: raw.private_key,
+};
 
 const CORS = [
   {
@@ -22,25 +28,14 @@ const CORS = [
   },
 ];
 
-// List all available buckets first
-const listApp = initializeApp({ credential: cert(sa) }, 'list');
-const storage = getStorage(listApp);
-
-let buckets: { name: string }[] = [];
-try {
-  const [b] = await storage.getBuckets();
-  buckets = b;
-  console.log('Available buckets:');
-  for (const bucket of buckets) console.log(' -', bucket.name);
-} catch (err) {
-  console.error('Could not list buckets:', err instanceof Error ? err.message : err);
-}
-await deleteApp(listApp);
-
-// Try to set CORS on each candidate
-const candidates = buckets.length > 0
-  ? buckets.map(b => b.name)
-  : [`${sa.project_id}.firebasestorage.app`, `${sa.project_id}.appspot.com`];
+// firebase-admin's Storage has no getBuckets() — bucket enumeration lives in
+// @google-cloud/storage, which is not a dependency here. Both naming schemes
+// Firebase has used are tried directly instead; the loop below already reports
+// which one succeeded.
+const candidates = [
+  `${raw.project_id}.firebasestorage.app`,
+  `${raw.project_id}.appspot.com`,
+];
 
 let ok = false;
 for (const name of candidates) {
@@ -60,7 +55,7 @@ for (const name of candidates) {
 
 if (!ok) {
   console.error('\n❌ Could not set CORS. The service account may need Storage Admin role.');
-  console.error('Go to: https://console.cloud.google.com/iam-admin/iam?project=' + sa.project_id);
+  console.error('Go to: https://console.cloud.google.com/iam-admin/iam?project=' + raw.project_id);
   console.error('Find the service account and add the "Storage Admin" role.');
   process.exit(1);
 }

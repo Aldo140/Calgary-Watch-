@@ -1,13 +1,28 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Approved admin, checked from the auth token. Storage rules cannot read
+    // Firestore, so the `users/{uid}.role == 'admin'` fallback used in
+    // firestore.rules is not available here — this must stay in sync with
+    // isApprovedAdminToken() there and ALLOWED_ADMIN_EMAILS in
+    // src/constants/admin.ts.
+    function isApprovedAdmin() {
+      return request.auth != null
+             && request.auth.token.email == 'jorti104@mtroyal.ca'
+             && request.auth.token.email_verified == true;
+    }
+
     match /incidents/{uid}/{fileName} {
       allow read: if true;
       allow write: if request.auth != null
                    && request.auth.uid == uid
                    && request.resource.size <= 5 * 1024 * 1024
                    && request.resource.contentType.matches('image/(jpeg|png|webp)');
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      // Admins need a delete path so a moderated image does not outlive the
+      // report it belonged to. Without this, removing an incident left its
+      // photo publicly readable at a guessable URL forever.
+      allow delete: if isApprovedAdmin()
+                    || (request.auth != null && request.auth.uid == uid);
     }
   }
 }

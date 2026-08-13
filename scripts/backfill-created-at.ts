@@ -8,16 +8,21 @@
  * Or with a service account:
  *   FIREBASE_SERVICE_ACCOUNT='<json>' npx tsx scripts/backfill-created-at.ts
  */
-import { initializeApp, cert, applicationDefault, deleteApp } from 'firebase-admin/app';
+import { initializeApp, cert, applicationDefault, deleteApp, type ServiceAccount } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
 const PROJECT_ID = 'calgary-map-e70bb';
 
 const SA_JSON = process.env.FIREBASE_SERVICE_ACCOUNT;
-const credential = SA_JSON
-  ? cert(JSON.parse(SA_JSON) as { project_id: string; client_email: string; private_key: string })
-  : applicationDefault();
+
+/** Service-account JSON uses snake_case; the ServiceAccount type is camelCase. */
+function toServiceAccount(json: string): ServiceAccount {
+  const raw = JSON.parse(json) as { project_id: string; client_email: string; private_key: string };
+  return { projectId: raw.project_id, clientEmail: raw.client_email, privateKey: raw.private_key };
+}
+
+const credential = SA_JSON ? cert(toServiceAccount(SA_JSON)) : applicationDefault();
 
 const app = initializeApp({ credential, projectId: PROJECT_ID });
 const auth = getAuth(app);

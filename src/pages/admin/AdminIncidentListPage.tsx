@@ -6,7 +6,7 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { Button } from '@/src/components/ui/Button';
 import { Card } from '@/src/components/ui/Card';
 import { db, isFirebaseConfigured } from '@/src/firebase';
-import { Incident, IncidentCategory } from '@/src/types';
+import { Incident, IncidentCategory, incidentVisibility } from '@/src/types';
 import { cn } from '@/src/lib/utils';
 
 type UserProfile = {
@@ -56,7 +56,7 @@ export default function AdminIncidentListPage() {
   useEffect(() => {
     if (!db) return;
     const unsubIncidents = onSnapshot(query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)), (snapshot) => {
-      const rows = snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as Incident)).filter((row) => row.deleted !== true);
+      const rows = snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as Incident)).filter((row) => incidentVisibility(row) !== 'deleted');
       setIncidents(rows);
       setSelectedId((current) => current || rows[0]?.id || null);
     });

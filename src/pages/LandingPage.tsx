@@ -1582,16 +1582,20 @@ function SignalTimeline({ reduced, allSizes }: { reduced: boolean; allSizes: boo
                   style={{ background: T.panel, border: `1px solid ${T.line}` }}
                 >
                   <div className="absolute top-0 left-0 h-1 w-full" style={{ background: step.accent }} aria-hidden="true" />
+                  {/* Decorative numeral sits behind the copy. It is absolutely
+                      positioned while the eyebrow below is normal flow, so on a
+                      narrow screen the label ran straight underneath it — the
+                      reserved right padding is what keeps them apart. */}
                   <span
-                    className="absolute -top-4 right-2 font-display font-extrabold select-none leading-none"
-                    style={{ fontSize: '5.5rem', color: 'transparent', WebkitTextStroke: `1.3px ${step.accent}`, opacity: 0.4 }}
+                    className="absolute -top-4 right-2 z-0 font-display font-extrabold select-none leading-none text-[3.75rem] sm:text-[5.5rem]"
+                    style={{ color: 'transparent', WebkitTextStroke: `1.3px ${step.accent}`, opacity: 0.4 }}
                     aria-hidden="true"
                   >
                     {step.n}
                   </span>
-                  <p className="font-mono text-[10px] tracking-[0.26em]" style={{ color: step.accent }}>{step.mono}</p>
-                  <h3 className="mt-3 font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em]" style={{ color: T.ink }}>{step.title}</h3>
-                  <p className="mt-3 text-[14.5px] leading-relaxed max-w-md" style={{ color: T.inkSoft }}>{step.body}</p>
+                  <p className="relative z-10 pr-16 sm:pr-24 font-mono text-[10px] tracking-[0.26em]" style={{ color: step.accent }}>{step.mono}</p>
+                  <h3 className="relative z-10 mt-3 font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em]" style={{ color: T.ink }}>{step.title}</h3>
+                  <p className="relative z-10 mt-3 text-[14.5px] leading-relaxed max-w-md" style={{ color: T.inkSoft }}>{step.body}</p>
                   <p className="mt-5 pt-3 font-mono text-[10px] tracking-[0.06em]" style={{ color: step.accent, borderTop: `1px dashed ${T.line}` }}>
                     {step.log}
                   </p>

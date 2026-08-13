@@ -48,3 +48,24 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+
+      - name: Notify Bing and AI search indexes
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --retry 2 \
+            --request POST 'https://api.indexnow.org/indexnow' \
+            --header 'Content-Type: application/json; charset=utf-8' \
+            --data '{
+              "host": "calgarywatch.ca",
+              "key": "c37ca947ce2a9a5c7517be527c85bc79",
+              "keyLocation": "https://calgarywatch.ca/c37ca947ce2a9a5c7517be527c85bc79.txt",
+              "urlList": [
+                "https://calgarywatch.ca/",
+                "https://calgarywatch.ca/map",
+                "https://calgarywatch.ca/about",
+                "https://calgarywatch.ca/coverage",
+                "https://calgarywatch.ca/calgary-neighbourhood-watch",
+                "https://calgarywatch.ca/llms.txt",
+                "https://calgarywatch.ca/llms-full.txt"
+              ]
+            }'

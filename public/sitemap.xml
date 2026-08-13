@@ -71,6 +71,20 @@
   </url>
 
   <url>
+    <loc>https://calgarywatch.ca/calgary-neighbourhood-watch</loc>
+    <lastmod>2026-08-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:title>Calgary Neighbourhood Watch Guide</image:title>
+      <image:caption>How to check recent incidents near you and choose the right Calgary reporting channel</image:caption>
+      <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
+    </image:image>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/calgary-neighbourhood-watch" />
+  </url>
+
+  <url>
     <loc>https://calgarywatch.ca/llms.txt</loc>
     <lastmod>2026-08-13</lastmod>
     <changefreq>monthly</changefreq>

@@ -18,6 +18,7 @@ const AdminPage   = lazy(() => import('@/src/pages/AdminPage'));
 const AdminUserListPage = lazy(() => import('@/src/pages/admin/AdminUserListPage'));
 const AdminIncidentListPage = lazy(() => import('@/src/pages/admin/AdminIncidentListPage'));
 const CoveragePage = lazy(() => import('@/src/pages/CoveragePage'));
+const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 
 /**
  * Handles redirects from the 404.html hack.
@@ -145,6 +146,7 @@ export default function App() {
           <Route path="/admin/users" element={<AdminUserListPage />} />
           <Route path="/admin/incidents" element={<AdminIncidentListPage />} />
           <Route path="/coverage" element={<CoveragePage />} />
+          <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />
           {/* Redirect unknown paths to landing page */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

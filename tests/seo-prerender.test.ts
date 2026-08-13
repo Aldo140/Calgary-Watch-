@@ -42,7 +42,7 @@ const SHELL = `<!doctype html>
 describe('renderRouteHtml', () => {
   it('bakes the route title into the static HTML', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
-    assert.match(html, /<title>Live Calgary Crime &amp; Incident Map \| Calgary Watch<\/title>/);
+    assert.match(html, /<title>Calgary Crime Map: Live Incidents Near You \| Calgary Watch<\/title>/);
     assert.doesNotMatch(html, /<title>Calgary Watch \| Real-Time Community Safety Map<\/title>/);
   });
 
@@ -50,7 +50,7 @@ describe('renderRouteHtml', () => {
     const html = renderRouteHtml(SHELL, '/about', PRODUCTION_ORIGIN);
     const matches = html.match(/<meta[^>]*name=["']description["'][^>]*>/g) ?? [];
     assert.equal(matches.length, 1, 'exactly one description meta must remain');
-    assert.match(html, /Learn how Calgary Watch combines community reporting/);
+    assert.match(html, /Learn how Calgary Watch combines community reports and public data/);
   });
 
   it('sets canonical and og:url to the route, not the homepage', () => {
@@ -63,7 +63,7 @@ describe('renderRouteHtml', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
     assert.equal((html.match(/property=["']og:title["']/g) ?? []).length, 1);
     assert.equal((html.match(/name=["']twitter:title["']/g) ?? []).length, 1);
-    assert.match(html, /<meta property="og:title" content="Live Calgary Crime &amp; Incident Map \| Calgary Watch" \/>/);
+    assert.match(html, /<meta property="og:title" content="Calgary Crime Map: Live Incidents Near You \| Calgary Watch" \/>/);
   });
 
   it('leaves the script tags and app shell untouched', () => {

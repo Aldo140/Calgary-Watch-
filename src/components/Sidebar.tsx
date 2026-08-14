@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
-import { Card } from '@/src/components/ui/Card';
 import { formatDistanceToNow } from 'date-fns';
-import { Search, Layers, Maximize2, ShieldCheck, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { Search, Layers, Maximize2, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
@@ -150,49 +149,44 @@ export default function Sidebar({
   }, [activeIncidentId]);
 
   return (
-    <div className="flex flex-col h-full w-full lg:w-[22rem] bg-slate-950/50 light:bg-[rgba(255,250,243,0.92)] backdrop-blur-2xl border-r border-white/5 light:border-stone-200/80 overflow-hidden shadow-2xl z-20">
-      {/* Calgary Watch brand gradient - sky blue → Bow River teal (dark) / mountain stone → night (light) */}
-      <div
-        className="h-1.5 w-full shrink-0"
-        style={{
-          background: 'linear-gradient(to right, #4A90D9, #2E8B7A, #D4A843)',
-        }}
-      />
+    <div className="flex h-full w-full flex-col overflow-hidden border-r border-[#C9D8E4] bg-[#F8FAFC] lg:w-[23rem]">
+      <div className="h-1 w-full shrink-0 bg-[#4A90D9]" />
       
-      <div className="p-6 border-b border-white/5 light:border-stone-200/80 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-purple-600/10 light:from-sky-500/12 light:via-transparent light:to-amber-400/12 z-0" />
-        <div className="relative z-10">
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <ShieldCheck className="text-blue-400 light:text-slate-900" />
-            Calgary Watch
-          </h1>
-          <div className="flex items-center justify-between mt-1">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-              <span className="text-[10px] font-black text-slate-400 light:text-stone-600 uppercase tracking-widest">Live Feed</span>
-            </div>
-              <span className="text-[10px] font-bold text-slate-500 light:text-stone-500 uppercase tracking-widest">
-              Updated {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      <div className="border-b border-[#D8E2EA] bg-[#F8FAFC] px-5 py-5">
+        <div className="flex items-center gap-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F3FC]">
+            <img src="/icon.svg" alt="" width={24} height={24} className="size-6" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg font-black tracking-[-0.025em] text-[#0B1F33]">Calgary Watch</h1>
+            <p className="mt-0.5 text-[11px] font-semibold text-[#52697D]">Community incident map</p>
+          </div>
+          <div className="text-right">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#176A5D]">
+              <span className="size-1.5 rounded-full bg-[#2E8B7A]" aria-hidden="true" /> Live
+            </span>
+            <span className="mt-0.5 block text-[9px] font-semibold tabular-nums text-[#6B8296]">
+              {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="px-4 pt-4 flex items-center gap-3">
+      <div className="flex items-center gap-2.5 px-4 pt-4">
         <div className="relative flex-1 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 light:group-focus-within:text-slate-900 transition-colors" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B8296] transition-colors group-focus-within:text-[#286FAF]" size={16} />
           <input
             ref={searchInputRef}
             type="text"
             placeholder="Search reports or areas"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 light:bg-white light:border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 light:focus:ring-slate-900/40 focus:border-blue-500/50 light:focus:border-slate-900/40 transition-all"
+            className="h-11 w-full rounded-xl border border-[#C9D8E4] bg-[#FFFFFF] py-2.5 pl-10 pr-4 text-sm font-medium text-[#0B1F33] placeholder:text-[#6B8296] focus:border-[#4A90D9] focus:outline-none focus:ring-2 focus:ring-[#4A90D9]/25"
           />
         </div>
-        <div className="flex flex-col items-center justify-center bg-blue-500/10 border border-blue-500/20 light:bg-gradient-to-br light:from-sky-600 light:to-teal-700 light:border-sky-600 rounded-xl px-3 py-2 min-w-[56px]">
-          <span className="text-[10px] font-bold text-blue-300 light:text-white/90 uppercase tracking-[0.08em] leading-none">Total</span>
-          <motion.span className="text-lg font-black text-white leading-none mt-1">
+        <div className="flex h-11 min-w-[62px] flex-col items-center justify-center rounded-xl bg-[#0B1F33] px-3">
+          <span className="text-[8px] font-black uppercase tracking-[0.12em] leading-none text-[#AFC5D9]">Shown</span>
+          <motion.span className="mt-1 text-base font-black leading-none tabular-nums text-[#F7FBFF]">
             {displayCount}
           </motion.span>
         </div>
@@ -204,8 +198,7 @@ export default function Sidebar({
         </div>
       )}
 
-      <div className="pl-8 pr-6 py-4 flex gap-2 overflow-x-auto no-scrollbar shrink-0 border-b border-white/5 light:border-slate-200 scroll-smooth items-center min-w-0 snap-x scroll-px-8">
-        <div className="w-2 shrink-0" />
+      <div className="flex min-w-0 shrink-0 snap-x items-center gap-1.5 overflow-x-auto border-b border-[#D8E2EA] px-4 py-3 no-scrollbar scroll-smooth scroll-px-4">
         {categories.map((cat) => {
           const count = cat.id === 'all' 
             ? incidents.length 
@@ -217,47 +210,46 @@ export default function Sidebar({
               key={cat.id}
               onClick={() => onCategoryChange(cat.id as any)}
               className={cn(
-                'category-chip px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-tight transition-all whitespace-nowrap flex items-center gap-2 border shrink-0 snap-start',
+                'category-chip flex h-9 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[10px] font-bold transition-colors',
                 selectedCategory === cat.id
-                  ? 'category-chip-selected bg-blue-600 text-white border-blue-400 shadow-lg shadow-blue-500/20'
-                  : 'bg-slate-800/50 text-slate-400 border-white/5 hover:bg-slate-800 hover:border-white/10 light:bg-white light:text-slate-700 light:border-slate-300 light:hover:bg-slate-100'
+                  ? 'border-[#286FAF] bg-[#286FAF] text-[#F7FBFF]'
+                  : 'border-[#C9D8E4] bg-[#FFFFFF] text-[#40566B] hover:border-[#8DBBDB] hover:bg-[#E8F3FC]'
               )}
             >
-              <Icon size={14} className={cn('category-chip-icon', selectedCategory === cat.id ? "text-white" : "text-blue-400 light:text-slate-700")} />
+              <Icon size={13} className={selectedCategory === cat.id ? 'text-[#F7FBFF]' : 'text-[#52697D]'} />
               <span>{cat.label}</span>
               <span className={cn(
-                "category-chip-count text-[9px] px-1.5 py-0.5 rounded-full font-black",
-                selectedCategory === cat.id ? "bg-white/20 text-white" : "bg-white/10 text-slate-500"
+                'rounded-md px-1.5 py-0.5 text-[9px] font-black tabular-nums',
+                selectedCategory === cat.id ? 'bg-[rgba(255,255,255,0.18)] text-[#F7FBFF]' : 'bg-[#EEF4F8] text-[#52697D]'
               )}>
                 {count}
               </span>
             </button>
           );
         })}
-        <div className="w-8 shrink-0" />
       </div>
 
       {/* Collapsible desktop feed controls */}
-      <div className="bg-slate-900/40 light:bg-white/60 border-b border-white/5 light:border-stone-200/80">
+      <div className="border-b border-[#D8E2EA] bg-[#F2F6F9]">
         <button
           type="button"
           onClick={() => setControlsCollapsed((prev) => !prev)}
-          className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/5 light:hover:bg-white transition-colors"
+          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#E8F3FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4A90D9]"
           aria-expanded={!controlsCollapsed}
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white text-blue-400 light:text-slate-700">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#C9D8E4] bg-[#FFFFFF] text-[#286FAF]">
             <SlidersHorizontal size={15} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-white light:text-slate-900">Feed controls</span>
+              <span className="text-xs font-black text-[#0B1F33]">Feed controls</span>
               {(feedFilter || searchQuery || selectedCategory !== 'all') && (
                 <span className="rounded-md bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-300 light:text-blue-700">
                   Filtered
                 </span>
               )}
             </div>
-            <p className="mt-0.5 truncate text-[10px] font-bold text-slate-500 light:text-slate-600">
+            <p className="mt-0.5 truncate text-[10px] font-semibold text-[#52697D]">
               {sortBy === 'newest' ? 'Newest first' : sortBy === 'oldest' ? 'Oldest first' : 'Most verified'} · {feedFilter ? `${feedFilter === 'community' ? 'Community' : 'Recent 2h'} on` : 'All posts'} · {neighborhoodPulse.length} pulse areas
             </p>
           </div>
@@ -391,7 +383,7 @@ export default function Sidebar({
         </AnimatePresence>
       </div>
 
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-3 py-3 custom-scrollbar">
         <motion.div
           variants={{
             hidden: { opacity: 0 },
@@ -404,7 +396,7 @@ export default function Sidebar({
           }}
           initial="hidden"
           animate="show"
-          className="space-y-4"
+          className="space-y-2.5"
         >
           <AnimatePresence>
             {filteredIncidents.length > 0 ? (
@@ -427,49 +419,39 @@ export default function Sidebar({
                     exit={{ opacity: 0, scale: 0.95 }}
                     onClick={() => onIncidentClick(incident)}
                   >
-                    <Card className={cn(
-                      "cursor-pointer transition-all duration-300 group border bg-white/[0.03] active:scale-[0.98] relative overflow-hidden light:bg-white light:border-slate-200 hover:scale-[1.02]",
+                    <div className={cn(
+                      'group relative cursor-pointer overflow-hidden rounded-2xl border bg-[#FFFFFF] p-4 transition-[border-color,background-color,box-shadow,transform] duration-200 active:scale-[0.99]',
                       isEmergency
-                        ? "border-red-500/60 bg-red-950/30 shadow-xl shadow-red-600/20 ring-1 ring-red-500/30"
+                        ? 'border-[#E7A8A0] bg-[#FFF4F1]'
                         : isActive
-                        ? "border-blue-500 bg-blue-500/10 shadow-xl shadow-blue-500/20 ring-1 ring-blue-500/50 animate-active-glow light:border-slate-900 light:bg-slate-900/5 light:ring-slate-900/50"
-                        : "border-white/5 hover:bg-white/10 hover:border-white/10 hover:shadow-xl hover:shadow-blue-500/5 light:hover:bg-slate-50 light:hover:shadow-lg light:hover:shadow-slate-300/50"
+                        ? 'border-[#4A90D9] bg-[#E8F3FC] shadow-[0_0_0_2px_rgba(74,144,217,0.16)]'
+                        : 'border-[#D8E2EA] hover:border-[#8DBBDB] hover:bg-[#F4F8FB]'
                     )}>
-                      {/* Category Indicator Border */}
-                      <div className={cn(
-                        "absolute left-0 top-0 bottom-0 w-1 transition-all",
-                        isEmergency ? 'bg-red-600 animate-pulse' :
-                        incident.category === 'crime' ? 'bg-red-500' :
-                        incident.category === 'traffic' ? 'bg-orange-500' :
-                        incident.category === 'infrastructure' ? 'bg-blue-500' :
-                        'bg-purple-500'
-                      )} />
-
                       {/* Emergency banner */}
                       {isEmergency && (
-                        <div className="absolute top-0 right-0 flex items-center gap-1 bg-red-600 px-2 py-0.5 rounded-bl-xl">
-                          <Siren size={10} className="text-white animate-pulse" />
-                          <span className="text-[8px] font-black uppercase tracking-widest text-white">SOS</span>
+                        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-[#B42318] px-2 py-1">
+                          <Siren size={10} className="text-[#F7FBFF]" />
+                          <span className="text-[8px] font-black uppercase tracking-widest text-[#F7FBFF]">SOS</span>
                         </div>
                       )}
 
-                      <div className="flex gap-3 pl-1">
+                      <div className={cn('flex gap-3', isEmergency && 'pt-5')}>
                         <div className="flex-1 min-w-0">
                           <div className="flex gap-3">
                             <div className={cn(
-                              'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110',
-                              isEmergency ? 'bg-red-600/30 text-red-400' :
-                              incident.category === 'crime' ? 'bg-red-500/20 text-red-400' :
-                              incident.category === 'traffic' ? 'bg-orange-500/20 text-orange-400' :
-                              incident.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400' :
-                              'bg-purple-500/20 text-purple-400'
+                              'flex size-10 shrink-0 items-center justify-center rounded-xl',
+                              isEmergency ? 'bg-[#FADBD7] text-[#B42318]' :
+                              incident.category === 'crime' ? 'bg-[#FDE8E6] text-[#C0392B]' :
+                              incident.category === 'traffic' ? 'bg-[#FFF0E4] text-[#C65514]' :
+                              incident.category === 'infrastructure' ? 'bg-[#E8F3FC] text-[#286FAF]' :
+                              'bg-[#E7F5F2] text-[#176A5D]'
                             )}>
                               <Icon size={20} />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-col gap-1">
                                 <div className="flex items-center justify-between gap-2">
-                                  <h3 className="text-white text-sm font-bold leading-tight group-hover:text-blue-400 transition-colors light:text-slate-900 line-clamp-2">{incident.title}</h3>
+                                  <h3 className="line-clamp-2 text-sm font-black leading-tight tracking-[-0.01em] text-[#0B1F33] transition-colors group-hover:text-[#174A6E]">{incident.title}</h3>
                                   <div className="flex items-center gap-1.5 shrink-0">
                                     {/* Sample reports are labelled before any other
                                         source badge — it is the most important thing
@@ -501,12 +483,12 @@ export default function Sidebar({
                                         New
                                       </span>
                                     )}
-                                    <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-slate-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                                    <div className="flex size-7 items-center justify-center rounded-lg bg-[#EEF4F8] text-[#52697D] transition-colors group-hover:bg-[#286FAF] group-hover:text-[#F7FBFF]">
                                       <Maximize2 size={12} />
                                     </div>
                                   </div>
                                 </div>
-                                <span className="text-[10px] text-slate-500 font-medium">
+                                <span className="text-[10px] font-medium text-[#6B8296]">
                                   {formatDistanceToNow(incident.timestamp)} ago • {incident.neighborhood || 'Calgary'} • by {getReporterDisplay(incident).firstName}
                                 </span>
                               </div>
@@ -522,7 +504,7 @@ export default function Sidebar({
                                 loading="lazy"
                               />
                             )}
-                            <p className="text-slate-400 text-xs leading-relaxed light:text-slate-600 line-clamp-3">{incident.description}</p>
+                            <p className="line-clamp-3 text-xs leading-relaxed text-[#52697D]">{incident.description}</p>
                           </div>
                           
                           <div className="flex items-center justify-between mt-3">
@@ -538,17 +520,17 @@ export default function Sidebar({
                             
                             {/* Neighborhood Initial Circle Thumbnail */}
                             <div className={cn(
-                              "w-12 h-12 rounded-full flex items-center justify-center shrink-0 border border-white/20 transition-all group-hover:scale-110 shadow-lg",
-                              isEmergency ? 'bg-red-600 text-white ring-2 ring-red-500/50' :
-                              incident.category === 'crime' ? 'bg-red-500 text-white' :
-                              incident.category === 'traffic' ? 'bg-orange-500 text-white' :
-                              incident.category === 'infrastructure' ? 'bg-blue-500 text-white' :
-                              'bg-purple-500 text-white'
+                              'flex size-8 shrink-0 items-center justify-center rounded-full border border-[#FFFFFF] text-[#F7FBFF]',
+                              isEmergency ? 'bg-[#B42318]' :
+                              incident.category === 'crime' ? 'bg-[#C0392B]' :
+                              incident.category === 'traffic' ? 'bg-[#C65514]' :
+                              incident.category === 'infrastructure' ? 'bg-[#286FAF]' :
+                              'bg-[#2E8B7A]'
                             )}>
                               {getReporterDisplay(incident).anonymous ? (
-                                <User size={22} />
+                                <User size={14} />
                               ) : (
-                                <span className="text-lg font-black tracking-tighter">
+                                <span className="text-xs font-black">
                                   {getReporterDisplay(incident).initial}
                                 </span>
                               )}
@@ -556,7 +538,7 @@ export default function Sidebar({
                           </div>
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   </motion.div>
                 );
               })

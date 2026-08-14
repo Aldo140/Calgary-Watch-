@@ -1723,7 +1723,10 @@ export default function MapPage() {
 
   const showProfileStep = Boolean(user);
   const authPanelVisible = authPanelOpen || (profileNeedsSetup && !onboardingDismissedThisSession);
-  const canCloseAuthPanel = Boolean(user);
+  // A signed-out visitor may open this panel just to learn what an account is
+  // for. Keep the exit available before Google auth as well as during profile
+  // setup so choosing "Sign in" never becomes a one-way action.
+  const canCloseAuthPanel = authPanelOpen || Boolean(user);
   const locationLabel = preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'your local report area';
 
   // ── First-run tour ─────────────────────────────────────────────────────────
@@ -1821,7 +1824,7 @@ export default function MapPage() {
             className="fixed inset-0 z-[180] flex items-center justify-center bg-slate-950/72 p-3 backdrop-blur-xl sm:p-6"
             role="dialog"
             aria-modal="true"
-            aria-label={showProfileStep ? 'Calgary Watch profile settings' : 'Sign in to Calgary Watch'}
+            aria-label={showProfileStep ? 'Calgary Watch profile settings' : 'Sign up or sign in to Calgary Watch'}
           >
             <motion.div
               initial={{ opacity: 0, y: 22, scale: 0.96 }}
@@ -1841,8 +1844,8 @@ export default function MapPage() {
                     setAuthPanelMode('signin');
                     setProfileSaveError(null);
                   }}
-                  className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 light:border-slate-200 light:bg-white light:text-slate-700 light:hover:bg-slate-50"
-                  aria-label="Close sign in panel"
+                  className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 sm:right-4 sm:top-4"
+                  aria-label="Close sign up or sign in panel"
                 >
                   <X size={16} />
                 </button>
@@ -1856,12 +1859,12 @@ export default function MapPage() {
                   <h2 className="mt-6 text-2xl font-black tracking-tight text-slate-950">
                     {showProfileStep
                       ? authPanelMode === 'settings' ? 'Account settings' : 'Finish your profile'
-                      : 'Sign in to Calgary Watch'}
+                      : 'Sign up or sign in'}
                   </h2>
                   <p className="mt-3 text-sm leading-relaxed text-slate-700">
                     {showProfileStep
                       ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
-                      : 'Use Google to post reports, save preferences, and receive neighbourhood-specific safety updates.'}
+                      : 'Continue with Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
                   </p>
 
                   {showProfileStep && (
@@ -1879,10 +1882,10 @@ export default function MapPage() {
                   {!showProfileStep ? (
                     <div className="space-y-5">
                       <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-sky-400">Google account required</p>
-                        <h3 className="mt-2 text-2xl font-black text-slate-950">Continue securely</h3>
+                        <p className="text-xs font-black uppercase tracking-widest text-sky-600">Continue with Google</p>
+                        <h3 className="mt-2 text-2xl font-black text-slate-950">Sign up or sign in securely</h3>
                         <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                          After Google sign-in, this same panel will ask for your privacy consent and your neighbourhood or address.
+                          New to Calgary Watch? Google will create your account. Already registered? Google will sign you in. This panel will then ask for your privacy consent and neighbourhood or address.
                         </p>
                       </div>
 
@@ -1891,7 +1894,7 @@ export default function MapPage() {
                         className="h-12 w-full rounded-2xl bg-white text-slate-950 hover:bg-slate-100 light:border light:border-slate-200 light:bg-slate-950 light:text-white light:hover:bg-slate-800"
                       >
                         <GoogleIcon />
-                        Sign in with Google
+                        Sign up or sign in with Google
                       </Button>
 
                       <p className="text-[11px] leading-relaxed text-slate-600">

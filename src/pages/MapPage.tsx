@@ -1792,11 +1792,7 @@ export default function MapPage() {
   }, [user, celebrate]);
 
   return (
-    <div className="flex h-dvh w-full bg-slate-950 light:bg-[#eef3ea] overflow-hidden font-sans relative">
-      <div className="pointer-events-none absolute inset-0 hidden light:block">
-        <div className="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top_left,rgba(74,144,217,0.16),transparent_38%),radial-gradient(circle_at_top_right,rgba(212,168,67,0.16),transparent_28%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-72 bg-[radial-gradient(circle_at_25%_20%,rgba(46,139,122,0.12),transparent_26%),radial-gradient(circle_at_80%_30%,rgba(192,57,43,0.08),transparent_22%)]" />
-      </div>
+    <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#EAF1F6] font-sans text-[#0B1F33]">
       <AnimatePresence>
         {isLoading && (
           <motion.div
@@ -2307,7 +2303,7 @@ export default function MapPage() {
       <MapTour open={tourOpen} onFinish={finishTour} />
 
       {/* Sidebar Feed - Desktop */}
-      <div className="hidden lg:flex flex-col h-full shrink-0 z-40 relative shadow-2xl" data-tour="feed">
+      <div className="relative z-40 hidden h-full shrink-0 flex-col lg:flex" data-tour="feed">
         <Sidebar
           incidents={feedIncidents}
           timeWindow={timeWindow}
@@ -2378,7 +2374,7 @@ export default function MapPage() {
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
         <div
           className={cn(
-            'absolute z-30 inset-x-0 top-0 pt-[max(0.5rem,env(safe-area-inset-top))] px-3 pb-2 pointer-events-none lg:hidden transition-all duration-300 text-slate-900',
+            'absolute inset-x-0 top-0 z-30 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] text-[#0B1F33] transition-all duration-200 pointer-events-none lg:hidden',
             (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible -translate-y-4'
           )}
         >
@@ -2386,7 +2382,7 @@ export default function MapPage() {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 shadow-lg text-slate-700"
+              className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[#40566B] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
               aria-label="Back to home"
             >
               <Home size={18} />
@@ -2395,17 +2391,16 @@ export default function MapPage() {
               type="button"
               data-tour="m-feed"
               onClick={() => setSheetSnap(sheetSnap === '80px' ? 0.38 : 0.82)}
-              className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 px-3.5 h-12 shadow-lg text-left active:scale-[0.99] transition-transform"
+              className="flex h-11 min-w-0 flex-1 items-center gap-3 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] px-3.5 text-left shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-transform active:scale-[0.99]"
             >
               <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-                <span className={cn('absolute inline-flex h-full w-full rounded-full animate-ping opacity-60', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-slate-400')} />
                 <span className={cn('relative inline-flex h-2 w-2 rounded-full', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-slate-400')} />
               </span>
               <div className="min-w-0 flex-1 leading-none">
                 <p className="text-[12.5px] font-black tracking-tight text-slate-900 truncate">
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </p>
-                <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 truncate">
+                <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-[0.16em] text-[#6B8296]">
                   {mapIncidents.length === 0 ? 'Be first to report' : 'Tap for the full feed'}
                 </p>
               </div>
@@ -2423,7 +2418,7 @@ export default function MapPage() {
           </div>
 
           {/* One-tap category filter — same state the sheet and sidebar use */}
-          <div className="mt-2 -mx-3 px-3 flex gap-1.5 overflow-x-auto no-scrollbar pointer-events-auto">
+          <div className="pointer-events-auto -mx-3 mt-2 flex gap-1.5 overflow-x-auto px-3 pb-1 no-scrollbar">
             {([
               { key: 'all', label: 'All', color: '#1C2B3A' },
               { key: 'crime', label: 'Crime', color: '#DC2626' },
@@ -2438,7 +2433,7 @@ export default function MapPage() {
                   key={c.key}
                   type="button"
                   onClick={() => setSelectedCategory(c.key)}
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 h-8 text-[11px] font-bold border shadow-sm backdrop-blur-xl transition-all active:scale-95"
+                  className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 text-[11px] font-bold shadow-[0_2px_4px_rgba(11,31,51,0.08)] backdrop-blur-lg transition-transform active:scale-[0.98]"
                   style={active
                     ? { background: c.color, borderColor: c.color, color: '#fff' }
                     : { background: 'rgba(255,255,255,0.92)', borderColor: 'rgb(226,232,240)', color: 'rgb(51,65,85)' }}
@@ -2456,7 +2451,7 @@ export default function MapPage() {
         {/* Mobile vertical action buttons (right edge) */}
         <div
           className={cn(
-            'absolute right-3 top-28 flex flex-col gap-2.5 z-30 pointer-events-none lg:hidden transition-all duration-300 text-slate-900',
+            'absolute right-3 top-28 z-30 flex flex-col gap-2 pointer-events-none text-[#0B1F33] transition-all duration-200 lg:hidden',
             (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible translate-x-4'
           )}
         >
@@ -2493,10 +2488,10 @@ export default function MapPage() {
             }}
             data-tour="near-me"
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-2xl backdrop-blur-xl border shadow-lg pointer-events-auto transition-colors",
+              'pointer-events-auto flex size-11 items-center justify-center rounded-xl border shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors active:scale-[0.98]',
               nearMeOpen
-                ? "bg-slate-900 border-slate-900 text-[#fff]"
-                : "bg-white/95 border-slate-200 text-blue-600"
+                ? 'border-[#0B1F33] bg-[#0B1F33] text-[#F7FBFF]'
+                : 'border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[#286FAF]'
             )}
             aria-label="What's near me"
           >
@@ -2510,7 +2505,7 @@ export default function MapPage() {
                 if (!showNotifications) setUnreadNotifications(0);
               }}
               data-tour="m-alerts"
-              className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white/95 backdrop-blur-xl border border-slate-200 text-slate-700 shadow-lg"
+              className="relative flex size-11 items-center justify-center rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[#40566B] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
               aria-label="Notifications"
             >
               <Bell size={18} className={cn(unreadNotifications > 0 && 'text-sky-400')} />
@@ -2571,7 +2566,7 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={() => openAuthPanel('signin')}
-                className="h-12 w-12 md:w-auto md:px-3.5 rounded-2xl bg-white/95 text-slate-900 text-[10px] font-black uppercase tracking-wide shadow-lg border border-slate-200 flex items-center justify-center gap-2"
+                className="flex size-11 items-center justify-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[10px] font-black uppercase tracking-wide text-[#0B1F33] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg active:scale-[0.98] md:w-auto md:px-3.5"
               >
                 <LogIn size={16} />
                 <span className="hidden md:inline">Sign in</span>
@@ -2840,23 +2835,25 @@ export default function MapPage() {
           )}
         </AnimatePresence>
 
-        {/* Desktop top header — branded command bar */}
-        <div className="absolute top-4 md:top-6 left-4 md:left-6 right-4 md:right-6 items-center justify-between pointer-events-none z-30 hidden lg:flex">
-          <div className="flex items-center pointer-events-auto rounded-full bg-white/95 backdrop-blur-xl border border-slate-300 shadow-2xl h-12 pl-4 pr-1.5 gap-1">
-            <div className="flex items-center gap-2.5 pr-3 border-r border-slate-200">
+        {/* Desktop map command bar */}
+        <div className="pointer-events-none absolute left-5 right-5 top-5 z-30 hidden items-center justify-between lg:flex">
+          <div className="pointer-events-auto flex h-13 items-center gap-1 rounded-2xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] py-1 pl-2 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg">
+            <div className="flex items-center gap-2.5 border-r border-[#D8E2EA] pr-3">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-[#E8F3FC]">
+                <img src="/icon.svg" alt="" width={19} height={19} className="size-[19px]" />
+              </span>
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-ping opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2E8B7A]" />
               </span>
               <div className="leading-none">
-                <h1 className="text-[12px] font-black tracking-tight text-slate-900">Calgary Crime Map</h1>
-                <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.24em] text-slate-500">Calgary Watch · Live near you</p>
+                <h1 className="text-[12px] font-black tracking-tight text-[#0B1F33]">Calgary Crime Map</h1>
+                <p className="mt-1 text-[8px] font-bold uppercase tracking-[0.16em] text-[#6B8296]">Calgary Watch / Live reports</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              className="flex size-9 items-center justify-center rounded-lg text-[#52697D] transition-colors hover:bg-[#E8F3FC] hover:text-[#174A6E] active:scale-[0.98]"
               title="Back to landing page"
               aria-label="Back to landing page"
             >
@@ -2872,7 +2869,7 @@ export default function MapPage() {
                   mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
                 }
               }}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              className="flex size-9 items-center justify-center rounded-lg text-[#52697D] transition-colors hover:bg-[#E8F3FC] hover:text-[#174A6E] active:scale-[0.98]"
               title="Fly to my location"
               aria-label="Fly to my location"
             >
@@ -2886,13 +2883,13 @@ export default function MapPage() {
                 variant="secondary"
                 size="icon"
                 data-tour="alerts"
-                className="rounded-full w-12 h-12 bg-slate-950/80 backdrop-blur-xl border border-white/10 hover:border-blue-500/50 transition-all shadow-2xl light:bg-white/95 light:text-slate-900 light:border-slate-300"
+                className="size-12 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#8DBBDB] hover:bg-[#E8F3FC]"
                 onClick={() => {
                   setShowNotifications(!showNotifications);
                   if (!showNotifications) setUnreadNotifications(0);
                 }}
               >
-                <Bell size={20} className={cn(unreadNotifications > 0 ? "text-blue-400 animate-bounce" : "text-slate-400")} />
+                <Bell size={19} className={cn(unreadNotifications > 0 ? 'text-[#286FAF]' : 'text-[#52697D]')} />
                 {unreadNotifications > 0 && (
                   <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-slate-950">
                     {unreadNotifications}
@@ -2938,7 +2935,7 @@ export default function MapPage() {
               <div className="relative">
                 <button 
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 rounded-full p-1 shadow-2xl hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all"
+                  className="flex size-12 items-center justify-center overflow-hidden rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] p-1 shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#8DBBDB]"
                 >
                   {user.photoURL ? (
                     <img
@@ -3010,29 +3007,29 @@ export default function MapPage() {
             ) : (
               <Button
                 variant="secondary"
-                className="h-12 rounded-2xl px-5 flex items-center gap-2 bg-slate-950/80 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-300 hover:border-blue-500/50 light:hover:border-slate-900/40 transition-all shadow-2xl"
+                className="flex h-12 items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] px-4 text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#8DBBDB] hover:bg-[#E8F3FC]"
                 onClick={() => openAuthPanel('signin')}
               >
                 <LogIn size={18} className="text-blue-400" />
                 {/* The button turns white in light mode, so the label has to
                     turn dark with it. Without this it inherits white and the
                     primary sign-in call to action is invisible. */}
-                <span className="text-sm font-bold text-white light:text-slate-900">Sign In</span>
+                <span className="text-sm font-bold text-[#0B1F33]">Sign in</span>
               </Button>
             )}
           </div>
         </div>
 
-        {/* FABs: Emergency SOS + Report Incident - extra lift on small screens for layer dock */}
+        {/* Emergency and report actions */}
         <div className={cn(
-          "absolute right-4 md:right-8 z-30 flex flex-col items-end gap-3 max-lg:bottom-[calc(7.25rem+env(safe-area-inset-bottom))] md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] bottom-28 md:bottom-32 transition-all duration-300",
+          'absolute right-3 z-30 flex flex-col items-end gap-2.5 bottom-[calc(7rem+env(safe-area-inset-bottom))] transition-all duration-200 md:right-5 md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] lg:right-6 lg:bottom-24',
           (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
         )}>
-          {/* SOS Emergency Button — labelled pill on desktop, round FAB on mobile */}
+          {/* SOS remains visually separate from standard reporting. */}
           <Button
             variant="primary"
             data-tour="sos"
-            className="rounded-full w-14 h-14 md:w-16 md:h-16 lg:w-auto lg:h-13 lg:px-5 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 shadow-2xl shadow-red-600/50 transition-all active:scale-90 group relative"
+            className="group relative flex size-12 items-center justify-center gap-2 rounded-2xl bg-[#C62828] text-[#F7FBFF] shadow-[0_4px_8px_rgba(127,29,29,0.28)] transition-[background-color,transform] hover:bg-[#A91F1F] active:scale-[0.97] md:size-14 lg:h-12 lg:w-auto lg:px-4"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
@@ -3043,7 +3040,6 @@ export default function MapPage() {
               setIsEmergencyOpen(true);
             }}
           >
-            <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-30 lg:hidden" />
             <Siren size={22} className="relative z-10 shrink-0" />
             <span className="hidden lg:inline text-sm font-black tracking-tight text-[#fff]">SOS</span>
             <div className="absolute right-full mr-4 px-3 py-1.5 bg-red-950 text-red-200 text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-red-500/30 shadow-xl hidden md:block lg:hidden">
@@ -3051,11 +3047,11 @@ export default function MapPage() {
             </div>
           </Button>
 
-          {/* Regular Report Button — labelled pill on desktop */}
+          {/* Primary reporting action is labelled at every viewport size. */}
           <Button
             variant="primary"
             data-tour="report"
-            className="rounded-full w-14 h-14 md:w-16 md:h-16 lg:w-auto lg:h-14 lg:px-6 flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-700 light:bg-slate-900 light:hover:bg-slate-800 shadow-2xl shadow-blue-500/40 light:shadow-slate-900/30 transition-all active:scale-90 group"
+            className="group flex h-12 w-auto items-center justify-center gap-2 rounded-2xl bg-[#0B1F33] px-4 text-[#F7FBFF] shadow-[0_4px_8px_rgba(11,31,51,0.24)] transition-[background-color,transform] hover:bg-[#174A6E] active:scale-[0.97] md:h-14 md:px-5 lg:h-13 lg:px-5"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
@@ -3073,8 +3069,8 @@ export default function MapPage() {
               }
             }}
           >
-            <Plus size={26} className="transition-transform group-hover:rotate-90 duration-150 [color:white] shrink-0" />
-            <span className="hidden lg:inline text-sm font-black tracking-tight text-[#fff]">Report an incident</span>
+            <Plus size={21} className="shrink-0 text-[#F7FBFF]" />
+            <span className="text-xs font-black tracking-tight text-[#F7FBFF] sm:text-sm">Report<span className="hidden lg:inline"> an incident</span></span>
             <div className="absolute right-full mr-4 px-3 py-1.5 bg-slate-950 text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block lg:hidden">
               Report Incident
             </div>
@@ -3093,26 +3089,22 @@ export default function MapPage() {
         />
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}
-        <div className="absolute bottom-10 md:bottom-12 left-4 md:left-6 right-4 md:right-8 items-center justify-between pointer-events-none z-20 hidden lg:flex">
-          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-slate-950/60 light:bg-white/95 backdrop-blur-xl border border-white/5 light:border-slate-300 rounded-full shadow-lg">
+        <div className="pointer-events-none absolute bottom-6 left-6 right-6 z-20 hidden items-center justify-between lg:flex">
+          <div className="flex items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.94)] px-3 py-2 shadow-[0_3px_8px_rgba(11,31,51,0.1)] backdrop-blur-lg">
             <div className="relative flex items-center justify-center w-1.5 h-1.5 md:w-2 md:h-2">
               <div className={cn(
-                "absolute inset-0 rounded-full animate-ping opacity-75",
-                mapIncidents.length > 0 ? "bg-green-500" : "bg-slate-500"
-              )} />
-              <div className={cn(
                 "relative w-1.5 h-1.5 md:w-2 md:h-2 rounded-full",
-                mapIncidents.length > 0 ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-slate-500"
+                mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#6B8296]'
               )} />
             </div>
-            <span className="text-[8px] md:text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#40566B]">
               {mapIncidents.length} Map Markers
             </span>
           </div>
 
-          <div className="flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-slate-950/60 light:bg-white/95 backdrop-blur-xl border border-white/5 light:border-slate-300 rounded-full shadow-lg">
-            <ShieldAlert size={10} className="text-yellow-500" />
-            <span className="text-[8px] md:text-[9px] font-medium text-slate-400 uppercase tracking-tight">
+          <div className="flex items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.94)] px-3 py-2 shadow-[0_3px_8px_rgba(11,31,51,0.1)] backdrop-blur-lg">
+            <ShieldAlert size={12} className="text-[#9A7318]" />
+            <span className="text-[9px] font-bold uppercase tracking-tight text-[#52697D]">
               Verify before action.
             </span>
           </div>

@@ -415,10 +415,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             'width:56px', 'height:56px',
             'background:rgba(239,68,68,0.97)',
             'border:2.5px solid rgba(254,226,226,0.95)',
-            'border-radius:20px',
+            'border-radius:16px',
             'display:flex', 'align-items:center', 'justify-content:center',
             'cursor:pointer',
-            'box-shadow:0 0 0 4px rgba(239,68,68,0.25), 0 0 28px rgba(239,68,68,0.7)',
+            'box-shadow:0 4px 10px rgba(127,29,29,0.28)',
           ].join(';');
 
           // Siren SVG icon — no count, emergency takes full icon space
@@ -449,12 +449,12 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         } else {
           el.style.cssText = [
             'width:44px', 'height:44px',
-            'background:rgba(15,23,42,0.93)',
-            'border:2px solid rgba(34,211,238,0.60)',
-            'border-radius:14px',
+            'background:#0B1F33',
+            'border:2px solid rgba(255,255,255,0.92)',
+            'border-radius:13px',
             'display:flex', 'align-items:center', 'justify-content:center',
             'cursor:pointer',
-            'box-shadow:0 4px 24px rgba(0,0,0,0.55),0 0 0 1px rgba(34,211,238,0.12)',
+            'box-shadow:0 4px 10px rgba(11,31,51,0.24)',
           ].join(';');
           const label = document.createElement('span');
           label.style.cssText = 'color:white;font-size:12px;font-weight:900;letter-spacing:-0.01em;';
@@ -632,16 +632,17 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         ? 'relative w-14 h-14 flex items-center justify-center group'
         : 'relative w-10 h-10 flex items-center justify-center group';
 
-      // Pulse ring - emergency gets an extra outer ring
+      // Emergency pins retain a restrained attention ring. Standard markers
+      // stay still so dense map areas remain readable and calm.
       if (isEmergency) {
         const outerRing = document.createElement('div');
-        outerRing.className = 'absolute inset-[-8px] rounded-2xl bg-red-600 animate-ping opacity-30';
+        outerRing.className = 'absolute inset-[-5px] rounded-2xl border-2 border-red-500/45';
         el.appendChild(outerRing);
       }
 
       const pulse = document.createElement('div');
       pulse.className = cn(
-        'absolute inset-0 rounded-2xl animate-pulse-ring',
+        'absolute inset-0 rounded-xl opacity-20',
         isEmergency ? 'bg-red-600' :
         incident.category === 'crime' ? 'bg-red-500' :
         incident.category === 'traffic' ? 'bg-orange-500' :
@@ -654,13 +655,13 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       const body = document.createElement('div');
       body.className = cn(
         isEmergency
-          ? 'relative w-14 h-14 rounded-2xl border-2 border-white/40 shadow-2xl cursor-pointer transition-all hover:scale-110 flex items-center justify-center z-10 bg-red-600 shadow-red-600/60'
-          : 'relative w-10 h-10 rounded-2xl border-2 border-white/20 shadow-2xl cursor-pointer transition-all hover:scale-110 flex items-center justify-center z-10',
+          ? 'relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-2xl border-2 border-white/80 bg-red-600 shadow-[0_4px_10px_rgba(127,29,29,0.28)] transition-transform hover:scale-105 z-10'
+          : 'relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border-2 border-white/90 shadow-[0_4px_10px_rgba(11,31,51,0.2)] transition-transform hover:scale-105 z-10',
         !isEmergency && (
-          incident.category === 'crime' ? 'bg-red-500 shadow-red-500/40' :
-          incident.category === 'traffic' ? 'bg-orange-500 shadow-orange-500/40' :
-          incident.category === 'infrastructure' ? 'bg-blue-500 shadow-blue-500/40' :
-          'bg-purple-500 shadow-purple-500/40'
+          incident.category === 'crime' ? 'bg-[#C0392B]' :
+          incident.category === 'traffic' ? 'bg-[#C65514]' :
+          incident.category === 'infrastructure' ? 'bg-[#286FAF]' :
+          'bg-[#2E8B7A]'
         )
       );
 

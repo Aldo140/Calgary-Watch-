@@ -21,14 +21,13 @@ const FEED_FILTER_KEY = 'cw_feedFilter';
 
 type SortBy = 'newest' | 'oldest' | 'verified';
 
-// Field-atlas palette — explicit hexes on purpose (several Tailwind color
-// utilities are globally remapped in index.css).
+// Map-instrument palette. Explicit hexes avoid legacy global utility remaps.
 const P = {
-  paper: '#FFFDF8',
-  card: '#F7F3EA',
-  ink: '#1C2B3A',
-  soft: '#5A6B7D',
-  line: '#E7E0D2',
+  paper: '#F8FAFC',
+  card: '#EEF4F8',
+  ink: '#0B1F33',
+  soft: '#52697D',
+  line: '#C9D8E4',
 };
 
 const CAT_COLOR: Record<string, string> = {
@@ -286,7 +285,7 @@ export default function MobileMapSheet({
     >
       <Drawer.Portal>
         <Drawer.Content
-          className="fixed bottom-0 left-0 right-0 z-[50] flex flex-col rounded-t-[1.5rem] outline-none lg:hidden shadow-[0_-12px_40px_rgba(28,43,58,0.18)]"
+          className="fixed bottom-0 left-0 right-0 z-[50] flex flex-col rounded-t-2xl outline-none lg:hidden shadow-[0_-4px_12px_rgba(11,31,51,0.16)]"
           style={{
             maxHeight: '85vh',
             background: P.paper,
@@ -297,10 +296,9 @@ export default function MobileMapSheet({
           <Drawer.Title className="sr-only">Incidents</Drawer.Title>
           <Drawer.Description className="sr-only">Browse and search Calgary incidents</Drawer.Description>
 
-          {/* Brand stripe */}
+          {/* Brand edge */}
           <div
-            className="h-1 w-full shrink-0 rounded-t-[1.5rem]"
-            style={{ background: 'linear-gradient(to right, #4A90D9, #2E8B7A, #D4A843)' }}
+            className="h-1 w-full shrink-0 rounded-t-2xl bg-[#4A90D9]"
           />
 
           {/* Drag handle */}
@@ -326,7 +324,7 @@ export default function MobileMapSheet({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); onReportPress(); }}
-                className="flex items-center gap-1.5 px-3.5 h-8 rounded-full text-[10px] font-black uppercase tracking-[0.14em] transition-transform active:scale-95"
+                  className="flex h-9 items-center gap-1.5 rounded-xl px-3.5 text-[10px] font-black uppercase tracking-[0.12em] transition-transform active:scale-[0.98]"
                 style={{ background: P.ink, color: P.paper }}
               >
                 <Plus size={11} />
@@ -342,7 +340,7 @@ export default function MobileMapSheet({
               {/* Search + total count */}
               <div className="px-3 pt-1 pb-2 shrink-0 flex items-center gap-2">
                 <div
-                  className="flex items-center gap-2 rounded-2xl px-3 h-11 flex-1"
+                  className="flex h-11 flex-1 items-center gap-2 rounded-xl px-3"
                   style={{ background: P.card, border: `1px solid ${P.line}` }}
                 >
                   <Search size={15} className="shrink-0" style={{ color: P.soft }} />
@@ -363,7 +361,7 @@ export default function MobileMapSheet({
                   )}
                 </div>
                 <div
-                  className="flex flex-col items-center justify-center rounded-2xl px-3 h-11 min-w-[52px] shrink-0"
+                  className="flex h-11 min-w-[52px] shrink-0 flex-col items-center justify-center rounded-xl px-3"
                   style={{ background: P.ink }}
                 >
                   <span className="font-mono text-[7.5px] font-bold uppercase tracking-[0.14em] leading-none" style={{ color: 'rgba(255,253,248,0.6)' }}>Total</span>
@@ -385,7 +383,7 @@ export default function MobileMapSheet({
                       <button
                         key={id}
                         onClick={() => onCategoryChange(id as IncidentCategory | 'all')}
-                        className="category-chip shrink-0 flex items-center gap-1.5 px-3 h-8 rounded-full text-[10.5px] font-bold border transition-all whitespace-nowrap active:scale-95"
+                        className="category-chip flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[10.5px] font-bold transition-[background-color,border-color,color,transform] active:scale-[0.98]"
                         style={isSelected
                           ? { background: color, borderColor: color, color: '#fff' }
                           : { background: P.paper, borderColor: P.line, color: P.soft }}
@@ -610,7 +608,7 @@ export default function MobileMapSheet({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           onClick={() => handleIncidentSelect(incident)}
-                          className="w-full text-left rounded-2xl mb-2 overflow-hidden transition-all active:scale-[0.99] relative"
+                          className="relative mb-2 w-full overflow-hidden rounded-2xl text-left transition-[border-color,background-color,box-shadow,transform] active:scale-[0.99]"
                           style={{
                             background: isEmergency ? 'rgba(225,29,72,0.05)' : P.paper,
                             border: `1px solid ${isEmergency ? 'rgba(225,29,72,0.4)' : isActive ? '#4A90D9' : P.line}`,
@@ -768,7 +766,7 @@ export default function MobileMapSheet({
                   <button
                     type="button"
                     onClick={onReportPress}
-                    className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl font-black text-[12.5px] transition-transform active:scale-[0.98]"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl text-[12.5px] font-black transition-transform active:scale-[0.98]"
                     style={{ background: P.ink, color: P.paper }}
                   >
                     <Plus size={15} />

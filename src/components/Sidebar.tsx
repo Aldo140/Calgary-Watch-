@@ -198,7 +198,7 @@ export default function Sidebar({
         </div>
       )}
 
-      <div className="flex min-w-0 shrink-0 snap-x items-center gap-1.5 overflow-x-auto border-b border-[#D8E2EA] px-4 py-3 no-scrollbar scroll-smooth scroll-px-4">
+      <div className="grid shrink-0 grid-cols-3 gap-1.5 border-b border-[#D8E2EA] px-4 py-3">
         {categories.map((cat) => {
           const count = cat.id === 'all' 
             ? incidents.length 
@@ -210,14 +210,14 @@ export default function Sidebar({
               key={cat.id}
               onClick={() => onCategoryChange(cat.id as any)}
               className={cn(
-                'category-chip flex h-9 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[10px] font-bold transition-colors',
+                'category-chip flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2 text-[10px] font-bold transition-colors',
                 selectedCategory === cat.id
                   ? 'border-[#286FAF] bg-[#286FAF] text-[#F7FBFF]'
                   : 'border-[#C9D8E4] bg-[#FFFFFF] text-[#40566B] hover:border-[#8DBBDB] hover:bg-[#E8F3FC]'
               )}
             >
               <Icon size={13} className={selectedCategory === cat.id ? 'text-[#F7FBFF]' : 'text-[#52697D]'} />
-              <span>{cat.label}</span>
+              <span className="truncate">{cat.label}</span>
               <span className={cn(
                 'rounded-md px-1.5 py-0.5 text-[9px] font-black tabular-nums',
                 selectedCategory === cat.id ? 'bg-[rgba(255,255,255,0.18)] text-[#F7FBFF]' : 'bg-[#EEF4F8] text-[#52697D]'

@@ -32,8 +32,8 @@
 }
 
 .custom-leaflet-popup .leaflet-popup-tip {
-  background: #faf8f4 !important; /* stone-50 */
-  border: 1px solid rgba(120, 113, 108, 0.15);
+  background: #f8fafc !important;
+  border: 1px solid #c9d8e4;
 }
 
 .custom-leaflet-popup .leaflet-popup-content {

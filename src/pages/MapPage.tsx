@@ -2268,8 +2268,8 @@ export default function MapPage() {
         This used to sit centred at the very top, where on a phone it wrapped to
         four lines and covered the search field, the home button and the whole
         category chip row — the primary controls — until it was dismissed by
-        hand. It now sits above the bottom controls on mobile and below the
-        header on desktop, stays on one line, and clears itself, because a
+        hand. It now sits below the mobile filter bar and the desktop header,
+        stays on one line, and clears itself, because a
         denied location is a minor fallback rather than an error the map needs
         to keep insisting on.
       */}
@@ -2280,14 +2280,13 @@ export default function MapPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
             role="status"
-            className="fixed z-[200] left-1/2 -translate-x-1/2 max-w-[calc(100vw-2rem)]
-                       bottom-[calc(6.5rem+env(safe-area-inset-bottom))]
-                       lg:bottom-auto lg:top-24
+            className="fixed left-3 top-[calc(6.5rem+env(safe-area-inset-top))] z-[200] max-w-[calc(100vw-5rem)]
+                       lg:left-1/2 lg:top-24 lg:-translate-x-1/2 lg:max-w-[calc(100vw-2rem)]
                        flex items-center gap-2 px-3.5 py-2 rounded-full shadow-lg backdrop-blur-xl
                        bg-slate-900/92 border border-amber-400/30 text-amber-100 text-[0.72rem] font-semibold whitespace-nowrap"
           >
             <Navigation size={13} className="shrink-0 text-amber-300" />
-            <span className="truncate">Location off — showing all of Calgary</span>
+            <span className="truncate">Location off. Showing all of Calgary</span>
             <button
               onClick={() => setLocationError(false)}
               aria-label="Dismiss"
@@ -2566,10 +2565,12 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={() => openAuthPanel('signin')}
+                aria-label="Sign up or sign in"
+                title="Sign up or sign in"
                 className="flex size-11 items-center justify-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[10px] font-black uppercase tracking-wide text-[#0B1F33] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg active:scale-[0.98] md:w-auto md:px-3.5"
               >
                 <LogIn size={16} />
-                <span className="hidden md:inline">Sign in</span>
+                <span className="hidden md:inline">Sign up / sign in</span>
               </button>
             )}
             <AnimatePresence>
@@ -2846,8 +2847,12 @@ export default function MapPage() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2E8B7A]" />
               </span>
               <div className="leading-none">
-                <h1 className="text-[12px] font-black tracking-tight text-[#0B1F33]">Calgary Crime Map</h1>
-                <p className="mt-1 text-[8px] font-bold uppercase tracking-[0.16em] text-[#6B8296]">Calgary Watch / Live reports</p>
+                <h1 className="text-[12px] font-black tracking-tight text-[#0B1F33]">
+                  {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
+                </h1>
+                <p className="mt-1 text-[8px] font-bold uppercase tracking-[0.16em] text-[#6B8296]">
+                  {filteredIncidentsCount} visible / Calgary Watch
+                </p>
               </div>
             </div>
             <button
@@ -3009,12 +3014,13 @@ export default function MapPage() {
                 variant="secondary"
                 className="flex h-12 items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] px-4 text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#8DBBDB] hover:bg-[#E8F3FC]"
                 onClick={() => openAuthPanel('signin')}
+                aria-label="Sign up or sign in"
               >
                 <LogIn size={18} className="text-blue-400" />
                 {/* The button turns white in light mode, so the label has to
                     turn dark with it. Without this it inherits white and the
                     primary sign-in call to action is invisible. */}
-                <span className="text-sm font-bold text-[#0B1F33]">Sign in</span>
+                <span className="text-sm font-bold text-[#0B1F33]">Sign up / sign in</span>
               </Button>
             )}
           </div>

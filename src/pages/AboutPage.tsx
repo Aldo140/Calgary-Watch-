@@ -849,7 +849,7 @@ export default function AboutPage() {
 
               {/* Subtitle */}
               <motion.p
-                className="mt-6 text-base md:text-xl text-slate-300 leading-relaxed max-w-xl"
+                className="mt-6 text-base md:text-xl text-[#FFFFFF] leading-relaxed max-w-xl"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.6 }}

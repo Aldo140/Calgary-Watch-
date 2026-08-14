@@ -158,7 +158,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         popup.current.remove();
       }
       const wrapper = document.createElement('div');
-      wrapper.className = 'min-w-[264px] bg-slate-950 text-white rounded-[1.4rem] border border-white/10 shadow-[0_14px_34px_rgba(0,0,0,0.42)] overflow-hidden';
+      wrapper.className = 'min-w-[264px] max-w-[300px] overflow-hidden rounded-2xl bg-[#F8FAFC] text-[#0B1F33] shadow-[0_4px_10px_rgba(11,31,51,0.18)] ring-1 ring-[#C9D8E4]';
 
       const content = document.createElement('div');
       content.className = 'p-4 space-y-3';
@@ -166,10 +166,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       const topRow = document.createElement('div');
       topRow.className = 'flex items-center justify-between gap-2';
       const categoryPill = document.createElement('span');
-      categoryPill.className = 'text-[10px] font-black uppercase tracking-[0.2em] text-slate-300';
+      categoryPill.className = 'text-[10px] font-black uppercase tracking-[0.16em] text-[#286FAF]';
       categoryPill.textContent = toLabel(incident.category, 'incident');
       const neighborhood = document.createElement('span');
-      neighborhood.className = 'text-[10px] font-bold text-slate-500';
+      neighborhood.className = 'text-[10px] font-bold text-[#6B8296]';
       neighborhood.textContent = toLabel(incident.neighborhood, 'Calgary');
       topRow.append(categoryPill, neighborhood);
       content.appendChild(topRow);
@@ -178,41 +178,41 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       // easy to miss once the popup covers it.
       if (incident.data_source === 'demo') {
         const demoRow = document.createElement('div');
-        demoRow.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.4);';
+        demoRow.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:#FFF7E2;border:1px solid #E7C86D;';
         const dot = document.createElement('span');
         dot.style.cssText = 'width:5px;height:5px;border-radius:50%;background:#F59E0B;flex:0 0 auto;';
         const label = document.createElement('span');
-        label.style.cssText = 'font-size:9.5px;font-weight:800;letter-spacing:0.04em;color:#FCD34D;line-height:1.3;';
-        label.textContent = 'Example report — shows how reporting works';
+        label.style.cssText = 'font-size:9.5px;font-weight:800;letter-spacing:0.02em;color:#7A5A0A;line-height:1.3;';
+        label.textContent = 'Example report: see how reporting works';
         demoRow.append(dot, label);
         content.appendChild(demoRow);
       }
 
       const title = document.createElement('h3');
-      title.className = 'text-sm font-black tracking-tight leading-tight text-white';
+      title.className = 'text-sm font-black tracking-tight leading-tight text-[#0B1F33]';
       title.textContent = toLabel(incident.title, 'Untitled report');
       content.appendChild(title);
 
       const desc = document.createElement('p');
-      desc.className = 'text-xs text-slate-400 leading-relaxed line-clamp-2';
+      desc.className = 'text-xs text-[#52697D] leading-relaxed line-clamp-2';
       desc.textContent = toLabel(incident.description, '');
       content.appendChild(desc);
 
       const reporter = getReporterDisplay(incident);
       const reporterText = document.createElement('p');
-      reporterText.className = 'text-[11px] text-slate-400';
+      reporterText.className = 'text-[11px] font-medium text-[#6B8296]';
       reporterText.textContent = `By ${reporter.firstName}`;
       content.appendChild(reporterText);
 
       const actions = document.createElement('div');
       actions.className = 'flex items-center gap-2 pt-1';
       const viewDetails = document.createElement('button');
-      viewDetails.className = 'view-details-btn flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all';
+      viewDetails.className = 'view-details-btn flex-1 rounded-xl bg-[#0B1F33] px-3 py-2.5 text-[10px] font-black tracking-wide text-[#F7FBFF] transition-colors hover:bg-[#174A6E]';
       viewDetails.setAttribute('data-id', toLabel(incident.id, ''));
       viewDetails.textContent = 'Details';
       viewDetails.setAttribute('aria-label', 'View details');
       const learnMore = document.createElement('button');
-      learnMore.className = 'learn-more-btn py-2.5 px-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl transition-all border border-white/10 text-[10px] font-black uppercase tracking-widest';
+      learnMore.className = 'learn-more-btn rounded-xl border border-[#B8D2E5] bg-[#E8F3FC] px-3 py-2.5 text-[10px] font-black tracking-wide text-[#174A6E] transition-colors hover:bg-[#D9ECF9]';
       learnMore.textContent = 'Area Intel';
       learnMore.setAttribute('data-neighborhood', toLabel(incident.neighborhood, ''));
       actions.append(viewDetails, learnMore);
@@ -456,10 +456,13 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
             'cursor:pointer',
             'box-shadow:0 4px 10px rgba(11,31,51,0.24)',
           ].join(';');
-          const label = document.createElement('span');
-          label.style.cssText = 'color:white;font-size:12px;font-weight:900;letter-spacing:-0.01em;';
-          label.textContent = `+${count}`;
-          el.appendChild(label);
+          el.style.color = '#F7FBFF';
+          el.style.fontFamily = 'Inter, ui-sans-serif, system-ui, sans-serif';
+          el.style.fontSize = '12px';
+          el.style.fontWeight = '900';
+          el.style.lineHeight = '1';
+          el.textContent = count > 99 ? '99+' : String(count);
+          el.setAttribute('aria-label', `${count} reports in this area`);
           return L.divIcon({ html: el, className: '', iconSize: [44, 44], iconAnchor: [22, 22] });
         }
       },

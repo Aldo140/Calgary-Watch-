@@ -361,13 +361,22 @@ export default function CoveragePage() {
               and nearby places — from Airdrie and Cochrane to Okotoks, Strathmore, and High River.
             </p>
 
-            <a
-              href="/airdrie-crime-map"
-              className="mb-10 inline-flex items-center gap-2 text-sm font-bold text-[#7DB8F1] light:text-[#286FAF] underline decoration-[#4A90D9]/40 underline-offset-4 hover:text-white light:hover:text-slate-900"
-            >
-              Comparing Airdrie crime maps? Read the source guide
-              <ArrowRight size={15} aria-hidden="true" />
-            </a>
+            <nav className="mb-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap" aria-label="Local safety guides">
+              <a
+                href="/calgary-neighbourhood-watch"
+                className="group inline-flex min-h-12 items-center justify-between gap-4 rounded-xl bg-[#E8F3FC] px-4 py-3 text-sm font-black text-[#174A6E] ring-1 ring-[#8DBBDB] transition-colors hover:bg-[#D4EAF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1F33]"
+              >
+                Calgary neighbourhood watch guide
+                <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </a>
+              <a
+                href="/airdrie-crime-map"
+                className="group inline-flex min-h-12 items-center justify-between gap-4 rounded-xl border border-[rgba(255,255,255,0.2)] px-4 py-3 text-sm font-black text-[#B9DCF9] transition-colors hover:border-[#4A90D9] hover:bg-[rgba(74,144,217,0.1)] hover:text-[#F7FBFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1F33] light:border-slate-300 light:text-[#286FAF] light:hover:bg-[#E8F3FC] light:hover:text-[#174A6E]"
+              >
+                Airdrie crime map source guide
+                <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </a>
+            </nav>
 
             {/* Stats strip */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

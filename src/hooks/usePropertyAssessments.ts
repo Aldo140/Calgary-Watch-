@@ -121,6 +121,11 @@ export function usePropertyAssessments(communityName: string | null): {
       // Resolve the app's name onto whatever the city calls the community.
       const resolved = resolveCommunityName(communityName, catalogue) ?? communityName.toUpperCase();
       const encoded = encodeURIComponent(resolved);
+      // Only the years the panel actually charts. Without this the request
+      // pulled every roll year back to 2005 — 2.4MB and about four seconds for
+      // a single community on desktop, and far worse on mobile data, which is
+      // long enough that the section looks empty rather than loading.
+      const earliestYear = new Date().getFullYear() - 6;
       const url =
         `https://data.calgary.ca/resource/4ur7-wsgc.json` +
         // Residential only. Without the class filter the "average home value"
@@ -128,7 +133,9 @@ export function usePropertyAssessments(communityName: string | null): {
         // which inflated Forest Lawn from $541k to $646k and Marlborough from
         // $532k to $618k — enough to push ordinary residential areas above the
         // city's residential median and misplace them on the value axis.
-        `?$where=comm_name='${encoded}' AND assessment_class='RE'` +
+        `?$where=${encodeURIComponent(
+          `comm_name='${resolved}' AND assessment_class='RE' AND roll_year>='${earliestYear}'`,
+        )}` +
         `&$select=assessed_value,roll_year` +
         `&$limit=50000`;
 

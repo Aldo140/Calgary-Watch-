@@ -445,6 +445,7 @@ function Content({
               tooltipStyle={tooltipStyle}
               tooltipLabelStyle={tooltipLabelStyle}
               score={score}
+              communityName={data.communityName}
             />
           </div>
           <div id="sec-signals" className="scroll-mt-16">
@@ -1116,22 +1117,34 @@ const SAFETY_AXIS_MIN = 40;
 const SAFETY_AXIS_MAX = 100;
 
 function PropertyValueSection({
-  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score,
+  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score, communityName,
 }: {
   propertyData: PropertyYearEntry[];
+  communityName: string;
   yearlyStats: CrimeYearEntry[];
   isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
   score: number;
 }) {
+  // Names the city uses for land with no housing on it.
+  const isNonResidentialArea = /\b(industrial|park|business|commercial|airport|reserve)\b/i.test(
+    communityName,
+  );
+
   if (propertyData.length === 0) {
     return (
       <Section title="Property Value vs Safety" isLight={isLight}>
         <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
           <Info size={14} className={isLight ? 'text-slate-400 shrink-0 mt-0.5' : 'text-slate-600 shrink-0 mt-0.5'} />
           <p className="text-sm text-slate-500">
-            Property assessment data not available for this community in the current dataset snapshot.
+            {/* Industrial estates, parks and survey parcels have no homes to
+                value, so the city publishes no residential assessment for them.
+                Saying "not available" made a correct, expected result read as a
+                loading failure. */}
+            {isNonResidentialArea
+              ? `${communityName} is an industrial or park area, so the city publishes no residential assessments for it.`
+              : 'No residential assessment has been published for this community yet.'}
           </p>
         </div>
       </Section>

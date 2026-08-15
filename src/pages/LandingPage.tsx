@@ -1455,30 +1455,51 @@ const STEPS = [
   },
 ];
 
+/**
+ * One step of the report sequence.
+ *
+ * The card used to be 58vh with the content pinned top and the step numeral
+ * pinned bottom, which left roughly 270px of nothing between them and made the
+ * numeral read as a stray mark rather than part of the card.
+ *
+ * The numeral now sits where a reader meets it — top right, bleeding past the
+ * corner so it registers as the card's index rather than a decoration — and
+ * the card is shorter, so the copy sits in a composition instead of floating
+ * at the top of a void. The numbering is kept because filing a report really
+ * is a sequence; the order carries information.
+ */
 function RideCard({ step }: { step: (typeof STEPS)[number] }) {
   return (
     <div
-      className="relative overflow-hidden rounded-3xl p-10 xl:p-12 flex flex-col justify-between w-[min(44vw,620px)] shrink-0 h-[58vh] min-h-[26rem]"
+      className="relative overflow-hidden rounded-3xl p-9 xl:p-11 flex flex-col w-[min(42vw,580px)] shrink-0 h-[46vh] min-h-[22rem]"
       style={{ background: T.panel, border: `1px solid ${T.line}` }}
     >
       <div className="absolute top-0 left-0 h-1.5 w-full" style={{ background: step.accent }} aria-hidden="true" />
-      <div>
+
+      {/* Index, bled off the corner. Sits behind the copy and is reserved for
+          in the padding below so the two can never overlap. */}
+      <span
+        className="pointer-events-none absolute -top-6 -right-3 z-0 font-display font-extrabold select-none leading-none"
+        style={{ fontSize: '9rem', color: 'transparent', WebkitTextStroke: `1.5px ${step.accent}`, opacity: 0.28 }}
+        aria-hidden="true"
+      >
+        {step.n}
+      </span>
+
+      <div className="relative z-10 pr-20">
         <p className="font-mono text-[11px] tracking-[0.28em]" style={{ color: step.accent }}>{step.mono}</p>
-        <h3 className="mt-4 font-display font-extrabold tracking-[-0.02em]" style={{ color: T.ink, fontSize: 'clamp(2.4rem,3.4vw,3.6rem)' }}>
+        <h3 className="mt-3.5 font-display font-extrabold tracking-[-0.02em]" style={{ color: T.ink, fontSize: 'clamp(2.2rem,3.1vw,3.2rem)' }}>
           {step.title}
         </h3>
-        <p className="mt-4 max-w-md text-[15.5px] leading-relaxed" style={{ color: T.inkSoft }}>{step.body}</p>
       </div>
-      <div className="flex items-end justify-between gap-4">
-        <p className="font-mono text-[10.5px] tracking-[0.08em]" style={{ color: step.accent }}>{step.log}</p>
-        <span
-          className="font-display font-extrabold select-none leading-none"
-          style={{ fontSize: '7rem', color: 'transparent', WebkitTextStroke: `1.5px ${step.accent}`, opacity: 0.65 }}
-          aria-hidden="true"
-        >
-          {step.n}
-        </span>
-      </div>
+      <p className="relative z-10 mt-4 max-w-md text-[15.5px] leading-relaxed" style={{ color: T.inkSoft }}>{step.body}</p>
+
+      <p
+        className="relative z-10 mt-auto pt-5 font-mono text-[10.5px] tracking-[0.08em]"
+        style={{ color: step.accent, borderTop: `1px dashed ${T.line}` }}
+      >
+        {step.log}
+      </p>
     </div>
   );
 }

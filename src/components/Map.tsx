@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import L from 'leaflet';
 import type { TrafficCamera } from '@/src/hooks/useTrafficCameras';
+import type { SafetyCamera } from '@/src/hooks/useSafetyCameras';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -28,6 +29,8 @@ interface MapProps {
   showCrimeLayer?: boolean;
   /** City traffic cameras, plotted when the layer is on. */
   trafficCameras?: TrafficCamera[];
+  /** Intersection safety cameras — the ones that issue tickets. */
+  safetyCameras?: SafetyCamera[];
   crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
   isMapInteractive?: boolean;
 }
@@ -48,13 +51,14 @@ export interface MapRef {
   clearUserLocation: () => void;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, crimeStats, isMapInteractive = true }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, safetyCameras, crimeStats, isMapInteractive = true }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
   const clusterGroup = useRef<any>(null);
   const heatmapLayer = useRef<any>(null);
   const cameraLayer = useRef<L.LayerGroup | null>(null);
+  const safetyCameraLayer = useRef<L.LayerGroup | null>(null);
   const baseTileLayer = useRef<L.TileLayer | null>(null);
   const popup = useRef<L.Popup | null>(null);
   const serviceAreaLayer = useRef<L.LayerGroup | null>(null);
@@ -971,6 +975,88 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       }
     };
   }, [trafficCameras, isMapLoaded]);
+
+  /**
+   * Intersection safety camera layer.
+   *
+   * These are enforcement points, not webcams, so they read as a warning
+   * rather than as context: amber where the traffic cameras are navy. There
+   * are only 57 of them city-wide — a twentieth of the incident volume — so
+   * unlike the traffic layer they are not gated behind a zoom threshold.
+   * "Where are the safety cameras" is a question people ask about the whole
+   * city at once, and hiding the answer until you zoom in would defeat it.
+   *
+   * The badge carries a chevron rotated to the direction of travel the camera
+   * faces, because a camera on the far side of an intersection watching the
+   * other way does not apply to you.
+   */
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+
+    if (safetyCameraLayer.current) {
+      map.current.removeLayer(safetyCameraLayer.current);
+      safetyCameraLayer.current = null;
+    }
+    if (!safetyCameras || safetyCameras.length === 0) return;
+
+    const HEADING: Record<string, number> = {
+      Northbound: 0, Eastbound: 90, Southbound: 180, Westbound: 270,
+    };
+
+    const markers = safetyCameras.map((cam) => {
+      const rotation = HEADING[cam.direction] ?? 0;
+      const icon = L.divIcon({
+        className: '',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        html: `<div style="position:relative;width:24px;height:24px">
+                 <div style="width:24px;height:24px;border-radius:50%;background:#C77F18;border:2px solid #F7F3EA;
+                             box-shadow:0 1px 3px rgba(11,31,51,0.28);display:flex;align-items:center;justify-content:center">
+                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFDF8" stroke-width="2.4"
+                        stroke-linecap="round" stroke-linejoin="round">
+                     <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                     <circle cx="12" cy="13" r="3"/>
+                   </svg>
+                 </div>
+                 ${cam.direction ? `<div style="position:absolute;inset:0;transform:rotate(${rotation}deg)">
+                   <div style="position:absolute;top:-5px;left:50%;margin-left:-4px;width:0;height:0;
+                               border-left:4px solid transparent;border-right:4px solid transparent;
+                               border-bottom:6px solid #C77F18;filter:drop-shadow(0 -1px 0 #F7F3EA)"></div>
+                 </div>` : ''}
+               </div>`,
+      });
+
+      const community = cam.community
+        ? cam.community.replace(/\b\w+/g, (w) => w.charAt(0) + w.slice(1).toLowerCase())
+        : '';
+
+      return L.marker([cam.lat, cam.lng], { icon, zIndexOffset: -400 }).bindPopup(
+        `<div style="width:224px;font-family:Inter,system-ui,sans-serif">
+           <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:0.14em;
+                       text-transform:uppercase;color:#C77F18">Safety camera</div>
+           <div style="font-weight:800;font-size:13px;color:#0B1F33;line-height:1.3;margin-top:3px">${cam.intersection}</div>
+           ${cam.direction ? `<div style="font-size:11.5px;color:#52697D;margin-top:2px">Watches ${cam.direction.toLowerCase()} traffic</div>` : ''}
+           <div style="margin-top:7px;padding-top:7px;border-top:1px solid #E4E2DC;font-size:11px;color:#52697D;line-height:1.45">
+             Tickets both running the red <strong style="color:#0B1F33">and</strong> speeding through the green.
+           </div>
+           ${community ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#52697D;margin-top:6px">
+             ${community}${cam.ward ? ` &middot; Ward ${cam.ward}` : ''}
+           </div>` : ''}
+         </div>`,
+        { maxWidth: 244, className: 'cw-camera-popup' },
+      );
+    });
+
+    const group = L.layerGroup(markers).addTo(map.current);
+    safetyCameraLayer.current = group;
+
+    return () => {
+      if (map.current && safetyCameraLayer.current) {
+        map.current.removeLayer(safetyCameraLayer.current);
+        safetyCameraLayer.current = null;
+      }
+    };
+  }, [safetyCameras, isMapLoaded]);
 
   return (
     <div className="relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center bg-slate-100">

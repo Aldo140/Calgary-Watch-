@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Layers, Activity, Map as MapIcon, ShieldCheck, Video, X } from 'lucide-react';
+import { Layers, Activity, Map as MapIcon, ShieldCheck, Video, Camera, X } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 interface LayerToggleProps {
@@ -11,7 +11,49 @@ interface LayerToggleProps {
   setShowCrimeLayer: (show: boolean) => void;
   showCameras: boolean;
   setShowCameras: (show: boolean) => void;
+  showSafetyCameras: boolean;
+  setShowSafetyCameras: (show: boolean) => void;
   isPinMode?: boolean;
+}
+
+/** One overlay in the "More layers" panel. */
+function OverlayRow({
+  icon, label, meta, on, onToggle,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  meta: string;
+  on: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={on}
+      className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-[#E8F3FC]"
+    >
+      <span
+        className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-colors',
+          on ? 'bg-[#286FAF] text-[#F7FBFF]' : 'bg-[#E8F3FC] text-[#40566B]')}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12px] font-bold text-[#0B1F33]">{label}</span>
+        <span className="block text-[10.5px] text-[#52697D]">{meta}</span>
+      </span>
+      <span
+        className={cn('relative h-5 w-9 shrink-0 rounded-full transition-colors',
+          on ? 'bg-[#286FAF]' : 'bg-[#C9D8E4]')}
+      >
+        <span
+          className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-[left]"
+          style={{ left: on ? 18 : 2 }}
+        />
+      </span>
+    </button>
+  );
 }
 
 /**
@@ -35,6 +77,8 @@ export default function LayerToggle({
   setShowCrimeLayer,
   showCameras,
   setShowCameras,
+  showSafetyCameras,
+  setShowSafetyCameras,
   isPinMode = false,
 }: LayerToggleProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -64,7 +108,7 @@ export default function LayerToggle({
   const off = 'text-[#40566B] hover:bg-[#E8F3FC]';
 
   /** Count of supplementary layers currently on, surfaced on the Layers chip. */
-  const extrasOn = showCameras ? 1 : 0;
+  const extrasOn = (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0);
 
   return (
     <div
@@ -91,33 +135,22 @@ export default function LayerToggle({
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowCameras(!showCameras)}
-            aria-pressed={showCameras}
-            className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-[#E8F3FC]"
-          >
-            <span
-              className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-colors',
-                showCameras ? 'bg-[#286FAF] text-[#F7FBFF]' : 'bg-[#E8F3FC] text-[#40566B]')}
-            >
-              <Video size={15} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[12px] font-bold text-[#0B1F33]">Traffic cameras</span>
-              <span className="block text-[10.5px] text-[#52697D]">City of Calgary · live · zoom in to view</span>
-            </span>
-            {/* Switch */}
-            <span
-              className={cn('relative h-5 w-9 shrink-0 rounded-full transition-colors',
-                showCameras ? 'bg-[#286FAF]' : 'bg-[#C9D8E4]')}
-            >
-              <span
-                className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-[left]"
-                style={{ left: showCameras ? 18 : 2 }}
-              />
-            </span>
-          </button>
+          <div className="space-y-0.5">
+            <OverlayRow
+              icon={<Video size={15} />}
+              label="Traffic cameras"
+              meta="City of Calgary · live · zoom in"
+              on={showCameras}
+              onToggle={() => setShowCameras(!showCameras)}
+            />
+            <OverlayRow
+              icon={<Camera size={15} />}
+              label="Safety cameras"
+              meta="57 fixed · red light and speed"
+              on={showSafetyCameras}
+              onToggle={() => setShowSafetyCameras(!showSafetyCameras)}
+            />
+          </div>
         </div>
       )}
 

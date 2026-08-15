@@ -165,7 +165,7 @@ export default function Sidebar({
             <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#176A5D]">
               <span className="size-1.5 rounded-full bg-[#2E8B7A]" aria-hidden="true" /> Live
             </span>
-            <span className="mt-0.5 block text-[9px] font-semibold tabular-nums text-[#6B8296]">
+            <span className="mt-0.5 block text-[10.5px] font-semibold tabular-nums text-[#6B8296]">
               {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -219,7 +219,10 @@ export default function Sidebar({
               <Icon size={13} className={selectedCategory === cat.id ? 'text-[#F7FBFF]' : 'text-[#52697D]'} />
               <span className="truncate">{cat.label}</span>
               <span className={cn(
-                'rounded-md px-1.5 py-0.5 text-[9px] font-black tabular-nums',
+                // 9px is fine for a decorative eyebrow but not for a figure a
+                // reader is meant to compare across chips — these counts are
+                // the point of the filter row.
+                'rounded-md px-1.5 py-0.5 text-[11px] font-black tabular-nums',
                 selectedCategory === cat.id ? 'bg-[rgba(255,255,255,0.18)] text-[#F7FBFF]' : 'bg-[#EEF4F8] text-[#52697D]'
               )}>
                 {count}

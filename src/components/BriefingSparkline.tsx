@@ -13,7 +13,7 @@ import type { PropertyYearEntry } from '@/src/hooks/usePropertyAssessments';
  * the top of the box.
  */
 
-const T = { ink: '#1C2B3A', inkSoft: '#5A6B7D', line: '#D9D2C3', panel: '#FFFDF8', bow: '#2E8B7A', critical: '#C0392B' };
+const T = { ink: '#2A2420', inkSoft: '#6E6357', line: '#E4DACA', panel: '#FFFCF6', bow: '#2E8B7A', critical: '#B0503A' };
 
 export function buildPath(values: number[], width: number, height: number, pad = 4): string {
   if (values.length < 2) return '';
@@ -52,14 +52,14 @@ export default function BriefingSparkline({
   const stroke = rising ? T.bow : T.critical;
 
   return (
-    <div className="rounded-xl border px-3.5 py-3" style={{ borderColor: T.line, background: T.panel }}>
+    <div className="rounded-2xl border px-3.5 py-3" style={{ borderColor: T.line, background: T.panel }}>
       <div className="flex items-end justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-display text-[1.4rem] font-extrabold leading-none tabular-nums" style={{ color: T.ink }}>
+          <p className="font-display text-[1.5rem] font-extrabold leading-none tabular-nums" style={{ color: T.ink }}>
             ${Math.round(latest.avgValue).toLocaleString()}
           </p>
           <p className="mt-1 text-[11px] font-semibold leading-tight" style={{ color: T.inkSoft }}>
-            Average residential assessment · {latest.year}
+            Average home assessment here · {latest.year}
           </p>
         </div>
         {change !== null && (

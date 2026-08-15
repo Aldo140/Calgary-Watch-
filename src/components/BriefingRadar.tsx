@@ -51,22 +51,25 @@ export function plotPoint(
   return { x: centre + r * Math.sin(rad), y: centre - r * Math.cos(rad) };
 }
 
+/** Warmed to match the page: clay rather than crimson, gold rather than orange. */
 const CATEGORY_COLOR: Record<string, string> = {
-  emergency: '#C0392B',
-  crime: '#C0392B',
-  traffic: '#C77F18',
-  infrastructure: '#2F855A',
-  weather: '#7C5CBF',
-  gas: '#0F8B8D',
+  emergency: '#C4553C',
+  crime: '#B0503A',
+  traffic: '#C08A3E',
+  infrastructure: '#4E8C6A',
+  weather: '#7A6BA8',
+  gas: '#2E8B7A',
 };
 
-const T = { ink: '#1C2B3A', navy: '#24466B', bow: '#2E8B7A', paper: '#F7F3EA', line: '#D9D2C3' };
+const T = { deep: '#1F3D37', deep2: '#2F5F52', gold: '#B0793C', glow: '#E8B871', page: '#FDFAF3' };
 
 export default function BriefingRadar({
-  points, radiusM, size = 200, still = false, onSelect,
+  points, radiusM, radiusLabel, size = 200, still = false, onSelect,
 }: {
   points: RadarPoint[];
   radiusM: number;
+  /** How to say the radius out loud. Defaults to metres. */
+  radiusLabel?: string;
   size?: number;
   still?: boolean;
   onSelect?: (incident: Incident) => void;
@@ -78,23 +81,23 @@ export default function BriefingRadar({
   return (
     <div
       className="relative overflow-hidden rounded-2xl"
-      style={{ background: `linear-gradient(150deg, ${T.ink} 0%, ${T.navy} 100%)` }}
+      style={{ background: `linear-gradient(155deg, ${T.deep} 0%, ${T.deep2} 100%)` }}
     >
       <svg viewBox={`0 0 ${size} ${size}`} width="100%" height="100%" role="img"
-        aria-label={`Plan view of ${points.length} reports within ${radiusM} metres of your address`}>
+        aria-label={`Map of ${points.length} reports within ${radiusM} metres of your home`}>
         <defs>
           <linearGradient id="cw-plot-sweep" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor={T.bow} stopOpacity="0" />
-            <stop offset="100%" stopColor={T.bow} stopOpacity="0.55" />
+            <stop offset="0%" stopColor={T.glow} stopOpacity="0" />
+            <stop offset="100%" stopColor={T.glow} stopOpacity="0.5" />
           </linearGradient>
         </defs>
 
         {ringFractions.map((f, i) => (
           <circle key={f} cx={centre} cy={centre} r={usable * f}
-            fill="none" stroke={T.bow} strokeWidth="1" opacity={0.34 - i * 0.05} />
+            fill="none" stroke={T.glow} strokeWidth="1" opacity={0.3 - i * 0.045} />
         ))}
-        <line x1={centre} y1={centre - usable} x2={centre} y2={centre + usable} stroke={T.bow} strokeWidth="0.75" opacity="0.16" />
-        <line x1={centre - usable} y1={centre} x2={centre + usable} y2={centre} stroke={T.bow} strokeWidth="0.75" opacity="0.16" />
+        <line x1={centre} y1={centre - usable} x2={centre} y2={centre + usable} stroke={T.glow} strokeWidth="0.75" opacity="0.14" />
+        <line x1={centre - usable} y1={centre} x2={centre + usable} y2={centre} stroke={T.glow} strokeWidth="0.75" opacity="0.14" />
 
         {/* One sweep on entry, matching the locate button's scan. */}
         {!still && (
@@ -109,24 +112,28 @@ export default function BriefingRadar({
               initial={{ opacity: 0.9 }} animate={{ opacity: 0 }}
               transition={{ duration: 1.9, ease: 'easeIn' }}
             />
-            <line x1={centre} y1={centre} x2={centre} y2={centre - usable}
-              stroke={T.bow} strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+            <motion.line
+              x1={centre} y1={centre} x2={centre} y2={centre - usable}
+              stroke={T.glow} strokeWidth="1.5" strokeLinecap="round"
+              initial={{ opacity: 0.65 }} animate={{ opacity: 0 }}
+              transition={{ duration: 1.6, ease: 'easeIn' }}
+            />
           </motion.g>
         )}
 
         {/* North, so the plot reads as a plan rather than a diagram. */}
         {/* Sized in viewBox units: the plot scales to its container, so these
             must stay legible at the smallest width it is rendered at. */}
-        <text x={centre} y="12" textAnchor="middle" fill={T.bow} fillOpacity="0.7"
+        <text x={centre} y="12" textAnchor="middle" fill={T.glow} fillOpacity="0.75"
           style={{ font: "bold 10px 'IBM Plex Mono', monospace", letterSpacing: '0.12em' }}>N</text>
         {/* Bottom-left, not on the east axis: a report due east of the house
             lands exactly where this label used to sit. */}
-        <text x="7" y={size - 7} textAnchor="start" fill={T.bow} fillOpacity="0.5"
-          style={{ font: "bold 10px 'IBM Plex Mono', monospace" }}>{radiusM}m</text>
+        <text x="7" y={size - 7} textAnchor="start" fill={T.glow} fillOpacity="0.55"
+          style={{ font: "bold 10px 'IBM Plex Mono', monospace" }}>{radiusLabel ?? `${radiusM}m`}</text>
 
         {points.map(({ incident, distanceM, bearing }, i) => {
           const { x, y } = plotPoint(distanceM, bearing, radiusM, size);
-          const color = CATEGORY_COLOR[incident.category] ?? T.bow;
+          const color = CATEGORY_COLOR[incident.category] ?? T.glow;
           return (
             <motion.g
               key={incident.id}
@@ -136,15 +143,15 @@ export default function BriefingRadar({
               style={{ transformOrigin: `${x}px ${y}px`, cursor: onSelect ? 'pointer' : undefined }}
               onClick={onSelect ? () => onSelect(incident) : undefined}
             >
-              <circle cx={x} cy={y} r="6.5" fill={color} opacity="0.22" />
-              <circle cx={x} cy={y} r="3.2" fill={color} stroke="#FFFDF8" strokeWidth="1.1" />
+              <circle cx={x} cy={y} r="6.5" fill={color} opacity="0.24" />
+              <circle cx={x} cy={y} r="3.2" fill={color} stroke={T.page} strokeWidth="1.1" />
             </motion.g>
           );
         })}
 
         {/* Their address. Drawn last so nothing covers it. */}
-        <circle cx={centre} cy={centre} r="7" fill={T.bow} opacity="0.22" />
-        <circle cx={centre} cy={centre} r="3" fill="#FFFDF8" />
+        <circle cx={centre} cy={centre} r="8" fill={T.glow} opacity="0.28" />
+        <circle cx={centre} cy={centre} r="3.2" fill={T.page} />
       </svg>
     </div>
   );

@@ -2,64 +2,77 @@ import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
-import { X, FileText, Camera, ShieldCheck, Home, ArrowRight, Settings2, Lock } from 'lucide-react';
-import { useCountUp } from '@/src/hooks/useCountUp';
+import { X, FileText, Camera, Video, Home, ArrowRight, Settings2, Compass, Sparkles } from 'lucide-react';
 import type { Incident } from '@/src/types';
 import { useHomeLocation } from '@/src/hooks/useHomeLocation';
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { distanceMeters, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import { findSafetyCamerasNear, type SafetyCamera } from '@/src/hooks/useSafetyCameras';
 import { useTrafficVolumes, volumeAt } from '@/src/hooks/useTrafficVolumes';
+import { useCountUp } from '@/src/hooks/useCountUp';
 import BriefingRadar, { bearingDegrees, type RadarPoint } from '@/src/components/BriefingRadar';
 import BriefingSparkline from '@/src/components/BriefingSparkline';
 
 /**
- * The signed-in resident's own briefing.
+ * What one neighbour's corner of Calgary looks like this week.
  *
- * Everyone can open the area panel for any community. This is the one screen
- * that could only have been produced for one person, and its structure says so:
- * sections are ordered as rings measured outward from their own front door —
- * their address, a few minutes' walk, the ride to work, their community, the
- * city. The radius is the section heading, because the distance *is* the
- * information. Nothing here is a generic dashboard tile.
+ * ── On the design ──────────────────────────────────────────────────────────
+ * This screen used to be a dossier: navy, radar, "issued", a reference code.
+ * Professional, and completely wrong for what Calgary Watch is. Nobody joins a
+ * neighbourhood watch to receive intelligence briefings; they join because they
+ * live somewhere and want to know how it is doing. The tone now matches that —
+ * a greeting, plain sentences, and their own name at the top.
  *
- * Two rules the whole component follows:
+ * The material is Calgary's. The city built its schools, courthouse and city
+ * hall out of Paskapoo sandstone and called itself the Sandstone City, so the
+ * page is set on sandstone with foothill green and a warm gold rule rather
+ * than on the cream-and-terracotta that any city would get. Ranges are stated
+ * in the city's own terms — a fifteen-minute walk, your community, your part in
+ * it — instead of in radii.
  *
- *  1. It is built only from what this person chose to give us. Nothing is
- *     inferred from an IP address, a device or a browsing trail, and the
- *     footer says so, naming each input.
- *  2. A section with no data does not render. There are no zero states dressed
- *     up as insight and no "—" placeholders; an empty ring means that ring was
- *     quiet, which is itself worth showing plainly rather than padding.
- *
- * The motion carries the same idea rather than decorating it: on open the
- * masthead radar sweeps once, then the rings resolve outward in order and the
- * spine draws down between them, so the document appears to assemble from
- * their address outward. Figures count up as their ring lands. All of it is
- * gated on prefers-reduced-motion, where every element simply starts resolved.
+ * ── Two rules the content follows ──────────────────────────────────────────
+ *  1. Built only from what this person chose to give us: their name, their
+ *     saved location, and the reports they filed. Nothing is inferred from an
+ *     IP address, a device or a browsing trail, and the closing note names each
+ *     input so the claim can be checked rather than trusted.
+ *  2. A section with no data does not render. No zero states dressed as
+ *     insight, no "—" placeholders. A quiet week is worth saying plainly.
  */
 
 const T = {
-  paper: '#F7F3EA',
-  panel: '#FFFDF8',
-  ink: '#1C2B3A',
-  inkSoft: '#5A6B7D',
-  line: '#D9D2C3',
-  bow: '#2E8B7A',
-  amber: '#C77F18',
-  navy: '#24466B',
+  page: '#F5EFE4',
+  card: '#FFFCF6',
+  ink: '#2A2420',
+  soft: '#6E6357',
+  line: '#E4DACA',
+  edge: '#D6C9B4',
+  teal: '#2E8B7A',
+  deep: '#1F3D37',
+  deep2: '#2F5F52',
+  gold: '#B0793C',
+  clay: '#B0503A',
 } as const;
 
-const BAND = [
-  { max: 0.10, label: 'Hot', color: '#DC2626' },
-  { max: 0.25, label: 'High', color: '#EA580C' },
-  { max: 0.50, label: 'Elevated', color: '#B8860B' },
-  { max: 1.01, label: 'Calm', color: '#2E8B7A' },
-] as const;
+/**
+ * A fifteen-minute walk, at a comfortable 80 m a minute.
+ *
+ * The ring was five minutes, which on most Calgary blocks caught the houses
+ * either side and nothing else. Fifteen minutes is the distance people
+ * actually think of as "round here" — the walk to the shops, the school, the
+ * station — and it is the same span the fifteen-minute-neighbourhood idea uses.
+ */
+export const WALK_M = 1200;
+export const WALK_MIN = 15;
 
-/** Rings, in metres. The walk is what people can picture; the rest follows. */
-const WALK_M = 400;
-const RIDE_M = 1000;
+/** The wider sweep the map's locate button flips through. */
+export const NEARBY_KM = 3;
+
+const BAND = [
+  { max: 0.10, label: 'Busy', color: '#B0503A' },
+  { max: 0.25, label: 'Above average', color: '#C0762A' },
+  { max: 0.50, label: 'Middling', color: '#8A7430' },
+  { max: 1.01, label: 'Quiet', color: '#2E8B7A' },
+] as const;
 
 export interface BriefingAreaStats {
   crime: number;
@@ -73,9 +86,8 @@ interface PersonalBriefingProps {
   open: boolean;
   onClose: () => void;
   displayName: string;
-  /** Saved street address, or '' when they only gave a neighbourhood. */
+  photoURL?: string;
   address: string;
-  /** Resolved community name for the saved location. */
   communityName: string;
   uid: string;
   memberSince?: number;
@@ -87,24 +99,21 @@ interface PersonalBriefingProps {
   onOpenArea: () => void;
   onOpenSettings: () => void;
   onSelectIncident: (incident: Incident) => void;
+  /** Opens the map's 3 km flip-through, which this page links out to. */
+  onOpenNearby: () => void;
 }
 
 function titleCase(value: string): string {
   return value.replace(/\b[\w']+/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
 }
 
-/**
- * "180 m" below a kilometre, "1.4 km" above — nobody thinks in 1,400 metres.
- *
- * Anything inside 25 m is their own address, and rounding that to "0 m" reads
- * as a broken figure rather than as the striking fact it is.
- */
+/** "180 m" below a kilometre, "1.4 km" above. Under 25 m is their own door. */
 export function formatDistance(metres: number): string {
   if (metres < 25) return 'at home';
   return metres < 1000 ? `${Math.round(metres / 10) * 10} m` : `${(metres / 1000).toFixed(1)} km`;
 }
 
-/** Roughly how long it takes to walk that far, at 80 m/min. */
+/** Roughly how long it takes to walk that far, at 80 m a minute. */
 export function walkingMinutes(metres: number): number {
   return Math.max(1, Math.round(metres / 80));
 }
@@ -115,11 +124,11 @@ export function bandFor(rank: number, total: number): { label: string; color: st
 }
 
 /**
- * A stable reference for this person's briefing.
+ * A stable reference for this person's page.
  *
- * Deliberately derived from the account id rather than being random, so the
- * same person sees the same reference every time and can quote it to us. It
- * is a hash, not the id itself — the id should not be sitting on screen.
+ * Derived from the account id rather than random, so the same person sees the
+ * same reference and can quote it to us. It is a hash, not the id — the id
+ * should not be sitting on screen.
  */
 export function briefingRef(uid: string, issuedAt: number): string {
   let h = 0;
@@ -129,91 +138,120 @@ export function briefingRef(uid: string, issuedAt: number): string {
   return `CW-${stamp}-${h.toString(36).toUpperCase().padStart(5, '0').slice(-5)}`;
 }
 
+/** Greets by the clock, because a person reading this is having a day. */
+export function greetingFor(date: Date): string {
+  const h = date.getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+// ── Pieces ──────────────────────────────────────────────────────────────────
+
 /**
- * Section heading. The radius is the label, because the distance is the point.
+ * A section of the page.
  *
- * `order` places the ring in the reveal sequence, so the document resolves
- * outward from the reader's address rather than appearing all at once.
+ * Sections are separated by a rule with a small gold mark rather than strung
+ * on a vertical spine. The spine made the page read as an instrument readout;
+ * a rule reads as a printed page, which is what this is.
  */
-function Ring({
-  radius, title, children, accent = T.bow, order = 0, still = false,
+function Section({
+  eyebrow, title, children, order = 0, still = false,
 }: {
-  radius: string; title: string; children: React.ReactNode;
-  accent?: string; order?: number; still?: boolean;
+  eyebrow: string; title: string; children: React.ReactNode; order?: number; still?: boolean;
 }) {
-  const delay = still ? 0 : 0.28 + order * 0.13;
+  const delay = still ? 0 : 0.2 + order * 0.11;
   return (
     <motion.section
-      className="relative pl-6 sm:pl-7"
-      initial={still ? false : { opacity: 0, y: 14 }}
+      className="pt-7 first:pt-1"
+      initial={still ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Spine: draws downward as the ring lands, joining it to the next. */}
-      <motion.span
-        aria-hidden="true"
-        className="absolute left-[7px] top-3 bottom-0 w-px origin-top sm:left-[9px]"
-        style={{ background: T.line }}
-        initial={still ? false : { scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ delay: delay + 0.1, duration: 0.5, ease: 'easeOut' }}
-      />
-      <motion.span
-        aria-hidden="true"
-        className="absolute left-0 top-1.5 grid h-[15px] w-[15px] place-items-center rounded-full sm:left-[2px]"
-        style={{ background: T.paper, border: `2px solid ${accent}` }}
-        initial={still ? false : { scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay, type: 'spring', stiffness: 420, damping: 18 }}
+      <div className="flex items-center gap-2.5">
+        <span className="h-[3px] w-[18px] shrink-0 rounded-full" style={{ background: T.gold }} aria-hidden="true" />
+        <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: T.gold }}>
+          {eyebrow}
+        </span>
+      </div>
+      <h3
+        className="mt-2 font-display text-[1.3rem] font-extrabold leading-tight tracking-[-0.02em] sm:text-[1.5rem]"
+        style={{ color: T.ink }}
       >
-        <span className="h-[3px] w-[3px] rounded-full" style={{ background: accent }} />
-      </motion.span>
-      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: accent }}>
-        {radius}
-      </p>
-      <h3 className="mt-0.5 font-display text-[1.05rem] font-extrabold tracking-[-0.01em] sm:text-[1.15rem]" style={{ color: T.ink }}>
         {title}
       </h3>
-      <div className="mt-2.5 pb-7">{children}</div>
+      <div className="mt-3.5">{children}</div>
     </motion.section>
   );
 }
 
-/**
- * A single number and what it means.
- *
- * `count` animates the value up when it is a plain figure; `value` is used
- * verbatim for anything already formatted (a dollar amount, a year).
- */
-function Figure({
-  count, value, label, tone = T.ink, prefix = '', still = false,
+function Stat({
+  count, value, label, tone = T.ink, still = false,
 }: {
-  count?: number; value?: string; label: string; tone?: string; prefix?: string; still?: boolean;
+  count?: number; value?: string; label: string; tone?: string; still?: boolean;
 }) {
   const animated = useCountUp(count ?? 0, 900, !still && count !== undefined);
-  const shown = value ?? `${prefix}${(still ? (count ?? 0) : animated).toLocaleString()}`;
+  const shown = value ?? (still ? (count ?? 0) : animated).toLocaleString();
   return (
-    <div className="rounded-xl border px-3 py-2.5" style={{ borderColor: T.line, background: T.panel }}>
-      <p className="font-display text-[1.4rem] font-extrabold leading-none tabular-nums" style={{ color: tone }}>{shown}</p>
-      <p className="mt-1 text-[11px] font-semibold leading-tight" style={{ color: T.inkSoft }}>{label}</p>
+    <div className="rounded-2xl px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+      <p className="font-display text-[1.5rem] font-extrabold leading-none tabular-nums" style={{ color: tone }}>
+        {shown}
+      </p>
+      <p className="mt-1.5 text-[11.5px] font-semibold leading-tight" style={{ color: T.soft }}>{label}</p>
     </div>
   );
 }
 
+/** A report, as a row you can open. */
+function ReportRow({
+  incident, badge, sub, icon, onOpen, index = 0, still = false,
+}: {
+  incident: Incident; badge?: string; sub: string; icon?: React.ReactNode;
+  onOpen: () => void; index?: number; still?: boolean;
+}) {
+  return (
+    <motion.li
+      initial={still ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: still ? 0 : 0.42 + index * 0.06, duration: 0.34, ease: 'easeOut' }}
+    >
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex w-full items-start gap-3 rounded-2xl px-3.5 py-3 text-left transition-colors hover:opacity-90"
+        style={{ background: T.card, border: `1px solid ${T.line}` }}
+      >
+        {badge !== undefined ? (
+          <span
+            className="mt-[2px] shrink-0 rounded-lg px-2 py-1 font-mono text-[10px] font-bold tabular-nums"
+            style={{ background: 'rgba(46,139,122,0.12)', color: '#1F6154' }}
+          >
+            {badge}
+          </span>
+        ) : icon}
+        <span className="min-w-0 flex-1">
+          <span className="block text-[13.5px] font-bold leading-snug line-clamp-2" style={{ color: T.ink }}>
+            {incident.title}
+          </span>
+          <span className="mt-0.5 block text-[11.5px]" style={{ color: T.soft }}>{sub}</span>
+        </span>
+      </button>
+    </motion.li>
+  );
+}
+
+// ── Page ────────────────────────────────────────────────────────────────────
+
 export default function PersonalBriefing({
-  open, onClose, displayName, address, communityName, uid, memberSince, digestOptIn,
+  open, onClose, displayName, photoURL, address, communityName, uid, memberSince, digestOptIn,
   incidents, areaStats, safetyCameras, trafficCameras,
-  onOpenArea, onOpenSettings, onSelectIncident,
+  onOpenArea, onOpenSettings, onSelectIncident, onOpenNearby,
 }: PersonalBriefingProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  // Everything below animates outward from the reader's address. Where motion
-  // is unwelcome, every element simply starts resolved.
-  const still = useReducedMotion() ?? false;
-  // Frozen at open so the reference and the "issued" line do not change while
-  // it is on screen.
   const issuedAtRef = useRef<number>(Date.now());
   if (!open) issuedAtRef.current = Date.now();
 
+  const still = useReducedMotion() ?? false;
   const { home, isResolving } = useHomeLocation(address, open);
   const { data: propertyData } = usePropertyAssessments(open && communityName ? communityName : null);
   const volumes = useTrafficVolumes(open);
@@ -233,14 +271,14 @@ export default function PersonalBriefing({
 
   const firstName = (displayName || '').trim().split(/\s+/)[0] || 'neighbour';
   const issuedAt = issuedAtRef.current;
+  const areaLabel = communityName ? titleCase(communityName) : 'your area';
 
-  /** Community reports this person filed. Their own record, not a leaderboard. */
   const myReports = useMemo(
     () => incidents.filter((i) => i.authorUid === uid).sort((a, b) => b.timestamp - a.timestamp),
     [incidents, uid],
   );
 
-  /** Everything within a walk of their door, nearest first. */
+  /** Everything inside the walk, nearest first. */
   const nearby = useMemo(() => {
     if (!home) return [];
     return incidents
@@ -250,18 +288,16 @@ export default function PersonalBriefing({
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [incidents, home]);
 
-  /** The same reports, placed at their true bearing for the plan view. */
   const radarPoints = useMemo<RadarPoint[]>(() => {
     if (!home) return [];
     return nearby.map(({ incident, distanceM }) => ({
-      incident,
-      distanceM,
+      incident, distanceM,
       bearing: bearingDegrees(home.lat, home.lng, incident.lat, incident.lng),
     }));
   }, [home, nearby]);
 
   const nearbySafety = useMemo(
-    () => (home ? findSafetyCamerasNear(home.lat, home.lng, safetyCameras, RIDE_M) : []),
+    () => (home ? findSafetyCamerasNear(home.lat, home.lng, safetyCameras, WALK_M) : []),
     [home, safetyCameras],
   );
 
@@ -269,351 +305,293 @@ export default function PersonalBriefing({
     if (!home) return [];
     return trafficCameras
       .map((camera) => ({ camera, distanceM: distanceMeters(home.lat, home.lng, camera.lat, camera.lng) }))
-      .filter((x) => x.distanceM <= RIDE_M)
+      .filter((x) => x.distanceM <= WALK_M)
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [home, trafficCameras]);
 
   const latestValue = propertyData.length > 0 ? propertyData[propertyData.length - 1] : null;
   const band = areaStats ? bandFor(areaStats.rank, areaStats.count) : null;
-  const areaLabel = communityName ? titleCase(communityName) : 'your area';
 
-  /**
-   * The one number the whole document is about, chosen by what we actually
-   * know. A resolved address gives the walk; without one the community's
-   * standing is the strongest true statement we can lead with.
-   */
-  const thesis: { figure: number; label: string } | null = home
+  /** The one number this page is about. */
+  const headline: { figure: number; label: string } | null = home
     ? {
         figure: nearby.length,
-        label: nearby.length === 0
-          ? `reports inside your ${walkingMinutes(WALK_M)}-minute walk — the quietest thing this can say`
-          : `report${nearby.length === 1 ? '' : 's'} inside your ${walkingMinutes(WALK_M)}-minute walk`,
+        label: nearby.length === 1 ? 'thing your neighbours reported' : 'things your neighbours reported',
       }
     : areaStats
       ? { figure: areaStats.rank, label: `of ${areaStats.count} Calgary communities by reported volume` }
       : null;
-  const thesisCount = useCountUp(thesis?.figure ?? 0, 1100, !still && thesis !== null);
+  const headlineCount = useCountUp(headline?.figure ?? 0, 1000, !still && headline !== null);
 
   if (!open) return null;
 
   const body = (
     <div
       className="fixed inset-0 z-[1200] flex items-stretch justify-center sm:items-center sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Safety briefing for ${firstName}`}
+      role="dialog" aria-modal="true" aria-label={`Your neighbourhood, ${firstName}`}
     >
       <motion.button
-        type="button"
-        aria-label="Close briefing"
-        onClick={onClose}
+        type="button" aria-label="Close" onClick={onClose}
         className="absolute inset-0 h-full w-full cursor-default"
-        style={{ background: 'rgba(12,22,33,0.55)', backdropFilter: 'blur(3px)' }}
-        initial={still ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.25 }}
+        style={{ background: 'rgba(30,24,18,0.55)', backdropFilter: 'blur(3px)' }}
+        initial={still ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }}
       />
 
       <motion.div
-        className="relative flex h-full w-full max-w-[44rem] flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:rounded-3xl"
-        style={{ background: T.paper }}
-        initial={still ? false : { opacity: 0, y: 24, scale: 0.985 }}
+        className="relative flex h-full w-full max-w-[44rem] flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:rounded-[1.75rem]"
+        style={{ background: T.page }}
+        initial={still ? false : { opacity: 0, y: 22, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* ── Masthead ──────────────────────────────────────────────────────
-            The one part of the product with this person's name printed on it.
-            The radar is not decoration: it is the document's structure stated
-            once, and it sweeps their address before the rings resolve. */}
+        {/* ── Greeting ──────────────────────────────────────────────────────
+            Their name and their street, in a sentence, the way a neighbour
+            would open. */}
         <header
-          className="relative shrink-0 overflow-hidden px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-7 sm:pb-6 sm:pt-6"
-          style={{ background: `linear-gradient(135deg, ${T.ink} 0%, ${T.navy} 100%)` }}
+          className="relative shrink-0 overflow-hidden px-5 pb-6 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 sm:pb-7 sm:pt-7"
+          style={{ background: `linear-gradient(155deg, ${T.deep} 0%, ${T.deep2} 100%)` }}
         >
-          {/* The radar is the one place this document spends its boldness:
-              large enough to read as the instrument the briefing is named
-              after, quiet enough in opacity that the headline stays first. */}
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-20 -top-24 h-[19rem] w-[19rem] sm:-right-16 sm:-top-28 sm:h-[23rem] sm:w-[23rem]"
-          >
-            <svg viewBox="0 0 200 200" width="100%" height="100%" fill="none">
-              <defs>
-                <linearGradient id="cw-sweep" x1="0" y1="1" x2="0" y2="0">
-                  <stop offset="0%" stopColor={T.bow} stopOpacity="0" />
-                  <stop offset="100%" stopColor={T.bow} stopOpacity="0.9" />
-                </linearGradient>
-              </defs>
-              {/* Four standing rings — the four radii the document is built from. */}
-              {[28, 52, 76, 99].map((r, i) => (
-                <circle key={r} cx="100" cy="100" r={r} stroke={T.bow} strokeWidth="1.25"
-                  opacity={0.34 - i * 0.05} />
-              ))}
-              {/* Cross-hairs, so it reads as an instrument rather than a ripple. */}
-              <line x1="100" y1="1" x2="100" y2="199" stroke={T.bow} strokeWidth="0.75" opacity="0.16" />
-              <line x1="1" y1="100" x2="199" y2="100" stroke={T.bow} strokeWidth="0.75" opacity="0.16" />
-              {/* One outward pulse per ring, staggered to match the sections. */}
-              {!still && [0, 1, 2].map((i) => (
-                <motion.circle
-                  key={`p${i}`} cx="100" cy="100" r="28" stroke={T.bow} strokeWidth="1.5" fill="none"
-                  initial={{ scale: 0.3, opacity: 0.6 }}
-                  animate={{ scale: 3.6, opacity: 0 }}
-                  style={{ transformOrigin: '100px 100px' }}
-                  transition={{ delay: 0.15 + i * 0.5, duration: 2.2, ease: 'easeOut' }}
-                />
-              ))}
-              {/* The sweep: two passes, then it rests. A looping radar would
-                  imply the page is still working after it has finished. */}
-              {!still && (
-                <motion.g
-                  style={{ transformOrigin: '100px 100px' }}
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: 720 }}
-                  transition={{ duration: 2.6, ease: [0.33, 0, 0.2, 1] }}
-                >
-                  <motion.path
-                    d="M100 100 L100 1 A99 99 0 0 1 170 30 Z"
-                    fill="url(#cw-sweep)"
-                    initial={{ opacity: 0.5 }}
-                    animate={{ opacity: 0 }}
-                    transition={{ duration: 2.6, times: [0, 1], ease: 'easeIn' }}
-                  />
-                  <line x1="100" y1="100" x2="100" y2="1" stroke={T.bow} strokeWidth="1.75"
-                    strokeLinecap="round" opacity="0.75" />
-                </motion.g>
-              )}
-              <circle cx="100" cy="100" r="3.5" fill={T.bow} opacity="0.8" />
+          {/* Foothill contour — a warm landform, not a targeting reticle. */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-24 opacity-[0.16]">
+            <svg viewBox="0 0 400 100" width="100%" height="100%" preserveAspectRatio="none" fill="none" stroke={T.page} strokeWidth="1">
+              <path d="M0 78 Q 52 44 104 62 T 208 52 T 312 68 T 400 46" />
+              <path d="M0 92 Q 60 62 124 78 T 246 66 T 400 82" opacity="0.7" />
             </svg>
           </span>
 
           <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Close briefing"
-            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid h-9 w-9 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-5 sm:top-5"
-            style={{ background: 'rgba(255,253,248,0.14)', color: T.paper }}
+            ref={closeRef} type="button" onClick={onClose} aria-label="Close"
+            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid h-9 w-9 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-6 sm:top-6"
+            style={{ background: 'rgba(245,239,228,0.16)', color: T.page }}
           >
             <X size={17} />
           </button>
 
           <motion.div
-            initial={still ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={still ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
-              Prepared for you
-            </p>
+            <div className="flex items-center gap-3">
+              {photoURL ? (
+                <img
+                  src={photoURL} alt="" referrerPolicy="no-referrer"
+                  className="h-9 w-9 shrink-0 rounded-full object-cover"
+                  style={{ boxShadow: `0 0 0 2px rgba(245,239,228,0.35)` }}
+                />
+              ) : (
+                <span
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full font-display text-[15px] font-extrabold"
+                  style={{ background: 'rgba(245,239,228,0.18)', color: T.page }}
+                >
+                  {firstName.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: '#93C4B4' }}>
+                {greetingFor(new Date(issuedAt))}, {firstName}
+              </p>
+            </div>
+
             <h2
-              className="mt-2 font-display font-extrabold leading-[1.05] tracking-[-0.03em] pr-11"
-              style={{ color: '#FFFDF8', fontSize: 'clamp(1.6rem, 6.2vw, 2.35rem)' }}
+              className="mt-3.5 font-display font-extrabold leading-[1.06] tracking-[-0.03em] pr-10"
+              style={{ color: '#FDFAF3', fontSize: 'clamp(1.75rem, 6.6vw, 2.5rem)' }}
             >
-              {firstName}&rsquo;s safety briefing
+              Here&rsquo;s your corner of Calgary
             </h2>
-            <p className="mt-2.5 flex items-start gap-1.5 text-[12.5px] font-medium leading-snug" style={{ color: '#B9CBD8' }}>
+
+            <p className="mt-3 flex items-start gap-1.5 text-[13px] font-medium leading-snug" style={{ color: '#C3D6CE' }}>
               <Home size={13} className="mt-[2px] shrink-0" aria-hidden="true" />
               <span className="min-w-0">
-                Measured from <span className="font-bold" style={{ color: '#FFFDF8' }}>{address || areaLabel}</span>
+                Everything below is measured from{' '}
+                <span className="font-bold" style={{ color: '#FDFAF3' }}>{address || areaLabel}</span>
               </span>
             </p>
           </motion.div>
 
-          {/* The thesis: the single number this whole document is about. */}
-          {thesis && (
+          {headline && (
             <motion.div
-              className="mt-4 flex items-baseline gap-2.5"
-              initial={still ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.18, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-5 flex items-baseline gap-3"
+              initial={still ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.16, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <span
                 className="font-display font-extrabold leading-none tabular-nums"
-                style={{ color: '#7FB5A6', fontSize: 'clamp(2.4rem, 10vw, 3.4rem)' }}
+                style={{ color: '#E8B871', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}
               >
-                {still ? thesis.figure : thesisCount}
+                {still ? headline.figure : headlineCount}
               </span>
-              <span className="min-w-0 pb-1 text-[12.5px] font-semibold leading-tight" style={{ color: '#B9CBD8' }}>
-                {thesis.label}
+              <span className="min-w-0 pb-1.5 text-[13px] font-semibold leading-tight" style={{ color: '#C3D6CE' }}>
+                {headline.label}
+                {home && <span className="block font-normal">within a {WALK_MIN}-minute walk</span>}
               </span>
             </motion.div>
           )}
-
-          <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: '#8FA9BC' }}>
-            <span>
-              Issued {new Date(issuedAt).toLocaleDateString('en-CA', { day: 'numeric', month: 'short', year: 'numeric' })}
-            </span>
-            <span aria-hidden="true">&middot;</span>
-            <span>{briefingRef(uid, issuedAt)}</span>
-          </div>
         </header>
 
-        {/* ── Rings ─────────────────────────────────────────────────────────── */}
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-6 sm:px-7">
-          {/* Ring 1 — the walk. Only this person can see this list. */}
+        {/* ── Page ──────────────────────────────────────────────────────────── */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-8 pt-6 sm:px-8">
           {home && (
-            <Ring order={0} still={still} radius={`Within ${WALK_M} m · about a ${walkingMinutes(WALK_M)}-minute walk`} title={
-              nearby.length === 0
-                ? 'Nothing reported on your block'
-                : `${nearby.length} report${nearby.length === 1 ? '' : 's'} inside your walk`
-            }>
+            <Section
+              order={0} still={still}
+              eyebrow={`A ${WALK_MIN}-minute walk`}
+              title={nearby.length === 0 ? 'A quiet week around you' : `What people reported near you`}
+            >
               {nearby.length === 0 ? (
-                <p className="text-[13.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-                  No incident in the current window sits within a few minutes&rsquo; walk of your address.
-                  That is the quietest thing this briefing can tell you.
+                <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
+                  Nobody has reported anything within a {WALK_MIN}-minute walk of your address lately.
+                  That is the best thing this page can tell you.
                 </p>
               ) : (
-                /* The walk, drawn to scale: true bearing, true distance. */
-                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  {/* Capped rather than full-bleed: the plot scales to its box,
-                      so a full-width phone rendering blew the axis labels up to
-                      nearly twice their desktop size. */}
-                  <div className="mx-auto w-full max-w-[15rem] shrink-0 sm:mx-0 sm:w-[13.5rem] sm:max-w-none">
-                    <BriefingRadar
-                      points={radarPoints}
-                      radiusM={WALK_M}
-                      still={still}
-                      onSelect={(incident) => { onSelectIncident(incident); onClose(); }}
-                    />
+                <>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                    <div className="mx-auto w-full max-w-[16rem] shrink-0 sm:mx-0 sm:w-[15rem] sm:max-w-none">
+                      <BriefingRadar
+                        points={radarPoints} radiusM={WALK_M} radiusLabel={`${(WALK_M / 1000).toFixed(1)} km`} still={still}
+                        onSelect={(incident) => { onSelectIncident(incident); onClose(); }}
+                      />
+                    </div>
+                    <p className="text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
+                      Your home is the middle. Every dot is a real report, placed at the direction and
+                      distance it actually happened — north is up, and a dot on the outer ring is a full
+                      {' '}{WALK_MIN}-minute walk away. Tap one to read it.
+                    </p>
                   </div>
-                  <p className="text-[12.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-                    Your address is the centre. Each dot is a report at its real bearing and its real
-                    distance, so a dot at the outer ring is genuinely {WALK_M} m away. Colour is the
-                    category. Tap one to open it.
-                  </p>
-                </div>
-              )}
-              {nearby.length > 0 && (
-                <ul className="space-y-1.5">
-                  {nearby.slice(0, 5).map(({ incident, distanceM }, i) => (
-                    <motion.li
-                      key={incident.id}
-                      initial={still ? false : { opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.42 + i * 0.07, duration: 0.35, ease: 'easeOut' }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => { onSelectIncident(incident); onClose(); }}
-                        className="flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors hover:opacity-90"
-                        style={{ borderColor: T.line, background: T.panel }}
-                      >
-                        <span
-                          className="mt-[3px] shrink-0 rounded-md px-1.5 py-1 font-mono text-[10px] font-bold tabular-nums"
-                          style={{ background: `${T.bow}1f`, color: '#1F6154' }}
-                        >
-                          {formatDistance(distanceM)}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-bold leading-snug line-clamp-2" style={{ color: T.ink }}>
-                            {incident.title}
-                          </span>
-                          <span className="block text-[11px]" style={{ color: T.inkSoft }}>
-                            {titleCase(incident.category)} &middot; {formatDistanceToNow(incident.timestamp)} ago
-                          </span>
-                        </span>
-                      </button>
-                    </motion.li>
-                  ))}
+
+                  <ul className="mt-4 space-y-2">
+                    {nearby.slice(0, 5).map(({ incident, distanceM }, i) => (
+                      <ReportRow
+                        key={incident.id} incident={incident} index={i} still={still}
+                        badge={formatDistance(distanceM)}
+                        sub={`${titleCase(incident.category)} · ${formatDistanceToNow(incident.timestamp)} ago`}
+                        onOpen={() => { onSelectIncident(incident); onClose(); }}
+                      />
+                    ))}
+                  </ul>
                   {nearby.length > 5 && (
-                    <li className="pt-0.5 text-[11.5px] font-semibold" style={{ color: T.inkSoft }}>
-                      and {nearby.length - 5} more within the same walk
-                    </li>
+                    <p className="mt-2.5 text-[12.5px] font-semibold" style={{ color: T.soft }}>
+                      and {nearby.length - 5} more inside the same walk
+                    </p>
                   )}
-                </ul>
+                </>
               )}
-            </Ring>
+
+              {/* The way through to the map's wider sweep. */}
+              <button
+                type="button"
+                onClick={() => { onOpenNearby(); onClose(); }}
+                className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3.5 text-left transition-transform active:scale-[0.99]"
+                style={{ background: T.ink, color: T.page }}
+              >
+                <span className="flex min-w-0 items-center gap-3">
+                  <Compass size={18} className="shrink-0" style={{ color: '#E8B871' }} />
+                  <span className="min-w-0">
+                    <span className="block text-[14px] font-black leading-tight">Look further out</span>
+                    <span className="block text-[11.5px] opacity-75">
+                      Flip through everything within {NEARBY_KM} km, one at a time
+                    </span>
+                  </span>
+                </span>
+                <ArrowRight size={17} className="shrink-0" />
+              </button>
+            </Section>
           )}
 
-          {/* Ring 2 — enforcement and eyes, at commuting range. */}
           {home && (nearbySafety.length > 0 || nearbyTraffic.length > 0) && (
-            <Ring order={1} still={still} radius={`Within ${RIDE_M / 1000} km`} title="Cameras around you" accent={T.amber}>
-              <div className="grid grid-cols-2 gap-2">
-                <Figure count={nearbySafety.length} still={still} label="Safety cameras that ticket" tone={T.amber} />
-                <Figure count={nearbyTraffic.length} still={still} label="Public traffic cameras" tone={T.navy} />
+            <Section
+              order={1} still={still} eyebrow="On your streets"
+              title={`Cameras within your walk`}
+            >
+              <div className="grid grid-cols-2 gap-2.5">
+                <Stat count={nearbySafety.length} still={still} tone={T.gold} label="Safety cameras that ticket" />
+                <Stat count={nearbyTraffic.length} still={still} tone={T.deep2} label="Public traffic cameras" />
               </div>
 
               {nearbySafety.length > 0 && (
-                <ul className="mt-2.5 space-y-1.5">
-                  {nearbySafety.slice(0, 3).map(({ camera, distanceM }) => (
-                    <li
-                      key={camera.id}
-                      className="flex items-start gap-2.5 rounded-xl border px-3 py-2.5"
-                      style={{ borderColor: T.line, background: T.panel }}
-                    >
-                      <Camera size={14} className="mt-[2px] shrink-0" style={{ color: T.amber }} aria-hidden="true" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[12.5px] font-bold leading-snug" style={{ color: T.ink }}>
-                          {camera.intersection}
-                        </span>
-                        <span className="block text-[11px]" style={{ color: T.inkSoft }}>
-                          {formatDistance(distanceM)} away
-                          {camera.direction ? ` · watches ${camera.direction.toLowerCase()} traffic` : ''}
-                        </span>
-                        {/* How busy the road is, where the city has counted it. */}
-                        {(() => {
-                          const daily = volumeAt(camera.lat, camera.lng, volumes);
-                          return daily ? (
-                            <span className="mt-1 inline-block rounded-md px-1.5 py-0.5 font-mono text-[9.5px] font-bold tabular-nums"
-                              style={{ background: 'rgba(199,127,24,0.14)', color: '#8A5710' }}>
+                <ul className="mt-2.5 space-y-2">
+                  {nearbySafety.slice(0, 3).map(({ camera, distanceM }) => {
+                    const daily = volumeAt(camera.lat, camera.lng, volumes);
+                    return (
+                      <li
+                        key={camera.id}
+                        className="flex items-start gap-3 rounded-2xl px-3.5 py-3"
+                        style={{ background: T.card, border: `1px solid ${T.line}` }}
+                      >
+                        <Camera size={15} className="mt-[2px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[13px] font-bold leading-snug" style={{ color: T.ink }}>
+                            {camera.intersection}
+                          </span>
+                          <span className="block text-[11.5px]" style={{ color: T.soft }}>
+                            {formatDistance(distanceM)} away
+                            {camera.direction ? ` · watches ${camera.direction.toLowerCase()} traffic` : ''}
+                          </span>
+                          {daily && (
+                            <span
+                              className="mt-1.5 inline-block rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums"
+                              style={{ background: 'rgba(176,121,60,0.14)', color: '#8A5710' }}
+                            >
                               {Math.round(daily).toLocaleString()} vehicles a day
                             </span>
-                          ) : null;
-                        })()}
-                      </span>
-                    </li>
-                  ))}
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
                   {nearbySafety.length > 3 && (
-                    <li className="pt-0.5 text-[11.5px] font-semibold" style={{ color: T.inkSoft }}>
-                      and {nearbySafety.length - 3} more inside {RIDE_M / 1000} km
+                    <li className="pt-0.5 text-[12.5px] font-semibold" style={{ color: T.soft }}>
+                      and {nearbySafety.length - 3} more inside the same walk
                     </li>
                   )}
                 </ul>
               )}
 
-              <p className="mt-2.5 text-[12px] leading-relaxed" style={{ color: T.inkSoft }}>
+              {nearbyTraffic.length > 0 && (
+                <p className="mt-2.5 flex items-start gap-2 text-[12.5px] leading-relaxed" style={{ color: T.soft }}>
+                  <Video size={13} className="mt-[3px] shrink-0" style={{ color: T.deep2 }} aria-hidden="true" />
+                  <span>
+                    The traffic cameras are public webcams you can look through yourself — switch the layer
+                    on from the map.
+                  </span>
+                </p>
+              )}
+
+              <p className="mt-2.5 text-[12.5px] leading-relaxed" style={{ color: T.soft }}>
                 Safety cameras ticket for running the red <strong style={{ color: T.ink }}>and</strong> for
-                speeding through the green. Calgary does not publish how many tickets each one writes, or
-                where mobile photo radar sets up, so this is the fixed set and how busy their roads are —
-                not a ranking of which camera catches most.
+                speeding through the green. The city does not publish how many tickets each one writes, or
+                where mobile photo radar sets up — so this is where the fixed cameras are and how busy their
+                roads are, not a ranking of which one catches most.
               </p>
-            </Ring>
+            </Section>
           )}
 
-          {/* Ring 3 — the community. */}
           {(areaStats || latestValue) && (
-            <Ring order={2} still={still} radius={communityName ? titleCase(communityName) : 'Your community'} title="How your community reads">
+            <Section
+              order={2} still={still} eyebrow={areaLabel}
+              title="How your community is doing"
+            >
               {areaStats && band && (
                 <>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em]"
-                      style={{ background: `${band.color}1f`, color: band.color }}
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: band.color }} />
-                      {band.label}
-                    </span>
-                    <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: T.inkSoft }}>
-                      #{areaStats.rank} of {areaStats.count} communities by volume
-                    </span>
-                  </div>
-                  <div className="mt-2.5 grid grid-cols-2 gap-2">
-                    <Figure count={areaStats.crime} still={still} label={`Criminal offences · ${areaStats.year}`} />
-                    <Figure count={areaStats.disorder} still={still} label={`Disorder calls · ${areaStats.year}`} />
+                  <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
+                    Against every other Calgary community, {areaLabel} sits{' '}
+                    <strong style={{ color: band.color }}>{band.label.toLowerCase()}</strong> — number{' '}
+                    <strong style={{ color: T.ink }}>{areaStats.rank}</strong> of {areaStats.count} by how
+                    much gets reported.
+                  </p>
+                  <div className="mt-3 grid grid-cols-2 gap-2.5">
+                    <Stat count={areaStats.crime} still={still} label={`Criminal offences in ${areaStats.year}`} />
+                    <Stat count={areaStats.disorder} still={still} label={`Disorder calls in ${areaStats.year}`} />
                   </div>
                 </>
               )}
 
               {propertyData.length >= 2 ? (
-                <div className="mt-2">
-                  <BriefingSparkline data={propertyData} still={still} />
-                </div>
+                <div className="mt-2.5"><BriefingSparkline data={propertyData} still={still} /></div>
               ) : latestValue ? (
-                <div className="mt-2 rounded-xl border px-3 py-2.5" style={{ borderColor: T.line, background: T.panel }}>
-                  <p className="font-display text-[1.4rem] font-extrabold leading-none tabular-nums" style={{ color: T.ink }}>
+                <div className="mt-2.5 rounded-2xl px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+                  <p className="font-display text-[1.5rem] font-extrabold leading-none tabular-nums" style={{ color: T.ink }}>
                     ${Math.round(latestValue.avgValue).toLocaleString()}
                   </p>
-                  <p className="mt-1 text-[11px] font-semibold leading-snug" style={{ color: T.inkSoft }}>
-                    Average residential assessment here in {latestValue.year} &middot; {latestValue.sampleCount.toLocaleString()} properties
+                  <p className="mt-1.5 text-[11.5px] font-semibold leading-snug" style={{ color: T.soft }}>
+                    Average home assessment here in {latestValue.year} · {latestValue.sampleCount.toLocaleString()} properties
                   </p>
                 </div>
               ) : null}
@@ -621,97 +599,88 @@ export default function PersonalBriefing({
               <button
                 type="button"
                 onClick={() => { onOpenArea(); onClose(); }}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[12.5px] font-bold transition-opacity hover:opacity-90"
-                style={{ background: T.ink, color: T.paper }}
+                className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-bold transition-opacity hover:opacity-90"
+                style={{ background: 'transparent', border: `1.5px solid ${T.edge}`, color: T.ink }}
               >
-                Open the full area report <ArrowRight size={14} />
+                See everything about {areaLabel} <ArrowRight size={14} />
               </button>
-            </Ring>
+            </Section>
           )}
 
-          {/* Ring 4 — what they put in. */}
-          <Ring order={3} still={still} radius="Your record" title={
-            myReports.length === 0 ? 'You have not filed a report yet' : `${myReports.length} report${myReports.length === 1 ? '' : 's'} filed by you`
-          } accent={T.navy}>
+          <Section
+            order={3} still={still} eyebrow="Your part in it"
+            title={myReports.length === 0 ? 'Nothing from you yet' : `You have reported ${myReports.length} thing${myReports.length === 1 ? '' : 's'}`}
+          >
             {myReports.length === 0 ? (
-              <p className="text-[13.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-                The map is only as good as what neighbours put into it. The next thing you notice near
-                {address ? ' your address' : ' you'} is worth a minute.
+              <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
+                This map is only as good as what neighbours put into it. The next thing you notice
+                {address ? ' near your place' : ''} is worth the minute it takes.
               </p>
             ) : (
-              <ul className="space-y-1.5">
-                {myReports.slice(0, 3).map((incident) => (
-                  <li key={incident.id}>
-                    <button
-                      type="button"
-                      onClick={() => { onSelectIncident(incident); onClose(); }}
-                      className="flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-colors hover:opacity-90"
-                      style={{ borderColor: T.line, background: T.panel }}
-                    >
-                      <ShieldCheck size={14} className="mt-[3px] shrink-0" style={{ color: T.navy }} aria-hidden="true" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[13px] font-bold leading-snug line-clamp-2" style={{ color: T.ink }}>{incident.title}</span>
-                        <span className="block text-[11px]" style={{ color: T.inkSoft }}>
-                          {formatDistanceToNow(incident.timestamp)} ago
-                          {incident.report_count > 1 ? ` · ${incident.report_count} neighbours confirmed it` : ''}
-                        </span>
-                      </span>
-                    </button>
-                  </li>
+              <ul className="space-y-2">
+                {myReports.slice(0, 3).map((incident, i) => (
+                  <ReportRow
+                    key={incident.id} incident={incident} index={i} still={still}
+                    icon={<Sparkles size={15} className="mt-[3px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />}
+                    sub={`${formatDistanceToNow(incident.timestamp)} ago${
+                      incident.report_count > 1 ? ` · ${incident.report_count} neighbours backed it up` : ''
+                    }`}
+                    onOpen={() => { onSelectIncident(incident); onClose(); }}
+                  />
                 ))}
               </ul>
             )}
             {memberSince && (
-              <p className="mt-2.5 font-mono text-[10.5px] font-bold uppercase tracking-[0.12em]" style={{ color: T.inkSoft }}>
-                Watching since {new Date(memberSince).toLocaleDateString('en-CA', { month: 'long', year: 'numeric' })}
+              <p className="mt-3 text-[12.5px] font-semibold" style={{ color: T.soft }}>
+                Watching with us since{' '}
+                {new Date(memberSince).toLocaleDateString('en-CA', { month: 'long', year: 'numeric' })}.
+                Thank you.
               </p>
             )}
-          </Ring>
+          </Section>
 
-          {/* Address given but not found in the register — say so rather than
-              silently dropping the two rings that depend on it. */}
           {address && !home && !isResolving && (
-            <div className="mb-7 rounded-xl border px-3.5 py-3" style={{ borderColor: T.line, background: T.panel }}>
-              <p className="text-[12.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-                We could not match <span className="font-bold" style={{ color: T.ink }}>{address}</span> to the
-                city&rsquo;s property register, so the distance sections are missing. Picking your address from
-                the suggestions in settings fixes it.
+            <div className="mt-7 rounded-2xl px-4 py-3.5" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+              <p className="text-[13px] leading-relaxed" style={{ color: T.soft }}>
+                We could not find <span className="font-bold" style={{ color: T.ink }}>{address}</span> in the
+                city&rsquo;s property register, so the sections measured from your door are missing. Picking
+                your address from the suggestions in settings will fix it.
               </p>
             </div>
           )}
 
-          {/* ── Provenance ───────────────────────────────────────────────────
-              Naming every input is the point: it should be obvious that this
-              was assembled from things they handed over, not gathered. */}
-          <div className="mb-8 rounded-2xl border px-4 py-3.5" style={{ borderColor: T.line, background: T.panel }}>
-            <p className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: T.bow }}>
-              <Lock size={11} aria-hidden="true" /> How this was built
+          {/* ── Closing note ────────────────────────────────────────────────
+              Naming every input is the point: this was assembled from things
+              they handed over, not gathered from behind their back. */}
+          <div className="mt-8 rounded-2xl px-4 py-4" style={{ background: 'rgba(46,139,122,0.07)', border: `1px solid rgba(46,139,122,0.22)` }}>
+            <p className="text-[13px] leading-relaxed" style={{ color: T.soft }}>
+              <strong style={{ color: T.ink }}>How this page was made.</strong> From three things you gave
+              us — your name, your saved address, and the reports you have filed. Distances are worked out
+              on your own device against the city&rsquo;s public property register, so your coordinates are
+              never sent to us or stored. Everything else is City of Calgary open data that anyone can look
+              up.{digestOptIn
+                ? ' You get the weekly email, so a shorter version of this lands in your inbox.'
+                : ' You are not signed up for the weekly email.'}
             </p>
-            <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-              From three things you gave us: your name, your saved location and the reports you filed.
-              Distances are worked out in your browser against the city&rsquo;s public property register —
-              your coordinates are never sent to us or stored. Crime, camera and assessment figures are
-              City of Calgary open data, the same numbers anyone can look up.
-              {digestOptIn
-                ? ' You are signed up for the weekly digest, so a shorter version of this lands in your inbox.'
-                : ' You are not signed up for the weekly digest.'}
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="mt-3.5 flex flex-wrap items-center gap-x-5 gap-y-2">
               <button
                 type="button"
                 onClick={() => { onOpenSettings(); onClose(); }}
-                className="inline-flex items-center gap-1.5 text-[12px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
+                className="inline-flex items-center gap-1.5 text-[12.5px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
                 style={{ color: T.ink }}
               >
                 <Settings2 size={13} /> Change what you share
               </button>
               <a
                 href="/privacy"
-                className="inline-flex items-center gap-1.5 text-[12px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
+                className="inline-flex items-center gap-1.5 text-[12.5px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
                 style={{ color: T.ink }}
               >
                 <FileText size={13} /> Privacy policy
               </a>
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: T.soft }}>
+                {briefingRef(uid, issuedAt)}
+              </span>
             </div>
           </div>
         </div>
@@ -721,4 +690,3 @@ export default function PersonalBriefing({
 
   return createPortal(body, document.body);
 }
-

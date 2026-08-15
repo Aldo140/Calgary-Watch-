@@ -18,6 +18,9 @@ import {
   walkingMinutes,
   bandFor,
   briefingRef,
+  greetingFor,
+  WALK_M,
+  WALK_MIN,
 } from '../src/components/PersonalBriefing.tsx';
 
 describe('toRegistryAddress', () => {
@@ -85,18 +88,46 @@ describe('walkingMinutes', () => {
 });
 
 describe('bandFor', () => {
-  it('calls the worst tenth Hot and the better half Calm', () => {
-    assert.equal(bandFor(1, 300).label, 'Hot');
-    assert.equal(bandFor(30, 300).label, 'Hot');
-    assert.equal(bandFor(31, 300).label, 'High');
-    assert.equal(bandFor(75, 300).label, 'High');
-    assert.equal(bandFor(150, 300).label, 'Elevated');
-    assert.equal(bandFor(151, 300).label, 'Calm');
-    assert.equal(bandFor(300, 300).label, 'Calm');
+  // Wording is a neighbour's, not a dispatcher's — "Busy" rather than "Hot".
+  // The boundaries are what matter and they have not moved.
+  it('bands the worst tenth as Busy and the better half as Quiet', () => {
+    assert.equal(bandFor(1, 300).label, 'Busy');
+    assert.equal(bandFor(30, 300).label, 'Busy');
+    assert.equal(bandFor(31, 300).label, 'Above average');
+    assert.equal(bandFor(75, 300).label, 'Above average');
+    assert.equal(bandFor(150, 300).label, 'Middling');
+    assert.equal(bandFor(151, 300).label, 'Quiet');
+    assert.equal(bandFor(300, 300).label, 'Quiet');
   });
 
   it('does not divide by zero before the stats have loaded', () => {
-    assert.equal(bandFor(0, 0).label, 'Calm');
+    assert.equal(bandFor(0, 0).label, 'Quiet');
+  });
+});
+
+describe('greetingFor', () => {
+  const at = (h: number) => { const d = new Date(); d.setHours(h, 0, 0, 0); return d; };
+
+  it('greets by the clock', () => {
+    assert.equal(greetingFor(at(8)), 'Good morning');
+    assert.equal(greetingFor(at(14)), 'Good afternoon');
+    assert.equal(greetingFor(at(21)), 'Good evening');
+  });
+
+  it('has no gap at the boundaries', () => {
+    assert.equal(greetingFor(at(0)), 'Good morning');
+    assert.equal(greetingFor(at(11)), 'Good morning');
+    assert.equal(greetingFor(at(12)), 'Good afternoon');
+    assert.equal(greetingFor(at(16)), 'Good afternoon');
+    assert.equal(greetingFor(at(17)), 'Good evening');
+    assert.equal(greetingFor(at(23)), 'Good evening');
+  });
+});
+
+describe('WALK_M', () => {
+  it('is a fifteen-minute walk, matching what the page says', () => {
+    assert.equal(walkingMinutes(WALK_M), WALK_MIN);
+    assert.equal(WALK_MIN, 15);
   });
 });
 

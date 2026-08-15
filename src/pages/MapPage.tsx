@@ -3482,6 +3482,17 @@ export default function MapPage() {
               }
             }}
             onOpenSettings={() => openAuthPanel('settings')}
+            photoURL={user.photoURL ?? undefined}
+            onOpenNearby={() => {
+              const loc = userLocation || CALGARY_CENTER;
+              mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 14 : 11);
+              if (userLocation) {
+                mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
+                userPinShown.current = true;
+              }
+              setNearMeOpen(true);
+              startNearMeScan();
+            }}
             onSelectIncident={(incident) => startTransition(() => setSelectedIncident(incident))}
           />
         )}

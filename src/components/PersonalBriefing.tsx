@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { X, FileText, Camera, ShieldCheck, Home, ArrowRight, Settings2, Lock } from 'lucide-react';
+import { useCountUp } from '@/src/hooks/useCountUp';
 import type { Incident } from '@/src/types';
 import { useHomeLocation } from '@/src/hooks/useHomeLocation';
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
@@ -26,6 +28,12 @@ import { findSafetyCamerasNear, type SafetyCamera } from '@/src/hooks/useSafetyC
  *  2. A section with no data does not render. There are no zero states dressed
  *     up as insight and no "—" placeholders; an empty ring means that ring was
  *     quiet, which is itself worth showing plainly rather than padding.
+ *
+ * The motion carries the same idea rather than decorating it: on open the
+ * masthead radar sweeps once, then the rings resolve outward in order and the
+ * spine draws down between them, so the document appears to assemble from
+ * their address outward. Figures count up as their ring lands. All of it is
+ * gated on prefers-reduced-motion, where every element simply starts resolved.
  */
 
 const T = {
@@ -118,23 +126,45 @@ export function briefingRef(uid: string, issuedAt: number): string {
   return `CW-${stamp}-${h.toString(36).toUpperCase().padStart(5, '0').slice(-5)}`;
 }
 
-/** Section heading. The radius is the label, because the distance is the point. */
+/**
+ * Section heading. The radius is the label, because the distance is the point.
+ *
+ * `order` places the ring in the reveal sequence, so the document resolves
+ * outward from the reader's address rather than appearing all at once.
+ */
 function Ring({
-  radius, title, children, accent = T.bow,
+  radius, title, children, accent = T.bow, order = 0, still = false,
 }: {
-  radius: string; title: string; children: React.ReactNode; accent?: string;
+  radius: string; title: string; children: React.ReactNode;
+  accent?: string; order?: number; still?: boolean;
 }) {
+  const delay = still ? 0 : 0.28 + order * 0.13;
   return (
-    <section className="relative pl-6 sm:pl-7">
-      {/* Spine: a continuous line through every ring, with a node per section. */}
-      <span aria-hidden="true" className="absolute left-[7px] top-3 bottom-0 w-px sm:left-[9px]" style={{ background: T.line }} />
-      <span
+    <motion.section
+      className="relative pl-6 sm:pl-7"
+      initial={still ? false : { opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {/* Spine: draws downward as the ring lands, joining it to the next. */}
+      <motion.span
+        aria-hidden="true"
+        className="absolute left-[7px] top-3 bottom-0 w-px origin-top sm:left-[9px]"
+        style={{ background: T.line }}
+        initial={still ? false : { scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ delay: delay + 0.1, duration: 0.5, ease: 'easeOut' }}
+      />
+      <motion.span
         aria-hidden="true"
         className="absolute left-0 top-1.5 grid h-[15px] w-[15px] place-items-center rounded-full sm:left-[2px]"
         style={{ background: T.paper, border: `2px solid ${accent}` }}
+        initial={still ? false : { scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay, type: 'spring', stiffness: 420, damping: 18 }}
       >
         <span className="h-[3px] w-[3px] rounded-full" style={{ background: accent }} />
-      </span>
+      </motion.span>
       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: accent }}>
         {radius}
       </p>
@@ -142,14 +172,26 @@ function Ring({
         {title}
       </h3>
       <div className="mt-2.5 pb-7">{children}</div>
-    </section>
+    </motion.section>
   );
 }
 
-function Figure({ value, label, tone = T.ink }: { value: string; label: string; tone?: string }) {
+/**
+ * A single number and what it means.
+ *
+ * `count` animates the value up when it is a plain figure; `value` is used
+ * verbatim for anything already formatted (a dollar amount, a year).
+ */
+function Figure({
+  count, value, label, tone = T.ink, prefix = '', still = false,
+}: {
+  count?: number; value?: string; label: string; tone?: string; prefix?: string; still?: boolean;
+}) {
+  const animated = useCountUp(count ?? 0, 900, !still && count !== undefined);
+  const shown = value ?? `${prefix}${(still ? (count ?? 0) : animated).toLocaleString()}`;
   return (
     <div className="rounded-xl border px-3 py-2.5" style={{ borderColor: T.line, background: T.panel }}>
-      <p className="font-display text-[1.4rem] font-extrabold leading-none tabular-nums" style={{ color: tone }}>{value}</p>
+      <p className="font-display text-[1.4rem] font-extrabold leading-none tabular-nums" style={{ color: tone }}>{shown}</p>
       <p className="mt-1 text-[11px] font-semibold leading-tight" style={{ color: T.inkSoft }}>{label}</p>
     </div>
   );
@@ -161,6 +203,9 @@ export default function PersonalBriefing({
   onOpenArea, onOpenSettings, onSelectIncident,
 }: PersonalBriefingProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  // Everything below animates outward from the reader's address. Where motion
+  // is unwelcome, every element simply starts resolved.
+  const still = useReducedMotion() ?? false;
   // Frozen at open so the reference and the "issued" line do not change while
   // it is on screen.
   const issuedAtRef = useRef<number>(Date.now());
@@ -218,6 +263,23 @@ export default function PersonalBriefing({
   const band = areaStats ? bandFor(areaStats.rank, areaStats.count) : null;
   const areaLabel = communityName ? titleCase(communityName) : 'your area';
 
+  /**
+   * The one number the whole document is about, chosen by what we actually
+   * know. A resolved address gives the walk; without one the community's
+   * standing is the strongest true statement we can lead with.
+   */
+  const thesis: { figure: number; label: string } | null = home
+    ? {
+        figure: nearby.length,
+        label: nearby.length === 0
+          ? `reports inside your ${walkingMinutes(WALK_M)}-minute walk — the quietest thing this can say`
+          : `report${nearby.length === 1 ? '' : 's'} inside your ${walkingMinutes(WALK_M)}-minute walk`,
+      }
+    : areaStats
+      ? { figure: areaStats.rank, label: `of ${areaStats.count} Calgary communities by reported volume` }
+      : null;
+  const thesisCount = useCountUp(thesis?.figure ?? 0, 1100, !still && thesis !== null);
+
   if (!open) return null;
 
   const body = (
@@ -227,30 +289,85 @@ export default function PersonalBriefing({
       aria-modal="true"
       aria-label={`Safety briefing for ${firstName}`}
     >
-      <button
+      <motion.button
         type="button"
         aria-label="Close briefing"
         onClick={onClose}
         className="absolute inset-0 h-full w-full cursor-default"
         style={{ background: 'rgba(12,22,33,0.55)', backdropFilter: 'blur(3px)' }}
+        initial={still ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.25 }}
       />
 
-      <div
+      <motion.div
         className="relative flex h-full w-full max-w-[44rem] flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:rounded-3xl"
         style={{ background: T.paper }}
+        initial={still ? false : { opacity: 0, y: 24, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* ── Masthead ──────────────────────────────────────────────────────
-            The one part of the product with this person's name printed on it. */}
+            The one part of the product with this person's name printed on it.
+            The radar is not decoration: it is the document's structure stated
+            once, and it sweeps their address before the rings resolve. */}
         <header
           className="relative shrink-0 overflow-hidden px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-7 sm:pb-6 sm:pt-6"
           style={{ background: `linear-gradient(135deg, ${T.ink} 0%, ${T.navy} 100%)` }}
         >
-          {/* Range rings — the structural idea of the document, stated once. */}
-          <span aria-hidden="true" className="pointer-events-none absolute -right-14 -top-14 h-52 w-52 opacity-[0.22]">
-            <svg viewBox="0 0 200 200" width="100%" height="100%" fill="none" stroke={T.bow} strokeWidth="1.5">
-              <circle cx="100" cy="100" r="28" /><circle cx="100" cy="100" r="52" />
-              <circle cx="100" cy="100" r="76" /><circle cx="100" cy="100" r="99" />
-              <circle cx="100" cy="100" r="4" fill={T.bow} stroke="none" />
+          {/* The radar is the one place this document spends its boldness:
+              large enough to read as the instrument the briefing is named
+              after, quiet enough in opacity that the headline stays first. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-20 -top-24 h-[19rem] w-[19rem] sm:-right-16 sm:-top-28 sm:h-[23rem] sm:w-[23rem]"
+          >
+            <svg viewBox="0 0 200 200" width="100%" height="100%" fill="none">
+              <defs>
+                <linearGradient id="cw-sweep" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor={T.bow} stopOpacity="0" />
+                  <stop offset="100%" stopColor={T.bow} stopOpacity="0.9" />
+                </linearGradient>
+              </defs>
+              {/* Four standing rings — the four radii the document is built from. */}
+              {[28, 52, 76, 99].map((r, i) => (
+                <circle key={r} cx="100" cy="100" r={r} stroke={T.bow} strokeWidth="1.25"
+                  opacity={0.34 - i * 0.05} />
+              ))}
+              {/* Cross-hairs, so it reads as an instrument rather than a ripple. */}
+              <line x1="100" y1="1" x2="100" y2="199" stroke={T.bow} strokeWidth="0.75" opacity="0.16" />
+              <line x1="1" y1="100" x2="199" y2="100" stroke={T.bow} strokeWidth="0.75" opacity="0.16" />
+              {/* One outward pulse per ring, staggered to match the sections. */}
+              {!still && [0, 1, 2].map((i) => (
+                <motion.circle
+                  key={`p${i}`} cx="100" cy="100" r="28" stroke={T.bow} strokeWidth="1.5" fill="none"
+                  initial={{ scale: 0.3, opacity: 0.6 }}
+                  animate={{ scale: 3.6, opacity: 0 }}
+                  style={{ transformOrigin: '100px 100px' }}
+                  transition={{ delay: 0.15 + i * 0.5, duration: 2.2, ease: 'easeOut' }}
+                />
+              ))}
+              {/* The sweep: two passes, then it rests. A looping radar would
+                  imply the page is still working after it has finished. */}
+              {!still && (
+                <motion.g
+                  style={{ transformOrigin: '100px 100px' }}
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: 720 }}
+                  transition={{ duration: 2.6, ease: [0.33, 0, 0.2, 1] }}
+                >
+                  <motion.path
+                    d="M100 100 L100 1 A99 99 0 0 1 170 30 Z"
+                    fill="url(#cw-sweep)"
+                    initial={{ opacity: 0.5 }}
+                    animate={{ opacity: 0 }}
+                    transition={{ duration: 2.6, times: [0, 1], ease: 'easeIn' }}
+                  />
+                  <line x1="100" y1="100" x2="100" y2="1" stroke={T.bow} strokeWidth="1.75"
+                    strokeLinecap="round" opacity="0.75" />
+                </motion.g>
+              )}
+              <circle cx="100" cy="100" r="3.5" fill={T.bow} opacity="0.8" />
             </svg>
           </span>
 
@@ -259,28 +376,53 @@ export default function PersonalBriefing({
             type="button"
             onClick={onClose}
             aria-label="Close briefing"
-            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] grid h-9 w-9 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-5 sm:top-5"
+            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid h-9 w-9 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-5 sm:top-5"
             style={{ background: 'rgba(255,253,248,0.14)', color: T.paper }}
           >
             <X size={17} />
           </button>
 
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
-            Prepared for you
-          </p>
-          <h2
-            className="mt-2 font-display font-extrabold leading-[1.05] tracking-[-0.03em] pr-11"
-            style={{ color: '#FFFDF8', fontSize: 'clamp(1.6rem, 6.2vw, 2.35rem)' }}
+          <motion.div
+            initial={still ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            {firstName}&rsquo;s safety briefing
-          </h2>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
+              Prepared for you
+            </p>
+            <h2
+              className="mt-2 font-display font-extrabold leading-[1.05] tracking-[-0.03em] pr-11"
+              style={{ color: '#FFFDF8', fontSize: 'clamp(1.6rem, 6.2vw, 2.35rem)' }}
+            >
+              {firstName}&rsquo;s safety briefing
+            </h2>
+            <p className="mt-2.5 flex items-start gap-1.5 text-[12.5px] font-medium leading-snug" style={{ color: '#B9CBD8' }}>
+              <Home size={13} className="mt-[2px] shrink-0" aria-hidden="true" />
+              <span className="min-w-0">
+                Measured from <span className="font-bold" style={{ color: '#FFFDF8' }}>{address || areaLabel}</span>
+              </span>
+            </p>
+          </motion.div>
 
-          <p className="mt-2.5 flex items-start gap-1.5 text-[12.5px] font-medium leading-snug" style={{ color: '#B9CBD8' }}>
-            <Home size={13} className="mt-[2px] shrink-0" aria-hidden="true" />
-            <span className="min-w-0">
-              Measured from <span className="font-bold" style={{ color: '#FFFDF8' }}>{address || areaLabel}</span>
-            </span>
-          </p>
+          {/* The thesis: the single number this whole document is about. */}
+          {thesis && (
+            <motion.div
+              className="mt-4 flex items-baseline gap-2.5"
+              initial={still ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.18, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span
+                className="font-display font-extrabold leading-none tabular-nums"
+                style={{ color: '#7FB5A6', fontSize: 'clamp(2.4rem, 10vw, 3.4rem)' }}
+              >
+                {still ? thesis.figure : thesisCount}
+              </span>
+              <span className="min-w-0 pb-1 text-[12.5px] font-semibold leading-tight" style={{ color: '#B9CBD8' }}>
+                {thesis.label}
+              </span>
+            </motion.div>
+          )}
 
           <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: '#8FA9BC' }}>
             <span>
@@ -295,7 +437,7 @@ export default function PersonalBriefing({
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-6 sm:px-7">
           {/* Ring 1 — the walk. Only this person can see this list. */}
           {home && (
-            <Ring radius={`Within ${WALK_M} m · about a ${walkingMinutes(WALK_M)}-minute walk`} title={
+            <Ring order={0} still={still} radius={`Within ${WALK_M} m · about a ${walkingMinutes(WALK_M)}-minute walk`} title={
               nearby.length === 0
                 ? 'Nothing reported on your block'
                 : `${nearby.length} report${nearby.length === 1 ? '' : 's'} inside your walk`
@@ -307,8 +449,13 @@ export default function PersonalBriefing({
                 </p>
               ) : (
                 <ul className="space-y-1.5">
-                  {nearby.slice(0, 5).map(({ incident, distanceM }) => (
-                    <li key={incident.id}>
+                  {nearby.slice(0, 5).map(({ incident, distanceM }, i) => (
+                    <motion.li
+                      key={incident.id}
+                      initial={still ? false : { opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.42 + i * 0.07, duration: 0.35, ease: 'easeOut' }}
+                    >
                       <button
                         type="button"
                         onClick={() => { onSelectIncident(incident); onClose(); }}
@@ -330,7 +477,7 @@ export default function PersonalBriefing({
                           </span>
                         </span>
                       </button>
-                    </li>
+                    </motion.li>
                   ))}
                   {nearby.length > 5 && (
                     <li className="pt-0.5 text-[11.5px] font-semibold" style={{ color: T.inkSoft }}>
@@ -344,10 +491,10 @@ export default function PersonalBriefing({
 
           {/* Ring 2 — enforcement and eyes, at commuting range. */}
           {home && (nearbySafety.length > 0 || nearbyTraffic.length > 0) && (
-            <Ring radius={`Within ${RIDE_M / 1000} km`} title="Cameras around you" accent={T.amber}>
+            <Ring order={1} still={still} radius={`Within ${RIDE_M / 1000} km`} title="Cameras around you" accent={T.amber}>
               <div className="grid grid-cols-2 gap-2">
-                <Figure value={String(nearbySafety.length)} label="Safety cameras that ticket" tone={T.amber} />
-                <Figure value={String(nearbyTraffic.length)} label="Public traffic cameras" tone={T.navy} />
+                <Figure count={nearbySafety.length} still={still} label="Safety cameras that ticket" tone={T.amber} />
+                <Figure count={nearbyTraffic.length} still={still} label="Public traffic cameras" tone={T.navy} />
               </div>
 
               {nearbySafety.length > 0 && (
@@ -388,7 +535,7 @@ export default function PersonalBriefing({
 
           {/* Ring 3 — the community. */}
           {(areaStats || latestValue) && (
-            <Ring radius={communityName ? titleCase(communityName) : 'Your community'} title="How your community reads">
+            <Ring order={2} still={still} radius={communityName ? titleCase(communityName) : 'Your community'} title="How your community reads">
               {areaStats && band && (
                 <>
                   <div className="flex flex-wrap items-center gap-2">
@@ -404,8 +551,8 @@ export default function PersonalBriefing({
                     </span>
                   </div>
                   <div className="mt-2.5 grid grid-cols-2 gap-2">
-                    <Figure value={areaStats.crime.toLocaleString()} label={`Criminal offences · ${areaStats.year}`} />
-                    <Figure value={areaStats.disorder.toLocaleString()} label={`Disorder calls · ${areaStats.year}`} />
+                    <Figure count={areaStats.crime} still={still} label={`Criminal offences · ${areaStats.year}`} />
+                    <Figure count={areaStats.disorder} still={still} label={`Disorder calls · ${areaStats.year}`} />
                   </div>
                 </>
               )}
@@ -433,7 +580,7 @@ export default function PersonalBriefing({
           )}
 
           {/* Ring 4 — what they put in. */}
-          <Ring radius="Your record" title={
+          <Ring order={3} still={still} radius="Your record" title={
             myReports.length === 0 ? 'You have not filed a report yet' : `${myReports.length} report${myReports.length === 1 ? '' : 's'} filed by you`
           } accent={T.navy}>
             {myReports.length === 0 ? (
@@ -518,7 +665,7 @@ export default function PersonalBriefing({
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 

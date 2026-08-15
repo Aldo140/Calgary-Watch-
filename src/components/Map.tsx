@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import L from 'leaflet';
+import type { TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -25,6 +26,8 @@ interface MapProps {
   onPinConfirm?: (lat: number, lng: number) => void;
   onPinCancel?: () => void;
   showCrimeLayer?: boolean;
+  /** City traffic cameras, plotted when the layer is on. */
+  trafficCameras?: TrafficCamera[];
   crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
   isMapInteractive?: boolean;
 }
@@ -45,12 +48,13 @@ export interface MapRef {
   clearUserLocation: () => void;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, crimeStats, isMapInteractive = true }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, crimeStats, isMapInteractive = true }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
   const clusterGroup = useRef<any>(null);
   const heatmapLayer = useRef<any>(null);
+  const cameraLayer = useRef<L.LayerGroup | null>(null);
   const baseTileLayer = useRef<L.TileLayer | null>(null);
   const popup = useRef<L.Popup | null>(null);
   const serviceAreaLayer = useRef<L.LayerGroup | null>(null);
@@ -65,6 +69,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   // Live map centre - updated on every move event so the pin overlay shows real coords
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [isSettling, setIsSettling] = useState(false);
+  const [camerasHiddenByZoom, setCamerasHiddenByZoom] = useState(false);
 
   // Callback refs - keep the single Leaflet click handler up-to-date with latest props
   // without needing to re-register it on every render.
@@ -888,6 +893,85 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     }
   }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded, isHeatPluginReady]);
 
+  /**
+   * Traffic camera layer.
+   *
+   * Markers are deliberately quieter than incident pins — a camera is context,
+   * not something that happened. The popup loads the city's live JPEG with a
+   * cache-busting stamp so reopening it shows the current frame rather than
+   * whatever the browser kept.
+   */
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+
+    if (cameraLayer.current) {
+      map.current.removeLayer(cameraLayer.current);
+      cameraLayer.current = null;
+    }
+    if (!trafficCameras || trafficCameras.length === 0) return;
+
+    // 211 cameras at city zoom blanket the map and bury the incidents, which
+    // are the reason anyone opened it. They appear once you are zoomed in far
+    // enough for a specific intersection to be worth looking at.
+    const MIN_ZOOM = 12;
+
+    const icon = L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
+      html: `<div style="width:26px;height:26px;border-radius:8px;background:#0B1F33;border:2px solid #F7F3EA;
+                  box-shadow:0 2px 6px rgba(11,31,51,0.35);display:flex;align-items:center;justify-content:center;">
+               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2E8B7A" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                 <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+               </svg>
+             </div>`,
+    });
+
+    const markers = trafficCameras.map((cam) =>
+      L.marker([cam.lat, cam.lng], { icon, zIndexOffset: -500 }).bindPopup(
+        () => {
+          const src = `${cam.imageUrl}?t=${Date.now()}`;
+          return `<div style="width:250px;font-family:Inter,system-ui,sans-serif">
+              <div style="font-weight:800;font-size:13px;color:#0B1F33;line-height:1.25">${cam.location}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#52697D;margin:2px 0 7px">
+                CITY OF CALGARY · ${cam.quadrant}
+              </div>
+              <img src="${src}" alt="Live traffic camera at ${cam.location}" width="250" height="167"
+                   style="width:100%;border-radius:9px;display:block;background:#E8EEF3;object-fit:cover" />
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#52697D;margin-top:6px">
+                Live frame · reopen to refresh
+              </div>
+            </div>`;
+        },
+        { maxWidth: 270, className: 'cw-camera-popup' },
+      ),
+    );
+
+    const group = L.layerGroup(markers);
+    cameraLayer.current = group;
+
+    const syncToZoom = () => {
+      if (!map.current) return;
+      const shouldShow = map.current.getZoom() >= MIN_ZOOM;
+      setCamerasHiddenByZoom(!shouldShow);
+      const isShown = map.current.hasLayer(group);
+      if (shouldShow && !isShown) group.addTo(map.current);
+      else if (!shouldShow && isShown) map.current.removeLayer(group);
+    };
+    syncToZoom();
+    map.current.on('zoomend', syncToZoom);
+
+    return () => {
+      map.current?.off('zoomend', syncToZoom);
+      setCamerasHiddenByZoom(false);
+      if (map.current && cameraLayer.current) {
+        map.current.removeLayer(cameraLayer.current);
+        cameraLayer.current = null;
+      }
+    };
+  }, [trafficCameras, isMapLoaded]);
+
   return (
     <div className="relative w-full h-full min-h-[400px] overflow-hidden flex items-center justify-center bg-slate-100">
       <div ref={mapContainer} className="absolute inset-0 w-full h-full z-0" />
@@ -946,6 +1030,24 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(10rem+env(safe-area-inset-top))] lg:top-4">
           <div className="px-3 py-2 rounded-xl border border-amber-400/30 bg-slate-950/85 text-amber-300 text-[11px] font-bold tracking-wide shadow-lg">
             Zoom in for Calgary metro coverage
+          </div>
+        </div>
+      )}
+
+      {/* The camera layer is on but zoomed out past its threshold. Saying so
+          beats leaving the user staring at a map that did not change. */}
+      {camerasHiddenByZoom && !isPinMode && (
+        <div className="absolute left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none max-lg:bottom-[calc(9.5rem+env(safe-area-inset-bottom))] bottom-24">
+          <div
+            className="flex items-center gap-2 px-3.5 py-2 rounded-full shadow-lg whitespace-nowrap"
+            style={{ background: '#F7F3EA', border: '1px solid rgba(11,31,51,0.14)' }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2E8B7A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+            </svg>
+            <span className="text-[11.5px] font-bold" style={{ color: '#0B1F33' }}>
+              Zoom in to see traffic cameras
+            </span>
           </div>
         </div>
       )}

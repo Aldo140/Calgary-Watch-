@@ -1,4 +1,4 @@
-import { Layers, Activity, Map as MapIcon, ShieldCheck } from 'lucide-react';
+import { Layers, Activity, Map as MapIcon, ShieldCheck, Video } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 interface LayerToggleProps {
@@ -8,6 +8,8 @@ interface LayerToggleProps {
   setShowHeatmap: (show: boolean) => void;
   showCrimeLayer: boolean;
   setShowCrimeLayer: (show: boolean) => void;
+  showCameras: boolean;
+  setShowCameras: (show: boolean) => void;
   isPinMode?: boolean;
 }
 
@@ -18,6 +20,8 @@ export default function LayerToggle({
   setShowHeatmap,
   showCrimeLayer,
   setShowCrimeLayer,
+  showCameras,
+  setShowCameras,
   isPinMode = false
 }: LayerToggleProps) {
   if (isPinMode) return null;
@@ -43,6 +47,21 @@ export default function LayerToggle({
           <Activity size={14} className="max-lg:shrink-0" />
           <span className="text-[10px] md:text-xs font-bold max-lg:tracking-tight">Live</span>
           <span className="hidden md:inline font-bold text-xs"> Reports</span>
+        </button>
+
+        {/* City traffic cameras. Off by default: it is context, not an alert. */}
+        <button
+          type="button"
+          onClick={() => setShowCameras(!showCameras)}
+          className={cn(
+            'flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl px-3 transition-[background-color,color,transform] active:scale-[0.98] max-lg:flex-1 max-lg:justify-center md:gap-2 md:px-4',
+            showCameras
+              ? 'bg-[#286FAF] text-[#F7FBFF]'
+              : 'text-[#40566B] hover:bg-[#E8F3FC]'
+          )}
+        >
+          <Video size={14} className="max-lg:shrink-0" />
+          <span className="text-[10px] md:text-xs font-bold">Cameras</span>
         </button>
 
         <button

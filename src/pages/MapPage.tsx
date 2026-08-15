@@ -25,6 +25,7 @@ import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipa
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
+import { useTrafficCameras } from '@/src/hooks/useTrafficCameras';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 
@@ -663,6 +664,9 @@ export default function MapPage() {
   
   const [showLiveReports, setShowLiveReports] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showCameras, setShowCameras] = useState(false);
+  // Only fetched once the layer is switched on.
+  const trafficCameras = useTrafficCameras(showCameras);
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
@@ -2341,6 +2345,7 @@ export default function MapPage() {
           showLiveReports={showLiveReports}
           showHeatmap={showHeatmap}
           showCrimeLayer={showCrimeLayer}
+          trafficCameras={showCameras ? trafficCameras : undefined}
           crimeStats={crimeStats}
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
@@ -3104,6 +3109,8 @@ export default function MapPage() {
           setShowLiveReports={setShowLiveReports}
           showHeatmap={showHeatmap}
           setShowHeatmap={setShowHeatmap}
+          showCameras={showCameras}
+          setShowCameras={setShowCameras}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
           isPinMode={isPinMode || isEmergencyPinMode}

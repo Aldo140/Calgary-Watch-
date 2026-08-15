@@ -9,6 +9,9 @@ import { useHomeLocation } from '@/src/hooks/useHomeLocation';
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { distanceMeters, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import { findSafetyCamerasNear, type SafetyCamera } from '@/src/hooks/useSafetyCameras';
+import { useTrafficVolumes, volumeAt } from '@/src/hooks/useTrafficVolumes';
+import BriefingRadar, { bearingDegrees, type RadarPoint } from '@/src/components/BriefingRadar';
+import BriefingSparkline from '@/src/components/BriefingSparkline';
 
 /**
  * The signed-in resident's own briefing.
@@ -213,6 +216,7 @@ export default function PersonalBriefing({
 
   const { home, isResolving } = useHomeLocation(address, open);
   const { data: propertyData } = usePropertyAssessments(open && communityName ? communityName : null);
+  const volumes = useTrafficVolumes(open);
 
   useEffect(() => {
     if (!open) return;
@@ -245,6 +249,16 @@ export default function PersonalBriefing({
       .filter((x) => x.distanceM <= WALK_M)
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [incidents, home]);
+
+  /** The same reports, placed at their true bearing for the plan view. */
+  const radarPoints = useMemo<RadarPoint[]>(() => {
+    if (!home) return [];
+    return nearby.map(({ incident, distanceM }) => ({
+      incident,
+      distanceM,
+      bearing: bearingDegrees(home.lat, home.lng, incident.lat, incident.lng),
+    }));
+  }, [home, nearby]);
 
   const nearbySafety = useMemo(
     () => (home ? findSafetyCamerasNear(home.lat, home.lng, safetyCameras, RIDE_M) : []),
@@ -448,6 +462,27 @@ export default function PersonalBriefing({
                   That is the quietest thing this briefing can tell you.
                 </p>
               ) : (
+                /* The walk, drawn to scale: true bearing, true distance. */
+                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  {/* Capped rather than full-bleed: the plot scales to its box,
+                      so a full-width phone rendering blew the axis labels up to
+                      nearly twice their desktop size. */}
+                  <div className="mx-auto w-full max-w-[15rem] shrink-0 sm:mx-0 sm:w-[13.5rem] sm:max-w-none">
+                    <BriefingRadar
+                      points={radarPoints}
+                      radiusM={WALK_M}
+                      still={still}
+                      onSelect={(incident) => { onSelectIncident(incident); onClose(); }}
+                    />
+                  </div>
+                  <p className="text-[12.5px] leading-relaxed" style={{ color: T.inkSoft }}>
+                    Your address is the centre. Each dot is a report at its real bearing and its real
+                    distance, so a dot at the outer ring is genuinely {WALK_M} m away. Colour is the
+                    category. Tap one to open it.
+                  </p>
+                </div>
+              )}
+              {nearby.length > 0 && (
                 <ul className="space-y-1.5">
                   {nearby.slice(0, 5).map(({ incident, distanceM }, i) => (
                     <motion.li
@@ -514,6 +549,16 @@ export default function PersonalBriefing({
                           {formatDistance(distanceM)} away
                           {camera.direction ? ` · watches ${camera.direction.toLowerCase()} traffic` : ''}
                         </span>
+                        {/* How busy the road is, where the city has counted it. */}
+                        {(() => {
+                          const daily = volumeAt(camera.lat, camera.lng, volumes);
+                          return daily ? (
+                            <span className="mt-1 inline-block rounded-md px-1.5 py-0.5 font-mono text-[9.5px] font-bold tabular-nums"
+                              style={{ background: 'rgba(199,127,24,0.14)', color: '#8A5710' }}>
+                              {Math.round(daily).toLocaleString()} vehicles a day
+                            </span>
+                          ) : null;
+                        })()}
                       </span>
                     </li>
                   ))}
@@ -527,8 +572,9 @@ export default function PersonalBriefing({
 
               <p className="mt-2.5 text-[12px] leading-relaxed" style={{ color: T.inkSoft }}>
                 Safety cameras ticket for running the red <strong style={{ color: T.ink }}>and</strong> for
-                speeding through the green. Calgary does not publish mobile photo radar locations, so this is
-                the fixed set only.
+                speeding through the green. Calgary does not publish how many tickets each one writes, or
+                where mobile photo radar sets up, so this is the fixed set and how busy their roads are —
+                not a ranking of which camera catches most.
               </p>
             </Ring>
           )}
@@ -557,7 +603,11 @@ export default function PersonalBriefing({
                 </>
               )}
 
-              {latestValue && (
+              {propertyData.length >= 2 ? (
+                <div className="mt-2">
+                  <BriefingSparkline data={propertyData} still={still} />
+                </div>
+              ) : latestValue ? (
                 <div className="mt-2 rounded-xl border px-3 py-2.5" style={{ borderColor: T.line, background: T.panel }}>
                   <p className="font-display text-[1.4rem] font-extrabold leading-none tabular-nums" style={{ color: T.ink }}>
                     ${Math.round(latestValue.avgValue).toLocaleString()}
@@ -566,7 +616,7 @@ export default function PersonalBriefing({
                     Average residential assessment here in {latestValue.year} &middot; {latestValue.sampleCount.toLocaleString()} properties
                   </p>
                 </div>
-              )}
+              ) : null}
 
               <button
                 type="button"

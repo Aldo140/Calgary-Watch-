@@ -27,7 +27,7 @@ import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { useTrafficCameras } from '@/src/hooks/useTrafficCameras';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
-import { stripCityQualifier, withCityQualifier } from '@/src/lib/address';
+import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMatches, rankFullTextMatches } from '@/src/lib/address';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
@@ -166,33 +166,49 @@ function titleCaseAddress(raw: string): string {
 function useAddressSearch(query: string): Array<{ label: string; neighborhood: string }> {
   const [results, setResults] = useState<Array<{ label: string; neighborhood: string }>>([]);
   useEffect(() => {
-    const q = stripCityQualifier(query);
-    if (q.length < 3) { setResults([]); return; }
+    const built = buildAddressQuery(query);
+    if (!built) { setResults([]); return; }
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
-      try {
+      const run = async (params: string) => {
         const url =
-          'https://data.calgary.ca/resource/4ur7-wsgc.json' +
-          '?$select=address,comm_name&$q=' + encodeURIComponent(q) + '&$limit=10';
+          'https://data.calgary.ca/resource/4ur7-wsgc.json?$select=address,comm_name' +
+          '&$group=address,comm_name&$limit=25' + params;
         const res = await fetch(url, { signal: ctrl.signal });
-        if (!res.ok) return;
-        const rows: Array<{ address?: string; comm_name?: string }> = await res.json();
-        const seen = new Set<string>();
-        const out: Array<{ label: string; neighborhood: string }> = [];
-        for (const row of rows) {
-          if (!row.address) continue;
-          const label = titleCaseAddress(row.address);
-          if (seen.has(label)) continue;
-          seen.add(label);
-          out.push({
-            label: `${label}, Calgary`,
-            neighborhood: row.comm_name ? titleCaseAddress(row.comm_name) : '',
-          });
-          if (out.length >= 4) break;
+        return res.ok ? ((await res.json()) as Array<{ address?: string; comm_name?: string }>) : [];
+      };
+      try {
+        let usedPrefix = Boolean(built.where);
+        let rows = await run(
+          built.where ? `&$where=${encodeURIComponent(built.where)}` : `&$q=${encodeURIComponent(built.q ?? '')}`,
+        );
+        // "17 av sw" starts with a digit but is a street, not a house number,
+        // so nothing prefix-matches it. Fall back to full text — and drop the
+        // prefix ranking with it, because that ordering is only valid when
+        // every result is an equally good match.
+        if (rows.length === 0 && built.where) {
+          rows = await run(`&$q=${encodeURIComponent(stripCityQualifier(query).trim())}`);
+          usedPrefix = false;
         }
-        setResults(out);
+
+        // A plain record, not a Map — `Map` is the map component in this file.
+        const community: Record<string, string> = {};
+        for (const row of rows) {
+          if (row.address && !(row.address in community)) community[row.address] = row.comm_name ?? '';
+        }
+        const ordered = usedPrefix
+          ? rankAddressMatches(Object.keys(community))
+          : rankFullTextMatches(Object.keys(community), query);
+        setResults(
+          ordered
+            .slice(0, 5)
+            .map((address) => ({
+              label: `${titleCaseAddress(address)}, Calgary`,
+              neighborhood: community[address] ? titleCaseAddress(community[address]) : '',
+            })),
+        );
       } catch { /* aborted or offline — keep previous results */ }
-    }, 350);
+    }, 300);
     return () => { clearTimeout(t); ctrl.abort(); };
   }, [query]);
   return results;

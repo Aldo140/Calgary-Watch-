@@ -384,11 +384,11 @@ function Nav() {
           aria-label="Calgary Watch home"
         >
           <img
-            src={publicAsset('images/calgary-watch-owl-outline.png')}
+            src={publicAsset('images/calgary-watch-plane-mark.webp')}
             alt=""
             width={40}
             height={40}
-            className={cn('h-10 w-7 object-contain', scrolled && 'brightness-0')}
+            className="h-11 w-12 object-contain"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <span className="flex flex-col leading-none text-left">
@@ -442,7 +442,7 @@ function Nav() {
             className="absolute inset-x-0 top-full z-[60] h-[calc(100dvh-4rem)] md:hidden overflow-y-auto bg-[#06162F] text-[#F2EFE8]"
           >
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-              <img src={publicAsset('images/calgary-watch-owl-outline.png')} alt="" className="absolute -right-6 top-7 h-80 w-40 rotate-6 object-contain opacity-[0.12]" />
+              <img src={publicAsset('images/calgary-watch-plane-mark.webp')} alt="" className="absolute -right-20 top-4 size-80 rotate-6 object-contain opacity-[0.1]" />
               <div className="absolute -left-20 top-[43%] h-16 w-[140%] -rotate-6 bg-[#E52C20]/15" />
             </div>
 
@@ -550,9 +550,9 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         Calgary / 51.0447° N
       </div>
       <motion.img
-        src={publicAsset('images/calgary-watch-owl-outline.png')}
+        src={publicAsset('images/calgary-watch-plane-mark.webp')}
         alt=""
-        className="absolute right-5 top-[17%] z-[3] h-16 w-9 rotate-6 object-contain drop-shadow-[0_2px_3px_rgba(6,22,47,0.9)]"
+        className="absolute right-3 top-[16%] z-[3] size-20 rotate-6 object-contain drop-shadow-[0_2px_3px_rgba(6,22,47,0.9)]"
         animate={reduced ? undefined : { rotate: [6, 1, 6], y: [0, -4, 0] }}
         transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
         aria-hidden="true"
@@ -689,12 +689,12 @@ function Hero({ reduced }: { reduced: boolean }) {
         </div>
 
         <motion.div
-          className="absolute right-[5%] top-[13%] z-[3] h-28 w-16 rotate-6 drop-shadow-[0_3px_4px_rgba(6,22,47,0.9)]"
+          className="absolute right-[4%] top-[12%] z-[3] size-32 rotate-6 drop-shadow-[0_3px_4px_rgba(6,22,47,0.9)]"
           animate={reduced ? undefined : { rotate: [6, 2, 6], y: [0, -5, 0] }}
           transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
         >
-          <img src={publicAsset('images/calgary-watch-owl-outline.png')} alt="" className="size-full object-contain" />
+          <img src={publicAsset('images/calgary-watch-plane-mark.webp')} alt="" className="size-full object-contain" />
         </motion.div>
 
         <div className="absolute bottom-[7%] right-[2.5%] z-[3] font-display text-[10px] font-bold uppercase tracking-[0.18em] text-[#F2EFE8]/65 [writing-mode:vertical-rl]" aria-hidden="true">

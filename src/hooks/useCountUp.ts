@@ -14,6 +14,14 @@ export function useCountUp(target: number, duration = 900, active = true): numbe
     }
     setValue(0);
     let startTime: number | null = null;
+    // `step` re-schedules itself, so the id to cancel is the one from the most
+    // recent frame — not the one returned below. Cancelling only that first id
+    // left the loop running after the effect was torn down, still holding the
+    // old target in its closure and still calling setValue. When the target
+    // changed mid-animation the stale loop overwrote the new value: the
+    // briefing showed a community rank of 212 under the words "things reported
+    // near you", because that rank was the target one render earlier.
+    let frame = 0;
 
     const step = (timestamp: number) => {
       if (startTime === null) startTime = timestamp;
@@ -22,11 +30,11 @@ export function useCountUp(target: number, duration = 900, active = true): numbe
       // cubic ease-out: 1 - (1 - t)^3
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.round(eased * target));
-      if (progress < 1) requestAnimationFrame(step);
+      if (progress < 1) frame = requestAnimationFrame(step);
     };
 
-    const id = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(id);
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
   }, [target, duration, active]);
 
   return value;

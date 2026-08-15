@@ -934,8 +934,23 @@ function PropertyValueContent({
   const CHART_W     = 216;
   const CHART_H     = 216;
   const PAD         = 32;
-  const dotX        = PAD + (score / 100) * CHART_W;
-  const dotY        = PAD + (1 - Math.min(latestEntry.AvgValue / 1_000_000, 1)) * CHART_H;
+  // Both axes are centred on a city benchmark, so the crosshair in the middle
+  // of the plot genuinely is "city average" and the four quadrant labels mean
+  // something relative.
+  //
+  // The value axis used to run 0–$1M, which put the divider at $500k and
+  // labelled it City Avg. Calgary's 2025 residential assessments (dataset
+  // 4ur7-wsgc, n=20,000) are median $598k with p10 $334.5k and p90 $858.5k, so
+  // a flat 0–$1M scale pushed ordinary communities into the bottom half and
+  // marked them "Hidden Gem" whatever they were worth. Scaling p10→p90 lands
+  // the median in the centre, because the median sits almost exactly midway
+  // between those percentiles.
+  //
+  // Safety runs 40–100 rather than 0–100: these scores cluster high, so a
+  // midpoint of 50 put nearly every community on the safe side of the divider.
+  const clamp01     = (n: number) => Math.min(Math.max(n, 0), 1);
+  const dotX        = PAD + clamp01((score - SAFETY_AXIS_MIN) / (SAFETY_AXIS_MAX - SAFETY_AXIS_MIN)) * CHART_W;
+  const dotY        = PAD + (1 - clamp01((latestEntry.AvgValue - VALUE_AXIS_MIN) / (VALUE_AXIS_MAX - VALUE_AXIS_MIN))) * CHART_H;
 
   const crimeFirst  = combined[0].TotalCrime;
   const crimeLast   = combined[combined.length - 1].TotalCrime;
@@ -1083,6 +1098,22 @@ function PropertyValueContent({
     </Section>
   );
 }
+
+/**
+ * City benchmarks for the safety-vs-value quadrant.
+ *
+ * Value figures are Calgary residential assessments for roll year 2025
+ * (Open Data 4ur7-wsgc, 20,000-row sample): median $598,000, p10 $334,500,
+ * p90 $858,500. The axis spans p10→p90 so communities spread across the plot
+ * and the median falls in the centre, where the "City Avg" crosshair is drawn.
+ *
+ * Safety scores in this app cluster well above 50, so the axis starts at 40 to
+ * put a typical score near the middle rather than hard against the right edge.
+ */
+const VALUE_AXIS_MIN = 334_500;
+const VALUE_AXIS_MAX = 858_500;
+const SAFETY_AXIS_MIN = 40;
+const SAFETY_AXIS_MAX = 100;
 
 function PropertyValueSection({
   propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score,

@@ -328,14 +328,38 @@ function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' |
 // ---------------------------------------------------------------------------
 function Nav() {
   const [visible, setVisible] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
+  /**
+   * Whether the bar has left the hero behind.
+   *
+   * It used to flip at 40px of scroll, which put a paper bar over the top of
+   * the artwork for the remaining 95% of the hero. On mobile it never flipped
+   * at all — the bar carried a hard-coded navy background, so the collage was
+   * covered from the first pixel.
+   *
+   * Tying it to the hero element instead means the bar stays out of the way
+   * for exactly as long as there is artwork behind it, however tall that
+   * turns out to be.
+   */
+  const [pastHero, setPastHero] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const lastY = useRef(0);
 
   useEffect(() => {
+    const hero = document.getElementById('site-hero');
+    // No hero to sit over: take the solid treatment. A transparent bar over
+    // light content is unreadable, so that is the safe default.
+    if (!hero) { setPastHero(true); return; }
+    const observer = new IntersectionObserver(
+      ([entry]) => setPastHero(!entry.isIntersecting),
+      { rootMargin: '-64px 0px 0px 0px' },
+    );
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      setScrolled(y > 40);
       if (y < 80) setVisible(true);
       else if (y > lastY.current + 6) setVisible(false);
       else if (y < lastY.current - 6) setVisible(true);
@@ -359,21 +383,31 @@ function Nav() {
     };
   }, [menuOpen]);
 
+  /** Over the hero the bar gets out of the way; past it, it behaves normally. */
+  const solid = pastHero || menuOpen;
+
   const link = cn(
     'px-3 py-1.5 text-sm font-semibold transition-colors',
-    scrolled ? 'hover:bg-[rgba(28,43,58,0.06)]' : 'hover:bg-white/10',
+    solid ? 'hover:bg-[rgba(28,43,58,0.06)]' : 'hover:bg-white/10',
   );
 
   return (
     <nav
       className={cn(
-        'fixed top-0 inset-x-0 z-50 transition-transform duration-300 max-md:border-b max-md:border-white/10 max-md:bg-[#081A2B]',
+        'fixed top-0 inset-x-0 z-50 transition-[transform,background-color] duration-300',
         visible || menuOpen ? 'translate-y-0' : '-translate-y-full',
       )}
       style={{
-        background: scrolled ? 'rgba(247,243,234,0.9)' : undefined,
-        backdropFilter: scrolled ? 'blur(14px)' : undefined,
-        borderBottom: scrolled ? `1px solid ${T.line}` : undefined,
+        // Over the hero: no bar, just enough of a scrim that the wordmark stays
+        // legible wherever the collage happens to be bright. With the menu open
+        // it goes solid so the header meets the panel below it cleanly.
+        background: menuOpen
+          ? '#06162F'
+          : pastHero
+            ? 'rgba(247,243,234,0.9)'
+            : 'linear-gradient(to bottom, rgba(6,22,47,0.62), rgba(6,22,47,0.18) 70%, transparent)',
+        backdropFilter: pastHero && !menuOpen ? 'blur(14px)' : undefined,
+        borderBottom: pastHero && !menuOpen ? `1px solid ${T.line}` : undefined,
       }}
     >
       <div className="mx-auto max-w-[88rem] px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
@@ -392,12 +426,12 @@ function Nav() {
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <span className="flex flex-col leading-none text-left">
-            <span className={cn('font-display text-[17px] font-bold tracking-tight', scrolled ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
-            <span className={cn('mt-0.5 font-mono text-[8.5px] font-medium uppercase tracking-[0.34em]', scrolled ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Safety</span>
+            <span className={cn('font-display text-[17px] font-bold tracking-tight', solid ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
+            <span className={cn('mt-0.5 font-mono text-[8.5px] font-medium uppercase tracking-[0.34em]', solid ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Safety</span>
           </span>
         </button>
 
-        <div className="hidden md:flex items-center gap-1" style={{ color: scrolled ? T.ink : T.nightText }}>
+        <div className="hidden md:flex items-center gap-1" style={{ color: solid ? T.ink : T.nightText }}>
           <a href="#features" className={link}>What we track</a>
           <a href="#how-it-works" className={link}>How it works</a>
           <a href="/about" className={link}>About</a>
@@ -408,7 +442,7 @@ function Nav() {
           <a
             href="/map"
             className="hidden md:inline-flex items-center gap-2 rounded-full h-10 px-5 text-sm font-bold transition-transform hover:-translate-y-0.5"
-            style={{ background: scrolled ? T.ink : '#F2EFE8', color: scrolled ? T.panel : '#06162F' }}
+            style={{ background: solid ? T.ink : '#F2EFE8', color: solid ? T.panel : '#06162F' }}
           >
             <MapPin size={14} />
             Open the live map
@@ -417,9 +451,9 @@ function Nav() {
             type="button"
             className="relative z-[61] md:hidden w-10 h-10 flex items-center justify-center border transition-transform active:scale-95"
             style={{
-              borderColor: menuOpen ? '#E52C20' : scrolled ? T.line : 'rgba(237,242,240,0.35)',
-              color: menuOpen ? '#06162F' : scrolled ? T.ink : T.nightText,
-              background: menuOpen ? '#F2EFE8' : scrolled ? 'rgba(255,253,248,0.9)' : 'rgba(8,26,43,0.78)',
+              borderColor: menuOpen ? '#E52C20' : pastHero ? T.line : 'rgba(237,242,240,0.55)',
+              color: menuOpen ? '#06162F' : pastHero ? T.ink : T.nightText,
+              background: menuOpen ? '#F2EFE8' : pastHero ? 'rgba(255,253,248,0.9)' : 'rgba(6,22,47,0.55)',
             }}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -640,7 +674,7 @@ function Hero({ reduced }: { reduced: boolean }) {
   };
 
   return (
-    <section className="relative min-h-[100dvh] overflow-hidden bg-[#06162F]">
+    <section id="site-hero" className="relative min-h-[100dvh] overflow-hidden bg-[#06162F]">
       <MobileHero reduced={reduced} />
 
       <div
@@ -1197,144 +1231,114 @@ function Quadrants({ reduced }: { reduced: boolean }) {
   const pick = (i: number) => { setTouched(true); setActive(i); };
   const q = QUADRANTS[active];
   const meta = QUAD_META[active];
+  const direction = active % 2 === 0 ? -1 : 1;
 
   return (
-    <section className="relative py-16 sm:py-20 lg:py-36 overflow-hidden" style={{ background: T.paper }}>
-      <div ref={sectionRef} className="mx-auto max-w-[80rem] px-5 sm:px-8">
-        <Reveal>
-          <Eyebrow color={T.gold}>The grid · NW NE SW SE</Eyebrow>
-          <h2 className="mt-5 font-display font-extrabold tracking-[-0.025em] leading-[1.02]" style={{ color: T.ink, fontSize: 'clamp(2.2rem, 5vw, 4.2rem)' }}>
-            Every address ends<br />in a quadrant.
-          </h2>
-          <p className="mt-5 max-w-xl text-[16px] leading-relaxed" style={{ color: T.inkSoft }}>
-            Centre Street splits east from west, the Bow bends through the
-            middle — and the map thinks the way the city does. Touch a quadrant.
-          </p>
-        </Reveal>
+    <section className="relative overflow-hidden py-20 sm:py-24 lg:py-32" style={{ background: '#06162F' }}>
+      <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(rgba(242,239,232,0.8) 0.7px, transparent 0.7px)', backgroundSize: '8px 8px' }} aria-hidden="true" />
+      <div ref={sectionRef} className="relative mx-auto max-w-[88rem] px-5 sm:px-8">
+        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end lg:gap-16">
+          <Reveal>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[#E52C20]">Calgary field index · 4 sectors</p>
+            <h2 className="mt-5 max-w-2xl font-display text-[clamp(2.8rem,7vw,5.7rem)] font-black uppercase leading-[0.82] tracking-[-0.04em] text-[#F2EFE8]">
+              Every address<br /><span className="text-[#E52C20]">has a side.</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="max-w-xl text-[15px] leading-relaxed text-[#AFC5DF] sm:text-base lg:ml-auto">
+              Centre Street draws east from west. The Bow bends north from south.
+              Calgary Watch follows the same shorthand locals use every day—choose
+              a quadrant to bring its neighbourhoods into focus.
+            </p>
+          </Reveal>
+        </div>
 
-        <div className="mt-12 lg:mt-16 grid lg:grid-cols-[5fr_6fr] gap-8 lg:gap-14 items-center">
-          {/* Atlas diagram */}
-          <Reveal className="mx-auto w-full max-w-[26rem] lg:max-w-none">
-            <div className="relative">
-              <svg viewBox="0 0 360 360" className="w-full" role="group" aria-label="Calgary quadrant selector">
-                {QUADRANTS.map((quad, i) => {
-                  const m = QUAD_META[i];
-                  const isActive = active === i;
-                  return (
-                    <g
-                      key={quad.code}
-                      onClick={() => pick(i)}
-                      onMouseEnter={() => pick(i)}
-                      className="cursor-pointer"
-                      role="button"
-                      aria-label={`${quad.name} quadrant`}
-                      aria-pressed={isActive}
-                    >
-                      <motion.rect
-                        x={m.x + 4} y={m.y + 4} width={164} height={164} rx={26}
-                        animate={{
-                          fill: isActive ? m.color : T.panel,
-                          stroke: isActive ? m.color : T.line,
-                        }}
-                        transition={{ duration: 0.45, ease: 'easeOut' }}
-                        strokeWidth={1.5}
-                        style={{ filter: isActive ? `drop-shadow(0 16px 28px ${m.color}55)` : undefined }}
-                      />
-                      <text
-                        x={m.x + 86} y={m.y + 104}
-                        textAnchor="middle"
-                        className="font-display select-none"
-                        style={{ fontSize: 56, fontWeight: 800, fill: isActive ? '#FFFDF8' : T.line, letterSpacing: '-0.02em', transition: 'fill 0.4s' }}
+        <div className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-[minmax(22rem,0.82fr)_minmax(0,1.18fr)] lg:items-center lg:gap-16">
+          <Reveal className="mx-auto w-full max-w-[32rem] lg:max-w-none">
+            <div className="relative isolate aspect-square">
+              <div className="absolute inset-2 translate-x-3 translate-y-3 bg-[#E52C20]" style={{ clipPath: 'polygon(3% 0, 100% 2%, 98% 96%, 2% 100%, 0 5%)' }} aria-hidden="true" />
+              <div className="absolute inset-0 bg-[#F2EFE8] p-3 sm:p-4" style={{ clipPath: 'polygon(3% 0, 100% 2%, 98% 96%, 2% 100%, 0 5%)' }}>
+                <div className="relative grid h-full grid-cols-2 grid-rows-2 gap-[3px] bg-[#06162F] p-[3px]" role="group" aria-label="Choose a Calgary quadrant">
+                  {QUADRANTS.map((quad, i) => {
+                    const isActive = active === i;
+                    const shortPlaces = quad.places.split(' · ').slice(0, 2).join(' / ');
+                    return (
+                      <button
+                        key={quad.code}
+                        type="button"
+                        onClick={() => pick(i)}
+                        onMouseEnter={() => pick(i)}
+                        onFocus={() => pick(i)}
+                        aria-pressed={isActive}
+                        aria-label={`Show ${quad.name} Calgary`}
+                        className="group relative overflow-hidden bg-[#0C2947] text-left outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]"
+                        style={{ background: isActive ? meta.color : '#0C2947' }}
                       >
-                        {quad.code}
-                      </text>
-                      {/* incident constellation inside the active sector */}
-                      {m.dots.map(([dx, dy], di) => (
-                        <motion.circle
-                          key={di}
-                          cx={dx} cy={dy} r={3.5}
-                          animate={{ opacity: isActive ? [0.4, 1, 0.4] : 0.18, fill: isActive ? '#FFFDF8' : m.color }}
-                          transition={isActive && !reduced ? { duration: 1.8, repeat: Infinity, delay: di * 0.35 } : { duration: 0.3 }}
-                        />
-                      ))}
-                    </g>
-                  );
-                })}
+                        <span className="absolute left-3 top-3 font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-[#AFC5DF] sm:left-4 sm:top-4">Sector 0{i + 1}</span>
+                        <span className="absolute inset-x-3 bottom-3 sm:inset-x-4 sm:bottom-4">
+                          <span className="block font-display text-[clamp(2.6rem,12vw,5.4rem)] font-black leading-[0.75] tracking-[-0.04em] text-[#F2EFE8]">{quad.code}</span>
+                          <span className="mt-2 hidden font-mono text-[8px] uppercase tracking-[0.12em] text-[#F2EFE8]/75 sm:block">{shortPlaces}</span>
+                        </span>
+                        {QUAD_META[i].dots.slice(0, 3).map((_, dot) => (
+                          <motion.span
+                            key={dot}
+                            className="absolute h-1.5 w-1.5 bg-[#F2EFE8]"
+                            style={{ right: `${18 + dot * 17}%`, top: `${25 + (dot % 2) * 13}%` }}
+                            animate={isActive && !reduced ? { opacity: [0.25, 1, 0.25], scale: [0.8, 1.25, 0.8] } : { opacity: 0.18, scale: 1 }}
+                            transition={{ duration: 1.8, repeat: isActive && !reduced ? Infinity : 0, delay: dot * 0.28 }}
+                            aria-hidden="true"
+                          />
+                        ))}
+                      </button>
+                    );
+                  })}
 
-                {/* Centre Street — vertical axis */}
-                <line x1="180" y1="0" x2="180" y2="360" stroke={T.paper} strokeWidth="16" />
-                <line x1="180" y1="6" x2="180" y2="354" stroke={T.ink} strokeWidth="1" strokeDasharray="6 5" opacity="0.45" />
-                {/* The Bow — wavy horizontal divider */}
-                <line x1="0" y1="180" x2="360" y2="180" stroke={T.paper} strokeWidth="16" />
-                <path d="M0 180 C 40 168, 80 194, 122 180 S 210 164, 254 182 S 330 190, 360 176" fill="none" stroke={T.bow} strokeWidth="2.5" opacity="0.85" />
-
-                {/* axis labels */}
-                <text x="188" y="16" className="select-none" style={{ fontSize: 8.5, fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, letterSpacing: '0.22em', fill: T.inkSoft }}>CENTRE ST</text>
-                <text x="6" y="171" className="select-none" style={{ fontSize: 8.5, fontFamily: 'IBM Plex Mono, monospace', fontWeight: 700, letterSpacing: '0.22em', fill: T.bow }}>THE BOW</text>
-
-                {/* hub */}
-                <circle cx="180" cy="180" r="13" fill={T.ink} />
-                <circle cx="180" cy="180" r="4" fill={T.gold} />
-              </svg>
-
-              {/* progress ticks under the diagram */}
-              <div className="mt-4 flex items-center justify-center gap-2" aria-hidden="true">
-                {QUADRANTS.map((quad, i) => (
-                  <button
-                    key={quad.code}
-                    type="button"
-                    onClick={() => pick(i)}
-                    className="h-1.5 rounded-full transition-all duration-400"
-                    style={{ width: active === i ? 26 : 10, background: active === i ? QUAD_META[i].color : T.line }}
-                    aria-label={`Show ${quad.name}`}
-                  />
-                ))}
+                  <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 w-6 -translate-x-1/2 bg-[#F2EFE8]" aria-hidden="true">
+                    <span className="absolute left-1/2 top-4 -translate-x-1/2 [writing-mode:vertical-rl] font-mono text-[7px] font-bold uppercase tracking-[0.18em] text-[#06162F]">Centre St</span>
+                  </div>
+                  <svg className="pointer-events-none absolute inset-x-0 top-1/2 z-20 h-10 w-full -translate-y-1/2" viewBox="0 0 500 40" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M0 21 C60 1 112 39 176 20 S294 4 352 22 S445 35 500 15" fill="none" stroke="#F2EFE8" strokeWidth="18" />
+                    <path d="M0 21 C60 1 112 39 176 20 S294 4 352 22 S445 35 500 15" fill="none" stroke="#E52C20" strokeWidth="3" />
+                  </svg>
+                  <span className="pointer-events-none absolute left-3 top-1/2 z-30 -translate-y-1/2 bg-[#F2EFE8] px-2 py-1 font-mono text-[7px] font-bold uppercase tracking-[0.18em] text-[#E52C20]" aria-hidden="true">Bow River</span>
+                  <span className="pointer-events-none absolute left-1/2 top-1/2 z-30 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#E52C20] outline outline-4 outline-[#F2EFE8]" aria-hidden="true" />
+                </div>
               </div>
             </div>
+            <p className="mt-6 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-[#AFC5DF]">
+              <span>Tap a sector</span><span>{String(active + 1).padStart(2, '0')} / 04 selected</span>
+            </p>
           </Reveal>
 
-          {/* Detail plate — crossfades with the selection */}
           <Reveal delay={0.08}>
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.article
                 key={q.code}
-                initial={reduced ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? undefined : { opacity: 0, y: -12 }}
-                transition={{ duration: 0.4, ease: EASE }}
-                className="relative overflow-hidden rounded-3xl"
-                style={{ background: T.panel, border: `1px solid ${T.line}` }}
+                custom={direction}
+                initial={reduced ? false : { opacity: 0, x: direction * 32, rotate: direction * 1.5 }}
+                animate={{ opacity: 1, x: 0, rotate: 0 }}
+                exit={reduced ? undefined : { opacity: 0, x: direction * -22 }}
+                transition={{ duration: 0.42, ease: EASE }}
+                className="relative pb-6 pr-3 sm:pb-8 sm:pr-5"
               >
-                <div className="absolute top-0 inset-x-0 h-1 z-10" style={{ background: meta.color }} aria-hidden="true" />
-                <div className="relative h-44 sm:h-52 overflow-hidden" aria-hidden="true">
-                  <img
-                    src={publicAsset(q.img)}
-                    alt={q.imgAlt}
-                    loading="lazy"
-                    decoding="async"
-                    width={800} height={450}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0" style={{ background: `linear-gradient(160deg, ${meta.color}55, transparent 60%)`, mixBlendMode: 'multiply' }} />
-                  <div className="absolute inset-x-0 bottom-0 h-12" style={{ background: `linear-gradient(to top, ${T.panel}, transparent)` }} />
-                  <span
-                    className="absolute top-3 left-3 font-mono text-[9px] font-bold tracking-[0.22em] uppercase px-2.5 py-1.5 rounded-md"
-                    style={{ background: 'rgba(255,253,248,0.9)', color: meta.color }}
-                  >
-                    Plate {String(active + 1).padStart(2, '0')} · {q.code}
-                  </span>
-                </div>
-                <div className="p-6 sm:p-8 pt-4">
-                  <h3 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em]" style={{ color: T.ink }}>
-                    {q.name}
-                  </h3>
-                  <p className="mt-2.5 text-sm leading-relaxed" style={{ color: T.inkSoft }}>{q.places}</p>
-                  <div className="mt-5 flex items-center gap-2" aria-hidden="true">
-                    {CATEGORIES.map((c) => (
-                      <span key={c.key} className="w-2 h-2 rounded-full" style={{ background: c.color }} />
-                    ))}
-                    <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em]" style={{ color: T.inkSoft }}>
-                      All five categories · live
+                <div className="absolute inset-0 translate-x-3 translate-y-3 bg-[#E52C20] sm:translate-x-5 sm:translate-y-5" style={{ clipPath: 'polygon(1% 2%, 100% 0, 98% 98%, 3% 100%, 0 5%)' }} aria-hidden="true" />
+                <div className="relative bg-[#F2EFE8] p-2.5 sm:p-3" style={{ clipPath: 'polygon(1% 2%, 100% 0, 98% 98%, 3% 100%, 0 5%)' }}>
+                  <div className="relative h-[19rem] overflow-hidden sm:h-[25rem] lg:h-[31rem]">
+                    <img src={publicAsset(q.img)} alt={q.imgAlt} loading="lazy" decoding="async" width={1100} height={850} className="h-full w-full object-cover saturate-[0.82] contrast-[1.14]" />
+                    <div className="absolute inset-0 bg-[#0B3157]/20 mix-blend-color" aria-hidden="true" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#06162F] via-[#06162F]/45 to-transparent" aria-hidden="true" />
+                    <span className="absolute left-4 top-4 -rotate-2 bg-[#06162F] px-3 py-2 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8] shadow-[4px_4px_0_#E52C20] sm:left-6 sm:top-6">Plate {String(active + 1).padStart(2, '0')} · {q.code}</span>
+                    <div className="absolute inset-x-5 bottom-5 text-[#F2EFE8] sm:inset-x-8 sm:bottom-8">
+                      <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#E52C20]">Now watching</p>
+                      <h3 className="mt-2 font-display text-[clamp(2.5rem,7vw,5.3rem)] font-black uppercase leading-[0.82] tracking-[-0.04em]">{q.name}</h3>
+                      <p className="mt-4 max-w-lg text-sm leading-relaxed text-[#D9E2EC] sm:text-base">{q.places}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-4 text-[#06162F] sm:px-5">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em]">All report types active</span>
+                    <span className="flex items-center gap-1.5" aria-label="Crime, traffic, weather, infrastructure, and emergency reports">
+                      {CATEGORIES.map((c) => <span key={c.key} className="h-2 w-2" style={{ background: c.color }} aria-hidden="true" />)}
+                      <span className="ml-1 font-mono text-[9px] uppercase tracking-[0.14em] text-[#5A6B7D]">Live</span>
                     </span>
                   </div>
                 </div>

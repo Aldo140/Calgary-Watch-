@@ -111,3 +111,57 @@ export const CHART_SERIES = {
   weather: '#7C5CBF',
   gas: '#0F8B8D',
 } as const;
+
+// ─── The map application ────────────────────────────────────────────────────
+
+/**
+ * Layer 3 surfaces: map chrome, panels, sheets, forms.
+ *
+ * An audit of the map app found **89 distinct hex colours**, of which 95 pairs
+ * were within 18 units of each other in RGB — `#D8E2EA` against `#D9E2E8`,
+ * `#F7FBFF` against `#F8FAFC`, `#1C2B3A` against `#1E293B`. Nobody chose those;
+ * they accumulated one component at a time. Grouped by role, the usage counts
+ * show the palette was only ever about a dozen values with seventy-odd near
+ * misses layered on top.
+ *
+ * These are those dozen, picked as the most-used member of each cluster so
+ * adopting them changes almost nothing visually. Import from here; a new hex
+ * literal in a component is how the drift started.
+ *
+ * This is Layer 3, so it takes the poster's *grammar* — square corners, mono
+ * labels in wide uppercase tracking, the hard-offset press on primary actions —
+ * and not its display type or its dark ground. Forty report rows in
+ * `leading-[0.76]` black caps is unreadable, and dark chrome over a light
+ * basemap fights both the tiles and the crime choropleth.
+ */
+export const MAP = {
+  /** Panel and card surface. Was also #FFFFFF, #FFFCF6, #F8FAFC. */
+  panel: '#FFFDF8',
+  /** The page behind the panels. Was also #F5F2E9, #F7F6F3. */
+  paper: '#F7F3EA',
+  /** Tinted surface for a selected or hovered row. Was also #EAF1F6, #EEF4F8. */
+  tint: '#E8F3FC',
+
+  /** Primary text. Was also #1E293B, #0F172A, #020617. */
+  ink: '#1C2B3A',
+  /** Deep chrome ink — headers and the map's own furniture. Was also #0A1628, #0F1E3D. */
+  inkDeep: '#0B1F33',
+  /** Secondary text. Was also #52697D, #6B8296, #64748B, #475569. */
+  muted: '#5A6B7D',
+  /** Tertiary text — timestamps, counts. */
+  faint: '#9AA6B2',
+
+  /** Hairline on paper. Was also #D9D2C3, #F0EBDD. */
+  line: '#E7E0D2',
+  /** Hairline on the cooler map chrome. Was also #D8E2EA, #D9E2E8, #E2E8F0. */
+  lineCool: '#C9D8E4',
+
+  /** Interactive accent. Was also #286FAF, #2563EB. */
+  accent: '#4A90D9',
+  /** Positive / live. Was also #059669, #34D399, #22C55E. */
+  ok: '#2E8B7A',
+  /** Warning. Was also #EA580C, #B45309, #92400E. */
+  warn: '#C77F18',
+  /** Danger. Was also #EF4444, #E11D48, #B91C1C, #7F1D1D. */
+  danger: '#C0392B',
+} as const;

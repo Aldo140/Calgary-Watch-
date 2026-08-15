@@ -2803,8 +2803,8 @@ export default function MapPage() {
                   className="absolute right-full mr-3 top-0 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-[rgb(255,250,243)] light:border-stone-200/80 pointer-events-auto"
                 >
                   <div className="p-3 border-b border-white/5">
-                    <p className="text-xs font-bold text-white truncate">{user.displayName}</p>
-                    <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
+                    <p className="text-xs font-bold truncate" style={{ color: '#1C2B3A' }}>{user.displayName}</p>
+                    <p className="text-[10px] truncate" style={{ color: '#5A6B7D' }}>{user.email}</p>
                   </div>
                   {isAdmin && (
                     <button
@@ -3268,7 +3268,7 @@ export default function MapPage() {
                       className="absolute right-0 mt-2 w-52 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden light:bg-white light:border-slate-300"
                     >
                       <div className="p-4 border-b border-white/5">
-                        <p className="text-xs font-bold text-white truncate">{user.displayName}</p>
+                        <p className="text-xs font-bold truncate" style={{ color: '#1C2B3A' }}>{user.displayName}</p>
                         <p className="text-[10px] text-slate-500 truncate mt-0.5">{user.email}</p>
                       </div>
                       {isAdmin && (

@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { parseAssessedValue } from '../src/hooks/usePropertyAssessments.js';
+import { parseAssessedValue, resolveCommunityName } from '../src/hooks/usePropertyAssessments.js';
 
 describe('parseAssessedValue', () => {
   it('reads a comma-formatted value in full', () => {
@@ -46,5 +46,45 @@ describe('parseAssessedValue', () => {
     const plain = parseAssessedValue('651153');
     const growth = Math.round(((plain - formatted) / formatted) * 100);
     assert.ok(growth > 0 && growth < 200, `expected a plausible growth figure, got ${growth}%`);
+  });
+});
+
+describe('resolveCommunityName', () => {
+  // A slice of the real catalogue from Calgary Open Data 4ur7-wsgc.
+  const CATALOGUE = [
+    'BRIDGELAND/RIVERSIDE', 'SADDLE RIDGE', 'HILLHURST', 'WEST HILLHURST',
+    'SUNNYSIDE', 'ALTADORE', 'FOREST LAWN', 'BELTLINE', 'UPPER MOUNT ROYAL',
+    'LOWER MOUNT ROYAL', 'NOSE HILL PARK', 'ALBERT PARK/RADISSON HEIGHTS',
+  ];
+
+  it('matches ignoring case and punctuation', () => {
+    assert.equal(resolveCommunityName('altadore', CATALOGUE), 'ALTADORE');
+    assert.equal(resolveCommunityName('Forest Lawn', CATALOGUE), 'FOREST LAWN');
+  });
+
+  it('resolves a name the city files under a slash-combined community', () => {
+    // The app stores "bridgeland"; the city files BRIDGELAND/RIVERSIDE.
+    assert.equal(resolveCommunityName('bridgeland', CATALOGUE), 'BRIDGELAND/RIVERSIDE');
+    assert.equal(resolveCommunityName('radisson heights', CATALOGUE), 'ALBERT PARK/RADISSON HEIGHTS');
+  });
+
+  it('resolves a spacing difference', () => {
+    // "saddleridge" in the app, "SADDLE RIDGE" in the dataset.
+    assert.equal(resolveCommunityName('saddleridge', CATALOGUE), 'SADDLE RIDGE');
+  });
+
+  it('maps a district people use to the community the city records', () => {
+    // Kensington is a business district; the city files it under Hillhurst.
+    assert.equal(resolveCommunityName('kensington', CATALOGUE), 'HILLHURST');
+  });
+
+  it('prefers the most specific containment match', () => {
+    // HILLHURST must win over WEST HILLHURST for a bare "hillhurst".
+    assert.equal(resolveCommunityName('hillhurst', CATALOGUE), 'HILLHURST');
+  });
+
+  it('returns null when nothing plausibly matches', () => {
+    assert.equal(resolveCommunityName('false creek', CATALOGUE), null);
+    assert.equal(resolveCommunityName('', CATALOGUE), null);
   });
 });

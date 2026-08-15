@@ -34,6 +34,68 @@ export function parseAssessedValue(raw: string | undefined): number {
   return parseFloat(String(raw).replace(/[^0-9.]/g, ''));
 }
 
+/**
+ * Calgary's assessment dataset names communities its own way, and the app does
+ * not. It carries "bridgeland" where the dataset has BRIDGELAND/RIVERSIDE,
+ * "saddleridge" against SADDLE RIDGE, and district names like Kensington that
+ * the city files under HILLHURST. The old code uppercased the app's name and
+ * asked for an exact match, so any community whose name did not happen to line
+ * up returned nothing and the whole property tab came up empty.
+ *
+ * Matching in order of confidence: exact, then punctuation- and space-
+ * insensitive, then either half of a slash-combined name, then containment.
+ */
+const NAME_ALIASES: Record<string, string> = {
+  // Districts people use that the city files under a different community.
+  kensington: 'hillhurst',
+  victoriapark: 'beltline',
+};
+
+const normalizeName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+export function resolveCommunityName(input: string, catalogue: string[]): string | null {
+  if (!input) return null;
+  const wanted = NAME_ALIASES[normalizeName(input)] ?? normalizeName(input);
+  if (!wanted) return null;
+
+  const index = new Map<string, string>();
+  for (const name of catalogue) {
+    index.set(normalizeName(name), name);
+    // Index each half of BRIDGELAND/RIVERSIDE so either side resolves.
+    for (const part of name.split('/')) {
+      const key = normalizeName(part);
+      if (key && !index.has(key)) index.set(key, name);
+    }
+  }
+
+  const direct = index.get(wanted);
+  if (direct) return direct;
+
+  // Last resort: the shortest containment match, which avoids "PARK" style
+  // fragments swallowing a more specific community.
+  const partial = [...index.entries()]
+    .filter(([key]) => key.includes(wanted) || wanted.includes(key))
+    .sort((a, b) => a[0].length - b[0].length);
+  return partial.length ? partial[0][1] : null;
+}
+
+/** The dataset's community list, fetched once per session. */
+let _catalogue: Promise<string[]> | null = null;
+function loadCommunityCatalogue(): Promise<string[]> {
+  if (!_catalogue) {
+    _catalogue = fetch(
+      'https://data.calgary.ca/resource/4ur7-wsgc.json' +
+        '?$select=comm_name&$group=comm_name&$limit=1000',
+    )
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows: { comm_name?: string }[]) =>
+        rows.map((r) => r.comm_name ?? '').filter(Boolean),
+      )
+      .catch(() => []);
+  }
+  return _catalogue;
+}
+
 export function usePropertyAssessments(communityName: string | null): {
   data: PropertyYearEntry[];
   isLoading: boolean;
@@ -53,20 +115,24 @@ export function usePropertyAssessments(communityName: string | null): {
     let cancelled = false;
     setLoading(true);
 
-    // Calgary Open Data expects the community name in UPPER CASE
-    const encoded = encodeURIComponent(communityName.toUpperCase());
-    const url =
-      `https://data.calgary.ca/resource/4ur7-wsgc.json` +
-      // Residential only. Without the class filter the "average home value"
-      // for a community silently included shops, offices and industrial land,
-      // which inflated Forest Lawn from $541k to $646k and Marlborough from
-      // $532k to $618k — enough to push ordinary residential areas above the
-      // city's residential median and misplace them on the value axis.
-      `?$where=comm_name='${encoded}' AND assessment_class='RE'` +
-      `&$select=assessed_value,roll_year` +
-      `&$limit=50000`;
+    loadCommunityCatalogue().then((catalogue) => {
+      if (cancelled) return;
 
-    fetch(url)
+      // Resolve the app's name onto whatever the city calls the community.
+      const resolved = resolveCommunityName(communityName, catalogue) ?? communityName.toUpperCase();
+      const encoded = encodeURIComponent(resolved);
+      const url =
+        `https://data.calgary.ca/resource/4ur7-wsgc.json` +
+        // Residential only. Without the class filter the "average home value"
+        // for a community silently included shops, offices and industrial land,
+        // which inflated Forest Lawn from $541k to $646k and Marlborough from
+        // $532k to $618k — enough to push ordinary residential areas above the
+        // city's residential median and misplace them on the value axis.
+        `?$where=comm_name='${encoded}' AND assessment_class='RE'` +
+        `&$select=assessed_value,roll_year` +
+        `&$limit=50000`;
+
+      return fetch(url)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -98,6 +164,10 @@ export function usePropertyAssessments(communityName: string | null): {
         _cache.set(cacheKey, result);
         setData(result);
       })
+        .catch(() => {
+          if (!cancelled) setData([]);
+        });
+    })
       .catch(() => {
         if (!cancelled) setData([]);
       })

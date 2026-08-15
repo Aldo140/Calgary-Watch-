@@ -12,6 +12,8 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 
+import { clampToNow } from '../scripts/ingest/sources/511-alberta.js';
+
 const SRC = readFileSync('scripts/ingest/sources/511-alberta.ts', 'utf8');
 
 /** Real record from https://511.alberta.ca/api/v2/get/event */
@@ -66,5 +68,30 @@ describe('511 Alberta categorisation', () => {
 
   it('still recognises weather events', () => {
     assert.match(SRC, /'weather'/);
+  });
+});
+
+describe('clampToNow', () => {
+  const NOW = 1_700_000_000_000;
+
+  it('leaves a past report time untouched', () => {
+    assert.equal(clampToNow(NOW - 3_600_000, NOW), NOW - 3_600_000);
+  });
+
+  it('clamps a future report time to now', () => {
+    // 511 publishes planned work: a restriction scheduled for next week
+    // carries a StartDate days ahead of the ingest run.
+    assert.equal(clampToNow(NOW + 4 * 86_400_000, NOW), NOW);
+  });
+
+  it('stops planned work outranking reports filed after the ingest run', () => {
+    // The feed is ordered newest-first with a page limit. Unclamped, a
+    // restriction planned for next week outranks every report filed between
+    // now and then, pushing genuine community posts out of the loaded window.
+    const raw = NOW + 5 * 86_400_000;          // planned five days out
+    const filedTomorrow = NOW + 86_400_000;    // a neighbour reports a day later
+
+    assert.ok(raw > filedTomorrow, 'unclamped, planned work buries the later report');
+    assert.ok(clampToNow(raw, NOW) < filedTomorrow, 'clamped, the real report wins');
   });
 });

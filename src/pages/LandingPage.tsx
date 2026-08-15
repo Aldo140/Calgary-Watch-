@@ -2118,8 +2118,15 @@ function Coverage() {
 
   return (
     <section className="relative py-16 sm:py-20 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
-      <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid lg:grid-cols-2 gap-14 items-center">
-        <div>
+      {/*
+        On a phone this used to run heading, body, form, link, then the list of
+        covered towns — so the page asked "name your city" before it had shown
+        that thirty of them are already covered. The grid is placed explicitly
+        so mobile reads proof-then-ask while the desktop two-column layout is
+        unchanged.
+      */}
+      <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid gap-8 lg:gap-14 lg:grid-cols-2 lg:items-center">
+        <div className="order-1 lg:col-start-1 lg:row-start-1">
           <Reveal>
             <Eyebrow>Beyond city limits</Eyebrow>
             <h2 className="mt-5 font-display font-extrabold tracking-[-0.025em] leading-[1.04]" style={{ color: T.ink, fontSize: 'clamp(2.2rem, 4.6vw, 3.8rem)' }}>
@@ -2131,8 +2138,9 @@ function Coverage() {
               Tell us where to point the watch next.
             </p>
           </Reveal>
+        </div>
 
-          <Reveal delay={0.1} className="mt-8">
+        <Reveal delay={0.1} className="order-3 lg:col-start-1 lg:row-start-2">
             <div className="flex flex-col sm:flex-row gap-3 max-w-md">
               <input
                 id="city-request-input"
@@ -2161,14 +2169,13 @@ function Coverage() {
               See the Airdrie and Calgary area coverage map
               <ArrowUpRight size={15} />
             </a>
-          </Reveal>
-        </div>
+        </Reveal>
 
-        {/* Region panel — towns pop in around the Calgary hub */}
-        <Reveal delay={0.12}>
-          <div className="relative rounded-[1.75rem] p-8 lg:p-10 overflow-hidden" style={{ background: T.panel, border: `1px solid ${T.line}` }}>
+        {/* Region panel — the proof. Sits above the form on mobile. */}
+        <Reveal delay={0.12} className="order-2 lg:col-start-2 lg:row-start-1 lg:row-span-2">
+          <div className="relative rounded-[1.75rem] p-6 sm:p-8 lg:p-10 overflow-hidden" style={{ background: T.panel, border: `1px solid ${T.line}` }}>
             <p className="font-mono text-[10px] uppercase tracking-[0.28em]" style={{ color: T.inkSoft }}>Region · Greater Calgary</p>
-            <div className="mt-6 flex flex-wrap gap-2.5">
+            <div className="mt-5 flex flex-wrap gap-2 sm:mt-6 sm:gap-2.5">
               {towns.map((t, i) => (
                 <motion.span
                   key={t}
@@ -2176,7 +2183,7 @@ function Coverage() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.05 * i, duration: 0.45, ease: EASE }}
-                  className="rounded-full px-4 py-2 text-[13px] font-bold"
+                  className="rounded-full px-3 py-1.5 text-[12px] font-bold sm:px-4 sm:py-2 sm:text-[13px]"
                   style={t === '+ 20 more'
                     ? { background: T.ink, color: T.paper }
                     : { border: `1px solid ${T.line}`, color: T.ink, background: T.paper }}

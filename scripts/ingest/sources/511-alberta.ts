@@ -134,6 +134,17 @@ function buildHeadline(event: AlbertaEvent): string {
 // Main export
 // ---------------------------------------------------------------------------
 
+/**
+ * A report may not be dated in the future.
+ *
+ * 511 publishes planned work, so StartDate is routinely days ahead. Since the
+ * feed sorts newest-first with a page limit, an unclamped future timestamp
+ * permanently outranks every genuine report.
+ */
+export function clampToNow(ms: number, now: number = Date.now()): number {
+  return Number.isFinite(ms) && ms > now ? now : ms;
+}
+
 export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
   const res = await fetch(API_URL, {
     headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact jorti104@mtroyal.ca)' },
@@ -167,11 +178,20 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
       title: headline,
       description,
       // Reported/StartDate are Unix seconds.
-      timestamp: typeof event.Reported === 'number' && event.Reported > 0
-        ? event.Reported * 1000
-        : typeof event.StartDate === 'number' && event.StartDate > 0
-          ? event.StartDate * 1000
-          : Date.now(),
+      //
+      // Clamped to now because 511 publishes *planned* work: a restriction
+      // scheduled for next week carries a StartDate days in the future. The
+      // feed is ordered newest-first with a page limit, so future-dated records
+      // sat permanently at the top and pushed real community reports out of the
+      // loaded window — they appeared neither as pins nor in the feed. A report
+      // cannot be newer than the moment it was read.
+      timestamp: clampToNow(
+        typeof event.Reported === 'number' && event.Reported > 0
+          ? event.Reported * 1000
+          : typeof event.StartDate === 'number' && event.StartDate > 0
+            ? event.StartDate * 1000
+            : Date.now(),
+      ),
       category: mapEventTypeToCategory(event),
       neighborhood: getNeighborhood(event),
       lat: coords.lat,

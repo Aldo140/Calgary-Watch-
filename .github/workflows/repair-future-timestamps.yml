@@ -1,0 +1,31 @@
+name: Repair Future Timestamps
+
+# Manual only. Corrects incident records whose `timestamp` sits in the future,
+# which happened while the 511 source wrote planned StartDates unclamped. Those
+# records sort to the top of the newest-first feed forever and push genuine
+# community reports out of the loaded page.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Count without writing (leave checked for the first run)'
+        type: boolean
+        default: true
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Both branches are non-empty on purpose: GitHub treats '' as falsy, so
+      # `inputs.dry_run && '' || '--commit'` collapses to '--commit' in both states.
+      - run: npx tsx scripts/repair-future-timestamps.ts ${{ inputs.dry_run && '--dry-run' || '--commit' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}

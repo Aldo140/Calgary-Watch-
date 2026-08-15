@@ -13,7 +13,8 @@
     "lint": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "ingest:outages": "tsx scripts/ingest/power-outages.ts",
-    "backfill:visibility": "tsx scripts/backfill-visibility.ts"
+    "backfill:visibility": "tsx scripts/backfill-visibility.ts",
+    "repair:timestamps": "tsx scripts/repair-future-timestamps.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

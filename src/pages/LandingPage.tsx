@@ -448,11 +448,119 @@ const HERO_LINES = [
 ];
 
 const MOBILE_SCAN = [
-  { label: 'Crime', icon: AlertCircle },
-  { label: 'Traffic', icon: Car },
-  { label: 'Weather', icon: CloudRain },
-  { label: 'Emergencies', icon: Siren },
+  { label: 'Crime', location: 'Inglewood', icon: AlertCircle, color: '#FF7770', x: '27%', y: '48%' },
+  { label: 'Traffic', location: 'Deerfoot', icon: Car, color: '#FFBC58', x: '74%', y: '41%' },
+  { label: 'Weather', location: 'Northwest', icon: CloudRain, color: '#79C8FF', x: '52%', y: '30%' },
+  { label: 'Emergency', location: 'Beltline', icon: Siren, color: '#C9A4FF', x: '45%', y: '52%' },
 ] as const;
+
+function MobileCitySignals({ activeIndex, reduced }: { activeIndex: number; reduced: boolean }) {
+  const active = MOBILE_SCAN[activeIndex];
+  const ActiveIcon = active.icon;
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 bottom-[15.5rem] top-16 z-[1] overflow-hidden" aria-hidden="true">
+      {!reduced && (
+        <>
+          <motion.div
+            className="absolute -bottom-[8%] top-0 w-[34%] -skew-x-12"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(103,183,247,0.04) 20%, rgba(103,183,247,0.2) 52%, rgba(103,183,247,0.04) 82%, transparent)',
+              borderRight: '1px solid rgba(143,208,255,0.48)',
+              filter: 'drop-shadow(0 0 12px rgba(103,183,247,0.28))',
+            }}
+            initial={{ x: '-45vw', opacity: 0 }}
+            animate={{ x: '120vw', opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 4.8, delay: 0.6, repeat: Infinity, repeatDelay: 0.7, ease: 'linear' }}
+          />
+
+          <motion.div
+            className="absolute left-[39%] top-[42%] size-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-300/30"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+          >
+            <span className="absolute left-1/2 top-[-5px] h-2.5 w-px bg-sky-200/70" />
+            <span className="absolute bottom-[-5px] left-1/2 h-2.5 w-px bg-sky-200/70" />
+            <span className="absolute left-[-5px] top-1/2 h-px w-2.5 bg-sky-200/70" />
+            <span className="absolute right-[-5px] top-1/2 h-px w-2.5 bg-sky-200/70" />
+            <motion.span
+              className="absolute inset-3 rounded-full border border-sky-200/30"
+              animate={{ scale: [0.72, 1.18], opacity: [0.72, 0] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
+            />
+          </motion.div>
+
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 390 530" preserveAspectRatio="none">
+            <motion.path
+              d="M39 327 C96 278 123 351 177 300 S263 238 351 284"
+              fill="none"
+              stroke="rgba(143,208,255,0.48)"
+              strokeWidth="1"
+              strokeDasharray="3 7"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: [0, 1, 1], opacity: [0, 0.72, 0] }}
+              transition={{ duration: 5.4, repeat: Infinity, repeatDelay: 0.4, ease: [0.77, 0, 0.175, 1] }}
+            />
+          </svg>
+        </>
+      )}
+
+      {MOBILE_SCAN.map((signal, index) => (
+        <motion.span
+          key={signal.label}
+          className="absolute size-1.5 rounded-full"
+          style={{ left: signal.x, top: signal.y, background: signal.color, boxShadow: `0 0 11px ${signal.color}` }}
+          animate={reduced ? undefined : index === activeIndex ? { scale: [1, 1.45, 1] } : { opacity: [0.35, 0.9, 0.35] }}
+          transition={{ duration: index === activeIndex ? 0.7 : 2.4 + index * 0.25, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      ))}
+
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.div
+          key={active.label}
+          className="absolute"
+          style={{ left: active.x, top: active.y, color: active.color }}
+          initial={reduced ? false : { opacity: 0, scale: 0.9, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={reduced ? undefined : { opacity: 0, scale: 0.96, y: -6 }}
+          transition={{ duration: 0.38, ease: EASE }}
+        >
+          {!reduced && (
+            <>
+              <motion.span
+                className="absolute -left-4 -top-4 size-8 rounded-full border"
+                style={{ borderColor: active.color }}
+                animate={{ scale: [0.55, 1.7], opacity: [0.85, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+              />
+              <motion.span
+                className="absolute -left-4 -top-4 size-8 rounded-full border"
+                style={{ borderColor: active.color }}
+                animate={{ scale: [0.55, 1.7], opacity: [0.65, 0] }}
+                transition={{ duration: 1.8, delay: 0.6, repeat: Infinity, ease: 'easeOut' }}
+              />
+            </>
+          )}
+          <span
+            className="absolute left-0 top-2 h-4 w-px"
+            style={{ background: active.color }}
+          />
+          <span
+            className="absolute left-0 top-6 flex min-w-max -translate-x-1/2 items-center gap-2 rounded-md px-2.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.1em] text-white"
+            style={{
+              background: 'rgba(8,26,43,0.9)',
+              boxShadow: `0 0 0 1px ${active.color}66`,
+            }}
+          >
+            <ActiveIcon size={11} style={{ color: active.color }} />
+            {active.label}
+            <span className="text-white/50">{active.location}</span>
+          </span>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
 
 /** Mobile hero: a bespoke Calgary plate with a capability-led scan sequence. */
 function MobileHero({ reduced }: { reduced: boolean }) {
@@ -473,9 +581,9 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         width={720}
         height={1279}
         fetchPriority="high"
-        initial={reduced ? false : { scale: 1.07 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: EASE }}
+        initial={reduced ? false : { scale: 1.06 }}
+        animate={reduced ? { scale: 1 } : { scale: [1.06, 1.015, 1.04], x: ['-1.2%', '0.8%', '-1.2%'] }}
+        transition={reduced ? { duration: 0 } : { duration: 16, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute inset-0 h-full w-full object-cover object-center"
         onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
       />
@@ -487,16 +595,7 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         aria-hidden="true"
       />
 
-      {!reduced && (
-        <motion.div
-          className="pointer-events-none absolute inset-x-0 top-0 h-px"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(103,183,247,0.9), transparent)', boxShadow: '0 0 18px rgba(103,183,247,0.55)' }}
-          initial={{ y: '14vh', opacity: 0 }}
-          animate={{ y: '76vh', opacity: [0, 0.8, 0.45, 0] }}
-          transition={{ duration: 2.6, delay: 0.45, ease: [0.77, 0, 0.175, 1] }}
-          aria-hidden="true"
-        />
-      )}
+      <MobileCitySignals activeIndex={scanIndex} reduced={reduced} />
 
       <div className="relative z-[2] flex min-h-[100dvh] flex-col px-5 pb-5 pt-20 sm:px-7">
         <div className="flex-1" aria-hidden="true" />
@@ -505,13 +604,13 @@ function MobileHero({ reduced }: { reduced: boolean }) {
           initial={false}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.18, ease: EASE }}
-          className="mb-3 flex h-6 items-center gap-2 overflow-hidden text-[11px] font-bold uppercase tracking-[0.12em]"
+          className="mb-3 flex h-6 items-center gap-2 overflow-hidden text-[10px] font-bold uppercase tracking-[0.12em]"
           style={{ color: '#8FD0FF' }}
         >
           <span className="sr-only">Monitoring crime, traffic, weather and emergencies</span>
           <span aria-hidden="true" className="flex items-center gap-2">
             <Radio size={13} />
-            Monitoring
+            City signal live
           </span>
           <span aria-hidden="true" className="h-3 w-px bg-white/25" />
           <AnimatePresence mode="wait" initial={false}>
@@ -524,8 +623,8 @@ function MobileHero({ reduced }: { reduced: boolean }) {
               transition={{ duration: 0.3, ease: EASE }}
               className="flex items-center gap-1.5"
             >
-              <ScanIcon size={13} />
-              {scan.label}
+              <ScanIcon size={12} style={{ color: scan.color }} />
+              {scan.label} · {scan.location}
             </motion.span>
           </AnimatePresence>
         </motion.div>

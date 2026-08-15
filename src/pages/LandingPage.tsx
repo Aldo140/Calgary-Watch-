@@ -92,10 +92,10 @@ const NEARBY_POSTS: Array<{
 ];
 
 const QUADRANTS = [
-  { code: 'NW', name: 'Northwest', places: 'Bowness · Kensington · Nose Hill · University District', from: { x: -60, y: -60 }, img: 'images/calgary4.webp', imgAlt: 'Peace Bridge over the Bow River' },
-  { code: 'NE', name: 'Northeast', places: 'Saddle Ridge · Marlborough · Airport · Bridgeland', from: { x: 60, y: -60 }, img: 'images/calgary1.webp', imgAlt: 'Calgary skyline under a golden prairie sky' },
-  { code: 'SW', name: 'Southwest', places: 'Beltline · Marda Loop · Signal Hill · Glenmore', from: { x: -60, y: 60 }, img: 'images/calgary2.webp', imgAlt: 'Calgary Tower at golden hour' },
-  { code: 'SE', name: 'Southeast', places: 'Inglewood · Forest Lawn · Seton · Mahogany', from: { x: 60, y: 60 }, img: 'images/calgary7.webp', imgAlt: 'Saddledome and downtown from Scotsman Hill' },
+  { code: 'NW', name: 'Northwest', places: 'Bowness · Kensington · Nose Hill · University District', img: 'images/quadrant-nw-collage.webp', imgAlt: 'Collage of the Peace Bridge, Bow River, Nose Hill and northwest Calgary' },
+  { code: 'NE', name: 'Northeast', places: 'Saddle Ridge · Marlborough · Airport · Bridgeland', img: 'images/quadrant-ne-collage.webp', imgAlt: 'Collage of a northeast CTrain, airport approach and neighbourhood streets' },
+  { code: 'SW', name: 'Southwest', places: 'Beltline · Marda Loop · Signal Hill · Glenmore', img: 'images/quadrant-sw-collage.webp', imgAlt: 'Collage of Glenmore Reservoir, the Rockies and southwest Calgary neighbourhoods' },
+  { code: 'SE', name: 'Southeast', places: 'Inglewood · Forest Lawn · Seton · Mahogany', img: 'images/quadrant-se-collage.webp', imgAlt: 'Collage of the Saddledome, Inglewood brick streets and southeast Calgary homes' },
 ];
 
 // "One day on the watch" — dawn to after-midnight camera dolly.
@@ -1212,12 +1212,12 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
 // QUADRANTS — an interactive atlas plate: Calgary's real quadrant system as a
 // living diagram (Centre St axis + the Bow drawn in), driving a detail plate.
 // ---------------------------------------------------------------------------
-const QUAD_META: Array<{ color: string; x: number; y: number; dots: Array<[number, number]> }> = [
-  { color: '#4A90D9', x: 0,   y: 0,   dots: [[52, 62], [110, 38], [88, 118], [140, 90]] },   // NW
-  { color: '#D4A843', x: 188, y: 0,   dots: [[238, 52], [296, 96], [262, 124], [310, 40]] }, // NE
-  { color: '#2E8B7A', x: 0,   y: 188, dots: [[60, 250], [118, 296], [96, 224], [148, 270]] },// SW
-  { color: '#C0392B', x: 188, y: 188, dots: [[240, 236], [292, 282], [258, 312], [312, 250]] }, // SE
-];
+const QUAD_META = [
+  { color: '#4A90D9', bearing: '315°', dots: [[52, 62], [110, 38], [88, 118]] },
+  { color: '#D4A843', bearing: '045°', dots: [[238, 52], [296, 96], [262, 124]] },
+  { color: '#2E8B7A', bearing: '225°', dots: [[60, 250], [118, 296], [96, 224]] },
+  { color: '#C0392B', bearing: '135°', dots: [[240, 236], [292, 282], [258, 312]] },
+] as const;
 
 function Quadrants({ reduced }: { reduced: boolean }) {
   const [active, setActive] = useState(0);
@@ -1225,16 +1225,14 @@ function Quadrants({ reduced }: { reduced: boolean }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { margin: '-20%' });
 
-  // Auto-tour the quadrants until the visitor takes over
   useEffect(() => {
     if (reduced || touched || !inView) return;
-    const id = window.setInterval(() => setActive((a) => (a + 1) % 4), 3200);
+    const id = window.setInterval(() => setActive((value) => (value + 1) % QUADRANTS.length), 3600);
     return () => window.clearInterval(id);
   }, [reduced, touched, inView]);
 
-  const pick = (i: number) => { setTouched(true); setActive(i); };
+  const pick = (index: number) => { setTouched(true); setActive(index); };
   const q = QUADRANTS[active];
-  const meta = QUAD_META[active];
   const direction = active % 2 === 0 ? -1 : 1;
 
   return (
@@ -1255,7 +1253,6 @@ function Quadrants({ reduced }: { reduced: boolean }) {
           </div>
         </Reveal>
 
-        {/* Mobile: one cinematic quadrant at a time, with the selector attached. */}
         <div className="mt-8 lg:hidden">
           <div className="grid grid-cols-4 border-y border-[#F2EFE8]/20" role="tablist" aria-label="Calgary quadrants">
             {QUADRANTS.map((quad, i) => {
@@ -1268,43 +1265,29 @@ function Quadrants({ reduced }: { reduced: boolean }) {
               );
             })}
           </div>
-
           <AnimatePresence mode="wait" custom={direction}>
             <motion.article id="quadrant-mobile-panel" role="tabpanel" key={q.code} custom={direction} initial={reduced ? false : { opacity: 0, x: direction * 32 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? undefined : { opacity: 0, x: direction * -24 }} transition={{ duration: 0.38, ease: EASE }} className="relative -mx-5 min-h-[36rem] overflow-hidden sm:-mx-8">
               <img src={publicAsset(q.img)} alt={q.imgAlt} loading="lazy" decoding="async" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#06162F] via-[#06162F]/20 to-transparent" aria-hidden="true" />
-              <span className="absolute right-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{meta.bearing} · {String(active + 1).padStart(2, '0')}/04</span>
+              <span className="absolute right-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[active].bearing} · {String(active + 1).padStart(2, '0')}/04</span>
               <div className="absolute inset-x-5 bottom-8 sm:inset-x-8">
                 <span className="font-display text-[6.5rem] font-black leading-none tracking-[-0.04em] text-[#F2EFE8]/15" aria-hidden="true">{q.code}</span>
                 <h3 className="-mt-8 font-display text-4xl font-black uppercase tracking-[-0.03em] text-[#F2EFE8]">{q.name}</h3>
                 <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#D9E2EC]">{q.places}</p>
-                <div className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#F2EFE8]">
-                  <span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live
-                </div>
+                <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#F2EFE8]"><span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live</p>
               </div>
             </motion.article>
           </AnimatePresence>
         </div>
 
-        {/* Desktop: the four directions form one city; choosing one changes the composition. */}
         <Reveal delay={0.08} className="mt-10 hidden lg:block">
           <div className="relative flex h-[min(68vh,46rem)] gap-2" role="tablist" aria-label="Explore Calgary by quadrant">
             {QUADRANTS.map((quad, i) => {
               const isActive = active === i;
               return (
-                <button
-                  key={quad.code}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => pick(i)}
-                  onMouseEnter={() => pick(i)}
-                  onFocus={() => pick(i)}
-                  className="group relative min-w-0 overflow-hidden text-left outline-none transition-[flex] duration-700 ease-out focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]"
-                  style={{ flex: isActive ? '2.35 1 0%' : '0.72 1 0%' }}
-                >
+                <button key={quad.code} type="button" role="tab" aria-selected={isActive} onClick={() => pick(i)} onMouseEnter={() => pick(i)} onFocus={() => pick(i)} className="group relative min-w-0 overflow-hidden text-left outline-none transition-[flex] duration-700 ease-out focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]" style={{ flex: isActive ? '2.35 1 0%' : '0.72 1 0%' }}>
                   <img src={publicAsset(quad.img)} alt="" loading="lazy" decoding="async" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.015]" />
-                  <div className="absolute inset-0 transition-colors duration-500" style={{ background: isActive ? 'linear-gradient(to top, rgba(6,22,47,0.94), rgba(6,22,47,0.04) 70%)' : 'rgba(6,22,47,0.58)' }} aria-hidden="true" />
+                  <div className="absolute inset-0 transition-colors duration-500" style={{ background: isActive ? 'linear-gradient(to top, rgba(6,22,47,0.94), rgba(6,22,47,0.04) 70%)' : 'rgba(6,22,47,0.62)' }} aria-hidden="true" />
                   <span className="absolute left-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[i].bearing}</span>
                   <span className="absolute right-0 top-0 h-full w-1 origin-top transition-transform duration-500" style={{ background: QUAD_META[i].color, transform: isActive ? 'scaleY(1)' : 'scaleY(0)' }} aria-hidden="true" />
                   <div className="absolute inset-x-5 bottom-6 sm:inset-x-7 sm:bottom-8">
@@ -1313,9 +1296,7 @@ function Quadrants({ reduced }: { reduced: boolean }) {
                       <div className="overflow-hidden">
                         <h3 className="mt-5 font-display text-3xl font-black uppercase tracking-[-0.03em] text-[#F2EFE8] xl:text-4xl">{quad.name}</h3>
                         <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#D9E2EC] xl:text-base">{quad.places}</p>
-                        <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#F2EFE8]">
-                          <span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live
-                        </p>
+                        <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#F2EFE8]"><span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live</p>
                       </div>
                     </div>
                   </div>
@@ -1323,16 +1304,11 @@ function Quadrants({ reduced }: { reduced: boolean }) {
               );
             })}
             <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
-              <svg viewBox="0 0 1200 70" preserveAspectRatio="none" className="h-12 w-full opacity-90">
-                <path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#F2EFE8" strokeWidth="14" />
-                <path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#E52C20" strokeWidth="2.5" />
-              </svg>
+              <svg viewBox="0 0 1200 70" preserveAspectRatio="none" className="h-12 w-full opacity-90"><path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#F2EFE8" strokeWidth="14" /><path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#E52C20" strokeWidth="2.5" /></svg>
               <span className="absolute left-5 top-1/2 -translate-y-1/2 bg-[#F2EFE8] px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">The Bow</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-[#AFC5DF]">
-            <span>Hover or focus a direction</span><span>Centre St × Bow River · Calgary, AB</span>
-          </div>
+          <div className="mt-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-[#AFC5DF]"><span>Hover or focus a direction</span><span>Centre St × Bow River · Calgary, AB</span></div>
         </Reveal>
       </div>
     </section>

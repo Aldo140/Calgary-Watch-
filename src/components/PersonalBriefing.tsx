@@ -118,6 +118,24 @@ export function walkingMinutes(metres: number): number {
   return Math.max(1, Math.round(metres / 80));
 }
 
+/**
+ * Where a report came from.
+ *
+ * The walk section counts every source the map carries — neighbours, Calgary
+ * Police, 311, 511 Alberta, ENMAX — but the headline used to call all of it
+ * "things your neighbours reported", which was both wrong and made a busy
+ * block look empty. Naming the source per row shows the mix instead of hiding
+ * it, and is what makes an official record readable as official.
+ *
+ * Reporter names are deliberately not used here. They are on the public map
+ * already, but a page addressed to one person listing their neighbours by name
+ * reads very differently, and adds nothing.
+ */
+export function sourceLabel(incident: Pick<Incident, 'data_source' | 'source_name'>): string {
+  if (incident.data_source === 'community') return 'A neighbour';
+  return incident.source_name?.trim() || 'City of Calgary';
+}
+
 export function bandFor(rank: number, total: number): { label: string; color: string } {
   const pct = total > 0 ? rank / total : 1;
   return BAND.find((b) => pct <= b.max) ?? BAND[BAND.length - 1];
@@ -278,15 +296,35 @@ export default function PersonalBriefing({
     [incidents, uid],
   );
 
-  /** Everything inside the walk, nearest first. */
-  const nearby = useMemo(() => {
+  /**
+   * Every report the map carries, by distance from their door.
+   *
+   * Deliberately not restricted to community posts: police records, 311
+   * service requests, 511 road closures and utility outages are all things
+   * happening on their street, and excluding them is what made this section
+   * read empty on a block that plainly was not.
+   */
+  const byDistance = useMemo(() => {
     if (!home) return [];
     return incidents
       .filter((i) => i.data_source !== 'demo' && Number.isFinite(i.lat) && Number.isFinite(i.lng))
       .map((incident) => ({ incident, distanceM: distanceMeters(home.lat, home.lng, incident.lat, incident.lng) }))
-      .filter((x) => x.distanceM <= WALK_M)
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [incidents, home]);
+
+  const nearby = useMemo(() => byDistance.filter((x) => x.distanceM <= WALK_M), [byDistance]);
+
+  /**
+   * When the walk really is quiet, the closest few anyway.
+   *
+   * An empty section is a dead end. Showing the nearest handful with their
+   * true distances keeps the page useful and stays honest, because each one
+   * still says how far away it actually is.
+   */
+  const justBeyond = useMemo(
+    () => (nearby.length === 0 ? byDistance.slice(0, 4) : []),
+    [nearby.length, byDistance],
+  );
 
   const radarPoints = useMemo<RadarPoint[]>(() => {
     if (!home) return [];
@@ -316,7 +354,7 @@ export default function PersonalBriefing({
   const headline: { figure: number; label: string } | null = home
     ? {
         figure: nearby.length,
-        label: nearby.length === 1 ? 'thing your neighbours reported' : 'things your neighbours reported',
+        label: nearby.length === 1 ? 'thing reported near you' : 'things reported near you',
       }
     : areaStats
       ? { figure: areaStats.rank, label: `of ${areaStats.count} Calgary communities by reported volume` }
@@ -433,13 +471,29 @@ export default function PersonalBriefing({
             <Section
               order={0} still={still}
               eyebrow={`A ${WALK_MIN}-minute walk`}
-              title={nearby.length === 0 ? 'A quiet week around you' : `What people reported near you`}
+              title={nearby.length === 0 ? 'A quiet stretch around you' : `What's happening near you`}
             >
               {nearby.length === 0 ? (
-                <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
-                  Nobody has reported anything within a {WALK_MIN}-minute walk of your address lately.
-                  That is the best thing this page can tell you.
-                </p>
+                <>
+                  <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
+                    Nothing at all — no neighbour reports, no police records, no road or utility work —
+                    within a {WALK_MIN}-minute walk of your address. That is the best thing this page can
+                    tell you.
+                    {justBeyond.length > 0 && ' Here is the closest anyway:'}
+                  </p>
+                  {justBeyond.length > 0 && (
+                    <ul className="mt-3 space-y-2">
+                      {justBeyond.map(({ incident, distanceM }, i) => (
+                        <ReportRow
+                          key={incident.id} incident={incident} index={i} still={still}
+                          badge={formatDistance(distanceM)}
+                          sub={`${sourceLabel(incident)} · ${formatDistanceToNow(incident.timestamp)} ago`}
+                          onOpen={() => { onSelectIncident(incident); onClose(); }}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </>
               ) : (
                 <>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -450,9 +504,10 @@ export default function PersonalBriefing({
                       />
                     </div>
                     <p className="text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
-                      Your home is the middle. Every dot is a real report, placed at the direction and
-                      distance it actually happened — north is up, and a dot on the outer ring is a full
-                      {' '}{WALK_MIN}-minute walk away. Tap one to read it.
+                      Your home is the middle. Every dot is something real — a neighbour&rsquo;s report, a
+                      police record, road work, an outage — placed at the direction and distance it
+                      actually happened. North is up, and a dot on the outer ring is a full{' '}
+                      {WALK_MIN}-minute walk away. Tap one to read it.
                     </p>
                   </div>
 
@@ -461,7 +516,7 @@ export default function PersonalBriefing({
                       <ReportRow
                         key={incident.id} incident={incident} index={i} still={still}
                         badge={formatDistance(distanceM)}
-                        sub={`${titleCase(incident.category)} · ${formatDistanceToNow(incident.timestamp)} ago`}
+                        sub={`${sourceLabel(incident)} · ${titleCase(incident.category)} · ${formatDistanceToNow(incident.timestamp)} ago`}
                         onOpen={() => { onSelectIncident(incident); onClose(); }}
                       />
                     ))}

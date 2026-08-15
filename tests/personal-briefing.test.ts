@@ -19,6 +19,7 @@ import {
   bandFor,
   briefingRef,
   greetingFor,
+  sourceLabel,
   WALK_M,
   WALK_MIN,
 } from '../src/components/PersonalBriefing.tsx';
@@ -149,5 +150,30 @@ describe('briefingRef', () => {
 
   it('has a fixed shape', () => {
     assert.match(briefingRef('abc123', day), /^CW-\d{8}-[0-9A-Z]{5}$/);
+  });
+});
+
+describe('sourceLabel', () => {
+  // The walk section counts every source the map carries. Calling all of it
+  // "things your neighbours reported" was wrong, and made a block that plainly
+  // had things happening on it look empty.
+  it('names a community post as a neighbour', () => {
+    assert.equal(sourceLabel({ data_source: 'community' }), 'A neighbour');
+  });
+
+  it('credits an ingested record to the body that published it', () => {
+    assert.equal(sourceLabel({ data_source: 'official', source_name: '511 Alberta' }), '511 Alberta');
+    assert.equal(sourceLabel({ data_source: 'system', source_name: 'ENMAX' }), 'ENMAX');
+  });
+
+  it('falls back to the city rather than showing nothing', () => {
+    assert.equal(sourceLabel({ data_source: 'official' }), 'City of Calgary');
+    assert.equal(sourceLabel({ data_source: 'official', source_name: '  ' }), 'City of Calgary');
+  });
+
+  it('never credits an official record to a neighbour', () => {
+    for (const s of ['official', 'system'] as const) {
+      assert.notEqual(sourceLabel({ data_source: s, source_name: 'Calgary Police' }), 'A neighbour');
+    }
   });
 });

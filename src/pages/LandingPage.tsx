@@ -193,7 +193,17 @@ function RiverRail({ progress }: { progress: MotionValue<number> }) {
   const dotY = useTransform(scaleY, (v) => `${Math.min(Math.max(v, 0), 1) * 100}%`);
   return (
     <div className="fixed left-7 top-24 bottom-24 z-40 hidden xl:flex flex-col items-center pointer-events-none select-none" aria-hidden="true">
-      <span className="font-mono text-[9px] tracking-[0.2em] mb-3" style={{ color: T.inkSoft }}>51.05°N</span>
+      {/* Coordinates run along the rail rather than across it. Set horizontally
+          they were ~55px wide, and because the rail is fixed while the hero
+          scrolls beneath it, the bottom label landed on top of the hero stat
+          strip — rendering as "1145°C1EGORIES". Vertical text keeps the whole
+          rail inside its own ~12px column at every scroll position. */}
+      <span
+        className="font-mono text-[9px] tracking-[0.2em] mb-3"
+        style={{ color: T.inkSoft, writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+      >
+        51.05°N
+      </span>
       <div className="relative flex-1 w-px" style={{ background: T.line }}>
         <motion.div
           className="absolute top-0 origin-top"
@@ -214,7 +224,12 @@ function RiverRail({ progress }: { progress: MotionValue<number> }) {
           }}
         />
       </div>
-      <span className="font-mono text-[9px] tracking-[0.2em] mt-3" style={{ color: T.inkSoft }}>114.07°W</span>
+      <span
+        className="font-mono text-[9px] tracking-[0.2em] mt-3"
+        style={{ color: T.inkSoft, writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+      >
+        114.07°W
+      </span>
     </div>
   );
 }

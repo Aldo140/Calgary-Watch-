@@ -828,7 +828,11 @@ function Ticker({ reduced }: { reduced: boolean }) {
   );
 
   return (
-    <div className="relative z-10 overflow-hidden py-4 -rotate-[0.6deg] scale-[1.01]" style={{ background: T.ink }} aria-hidden="true">
+    // Desktop only. On a phone this sat directly under the hero's own scrolling
+    // neighbourhood strip, so the first two things below the fold were both
+    // sliding text — and a narrow viewport shows so little of each item that
+    // "Car break-in / Inglewood" reads as fragments rather than as reports.
+    <div className="relative z-10 hidden overflow-hidden py-4 -rotate-[0.6deg] scale-[1.01] md:block" style={{ background: T.ink }} aria-hidden="true">
       <div
         className="flex w-max"
         style={reduced ? undefined : { animation: 'lp-marquee 46s linear infinite' }}
@@ -1234,118 +1238,102 @@ function Quadrants({ reduced }: { reduced: boolean }) {
   const direction = active % 2 === 0 ? -1 : 1;
 
   return (
-    <section className="relative overflow-hidden py-20 sm:py-24 lg:py-32" style={{ background: '#06162F' }}>
-      <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(rgba(242,239,232,0.8) 0.7px, transparent 0.7px)', backgroundSize: '8px 8px' }} aria-hidden="true" />
-      <div ref={sectionRef} className="relative mx-auto max-w-[88rem] px-5 sm:px-8">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end lg:gap-16">
-          <Reveal>
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[#E52C20]">Calgary field index · 4 sectors</p>
-            <h2 className="mt-5 max-w-2xl font-display text-[clamp(2.8rem,7vw,5.7rem)] font-black uppercase leading-[0.82] tracking-[-0.04em] text-[#F2EFE8]">
-              Every address<br /><span className="text-[#E52C20]">has a side.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="max-w-xl text-[15px] leading-relaxed text-[#AFC5DF] sm:text-base lg:ml-auto">
-              Centre Street draws east from west. The Bow bends north from south.
-              Calgary Watch follows the same shorthand locals use every day—choose
-              a quadrant to bring its neighbourhoods into focus.
+    <section className="relative overflow-hidden bg-[#06162F] py-20 sm:py-24 lg:py-28">
+      <div ref={sectionRef} className="relative mx-auto max-w-[96rem] px-5 sm:px-8">
+        <Reveal>
+          <div className="flex flex-col gap-5 border-b border-[#F2EFE8]/20 pb-7 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.26em] text-[#E52C20]">One city · four directions</p>
+              <h2 className="mt-4 max-w-3xl font-display text-[clamp(2.65rem,6.3vw,5.6rem)] font-black uppercase leading-[0.84] tracking-[-0.04em] text-[#F2EFE8]">
+                Every address<br />ends in a quadrant.
+              </h2>
+            </div>
+            <p className="max-w-lg text-[15px] leading-relaxed text-[#AFC5DF] sm:text-base">
+              Centre Street splits east from west; the Bow bends north from south.
+              Pick a direction and Calgary changes with it.
             </p>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-[minmax(22rem,0.82fr)_minmax(0,1.18fr)] lg:items-center lg:gap-16">
-          <Reveal className="mx-auto w-full max-w-[32rem] lg:max-w-none">
-            <div className="relative isolate aspect-square">
-              <div className="absolute inset-2 translate-x-3 translate-y-3 bg-[#E52C20]" style={{ clipPath: 'polygon(3% 0, 100% 2%, 98% 96%, 2% 100%, 0 5%)' }} aria-hidden="true" />
-              <div className="absolute inset-0 bg-[#F2EFE8] p-3 sm:p-4" style={{ clipPath: 'polygon(3% 0, 100% 2%, 98% 96%, 2% 100%, 0 5%)' }}>
-                <div className="relative grid h-full grid-cols-2 grid-rows-2 gap-[3px] bg-[#06162F] p-[3px]" role="group" aria-label="Choose a Calgary quadrant">
-                  {QUADRANTS.map((quad, i) => {
-                    const isActive = active === i;
-                    const shortPlaces = quad.places.split(' · ').slice(0, 2).join(' / ');
-                    return (
-                      <button
-                        key={quad.code}
-                        type="button"
-                        onClick={() => pick(i)}
-                        onMouseEnter={() => pick(i)}
-                        onFocus={() => pick(i)}
-                        aria-pressed={isActive}
-                        aria-label={`Show ${quad.name} Calgary`}
-                        className="group relative overflow-hidden bg-[#0C2947] text-left outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]"
-                        style={{ background: isActive ? meta.color : '#0C2947' }}
-                      >
-                        <span className="absolute left-3 top-3 font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-[#AFC5DF] sm:left-4 sm:top-4">Sector 0{i + 1}</span>
-                        <span className="absolute inset-x-3 bottom-3 sm:inset-x-4 sm:bottom-4">
-                          <span className="block font-display text-[clamp(2.6rem,12vw,5.4rem)] font-black leading-[0.75] tracking-[-0.04em] text-[#F2EFE8]">{quad.code}</span>
-                          <span className="mt-2 hidden font-mono text-[8px] uppercase tracking-[0.12em] text-[#F2EFE8]/75 sm:block">{shortPlaces}</span>
-                        </span>
-                        {QUAD_META[i].dots.slice(0, 3).map((_, dot) => (
-                          <motion.span
-                            key={dot}
-                            className="absolute h-1.5 w-1.5 bg-[#F2EFE8]"
-                            style={{ right: `${18 + dot * 17}%`, top: `${25 + (dot % 2) * 13}%` }}
-                            animate={isActive && !reduced ? { opacity: [0.25, 1, 0.25], scale: [0.8, 1.25, 0.8] } : { opacity: 0.18, scale: 1 }}
-                            transition={{ duration: 1.8, repeat: isActive && !reduced ? Infinity : 0, delay: dot * 0.28 }}
-                            aria-hidden="true"
-                          />
-                        ))}
-                      </button>
-                    );
-                  })}
+        {/* Mobile: one cinematic quadrant at a time, with the selector attached. */}
+        <div className="mt-8 lg:hidden">
+          <div className="grid grid-cols-4 border-y border-[#F2EFE8]/20" role="tablist" aria-label="Calgary quadrants">
+            {QUADRANTS.map((quad, i) => {
+              const isActive = active === i;
+              return (
+                <button key={quad.code} type="button" role="tab" aria-selected={isActive} aria-controls="quadrant-mobile-panel" onClick={() => pick(i)} className="relative min-h-14 border-r border-[#F2EFE8]/20 font-display text-lg font-black text-[#F2EFE8] outline-none last:border-r-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]">
+                  {quad.code}
+                  <motion.span className="absolute inset-x-3 bottom-0 h-1 origin-left" animate={{ scaleX: isActive ? 1 : 0 }} style={{ background: QUAD_META[i].color }} />
+                </button>
+              );
+            })}
+          </div>
 
-                  <div className="pointer-events-none absolute inset-y-0 left-1/2 z-10 w-6 -translate-x-1/2 bg-[#F2EFE8]" aria-hidden="true">
-                    <span className="absolute left-1/2 top-4 -translate-x-1/2 [writing-mode:vertical-rl] font-mono text-[7px] font-bold uppercase tracking-[0.18em] text-[#06162F]">Centre St</span>
-                  </div>
-                  <svg className="pointer-events-none absolute inset-x-0 top-1/2 z-20 h-10 w-full -translate-y-1/2" viewBox="0 0 500 40" preserveAspectRatio="none" aria-hidden="true">
-                    <path d="M0 21 C60 1 112 39 176 20 S294 4 352 22 S445 35 500 15" fill="none" stroke="#F2EFE8" strokeWidth="18" />
-                    <path d="M0 21 C60 1 112 39 176 20 S294 4 352 22 S445 35 500 15" fill="none" stroke="#E52C20" strokeWidth="3" />
-                  </svg>
-                  <span className="pointer-events-none absolute left-3 top-1/2 z-30 -translate-y-1/2 bg-[#F2EFE8] px-2 py-1 font-mono text-[7px] font-bold uppercase tracking-[0.18em] text-[#E52C20]" aria-hidden="true">Bow River</span>
-                  <span className="pointer-events-none absolute left-1/2 top-1/2 z-30 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#E52C20] outline outline-4 outline-[#F2EFE8]" aria-hidden="true" />
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.article id="quadrant-mobile-panel" role="tabpanel" key={q.code} custom={direction} initial={reduced ? false : { opacity: 0, x: direction * 32 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? undefined : { opacity: 0, x: direction * -24 }} transition={{ duration: 0.38, ease: EASE }} className="relative -mx-5 min-h-[36rem] overflow-hidden sm:-mx-8">
+              <img src={publicAsset(q.img)} alt={q.imgAlt} loading="lazy" decoding="async" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#06162F] via-[#06162F]/20 to-transparent" aria-hidden="true" />
+              <span className="absolute right-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{meta.bearing} · {String(active + 1).padStart(2, '0')}/04</span>
+              <div className="absolute inset-x-5 bottom-8 sm:inset-x-8">
+                <span className="font-display text-[6.5rem] font-black leading-none tracking-[-0.04em] text-[#F2EFE8]/15" aria-hidden="true">{q.code}</span>
+                <h3 className="-mt-8 font-display text-4xl font-black uppercase tracking-[-0.03em] text-[#F2EFE8]">{q.name}</h3>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#D9E2EC]">{q.places}</p>
+                <div className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#F2EFE8]">
+                  <span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live
                 </div>
               </div>
-            </div>
-            <p className="mt-6 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-[#AFC5DF]">
-              <span>Tap a sector</span><span>{String(active + 1).padStart(2, '0')} / 04 selected</span>
-            </p>
-          </Reveal>
+            </motion.article>
+          </AnimatePresence>
+        </div>
 
-          <Reveal delay={0.08}>
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.article
-                key={q.code}
-                custom={direction}
-                initial={reduced ? false : { opacity: 0, x: direction * 32, rotate: direction * 1.5 }}
-                animate={{ opacity: 1, x: 0, rotate: 0 }}
-                exit={reduced ? undefined : { opacity: 0, x: direction * -22 }}
-                transition={{ duration: 0.42, ease: EASE }}
-                className="relative pb-6 pr-3 sm:pb-8 sm:pr-5"
-              >
-                <div className="absolute inset-0 translate-x-3 translate-y-3 bg-[#E52C20] sm:translate-x-5 sm:translate-y-5" style={{ clipPath: 'polygon(1% 2%, 100% 0, 98% 98%, 3% 100%, 0 5%)' }} aria-hidden="true" />
-                <div className="relative bg-[#F2EFE8] p-2.5 sm:p-3" style={{ clipPath: 'polygon(1% 2%, 100% 0, 98% 98%, 3% 100%, 0 5%)' }}>
-                  <div className="relative h-[19rem] overflow-hidden sm:h-[25rem] lg:h-[31rem]">
-                    <img src={publicAsset(q.img)} alt={q.imgAlt} loading="lazy" decoding="async" width={1100} height={850} className="h-full w-full object-cover saturate-[0.82] contrast-[1.14]" />
-                    <div className="absolute inset-0 bg-[#0B3157]/20 mix-blend-color" aria-hidden="true" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[#06162F] via-[#06162F]/45 to-transparent" aria-hidden="true" />
-                    <span className="absolute left-4 top-4 -rotate-2 bg-[#06162F] px-3 py-2 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8] shadow-[4px_4px_0_#E52C20] sm:left-6 sm:top-6">Plate {String(active + 1).padStart(2, '0')} · {q.code}</span>
-                    <div className="absolute inset-x-5 bottom-5 text-[#F2EFE8] sm:inset-x-8 sm:bottom-8">
-                      <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#E52C20]">Now watching</p>
-                      <h3 className="mt-2 font-display text-[clamp(2.5rem,7vw,5.3rem)] font-black uppercase leading-[0.82] tracking-[-0.04em]">{q.name}</h3>
-                      <p className="mt-4 max-w-lg text-sm leading-relaxed text-[#D9E2EC] sm:text-base">{q.places}</p>
+        {/* Desktop: the four directions form one city; choosing one changes the composition. */}
+        <Reveal delay={0.08} className="mt-10 hidden lg:block">
+          <div className="relative flex h-[min(68vh,46rem)] gap-2" role="tablist" aria-label="Explore Calgary by quadrant">
+            {QUADRANTS.map((quad, i) => {
+              const isActive = active === i;
+              return (
+                <button
+                  key={quad.code}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => pick(i)}
+                  onMouseEnter={() => pick(i)}
+                  onFocus={() => pick(i)}
+                  className="group relative min-w-0 overflow-hidden text-left outline-none transition-[flex] duration-700 ease-out focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]"
+                  style={{ flex: isActive ? '2.35 1 0%' : '0.72 1 0%' }}
+                >
+                  <img src={publicAsset(quad.img)} alt="" loading="lazy" decoding="async" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.015]" />
+                  <div className="absolute inset-0 transition-colors duration-500" style={{ background: isActive ? 'linear-gradient(to top, rgba(6,22,47,0.94), rgba(6,22,47,0.04) 70%)' : 'rgba(6,22,47,0.58)' }} aria-hidden="true" />
+                  <span className="absolute left-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[i].bearing}</span>
+                  <span className="absolute right-0 top-0 h-full w-1 origin-top transition-transform duration-500" style={{ background: QUAD_META[i].color, transform: isActive ? 'scaleY(1)' : 'scaleY(0)' }} aria-hidden="true" />
+                  <div className="absolute inset-x-5 bottom-6 sm:inset-x-7 sm:bottom-8">
+                    <span className="block font-display text-[clamp(3.5rem,7vw,7rem)] font-black leading-[0.72] tracking-[-0.04em] text-[#F2EFE8]">{quad.code}</span>
+                    <div className="grid transition-[grid-template-rows,opacity] duration-500" style={{ gridTemplateRows: isActive ? '1fr' : '0fr', opacity: isActive ? 1 : 0 }}>
+                      <div className="overflow-hidden">
+                        <h3 className="mt-5 font-display text-3xl font-black uppercase tracking-[-0.03em] text-[#F2EFE8] xl:text-4xl">{quad.name}</h3>
+                        <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#D9E2EC] xl:text-base">{quad.places}</p>
+                        <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#F2EFE8]">
+                          <span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-4 text-[#06162F] sm:px-5">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em]">All report types active</span>
-                    <span className="flex items-center gap-1.5" aria-label="Crime, traffic, weather, infrastructure, and emergency reports">
-                      {CATEGORIES.map((c) => <span key={c.key} className="h-2 w-2" style={{ background: c.color }} aria-hidden="true" />)}
-                      <span className="ml-1 font-mono text-[9px] uppercase tracking-[0.14em] text-[#5A6B7D]">Live</span>
-                    </span>
-                  </div>
-                </div>
-              </motion.article>
-            </AnimatePresence>
-          </Reveal>
-        </div>
+                </button>
+              );
+            })}
+            <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
+              <svg viewBox="0 0 1200 70" preserveAspectRatio="none" className="h-12 w-full opacity-90">
+                <path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#F2EFE8" strokeWidth="14" />
+                <path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#E52C20" strokeWidth="2.5" />
+              </svg>
+              <span className="absolute left-5 top-1/2 -translate-y-1/2 bg-[#F2EFE8] px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">The Bow</span>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-[#AFC5DF]">
+            <span>Hover or focus a direction</span><span>Centre St × Bow River · Calgary, AB</span>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

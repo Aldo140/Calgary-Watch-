@@ -148,9 +148,12 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
           <div style="position:absolute;width:16px;height:16px;border-radius:50%;background:rgba(56,189,248,0.35);"></div>
           <div style="position:relative;width:10px;height:10px;border-radius:50%;background:#38bdf8;border:2px solid white;box-shadow:0 0 8px rgba(56,189,248,0.8);"></div>
         </div>`;
-      const style = document.createElement('style');
-      style.textContent = '@keyframes location-pulse{0%{transform:scale(1);opacity:0.8}70%{transform:scale(2.2);opacity:0}100%{transform:scale(2.2);opacity:0}}';
-      document.head.appendChild(style);
+      if (!document.getElementById('cw-location-pulse')) {
+        const style = document.createElement('style');
+        style.id = 'cw-location-pulse';
+        style.textContent = '@keyframes location-pulse{0%{transform:scale(1);opacity:0.8}70%{transform:scale(2.2);opacity:0}100%{transform:scale(2.2);opacity:0}}';
+        document.head.appendChild(style);
+      }
       const icon = L.divIcon({ html: el.innerHTML, className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
       userLocationMarker.current = L.marker([lat, lng], { icon, zIndexOffset: 1000, interactive: false }).addTo(map.current);
     },

@@ -12,7 +12,7 @@ import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
-import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle, MapPin } from 'lucide-react';
+import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle, MapPin, Check, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -27,6 +27,7 @@ import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { useTrafficCameras } from '@/src/hooks/useTrafficCameras';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
+import { stripCityQualifier, withCityQualifier } from '@/src/lib/address';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
@@ -165,7 +166,7 @@ function titleCaseAddress(raw: string): string {
 function useAddressSearch(query: string): Array<{ label: string; neighborhood: string }> {
   const [results, setResults] = useState<Array<{ label: string; neighborhood: string }>>([]);
   useEffect(() => {
-    const q = query.trim();
+    const q = stripCityQualifier(query);
     if (q.length < 3) { setResults([]); return; }
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
@@ -682,6 +683,15 @@ export default function MapPage() {
   // Radar-scan moment before results reveal — the pause builds anticipation
   // and makes the reveal land (Duolingo-style feedback loop).
   const [nearMeScanning, setNearMeScanning] = useState(false);
+  /**
+   * The locate button used to do three things on one press: fly, drop a pin,
+   * and jump straight to the nearest incident — which moved the map away from
+   * the thing the person had just asked to see. It now stops on arrival and
+   * asks before going anywhere.
+   */
+  const [nearMeStage, setNearMeStage] = useState<'arrived' | 'results'>('arrived');
+  /** Once shown, the "you are here" pin stays for the whole session. */
+  const userPinShown = useRef(false);
   const nearMeScanTimer = useRef<number | null>(null);
   const NEAR_ME_RADIUS_KM = 3;
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -1093,7 +1103,7 @@ export default function MapPage() {
     return [...names].sort((a, b) => a.localeCompare(b));
   }, [incidents, crimeStats, officialCommunities]);
 
-  const addressQuery = profileDraft.address.trim().toLowerCase();
+  const addressQuery = stripCityQualifier(profileDraft.address).toLowerCase();
   const neighborhoodQuery = profileDraft.neighborhood.trim().toLowerCase();
 
   // Real addresses from the city property registry; falls back to accepting
@@ -1102,10 +1112,23 @@ export default function MapPage() {
   const addressSuggestions = useMemo(() => {
     if (liveAddressResults.length > 0) return liveAddressResults;
     if (/\d/.test(addressQuery) && addressQuery.length >= 5) {
-      return [{ label: `${profileDraft.address.trim()}, Calgary, AB`, neighborhood: '' }];
+      return [{ label: withCityQualifier(profileDraft.address), neighborhood: '' }];
     }
     return [];
   }, [liveAddressResults, addressQuery, profileDraft.address]);
+
+  /**
+   * Whether the address in the box is already settled.
+   *
+   * It is settled if we resolved a community for it, or if it is exactly what
+   * is already saved on the account. Either way the person has finished
+   * choosing, and continuing to offer suggestions for a decision they already
+   * made reads as the form not having noticed.
+   */
+  const addressIsSettled =
+    profileDraft.address.trim().length > 0 &&
+    (profileDraft.inferredNeighborhood.trim().length > 0 ||
+      profileDraft.address.trim() === (userProfile?.address ?? '').trim());
 
   const filteredNeighborhoodSuggestions = useMemo(() => {
     const query = neighborhoodQuery;
@@ -1461,6 +1484,10 @@ export default function MapPage() {
       .map(x => ({ ...x.i, _dist: x.dist })) as (Incident & { _dist: number })[];
   }, [incidents, userLocation]);
 
+  /** Latest nearby list, for callbacks that fire after a delay. */
+  const nearMeIncidentsRef = useRef<(Incident & { _dist: number })[]>([]);
+  useEffect(() => { nearMeIncidentsRef.current = nearMeIncidents; }, [nearMeIncidents]);
+
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
     const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
@@ -1613,6 +1640,41 @@ export default function MapPage() {
     setNotifications((prev) => [notification, ...prev].slice(0, 20));
     setUnreadNotifications((prev) => prev + 1);
   }, [user, preferredAddress, preferredNeighborhood, preferredInferredNeighborhood, profileNeedsSetup]);
+
+  /**
+   * Locate: show them where they are, and stop there.
+   *
+   * The pin is deliberately never cleared once placed. Losing your own
+   * position the moment you close a panel is disorienting on a map whose whole
+   * subject is distance from you.
+   */
+  const handleLocate = useCallback(() => {
+    const loc = userLocation || CALGARY_CENTER;
+    if (nearMeOpen) { setNearMeOpen(false); return; }
+    mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
+    if (userLocation) {
+      mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
+      userPinShown.current = true;
+    }
+    setNearMeIndex(0);
+    setNearMeStage('arrived');
+    setNearMeScanning(false);
+    if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
+    setNearMeOpen(true);
+  }, [userLocation, nearMeOpen]);
+
+  /** They said yes to the scan: run the radar beat, then reveal. */
+  const startNearMeScan = useCallback(() => {
+    setNearMeStage('results');
+    setNearMeIndex(0);
+    setNearMeScanning(true);
+    if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
+    nearMeScanTimer.current = window.setTimeout(() => {
+      setNearMeScanning(false);
+      const first = nearMeIncidentsRef.current[0];
+      if (first) mapRef.current?.flyTo(first.lat, first.lng, 15);
+    }, 1600);
+  }, []);
 
   const handleNotificationClick = useCallback((notification: MapNotification) => {
     // The neighbourhood report is this person's own briefing. Sending it to the
@@ -1965,10 +2027,10 @@ export default function MapPage() {
                               </div>
                             )}
                             <div className="min-w-0">
-                              <p className="truncate text-lg font-black text-white light:text-slate-950">
+                              <p className="truncate text-lg font-black" style={{ color: '#1C2B3A' }}>
                                 {user?.displayName || 'Calgary User'}
                               </p>
-                              <p className="truncate text-xs text-slate-400 light:text-slate-500">
+                              <p className="truncate text-xs" style={{ color: '#5A6B7D' }}>
                                 {user?.email}
                               </p>
                             </div>
@@ -2021,127 +2083,221 @@ export default function MapPage() {
                         /* ── Edit / onboarding form ─────────────────────────── */
                         <>
                           <div>
-                            <p className="text-xs font-black uppercase tracking-widest text-sky-400">
-                              {profileNeedsSetup ? 'Required setup' : 'Edit preferences'}
+                            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#2E8B7A' }}>
+                              {profileNeedsSetup ? 'Set up your report area' : 'Edit preferences'}
                             </p>
-                            <h3 className="mt-2 text-2xl font-black text-white light:text-slate-950">Local report preferences</h3>
-                            <p className="mt-2 text-sm leading-relaxed text-slate-400 light:text-slate-600">
-                              Add either an address or a neighbourhood. Address is first because it gives better guesses; neighbourhood is the broader fallback.
+                            <h3 className="mt-2 font-display text-2xl font-extrabold tracking-[-0.02em]" style={{ color: '#1C2B3A' }}>
+                              {addressIsSettled ? 'Your report area' : 'Where should we watch?'}
+                            </h3>
+                            <p className="mt-2 text-sm leading-relaxed" style={{ color: '#5A6B7D' }}>
+                              {addressIsSettled
+                                ? 'This is the address your briefing is measured from. Change it any time.'
+                                : 'Give an address for a report measured from your door, or just a neighbourhood if you would rather not store one.'}
                             </p>
-                          </div>
-
-                          <div className="rounded-2xl border border-sky-400/20 bg-sky-400/8 p-3 text-xs leading-relaxed text-slate-300 light:text-slate-700">
-                            Choose one: use an address for a tighter report area, or use a neighbourhood name if you prefer not to store an address.
                           </div>
 
                           <div className="grid gap-4">
-                            <label className="space-y-2">
+                            {/* ── Address ────────────────────────────────────
+                                Three states, because there are three moments:
+                                nothing given yet, typing, and settled. The old
+                                form only had one, so it kept suggesting
+                                alternatives for an address already on file. */}
+                            <div className="space-y-2">
                               <span className="flex items-center justify-between gap-3">
-                                <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Address or nearby landmark</span>
-                                <span className="text-[10px] font-bold text-sky-400">Recommended</span>
+                                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                  Address or nearby landmark
+                                </span>
+                                <span
+                                  className="rounded-full px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em]"
+                                  style={{ background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }}
+                                >
+                                  Recommended
+                                </span>
                               </span>
-                              <input
-                                value={profileDraft.address}
-                                onChange={(e) => {
-                                  const address = e.target.value;
-                                  setProfileDraft((prev) => ({ ...prev, address, inferredNeighborhood: '', neighborhood: address.trim() ? '' : prev.neighborhood }));
-                                }}
-                                placeholder="Start typing an address, street, or landmark"
-                                className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
-                              />
-                              <div className="min-h-6">
-                                {profileDraft.address.trim().length > 0 && addressSuggestions.length === 0 && addressQuery.length < 3 && (
-                                  <p className="text-[11px] font-medium text-slate-500">Keep typing — matched against the City of Calgary address registry.</p>
-                                )}
-                                {addressSuggestions.length > 0 && (
-                                  <div className="grid gap-2 sm:grid-cols-2">
-                                    {addressSuggestions.map((item) => (
-                                      <button
-                                        key={`${item.label}-${item.neighborhood}`}
-                                        type="button"
-                                        onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
-                                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
-                                      >
-                                        <span className="block truncate">{item.label}</span>
-                                        {item.neighborhood && <span className="mt-0.5 block text-[10px] font-medium text-slate-500">Best area: {item.neighborhood}</span>}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </label>
 
-                            <div className="flex items-center gap-3">
-                              <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
-                              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">or</span>
-                              <div className="h-px flex-1 bg-white/10 light:bg-slate-200" />
+                              {addressIsSettled ? (
+                                /* Settled — confirm it and get out of the way. */
+                                <div
+                                  className="flex items-start gap-3 rounded-2xl p-3.5"
+                                  style={{ background: 'rgba(46,139,122,0.08)', border: '1px solid rgba(46,139,122,0.3)' }}
+                                >
+                                  <span
+                                    className="mt-[1px] grid h-6 w-6 shrink-0 place-items-center rounded-full"
+                                    style={{ background: '#2E8B7A' }}
+                                  >
+                                    <Check size={13} style={{ color: '#FFFDF8' }} />
+                                  </span>
+                                  <span className="min-w-0 flex-1">
+                                    <span className="block text-sm font-bold leading-snug" style={{ color: '#1C2B3A' }}>
+                                      {profileDraft.address}
+                                    </span>
+                                    <span className="mt-0.5 block text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                      {profileDraft.inferredNeighborhood
+                                        ? `Matched to ${profileDraft.inferredNeighborhood} in the city registry`
+                                        : 'Saved as your report area'}
+                                    </span>
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setProfileDraft((prev) => ({ ...prev, address: '', inferredNeighborhood: '' }))}
+                                    className="shrink-0 rounded-lg px-2 py-1 text-[11.5px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
+                                    style={{ color: '#1C2B3A' }}
+                                  >
+                                    Change
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  <input
+                                    value={profileDraft.address}
+                                    onChange={(e) => {
+                                      const address = e.target.value;
+                                      setProfileDraft((prev) => ({ ...prev, address, inferredNeighborhood: '', neighborhood: address.trim() ? '' : prev.neighborhood }));
+                                    }}
+                                    autoFocus={profileDraft.address.trim().length === 0 && !profileNeedsSetup}
+                                    placeholder="Start typing an address, street, or landmark"
+                                    className="h-12 w-full rounded-2xl px-4 text-sm outline-none transition-colors"
+                                    style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                  />
+                                  <div className="min-h-6">
+                                    {addressQuery.length > 0 && addressQuery.length < 3 && (
+                                      <p className="text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                        Keep typing — matched against the City of Calgary address registry.
+                                      </p>
+                                    )}
+                                    {addressSuggestions.length > 0 && (
+                                      <div className="grid gap-2 sm:grid-cols-2">
+                                        {addressSuggestions.map((item) => (
+                                          <button
+                                            key={`${item.label}-${item.neighborhood}`}
+                                            type="button"
+                                            onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
+                                            className="rounded-xl px-3 py-2 text-left text-xs font-bold transition-colors"
+                                            style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                          >
+                                            <span className="block truncate">{item.label}</span>
+                                            {item.neighborhood && (
+                                              <span className="mt-0.5 block text-[10px] font-medium" style={{ color: '#5A6B7D' }}>
+                                                {item.neighborhood}
+                                              </span>
+                                            )}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </>
+                              )}
                             </div>
 
-                            <label className="space-y-2">
-                              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Neighbourhood only</span>
-                              <input
-                                value={profileDraft.neighborhood}
-                                onChange={(e) => {
-                                  const neighborhood = e.target.value;
-                                  setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
-                                }}
-                                placeholder="Start typing a Calgary neighbourhood"
-                                className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-sky-400 light:border-slate-300 light:bg-white light:text-slate-950"
-                              />
-                              <div className="min-h-6">
-                                {profileDraft.neighborhood.trim().length > 0 && filteredNeighborhoodSuggestions.length === 0 && neighborhoodQuery.length < 2 && (
-                                  <p className="text-[11px] font-medium text-slate-500">Type 2+ letters — all {neighborhoodSuggestions.length || 300}+ official communities are searchable.</p>
-                                )}
-                                {filteredNeighborhoodSuggestions.length > 0 && (
-                                  <div className="flex flex-wrap gap-2">
-                                    {filteredNeighborhoodSuggestions.map((name) => (
-                                      <button
-                                        key={name}
-                                        type="button"
-                                        onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
-                                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-300 hover:border-sky-400/50 hover:text-white light:border-slate-200 light:bg-slate-50 light:text-slate-700 light:hover:border-sky-500"
-                                      >
-                                        {name}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </label>
+                            <div className="flex items-center gap-3">
+                              <div className="h-px flex-1" style={{ background: '#E7E0D2' }} />
+                              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>or</span>
+                              <div className="h-px flex-1" style={{ background: '#E7E0D2' }} />
+                            </div>
+
+                            {/* ── Neighbourhood ──────────────────────────────
+                                Hidden once an address is settled: the two are
+                                mutually exclusive, and showing an empty second
+                                option implies the choice is unfinished. */}
+                            {!addressIsSettled && (
+                              <label className="space-y-2">
+                                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                  Neighbourhood only
+                                </span>
+                                <input
+                                  value={profileDraft.neighborhood}
+                                  onChange={(e) => {
+                                    const neighborhood = e.target.value;
+                                    setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
+                                  }}
+                                  placeholder="Start typing a Calgary neighbourhood"
+                                  className="h-12 w-full rounded-2xl px-4 text-sm outline-none transition-colors"
+                                  style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                />
+                                <div className="min-h-6">
+                                  {neighborhoodQuery.length > 0 && neighborhoodQuery.length < 2 && (
+                                    <p className="text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                      Type 2+ letters — all {neighborhoodSuggestions.length || 300}+ official communities are searchable.
+                                    </p>
+                                  )}
+                                  {filteredNeighborhoodSuggestions.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                      {filteredNeighborhoodSuggestions.map((name) => (
+                                        <button
+                                          key={name}
+                                          type="button"
+                                          onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
+                                          className="rounded-xl px-3 py-2 text-xs font-bold transition-colors"
+                                          style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                        >
+                                          {name}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </label>
+                            )}
+                            {addressIsSettled && (
+                              <p className="text-[11.5px] font-medium" style={{ color: '#5A6B7D' }}>
+                                Prefer not to store an address? Choose <strong style={{ color: '#1C2B3A' }}>Change</strong> above, then
+                                give a neighbourhood name instead.
+                              </p>
+                            )}
                           </div>
 
-                          <label className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 light:border-slate-200 light:bg-slate-50">
+                          <label
+                            className="flex cursor-pointer gap-3 rounded-2xl p-4"
+                            style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }}
+                          >
                             <input
                               type="checkbox"
                               checked={profileDraft.piiConsent}
                               onChange={(e) => setProfileDraft((prev) => ({ ...prev, piiConsent: e.target.checked }))}
-                              className="mt-1 h-4 w-4 rounded border-slate-400"
+                              className="mt-0.5 h-4 w-4 shrink-0 rounded"
+                              style={{ accentColor: '#2E8B7A' }}
                             />
-                            <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
-                              I agree Calgary Watch may store my profile details and location preference as personal information for account, safety, moderation, and neighbourhood-report features.
+                            <span className="text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
+                              <strong style={{ color: '#1C2B3A' }}>Store my location preference.</strong> Calgary Watch keeps your
+                              profile and report area to run your account, your neighbourhood report and moderation.{' '}
+                              <a href="/privacy" className="font-bold underline underline-offset-2" style={{ color: '#1C2B3A' }}>
+                                What we keep
+                              </a>
                             </span>
                           </label>
 
-                          <label className="flex gap-3 rounded-2xl border border-teal-400/20 bg-teal-400/8 p-4">
+                          <label
+                            className="flex cursor-pointer gap-3 rounded-2xl p-4"
+                            style={{ background: 'rgba(46,139,122,0.08)', border: '1px solid rgba(46,139,122,0.3)' }}
+                          >
                             <input
                               type="checkbox"
                               checked={profileDraft.weeklyDigestOptIn}
                               onChange={(e) => setProfileDraft((prev) => ({ ...prev, weeklyDigestOptIn: e.target.checked }))}
-                              className="mt-1 h-4 w-4 rounded border-slate-400"
+                              className="mt-0.5 h-4 w-4 shrink-0 rounded"
+                              style={{ accentColor: '#2E8B7A' }}
                             />
-                            <span className="text-sm leading-relaxed text-slate-300 light:text-slate-700">
-                              I want Calgary Watch to email me weekly crime stats, interesting reports, market/events, and relevant community updates for my neighbourhood.
+                            <span className="text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
+                              <strong style={{ color: '#1C2B3A' }}>Email me the weekly digest.</strong> Crime stats, notable reports
+                              and community updates for your area. Optional, and you can turn it off any time.
                             </span>
                           </label>
 
-                          {profileSaveError && <p className="text-sm font-bold text-red-400">{profileSaveError}</p>}
+                          {profileSaveError && (
+                            <p className="rounded-xl px-3 py-2.5 text-[13px] font-bold"
+                               style={{ background: 'rgba(192,57,43,0.08)', border: '1px solid rgba(192,57,43,0.3)', color: '#C0392B' }}>
+                              {profileSaveError}
+                            </p>
+                          )}
 
                           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                             {profileNeedsSetup && (
                               <Button
                                 variant="secondary"
                                 onClick={skipOnboarding}
-                                className="rounded-2xl border-white/10 bg-white/5 text-slate-400 light:border-slate-200 light:bg-white light:text-slate-500"
+                                className="rounded-2xl"
+                                style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#5A6B7D' }}
                               >
                                 Skip for now
                               </Button>
@@ -2160,7 +2316,8 @@ export default function MapPage() {
                                   });
                                   setProfileSaveError(null);
                                 }}
-                                className="rounded-2xl border-white/10 bg-white/5 light:border-slate-200 light:bg-white"
+                                className="rounded-2xl"
+                                style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
                               >
                                 Cancel
                               </Button>
@@ -2169,9 +2326,10 @@ export default function MapPage() {
                               <Button
                                 onClick={saveProfileSettings}
                                 disabled={isSavingProfile}
-                                className="rounded-2xl bg-sky-600 hover:bg-sky-700"
+                                className="rounded-2xl transition-opacity hover:opacity-90"
+                                style={{ background: '#1C2B3A', color: '#FFFDF8' }}
                               >
-                                {isSavingProfile ? 'Saving...' : 'Save and continue'}
+                                {isSavingProfile ? 'Saving…' : 'Save and continue'}
                               </Button>
                             )}
                           </div>
@@ -2506,35 +2664,7 @@ export default function MapPage() {
         >
           <button
             type="button"
-            onClick={() => {
-              const loc = userLocation || CALGARY_CENTER;
-              if (nearMeOpen) {
-                setNearMeOpen(false);
-                setNearMeScanning(false);
-                if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
-                mapRef.current?.clearUserLocation();
-                return;
-              }
-              mapRef.current?.flyTo(loc.lat, loc.lng, 14);
-              if (userLocation) mapRef.current?.showUserLocation(userLocation.lat, userLocation.lng);
-              setNearMeIndex(0);
-              setNearMeOpen(true);
-              setNearMeScanning(true);
-              if (nearMeScanTimer.current) window.clearTimeout(nearMeScanTimer.current);
-              nearMeScanTimer.current = window.setTimeout(() => setNearMeScanning(false), 1600);
-              // Pan to first nearby incident after map settles
-              setTimeout(() => {
-                const nearMeList = incidents
-                  .map(i => ({ i, dist: getDistance(loc.lat, loc.lng, i.lat, i.lng) }))
-                  .filter(x => x.dist <= NEAR_ME_RADIUS_KM)
-                  .sort((a, b) => {
-                    if (a.i.category === 'emergency' && b.i.category !== 'emergency') return -1;
-                    if (b.i.category === 'emergency' && a.i.category !== 'emergency') return 1;
-                    return a.dist - b.dist;
-                  });
-                if (nearMeList[0]) mapRef.current?.flyTo(nearMeList[0].i.lat, nearMeList[0].i.lng, 15);
-              }, 600);
-            }}
+            onClick={handleLocate}
             data-tour="near-me"
             className={cn(
               'pointer-events-auto flex size-11 items-center justify-center rounded-xl border shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors active:scale-[0.98]',
@@ -2685,8 +2815,8 @@ export default function MapPage() {
               exit={{ opacity: 0, y: 40 }}
               transition={{ type: 'spring', damping: 26, stiffness: 220 }}
               className={cn(
-                'absolute z-40 pointer-events-auto lg:hidden',
-                'bottom-6 left-3 right-3'
+                'absolute z-40 pointer-events-auto',
+                'bottom-6 left-3 right-3 lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
               )}
             >
               <div className="bg-[rgba(255,253,248,0.97)] backdrop-blur-md border border-[#E7E0D2] rounded-3xl shadow-2xl overflow-hidden">
@@ -2694,11 +2824,15 @@ export default function MapPage() {
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                   <div className="flex items-center gap-2">
                     <Navigation size={14} className="text-blue-600" />
-                    <span className="text-xs font-black uppercase tracking-widest text-blue-700">Near You</span>
-                    <span className="text-[10px] text-slate-500 font-semibold">within {NEAR_ME_RADIUS_KM} km</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-blue-700">
+                      {nearMeStage === 'arrived' ? 'Your location' : 'Near You'}
+                    </span>
+                    {nearMeStage === 'results' && (
+                      <span className="text-[10px] text-slate-500 font-semibold">within {NEAR_ME_RADIUS_KM} km</span>
+                    )}
                   </div>
                   <button
-                    onClick={() => { setNearMeOpen(false); setNearMeScanning(false); mapRef.current?.clearUserLocation(); }}
+                    onClick={() => { setNearMeOpen(false); setNearMeScanning(false); }}
                     className="w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
                     aria-label="Close near me panel"
                   >
@@ -2706,7 +2840,81 @@ export default function MapPage() {
                   </button>
                 </div>
 
-                {nearMeScanning ? (
+                {nearMeStage === 'arrived' ? (
+                  /* ── Arrival ──────────────────────────────────────────────
+                      Show them where they are and ask before moving the map
+                      somewhere else. The old flow flew straight to the nearest
+                      incident, which took the map off the thing they had just
+                      asked to see. */
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="px-4 pb-4 pt-1"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="relative mt-0.5 grid h-9 w-9 shrink-0 place-items-center" aria-hidden="true">
+                        <motion.span
+                          className="absolute inset-0 rounded-full"
+                          style={{ background: 'rgba(74,144,217,0.22)' }}
+                          animate={{ scale: [1, 1.9], opacity: [0.7, 0] }}
+                          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+                        />
+                        <span className="relative h-3 w-3 rounded-full border-2 border-white shadow" style={{ background: '#4A90D9' }} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-black leading-tight" style={{ color: '#1C2B3A' }}>
+                          {userLocation ? 'This is where you are' : 'Showing central Calgary'}
+                        </p>
+                        <p className="mt-1 text-[12px] font-medium leading-snug" style={{ color: '#5A6B7D' }}>
+                          {userLocation
+                            ? 'Your pin stays on the map while you look around.'
+                            : 'Turn on location in your browser to centre the map on you.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3.5 space-y-2">
+                      <button
+                        type="button"
+                        onClick={startNearMeScan}
+                        className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-transform active:scale-[0.99]"
+                        style={{ background: '#1C2B3A', color: '#FFFDF8' }}
+                      >
+                        <span className="min-w-0">
+                          <span className="block text-[13.5px] font-black leading-tight">See what is near me</span>
+                          <span className="block text-[11px] font-medium opacity-75">
+                            {nearMeIncidents.length > 0
+                              ? `${nearMeIncidents.length} report${nearMeIncidents.length === 1 ? '' : 's'} within ${NEAR_ME_RADIUS_KM} km`
+                              : `Scan ${NEAR_ME_RADIUS_KM} km around this pin`}
+                          </span>
+                        </span>
+                        <ArrowRight size={16} className="shrink-0" />
+                      </button>
+
+                      {/* The deeper version of the same question, for people
+                          who have given us an address to measure from. */}
+                      {user && preferredAddress && (
+                        <button
+                          type="button"
+                          onClick={() => { setNearMeOpen(false); setBriefingOpen(true); }}
+                          className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-colors"
+                          style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.3)' }}
+                        >
+                          <span className="min-w-0">
+                            <span className="block text-[13.5px] font-black leading-tight" style={{ color: '#1C2B3A' }}>
+                              Open my full briefing
+                            </span>
+                            <span className="block text-[11px] font-medium" style={{ color: '#5A6B7D' }}>
+                              Measured from {preferredAddress}
+                            </span>
+                          </span>
+                          <ArrowRight size={16} className="shrink-0" style={{ color: '#2E8B7A' }} />
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                ) : nearMeScanning ? (
                   /* ── Radar scan — anticipation beat before the reveal ── */
                   <div className="px-4 pb-6 pt-1 flex flex-col items-center">
                     <div className="relative h-24 w-24" aria-hidden="true">
@@ -2833,9 +3041,17 @@ export default function MapPage() {
                       >
                         ← Prev
                       </button>
-                      <span className="text-[11px] text-slate-500 font-semibold">
-                        {nearMeIndex + 1} of {nearMeIncidents.length}
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNearMeStage('arrived');
+                          const loc = userLocation || CALGARY_CENTER;
+                          mapRef.current?.flyTo(loc.lat, loc.lng, userLocation ? 15 : 11);
+                        }}
+                        className="text-[11px] font-semibold underline underline-offset-2 text-slate-500 transition-opacity hover:opacity-70"
+                      >
+                        {nearMeIndex + 1} of {nearMeIncidents.length} · back to me
+                      </button>
                       <button
                         onClick={() => {
                           const next = Math.min(nearMeIncidents.length - 1, nearMeIndex + 1);
@@ -2853,7 +3069,7 @@ export default function MapPage() {
                 )}
 
                 {/* Weekly digest opt-in — wired to the existing profile setting */}
-                {!nearMeScanning && (
+                {nearMeStage === 'results' && !nearMeScanning && (
                   <motion.button
                     type="button"
                     initial={{ opacity: 0, y: 8 }}
@@ -2861,7 +3077,6 @@ export default function MapPage() {
                     transition={{ delay: 0.35, duration: 0.4 }}
                     onClick={() => {
                       setNearMeOpen(false);
-                      mapRef.current?.clearUserLocation();
                       openAuthPanel(user ? 'settings' : 'signin');
                     }}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[rgba(46,139,122,0.14)]"
@@ -2917,16 +3132,13 @@ export default function MapPage() {
             <button
               type="button"
               data-tour="locate"
-              onClick={() => {
-                if (userLocation) {
-                  mapRef.current?.flyTo(userLocation.lat, userLocation.lng);
-                } else {
-                  mapRef.current?.flyTo(CALGARY_CENTER.lat, CALGARY_CENTER.lng, 11);
-                }
-              }}
-              className="flex size-9 items-center justify-center rounded-lg text-[#52697D] transition-colors hover:bg-[#E8F3FC] hover:text-[#174A6E] active:scale-[0.98]"
-              title="Fly to my location"
-              aria-label="Fly to my location"
+              onClick={handleLocate}
+              className={cn(
+                'flex size-9 items-center justify-center rounded-lg transition-colors active:scale-[0.98]',
+                nearMeOpen ? 'bg-[#0B1F33] text-[#F7FBFF]' : 'text-[#52697D] hover:bg-[#E8F3FC] hover:text-[#174A6E]',
+              )}
+              title="Show my location"
+              aria-label="Show my location"
             >
               <Navigation size={16} />
             </button>

@@ -450,9 +450,15 @@ export default function Sidebar({
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-col gap-1">
-                                <div className="flex items-center justify-between gap-2">
+                                {/* Title takes the full width and the badges wrap
+                                    beneath it. Sharing one row meant the badge
+                                    group squeezed the heading into a narrow
+                                    column, so ordinary 511 titles clamped down to
+                                    "RestrictionClass on Queen…" and lost the road
+                                    name — the one part a reader needs. */}
+                                <div className="flex flex-col gap-1.5">
                                   <h3 className="line-clamp-2 text-sm font-black leading-tight tracking-[-0.01em] text-[#0B1F33] transition-colors group-hover:text-[#174A6E]">{incident.title}</h3>
-                                  <div className="flex items-center gap-1.5 shrink-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
                                     {/* Sample reports are labelled before any other
                                         source badge — it is the most important thing
                                         to know about the row. */}

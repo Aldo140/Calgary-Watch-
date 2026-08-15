@@ -3028,7 +3028,11 @@ export default function MapPage() {
 
         {/* Emergency and report actions */}
         <div className={cn(
-          'absolute right-3 z-30 flex flex-col items-end gap-2.5 bottom-[calc(7rem+env(safe-area-inset-bottom))] transition-all duration-200 md:right-5 md:max-lg:bottom-[calc(6.75rem+env(safe-area-inset-bottom))] lg:right-6 lg:bottom-24',
+          // On a phone the layer bar sits 88–140px off the bottom, centred and
+          // up to 20rem wide, which put it straight through the SOS/Report
+          // column at 7rem. Lifting the column clear of it keeps both usable
+          // one-handed instead of stacking two tap targets on top of each other.
+          'absolute right-3 z-30 flex flex-col items-end gap-2.5 bottom-[calc(10.25rem+env(safe-area-inset-bottom))] transition-all duration-200 md:right-5 md:max-lg:bottom-[calc(9.5rem+env(safe-area-inset-bottom))] lg:right-6 lg:bottom-24',
           (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
         )}>
           {/* SOS remains visually separate from standard reporting. */}

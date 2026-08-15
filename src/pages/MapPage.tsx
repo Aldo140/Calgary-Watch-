@@ -26,6 +26,8 @@ import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { useTrafficCameras } from '@/src/hooks/useTrafficCameras';
+import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
+import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 
@@ -665,10 +667,14 @@ export default function MapPage() {
   const [showLiveReports, setShowLiveReports] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCameras, setShowCameras] = useState(false);
+  const [showSafetyCameras, setShowSafetyCameras] = useState(false);
+  const [briefingOpen, setBriefingOpen] = useState(false);
   // Only fetched once the layer is switched on.
   // Also loaded when an incident is open, so its detail panel can show a
   // camera overlooking that spot. One request, cached for the session.
   const trafficCameras = useTrafficCameras(showCameras || Boolean(selectedIncident));
+  // Also loaded for the personal briefing, which counts them near a saved address.
+  const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
@@ -1609,6 +1615,14 @@ export default function MapPage() {
   }, [user, preferredAddress, preferredNeighborhood, preferredInferredNeighborhood, profileNeedsSetup]);
 
   const handleNotificationClick = useCallback((notification: MapNotification) => {
+    // The neighbourhood report is this person's own briefing. Sending it to the
+    // shared area panel — which anyone can open for any community — threw away
+    // everything that made it theirs.
+    if (notification.kind === 'neighborhood_report') {
+      setShowNotifications(false);
+      setBriefingOpen(true);
+      return;
+    }
     if (notification.neighborhood) {
       handleViewNeighborhood(notification.neighborhood);
       setShowNotifications(false);
@@ -1643,6 +1657,23 @@ export default function MapPage() {
     return { entry, total, rank, count: areaTotalsDesc.length, band };
   }, [crimeStats, areaTotalsDesc]);
 
+  /** The community the briefing is written about, from their saved location. */
+  const briefingCommunity =
+    preferredInferredNeighborhood || preferredNeighborhood || '';
+
+  /** Their community's figures, shaped for the briefing. */
+  const briefingAreaStats = useMemo(() => {
+    const stats = getAreaStats(briefingCommunity);
+    if (!stats) return null;
+    return {
+      crime: stats.entry.crime,
+      disorder: stats.entry.disorder,
+      year: stats.entry.year,
+      rank: stats.rank,
+      count: stats.count,
+    };
+  }, [getAreaStats, briefingCommunity]);
+
   // Featured card for "your neighbourhood report" — rendered in both dropdowns
   const renderNotificationRow = useCallback((n: MapNotification, compact: boolean) => {
     const stats = n.kind === 'neighborhood_report' ? getAreaStats(n.neighborhood) : null;
@@ -1661,7 +1692,7 @@ export default function MapPage() {
           >
             <span className="absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #2E8B7A, transparent 70%)' }} aria-hidden="true" />
             <p className="font-mono text-[8px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
-              Your area intel is ready
+              Your briefing is ready
             </p>
             <p className={cn('font-black mt-1 truncate', compact ? 'text-[13px]' : 'text-[14.5px]')} style={{ color: '#FFFDF8' }}>
               {areaName}
@@ -1691,11 +1722,11 @@ export default function MapPage() {
               </div>
             ) : (
               <p className="mt-1.5 text-[10px] font-medium" style={{ color: '#8FA3B5' }}>
-                Safety score, trends and property data for your block
+                Reports near your door, cameras, and what your community reads
               </p>
             )}
             <p className="mt-2 font-mono text-[8.5px] font-bold uppercase tracking-[0.16em]" style={{ color: '#7FB5A6' }}>
-              Open full intel →
+              Open your briefing →
             </p>
           </button>
           {/* Sibling of the main button, not nested inside it — nesting
@@ -2348,6 +2379,7 @@ export default function MapPage() {
           showHeatmap={showHeatmap}
           showCrimeLayer={showCrimeLayer}
           trafficCameras={showCameras ? trafficCameras : undefined}
+          safetyCameras={showSafetyCameras ? safetyCameras : undefined}
           crimeStats={crimeStats}
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
@@ -3113,6 +3145,8 @@ export default function MapPage() {
           setShowHeatmap={setShowHeatmap}
           showCameras={showCameras}
           setShowCameras={setShowCameras}
+          showSafetyCameras={showSafetyCameras}
+          setShowSafetyCameras={setShowSafetyCameras}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
           isPinMode={isPinMode || isEmergencyPinMode}
@@ -3195,6 +3229,34 @@ export default function MapPage() {
           } : null}
           userUid={user?.uid ?? ''}
         />
+
+        {/* The signed-in resident's own briefing, opened from their report card. */}
+        {user && (
+          <PersonalBriefing
+            open={briefingOpen}
+            onClose={() => setBriefingOpen(false)}
+            uid={user.uid}
+            displayName={user.displayName || userProfile?.displayName || ''}
+            address={preferredAddress}
+            communityName={briefingCommunity}
+            memberSince={
+              user.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : undefined
+            }
+            digestOptIn={Boolean(userProfile?.weeklyDigestOptIn)}
+            incidents={incidents}
+            areaStats={briefingAreaStats}
+            safetyCameras={safetyCameras}
+            trafficCameras={trafficCameras}
+            onOpenArea={() => {
+              if (briefingCommunity) {
+                handleViewNeighborhood(briefingCommunity);
+                setSheetSnap('80px');
+              }
+            }}
+            onOpenSettings={() => openAuthPanel('settings')}
+            onSelectIncident={(incident) => startTransition(() => setSelectedIncident(incident))}
+          />
+        )}
       </main>
 
       {/* Global Background Animation (Subtle) */}

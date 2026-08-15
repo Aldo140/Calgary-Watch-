@@ -162,3 +162,21 @@ However, **local images are recommended** for:
 ---
 
 **Questions?** Check `index.html` for meta tag references or `vite.config.ts` for build optimization settings.
+
+## Linocut illustration set (Aug 2026)
+
+Black-ink linocut on cream, converted to WebP with the paper knocked out so the
+linework sits on any surface. The ink is dark, so these read on **cream/paper
+grounds**; `-light` variants carry paper-coloured ink for dark grounds.
+
+| File | What it is | Intended home |
+|---|---|---|
+| `calgary-bow-emblem.webp` | Skyline, Bow River, bridge and moon in a hand-drawn circle | "Near me" — the city held in one frame |
+| `calgary-watch-shield.webp` | Crest: C, Calgary Tower, mountains | `/about` and the footer lockup |
+| `alberta-heart.webp` | Alberta outline with a heart | `/coverage` — the reach story |
+| `calgary-skyline-rule.webp` | Wide skyline strip with trees (3:1) | Section divider on cream |
+| `calgary-skyline-rule-light.webp` | Same, paper ink | Section divider on navy |
+| `emergency-siren.webp` | Beacon with rays | The SOS / emergency flow |
+
+Sources are the PNGs in `new images/`; regenerate with the knockout script in
+the commit that added them rather than by hand-tracing an alpha.

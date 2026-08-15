@@ -2182,7 +2182,7 @@ function FilmStrip({ reduced }: { reduced: boolean }) {
             width={480} height={320}
             className="h-36 w-56 sm:h-44 sm:w-72 object-cover rounded-lg"
           />
-          <figcaption className="mt-2 flex items-center justify-between font-mono text-[9px] tracking-[0.18em] uppercase" style={{ color: T.inkSoft }}>
+          <figcaption className="mt-2 flex items-center justify-between font-mono text-[9px] tracking-[0.18em] uppercase" style={{ color: T.nightSoft }}>
             <span>{p.label}</span>
             <span style={{ color: T.bow }}>CW-{String(i + 1).padStart(2, '0')}</span>
           </figcaption>
@@ -2192,15 +2192,20 @@ function FilmStrip({ reduced }: { reduced: boolean }) {
   );
 
   return (
-    <section className="relative py-16 sm:py-20 overflow-hidden" style={{ background: T.paper, borderTop: `1px solid ${T.line}` }}>
+    // Photography sits on the night band, the same ground the "one day on the
+    // watch" plates use. Two photo sections on two different surfaces read as
+    // two unrelated ideas, and prints on cream wash out — the page also ran
+    // three cream sections back to back here, flattening the last third of the
+    // scroll into one tone.
+    <section className="relative py-16 sm:py-20 overflow-hidden" style={{ background: T.night }}>
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8 mb-8 flex items-end justify-between gap-6">
         <Reveal>
           <Eyebrow color={T.gold}>Field photography · YYC</Eyebrow>
-          <h2 className="mt-4 font-display font-extrabold tracking-[-0.02em]" style={{ color: T.ink, fontSize: 'clamp(1.7rem, 3.6vw, 2.6rem)' }}>
+          <h2 className="mt-4 font-display font-extrabold tracking-[-0.02em]" style={{ color: T.nightText, fontSize: 'clamp(1.7rem, 3.6vw, 2.6rem)' }}>
             The city we're watching.
           </h2>
         </Reveal>
-        <p className="hidden md:block font-mono text-[10px] uppercase tracking-[0.24em] pb-1 shrink-0" style={{ color: T.inkSoft }}>
+        <p className="hidden md:block font-mono text-[10px] uppercase tracking-[0.24em] pb-1 shrink-0" style={{ color: T.nightSoft }}>
           Hover to hold a print
         </p>
       </div>

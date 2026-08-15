@@ -24,8 +24,8 @@ type SortBy = 'newest' | 'oldest' | 'verified';
 
 // Map-instrument palette. Explicit hexes avoid legacy global utility remaps.
 const P = {
-  paper: '#F8FAFC',
-  card: '#EEF4F8',
+  paper: '#FFFDF8',
+  card: '#E8F3FC',
   ink: '#0B1F33',
   soft: '#52697D',
   line: '#C9D8E4',
@@ -37,10 +37,10 @@ const P = {
 
 const CATEGORY_OPTIONS = [
   { id: 'all' as const,            label: 'All',     Icon: Layers,       color: '#1C2B3A' },
-  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#E11D48' },
-  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#DC2626' },
-  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#EA580C' },
-  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#2563EB' },
+  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#C0392B' },
+  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#C0392B' },
+  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#C77F18' },
+  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#4A90D9' },
   { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
 ] as const;
 
@@ -407,9 +407,9 @@ export default function MobileMapSheet({
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
                       {[
-                        { dot: '#ef4444', label: `${filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length} Critical` },
+                        { dot: '#C0392B', label: `${filteredIncidents.filter(i => i.verified_status === 'multiple_reports').length} Critical` },
                         { dot: '#eab308', label: `${filteredIncidents.filter(i => i.verified_status === 'unverified').length} Active` },
-                        { dot: '#22c55e', label: `${filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved` },
+                        { dot: '#2E8B7A', label: `${filteredIncidents.filter(i => i.verified_status === 'community_confirmed').length} Resolved` },
                       ].map(({ dot, label }) => (
                         <div key={label} className="flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
@@ -458,7 +458,7 @@ export default function MobileMapSheet({
                       <button
                         onClick={clearAllFilters}
                         className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
-                        style={{ borderColor: P.line, color: '#B91C1C', background: P.paper }}
+                        style={{ borderColor: P.line, color: '#A6332A', background: P.paper }}
                       >
                         Clear filters
                       </button>
@@ -486,7 +486,7 @@ export default function MobileMapSheet({
                           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 text-left transition-colors"
                           style={{ background: 'rgba(74,144,217,0.09)', border: '1px solid rgba(74,144,217,0.28)' }}
                         >
-                          <MapPin size={14} className="shrink-0" style={{ color: '#2563EB' }} />
+                          <MapPin size={14} className="shrink-0" style={{ color: '#4A90D9' }} />
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-black" style={{ color: P.ink }}>{name}</p>
                             <p className="text-[10px]" style={{ color: P.soft }}>Fly to area</p>
@@ -583,7 +583,7 @@ export default function MobileMapSheet({
                               )}
                             </span>
                             {isNew && (
-                              <span className="shrink-0 rounded px-1.5 py-0.5 text-[7.5px] font-black uppercase" style={{ background: '#2563EB', color: '#fff' }}>New</span>
+                              <span className="shrink-0 rounded px-1.5 py-0.5 text-[7.5px] font-black uppercase" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
                             )}
                             <ChevronRight size={14} className="shrink-0" style={{ color: P.soft }} />
                           </motion.button>
@@ -613,7 +613,7 @@ export default function MobileMapSheet({
                           }}
                         >
                           {isEmergency && (
-                            <div className="absolute top-0 right-0 flex items-center gap-1 px-2 py-0.5 rounded-bl-xl" style={{ background: '#E11D48' }}>
+                            <div className="absolute top-0 right-0 flex items-center gap-1 px-2 py-0.5 rounded-bl-xl" style={{ background: '#C0392B' }}>
                               <span className="text-[8px] font-black uppercase tracking-widest text-[#fff]">SOS</span>
                             </div>
                           )}
@@ -637,7 +637,7 @@ export default function MobileMapSheet({
                                 </p>
                                 <div className="flex items-center gap-1 shrink-0 ml-1">
                                   {incident.source_type === 'reddit_calgary' && (
-                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(234,88,12,0.12)', color: '#EA580C', border: '1px solid rgba(234,88,12,0.3)' }}>Reddit</span>
+                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(234,88,12,0.12)', color: '#C77F18', border: '1px solid rgba(234,88,12,0.3)' }}>Reddit</span>
                                   )}
                                   {incident.source_type === 'news_rss' && (
                                     <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(147,51,234,0.1)', color: '#7E22CE', border: '1px solid rgba(147,51,234,0.3)' }}>News</span>
@@ -646,7 +646,7 @@ export default function MobileMapSheet({
                                     <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(14,165,233,0.12)', color: '#0369A1', border: '1px solid rgba(14,165,233,0.3)' }}>Official</span>
                                   )}
                                   {isNew && (
-                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase animate-pulse" style={{ background: '#2563EB', color: '#fff' }}>New</span>
+                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase animate-pulse" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
                                   )}
                                 </div>
                               </div>
@@ -675,7 +675,7 @@ export default function MobileMapSheet({
                                 <div
                                   className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold"
                                   style={
-                                    incident.verified_status === 'community_confirmed' ? { background: 'rgba(34,197,94,0.12)', color: '#15803D' } :
+                                    incident.verified_status === 'community_confirmed' ? { background: 'rgba(34,197,94,0.12)', color: '#1F6154' } :
                                     incident.verified_status === 'multiple_reports' ? { background: 'rgba(234,179,8,0.14)', color: '#A16207' } :
                                     { background: P.card, color: P.soft }
                                   }
@@ -718,7 +718,7 @@ export default function MobileMapSheet({
                         <button
                           onClick={clearAllFilters}
                           className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-colors"
-                          style={{ color: '#2563EB' }}
+                          style={{ color: '#4A90D9' }}
                         >
                           Clear all filters
                         </button>
@@ -749,7 +749,7 @@ export default function MobileMapSheet({
                   <button
                     onClick={() => setSnap(0.82)}
                     className="w-full flex items-center justify-center gap-1.5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-colors"
-                    style={{ color: '#2563EB' }}
+                    style={{ color: '#4A90D9' }}
                   >
                     <ChevronDown size={12} className="rotate-180" />
                     Show all {filteredIncidents.length} reports

@@ -162,23 +162,23 @@ export default function EmergencyModal({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <Siren size={15} className="animate-pulse" style={{ color: '#DC2626' }} />
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.26em]" style={{ color: '#DC2626' }}>Emergency signal</span>
+                    <Siren size={15} className="animate-pulse" style={{ color: '#C0392B' }} />
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.26em]" style={{ color: '#C0392B' }}>Emergency signal</span>
                   </div>
                   <h2 className="font-display text-xl font-extrabold tracking-[-0.02em] leading-tight" style={{ color: '#1C2B3A' }}>
                     {step === 'choose' ? 'Where is it?' : "What's happening?"}
                   </h2>
                   <p className="text-xs mt-0.5" style={{ color: '#5A6B7D' }}>Goes live instantly for everyone nearby</p>
                 </div>
-                <button onClick={handleClose} className="p-2 text-slate-500 light:text-stone-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
+                <button onClick={handleClose} className="p-2 text-stone-500 light:text-stone-500 hover:text-white light:hover:text-stone-900 hover:bg-white/10 light:hover:bg-white/80 rounded-xl transition-all">
                   <X size={18} />
                 </button>
               </div>
 
               {/* ── Disclaimer ── */}
               <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-2xl" style={{ background: 'rgba(220,38,38,0.07)', border: '1px solid rgba(220,38,38,0.3)' }}>
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#DC2626' }} />
-                <p className="text-[11px] leading-relaxed" style={{ color: '#7F1D1D' }}>
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#C0392B' }} />
+                <p className="text-[11px] leading-relaxed" style={{ color: '#8A2A22' }}>
                   <span className="font-black">For life-threatening emergencies call 911 first.</span>{' '}
                   This tool is for community awareness only, not a substitute for emergency services. Do not submit false reports.
                 </p>
@@ -208,8 +208,8 @@ export default function EmergencyModal({
                     </button>
                   ) : (
                     <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.3)' }}>
-                      <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#B45309' }} />
-                      <p className="text-xs" style={{ color: '#92400E' }}>GPS unavailable. Use the pin below to mark the location.</p>
+                      <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#8A5710' }} />
+                      <p className="text-xs" style={{ color: '#8A5710' }}>GPS unavailable. Use the pin below to mark the location.</p>
                     </div>
                   )}
 
@@ -239,7 +239,7 @@ export default function EmergencyModal({
                   {/* Active location display */}
                   <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
                     <div className="flex items-center gap-2">
-                      <MapPin size={13} style={{ color: activeLocation ? '#2E8B7A' : '#DC2626' }} />
+                      <MapPin size={13} style={{ color: activeLocation ? '#2E8B7A' : '#C0392B' }} />
                       <span className="text-xs font-mono tabular-nums" style={{ color: '#1C2B3A' }}>
                         {activeLocation
                           ? `${activeLocation.lat.toFixed(5)}, ${activeLocation.lng.toFixed(5)}`
@@ -257,7 +257,7 @@ export default function EmergencyModal({
 
                   {/* Type selector */}
                   <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.18em] mb-2">Type</p>
+                    <p className="text-[10px] font-black text-stone-500 uppercase tracking-[0.18em] mb-2">Type</p>
                     <div className="grid grid-cols-5 gap-2">
                       {EMERGENCY_TYPES.map(({ id, label, icon: Icon, color, ring }) => (
                         <button
@@ -278,7 +278,7 @@ export default function EmergencyModal({
 
                   {/* Neighbourhood */}
                   <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.18em] mb-2">Neighbourhood</p>
+                    <p className="text-[10px] font-black text-stone-500 uppercase tracking-[0.18em] mb-2">Neighbourhood</p>
                     <select
                       value={neighborhood}
                       onChange={(e) => setNeighborhood(e.target.value)}
@@ -295,7 +295,7 @@ export default function EmergencyModal({
 
                   {/* Description */}
                   <div>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.18em] mb-2">What's happening?</p>
+                    <p className="text-[10px] font-black text-stone-500 uppercase tracking-[0.18em] mb-2">What's happening?</p>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -312,7 +312,7 @@ export default function EmergencyModal({
 
                   {/* Reporter */}
                   <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl" style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }}>
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black" style={{ background: '#DC2626', color: '#fff' }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black" style={{ background: '#C0392B', color: '#fff' }}>
                       {userName.charAt(0).toUpperCase()}
                     </div>
                     <span className="text-xs" style={{ color: '#5A6B7D' }}>Posting as <span className="font-bold" style={{ color: '#1C2B3A' }}>{userName}</span> · never anonymous for SOS</span>

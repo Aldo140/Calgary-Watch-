@@ -44,7 +44,7 @@ interface AreaIntelligencePanelProps {
 
 function makeTooltipStyle(isLight: boolean) {
   return {
-    backgroundColor: isLight ? '#ffffff' : '#020617',
+    backgroundColor: isLight ? '#ffffff' : '#0B1F33',
     borderRadius: '14px',
     border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)',
     boxShadow: isLight ? '0 8px 32px -4px rgba(0,0,0,0.18)' : '0 18px 25px -5px rgba(0,0,0,0.45)',
@@ -55,7 +55,7 @@ function makeTooltipLabelStyle(isLight: boolean) {
   return {
     fontSize: 11,
     fontWeight: 900,
-    color: isLight ? '#1e293b' : '#fff',
+    color: isLight ? '#1C2B3A' : '#fff',
     marginBottom: 4,
     textTransform: 'uppercase' as const,
     letterSpacing: '0.1em',
@@ -85,7 +85,7 @@ function Section({
         <div>
           <h3 className={cn('font-display text-xl font-bold leading-tight tracking-[-0.01em]', isLight ? 'text-[#1C2B3A]' : 'text-white')}>{title}</h3>
           {subtitle && (
-            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] font-bold mt-1 text-slate-500">{subtitle}</p>
+            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] font-bold mt-1 text-stone-500">{subtitle}</p>
           )}
         </div>
       </div>
@@ -112,7 +112,7 @@ function HeroSection({
   const rankPct = rank > 0 && total > 0
     ? Math.round(((total - rank + 1) / total) * 100)
     : 0;
-  const rankColor = rankPct <= 30 ? '#34d399' : rankPct <= 60 ? '#f59e0b' : '#ef4444';
+  const rankColor = rankPct <= 30 ? '#3FA391' : rankPct <= 60 ? '#C77F18' : '#C0392B';
   const r = 26;
   const circ = 2 * Math.PI * r;
   const [gaugeRef, gaugeInView] = useInView(0);
@@ -124,7 +124,7 @@ function HeroSection({
       className="relative px-5 pt-5 pb-6 md:px-8 overflow-hidden"
       style={{
         background: isLight
-          ? 'linear-gradient(135deg, #EFF5FA 0%, #F5F2E9 100%)'
+          ? 'linear-gradient(135deg, #E8F3FC 0%, #F7F3EA 100%)'
           : 'linear-gradient(135deg, #0f1e3d 0%, #0a1628 100%)',
       }}
     >
@@ -148,8 +148,8 @@ function HeroSection({
           className={cn(
             'p-2.5 rounded-xl border transition-all group',
             isLight
-              ? 'text-slate-600 hover:text-slate-900 bg-black/5 hover:bg-black/10 border-black/10'
-              : 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10',
+              ? 'text-stone-600 hover:text-stone-900 bg-black/5 hover:bg-black/10 border-black/10'
+              : 'text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10',
           )}
         >
           <X size={17} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -184,8 +184,8 @@ function HeroSection({
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={cn('text-[15px] font-black leading-none', isLight ? 'text-slate-900' : 'text-white')}>{animatedScore}</span>
-            <span className="text-[7px] text-slate-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
+            <span className={cn('text-[15px] font-black leading-none', isLight ? 'text-stone-900' : 'text-white')}>{animatedScore}</span>
+            <span className="text-[7px] text-stone-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
           </div>
         </div>
 
@@ -196,7 +196,7 @@ function HeroSection({
             {
               label: 'Trend',
               value: data.trend ?? '–',
-              color: data.trend === 'improving' ? 'text-emerald-600' : data.trend === 'declining' ? 'text-red-500' : (isLight ? 'text-slate-600' : 'text-slate-300'),
+              color: data.trend === 'improving' ? 'text-emerald-600' : data.trend === 'declining' ? 'text-red-500' : (isLight ? 'text-stone-600' : 'text-stone-300'),
             },
             {
               label: 'Risk',
@@ -208,7 +208,7 @@ function HeroSection({
               'rounded-xl p-2 text-center border',
               isLight ? 'bg-white/60 border-black/10' : 'bg-white/[0.04] border-white/[0.07]',
             )}>
-              <p className="text-[7px] font-black uppercase tracking-wide text-slate-500 leading-none mb-1">{label}</p>
+              <p className="text-[7px] font-black uppercase tracking-wide text-stone-500 leading-none mb-1">{label}</p>
               <p className={cn('text-[11px] font-black truncate leading-none capitalize', color)}>{value}</p>
             </div>
           ))}
@@ -218,8 +218,8 @@ function HeroSection({
       {/* City rank bar */}
       {rank > 0 && total > 0 && (
         <div className="mt-4 relative z-10">
-          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 mb-1">City Rank</p>
-          <p className={cn('text-[11px] font-medium mb-1.5', isLight ? 'text-slate-700' : 'text-white')}>
+          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-500 mb-1">City Rank</p>
+          <p className={cn('text-[11px] font-medium mb-1.5', isLight ? 'text-stone-700' : 'text-white')}>
             #{rank} out of {total} neighbourhoods
           </p>
           <div className={cn('h-[4px] rounded-full overflow-hidden', isLight ? 'bg-black/10' : 'bg-white/10')}>
@@ -238,10 +238,10 @@ function HeroSection({
       {data.liveOverlayInsight && (
         <div className={cn(
           'mt-4 flex items-start gap-2.5 rounded-2xl px-3 py-2.5 relative z-10 border',
-          isLight ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20',
+          isLight ? 'bg-[#E8F3FC] border-[#C9D8E4]' : 'bg-[#4A90D9]/10 border-[#4A90D9]/20',
         )}>
-          <Activity size={13} className="text-blue-500 shrink-0 mt-0.5" />
-          <p className={cn('text-[12px] font-medium leading-relaxed', isLight ? 'text-blue-800' : 'text-blue-100')}>
+          <Activity size={13} className="text-[#4A90D9] shrink-0 mt-0.5" />
+          <p className={cn('text-[12px] font-medium leading-relaxed', isLight ? 'text-[#174A6E]' : 'text-[#E8F3FC]')}>
             {data.liveOverlayInsight}
           </p>
         </div>
@@ -352,7 +352,7 @@ function Content({
             transition={{ duration: 0.2 }}
             className={cn(
               'sticky top-0 z-20 flex items-center justify-between px-5 py-2.5 border-b backdrop-blur-xl',
-              isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-slate-950/90 border-white/10'
+              isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-stone-950/90 border-white/10'
             )}
           >
             <span className="font-display text-sm font-bold truncate">{data.communityName}</span>
@@ -368,7 +368,7 @@ function Content({
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-500 hover:bg-black/5"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-stone-500 hover:bg-black/5"
               >
                 <X size={13} />
               </button>
@@ -387,7 +387,7 @@ function Content({
         <div
           className={cn(
             'sticky top-0 z-10 flex gap-1.5 overflow-x-auto no-scrollbar px-5 md:px-8 py-2.5 border-b backdrop-blur-xl',
-            isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-slate-950/92 border-white/10'
+            isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-stone-950/92 border-white/10'
           )}
         >
           {INTEL_SECTIONS.map(({ id, label }) => {
@@ -402,7 +402,7 @@ function Content({
                   ? { background: '#1C2B3A', borderColor: '#1C2B3A', color: '#FFFDF8' }
                   : isLight
                     ? { background: '#F7F3EA', borderColor: '#E7E0D2', color: '#5A6B7D' }
-                    : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#94a3b8' }}
+                    : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#9AA6B2' }}
               >
                 {label}
               </button>
@@ -410,7 +410,7 @@ function Content({
           })}
         </div>
 
-        <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[#FFFDF8]' : 'bg-slate-950')}>
+        <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[#FFFDF8]' : 'bg-stone-950')}>
           <div id="sec-year" className="scroll-mt-16">
             <CrimeThisYearSection
               crimeEntry={crimeEntry}
@@ -477,7 +477,7 @@ export default function AreaIntelligencePanel({
   const hasRealData    = realYearly.length > 0;
   const isStatcanData  = crimeEntry?.dataSource === 'statcan';
   const score          = data.safetyScore ?? 0;
-  const gaugeColor     = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
+  const gaugeColor     = score >= 70 ? '#3FA391' : score >= 40 ? '#C77F18' : '#C0392B';
   const glowColor      = score >= 70 ? 'rgba(52,211,153,0.12)' : score >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)';
 
   const chartData = hasRealData
@@ -536,7 +536,7 @@ export default function AreaIntelligencePanel({
             <Drawer.Content className="fixed bottom-0 left-0 right-0 h-[94dvh] z-[101] outline-none">
               <div className={cn(
                 'h-full rounded-t-[1.75rem] overflow-hidden flex flex-col relative',
-                isLight ? 'bg-[#FFFDF8]' : 'bg-slate-950 border-t border-white/10'
+                isLight ? 'bg-[#FFFDF8]' : 'bg-stone-950 border-t border-white/10'
               )}>
                 {/* score-keyed accent spine */}
                 <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
@@ -572,7 +572,7 @@ function Sparkline({ values }: { values: number[] }) {
   const delta = first > 0 ? ((last - first) / first) * 100
               : last > 0  ? 100
               : 0;
-  const color = delta < -5 ? '#34d399' : delta > 5 ? '#ef4444' : '#64748b';
+  const color = delta < -5 ? '#3FA391' : delta > 5 ? '#C0392B' : '#6E6357';
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="shrink-0">
       <polyline
@@ -626,7 +626,7 @@ function CrimeThisYearSection({
       label: 'Property Crime',
       value: crimeEntry.property,
       avg: cityAverages?.avgProperty ?? 0,
-      color: 'bg-blue-500',
+      color: 'bg-[#4A90D9]',
       sparkValues: last6.map(e => e.property),
     },
     {
@@ -645,7 +645,7 @@ function CrimeThisYearSection({
       isLight={isLight}
     >
       {isStatcanData && (
-        <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-medium inline-block mb-3">
+        <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-[#4A90D9]/20 text-[#8DBBDB] font-medium inline-block mb-3">
           StatsCan
         </span>
       )}
@@ -663,15 +663,15 @@ function CrimeThisYearSection({
             <div key={label}>
               <div className="flex items-center gap-2 mb-1.5">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <span className={cn('text-[13px] font-bold truncate', isLight ? 'text-slate-700' : 'text-slate-300')}>{label}</span>
+                  <span className={cn('text-[13px] font-bold truncate', isLight ? 'text-stone-700' : 'text-stone-300')}>{label}</span>
                   {vsCity > 0 && (
                     <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-full border shrink-0', vsColor)}>{vsLabel}</span>
                   )}
                 </div>
                 <Sparkline values={sparkValues} />
-                <span className={cn('text-base font-black shrink-0', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
+                <span className={cn('text-base font-black shrink-0', isLight ? 'text-stone-900' : 'text-white')}>{value.toLocaleString()}</span>
               </div>
-              <div className={cn('h-[10px] rounded-full overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
+              <div className={cn('h-[10px] rounded-full overflow-hidden', isLight ? 'bg-stone-200' : 'bg-white/10')}>
                 <motion.div
                   className={cn('h-full rounded-full', color)}
                   initial={{ width: '0%' }}
@@ -683,7 +683,7 @@ function CrimeThisYearSection({
           );
         })}
       </div>
-      <p className="text-[11px] mt-4 text-slate-500">
+      <p className="text-[11px] mt-4 text-stone-500">
         Criminal offences reported to Calgary Police · {crimeEntry.year} · City of Calgary Open Data (78gh-n26t, h3h6-kgme)
       </p>
     </Section>
@@ -722,9 +722,9 @@ function TrendChartSection({
   const endYear   = chartData[chartData.length - 1]?.name ?? '';
 
   const pills = [
-    { key: 'violent' as const,  label: 'Violent',  active: showViolent,  toggle: () => setShowViolent(p  => !p), color: 'border-red-500 bg-red-500/15 text-red-400',   inactive: isLight ? 'border-slate-300 bg-slate-100 text-slate-500' : 'border-white/10 bg-white/5 text-slate-500' },
-    { key: 'property' as const, label: 'Property', active: showProperty, toggle: () => setShowProperty(p => !p), color: 'border-blue-500 bg-blue-500/15 text-blue-400',  inactive: isLight ? 'border-slate-300 bg-slate-100 text-slate-500' : 'border-white/10 bg-white/5 text-slate-500' },
-    { key: 'disorder' as const, label: 'Disorder', active: showDisorder, toggle: () => setShowDisorder(p => !p), color: 'border-amber-500 bg-amber-500/15 text-amber-400', inactive: isLight ? 'border-slate-300 bg-slate-100 text-slate-500' : 'border-white/10 bg-white/5 text-slate-500' },
+    { key: 'violent' as const,  label: 'Violent',  active: showViolent,  toggle: () => setShowViolent(p  => !p), color: 'border-red-500 bg-red-500/15 text-red-400',   inactive: isLight ? 'border-stone-300 bg-stone-100 text-stone-500' : 'border-white/10 bg-white/5 text-stone-500' },
+    { key: 'property' as const, label: 'Property', active: showProperty, toggle: () => setShowProperty(p => !p), color: 'border-[#4A90D9] bg-[#4A90D9]/15 text-[#4A90D9]',  inactive: isLight ? 'border-stone-300 bg-stone-100 text-stone-500' : 'border-white/10 bg-white/5 text-stone-500' },
+    { key: 'disorder' as const, label: 'Disorder', active: showDisorder, toggle: () => setShowDisorder(p => !p), color: 'border-amber-500 bg-amber-500/15 text-amber-400', inactive: isLight ? 'border-stone-300 bg-stone-100 text-stone-500' : 'border-white/10 bg-white/5 text-stone-500' },
   ];
 
   return (
@@ -751,7 +751,7 @@ function TrendChartSection({
 
       {/* Area chart */}
       <div
-        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}
         role="img"
         aria-label={`Crime trend chart for ${startYear}–${endYear}`}
       >
@@ -759,25 +759,25 @@ function TrendChartSection({
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="aiV" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#ef4444" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                <stop offset="5%"  stopColor="#C0392B" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#C0392B" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="aiP" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.25} />
                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="aiD" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#f59e0b" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                <stop offset="5%"  stopColor="#C77F18" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#C77F18" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} dy={8} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} tickFormatter={fmtTick} />
             <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 12, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
-            {showViolent  && <Area type="monotone" dataKey="Violent"  stroke="#ef4444" strokeWidth={2.5} fillOpacity={1} fill="url(#aiV)" isAnimationActive animationBegin={200} animationDuration={800} />}
+            {showViolent  && <Area type="monotone" dataKey="Violent"  stroke="#C0392B" strokeWidth={2.5} fillOpacity={1} fill="url(#aiV)" isAnimationActive animationBegin={200} animationDuration={800} />}
             {showProperty && <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#aiP)" isAnimationActive animationBegin={200} animationDuration={800} />}
-            {showDisorder && <Area type="monotone" dataKey="Disorder" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#aiD)" isAnimationActive animationBegin={200} animationDuration={800} />}
+            {showDisorder && <Area type="monotone" dataKey="Disorder" stroke="#C77F18" strokeWidth={2.5} fillOpacity={1} fill="url(#aiD)" isAnimationActive animationBegin={200} animationDuration={800} />}
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -796,12 +796,12 @@ function TrendChartSection({
               ? (isLight ? 'text-red-600' : 'text-red-400')
               : (isLight ? 'text-emerald-700' : 'text-emerald-400');
             return (
-              <div key={label} className={cn('rounded-xl p-3 border text-center', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.03] border-white/5')}>
-                <p className="text-[10px] font-black uppercase tracking-wide mb-0.5 text-slate-500">{label}</p>
+              <div key={label} className={cn('rounded-xl p-3 border text-center', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.03] border-white/5')}>
+                <p className="text-[10px] font-black uppercase tracking-wide mb-0.5 text-stone-500">{label}</p>
                 <p className={cn('text-sm font-black', color)}>
                   {isUp ? '↑' : '↓'} {Math.abs(delta)}%
                 </p>
-                <p className={cn('text-[9px] mt-0.5', isLight ? 'text-slate-400' : 'text-slate-600')}>vs prior year</p>
+                <p className={cn('text-[9px] mt-0.5', isLight ? 'text-stone-400' : 'text-stone-600')}>vs prior year</p>
               </div>
             );
           })}
@@ -822,19 +822,19 @@ function DonutSection({
 
   if (!crimeEntry || total === 0) return null;
   const slices = [
-    { name: 'Violent',  value: crimeEntry.violent,  color: '#ef4444', description: 'Assault, robbery, threats' },
+    { name: 'Violent',  value: crimeEntry.violent,  color: '#C0392B', description: 'Assault, robbery, threats' },
     { name: 'Property', value: crimeEntry.property, color: '#3b82f6', description: 'Break & enter, theft' },
-    { name: 'Disorder', value: crimeEntry.disorder, color: '#f59e0b', description: 'Non-criminal service calls' },
+    { name: 'Disorder', value: crimeEntry.disorder, color: '#C77F18', description: 'Non-criminal service calls' },
   ];
 
   const renderActiveShape = (props: any) => {
     const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
     return (
       <g>
-        <text x={cx} y={cy - 10} textAnchor="middle" fill={isLight ? '#0f172a' : '#fff'} style={{ fontSize: 22, fontWeight: 900 }}>
+        <text x={cx} y={cy - 10} textAnchor="middle" fill={isLight ? '#0B1F33' : '#fff'} style={{ fontSize: 22, fontWeight: 900 }}>
           {payload.value.toLocaleString()}
         </text>
-        <text x={cx} y={cy + 14} textAnchor="middle" fill="#64748b" style={{ fontSize: 11, fontWeight: 700 }}>
+        <text x={cx} y={cy + 14} textAnchor="middle" fill="#6E6357" style={{ fontSize: 11, fontWeight: 700 }}>
           {(percent * 100).toFixed(0)}% of total
         </text>
         <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 8} startAngle={startAngle} endAngle={endAngle} fill={fill} />
@@ -875,7 +875,7 @@ function DonutSection({
 
         {/* Legend */}
         <div className="flex-1 space-y-3 w-full">
-          <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-500">
+          <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-stone-500">
             Total: {total.toLocaleString()} incidents
           </p>
           {slices.map(({ name, value, color, description }, i) => (
@@ -885,18 +885,18 @@ function DonutSection({
               className={cn(
                 'w-full flex items-center gap-3 rounded-xl p-3 border text-left transition-all',
                 activeIdx === i
-                  ? (isLight ? 'border-slate-300 bg-slate-100' : 'border-white/15 bg-white/[0.06]')
-                  : (isLight ? 'border-slate-200 bg-white hover:bg-slate-50' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]')
+                  ? (isLight ? 'border-stone-300 bg-stone-100' : 'border-white/15 bg-white/[0.06]')
+                  : (isLight ? 'border-stone-200 bg-white hover:bg-stone-50' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]')
               )}
             >
               <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className={cn('text-sm font-bold', isLight ? 'text-slate-900' : 'text-white')}>{name}</span>
-                  <span className={cn('text-sm font-black', isLight ? 'text-slate-900' : 'text-white')}>{value.toLocaleString()}</span>
+                  <span className={cn('text-sm font-bold', isLight ? 'text-stone-900' : 'text-white')}>{name}</span>
+                  <span className={cn('text-sm font-black', isLight ? 'text-stone-900' : 'text-white')}>{value.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between mt-0.5">
-                  <span className="text-[11px] text-slate-500">{description}</span>
+                  <span className="text-[11px] text-stone-500">{description}</span>
                   <span className="text-[11px] font-bold" style={{ color }}>
                     {total > 0 ? `${Math.round((value / total) * 100)}%` : '–'}
                   </span>
@@ -904,7 +904,7 @@ function DonutSection({
               </div>
             </button>
           ))}
-          <p className={cn('text-[10px] pt-1', isLight ? 'text-slate-400' : 'text-slate-600')}>
+          <p className={cn('text-[10px] pt-1', isLight ? 'text-stone-400' : 'text-stone-600')}>
             Tap a slice or row to highlight
           </p>
         </div>
@@ -931,7 +931,7 @@ function PropertyValueContent({
   const animatedValue  = useCountUp(latestEntry.AvgValue, 1200, valueInView);
   const animatedChange = useCountUp(Math.abs(valueChange ?? 0), 1000, valueInView);
 
-  const gaugeColor  = score >= 70 ? '#34d399' : score >= 40 ? '#f59e0b' : '#ef4444';
+  const gaugeColor  = score >= 70 ? '#3FA391' : score >= 40 ? '#C77F18' : '#C0392B';
   const CHART_W     = 216;
   const CHART_H     = 216;
   const PAD         = 32;
@@ -982,11 +982,11 @@ function PropertyValueContent({
       {/* Quadrant plot */}
       <div
         ref={valueRef}
-        className={cn('rounded-[1.6rem] border p-4 mb-4', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+        className={cn('rounded-[1.6rem] border p-4 mb-4', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}
         role="img"
         aria-label="Safety score vs property value quadrant"
       >
-        <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-slate-500">
+        <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-stone-500">
           Safety Score vs Assessed Value
         </p>
         <svg
@@ -1000,17 +1000,17 @@ function PropertyValueContent({
           <rect x={PAD} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(254,242,242,0.8)' : 'rgba(239,68,68,0.02)'} />
           <rect x={PAD + CHART_W / 2} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(239,246,255,0.8)' : 'rgba(59,130,246,0.02)'} />
           {/* Dividing lines */}
-          <line x1={PAD} y1={PAD + CHART_H / 2} x2={PAD + CHART_W} y2={PAD + CHART_H / 2} stroke={isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
-          <line x1={PAD + CHART_W / 2} y1={PAD} x2={PAD + CHART_W / 2} y2={PAD + CHART_H} stroke={isLight ? '#e2e8f0' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
+          <line x1={PAD} y1={PAD + CHART_H / 2} x2={PAD + CHART_W} y2={PAD + CHART_H / 2} stroke={isLight ? '#E7E0D2' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
+          <line x1={PAD + CHART_W / 2} y1={PAD} x2={PAD + CHART_W / 2} y2={PAD + CHART_H} stroke={isLight ? '#E7E0D2' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
           {/* Quadrant labels */}
-          <text x={PAD + 6} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Transitioning</text>
-          <text x={PAD + CHART_W / 2 + 4} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Premier</text>
-          <text x={PAD + 6} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Challenged</text>
-          <text x={PAD + CHART_W / 2 + 4} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#94a3b8' : '#475569'}>Hidden Gem</text>
+          <text x={PAD + 6} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Transitioning</text>
+          <text x={PAD + CHART_W / 2 + 4} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Premier</text>
+          <text x={PAD + 6} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Challenged</text>
+          <text x={PAD + CHART_W / 2 + 4} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Hidden Gem</text>
           {/* City avg crosshair */}
-          <line x1={PAD + CHART_W / 2 - 6} y1={PAD + CHART_H / 2} x2={PAD + CHART_W / 2 + 6} y2={PAD + CHART_H / 2} stroke="#64748b" strokeWidth="1.5" />
-          <line x1={PAD + CHART_W / 2} y1={PAD + CHART_H / 2 - 6} x2={PAD + CHART_W / 2} y2={PAD + CHART_H / 2 + 6} stroke="#64748b" strokeWidth="1.5" />
-          <text x={PAD + CHART_W / 2 + 8} y={PAD + CHART_H / 2 - 4} fontSize="9" fill="#64748b" fontWeight="700">City Avg</text>
+          <line x1={PAD + CHART_W / 2 - 6} y1={PAD + CHART_H / 2} x2={PAD + CHART_W / 2 + 6} y2={PAD + CHART_H / 2} stroke="#6E6357" strokeWidth="1.5" />
+          <line x1={PAD + CHART_W / 2} y1={PAD + CHART_H / 2 - 6} x2={PAD + CHART_W / 2} y2={PAD + CHART_H / 2 + 6} stroke="#6E6357" strokeWidth="1.5" />
+          <text x={PAD + CHART_W / 2 + 8} y={PAD + CHART_H / 2 - 4} fontSize="9" fill="#6E6357" fontWeight="700">City Avg</text>
           {/* Community dot with pulsing ring */}
           <motion.g
             initial={{ scale: 0, opacity: 0 }}
@@ -1025,22 +1025,22 @@ function PropertyValueContent({
             <circle cx={dotX} cy={dotY} r="7" fill={gaugeColor} />
           </motion.g>
           {/* Axis labels */}
-          <text x={PAD + CHART_W / 2} y={PAD + CHART_H + 18} fontSize="9" fill="#64748b" textAnchor="middle" fontWeight="700">Safety Score →</text>
-          <text x={PAD - 20} y={PAD + CHART_H / 2} fontSize="9" fill="#64748b" textAnchor="middle" transform={`rotate(-90, ${PAD - 20}, ${PAD + CHART_H / 2})`} fontWeight="700">Value →</text>
+          <text x={PAD + CHART_W / 2} y={PAD + CHART_H + 18} fontSize="9" fill="#6E6357" textAnchor="middle" fontWeight="700">Safety Score →</text>
+          <text x={PAD - 20} y={PAD + CHART_H / 2} fontSize="9" fill="#6E6357" textAnchor="middle" transform={`rotate(-90, ${PAD - 20}, ${PAD + CHART_H / 2})`} fontWeight="700">Value →</text>
         </svg>
       </div>
 
       {/* Correlation callout */}
       {correlationText && combined.length >= 2 && (
-        <div className={cn('rounded-2xl border px-4 py-3 mb-4', isLight ? 'bg-indigo-50 border-indigo-100' : 'bg-indigo-500/5 border-indigo-500/15')}>
-          <p className={cn('text-[13px] italic leading-relaxed', isLight ? 'text-indigo-700' : 'text-indigo-300')}>
+        <div className={cn('rounded-2xl border px-4 py-3 mb-4', isLight ? 'bg-[#E8F3FC] border-[#E8F3FC]' : 'bg-[#4A90D9]/5 border-[#4A90D9]/15')}>
+          <p className={cn('text-[13px] italic leading-relaxed', isLight ? 'text-[#174A6E]' : 'text-[#8DBBDB]')}>
             {correlationText}
           </p>
         </div>
       )}
 
       <div
-        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}
+        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}
         role="img"
         aria-label="Property value versus total crime by year"
       >
@@ -1048,13 +1048,13 @@ function PropertyValueContent({
           <ComposedChart data={combined}>
             <defs>
               <linearGradient id="aiCrime" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#ef4444" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                <stop offset="5%"  stopColor="#C0392B" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#C0392B" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#475569' : '#64748b', fontWeight: 700 }} dy={8} />
-            <YAxis yAxisId="crime" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#94a3b8' : '#64748b', fontWeight: 700 }} tickFormatter={fmtTick} orientation="left" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} dy={8} />
+            <YAxis yAxisId="crime" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#9AA6B2' : '#6E6357', fontWeight: 700 }} tickFormatter={fmtTick} orientation="left" />
             <YAxis yAxisId="value" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#818cf8', fontWeight: 700 }} tickFormatter={fmtDollars} orientation="right" />
             <Tooltip
               contentStyle={tooltipStyle}
@@ -1068,32 +1068,32 @@ function PropertyValueContent({
               }}
               itemStyle={{ fontSize: 12, fontWeight: 'bold' }}
             />
-            <Area yAxisId="crime" type="monotone" dataKey="TotalCrime" stroke="#ef4444" strokeWidth={2} fill="url(#aiCrime)" fillOpacity={1} isAnimationActive animationBegin={200} animationDuration={800} />
-            <Line  yAxisId="value" type="monotone" dataKey="AvgValue"   stroke="#818cf8" strokeWidth={3} dot={{ r: 4, fill: '#818cf8', strokeWidth: 2, stroke: isLight ? '#fff' : '#0f172a' }} isAnimationActive animationBegin={200} animationDuration={800} />
+            <Area yAxisId="crime" type="monotone" dataKey="TotalCrime" stroke="#C0392B" strokeWidth={2} fill="url(#aiCrime)" fillOpacity={1} isAnimationActive animationBegin={200} animationDuration={800} />
+            <Line  yAxisId="value" type="monotone" dataKey="AvgValue"   stroke="#818cf8" strokeWidth={3} dot={{ r: 4, fill: '#818cf8', strokeWidth: 2, stroke: isLight ? '#fff' : '#0B1F33' }} isAnimationActive animationBegin={200} animationDuration={800} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       {/* Insight row */}
       <div className="grid grid-cols-2 gap-3 mt-4">
-        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Avg. Assessed Value ({latestEntry.name})</p>
-          <p className="text-xl font-black text-indigo-400">{fmtDollars(animatedValue)}</p>
+        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}>
+          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-stone-500">Avg. Assessed Value ({latestEntry.name})</p>
+          <p className="text-xl font-black text-[#4A90D9]">{fmtDollars(animatedValue)}</p>
         </div>
-        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-slate-500">Change vs {earliestEntry.name}</p>
+        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}>
+          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-stone-500">Change vs {earliestEntry.name}</p>
           {valueChange !== null ? (
             <p className={cn('text-xl font-black', valueChange >= 0 ? 'text-emerald-400' : 'text-red-400')}>
               {valueChange >= 0 ? '↑' : '↓'} {animatedChange}%
             </p>
           ) : (
-            <p className="text-xl font-black text-slate-500">–</p>
+            <p className="text-xl font-black text-stone-500">–</p>
           )}
         </div>
       </div>
 
       {/* Methodology note */}
-      <p className="text-[12px] leading-relaxed mt-3 italic text-slate-500">
+      <p className="text-[12px] leading-relaxed mt-3 italic text-stone-500">
         Assessed values are the City of Calgary's annual tax appraisal — they typically lag the real estate market by approximately one year. Cross-referencing with crime trends can reveal whether safety changes precede or follow property value shifts.
       </p>
     </Section>
@@ -1135,9 +1135,9 @@ function PropertyValueSection({
   if (propertyData.length === 0) {
     return (
       <Section title="Property Value vs Safety" isLight={isLight}>
-        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.02] border-white/5')}>
-          <Info size={14} className={isLight ? 'text-slate-400 shrink-0 mt-0.5' : 'text-slate-600 shrink-0 mt-0.5'} />
-          <p className="text-sm text-slate-500">
+        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}>
+          <Info size={14} className={isLight ? 'text-stone-400 shrink-0 mt-0.5' : 'text-stone-600 shrink-0 mt-0.5'} />
+          <p className="text-sm text-stone-500">
             {/* Industrial estates, parks and survey parcels have no homes to
                 value, so the city publishes no residential assessment for them.
                 Saying "not available" made a correct, expected result read as a
@@ -1208,9 +1208,9 @@ function KeySignalsSection({
   }
 
   function cardColors(type: 'up' | 'down' | 'neutral', light: boolean) {
-    if (type === 'up')   return { border: '#ef4444', iconBg: light ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20',         icon: <TrendingUp size={24} className="text-red-400" />,     statColor: '#ef4444' };
-    if (type === 'down') return { border: '#34d399', iconBg: light ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20', icon: <TrendingDown size={24} className="text-emerald-400" />, statColor: '#34d399' };
-    return { border: '#3b82f6', iconBg: light ? 'bg-blue-50 border-blue-200' : 'bg-blue-500/10 border-blue-500/20',           icon: <ShieldCheck size={24} className="text-blue-400" />,  statColor: '#3b82f6' };
+    if (type === 'up')   return { border: '#C0392B', iconBg: light ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20',         icon: <TrendingUp size={24} className="text-red-400" />,     statColor: '#C0392B' };
+    if (type === 'down') return { border: '#3FA391', iconBg: light ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20', icon: <TrendingDown size={24} className="text-emerald-400" />, statColor: '#3FA391' };
+    return { border: '#3b82f6', iconBg: light ? 'bg-[#E8F3FC] border-[#C9D8E4]' : 'bg-[#4A90D9]/10 border-[#4A90D9]/20',           icon: <ShieldCheck size={24} className="text-[#4A90D9]" />,  statColor: '#3b82f6' };
   }
 
   function extractStat(text: string): string | null {
@@ -1239,12 +1239,12 @@ function KeySignalsSection({
     <Section title="Key Signals" isLight={isLight}>
       {/* Counter + progress bar above stack */}
       <div className="flex items-center mb-3">
-        <p className="text-[11px] uppercase tracking-widest font-black text-slate-500 shrink-0">
+        <p className="text-[11px] uppercase tracking-widest font-black text-stone-500 shrink-0">
           {currentIdx + 1} / {n}
         </p>
-        <div className={cn('h-[3px] rounded-full flex-1 mx-3 overflow-hidden', isLight ? 'bg-slate-200' : 'bg-white/10')}>
+        <div className={cn('h-[3px] rounded-full flex-1 mx-3 overflow-hidden', isLight ? 'bg-stone-200' : 'bg-white/10')}>
           <motion.div
-            className="h-full rounded-full bg-blue-500"
+            className="h-full rounded-full bg-[#4A90D9]"
             animate={{ width: `${((currentIdx + 1) / n) * 100}%` }}
             transition={{ duration: 0.3 }}
           />
@@ -1256,7 +1256,7 @@ function KeySignalsSection({
         {/* Ghost card 2 (furthest back) */}
         {visibleCards >= 3 && (
           <div
-            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10')}
+            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-stone-200' : 'bg-white/[0.03] border-white/10')}
             style={{
               height: 200,
               transform: 'scale(0.90) translateY(16px) rotate(1.5deg)',
@@ -1269,7 +1269,7 @@ function KeySignalsSection({
         {/* Ghost card 1 (middle) */}
         {visibleCards >= 2 && (
           <div
-            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-slate-200' : 'bg-white/[0.03] border-white/10')}
+            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-stone-200' : 'bg-white/[0.03] border-white/10')}
             style={{
               height: 200,
               transform: 'scale(0.95) translateY(8px) rotate(-2deg)',
@@ -1314,7 +1314,7 @@ function KeySignalsSection({
                 }}
                 className={cn(
                   'rounded-3xl border p-5 cursor-grab active:cursor-grabbing select-none',
-                  isLight ? 'bg-white border-slate-200' : 'bg-white/[0.04] border-white/10'
+                  isLight ? 'bg-white border-stone-200' : 'bg-white/[0.04] border-white/10'
                 )}
               >
                 <div className="flex items-start gap-4">
@@ -1330,12 +1330,12 @@ function KeySignalsSection({
                       </p>
                     )}
                     {/* Insight text */}
-                    <p className={cn('text-[14px] font-bold leading-[1.6]', isLight ? 'text-slate-800' : 'text-white')}>
+                    <p className={cn('text-[14px] font-bold leading-[1.6]', isLight ? 'text-stone-800' : 'text-white')}>
                       {insight}
                     </p>
                   </div>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-3 font-medium">← swipe to see next →</p>
+                <p className="text-[10px] text-stone-500 mt-3 font-medium">← swipe to see next →</p>
               </motion.div>
             );
           })()}
@@ -1350,20 +1350,20 @@ function KeySignalsSection({
           onClick={previous}
           className={cn(
             'w-10 h-10 rounded-full border flex items-center justify-center text-lg font-black transition-colors',
-            isLight ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+            isLight ? 'border-stone-200 bg-white hover:bg-stone-50 text-stone-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
           )}
           aria-label="Previous insight"
         >
           ←
         </motion.button>
-        <span className="text-[11px] font-black text-slate-500">{currentIdx + 1} / {n}</span>
+        <span className="text-[11px] font-black text-stone-500">{currentIdx + 1} / {n}</span>
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={dismiss}
           className={cn(
             'w-10 h-10 rounded-full border flex items-center justify-center text-lg font-black transition-colors',
-            isLight ? 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+            isLight ? 'border-stone-200 bg-white hover:bg-stone-50 text-stone-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
           )}
           aria-label="Next insight"
         >
@@ -1397,21 +1397,21 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
         {DATA_SOURCES.map(({ title, content }, idx) => (
           <div
             key={title}
-            className={cn('rounded-2xl border overflow-hidden', isLight ? 'border-slate-200' : 'border-white/10')}
+            className={cn('rounded-2xl border overflow-hidden', isLight ? 'border-stone-200' : 'border-white/10')}
           >
             <button
               onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
               className={cn(
                 'w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors',
-                isLight ? 'bg-white hover:bg-slate-50' : 'bg-white/[0.02] hover:bg-white/[0.04]'
+                isLight ? 'bg-white hover:bg-stone-50' : 'bg-white/[0.02] hover:bg-white/[0.04]'
               )}
             >
               <div className="flex items-center gap-2.5">
-                <Database size={13} className={isLight ? 'text-slate-400' : 'text-slate-500'} />
-                <span className={cn('text-sm font-bold', isLight ? 'text-slate-800' : 'text-white')}>{title}</span>
+                <Database size={13} className={isLight ? 'text-stone-400' : 'text-stone-500'} />
+                <span className={cn('text-sm font-bold', isLight ? 'text-stone-800' : 'text-white')}>{title}</span>
               </div>
               <motion.div animate={{ rotate: openIdx === idx ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <ChevronDown size={15} className={isLight ? 'text-slate-400' : 'text-slate-500'} />
+                <ChevronDown size={15} className={isLight ? 'text-stone-400' : 'text-stone-500'} />
               </motion.div>
             </button>
             <AnimatePresence initial={false}>
@@ -1423,7 +1423,7 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
                   transition={{ duration: 0.25, ease: 'easeInOut' }}
                   className="overflow-hidden"
                 >
-                  <p className={cn('px-4 pb-4 pt-1 text-[13px] leading-relaxed', isLight ? 'text-slate-600' : 'text-slate-400')}>
+                  <p className={cn('px-4 pb-4 pt-1 text-[13px] leading-relaxed', isLight ? 'text-stone-600' : 'text-stone-400')}>
                     {content}
                   </p>
                 </motion.div>
@@ -1432,7 +1432,7 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
           </div>
         ))}
       </div>
-      <p className={cn('text-[12px] mt-4 pt-4 border-t leading-relaxed', isLight ? 'text-slate-400 border-slate-200' : 'text-slate-600 border-white/5')}>
+      <p className={cn('text-[12px] mt-4 pt-4 border-t leading-relaxed', isLight ? 'text-stone-400 border-stone-200' : 'text-stone-600 border-white/5')}>
         All figures reflect reported incidents only — not all crime is reported to police. Safety scores are normalized against the Calgary city-wide average.
       </p>
     </Section>

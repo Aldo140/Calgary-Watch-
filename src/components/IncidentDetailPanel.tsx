@@ -21,11 +21,11 @@ const P = {
 };
 
 const CAT_META: Record<string, { color: string; soft: string; label: string }> = {
-  crime:          { color: '#DC2626', soft: 'rgba(220,38,38,0.1)',  label: 'Crime' },
-  traffic:        { color: '#EA580C', soft: 'rgba(234,88,12,0.1)',  label: 'Traffic' },
-  infrastructure: { color: '#2563EB', soft: 'rgba(37,99,235,0.1)',  label: 'Infrastructure' },
+  crime:          { color: '#C0392B', soft: 'rgba(220,38,38,0.1)',  label: 'Crime' },
+  traffic:        { color: '#C77F18', soft: 'rgba(234,88,12,0.1)',  label: 'Traffic' },
+  infrastructure: { color: '#4A90D9', soft: 'rgba(37,99,235,0.1)',  label: 'Infrastructure' },
   weather:        { color: '#0284C7', soft: 'rgba(2,132,199,0.1)',  label: 'Weather' },
-  emergency:      { color: '#E11D48', soft: 'rgba(225,29,72,0.12)', label: 'Emergency' },
+  emergency:      { color: '#C0392B', soft: 'rgba(225,29,72,0.12)', label: 'Emergency' },
 };
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -33,8 +33,8 @@ const CATEGORY_EMOJI: Record<string, string> = {
 };
 
 const STATUS_META: Record<string, { color: string; label: string }> = {
-  community_confirmed: { color: '#059669', label: 'Confirmed' },
-  multiple_reports:    { color: '#B45309', label: 'Multiple reports' },
+  community_confirmed: { color: '#2E8B7A', label: 'Confirmed' },
+  multiple_reports:    { color: '#8A5710', label: 'Multiple reports' },
   unverified:          { color: '#6B7280', label: 'Unverified' },
 };
 
@@ -358,7 +358,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                       src={`${nearbyCamera.camera.imageUrl}?t=${cameraStamp}`}
                       alt={`Live City of Calgary traffic camera at ${nearbyCamera.camera.location}`}
                       loading="lazy"
-                      className="w-full object-cover max-h-56 bg-slate-100"
+                      className="w-full object-cover max-h-56 bg-stone-100"
                     />
                     <div className="px-3 py-2.5 space-y-1" style={{ background: P.paper }}>
                       <p className="text-[12.5px] font-black leading-tight" style={{ color: P.ink }}>
@@ -484,7 +484,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     onClick={() => void handleCopyLink()}
                     className="flex-1 flex items-center justify-center gap-2 rounded-xl h-11 text-[12px] font-bold transition-all active:scale-95"
                     style={copied
-                      ? { background: 'rgba(5,150,105,0.12)', color: '#059669', border: '1px solid rgba(5,150,105,0.35)' }
+                      ? { background: 'rgba(5,150,105,0.12)', color: '#2E8B7A', border: '1px solid rgba(5,150,105,0.35)' }
                       : { background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                   >
                     <Link size={14} />
@@ -533,12 +533,12 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     deleteConfirm ? (
                       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(220,38,38,0.35)', background: 'rgba(220,38,38,0.07)' }}>
                         <div className="flex gap-2 items-center p-3">
-                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#B91C1C' }}>Delete your report permanently?</p>
+                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#A6332A' }}>Delete your report permanently?</p>
                           <button
                             onClick={() => void handleDelete()}
                             disabled={deleting}
                             className="px-3 py-1.5 rounded-lg text-[11px] font-black transition-all disabled:opacity-50"
-                            style={{ background: '#DC2626', color: '#fff' }}
+                            style={{ background: '#C0392B', color: '#fff' }}
                           >
                             {deleting ? 'Deleting…' : 'Delete'}
                           </button>
@@ -550,13 +550,13 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                             Cancel
                           </button>
                         </div>
-                        {deleteError && <p className="px-3 pb-3 text-[11px] font-bold" style={{ color: '#DC2626' }}>Failed to delete. Try again.</p>}
+                        {deleteError && <p className="px-3 pb-3 text-[11px] font-bold" style={{ color: '#C0392B' }}>Failed to delete. Try again.</p>}
                       </div>
                     ) : (
                       <button
                         onClick={() => setDeleteConfirm(true)}
                         className="w-full inline-flex items-center justify-center gap-2 rounded-xl h-10 text-[11.5px] font-bold transition-colors hover:bg-red-50"
-                        style={{ color: '#B91C1C', border: `1px solid ${P.line}` }}
+                        style={{ color: '#A6332A', border: `1px solid ${P.line}` }}
                       >
                         <Trash2 size={13} />
                         Delete my report
@@ -567,7 +567,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     flagConfirm ? (
                       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(180,83,9,0.35)', background: 'rgba(180,83,9,0.07)' }}>
                         <div className="flex gap-2 items-center p-3">
-                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#92400E' }}>
+                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#8A5710' }}>
                             {existingFlaggers.length + 1 >= FLAG_THRESHOLD
                               ? 'Report as inappropriate? This hides it from the map now.'
                               : `Report as inappropriate? It stays visible until ${FLAG_THRESHOLD} neighbours flag it.`}
@@ -576,7 +576,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                             onClick={() => void handleFlag()}
                             disabled={flagging}
                             className="px-3 py-1.5 rounded-lg text-[11px] font-black transition-all disabled:opacity-50"
-                            style={{ background: '#B45309', color: '#fff' }}
+                            style={{ background: '#8A5710', color: '#fff' }}
                           >
                             {flagging ? 'Reporting…' : 'Confirm'}
                           </button>
@@ -588,13 +588,13 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                             Cancel
                           </button>
                         </div>
-                        {flagError && <p className="px-3 pb-3 text-[11px] font-bold" style={{ color: '#DC2626' }}>Could not submit report. Please try again.</p>}
+                        {flagError && <p className="px-3 pb-3 text-[11px] font-bold" style={{ color: '#C0392B' }}>Could not submit report. Please try again.</p>}
                       </div>
                     ) : (
                       <button
                         onClick={() => setFlagConfirm(true)}
                         className="w-full inline-flex items-center justify-center gap-2 rounded-xl h-10 text-[11.5px] font-bold transition-colors hover:bg-amber-50"
-                        style={{ color: '#92400E', border: `1px solid ${P.line}` }}
+                        style={{ color: '#8A5710', border: `1px solid ${P.line}` }}
                       >
                         <Flag size={13} />
                         Report inappropriate
@@ -609,8 +609,8 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                 <p className="font-mono text-[8.5px] uppercase tracking-[0.18em] truncate" style={{ color: P.soft }}>
                   ID · {incident.id}
                 </p>
-                <span className="inline-flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.18em] shrink-0" style={{ color: '#059669' }}>
-                  <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: '#059669' }} />
+                <span className="inline-flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.18em] shrink-0" style={{ color: '#2E8B7A' }}>
+                  <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: '#2E8B7A' }} />
                   Live
                 </span>
               </div>
@@ -637,7 +637,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
               <button
                 onClick={() => onReportIncident(incident)}
                 className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[12.5px] font-black transition-transform active:scale-[0.97]"
-                style={{ background: 'rgba(220,38,38,0.09)', color: '#B91C1C', border: '1px solid rgba(220,38,38,0.3)' }}
+                style={{ background: 'rgba(220,38,38,0.09)', color: '#A6332A', border: '1px solid rgba(220,38,38,0.3)' }}
               >
                 <Siren size={15} />
                 Report related

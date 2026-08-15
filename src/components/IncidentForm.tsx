@@ -20,11 +20,11 @@ const P = {
 };
 
 const CATEGORY_CHIPS = [
-  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#DC2626' },
-  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#EA580C' },
-  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#2563EB' },
+  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#C0392B' },
+  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#C77F18' },
+  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#4A90D9' },
   { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
-  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#E11D48' },
+  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#C0392B' },
 ];
 
 // Approximate neighbourhood centres for Calgary.
@@ -382,9 +382,9 @@ export default function IncidentForm({
             ) : (
               <div className="p-4 rounded-2xl" style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.3)' }}>
                 <div className="flex items-start gap-3">
-                  <AlertTriangle size={15} className="mt-0.5 shrink-0" style={{ color: '#B45309' }} />
+                  <AlertTriangle size={15} className="mt-0.5 shrink-0" style={{ color: '#8A5710' }} />
                   <div className="flex-1 space-y-1.5">
-                    <p className="text-[13px] font-black" style={{ color: '#92400E' }}>Location access is off</p>
+                    <p className="text-[13px] font-black" style={{ color: '#8A5710' }}>Location access is off</p>
                     <p className="text-xs leading-relaxed" style={{ color: P.soft }}>
                       Your browser hasn't shared your location — no problem, just drop a pin below.
                     </p>
@@ -393,7 +393,7 @@ export default function IncidentForm({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-[11px] font-bold underline underline-offset-2"
-                      style={{ color: '#92400E' }}
+                      style={{ color: '#8A5710' }}
                     >
                       How to enable location
                       <ExternalLink size={10} />
@@ -466,8 +466,8 @@ export default function IncidentForm({
 
             {/* 911 notice — compact strip */}
             <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.25)' }}>
-              <AlertTriangle size={13} className="shrink-0" style={{ color: '#DC2626' }} />
-              <p className="text-[11px] leading-snug font-medium" style={{ color: '#7F1D1D' }}>
+              <AlertTriangle size={13} className="shrink-0" style={{ color: '#C0392B' }} />
+              <p className="text-[11px] leading-snug font-medium" style={{ color: '#8A2A22' }}>
                 Not sent to police. Emergencies: call <b>911</b> — this alerts neighbours in parallel.
               </p>
             </div>
@@ -535,7 +535,7 @@ export default function IncidentForm({
                 </div>
               )}
               {errors.neighborhood && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{errors.neighborhood.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{errors.neighborhood.message}</p>
               )}
             </div>
 
@@ -549,7 +549,7 @@ export default function IncidentForm({
                 style={inputStyle}
               />
               {errors.title && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{errors.title.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{errors.title.message}</p>
               )}
             </div>
 
@@ -564,7 +564,7 @@ export default function IncidentForm({
                 style={inputStyle}
               />
               {errors.description && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{errors.description.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{errors.description.message}</p>
               )}
             </div>
 
@@ -618,7 +618,7 @@ export default function IncidentForm({
                   />
                 </label>
               )}
-              {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: '#DC2626' }}>{imageError}</p>}
+              {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{imageError}</p>}
             </div>
 
             {/* Anonymous toggle */}
@@ -649,7 +649,7 @@ export default function IncidentForm({
             </label>
 
             {errors.root && (
-              <p className="text-xs font-bold px-1" role="alert" style={{ color: '#DC2626' }}>
+              <p className="text-xs font-bold px-1" role="alert" style={{ color: '#C0392B' }}>
                 {errors.root.message}
               </p>
             )}

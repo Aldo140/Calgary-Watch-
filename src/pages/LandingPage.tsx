@@ -1653,96 +1653,130 @@ function HowItWorks({ reduced }: { reduced: boolean }) {
 // ---------------------------------------------------------------------------
 // CATEGORIES — five wipe-reveal ledger rows
 // ---------------------------------------------------------------------------
+/**
+ * WHAT WE TRACK — the dispatch board.
+ *
+ * This was a hairline ledger table: five rows, rules between them, and the
+ * whole right half of the heading area empty. It was also the one section that
+ * looked like any other product page rather than like Calgary Watch.
+ *
+ * It now reads as the board an admin or a neighbour actually watches. Each
+ * category is rendered the way an incident is rendered on the live map — a
+ * coloured edge, an icon tile, and a status line carrying a real location —
+ * so the page previews the product instead of describing it. The heading holds
+ * the left column and stays put while the board scrolls past it, which is what
+ * fills the dead space and gives the section a spine.
+ */
 function Categories({ reduced }: { reduced: boolean }) {
   const [active, setActive] = useState<string | null>(null);
 
   return (
-    <section id="features" className="relative py-16 sm:py-20 lg:py-32" style={{ background: T.panel, borderTop: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}` }}>
-      <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
-        <Reveal>
-          <Eyebrow color={T.red}>The ledger · what we track</Eyebrow>
-          <h2 className="mt-5 font-display font-extrabold tracking-[-0.025em] leading-[1.02]" style={{ color: T.ink, fontSize: 'clamp(2.2rem, 5vw, 4.2rem)' }}>
-            Five things worth<br />knowing about.
-          </h2>
-        </Reveal>
+    <section
+      id="features"
+      className="relative py-16 sm:py-20 lg:py-28"
+      style={{ background: T.panel, borderTop: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}` }}
+    >
+      <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid gap-10 lg:gap-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start">
 
-        {/* sm+: ledger rows with hover flood + wipe reveal */}
-        <div className="mt-14 hidden sm:block">
+        {/* Left: the spine. Sticky on desktop so the board scrolls against it. */}
+        <div className="lg:sticky lg:top-28">
+          <Reveal>
+            <Eyebrow color={T.red}>What we track</Eyebrow>
+            <h2
+              className="mt-5 font-display font-extrabold tracking-[-0.025em] leading-[1.02]"
+              style={{ color: T.ink, fontSize: 'clamp(2.1rem, 4.4vw, 3.6rem)' }}
+            >
+              Five kinds of<br />report. One map.
+            </h2>
+            <p className="mt-5 max-w-sm text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
+              Every report a neighbour files lands in one of these five. This is
+              exactly how they appear on the map — colour, category, and where it
+              happened.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div className="mt-7 flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                {!reduced && (
+                  <span className="absolute inline-flex h-full w-full rounded-full opacity-70 motion-safe:animate-ping" style={{ background: T.bow }} />
+                )}
+                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: T.bow }} />
+              </span>
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.2em]" style={{ color: T.inkSoft }}>
+                All five live across every quadrant
+              </span>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Right: the board. Same anatomy as an incident on the live map. */}
+        <ul className="flex flex-col gap-3">
           {CATEGORIES.map((cat, i) => {
             const Icon = cat.icon;
             const isActive = active === cat.key;
+            const [sampleTitle, sampleArea] = cat.sample.split(' · ');
             return (
-              <motion.div
+              <motion.li
                 key={cat.key}
-                initial={reduced ? false : { clipPath: 'inset(0 100% 0 0)' }}
-                whileInView={{ clipPath: 'inset(0 0% 0 0)' }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.8, delay: i * 0.09, ease: EASE }}
+                initial={reduced ? false : { opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, delay: i * 0.06, ease: EASE }}
                 onMouseEnter={() => setActive(cat.key)}
                 onMouseLeave={() => setActive(null)}
-                className="group relative"
-                style={{ borderTop: `1px solid ${T.line}`, borderBottom: i === CATEGORIES.length - 1 ? `1px solid ${T.line}` : undefined }}
+                onFocus={() => setActive(cat.key)}
+                onBlur={() => setActive(null)}
+                tabIndex={0}
+                className="group relative overflow-hidden rounded-2xl outline-none transition-[transform,box-shadow] duration-300 focus-visible:ring-2 focus-visible:ring-offset-2 sm:hover:-translate-y-0.5"
+                style={{
+                  background: T.paper,
+                  border: `1px solid ${isActive ? `${cat.color}66` : T.line}`,
+                  boxShadow: isActive ? `0 10px 24px -14px ${cat.color}99` : 'none',
+                  // @ts-expect-error -- CSS custom property for the focus ring
+                  '--tw-ring-color': cat.color,
+                }}
               >
-                {/* hover flood */}
-                <div
-                  className="absolute inset-0 origin-left transition-transform duration-500 ease-out"
-                  style={{ background: `${cat.color}12`, transform: isActive ? 'scaleX(1)' : 'scaleX(0)' }}
-                  aria-hidden="true"
-                />
-                <div className="relative grid grid-cols-[3.5rem_11rem_1fr_auto] items-center gap-x-5 gap-y-2 py-7 px-4">
+                {/* Category edge — the same signal the map uses. */}
+                <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: cat.color }} aria-hidden="true" />
+
+                <div className="relative flex items-start gap-4 py-5 pl-6 pr-5 sm:pl-7">
                   <span
-                    className="flex w-11 h-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+                    className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105"
                     style={{ background: `${cat.color}1c` }}
                   >
                     <Icon size={19} style={{ color: cat.color }} />
                   </span>
-                  <h3 className="font-display text-2xl font-bold" style={{ color: T.ink }}>{cat.label}</h3>
-                  <p className="text-sm leading-relaxed max-w-xl" style={{ color: T.inkSoft }}>{cat.desc}</p>
-                  <span className="font-mono text-[10.5px] text-right whitespace-nowrap" style={{ color: cat.color }}>
-                    {cat.sample}
-                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-xl font-bold sm:text-[1.35rem]" style={{ color: T.ink }}>
+                      {cat.label}
+                    </h3>
+                    <p className="mt-1.5 text-[13.5px] leading-relaxed sm:text-sm" style={{ color: T.inkSoft }}>
+                      {cat.desc}
+                    </p>
+
+                    {/* Status line, styled like a live incident row. */}
+                    <div
+                      className="mt-3.5 flex flex-wrap items-center gap-x-2 gap-y-1 pt-3"
+                      style={{ borderTop: `1px dashed ${T.line}` }}
+                    >
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: cat.color }} aria-hidden="true" />
+                      <span className="font-mono text-[10.5px] font-semibold" style={{ color: cat.color }}>
+                        {sampleTitle}
+                      </span>
+                      {sampleArea && (
+                        <span className="font-mono text-[10.5px]" style={{ color: T.inkSoft }}>
+                          · {sampleArea}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </motion.div>
+              </motion.li>
             );
           })}
-        </div>
-
-        {/* Mobile: colour-coded category cards — no hover needed */}
-        <div className="mt-10 sm:hidden space-y-3.5">
-          {CATEGORIES.map((cat, i) => {
-            const Icon = cat.icon;
-            return (
-              <motion.article
-                key={cat.key}
-                initial={reduced ? false : { opacity: 0, y: 22 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.55, delay: 0.04, ease: EASE }}
-                className="relative overflow-hidden rounded-2xl p-5 pl-6"
-                style={{ background: T.paper, border: `1px solid ${T.line}` }}
-              >
-                <span className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: cat.color }} aria-hidden="true" />
-                <div className="flex items-center gap-3">
-                  <span className="flex w-10 h-10 shrink-0 items-center justify-center rounded-xl" style={{ background: `${cat.color}1c` }}>
-                    <Icon size={17} style={{ color: cat.color }} />
-                  </span>
-                  <h3 className="font-display text-xl font-bold" style={{ color: T.ink }}>{cat.label}</h3>
-                </div>
-                <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: T.inkSoft }}>{cat.desc}</p>
-                <p className="mt-3.5 pt-3 font-mono text-[10px]" style={{ color: cat.color, borderTop: `1px dashed ${T.line}` }}>
-                  → last report: {cat.sample}
-                </p>
-              </motion.article>
-            );
-          })}
-        </div>
-
-        <Reveal delay={0.15} className="mt-10 flex items-center gap-3">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: T.inkSoft }}>
-            Every category, every quadrant, one map
-          </p>
-          <span className="h-px flex-1" style={{ background: T.line }} aria-hidden="true" />
-        </Reveal>
+        </ul>
       </div>
     </section>
   );

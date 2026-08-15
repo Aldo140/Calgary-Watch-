@@ -67,6 +67,44 @@ export const WALK_MIN = 15;
 /** The wider sweep the map's locate button flips through. */
 export const NEARBY_KM = 3;
 
+/**
+ * How far out to look, in order, until there is something to say.
+ *
+ * A fifteen-minute walk is the ring people care about, but plenty of Calgary
+ * addresses are genuinely quiet at that range — a real one tested here had
+ * nothing inside 1.2 km and four things between 2.2 and 2.8. Leading with "0"
+ * there is accurate and useless: it reports the radius we chose rather than
+ * the neighbourhood they live in.
+ *
+ * So the page widens until it finds something and says which ring it used. The
+ * number at the top always describes what is actually shown below it.
+ */
+export const RINGS: ReadonlyArray<{ metres: number; label: string }> = [
+  { metres: WALK_M, label: `within a ${WALK_MIN}-minute walk` },
+  { metres: 3_000, label: 'within 3 km' },
+  { metres: 10_000, label: 'within 10 km' },
+];
+
+/**
+ * The first ring holding anything, with what is in it.
+ *
+ * Falls back to the widest ring when everything is empty, so the caller always
+ * has a radius to draw and a phrase to print.
+ */
+export function selectRing<T extends { distanceM: number }>(
+  items: T[],
+  rings: ReadonlyArray<{ metres: number; label: string }> = RINGS,
+): { metres: number; label: string; items: T[]; widened: boolean } {
+  for (let i = 0; i < rings.length; i += 1) {
+    const inRing = items.filter((x) => x.distanceM <= rings[i].metres);
+    if (inRing.length > 0 || i === rings.length - 1) {
+      return { ...rings[i], items: inRing, widened: i > 0 };
+    }
+  }
+  const last = rings[rings.length - 1];
+  return { ...last, items: [], widened: true };
+}
+
 const BAND = [
   { max: 0.10, label: 'Busy', color: '#B0503A' },
   { max: 0.25, label: 'Above average', color: '#C0762A' },
@@ -312,19 +350,9 @@ export default function PersonalBriefing({
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [incidents, home]);
 
-  const nearby = useMemo(() => byDistance.filter((x) => x.distanceM <= WALK_M), [byDistance]);
-
-  /**
-   * When the walk really is quiet, the closest few anyway.
-   *
-   * An empty section is a dead end. Showing the nearest handful with their
-   * true distances keeps the page useful and stays honest, because each one
-   * still says how far away it actually is.
-   */
-  const justBeyond = useMemo(
-    () => (nearby.length === 0 ? byDistance.slice(0, 4) : []),
-    [nearby.length, byDistance],
-  );
+  /** The tightest ring that actually has something in it. */
+  const ring = useMemo(() => selectRing(byDistance), [byDistance]);
+  const nearby = ring.items;
 
   const radarPoints = useMemo<RadarPoint[]>(() => {
     if (!home) return [];
@@ -350,14 +378,35 @@ export default function PersonalBriefing({
   const latestValue = propertyData.length > 0 ? propertyData[propertyData.length - 1] : null;
   const band = areaStats ? bandFor(areaStats.rank, areaStats.count) : null;
 
-  /** The one number this page is about. */
-  const headline: { figure: number; label: string } | null = home
+  /**
+   * The one number this page is about.
+   *
+   * While a saved address is still resolving there is no honest headline yet,
+   * so it shows nothing rather than flashing the community rank and then
+   * replacing it with a count of reports. The two mean entirely different
+   * things and swapping one for the other mid-read is worse than a beat of
+   * blank space.
+   */
+  const addressPending = Boolean(address) && !home && isResolving;
+  /**
+   * A giant "0" reads as a broken widget rather than as good news, so the
+   * all-clear is a sentence instead of a figure.
+   */
+  const allClear = Boolean(home) && nearby.length === 0;
+  const headline: { figure: number; label: string; sub: string } | null = addressPending || allClear
+    ? null
+    : home
     ? {
         figure: nearby.length,
         label: nearby.length === 1 ? 'thing reported near you' : 'things reported near you',
+        sub: ring.label,
       }
     : areaStats
-      ? { figure: areaStats.rank, label: `of ${areaStats.count} Calgary communities by reported volume` }
+      ? {
+          figure: areaStats.rank,
+          label: `of ${areaStats.count} Calgary communities`,
+          sub: 'by how much gets reported',
+        }
       : null;
   const headlineCount = useCountUp(headline?.figure ?? 0, 1000, !still && headline !== null);
 
@@ -445,6 +494,18 @@ export default function PersonalBriefing({
             </p>
           </motion.div>
 
+          {allClear && (
+            <motion.p
+              className="mt-5 text-[15px] font-semibold leading-snug"
+              style={{ color: '#C3D6CE' }}
+              initial={still ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.16, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span style={{ color: '#E8B871' }}>All quiet.</span> Nothing has been reported near you —
+              by anyone.
+            </motion.p>
+          )}
+
           {headline && (
             <motion.div
               className="mt-5 flex items-baseline gap-3"
@@ -459,7 +520,7 @@ export default function PersonalBriefing({
               </span>
               <span className="min-w-0 pb-1.5 text-[13px] font-semibold leading-tight" style={{ color: '#C3D6CE' }}>
                 {headline.label}
-                {home && <span className="block font-normal">within a {WALK_MIN}-minute walk</span>}
+                <span className="block font-normal">{headline.sub}</span>
               </span>
             </motion.div>
           )}
@@ -470,44 +531,46 @@ export default function PersonalBriefing({
           {home && (
             <Section
               order={0} still={still}
-              eyebrow={`A ${WALK_MIN}-minute walk`}
-              title={nearby.length === 0 ? 'A quiet stretch around you' : `What's happening near you`}
+              eyebrow={ring.label}
+              title={
+                nearby.length === 0
+                  ? 'A quiet stretch around you'
+                  : ring.widened
+                    ? "What's happening in your wider neighbourhood"
+                    : "What's happening near you"
+              }
             >
+              {ring.widened && nearby.length > 0 && (
+                <p className="mb-3 text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
+                  Nothing at all inside a {WALK_MIN}-minute walk of your door — no neighbour reports, no
+                  police records, no road or utility work. So this is the ring around that:{' '}
+                  <strong style={{ color: T.ink }}>{ring.label}</strong>.
+                </p>
+              )}
+
               {nearby.length === 0 ? (
-                <>
-                  <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
-                    Nothing at all — no neighbour reports, no police records, no road or utility work —
-                    within a {WALK_MIN}-minute walk of your address. That is the best thing this page can
-                    tell you.
-                    {justBeyond.length > 0 && ' Here is the closest anyway:'}
-                  </p>
-                  {justBeyond.length > 0 && (
-                    <ul className="mt-3 space-y-2">
-                      {justBeyond.map(({ incident, distanceM }, i) => (
-                        <ReportRow
-                          key={incident.id} incident={incident} index={i} still={still}
-                          badge={formatDistance(distanceM)}
-                          sub={`${sourceLabel(incident)} · ${formatDistanceToNow(incident.timestamp)} ago`}
-                          onOpen={() => { onSelectIncident(incident); onClose(); }}
-                        />
-                      ))}
-                    </ul>
-                  )}
-                </>
+                <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
+                  Nothing has been reported anywhere near you — not by a neighbour, not by police, not by
+                  311 or the road and utility feeds. That is the best thing this page can tell you.
+                </p>
               ) : (
                 <>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                     <div className="mx-auto w-full max-w-[16rem] shrink-0 sm:mx-0 sm:w-[15rem] sm:max-w-none">
                       <BriefingRadar
-                        points={radarPoints} radiusM={WALK_M} radiusLabel={`${(WALK_M / 1000).toFixed(1)} km`} still={still}
+                        points={radarPoints}
+                        radiusM={ring.metres}
+                        radiusLabel={ring.metres >= 1000 ? `${(ring.metres / 1000).toFixed(1)} km` : `${ring.metres} m`}
+                        still={still}
                         onSelect={(incident) => { onSelectIncident(incident); onClose(); }}
                       />
                     </div>
                     <p className="text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
                       Your home is the middle. Every dot is something real — a neighbour&rsquo;s report, a
                       police record, road work, an outage — placed at the direction and distance it
-                      actually happened. North is up, and a dot on the outer ring is a full{' '}
-                      {WALK_MIN}-minute walk away. Tap one to read it.
+                      actually happened. North is up, and a dot on the outer ring is the full{' '}
+                      {ring.metres >= 1000 ? `${(ring.metres / 1000).toFixed(1)} km` : `${ring.metres} m`}{' '}
+                      away. Tap one to read it.
                     </p>
                   </div>
 
@@ -523,7 +586,7 @@ export default function PersonalBriefing({
                   </ul>
                   {nearby.length > 5 && (
                     <p className="mt-2.5 text-[12.5px] font-semibold" style={{ color: T.soft }}>
-                      and {nearby.length - 5} more inside the same walk
+                      and {nearby.length - 5} more {ring.label}
                     </p>
                   )}
                 </>

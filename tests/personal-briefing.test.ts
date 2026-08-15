@@ -20,6 +20,7 @@ import {
   briefingRef,
   greetingFor,
   sourceLabel,
+  selectRing,
   WALK_M,
   WALK_MIN,
 } from '../src/components/PersonalBriefing.tsx';
@@ -175,5 +176,55 @@ describe('sourceLabel', () => {
     for (const s of ['official', 'system'] as const) {
       assert.notEqual(sourceLabel({ data_source: s, source_name: 'Calgary Police' }), 'A neighbour');
     }
+  });
+});
+
+describe('selectRing', () => {
+  const at = (m: number) => ({ distanceM: m });
+  const rings = [
+    { metres: 1200, label: 'within a 15-minute walk' },
+    { metres: 3000, label: 'within 3 km' },
+    { metres: 10_000, label: 'within 10 km' },
+  ];
+
+  it('uses the walk when the walk has something in it', () => {
+    const r = selectRing([at(200), at(900), at(2500)], rings);
+    assert.equal(r.metres, 1200);
+    assert.equal(r.widened, false);
+    assert.equal(r.items.length, 2);
+  });
+
+  it('widens rather than reporting a zero', () => {
+    // A real address: nothing inside 1.2 km, four things between 2.2 and 2.8.
+    // Leading with "0" there reports the radius we picked, not the place.
+    const r = selectRing([at(2200), at(2300), at(2800), at(2800)], rings);
+    assert.equal(r.metres, 3000);
+    assert.equal(r.widened, true);
+    assert.equal(r.items.length, 4);
+    assert.equal(r.label, 'within 3 km');
+  });
+
+  it('keeps widening past the second ring', () => {
+    const r = selectRing([at(7000)], rings);
+    assert.equal(r.metres, 10_000);
+    assert.equal(r.items.length, 1);
+  });
+
+  it('never returns something outside the ring it reports', () => {
+    const r = selectRing([at(2200), at(50_000)], rings);
+    assert.ok(r.items.every((x) => x.distanceM <= r.metres));
+  });
+
+  it('falls back to the widest ring when there is genuinely nothing', () => {
+    const r = selectRing([at(90_000)], rings);
+    assert.equal(r.metres, 10_000);
+    assert.equal(r.items.length, 0);
+    assert.equal(r.widened, true);
+  });
+
+  it('handles an empty feed without throwing', () => {
+    const r = selectRing([], rings);
+    assert.equal(r.items.length, 0);
+    assert.ok(r.label.length > 0);
   });
 });

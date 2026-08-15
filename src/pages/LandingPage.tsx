@@ -846,6 +846,9 @@ function DayPlate({ plate, i, count, progress }: {
   const x = useTransform(progress, scrollRange(start, out), i % 2 ? ['7vw', '-2.5vw'] : ['-7vw', '2.5vw'], { ease: easeInOut });
   const y = useTransform(progress, scrollRange(start, out), ['5vh', '-4vh'], { ease: easeOut });
   const rotateY = useTransform(progress, scrollRange(start, peak), [i % 2 ? -9 : 9, 0], { ease: easeOut });
+  const plateClip = i % 2
+    ? 'polygon(1.5% 0, 98% 1.5%, 100% 96%, 3% 100%, 0 5%)'
+    : 'polygon(2% 2%, 100% 0, 98% 98%, 1% 100%, 0 4%)';
 
   return (
     <motion.div
@@ -854,31 +857,36 @@ function DayPlate({ plate, i, count, progress }: {
       aria-hidden="true"
     >
       <motion.div
-        className="relative w-[min(88vw,760px)] overflow-hidden rounded-[1.1rem] sm:rounded-[1.4rem]"
+        className="relative w-[min(78vw,800px)]"
         style={{
           scale, x, y, rotateY,
           transformPerspective: 1200,
           willChange: 'transform, opacity',
-          border: '1px solid rgba(237,242,240,0.18)',
-          background: T.nightPanel,
-          boxShadow: '0 60px 120px -40px rgba(0,0,0,0.8)',
         }}
       >
-        <img
-          src={publicAsset(plate.src)}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          width={1520} height={950}
-          className="w-full aspect-[16/10] object-cover"
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(12,29,46,0.45), transparent 40%)' }} />
-        <span
-          className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 font-mono text-[10px] sm:text-[11px] font-bold tracking-[0.2em] px-2.5 py-1.5 rounded-md tabular-nums"
-          style={{ background: 'rgba(12,29,46,0.72)', color: T.nightText, backdropFilter: 'blur(6px)' }}
-        >
-          {plate.time}
-        </span>
+        <div className="absolute inset-0 translate-x-3 translate-y-3 bg-[#E52C20]" style={{ clipPath: plateClip }} aria-hidden="true" />
+        <div className="relative bg-[#F2EFE8] p-2 sm:p-3" style={{ clipPath: plateClip, boxShadow: '0 55px 110px -35px rgba(0,0,0,0.86)' }}>
+          <div className="relative overflow-hidden" style={{ clipPath: plateClip }}>
+            <img
+              src={publicAsset(plate.src)}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              width={1520} height={950}
+              className="w-full aspect-[16/10] object-cover saturate-[0.82] contrast-[1.12]"
+            />
+            <div className="absolute inset-0 bg-[#0B3157]/15 mix-blend-color" aria-hidden="true" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(6,22,47,0.5), transparent 48%)' }} />
+          </div>
+          <span
+            className="absolute left-5 top-5 -rotate-2 bg-[#06162F] px-3 py-2 font-display text-xl font-black tabular-nums text-[#F2EFE8] shadow-[4px_4px_0_#E52C20] sm:left-7 sm:top-7 sm:text-2xl"
+          >
+            {plate.time}
+          </span>
+          <span className="absolute bottom-5 right-6 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-white/75 sm:text-[10px]">
+            YYC / Frame 0{i + 1}
+          </span>
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -897,12 +905,14 @@ function DayStories({ reduced }: { reduced: boolean }) {
     const el = trackRef.current;
     const card = el?.firstElementChild as HTMLElement | null;
     if (!el || !card) return;
-    const step = card.offsetWidth + 16;
+    const styles = window.getComputedStyle(el);
+    const step = card.offsetWidth + (Number.parseFloat(styles.columnGap || styles.gap) || 0);
     setIdx(Math.max(0, Math.min(DAY_PLATES.length - 1, Math.round(el.scrollLeft / step))));
   };
 
   return (
-    <section className="relative lg:hidden py-16 sm:py-20 overflow-hidden" style={{ background: T.night }} aria-label="One day on the watch — photo stories">
+    <section className="relative lg:hidden overflow-hidden py-16 sm:py-20" style={{ background: T.night }} aria-label="One day on the watch — photo stories">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(rgba(242,239,232,0.75) 0.7px, transparent 0.7px)', backgroundSize: '7px 7px' }} aria-hidden="true" />
       <motion.img
         src={publicAsset('images/plane-signal.webp')}
         alt=""
@@ -912,18 +922,26 @@ function DayStories({ reduced }: { reduced: boolean }) {
         aria-hidden="true"
       />
       <div className="relative px-5 sm:px-8">
-        <Eyebrow color={T.gold} light>Field footage · 24 hours</Eyebrow>
-        <h2 className="mt-4 font-display font-extrabold tracking-[-0.025em] leading-[1.02]" style={{ color: T.nightText, fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
-          One day on the watch.
-        </h2>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <Eyebrow color="#E52C20" light>Field footage · Calgary</Eyebrow>
+            <h2 className="mt-4 font-display text-[clamp(2.8rem,14vw,4.8rem)] font-black uppercase leading-[0.79] tracking-[-0.045em] text-[#F2EFE8]">
+              One day<br /><span className="text-[#E52C20]">on watch.</span>
+            </h2>
+          </div>
+          <div className="mt-1 -rotate-3 border border-[#F2EFE8]/35 px-3 py-2 text-right font-mono uppercase text-[#AFC5DF]" aria-hidden="true">
+            <span className="block text-[8px] tracking-[0.2em]">Archive</span>
+            <span className="mt-1 block font-display text-xl font-black tracking-tight text-[#F2EFE8]">24H</span>
+          </div>
+        </div>
 
         {/* story-style segmented progress */}
-        <div className="mt-6 flex gap-1.5" aria-hidden="true">
+        <div className="mt-7 flex gap-1" aria-hidden="true">
           {DAY_PLATES.map((p, i) => (
-            <span key={p.src} className="h-[3px] flex-1 rounded-full overflow-hidden" style={{ background: 'rgba(237,242,240,0.16)' }}>
+            <span key={p.src} className="h-1 flex-1 overflow-hidden" style={{ background: 'rgba(237,242,240,0.16)' }}>
               <span
-                className="block h-full rounded-full transition-all duration-400"
-                style={{ width: i <= idx ? '100%' : '0%', background: i === idx ? p.color : 'rgba(237,242,240,0.5)' }}
+                className="block h-full transition-all duration-400"
+                style={{ width: i <= idx ? '100%' : '0%', background: i === idx ? '#E52C20' : '#F2EFE8' }}
               />
             </span>
           ))}
@@ -934,7 +952,7 @@ function DayStories({ reduced }: { reduced: boolean }) {
       <div
         ref={trackRef}
         onScroll={onScroll}
-        className="mt-5 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar px-5 sm:px-8 pb-2"
+        className="mt-6 flex gap-5 overflow-x-auto snap-x snap-mandatory no-scrollbar px-5 sm:px-8 pb-5"
       >
         {DAY_PLATES.map((p, i) => (
           <motion.figure
@@ -943,36 +961,42 @@ function DayStories({ reduced }: { reduced: boolean }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.55, delay: Math.min(i, 2) * 0.08, ease: EASE }}
-            className="w-[82vw] max-w-[26rem] shrink-0 snap-center overflow-hidden rounded-2xl"
-            style={{ background: T.nightPanel, border: '1px solid rgba(237,242,240,0.16)' }}
+            className="relative w-[84vw] max-w-[27rem] shrink-0 snap-center pt-1"
+            style={{ rotate: `${i % 2 ? 0.8 : -0.8}deg` }}
           >
-            <div className="relative">
+            <div className="absolute inset-0 translate-x-2 translate-y-2 bg-[#E52C20]" style={{ clipPath: 'polygon(1% 0, 99% 1%, 100% 97%, 2% 100%, 0 4%)' }} aria-hidden="true" />
+            <div className="relative bg-[#F2EFE8] p-2" style={{ clipPath: 'polygon(1% 0, 99% 1%, 100% 97%, 2% 100%, 0 4%)' }}>
+            <div className="relative overflow-hidden">
               <img
                 src={publicAsset(p.src)}
-                alt={p.caption}
+                alt=""
                 loading="lazy"
                 decoding="async"
                 width={1520} height={1045}
-                className="w-full aspect-[16/11] object-cover"
+                className="w-full aspect-[4/5] object-cover saturate-[0.8] contrast-[1.12]"
               />
+              <div className="absolute inset-0 bg-[#0B3157]/15 mix-blend-color" aria-hidden="true" />
               <span
-                className="absolute top-2.5 left-2.5 font-mono text-[10px] font-bold tracking-[0.2em] px-2.5 py-1.5 rounded-md tabular-nums"
-                style={{ background: 'rgba(12,29,46,0.72)', color: T.nightText, backdropFilter: 'blur(6px)' }}
+                className="absolute left-3 top-3 -rotate-2 bg-[#06162F] px-3 py-2 font-display text-lg font-black tabular-nums text-[#F2EFE8] shadow-[3px_3px_0_#E52C20]"
               >
                 {p.time}
               </span>
+              <span className="absolute bottom-3 right-3 font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/75">Frame 0{i + 1}</span>
             </div>
-            <figcaption className="p-4">
-              <p className="font-mono text-[9.5px] tracking-[0.18em] uppercase" style={{ color: p.color }}>{p.note}</p>
-              <p className="mt-1 text-[15px] font-bold leading-snug" style={{ color: T.nightText }}>{p.caption}</p>
+            <figcaption className="px-3 pb-4 pt-4 text-[#06162F]">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#E52C20]">{p.note}</p>
+              <p className="mt-1.5 font-display text-[19px] font-black uppercase leading-[1.02] tracking-[-0.02em]">{p.caption}</p>
             </figcaption>
+            </div>
           </motion.figure>
         ))}
         <div className="w-1 shrink-0" aria-hidden="true" />
       </div>
 
       {/* swipe affordance */}
-      <div className="mt-4 px-5 sm:px-8 flex items-center gap-2.5 font-mono text-[10px] uppercase tracking-[0.24em]" style={{ color: T.nightSoft }}>
+      <div className="mt-2 px-5 sm:px-8 flex items-center justify-between border-t border-[#F2EFE8]/20 pt-4 font-mono text-[9px] uppercase tracking-[0.2em] text-[#AFC5DF]">
+        <span>Swipe the archive</span>
+        <span className="flex items-center gap-2.5">
         <motion.span
           animate={reduced ? undefined : { x: [0, 6, 0] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
@@ -981,7 +1005,8 @@ function DayStories({ reduced }: { reduced: boolean }) {
         >
           <ArrowRight size={12} style={{ color: T.gold }} />
         </motion.span>
-        Swipe through the day · {idx + 1}/{DAY_PLATES.length}
+        {String(idx + 1).padStart(2, '0')} / {String(DAY_PLATES.length).padStart(2, '0')}
+        </span>
       </div>
     </section>
   );
@@ -1008,18 +1033,22 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
   // Reduced motion: a calm annotated contact sheet instead of the ride.
   if (reduced) {
     return (
-      <section className="py-20 px-5 sm:px-8" style={{ background: T.night }}>
+      <section className="relative overflow-hidden px-5 py-20 sm:px-8" style={{ background: T.night }}>
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(rgba(242,239,232,0.75) 0.7px, transparent 0.7px)', backgroundSize: '7px 7px' }} aria-hidden="true" />
         <div className="mx-auto max-w-[80rem]">
-          <Eyebrow color={T.gold} light>Field footage · 24 hours</Eyebrow>
-          <h2 className="mt-4 font-display text-4xl font-extrabold" style={{ color: T.nightText }}>One day on the watch.</h2>
-          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {DAY_PLATES.map((p) => (
-              <figure key={p.src} className="overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(237,242,240,0.16)' }}>
-                <img src={publicAsset(p.src)} alt={p.caption} loading="lazy" className="w-full aspect-[16/10] object-cover" />
-                <figcaption className="p-4">
-                  <p className="font-mono text-[10px] tracking-[0.2em] tabular-nums" style={{ color: p.color }}>{p.time} · {p.note}</p>
-                  <p className="mt-1 text-sm font-bold" style={{ color: T.nightText }}>{p.caption}</p>
-                </figcaption>
+          <Eyebrow color="#E52C20" light>Field footage · Calgary</Eyebrow>
+          <h2 className="mt-4 font-display text-5xl font-black uppercase leading-[0.84] tracking-[-0.04em] text-[#F2EFE8]">One day<br /><span className="text-[#E52C20]">on watch.</span></h2>
+          <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+            {DAY_PLATES.map((p, i) => (
+              <figure key={p.src} className="relative pt-1" style={{ rotate: `${i % 2 ? 0.6 : -0.6}deg` }}>
+                <div className="absolute inset-0 translate-x-2 translate-y-2 bg-[#E52C20]" aria-hidden="true" />
+                <div className="relative bg-[#F2EFE8] p-2">
+                  <img src={publicAsset(p.src)} alt="" loading="lazy" className="w-full aspect-[4/3] object-cover saturate-[0.82] contrast-[1.1]" />
+                  <figcaption className="px-3 pb-3 pt-4 text-[#06162F]">
+                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">{p.time} · {p.note}</p>
+                    <p className="mt-1 font-display text-lg font-black uppercase leading-tight">{p.caption}</p>
+                  </figcaption>
+                </div>
               </figure>
             ))}
           </div>
@@ -1033,15 +1062,9 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
     <DayStories reduced={reduced} />
     <section ref={ref} className="relative hidden lg:block" style={{ height: `${count * 85 + 110}vh`, background: T.night }} aria-label="One day on the watch — photo sequence">
       <div className="sticky top-0 h-screen overflow-hidden" style={{ perspective: '1200px' }}>
-        {/* receding survey grid */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.06]" aria-hidden="true">
-          <defs>
-            <pattern id="lp-tunnel-grid" width="72" height="72" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <path d="M72 0H0V72" fill="none" stroke={T.nightText} strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#lp-tunnel-grid)" />
-        </svg>
+        {/* offset-print halftone field */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(rgba(242,239,232,0.8) 0.7px, transparent 0.7px)', backgroundSize: '8px 8px' }} aria-hidden="true" />
+        <div className="pointer-events-none absolute -left-[8%] top-[22%] h-20 w-[46%] -rotate-6 bg-[#E52C20]/10" aria-hidden="true" />
 
         {/* ambient room glow — takes on the active plate's category colour */}
         <motion.div
@@ -1056,17 +1079,17 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
         <div className="absolute inset-x-0 top-0 h-14 sm:h-16 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(4,12,20,0.9), transparent)', zIndex: 21 }} aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-36 sm:h-40 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(4,12,20,0.95), rgba(4,12,20,0.55) 55%, transparent)', zIndex: 21 }} aria-hidden="true" />
 
-        {/* camera HUD */}
+        {/* field-archive registration frame */}
         <div className="absolute inset-3 sm:inset-6 pointer-events-none" style={{ zIndex: 40 }} aria-hidden="true">
           {['top-0 left-0 border-t border-l', 'top-0 right-0 border-t border-r', 'bottom-0 left-0 border-b border-l', 'bottom-0 right-0 border-b border-r'].map((pos) => (
             <span key={pos} className={cn('absolute w-5 h-5 sm:w-8 sm:h-8', pos)} style={{ borderColor: 'rgba(237,242,240,0.35)' }} />
           ))}
           <span className="absolute top-1.5 left-8 sm:top-2 sm:left-12 font-mono text-[8.5px] sm:text-[10px] tracking-[0.3em] uppercase" style={{ color: T.nightSoft }}>
-            Cam 01 · Dolly N 51°
+            Archive / YYC / 24H
           </span>
           <span className="absolute top-1.5 right-8 sm:top-2 sm:right-12 font-mono text-[8.5px] sm:text-[10px] tracking-[0.3em] uppercase flex items-center gap-2" style={{ color: T.nightSoft }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.red }} />
-            Rec
+            Live sequence
           </span>
         </div>
 
@@ -1086,23 +1109,23 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
           aria-hidden="true"
         />
         <motion.div
-          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          className="absolute inset-0 flex flex-col items-start justify-center px-[clamp(4rem,9vw,10rem)] pointer-events-none"
           style={{ opacity: introOpacity, y: introY, scale: introScale, zIndex: 45 }}
         >
-          <Eyebrow color={T.gold} light>Field footage · 24 hours</Eyebrow>
+          <Eyebrow color="#E52C20" light>Field footage · Calgary</Eyebrow>
           <h2
-            className="mt-5 font-display font-extrabold tracking-[-0.03em] leading-[0.98]"
-            style={{ color: T.nightText, fontSize: 'clamp(2.6rem, 7.4vw, 6rem)', textShadow: '0 4px 40px rgba(4,12,20,0.9)' }}
+            className="mt-6 font-display font-black uppercase tracking-[-0.045em] leading-[0.76]"
+            style={{ color: T.nightText, fontSize: 'clamp(5rem, 10vw, 9rem)', textShadow: '0 4px 40px rgba(4,12,20,0.9)' }}
           >
-            One day<br />on the watch.
+            One day<br /><span className="text-[#E52C20]">on watch.</span>
           </h2>
-          <p className="mt-6 font-mono text-[10px] sm:text-[11px] tracking-[0.3em] uppercase flex flex-col items-center gap-3" style={{ color: T.nightSoft }}>
-            Keep scrolling — the camera moves
+          <p className="mt-8 font-mono text-[10px] sm:text-[11px] tracking-[0.3em] uppercase flex items-center gap-4" style={{ color: T.nightSoft }}>
+            Scroll the archive
             <motion.span
-              animate={reduced ? undefined : { y: [0, 6, 0] }}
+              animate={reduced ? undefined : { x: [0, 8, 0] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-              className="block w-px h-7"
-              style={{ background: `linear-gradient(to bottom, ${T.gold}, transparent)` }}
+              className="block h-px w-12"
+              style={{ background: `linear-gradient(to right, #E52C20, transparent)` }}
             />
           </p>
         </motion.div>
@@ -1119,14 +1142,13 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.32, ease: EASE }}
-              className="flex flex-col items-center text-center min-h-[3.6rem] sm:min-h-[4.2rem] justify-end"
+              className="flex min-h-[4.5rem] rotate-[-1deg] flex-col items-start justify-center bg-[#F2EFE8] px-6 py-3 text-left shadow-[6px_6px_0_#E52C20]"
             >
-              <p className="font-mono text-[9.5px] sm:text-[10.5px] tracking-[0.24em] uppercase tabular-nums" style={{ color: DAY_PLATES[active].color }}>
+              <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.2em] tabular-nums text-[#E52C20]">
                 {DAY_PLATES[active].time} · {DAY_PLATES[active].note}
               </p>
               <p
-                className="mt-1.5 font-display text-xl sm:text-3xl font-bold"
-                style={{ color: T.nightText, textShadow: '0 2px 24px rgba(4,12,20,0.95)' }}
+                className="mt-1 font-display text-xl font-black uppercase tracking-[-0.02em] text-[#06162F] sm:text-2xl"
               >
                 {DAY_PLATES[active].caption}
               </p>

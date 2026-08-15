@@ -117,6 +117,7 @@ function usePrefersReducedMotion(): boolean {
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
   }, []);
+
   return reduced;
 }
 
@@ -344,6 +345,20 @@ function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [menuOpen]);
+
   const link = cn(
     'px-3 py-1.5 text-sm font-semibold transition-colors',
     scrolled ? 'hover:bg-[rgba(28,43,58,0.06)]' : 'hover:bg-white/10',
@@ -353,7 +368,7 @@ function Nav() {
     <nav
       className={cn(
         'fixed top-0 inset-x-0 z-50 transition-transform duration-300 max-md:border-b max-md:border-white/10 max-md:bg-[#081A2B]',
-        visible ? 'translate-y-0' : '-translate-y-full',
+        visible || menuOpen ? 'translate-y-0' : '-translate-y-full',
       )}
       style={{
         background: scrolled ? 'rgba(247,243,234,0.9)' : undefined,
@@ -369,11 +384,11 @@ function Nav() {
           aria-label="Calgary Watch home"
         >
           <img
-            src={publicAsset('icon.svg')}
+            src={publicAsset('images/calgary-watch-owl.webp')}
             alt=""
-            width={30}
-            height={30}
-            className="w-[30px] h-[30px] object-contain"
+            width={40}
+            height={40}
+            className="h-10 w-10 object-cover shadow-[3px_3px_0_#E52C20]"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <span className="flex flex-col leading-none text-left">
@@ -400,14 +415,16 @@ function Nav() {
           </a>
           <button
             type="button"
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-full"
+            className="relative z-[61] md:hidden w-10 h-10 flex items-center justify-center border transition-transform active:scale-95"
             style={{
-              border: `1px solid ${scrolled ? T.line : 'rgba(237,242,240,0.22)'}`,
-              color: scrolled ? T.ink : T.nightText,
-              background: scrolled ? 'rgba(255,253,248,0.7)' : 'rgba(8,26,43,0.7)',
+              borderColor: menuOpen ? '#E52C20' : scrolled ? T.line : 'rgba(237,242,240,0.35)',
+              color: menuOpen ? '#06162F' : scrolled ? T.ink : T.nightText,
+              background: menuOpen ? '#F2EFE8' : scrolled ? 'rgba(255,253,248,0.9)' : 'rgba(8,26,43,0.78)',
             }}
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
           >
             {menuOpen ? <X size={17} /> : <Menu size={17} />}
           </button>
@@ -417,22 +434,61 @@ function Nav() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="md:hidden px-5 py-4 flex flex-col gap-1"
-            style={{ background: 'rgba(247,243,234,0.97)', backdropFilter: 'blur(14px)', borderTop: `1px solid ${T.line}`, color: T.ink }}
+            id="mobile-navigation"
+            initial={{ opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
+            animate={{ opacity: 1, clipPath: 'inset(0 0 0% 0)' }}
+            exit={{ opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
+            transition={{ duration: 0.42, ease: EASE }}
+            className="absolute inset-x-0 top-full z-[60] h-[calc(100dvh-4rem)] md:hidden overflow-y-auto bg-[#06162F] text-[#F2EFE8]"
           >
-            <a href="#features" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 text-sm font-semibold rounded-xl">What we track</a>
-            <a href="#how-it-works" onClick={() => setMenuOpen(false)} className="px-3 py-2.5 text-sm font-semibold rounded-xl">How it works</a>
-            <a href="/about" onClick={() => setMenuOpen(false)} className="text-left px-3 py-2.5 text-sm font-semibold rounded-xl">About</a>
-            <a href="/coverage" onClick={() => setMenuOpen(false)} className="text-left px-3 py-2.5 text-sm font-semibold rounded-xl">Airdrie &amp; area coverage</a>
-            <a
-              href="/map"
-              onClick={() => setMenuOpen(false)}
-              className="mt-2 h-12 rounded-2xl font-bold text-sm"
-              style={{ background: T.ink, color: T.panel }}
-            >
-              Open the live map
-            </a>
+            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+              <img src={publicAsset('images/calgary-watch-owl.webp')} alt="" className="absolute -right-20 top-8 size-72 rotate-6 opacity-[0.12] mix-blend-screen" />
+              <div className="absolute -left-20 top-[43%] h-16 w-[140%] -rotate-6 bg-[#E52C20]/15" />
+            </div>
+
+            <div className="relative flex min-h-full flex-col px-5 pb-6 pt-8 sm:px-7">
+              <div className="mb-7 flex items-center justify-between border-b border-white/15 pb-4 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#AFC5DF]">
+                <span>Calgary / 51.0447° N</span>
+                <span className="text-[#E52C20]">Navigation / 01</span>
+              </div>
+
+              <div className="flex flex-col">
+                {[
+                  ['01', 'What we track', '#features'],
+                  ['02', 'How it works', '#how-it-works'],
+                  ['03', 'About', '/about'],
+                  ['04', 'Area coverage', '/coverage'],
+                ].map(([number, label, href], index) => (
+                  <motion.a
+                    key={href}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    initial={{ opacity: 0, x: -24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + index * 0.055, duration: 0.42, ease: EASE }}
+                    className="group flex min-h-16 items-center gap-4 border-b border-white/15 py-3 font-display text-[clamp(1.55rem,8vw,2.25rem)] font-black uppercase leading-none tracking-[-0.035em]"
+                  >
+                    <span className="w-6 font-mono text-[9px] tracking-normal text-[#E52C20]">{number}</span>
+                    <span className="flex-1">{label}</span>
+                    <ArrowUpRight size={20} className="text-[#AFC5DF] transition-transform group-active:translate-x-1 group-active:-translate-y-1" />
+                  </motion.a>
+                ))}
+              </div>
+
+              <div className="mt-auto pt-8">
+                <a
+                  href="/map"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex h-15 items-center justify-between bg-[#F2EFE8] px-5 font-display text-[15px] font-black uppercase text-[#06162F] shadow-[5px_5px_0_#E52C20] active:translate-x-1 active:translate-y-1 active:shadow-none"
+                >
+                  <span className="flex items-center gap-3"><MapPin size={17} /> Open the live map</span>
+                  <ArrowRight size={18} />
+                </a>
+                <p className="mt-5 max-w-[30ch] text-[12px] leading-relaxed text-[#AFC5DF]">
+                  Community reports and verified city data, in one clear view of Calgary.
+                </p>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -493,9 +549,14 @@ function MobileHero({ reduced }: { reduced: boolean }) {
       <div className="absolute left-4 top-[11.5%] z-[3] -rotate-3 bg-[#F2EFE8] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-[#06162F] shadow-[3px_3px_0_#E52C20]" aria-hidden="true">
         Calgary / 51.0447° N
       </div>
-      <div className="absolute right-4 top-[18%] z-[3] flex size-11 rotate-6 flex-col items-center justify-center bg-[#E52C20] text-[9px] font-black leading-none text-white" aria-hidden="true">
-        <span>CW</span><span className="mt-1 text-[7px] opacity-70">LIVE</span>
-      </div>
+      <motion.img
+        src={publicAsset('images/calgary-watch-owl.webp')}
+        alt=""
+        className="absolute right-4 top-[17%] z-[3] size-13 rotate-6 object-cover shadow-[4px_4px_0_#E52C20]"
+        animate={reduced ? undefined : { rotate: [6, 1, 6], y: [0, -4, 0] }}
+        transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden="true"
+      />
 
       <div className="absolute inset-x-[-8%] top-[48%] z-[3] -rotate-2 overflow-hidden border-y border-[#06162F] bg-[#F2EFE8] py-2 text-[#06162F] shadow-[0_4px_0_rgba(229,44,32,0.9)] [@media(min-height:700px)]:top-[55%]" aria-hidden="true">
         <motion.div
@@ -628,13 +689,12 @@ function Hero({ reduced }: { reduced: boolean }) {
         </div>
 
         <motion.div
-          className="absolute right-[4%] top-[14%] z-[3] flex size-20 rotate-6 flex-col items-center justify-center bg-[#E52C20] font-display text-white"
+          className="absolute right-[4%] top-[13%] z-[3] size-24 rotate-6 bg-[#06162F] shadow-[7px_7px_0_#E52C20]"
           animate={reduced ? undefined : { rotate: [6, 2, 6], y: [0, -5, 0] }}
           transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
         >
-          <span className="text-xl font-black leading-none">CW</span>
-          <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.18em] opacity-70">Live / 01</span>
+          <img src={publicAsset('images/calgary-watch-owl.webp')} alt="" className="size-full object-cover" />
         </motion.div>
 
         <div className="absolute bottom-[7%] right-[2.5%] z-[3] font-display text-[10px] font-bold uppercase tracking-[0.18em] text-[#F2EFE8]/65 [writing-mode:vertical-rl]" aria-hidden="true">

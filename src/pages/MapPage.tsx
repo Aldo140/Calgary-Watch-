@@ -767,11 +767,40 @@ export default function MapPage() {
   const deepLinkHandledRef = useRef(false); // Ensure ?i= deep-link opens only once
   const lastNeighborhoodReportUidRef = useRef<string | null>(null);
 
+  /**
+   * The buttons in the top-right column each open their own floating panel,
+   * and nothing closed anyone else's. Tapping settings with notifications
+   * already open left both on screen, stacked — most of a phone's width taken
+   * by two competing panels.
+   *
+   * They are mutually exclusive by construction here rather than by a
+   * `setShowNotifications(false)` at each of the eight call sites, so a new
+   * entry point cannot reintroduce it.
+   */
   const openAuthPanel = useCallback((mode: 'signin' | 'settings' = 'signin') => {
     setAuthPanelMode(mode);
     setAuthPanelOpen(true);
     setShowUserMenu(false);
+    setShowNotifications(false);
     setIsEditingPreferences(false);
+  }, []);
+
+  const toggleNotifications = useCallback(() => {
+    setShowNotifications((wasOpen) => {
+      if (!wasOpen) {
+        setShowUserMenu(false);
+        setAuthPanelOpen(false);
+        setUnreadNotifications(0);
+      }
+      return !wasOpen;
+    });
+  }, []);
+
+  const toggleUserMenu = useCallback(() => {
+    setShowUserMenu((wasOpen) => {
+      if (!wasOpen) setShowNotifications(false);
+      return !wasOpen;
+    });
   }, []);
 
   useEffect(() => {
@@ -2695,10 +2724,7 @@ export default function MapPage() {
           <div className="relative pointer-events-auto">
             <button
               type="button"
-              onClick={() => {
-                setShowNotifications(!showNotifications);
-                if (!showNotifications) setUnreadNotifications(0);
-              }}
+              onClick={toggleNotifications}
               data-tour="m-alerts"
               className="relative flex size-11 items-center justify-center rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[#40566B] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
               aria-label="Notifications"
@@ -2747,7 +2773,7 @@ export default function MapPage() {
             {user ? (
               <button
                 type="button"
-                onClick={() => setShowUserMenu(!showUserMenu)}
+                onClick={toggleUserMenu}
                 className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden border border-slate-200 bg-white/95 shadow-lg"
                 aria-label="Account menu"
               >
@@ -3167,10 +3193,7 @@ export default function MapPage() {
                 size="icon"
                 data-tour="alerts"
                 className="size-12 rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#8DBBDB] hover:bg-[#E8F3FC]"
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  if (!showNotifications) setUnreadNotifications(0);
-                }}
+                onClick={toggleNotifications}
               >
                 <Bell size={19} className={cn(unreadNotifications > 0 ? 'text-[#286FAF]' : 'text-[#52697D]')} />
                 {unreadNotifications > 0 && (
@@ -3217,7 +3240,7 @@ export default function MapPage() {
             {user ? (
               <div className="relative">
                 <button 
-                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  onClick={toggleUserMenu}
                   className="flex size-12 items-center justify-center overflow-hidden rounded-xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] p-1 shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#8DBBDB]"
                 >
                   {user.photoURL ? (

@@ -12,6 +12,7 @@ import { cn } from '@/src/lib/utils';
 import { MapRef } from '@/src/components/Map';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import DemoBadge from '@/src/components/DemoBadge';
+import { categoryColor } from '@/src/lib/tokens';
 
 export const SNAP_POINTS = ['80px', 0.38, 0.82] as const;
 export type SnapPoint = (typeof SNAP_POINTS)[number];
@@ -30,13 +31,9 @@ const P = {
   line: '#C9D8E4',
 };
 
-const CAT_COLOR: Record<string, string> = {
-  emergency: '#E11D48',
-  crime: '#DC2626',
-  traffic: '#EA580C',
-  infrastructure: '#2563EB',
-  weather: '#0284C7',
-};
+// Category colour lives in src/lib/tokens.ts. This file used to keep its own
+// copy, which had drifted from the briefing's and the admin's — crime was red
+// here, clay there and blue in the charts.
 
 const CATEGORY_OPTIONS = [
   { id: 'all' as const,            label: 'All',     Icon: Layers,       color: '#1C2B3A' },
@@ -549,7 +546,7 @@ export default function MobileMapSheet({
                       const isEmergency = incident.category === 'emergency';
                       const isNew = Date.now() - incident.timestamp < 30 * 60 * 1000;
                       const reporter = getReporterDisplay(incident);
-                      const catColor = CAT_COLOR[incident.category] ?? '#0284C7';
+                      const catColor = categoryColor(incident.category);
 
                       if (isPeek) {
                         // ── Glance row: one tap-height line for fast scanning ──

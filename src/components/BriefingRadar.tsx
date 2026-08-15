@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import type { Incident } from '@/src/types';
+import { categoryColor } from '@/src/lib/tokens';
 
 /**
  * The walk around someone's address, drawn to scale.
@@ -50,16 +51,6 @@ export function plotPoint(
   const rad = (bearing * Math.PI) / 180;
   return { x: centre + r * Math.sin(rad), y: centre - r * Math.cos(rad) };
 }
-
-/** Warmed to match the page: clay rather than crimson, gold rather than orange. */
-const CATEGORY_COLOR: Record<string, string> = {
-  emergency: '#C4553C',
-  crime: '#B0503A',
-  traffic: '#C08A3E',
-  infrastructure: '#4E8C6A',
-  weather: '#7A6BA8',
-  gas: '#2E8B7A',
-};
 
 const T = { deep: '#1F3D37', deep2: '#2F5F52', gold: '#B0793C', glow: '#E8B871', page: '#FDFAF3' };
 
@@ -133,7 +124,7 @@ export default function BriefingRadar({
 
         {points.map(({ incident, distanceM, bearing }, i) => {
           const { x, y } = plotPoint(distanceM, bearing, radiusM, size);
-          const color = CATEGORY_COLOR[incident.category] ?? T.glow;
+          const color = categoryColor(incident.category);
           return (
             <motion.g
               key={incident.id}

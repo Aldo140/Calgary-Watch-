@@ -1486,7 +1486,6 @@ export default function MapPage() {
     setIsEmergencyOpen(false);
   }, []);
 
-
   // filteredIncidentsCount is intentionally kept for the sidebar category badge
   const filteredIncidentsCount = useMemo(
     () =>
@@ -2774,7 +2773,7 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={toggleUserMenu}
-                className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden border border-slate-200 bg-white/95 shadow-lg"
+                className="flex h-12 w-12 items-center justify-center overflow-hidden border border-slate-200 bg-white/95 shadow-lg"
                 aria-label="Account menu"
               >
                 {user.photoURL ? (
@@ -2804,7 +2803,7 @@ export default function MapPage() {
                   className="absolute right-full mr-3 top-0 w-52 rounded-2xl border border-white/10 bg-slate-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-[rgb(255,250,243)] light:border-stone-200/80 pointer-events-auto"
                 >
                   <div className="p-3 border-b border-white/5">
-                    <p className="text-xs font-bold text-white truncate light:text-slate-900">{user.displayName}</p>
+                    <p className="text-xs font-bold text-white truncate">{user.displayName}</p>
                     <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
                   </div>
                   {isAdmin && (
@@ -2988,7 +2987,7 @@ export default function MapPage() {
                     className="relative px-4 pb-5 pt-2 text-center overflow-hidden"
                   >
                     {/* confetti burst */}
-                    {['#4A90D9', '#2E8B7A', '#D4A843', '#ef4444', '#a855f7', '#2E8B7A', '#D4A843', '#4A90D9'].map((c, i) => (
+                    {['#4A90D9', '#2E8B7A', '#D4A843', '#ef4444', '#a855f7', '#2E8B7A', '#D4A843', '#4A90D9', '#ef4444', '#4A90D9'].map((c, i) => (
                       <motion.span
                         key={i}
                         className="absolute left-1/2 top-8 h-1.5 w-1.5 rounded-full"
@@ -3111,7 +3110,7 @@ export default function MapPage() {
                 )}
 
                 {/* Weekly digest opt-in — wired to the existing profile setting */}
-                {nearMeStage === 'results' && !nearMeScanning && (
+                {nearMeStage === 'results' && !nearMeScanning && (!user || userProfile?.weeklyDigestOptIn !== true) && (
                   <motion.button
                     type="button"
                     initial={{ opacity: 0, y: 8 }}
@@ -3151,7 +3150,7 @@ export default function MapPage() {
                 <img src="/icon.svg" alt="" width={19} height={19} className="size-[19px]" />
               </span>
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2E8B7A]" />
+                <span className={cn('relative inline-flex h-2 w-2 rounded-full', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-slate-400')} />
               </span>
               <div className="leading-none">
                 <h1 className="text-[12px] font-black tracking-tight text-[#0B1F33]">
@@ -3177,7 +3176,9 @@ export default function MapPage() {
               onClick={handleLocate}
               className={cn(
                 'flex size-9 items-center justify-center rounded-lg transition-colors active:scale-[0.98]',
-                nearMeOpen ? 'bg-[#0B1F33] text-[#F7FBFF]' : 'text-[#52697D] hover:bg-[#E8F3FC] hover:text-[#174A6E]',
+                nearMeOpen
+                  ? 'bg-[#0B1F33] text-[#F7FBFF]'
+                  : 'text-[#52697D] hover:bg-[#E8F3FC] hover:text-[#174A6E]',
               )}
               title="Show my location"
               aria-label="Show my location"

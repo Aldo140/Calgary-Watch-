@@ -1262,7 +1262,7 @@ function Quadrants({ reduced }: { reduced: boolean }) {
   const meta = QUAD_META[active];
 
   return (
-    <section className="relative py-24 lg:py-36 overflow-hidden" style={{ background: T.paper }}>
+    <section className="relative py-16 sm:py-20 lg:py-36 overflow-hidden" style={{ background: T.paper }}>
       <div ref={sectionRef} className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <Eyebrow color={T.gold}>The grid · NW NE SW SE</Eyebrow>
@@ -1642,7 +1642,7 @@ function Categories({ reduced }: { reduced: boolean }) {
   const [active, setActive] = useState<string | null>(null);
 
   return (
-    <section id="features" className="relative py-24 lg:py-32" style={{ background: T.panel, borderTop: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}` }}>
+    <section id="features" className="relative py-16 sm:py-20 lg:py-32" style={{ background: T.panel, borderTop: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}` }}>
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
         <Reveal>
           <Eyebrow color={T.red}>The ledger · what we track</Eyebrow>
@@ -1739,7 +1739,7 @@ function Categories({ reduced }: { reduced: boolean }) {
 // ---------------------------------------------------------------------------
 function NearMe({ reduced }: { reduced: boolean }) {
   return (
-    <section className="relative py-24 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
+    <section className="relative py-16 sm:py-20 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid lg:grid-cols-[6fr_5fr] gap-12 lg:gap-16 items-center">
         {/* Copy */}
         <div>
@@ -1928,7 +1928,7 @@ function NightWatch({ reduced }: { reduced: boolean }) {
   ];
 
   return (
-    <section ref={ref} className="relative overflow-hidden py-24 lg:py-36" style={{ background: T.night }}>
+    <section ref={ref} className="relative overflow-hidden py-16 sm:py-20 lg:py-36" style={{ background: T.night }}>
       {/* live traffic map of Calgary glowing under the whole band */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <motion.img
@@ -2047,7 +2047,7 @@ function Coverage() {
   const towns = ['Airdrie', 'Cochrane', 'Chestermere', 'Okotoks', 'Strathmore', 'High River', 'Canmore', 'Langdon', 'Crossfield', 'Didsbury', 'Olds', '+ 20 more'];
 
   return (
-    <section className="relative py-24 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
+    <section className="relative py-16 sm:py-20 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
       <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid lg:grid-cols-2 gap-14 items-center">
         <div>
           <Reveal>

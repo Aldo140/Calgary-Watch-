@@ -1017,7 +1017,18 @@ export default function MapPage() {
     setSheetSnap('80px');
   }, []);
 
-  const MAP_DECAY_MS = 24 * 60 * 60 * 1000; // 24 hours — hide from map
+  /**
+   * How long a community report stays on the map.
+   *
+   * Was 24 hours, which emptied the map faster than neighbours could fill it —
+   * a report vanished the day after it was filed, so the map read as quieter
+   * than the neighbourhood actually was. Five days lets real reports accumulate
+   * into something worth opening.
+   *
+   * Official records are unaffected: their lifetime comes from `expires_at`,
+   * set by the source, so a cleared road closure still disappears on time.
+   */
+  const MAP_DECAY_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
 
   // All incidents for the sidebar — community posts show until deleted, official use expires_at
   const incidents = useMemo(() => {
@@ -1411,7 +1422,7 @@ export default function MapPage() {
       if (i.data_source === 'official') {
         return !i.expires_at || i.expires_at > now;         // expires_at controls official lifetime
       }
-      return now - i.timestamp < MAP_DECAY_MS;              // 24h decay for community posts
+      return now - i.timestamp < MAP_DECAY_MS;              // community reports linger 5 days
     });
     if (selectedCategory === 'all') return visible;
     return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');

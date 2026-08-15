@@ -1,4 +1,5 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS, FLAG_THRESHOLD, isPubliclyVisible } from '@/src/types';
+import { findNearestCamera, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, Trash2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -52,12 +53,14 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 interface IncidentDetailPanelProps {
   incident: Incident | null;
+  /** Loaded city traffic cameras, used to find one overlooking this location. */
+  trafficCameras?: TrafficCamera[];
   onClose: () => void;
   onViewNeighborhood: (neighborhood: string) => void;
   onReportIncident: (incident: Incident) => void;
 }
 
-export default function IncidentDetailPanel({ incident, onClose, onViewNeighborhood, onReportIncident }: IncidentDetailPanelProps) {
+export default function IncidentDetailPanel({ incident, trafficCameras, onClose, onViewNeighborhood, onReportIncident }: IncidentDetailPanelProps) {
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
   );
@@ -90,6 +93,14 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
   if (!incident) return null;
 
   const isSystem = (incident.data_source != null && incident.data_source !== 'community') || incident.authorUid === 'system';
+
+  // Nearest city camera overlooking this location, if any is close enough.
+  const nearbyCamera = trafficCameras?.length
+    ? findNearestCamera(incident.lat, incident.lng, trafficCameras)
+    : null;
+  // Stamped once per opened incident so the frame is current without the image
+  // re-requesting on every render.
+  const cameraStamp = incident.id;
   const existingFlaggers = incident.flagged_by ?? [];
   const alreadyFlaggedByMe = Boolean(user && existingFlaggers.includes(user.uid));
   const canFlag =
@@ -328,6 +339,42 @@ export default function IncidentDetailPanel({ incident, onClose, onViewNeighborh
                   </p>
                 </div>
               </div>
+
+              {/*
+                A city camera overlooking this spot.
+                
+                Deliberately labelled as the current view, never as footage of
+                the report. The image is a live frame pulled now — for a
+                collision filed twenty minutes ago it may well show the scene,
+                but for a break-in from Tuesday it shows an empty street, and a
+                safety app must not let a reader mistake one for the other. The
+                distance is stated so they can judge how relevant it is.
+              */}
+              {nearbyCamera && (
+                <div className="space-y-2.5">
+                  <SectionLabel>Live view nearby</SectionLabel>
+                  <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
+                    <img
+                      src={`${nearbyCamera.camera.imageUrl}?t=${cameraStamp}`}
+                      alt={`Live City of Calgary traffic camera at ${nearbyCamera.camera.location}`}
+                      loading="lazy"
+                      className="w-full object-cover max-h-56 bg-slate-100"
+                    />
+                    <div className="px-3 py-2.5 space-y-1" style={{ background: P.paper }}>
+                      <p className="text-[12.5px] font-black leading-tight" style={{ color: P.ink }}>
+                        {nearbyCamera.camera.location}
+                      </p>
+                      <p className="font-mono text-[10px] tracking-[0.06em]" style={{ color: P.soft }}>
+                        {Math.round(nearbyCamera.distanceM)} M AWAY · CITY OF CALGARY
+                        {nearbyCamera.camera.quadrant ? ` · ${nearbyCamera.camera.quadrant}` : ''}
+                      </p>
+                      <p className="text-[11px] leading-snug" style={{ color: P.soft }}>
+                        Current conditions at this intersection — not footage of this report.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {incident.image_url && (
                 <div className="space-y-2.5">

@@ -101,3 +101,41 @@ export function useTrafficCameras(enabled: boolean): TrafficCamera[] {
 
   return cameras;
 }
+
+/** Metres between two coordinates (haversine). */
+export function distanceMeters(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 6_371_000;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(bLat - aLat);
+  const dLng = toRad(bLng - aLng);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/**
+ * The nearest camera to an incident, if one is close enough to be looking at
+ * the same place.
+ *
+ * 400m is roughly a city block plus the approach to it. Beyond that a camera
+ * is pointing at a different intersection and showing it next to a report would
+ * imply a connection that does not exist.
+ */
+export const CAMERA_PROXIMITY_M = 400;
+
+export function findNearestCamera(
+  lat: number,
+  lng: number,
+  cameras: TrafficCamera[],
+  maxMeters: number = CAMERA_PROXIMITY_M,
+): { camera: TrafficCamera; distanceM: number } | null {
+  let best: { camera: TrafficCamera; distanceM: number } | null = null;
+  for (const camera of cameras) {
+    const distanceM = distanceMeters(lat, lng, camera.lat, camera.lng);
+    if (distanceM <= maxMeters && (!best || distanceM < best.distanceM)) {
+      best = { camera, distanceM };
+    }
+  }
+  return best;
+}

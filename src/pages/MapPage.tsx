@@ -666,7 +666,9 @@ export default function MapPage() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCameras, setShowCameras] = useState(false);
   // Only fetched once the layer is switched on.
-  const trafficCameras = useTrafficCameras(showCameras);
+  // Also loaded when an incident is open, so its detail panel can show a
+  // camera overlooking that spot. One request, cached for the session.
+  const trafficCameras = useTrafficCameras(showCameras || Boolean(selectedIncident));
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
@@ -3144,6 +3146,7 @@ export default function MapPage() {
           onClose={() => setSelectedIncident(null)}
           onViewNeighborhood={handleViewNeighborhood}
           onReportIncident={handleReportFromIncident}
+          trafficCameras={trafficCameras}
         />
         <AreaIntelligencePanel
           data={selectedArea}

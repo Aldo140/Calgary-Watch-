@@ -31,7 +31,6 @@ import {
   ShieldCheck,
   Users,
   Lock,
-  Activity,
   Crosshair,
 } from 'lucide-react';
 import { publicAsset, cn } from '@/src/lib/utils';
@@ -345,7 +344,10 @@ function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const link = 'px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors hover:bg-[rgba(28,43,58,0.06)]';
+  const link = cn(
+    'px-3 py-1.5 text-sm font-semibold transition-colors',
+    scrolled ? 'hover:bg-[rgba(28,43,58,0.06)]' : 'hover:bg-white/10',
+  );
 
   return (
     <nav
@@ -375,12 +377,12 @@ function Nav() {
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <span className="flex flex-col leading-none text-left">
-            <span className={cn('font-display text-[17px] font-bold tracking-tight md:text-[#1C2B3A]', scrolled ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
-            <span className={cn('mt-0.5 font-mono text-[8.5px] font-medium uppercase tracking-[0.34em] md:text-[#5A6B7D]', scrolled ? 'text-[#5A6B7D]' : 'text-[#8FA3B5]')}>Community Safety</span>
+            <span className={cn('font-display text-[17px] font-bold tracking-tight', scrolled ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
+            <span className={cn('mt-0.5 font-mono text-[8.5px] font-medium uppercase tracking-[0.34em]', scrolled ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Safety</span>
           </span>
         </button>
 
-        <div className="hidden md:flex items-center gap-1" style={{ color: T.ink }}>
+        <div className="hidden md:flex items-center gap-1" style={{ color: scrolled ? T.ink : T.nightText }}>
           <a href="#features" className={link}>What we track</a>
           <a href="#how-it-works" className={link}>How it works</a>
           <a href="/about" className={link}>About</a>
@@ -391,7 +393,7 @@ function Nav() {
           <a
             href="/map"
             className="hidden md:inline-flex items-center gap-2 rounded-full h-10 px-5 text-sm font-bold transition-transform hover:-translate-y-0.5"
-            style={{ background: T.ink, color: T.panel }}
+            style={{ background: scrolled ? T.ink : '#F2EFE8', color: scrolled ? T.panel : '#06162F' }}
           >
             <MapPin size={14} />
             Open the live map
@@ -441,12 +443,6 @@ function Nav() {
 // ---------------------------------------------------------------------------
 // HERO — parallax skyline plate + staggered display type + live dispatch card
 // ---------------------------------------------------------------------------
-const HERO_LINES = [
-  { text: 'Calgary crime.', color: T.ink },
-  { text: 'Mapped live.', color: T.sky },
-  { text: 'By neighbours.', color: T.ink },
-];
-
 const MOBILE_ROUTE = 'BOWNESS  /  BELTLINE  /  INGLEWOOD  /  FOREST LAWN  /  BRIDGELAND  /  KENSINGTON  /  ';
 
 /** Mobile hero: an animated Calgary collage built like a cultural night poster. */
@@ -567,284 +563,156 @@ function MobileHero({ reduced }: { reduced: boolean }) {
 }
 
 function Hero({ reduced }: { reduced: boolean }) {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
-  const imgY = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
-  const textY = useTransform(scrollYProgress, [0, 1], ['0%', '-30%']);
-  const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const plateRotate = useTransform(scrollYProgress, [0, 1], [0, 3]);
+  const collageX = useSpring(useMotionValue(0), { stiffness: 90, damping: 22 });
+  const collageY = useSpring(useMotionValue(0), { stiffness: 90, damping: 22 });
 
-  // Pointer-tracked 3D tilt on the skyline plate (fine pointers only)
-  const tiltX = useSpring(useMotionValue(0), { stiffness: 160, damping: 18 });
-  const tiltY = useSpring(useMotionValue(0), { stiffness: 160, damping: 18 });
-  const onPlateMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (reduced || e.pointerType !== 'mouse') return;
-    const r = e.currentTarget.getBoundingClientRect();
-    tiltY.set(((e.clientX - r.left) / r.width - 0.5) * 9);
-    tiltX.set(-((e.clientY - r.top) / r.height - 0.5) * 7);
+  const onCollageMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduced || event.pointerType !== 'mouse') return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    collageX.set(((event.clientX - rect.left) / rect.width - 0.5) * 18);
+    collageY.set(((event.clientY - rect.top) / rect.height - 0.5) * 12);
   };
-  const onPlateLeave = () => { tiltX.set(0); tiltY.set(0); };
 
-  const lines = HERO_LINES;
+  const resetCollage = () => {
+    collageX.set(0);
+    collageY.set(0);
+  };
 
   return (
-    <section ref={ref} className="relative min-h-dvh flex flex-col overflow-hidden" style={{ background: T.paper }}>
-      {/* 45° survey grid — downtown Calgary's rotated street grid */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-        <defs>
-          <pattern id="lp-grid" width="64" height="64" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <path d="M64 0H0V64" fill="none" stroke={T.ink} strokeWidth="0.5" />
-          </pattern>
-          <radialGradient id="lp-grid-fade" cx="30%" cy="30%" r="80%">
-            <stop offset="0%" stopColor="#fff" stopOpacity="1" />
-            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-          </radialGradient>
-          <mask id="lp-grid-mask"><rect width="100%" height="100%" fill="url(#lp-grid-fade)" /></mask>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#lp-grid)" mask="url(#lp-grid-mask)" opacity="0.07" />
-      </svg>
-
+    <section className="relative min-h-[100dvh] overflow-hidden bg-[#06162F]">
       <MobileHero reduced={reduced} />
 
-      <div className="relative z-10 mx-auto w-full max-w-[88rem] px-5 sm:px-8 pt-28 lg:pt-32 pb-16 hidden lg:grid lg:grid-cols-[7fr_5fr] gap-12 lg:gap-8 items-center flex-1">
-        {/* Left — thesis */}
-        <motion.div style={reduced ? undefined : { y: textY, opacity: fade }}>
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: EASE }}
-          >
-            <Eyebrow>
-              <span className="inline-flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-70" style={{ background: T.bow }} />
-                  <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: T.bow }} />
-                </span>
-                Live · Calgary, Alberta
-              </span>
-            </Eyebrow>
+      <div
+        className="absolute inset-0 hidden lg:block"
+        onPointerMove={onCollageMove}
+        onPointerLeave={resetCollage}
+      >
+        <motion.img
+          src={publicAsset('images/desktop-hero-calgary-collage.webp')}
+          alt="Art collage of Calgary Tower, Peace Bridge, the Bow River and downtown at night"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          initial={false}
+          animate={reduced ? undefined : { scale: [1.015, 1.04, 1.015] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-0 h-full w-full object-cover"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/hero-wide.webp'); }}
+        />
+
+        {!reduced && (
+          <motion.div className="absolute inset-0" style={{ x: collageX, y: collageY }} aria-hidden="true">
+            <motion.img
+              src={publicAsset('images/desktop-hero-calgary-collage.webp')}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ clipPath: 'polygon(51% 0, 100% 0, 100% 58%, 67% 56%, 45% 47%)', filter: 'saturate(1.08) contrast(1.03)' }}
+              animate={{ x: ['0.7%', '-0.5%', '0.7%'], y: ['-0.4%', '0.5%', '-0.4%'] }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.img
+              src={publicAsset('images/desktop-hero-calgary-collage.webp')}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ clipPath: 'polygon(42% 55%, 68% 58%, 100% 48%, 100% 100%, 31% 100%)' }}
+              animate={{ x: ['-0.5%', '0.65%', '-0.5%'], y: ['0.45%', '-0.3%', '0.45%'] }}
+              transition={{ duration: 12.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
           </motion.div>
+        )}
 
-          <h1 className="mt-6 font-display font-extrabold leading-[0.95] tracking-[-0.03em]" style={{ fontSize: 'clamp(2.7rem, 8.2vw, 7.2rem)' }}>
-            {lines.map((line, i) => (
-              <span key={line.text} className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-                <motion.span
-                  className="block"
-                  style={{ color: line.color }}
-                  initial={reduced ? false : { y: '110%' }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.9, delay: 0.15 + i * 0.13, ease: EASE }}
-                >
-                  {line.text}
-                  {i === 1 && (
-                    <motion.svg
-                      viewBox="0 0 300 14" className="block w-[62%] mt-1" aria-hidden="true"
-                      initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}
-                    >
-                      <motion.path
-                        d="M2 10 C 60 2, 120 13, 180 7 S 280 4, 298 8"
-                        fill="none" stroke={T.bow} strokeWidth="3.5" strokeLinecap="round"
-                        initial={reduced ? false : { pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 1.1, delay: 0.95, ease: 'easeInOut' }}
-                      />
-                    </motion.svg>
-                  )}
-                </motion.span>
-              </span>
-            ))}
-          </h1>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#06162F]/20 via-transparent to-transparent" aria-hidden="true" />
 
-          <motion.p
-            className="mt-7 max-w-xl text-[17px] leading-relaxed"
-            style={{ color: T.inkSoft }}
-            initial={reduced ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.65, ease: EASE }}
-          >
-            Calgary Watch is a free Calgary crime map and neighbourhood safety
-            network. See current community reports near you — break-ins, stolen
-            vehicles, traffic, weather and emergencies — then sign in to alert
-            your neighbours.
-          </motion.p>
+        <div className="absolute left-[3.5%] top-[15%] z-[3] -rotate-2 bg-[#F2EFE8] px-3 py-1.5 font-display text-[11px] font-black uppercase tracking-[0.16em] text-[#06162F] shadow-[4px_4px_0_#E52C20]" aria-hidden="true">
+          Calgary / 51.0447° N / 114.0719° W
+        </div>
 
-          <motion.div
-            className="mt-9 flex flex-wrap items-center gap-3.5"
-            initial={reduced ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.8, ease: EASE }}
-          >
-            <InkButton href="/map">
-              <MapPin size={16} />
-              Open the live map
-              <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </InkButton>
-            <InkButton href="/map?report=true" tone="outline">
-              Sign in to report
-            </InkButton>
-          </motion.div>
-
-          <motion.div
-            className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-[11px] uppercase tracking-[0.18em]"
-            style={{ color: T.inkSoft }}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.05 }}
-          >
-            <span><strong style={{ color: T.ink }}>5</strong> categories</span>
-            <span><strong style={{ color: T.ink }}>3 km</strong> near-me view</span>
-            <span><strong style={{ color: T.ink }}>&lt;30s</strong> to report</span>
-            <span style={{ color: T.bow }}>Free · Non-profit</span>
-          </motion.div>
+        <motion.div
+          className="absolute right-[4%] top-[14%] z-[3] flex size-20 rotate-6 flex-col items-center justify-center bg-[#E52C20] font-display text-white"
+          animate={reduced ? undefined : { rotate: [6, 2, 6], y: [0, -5, 0] }}
+          transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+          aria-hidden="true"
+        >
+          <span className="text-xl font-black leading-none">CW</span>
+          <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.18em] opacity-70">Live / 01</span>
         </motion.div>
 
-        {/* Right — skyline plate with live dispatch card */}
-        <motion.div
-          className="relative"
-          initial={reduced ? false : { opacity: 0, y: 40, rotate: 2 }}
-          animate={{ opacity: 1, y: 0, rotate: 0 }}
-          transition={{ duration: 1, delay: 0.5, ease: EASE }}
-          style={reduced ? undefined : { rotate: plateRotate, rotateX: tiltX, rotateY: tiltY, transformPerspective: 1100 }}
-          onPointerMove={onPlateMove}
-          onPointerLeave={onPlateLeave}
-        >
-          <div
-            className="relative overflow-hidden rounded-[1.5rem] sm:rounded-[1.75rem] shadow-[0_40px_80px_-32px_rgba(28,43,58,0.45)]"
-            style={{ border: `1px solid ${T.line}`, background: T.panel }}
+        <div className="absolute bottom-[7%] right-[2.5%] z-[3] font-display text-[10px] font-bold uppercase tracking-[0.18em] text-[#F2EFE8]/65 [writing-mode:vertical-rl]" aria-hidden="true">
+          Community-made · Calgary, Alberta
+        </div>
+
+        <div className="absolute left-[46%] right-[-3%] top-[73%] z-[3] rotate-[-2deg] overflow-hidden border-y border-[#06162F] bg-[#F2EFE8] py-2.5 text-[#06162F] shadow-[0_5px_0_#E52C20]" aria-hidden="true">
+          <motion.div
+            className="flex w-max whitespace-nowrap font-display text-[12px] font-black uppercase tracking-[0.16em]"
+            animate={reduced ? undefined : { x: ['0%', '-50%'] }}
+            transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
           >
-            <div className="relative h-[220px] sm:h-[420px] lg:h-[500px] overflow-hidden">
-              <motion.img
-                src={publicAsset('images/calgary2.webp')}
-                alt="Calgary Tower at golden hour"
-                width={1200} height={1641}
-                fetchPriority="high"
-                className="absolute inset-0 h-[118%] w-full object-cover"
-                style={reduced ? undefined : { y: imgY }}
-                onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary1.webp'); }}
-              />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(12,29,46,0.55), transparent 55%)' }} />
+            <span>{MOBILE_ROUTE}{MOBILE_ROUTE}</span>
+            <span>{MOBILE_ROUTE}{MOBILE_ROUTE}</span>
+          </motion.div>
+        </div>
 
-              {/* plate annotations */}
-              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 font-mono text-[8.5px] sm:text-[9.5px] tracking-[0.22em] uppercase px-2.5 py-1.5 rounded-md"
-                style={{ background: 'rgba(247,243,234,0.85)', color: T.ink, backdropFilter: 'blur(6px)' }}>
-                Plate 01 — Calgary Tower · Centre St S
-              </div>
-              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 hidden min-[400px]:block font-mono text-[8.5px] sm:text-[9.5px] tracking-[0.18em] px-2.5 py-1.5 rounded-md"
-                style={{ background: 'rgba(247,243,234,0.85)', color: T.bow, backdropFilter: 'blur(6px)' }}>
-                YYC · 1,045 m
-              </div>
-
-              {/* pulsing incident pins on the photo */}
-              {[
-                { left: '22%', top: '58%', color: '#f59e0b', delay: 0 },
-                { left: '58%', top: '40%', color: '#ef4444', delay: 0.8 },
-                { left: '78%', top: '66%', color: '#60a5fa', delay: 1.6 },
-              ].map((pin) => (
-                <span key={pin.left} className="absolute" style={{ left: pin.left, top: pin.top }} aria-hidden="true">
-                  <span
-                    className="absolute -inset-2.5 rounded-full animate-ping"
-                    style={{ background: pin.color, opacity: 0.3, animationDelay: `${pin.delay}s`, animationDuration: '2.4s' }}
-                  />
-                  <span className="relative block w-3 h-3 rounded-full border-2 border-[#fff]" style={{ background: pin.color }} />
-                </span>
-              ))}
-            </div>
-
-            {/* Dispatch strip under the photo */}
-            <div className="px-5 py-4" style={{ borderTop: `1px solid ${T.line}` }}>
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-mono text-[10px] uppercase tracking-[0.24em] flex items-center gap-2" style={{ color: T.inkSoft }}>
-                  <Activity size={11} style={{ color: T.sky }} />
-                  Live dispatch
-                </span>
-                <span className="font-mono text-[10px] font-bold flex items-center gap-1.5" style={{ color: T.red }}>
-                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.red }} />
-                  3 active
-                </span>
-              </div>
-              <HeroFeed reduced={reduced} />
-            </div>
+        <div className="relative z-[4] flex min-h-[100dvh] w-[48%] flex-col justify-end px-[clamp(3rem,6vw,7rem)] pb-[clamp(3rem,6vh,5.5rem)] pt-28">
+          <div className="mb-4 flex items-center gap-3 font-display text-xs font-bold uppercase tracking-[0.15em] text-[#AFC5DF]">
+            <motion.span
+              className="size-2.5 bg-[#E52C20]"
+              animate={reduced ? undefined : { rotate: [0, 90, 180], scale: [1, 0.72, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              aria-hidden="true"
+            />
+            Community reports + verified data
           </div>
 
-          {/* Floating quadrant compass chip */}
-          <motion.div
-            className="absolute -bottom-6 -left-6 hidden lg:flex items-center gap-3 rounded-2xl px-4 py-3 shadow-xl"
-            style={{ background: T.ink, color: T.paper }}
-            initial={reduced ? false : { opacity: 0, scale: 0.8, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 1.15, duration: 0.6, ease: EASE }}
-          >
-            <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-              <circle cx="17" cy="17" r="15" fill="none" stroke={T.paper} strokeOpacity="0.35" />
-              <path d="M17 5 L20 17 L17 29 L14 17 Z" fill={T.gold} />
-              <circle cx="17" cy="17" r="2" fill={T.paper} />
-            </svg>
-            <span className="font-mono text-[10px] leading-snug tracking-[0.14em] uppercase">
-              All four<br />quadrants live
+          <h1 className="font-display text-[clamp(5rem,9vw,9.5rem)] font-black uppercase leading-[0.76] tracking-[-0.04em] text-[#F2EFE8]">
+            <span className="block">Know</span>
+            <span className="block">your</span>
+            <span className="relative mt-3 inline-block overflow-hidden pb-[0.12em] pr-6 text-[#E52C20]">
+              city.
+              {!reduced && (
+                <motion.span
+                  className="absolute inset-y-0 w-12 -skew-x-12 bg-white/30 mix-blend-screen"
+                  initial={{ x: '-180%' }}
+                  animate={{ x: '850%' }}
+                  transition={{ duration: 1.4, delay: 0.8, repeat: Infinity, repeatDelay: 6, ease: [0.77, 0, 0.175, 1] }}
+                  aria-hidden="true"
+                />
+              )}
             </span>
-          </motion.div>
-        </motion.div>
-      </div>
+          </h1>
 
-      {/* Scroll cue */}
-      <motion.div
-        className="relative z-10 pb-6 hidden lg:flex justify-center"
-        initial={reduced ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4 }}
-      >
-        <div className="flex flex-col items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase" style={{ color: T.inkSoft }}>
-          Follow the river
-          <motion.span
-            animate={reduced ? undefined : { y: [0, 7, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            className="block w-px h-9"
-            style={{ background: `linear-gradient(to bottom, ${T.bow}, transparent)` }}
-          />
+          <p className="mt-5 max-w-[31rem] text-[clamp(1rem,1.2vw,1.2rem)] font-medium leading-relaxed text-[#D5DFEB]">
+            Live community reports and trusted city data, cut into one clear view of Calgary.
+          </p>
+
+          <div className="mt-7 flex items-center gap-4">
+            <a
+              href="/map"
+              className="group inline-flex h-14 items-center gap-3 bg-[#F2EFE8] px-7 font-display text-[15px] font-black uppercase text-[#06162F] shadow-[5px_5px_0_#E52C20] transition-transform hover:-translate-y-1 active:translate-x-1 active:translate-y-1 active:shadow-none"
+            >
+              <MapPin size={17} />
+              <span className="xl:hidden">Open map</span>
+              <span className="hidden xl:inline">Open the map</span>
+              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+            </a>
+            <a
+              href="/map?report=true"
+              className="inline-flex h-14 items-center border border-[#F2EFE8]/55 px-7 font-display text-[15px] font-bold text-[#F2EFE8] transition-colors hover:bg-[#F2EFE8] hover:text-[#06162F] active:translate-y-0.5"
+            >
+              <span className="xl:hidden">Report</span>
+              <span className="hidden xl:inline">Sign in to report</span>
+            </a>
+          </div>
+
+          <div className="mt-8 flex max-w-[34rem] items-center justify-between border-t border-[#F2EFE8]/20 pt-4 font-display text-[10px] font-bold uppercase tracking-[0.14em] text-[#AFC5DF]">
+            <span>Free / non-profit</span>
+            <span>All four quadrants</span>
+            <span>Built for neighbours</span>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
-
-function HeroFeed({ reduced }: { reduced: boolean }) {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    if (reduced) return;
-    const id = window.setInterval(() => setIdx((i) => (i + 1) % TICKER_ITEMS.length), 3200);
-    return () => window.clearInterval(id);
-  }, [reduced]);
-
-  const visible = [0, 1, 2].map((o) => TICKER_ITEMS[(idx + o) % TICKER_ITEMS.length]);
-
-  return (
-    <ul className="mt-3 space-y-2.5">
-      <AnimatePresence initial={false} mode="popLayout">
-        {visible.map((item) => {
-          const Icon = item.icon;
-          return (
-            <motion.li
-              key={item.title + item.area}
-              layout
-              initial={reduced ? false : { opacity: 0, x: -14 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={reduced ? undefined : { opacity: 0, x: 14 }}
-              transition={{ duration: 0.45, ease: EASE }}
-              className="flex items-center gap-3"
-            >
-              <span className="flex w-7 h-7 items-center justify-center rounded-lg shrink-0" style={{ background: `${item.color}1f` }}>
-                <Icon size={13} style={{ color: item.color }} />
-              </span>
-              <span className="text-[13px] font-semibold truncate" style={{ color: T.ink }}>{item.title}</span>
-              <span className="ml-auto font-mono text-[10px] shrink-0" style={{ color: T.inkSoft }}>{item.area}</span>
-            </motion.li>
-          );
-        })}
-      </AnimatePresence>
-    </ul>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Marquee ticker — the city, scrolling past
 // ---------------------------------------------------------------------------

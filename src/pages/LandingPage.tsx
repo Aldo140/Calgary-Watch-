@@ -5,6 +5,7 @@ import {
   useScroll,
   useTransform,
   useSpring,
+  useMotionTemplate,
   useInView,
   useMotionValue,
   useMotionValueEvent,
@@ -1686,129 +1687,214 @@ function SignalFlight({ reduced }: { reduced: boolean }) {
 // CATEGORIES — five wipe-reveal ledger rows
 // ---------------------------------------------------------------------------
 /**
- * WHAT WE TRACK — the dispatch board.
+ * WHAT WE TRACK — the specimen board.
  *
- * This was a hairline ledger table: five rows, rules between them, and the
- * whole right half of the heading area empty. It was also the one section that
- * looked like any other product page rather than like Calgary Watch.
+ * The copy promises "exactly how they appear on the map", so the section shows
+ * the real marker rather than an illustration of one: the same rounded tile,
+ * white rim and white icon that Map.tsx draws, at a size you can actually
+ * examine. Five specimens pinned to a board with a field label and a real
+ * sighting, the way a plate in a field guide is laid out.
  *
- * It now reads as the board an admin or a neighbour actually watches. Each
- * category is rendered the way an incident is rendered on the live map — a
- * coloured edge, an icon tile, and a status line carrying a real location —
- * so the page previews the product instead of describing it. The heading holds
- * the left column and stays put while the board scrolls past it, which is what
- * fills the dead space and gives the section a spine.
+ * ── On colour ──────────────────────────────────────────────────────────────
+ *
+ * This is the one editorial surface that carries the app's severity palette,
+ * because the palette *is* the subject — a legend has to be the real colours or
+ * it is not a legend. Per docs/design-system.md, brand vermilion and severity
+ * red must never share a view, so this section spends no vermilion at all. The
+ * badges carry every colour on screen and the type stays ink. That constraint
+ * is why the headline is not accented: picking one category to tint it would
+ * have been arbitrary, and picking the brand red would have broken the rule the
+ * section exists to illustrate.
+ *
+ * ── On the dimension ───────────────────────────────────────────────────────
+ *
+ * The flight section is flat on purpose. Here the badge is a physical object
+ * sitting on flat paper, so it may have depth the board does not: a small
+ * CSS-3D tilt with a sheen that tracks it, the way an enamel pin catches light.
+ * Pointer-driven where there is a pointer, scroll-driven where there is not, so
+ * a phone gets the same idea rather than a dead version of it. No WebGL — a
+ * rendered model would be a different material language and 150KB to say the
+ * same thing.
  */
-function Categories({ reduced }: { reduced: boolean }) {
-  const [active, setActive] = useState<string | null>(null);
+/** Field codes, so the plate reads as catalogued rather than truncated. */
+const FIELD_CODE: Record<string, string> = {
+  crime: 'CRM', traffic: 'TRF', weather: 'WTH', infrastructure: 'INF', emergency: 'EMG',
+};
 
+function SpecimenBadge({
+  category, reduced, index,
+}: {
+  category: (typeof CATEGORIES)[number];
+  reduced: boolean;
+  index: number;
+}) {
+  const Icon = category.icon;
+  const ref = useRef<HTMLDivElement>(null);
+  const rx = useSpring(useMotionValue(0), { stiffness: 140, damping: 16 });
+  const ry = useSpring(useMotionValue(0), { stiffness: 140, damping: 16 });
+  /** Where the highlight sits, in step with the tilt. */
+  const sheenX = useTransform(ry, [-14, 14], ['82%', '18%']);
+  const sheenY = useTransform(rx, [-14, 14], ['18%', '82%']);
+  // Hooks cannot live inside the conditional branch that renders the sheen.
+  const sheen = useMotionTemplate`radial-gradient(70% 60% at ${sheenX} ${sheenY}, rgba(255,255,255,0.5), rgba(255,255,255,0) 62%)`;
+
+  const onMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduced || event.pointerType !== 'mouse') return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    ry.set(((event.clientX - rect.left) / rect.width - 0.5) * 28);
+    rx.set((0.5 - (event.clientY - rect.top) / rect.height) * 28);
+  };
+  const rest = () => { rx.set(0); ry.set(0); };
+
+  // No pointer to follow on a phone, so the badge turns as it arrives instead.
+  const settle = reduced
+    ? {}
+    : {
+        initial: { rotateX: -18, rotateY: 12, opacity: 0 },
+        whileInView: { rotateX: 0, rotateY: 0, opacity: 1 },
+        viewport: { once: true, margin: '-80px' },
+        transition: { duration: 0.7, delay: index * 0.07, ease: EASE },
+      };
+
+  return (
+    <div
+      ref={ref}
+      onPointerMove={onMove}
+      onPointerLeave={rest}
+      className="relative shrink-0"
+      style={{ perspective: 620 }}
+    >
+      <motion.div
+        className="relative grid h-[4.5rem] w-[4.5rem] place-items-center sm:h-20 sm:w-20"
+        style={{
+          rotateX: reduced ? 0 : rx,
+          rotateY: reduced ? 0 : ry,
+          transformStyle: 'preserve-3d',
+          background: category.color,
+          borderRadius: 20,
+          border: '2.5px solid rgba(255,255,255,0.94)',
+          boxShadow: `0 8px 16px -10px ${category.color}, 0 2px 5px rgba(28,43,58,0.2)`,
+        }}
+        {...settle}
+      >
+        <Icon size={30} strokeWidth={2.4} color="#FFFFFF" aria-hidden="true" />
+        {/* The sheen: what makes it read as an object rather than a swatch. */}
+        {!reduced && (
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              borderRadius: 18,
+              background: sheen,
+            }}
+          />
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+/** One specimen: the marker, what it covers, and something really filed under it. */
+function Specimen({
+  category, reduced, index,
+}: {
+  category: (typeof CATEGORIES)[number];
+  reduced: boolean;
+  index: number;
+}) {
+  const [title, place] = category.sample.split(' · ');
+  const tilt = [-1.1, 0.8, -0.7, 1.1, -0.9][index] ?? 0;
+
+  return (
+    <motion.article
+      className="relative flex h-full gap-4 p-5 sm:gap-5 lg:flex-col lg:gap-0 lg:p-6"
+      style={{
+        background: T.panel,
+        border: `1px solid ${T.line}`,
+        boxShadow: `5px 5px 0 ${category.color}`,
+        rotate: `${tilt}deg`,
+      }}
+      initial={reduced ? false : { opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-70px' }}
+      transition={{ duration: 0.5, delay: index * 0.06, ease: EASE }}
+    >
+      {/* Field code — a specimen plate numbers what is on it. */}
+      <span
+        className="absolute right-4 top-4 font-mono text-[10px] font-bold uppercase tracking-[0.18em] lg:right-5 lg:top-5"
+        style={{ color: T.inkSoft }}
+        aria-hidden="true"
+      >
+        {FIELD_CODE[category.key] ?? category.key.toUpperCase()}
+      </span>
+
+      <SpecimenBadge category={category} reduced={reduced} index={index} />
+
+      <div className="flex min-w-0 flex-1 flex-col lg:mt-5">
+        <h3
+          className="font-display font-black uppercase leading-[0.92] tracking-[-0.03em]"
+          style={{ color: T.ink, fontSize: 'clamp(1.25rem, 2vw, 1.6rem)' }}
+        >
+          {category.label}
+        </h3>
+        <p className="mt-2 text-[13.5px] leading-[1.5]" style={{ color: T.inkSoft }}>
+          {category.desc}
+        </p>
+
+        {/* The sighting: proof the category is a real thing people file. */}
+        <div className="mt-4 pt-3 lg:mt-auto" style={{ borderTop: `1px dashed ${T.line}` }}>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: category.color }}>
+            Filed as
+          </p>
+          <p className="mt-1.5 text-[13px] font-bold leading-tight" style={{ color: T.ink }}>{title}</p>
+          <p className="font-mono text-[11px]" style={{ color: T.inkSoft }}>{place}</p>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function Categories({ reduced }: { reduced: boolean }) {
   return (
     <section
       id="features"
-      className="relative py-16 sm:py-20 lg:py-28"
-      style={{ background: T.panel, borderTop: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}` }}
+      className="relative py-16 sm:py-20 lg:py-24"
+      style={{ background: '#F2EFE8', borderTop: `1px solid ${T.line}`, borderBottom: `1px solid ${T.line}` }}
     >
-      <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid gap-10 lg:gap-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start">
-
-        {/* Left: the spine. Sticky on desktop so the board scrolls against it. */}
-        <div className="lg:sticky lg:top-28">
-          <Reveal>
-            <Eyebrow color={T.red}>What we track</Eyebrow>
-            <h2
-              className="mt-5 font-display font-extrabold tracking-[-0.025em] leading-[1.02]"
-              style={{ color: T.ink, fontSize: 'clamp(2.1rem, 4.4vw, 3.6rem)' }}
-            >
-              Five kinds of<br />report. One map.
-            </h2>
-            <p className="mt-5 max-w-sm text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-              Every report a neighbour files lands in one of these five. This is
-              exactly how they appear on the map — colour, category, and where it
-              happened.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.12}>
-            <div className="mt-7 flex items-center gap-2.5">
-              <span className="relative flex h-2 w-2" aria-hidden="true">
-                {!reduced && (
-                  <span className="absolute inline-flex h-full w-full rounded-full opacity-70 motion-safe:animate-ping" style={{ background: T.bow }} />
-                )}
-                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: T.bow }} />
-              </span>
-              <span className="font-mono text-[10.5px] uppercase tracking-[0.2em]" style={{ color: T.inkSoft }}>
-                All five live across every quadrant
+      <div className="mx-auto max-w-[88rem] px-5 sm:px-8">
+        <div className="lg:flex lg:items-end lg:justify-between lg:gap-10">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <span className="h-[3px] w-[22px] shrink-0" style={{ background: T.ink }} aria-hidden="true" />
+              <span className="font-mono text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: T.inkSoft }}>
+                What we track
               </span>
             </div>
-          </Reveal>
+            <h2
+              className="mt-4 font-display font-black uppercase leading-[0.84] tracking-[-0.04em]"
+              style={{ color: T.ink, fontSize: 'clamp(2.3rem, 6.4vw, 4.6rem)' }}
+            >
+              Five kinds of
+              <br />
+              report. One map.
+            </h2>
+          </div>
+          <p className="mt-5 max-w-[38ch] text-[14px] leading-[1.55] lg:mb-2 lg:mt-0 sm:text-[15px]" style={{ color: T.inkSoft }}>
+            Every report a neighbour files lands in one of these five. These are the real markers,
+            at the size and colour the map draws them.
+          </p>
         </div>
 
-        {/* Right: the board. Same anatomy as an incident on the live map. */}
-        <ul className="flex flex-col gap-3">
-          {CATEGORIES.map((cat, i) => {
-            const Icon = cat.icon;
-            const isActive = active === cat.key;
-            const [sampleTitle, sampleArea] = cat.sample.split(' · ');
-            return (
-              <motion.li
-                key={cat.key}
-                initial={reduced ? false : { opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: i * 0.06, ease: EASE }}
-                onMouseEnter={() => setActive(cat.key)}
-                onMouseLeave={() => setActive(null)}
-                onFocus={() => setActive(cat.key)}
-                onBlur={() => setActive(null)}
-                tabIndex={0}
-                className="group relative overflow-hidden rounded-2xl outline-none transition-[transform,box-shadow] duration-300 focus-visible:ring-2 focus-visible:ring-offset-2 sm:hover:-translate-y-0.5"
-                style={{
-                  background: T.paper,
-                  border: `1px solid ${isActive ? `${cat.color}66` : T.line}`,
-                  boxShadow: isActive ? `0 10px 24px -14px ${cat.color}99` : 'none',
-                  // @ts-expect-error -- CSS custom property for the focus ring
-                  '--tw-ring-color': cat.color,
-                }}
-              >
-                {/* Category edge — the same signal the map uses. */}
-                <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: cat.color }} aria-hidden="true" />
+        {/* The board */}
+        <div className="mt-10 grid gap-4 sm:mt-12 sm:gap-5 lg:grid-cols-5">
+          {CATEGORIES.map((c, i) => (
+            <Specimen key={c.key} category={c} reduced={reduced} index={i} />
+          ))}
+        </div>
 
-                <div className="relative flex items-start gap-4 py-5 pl-6 pr-5 sm:pl-7">
-                  <span
-                    className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105"
-                    style={{ background: `${cat.color}1c` }}
-                  >
-                    <Icon size={19} style={{ color: cat.color }} />
-                  </span>
-
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-xl font-bold sm:text-[1.35rem]" style={{ color: T.ink }}>
-                      {cat.label}
-                    </h3>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed sm:text-sm" style={{ color: T.inkSoft }}>
-                      {cat.desc}
-                    </p>
-
-                    {/* Status line, styled like a live incident row. */}
-                    <div
-                      className="mt-3.5 flex flex-wrap items-center gap-x-2 gap-y-1 pt-3"
-                      style={{ borderTop: `1px dashed ${T.line}` }}
-                    >
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: cat.color }} aria-hidden="true" />
-                      <span className="font-mono text-[10.5px] font-semibold" style={{ color: cat.color }}>
-                        {sampleTitle}
-                      </span>
-                      {sampleArea && (
-                        <span className="font-mono text-[10.5px]" style={{ color: T.inkSoft }}>
-                          · {sampleArea}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.li>
-            );
-          })}
-        </ul>
+        <p className="mt-8 font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: T.inkSoft }}>
+          All five live across every quadrant · NW · NE · SW · SE
+        </p>
       </div>
     </section>
   );

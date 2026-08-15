@@ -62,10 +62,18 @@ things: one is the brand's ink, the other is *someone is in danger*.
 editorial surfaces carry no incident severity, and data surfaces carry no
 marketing accent. Where they would otherwise meet, severity wins.
 
-This is currently true by construction: the landing page renders no severity
-colours, and the app renders no marketing accent. Keep it that way. If a
-marketing CTA ever has to sit next to an incident chip, the CTA gives up the
+This is true by construction almost everywhere: the landing page renders no
+severity colours, and the app renders no marketing accent. Keep it that way. If
+a marketing CTA ever has to sit next to an incident chip, the CTA gives up the
 red.
+
+**The one exception is the legend.** "What we track" on the landing page shows
+the five category markers, and a legend has to be the real colours or it is not
+a legend. So that section carries the severity palette and spends *no*
+vermilion at all — the badges hold every colour on screen and the type stays
+ink. That is also why its headline is not accented: tinting it with one
+category would be arbitrary, and tinting it with the brand red would break the
+very rule the section exists to illustrate.
 
 ---
 

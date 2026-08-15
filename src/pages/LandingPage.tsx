@@ -902,8 +902,16 @@ function DayStories({ reduced }: { reduced: boolean }) {
   };
 
   return (
-    <section className="lg:hidden py-16 sm:py-20 overflow-hidden" style={{ background: T.night }} aria-label="One day on the watch — photo stories">
-      <div className="px-5 sm:px-8">
+    <section className="relative lg:hidden py-16 sm:py-20 overflow-hidden" style={{ background: T.night }} aria-label="One day on the watch — photo stories">
+      <motion.img
+        src={publicAsset('images/plane-signal.webp')}
+        alt=""
+        className="pointer-events-none absolute -right-20 top-8 w-72 rotate-[-7deg] object-contain opacity-[0.16]"
+        animate={reduced ? undefined : { x: [8, -6, 8], y: [4, -3, 4] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden="true"
+      />
+      <div className="relative px-5 sm:px-8">
         <Eyebrow color={T.gold} light>Field footage · 24 hours</Eyebrow>
         <h2 className="mt-4 font-display font-extrabold tracking-[-0.025em] leading-[1.02]" style={{ color: T.nightText, fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
           One day on the watch.
@@ -1068,6 +1076,15 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
         ))}
 
         {/* intro title — owns the first stretch, always above the plates */}
+        <motion.img
+          src={publicAsset('images/plane-signal.webp')}
+          alt=""
+          className="pointer-events-none absolute right-[3%] top-[12%] w-[min(34vw,30rem)] rotate-[-5deg] object-contain opacity-[0.13]"
+          style={{ zIndex: 44 }}
+          animate={{ x: [12, -8, 12], y: [6, -4, 6] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+          aria-hidden="true"
+        />
         <motion.div
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
           style={{ opacity: introOpacity, y: introY, scale: introScale, zIndex: 45 }}
@@ -1419,11 +1436,21 @@ function HowItWorksRide() {
       <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
         <div className="mx-auto w-full max-w-[88rem] px-8 mb-10">
           <Eyebrow>From sighting to signal</Eyebrow>
-          <div className="mt-4 flex items-end justify-between gap-8">
+          <div className="relative mt-4 flex items-end justify-between gap-8">
             <h2 className="font-display font-extrabold tracking-[-0.025em] leading-none" style={{ color: T.ink, fontSize: 'clamp(2.2rem,4.2vw,3.8rem)' }}>
               Thirty seconds,<br />start to signal.
             </h2>
-            <div className="hidden xl:block w-64 h-px relative" style={{ background: T.line }} aria-hidden="true">
+            <motion.img
+              src={publicAsset('images/plane-speed.webp')}
+              alt=""
+              className="pointer-events-none absolute right-0 bottom-[-1.5rem] hidden w-80 object-contain opacity-90 xl:block"
+              initial={{ opacity: 0, x: -90, rotate: -4 }}
+              whileInView={{ opacity: 0.9, x: 0, rotate: -1 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.9, ease: EASE }}
+              aria-hidden="true"
+            />
+            <div className="hidden xl:block w-64 h-px relative opacity-0" style={{ background: T.line }} aria-hidden="true">
               <motion.div className="absolute left-0 w-full origin-left" style={{ scaleX: trackScale, background: T.bow, height: '2px', top: '-0.5px' }} />
             </div>
           </div>
@@ -1449,6 +1476,14 @@ function SignalTimeline({ reduced, allSizes }: { reduced: boolean; allSizes: boo
 
   return (
     <section className={cn('relative py-20 sm:py-24 overflow-hidden', !allSizes && 'lg:hidden')} style={{ background: T.paper }}>
+      <motion.img
+        src={publicAsset('images/plane-speed.webp')}
+        alt=""
+        className="pointer-events-none absolute -right-24 top-8 w-72 rotate-[-7deg] object-contain opacity-[0.1] sm:w-96"
+        animate={reduced ? undefined : { x: [10, -5, 10], y: [4, -3, 4] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden="true"
+      />
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <Reveal>
           <Eyebrow>From sighting to signal</Eyebrow>
@@ -2223,6 +2258,15 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
             </defs>
             <rect width="100%" height="100%" fill="url(#lp-cta-grid)" />
           </svg>
+
+          <motion.img
+            src={publicAsset('images/plane-white.webp')}
+            alt=""
+            className="pointer-events-none absolute -left-20 -bottom-12 w-80 rotate-[-8deg] object-contain opacity-[0.24] mix-blend-screen sm:w-[30rem] lg:-left-12 lg:-bottom-20"
+            animate={reduced ? undefined : { x: [8, -7, 8], y: [5, -4, 5], rotate: [-8, -5, -8] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+            aria-hidden="true"
+          />
 
           <div className="relative">
             <p className="font-mono text-[11px] uppercase tracking-[0.34em]" style={{ color: T.gold }}>The map is already on</p>

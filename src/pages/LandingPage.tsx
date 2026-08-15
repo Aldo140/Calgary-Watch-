@@ -2141,7 +2141,20 @@ function Coverage() {
         </div>
 
         <Reveal delay={0.1} className="order-3 lg:col-start-1 lg:row-start-2">
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md">
+            {/*
+              One control, not two blocks. Stacked, a pale hairline input above
+              a solid black button read as two unrelated things and ate most of
+              a phone screen; the placeholder also floated oddly inside the
+              pill. The field and its action now share a single container that
+              lights up as one on focus, which is both shorter and legible as a
+              thing you type into.
+            */}
+            <label
+              htmlFor="city-request-input"
+              className="flex items-center gap-2 rounded-full py-1.5 pl-5 pr-1.5 max-w-md transition-shadow focus-within:shadow-[0_0_0_3px_rgba(74,144,217,0.25)]"
+              style={{ background: T.panel, border: `1.5px solid ${T.line}` }}
+            >
+              <span className="sr-only">Request a city</span>
               <input
                 id="city-request-input"
                 type="text"
@@ -2150,14 +2163,23 @@ function Coverage() {
                 maxLength={100}
                 onChange={(e) => setCityRequest(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCityRequest(); }}
-                className="flex-1 h-[52px] rounded-full px-6 text-[15px] font-medium outline-none transition-shadow focus:shadow-[0_0_0_3px_rgba(74,144,217,0.25)]"
-                style={{ background: T.panel, border: `1.5px solid ${T.line}`, color: T.ink }}
-                aria-label="Request a city"
+                className="min-w-0 flex-1 bg-transparent py-2.5 text-[15px] font-medium outline-none placeholder:font-normal"
+                style={{ color: T.ink }}
               />
-              <InkButton onClick={handleCityRequest} className={cn('shrink-0', submitting && 'opacity-60 pointer-events-none')}>
+              <button
+                type="button"
+                onClick={handleCityRequest}
+                disabled={submitting}
+                className={cn(
+                  'shrink-0 rounded-full h-11 px-5 text-[14px] font-bold transition-[background-color,opacity] active:scale-[0.98]',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2',
+                  submitting && 'opacity-60 pointer-events-none',
+                )}
+                style={{ background: T.ink, color: T.paper, outlineColor: T.sky }}
+              >
                 {submitting ? 'Sending…' : 'Request it'}
-              </InkButton>
-            </div>
+              </button>
+            </label>
             {message && (
               <p className="mt-3 text-sm font-semibold" style={{ color: T.bow }} role="status">{message}</p>
             )}

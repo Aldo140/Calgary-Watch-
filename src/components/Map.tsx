@@ -64,6 +64,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const [isOutsideServiceArea, setIsOutsideServiceArea] = useState(false);
   // Live map centre - updated on every move event so the pin overlay shows real coords
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [isSettling, setIsSettling] = useState(false);
 
   // Callback refs - keep the single Leaflet click handler up-to-date with latest props
   // without needing to re-register it on every render.
@@ -493,8 +494,19 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       setMapCenter({ lat: c.lat, lng: c.lng });
     };
     update(); // seed immediately when pin mode activates
+    // Settling state drives the reticle: it only pulses while the map is
+    // actually moving, so the animation reports something instead of
+    // decorating. A still reticle means the coordinate under it is final.
+    const start = () => setIsSettling(true);
+    const end = () => setIsSettling(false);
     map.current.on('move', update);
-    return () => { map.current?.off('move', update); };
+    map.current.on('movestart', start);
+    map.current.on('moveend', end);
+    return () => {
+      map.current?.off('move', update);
+      map.current?.off('movestart', start);
+      map.current?.off('moveend', end);
+    };
   }, [isPinMode, isMapLoaded]);
 
   // Fetch Calgary community boundaries once for choropleth.
@@ -938,112 +950,96 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         </div>
       )}
 
-      {/* ── Pin-mode crosshair overlay ── */}
+      {/*
+        ── Pin placement: a surveyor's sight, not a map blob ──────────────────
+        The old overlay was a blue gradient teardrop on slate chrome — none of
+        it from the brand palette, and it vanished into marker clusters because
+        it was the same weight and hue as the pins around it. Two labels were
+        also unreadable: "Set Pin Here" inside the dark banner and the Cancel
+        button both rendered dark-on-dark, because the app's `light:` theme
+        layer overrides utility colours here. Every colour below is inline for
+        that reason.
+
+        The reticle reads as an instrument: a white halo so it survives any
+        basemap or cluster behind it, ink rings for precision, and the Bow teal
+        reserved for the exact point. It centres on the coordinate directly, so
+        the fragile stem-and-tip offset that used to align it is gone.
+      */}
       {isPinMode && (
         <>
-          {/* Crosshair guide lines */}
+          {/* Graticule. Hairlines with a gap at the centre so they frame the
+              reticle rather than run through it. */}
           <div className="absolute inset-0 z-20 pointer-events-none select-none">
-            <div className="absolute top-1/2 w-full h-px bg-blue-400/25" />
-            <div className="absolute left-1/2 h-full w-px bg-blue-400/25" />
+            <div className="absolute top-1/2 left-0 right-1/2 h-px" style={{ background: 'rgba(11,31,51,0.18)', marginRight: 46 }} />
+            <div className="absolute top-1/2 left-1/2 right-0 h-px" style={{ background: 'rgba(11,31,51,0.18)', marginLeft: 46 }} />
+            <div className="absolute left-1/2 top-0 bottom-1/2 w-px" style={{ background: 'rgba(11,31,51,0.18)', marginBottom: 46 }} />
+            <div className="absolute left-1/2 top-1/2 bottom-0 w-px" style={{ background: 'rgba(11,31,51,0.18)', marginTop: 46 }} />
           </div>
 
-          {/* Pin - rendered in its own stacking layer so the shadow ellipse
-              doesn't clip the crosshair lines above */}
+          {/* Reticle, centred exactly on the map centre. */}
           <div className="absolute inset-0 z-[21] pointer-events-none select-none">
-            {/*
-              The entire pin graphic is a column of:
-                [pulse ring + pin head] → stem → tip dot (= map centre)
-              translateY(-100%) lifts it so the tip dot sits exactly at 50%/50%.
-            */}
             <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                // -100% lifts the whole column so its bottom aligns with 50%.
-                // +6px compensates for the 6px tip dot: +3px for tip radius, +3px
-                // for the visual optical correction (pin head shadow reads heavy).
-                transform: 'translateX(-50%) translateY(calc(-100% + 6px))',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
+              className="absolute"
+              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
             >
-              {/* Pulse ring - uses Tailwind's animate-ping */}
-              <div
-                className="animate-ping"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  width: 44,
-                  height: 44,
-                  borderRadius: '50%',
-                  background: 'rgba(37,99,235,0.30)',
-                }}
-              />
-              {/* Pin head */}
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg,#3b82f6,#1d4ed8)',
-                  border: '3px solid white',
-                  boxShadow: '0 6px 24px rgba(37,99,235,0.55)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {/* Inner dot */}
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'white', opacity: 0.9 }} />
-              </div>
-              {/* Stem */}
-              <div style={{ width: 3, height: 18, background: 'linear-gradient(to bottom,#1d4ed8,#1e3a8a)', borderRadius: '0 0 2px 2px', flexShrink: 0 }} />
-              {/* Tip dot - this pixel sits at exact map centre */}
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#1d4ed8', flexShrink: 0 }} />
+              <svg width="92" height="92" viewBox="0 0 92 92" aria-hidden="true">
+                {/* White halo keeps the sight legible over dark clusters. */}
+                <circle cx="46" cy="46" r="27" fill="none" stroke="#FFFFFF" strokeWidth="6" opacity="0.9" />
+                <circle cx="46" cy="46" r="27" fill="none" stroke="#0B1F33" strokeWidth="1.75" />
+                <circle cx="46" cy="46" r="17" fill="none" stroke="#0B1F33" strokeWidth="1" opacity="0.45" />
+                {/* Ticks at the cardinals — the sight's own graticule. */}
+                {[[46, 8, 46, 19], [46, 73, 46, 84], [8, 46, 19, 46], [73, 46, 84, 46]].map(([x1, y1, x2, y2], i) => (
+                  <g key={i}>
+                    <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round" opacity="0.9" />
+                    <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#0B1F33" strokeWidth="1.75" strokeLinecap="round" />
+                  </g>
+                ))}
+                {/* The point itself. Teal is used nowhere else in this overlay. */}
+                <circle cx="46" cy="46" r="6.5" fill="#FFFFFF" />
+                <circle cx="46" cy="46" r="4.5" fill="#2E8B7A" />
+                {/* Settling ring: present only while the map is in motion. */}
+                {isSettling && (
+                  <circle cx="46" cy="46" r="27" fill="none" stroke="#2E8B7A" strokeWidth="2" opacity="0.55">
+                    <animate attributeName="r" values="20;34;20" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.55;0;0.55" dur="1.1s" repeatCount="indefinite" />
+                  </circle>
+                )}
+              </svg>
             </div>
-
-            {/* Shadow ellipse under the tip */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, 6px)',
-                width: 20,
-                height: 6,
-                borderRadius: '50%',
-                background: 'rgba(0,0,0,0.30)',
-                filter: 'blur(3px)',
-              }}
-            />
           </div>
 
-          {/* Instruction banner + live coordinate readout */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2 max-lg:top-[calc(5.25rem+env(safe-area-inset-top))] lg:top-4 w-[92vw] max-w-sm">
-            <div className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl bg-slate-950/90 border border-blue-500/40 shadow-2xl backdrop-blur-md w-full">
-              <svg className="shrink-0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span className="text-blue-300 text-[10px] sm:text-xs font-bold leading-tight flex-1 text-center truncate">
-                Tap map to pin - or pan & press <span className="text-white">Set Pin Here</span>
+          {/* Instruction + live coordinate, on cream so the text is readable. */}
+          <div className="absolute left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center gap-2 w-[92vw] max-w-xs max-lg:top-[calc(5.25rem+env(safe-area-inset-top))] lg:top-6">
+            <div
+              className="flex items-center gap-2 px-3.5 py-2.5 rounded-full shadow-lg w-full justify-center"
+              style={{ background: '#F7F3EA', border: '1px solid rgba(11,31,51,0.14)' }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2E8B7A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+              </svg>
+              <span className="text-[12px] font-bold leading-tight" style={{ color: '#0B1F33' }}>
+                Move the map to place your pin
               </span>
             </div>
-            {/* Live coords - updates every frame as user pans */}
             {mapCenter && (
-              <div className="px-3 py-1.5 rounded-xl bg-slate-950/80 border border-white/10 backdrop-blur-md">
-                <span className="text-[11px] font-mono text-emerald-300">
-                  {mapCenter.lat.toFixed(5)},&nbsp;{mapCenter.lng.toFixed(5)}
+              <div
+                className="px-2.5 py-1 rounded-md shadow-sm"
+                style={{ background: '#0B1F33', border: '1px solid rgba(255,255,255,0.12)' }}
+              >
+                <span className="text-[11px] tabular-nums" style={{ fontFamily: "'IBM Plex Mono', ui-monospace, monospace", color: '#EAF2F8' }}>
+                  {mapCenter.lat.toFixed(5)}, {mapCenter.lng.toFixed(5)}
                 </span>
               </div>
             )}
           </div>
 
-          {/* Action buttons - when LayerToggle is hidden (isPinMode), sit above collapsed MobileMapSheet */}
-          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center justify-center flex-wrap gap-2 md:gap-3 w-[90vw] max-w-sm max-lg:bottom-[5.5rem] md:max-lg:bottom-28 bottom-36 md:bottom-28">
+          {/* Actions. Ink for confirm, cream for cancel — both with explicit
+              inline colours so neither label can be themed into invisibility. */}
+          <div className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 w-[90vw] max-w-sm max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] bottom-32 md:bottom-28">
             <button
               onClick={(e) => { e.stopPropagation(); onPinCancel?.(); }}
-              className="px-5 py-3 rounded-2xl bg-slate-900/90 border border-white/15 text-slate-300 text-sm font-bold backdrop-blur-md hover:bg-slate-800 active:scale-95 transition-all shadow-xl whitespace-nowrap shrink-0 flex-1 max-w-[120px]"
+              className="h-12 px-5 rounded-full text-[14px] font-bold shadow-lg active:scale-95 transition-transform shrink-0"
+              style={{ background: '#F7F3EA', border: '1px solid rgba(11,31,51,0.16)', color: '#0B1F33' }}
             >
               Cancel
             </button>
@@ -1054,10 +1050,13 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
                 const c = map.current.getCenter();
                 onPinConfirm?.(c.lat, c.lng);
               }}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xl shadow-blue-500/40 active:scale-95 transition-all whitespace-nowrap shrink-0 flex-[2]"
+              className="flex-1 h-12 inline-flex items-center justify-center gap-2 rounded-full text-[14px] font-bold shadow-xl active:scale-95 transition-transform"
+              style={{ background: '#0B1F33', color: '#F7FBFF' }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              Set Pin Here
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E8B7A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+              </svg>
+              Drop pin here
             </button>
           </div>
         </>

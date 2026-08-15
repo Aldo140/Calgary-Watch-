@@ -1323,7 +1323,6 @@ const STEPS = [
     n: '01',
     title: 'Spot it',
     body: 'Something is happening on your street — a collision, a break-in, a flooded underpass. You are already the closest sensor the city has.',
-    accent: T.sky,
     mono: 'OBSERVE · YOUR BLOCK',
     log: '→ eyes on · 51.0447 N, 114.0719 W',
     art: 'images/process-megaphone.webp',
@@ -1333,7 +1332,6 @@ const STEPS = [
     n: '02',
     title: 'Pin it',
     body: 'Drop a pin, pick a category, write one line — and if it\'s your stolen bike, add a way for neighbours to reach you. Under thirty seconds, anonymous if you prefer.',
-    accent: T.gold,
     mono: 'REPORT · <30 SECONDS',
     log: '→ pin dropped · category set · 0:27',
     art: 'images/process-signal.webp',
@@ -1343,7 +1341,6 @@ const STEPS = [
     n: '03',
     title: 'The city sees it',
     body: 'Your report appears instantly for every neighbour watching the map — and stays there, so patterns become visible over weeks.',
-    accent: T.bow,
     mono: 'BROADCAST · REALTIME',
     log: '→ live on the map · all quadrants',
     art: 'images/process-community.webp',
@@ -1353,7 +1350,6 @@ const STEPS = [
     n: '04',
     title: 'The pattern stays',
     body: 'Recent reports remain visible with their time and source, helping neighbours notice repeat activity without turning one observation into a permanent label.',
-    accent: T.red,
     mono: 'CONTEXT · OVER TIME',
     log: '→ dated · attributed · easier to verify',
     art: 'images/process-history.webp',
@@ -1361,237 +1357,328 @@ const STEPS = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// FROM SIGHTING TO SIGNAL — the report's flight path
+// ---------------------------------------------------------------------------
 /**
- * One step of the report sequence.
+ * The brand mark is a paper plane and this section is about a report
+ * travelling, so the structure is the flight itself: one drawn trajectory,
+ * four waypoints, flown as you scroll. That earns the numbering — filing a
+ * report really is a sequence — and it belongs to this product rather than
+ * being a timeline that would suit anything.
  *
- * The card used to be 58vh with the content pinned top and the step numeral
- * pinned bottom, which left roughly 270px of nothing between them and made the
- * numeral read as a stray mark rather than part of the card.
+ * Editorial layer, so it takes the full poster language (see
+ * docs/design-system.md): navy ground, paper slips pinned off-axis with hard
+ * vermilion offset shadows, uppercase display, zero radius.
  *
- * The numeral now sits where a reader meets it — top right, bleeding past the
- * corner so it registers as the card's index rather than a decoration — and
- * the card is shorter, so the copy sits in a composition instead of floating
- * at the top of a void. The numbering is kept because filing a report really
- * is a sequence; the order carries information.
+ * The four steps used to carry four different accent colours. The poster
+ * language has one accent, so identity now comes from the numeral and the
+ * label, and vermilion is spent only on the path and the waypoint the plane
+ * has reached. Four accents in a four-step sequence was decoration pretending
+ * to be information.
+ *
+ * No 3D here deliberately: this language is screen-printed and flat — zero-blur
+ * shadows, no perspective, no depth haze. A rendered model would fight every
+ * other rule in it, and the hard offset shadow already does the "lifted off the
+ * page" job in the grammar the rest of the page speaks.
  */
-function RideCard({ step }: { step: (typeof STEPS)[number] }) {
-  return (
-    <div
-      className="relative overflow-hidden rounded-3xl p-9 xl:p-11 flex flex-col w-[min(42vw,580px)] shrink-0 h-[46vh] min-h-[22rem]"
-      style={{ background: T.panel, border: `1px solid ${T.line}` }}
-    >
-      <div className="absolute top-0 left-0 h-1.5 w-full" style={{ background: step.accent }} aria-hidden="true" />
 
-      <motion.img
-        src={publicAsset(step.art)}
-        alt={step.artAlt}
-        width={640}
-        height={640}
-        className="absolute -right-7 -top-7 z-0 h-44 w-44 rotate-3 object-cover opacity-90 xl:h-52 xl:w-52"
-        whileHover={{ rotate: 0, scale: 1.025 }}
-        transition={{ duration: 0.22, ease: EASE }}
-      />
+/** Where each waypoint sits along the flight, 0–1. */
+const WAYPOINTS = [0.03, 0.35, 0.67, 0.98];
 
-      <div className="relative z-10 pr-32 xl:pr-40">
-        <p className="font-mono text-[11px] tracking-[0.28em]" style={{ color: step.accent }}>{step.mono}</p>
-        <h3 className="mt-3.5 font-display font-extrabold tracking-[-0.02em]" style={{ color: T.ink, fontSize: 'clamp(2.2rem,3.1vw,3.2rem)' }}>
-          {step.title}
-        </h3>
-      </div>
-      <p className="relative z-10 mt-4 max-w-md text-[15.5px] leading-relaxed" style={{ color: T.inkSoft }}>{step.body}</p>
+const DESKTOP_STAGE = { w: 1200, h: 230 };
+/**
+ * A shallow climb across the top of the stage, with the slips hanging beneath
+ * it like luggage tags.
+ *
+ * The first version climbed hard and alternated slips above and below the
+ * line. On a rising path that inverts: "below waypoint four" ends up higher
+ * than "above waypoint three", so the last two slips collided. Hanging them
+ * all from the same side means the path's own climb does the staggering, which
+ * is both tidier and truer to what the line represents.
+ */
+const DESKTOP_PATH =
+  'M 16 194 C 220 194, 286 152, 462 140 C 638 128, 706 94, 884 80 C 1012 70, 1094 48, 1184 34';
 
-      <p
-        className="relative z-10 mt-auto pt-5 font-mono text-[10.5px] tracking-[0.08em]"
-        style={{ color: step.accent, borderTop: `1px dashed ${T.line}` }}
-      >
-        {step.log}
-      </p>
-    </div>
-  );
-}
+/** Column centres, as a fraction of the stage width — one per step. */
+const COLUMNS = [0.125, 0.375, 0.625, 0.875];
 
 /**
- * Desktop pinned ride. The section height is 100vh + the measured horizontal
- * overflow of the card track, so scroll distance and card travel match 1:1 —
- * the pin releases exactly when the last card is fully in view.
+ * Rides a motion value along an SVG path.
+ *
+ * Position and heading both come from the path itself — the heading by sampling
+ * a point slightly ahead — so the plane genuinely banks into the curve instead
+ * of being keyframed to approximately match it.
  */
-function HowItWorksRide() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [distance, setDistance] = useState(0);
+function usePathRider(pathRef: React.RefObject<SVGPathElement | null>, progress: MotionValue<number>) {
+  const [length, setLength] = useState(0);
 
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const measure = () => {
-      setDistance(Math.max(track.scrollWidth - window.innerWidth, 0));
-    };
+    const measure = () => setLength(pathRef.current?.getTotalLength() ?? 0);
     measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(track);
     window.addEventListener('resize', measure);
-    return () => { ro.disconnect(); window.removeEventListener('resize', measure); };
-  }, []);
+    return () => window.removeEventListener('resize', measure);
+  }, [pathRef]);
 
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] });
-  const x = useTransform(scrollYProgress, [0, 1], [0, -distance]);
-  const trackScale = useSpring(scrollYProgress, { stiffness: 80, damping: 22 });
+  const at = (p: number) => {
+    const path = pathRef.current;
+    if (!path || length === 0) return { x: 0, y: 0, angle: 0 };
+    const d = Math.min(Math.max(p, 0), 1) * length;
+    const here = path.getPointAtLength(d);
+    const ahead = path.getPointAtLength(Math.min(d + 2, length));
+    return { x: here.x, y: here.y, angle: (Math.atan2(ahead.y - here.y, ahead.x - here.x) * 180) / Math.PI };
+  };
 
+  /**
+   * The point on the path directly above a column.
+   *
+   * Cards sit on an even grid rather than being hung off the path: four cards
+   * wide enough to hold a sentence do not fit between four waypoints spaced by
+   * a curve, and anchoring them to the curve made every neighbouring pair
+   * overlap. Sampling the path for each column's x instead keeps the dot
+   * genuinely on the line while the cards stay evenly spaced.
+   */
+  const atX = (targetX: number) => {
+    const path = pathRef.current;
+    if (!path || length === 0) return { x: targetX, y: 0, t: 0 };
+    let lo = 0;
+    let hi = length;
+    for (let i = 0; i < 24; i += 1) {
+      const mid = (lo + hi) / 2;
+      if (path.getPointAtLength(mid).x < targetX) lo = mid; else hi = mid;
+    }
+    const pt = path.getPointAtLength(lo);
+    return { x: pt.x, y: pt.y, t: lo / length };
+  };
+
+  return {
+    length,
+    x: useTransform(progress, (p) => at(p).x),
+    y: useTransform(progress, (p) => at(p).y),
+    angle: useTransform(progress, (p) => at(p).angle),
+    pointAt: at,
+    pointAtX: atX,
+  };
+}
+
+/** A paper slip pinned to the board. */
+function FlightSlip({
+  step, index, reached, reduced, className,
+}: {
+  step: (typeof STEPS)[number];
+  index: number;
+  reached: boolean;
+  reduced: boolean;
+  className?: string;
+}) {
+  const tilt = [-1.6, 1.2, -1.1, 1.7][index] ?? 0;
   return (
-    <div ref={sectionRef} className="relative hidden lg:block" style={{ background: T.paper, height: `calc(100vh + ${distance}px)` }}>
-      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
-        <div className="mx-auto w-full max-w-[88rem] px-8 mb-10">
-          <Eyebrow>From sighting to signal</Eyebrow>
-          <div className="relative mt-4 flex items-end justify-between gap-8">
-            <h2 className="font-display font-extrabold tracking-[-0.025em] leading-none" style={{ color: T.ink, fontSize: 'clamp(2.2rem,4.2vw,3.8rem)' }}>
-              Thirty seconds,<br />start to signal.
-            </h2>
-            <motion.img
-              src={publicAsset('images/plane-speed.webp')}
-              alt=""
-              className="pointer-events-none absolute right-0 bottom-[-1.5rem] hidden w-80 object-contain opacity-90 xl:block"
-              initial={{ opacity: 0, x: -90, rotate: -4 }}
-              whileInView={{ opacity: 0.9, x: 0, rotate: -1 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, ease: EASE }}
-              aria-hidden="true"
-            />
-            <div className="hidden xl:block w-64 h-px relative opacity-0" style={{ background: T.line }} aria-hidden="true">
-              <motion.div className="absolute left-0 w-full origin-left" style={{ scaleX: trackScale, background: T.bow, height: '2px', top: '-0.5px' }} />
-            </div>
-          </div>
-        </div>
-        <motion.div ref={trackRef} className="flex gap-6 pl-[6vw] pr-[6vw] w-max" style={{ x }}>
-          {STEPS.map((s) => <RideCard key={s.n} step={s} />)}
-        </motion.div>
+    <motion.article
+      className={cn('relative', className)}
+      initial={reduced ? false : { opacity: 0, y: 22, rotate: tilt * 2.2 }}
+      whileInView={{ opacity: 1, y: 0, rotate: tilt }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.55, ease: EASE }}
+    >
+      <div
+        className="relative bg-[#F2EFE8] px-5 py-5 sm:px-6 sm:py-6"
+        style={{ boxShadow: reached ? '6px 6px 0 #E52C20' : '6px 6px 0 rgba(242,239,232,0.22)', transition: 'box-shadow 420ms ease' }}
+      >
+        {/* The index, set as the poster sets numbers: huge, tight, cropped. */}
+        <span
+          className="pointer-events-none absolute -top-1 right-3 select-none font-display font-black leading-none tracking-[-0.06em]"
+          style={{ fontSize: 'clamp(3.4rem, 7vw, 5.2rem)', color: 'rgba(6,22,47,0.07)' }}
+          aria-hidden="true"
+        >
+          {step.n}
+        </span>
+
+        <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.2em]" style={{ color: '#E52C20' }}>
+          {step.mono}
+        </p>
+        <h3
+          className="mt-2 font-display font-black uppercase leading-[0.88] tracking-[-0.03em]"
+          style={{ color: '#06162F', fontSize: 'clamp(1.5rem, 3vw, 2.1rem)' }}
+        >
+          {step.title}
+        </h3>
+        <p className="relative mt-2.5 text-[13.5px] leading-[1.5]" style={{ color: '#3B4A5C' }}>
+          {step.body}
+        </p>
+        <p
+          className="mt-3.5 pt-3 font-mono text-[10px] tracking-[0.06em]"
+          style={{ color: '#6B7A8C', borderTop: '1px dashed rgba(6,22,47,0.18)' }}
+        >
+          {step.log}
+        </p>
       </div>
-    </div>
+    </motion.article>
   );
 }
 
 /**
- * Mobile / tablet: "signal timeline" — a dispatch rail that fills with the
- * river gradient as you scroll, numbered nodes that snap in, and tilted
- * transmission-log cards. Also serves as the reduced-motion layout on desktop.
+ * The section. One concept, two builds: the flight arcs across the field on a
+ * wide screen, and descends a rail on a narrow one. A phone reads a sequence
+ * top-to-bottom, and bending that into an arc to match the desktop would be
+ * the layout serving the idea instead of the reader.
  */
-function SignalTimeline({ reduced, allSizes }: { reduced: boolean; allSizes: boolean }) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: railRef, offset: ['start 0.8', 'end 0.55'] });
-  const fill = useSpring(scrollYProgress, { stiffness: 90, damping: 25 });
-  const dotTop = useTransform(fill, (v) => `${Math.min(Math.max(v, 0), 1) * 100}%`);
+function SignalFlight({ reduced }: { reduced: boolean }) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const desktopPathRef = useRef<SVGPathElement>(null);
+  const mobileRailRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start 0.85', 'end 0.65'] });
+  const flown = useSpring(scrollYProgress, { stiffness: 70, damping: 24, restDelta: 0.001 });
+
+  const desktop = usePathRider(desktopPathRef, flown);
+  const planeTop = useTransform(flown, (p) => `${Math.min(Math.max(p, 0), 1) * 100}%`);
+
+  /** Which waypoints the plane has passed, for the shadow to light up. */
+  const [reached, setReached] = useState<boolean[]>([false, false, false, false]);
+  useEffect(() => {
+    const stop = flown.on('change', (p) => {
+      setReached((prev) => {
+        const next = WAYPOINTS.map((w, i) => prev[i] || p >= w - 0.02);
+        return next.some((v, i) => v !== prev[i]) ? next : prev;
+      });
+    });
+    return () => stop();
+  }, [flown]);
 
   return (
-    <section className={cn('relative py-20 sm:py-24 overflow-hidden', !allSizes && 'lg:hidden')} style={{ background: T.paper }}>
-      <motion.img
-        src={publicAsset('images/plane-speed.webp')}
-        alt=""
-        className="pointer-events-none absolute -right-24 top-8 w-72 rotate-[-7deg] object-contain opacity-[0.1] sm:w-96"
-        animate={reduced ? undefined : { x: [10, -5, 10], y: [4, -3, 4] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        aria-hidden="true"
-      />
-      <div className="mx-auto max-w-3xl px-5 sm:px-8">
-        <Reveal>
-          <Eyebrow>From sighting to signal</Eyebrow>
-          <h2 className="mt-4 font-display font-extrabold tracking-[-0.025em] leading-[1.04]" style={{ color: T.ink, fontSize: 'clamp(2.1rem, 7.4vw, 3.4rem)' }}>
-            Thirty seconds,<br />start to signal.
-          </h2>
-          <p className="mt-4 max-w-md text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-            One report travels from your sidewalk to every screen watching the
-            map. Follow the signal down.
-          </p>
-        </Reveal>
+    <section ref={sectionRef} className="relative overflow-hidden py-20 sm:py-24 lg:py-28" style={{ background: '#06162F' }}>
+      {/* Header */}
+      <div className="mx-auto max-w-[88rem] px-5 sm:px-8">
+        <div className="flex items-center gap-2.5">
+          <span className="h-[3px] w-[22px] shrink-0" style={{ background: '#E52C20' }} aria-hidden="true" />
+          <span className="font-mono text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: '#AFC5DF' }}>
+            From sighting to signal
+          </span>
+        </div>
+        <h2
+          className="mt-4 font-display font-black uppercase leading-[0.82] tracking-[-0.04em]"
+          style={{ color: '#F2EFE8', fontSize: 'clamp(2.6rem, 8.4vw, 6.4rem)' }}
+        >
+          Thirty seconds,
+          <br />
+          start to <span style={{ color: '#E52C20' }}>signal.</span>
+        </h2>
+        <p className="mt-5 max-w-[34ch] text-[14px] leading-[1.55] sm:text-[15px]" style={{ color: '#D5DFEB' }}>
+          One report travels from your sidewalk to every screen watching the map. Follow it down the line.
+        </p>
+      </div>
 
-        <div ref={railRef} className="relative mt-12">
-          {/* dispatch rail */}
-          <div className="absolute left-[21px] top-1 bottom-1 w-[2px] rounded-full" style={{ background: T.line }} aria-hidden="true">
+      {/* ── Wide: the flight crosses above, the slips hang from it ───────── */}
+      <div className="mx-auto mt-16 hidden w-full max-w-[75rem] px-8 lg:block">
+        <div className="relative">
+          <div className="relative w-full" style={{ aspectRatio: `${DESKTOP_STAGE.w} / ${DESKTOP_STAGE.h}` }}>
+            <svg
+              viewBox={`0 0 ${DESKTOP_STAGE.w} ${DESKTOP_STAGE.h}`}
+              className="absolute inset-0 h-full w-full overflow-visible"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path ref={desktopPathRef} d={DESKTOP_PATH} stroke="rgba(242,239,232,0.16)" strokeWidth="2" strokeDasharray="7 9" />
+              <motion.path
+                d={DESKTOP_PATH}
+                stroke="#E52C20"
+                strokeWidth="2.5"
+                strokeDasharray="7 9"
+                style={{ pathLength: reduced ? 1 : flown }}
+              />
+
+              {COLUMNS.map((c, i) => {
+                const p = desktop.pointAtX(c * DESKTOP_STAGE.w);
+                const on = reached[i];
+                return (
+                  <g key={c}>
+                    {/* Tether: what ties this slip to that moment in the flight. */}
+                    <line
+                      x1={p.x} y1={p.y} x2={p.x} y2={DESKTOP_STAGE.h}
+                      stroke={on ? 'rgba(229,44,32,0.55)' : 'rgba(242,239,232,0.14)'}
+                      strokeWidth="1.5"
+                      strokeDasharray="3 6"
+                      style={{ transition: 'stroke 420ms ease' }}
+                    />
+                    <circle cx={p.x} cy={p.y} r="8.5" fill="#06162F"
+                      stroke={on ? '#E52C20' : 'rgba(242,239,232,0.32)'} strokeWidth="2.5"
+                      style={{ transition: 'stroke 420ms ease' }} />
+                    {on && <circle cx={p.x} cy={p.y} r="3.2" fill="#E52C20" />}
+                  </g>
+                );
+              })}
+
+              {!reduced && desktop.length > 0 && (
+                <motion.g style={{ x: desktop.x, y: desktop.y, rotate: desktop.angle, transformBox: 'fill-box', transformOrigin: 'center' }}>
+                  <image href={publicAsset('images/plane-white.webp')} x="-24" y="-24" width="48" height="48" />
+                </motion.g>
+              )}
+            </svg>
+          </div>
+
+          <div className="grid grid-cols-4 gap-5 xl:gap-6">
+            {STEPS.map((step, i) => (
+              <FlightSlip key={step.n} step={step} index={i} reached={reached[i]} reduced={reduced} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Narrow: the flight descends a rail ───────────────────────────── */}
+      {/* A phone reads a sequence top to bottom, so the flight descends rather
+          than arcing. The rail is dead straight: squeezed into a 3rem column an
+          S-curve stops reading as a trajectory and starts reading as a wobble.
+          The plane still flies it, because that is the whole idea. */}
+      <div className="mt-12 lg:hidden">
+        <div ref={mobileRailRef} className="relative mx-auto max-w-3xl px-5 sm:px-8">
+          <div className="absolute bottom-6 left-[2.05rem] top-6 w-[3px] sm:left-[2.8rem]" style={{ background: 'rgba(242,239,232,0.16)' }} aria-hidden="true">
             <motion.div
-              className="absolute inset-x-0 top-0 h-full origin-top rounded-full"
-              style={{ scaleY: reduced ? 1 : fill, background: `linear-gradient(to bottom, ${T.sky}, ${T.bow})` }}
+              className="absolute inset-x-0 top-0 h-full origin-top"
+              style={{ background: '#E52C20', scaleY: reduced ? 1 : flown }}
             />
             {!reduced && (
-              <motion.span
-                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[11px] h-[11px] rounded-full"
-                style={{ top: dotTop, background: T.bow, boxShadow: `0 0 0 4px ${T.paper}, 0 0 14px 3px rgba(46,139,122,0.6)` }}
+              <motion.img
+                src={publicAsset('images/plane-white.webp')}
+                alt=""
+                className="absolute left-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 object-contain"
+                style={{ top: planeTop, rotate: 78 }}
               />
             )}
           </div>
 
-          <ol className="space-y-9 sm:space-y-11">
+          <ol className="relative space-y-7">
             {STEPS.map((step, i) => (
-              <li key={step.n} className="relative pl-16 sm:pl-20">
-                {/* node */}
-                <motion.span
-                  className="absolute left-0 top-1 flex w-[44px] h-[44px] items-center justify-center rounded-full font-mono text-[13px] font-bold"
-                  style={{ background: T.panel, border: `2px solid ${step.accent}`, color: step.accent, boxShadow: `0 0 0 6px ${T.paper}` }}
-                  initial={reduced ? false : { scale: 0.3, opacity: 0 }}
-                  whileInView={{ scale: 1, opacity: 1 }}
-                  viewport={{ once: true, margin: '-25% 0px -25% 0px' }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 17 }}
+              <li key={step.n} className="relative pl-[3.9rem] sm:pl-[4.9rem]">
+                <span
+                  className="absolute left-[1.15rem] top-7 grid h-7 w-7 place-items-center sm:left-[1.9rem]"
+                  style={{
+                    background: '#06162F',
+                    border: `3px solid ${reached[i] ? '#E52C20' : 'rgba(242,239,232,0.3)'}`,
+                    transition: 'border-color 420ms ease',
+                  }}
+                  aria-hidden="true"
                 >
-                  {step.n}
-                </motion.span>
-
-                {/* transmission card */}
-                <motion.div
-                  initial={reduced ? false : { opacity: 0, x: 40, rotate: i % 2 ? -1.4 : 1.4 }}
-                  whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.7, ease: EASE }}
-                  className="relative overflow-hidden rounded-3xl p-6 sm:p-8"
-                  style={{ background: T.panel, border: `1px solid ${T.line}` }}
-                >
-                  <div className="absolute top-0 left-0 h-1 w-full" style={{ background: step.accent }} aria-hidden="true" />
-                  <motion.img
-                    src={publicAsset(step.art)}
-                    alt={step.artAlt}
-                    width={640}
-                    height={640}
-                    className="absolute -right-4 -top-4 z-0 h-28 w-28 rotate-3 object-cover opacity-90 sm:h-36 sm:w-36"
-                    initial={reduced ? false : { opacity: 0, rotate: 10, scale: 0.86 }}
-                    whileInView={{ opacity: 0.9, rotate: 3, scale: 1 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.6, ease: EASE }}
-                  />
-                  <p className="relative z-10 pr-24 sm:pr-32 font-mono text-[10px] tracking-[0.26em]" style={{ color: step.accent }}>{step.mono}</p>
-                  <h3 className="relative z-10 mt-3 font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.02em]" style={{ color: T.ink }}>{step.title}</h3>
-                  <p className="relative z-10 mt-3 text-[14.5px] leading-relaxed max-w-md" style={{ color: T.inkSoft }}>{step.body}</p>
-                  <p className="mt-5 pt-3 font-mono text-[10px] tracking-[0.06em]" style={{ color: step.accent, borderTop: `1px dashed ${T.line}` }}>
-                    {step.log}
-                  </p>
-                </motion.div>
+                  {reached[i] && <span className="h-2.5 w-2.5" style={{ background: '#E52C20' }} />}
+                </span>
+                <FlightSlip step={step} index={i} reached={reached[i]} reduced={reduced} />
               </li>
             ))}
           </ol>
-
-          {/* signal delivered */}
-          <motion.div
-            className="relative mt-10 ml-16 sm:ml-20"
-            initial={reduced ? false : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.6, ease: EASE }}
-          >
-            <span className="inline-flex items-center gap-2.5 rounded-full px-5 py-3" style={{ background: T.ink, color: T.paper }}>
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full animate-ping opacity-70" style={{ background: T.bow }} />
-                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: T.bow }} />
-              </span>
-              <span className="font-mono text-[10.5px] tracking-[0.2em] uppercase">Signal live on the map</span>
-            </span>
-          </motion.div>
         </div>
       </div>
-    </section>
-  );
-}
 
-function HowItWorks({ reduced }: { reduced: boolean }) {
-  return (
-    <div id="how-it-works">
-      {!reduced && <HowItWorksRide />}
-      <SignalTimeline reduced={reduced} allSizes={reduced} />
-    </div>
+      {/* Arrival */}
+      <div className="mx-auto mt-12 max-w-[88rem] px-5 sm:px-8 lg:mt-0">
+        <a
+          href="/map"
+          className="inline-flex items-center gap-3 bg-[#F2EFE8] px-6 py-4 font-display text-[14px] font-black uppercase tracking-[-0.01em] text-[#06162F] transition-transform hover:-translate-y-1 active:translate-x-1 active:translate-y-1 active:shadow-none sm:text-[15px]"
+          style={{ boxShadow: '5px 5px 0 #E52C20' }}
+        >
+          Signal live on the map
+          <ArrowRight size={16} aria-hidden="true" />
+        </a>
+      </div>
+    </section>
   );
 }
 
@@ -2359,7 +2446,7 @@ export default function LandingPage() {
         <Ticker reduced={reduced} />
         <DayTunnel reduced={reduced} />
         <Quadrants reduced={reduced} />
-        <HowItWorks reduced={reduced} />
+        <SignalFlight reduced={reduced} />
         <Categories reduced={reduced} />
         <NearMe reduced={reduced} />
         <NightWatch reduced={reduced} />

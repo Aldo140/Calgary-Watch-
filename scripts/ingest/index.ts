@@ -112,26 +112,40 @@ async function upsertIncident(
 ): Promise<void> {
   const docId = dedupKeyToDocId(incident.dedup_key);
   const now = FieldValue.serverTimestamp();
+  const ref = db.collection('incidents').doc(docId);
 
-  await db.collection('incidents').doc(docId).set(
-    {
-      ...incident,
-      // Use the source's own report time. Overwriting this with Date.now() on
-      // every run made week-old records show as "just now" and re-surface as
-      // new on each 30-minute pass.
-      timestamp: incident.timestamp ?? Date.now(),
-      updatedAt: now,
-      verified_status: incident.verified_status,
-      report_count: 1,
-      // The public map filters on `visibility`; a record written without it is
-      // invisible. `deleted` is kept in step for documents and code paths that
-      // predate the visibility migration.
-      visibility: 'public',
-      deleted: false,
-      authorUid: 'system',
-    },
-    { merge: true },
-  );
+  const mutable = {
+    ...incident,
+    updatedAt: now,
+    verified_status: incident.verified_status,
+    report_count: 1,
+    // The public map filters on `visibility`; a record written without it is
+    // invisible. `deleted` is kept in step for documents and code paths that
+    // predate the visibility migration.
+    visibility: 'public',
+    deleted: false,
+    authorUid: 'system',
+  };
+  // `timestamp` is deliberately excluded from `mutable` — see below.
+  delete (mutable as { timestamp?: number }).timestamp;
+
+  try {
+    // First sighting: stamp it once. 511 publishes planned work, so a source
+    // time can be in the future; clampToNow pins it to when we read it.
+    await ref.create({ ...mutable, timestamp: incident.timestamp ?? Date.now() });
+  } catch (err) {
+    const code = (err as { code?: number | string }).code;
+    // ALREADY_EXISTS — refresh everything except the timestamp.
+    //
+    // Rewriting `timestamp` on every pass is what made week-old records show
+    // as "just now" and re-surface as new each run. It bites hardest for
+    // planned roadwork: its source time is in the future, so clamping it to
+    // the run time would re-stamp it as brand new every thirty minutes and
+    // permanently outrank real community reports in a newest-first feed.
+    // The first sighting is the honest answer and it never moves.
+    if (code !== 6 && code !== 'already-exists') throw err;
+    await ref.set(mutable, { merge: true });
+  }
 }
 
 

@@ -447,244 +447,120 @@ const HERO_LINES = [
   { text: 'By neighbours.', color: T.ink },
 ];
 
-const MOBILE_SCAN = [
-  { label: 'Crime', location: 'Inglewood', icon: AlertCircle, color: '#FF7770', x: '27%', y: '48%' },
-  { label: 'Traffic', location: 'Deerfoot', icon: Car, color: '#FFBC58', x: '74%', y: '41%' },
-  { label: 'Weather', location: 'Northwest', icon: CloudRain, color: '#79C8FF', x: '52%', y: '30%' },
-  { label: 'Emergency', location: 'Beltline', icon: Siren, color: '#C9A4FF', x: '45%', y: '52%' },
-] as const;
+const MOBILE_ROUTE = 'BOWNESS  /  BELTLINE  /  INGLEWOOD  /  FOREST LAWN  /  BRIDGELAND  /  KENSINGTON  /  ';
 
-function MobileCitySignals({ activeIndex, reduced }: { activeIndex: number; reduced: boolean }) {
-  const active = MOBILE_SCAN[activeIndex];
-  const ActiveIcon = active.icon;
-
-  return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-[15.5rem] top-16 z-[1] overflow-hidden" aria-hidden="true">
-      {!reduced && (
-        <>
-          <motion.div
-            className="absolute -bottom-[8%] top-0 w-[34%] -skew-x-12"
-            style={{
-              background: 'linear-gradient(90deg, transparent, rgba(103,183,247,0.04) 20%, rgba(103,183,247,0.2) 52%, rgba(103,183,247,0.04) 82%, transparent)',
-              borderRight: '1px solid rgba(143,208,255,0.48)',
-              filter: 'drop-shadow(0 0 12px rgba(103,183,247,0.28))',
-            }}
-            initial={{ x: '-45vw', opacity: 0 }}
-            animate={{ x: '120vw', opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 4.8, delay: 0.6, repeat: Infinity, repeatDelay: 0.7, ease: 'linear' }}
-          />
-
-          <motion.div
-            className="absolute left-[39%] top-[42%] size-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-sky-300/30"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-          >
-            <span className="absolute left-1/2 top-[-5px] h-2.5 w-px bg-sky-200/70" />
-            <span className="absolute bottom-[-5px] left-1/2 h-2.5 w-px bg-sky-200/70" />
-            <span className="absolute left-[-5px] top-1/2 h-px w-2.5 bg-sky-200/70" />
-            <span className="absolute right-[-5px] top-1/2 h-px w-2.5 bg-sky-200/70" />
-            <motion.span
-              className="absolute inset-3 rounded-full border border-sky-200/30"
-              animate={{ scale: [0.72, 1.18], opacity: [0.72, 0] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut' }}
-            />
-          </motion.div>
-
-          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 390 530" preserveAspectRatio="none">
-            <motion.path
-              d="M39 327 C96 278 123 351 177 300 S263 238 351 284"
-              fill="none"
-              stroke="rgba(143,208,255,0.48)"
-              strokeWidth="1"
-              strokeDasharray="3 7"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: [0, 1, 1], opacity: [0, 0.72, 0] }}
-              transition={{ duration: 5.4, repeat: Infinity, repeatDelay: 0.4, ease: [0.77, 0, 0.175, 1] }}
-            />
-          </svg>
-        </>
-      )}
-
-      {MOBILE_SCAN.map((signal, index) => (
-        <motion.span
-          key={signal.label}
-          className="absolute size-1.5 rounded-full"
-          style={{ left: signal.x, top: signal.y, background: signal.color, boxShadow: `0 0 11px ${signal.color}` }}
-          animate={reduced ? undefined : index === activeIndex ? { scale: [1, 1.45, 1] } : { opacity: [0.35, 0.9, 0.35] }}
-          transition={{ duration: index === activeIndex ? 0.7 : 2.4 + index * 0.25, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      ))}
-
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.div
-          key={active.label}
-          className="absolute"
-          style={{ left: active.x, top: active.y, color: active.color }}
-          initial={reduced ? false : { opacity: 0, scale: 0.9, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={reduced ? undefined : { opacity: 0, scale: 0.96, y: -6 }}
-          transition={{ duration: 0.38, ease: EASE }}
-        >
-          {!reduced && (
-            <>
-              <motion.span
-                className="absolute -left-4 -top-4 size-8 rounded-full border"
-                style={{ borderColor: active.color }}
-                animate={{ scale: [0.55, 1.7], opacity: [0.85, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-              />
-              <motion.span
-                className="absolute -left-4 -top-4 size-8 rounded-full border"
-                style={{ borderColor: active.color }}
-                animate={{ scale: [0.55, 1.7], opacity: [0.65, 0] }}
-                transition={{ duration: 1.8, delay: 0.6, repeat: Infinity, ease: 'easeOut' }}
-              />
-            </>
-          )}
-          <span
-            className="absolute left-0 top-2 h-4 w-px"
-            style={{ background: active.color }}
-          />
-          <span
-            className="absolute left-0 top-6 flex min-w-max -translate-x-1/2 items-center gap-2 rounded-md px-2.5 py-1.5 text-[9px] font-extrabold uppercase tracking-[0.1em] text-white"
-            style={{
-              background: 'rgba(8,26,43,0.9)',
-              boxShadow: `0 0 0 1px ${active.color}66`,
-            }}
-          >
-            <ActiveIcon size={11} style={{ color: active.color }} />
-            {active.label}
-            <span className="text-white/50">{active.location}</span>
-          </span>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-/** Mobile hero: a bespoke Calgary plate with a capability-led scan sequence. */
+/** Mobile hero: an animated Calgary collage built like a cultural night poster. */
 function MobileHero({ reduced }: { reduced: boolean }) {
-  const [scanIndex, setScanIndex] = useState(0);
-  useEffect(() => {
-    if (reduced) return;
-    const id = window.setInterval(() => setScanIndex((index) => (index + 1) % MOBILE_SCAN.length), 1800);
-    return () => window.clearInterval(id);
-  }, [reduced]);
-  const scan = MOBILE_SCAN[scanIndex];
-  const ScanIcon = scan.icon;
-
   return (
-    <div className="relative z-10 min-h-[100dvh] overflow-hidden bg-[#081A2B] lg:hidden">
+    <div className="relative z-10 min-h-[100dvh] overflow-hidden bg-[#06162F] lg:hidden">
       <motion.img
-        src={publicAsset('images/mobile-hero-calgary-v2.webp')}
-        alt="Calgary skyline, Calgary Tower and the Bow River at blue hour"
+        src={publicAsset('images/mobile-hero-calgary-collage.webp')}
+        alt="Art collage of the Calgary Tower, downtown, the Bow River and city streets"
         width={720}
-        height={1279}
+        height={1280}
         fetchPriority="high"
-        initial={reduced ? false : { scale: 1.06 }}
-        animate={reduced ? { scale: 1 } : { scale: [1.06, 1.015, 1.04], x: ['-1.2%', '0.8%', '-1.2%'] }}
-        transition={reduced ? { duration: 0 } : { duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+        initial={false}
+        animate={reduced ? undefined : { scale: [1.025, 1.055, 1.025], y: ['0%', '-0.8%', '0%'] }}
+        transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute inset-0 h-full w-full object-cover object-center"
         onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
       />
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(8,26,43,0.1) 10%, rgba(8,26,43,0.05) 38%, rgba(8,26,43,0.68) 66%, rgba(8,26,43,0.98) 100%)',
-        }}
-        aria-hidden="true"
-      />
+      {!reduced && (
+        <div className="absolute inset-0" aria-hidden="true">
+          <motion.img
+            src={publicAsset('images/mobile-hero-calgary-collage.webp')}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            style={{ clipPath: 'polygon(0 0, 48% 0, 36% 62%, 0 57%)', filter: 'saturate(1.08) contrast(1.04)' }}
+            animate={{ x: ['-1.8%', '0.8%', '-1.8%'], rotate: [-0.35, 0.2, -0.35] }}
+            transition={{ duration: 8.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.img
+            src={publicAsset('images/mobile-hero-calgary-collage.webp')}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            style={{ clipPath: 'polygon(39% 0, 100% 0, 100% 62%, 66% 57%)' }}
+            animate={{ x: ['1.2%', '-0.5%', '1.2%'], y: ['-0.5%', '0.7%', '-0.5%'] }}
+            transition={{ duration: 10.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute -left-[18%] top-[33%] h-[19%] w-[70%] -rotate-[7deg] bg-[#E52C20] mix-blend-multiply"
+            animate={{ x: ['-4%', '4%', '-4%'] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ opacity: 0.2 }}
+          />
+        </div>
+      )}
 
-      <MobileCitySignals activeIndex={scanIndex} reduced={reduced} />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#06162F]/70" aria-hidden="true" />
 
-      <div className="relative z-[2] flex min-h-[100dvh] flex-col px-5 pb-5 pt-20 sm:px-7">
+      <div className="absolute left-4 top-[11.5%] z-[3] -rotate-3 bg-[#F2EFE8] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-[#06162F] shadow-[3px_3px_0_#E52C20]" aria-hidden="true">
+        Calgary / 51.0447° N
+      </div>
+      <div className="absolute right-4 top-[18%] z-[3] flex size-11 rotate-6 flex-col items-center justify-center bg-[#E52C20] text-[9px] font-black leading-none text-white" aria-hidden="true">
+        <span>CW</span><span className="mt-1 text-[7px] opacity-70">LIVE</span>
+      </div>
+
+      <div className="absolute inset-x-[-8%] top-[48%] z-[3] -rotate-2 overflow-hidden border-y border-[#06162F] bg-[#F2EFE8] py-2 text-[#06162F] shadow-[0_4px_0_rgba(229,44,32,0.9)] [@media(min-height:700px)]:top-[55%]" aria-hidden="true">
+        <motion.div
+          className="flex w-max whitespace-nowrap font-display text-[11px] font-black uppercase tracking-[0.14em]"
+          animate={reduced ? undefined : { x: ['0%', '-50%'] }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+        >
+          <span>{MOBILE_ROUTE}{MOBILE_ROUTE}</span>
+          <span>{MOBILE_ROUTE}{MOBILE_ROUTE}</span>
+        </motion.div>
+      </div>
+
+      <div className="relative z-[4] flex min-h-[100dvh] flex-col px-5 pb-5 pt-20 sm:px-7">
         <div className="flex-1" aria-hidden="true" />
 
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.18, ease: EASE }}
-          className="mb-3 flex h-6 items-center gap-2 overflow-hidden text-[10px] font-bold uppercase tracking-[0.12em]"
-          style={{ color: '#8FD0FF' }}
-        >
-          <span className="sr-only">Monitoring crime, traffic, weather and emergencies</span>
-          <span aria-hidden="true" className="flex items-center gap-2">
-            <Radio size={13} />
-            City signal live
-          </span>
-          <span aria-hidden="true" className="h-3 w-px bg-white/25" />
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span
-              aria-hidden="true"
-              key={scan.label}
-              initial={reduced ? false : { y: 14, opacity: 0, filter: 'blur(4px)' }}
-              animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
-              exit={reduced ? undefined : { y: -14, opacity: 0, filter: 'blur(4px)' }}
-              transition={{ duration: 0.3, ease: EASE }}
-              className="flex items-center gap-1.5"
-            >
-              <ScanIcon size={12} style={{ color: scan.color }} />
-              {scan.label} · {scan.location}
-            </motion.span>
-          </AnimatePresence>
-        </motion.div>
+        <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.13em] text-[#AFC5DF]">
+          <motion.span
+            className="size-2 bg-[#E52C20]"
+            animate={reduced ? undefined : { rotate: [0, 90, 180], scale: [1, 0.72, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            aria-hidden="true"
+          />
+          Community reports + verified data
+        </div>
 
-        <h1 className="font-display text-[clamp(2.35rem,11vw,3rem)] font-extrabold leading-[0.92] tracking-[-0.03em] max-[340px]:text-[2.1rem]">
-          <span className="block overflow-hidden pb-[0.07em]" style={{ color: T.nightText }}>
-            <motion.span
-              className="block"
-              initial={false}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.68, delay: 0.26, ease: EASE }}
-            >
-              Calgary moves.
-            </motion.span>
-          </span>
-          <span className="block overflow-hidden pb-[0.08em]" style={{ color: '#67B7F7' }}>
-            <motion.span
-              className="block"
-              initial={false}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.68, delay: 0.34, ease: EASE }}
-            >
-              See it sooner.
-            </motion.span>
+        <h1 className="font-display text-[clamp(3.1rem,15.5vw,4.5rem)] font-black uppercase leading-[0.78] tracking-[-0.04em] text-[#F2EFE8] max-[340px]:text-[2.75rem]">
+          <span className="block">Know your</span>
+          <span className="relative mt-2 inline-block overflow-hidden pb-[0.13em] pr-3 text-[#E52C20]">
+            city.
+            {!reduced && (
+              <motion.span
+                className="absolute inset-y-0 w-8 -skew-x-12 bg-white/30 mix-blend-screen"
+                initial={{ x: '-180%' }}
+                animate={{ x: '600%' }}
+                transition={{ duration: 1.2, delay: 0.7, repeat: Infinity, repeatDelay: 5.5, ease: [0.77, 0, 0.175, 1] }}
+                aria-hidden="true"
+              />
+            )}
           </span>
         </h1>
 
-        <motion.p
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.46, ease: EASE }}
-          className="mt-3 max-w-[35ch] text-[14px] leading-[1.55] sm:text-[15px]"
-          style={{ color: 'rgba(237,242,240,0.78)' }}
-        >
-          Live community reports and verified city data, together on one map.
-        </motion.p>
+        <p className="mt-3 max-w-[33ch] text-[13px] font-medium leading-[1.5] text-[#D5DFEB] sm:text-[14px]">
+          Live reports and trusted city data, cut into one clear view of Calgary.
+        </p>
 
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.56, ease: EASE }}
-          className="mt-5 grid grid-cols-[1fr_auto] gap-2.5"
-        >
+        <div className="mt-4 grid grid-cols-[1fr_auto] gap-2.5">
           <a
             href="/map"
-            className="flex h-13 min-w-0 items-center justify-center gap-2 rounded-xl px-4 text-[14px] font-extrabold transition-transform active:scale-[0.98]"
-            style={{ background: '#67B7F7', color: T.night, boxShadow: '0 5px 8px rgba(4,16,28,0.3)' }}
+            className="flex h-13 min-w-0 items-center justify-center gap-2 bg-[#F2EFE8] px-4 text-[14px] font-black uppercase tracking-[-0.01em] text-[#06162F] shadow-[4px_4px_0_#E52C20] transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none"
           >
             <MapPin size={16} aria-hidden="true" />
-            Open live map
+            Open the map
             <ArrowRight size={14} aria-hidden="true" />
           </a>
           <a
             href="/map?report=true"
-            className="flex h-13 items-center justify-center rounded-xl px-4 text-[14px] font-bold transition-transform active:scale-[0.98]"
-            style={{ border: '1px solid rgba(237,242,240,0.38)', color: T.nightText, background: 'rgba(12,29,46,0.56)', backdropFilter: 'blur(10px)' }}
+            className="flex h-13 items-center justify-center border border-[#F2EFE8]/60 bg-[#06162F] px-4 text-[14px] font-bold text-[#F2EFE8] transition-transform active:translate-y-0.5"
           >
             Report
           </a>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

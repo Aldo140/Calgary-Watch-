@@ -82,7 +82,7 @@ const CATEGORIES = [
   { icon: AlertCircle, label: 'Crime',          color: 'text-red-400',    bg: 'bg-red-500/10 border-red-500/20',    desc: 'Break-ins, vehicle theft, assault, vandalism, suspicious activity, theft from vehicle, robbery' },
   { icon: Car,         label: 'Traffic',        color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/20',desc: 'Collisions, road closures, Deerfoot Trail incidents, Stoney Trail congestion, highway accidents' },
   { icon: Construction,label: 'Infrastructure', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20',desc: 'Water main breaks, flooding, utility outages, road washouts, construction hazards' },
-  { icon: CloudRain,   label: 'Weather',        color: 'text-sky-400',    bg: 'bg-sky-500/10 border-sky-500/20',    desc: 'Severe weather warnings, icy roads, flash flooding, hail alerts, whiteout conditions, fog' },
+  { icon: CloudRain,   label: 'Weather',        color: 'text-[#7A6BA8]',  bg: 'bg-[#7A6BA8]/10 border-[#7A6BA8]/25',    desc: 'Severe weather warnings, icy roads, flash flooding, hail alerts, whiteout conditions, fog' },
   { icon: Siren,       label: 'Emergency',      color: 'text-emerald-400',bg: 'bg-emerald-500/10 border-emerald-500/20',desc: 'Active fires, EMS activity, evacuation notices, Amber Alerts, shelter-in-place orders' },
 ];
 
@@ -101,8 +101,8 @@ function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
     <div className={cn(
       'border rounded-2xl overflow-hidden transition-colors duration-200',
       open
-        ? 'border-[#4A90D9]/40 bg-[#4A90D9]/5 light:bg-[#4A90D9]/4'
-        : 'border-white/8 light:border-slate-200 bg-white/[0.02] light:bg-white',
+        ? 'border-[#E52C20]/40 bg-[#E52C20]/5 light:bg-[#E52C20]/4'
+        : 'border-white/8 light:border-stone-200 bg-white/[0.02] light:bg-white',
     )}>
       <button
         type="button"
@@ -112,15 +112,15 @@ function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
       >
         <span className={cn(
           'text-sm font-bold leading-snug transition-colors',
-          open ? 'text-[#4A90D9]' : 'text-white light:text-slate-900',
+          open ? 'text-[#E52C20]' : 'text-white light:text-stone-900',
         )}>
           {q}
         </span>
         <ChevronDown
           size={16}
           className={cn(
-            'shrink-0 mt-0.5 transition-transform duration-300 text-slate-400',
-            open && 'rotate-180 text-[#4A90D9]',
+            'shrink-0 mt-0.5 transition-transform duration-300 text-stone-400',
+            open && 'rotate-180 text-[#E52C20]',
           )}
         />
       </button>
@@ -134,7 +134,7 @@ function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
             transition={{ duration: 0.28, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="px-6 pb-5 text-sm text-slate-400 light:text-slate-600 leading-relaxed border-t border-white/6 light:border-slate-100 pt-4">
+            <p className="px-6 pb-5 text-sm text-stone-400 light:text-stone-600 leading-relaxed border-t border-white/6 light:border-stone-100 pt-4">
               {a}
             </p>
           </motion.div>
@@ -146,18 +146,18 @@ function FaqItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
 
 // ─── Community Card ───────────────────────────────────────────────────────
 const typeColor: Record<string, string> = {
-  City:    'text-[#4A90D9] bg-[#4A90D9]/10 border-[#4A90D9]/25',
+  City:    'text-[#E52C20] bg-[#E52C20]/10 border-[#E52C20]/25',
   Town:    'text-[#2E8B7A] bg-[#2E8B7A]/10 border-[#2E8B7A]/25',
-  Village: 'text-[#D4A843] bg-[#D4A843]/10 border-[#D4A843]/25',
-  Hamlet:  'text-slate-400 bg-white/5 border-white/10',
-  County:  'text-violet-400 bg-violet-500/10 border-violet-500/25',
+  Village: 'text-[#B0793C] bg-[#B0793C]/10 border-[#B0793C]/25',
+  Hamlet:  'text-stone-400 bg-white/5 border-white/10',
+  County:  'text-[#7A6BA8] bg-[#7A6BA8]/10 border-[#7A6BA8]/25',
 };
 const typeColorLight: Record<string, string> = {
-  City:    'text-[#2563eb] bg-blue-50 border-blue-200',
-  Town:    'text-[#0f766e] bg-teal-50 border-teal-200',
-  Village: 'text-[#92400e] bg-amber-50 border-amber-200',
-  Hamlet:  'text-slate-500 bg-slate-50 border-slate-200',
-  County:  'text-violet-700 bg-violet-50 border-violet-200',
+  City:    'text-[#B8241A] bg-[#E52C20]/8 border-[#E52C20]/25',
+  Town:    'text-[#1F6154] bg-[#2E8B7A]/10 border-[#2E8B7A]/25',
+  Village: 'text-[#8A5710] bg-[#B0793C]/10 border-[#B0793C]/25',
+  Hamlet:  'text-stone-500 bg-stone-50 border-stone-200',
+  County:  'text-[#584C7E] bg-[#7A6BA8]/10 border-[#7A6BA8]/25',
 };
 
 function CommunityCard({ c, index, navigate }: { c: typeof COMMUNITIES[0]; index: number; navigate: ReturnType<typeof useNavigate> }) {
@@ -173,7 +173,7 @@ function CommunityCard({ c, index, navigate }: { c: typeof COMMUNITIES[0]; index
       className={cn(
         'group relative rounded-2xl border p-4 cursor-pointer transition-all duration-200',
         'border-white/8 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/15',
-        'light:border-slate-200 light:bg-white light:hover:border-slate-300 light:hover:bg-slate-50/80',
+        'light:border-stone-200 light:bg-white light:hover:border-stone-300 light:hover:bg-stone-50/80',
       )}
       onClick={() => navigate('/map')}
       role="button"
@@ -199,23 +199,23 @@ function CommunityCard({ c, index, navigate }: { c: typeof COMMUNITIES[0]; index
         </span>
 
         {c.dist > 0 && (
-          <span className="font-mono text-[10px] text-slate-500 shrink-0">
+          <span className="font-mono text-[10px] text-stone-500 shrink-0">
             {c.dist} km {c.dir}
           </span>
         )}
         {c.dist === 0 && (
-          <span className="font-mono text-[10px] text-slate-500 shrink-0">{c.dir}</span>
+          <span className="font-mono text-[10px] text-stone-500 shrink-0">{c.dir}</span>
         )}
       </div>
 
-      <p className="text-sm font-black text-white light:text-slate-900 leading-tight mb-1">{c.name}</p>
+      <p className="text-sm font-black text-white light:text-stone-900 leading-tight mb-1">{c.name}</p>
       {c.pop !== '—' && (
-        <p className="text-[10px] text-slate-500 font-medium">{c.pop}</p>
+        <p className="text-[10px] text-stone-500 font-medium">{c.pop}</p>
       )}
 
       {/* Hover arrow */}
       <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ArrowRight size={13} className="text-[#4A90D9]" />
+        <ArrowRight size={13} className="text-[#E52C20]" />
       </div>
     </motion.div>
   );
@@ -299,7 +299,7 @@ export default function CoveragePage() {
   }, []);
 
   return (
-    <div className="relative min-h-dvh bg-slate-950 light:bg-[#f8f3e8] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
+    <div className="relative min-h-dvh bg-stone-950 light:bg-[#F5EFE4] text-white light:text-stone-900 font-sans overflow-x-hidden isolate">
 
       {/* Subtle background texture */}
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
@@ -310,12 +310,12 @@ export default function CoveragePage() {
       </div>
 
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-40 border-b border-white/8 light:border-slate-200/80 bg-slate-950/80 light:bg-[#f8f3e8]/85 backdrop-blur-xl">
+      <nav className="sticky top-0 z-40 border-b border-white/8 light:border-stone-200/80 bg-stone-950/80 light:bg-[#F5EFE4]/85 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-4">
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-sm font-bold text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-stone-400 light:text-stone-600 hover:text-white light:hover:text-stone-900 transition-colors"
           >
             <ArrowLeft size={15} />
             Calgary Watch
@@ -324,7 +324,7 @@ export default function CoveragePage() {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
-              className="h-8 px-4 rounded-full text-xs font-bold bg-[#4A90D9] hover:bg-[#3a7fc8]"
+              className="h-8 px-4 rounded-full text-xs font-bold bg-[#E52C20] hover:bg-[#3a7fc8]"
               onClick={() => navigate('/map')}
             >
               Open Map
@@ -353,10 +353,10 @@ export default function CoveragePage() {
 
             <h1 className="text-[clamp(2.6rem,8vw,6rem)] font-black leading-[0.92] tracking-tight mb-6 max-w-4xl">
               Calgary Area
-              <span className="block text-[#4A90D9]">Safety Guide.</span>
+              <span className="block text-[#E52C20]">Safety Guide.</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-400 light:text-slate-600 max-w-2xl leading-relaxed mb-10 border-l-2 border-[#4A90D9]/40 pl-4">
+            <p className="text-base sm:text-lg text-stone-400 light:text-stone-600 max-w-2xl leading-relaxed mb-10 border-l-2 border-[#E52C20]/40 pl-4">
               Community reports and selected public-source incident information for Calgary
               and nearby places — from Airdrie and Cochrane to Okotoks, Strathmore, and High River.
             </p>
@@ -364,14 +364,14 @@ export default function CoveragePage() {
             <nav className="mb-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap" aria-label="Local safety guides">
               <a
                 href="/calgary-neighbourhood-watch"
-                className="group inline-flex min-h-12 items-center justify-between gap-4 rounded-xl bg-[#E8F3FC] px-4 py-3 text-sm font-black text-[#174A6E] ring-1 ring-[#8DBBDB] transition-colors hover:bg-[#D4EAF9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1F33]"
+                className="group inline-flex min-h-12 items-center justify-between gap-4 rounded-xl bg-[#EAE3D5] px-4 py-3 text-sm font-black text-[#06162F] ring-1 ring-[#D8CEBC] transition-colors hover:bg-[#EFE6D6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E52C20] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06162F]"
               >
                 Calgary neighbourhood watch guide
                 <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
               </a>
               <a
                 href="/airdrie-crime-map"
-                className="group inline-flex min-h-12 items-center justify-between gap-4 rounded-xl border border-[rgba(255,255,255,0.2)] px-4 py-3 text-sm font-black text-[#B9DCF9] transition-colors hover:border-[#4A90D9] hover:bg-[rgba(74,144,217,0.1)] hover:text-[#F7FBFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1F33] light:border-slate-300 light:text-[#286FAF] light:hover:bg-[#E8F3FC] light:hover:text-[#174A6E]"
+                className="group inline-flex min-h-12 items-center justify-between gap-4 rounded-xl border border-[rgba(255,255,255,0.2)] px-4 py-3 text-sm font-black text-[#B9DCF9] transition-colors hover:border-[#E52C20] hover:bg-[rgba(74,144,217,0.1)] hover:text-[#F2EFE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E52C20] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06162F] light:border-stone-300 light:text-[#B8241A] light:hover:bg-[#EAE3D5] light:hover:text-[#06162F]"
               >
                 Airdrie crime map source guide
                 <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -381,14 +381,14 @@ export default function CoveragePage() {
             {/* Stats strip */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { value: '100 km',  label: 'Coverage radius',   color: 'text-[#4A90D9]' },
+                { value: '100 km',  label: 'Coverage radius',   color: 'text-[#E52C20]' },
                 { value: '30+',     label: 'Communities',       color: 'text-[#2E8B7A]' },
-                { value: '5',       label: 'Incident categories', color: 'text-[#D4A843]' },
+                { value: '5',       label: 'Incident categories', color: 'text-[#B0793C]' },
                 { value: 'Free',    label: 'Always open',       color: 'text-emerald-400' },
               ].map(({ value, label, color }) => (
-                <div key={label} className="rounded-2xl border border-white/8 light:border-slate-200 bg-white/[0.03] light:bg-white px-4 py-3">
+                <div key={label} className="rounded-2xl border border-white/8 light:border-stone-200 bg-white/[0.03] light:bg-white px-4 py-3">
                   <p className={cn('text-2xl font-black font-mono', color)}>{value}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">{label}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500 mt-0.5">{label}</p>
                 </div>
               ))}
             </div>
@@ -396,16 +396,16 @@ export default function CoveragePage() {
         </header>
 
         {/* ── COMMUNITIES GRID ────────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
-                <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#4A90D9] mb-2">Coverage Map</p>
+                <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#E52C20] mb-2">Coverage Map</p>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
                   30+ Communities Covered
                 </h2>
               </div>
-              <p className="text-xs text-slate-500 light:text-slate-500 max-w-xs leading-relaxed">
+              <p className="text-xs text-stone-500 light:text-stone-500 max-w-xs leading-relaxed">
                 Click any community to view current incidents on the live map.
               </p>
             </div>
@@ -421,13 +421,13 @@ export default function CoveragePage() {
               {Object.entries(typeColor).map(([type]) => (
                 <div key={type} className="flex items-center gap-1.5">
                   <span className={cn('w-2 h-2 rounded-full', {
-                    'bg-[#4A90D9]': type === 'City',
+                    'bg-[#E52C20]': type === 'City',
                     'bg-[#2E8B7A]': type === 'Town',
-                    'bg-[#D4A843]': type === 'Village',
-                    'bg-slate-500': type === 'Hamlet',
-                    'bg-violet-400': type === 'County',
+                    'bg-[#B0793C]': type === 'Village',
+                    'bg-stone-500': type === 'Hamlet',
+                    'bg-[#7A6BA8]': type === 'County',
                   })} />
-                  <span className="text-[10px] text-slate-500">{type}</span>
+                  <span className="text-[10px] text-stone-500">{type}</span>
                 </div>
               ))}
             </div>
@@ -435,7 +435,7 @@ export default function CoveragePage() {
         </section>
 
         {/* ── INCIDENT CATEGORIES ─────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
             <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#2E8B7A] mb-2">What We Track</p>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight mb-8">
@@ -456,7 +456,7 @@ export default function CoveragePage() {
                     <Icon size={18} className={color} />
                     <span className={cn('text-sm font-black', color)}>{label}</span>
                   </div>
-                  <p className="text-xs text-slate-400 light:text-slate-600 leading-relaxed">{desc}</p>
+                  <p className="text-xs text-stone-400 light:text-stone-600 leading-relaxed">{desc}</p>
                 </motion.div>
               ))}
 
@@ -466,40 +466,40 @@ export default function CoveragePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
                 transition={{ duration: 0.4, delay: 0.35 }}
-                className="rounded-2xl border border-white/6 light:border-slate-200 bg-white/[0.02] light:bg-white p-5 flex flex-col justify-between"
+                className="rounded-2xl border border-white/6 light:border-stone-200 bg-white/[0.02] light:bg-white p-5 flex flex-col justify-between"
               >
                 <div>
-                  <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-slate-500 mb-3">Every marker</p>
-                  <p className="text-3xl font-black text-white light:text-slate-900">Source</p>
-                  <p className="text-xs text-slate-400 light:text-slate-600 mt-1">shown on incident details</p>
+                  <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-stone-500 mb-3">Every marker</p>
+                  <p className="text-3xl font-black text-white light:text-stone-900">Source</p>
+                  <p className="text-xs text-stone-400 light:text-stone-600 mt-1">shown on incident details</p>
                 </div>
-                <div className="mt-4 h-px bg-gradient-to-r from-[#4A90D9]/40 to-transparent" />
+                <div className="mt-4 h-px bg-gradient-to-r from-[#E52C20]/40 to-transparent" />
               </motion.div>
             </div>
           </Section>
         </section>
 
         {/* ── CALGARY QUADRANTS ────────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
-            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#D4A843] mb-2">City Zones</p>
+            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#B0793C] mb-2">City Zones</p>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight mb-2">Calgary Quadrant Coverage</h2>
-            <p className="text-sm text-slate-400 light:text-slate-600 mb-8 max-w-2xl">
+            <p className="text-sm text-stone-400 light:text-stone-600 mb-8 max-w-2xl">
               Calgary is divided into four quadrants plus the downtown core. Calgary Watch monitors community-reported incidents across all zones, with particular density data for high-traffic corridors.
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
-                { zone: 'NW Calgary',       desc: 'Tuscany, Rocky Ridge, Nolan Hill, Evanston, Panorama Hills, Hamptons',                     accent: 'border-[#4A90D9]/30 bg-[#4A90D9]/5' },
+                { zone: 'NW Calgary',       desc: 'Tuscany, Rocky Ridge, Nolan Hill, Evanston, Panorama Hills, Hamptons',                     accent: 'border-[#E52C20]/30 bg-[#E52C20]/5' },
                 { zone: 'NE Calgary',       desc: 'Saddle Ridge, Skyview Ranch, Redstone, Cornerstone, Martindale, Temple, Falconridge',       accent: 'border-[#2E8B7A]/30 bg-[#2E8B7A]/5' },
-                { zone: 'SW Calgary',       desc: 'Signal Hill, Cougar Ridge, Discovery Ridge, Aspen Woods, West Springs, Lakeview, Richmond', accent: 'border-[#D4A843]/30 bg-[#D4A843]/5' },
-                { zone: 'SE Calgary',       desc: 'Auburn Bay, Mahogany, Cranston, New Brighton, McKenzie Towne, Legacy, Copperfield',         accent: 'border-violet-500/30 bg-violet-500/5' },
+                { zone: 'SW Calgary',       desc: 'Signal Hill, Cougar Ridge, Discovery Ridge, Aspen Woods, West Springs, Lakeview, Richmond', accent: 'border-[#B0793C]/30 bg-[#B0793C]/5' },
+                { zone: 'SE Calgary',       desc: 'Auburn Bay, Mahogany, Cranston, New Brighton, McKenzie Towne, Legacy, Copperfield',         accent: 'border-[#7A6BA8]/30 bg-[#7A6BA8]/5' },
                 { zone: 'Downtown Core',    desc: 'Beltline, East Village, Chinatown, Mission, Inglewood, Kensington, Hillhurst, Bridgeland',  accent: 'border-red-500/30 bg-red-500/5' },
-                { zone: 'Key Corridors',    desc: 'Deerfoot Trail, Stoney Trail, Glenmore Trail, Crowchild Trail, Memorial Drive, 16 Ave',     accent: 'border-slate-500/30 bg-white/3' },
+                { zone: 'Key Corridors',    desc: 'Deerfoot Trail, Stoney Trail, Glenmore Trail, Crowchild Trail, Memorial Drive, 16 Ave',     accent: 'border-stone-500/30 bg-white/3' },
               ].map(({ zone, desc, accent }) => (
-                <div key={zone} className={cn('rounded-2xl border p-4 light:border-slate-200 light:bg-white', accent)}>
-                  <p className="text-sm font-black text-white light:text-slate-900 mb-1.5">{zone}</p>
-                  <p className="text-[11px] text-slate-400 light:text-slate-600 leading-relaxed">{desc}</p>
+                <div key={zone} className={cn('rounded-2xl border p-4 light:border-stone-200 light:bg-white', accent)}>
+                  <p className="text-sm font-black text-white light:text-stone-900 mb-1.5">{zone}</p>
+                  <p className="text-[11px] text-stone-400 light:text-stone-600 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -507,9 +507,9 @@ export default function CoveragePage() {
         </section>
 
         {/* ── FAQ ──────────────────────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
-            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#4A90D9] mb-2">Common Questions</p>
+            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-[#E52C20] mb-2">Common Questions</p>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight mb-8">
               Calgary Area Safety FAQ
             </h2>
@@ -529,32 +529,32 @@ export default function CoveragePage() {
         </section>
 
         {/* ── SEO CONTENT BLOCK ────────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
-            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-slate-500 mb-6">About This Service</p>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-slate-400 light:text-slate-600 leading-relaxed">
+            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-stone-500 mb-6">About This Service</p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-stone-400 light:text-stone-600 leading-relaxed">
               <div>
-                <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Crime mapping for Calgary</h3>
+                <h3 className="text-sm font-black text-white light:text-stone-900 mb-2">Crime mapping for Calgary</h3>
                 <p>Calgary Watch displays recent community observations and selected public-source information across Calgary. Read every marker with its timestamp, source, and status; the map is not a complete record of police-reported crime.</p>
               </div>
               <div>
-                <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Airdrie &amp; Cochrane coverage</h3>
+                <h3 className="text-sm font-black text-white light:text-stone-900 mb-2">Airdrie &amp; Cochrane coverage</h3>
                 <p>Calgary Watch accepts community reports across Airdrie, Cochrane, and surrounding Rocky View County. For Airdrie crime reported to police, use the City of Airdrie's official RCMP-reported crime map; Calgary Watch is a separate community-awareness source.</p>
               </div>
               <div>
-                <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Southern Alberta communities</h3>
+                <h3 className="text-sm font-black text-white light:text-stone-900 mb-2">Southern Alberta communities</h3>
                 <p>The map is designed to accept relevant community reports around Okotoks, High River, and Strathmore. Public-source coverage varies, so an empty map does not establish that an area has no incidents.</p>
               </div>
               <div>
-                <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Rural communities &amp; hamlets</h3>
+                <h3 className="text-sm font-black text-white light:text-stone-900 mb-2">Rural communities &amp; hamlets</h3>
                 <p>Residents around Bragg Creek, Springbank, Priddis, Millarville, De Winton, and Bearspaw can use the same map and community-report flow. Availability and recency still depend on the reports and sources present.</p>
               </div>
               <div>
-                <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Anonymous community reporting</h3>
+                <h3 className="text-sm font-black text-white light:text-stone-900 mb-2">Anonymous community reporting</h3>
                 <p>Every Calgary Watch report can be submitted anonymously. Your name and contact information are never displayed publicly. This encourages reporting in situations where witnesses may be reluctant to identify themselves — particularly important for crime in progress or ongoing suspicious activity.</p>
               </div>
               <div>
-                <h3 className="text-sm font-black text-white light:text-slate-900 mb-2">Official data integration</h3>
+                <h3 className="text-sm font-black text-white light:text-stone-900 mb-2">Official data integration</h3>
                 <p>Alongside community reports, Calgary Watch displays selected attributed public-source items, including weather and highway information. It does not promise a complete picture; always follow the source link when official confirmation matters.</p>
               </div>
             </div>
@@ -562,9 +562,9 @@ export default function CoveragePage() {
         </section>
 
         {/* ── OFFICIAL RESOURCES ───────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
-            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-slate-500 mb-2">External Resources</p>
+            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-stone-500 mb-2">External Resources</p>
             <h2 className="text-xl font-black tracking-tight mb-6">Official Safety Resources</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {OFFICIAL_LINKS.map(({ label, url, desc }) => (
@@ -576,14 +576,14 @@ export default function CoveragePage() {
                   className={cn(
                     'group flex items-start justify-between gap-3 rounded-2xl border p-4 transition-all duration-200',
                     'border-white/8 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/15',
-                    'light:border-slate-200 light:bg-white light:hover:border-slate-300 light:hover:bg-slate-50',
+                    'light:border-stone-200 light:bg-white light:hover:border-stone-300 light:hover:bg-stone-50',
                   )}
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-white light:text-slate-900 truncate">{label}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{desc}</p>
+                    <p className="text-sm font-bold text-white light:text-stone-900 truncate">{label}</p>
+                    <p className="text-[11px] text-stone-500 mt-0.5">{desc}</p>
                   </div>
-                  <ExternalLink size={13} className="shrink-0 mt-0.5 text-slate-600 group-hover:text-[#4A90D9] transition-colors" />
+                  <ExternalLink size={13} className="shrink-0 mt-0.5 text-stone-600 group-hover:text-[#E52C20] transition-colors" />
                 </a>
               ))}
             </div>
@@ -591,9 +591,9 @@ export default function CoveragePage() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────────────────── */}
-        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-slate-200/80">
+        <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 md:py-16 border-t border-white/5 light:border-stone-200/80">
           <Section>
-            <div className="relative overflow-hidden rounded-2xl md:rounded-[2rem] border border-white/10 light:border-slate-200 bg-gradient-to-br from-[#0d1929] to-slate-950 light:from-white light:to-slate-50 p-8 md:p-12">
+            <div className="relative overflow-hidden rounded-2xl md:rounded-[2rem] border border-white/10 light:border-stone-200 bg-gradient-to-br from-[#0d1929] to-stone-950 light:from-white light:to-stone-50 p-8 md:p-12">
               <div className="absolute inset-0 pointer-events-none"
                 style={{ background: 'radial-gradient(circle at 15% 50%, rgba(74,144,217,0.14), transparent 45%), radial-gradient(circle at 85% 50%, rgba(46,139,122,0.1), transparent 45%)' }}
                 aria-hidden="true"
@@ -604,10 +604,10 @@ export default function CoveragePage() {
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="font-mono text-[10px] tracking-[0.24em] uppercase text-emerald-400">Live now</span>
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white light:text-slate-900 mb-2">
+                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white light:text-stone-900 mb-2">
                     See Calgary in real time.
                   </h2>
-                  <p className="text-sm text-slate-400 light:text-slate-600">
+                  <p className="text-sm text-stone-400 light:text-stone-600">
                     Open the live map to monitor incidents across Calgary and surrounding communities.
                   </p>
                 </div>
@@ -615,7 +615,7 @@ export default function CoveragePage() {
                   <Button
                     size="lg"
                     className="h-12 px-7 rounded-2xl font-black text-sm"
-                    style={{ background: 'linear-gradient(135deg,#4A90D9,#2E8B7A)', boxShadow: '0 8px 28px -12px rgba(74,144,217,0.7)' }}
+                    style={{ background: 'linear-gradient(135deg,#E52C20,#2E8B7A)', boxShadow: '0 8px 28px -12px rgba(74,144,217,0.7)' }}
                     onClick={() => navigate('/map')}
                   >
                     Open Live Map
@@ -624,7 +624,7 @@ export default function CoveragePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="h-12 px-7 rounded-2xl font-black text-sm bg-white/8 light:bg-white border border-white/15 light:border-slate-300 text-white light:text-slate-900 hover:bg-white/12 light:hover:bg-slate-100"
+                    className="h-12 px-7 rounded-2xl font-black text-sm bg-white/8 light:bg-white border border-white/15 light:border-stone-300 text-white light:text-stone-900 hover:bg-white/12 light:hover:bg-stone-100"
                     onClick={() => navigate('/map?report=true')}
                   >
                     Submit a Report
@@ -636,18 +636,18 @@ export default function CoveragePage() {
         </section>
 
         {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-        <footer className="max-w-6xl mx-auto px-5 sm:px-8 py-8 border-t border-white/5 light:border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <footer className="max-w-6xl mx-auto px-5 sm:px-8 py-8 border-t border-white/5 light:border-stone-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src={publicAsset('icon.svg')} alt="" width={18} height={18} className="w-[18px] h-[18px] opacity-70" />
-            <span className="text-sm font-bold text-slate-500">Calgary Watch</span>
+            <span className="text-sm font-bold text-stone-500">Calgary Watch</span>
           </div>
-          <p className="text-xs text-slate-600 text-center">
+          <p className="text-xs text-stone-600 text-center">
             Community safety data for Calgary, AB and surrounding region · Always verify with official sources.
           </p>
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="text-xs text-slate-500 hover:text-white light:hover:text-slate-900 transition-colors"
+            className="text-xs text-stone-500 hover:text-white light:hover:text-stone-900 transition-colors"
           >
             ← Back to home
           </button>

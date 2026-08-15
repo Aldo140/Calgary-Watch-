@@ -234,7 +234,7 @@ function VolunteerForm() {
   }
 
   const inputClass =
-    'w-full bg-white/5 light:bg-white/80 border border-white/12 light:border-slate-300 rounded-lg px-4 py-3 text-sm text-white light:text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-[#2E8B7A]/70 focus:bg-white/8 light:focus:bg-white transition-all';
+    'w-full bg-white/5 light:bg-white/80 border border-white/12 light:border-stone-300 rounded-lg px-4 py-3 text-sm text-white light:text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-[#2E8B7A]/70 focus:bg-white/8 light:focus:bg-white transition-all';
 
   return (
     <AnimatePresence mode="wait">
@@ -255,10 +255,10 @@ function VolunteerForm() {
             <CheckCircle2 size={32} className="text-[#2E8B7A]" />
           </motion.div>
           <div>
-            <p className="text-xl font-black text-white light:text-slate-900">
+            <p className="text-xl font-black text-white light:text-stone-900">
               Thanks, {name.split(' ')[0]}!
             </p>
-            <p className="text-slate-400 light:text-slate-600 text-sm mt-1">
+            <p className="text-stone-400 light:text-stone-600 text-sm mt-1">
               We'll be in touch soon.
             </p>
           </div>
@@ -290,7 +290,7 @@ function VolunteerForm() {
             className={inputClass}
           />
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-stone-500 mb-2.5">
               I want to help with
             </p>
             <div className="flex flex-wrap gap-2">
@@ -302,7 +302,7 @@ function VolunteerForm() {
                   className={`text-xs font-bold px-3.5 py-1.5 rounded-full border transition-all cursor-pointer ${
                     role === r
                       ? 'bg-[#2E8B7A] border-[#2E8B7A] text-white shadow-lg shadow-[#2E8B7A]/25'
-                      : 'bg-transparent border-white/15 light:border-slate-300 text-slate-400 light:text-slate-600 hover:border-[#2E8B7A]/50 hover:text-[#2E8B7A]'
+                      : 'bg-transparent border-white/15 light:border-stone-300 text-stone-400 light:text-stone-600 hover:border-[#2E8B7A]/50 hover:text-[#2E8B7A]'
                   }`}
                 >
                   {r}
@@ -311,7 +311,7 @@ function VolunteerForm() {
             </div>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-stone-500 mb-2.5">
               Why do you want to join?
             </p>
             <textarea
@@ -323,7 +323,7 @@ function VolunteerForm() {
               rows={3}
               className={`${inputClass} resize-none`}
             />
-            <p className="text-[10px] text-slate-600 mt-1 text-right tabular-nums">
+            <p className="text-[10px] text-stone-600 mt-1 text-right tabular-nums">
               {whyJoin.length}/500
             </p>
           </div>
@@ -343,7 +343,7 @@ function VolunteerForm() {
             }
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="w-full rounded-xl py-3.5 bg-gradient-to-r from-[#2E8B7A] to-[#246b5f] text-white text-sm font-black disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer tracking-wide shadow-lg shadow-[#2E8B7A]/20"
+            className="w-full rounded-xl py-3.5 bg-gradient-to-r from-[#2E8B7A] to-[#2E8B7A] text-white text-sm font-black disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer tracking-wide shadow-lg shadow-[#2E8B7A]/20"
           >
             {status === 'submitting' ? 'Sending…' : 'Express Interest'}
           </motion.button>
@@ -367,7 +367,7 @@ function HeroPerspectiveTitle({ scrollProgress }: { scrollProgress: ReturnType<t
     return (
       <h1 className="text-[clamp(3rem,10vw,8.5rem)] font-black tracking-tight leading-[0.92] select-none">
         <span className="block text-[#FFFFFF]">Real-time</span>
-        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
+        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#E52C20] via-[#2E8B7A] to-[#B0793C]">
           city
         </span>
         <span className="block text-[#FFFFFF]">intelligence.</span>
@@ -395,7 +395,7 @@ function HeroPerspectiveTitle({ scrollProgress }: { scrollProgress: ReturnType<t
           Real-time
         </motion.span>
         <motion.span
-          className="block text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]"
+          className="block text-transparent bg-clip-text bg-gradient-to-r from-[#E52C20] via-[#2E8B7A] to-[#B0793C]"
           initial={{ opacity: 0, x: 60 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -430,7 +430,7 @@ function ScrollingMarquee() {
   const doubled = [...items, ...items];
 
   return (
-    <div className="relative overflow-hidden py-5 border-y border-white/6 light:border-slate-200 bg-white/[0.02] light:bg-slate-50/60">
+    <div className="relative overflow-hidden py-5 border-y border-white/6 light:border-stone-200 bg-white/[0.02] light:bg-stone-50/60">
       <motion.div
         className="flex gap-12 whitespace-nowrap w-max"
         animate={prefersReducedMotion() ? {} : { x: [0, '-50%'] }}
@@ -443,12 +443,12 @@ function ScrollingMarquee() {
         {doubled.map((item, i) => (
           <span
             key={i}
-            className="text-xs font-black uppercase tracking-[0.22em] text-slate-500 light:text-slate-400 flex items-center gap-4"
+            className="text-xs font-black uppercase tracking-[0.22em] text-stone-500 light:text-stone-400 flex items-center gap-4"
           >
             <span
               className="inline-block w-1.5 h-1.5 rounded-full"
               style={{
-                background: ['#4A90D9', '#2E8B7A', '#D4A843'][i % 3],
+                background: ['#E52C20', '#2E8B7A', '#B0793C'][i % 3],
               }}
             />
             {item}
@@ -482,7 +482,7 @@ function DiagonalImageBlock({ src, alt }: { src: string; alt: string }) {
         className="w-full h-80 md:h-[28rem] object-cover"
         style={prefersReducedMotion() ? undefined : { y: smoothY }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-stone-950/70 to-transparent" />
     </div>
   );
 }
@@ -493,19 +493,19 @@ function DiagonalImageBlock({ src, alt }: { src: string; alt: string }) {
 function OrbitingBadges() {
   const reduced = prefersReducedMotion();
   const badges = [
-    { label: '2000+', sub: 'incidents', color: '#4A90D9', angle: 0 },
+    { label: '2000+', sub: 'incidents', color: '#E52C20', angle: 0 },
     { label: '47', sub: 'areas', color: '#2E8B7A', angle: 90 },
-    { label: '<30s', sub: 'latency', color: '#D4A843', angle: 180 },
-    { label: '100+', sub: 'contributors', color: '#a855f7', angle: 270 },
+    { label: '<30s', sub: 'latency', color: '#B0793C', angle: 180 },
+    { label: '100+', sub: 'contributors', color: '#7A6BA8', angle: 270 },
   ];
 
   return (
     <div className="relative w-64 h-64 mx-auto flex items-center justify-center">
       {/* Central glow */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#4A90D9]/15 via-[#2E8B7A]/10 to-[#D4A843]/15 blur-xl" />
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#E52C20]/15 via-[#2E8B7A]/10 to-[#B0793C]/15 blur-xl" />
       {/* Central icon */}
       <motion.div
-        className="relative z-10 w-20 h-20 rounded-2xl bg-gradient-to-br from-[#4A90D9] to-[#2E8B7A] flex items-center justify-center shadow-2xl shadow-[#4A90D9]/30"
+        className="relative z-10 w-20 h-20 rounded-2xl bg-gradient-to-br from-[#E52C20] to-[#2E8B7A] flex items-center justify-center shadow-2xl shadow-[#E52C20]/30"
         animate={reduced ? {} : { rotate: [0, 5, -5, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       >
@@ -519,7 +519,7 @@ function OrbitingBadges() {
       </motion.div>
       {/* Orbit ring */}
       <motion.div
-        className="absolute inset-0 rounded-full border border-white/8 light:border-slate-300/50"
+        className="absolute inset-0 rounded-full border border-white/8 light:border-stone-300/50"
         animate={reduced ? {} : { rotate: 360 }}
         transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
       />
@@ -540,7 +540,7 @@ function OrbitingBadges() {
             <span className="text-base font-black tabular-nums" style={{ color: b.color }}>
               {b.label}
             </span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 light:text-slate-400">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-stone-500 light:text-stone-400">
               {b.sub}
             </span>
           </motion.div>
@@ -587,7 +587,7 @@ function TimelineStep({
         style={{ perspective: '1000px' }}
       >
         <div
-          className="relative overflow-hidden rounded-2xl border border-white/8 light:border-slate-200 group"
+          className="relative overflow-hidden rounded-2xl border border-white/8 light:border-stone-200 group"
           style={{ boxShadow: `0 24px 60px ${color}18` }}
         >
           <img
@@ -597,7 +597,7 @@ function TimelineStep({
             loading="lazy"
             className="w-full h-60 md:h-72 object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent" />
           <div
             className="absolute bottom-4 left-4 text-5xl font-black opacity-20"
             style={{ color }}
@@ -644,7 +644,7 @@ function TimelineStep({
             Step {num}
           </span>
           <h3 className="text-3xl md:text-4xl font-black mb-3 tracking-tight">{title}</h3>
-          <p className="text-slate-400 light:text-slate-600 leading-relaxed">{desc}</p>
+          <p className="text-stone-400 light:text-stone-600 leading-relaxed">{desc}</p>
         </div>
       </motion.div>
     </div>
@@ -690,7 +690,7 @@ function MorphingStat({
         animate={inView ? { width: 48 } : {}}
         transition={{ duration: 0.5, delay: delay + 0.2 }}
       />
-      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 light:text-slate-500 text-center">
+      <p className="text-xs font-bold uppercase tracking-widest text-stone-400 light:text-stone-500 text-center">
         {label}
       </p>
     </div>
@@ -705,15 +705,15 @@ function NorthernLightsBackground() {
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       <div
         className="absolute -top-32 left-1/4 w-[40rem] h-[20rem] rounded-full opacity-[0.07] blur-[80px]"
-        style={{ background: 'linear-gradient(135deg, #4A90D9, #2E8B7A)' }}
+        style={{ background: 'linear-gradient(135deg, #E52C20, #2E8B7A)' }}
       />
       <div
         className="absolute top-1/3 -right-24 w-[28rem] h-[16rem] rounded-full opacity-[0.055] blur-[60px]"
-        style={{ background: 'linear-gradient(135deg, #D4A843, #C0392B)' }}
+        style={{ background: 'linear-gradient(135deg, #B0793C, #C0392B)' }}
       />
       <div
         className="absolute bottom-0 left-1/3 w-[32rem] h-[18rem] rounded-full opacity-[0.06] blur-[70px]"
-        style={{ background: 'linear-gradient(135deg, #2E8B7A, #4A90D9)' }}
+        style={{ background: 'linear-gradient(135deg, #2E8B7A, #E52C20)' }}
       />
     </div>
   );
@@ -752,7 +752,7 @@ export default function AboutPage() {
   const smoothMissionY = useSpring(missionImgY, { stiffness: 50, damping: 18 });
 
   return (
-    <div className="relative min-h-dvh bg-slate-950 light:bg-[rgb(255,250,243)] text-white light:text-slate-900 font-sans overflow-x-hidden isolate">
+    <div className="relative min-h-dvh bg-stone-950 light:bg-[rgb(255,250,243)] text-white light:text-stone-900 font-sans overflow-x-hidden isolate">
       {/* Ambient light mode gradients */}
       <div className="pointer-events-none absolute inset-0 hidden light:block" aria-hidden="true">
         <div className="absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_15%_10%,rgba(74,144,217,0.14),transparent_34%),radial-gradient(circle_at_85%_5%,rgba(212,168,67,0.14),transparent_28%)]" />
@@ -762,7 +762,7 @@ export default function AboutPage() {
       {/* ================================================================
           NAVIGATION — fixed glassy bar
           ================================================================ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-2xl border-b border-white/5 light:border-stone-200/70">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-stone-950/80 light:bg-[rgba(255,250,242,0.88)] backdrop-blur-2xl border-b border-white/5 light:border-stone-200/70">
         <div className="max-w-7xl mx-auto px-5 h-[4.5rem] flex items-center justify-between">
           <motion.div
             className="flex items-center gap-3"
@@ -786,7 +786,7 @@ export default function AboutPage() {
           >
             <MagneticButton
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-sm font-bold rounded-full px-5 py-2.5 bg-white/5 light:bg-slate-100/80 border border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-200 transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-sm font-bold rounded-full px-5 py-2.5 bg-white/5 light:bg-stone-100/80 border border-white/10 light:border-stone-300 hover:bg-white/10 light:hover:bg-stone-200 transition-colors cursor-pointer"
             >
               <ArrowLeft size={15} />
               Back to Home
@@ -823,10 +823,10 @@ export default function AboutPage() {
           </motion.div>
 
           {/* Gradient overlays — depth stack */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/10" />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/55 to-stone-950/10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-950/50 via-transparent to-transparent" />
           {/* Top fade for nav */}
-          <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-slate-950/60 to-transparent" />
+          <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-stone-950/60 to-transparent" />
 
           {/* Hero content */}
           <div className="relative z-10 max-w-7xl mx-auto px-6 w-full pb-20 md:pb-28">
@@ -838,8 +838,8 @@ export default function AboutPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.05 }}
               >
-                <span className="w-2 h-2 rounded-full bg-[#4A90D9] animate-pulse" />
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-200">
+                <span className="w-2 h-2 rounded-full bg-[#E52C20] animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-stone-200">
                   Designed for Calgary
                 </span>
               </motion.div>
@@ -867,7 +867,7 @@ export default function AboutPage() {
               >
                 <MagneticButton
                   onClick={() => navigate('/map')}
-                  className="inline-flex items-center gap-2 rounded-xl px-7 py-4 font-black text-sm text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] shadow-xl shadow-[#4A90D9]/25 hover:shadow-[#4A90D9]/40 transition-shadow cursor-pointer"
+                  className="inline-flex items-center gap-2 rounded-xl px-7 py-4 font-black text-sm text-white bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] shadow-xl shadow-[#E52C20]/25 hover:shadow-[#E52C20]/40 transition-shadow cursor-pointer"
                 >
                   <MapPin size={17} />
                   View Live Map
@@ -923,8 +923,8 @@ export default function AboutPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <span className="w-10 h-px bg-[#4A90D9]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4A90D9]">
+              <span className="w-10 h-px bg-[#E52C20]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E52C20]">
                 Who We Are
               </span>
             </motion.div>
@@ -935,7 +935,7 @@ export default function AboutPage() {
               <div className="relative h-[32rem] hidden md:block shrink-0">
                 {/* Image 1 — top-left */}
                 <motion.div
-                  className="absolute top-0 left-0 w-[56%] h-[58%] rounded-2xl overflow-hidden border border-white/8 light:border-slate-200 shadow-2xl"
+                  className="absolute top-0 left-0 w-[56%] h-[58%] rounded-2xl overflow-hidden border border-white/8 light:border-stone-200 shadow-2xl"
                   initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -949,13 +949,13 @@ export default function AboutPage() {
                     style={prefersReducedMotion() ? undefined : { scale: whoImgScale }}
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4A90D9]/25 via-transparent to-transparent mix-blend-overlay" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#E52C20]/25 via-transparent to-transparent mix-blend-overlay" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 to-transparent" />
                 </motion.div>
 
                 {/* Image 2 — bottom-right */}
                 <motion.div
-                  className="absolute bottom-0 right-0 w-[60%] h-[62%] rounded-2xl overflow-hidden border border-white/8 light:border-slate-200 shadow-2xl"
+                  className="absolute bottom-0 right-0 w-[60%] h-[62%] rounded-2xl overflow-hidden border border-white/8 light:border-stone-200 shadow-2xl"
                   initial={prefersReducedMotion() ? undefined : { opacity: 0, y: -24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -969,37 +969,37 @@ export default function AboutPage() {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-[#2E8B7A]/20 via-transparent to-transparent mix-blend-overlay" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/40 to-transparent" />
                 </motion.div>
 
                 {/* Floating stat badge — overlaps both images */}
                 <motion.div
-                  className="absolute top-[46%] left-[34%] bg-slate-950/90 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-200 rounded-2xl px-5 py-4 shadow-2xl z-20"
+                  className="absolute top-[46%] left-[34%] bg-stone-950/90 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-stone-200 rounded-2xl px-5 py-4 shadow-2xl z-20"
                   initial={prefersReducedMotion() ? undefined : { opacity: 0, scale: 0.75 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
                 >
-                  <p className="text-3xl font-black text-[#4A90D9] tabular-nums leading-none mb-1">
+                  <p className="text-3xl font-black text-[#E52C20] tabular-nums leading-none mb-1">
                     <AnimatedCounter to={47} />
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">
                     Neighbourhoods
                   </p>
                 </motion.div>
 
                 {/* Second floating stat */}
                 <motion.div
-                  className="absolute top-[8%] right-[4%] bg-slate-950/90 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-slate-200 rounded-2xl px-4 py-3 shadow-xl z-20"
+                  className="absolute top-[8%] right-[4%] bg-stone-950/90 light:bg-white/95 backdrop-blur-xl border border-white/10 light:border-stone-200 rounded-2xl px-4 py-3 shadow-xl z-20"
                   initial={prefersReducedMotion() ? undefined : { opacity: 0, scale: 0.75 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.7, type: 'spring', stiffness: 200, damping: 20 }}
                 >
-                  <p className="text-2xl font-black text-[#D4A843] tabular-nums leading-none mb-0.5">
+                  <p className="text-2xl font-black text-[#B0793C] tabular-nums leading-none mb-0.5">
                     <AnimatedCounter to={2000} suffix="+" />
                   </p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">
                     Incidents
                   </p>
                 </motion.div>
@@ -1019,8 +1019,8 @@ export default function AboutPage() {
                     <motion.span
                       key={i}
                       className={`block ${gradient
-                        ? 'text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] italic'
-                        : 'text-white light:text-slate-900'
+                        ? 'text-transparent bg-clip-text bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] italic'
+                        : 'text-white light:text-stone-900'
                       }`}
                       initial={prefersReducedMotion() ? undefined : { opacity: 0, x: i % 2 === 0 ? -28 : 28 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -1033,7 +1033,7 @@ export default function AboutPage() {
                 </h2>
 
                 <motion.p
-                  className="text-base md:text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-10 max-w-md"
+                  className="text-base md:text-lg text-stone-400 light:text-stone-600 leading-relaxed mb-10 max-w-md"
                   initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 14 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -1046,22 +1046,22 @@ export default function AboutPage() {
                 </motion.p>
 
                 {/* Values — editorial numbered rows */}
-                <div className="border-t border-white/8 light:border-slate-200">
+                <div className="border-t border-white/8 light:border-stone-200">
                   {[
-                    { icon: Clock, num: '01', label: 'Real-Time', desc: 'Incidents appear on the map in seconds', color: '#4A90D9' },
+                    { icon: Clock, num: '01', label: 'Real-Time', desc: 'Incidents appear on the map in seconds', color: '#E52C20' },
                     { icon: Shield, num: '02', label: 'Verified', desc: 'Community reports + official CPS data', color: '#2E8B7A' },
-                    { icon: Users, num: '03', label: 'Community', desc: 'Powered by Calgary residents', color: '#D4A843' },
+                    { icon: Users, num: '03', label: 'Community', desc: 'Powered by Calgary residents', color: '#B0793C' },
                   ].map((item, i) => (
                     <motion.div
                       key={item.num}
-                      className="flex items-center gap-4 py-5 border-b border-white/8 light:border-slate-200 group cursor-default"
+                      className="flex items-center gap-4 py-5 border-b border-white/8 light:border-stone-200 group cursor-default"
                       initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 14 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.5, delay: 0.48 + i * 0.09 }}
                       whileHover={prefersReducedMotion() ? undefined : { x: 5 }}
                     >
-                      <span className="text-[11px] font-black tabular-nums text-slate-600 w-6 shrink-0">
+                      <span className="text-[11px] font-black tabular-nums text-stone-600 w-6 shrink-0">
                         {item.num}
                       </span>
                       <div
@@ -1072,7 +1072,7 @@ export default function AboutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-black text-sm tracking-tight mb-0.5">{item.label}</p>
-                        <p className="text-xs text-slate-500 light:text-slate-500 truncate">{item.desc}</p>
+                        <p className="text-xs text-stone-500 light:text-stone-500 truncate">{item.desc}</p>
                       </div>
                       <motion.div
                         className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1092,15 +1092,15 @@ export default function AboutPage() {
         {/* ==============================================================
             STATS — dramatic full-width typographic number bar
             ============================================================== */}
-        <section className="relative py-4 bg-slate-900/60 light:bg-slate-50/70 border-y border-white/5 light:border-slate-200 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#4A90D9/3,#2E8B7A/3,#D4A843/3,#a855f7/3)] opacity-5" aria-hidden="true" />
+        <section className="relative py-4 bg-stone-900/60 light:bg-stone-50/70 border-y border-white/5 light:border-stone-200 overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#E52C20/3,#2E8B7A/3,#B0793C/3,#7A6BA8/3)] opacity-5" aria-hidden="true" />
           <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/5 light:divide-slate-200">
+            <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-white/5 light:divide-stone-200">
               {[
-                { value: 2000, suffix: '+', prefix: '', label: 'Incidents Mapped', color: '#4A90D9' },
+                { value: 2000, suffix: '+', prefix: '', label: 'Incidents Mapped', color: '#E52C20' },
                 { value: 47,   suffix: '',  prefix: '', label: 'Neighbourhoods',   color: '#2E8B7A' },
-                { value: 30,   suffix: 's', prefix: '<', label: 'Report to Map',   color: '#D4A843' },
-                { value: 100,  suffix: '+', prefix: '', label: 'Contributors',     color: '#a855f7' },
+                { value: 30,   suffix: 's', prefix: '<', label: 'Report to Map',   color: '#B0793C' },
+                { value: 100,  suffix: '+', prefix: '', label: 'Contributors',     color: '#7A6BA8' },
               ].map((s, i) => (
                 <MorphingStat key={i} {...s} delay={i * 0.12} />
               ))}
@@ -1116,7 +1116,7 @@ export default function AboutPage() {
           <div className="max-w-5xl mx-auto relative z-10">
             <div className="mb-16 md:mb-24">
               <motion.span
-                className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4"
+                className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#E52C20] mb-4"
                 initial={prefersReducedMotion() ? undefined : { opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -1137,7 +1137,7 @@ export default function AboutPage() {
                   title: 'Report',
                   desc: 'Spot something? Drop a pin and report it in under 30 seconds. Our streamlined form gets your incident on the map before you put your phone away.',
                   image: publicAsset('images/calgary2.webp'),
-                  color: '#4A90D9',
+                  color: '#E52C20',
                 },
                 {
                   num: '02',
@@ -1151,7 +1151,7 @@ export default function AboutPage() {
                   title: 'Decide',
                   desc: "Context and verified data help you decide what to do next. Adjust your route, stay informed, or simply know what's happening around you.",
                   image: publicAsset('images/calgary5.webp'),
-                  color: '#D4A843',
+                  color: '#B0793C',
                 },
               ].map((step, i, arr) => (
                 <TimelineStep
@@ -1170,7 +1170,7 @@ export default function AboutPage() {
             ============================================================== */}
         <motion.section
           ref={missionRef}
-          className="py-24 md:py-40 px-6 bg-slate-900/40 light:bg-slate-50/50 relative overflow-hidden"
+          className="py-24 md:py-40 px-6 bg-stone-900/40 light:bg-stone-50/50 relative overflow-hidden"
         >
           <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-14 md:gap-20 items-center">
 
@@ -1183,7 +1183,7 @@ export default function AboutPage() {
               transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
               <div
-                className="relative overflow-hidden rounded-2xl border border-white/8 light:border-slate-200"
+                className="relative overflow-hidden rounded-2xl border border-white/8 light:border-stone-200"
                 style={{
                   clipPath: 'polygon(0 0, 100% 0, 100% 90%, 92% 100%, 0 100%)',
                 }}
@@ -1196,17 +1196,17 @@ export default function AboutPage() {
                   className="w-full h-80 md:h-[32rem] object-cover"
                   style={prefersReducedMotion() ? undefined : { y: smoothMissionY }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/50 to-transparent" />
                 {/* Floating stat overlay */}
                 <motion.div
-                  className="absolute bottom-6 left-6 bg-slate-950/80 light:bg-white/90 backdrop-blur-md border border-white/10 light:border-slate-200 rounded-xl px-5 py-4"
+                  className="absolute bottom-6 left-6 bg-stone-950/80 light:bg-white/90 backdrop-blur-md border border-white/10 light:border-stone-200 rounded-xl px-5 py-4"
                   initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
-                  <p className="text-2xl font-black text-[#4A90D9]">2,000+</p>
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 light:text-slate-500">
+                  <p className="text-2xl font-black text-[#E52C20]">2,000+</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-stone-400 light:text-stone-500">
                     incidents tracked
                   </p>
                 </motion.div>
@@ -1221,16 +1221,16 @@ export default function AboutPage() {
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
             >
-              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4">
+              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#E52C20] mb-4">
                 Our Mission
               </span>
               <h2 className="text-4xl md:text-5xl font-black leading-[1.08] tracking-tight mb-5">
                 Connected, aware,{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E52C20] to-[#2E8B7A]">
                   informed
                 </span>
               </h2>
-              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-8">
+              <p className="text-lg text-stone-400 light:text-stone-600 leading-relaxed mb-8">
                 We believe Calgarians deserve real-time awareness of what's happening
                 around them. Not endless notifications. Not algorithmic feeds. Just
                 clear, trustworthy information that helps you decide.
@@ -1256,7 +1256,7 @@ export default function AboutPage() {
                       size={18}
                       className="text-[#2E8B7A] shrink-0 mt-0.5"
                     />
-                    <span className="text-slate-300 light:text-slate-700 text-sm leading-relaxed">
+                    <span className="text-stone-300 light:text-stone-700 text-sm leading-relaxed">
                       {point}
                     </span>
                   </motion.div>
@@ -1282,8 +1282,8 @@ export default function AboutPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="w-10 h-px bg-[#4A90D9]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4A90D9]">
+                <span className="w-10 h-px bg-[#E52C20]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E52C20]">
                   Get Involved
                 </span>
               </motion.div>
@@ -1292,7 +1292,7 @@ export default function AboutPage() {
                 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05] mb-6"
               />
               <motion.p
-                className="text-lg text-slate-400 light:text-slate-600 leading-relaxed"
+                className="text-lg text-stone-400 light:text-stone-600 leading-relaxed"
                 initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -1310,20 +1310,20 @@ export default function AboutPage() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#4A90D9]/8 via-[#2E8B7A]/5 to-transparent light:from-blue-50/80 light:to-teal-50/50" />
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#E52C20]/8 via-[#2E8B7A]/5 to-transparent light:from-[#F5EFE4]/80 light:to-teal-50/50" />
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#E52C20] via-[#2E8B7A] to-[#B0793C]" />
               <div className="relative px-8 md:px-14 py-10 md:py-14 pl-10 md:pl-16">
-                <span className="text-[5rem] leading-none font-black text-[#4A90D9]/15 select-none absolute top-2 left-6 md:left-10">"</span>
-                <p className="text-xl md:text-2xl lg:text-3xl font-black leading-[1.3] tracking-tight text-white light:text-slate-900 mb-3">
+                <span className="text-[5rem] leading-none font-black text-[#E52C20]/15 select-none absolute top-2 left-6 md:left-10">"</span>
+                <p className="text-xl md:text-2xl lg:text-3xl font-black leading-[1.3] tracking-tight text-white light:text-stone-900 mb-3">
                   Trust is everything.
                 </p>
-                <p className="text-base md:text-lg text-slate-400 light:text-slate-600 leading-relaxed max-w-4xl">
+                <p className="text-base md:text-lg text-stone-400 light:text-stone-600 leading-relaxed max-w-4xl">
                   When Calgarians rely on us to stay informed about what's happening
                   in their neighbourhoods, we accept a responsibility to be accurate,
                   responsive, and transparent. Every volunteer, every verification,
                   every decision shapes whether Calgary Watch remains a platform they
                   can depend on.{' '}
-                  <span className="font-semibold text-white light:text-slate-900">
+                  <span className="font-semibold text-white light:text-stone-900">
                     Join us in building something our city can trust.
                   </span>
                 </p>
@@ -1338,14 +1338,14 @@ export default function AboutPage() {
               viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="absolute inset-0 bg-slate-900/80 light:bg-white/85 backdrop-blur-sm" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[#2E8B7A]/10 via-transparent to-[#4A90D9]/6" />
+              <div className="absolute inset-0 bg-stone-900/80 light:bg-white/85 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#2E8B7A]/10 via-transparent to-[#E52C20]/6" />
               <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#2E8B7A]/8 blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full bg-[#4A90D9]/6 blur-2xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-56 h-56 rounded-full bg-[#E52C20]/6 blur-2xl pointer-events-none" />
 
               <div className="relative grid md:grid-cols-[1fr_1.1fr]">
                 {/* Left: description */}
-                <div className="p-8 md:p-12 md:border-r border-white/6 light:border-slate-200 flex flex-col justify-center gap-7">
+                <div className="p-8 md:p-12 md:border-r border-white/6 light:border-stone-200 flex flex-col justify-center gap-7">
                   <div>
                     <div className="flex items-center gap-3 mb-5">
                       <div className="w-11 h-11 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/25 flex items-center justify-center">
@@ -1357,11 +1357,11 @@ export default function AboutPage() {
                     </div>
                     <h3 className="text-3xl md:text-4xl font-black tracking-tight leading-[1.05] mb-4">
                       Help keep<br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2E8B7A] to-[#4A90D9]">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2E8B7A] to-[#E52C20]">
                         Calgary informed
                       </span>
                     </h3>
-                    <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed">
+                    <p className="text-stone-400 light:text-stone-600 text-sm leading-relaxed">
                       We're looking for passionate Calgarians to join us. Your
                       contributions ensure we remain accurate, responsive, and worthy of
                       the community's trust.
@@ -1373,7 +1373,7 @@ export default function AboutPage() {
                     {['Reporter', 'Analyst', 'Developer', 'Advocate'].map((r, i) => (
                       <motion.span
                         key={r}
-                        className="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 light:border-slate-200 text-slate-400 light:text-slate-600"
+                        className="text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-full border border-white/10 light:border-stone-200 text-stone-400 light:text-stone-600"
                         initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 8 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -1387,7 +1387,7 @@ export default function AboutPage() {
                   {/* Social proof */}
                   <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
-                      {['#4A90D9', '#2E8B7A', '#D4A843'].map((color, i) => (
+                      {['#E52C20', '#2E8B7A', '#B0793C'].map((color, i) => (
                         <div
                           key={i}
                           className="w-8 h-8 rounded-full border-2 flex items-center justify-center"
@@ -1397,15 +1397,15 @@ export default function AboutPage() {
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-slate-500 light:text-slate-500">
-                      <span className="font-black text-white light:text-slate-900">100+</span> contributors and growing
+                    <p className="text-xs text-stone-500 light:text-stone-500">
+                      <span className="font-black text-white light:text-stone-900">100+</span> contributors and growing
                     </p>
                   </div>
                 </div>
 
                 {/* Right: form */}
                 <div className="p-8 md:p-12">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-500 mb-6">
                     Express your interest
                   </p>
                   <VolunteerForm />
@@ -1433,18 +1433,18 @@ export default function AboutPage() {
                     loading="lazy"
                     aria-hidden="true"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/25" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4A90D9]/15 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/25" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#E52C20]/15 to-transparent" />
                 </div>
                 <div className="relative p-8 md:p-10 flex flex-col gap-3 h-full justify-end">
-                  <div className="w-10 h-10 rounded-xl bg-[#4A90D9]/20 border border-[#4A90D9]/35 flex items-center justify-center mb-1">
-                    <Eye size={18} className="text-[#4A90D9]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#E52C20]/20 border border-[#E52C20]/35 flex items-center justify-center mb-1">
+                    <Eye size={18} className="text-[#E52C20]" />
                   </div>
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/15 px-2.5 py-1 rounded w-fit">
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#E52C20] bg-[#E52C20]/15 px-2.5 py-1 rounded w-fit">
                     Our Team
                   </span>
                   <h3 className="text-2xl font-black tracking-tight">Always watching, always here</h3>
-                  <p className="text-slate-300 light:text-slate-200 text-sm leading-relaxed">
+                  <p className="text-stone-300 light:text-stone-200 text-sm leading-relaxed">
                     A dedicated team actively monitors Calgary Watch around the clock,
                     reviewing reports, verifying incidents, and making sure the map
                     stays accurate and trustworthy. Every pin you see has a real person
@@ -1470,30 +1470,30 @@ export default function AboutPage() {
                     loading="lazy"
                     aria-hidden="true"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/25" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#D4A843]/15 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/25" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#B0793C]/15 to-transparent" />
                 </div>
                 <div className="relative p-8 md:p-10 flex flex-col gap-3 h-full justify-end">
                   <div className="flex items-start justify-between">
-                    <div className="w-10 h-10 rounded-xl bg-[#D4A843]/20 border border-[#D4A843]/35 flex items-center justify-center mb-1">
-                      <Handshake size={18} className="text-[#D4A843]" />
+                    <div className="w-10 h-10 rounded-xl bg-[#B0793C]/20 border border-[#B0793C]/35 flex items-center justify-center mb-1">
+                      <Handshake size={18} className="text-[#B0793C]" />
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-[#D4A843] bg-[#D4A843]/15 border border-[#D4A843]/30 px-2.5 py-1 rounded-full">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#B0793C] bg-[#B0793C]/15 border border-[#B0793C]/30 px-2.5 py-1 rounded-full">
                       Open
                     </span>
                   </div>
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/15 px-2.5 py-1 rounded w-fit">
+                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#B0793C] bg-[#B0793C]/15 px-2.5 py-1 rounded w-fit">
                     Business Partners
                   </span>
                   <h3 className="text-2xl font-black tracking-tight">Grow with Calgary</h3>
-                  <p className="text-slate-300 light:text-slate-200 text-sm leading-relaxed mb-2">
+                  <p className="text-stone-300 light:text-stone-200 text-sm leading-relaxed mb-2">
                     Looking for Calgary-based businesses who want to be part of a
                     platform thousands rely on. Sponsorship, integrations, partnerships.
                   </p>
                   <ul className="space-y-1.5 mb-4">
                     {['Sponsored neighbourhood alerts', 'Data & API integration', 'Co-branding opportunities'].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-xs text-slate-300">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#D4A843] shrink-0" />
+                      <li key={item} className="flex items-center gap-2 text-xs text-stone-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B0793C] shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -1501,7 +1501,7 @@ export default function AboutPage() {
                   <MagneticButton
                     tag="a"
                     href="mailto:jorti104@mtroyal.ca?subject=Partnership%20Inquiry"
-                    className="inline-flex items-center gap-2 text-sm font-black text-[#D4A843] hover:text-amber-300 transition-colors cursor-pointer w-fit"
+                    className="inline-flex items-center gap-2 text-sm font-black text-[#B0793C] hover:text-amber-300 transition-colors cursor-pointer w-fit"
                   >
                     <Mail size={14} />
                     Get in touch
@@ -1513,29 +1513,29 @@ export default function AboutPage() {
 
             {/* Funding / Investor Banner */}
             <motion.div
-              className="rounded-2xl border border-[#4A90D9]/25 relative overflow-hidden"
+              className="rounded-2xl border border-[#E52C20]/25 relative overflow-hidden"
               initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.65, delay: 0.15 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#4A90D9]/6 via-[#2E8B7A]/4 to-[#D4A843]/6 light:from-blue-50 light:to-amber-50" />
-              <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-[#4A90D9]/8 blur-3xl" aria-hidden="true" />
-              <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#D4A843]/8 blur-3xl" aria-hidden="true" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#E52C20]/6 via-[#2E8B7A]/4 to-[#B0793C]/6 light:from-[#F5EFE4] light:to-amber-50" />
+              <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-[#E52C20]/8 blur-3xl" aria-hidden="true" />
+              <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#B0793C]/8 blur-3xl" aria-hidden="true" />
               <div className="relative p-8 flex flex-col md:flex-row md:items-center gap-8">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#4A90D9] bg-[#4A90D9]/10 px-2.5 py-1 rounded">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#E52C20] bg-[#E52C20]/10 px-2.5 py-1 rounded">
                       Funding
                     </span>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#D4A843] bg-[#D4A843]/10 px-2.5 py-1 rounded">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-[#B0793C] bg-[#B0793C]/10 px-2.5 py-1 rounded">
                       Seeking Investors
                     </span>
                   </div>
                   <h3 className="text-xl md:text-2xl font-black mb-2 tracking-tight">
                     We're looking for funding to build the app.
                   </h3>
-                  <p className="text-slate-400 light:text-slate-600 text-sm leading-relaxed max-w-2xl mb-5">
+                  <p className="text-stone-400 light:text-stone-600 text-sm leading-relaxed max-w-2xl mb-5">
                     Calgary Watch has proven community demand. The next step is a native
                     iOS and Android app with push alerts, an enhanced trust system, and
                     expansion to other cities. We're actively seeking investors, grants,
@@ -1551,7 +1551,7 @@ export default function AboutPage() {
                     ].map(({ label, icon: Icon }) => (
                       <span
                         key={label}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 light:text-slate-700 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 px-3 py-1.5 rounded-full"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-300 light:text-stone-700 bg-white/5 light:bg-white border border-white/10 light:border-stone-200 px-3 py-1.5 rounded-full"
                       >
                         <Icon size={11} />
                         {label}
@@ -1562,7 +1562,7 @@ export default function AboutPage() {
                 <MagneticButton
                   tag="a"
                   href="mailto:jorti104@mtroyal.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
-                  className="shrink-0 inline-flex items-center gap-2.5 rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] text-white text-sm font-black shadow-xl shadow-[#4A90D9]/20 hover:shadow-[#4A90D9]/35 transition-shadow cursor-pointer whitespace-nowrap"
+                  className="shrink-0 inline-flex items-center gap-2.5 rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] text-white text-sm font-black shadow-xl shadow-[#E52C20]/20 hover:shadow-[#E52C20]/35 transition-shadow cursor-pointer whitespace-nowrap"
                 >
                   <Mail size={15} />
                   Reach Out
@@ -1577,7 +1577,7 @@ export default function AboutPage() {
         {/* ==============================================================
             CONTACT — centered, dramatic
             ============================================================== */}
-        <section className="py-24 md:py-32 px-6 bg-slate-900/50 light:bg-slate-50/60 relative overflow-hidden">
+        <section className="py-24 md:py-32 px-6 bg-stone-900/50 light:bg-stone-50/60 relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(74,144,217,0.05),transparent_60%)]" aria-hidden="true" />
           <div className="max-w-2xl mx-auto text-center relative z-10">
             <motion.div
@@ -1586,23 +1586,23 @@ export default function AboutPage() {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.65 }}
             >
-              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#4A90D9] mb-4">
+              <span className="inline-block text-[10px] font-black uppercase tracking-[0.25em] text-[#E52C20] mb-4">
                 Get In Touch
               </span>
               <h2 className="text-4xl md:text-5xl font-black leading-[1.08] tracking-tight mb-4">
                 Questions? Ideas?{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E52C20] to-[#2E8B7A]">
                   Let's talk.
                 </span>
               </h2>
-              <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-10">
+              <p className="text-lg text-stone-400 light:text-stone-600 leading-relaxed mb-10">
                 Whether you want to partner, have suggestions, or just want to chat
                 about the platform, we'd love to hear from you.
               </p>
               <MagneticButton
                 tag="a"
                 href="mailto:jorti104@mtroyal.ca"
-                className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-base font-black text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] shadow-xl shadow-[#4A90D9]/20 hover:shadow-[#4A90D9]/35 transition-shadow cursor-pointer"
+                className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-base font-black text-white bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] shadow-xl shadow-[#E52C20]/20 hover:shadow-[#E52C20]/35 transition-shadow cursor-pointer"
               >
                 <Mail size={18} />
                 jorti104@mtroyal.ca
@@ -1626,13 +1626,13 @@ export default function AboutPage() {
               className="w-full h-full object-cover opacity-20 light:opacity-25"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/70 light:from-[rgb(255,250,243)] light:via-[rgba(255,250,243,0.9)] light:to-[rgba(255,250,243,0.8)]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/85 to-stone-950/70 light:from-[rgb(255,250,243)] light:via-[rgba(255,250,243,0.9)] light:to-[rgba(255,250,243,0.8)]" />
           </div>
 
           {/* Center glow */}
           <div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[20rem] rounded-full blur-[120px] opacity-10"
-            style={{ background: 'linear-gradient(135deg, #4A90D9, #2E8B7A)' }}
+            style={{ background: 'linear-gradient(135deg, #E52C20, #2E8B7A)' }}
             aria-hidden="true"
           />
 
@@ -1645,11 +1645,11 @@ export default function AboutPage() {
           >
             <h2 className="text-5xl md:text-7xl font-black leading-[1] tracking-tight mb-6">
               See Calgary{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A90D9] via-[#2E8B7A] to-[#D4A843]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E52C20] via-[#2E8B7A] to-[#B0793C]">
                 live right now
               </span>
             </h2>
-            <p className="text-lg text-slate-400 light:text-slate-600 leading-relaxed mb-12 max-w-xl mx-auto">
+            <p className="text-lg text-stone-400 light:text-stone-600 leading-relaxed mb-12 max-w-xl mx-auto">
               Open the map, explore incidents in your neighbourhood, and join a
               community that's building real-time awareness for Calgary.
             </p>
@@ -1657,14 +1657,14 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <MagneticButton
                 onClick={() => navigate('/map')}
-                className="inline-flex items-center justify-center gap-2.5 rounded-xl px-10 py-4 font-black text-base text-white bg-gradient-to-r from-[#4A90D9] to-[#2E8B7A] shadow-2xl shadow-[#4A90D9]/25 hover:shadow-[#4A90D9]/40 transition-shadow cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 rounded-xl px-10 py-4 font-black text-base text-white bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] shadow-2xl shadow-[#E52C20]/25 hover:shadow-[#E52C20]/40 transition-shadow cursor-pointer"
               >
                 <MapPin size={18} />
                 Open Live Map
               </MagneticButton>
               <MagneticButton
                 onClick={() => navigate('/map?report=true')}
-                className="inline-flex items-center justify-center gap-2.5 rounded-xl px-10 py-4 font-black text-base bg-white/10 light:bg-slate-100/80 border-2 border-white/20 light:border-slate-300 hover:bg-white/15 light:hover:bg-slate-200 text-white light:text-slate-900 transition-colors cursor-pointer backdrop-blur-sm"
+                className="inline-flex items-center justify-center gap-2.5 rounded-xl px-10 py-4 font-black text-base bg-white/10 light:bg-stone-100/80 border-2 border-white/20 light:border-stone-300 hover:bg-white/15 light:hover:bg-stone-200 text-white light:text-stone-900 transition-colors cursor-pointer backdrop-blur-sm"
               >
                 <Zap size={18} />
                 Report Incident
@@ -1677,7 +1677,7 @@ export default function AboutPage() {
       {/* ================================================================
           FOOTER
           ================================================================ */}
-      <footer className="relative py-10 px-6 border-t border-white/5 light:border-stone-200/80 bg-slate-950 light:bg-[rgb(255,250,243)] overflow-hidden">
+      <footer className="relative py-10 px-6 border-t border-white/5 light:border-stone-200/80 bg-stone-950 light:bg-[rgb(255,250,243)] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(74,144,217,0.04),transparent_60%)]" aria-hidden="true" />
         <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -1688,23 +1688,23 @@ export default function AboutPage() {
               className="w-7 h-7 object-contain opacity-60"
               onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
             />
-            <span className="text-xs font-black uppercase tracking-widest text-slate-600 light:text-slate-500">
+            <span className="text-xs font-black uppercase tracking-widest text-stone-600 light:text-stone-500">
               Calgary Watch
             </span>
           </div>
-          <p className="text-xs text-slate-700 light:text-slate-500 font-bold uppercase tracking-widest text-center">
+          <p className="text-xs text-stone-700 light:text-stone-500 font-bold uppercase tracking-widest text-center">
             Built for Real-Time Awareness &bull; &copy; 2026
           </p>
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/map')}
-              className="text-xs text-slate-600 light:text-slate-500 hover:text-[#4A90D9] transition-colors font-bold uppercase tracking-wider cursor-pointer"
+              className="text-xs text-stone-600 light:text-stone-500 hover:text-[#E52C20] transition-colors font-bold uppercase tracking-wider cursor-pointer"
             >
               Live Map
             </button>
             <a
               href="mailto:jorti104@mtroyal.ca"
-              className="text-xs text-slate-600 light:text-slate-500 hover:text-[#4A90D9] transition-colors font-bold uppercase tracking-wider"
+              className="text-xs text-stone-600 light:text-stone-500 hover:text-[#E52C20] transition-colors font-bold uppercase tracking-wider"
             >
               Contact
             </a>

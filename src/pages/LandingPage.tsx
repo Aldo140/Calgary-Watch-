@@ -424,8 +424,9 @@ const HERO_LINES = [
 ];
 
 /**
- * Mobile hero — "pocket dispatch": boot line, staggered headline, a full-bleed
- * city window with live rotating dispatch chip, and thumb-zone CTAs.
+ * Mobile hero: a compact city briefing. The conversion action stays above the
+ * fold on short phones, while the Calgary image and report example explain the
+ * product without competing with the headline.
  */
 function MobileHero({ reduced }: { reduced: boolean }) {
   const [feedIdx, setFeedIdx] = useState(0);
@@ -438,174 +439,125 @@ function MobileHero({ reduced }: { reduced: boolean }) {
   const ItemIcon = item.icon;
 
   return (
-    <div className="lg:hidden relative z-10 flex flex-col min-h-dvh pt-24 pb-7">
-      <div className="px-5">
-        {/* boot line */}
-        <motion.p
-          initial={reduced ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="font-mono text-[10px] tracking-[0.3em] uppercase flex items-center gap-2.5"
-          style={{ color: T.bow }}
-        >
-          <span className="inline-block w-1.5 h-3 animate-pulse rounded-[1px]" style={{ background: T.bow }} aria-hidden="true" />
-          Scanning YYC · 4 quadrants live
-        </motion.p>
-
-        {/* headline */}
-        <h1 className="mt-5 font-display font-extrabold leading-[0.93] tracking-[-0.03em]" style={{ fontSize: 'clamp(2.9rem, 14.5vw, 4.6rem)' }}>
-          {HERO_LINES.map((line, i) => (
-            <span key={line.text} className="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
-              <motion.span
-                className="block"
-                style={{ color: line.color }}
-                initial={reduced ? false : { y: '110%' }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.85, delay: 0.12 + i * 0.12, ease: EASE }}
-              >
-                {line.text}
-                {i === 1 && (
-                  <motion.svg
-                    viewBox="0 0 300 14" className="block w-[62%] mt-1" aria-hidden="true"
-                    initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-                  >
-                    <motion.path
-                      d="M2 10 C 60 2, 120 13, 180 7 S 280 4, 298 8"
-                      fill="none" stroke={T.bow} strokeWidth="3.5" strokeLinecap="round"
-                      initial={reduced ? false : { pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 1, delay: 0.85, ease: 'easeInOut' }}
-                    />
-                  </motion.svg>
-                )}
-              </motion.span>
-            </span>
-          ))}
-        </h1>
-
-        <motion.p
-          initial={reduced ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55, ease: EASE }}
-          className="mt-4 text-[14.5px] leading-relaxed max-w-[32ch]"
-          style={{ color: T.inkSoft }}
-        >
-          See current crime and safety reports near you, then alert your
-          neighbours when something happens. Free, run by Calgarians.
-        </motion.p>
-      </div>
-
-      {/* city window — full-bleed strip with live dispatch */}
-      <motion.div
-        initial={reduced ? false : { opacity: 0, y: 26 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.75, delay: 0.7, ease: EASE }}
-        className="relative mt-7 h-44 min-[400px]:h-48 overflow-hidden"
-      >
-        <img
-          src={publicAsset('images/hero-wide.webp')}
-          alt="Calgary skyline over the Bow River"
-          width={1600} height={900}
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
-        />
-        <div className="absolute inset-x-0 top-0 h-8" style={{ background: `linear-gradient(to bottom, ${T.paper}, transparent)` }} aria-hidden="true" />
-        <div className="absolute inset-x-0 bottom-0 h-16" style={{ background: 'linear-gradient(to top, rgba(12,29,46,0.72), transparent)' }} aria-hidden="true" />
-
-        <span
-          className="absolute top-4 right-4 font-mono text-[8.5px] font-bold tracking-[0.24em] uppercase px-2.5 py-1.5 rounded-md flex items-center gap-1.5"
-          style={{ background: 'rgba(12,29,46,0.7)', color: '#F7F3EA', backdropFilter: 'blur(6px)' }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.red }} aria-hidden="true" />
-          Live · YYC
-        </span>
-
-        {/* pulsing pins */}
-        {[
-          { left: '18%', top: '46%', color: '#f59e0b', delay: 0 },
-          { left: '55%', top: '32%', color: '#ef4444', delay: 0.8 },
-          { left: '80%', top: '52%', color: '#60a5fa', delay: 1.6 },
-        ].map((pin) => (
-          <span key={pin.left} className="absolute" style={{ left: pin.left, top: pin.top }} aria-hidden="true">
-            <span
-              className="absolute -inset-2 rounded-full animate-ping"
-              style={{ background: pin.color, opacity: 0.35, animationDelay: `${pin.delay}s`, animationDuration: '2.4s' }}
-            />
-            <span className="relative block w-2.5 h-2.5 rounded-full border-2 border-[#fff]" style={{ background: pin.color }} />
-          </span>
-        ))}
-
-        {/* rotating dispatch chip */}
-        <div className="absolute bottom-3.5 left-4 right-4">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={feedIdx}
-              initial={reduced ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduced ? undefined : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: EASE }}
-              className="flex items-center gap-2.5 rounded-full pl-3 pr-2 py-2 w-fit max-w-full"
-              style={{ background: 'rgba(12,29,46,0.8)', backdropFilter: 'blur(8px)', border: '1px solid rgba(247,243,234,0.15)' }}
-            >
-              <ItemIcon size={12} style={{ color: item.color }} className="shrink-0" />
-              <span className="text-[12px] font-bold truncate" style={{ color: '#F7F3EA' }}>{item.title}</span>
-              <span className="font-mono text-[9px] truncate shrink-0" style={{ color: 'rgba(247,243,234,0.6)' }}>{item.area}</span>
-              <span className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: `${item.color}33`, color: item.color }}>
-                NOW
-              </span>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </motion.div>
-
-      <div className="flex-1" aria-hidden="true" />
-
-      {/* stat chips */}
-      <motion.div
-        initial={reduced ? false : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.85, ease: EASE }}
-        className="px-5 mt-6 flex gap-2"
-      >
-        {[
-          { v: '5', l: 'categories' },
-          { v: '3 km', l: 'near me' },
-          { v: '<30s', l: 'to report' },
-        ].map((s) => (
-          <div key={s.l} className="flex-1 rounded-xl px-2 py-2.5 text-center" style={{ background: T.panel, border: `1px solid ${T.line}` }}>
-            <p className="font-display text-[15px] font-extrabold leading-none" style={{ color: T.ink }}>{s.v}</p>
-            <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.18em]" style={{ color: T.inkSoft }}>{s.l}</p>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* thumb-zone CTAs */}
+    <div className="relative z-10 flex min-h-[100dvh] flex-col px-4 pb-4 pt-20 sm:px-6 lg:hidden">
       <motion.div
         initial={reduced ? false : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.95, ease: EASE }}
-        className="px-5 mt-3.5 flex flex-col gap-2.5"
+        transition={{ duration: 0.55, ease: EASE }}
+        className="flex items-center gap-2"
+      >
+        <p className="flex items-center gap-2 text-[12px] font-bold" style={{ color: T.bow }}>
+          <Radio size={14} aria-hidden="true" />
+          Community reports across Calgary
+        </p>
+      </motion.div>
+
+      <h1
+        className="mt-4 font-display text-[clamp(2.65rem,12vw,3.55rem)] font-extrabold leading-[0.94] tracking-[-0.03em] max-[340px]:text-[2.2rem]"
+        style={{ color: T.ink }}
+      >
+        <span className="block overflow-hidden pb-[0.06em]">
+          <motion.span
+            className="block"
+            initial={reduced ? false : { y: '105%' }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.7, delay: 0.08, ease: EASE }}
+          >
+            Calgary safety,
+          </motion.span>
+        </span>
+        <span className="block overflow-hidden pb-[0.08em]" style={{ color: T.sky }}>
+          <motion.span
+            className="block"
+            initial={reduced ? false : { y: '105%' }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.7, delay: 0.17, ease: EASE }}
+          >
+            mapped live.
+          </motion.span>
+        </span>
+      </h1>
+
+      <motion.p
+        initial={reduced ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: 0.28, ease: EASE }}
+        className="mt-3 max-w-[35ch] text-[14px] leading-[1.55] sm:text-[15px]"
+        style={{ color: T.inkSoft }}
+      >
+        Check crime, traffic, weather and emergencies near you. Share what your neighbours should know.
+      </motion.p>
+
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: 0.36, ease: EASE }}
+        className="mt-4 grid grid-cols-[1fr_auto] gap-2.5"
       >
         <a
           href="/map"
-          className="w-full h-14 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-transform"
-          style={{ background: T.ink, color: T.panel, boxShadow: '0 16px 34px -18px rgba(28,43,58,0.6)' }}
+          className="flex h-13 min-w-0 items-center justify-center gap-2 rounded-xl px-4 text-[14px] font-bold transition-transform active:scale-[0.98]"
+          style={{ background: T.ink, color: T.panel, boxShadow: '0 5px 8px rgba(28,43,58,0.2)' }}
         >
-          <MapPin size={16} />
-          Open the live map
-          <ArrowRight size={14} className="opacity-80" />
+          <MapPin size={16} aria-hidden="true" />
+          Open live map
+          <ArrowRight size={14} className="opacity-75" aria-hidden="true" />
         </a>
         <a
           href="/map?report=true"
-          className="w-full h-12 rounded-2xl font-bold text-[14px] flex items-center justify-center active:scale-[0.98] transition-transform"
-          style={{ border: `1.5px solid ${T.ink}`, color: T.ink }}
+          className="flex h-13 items-center justify-center rounded-xl px-4 text-[14px] font-bold transition-colors active:scale-[0.98]"
+          style={{ border: `1.5px solid ${T.ink}`, color: T.ink, background: T.panel }}
         >
-          Sign in to report
+          Report
         </a>
-        <p className="mt-1.5 text-center font-mono text-[8.5px] uppercase tracking-[0.26em]" style={{ color: T.inkSoft }}>
-          Free · Non-profit · Built by Calgarians
-        </p>
+      </motion.div>
+
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 18, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.42, ease: EASE }}
+        className="relative mt-4 flex min-h-[245px] flex-1 flex-col overflow-hidden rounded-2xl"
+        style={{ background: T.night, boxShadow: '0 6px 8px rgba(28,43,58,0.2)' }}
+      >
+        <div className="flex h-11 shrink-0 items-center justify-between gap-3 px-3.5" style={{ borderBottom: '1px solid rgba(237,242,240,0.12)' }}>
+          <span className="flex items-center gap-2 text-[11px] font-bold" style={{ color: T.nightText }}>
+            <Activity size={13} style={{ color: T.sky }} aria-hidden="true" />
+            Calgary Watch
+          </span>
+          <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.12em]" style={{ color: T.nightSoft }}>
+            All quadrants
+          </span>
+        </div>
+
+        <div className="relative min-h-[105px] flex-1 overflow-hidden">
+          <img
+            src={publicAsset('images/hero-wide.webp')}
+            alt="Calgary skyline over the Bow River"
+            width={1600}
+            height={900}
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
+          />
+        </div>
+
+        <div className="h-[78px] shrink-0 px-4 py-3" style={{ borderTop: '1px solid rgba(237,242,240,0.12)' }}>
+          <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'rgba(237,242,240,0.72)' }}>
+            Report example
+          </p>
+          <div className="mt-1.5 flex min-w-0 items-center gap-3">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${item.color}26` }}>
+              <ItemIcon size={15} style={{ color: item.color }} aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[14px] font-bold" style={{ color: T.nightText }}>
+                {item.title.replace(/\s+[—–]\s+/g, ': ')}
+              </span>
+              <span className="mt-0.5 block truncate text-[11px]" style={{ color: T.nightSoft }}>{item.area}</span>
+            </span>
+            <ArrowUpRight size={17} style={{ color: T.nightSoft }} aria-hidden="true" />
+          </div>
+        </div>
       </motion.div>
     </div>
   );

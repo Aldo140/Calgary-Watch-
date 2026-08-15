@@ -571,6 +571,13 @@ export default function IncidentForm({
             {/* Photo */}
             <div>
               <FieldLabel hint="Optional · JPEG/PNG/WebP · max 5 MB">Photo</FieldLabel>
+              {/* Photos are published on a public map. People do not think about
+                  what is in the frame until it is already up there, so the
+                  guidance sits at the point of choosing rather than in a policy
+                  page nobody opens. */}
+              <p className="-mt-1 text-[10px] leading-snug" style={{ color: P.soft }}>
+                Anyone can see this. Avoid faces, licence plates and house numbers.
+              </p>
               {imagePreview ? (
                 <div className="relative rounded-xl overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
                   <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
@@ -625,14 +632,19 @@ export default function IncidentForm({
                 className="h-4 w-4 rounded cursor-pointer accent-[#2E8B7A]"
               />
               <div className="flex-1">
-                <p className="text-xs font-bold" style={{ color: P.ink }}>Post anonymously</p>
-                <p className="text-[10px]" style={{ color: P.soft }}>Your name won't appear on the report</p>
+                <p className="text-xs font-bold" style={{ color: P.ink }}>Hide my name</p>
+                {/* "Your name won't appear" understated it: the account and
+                    email are still recorded against the report for moderation.
+                    Saying so is both honest and a disclosure obligation. */}
+                <p className="text-[10px]" style={{ color: P.soft }}>
+                  Hidden from the public map. Moderators can still see your account.
+                </p>
               </div>
               <span
                 className="font-mono text-[8.5px] font-bold uppercase tracking-[0.12em] px-2 py-1 rounded-full"
                 style={isAnonymous ? { background: 'rgba(46,139,122,0.14)', color: P.bow } : { background: P.paper, color: '#9AA6B2', border: `1px solid ${P.line}` }}
               >
-                {isAnonymous ? 'Anonymous' : 'Named'}
+                {isAnonymous ? 'Name hidden' : 'Named'}
               </span>
             </label>
 

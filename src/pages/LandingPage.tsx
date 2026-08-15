@@ -278,10 +278,18 @@ function InkButton({
 function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' | 'contact' | null; onClose: () => void }) {
   if (!legalModal) return null;
   const content = {
-    privacy: { title: 'Privacy Policy', body: 'Calgary Watch stores report metadata to operate safety alerts. We do not sell personal data. Reporter identity can be anonymised per report and admin access is restricted to verified administrators only.' },
+    // Short summary only. The full policy lives at /privacy — a two-sentence
+    // modal cannot state purposes, retention, third parties and access rights,
+    // which is what a privacy policy has to do.
+    privacy: {
+      title: 'Privacy',
+      body: 'We do not sell personal information, run advertising, or track you across other sites. Posting anonymously hides your name from the public map, but your account is still recorded for moderation. The full policy sets out what is stored, for how long, who else is involved, and how to get your data or have it deleted.',
+      href: '/privacy',
+      hrefLabel: 'Read the full privacy policy',
+    },
     terms: { title: 'Terms of Use', body: 'Calgary Watch is for informational awareness only. Always verify critical incidents with official agencies. Misleading or abusive submissions may be removed by administrators.' },
-    contact: { title: 'Contact', body: 'For support, account issues, or policy requests, contact: jorti104@mtroyal.ca' },
-  }[legalModal];
+    contact: { title: 'Contact', body: 'For support, account issues, data access or deletion requests, contact: jorti104@mtroyal.ca' },
+  }[legalModal] as { title: string; body: string; href?: string; hrefLabel?: string };
 
   return (
     <motion.div
@@ -298,6 +306,15 @@ function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' |
       >
         <h3 className="font-display text-2xl font-bold" style={{ color: T.ink }}>{content.title}</h3>
         <p className="mt-4 text-sm leading-relaxed" style={{ color: T.inkSoft }}>{content.body}</p>
+        {content.href && (
+          <a
+            href={content.href}
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-bold transition-opacity hover:opacity-75"
+            style={{ color: T.sky }}
+          >
+            {content.hrefLabel} <ArrowUpRight size={15} />
+          </a>
+        )}
         <div className="mt-6 flex justify-end">
           <InkButton onClick={onClose} className="h-11 px-6 text-sm">Close</InkButton>
         </div>
@@ -333,7 +350,7 @@ function Nav() {
   return (
     <nav
       className={cn(
-        'fixed top-0 inset-x-0 z-50 transition-transform duration-300 max-md:border-b max-md:border-[#D9D2C3] max-md:bg-[#F7F3EA]',
+        'fixed top-0 inset-x-0 z-50 transition-transform duration-300 max-md:border-b max-md:border-white/10 max-md:bg-[#081A2B]',
         visible ? 'translate-y-0' : '-translate-y-full',
       )}
       style={{
@@ -358,8 +375,8 @@ function Nav() {
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <span className="flex flex-col leading-none text-left">
-            <span className="font-display text-[17px] font-bold tracking-tight" style={{ color: T.ink }}>Calgary Watch</span>
-            <span className="font-mono text-[8.5px] font-medium tracking-[0.34em] uppercase mt-0.5" style={{ color: T.inkSoft }}>Community Safety</span>
+            <span className={cn('font-display text-[17px] font-bold tracking-tight md:text-[#1C2B3A]', scrolled ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
+            <span className={cn('mt-0.5 font-mono text-[8.5px] font-medium uppercase tracking-[0.34em] md:text-[#5A6B7D]', scrolled ? 'text-[#5A6B7D]' : 'text-[#8FA3B5]')}>Community Safety</span>
           </span>
         </button>
 
@@ -382,7 +399,11 @@ function Nav() {
           <button
             type="button"
             className="md:hidden w-10 h-10 flex items-center justify-center rounded-full"
-            style={{ border: `1px solid ${T.line}`, color: T.ink, background: 'rgba(255,253,248,0.7)' }}
+            style={{
+              border: `1px solid ${scrolled ? T.line : 'rgba(237,242,240,0.22)'}`,
+              color: scrolled ? T.ink : T.nightText,
+              background: scrolled ? 'rgba(255,253,248,0.7)' : 'rgba(8,26,43,0.7)',
+            }}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
@@ -426,53 +447,100 @@ const HERO_LINES = [
   { text: 'By neighbours.', color: T.ink },
 ];
 
-/** Mobile hero: one full-bleed Calgary scene with a short, direct briefing. */
+const MOBILE_SCAN = [
+  { label: 'Crime reports', icon: AlertCircle },
+  { label: 'Traffic disruptions', icon: Car },
+  { label: 'Severe weather', icon: CloudRain },
+  { label: 'City emergencies', icon: Siren },
+] as const;
+
+/** Mobile hero: a bespoke Calgary plate with a capability-led scan sequence. */
 function MobileHero({ reduced }: { reduced: boolean }) {
+  const [scanIndex, setScanIndex] = useState(0);
+  useEffect(() => {
+    if (reduced) return;
+    const id = window.setInterval(() => setScanIndex((index) => (index + 1) % MOBILE_SCAN.length), 1800);
+    return () => window.clearInterval(id);
+  }, [reduced]);
+  const scan = MOBILE_SCAN[scanIndex];
+  const ScanIcon = scan.icon;
+
   return (
-    <div className="relative z-10 min-h-[100dvh] overflow-hidden bg-[#0C1D2E] lg:hidden">
+    <div className="relative z-10 min-h-[100dvh] overflow-hidden bg-[#081A2B] lg:hidden">
       <motion.img
-        src={publicAsset('images/hero-wide.webp')}
-        alt="Calgary skyline and Stampede Park after sunset"
-        width={1600}
-        height={900}
+        src={publicAsset('images/mobile-hero-calgary-v2.webp')}
+        alt="Calgary skyline, Calgary Tower and the Bow River at blue hour"
+        width={720}
+        height={1279}
         fetchPriority="high"
-        initial={reduced ? false : { scale: 1.06 }}
+        initial={reduced ? false : { scale: 1.08, clipPath: 'inset(0 0 100% 0)' }}
         animate={{ scale: 1 }}
-        transition={{ duration: 1.4, ease: EASE }}
-        className="absolute inset-0 h-full w-full object-cover object-[54%_center]"
+        whileInView={{ clipPath: 'inset(0 0 0% 0)' }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.05, ease: EASE }}
+        className="absolute inset-0 h-full w-full object-cover object-center"
         onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
       />
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to bottom, rgba(12,29,46,0.12) 12%, rgba(12,29,46,0.22) 34%, rgba(12,29,46,0.82) 68%, rgba(12,29,46,0.98) 100%)',
+          background: 'linear-gradient(to bottom, rgba(8,26,43,0.1) 10%, rgba(8,26,43,0.05) 38%, rgba(8,26,43,0.68) 66%, rgba(8,26,43,0.98) 100%)',
         }}
         aria-hidden="true"
       />
 
-      <div className="relative flex min-h-[100dvh] flex-col px-5 pb-5 pt-24 sm:px-7">
-        <motion.p
-          initial={reduced ? false : { opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.08, ease: EASE }}
-          className="flex items-center gap-2 text-[12px] font-bold"
-          style={{ color: T.nightText }}
-        >
-          <Radio size={14} style={{ color: '#67B7F7' }} aria-hidden="true" />
-          Community reports across Calgary
-        </motion.p>
+      {!reduced && (
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(103,183,247,0.9), transparent)', boxShadow: '0 0 18px rgba(103,183,247,0.55)' }}
+          initial={{ y: '14vh', opacity: 0 }}
+          animate={{ y: '76vh', opacity: [0, 0.8, 0.45, 0] }}
+          transition={{ duration: 2.6, delay: 0.45, ease: [0.77, 0, 0.175, 1] }}
+          aria-hidden="true"
+        />
+      )}
 
+      <div className="relative flex min-h-[100dvh] flex-col px-5 pb-5 pt-20 sm:px-7">
         <div className="flex-1" aria-hidden="true" />
 
-        <h1 className="font-display text-[clamp(2rem,10vw,2.5rem)] font-extrabold leading-[0.95] tracking-[-0.03em]">
+        <motion.div
+          initial={reduced ? false : { opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, delay: 0.5, ease: EASE }}
+          className="mb-3 flex h-6 items-center gap-2 overflow-hidden text-[11px] font-bold uppercase tracking-[0.12em]"
+          style={{ color: '#8FD0FF' }}
+        >
+          <span className="sr-only">Monitoring crime reports, traffic disruptions, severe weather and city emergencies</span>
+          <span aria-hidden="true" className="flex items-center gap-2">
+            <Radio size={13} />
+            Monitoring
+          </span>
+          <span aria-hidden="true" className="h-3 w-px bg-white/25" />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              aria-hidden="true"
+              key={scan.label}
+              initial={reduced ? false : { y: 14, opacity: 0, filter: 'blur(4px)' }}
+              animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+              exit={reduced ? undefined : { y: -14, opacity: 0, filter: 'blur(4px)' }}
+              transition={{ duration: 0.3, ease: EASE }}
+              className="flex items-center gap-1.5"
+            >
+              <ScanIcon size={13} />
+              {scan.label}
+            </motion.span>
+          </AnimatePresence>
+        </motion.div>
+
+        <h1 className="font-display text-[clamp(2.35rem,11vw,3rem)] font-extrabold leading-[0.92] tracking-[-0.03em] max-[340px]:text-[2.1rem]">
           <span className="block overflow-hidden pb-[0.07em]" style={{ color: T.nightText }}>
             <motion.span
               className="block"
               initial={reduced ? false : { y: '105%' }}
               animate={{ y: 0 }}
-              transition={{ duration: 0.72, delay: 0.18, ease: EASE }}
+              transition={{ duration: 0.72, delay: 0.58, ease: EASE }}
             >
-              Calgary, live.
+              Calgary moves fast.
             </motion.span>
           </span>
           <span className="block overflow-hidden pb-[0.08em]" style={{ color: '#67B7F7' }}>
@@ -480,9 +548,9 @@ function MobileHero({ reduced }: { reduced: boolean }) {
               className="block"
               initial={reduced ? false : { y: '105%' }}
               animate={{ y: 0 }}
-              transition={{ duration: 0.72, delay: 0.28, ease: EASE }}
+              transition={{ duration: 0.72, delay: 0.68, ease: EASE }}
             >
-              Know what’s near.
+              See it sooner.
             </motion.span>
           </span>
         </h1>
@@ -490,23 +558,23 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         <motion.p
           initial={reduced ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.42, ease: EASE }}
+          transition={{ duration: 0.55, delay: 0.82, ease: EASE }}
           className="mt-3 max-w-[35ch] text-[14px] leading-[1.55] sm:text-[15px]"
           style={{ color: 'rgba(237,242,240,0.78)' }}
         >
-          Crime, traffic, weather and emergencies on one community map. Check your area before you head out.
+          Live community reports and verified city data, together on one map.
         </motion.p>
 
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.52, ease: EASE }}
+          transition={{ duration: 0.55, delay: 0.92, ease: EASE }}
           className="mt-5 grid grid-cols-[1fr_auto] gap-2.5"
         >
           <a
             href="/map"
             className="flex h-13 min-w-0 items-center justify-center gap-2 rounded-xl px-4 text-[14px] font-extrabold transition-transform active:scale-[0.98]"
-            style={{ background: '#67B7F7', color: T.night }}
+            style={{ background: '#67B7F7', color: T.night, boxShadow: '0 5px 8px rgba(4,16,28,0.3)' }}
           >
             <MapPin size={16} aria-hidden="true" />
             Open live map
@@ -2298,7 +2366,7 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
             <a href="/calgary-neighbourhood-watch" className="hover:opacity-70 transition-opacity">Neighbourhood watch guide</a>
             <a href="/coverage" className="hover:opacity-70 transition-opacity">Airdrie &amp; area coverage</a>
             <a href="/about" className="hover:opacity-70 transition-opacity">How Calgary Watch works</a>
-            <button type="button" onClick={() => openLegal('privacy')} className="hover:opacity-70 transition-opacity">Privacy</button>
+            <a href="/privacy" className="hover:opacity-70 transition-opacity">Privacy</a>
             <button type="button" onClick={() => openLegal('terms')} className="hover:opacity-70 transition-opacity">Terms</button>
             <button type="button" onClick={() => openLegal('contact')} className="hover:opacity-70 transition-opacity">Contact</button>
           </nav>

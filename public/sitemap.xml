@@ -112,4 +112,7 @@
     <priority>0.35</priority>
   </url>
 
+
+
+  <url><loc>https://calgarywatch.ca/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>

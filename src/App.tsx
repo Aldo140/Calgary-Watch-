@@ -18,6 +18,7 @@ const AdminPage   = lazy(() => import('@/src/pages/AdminPage'));
 const AdminUserListPage = lazy(() => import('@/src/pages/admin/AdminUserListPage'));
 const AdminIncidentListPage = lazy(() => import('@/src/pages/admin/AdminIncidentListPage'));
 const CoveragePage = lazy(() => import('@/src/pages/CoveragePage'));
+const PrivacyPage  = lazy(() => import('@/src/pages/PrivacyPage'));
 const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
 
@@ -147,6 +148,7 @@ export default function App() {
           <Route path="/admin/users" element={<AdminUserListPage />} />
           <Route path="/admin/incidents" element={<AdminIncidentListPage />} />
           <Route path="/coverage" element={<CoveragePage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />
           <Route path="/airdrie-crime-map" element={<AirdrieCrimeMapPage />} />
           {/* Redirect unknown paths to landing page */}

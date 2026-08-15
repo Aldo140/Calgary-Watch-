@@ -448,10 +448,10 @@ const HERO_LINES = [
 ];
 
 const MOBILE_SCAN = [
-  { label: 'Crime reports', icon: AlertCircle },
-  { label: 'Traffic disruptions', icon: Car },
-  { label: 'Severe weather', icon: CloudRain },
-  { label: 'City emergencies', icon: Siren },
+  { label: 'Crime', icon: AlertCircle },
+  { label: 'Traffic', icon: Car },
+  { label: 'Weather', icon: CloudRain },
+  { label: 'Emergencies', icon: Siren },
 ] as const;
 
 /** Mobile hero: a bespoke Calgary plate with a capability-led scan sequence. */
@@ -473,11 +473,9 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         width={720}
         height={1279}
         fetchPriority="high"
-        initial={reduced ? false : { scale: 1.08, clipPath: 'inset(0 0 100% 0)' }}
+        initial={reduced ? false : { scale: 1.07 }}
         animate={{ scale: 1 }}
-        whileInView={{ clipPath: 'inset(0 0 0% 0)' }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.05, ease: EASE }}
+        transition={{ duration: 1.5, ease: EASE }}
         className="absolute inset-0 h-full w-full object-cover object-center"
         onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
       />
@@ -500,17 +498,17 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         />
       )}
 
-      <div className="relative flex min-h-[100dvh] flex-col px-5 pb-5 pt-20 sm:px-7">
+      <div className="relative z-[2] flex min-h-[100dvh] flex-col px-5 pb-5 pt-20 sm:px-7">
         <div className="flex-1" aria-hidden="true" />
 
         <motion.div
-          initial={reduced ? false : { opacity: 0, x: -12 }}
+          initial={false}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.55, delay: 0.5, ease: EASE }}
+          transition={{ duration: 0.5, delay: 0.18, ease: EASE }}
           className="mb-3 flex h-6 items-center gap-2 overflow-hidden text-[11px] font-bold uppercase tracking-[0.12em]"
           style={{ color: '#8FD0FF' }}
         >
-          <span className="sr-only">Monitoring crime reports, traffic disruptions, severe weather and city emergencies</span>
+          <span className="sr-only">Monitoring crime, traffic, weather and emergencies</span>
           <span aria-hidden="true" className="flex items-center gap-2">
             <Radio size={13} />
             Monitoring
@@ -536,19 +534,19 @@ function MobileHero({ reduced }: { reduced: boolean }) {
           <span className="block overflow-hidden pb-[0.07em]" style={{ color: T.nightText }}>
             <motion.span
               className="block"
-              initial={reduced ? false : { y: '105%' }}
+              initial={false}
               animate={{ y: 0 }}
-              transition={{ duration: 0.72, delay: 0.58, ease: EASE }}
+              transition={{ duration: 0.68, delay: 0.26, ease: EASE }}
             >
-              Calgary moves fast.
+              Calgary moves.
             </motion.span>
           </span>
           <span className="block overflow-hidden pb-[0.08em]" style={{ color: '#67B7F7' }}>
             <motion.span
               className="block"
-              initial={reduced ? false : { y: '105%' }}
+              initial={false}
               animate={{ y: 0 }}
-              transition={{ duration: 0.72, delay: 0.68, ease: EASE }}
+              transition={{ duration: 0.68, delay: 0.34, ease: EASE }}
             >
               See it sooner.
             </motion.span>
@@ -556,9 +554,9 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         </h1>
 
         <motion.p
-          initial={reduced ? false : { opacity: 0, y: 10 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.82, ease: EASE }}
+          transition={{ duration: 0.5, delay: 0.46, ease: EASE }}
           className="mt-3 max-w-[35ch] text-[14px] leading-[1.55] sm:text-[15px]"
           style={{ color: 'rgba(237,242,240,0.78)' }}
         >
@@ -566,9 +564,9 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         </motion.p>
 
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 12 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.92, ease: EASE }}
+          transition={{ duration: 0.5, delay: 0.56, ease: EASE }}
           className="mt-5 grid grid-cols-[1fr_auto] gap-2.5"
         >
           <a

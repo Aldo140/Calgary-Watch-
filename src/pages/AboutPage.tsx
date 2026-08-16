@@ -813,7 +813,7 @@ export default function AboutPage() {
             style={prefersReducedMotion() ? undefined : { y: smoothBgY }}
           >
             <img
-              src={publicAsset('images/hero-wide.webp')}
+              src={publicAsset('images/hero/hero-wide.webp')}
               alt="Calgary skyline panorama"
               width={1920} height={1080}
               className="w-full h-full object-cover"
@@ -843,6 +843,21 @@ export default function AboutPage() {
                   Designed for Calgary
                 </span>
               </motion.div>
+
+              {/* The crest. This page is the one that says who we are, which is
+                  what a crest is for — and the hero is dark, so it takes the
+                  paper-inked variant rather than the ink one. */}
+              <motion.img
+                src={publicAsset('images/illustration/calgary-watch-shield.webp')}
+                alt=""
+                width={800} height={800} loading="lazy"
+                className="pointer-events-none absolute right-[6%] top-[18%] hidden w-40 opacity-[0.16] lg:block xl:w-52"
+                style={{ filter: 'invert(1)' }}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 0.16, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.2 }}
+                aria-hidden="true"
+              />
 
               {/* 3D perspective title */}
               <HeroPerspectiveTitle scrollProgress={heroProgress} />
@@ -942,7 +957,7 @@ export default function AboutPage() {
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <motion.img
-                    src={publicAsset('images/calgary3.webp')}
+                    src={publicAsset('images/photo/calgary3.webp')}
                     alt="Calgary community"
                     width={800} height={600}
                     className="w-full h-full object-cover"
@@ -962,7 +977,7 @@ export default function AboutPage() {
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
                 >
                   <img
-                    src={publicAsset('images/calgary5.webp')}
+                    src={publicAsset('images/photo/calgary5.webp')}
                     alt="Calgary neighbourhoods"
                     width={800} height={600}
                     className="w-full h-full object-cover"
@@ -1136,21 +1151,21 @@ export default function AboutPage() {
                   num: '01',
                   title: 'Report',
                   desc: 'Spot something? Drop a pin and report it in under 30 seconds. Our streamlined form gets your incident on the map before you put your phone away.',
-                  image: publicAsset('images/calgary2.webp'),
+                  image: publicAsset('images/photo/calgary2.webp'),
                   color: '#E52C20',
                 },
                 {
                   num: '02',
                   title: 'Share',
                   desc: 'Your report appears on the live map instantly for all Calgarians. Real-time awareness, city-wide. No delay, no middleman.',
-                  image: publicAsset('images/calgary3.webp'),
+                  image: publicAsset('images/photo/calgary3.webp'),
                   color: '#2E8B7A',
                 },
                 {
                   num: '03',
                   title: 'Decide',
                   desc: "Context and verified data help you decide what to do next. Adjust your route, stay informed, or simply know what's happening around you.",
-                  image: publicAsset('images/calgary5.webp'),
+                  image: publicAsset('images/photo/calgary5.webp'),
                   color: '#B0793C',
                 },
               ].map((step, i, arr) => (
@@ -1189,7 +1204,7 @@ export default function AboutPage() {
                 }}
               >
                 <motion.img
-                  src={publicAsset('images/calgary8.webp')}
+                  src={publicAsset('images/photo/calgary8.webp')}
                   alt="Calgary downtown"
                   width={1200} height={512}
                   loading="lazy"
@@ -1426,7 +1441,7 @@ export default function AboutPage() {
               >
                 <div className="absolute inset-0">
                   <img
-                    src={publicAsset('images/calgary2.webp')}
+                    src={publicAsset('images/photo/calgary2.webp')}
                     alt=""
                     width={800} height={400}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -1463,7 +1478,7 @@ export default function AboutPage() {
               >
                 <div className="absolute inset-0">
                   <img
-                    src={publicAsset('images/calgary8.webp')}
+                    src={publicAsset('images/photo/calgary8.webp')}
                     alt=""
                     width={800} height={400}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -1619,7 +1634,7 @@ export default function AboutPage() {
           {/* Background image */}
           <div className="absolute inset-0">
             <img
-              src={publicAsset('images/calgary5.webp')}
+              src={publicAsset('images/photo/calgary5.webp')}
               alt=""
               width={1200} height={600}
               aria-hidden="true"

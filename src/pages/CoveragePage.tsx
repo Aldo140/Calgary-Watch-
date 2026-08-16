@@ -359,7 +359,7 @@ export default function CoveragePage() {
               {/* The reach, drawn: a province with a heart in it says what
                   "30+ communities, 100 km" says, before the number is read. */}
               <img
-                src={publicAsset('images/alberta-heart.webp')}
+                src={publicAsset('images/illustration/alberta-heart.webp')}
                 alt=""
                 width={800} height={800} loading="lazy"
                 className="hidden w-28 shrink-0 self-center opacity-90 lg:block xl:w-36"

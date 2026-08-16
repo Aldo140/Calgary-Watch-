@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { publicAsset } from '@/src/lib/utils';
 import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, AlertTriangle } from 'lucide-react';
 
 const NEIGHBOURHOODS = [
@@ -157,9 +158,20 @@ export default function EmergencyModal({
             {/* Pulsing top bar */}
             <div className="h-1.5 w-full bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 animate-pulse" />
 
-            <div className="p-6 space-y-4">
+            <div className="relative p-6 space-y-4">
+              {/* The beacon, sitting behind the header rather than competing
+                  with it — this is a form, and the artwork sets the register
+                  without taking a turn in the reading order. */}
+              <img
+                src={publicAsset('images/illustration/emergency-siren.webp')}
+                alt=""
+                width={800} height={800} loading="lazy"
+                className="pointer-events-none absolute -right-6 -top-8 w-36 opacity-[0.07] sm:w-44"
+                aria-hidden="true"
+              />
+
               {/* Header */}
-              <div className="flex items-start justify-between">
+              <div className="relative flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Siren size={15} className="animate-pulse" style={{ color: '#C0392B' }} />

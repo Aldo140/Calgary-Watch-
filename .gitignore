@@ -10,3 +10,6 @@ coverage/
 .worktrees/
 .superpowers/
 *-firebase-adminsdk-*.json
+
+# Design sources: originals kept out of the deploy
+design-sources/

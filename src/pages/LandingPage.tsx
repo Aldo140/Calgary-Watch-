@@ -85,19 +85,19 @@ const TICKER_ITEMS: Array<{ icon: ElementType; color: string; title: string; are
 // "Near me" showcase — the neighbourhood radius view (Inglewood vantage).
 
 const QUADRANTS = [
-  { code: 'NW', name: 'Northwest', places: 'Bowness · Kensington · Nose Hill · University District', img: 'images/quadrant-nw-collage.webp', imgAlt: 'Collage of the Peace Bridge, Bow River, Nose Hill and northwest Calgary' },
-  { code: 'NE', name: 'Northeast', places: 'Saddle Ridge · Marlborough · Airport · Bridgeland', img: 'images/quadrant-ne-collage.webp', imgAlt: 'Collage of a northeast CTrain, airport approach and neighbourhood streets' },
-  { code: 'SW', name: 'Southwest', places: 'Beltline · Marda Loop · Signal Hill · Glenmore', img: 'images/quadrant-sw-collage.webp', imgAlt: 'Collage of Glenmore Reservoir, the Rockies and southwest Calgary neighbourhoods' },
-  { code: 'SE', name: 'Southeast', places: 'Inglewood · Forest Lawn · Seton · Mahogany', img: 'images/quadrant-se-collage.webp', imgAlt: 'Collage of the Saddledome, Inglewood brick streets and southeast Calgary homes' },
+  { code: 'NW', name: 'Northwest', places: 'Bowness · Kensington · Nose Hill · University District', img: 'images/quadrant/quadrant-nw-collage.webp', imgAlt: 'Collage of the Peace Bridge, Bow River, Nose Hill and northwest Calgary' },
+  { code: 'NE', name: 'Northeast', places: 'Saddle Ridge · Marlborough · Airport · Bridgeland', img: 'images/quadrant/quadrant-ne-collage.webp', imgAlt: 'Collage of a northeast CTrain, airport approach and neighbourhood streets' },
+  { code: 'SW', name: 'Southwest', places: 'Beltline · Marda Loop · Signal Hill · Glenmore', img: 'images/quadrant/quadrant-sw-collage.webp', imgAlt: 'Collage of Glenmore Reservoir, the Rockies and southwest Calgary neighbourhoods' },
+  { code: 'SE', name: 'Southeast', places: 'Inglewood · Forest Lawn · Seton · Mahogany', img: 'images/quadrant/quadrant-se-collage.webp', imgAlt: 'Collage of the Saddledome, Inglewood brick streets and southeast Calgary homes' },
 ];
 
 // "One day on the watch" — dawn to after-midnight camera dolly.
 const DAY_PLATES = [
-  { src: 'images/calgary1.webp', time: '07:12', caption: 'First light over the core', note: 'quiet · 0 open reports', color: T.gold },
-  { src: 'images/calgary5.webp', time: '12:38', caption: 'Three neighbours, one map', note: 'crime · graffiti logged, Kensington', color: '#ef4444' },
-  { src: 'images/calgary7.webp', time: '19:26', caption: 'Saddledome from Scotsman Hill', note: 'traffic · Macleod Tr slowdown', color: '#f59e0b' },
-  { src: 'images/calgary8.webp', time: '22:04', caption: 'Fireworks over Stampede Park', note: 'weather · clear skies, 14°C', color: '#60a5fa' },
-  { src: 'images/calgary3.webp', time: '01:47', caption: 'Deerfoot after midnight', note: 'infrastructure · signal fault cleared', color: '#f97316' },
+  { src: 'images/photo/calgary1.webp', time: '07:12', caption: 'First light over the core', note: 'quiet · 0 open reports', color: T.gold },
+  { src: 'images/photo/calgary5.webp', time: '12:38', caption: 'Three neighbours, one map', note: 'crime · graffiti logged, Kensington', color: '#ef4444' },
+  { src: 'images/photo/calgary7.webp', time: '19:26', caption: 'Saddledome from Scotsman Hill', note: 'traffic · Macleod Tr slowdown', color: '#f59e0b' },
+  { src: 'images/photo/calgary8.webp', time: '22:04', caption: 'Fireworks over Stampede Park', note: 'weather · clear skies, 14°C', color: '#60a5fa' },
+  { src: 'images/photo/calgary3.webp', time: '01:47', caption: 'Deerfoot after midnight', note: 'infrastructure · signal fault cleared', color: '#f97316' },
 ];
 
 function usePrefersReducedMotion(): boolean {
@@ -411,7 +411,7 @@ function Nav() {
           aria-label="Calgary Watch home"
         >
           <img
-            src={publicAsset('images/calgary-watch-plane-mark.webp')}
+            src={publicAsset('images/brand/calgary-watch-plane-mark.webp')}
             alt=""
             width={40}
             height={40}
@@ -469,7 +469,7 @@ function Nav() {
             className="absolute inset-x-0 top-full z-[60] h-[calc(100dvh-4rem)] md:hidden overflow-y-auto bg-[#06162F] text-[#F2EFE8]"
           >
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-              <img src={publicAsset('images/calgary-watch-plane-mark.webp')} alt="" className="absolute -right-20 top-4 size-80 rotate-6 object-contain opacity-[0.1]" />
+              <img src={publicAsset('images/brand/calgary-watch-plane-mark.webp')} alt="" className="absolute -right-20 top-4 size-80 rotate-6 object-contain opacity-[0.1]" />
               <div className="absolute -left-20 top-[43%] h-16 w-[140%] -rotate-6 bg-[#E52C20]/15" />
             </div>
 
@@ -533,7 +533,7 @@ function MobileHero({ reduced }: { reduced: boolean }) {
   return (
     <div className="relative z-10 min-h-[100dvh] overflow-hidden bg-[#06162F] lg:hidden">
       <motion.img
-        src={publicAsset('images/mobile-hero-calgary-collage.webp')}
+        src={publicAsset('images/hero/mobile-hero-calgary-collage.webp')}
         alt="Art collage of the Calgary Tower, downtown, the Bow River and city streets"
         width={720}
         height={1280}
@@ -542,12 +542,12 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         animate={reduced ? undefined : { scale: [1.025, 1.055, 1.025], y: ['0%', '-0.8%', '0%'] }}
         transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute inset-0 h-full w-full object-cover object-center"
-        onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/calgary2.webp'); }}
+        onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/photo/calgary2.webp'); }}
       />
       {!reduced && (
         <div className="absolute inset-0" aria-hidden="true">
           <motion.img
-            src={publicAsset('images/mobile-hero-calgary-collage.webp')}
+            src={publicAsset('images/hero/mobile-hero-calgary-collage.webp')}
             alt=""
             className="absolute inset-0 h-full w-full object-cover object-center"
             style={{ clipPath: 'polygon(0 0, 48% 0, 36% 62%, 0 57%)', filter: 'saturate(1.08) contrast(1.04)' }}
@@ -555,7 +555,7 @@ function MobileHero({ reduced }: { reduced: boolean }) {
             transition={{ duration: 8.5, repeat: Infinity, ease: 'easeInOut' }}
           />
           <motion.img
-            src={publicAsset('images/mobile-hero-calgary-collage.webp')}
+            src={publicAsset('images/hero/mobile-hero-calgary-collage.webp')}
             alt=""
             className="absolute inset-0 h-full w-full object-cover object-center"
             style={{ clipPath: 'polygon(39% 0, 100% 0, 100% 62%, 66% 57%)' }}
@@ -577,7 +577,7 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         Calgary / 51.0447° N
       </div>
       <motion.img
-        src={publicAsset('images/calgary-watch-plane-mark.webp')}
+        src={publicAsset('images/brand/calgary-watch-plane-mark.webp')}
         alt=""
         className="absolute right-3 top-[16%] z-[3] size-20 rotate-6 object-contain drop-shadow-[0_2px_3px_rgba(6,22,47,0.9)]"
         animate={reduced ? undefined : { rotate: [6, 1, 6], y: [0, -4, 0] }}
@@ -676,7 +676,7 @@ function Hero({ reduced }: { reduced: boolean }) {
         onPointerLeave={resetCollage}
       >
         <motion.img
-          src={publicAsset('images/desktop-hero-calgary-collage.webp')}
+          src={publicAsset('images/hero/desktop-hero-calgary-collage.webp')}
           alt="Art collage of Calgary Tower, Peace Bridge, the Bow River and downtown at night"
           width={1920}
           height={1080}
@@ -685,13 +685,13 @@ function Hero({ reduced }: { reduced: boolean }) {
           animate={reduced ? undefined : { scale: [1.015, 1.04, 1.015] }}
           transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute inset-0 h-full w-full object-cover"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/hero-wide.webp'); }}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = publicAsset('images/hero/hero-wide.webp'); }}
         />
 
         {!reduced && (
           <motion.div className="absolute inset-0" style={{ x: collageX, y: collageY }} aria-hidden="true">
             <motion.img
-              src={publicAsset('images/desktop-hero-calgary-collage.webp')}
+              src={publicAsset('images/hero/desktop-hero-calgary-collage.webp')}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
               style={{ clipPath: 'polygon(51% 0, 100% 0, 100% 58%, 67% 56%, 45% 47%)', filter: 'saturate(1.08) contrast(1.03)' }}
@@ -699,7 +699,7 @@ function Hero({ reduced }: { reduced: boolean }) {
               transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
             />
             <motion.img
-              src={publicAsset('images/desktop-hero-calgary-collage.webp')}
+              src={publicAsset('images/hero/desktop-hero-calgary-collage.webp')}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
               style={{ clipPath: 'polygon(42% 55%, 68% 58%, 100% 48%, 100% 100%, 31% 100%)' }}
@@ -721,7 +721,7 @@ function Hero({ reduced }: { reduced: boolean }) {
           transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
           aria-hidden="true"
         >
-          <img src={publicAsset('images/calgary-watch-plane-mark.webp')} alt="" className="size-full object-contain" />
+          <img src={publicAsset('images/brand/calgary-watch-plane-mark.webp')} alt="" className="size-full object-contain" />
         </motion.div>
 
         <div className="absolute bottom-[7%] right-[2.5%] z-[3] font-display text-[10px] font-bold uppercase tracking-[0.18em] text-[#F2EFE8]/65 [writing-mode:vertical-rl]" aria-hidden="true">
@@ -945,7 +945,7 @@ function DayStories({ reduced }: { reduced: boolean }) {
     <section className="relative lg:hidden overflow-hidden py-16 sm:py-20" style={{ background: T.night }} aria-label="One day on the watch — photo stories">
       <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: 'radial-gradient(rgba(242,239,232,0.75) 0.7px, transparent 0.7px)', backgroundSize: '7px 7px' }} aria-hidden="true" />
       <motion.img
-        src={publicAsset('images/plane-signal.webp')}
+        src={publicAsset('images/brand/plane-signal.webp')}
         alt=""
         className="pointer-events-none absolute -right-20 top-8 w-72 rotate-[-7deg] object-contain opacity-[0.16]"
         animate={reduced ? undefined : { x: [8, -6, 8], y: [4, -3, 4] }}
@@ -1131,7 +1131,7 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
 
         {/* intro title — owns the first stretch, always above the plates */}
         <motion.img
-          src={publicAsset('images/plane-signal.webp')}
+          src={publicAsset('images/brand/plane-signal.webp')}
           alt=""
           className="pointer-events-none absolute right-[3%] top-[12%] w-[min(34vw,30rem)] rotate-[-5deg] object-contain opacity-[0.13]"
           style={{ zIndex: 44 }}
@@ -1318,7 +1318,7 @@ const STEPS = [
     body: 'Something is happening on your street — a collision, a break-in, a flooded underpass. You are already the closest sensor the city has.',
     mono: 'OBSERVE · YOUR BLOCK',
     log: '→ eyes on · 51.0447 N, 114.0719 W',
-    art: 'images/process-megaphone.webp',
+    art: 'images/illustration/process-megaphone.webp',
     artAlt: 'Illustrated megaphone representing a local observation',
   },
   {
@@ -1327,7 +1327,7 @@ const STEPS = [
     body: 'Drop a pin, pick a category, write one line — and if it\'s your stolen bike, add a way for neighbours to reach you. Under thirty seconds, anonymous if you prefer.',
     mono: 'REPORT · <30 SECONDS',
     log: '→ pin dropped · category set · 0:27',
-    art: 'images/process-signal.webp',
+    art: 'images/illustration/process-signal.webp',
     artAlt: 'Illustrated paper plane representing a report being sent',
   },
   {
@@ -1336,7 +1336,7 @@ const STEPS = [
     body: 'Your report appears instantly for every neighbour watching the map — and stays there, so patterns become visible over weeks.',
     mono: 'BROADCAST · REALTIME',
     log: '→ live on the map · all quadrants',
-    art: 'images/process-community.webp',
+    art: 'images/illustration/process-community.webp',
     artAlt: 'Illustrated neighbours receiving a community report',
   },
   {
@@ -1345,7 +1345,7 @@ const STEPS = [
     body: 'Recent reports remain visible with their time and source, helping neighbours notice repeat activity without turning one observation into a permanent label.',
     mono: 'CONTEXT · OVER TIME',
     log: '→ dated · attributed · easier to verify',
-    art: 'images/process-history.webp',
+    art: 'images/illustration/process-history.webp',
     artAlt: 'Illustrated calendar representing reports over time',
   },
 ];
@@ -1603,7 +1603,7 @@ function SignalFlight({ reduced }: { reduced: boolean }) {
 
               {!reduced && desktop.length > 0 && (
                 <motion.g style={{ x: desktop.x, y: desktop.y, rotate: desktop.angle, transformBox: 'fill-box', transformOrigin: 'center' }}>
-                  <image href={publicAsset('images/plane-white.webp')} x="-24" y="-24" width="48" height="48" />
+                  <image href={publicAsset('images/brand/plane-white.webp')} x="-24" y="-24" width="48" height="48" />
                 </motion.g>
               )}
             </svg>
@@ -1631,7 +1631,7 @@ function SignalFlight({ reduced }: { reduced: boolean }) {
             />
             {!reduced && (
               <motion.img
-                src={publicAsset('images/plane-white.webp')}
+                src={publicAsset('images/brand/plane-white.webp')}
                 alt=""
                 className="absolute left-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 object-contain"
                 style={{ top: planeTop, rotate: 78 }}
@@ -1964,7 +1964,7 @@ function NearMe({ reduced }: { reduced: boolean }) {
 
           {/* The city you are standing in. */}
           <img
-            src={publicAsset('images/calgary-bow-emblem.webp')}
+            src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
             alt=""
             width={900} height={900} loading="lazy"
             className="mt-8 hidden w-40 shrink-0 opacity-90 lg:mt-0 lg:block xl:w-48"
@@ -2145,7 +2145,7 @@ function NightWatch({ reduced }: { reduced: boolean }) {
       {/* live traffic map of Calgary glowing under the whole band */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <motion.img
-          src={publicAsset('images/calgary_map.png')}
+          src={publicAsset('images/photo/calgary_map.png')}
           alt=""
           loading="lazy"
           decoding="async"
@@ -2377,14 +2377,14 @@ function Coverage() {
 // FILM STRIP — field prints drifting across the desk, pauses on hover
 // ---------------------------------------------------------------------------
 const STRIP_PRINTS = [
-  { src: 'images/calgary1.webp', label: 'NE · golden hour' },
-  { src: 'images/calgary4.webp', label: 'NW · Peace Bridge' },
-  { src: 'images/calgary7.webp', label: 'SE · Scotsman Hill' },
-  { src: 'images/calgary2.webp', label: 'SW · Calgary Tower' },
-  { src: 'images/calgary8.webp', label: 'SE · Stampede Park' },
-  { src: 'images/calgary5.webp', label: 'SW · Stephen Ave' },
-  { src: 'images/calgary3.webp', label: 'NE · Deerfoot, 01:47' },
-  { src: 'images/hero-wide.webp', label: 'SW · Bow River' },
+  { src: 'images/photo/calgary1.webp', label: 'NE · golden hour' },
+  { src: 'images/photo/calgary4.webp', label: 'NW · Peace Bridge' },
+  { src: 'images/photo/calgary7.webp', label: 'SE · Scotsman Hill' },
+  { src: 'images/photo/calgary2.webp', label: 'SW · Calgary Tower' },
+  { src: 'images/photo/calgary8.webp', label: 'SE · Stampede Park' },
+  { src: 'images/photo/calgary5.webp', label: 'SW · Stephen Ave' },
+  { src: 'images/photo/calgary3.webp', label: 'NE · Deerfoot, 01:47' },
+  { src: 'images/hero/hero-wide.webp', label: 'SW · Bow River' },
 ];
 
 function FilmStrip({ reduced }: { reduced: boolean }) {
@@ -2466,7 +2466,7 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
           <div className="absolute inset-0" style={{ background: `linear-gradient(120deg, ${T.ink} 0%, #24466B 60%, ${T.bow} 130%)` }} aria-hidden="true" />
           {/* Stampede fireworks glow through the gradient */}
           <img
-            src={publicAsset('images/calgary8.webp')}
+            src={publicAsset('images/photo/calgary8.webp')}
             alt=""
             loading="lazy"
             decoding="async"
@@ -2485,7 +2485,7 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
           </svg>
 
           <motion.img
-            src={publicAsset('images/plane-white.webp')}
+            src={publicAsset('images/brand/plane-white.webp')}
             alt=""
             className="pointer-events-none absolute -left-20 -bottom-12 w-80 rotate-[-8deg] object-contain opacity-[0.24] mix-blend-screen sm:w-[30rem] lg:-left-12 lg:-bottom-20"
             animate={reduced ? undefined : { x: [8, -7, 8], y: [5, -4, 5], rotate: [-8, -5, -8] }}
@@ -2520,11 +2520,31 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
         </motion.div>
       </div>
 
+      {/* The city itself, as the rule that closes the page. A 3:1 strip of
+          skyline does the job a hairline border was doing, and says where. */}
+      <div className="mx-auto max-w-[80rem] px-5 sm:px-8" aria-hidden="true">
+        <img
+          src={publicAsset('images/illustration/calgary-skyline-rule.webp')}
+          alt=""
+          width={1800} height={600} loading="lazy"
+          className="pointer-events-none mx-auto w-full max-w-4xl opacity-[0.55]"
+        />
+      </div>
+
       {/* Footer */}
       <footer className="mx-auto max-w-[80rem] px-5 sm:px-8 pb-10" style={{ color: T.inkSoft }}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-8" style={{ borderTop: `1px solid ${T.line}` }}>
           <div>
-            <p className="font-display text-lg font-bold" style={{ color: T.ink }}>Calgary Watch</p>
+            <div className="flex items-center gap-3">
+              <img
+                src={publicAsset('images/illustration/calgary-watch-shield.webp')}
+                alt=""
+                width={800} height={800} loading="lazy"
+                className="h-11 w-11 shrink-0 object-contain"
+                aria-hidden="true"
+              />
+              <p className="font-display text-lg font-bold" style={{ color: T.ink }}>Calgary Watch</p>
+            </div>
             <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed">
               A community safety map built by Calgarians, for Calgarians.
               Informational awareness only — always verify critical incidents

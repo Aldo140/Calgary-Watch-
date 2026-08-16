@@ -75,7 +75,7 @@ export default function NeighbourhoodWatchGuidePage() {
               <div className="absolute -bottom-4 -left-4 top-10 w-20 bg-[#2E8B7A] sm:-left-6" aria-hidden="true" />
               <figure className="relative overflow-hidden rounded-2xl bg-[#06162F] shadow-[0_24px_60px_rgba(11,31,51,0.22)]">
                 <img
-                  src="/images/calgary5.webp"
+                  src="/images/photo/calgary5.webp"
                   alt="Three Calgary residents looking at a phone together downtown"
                   width={1200}
                   height={677}

@@ -9,7 +9,7 @@
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
       <image:title>Calgary Crime Watch and Neighbourhood Safety Map</image:title>
       <image:caption>Interactive real-time crime and safety incident map covering Calgary, Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, and 30+ Alberta communities</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
@@ -28,7 +28,7 @@
     <changefreq>hourly</changefreq>
     <priority>0.95</priority>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
       <image:title>Calgary Crime Map — Live Incidents Near You</image:title>
       <image:caption>Real-time interactive map showing community-reported safety incidents across the Calgary metro area</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
@@ -42,7 +42,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/calgary1.webp</image:loc>
+      <image:loc>https://calgarywatch.ca/images/photo/calgary1.webp</image:loc>
       <image:title>About Calgary Watch — Community Safety Platform</image:title>
       <image:caption>Calgary Watch team and mission: community-powered real-time safety data for Calgary and area</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
@@ -56,13 +56,13 @@
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
       <image:title>Calgary Area Safety Map Coverage</image:title>
       <image:caption>Community coverage directory for Calgary Watch — Airdrie, Cochrane, Okotoks, Chestermere, Strathmore, High River, Canmore, and all surrounding Alberta communities</image:caption>
       <image:geo_location>Calgary Metropolitan Region, Alberta, Canada</image:geo_location>
     </image:image>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/calgary_map.png</image:loc>
+      <image:loc>https://calgarywatch.ca/images/photo/calgary_map.png</image:loc>
       <image:title>Calgary Metro Region Coverage Map</image:title>
       <image:caption>Map showing Calgary Watch coverage across the greater Calgary metropolitan area including all surrounding communities</image:caption>
       <image:geo_location>Calgary Metropolitan Region, Alberta, Canada</image:geo_location>
@@ -76,7 +76,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.90</priority>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
       <image:title>Calgary Neighbourhood Watch Guide</image:title>
       <image:caption>How to check recent incidents near you and choose the right Calgary reporting channel</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
@@ -90,7 +90,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.90</priority>
     <image:image>
-      <image:loc>https://calgarywatch.ca/images/hero-wide.webp</image:loc>
+      <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
       <image:title>Airdrie Crime Map Guide</image:title>
       <image:caption>Compare recent Airdrie-area community reports with official City of Airdrie and RCMP sources</image:caption>
       <image:geo_location>Airdrie, Alberta, Canada</image:geo_location>

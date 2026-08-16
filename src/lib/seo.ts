@@ -30,7 +30,7 @@ export interface SeoConfig {
 }
 
 export const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
-export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero-wide.webp';
+export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero/hero-wide.webp';
 const LAST_MOD = '2026-08-13';
 
 export const ROUTE_SEO: Record<string, SeoConfig> = {

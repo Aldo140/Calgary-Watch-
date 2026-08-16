@@ -2131,7 +2131,7 @@ export default function MapPage() {
                             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#2E8B7A' }}>
                               {profileNeedsSetup ? 'Set up your report area' : 'Edit preferences'}
                             </p>
-                            <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em]" style={{ color: '#0B1F33' }}>
+                            <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em] text-[#0B1F33]">
                               {addressIsSettled ? 'Your report area' : 'Where should we watch?'}
                             </h3>
                             <p className="mt-2 text-sm leading-relaxed" style={{ color: '#5A6B7D' }}>
@@ -3144,8 +3144,8 @@ export default function MapPage() {
         <div className="pointer-events-none absolute left-5 right-5 top-5 z-30 hidden items-center justify-between lg:flex">
           <div className="pointer-events-auto flex h-13 items-center gap-1 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] py-1 pl-2 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
             <div className="flex items-center gap-2.5 border-r-[1.5px] border-[#C9D8E4] pr-3">
-              <span className="flex size-8 items-center justify-center bg-[#F2EFE8]">
-                <img src="/icon.svg" alt="" width={19} height={19} className="size-[19px]" />
+              <span className="flex size-8 items-center justify-center rounded-lg bg-[#E8F3FC]">
+                <img src="/images/brand/calgary-watch-plane-mark.webp" alt="" width={19} height={19} className="size-[19px] object-contain" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
               </span>
               <span className="relative flex h-2 w-2" aria-hidden="true">
                 <span className={cn('relative inline-flex h-2 w-2', mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />

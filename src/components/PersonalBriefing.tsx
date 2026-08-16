@@ -220,16 +220,19 @@ function Section({
   const delay = still ? 0 : 0.2 + order * 0.11;
   return (
     <motion.section
-      className="pt-7 first:pt-1"
+      className="relative pt-7 first:pt-1"
       initial={still ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex items-center gap-2.5">
-        <span className="h-[3px] w-[18px] shrink-0 rounded-full" style={{ background: T.gold }} aria-hidden="true" />
+        <span className="h-[3px] w-[18px] shrink-0" style={{ background: T.gold }} aria-hidden="true" />
         <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: T.gold }}>
           {eyebrow}
         </span>
+        {/* The rule carries the eyebrow across the column, the way the map's
+            panels do it, so a section reads as a band rather than a paragraph. */}
+        <span className="h-px flex-1" style={{ background: T.line }} aria-hidden="true" />
       </div>
       <h3
         className="mt-2 font-display text-[1.3rem] font-extrabold leading-tight tracking-[-0.02em] sm:text-[1.5rem]"
@@ -250,7 +253,7 @@ function Stat({
   const animated = useCountUp(count ?? 0, 900, !still && count !== undefined);
   const shown = value ?? (still ? (count ?? 0) : animated).toLocaleString();
   return (
-    <div className="rounded-2xl px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+    <div className="px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
       <p className="font-display text-[1.5rem] font-extrabold leading-none tabular-nums" style={{ color: tone }}>
         {shown}
       </p>
@@ -275,7 +278,7 @@ function ReportRow({
       <button
         type="button"
         onClick={onOpen}
-        className="flex w-full items-start gap-3 rounded-2xl px-3.5 py-3 text-left transition-colors hover:opacity-90"
+        className="flex w-full items-start gap-3 px-3.5 py-3 text-left transition-colors hover:opacity-90"
         style={{ background: T.card, border: `1px solid ${T.line}` }}
       >
         {badge !== undefined ? (
@@ -426,7 +429,7 @@ export default function PersonalBriefing({
       />
 
       <motion.div
-        className="relative flex h-full w-full max-w-[44rem] flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:rounded-[1.75rem]"
+        className="relative flex h-full w-full max-w-[44rem] flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)]"
         style={{ background: T.page }}
         initial={still ? false : { opacity: 0, y: 22, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -610,7 +613,7 @@ export default function PersonalBriefing({
               <button
                 type="button"
                 onClick={() => { onOpenNearby(); onClose(); }}
-                className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3.5 text-left transition-transform active:scale-[0.99]"
+                className="mt-4 flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-transform active:scale-[0.99]"
                 style={{ background: T.ink, color: T.page }}
               >
                 <span className="flex min-w-0 items-center gap-3">
@@ -644,7 +647,7 @@ export default function PersonalBriefing({
                     return (
                       <li
                         key={camera.id}
-                        className="flex items-start gap-3 rounded-2xl px-3.5 py-3"
+                        className="flex items-start gap-3 px-3.5 py-3"
                         style={{ background: T.card, border: `1px solid ${T.line}` }}
                       >
                         <Camera size={15} className="mt-[2px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />
@@ -700,6 +703,13 @@ export default function PersonalBriefing({
               order={2} still={still} eyebrow={areaLabel}
               title="How your community is doing"
             >
+              <img
+                src={publicAsset('images/illustration/process-community.webp')}
+                alt=""
+                width={640} height={640} loading="lazy"
+                className="pointer-events-none absolute -right-4 top-6 hidden w-24 opacity-[0.09] sm:block"
+                aria-hidden="true"
+              />
               {areaStats && band && (
                 <>
                   <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
@@ -718,7 +728,7 @@ export default function PersonalBriefing({
               {propertyData.length >= 2 ? (
                 <div className="mt-2.5"><BriefingSparkline data={propertyData} still={still} /></div>
               ) : latestValue ? (
-                <div className="mt-2.5 rounded-2xl px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+                <div className="mt-2.5 px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
                   <p className="font-display text-[1.5rem] font-extrabold leading-none tabular-nums" style={{ color: T.ink }}>
                     ${Math.round(latestValue.avgValue).toLocaleString()}
                   </p>
@@ -731,7 +741,7 @@ export default function PersonalBriefing({
               <button
                 type="button"
                 onClick={() => { onOpenArea(); onClose(); }}
-                className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-bold transition-opacity hover:opacity-90"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold transition-opacity hover:opacity-90"
                 style={{ background: 'transparent', border: `1.5px solid ${T.edge}`, color: T.ink }}
               >
                 See everything about {areaLabel} <ArrowRight size={14} />
@@ -772,7 +782,7 @@ export default function PersonalBriefing({
           </Section>
 
           {address && !home && !isResolving && (
-            <div className="mt-7 rounded-2xl px-4 py-3.5" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+            <div className="mt-7 px-4 py-3.5" style={{ background: T.card, border: `1px solid ${T.line}` }}>
               <p className="text-[13px] leading-relaxed" style={{ color: T.soft }}>
                 We could not find <span className="font-bold" style={{ color: T.ink }}>{address}</span> in the
                 city&rsquo;s property register, so the sections measured from your door are missing. Picking
@@ -781,10 +791,21 @@ export default function PersonalBriefing({
             </div>
           )}
 
+          {/* The city, as the rule that closes the page — the same device the
+              landing page and the feed rail's footer use. */}
+          <div className="mt-2 mb-1" aria-hidden="true">
+            <img
+              src={publicAsset('images/illustration/calgary-skyline-rule.webp')}
+              alt=""
+              width={1800} height={600} loading="lazy"
+              className="pointer-events-none mx-auto w-full max-w-sm opacity-[0.4]"
+            />
+          </div>
+
           {/* ── Closing note ────────────────────────────────────────────────
               Naming every input is the point: this was assembled from things
               they handed over, not gathered from behind their back. */}
-          <div className="mt-8 rounded-2xl px-4 py-4" style={{ background: 'rgba(46,139,122,0.07)', border: `1px solid rgba(46,139,122,0.22)` }}>
+          <div className="mt-8 px-4 py-4" style={{ background: 'rgba(46,139,122,0.07)', border: `1px solid rgba(46,139,122,0.22)` }}>
             <p className="text-[13px] leading-relaxed" style={{ color: T.soft }}>
               <strong style={{ color: T.ink }}>How this page was made.</strong> From three things you gave
               us — your name, your saved address, and the reports you have filed. Distances are worked out

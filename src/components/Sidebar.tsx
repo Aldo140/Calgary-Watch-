@@ -149,23 +149,23 @@ export default function Sidebar({
   }, [activeIncidentId]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden border-r border-[#C9D8E4] bg-[#F8FAFC] lg:w-[23rem]">
+    <div className="flex h-full w-full flex-col overflow-hidden border-r border-[#C9D8E4] bg-[#FFFDF8] lg:w-[23rem]">
       <div className="h-1 w-full shrink-0 bg-[#4A90D9]" />
       
-      <div className="border-b border-[#D8E2EA] bg-[#F8FAFC] px-5 py-5">
+      <div className="border-b border-[#C9D8E4] bg-[#FFFDF8] px-5 py-5">
         <div className="flex items-center gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F3FC]">
             <img src="/icon.svg" alt="" width={24} height={24} className="size-6" />
           </span>
           <div className="min-w-0 flex-1">
             <h1 className="text-lg font-black tracking-[-0.025em] text-[#0B1F33]">Calgary Watch</h1>
-            <p className="mt-0.5 text-[11px] font-semibold text-[#52697D]">Community incident map</p>
+            <p className="mt-0.5 text-[11px] font-semibold text-[#5A6B7D]">Community incident map</p>
           </div>
           <div className="text-right">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#176A5D]">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-[#2E8B7A]">
               <span className="size-1.5 rounded-full bg-[#2E8B7A]" aria-hidden="true" /> Live
             </span>
-            <span className="mt-0.5 block text-[10.5px] font-semibold tabular-nums text-[#6B8296]">
+            <span className="mt-0.5 block text-[10.5px] font-semibold tabular-nums text-[#5A6B7D]">
               {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -174,19 +174,19 @@ export default function Sidebar({
 
       <div className="flex items-center gap-2.5 px-4 pt-4">
         <div className="relative flex-1 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B8296] transition-colors group-focus-within:text-[#286FAF]" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5A6B7D] transition-colors group-focus-within:text-[#4A90D9]" size={16} />
           <input
             ref={searchInputRef}
             type="text"
             placeholder="Search reports or areas"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 w-full rounded-xl border border-[#C9D8E4] bg-[#FFFFFF] py-2.5 pl-10 pr-4 text-sm font-medium text-[#0B1F33] placeholder:text-[#6B8296] focus:border-[#4A90D9] focus:outline-none focus:ring-2 focus:ring-[#4A90D9]/25"
+            className="h-11 w-full rounded-xl border border-[#C9D8E4] bg-[#FFFDF8] py-2.5 pl-10 pr-4 text-sm font-medium text-[#0B1F33] placeholder:text-[#5A6B7D] focus:border-[#4A90D9] focus:outline-none focus:ring-2 focus:ring-[#4A90D9]/25"
           />
         </div>
         <div className="flex h-11 min-w-[62px] flex-col items-center justify-center rounded-xl bg-[#0B1F33] px-3">
-          <span className="text-[8px] font-black uppercase tracking-[0.12em] leading-none text-[#AFC5D9]">Shown</span>
-          <motion.span className="mt-1 text-base font-black leading-none tabular-nums text-[#F7FBFF]">
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.12em] leading-none text-[#C9D8E4]">Shown</span>
+          <motion.span className="mt-1 text-base font-black leading-none tabular-nums text-[#FFFDF8]">
             {displayCount}
           </motion.span>
         </div>
@@ -198,7 +198,7 @@ export default function Sidebar({
         </div>
       )}
 
-      <div className="grid shrink-0 grid-cols-3 gap-1.5 border-b border-[#D8E2EA] px-4 py-3">
+      <div className="grid shrink-0 grid-cols-3 gap-1.5 border-b border-[#C9D8E4] px-4 py-3">
         {categories.map((cat) => {
           const count = cat.id === 'all' 
             ? incidents.length 
@@ -212,18 +212,18 @@ export default function Sidebar({
               className={cn(
                 'category-chip flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2 text-[10px] font-bold transition-colors',
                 selectedCategory === cat.id
-                  ? 'border-[#286FAF] bg-[#286FAF] text-[#F7FBFF]'
-                  : 'border-[#C9D8E4] bg-[#FFFFFF] text-[#40566B] hover:border-[#8DBBDB] hover:bg-[#E8F3FC]'
+                  ? 'border-[#0B1F33] bg-[#0B1F33] text-[#FFFDF8]'
+                  : 'border-[#C9D8E4] bg-[#FFFDF8] text-[#5A6B7D] hover:border-[#4A90D9] hover:bg-[#E8F3FC]'
               )}
             >
-              <Icon size={13} className={selectedCategory === cat.id ? 'text-[#F7FBFF]' : 'text-[#52697D]'} />
+              <Icon size={13} className={selectedCategory === cat.id ? 'text-[#FFFDF8]' : 'text-[#5A6B7D]'} />
               <span className="truncate">{cat.label}</span>
               <span className={cn(
                 // 9px is fine for a decorative eyebrow but not for a figure a
                 // reader is meant to compare across chips — these counts are
                 // the point of the filter row.
-                'rounded-md px-1.5 py-0.5 text-[11px] font-black tabular-nums',
-                selectedCategory === cat.id ? 'bg-[rgba(255,255,255,0.18)] text-[#F7FBFF]' : 'bg-[#EEF4F8] text-[#52697D]'
+                'px-1.5 py-0.5 text-[11px] font-black tabular-nums',
+                selectedCategory === cat.id ? 'bg-[rgba(255,255,255,0.18)] text-[#FFFDF8]' : 'bg-[#E8F3FC] text-[#5A6B7D]'
               )}>
                 {count}
               </span>
@@ -233,33 +233,33 @@ export default function Sidebar({
       </div>
 
       {/* Collapsible desktop feed controls */}
-      <div className="border-b border-[#D8E2EA] bg-[#F2F6F9]">
+      <div className="border-b border-[#C9D8E4] bg-[#F7F3EA]">
         <button
           type="button"
           onClick={() => setControlsCollapsed((prev) => !prev)}
           className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#E8F3FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4A90D9]"
           aria-expanded={!controlsCollapsed}
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#C9D8E4] bg-[#FFFFFF] text-[#286FAF]">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#C9D8E4] bg-[#FFFDF8] text-[#4A90D9]">
             <SlidersHorizontal size={15} />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-[#0B1F33]">Feed controls</span>
               {(feedFilter || searchQuery || selectedCategory !== 'all') && (
-                <span className="rounded-md bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-300 light:text-blue-700">
+                <span className="bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-300 light:text-blue-700">
                   Filtered
                 </span>
               )}
             </div>
-            <p className="mt-0.5 truncate text-[10px] font-semibold text-[#52697D]">
+            <p className="mt-0.5 truncate text-[10px] font-semibold text-[#5A6B7D]">
               {sortBy === 'newest' ? 'Newest first' : sortBy === 'oldest' ? 'Oldest first' : 'Most verified'} · {feedFilter ? `${feedFilter === 'community' ? 'Community' : 'Recent 2h'} on` : 'All posts'} · {neighborhoodPulse.length} pulse areas
             </p>
           </div>
           <ChevronDown
             size={16}
             className={cn(
-              'shrink-0 text-slate-500 transition-transform',
+              'shrink-0 text-[#5A6B7D] transition-transform',
               !controlsCollapsed && 'rotate-180'
             )}
           />
@@ -279,19 +279,19 @@ export default function Sidebar({
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-                      <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
+                      <span className="text-[10px] font-bold text-[#5A6B7D] uppercase tracking-tighter">
                         {criticalCount} Critical
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
-                      <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
+                      <span className="text-[10px] font-bold text-[#5A6B7D] uppercase tracking-tighter">
                         {activeCount} Active
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                      <span className="text-[10px] font-bold text-slate-400 light:text-slate-600 uppercase tracking-tighter">
+                      <span className="text-[10px] font-bold text-[#5A6B7D] uppercase tracking-tighter">
                         {resolvedCount} Resolved
                       </span>
                     </div>
@@ -299,15 +299,15 @@ export default function Sidebar({
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-500 light:text-slate-700 uppercase tracking-widest">Sort by</span>
+                  <span className="font-mono text-[10px] font-bold text-[#5A6B7D] uppercase tracking-[0.18em]">Sort by</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
-                    className="bg-slate-900 light:bg-white border border-white/10 light:border-slate-300 rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-slate-300 light:text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500/50 light:focus:ring-slate-900/40 cursor-pointer hover:border-white/20 light:hover:border-slate-400 transition-colors"
+                    className="bg-[#FFFDF8] border border-[#C9D8E4] rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-[#1C2B3A] focus:outline-none focus:ring-1 focus:ring-[#4A90D9]/50 cursor-pointer hover:border-[#4A90D9] transition-colors"
                   >
-                    <option value="newest" className="bg-slate-900">Newest First</option>
-                    <option value="oldest" className="bg-slate-900">Oldest First</option>
-                    <option value="verified" className="bg-slate-900">Most Verified</option>
+                    <option value="newest" style={{ background: '#FFFDF8', color: '#1C2B3A' }}>Newest First</option>
+                    <option value="oldest" style={{ background: '#FFFDF8', color: '#1C2B3A' }}>Oldest First</option>
+                    <option value="verified" style={{ background: '#FFFDF8', color: '#1C2B3A' }}>Most Verified</option>
                   </select>
                 </div>
 
@@ -317,8 +317,8 @@ export default function Sidebar({
                     className={cn(
                       "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all",
                       feedFilter === 'community'
-                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                        : "bg-white/5 light:bg-white text-slate-400 light:text-slate-700 border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50"
+                        ? "bg-[#2E8B7A] text-[#FFFDF8] border-[#2E8B7A]"
+                        : "bg-[#FFFDF8] text-[#5A6B7D] border-[#C9D8E4] hover:bg-[#E8F3FC]"
                     )}
                     title="Show only real community user posts, including older posts that are still stored"
                   >
@@ -330,8 +330,8 @@ export default function Sidebar({
                     className={cn(
                       "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all",
                       feedFilter === 'recent'
-                        ? "bg-blue-500/20 text-blue-400 border-blue-500/40 light:bg-slate-900 light:text-white light:border-slate-900"
-                        : "bg-white/5 light:bg-white text-slate-400 light:text-slate-700 border-white/10 light:border-slate-300 hover:bg-white/10 light:hover:bg-slate-50"
+                        ? "bg-[#0B1F33] text-[#FFFDF8] border-[#0B1F33]"
+                        : "bg-[#FFFDF8] text-[#5A6B7D] border-[#C9D8E4] hover:bg-[#E8F3FC]"
                     )}
                     title="Show incidents from the last 2 hours (R)"
                   >
@@ -345,7 +345,7 @@ export default function Sidebar({
                         setSearchQuery('');
                         onCategoryChange('all');
                       }}
-                      className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border border-white/10 light:border-slate-300 text-slate-400 light:text-slate-700 hover:bg-white/10 light:hover:bg-slate-50 transition-all"
+                      className="px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide border border-[#C9D8E4] text-[#5A6B7D] hover:bg-[#E8F3FC] transition-all"
                     >
                       Clear Filters
                     </button>
@@ -353,10 +353,10 @@ export default function Sidebar({
                 </div>
 
                 {neighborhoodPulse.length > 0 && (
-                  <div className="pt-2 border-t border-white/5 light:border-slate-200">
+                  <div className="pt-2 border-t border-white/5 light:border-stone-200">
                     <div className="flex items-center gap-1.5 mb-2.5">
                       <Activity size={12} className="text-blue-400" />
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Live Area Pulse · 2h</span>
+                      <span className="font-mono text-[10px] font-bold text-[#5A6B7D] uppercase tracking-[0.18em]">Live Area Pulse · 2h</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {neighborhoodPulse.map(({ name, count, level }) => {
@@ -367,12 +367,12 @@ export default function Sidebar({
                             className={cn(
                               'flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold',
                               cfg.bg,
-                              'border-white/5 light:border-slate-200'
+                              'border-white/5 light:border-stone-200'
                             )}
                             title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
                           >
                             <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dot)} />
-                            <span className="text-white light:text-slate-800 truncate max-w-[90px]">{name}</span>
+                            <span className="text-[#1C2B3A] truncate max-w-[90px]">{name}</span>
                             <span className={cn('font-black', cfg.text)}>{count}</span>
                           </div>
                         );
@@ -423,18 +423,18 @@ export default function Sidebar({
                     onClick={() => onIncidentClick(incident)}
                   >
                     <div className={cn(
-                      'group relative cursor-pointer overflow-hidden rounded-2xl border bg-[#FFFFFF] p-4 transition-[border-color,background-color,box-shadow,transform] duration-200 active:scale-[0.99]',
+                      'group relative cursor-pointer overflow-hidden rounded-2xl border bg-[#FFFDF8] p-4 transition-[border-color,background-color,box-shadow,transform] duration-200 active:scale-[0.99]',
                       isEmergency
                         ? 'border-[#E7A8A0] bg-[#FFF4F1]'
                         : isActive
                         ? 'border-[#4A90D9] bg-[#E8F3FC] shadow-[0_0_0_2px_rgba(74,144,217,0.16)]'
-                        : 'border-[#D8E2EA] hover:border-[#8DBBDB] hover:bg-[#F4F8FB]'
+                        : 'border-[#C9D8E4] hover:border-[#4A90D9] hover:bg-[#F7F3EA]'
                     )}>
                       {/* Emergency banner */}
                       {isEmergency && (
-                        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-[#B42318] px-2 py-1">
-                          <Siren size={10} className="text-[#F7FBFF]" />
-                          <span className="text-[8px] font-black uppercase tracking-widest text-[#F7FBFF]">SOS</span>
+                        <div className="absolute right-3 top-3 flex items-center gap-1 bg-[#C0392B] px-2 py-1">
+                          <Siren size={10} className="text-[#FFFDF8]" />
+                          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#FFFDF8]">SOS</span>
                         </div>
                       )}
 
@@ -443,11 +443,11 @@ export default function Sidebar({
                           <div className="flex gap-3">
                             <div className={cn(
                               'flex size-10 shrink-0 items-center justify-center rounded-xl',
-                              isEmergency ? 'bg-[#FADBD7] text-[#B42318]' :
-                              incident.category === 'crime' ? 'bg-[#FDE8E6] text-[#C0392B]' :
-                              incident.category === 'traffic' ? 'bg-[#FFF0E4] text-[#C65514]' :
-                              incident.category === 'infrastructure' ? 'bg-[#E8F3FC] text-[#286FAF]' :
-                              'bg-[#E7F5F2] text-[#176A5D]'
+                              isEmergency ? 'bg-[#FADBD7] text-[#C0392B]' :
+                              incident.category === 'crime' ? 'bg-[#FDE8E6] text-[#B5442F]' :
+                              incident.category === 'traffic' ? 'bg-[#FFF0E4] text-[#C07A2A]' :
+                              incident.category === 'infrastructure' ? 'bg-[#E8F3FC] text-[#3E7D8C]' :
+                              'bg-[#E7F5F2] text-[#2E8B7A]'
                             )}>
                               <Icon size={20} />
                             </div>
@@ -460,7 +460,7 @@ export default function Sidebar({
                                     "RestrictionClass on Queen…" and lost the road
                                     name — the one part a reader needs. */}
                                 <div className="flex flex-col gap-1.5">
-                                  <h3 className="line-clamp-2 text-sm font-black leading-tight tracking-[-0.01em] text-[#0B1F33] transition-colors group-hover:text-[#174A6E]">{incident.title}</h3>
+                                  <h3 className="line-clamp-2 text-sm font-black leading-tight tracking-[-0.01em] text-[#0B1F33] transition-colors group-hover:text-[#4A90D9]">{incident.title}</h3>
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     {/* Sample reports are labelled before any other
                                         source badge — it is the most important thing
@@ -468,36 +468,36 @@ export default function Sidebar({
                                     {incident.data_source === 'demo' && <DemoBadge size="xs" />}
                                     {/* Data-source badge — only for non-community reports */}
                                     {incident.source_type === 'reddit_calgary' && (
-                                      <span className="px-1.5 py-0.5 rounded bg-orange-500/20 border border-orange-500/30 text-[8px] font-black text-orange-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-orange-500/20 border border-orange-500/30 text-[8px] font-black text-orange-400 uppercase tracking-tighter">
                                         Reddit
                                       </span>
                                     )}
                                     {incident.source_type === 'news_rss' && (
-                                      <span className="px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-500/30 text-[8px] font-black text-purple-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-[8px] font-black text-purple-400 uppercase tracking-tighter">
                                         News
                                       </span>
                                     )}
                                     {incident.data_source === 'official' && incident.source_type !== 'reddit_calgary' && incident.source_type !== 'news_rss' && (
-                                      <span className="px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-500/30 text-[8px] font-black text-blue-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 text-[8px] font-black text-blue-400 uppercase tracking-tighter">
                                         Official
                                       </span>
                                     )}
                                     {incident.data_source === 'system' && (
-                                      <span className="px-1.5 py-0.5 rounded bg-slate-500/20 border border-slate-500/30 text-[8px] font-black text-slate-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-[#E8F3FC] border border-[#C9D8E4] text-[8px] font-black text-[#5A6B7D] uppercase tracking-tighter">
                                         Auto
                                       </span>
                                     )}
                                     {isNew && (
-                                      <span className="px-1.5 py-0.5 rounded bg-blue-500 text-[8px] font-black text-white uppercase tracking-tighter animate-pulse">
+                                      <span className="px-1.5 py-0.5 bg-[#4A90D9] text-[8px] font-black text-[#FFFDF8] uppercase tracking-tighter animate-pulse">
                                         New
                                       </span>
                                     )}
-                                    <div className="flex size-7 items-center justify-center rounded-lg bg-[#EEF4F8] text-[#52697D] transition-colors group-hover:bg-[#286FAF] group-hover:text-[#F7FBFF]">
+                                    <div className="flex size-7 items-center justify-center rounded-lg bg-[#E8F3FC] text-[#5A6B7D] transition-colors group-hover:bg-[#4A90D9] group-hover:text-[#FFFDF8]">
                                       <Maximize2 size={12} />
                                     </div>
                                   </div>
                                 </div>
-                                <span className="text-[10px] font-medium text-[#6B8296]">
+                                <span className="text-[10px] font-medium text-[#5A6B7D]">
                                   {formatDistanceToNow(incident.timestamp)} ago • {incident.neighborhood || 'Calgary'} • by {getReporterDisplay(incident).firstName}
                                 </span>
                               </div>
@@ -509,11 +509,11 @@ export default function Sidebar({
                               <img
                                 src={incident.image_url}
                                 alt=""
-                                className="h-16 w-16 shrink-0 rounded-xl border border-white/10 object-cover light:border-slate-200"
+                                className="h-16 w-16 shrink-0 rounded-xl border border-white/10 object-cover light:border-stone-200"
                                 loading="lazy"
                               />
                             )}
-                            <p className="line-clamp-3 text-xs leading-relaxed text-[#52697D]">{incident.description}</p>
+                            <p className="line-clamp-3 text-xs leading-relaxed text-[#5A6B7D]">{incident.description}</p>
                           </div>
                           
                           <div className="flex items-center justify-between mt-3">
@@ -521,7 +521,7 @@ export default function Sidebar({
                               'flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium',
                               incident.verified_status === 'community_confirmed' ? 'bg-green-500/20 text-green-400' :
                               incident.verified_status === 'multiple_reports' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-slate-500/20 text-slate-400'
+                              'bg-[#E8F3FC] text-[#5A6B7D]'
                             )}>
                               {StatusIcon && <StatusIcon size={12} />}
                               {incident.verified_status?.replace('_', ' ') || 'Unverified'}
@@ -529,11 +529,11 @@ export default function Sidebar({
                             
                             {/* Neighborhood Initial Circle Thumbnail */}
                             <div className={cn(
-                              'flex size-8 shrink-0 items-center justify-center rounded-full border border-[#FFFFFF] text-[#F7FBFF]',
-                              isEmergency ? 'bg-[#B42318]' :
-                              incident.category === 'crime' ? 'bg-[#C0392B]' :
-                              incident.category === 'traffic' ? 'bg-[#C65514]' :
-                              incident.category === 'infrastructure' ? 'bg-[#286FAF]' :
+                              'flex size-8 shrink-0 items-center justify-center rounded-full border border-[#FFFFFF] text-[#FFFDF8]',
+                              isEmergency ? 'bg-[#C0392B]' :
+                              incident.category === 'crime' ? 'bg-[#B5442F]' :
+                              incident.category === 'traffic' ? 'bg-[#C07A2A]' :
+                              incident.category === 'infrastructure' ? 'bg-[#3E7D8C]' :
                               'bg-[#2E8B7A]'
                             )}>
                               {getReporterDisplay(incident).anonymous ? (
@@ -558,13 +558,13 @@ export default function Sidebar({
                 className="flex flex-col items-center justify-center py-12 px-6 text-center space-y-4"
               >
                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center">
-                  <Search size={32} className="text-slate-600" />
+                  <Search size={32} className="text-[#5A6B7D]" />
                 </div>
                 <div className="space-y-2">
                   {(debouncedSearch || selectedCategory !== 'all' || feedFilter) ? (
                     <>
-                      <h3 className="text-white font-bold">No reports match</h3>
-                      <p className="text-slate-500 text-xs leading-relaxed">
+                      <h3 className="text-[#0B1F33] font-bold">No reports match</h3>
+                      <p className="text-[#5A6B7D] text-xs leading-relaxed">
                         Try clearing your filters or searching a different term.
                       </p>
                       <button
@@ -573,15 +573,15 @@ export default function Sidebar({
                           onCategoryChange('all');
                           setFeedFilter(null);
                         }}
-                        className="text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:text-blue-300 transition-colors"
+                        className="text-[#4A90D9] text-[10px] font-bold uppercase tracking-widest hover:opacity-70 transition-opacity"
                       >
                         Clear all filters
                       </button>
                     </>
                   ) : (
                     <>
-                      <h3 className="text-white font-bold">All clear right now</h3>
-                      <p className="text-slate-500 text-xs leading-relaxed max-w-[200px]">
+                      <h3 className="text-[#0B1F33] font-bold">All clear right now</h3>
+                      <p className="text-[#5A6B7D] text-xs leading-relaxed max-w-[200px]">
                         No incidents reported in Calgary at the moment. Be the first to report something you see.
                       </p>
                     </>
@@ -596,7 +596,7 @@ export default function Sidebar({
           <button
             onClick={onLoadMore}
             disabled={isLoadingMore || !onLoadMore}
-            className="w-full mt-2 py-2 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-white text-[10px] font-bold uppercase tracking-widest text-slate-300 light:text-slate-700 hover:bg-white/10 light:hover:bg-slate-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full mt-2 py-2 rounded-xl border border-[#C9D8E4] bg-[#FFFDF8] font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#1C2B3A] hover:bg-[#E8F3FC] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isLoadingMore ? 'Loading More...' : 'Load Older Reports'}
           </button>
@@ -604,8 +604,8 @@ export default function Sidebar({
       </div>
 
       {/* Sidebar Footer */}
-      <div className="p-4 border-t border-white/5 light:border-slate-200 bg-slate-950/30 light:bg-white">
-        <p className="text-[9px] text-slate-500 light:text-slate-700 font-bold uppercase tracking-[0.2em] text-center">
+      <div className="p-4 border-t border-[#E7E0D2] bg-[#F7F3EA]">
+        <p className="font-mono text-[9px] text-[#5A6B7D] font-bold uppercase tracking-[0.18em] text-center">
           Powered by Calgary Watch • Community Safety Platform
         </p>
       </div>

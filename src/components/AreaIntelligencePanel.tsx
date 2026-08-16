@@ -42,20 +42,20 @@ interface AreaIntelligencePanelProps {
 
 // ── Shared tooltip styles ────────────────────────────────────────────────────
 
-function makeTooltipStyle(isLight: boolean) {
+function makeTooltipStyle() {
   return {
-    backgroundColor: isLight ? '#ffffff' : '#0B1F33',
+    backgroundColor: '#ffffff',
     borderRadius: '0px',
-    border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)',
-    boxShadow: isLight ? '0 8px 32px -4px rgba(0,0,0,0.18)' : '0 18px 25px -5px rgba(0,0,0,0.45)',
+    border: '1px solid rgba(0,0,0,0.08)',
+    boxShadow: '0 8px 32px -4px rgba(0,0,0,0.18)',
   };
 }
 
-function makeTooltipLabelStyle(isLight: boolean) {
+function makeTooltipLabelStyle() {
   return {
     fontSize: 11,
     fontWeight: 900,
-    color: isLight ? '#1C2B3A' : '#fff',
+    color: '#1C2B3A',
     marginBottom: 4,
     textTransform: 'uppercase' as const,
     letterSpacing: '0.1em',
@@ -65,12 +65,11 @@ function makeTooltipLabelStyle(isLight: boolean) {
 // ── Section wrapper ──────────────────────────────────────────────────────────
 
 function Section({
-  title, subtitle, children, isLight,
+  title, subtitle, children,
 }: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
-  isLight: boolean;
 }) {
   const [ref, inView] = useInView();
   return (
@@ -95,7 +94,7 @@ function Section({
         </div>
         <h3
           className="mt-2 font-display text-[clamp(24px,5.4vw,30px)] font-black uppercase leading-[0.9] tracking-[-0.035em]"
-          style={{ color: isLight ? '#0B1F33' : '#F2EFE8' }}
+          style={{ color: '#0B1F33' }}
         >
           {title}
         </h3>
@@ -114,7 +113,6 @@ function HeroSection({
   onClose: () => void;
   glowColor: string;
   gaugeColor: string;
-  isLight: boolean;
 }) {
   const score = data.safetyScore ?? 0;
   const rankMatch = (data.insights[0] ?? '').match(/#(\d+) of (\d+)/);
@@ -290,7 +288,6 @@ function HeroSection({
 interface ContentProps {
   data: AreaIntelligence;
   onClose: () => void;
-  isLight: boolean;
   crimeEntry: CrimeStatEntry | undefined;
   realYearly: CrimeYearEntry[];
   hasRealData: boolean;
@@ -317,7 +314,6 @@ const INTEL_SECTIONS = [
 function Content({
   data,
   onClose,
-  isLight,
   crimeEntry,
   realYearly,
   hasRealData,
@@ -376,7 +372,7 @@ function Content({
   };
 
   return (
-    <div className={cn('flex flex-col h-full overflow-hidden relative', isLight ? 'text-[#1C2B3A]' : 'text-white')}>
+    <div className="flex flex-col h-full overflow-hidden relative text-[#1C2B3A]">
       {/* Sticky mini-bar */}
       <AnimatePresence>
         {miniBarVisible && (
@@ -385,10 +381,7 @@ function Content({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className={cn(
-              'sticky top-0 z-20 flex items-center justify-between px-5 py-2.5 border-b backdrop-blur-xl',
-              isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-stone-950/90 border-white/10'
-            )}
+            className="sticky top-0 z-20 flex items-center justify-between px-5 py-2.5 border-b backdrop-blur-xl bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]"
           >
             <span className="font-display text-[15px] font-black uppercase tracking-[-0.02em] truncate" style={{ color: '#0B1F33' }}>{data.communityName}</span>
             <div className="flex items-center gap-2">
@@ -414,15 +407,12 @@ function Content({
       {/* Scrollable body */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto no-scrollbar">
         <div ref={heroRef}>
-          <HeroSection data={data} onClose={onClose} glowColor={glowColor} gaugeColor={gaugeColor} isLight={isLight} />
+          <HeroSection data={data} onClose={onClose} glowColor={glowColor} gaugeColor={gaugeColor} />
         </div>
 
         {/* Section navigator — sticks under the mini-bar, scrollspy-highlighted */}
         <div
-          className={cn(
-            'sticky top-0 z-10 flex gap-2 overflow-x-auto no-scrollbar px-5 md:px-8 pt-3.5 pb-4 border-b backdrop-blur-xl',
-            isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-stone-950/92 border-white/10'
-          )}
+          className="sticky top-0 z-10 flex gap-2 overflow-x-auto no-scrollbar px-5 md:px-8 pt-3.5 pb-4 border-b backdrop-blur-xl bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]"
         >
           {INTEL_SECTIONS.map(({ id, label }) => {
             const active = activeSection === id;
@@ -451,12 +441,11 @@ function Content({
           })}
         </div>
 
-        <div className={cn('px-5 md:px-8 py-8 space-y-12', isLight ? 'bg-[#FFFDF8]' : 'bg-stone-950')}>
+        <div className="px-5 md:px-8 py-8 space-y-12 bg-[#FFFDF8]">
           <div id="sec-year" className="scroll-mt-16">
             <CrimeThisYearSection
               crimeEntry={crimeEntry}
               cityAverages={cityAverages}
-              isLight={isLight}
               yearlyStats={realYearly}
               isStatcanData={isStatcanData}
             />
@@ -466,7 +455,6 @@ function Content({
               chartData={chartData}
               hasRealData={hasRealData}
               yearlyStats={realYearly}
-              isLight={isLight}
               tooltipStyle={tooltipStyle}
               tooltipLabelStyle={tooltipLabelStyle}
             />
@@ -474,7 +462,6 @@ function Content({
           <div id="sec-mix" className="scroll-mt-16">
             <DonutSection
               crimeEntry={crimeEntry}
-              isLight={isLight}
             />
           </div>
           <div id="sec-property" className="scroll-mt-16">
@@ -482,7 +469,6 @@ function Content({
               key={`pv-${data.communityName}`}
               propertyData={propertyData}
               yearlyStats={realYearly}
-              isLight={isLight}
               tooltipStyle={tooltipStyle}
               tooltipLabelStyle={tooltipLabelStyle}
               score={score}
@@ -492,7 +478,6 @@ function Content({
           <div id="sec-signals" className="scroll-mt-16">
             <KeySignalsSection
               insights={data.insights}
-              isLight={isLight}
             />
           </div>
           {/* The city itself, as the rule that closes the reading. */}
@@ -503,7 +488,7 @@ function Content({
             className="pointer-events-none -mb-4 h-14 w-full select-none object-contain object-bottom opacity-[0.18] md:h-20"
           />
           <div id="sec-sources" className="scroll-mt-16">
-            <DataSourcesSection isLight={isLight} />
+            <DataSourcesSection />
           </div>
         </div>
       </div>
@@ -518,7 +503,6 @@ export default function AreaIntelligencePanel({
 }: AreaIntelligencePanelProps) {
   if (!data) return null;
 
-  const isLight = true; // app is light-only
   const communityKey   = data.crimeKey ?? data.communityName.toLowerCase();
   const crimeEntry     = crimeStats?.get(communityKey);
   const realYearly     = yearlyStats?.get(communityKey) ?? [];
@@ -532,13 +516,12 @@ export default function AreaIntelligencePanel({
     ? realYearly.map(e => ({ name: String(e.year), Violent: e.violent, Property: e.property, Disorder: e.disorder }))
     : data.monthlyTrends.map(t => ({ name: t.month, Violent: t.violent_crime, Property: t.property_crime, Disorder: t.disorder_calls }));
 
-  const tooltipStyle      = makeTooltipStyle(isLight);
-  const tooltipLabelStyle = makeTooltipLabelStyle(isLight);
+  const tooltipStyle      = makeTooltipStyle();
+  const tooltipLabelStyle = makeTooltipLabelStyle();
 
   const contentProps: ContentProps = {
     data,
     onClose,
-    isLight,
     crimeEntry,
     realYearly,
     hasRealData,
@@ -565,10 +548,7 @@ export default function AreaIntelligencePanel({
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed inset-y-0 right-0 h-full z-[90] p-5 md:p-6"
           >
-            <Card className={cn(
-              'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_24px_80px_-24px_rgba(28,43,58,0.55)] overflow-hidden rounded-none relative',
-              isLight ? 'border-[#E7E0D2] bg-[#FFFDF8]' : 'border-white/10'
-            )}>
+            <Card className="h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_24px_80px_-24px_rgba(28,43,58,0.55)] overflow-hidden rounded-none relative border-[#E7E0D2] bg-[#FFFDF8]">
               <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
               <Content {...contentProps} />
             </Card>
@@ -582,13 +562,10 @@ export default function AreaIntelligencePanel({
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 bg-[rgba(20,28,38,0.5)] backdrop-blur-sm z-[100]" />
             <Drawer.Content className="fixed bottom-0 left-0 right-0 h-[94dvh] z-[101] outline-none">
-              <div className={cn(
-                'h-full rounded-none overflow-hidden flex flex-col relative',
-                isLight ? 'bg-[#FFFDF8]' : 'bg-stone-950 border-t border-white/10'
-              )}>
+              <div className="h-full rounded-none overflow-hidden flex flex-col relative bg-[#FFFDF8]">
                 {/* score-keyed accent spine */}
                 <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
-                <div className={cn('mx-auto w-10 h-1 flex-shrink-0 rounded-none mt-3 mb-0', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')} />
+                <div className="mx-auto w-10 h-1 flex-shrink-0 rounded-none mt-3 mb-0 bg-[#E7E0D2]" />
                 <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
                 <Content {...contentProps} />
@@ -636,11 +613,10 @@ function Sparkline({ values }: { values: number[] }) {
 }
 
 function CrimeThisYearSection({
-  crimeEntry, cityAverages, isLight, yearlyStats, isStatcanData,
+  crimeEntry, cityAverages, yearlyStats, isStatcanData,
 }: {
   crimeEntry: CrimeStatEntry | undefined;
   cityAverages: { avgViolent: number; avgProperty: number; avgDisorder: number } | undefined;
-  isLight: boolean;
   yearlyStats: CrimeYearEntry[];
   isStatcanData: boolean;
 }) {
@@ -648,7 +624,7 @@ function CrimeThisYearSection({
 
   if (!crimeEntry) {
     return (
-      <Section title="Crime This Year" subtitle="Calgary Police Service · Open Data" isLight={isLight}>
+      <Section title="Crime This Year" subtitle="Calgary Police Service · Open Data">
         {/*
           A notice, not an alarm: paper card, one gold spine on the left. The
           amber-50 / amber-800 pair it replaced put 14px body on a wash that
@@ -699,7 +675,6 @@ function CrimeThisYearSection({
     <Section
       title="Crime This Year"
       subtitle={`${crimeEntry.year} · Calgary Police Service · Open Data`}
-      isLight={isLight}
     >
       {/*
         The StatsCan badge was #8DBBDB on a 20% wash of #4A90D9 — 1.7:1 against
@@ -742,7 +717,7 @@ function CrimeThisYearSection({
                 <Sparkline values={sparkValues} />
                 <span className="font-display text-[22px] font-black leading-none tabular-nums shrink-0" style={{ color: '#0B1F33' }}>{value.toLocaleString()}</span>
               </div>
-              <div className={cn('h-[10px] rounded-none overflow-hidden', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')}>
+              <div className="h-[10px] rounded-none overflow-hidden bg-[#E7E0D2]">
                 <motion.div
                   className={cn('h-full rounded-none', color)}
                   initial={{ width: '0%' }}
@@ -762,12 +737,11 @@ function CrimeThisYearSection({
 }
 
 function TrendChartSection({
-  chartData, hasRealData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle,
+  chartData, hasRealData, yearlyStats, tooltipStyle, tooltipLabelStyle,
 }: {
   chartData: { name: string; Violent: number; Property: number; Disorder: number }[];
   hasRealData: boolean;
   yearlyStats: CrimeYearEntry[];
-  isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
 }) {
@@ -809,7 +783,6 @@ function TrendChartSection({
     <Section
       title="6-Year Picture"
       subtitle={`${startYear} – ${endYear} · Annual reported incidents${hasRealData ? ' · Calgary Open Data' : ' · Estimated'}`}
-      isLight={isLight}
     >
       {/* Toggle pills */}
       <div className="flex gap-2 mb-4 flex-wrap">
@@ -827,7 +800,7 @@ function TrendChartSection({
 
       {/* Area chart */}
       <div
-        className={cn('h-[280px] md:h-[320px] w-full rounded-none p-4 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}
+        className="h-[280px] md:h-[320px] w-full rounded-none p-4 border bg-[#F7F3EA] border-[#E7E0D2]"
         role="img"
         aria-label={`Crime trend chart for ${startYear}–${endYear}`}
       >
@@ -847,9 +820,9 @@ function TrendChartSection({
                 <stop offset="95%" stopColor="#C77F18" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} tickFormatter={fmtTick} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={'rgba(0,0,0,0.07)'} />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#5A5247', fontWeight: 700 }} dy={8} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#5A5247', fontWeight: 700 }} tickFormatter={fmtTick} />
             <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 12, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
             {showViolent  && <Area type="monotone" dataKey="Violent"  stroke="#C0392B" strokeWidth={2.5} fillOpacity={1} fill="url(#aiV)" isAnimationActive animationBegin={200} animationDuration={800} />}
             {showProperty && <Area type="monotone" dataKey="Property" stroke="#4A90D9" strokeWidth={2.5} fillOpacity={1} fill="url(#aiP)" isAnimationActive animationBegin={200} animationDuration={800} />}
@@ -892,10 +865,9 @@ function TrendChartSection({
 }
 
 function DonutSection({
-  crimeEntry, isLight,
+  crimeEntry,
 }: {
   crimeEntry: CrimeStatEntry | undefined;
-  isLight: boolean;
 }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const total = crimeEntry ? crimeEntry.violent + crimeEntry.property + crimeEntry.disorder : 0;
@@ -911,7 +883,7 @@ function DonutSection({
     const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
     return (
       <g>
-        <text x={cx} y={cy - 10} textAnchor="middle" fill={isLight ? '#0B1F33' : '#fff'} style={{ fontSize: 22, fontWeight: 900 }}>
+        <text x={cx} y={cy - 10} textAnchor="middle" fill={'#0B1F33'} style={{ fontSize: 22, fontWeight: 900 }}>
           {payload.value.toLocaleString()}
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle" fill="#6E6357" style={{ fontSize: 11, fontWeight: 700 }}>
@@ -927,7 +899,6 @@ function DonutSection({
     <Section
       title="What's Driving Activity"
       subtitle={`Proportional breakdown · ${crimeEntry.year}`}
-      isLight={isLight}
     >
       <div className="flex flex-col md:flex-row gap-6 items-center">
         <div className="w-full md:w-auto flex justify-center">
@@ -965,8 +936,8 @@ function DonutSection({
               className={cn(
                 'w-full flex items-center gap-3 rounded-none p-3 border text-left transition-all',
                 activeIdx === i
-                  ? (isLight ? 'border-[#C9D8E4] bg-[#E8F3FC]' : 'border-white/15 bg-white/[0.06]')
-                  : (isLight ? 'border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA]' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]')
+                  ? ('border-[#C9D8E4] bg-[#E8F3FC]')
+                  : ('border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA]')
               )}
             >
               {/* A legend has to be the real colours or it is not a legend. */}
@@ -1000,13 +971,12 @@ interface PropertyValueContentProps {
   earliestEntry: { name: string; TotalCrime: number; AvgValue: number };
   valueChange: number | null;
   score: number;
-  isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
 }
 
 function PropertyValueContent({
-  combined, latestEntry, earliestEntry, valueChange, score, isLight, tooltipStyle, tooltipLabelStyle,
+  combined, latestEntry, earliestEntry, valueChange, score, tooltipStyle, tooltipLabelStyle,
 }: PropertyValueContentProps) {
   const [valueRef, valueInView] = useInView();
   const animatedValue  = useCountUp(latestEntry.AvgValue, 1200, valueInView);
@@ -1058,12 +1028,11 @@ function PropertyValueContent({
     <Section
       title="Property Value vs Safety"
       subtitle="Assessed values · City of Calgary · Cross-referenced with crime data"
-      isLight={isLight}
     >
       {/* Quadrant plot */}
       <div
         ref={valueRef}
-        className={cn('rounded-none border p-4 mb-4', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}
+        className="rounded-none border p-4 mb-4 bg-[#F7F3EA] border-[#E7E0D2]"
         role="img"
         aria-label="Safety score vs property value quadrant"
       >
@@ -1134,7 +1103,7 @@ function PropertyValueContent({
       )}
 
       <div
-        className={cn('h-[280px] md:h-[320px] w-full rounded-none p-4 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}
+        className="h-[280px] md:h-[320px] w-full rounded-none p-4 border bg-[#F7F3EA] border-[#E7E0D2]"
         role="img"
         aria-label="Property value versus total crime by year"
       >
@@ -1146,8 +1115,8 @@ function PropertyValueContent({
                 <stop offset="95%" stopColor="#C0392B" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} dy={8} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={'rgba(0,0,0,0.07)'} />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#5A5247', fontWeight: 700 }} dy={8} />
             <YAxis yAxisId="crime" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#A6332A', fontWeight: 700 }} tickFormatter={fmtTick} orientation="left" />
             <YAxis yAxisId="value" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6A63A8', fontWeight: 700 }} tickFormatter={fmtDollars} orientation="right" />
             <Tooltip
@@ -1170,11 +1139,11 @@ function PropertyValueContent({
 
       {/* Insight row */}
       <div className="grid grid-cols-2 gap-3 mt-4">
-        <div className={cn('rounded-none p-3 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}>
+        <div className="rounded-none p-3 border bg-[#F7F3EA] border-[#E7E0D2]">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: '#5A6B7D' }}>Avg. Assessed Value ({latestEntry.name})</p>
           <p className="font-display text-[28px] font-black tabular-nums leading-none" style={{ color: '#4F4A85' }}>{fmtDollars(animatedValue)}</p>
         </div>
-        <div className={cn('rounded-none p-3 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}>
+        <div className="rounded-none p-3 border bg-[#F7F3EA] border-[#E7E0D2]">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: '#5A6B7D' }}>Change vs {earliestEntry.name}</p>
           {valueChange !== null ? (
             <p className="font-display text-[28px] font-black tabular-nums leading-none" style={{ color: valueChange >= 0 ? '#1F6355' : '#A6332A' }}>
@@ -1211,12 +1180,11 @@ const SAFETY_AXIS_MIN = 40;
 const SAFETY_AXIS_MAX = 100;
 
 function PropertyValueSection({
-  propertyData, yearlyStats, isLight, tooltipStyle, tooltipLabelStyle, score, communityName,
+  propertyData, yearlyStats, tooltipStyle, tooltipLabelStyle, score, communityName,
 }: {
   propertyData: PropertyYearEntry[];
   communityName: string;
   yearlyStats: CrimeYearEntry[];
-  isLight: boolean;
   tooltipStyle: React.CSSProperties;
   tooltipLabelStyle: React.CSSProperties;
   score: number;
@@ -1228,9 +1196,9 @@ function PropertyValueSection({
 
   if (propertyData.length === 0) {
     return (
-      <Section title="Property Value vs Safety" subtitle="Assessed values · City of Calgary" isLight={isLight}>
-        <div className={cn('rounded-none p-4 border flex items-start gap-2.5', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}>
-          <Info size={14} className={isLight ? 'text-[#5A6B7D] shrink-0 mt-0.5' : 'text-stone-600 shrink-0 mt-0.5'} />
+      <Section title="Property Value vs Safety" subtitle="Assessed values · City of Calgary">
+        <div className="rounded-none p-4 border flex items-start gap-2.5 bg-[#F7F3EA] border-[#E7E0D2]">
+          <Info size={14} className={'text-[#5A6B7D] shrink-0 mt-0.5'} />
           <p className="text-[13.5px] leading-relaxed" style={{ color: '#5A6B7D' }}>
             {/* Industrial estates, parks and survey parcels have no homes to
                 value, so the city publishes no residential assessment for them.
@@ -1270,7 +1238,6 @@ function PropertyValueSection({
       earliestEntry={earliestEntry}
       valueChange={valueChange}
       score={score}
-      isLight={isLight}
       tooltipStyle={tooltipStyle}
       tooltipLabelStyle={tooltipLabelStyle}
     />
@@ -1278,10 +1245,9 @@ function PropertyValueSection({
 }
 
 function KeySignalsSection({
-  insights, isLight,
+  insights,
 }: {
   insights: string[];
-  isLight: boolean;
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const isAnimating = useRef(false);
@@ -1311,8 +1277,7 @@ function KeySignalsSection({
    * The big figure keeps a darkened step of the same hue so it clears the
    * card: #4A90D9 on #F7F3EA is 3.0:1, #2A6099 is 5.9:1.
    */
-  function cardColors(type: 'up' | 'down' | 'neutral', _light: boolean) {
-    void _light;
+  function cardColors(type: 'up' | 'down' | 'neutral') {
     if (type === 'up')   return { border: '#C0392B', badge: '#C0392B', icon: <TrendingUp   size={24} style={{ color: '#F2EFE8' }} />, statColor: '#A6332A' };
     if (type === 'down') return { border: '#2E8B7A', badge: '#2E8B7A', icon: <TrendingDown size={24} style={{ color: '#F2EFE8' }} />, statColor: '#1F6355' };
     return               { border: '#4A90D9', badge: '#2A6099', icon: <ShieldCheck  size={24} style={{ color: '#F2EFE8' }} />, statColor: '#2A6099' };
@@ -1341,13 +1306,13 @@ function KeySignalsSection({
   const visibleCards = Math.min(3, n);
 
   return (
-    <Section title="Key Signals" subtitle="What stands out in this community" isLight={isLight}>
+    <Section title="Key Signals" subtitle="What stands out in this community">
       {/* Counter + progress bar above stack */}
       <div className="flex items-center mb-3 md:max-w-[44rem]">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] tabular-nums shrink-0" style={{ color: '#5A6B7D' }}>
           {currentIdx + 1} / {n}
         </p>
-        <div className={cn('h-[3px] rounded-none flex-1 mx-3 overflow-hidden', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')}>
+        <div className="h-[3px] rounded-none flex-1 mx-3 overflow-hidden bg-[#E7E0D2]">
           <motion.div
             className="h-full rounded-none bg-[#4A90D9]"
             animate={{ width: `${((currentIdx + 1) / n) * 100}%` }}
@@ -1392,7 +1357,7 @@ function KeySignalsSection({
           {(() => {
             const insight = insights[currentIdx];
             const type = getCardType(insight);
-            const colors = cardColors(type, isLight);
+            const colors = cardColors(type);
             const stat = extractStat(insight);
 
             return (
@@ -1419,10 +1384,7 @@ function KeySignalsSection({
                   }
                   dragX.set(0);
                 }}
-                className={cn(
-                  'rounded-none border p-5 cursor-grab active:cursor-grabbing select-none',
-                  isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.04] border-white/10'
-                )}
+                className="rounded-none border p-5 cursor-grab active:cursor-grabbing select-none bg-[#F7F3EA] border-[#E7E0D2]"
               >
                 <div className="flex items-start gap-4">
                   {/* Icon badge — solid severity, ink reversed out. */}
@@ -1463,10 +1425,7 @@ function KeySignalsSection({
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={previous}
-          className={cn(
-            'w-10 h-10 rounded-none border flex items-center justify-center text-lg font-black transition-colors',
-            isLight ? 'border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA] text-[#5A6B7D]' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
-          )}
+          className="w-10 h-10 rounded-none border flex items-center justify-center text-lg font-black transition-colors border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA] text-[#5A6B7D]"
           aria-label="Previous insight"
         >
           ←
@@ -1476,10 +1435,7 @@ function KeySignalsSection({
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={dismiss}
-          className={cn(
-            'w-10 h-10 rounded-none border flex items-center justify-center text-lg font-black transition-colors',
-            isLight ? 'border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA] text-[#5A6B7D]' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
-          )}
+          className="w-10 h-10 rounded-none border flex items-center justify-center text-lg font-black transition-colors border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA] text-[#5A6B7D]"
           aria-label="Next insight"
         >
           →
@@ -1504,29 +1460,26 @@ const DATA_SOURCES = [
   },
 ];
 
-function DataSourcesSection({ isLight }: { isLight: boolean }) {
+function DataSourcesSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   return (
-    <Section title="Data Sources" subtitle="Where every number on this page comes from" isLight={isLight}>
+    <Section title="Data Sources" subtitle="Where every number on this page comes from">
       <div className="space-y-2">
         {DATA_SOURCES.map(({ title, content }, idx) => (
           <div
             key={title}
-            className={cn('rounded-none border overflow-hidden', isLight ? 'border-[#E7E0D2]' : 'border-white/10')}
+            className="rounded-none border overflow-hidden border-[#E7E0D2]"
           >
             <button
               onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-              className={cn(
-                'w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors',
-                isLight ? 'bg-[#FFFDF8] hover:bg-[#F7F3EA]' : 'bg-white/[0.02] hover:bg-white/[0.04]'
-              )}
+              className="w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors bg-[#FFFDF8] hover:bg-[#F7F3EA]"
             >
               <div className="flex items-center gap-2.5">
-                <Database size={13} className={isLight ? 'text-[#5A6B7D]' : 'text-stone-500'} />
+                <Database size={13} className={'text-[#5A6B7D]'} />
                 <span className="text-[13.5px] font-bold" style={{ color: '#1C2B3A' }}>{title}</span>
               </div>
               <motion.div animate={{ rotate: openIdx === idx ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <ChevronDown size={15} className={isLight ? 'text-[#5A6B7D]' : 'text-stone-500'} />
+                <ChevronDown size={15} className={'text-[#5A6B7D]'} />
               </motion.div>
             </button>
             <AnimatePresence initial={false}>
@@ -1547,7 +1500,7 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
           </div>
         ))}
       </div>
-      <p className={cn('text-[12px] mt-4 pt-4 border-t leading-relaxed', isLight ? 'text-[#5A6B7D] border-[#E7E0D2]' : 'text-stone-600 border-white/5')}>
+      <p className="text-[12px] mt-4 pt-4 border-t leading-relaxed text-[#5A6B7D] border-[#E7E0D2]">
         All figures reflect reported incidents only — not all crime is reported to police. Safety scores are normalized against the Calgary city-wide average.
       </p>
     </Section>

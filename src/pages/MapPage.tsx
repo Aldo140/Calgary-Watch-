@@ -28,6 +28,7 @@ import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { useTrafficCameras } from '@/src/hooks/useTrafficCameras';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
 import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMatches, rankFullTextMatches } from '@/src/lib/address';
+import { categoryColor } from '@/src/lib/tokens';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
@@ -1788,8 +1789,8 @@ export default function MapPage() {
       return (
         <div key={n.id} className="p-2">
           <div
-            className="relative overflow-hidden rounded-xl"
-            style={{ background: 'linear-gradient(135deg, #1C2B3A 0%, #24466B 80%)', border: '1px solid rgba(46,139,122,0.45)' }}
+            className="relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #1C2B3A 0%, #24466B 80%)', border: '1.5px solid rgba(46,139,122,0.55)' }}
           >
           <button
             type="button"
@@ -1816,7 +1817,7 @@ export default function MapPage() {
             {stats ? (
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 <span className="flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: `${stats.band.color}2e`, color: '#FFFDF8' }}>
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: stats.band.color }} />
+                  <span className="h-1.5 w-1.5" style={{ background: stats.band.color }} />
                   {stats.band.label}
                 </span>
                 <span className="px-2 py-1 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
@@ -1844,7 +1845,7 @@ export default function MapPage() {
                 setShowNotifications(false);
                 openAuthPanel('settings');
               }}
-              className="rounded-md text-[9.5px] font-bold underline underline-offset-2 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] underline underline-offset-2 transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2"
               style={{ color: '#7FB5A6' }}
             >
               Change location settings
@@ -1971,7 +1972,7 @@ export default function MapPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[180] flex items-center justify-center bg-stone-950/72 p-3 backdrop-blur-xl sm:p-6"
+            className="fixed inset-0 z-[180] flex items-center justify-center bg-[rgba(6,22,47,0.72)] p-3 backdrop-blur-xl sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-label={showProfileStep ? 'Calgary Watch profile settings' : 'Sign up or sign in to Calgary Watch'}
@@ -1981,8 +1982,8 @@ export default function MapPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 22, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-              className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl overflow-y-auto rounded-[1.75rem] shadow-[0_32px_80px_-32px_rgba(28,43,58,0.6)]"
-              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
+              className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-4xl overflow-y-auto shadow-[0_32px_80px_-32px_rgba(11,31,51,0.6)]"
+              style={{ background: '#FFFDF8', border: '1.5px solid #F2EFE8' }}
             >
               {canCloseAuthPanel && (
                 <button
@@ -1994,7 +1995,7 @@ export default function MapPage() {
                     setAuthPanelMode('signin');
                     setProfileSaveError(null);
                   }}
-                  className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-700 shadow-sm transition-colors hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 sm:right-4 sm:top-4"
+                  className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center border-[1.5px] border-[#0B1F33] bg-[#FFFDF8] text-[#0B1F33] transition-colors hover:bg-[#E8F3FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 sm:right-4 sm:top-4"
                   aria-label="Close sign up or sign in panel"
                 >
                   <X size={16} />
@@ -2002,26 +2003,26 @@ export default function MapPage() {
               )}
 
               <div className="grid lg:grid-cols-[0.82fr_1.18fr]">
-                <div className="bg-[linear-gradient(145deg,rgba(74,144,217,0.24),rgba(46,139,122,0.16)_52%,rgba(212,168,67,0.12))] p-6 text-[#1C2B3A] md:p-8">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 shadow-sm light:bg-white">
-                    {showProfileStep ? <Home size={22} className="text-sky-300 light:text-sky-700" /> : <GoogleIcon />}
+                <div className="bg-[#06162F] p-6 text-[#D5DFEB] md:p-8">
+                  <div className="flex h-12 w-12 items-center justify-center bg-[#F2EFE8]">
+                    {showProfileStep ? <Home size={22} className="text-[#0B1F33]" /> : <GoogleIcon />}
                   </div>
-                  <h2 className="mt-6 text-2xl font-black tracking-tight text-stone-950">
+                  <h2 className="mt-6 font-display text-2xl font-black tracking-[-0.02em] text-[#F2EFE8]">
                     {showProfileStep
                       ? authPanelMode === 'settings' ? 'Account settings' : 'Finish your profile'
                       : 'Sign up or sign in'}
                   </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-stone-700">
+                  <p className="mt-3 text-sm leading-relaxed text-[#D5DFEB]">
                     {showProfileStep
                       ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
                       : 'Continue with Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
                   </p>
 
                   {showProfileStep && (
-                    <div className="mt-6 rounded-2xl border border-white/10 bg-stone-950/35 p-4 light:border-stone-200 light:bg-white/75">
-                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">Current report area</p>
-                      <p className="mt-1 text-lg font-black">{locationLabel}</p>
-                      <p className="mt-2 text-xs leading-relaxed text-[#5A6B7D]">
+                    <div className="mt-6 border-[1.5px] border-[rgba(242,239,232,0.26)] bg-[rgba(242,239,232,0.08)] p-4">
+                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#AFC5DF]">Current report area</p>
+                      <p className="mt-1 text-lg font-black text-[#F2EFE8]">{locationLabel}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-[#AFC5DF]">
                         Weekly digest: {userProfile?.weeklyDigestOptIn === true ? 'enabled' : 'off'}
                       </p>
                     </div>
@@ -2032,22 +2033,22 @@ export default function MapPage() {
                   {!showProfileStep ? (
                     <div className="space-y-5">
                       <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-sky-600">Continue with Google</p>
-                        <h3 className="mt-2 text-2xl font-black text-stone-950">Sign up or sign in securely</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-stone-700">
+                        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#1F5C93]">Continue with Google</p>
+                        <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em] text-[#0B1F33]">Sign up or sign in securely</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-[#5A6B7D]">
                           New to Calgary Watch? Google will create your account. Already registered? Google will sign you in. This panel will then ask for your privacy consent and neighbourhood or address.
                         </p>
                       </div>
 
                       <Button
                         onClick={signIn}
-                        className="h-12 w-full rounded-2xl bg-white text-stone-950 hover:bg-stone-100 light:border light:border-stone-200 light:bg-stone-950 light:text-white light:hover:bg-stone-800"
+                        className="h-12 w-full rounded-none bg-[#06162F] text-[#F2EFE8] hover:bg-[#1C2B3A]"
                       >
                         <GoogleIcon />
                         Sign up or sign in with Google
                       </Button>
 
-                      <p className="text-[11px] leading-relaxed text-stone-600">
+                      <p className="text-[11px] leading-relaxed text-[#5A6B7D]">
                         Calgary Watch uses your account to reduce spam, support report moderation, and connect neighbourhood reports to your saved preferences.
                       </p>
                     </div>
@@ -2063,10 +2064,10 @@ export default function MapPage() {
                                 src={user.photoURL}
                                 alt={user.displayName || 'Profile'}
                                 referrerPolicy="no-referrer"
-                                className="h-14 w-14 rounded-full object-cover ring-2 ring-sky-400/30"
+                                className="h-14 w-14 border-[1.5px] border-[#C9D8E4] object-cover"
                               />
                             ) : (
-                              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#4A90D9] text-xl font-black text-[#FFFDF8]">
+                              <div className="flex h-14 w-14 items-center justify-center bg-[#2F6FB0] text-xl font-black text-[#FFFDF8]">
                                 {(user?.displayName || user?.email || 'U').charAt(0).toUpperCase()}
                               </div>
                             )}
@@ -2081,9 +2082,9 @@ export default function MapPage() {
                           </div>
 
                           {/* Preferences summary — ledger rows */}
-                          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #E7E0D2' }}>
+                          <div className="overflow-hidden" style={{ border: '1.5px solid #C9D8E4' }}>
                             <div className="flex items-center gap-3 p-4" style={{ background: '#F7F3EA' }}>
-                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(46,139,122,0.14)' }}>
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center" style={{ background: 'rgba(46,139,122,0.14)' }}>
                                 <Home size={15} className="text-[#2E8B7A]" />
                               </span>
                               <div className="min-w-0">
@@ -2094,8 +2095,8 @@ export default function MapPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3 p-4" style={{ borderTop: '1px dashed #E7E0D2' }}>
-                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(74,144,217,0.12)' }}>
-                                <Bell size={15} className="text-[#4A90D9]" />
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }}>
+                                <Bell size={15} className="text-[#2F6FB0]" />
                               </span>
                               <div className="min-w-0 flex-1">
                                 <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Weekly digest</p>
@@ -2117,8 +2118,8 @@ export default function MapPage() {
                           <button
                             type="button"
                             onClick={() => setIsEditingPreferences(true)}
-                            className="w-full h-12 rounded-2xl font-bold text-sm transition-transform active:scale-[0.98]"
-                            style={{ background: '#1C2B3A', color: '#FFFDF8' }}
+                            className="w-full h-12 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition-transform active:scale-[0.98]"
+                            style={{ background: '#06162F', color: '#F2EFE8' }}
                           >
                             Edit preferences
                           </button>
@@ -2130,7 +2131,7 @@ export default function MapPage() {
                             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#2E8B7A' }}>
                               {profileNeedsSetup ? 'Set up your report area' : 'Edit preferences'}
                             </p>
-                            <h3 className="mt-2 font-display text-2xl font-extrabold tracking-[-0.02em]" style={{ color: '#1C2B3A' }}>
+                            <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em]" style={{ color: '#0B1F33' }}>
                               {addressIsSettled ? 'Your report area' : 'Where should we watch?'}
                             </h3>
                             <p className="mt-2 text-sm leading-relaxed" style={{ color: '#5A6B7D' }}>
@@ -2162,11 +2163,11 @@ export default function MapPage() {
                               {addressIsSettled ? (
                                 /* Settled — confirm it and get out of the way. */
                                 <div
-                                  className="flex items-start gap-3 rounded-2xl p-3.5"
-                                  style={{ background: 'rgba(46,139,122,0.08)', border: '1px solid rgba(46,139,122,0.3)' }}
+                                  className="flex items-start gap-3 p-3.5"
+                                  style={{ background: 'rgba(46,139,122,0.08)', border: '1.5px solid rgba(46,139,122,0.45)' }}
                                 >
                                   <span
-                                    className="mt-[1px] grid h-6 w-6 shrink-0 place-items-center rounded-full"
+                                    className="mt-[1px] grid h-6 w-6 shrink-0 place-items-center"
                                     style={{ background: '#2E8B7A' }}
                                   >
                                     <Check size={13} style={{ color: '#FFFDF8' }} />
@@ -2184,7 +2185,7 @@ export default function MapPage() {
                                   <button
                                     type="button"
                                     onClick={() => setProfileDraft((prev) => ({ ...prev, address: '', inferredNeighborhood: '' }))}
-                                    className="shrink-0 rounded-lg px-2 py-1 text-[11.5px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
+                                    className="shrink-0 px-2 py-1 text-[11.5px] font-bold underline underline-offset-2 transition-opacity hover:opacity-70"
                                     style={{ color: '#1C2B3A' }}
                                   >
                                     Change
@@ -2200,8 +2201,8 @@ export default function MapPage() {
                                     }}
                                     autoFocus={profileDraft.address.trim().length === 0 && !profileNeedsSetup}
                                     placeholder="Start typing an address, street, or landmark"
-                                    className="h-12 w-full rounded-2xl px-4 text-sm outline-none transition-colors"
-                                    style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                    className="h-12 w-full px-4 text-sm outline-none transition-colors focus:border-[#4A90D9]"
+                                    style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
                                   />
                                   <div className="min-h-6">
                                     {addressQuery.length > 0 && addressQuery.length < 3 && (
@@ -2216,8 +2217,8 @@ export default function MapPage() {
                                             key={`${item.label}-${item.neighborhood}`}
                                             type="button"
                                             onClick={() => setProfileDraft((prev) => ({ ...prev, address: item.label, inferredNeighborhood: item.neighborhood, neighborhood: '' }))}
-                                            className="rounded-xl px-3 py-2 text-left text-xs font-bold transition-colors"
-                                            style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                            className="px-3 py-2 text-left text-xs font-bold transition-colors hover:bg-[#E8F3FC]"
+                                            style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
                                           >
                                             <span className="block truncate">{item.label}</span>
                                             {item.neighborhood && (
@@ -2256,8 +2257,8 @@ export default function MapPage() {
                                     setProfileDraft((prev) => ({ ...prev, neighborhood, inferredNeighborhood: '', address: neighborhood.trim() ? '' : prev.address }));
                                   }}
                                   placeholder="Start typing a Calgary neighbourhood"
-                                  className="h-12 w-full rounded-2xl px-4 text-sm outline-none transition-colors"
-                                  style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                  className="h-12 w-full px-4 text-sm outline-none transition-colors focus:border-[#4A90D9]"
+                                  style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
                                 />
                                 <div className="min-h-6">
                                   {neighborhoodQuery.length > 0 && neighborhoodQuery.length < 2 && (
@@ -2272,8 +2273,8 @@ export default function MapPage() {
                                           key={name}
                                           type="button"
                                           onClick={() => setProfileDraft((prev) => ({ ...prev, neighborhood: name, inferredNeighborhood: '', address: '' }))}
-                                          className="rounded-xl px-3 py-2 text-xs font-bold transition-colors"
-                                          style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                          className="px-3 py-2 text-xs font-bold transition-colors hover:bg-[#E8F3FC]"
+                                          style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
                                         >
                                           {name}
                                         </button>
@@ -2292,14 +2293,14 @@ export default function MapPage() {
                           </div>
 
                           <label
-                            className="flex cursor-pointer gap-3 rounded-2xl p-4"
-                            style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }}
+                            className="flex cursor-pointer gap-3 p-4"
+                            style={{ background: '#F7F3EA', border: '1.5px solid #C9D8E4' }}
                           >
                             <input
                               type="checkbox"
                               checked={profileDraft.piiConsent}
                               onChange={(e) => setProfileDraft((prev) => ({ ...prev, piiConsent: e.target.checked }))}
-                              className="mt-0.5 h-4 w-4 shrink-0 rounded"
+                              className="mt-0.5 h-4 w-4 shrink-0"
                               style={{ accentColor: '#2E8B7A' }}
                             />
                             <span className="text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
@@ -2312,14 +2313,14 @@ export default function MapPage() {
                           </label>
 
                           <label
-                            className="flex cursor-pointer gap-3 rounded-2xl p-4"
-                            style={{ background: 'rgba(46,139,122,0.08)', border: '1px solid rgba(46,139,122,0.3)' }}
+                            className="flex cursor-pointer gap-3 p-4"
+                            style={{ background: 'rgba(46,139,122,0.08)', border: '1.5px solid rgba(46,139,122,0.45)' }}
                           >
                             <input
                               type="checkbox"
                               checked={profileDraft.weeklyDigestOptIn}
                               onChange={(e) => setProfileDraft((prev) => ({ ...prev, weeklyDigestOptIn: e.target.checked }))}
-                              className="mt-0.5 h-4 w-4 shrink-0 rounded"
+                              className="mt-0.5 h-4 w-4 shrink-0"
                               style={{ accentColor: '#2E8B7A' }}
                             />
                             <span className="text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
@@ -2329,8 +2330,8 @@ export default function MapPage() {
                           </label>
 
                           {profileSaveError && (
-                            <p className="rounded-xl px-3 py-2.5 text-[13px] font-bold"
-                               style={{ background: 'rgba(192,57,43,0.08)', border: '1px solid rgba(192,57,43,0.3)', color: '#C0392B' }}>
+                            <p className="px-3 py-2.5 text-[13px] font-bold"
+                               style={{ background: 'rgba(192,57,43,0.08)', border: '1.5px solid rgba(192,57,43,0.45)', color: '#96271C' }}>
                               {profileSaveError}
                             </p>
                           )}
@@ -2340,8 +2341,8 @@ export default function MapPage() {
                               <Button
                                 variant="secondary"
                                 onClick={skipOnboarding}
-                                className="rounded-2xl"
-                                style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#5A6B7D' }}
+                                className="rounded-none font-mono text-[11px] font-bold uppercase tracking-[0.16em]"
+                                style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#5A6B7D' }}
                               >
                                 Skip for now
                               </Button>
@@ -2360,8 +2361,8 @@ export default function MapPage() {
                                   });
                                   setProfileSaveError(null);
                                 }}
-                                className="rounded-2xl"
-                                style={{ background: '#FFFDF8', border: '1px solid #E7E0D2', color: '#1C2B3A' }}
+                                className="rounded-none font-mono text-[11px] font-bold uppercase tracking-[0.16em]"
+                                style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4', color: '#1C2B3A' }}
                               >
                                 Cancel
                               </Button>
@@ -2370,8 +2371,8 @@ export default function MapPage() {
                               <Button
                                 onClick={saveProfileSettings}
                                 disabled={isSavingProfile}
-                                className="rounded-2xl transition-opacity hover:opacity-90"
-                                style={{ background: '#1C2B3A', color: '#FFFDF8' }}
+                                className="rounded-none font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-opacity hover:opacity-90"
+                                style={{ background: '#06162F', color: '#F2EFE8' }}
                               >
                                 {isSavingProfile ? 'Saving…' : 'Save and continue'}
                               </Button>
@@ -2501,11 +2502,11 @@ export default function MapPage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-3 bg-red-900/90 border border-red-500/40 rounded-2xl shadow-xl backdrop-blur-xl text-red-200 text-xs font-bold"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-3 bg-[#06162F] border-[1.5px] border-[#C0392B] shadow-[0_10px_28px_rgba(11,31,51,0.28)] backdrop-blur-xl text-[#F2EFE8] text-xs font-bold"
           >
-            <ShieldAlert size={14} className="shrink-0 text-red-400" />
+            <ShieldAlert size={14} className="shrink-0 text-[#E8B871]" />
             {submitError}
-            <button onClick={() => setSubmitError(null)} className="ml-1 text-red-400 hover:text-white transition-colors">
+            <button onClick={() => setSubmitError(null)} className="ml-1 text-[#AFC5DF] hover:text-[#F2EFE8] transition-colors">
               <X size={14} />
             </button>
           </motion.div>
@@ -2532,15 +2533,15 @@ export default function MapPage() {
             role="status"
             className="fixed left-3 top-[calc(6.5rem+env(safe-area-inset-top))] z-[200] max-w-[calc(100vw-5rem)]
                        lg:left-1/2 lg:top-24 lg:-translate-x-1/2 lg:max-w-[calc(100vw-2rem)]
-                       flex items-center gap-2 px-3.5 py-2 rounded-full shadow-lg backdrop-blur-xl
-                       bg-stone-900/92 border border-amber-400/30 text-amber-100 text-[0.72rem] font-semibold whitespace-nowrap"
+                       flex items-center gap-2 px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.24)] backdrop-blur-xl
+                       bg-[#06162F] border-[1.5px] border-[#E8B871] text-[#F2EFE8] text-[12px] font-semibold whitespace-nowrap"
           >
-            <Navigation size={13} className="shrink-0 text-amber-300" />
+            <Navigation size={13} className="shrink-0 text-[#E8B871]" />
             <span className="truncate">Location off. Showing all of Calgary</span>
             <button
               onClick={() => setLocationError(false)}
               aria-label="Dismiss"
-              className="shrink-0 -mr-1 p-1 text-amber-300/80 hover:text-white transition-colors"
+              className="shrink-0 -mr-1 p-1 text-[#AFC5DF] hover:text-[#F2EFE8] transition-colors"
             >
               <X size={13} />
             </button>
@@ -2633,7 +2634,7 @@ export default function MapPage() {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] text-[#5A6B7D] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
+              className="flex size-11 shrink-0 items-center justify-center border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
               aria-label="Back to home"
             >
               <Home size={18} />
@@ -2642,16 +2643,16 @@ export default function MapPage() {
               type="button"
               data-tour="m-feed"
               onClick={() => setSheetSnap(sheetSnap === '80px' ? 0.38 : 0.82)}
-              className="flex h-11 min-w-0 flex-1 items-center gap-3 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] px-3.5 text-left shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-transform active:scale-[0.99]"
+              className="flex h-11 min-w-0 flex-1 items-center gap-3 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 text-left shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-transform active:scale-[0.99]"
             >
               <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-                <span className={cn('relative inline-flex h-2 w-2 rounded-full', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-stone-400')} />
+                <span className={cn('relative inline-flex h-2 w-2', mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />
               </span>
               <div className="min-w-0 flex-1 leading-none">
-                <p className="text-[12.5px] font-black tracking-tight text-stone-900 truncate">
+                <p className="truncate font-display text-[13px] font-black tracking-[-0.02em] text-[#0B1F33]">
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </p>
-                <p className="mt-1 truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
+                <p className="mt-1 truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
                   {mapIncidents.length === 0 ? 'Be first to report' : 'Tap for the full feed'}
                 </p>
               </div>
@@ -2659,12 +2660,12 @@ export default function MapPage() {
                   overriding bg-slate-900 to a cream tone while the label stayed
                   white, leaving the live count invisible on mobile. */}
               <span
-                className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-black tabular-nums"
-                style={{ background: '#1C2B3A', color: '#FFFFFF' }}
+                className="shrink-0 px-2 py-1 text-[11px] font-black tabular-nums"
+                style={{ background: '#06162F', color: '#F2EFE8' }}
               >
                 {filteredIncidentsCount}
               </span>
-              <Search size={15} className="shrink-0 text-[#5A6B7D]" />
+              <Search size={15} className="shrink-0 text-[#40566B]" />
             </button>
           </div>
 
@@ -2684,13 +2685,13 @@ export default function MapPage() {
                   key={c.key}
                   type="button"
                   onClick={() => setSelectedCategory(c.key)}
-                  className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-xl border px-3.5 text-[11px] font-bold shadow-[0_2px_4px_rgba(11,31,51,0.08)] backdrop-blur-lg transition-transform active:scale-[0.98]"
+                  className="inline-flex h-8 shrink-0 items-center gap-1.5 border-[1.5px] px-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.08em] shadow-[0_2px_4px_rgba(11,31,51,0.10)] backdrop-blur-lg transition-transform active:scale-[0.98]"
                   style={active
-                    ? { background: c.color, borderColor: c.color, color: '#fff' }
-                    : { background: 'rgba(255,253,248,0.92)', borderColor: '#C9D8E4', color: '#1C2B3A' }}
+                    ? { background: '#06162F', borderColor: '#06162F', color: '#F2EFE8' }
+                    : { background: 'rgba(255,253,248,0.94)', borderColor: '#0B1F33', color: '#1C2B3A' }}
                 >
                   {c.key !== 'all' && (
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: active ? '#fff' : c.color }} aria-hidden="true" />
+                    <span className="h-1.5 w-1.5" style={{ background: active ? '#F2EFE8' : c.color }} aria-hidden="true" />
                   )}
                   {c.label}
                 </button>
@@ -2711,10 +2712,10 @@ export default function MapPage() {
             onClick={handleLocate}
             data-tour="near-me"
             className={cn(
-              'pointer-events-auto flex size-11 items-center justify-center rounded-xl border shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors active:scale-[0.98]',
+              'pointer-events-auto flex size-11 items-center justify-center border-[1.5px] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors active:scale-[0.98]',
               nearMeOpen
-                ? 'border-[#0B1F33] bg-[#0B1F33] text-[#FFFDF8]'
-                : 'border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] text-[#4A90D9]'
+                ? 'border-[#06162F] bg-[#06162F] text-[#F2EFE8]'
+                : 'border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#2F6FB0]'
             )}
             aria-label="What's near me"
           >
@@ -2725,12 +2726,12 @@ export default function MapPage() {
               type="button"
               onClick={toggleNotifications}
               data-tour="m-alerts"
-              className="relative flex size-11 items-center justify-center rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] text-[#5A6B7D] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
+              className="relative flex size-11 items-center justify-center border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC] active:scale-[0.98]"
               aria-label="Notifications"
             >
-              <Bell size={18} className={cn(unreadNotifications > 0 && 'text-[#4A90D9]')} />
+              <Bell size={18} className={cn(unreadNotifications > 0 && 'text-[#2F6FB0]')} />
               {unreadNotifications > 0 && (
-                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-[#C0392B] text-[#FFFDF8] text-[10px] font-black rounded-full flex items-center justify-center border border-black/20">
+                <span className="absolute top-1 right-1 flex h-4 min-w-[14px] items-center justify-center border-2 border-[#FFFDF8] bg-[#C0392B] px-0.5 text-[10px] font-black text-[#FFFDF8]">
                   {unreadNotifications > 9 ? '9+' : unreadNotifications}
                 </span>
               )}
@@ -2741,21 +2742,21 @@ export default function MapPage() {
                   initial={{ opacity: 0, x: 8, scale: 0.96 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 8, scale: 0.96 }}
-              className="absolute right-full mr-3 top-0 w-[min(18.5rem,calc(100vw-5rem))] rounded-2xl shadow-2xl overflow-hidden z-50"
-              style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
+              className="absolute right-full mr-3 top-0 w-[min(18.5rem,calc(100vw-5rem))] overflow-hidden z-50 shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
+              style={{ background: '#FFFDF8', border: '1.5px solid #0B1F33' }}
                 >
-                  <div className="flex items-center justify-between px-3.5 py-3" style={{ borderBottom: '1px solid #E7E0D2' }}>
-                    <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#5A6B7D]">Alerts</h3>
-                    <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
-                      <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-[#2E8B7A]" />
+                  <div className="flex items-center justify-between bg-[#06162F] px-3.5 py-2.5">
+                    <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#AFC5DF]">Alerts</h3>
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#7FDCC6]">
+                      <span className="h-1.5 w-1.5 animate-pulse bg-[#7FDCC6]" />
                       Live
                     </span>
                   </div>
                   <div className="max-h-56 overflow-y-auto">
                     {notifications.length === 0 ? (
                       <div className="px-4 py-6 text-center">
-                        <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full" style={{ background: '#F7F3EA' }}>
-                          <Bell size={15} className="text-[#9AA6B2]" />
+                        <span className="mx-auto flex h-10 w-10 items-center justify-center" style={{ background: '#E8F3FC' }}>
+                          <Bell size={15} className="text-[#5A6B7D]" />
                         </span>
                         <p className="mt-2 text-[11.5px] font-bold text-[#1C2B3A]">All caught up</p>
                         <p className="text-[10px] text-[#5A6B7D] mt-0.5">New reports will land here as they happen.</p>
@@ -2773,7 +2774,7 @@ export default function MapPage() {
               <button
                 type="button"
                 onClick={toggleUserMenu}
-                className="flex h-12 w-12 items-center justify-center overflow-hidden border border-stone-200 bg-white/95 shadow-lg"
+                className="flex size-11 items-center justify-center overflow-hidden border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg"
                 aria-label="Account menu"
               >
                 {user.photoURL ? (
@@ -2788,7 +2789,7 @@ export default function MapPage() {
                 onClick={() => openAuthPanel('signin')}
                 aria-label="Sign up or sign in"
                 title="Sign up or sign in"
-                className="flex size-11 items-center justify-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] text-[10px] font-black uppercase tracking-wide text-[#0B1F33] shadow-[0_3px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg active:scale-[0.98] md:w-auto md:px-3.5"
+                className="flex size-11 items-center justify-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg active:scale-[0.98] md:w-auto md:px-3.5"
               >
                 <LogIn size={16} />
                 <span className="hidden md:inline">Sign up / sign in</span>
@@ -2800,9 +2801,9 @@ export default function MapPage() {
                   initial={{ opacity: 0, x: 8 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 8 }}
-                  className="absolute right-full mr-3 top-0 w-52 rounded-2xl border border-white/10 bg-stone-900/98 backdrop-blur-xl shadow-2xl z-[60] light:bg-[rgb(255,250,243)] light:border-stone-200/80 pointer-events-auto"
+                  className="absolute right-full mr-3 top-0 w-52 border-[1.5px] border-[#0B1F33] bg-[#FFFDF8] backdrop-blur-xl shadow-[0_10px_28px_rgba(11,31,51,0.20)] z-[60] pointer-events-auto"
                 >
-                  <div className="p-3 border-b border-white/5">
+                  <div className="border-b-[1.5px] border-[#C9D8E4] bg-[#F7F3EA] p-3">
                     <p className="text-xs font-bold truncate" style={{ color: '#1C2B3A' }}>{user.displayName}</p>
                     <p className="text-[10px] truncate" style={{ color: '#5A6B7D' }}>{user.email}</p>
                   </div>
@@ -2810,7 +2811,7 @@ export default function MapPage() {
                     <button
                       type="button"
                       onClick={() => { navigate('/admin'); setShowUserMenu(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-blue-400 hover:bg-blue-500/10 text-left"
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#2F6FB0] hover:bg-[#E8F3FC] text-left"
                     >
                       <LayoutDashboard size={14} />
                       Admin
@@ -2819,7 +2820,7 @@ export default function MapPage() {
                   <button
                     type="button"
                     onClick={() => openAuthPanel('settings')}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-black/[0.04] text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] text-left"
                   >
                     <Settings size={14} />
                     Settings
@@ -2827,7 +2828,7 @@ export default function MapPage() {
                   <button
                     type="button"
                     onClick={replayTour}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-black/[0.04] text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] text-left"
                   >
                     <HelpCircle size={14} />
                     App tour
@@ -2835,7 +2836,7 @@ export default function MapPage() {
                   <button
                     type="button"
                     onClick={() => { logout(); setShowUserMenu(false); }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-red-400 hover:bg-red-500/10 text-left rounded-b-2xl"
+                    className="w-full flex items-center gap-2 border-t-[1.5px] border-[#C9D8E4] px-3 py-2.5 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] text-left"
                   >
                     <LogOut size={14} />
                     Sign out
@@ -2860,7 +2861,7 @@ export default function MapPage() {
                 'bottom-6 left-3 right-3 lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
               )}
             >
-              <div className="bg-[rgba(255,253,248,0.97)] backdrop-blur-md border border-[#E7E0D2] rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-[rgba(255,253,248,0.97)] backdrop-blur-md shadow-2xl overflow-hidden" style={{ border: '1.5px solid #0B1F33' }}>
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 pt-4 pb-2">
                   <div className="flex items-center gap-2">
@@ -2874,7 +2875,7 @@ export default function MapPage() {
                   </div>
                   <button
                     onClick={() => { setNearMeOpen(false); setNearMeScanning(false); }}
-                    className="w-7 h-7 flex items-center justify-center rounded-full bg-[#E8F3FC] hover:bg-[#C9D8E4] text-[#5A6B7D] transition-colors"
+                    className="w-7 h-7 flex items-center justify-center bg-[#E8F3FC] hover:bg-[#C9D8E4] text-[#5A6B7D] transition-colors"
                     aria-label="Close near me panel"
                   >
                     <X size={13} />
@@ -2919,7 +2920,7 @@ export default function MapPage() {
                       <button
                         type="button"
                         onClick={startNearMeScan}
-                        className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-transform active:scale-[0.99]"
+                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-transform active:scale-[0.99]"
                         style={{ background: '#1C2B3A', color: '#FFFDF8' }}
                       >
                         <span className="min-w-0">
@@ -2939,7 +2940,7 @@ export default function MapPage() {
                         <button
                           type="button"
                           onClick={() => { setNearMeOpen(false); setBriefingOpen(true); }}
-                          className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-colors"
+                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors"
                           style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.3)' }}
                         >
                           <span className="min-w-0">
@@ -3031,14 +3032,10 @@ export default function MapPage() {
                     {(() => {
                       const inc = nearMeIncidents[nearMeIndex];
                       if (!inc) return null;
-                      const catColors: Record<string, string> = {
-                        emergency: 'text-red-400 bg-red-500/10 border-red-500/20',
-                        crime: 'text-red-300 bg-red-500/8 border-red-500/15',
-                        traffic: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
-                        infrastructure: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-                        weather: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
-                      };
-                      const colClass = catColors[inc.category] ?? catColors.weather;
+                      // Straight from CATEGORY: the old map used remapped
+                      // Tailwind names, and painted emergency red onto traffic
+                      // and infrastructure cards that are not emergencies.
+                      const catInk = categoryColor(inc.category);
                       const age = Date.now() - inc.timestamp;
                       const ageStr = age < 60_000 ? 'Just now'
                         : age < 3_600_000 ? `${Math.round(age / 60_000)}m ago`
@@ -3048,7 +3045,8 @@ export default function MapPage() {
                       return (
                         <div className="px-4 pb-3">
                           <div
-                            className={cn('rounded-2xl border p-3.5 cursor-pointer', colClass)}
+                            className="p-3.5 cursor-pointer"
+                            style={{ background: `${catInk}14`, border: `1.5px solid ${catInk}59` }}
                             onClick={() => {
                               handleMarkerClick(inc);
                               setNearMeOpen(false);
@@ -3144,16 +3142,16 @@ export default function MapPage() {
 
         {/* Desktop map command bar */}
         <div className="pointer-events-none absolute left-5 right-5 top-5 z-30 hidden items-center justify-between lg:flex">
-          <div className="pointer-events-auto flex h-13 items-center gap-1 rounded-2xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] py-1 pl-2 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg">
-            <div className="flex items-center gap-2.5 border-r border-[#C9D8E4] pr-3">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-[#E8F3FC]">
+          <div className="pointer-events-auto flex h-13 items-center gap-1 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] py-1 pl-2 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
+            <div className="flex items-center gap-2.5 border-r-[1.5px] border-[#C9D8E4] pr-3">
+              <span className="flex size-8 items-center justify-center bg-[#F2EFE8]">
                 <img src="/icon.svg" alt="" width={19} height={19} className="size-[19px]" />
               </span>
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className={cn('relative inline-flex h-2 w-2 rounded-full', mapIncidents.length > 0 ? 'bg-emerald-500' : 'bg-stone-400')} />
+                <span className={cn('relative inline-flex h-2 w-2', mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />
               </span>
               <div className="leading-none">
-                <h1 className="text-[12px] font-black tracking-tight text-[#0B1F33]">
+                <h1 className="font-display text-[13px] font-black tracking-[-0.02em] text-[#0B1F33]">
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </h1>
                 <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
@@ -3164,7 +3162,7 @@ export default function MapPage() {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex size-9 items-center justify-center rounded-lg text-[#5A6B7D] transition-colors hover:bg-[#E8F3FC] hover:text-[#4A90D9] active:scale-[0.98]"
+              className="flex size-9 items-center justify-center text-[#40566B] transition-colors hover:bg-[#E8F3FC] hover:text-[#2F6FB0] active:scale-[0.98]"
               title="Back to landing page"
               aria-label="Back to landing page"
             >
@@ -3175,10 +3173,10 @@ export default function MapPage() {
               data-tour="locate"
               onClick={handleLocate}
               className={cn(
-                'flex size-9 items-center justify-center rounded-lg transition-colors active:scale-[0.98]',
+                'flex size-9 items-center justify-center transition-colors active:scale-[0.98]',
                 nearMeOpen
-                  ? 'bg-[#0B1F33] text-[#FFFDF8]'
-                  : 'text-[#5A6B7D] hover:bg-[#E8F3FC] hover:text-[#4A90D9]',
+                  ? 'bg-[#06162F] text-[#F2EFE8]'
+                  : 'text-[#40566B] hover:bg-[#E8F3FC] hover:text-[#2F6FB0]',
               )}
               title="Show my location"
               aria-label="Show my location"
@@ -3193,12 +3191,12 @@ export default function MapPage() {
                 variant="secondary"
                 size="icon"
                 data-tour="alerts"
-                className="size-12 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] text-[#5A6B7D] shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#4A90D9] hover:bg-[#E8F3FC]"
+                className="size-12 rounded-none border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] text-[#40566B] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC]"
                 onClick={toggleNotifications}
               >
-                <Bell size={19} className={cn(unreadNotifications > 0 ? 'text-[#4A90D9]' : 'text-[#5A6B7D]')} />
+                <Bell size={19} className={cn(unreadNotifications > 0 ? 'text-[#2F6FB0]' : 'text-[#40566B]')} />
                 {unreadNotifications > 0 && (
-                  <span className="absolute top-2 right-2 w-4 h-4 bg-[#C0392B] text-[#FFFDF8] text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-stone-950">
+                  <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center border-2 border-[#FFFDF8] bg-[#C0392B] text-[10px] font-black text-[#FFFDF8]">
                     {unreadNotifications}
                   </span>
                 )}
@@ -3210,21 +3208,21 @@ export default function MapPage() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-80 rounded-2xl shadow-2xl overflow-hidden z-50"
-                    style={{ background: '#FFFDF8', border: '1px solid #E7E0D2' }}
+                    className="absolute right-0 mt-2 w-80 overflow-hidden z-50 shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
+                    style={{ background: '#FFFDF8', border: '1.5px solid #0B1F33' }}
                   >
-                    <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #E7E0D2' }}>
-                      <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#5A6B7D]">Alerts</h3>
-                      <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
-                        <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-[#2E8B7A]" />
+                    <div className="flex items-center justify-between bg-[#06162F] px-4 py-2.5">
+                      <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#AFC5DF]">Alerts</h3>
+                      <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#7FDCC6]">
+                        <span className="h-1.5 w-1.5 animate-pulse bg-[#7FDCC6]" />
                         Live
                       </span>
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {notifications.length === 0 ? (
                         <div className="px-4 py-7 text-center">
-                          <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full" style={{ background: '#F7F3EA' }}>
-                            <Bell size={15} className="text-[#9AA6B2]" />
+                          <span className="mx-auto flex h-10 w-10 items-center justify-center" style={{ background: '#E8F3FC' }}>
+                            <Bell size={15} className="text-[#5A6B7D]" />
                           </span>
                           <p className="mt-2 text-[12px] font-bold text-[#1C2B3A]">All caught up</p>
                           <p className="text-[10.5px] text-[#5A6B7D] mt-0.5">New reports in your area will land here.</p>
@@ -3242,18 +3240,18 @@ export default function MapPage() {
               <div className="relative">
                 <button 
                   onClick={toggleUserMenu}
-                  className="flex size-12 items-center justify-center overflow-hidden rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] p-1 shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#4A90D9]"
+                  className="flex size-12 items-center justify-center overflow-hidden border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] p-1 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC]"
                 >
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
                       alt=""
-                      className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/20"
+                      className="w-8 h-8 md:w-10 md:h-10 border border-[#C9D8E4]"
                       referrerPolicy="no-referrer"
                       crossOrigin="anonymous"
                     />
                   ) : (
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/20 bg-[#4A90D9] flex items-center justify-center text-[#FFFDF8] text-xs font-black">
+                    <div className="w-8 h-8 md:w-10 md:h-10 border border-[#0B1F33] bg-[#2F6FB0] flex items-center justify-center text-[#FFFDF8] text-xs font-black">
                       {(user.displayName?.[0] ?? user.email?.[0] ?? 'U').toUpperCase()}
                     </div>
                   )}
@@ -3265,9 +3263,9 @@ export default function MapPage() {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-52 bg-[#FFFDF8] border border-[#E7E0D2] rounded-2xl shadow-2xl overflow-hidden"
+                      className="absolute right-0 mt-2 w-52 overflow-hidden border-[1.5px] border-[#0B1F33] bg-[#FFFDF8] shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
                     >
-                      <div className="p-4 border-b border-white/5">
+                      <div className="border-b-[1.5px] border-[#C9D8E4] bg-[#F7F3EA] p-4">
                         <p className="text-xs font-bold truncate" style={{ color: '#1C2B3A' }}>{user.displayName}</p>
                         <p className="text-[10px] text-[#5A6B7D] truncate mt-0.5">{user.email}</p>
                       </div>
@@ -3277,7 +3275,7 @@ export default function MapPage() {
                             navigate('/admin');
                             setShowUserMenu(false);
                           }}
-                          className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-blue-400 hover:bg-blue-500/10 transition-colors text-left"
+                          className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#2F6FB0] hover:bg-[#E8F3FC] transition-colors text-left"
                         >
                           <LayoutDashboard size={14} />
                           Admin Portal
@@ -3285,14 +3283,14 @@ export default function MapPage() {
                       )}
                       <button
                         onClick={() => openAuthPanel('settings')}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-black/[0.04] transition-colors text-left"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] transition-colors text-left"
                       >
                         <Settings size={14} />
                         Settings
                       </button>
                       <button
                         onClick={replayTour}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-black/[0.04] transition-colors text-left"
+                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] transition-colors text-left"
                       >
                         <HelpCircle size={14} />
                         App tour
@@ -3302,7 +3300,7 @@ export default function MapPage() {
                           logout();
                           setShowUserMenu(false);
                         }}
-                        className="w-full flex items-center gap-2 px-4 py-3 text-xs font-bold text-red-400 hover:bg-red-500/10 transition-colors text-left"
+                        className="w-full flex items-center gap-2 border-t-[1.5px] border-[#C9D8E4] px-4 py-3 text-xs font-bold text-[#1C2B3A] hover:bg-[#E8F3FC] transition-colors text-left"
                       >
                         <LogOut size={14} />
                         Sign Out
@@ -3314,11 +3312,11 @@ export default function MapPage() {
             ) : (
               <Button
                 variant="secondary"
-                className="flex h-12 items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.96)] px-4 text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.12)] backdrop-blur-lg transition-colors hover:border-[#4A90D9] hover:bg-[#E8F3FC]"
+                className="flex h-12 items-center gap-2 rounded-none border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-4 text-[#0B1F33] shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-colors hover:bg-[#E8F3FC]"
                 onClick={() => openAuthPanel('signin')}
                 aria-label="Sign up or sign in"
               >
-                <LogIn size={18} className="text-blue-400" />
+                <LogIn size={18} className="text-[#2F6FB0]" />
                 {/* The button turns white in light mode, so the label has to
                     turn dark with it. Without this it inherits white and the
                     primary sign-in call to action is invisible. */}
@@ -3341,7 +3339,7 @@ export default function MapPage() {
           <Button
             variant="primary"
             data-tour="sos"
-            className="group relative flex size-12 items-center justify-center gap-2 rounded-2xl bg-[#C0392B] text-[#FFFDF8] shadow-[0_4px_8px_rgba(127,29,29,0.28)] transition-[background-color,transform] hover:bg-[#A91F1F] active:scale-[0.97] md:size-14 lg:h-12 lg:w-auto lg:px-4"
+            className="group relative flex size-12 items-center justify-center gap-2 rounded-none border-[1.5px] border-[#8E241A] bg-[#C0392B] text-[#FFFDF8] shadow-[0_4px_8px_rgba(11,31,51,0.20)] transition-[background-color,transform] hover:bg-[#A91F1F] active:scale-[0.97] md:size-14 lg:h-12 lg:w-auto lg:px-4"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
@@ -3353,8 +3351,8 @@ export default function MapPage() {
             }}
           >
             <Siren size={22} className="relative z-10 shrink-0" />
-            <span className="hidden lg:inline text-sm font-black tracking-tight text-[#fff]">SOS</span>
-            <div className="absolute right-full mr-4 px-3 py-1.5 bg-red-950 text-red-200 text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-red-500/30 shadow-xl hidden md:block lg:hidden">
+            <span className="hidden lg:inline font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-[#fff]">SOS</span>
+            <div className="absolute right-full mr-4 px-3 py-1.5 bg-[#8E241A] text-[#FFFDF8] font-mono text-[10px] font-bold uppercase tracking-[0.14em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border-[1.5px] border-[#8E241A] shadow-[0_4px_8px_rgba(11,31,51,0.20)] hidden md:block lg:hidden">
               Emergency Report
             </div>
           </Button>
@@ -3385,8 +3383,8 @@ export default function MapPage() {
             }}
           >
             <Plus size={21} className="shrink-0 text-[#FFFDF8]" />
-            <span className="text-xs font-black tracking-tight text-[#FFFDF8] sm:text-sm">Report<span className="hidden lg:inline"> an incident</span></span>
-            <div className="absolute right-full mr-4 px-3 py-1.5 bg-[#0B1F33] text-[#FFFDF8] text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-white/10 shadow-xl hidden md:block lg:hidden">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#F2EFE8] sm:text-[12px]">Report<span className="hidden lg:inline"> an incident</span></span>
+            <div className="absolute right-full mr-4 px-3 py-1.5 bg-[#06162F] text-[#F2EFE8] font-mono text-[10px] font-bold uppercase tracking-[0.14em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border-[1.5px] border-[#06162F] shadow-[0_4px_8px_rgba(11,31,51,0.20)] hidden md:block lg:hidden">
               Report Incident
             </div>
           </Button>
@@ -3409,21 +3407,21 @@ export default function MapPage() {
 
         {/* Bottom Status & Disclaimer Bar - desktop / tablet only; mobile uses top chrome + layer bar */}
         <div className="pointer-events-none absolute bottom-6 left-6 right-6 z-20 hidden items-center justify-between lg:flex">
-          <div className="flex items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.94)] px-3 py-2 shadow-[0_3px_8px_rgba(11,31,51,0.1)] backdrop-blur-lg">
+          <div className="flex items-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
             <div className="relative flex items-center justify-center w-1.5 h-1.5 md:w-2 md:h-2">
               <div className={cn(
-                "relative w-1.5 h-1.5 md:w-2 md:h-2 rounded-full",
+                "relative w-1.5 h-1.5 md:w-2 md:h-2",
                 mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]'
               )} />
             </div>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
               {mapIncidents.length} Map Markers
             </span>
           </div>
 
-          <div className="flex items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.94)] px-3 py-2 shadow-[0_3px_8px_rgba(11,31,51,0.1)] backdrop-blur-lg">
-            <ShieldAlert size={12} className="text-[#C77F18]" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
+          <div className="flex items-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
+            <ShieldAlert size={12} className="text-[#8A5710]" />
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
               Verify before action.
             </span>
           </div>

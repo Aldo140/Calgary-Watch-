@@ -3,12 +3,13 @@ import { findNearestCamera, type TrafficCamera } from '@/src/hooks/useTrafficCam
 import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, Trash2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/src/lib/utils';
+import { cn, publicAsset } from '@/src/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import DemoBadge from '@/src/components/DemoBadge';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
+import { CATEGORY } from '@/src/lib/tokens';
 
 // ── Field-atlas palette (matches the landing brand; explicit hexes on purpose:
 //    several Tailwind color utilities are globally remapped in index.css) ─────
@@ -18,14 +19,34 @@ const P = {
   ink: '#1C2B3A',
   soft: '#5A6B7D',
   line: '#E7E0D2',
+  /**
+   * Masthead ground. The poster's night navy, brought onto a data surface as a
+   * header only — the layer rule keeps the rest of the panel legible and light.
+   */
+  ground: '#0B1F33',
+  /** Ink on the ground. A foreground, never a background. */
+  onGround: '#F2EFE8',
+  /** Eyebrow and metadata on the ground. */
+  onGroundSoft: '#AFC5DF',
+  /**
+   * The functional accent. Deliberately not the brand vermilion: on a map
+   * surface red means emergency, so the marketing accent gives up its red.
+   */
+  accent: '#4A90D9',
 };
 
-const CAT_META: Record<string, { color: string; soft: string; label: string }> = {
-  crime:          { color: '#C0392B', soft: 'rgba(220,38,38,0.1)',  label: 'Crime' },
-  traffic:        { color: '#C77F18', soft: 'rgba(234,88,12,0.1)',  label: 'Traffic' },
-  infrastructure: { color: '#4A90D9', soft: 'rgba(37,99,235,0.1)',  label: 'Infrastructure' },
-  weather:        { color: '#0284C7', soft: 'rgba(2,132,199,0.1)',  label: 'Weather' },
-  emergency:      { color: '#C0392B', soft: 'rgba(225,29,72,0.12)', label: 'Emergency' },
+/**
+ * Straight from CATEGORY, because this panel's spine has to be the same colour
+ * as the marker the reader just clicked. It was not: weather was #0284C7 cyan
+ * here and #6A63A8 violet on the map, and infrastructure was #4A90D9 here
+ * against #3E7D8C there — the same incident changed hue on the way in.
+ */
+const CAT_META: Record<string, { color: string; label: string }> = {
+  crime:          { color: CATEGORY.crime,          label: 'Crime' },
+  traffic:        { color: CATEGORY.traffic,        label: 'Traffic' },
+  infrastructure: { color: CATEGORY.infrastructure, label: 'Infrastructure' },
+  weather:        { color: CATEGORY.weather,        label: 'Weather' },
+  emergency:      { color: CATEGORY.emergency,      label: 'Emergency' },
 };
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -46,6 +67,7 @@ function buildIncidentUrl(incidentId: string): string {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.26em] flex items-center gap-2" style={{ color: P.soft }}>
+      <span className="h-[2px] w-3 shrink-0" style={{ background: P.accent }} aria-hidden="true" />
       {children}
     </h3>
   );
@@ -245,16 +267,6 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
     ? { initial: { y: '100%', opacity: 0 }, animate: { y: 0, opacity: 1 }, exit: { y: '100%', opacity: 0 } }
     : { initial: { x: '100%', opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: '100%', opacity: 0 } };
 
-  const chip = (color: string, softBg: string, label: string, icon?: React.ReactNode) => (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
-      style={{ background: softBg, color }}
-    >
-      {icon}
-      {label}
-    </span>
-  );
-
   return (
     <AnimatePresence>
       {incident && (
@@ -274,53 +286,93 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
         >
           <div
             className={cn(
-              'flex flex-col overflow-hidden relative min-h-0 shadow-[0_24px_64px_-24px_rgba(28,43,58,0.55)]',
-              isMobileSheet
-                ? 'max-h-[86dvh] w-full rounded-t-[1.6rem]'
-                : 'h-full rounded-[1.75rem] border'
+              'flex flex-col overflow-hidden relative min-h-0 rounded-none shadow-[0_24px_64px_-24px_rgba(28,43,58,0.55)]',
+              isMobileSheet ? 'max-h-[86dvh] w-full' : 'h-full border'
             )}
             style={{ background: P.paper, borderColor: P.line }}
           >
-            {/* category spine */}
-            <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: cat.color }} aria-hidden="true" />
+            {/*
+              ── Masthead ───────────────────────────────────────────────────
+              The panel header takes the poster's ground rather than the
+              page's. Severity is carried by the band across the top, where it
+              has real contrast against the navy; the chips below stay paper
+              and ink so nothing under 12px is asked to hold a tinted colour.
+            */}
+            <div className="shrink-0 relative overflow-hidden" style={{ background: P.ground }}>
+              {/* Category band — the one place severity is stated at full strength. */}
+              <div className="absolute top-0 inset-x-0 h-1.5 z-20" style={{ background: cat.color }} aria-hidden="true" />
 
-            {/* ── Header ──────────────────────────────────────────────────── */}
-            <div className="shrink-0 relative" style={{ borderBottom: `1px solid ${P.line}` }}>
+              {/* Calgary, printed faintly into the ground. */}
+              <img
+                src={publicAsset('images/illustration/calgary-skyline-rule-light.webp')}
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-20 w-full select-none object-cover object-bottom opacity-[0.16]"
+              />
+
               {isMobileSheet && (
-                <div className="flex justify-center pt-3" aria-hidden="true">
-                  <div className="h-1 w-10 rounded-full" style={{ background: P.line }} />
+                <div className="relative flex justify-center pt-3.5" aria-hidden="true">
+                  <div className="h-1 w-10" style={{ background: 'rgba(242,239,232,0.34)' }} />
                 </div>
               )}
-              <div className={cn('px-5 pb-4', isMobileSheet ? 'pt-2.5' : 'pt-6 px-6')}>
+              <div className={cn('relative z-10 px-5 pb-5', isMobileSheet ? 'pt-3' : 'px-6 pt-7')}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    {chip(cat.color, cat.soft, cat.label, <Icon size={11} />)}
-                    {chip(status.color, `${status.color}1a`, status.label, StatusIcon ? <StatusIcon size={11} /> : undefined)}
+                    <span
+                      className="inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
+                      style={{ background: P.onGround, color: P.ground }}
+                    >
+                      <Icon size={11} />
+                      {cat.label}
+                    </span>
+                    <span
+                      className="inline-flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
+                      style={{ border: '1px solid rgba(242,239,232,0.38)', color: '#D5DFEB' }}
+                    >
+                      {StatusIcon ? <StatusIcon size={11} /> : undefined}
+                      {status.label}
+                    </span>
                   </div>
                   <button
                     onClick={onClose}
-                    className="shrink-0 -mt-1 -mr-1 flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-black/5"
-                    style={{ color: P.soft }}
+                    className="shrink-0 -mt-1 -mr-1 flex h-9 w-9 items-center justify-center transition-colors hover:bg-[rgba(242,239,232,0.14)]"
+                    style={{ color: P.onGroundSoft }}
                     aria-label="Close incident details"
                   >
                     <X size={17} />
                   </button>
                 </div>
 
+                {/*
+                  The rail's coordinate stamp, carrying this incident's own
+                  fix. It is the device that makes a masthead read as a
+                  masthead rather than a card header — and here it is not
+                  decoration, since it is the only place the exact location is
+                  stated in words.
+                */}
+                <div className="mt-4 flex items-baseline justify-between gap-3 border-t pt-2.5" style={{ borderColor: 'rgba(242,239,232,0.20)' }}>
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: P.onGroundSoft }}>
+                    Incident report · YYC
+                  </p>
+                  <p className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.14em] tabular-nums" style={{ color: 'rgba(175,197,223,0.72)' }}>
+                    {Math.abs(incident.lat).toFixed(2)}°{incident.lat >= 0 ? 'N' : 'S'} · {Math.abs(incident.lng).toFixed(2)}°{incident.lng >= 0 ? 'E' : 'W'}
+                  </p>
+                </div>
+
                 <h2
-                  className={cn('font-display font-extrabold tracking-[-0.02em] leading-[1.08] mt-2.5', isMobileSheet ? 'text-[22px]' : 'text-[26px]')}
-                  style={{ color: P.ink }}
+                  className={cn('font-display font-black tracking-[-0.03em] leading-[0.98] mt-1.5', isMobileSheet ? 'text-[25px]' : 'text-[29px]')}
+                  style={{ color: P.onGround }}
                 >
                   {incident.title}
                 </h2>
 
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold" style={{ color: P.soft }}>
+                <div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: P.onGroundSoft }}>
                   <span className="inline-flex items-center gap-1.5">
-                    <MapPin size={12} style={{ color: cat.color }} />
+                    <MapPin size={11} />
                     {incident.neighborhood || 'Calgary'}
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <Clock size={12} />
+                    <Clock size={11} />
                     {timeAgo} ago
                   </span>
                 </div>
@@ -332,8 +384,8 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
               {/* Description — first, it's what people opened this for */}
               <div className="space-y-2.5">
                 <SectionLabel>What was reported</SectionLabel>
-                <div className="relative rounded-2xl p-4 pl-5" style={{ background: P.card, border: `1px solid ${P.line}` }}>
-                  <span className="absolute left-0 top-3 bottom-3 w-1 rounded-full" style={{ background: cat.color }} aria-hidden="true" />
+                <div className="relative rounded-none p-4 pl-5" style={{ background: P.card, borderTop: `1px solid ${P.line}`, borderRight: `1px solid ${P.line}`, borderBottom: `1px solid ${P.line}` }}>
+                  <span className="absolute left-0 inset-y-0 w-[3px] rounded-none" style={{ background: cat.color }} aria-hidden="true" />
                   <p className="text-[14.5px] leading-relaxed font-medium" style={{ color: P.ink }}>
                     {incident.description}
                   </p>
@@ -353,12 +405,12 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
               {nearbyCamera && (
                 <div className="space-y-2.5">
                   <SectionLabel>Live view nearby</SectionLabel>
-                  <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
+                  <div className="rounded-none overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
                     <img
                       src={`${nearbyCamera.camera.imageUrl}?t=${cameraStamp}`}
                       alt={`Live City of Calgary traffic camera at ${nearbyCamera.camera.location}`}
                       loading="lazy"
-                      className="w-full object-cover max-h-56 bg-stone-100"
+                      className="w-full object-cover max-h-56" style={{ background: P.card }}
                     />
                     <div className="px-3 py-2.5 space-y-1" style={{ background: P.paper }}>
                       <p className="text-[12.5px] font-black leading-tight" style={{ color: P.ink }}>
@@ -383,7 +435,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     src={incident.image_url}
                     alt="Incident photo"
                     loading="lazy"
-                    className="w-full rounded-2xl object-cover max-h-64"
+                    className="w-full rounded-none object-cover max-h-64"
                     style={{ border: `1px solid ${P.line}` }}
                   />
                 </div>
@@ -394,11 +446,11 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   a report, so it must be unmissable here. */}
               {incident.data_source === 'demo' && (
                 <div
-                  className="rounded-2xl p-3.5 space-y-2"
+                  className="rounded-none p-3.5 space-y-2"
                   style={{
-                    backgroundImage: 'repeating-linear-gradient(135deg, rgba(180,83,9,0.10) 0 4px, transparent 4px 9px)',
-                    backgroundColor: 'rgba(245,158,11,0.10)',
-                    border: '1px solid rgba(180,83,9,0.42)',
+                    backgroundImage: 'repeating-linear-gradient(135deg, rgba(138,87,16,0.12) 0 4px, transparent 4px 9px)',
+                    backgroundColor: 'rgba(199,127,24,0.12)',
+                    border: '1px solid rgba(199,127,24,0.48)',
                   }}
                 >
                   <DemoBadge size="md" />
@@ -413,9 +465,9 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
               {/* Source + reporter, one compact ledger */}
               <div className="space-y-2.5">
                 <SectionLabel><ShieldCheck size={12} /> Source</SectionLabel>
-                <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
+                <div className="rounded-none overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
                   <div className="flex items-center gap-3 p-3.5" style={{ background: P.card }}>
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden" style={{ background: P.paper, border: `1px solid ${P.line}` }}>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none overflow-hidden" style={{ background: P.paper, border: `1px solid ${P.line}` }}>
                       {safeSourceLogoUrl ? (
                         <img src={safeSourceLogoUrl} alt={incident.source_name} className="h-full w-full object-contain" referrerPolicy="no-referrer" />
                       ) : (
@@ -439,7 +491,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                         href={safeSourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-black/5"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none transition-colors hover:bg-black/5"
                         style={{ color: cat.color }}
                         aria-label="Open source website"
                       >
@@ -448,7 +500,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     )}
                   </div>
                   <div className="flex items-center gap-3 p-3.5" style={{ borderTop: `1px dashed ${P.line}` }}>
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: P.card, border: `1px solid ${P.line}` }}>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none" style={{ background: P.card, border: `1px solid ${P.line}` }}>
                       {isAnonymous ? (
                         <User size={16} style={{ color: P.soft }} />
                       ) : (
@@ -474,7 +526,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                 <div className="flex gap-2">
                   <button
                     onClick={handleShareToX}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl h-11 text-[12px] font-bold transition-transform active:scale-95"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-none h-11 text-[12px] font-bold transition-transform active:scale-95"
                     style={{ background: P.ink, color: P.paper }}
                   >
                     <Twitter size={14} />
@@ -482,9 +534,9 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   </button>
                   <button
                     onClick={() => void handleCopyLink()}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl h-11 text-[12px] font-bold transition-all active:scale-95"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-none h-11 text-[12px] font-bold transition-all active:scale-95"
                     style={copied
-                      ? { background: 'rgba(5,150,105,0.12)', color: '#2E8B7A', border: '1px solid rgba(5,150,105,0.35)' }
+                      ? { background: 'rgba(46,139,122,0.14)', color: '#1F6355', border: '1px solid rgba(46,139,122,0.42)' }
                       : { background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                   >
                     <Link size={14} />
@@ -493,7 +545,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   <button
                     onClick={() => void handleNativeShare()}
                     title="More share options"
-                    className="w-11 h-11 flex items-center justify-center rounded-xl transition-transform active:scale-95 shrink-0"
+                    className="w-11 h-11 flex items-center justify-center rounded-none transition-transform active:scale-95 shrink-0"
                     style={{ background: P.card, color: P.soft, border: `1px solid ${P.line}` }}
                     aria-label="More share options"
                   >
@@ -508,7 +560,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     <button
                       key={label}
                       onClick={onClick}
-                      className="flex items-center justify-center gap-1.5 rounded-xl h-10 text-[11px] font-bold transition-transform active:scale-95"
+                      className="flex items-center justify-center gap-1.5 rounded-none h-10 text-[11px] font-bold transition-transform active:scale-95"
                       style={{ background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                     >
                       <ShareIcon size={13} />
@@ -517,7 +569,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   ))}
                   <a
                     href={emailUrl}
-                    className="flex items-center justify-center gap-1.5 rounded-xl h-10 text-[11px] font-bold transition-transform active:scale-95"
+                    className="flex items-center justify-center gap-1.5 rounded-none h-10 text-[11px] font-bold transition-transform active:scale-95"
                     style={{ background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                   >
                     <Mail size={13} />
@@ -531,20 +583,20 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                 <div className="space-y-2">
                   {canDelete && (
                     deleteConfirm ? (
-                      <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(220,38,38,0.35)', background: 'rgba(220,38,38,0.07)' }}>
+                      <div className="rounded-none overflow-hidden" style={{ border: '1px solid rgba(192,57,43,0.38)', background: 'rgba(192,57,43,0.08)' }}>
                         <div className="flex gap-2 items-center p-3">
                           <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#A6332A' }}>Delete your report permanently?</p>
                           <button
                             onClick={() => void handleDelete()}
                             disabled={deleting}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-black transition-all disabled:opacity-50"
+                            className="px-3 py-1.5 rounded-none text-[11px] font-black transition-all disabled:opacity-50"
                             style={{ background: '#C0392B', color: '#fff' }}
                           >
                             {deleting ? 'Deleting…' : 'Delete'}
                           </button>
                           <button
                             onClick={() => setDeleteConfirm(false)}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-black"
+                            className="px-3 py-1.5 rounded-none text-[11px] font-black"
                             style={{ background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                           >
                             Cancel
@@ -555,7 +607,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     ) : (
                       <button
                         onClick={() => setDeleteConfirm(true)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl h-10 text-[11.5px] font-bold transition-colors hover:bg-red-50"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-none h-10 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-colors hover:bg-[rgba(192,57,43,0.08)]"
                         style={{ color: '#A6332A', border: `1px solid ${P.line}` }}
                       >
                         <Trash2 size={13} />
@@ -565,7 +617,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   )}
                   {canFlag && (
                     flagConfirm ? (
-                      <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(180,83,9,0.35)', background: 'rgba(180,83,9,0.07)' }}>
+                      <div className="rounded-none overflow-hidden" style={{ border: '1px solid rgba(199,127,24,0.42)', background: 'rgba(199,127,24,0.09)' }}>
                         <div className="flex gap-2 items-center p-3">
                           <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#8A5710' }}>
                             {existingFlaggers.length + 1 >= FLAG_THRESHOLD
@@ -575,14 +627,14 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                           <button
                             onClick={() => void handleFlag()}
                             disabled={flagging}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-black transition-all disabled:opacity-50"
+                            className="px-3 py-1.5 rounded-none text-[11px] font-black transition-all disabled:opacity-50"
                             style={{ background: '#8A5710', color: '#fff' }}
                           >
                             {flagging ? 'Reporting…' : 'Confirm'}
                           </button>
                           <button
                             onClick={() => setFlagConfirm(false)}
-                            className="px-3 py-1.5 rounded-lg text-[11px] font-black"
+                            className="px-3 py-1.5 rounded-none text-[11px] font-black"
                             style={{ background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                           >
                             Cancel
@@ -593,7 +645,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                     ) : (
                       <button
                         onClick={() => setFlagConfirm(true)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl h-10 text-[11.5px] font-bold transition-colors hover:bg-amber-50"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-none h-10 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-colors hover:bg-[rgba(199,127,24,0.10)]"
                         style={{ color: '#8A5710', border: `1px solid ${P.line}` }}
                       >
                         <Flag size={13} />
@@ -610,7 +662,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   ID · {incident.id}
                 </p>
                 <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] shrink-0" style={{ color: '#2E8B7A' }}>
-                  <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: '#2E8B7A' }} />
+                  <span className="h-1.5 w-1.5 rounded-none animate-pulse" style={{ background: '#2E8B7A' }} />
                   Live
                 </span>
               </div>
@@ -618,7 +670,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
 
             {/* ── Sticky action bar — thumb zone on mobile, always visible ── */}
             <div
-              className={cn('shrink-0 flex items-center gap-2', isMobileSheet ? 'px-4 pt-3 pb-[max(0.9rem,env(safe-area-inset-bottom))]' : 'px-5 py-4')}
+              className={cn('shrink-0 flex items-center gap-2.5', isMobileSheet ? 'px-4 pt-4 pb-[max(1.1rem,env(safe-area-inset-bottom))]' : 'px-5 py-5')}
               style={{ borderTop: `1px solid ${P.line}`, background: P.paper }}
             >
               {canNavigate && directionsUrl && (
@@ -626,7 +678,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   href={directionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform active:scale-95"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none transition-transform active:scale-95"
                   style={{ background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
                   title="Open in Google Maps"
                   aria-label="Open in Google Maps"
@@ -636,16 +688,22 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
               )}
               <button
                 onClick={() => onReportIncident(incident)}
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[12.5px] font-black transition-transform active:scale-[0.97]"
-                style={{ background: 'rgba(220,38,38,0.09)', color: '#A6332A', border: '1px solid rgba(220,38,38,0.3)' }}
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-none text-[12.5px] font-black transition-transform active:scale-[0.97]"
+                style={{ background: 'rgba(192,57,43,0.10)', color: '#A6332A', border: '1px solid rgba(192,57,43,0.38)' }}
               >
                 <Siren size={15} />
                 Report related
               </button>
+              {/*
+                The one hard-offset press in this view. The offset shadow *is*
+                the depth, so pressing collapses the button into the page. One
+                is a signature; twelve would be noise, which is why nothing
+                else on this panel carries a shadow.
+              */}
               <button
                 onClick={() => onViewNeighborhood(incident.neighborhood)}
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-[12.5px] font-black transition-transform active:scale-[0.97]"
-                style={{ background: P.ink, color: P.paper }}
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-none text-[12.5px] font-black uppercase tracking-[0.06em] shadow-[4px_4px_0_#4A90D9] transition-transform hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none"
+                style={{ background: P.ground, color: P.onGround }}
               >
                 <Layers size={15} />
                 Area intel

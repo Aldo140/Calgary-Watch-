@@ -8,7 +8,7 @@ import {
   AreaChart, Area, PieChart, Pie, Cell, Sector,
   ComposedChart, Line,
 } from 'recharts';
-import { cn } from '@/src/lib/utils';
+import { cn, publicAsset } from '@/src/lib/utils';
 import { Drawer } from 'vaul';
 import { CrimeStatEntry, CrimeYearEntry } from '@/src/hooks/useCrimeStats';
 import { PropertyYearEntry } from '@/src/hooks/usePropertyAssessments';
@@ -45,7 +45,7 @@ interface AreaIntelligencePanelProps {
 function makeTooltipStyle(isLight: boolean) {
   return {
     backgroundColor: isLight ? '#ffffff' : '#0B1F33',
-    borderRadius: '14px',
+    borderRadius: '0px',
     border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)',
     boxShadow: isLight ? '0 8px 32px -4px rgba(0,0,0,0.18)' : '0 18px 25px -5px rgba(0,0,0,0.45)',
   };
@@ -80,14 +80,25 @@ function Section({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-      <div className="mb-4 flex items-baseline gap-3">
-        <span className="h-px w-6 shrink-0 translate-y-[-4px]" style={{ background: '#2E8B7A' }} aria-hidden="true" />
-        <div>
-          <h3 className={cn('font-display text-xl font-bold leading-tight tracking-[-0.01em]', isLight ? 'text-[#1C2B3A]' : 'text-white')}>{title}</h3>
-          {subtitle && (
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] font-bold mt-1 text-stone-500">{subtitle}</p>
-          )}
+      {/*
+        Section heads take the poster's display register: a mono eyebrow in
+        wide uppercase tracking over a black display headline. The body below
+        stays sentence case — leading-[0.76] caps is magnificent at 9vw and
+        unreadable across forty rows of data.
+      */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2.5">
+          <span className="h-[3px] w-5 shrink-0" style={{ background: '#4A90D9' }} aria-hidden="true" />
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+            {subtitle ?? 'Area intelligence'}
+          </p>
         </div>
+        <h3
+          className="mt-2 font-display text-[clamp(24px,5.4vw,30px)] font-black uppercase leading-[0.9] tracking-[-0.035em]"
+          style={{ color: isLight ? '#0B1F33' : '#F2EFE8' }}
+        >
+          {title}
+        </h3>
       </div>
       {children}
     </motion.div>
@@ -97,7 +108,7 @@ function Section({
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
 function HeroSection({
-  data, onClose, glowColor, gaugeColor, isLight,
+  data, onClose, glowColor,
 }: {
   data: AreaIntelligence;
   onClose: () => void;
@@ -112,45 +123,69 @@ function HeroSection({
   const rankPct = rank > 0 && total > 0
     ? Math.round(((total - rank + 1) / total) * 100)
     : 0;
-  const rankColor = rankPct <= 30 ? '#3FA391' : rankPct <= 60 ? '#C77F18' : '#C0392B';
-  const r = 26;
-  const circ = 2 * Math.PI * r;
   const [gaugeRef, gaugeInView] = useInView(0);
   const animatedScore = useCountUp(score, 900, gaugeInView);
-  const dash = gaugeInView ? (score / 100) * circ : 0;
+
+  /*
+   * The severity ramp, lifted for the dark masthead.
+   *
+   * #C0392B is a 2.5:1 read against #0B1F33 — fine as a 10px bar on a light
+   * card, unusable as the largest figure on the page. These are the same three
+   * severity steps taken up in luminance until each clears the ground, and
+   * none of them is the brand vermilion: on a map surface red means emergency,
+   * so the marketing accent never appears here at all.
+   */
+  const ON_GROUND = { good: '#5FD3BC', mid: '#E8B871', bad: '#EE8C7B' } as const;
+  const figureColor = score >= 70 ? ON_GROUND.good : score >= 40 ? ON_GROUND.mid : ON_GROUND.bad;
+  const rankTone = rankPct <= 30 ? ON_GROUND.good : rankPct <= 60 ? ON_GROUND.mid : ON_GROUND.bad;
+  const band = score >= 70 ? 'Low risk' : score >= 40 ? 'Medium risk' : 'High risk';
+
+  const statTone = (v: string) => {
+    if (v === 'improving' || v === 'Low') return ON_GROUND.good;
+    if (v === 'declining' || v === 'High') return ON_GROUND.bad;
+    if (v === 'Medium') return ON_GROUND.mid;
+    return '#F2EFE8';
+  };
 
   return (
     <div
-      className="relative px-5 pt-5 pb-6 md:px-8 overflow-hidden"
-      style={{
-        background: isLight
-          ? 'linear-gradient(135deg, #E8F3FC 0%, #F7F3EA 100%)'
-          : 'linear-gradient(135deg, #0f1e3d 0%, #0a1628 100%)',
-      }}
+      /*
+       * ── Masthead ──────────────────────────────────────────────────────────
+       * The header of a panel inside the app: poster devices on the poster's
+       * own ground, with the single most important figure — the safety score —
+       * given the size it deserves. Everything below the navigator stays on
+       * the light data layer, because that is where people read numbers.
+       */
+      className="relative px-5 pt-6 pb-7 md:px-8 overflow-hidden"
+      style={{ background: 'linear-gradient(150deg, #06162F 0%, #0B1F33 58%, #14324F 100%)' }}
     >
+      {/* Calgary at the Bow, printed into the ground. */}
+      <img
+        src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
+        alt=""
+        aria-hidden="true"
+        /* Anchored bottom-right so it never sits under the close button. */
+        className="pointer-events-none absolute -right-12 -bottom-14 w-[220px] select-none opacity-[0.10] md:right-6 md:-bottom-16 md:w-[290px]"
+        style={{ filter: 'invert(1)' }}
+      />
+
       {/* Score-keyed glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at 20% 50%, ${glowColor.replace('0.12)', isLight ? '0.22)' : '0.12)')}, transparent 60%)`,
-        }}
+        style={{ background: `radial-gradient(ellipse at 18% 55%, ${glowColor.replace('0.12)', '0.20)')}, transparent 62%)` }}
       />
 
       {/* Eyebrow + close */}
-      <div className="flex items-center justify-between mb-3 relative z-10">
+      <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-2">
-          <MapPin size={11} style={{ color: '#2E8B7A' }} />
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#2E8B7A' }}>Area Intel · YYC</span>
+          <MapPin size={11} style={{ color: '#AFC5DF' }} />
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#AFC5DF' }}>Area Intel · YYC</span>
         </div>
         <button
           onClick={onClose}
           aria-label="Close"
-          className={cn(
-            'p-2.5 rounded-xl border transition-all group',
-            isLight
-              ? 'text-stone-600 hover:text-stone-900 bg-black/5 hover:bg-black/10 border-black/10'
-              : 'text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 border-white/10',
-          )}
+          className="p-2.5 rounded-none border transition-colors group hover:bg-[rgba(242,239,232,0.14)]"
+          style={{ color: '#AFC5DF', borderColor: 'rgba(242,239,232,0.28)' }}
         >
           <X size={17} className="group-hover:rotate-90 transition-transform duration-300" />
         </button>
@@ -158,74 +193,74 @@ function HeroSection({
 
       {/* Community name */}
       <h2
-        className={cn(
-          'font-display text-[clamp(26px,6vw,40px)] font-extrabold tracking-[-0.02em] leading-none mb-4 relative z-10 truncate',
-          isLight ? 'text-[#1C2B3A]' : 'text-white',
-        )}
+        className="font-display text-[clamp(30px,7vw,46px)] font-black uppercase tracking-[-0.04em] leading-[0.86] mb-5 relative z-10 truncate"
+        style={{ color: '#F2EFE8' }}
         title={data.communityName}
       >
         {data.communityName}
       </h2>
 
-      {/* Gauge + quick stats row */}
-      <div ref={gaugeRef} className="flex items-center gap-4 relative z-10">
-        {/* Animated SVG gauge */}
-        <div className="relative shrink-0 w-[64px] h-[64px] md:w-[72px] md:h-[72px]">
-          <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
-            <circle cx="32" cy="32" r={r} fill="none" stroke={isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.07)'} strokeWidth="7" />
-            <circle
-              cx="32" cy="32" r={r} fill="none"
-              stroke={gaugeColor}
-              strokeWidth="7"
-              strokeLinecap="round"
-              strokeDasharray={`${dash} ${circ}`}
-              transform="rotate(-90 32 32)"
-              style={{ transition: gaugeInView ? 'stroke-dasharray 0.9s cubic-bezier(0.33,1,0.68,1)' : 'none' }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={cn('text-[15px] font-black leading-none', isLight ? 'text-stone-900' : 'text-white')}>{animatedScore}</span>
-            <span className="text-[10px] text-stone-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
+      {/* The figure that leads the page. */}
+      <div ref={gaugeRef} className="relative z-10">
+        <div className="flex items-end gap-4">
+          <span
+            className="font-display font-black leading-[0.74] tabular-nums"
+            style={{ color: figureColor, fontSize: 'clamp(3.6rem, 15vw, 5.25rem)' }}
+          >
+            {animatedScore}
+          </span>
+          <div className="min-w-0 pb-2">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#AFC5DF' }}>
+              Safety score
+            </p>
+            <p className="mt-1 font-display text-[15px] font-black uppercase tracking-[-0.01em]" style={{ color: '#F2EFE8' }}>
+              Out of 100 · {band}
+            </p>
           </div>
         </div>
-
-        {/* 3-col quick stat chips */}
-        <div className="grid grid-cols-3 gap-2 flex-1">
-          {[
-            { label: 'Incidents', value: String(data.activeIncidents ?? 0), color: 'text-orange-500' },
-            {
-              label: 'Trend',
-              value: data.trend ?? '–',
-              color: data.trend === 'improving' ? 'text-emerald-600' : data.trend === 'declining' ? 'text-red-500' : (isLight ? 'text-stone-600' : 'text-stone-300'),
-            },
-            {
-              label: 'Risk',
-              value: score >= 70 ? 'Low' : score >= 40 ? 'Medium' : 'High',
-              color: score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-amber-600' : 'text-red-500',
-            },
-          ].map(({ label, value, color }) => (
-            <div key={label} className={cn(
-              'rounded-xl p-2 text-center border',
-              isLight ? 'bg-white/60 border-black/10' : 'bg-white/[0.04] border-white/[0.07]',
-            )}>
-              <p className="text-[10px] font-black uppercase tracking-wide text-stone-500 leading-none mb-1">{label}</p>
-              <p className={cn('text-[11px] font-black truncate leading-none capitalize', color)}>{value}</p>
-            </div>
-          ))}
+        {/* The gauge, unrolled: a meter reads at a glance where a 64px ring did not. */}
+        <div className="mt-3.5 h-[9px] overflow-hidden md:max-w-[34rem]" style={{ background: 'rgba(242,239,232,0.16)' }}>
+          <motion.div
+            className="h-full"
+            style={{ backgroundColor: figureColor }}
+            initial={{ width: '0%' }}
+            animate={{ width: gaugeInView ? `${score}%` : '0%' }}
+            transition={{ duration: 0.9, ease: [0.33, 1, 0.68, 1] }}
+          />
         </div>
+      </div>
+
+      {/* 3-col quick stat cards */}
+      <div className="mt-4 grid grid-cols-3 gap-2 relative z-10 md:max-w-[34rem]">
+        {[
+          { label: 'Incidents', value: String(data.activeIncidents ?? 0) },
+          { label: 'Trend', value: data.trend ?? '–' },
+          { label: 'Risk', value: score >= 70 ? 'Low' : score >= 40 ? 'Medium' : 'High' },
+        ].map(({ label, value }) => (
+          <div
+            key={label}
+            className="rounded-none px-2.5 py-2.5 border"
+            style={{ background: 'rgba(242,239,232,0.06)', borderColor: 'rgba(242,239,232,0.20)' }}
+          >
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] leading-none mb-1.5" style={{ color: '#AFC5DF' }}>{label}</p>
+            <p className="font-display text-[14px] font-black truncate leading-none capitalize" style={{ color: statTone(value) }}>{value}</p>
+          </div>
+        ))}
       </div>
 
       {/* City rank bar */}
       {rank > 0 && total > 0 && (
-        <div className="mt-4 relative z-10">
-          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-500 mb-1">City Rank</p>
-          <p className={cn('text-[11px] font-medium mb-1.5', isLight ? 'text-stone-700' : 'text-white')}>
-            #{rank} out of {total} neighbourhoods
-          </p>
-          <div className={cn('h-[4px] rounded-full overflow-hidden', isLight ? 'bg-black/10' : 'bg-white/10')}>
+        <div className="mt-4 relative z-10 md:max-w-[34rem]">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#AFC5DF' }}>City rank</p>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] tabular-nums" style={{ color: '#F2EFE8' }}>
+              #{rank} of {total} neighbourhoods
+            </p>
+          </div>
+          <div className="mt-2 h-[4px] rounded-none overflow-hidden" style={{ background: 'rgba(242,239,232,0.16)' }}>
             <motion.div
-              className="h-full rounded-full"
-              style={{ backgroundColor: rankColor }}
+              className="h-full rounded-none"
+              style={{ backgroundColor: rankTone }}
               initial={{ width: '0%' }}
               animate={{ width: `${rankPct}%` }}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
@@ -236,12 +271,12 @@ function HeroSection({
 
       {/* Live overlay insight */}
       {data.liveOverlayInsight && (
-        <div className={cn(
-          'mt-4 flex items-start gap-2.5 rounded-2xl px-3 py-2.5 relative z-10 border',
-          isLight ? 'bg-[#E8F3FC] border-[#C9D8E4]' : 'bg-[#4A90D9]/10 border-[#4A90D9]/20',
-        )}>
-          <Activity size={13} className="text-[#4A90D9] shrink-0 mt-0.5" />
-          <p className={cn('text-[12px] font-medium leading-relaxed', isLight ? 'text-[#174A6E]' : 'text-[#E8F3FC]')}>
+        <div
+          className="mt-4 flex items-start gap-2.5 rounded-none px-3.5 py-3 relative z-10 md:max-w-[46rem]"
+          style={{ background: 'rgba(74,144,217,0.16)', borderLeft: '3px solid #4A90D9' }}
+        >
+          <Activity size={13} style={{ color: '#8DBBDB' }} className="shrink-0 mt-0.5" />
+          <p className="text-[12px] font-medium leading-relaxed" style={{ color: '#DCE7F4' }}>
             {data.liveOverlayInsight}
           </p>
         </div>
@@ -355,20 +390,19 @@ function Content({
               isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-stone-950/90 border-white/10'
             )}
           >
-            <span className="font-display text-sm font-bold truncate">{data.communityName}</span>
+            <span className="font-display text-[15px] font-black uppercase tracking-[-0.02em] truncate" style={{ color: '#0B1F33' }}>{data.communityName}</span>
             <div className="flex items-center gap-2">
-              <span className={cn(
-                'text-xs font-black px-2.5 py-1 rounded-full border',
-                score >= 70 ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25'
-                  : score >= 40 ? 'bg-amber-500/10 text-amber-600 border-amber-500/25'
-                  : 'bg-red-500/10 text-red-500 border-red-500/25'
-              )}>
+              <span
+                className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] tabular-nums px-2.5 py-1.5 rounded-none"
+                style={{ background: '#0B1F33', color: '#F2EFE8' }}
+              >
                 {score} / 100
               </span>
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-stone-500 hover:bg-black/5"
+                className="flex h-7 w-7 items-center justify-center rounded-none hover:bg-black/5"
+                style={{ color: '#5A6B7D' }}
               >
                 <X size={13} />
               </button>
@@ -386,23 +420,30 @@ function Content({
         {/* Section navigator — sticks under the mini-bar, scrollspy-highlighted */}
         <div
           className={cn(
-            'sticky top-0 z-10 flex gap-1.5 overflow-x-auto no-scrollbar px-5 md:px-8 py-2.5 border-b backdrop-blur-xl',
+            'sticky top-0 z-10 flex gap-2 overflow-x-auto no-scrollbar px-5 md:px-8 pt-3.5 pb-4 border-b backdrop-blur-xl',
             isLight ? 'bg-[rgba(255,253,248,0.94)] border-[#E7E0D2]' : 'bg-stone-950/92 border-white/10'
           )}
         >
           {INTEL_SECTIONS.map(({ id, label }) => {
             const active = activeSection === id;
             return (
+              /*
+                The one hard-offset press in this view, and it only ever lands
+                on one tab at a time — the offset shadow is the depth, so
+                pressing collapses the tab into the page. Nothing else in the
+                panel carries a shadow: one is a signature, twelve is noise.
+              */
               <button
                 key={id}
                 type="button"
                 onClick={() => jumpTo(id)}
-                className="shrink-0 rounded-full px-3.5 h-8 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border transition-all"
+                className={cn(
+                  'shrink-0 rounded-none px-3.5 h-9 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border transition-transform',
+                  active && 'shadow-[3px_3px_0_#4A90D9] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+                )}
                 style={active
-                  ? { background: '#1C2B3A', borderColor: '#1C2B3A', color: '#FFFDF8' }
-                  : isLight
-                    ? { background: '#F7F3EA', borderColor: '#E7E0D2', color: '#5A6B7D' }
-                    : { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)', color: '#9AA6B2' }}
+                  ? { background: '#0B1F33', borderColor: '#0B1F33', color: '#F2EFE8' }
+                  : { background: '#F7F3EA', borderColor: '#E7E0D2', color: '#5A6B7D' }}
               >
                 {label}
               </button>
@@ -454,6 +495,13 @@ function Content({
               isLight={isLight}
             />
           </div>
+          {/* The city itself, as the rule that closes the reading. */}
+          <img
+            src={publicAsset('images/illustration/calgary-skyline-rule.webp')}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none -mb-4 h-14 w-full select-none object-contain object-bottom opacity-[0.18] md:h-20"
+          />
           <div id="sec-sources" className="scroll-mt-16">
             <DataSourcesSection isLight={isLight} />
           </div>
@@ -477,7 +525,7 @@ export default function AreaIntelligencePanel({
   const hasRealData    = realYearly.length > 0;
   const isStatcanData  = crimeEntry?.dataSource === 'statcan';
   const score          = data.safetyScore ?? 0;
-  const gaugeColor     = score >= 70 ? '#3FA391' : score >= 40 ? '#C77F18' : '#C0392B';
+  const gaugeColor     = score >= 70 ? '#2E8B7A' : score >= 40 ? '#C77F18' : '#C0392B';
   const glowColor      = score >= 70 ? 'rgba(52,211,153,0.12)' : score >= 40 ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)';
 
   const chartData = hasRealData
@@ -518,7 +566,7 @@ export default function AreaIntelligencePanel({
             className="fixed inset-y-0 right-0 h-full z-[90] p-5 md:p-6"
           >
             <Card className={cn(
-              'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_24px_80px_-24px_rgba(28,43,58,0.55)] overflow-hidden rounded-[1.75rem] relative',
+              'h-full w-[min(62vw,66rem)] min-w-[46rem] shadow-[0_24px_80px_-24px_rgba(28,43,58,0.55)] overflow-hidden rounded-none relative',
               isLight ? 'border-[#E7E0D2] bg-[#FFFDF8]' : 'border-white/10'
             )}>
               <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
@@ -535,12 +583,12 @@ export default function AreaIntelligencePanel({
             <Drawer.Overlay className="fixed inset-0 bg-[rgba(20,28,38,0.5)] backdrop-blur-sm z-[100]" />
             <Drawer.Content className="fixed bottom-0 left-0 right-0 h-[94dvh] z-[101] outline-none">
               <div className={cn(
-                'h-full rounded-t-[1.75rem] overflow-hidden flex flex-col relative',
+                'h-full rounded-none overflow-hidden flex flex-col relative',
                 isLight ? 'bg-[#FFFDF8]' : 'bg-stone-950 border-t border-white/10'
               )}>
                 {/* score-keyed accent spine */}
                 <div className="absolute top-0 inset-x-0 h-1 z-20" style={{ background: gaugeColor }} aria-hidden="true" />
-                <div className={cn('mx-auto w-10 h-1 flex-shrink-0 rounded-full mt-3 mb-0', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')} />
+                <div className={cn('mx-auto w-10 h-1 flex-shrink-0 rounded-none mt-3 mb-0', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')} />
                 <Drawer.Title className="sr-only">{data.communityName} Area Intelligence</Drawer.Title>
                 <Drawer.Description className="sr-only">Safety scores, crime trends, and historical data for {data.communityName}.</Drawer.Description>
                 <Content {...contentProps} />
@@ -572,7 +620,7 @@ function Sparkline({ values }: { values: number[] }) {
   const delta = first > 0 ? ((last - first) / first) * 100
               : last > 0  ? 100
               : 0;
-  const color = delta < -5 ? '#3FA391' : delta > 5 ? '#C0392B' : '#6E6357';
+  const color = delta < -5 ? '#2E8B7A' : delta > 5 ? '#C0392B' : '#6E6357';
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className="shrink-0">
       <polyline
@@ -600,10 +648,19 @@ function CrimeThisYearSection({
 
   if (!crimeEntry) {
     return (
-      <Section title="Crime This Year" isLight={isLight}>
-        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20')}>
-          <Info size={14} className="text-amber-500 shrink-0 mt-0.5" />
-          <p className={cn('text-sm leading-relaxed', isLight ? 'text-amber-800' : 'text-amber-300')}>
+      <Section title="Crime This Year" subtitle="Calgary Police Service · Open Data" isLight={isLight}>
+        {/*
+          A notice, not an alarm: paper card, one gold spine on the left. The
+          amber-50 / amber-800 pair it replaced put 14px body on a wash that
+          composited to #FEF6E7 — legible, but it read as a warning banner for
+          what is only a name mismatch between two datasets.
+        */}
+        <div
+          className="rounded-none p-4 pl-4 flex items-start gap-2.5"
+          style={{ background: '#F7F3EA', border: '1px solid #E7E0D2', borderLeft: '3px solid #C77F18' }}
+        >
+          <Info size={14} style={{ color: '#8A5710' }} className="shrink-0 mt-0.5" />
+          <p className="text-[13.5px] leading-relaxed" style={{ color: '#1C2B3A' }}>
             Detailed breakdown not available for this community. The community name may differ between datasets.
           </p>
         </div>
@@ -619,7 +676,7 @@ function CrimeThisYearSection({
       label: 'Violent Crime',
       value: crimeEntry.violent,
       avg: cityAverages?.avgViolent ?? 0,
-      color: 'bg-red-500',
+      color: 'bg-[#C0392B]',
       sparkValues: last6.map(e => e.violent),
     },
     {
@@ -633,7 +690,7 @@ function CrimeThisYearSection({
       label: 'Disorder Calls',
       value: crimeEntry.disorder,
       avg: cityAverages?.avgDisorder ?? 0,
-      color: 'bg-amber-500',
+      color: 'bg-[#C77F18]',
       sparkValues: last6.map(e => e.disorder),
     },
   ];
@@ -644,8 +701,16 @@ function CrimeThisYearSection({
       subtitle={`${crimeEntry.year} · Calgary Police Service · Open Data`}
       isLight={isLight}
     >
+      {/*
+        The StatsCan badge was #8DBBDB on a 20% wash of #4A90D9 — 1.7:1 against
+        the tint it actually sat on, which a parent-only contrast check misses
+        entirely. Solid ground, ink reversed out: 7.4:1.
+      */}
       {isStatcanData && (
-        <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-[#4A90D9]/20 text-[#8DBBDB] font-medium inline-block mb-3">
+        <span
+          className="px-2 py-1 rounded-none font-mono text-[10px] font-bold uppercase tracking-[0.18em] inline-block mb-4"
+          style={{ background: '#2A6099', color: '#F2EFE8' }}
+        >
           StatsCan
         </span>
       )}
@@ -654,26 +719,32 @@ function CrimeThisYearSection({
           const pct = Math.round((value / maxVal) * 100);
           const vsCity = avg > 0 ? Math.round((value / avg) * 100) : 0;
           const vsLabel = vsCity > 0 ? `${vsCity}% of city avg` : '–';
-          const vsColor =
-            vsCity > 120 ? (isLight ? 'text-red-600 bg-red-50 border-red-200' : 'text-red-400 bg-red-500/10 border-red-500/20') :
-            vsCity > 80  ? (isLight ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-amber-400 bg-amber-500/10 border-amber-500/20') :
-                           (isLight ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20');
+          /*
+           * Each chip is checked against its OWN composited tint, not the card
+           * behind it. On #FFFDF8 these land at 5.4:1, 4.6:1 and 4.4:1; the
+           * `text-red-600 bg-red-50` pairs they replaced were authored against
+           * a white page that this panel does not have.
+           */
+          const vsColor: React.CSSProperties =
+            vsCity > 120 ? { color: '#A6332A', background: 'rgba(192,57,43,0.12)',  borderColor: 'rgba(192,57,43,0.38)' } :
+            vsCity > 80  ? { color: '#8A5710', background: 'rgba(199,127,24,0.14)', borderColor: 'rgba(199,127,24,0.42)' } :
+                           { color: '#1F6355', background: 'rgba(46,139,122,0.14)', borderColor: 'rgba(46,139,122,0.42)' };
 
           return (
             <div key={label}>
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-2 mb-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <span className={cn('text-[13px] font-bold truncate', isLight ? 'text-stone-700' : 'text-stone-300')}>{label}</span>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] truncate" style={{ color: '#1C2B3A' }}>{label}</span>
                   {vsCity > 0 && (
-                    <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-full border shrink-0', vsColor)}>{vsLabel}</span>
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] tabular-nums px-1.5 py-0.5 rounded-none border shrink-0" style={vsColor}>{vsLabel}</span>
                   )}
                 </div>
                 <Sparkline values={sparkValues} />
-                <span className={cn('text-base font-black shrink-0', isLight ? 'text-stone-900' : 'text-white')}>{value.toLocaleString()}</span>
+                <span className="font-display text-[22px] font-black leading-none tabular-nums shrink-0" style={{ color: '#0B1F33' }}>{value.toLocaleString()}</span>
               </div>
-              <div className={cn('h-[10px] rounded-full overflow-hidden', isLight ? 'bg-stone-200' : 'bg-white/10')}>
+              <div className={cn('h-[10px] rounded-none overflow-hidden', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')}>
                 <motion.div
-                  className={cn('h-full rounded-full', color)}
+                  className={cn('h-full rounded-none', color)}
                   initial={{ width: '0%' }}
                   animate={{ width: barsInView ? `${pct}%` : '0%' }}
                   transition={{ duration: 0.7, ease: 'easeOut', delay: i * 0.08 }}
@@ -683,7 +754,7 @@ function CrimeThisYearSection({
           );
         })}
       </div>
-      <p className="text-[11px] mt-4 text-stone-500">
+      <p className="font-mono text-[10px] leading-relaxed tracking-[0.06em] mt-5 pt-4" style={{ color: '#5A6B7D', borderTop: '1px solid #E7E0D2' }}>
         Criminal offences reported to Calgary Police · {crimeEntry.year} · City of Calgary Open Data (78gh-n26t, h3h6-kgme)
       </p>
     </Section>
@@ -721,10 +792,17 @@ function TrendChartSection({
   const startYear = chartData[0]?.name ?? '';
   const endYear   = chartData[chartData.length - 1]?.name ?? '';
 
+  /*
+   * The series colour states the series; the *text* is a darkened step of it.
+   * #C77F18 label type on a 14% tint of itself is a 3:1 read at 10px, which is
+   * not good enough for a control — so the line keeps the true hue and the
+   * word keeps the contrast.
+   */
+  const INACTIVE_PILL = { background: '#F7F3EA', borderColor: '#E7E0D2', color: '#5A6B7D' } as const;
   const pills = [
-    { key: 'violent' as const,  label: 'Violent',  active: showViolent,  toggle: () => setShowViolent(p  => !p), color: 'border-red-500 bg-red-500/15 text-red-400',   inactive: isLight ? 'border-stone-300 bg-stone-100 text-stone-500' : 'border-white/10 bg-white/5 text-stone-500' },
-    { key: 'property' as const, label: 'Property', active: showProperty, toggle: () => setShowProperty(p => !p), color: 'border-[#4A90D9] bg-[#4A90D9]/15 text-[#4A90D9]',  inactive: isLight ? 'border-stone-300 bg-stone-100 text-stone-500' : 'border-white/10 bg-white/5 text-stone-500' },
-    { key: 'disorder' as const, label: 'Disorder', active: showDisorder, toggle: () => setShowDisorder(p => !p), color: 'border-amber-500 bg-amber-500/15 text-amber-400', inactive: isLight ? 'border-stone-300 bg-stone-100 text-stone-500' : 'border-white/10 bg-white/5 text-stone-500' },
+    { key: 'violent'  as const, label: 'Violent',  active: showViolent,  toggle: () => setShowViolent(p  => !p), on: { background: 'rgba(192,57,43,0.13)',  borderColor: '#C0392B', color: '#A6332A' } },
+    { key: 'property' as const, label: 'Property', active: showProperty, toggle: () => setShowProperty(p => !p), on: { background: 'rgba(74,144,217,0.15)', borderColor: '#4A90D9', color: '#2A6099' } },
+    { key: 'disorder' as const, label: 'Disorder', active: showDisorder, toggle: () => setShowDisorder(p => !p), on: { background: 'rgba(199,127,24,0.15)', borderColor: '#C77F18', color: '#8A5710' } },
   ];
 
   return (
@@ -735,14 +813,12 @@ function TrendChartSection({
     >
       {/* Toggle pills */}
       <div className="flex gap-2 mb-4 flex-wrap">
-        {pills.map(({ key, label, active, toggle, color, inactive }) => (
+        {pills.map(({ key, label, active, toggle, on }) => (
           <button
             key={key}
             onClick={toggle}
-            className={cn(
-              'px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wide border transition-all',
-              active ? color : inactive
-            )}
+            className="px-3 h-8 rounded-none font-mono text-[10px] font-bold uppercase tracking-[0.18em] border-2 transition-colors"
+            style={active ? on : INACTIVE_PILL}
           >
             {label}
           </button>
@@ -751,7 +827,7 @@ function TrendChartSection({
 
       {/* Area chart */}
       <div
-        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}
+        className={cn('h-[280px] md:h-[320px] w-full rounded-none p-4 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}
         role="img"
         aria-label={`Crime trend chart for ${startYear}–${endYear}`}
       >
@@ -763,8 +839,8 @@ function TrendChartSection({
                 <stop offset="95%" stopColor="#C0392B" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="aiP" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%"  stopColor="#4A90D9" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#4A90D9" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="aiD" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%"  stopColor="#C77F18" stopOpacity={0.25} />
@@ -776,7 +852,7 @@ function TrendChartSection({
             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} tickFormatter={fmtTick} />
             <Tooltip contentStyle={tooltipStyle} itemStyle={{ fontSize: 12, fontWeight: 'bold' }} labelStyle={tooltipLabelStyle} />
             {showViolent  && <Area type="monotone" dataKey="Violent"  stroke="#C0392B" strokeWidth={2.5} fillOpacity={1} fill="url(#aiV)" isAnimationActive animationBegin={200} animationDuration={800} />}
-            {showProperty && <Area type="monotone" dataKey="Property" stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#aiP)" isAnimationActive animationBegin={200} animationDuration={800} />}
+            {showProperty && <Area type="monotone" dataKey="Property" stroke="#4A90D9" strokeWidth={2.5} fillOpacity={1} fill="url(#aiP)" isAnimationActive animationBegin={200} animationDuration={800} />}
             {showDisorder && <Area type="monotone" dataKey="Disorder" stroke="#C77F18" strokeWidth={2.5} fillOpacity={1} fill="url(#aiD)" isAnimationActive animationBegin={200} animationDuration={800} />}
           </AreaChart>
         </ResponsiveContainer>
@@ -792,16 +868,20 @@ function TrendChartSection({
           ].map(({ label, delta }) => {
             if (delta === null) return null;
             const isUp  = delta > 0;
-            const color = isUp
-              ? (isLight ? 'text-red-600' : 'text-red-400')
-              : (isLight ? 'text-emerald-700' : 'text-emerald-400');
+            // Darkened steps of the severity ramp: #C0392B and #2E8B7A read at
+            // 4.9:1 and 3.7:1 on this card, #A6332A and #1F6355 at 6.4 and 6.0.
+            const color = isUp ? '#A6332A' : '#1F6355';
             return (
-              <div key={label} className={cn('rounded-xl p-3 border text-center', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.03] border-white/5')}>
-                <p className="text-[10px] font-black uppercase tracking-wide mb-0.5 text-stone-500">{label}</p>
-                <p className={cn('text-sm font-black', color)}>
-                  {isUp ? '↑' : '↓'} {Math.abs(delta)}%
+              <div
+                key={label}
+                className="rounded-none p-3 text-center"
+                style={{ background: '#F7F3EA', border: '1px solid #E7E0D2', borderTop: `3px solid ${color}` }}
+              >
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: '#5A6B7D' }}>{label}</p>
+                <p className="font-display text-[24px] font-black leading-none tabular-nums" style={{ color }}>
+                  {isUp ? '↑' : '↓'}{Math.abs(delta)}%
                 </p>
-                <p className={cn('text-[10px] mt-0.5', isLight ? 'text-stone-400' : 'text-stone-600')}>vs prior year</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.1em] mt-1.5" style={{ color: '#5A6B7D' }}>vs prior year</p>
               </div>
             );
           })}
@@ -823,7 +903,7 @@ function DonutSection({
   if (!crimeEntry || total === 0) return null;
   const slices = [
     { name: 'Violent',  value: crimeEntry.violent,  color: '#C0392B', description: 'Assault, robbery, threats' },
-    { name: 'Property', value: crimeEntry.property, color: '#3b82f6', description: 'Break & enter, theft' },
+    { name: 'Property', value: crimeEntry.property, color: '#4A90D9', description: 'Break & enter, theft' },
     { name: 'Disorder', value: crimeEntry.disorder, color: '#C77F18', description: 'Non-criminal service calls' },
   ];
 
@@ -875,7 +955,7 @@ function DonutSection({
 
         {/* Legend */}
         <div className="flex-1 space-y-3 w-full">
-          <p className="text-[11px] font-black uppercase tracking-widest mb-3 text-stone-500">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-3 pb-3" style={{ color: '#5A6B7D', borderBottom: '1px solid #E7E0D2' }}>
             Total: {total.toLocaleString()} incidents
           </p>
           {slices.map(({ name, value, color, description }, i) => (
@@ -883,28 +963,29 @@ function DonutSection({
               key={name}
               onClick={() => setActiveIdx(i)}
               className={cn(
-                'w-full flex items-center gap-3 rounded-xl p-3 border text-left transition-all',
+                'w-full flex items-center gap-3 rounded-none p-3 border text-left transition-all',
                 activeIdx === i
-                  ? (isLight ? 'border-stone-300 bg-stone-100' : 'border-white/15 bg-white/[0.06]')
-                  : (isLight ? 'border-stone-200 bg-white hover:bg-stone-50' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]')
+                  ? (isLight ? 'border-[#C9D8E4] bg-[#E8F3FC]' : 'border-white/15 bg-white/[0.06]')
+                  : (isLight ? 'border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA]' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]')
               )}
             >
-              <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+              {/* A legend has to be the real colours or it is not a legend. */}
+              <div className="w-4 h-8 rounded-none shrink-0" style={{ backgroundColor: color }} aria-hidden="true" />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className={cn('text-sm font-bold', isLight ? 'text-stone-900' : 'text-white')}>{name}</span>
-                  <span className={cn('text-sm font-black', isLight ? 'text-stone-900' : 'text-white')}>{value.toLocaleString()}</span>
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#0B1F33' }}>{name}</span>
+                  <span className="font-display text-[19px] font-black leading-none tabular-nums" style={{ color: '#0B1F33' }}>{value.toLocaleString()}</span>
                 </div>
-                <div className="flex items-center justify-between mt-0.5">
-                  <span className="text-[11px] text-stone-500">{description}</span>
-                  <span className="text-[11px] font-bold" style={{ color }}>
+                <div className="flex items-baseline justify-between gap-2 mt-1">
+                  <span className="text-[11.5px] truncate" style={{ color: '#5A6B7D' }}>{description}</span>
+                  <span className="font-mono text-[10px] font-bold tabular-nums shrink-0" style={{ color: '#5A6B7D' }}>
                     {total > 0 ? `${Math.round((value / total) * 100)}%` : '–'}
                   </span>
                 </div>
               </div>
             </button>
           ))}
-          <p className={cn('text-[10px] pt-1', isLight ? 'text-stone-400' : 'text-stone-600')}>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] pt-2" style={{ color: '#5A6B7D' }}>
             Tap a slice or row to highlight
           </p>
         </div>
@@ -931,7 +1012,7 @@ function PropertyValueContent({
   const animatedValue  = useCountUp(latestEntry.AvgValue, 1200, valueInView);
   const animatedChange = useCountUp(Math.abs(valueChange ?? 0), 1000, valueInView);
 
-  const gaugeColor  = score >= 70 ? '#3FA391' : score >= 40 ? '#C77F18' : '#C0392B';
+  const gaugeColor  = score >= 70 ? '#2E8B7A' : score >= 40 ? '#C77F18' : '#C0392B';
   const CHART_W     = 216;
   const CHART_H     = 216;
   const PAD         = 32;
@@ -982,35 +1063,48 @@ function PropertyValueContent({
       {/* Quadrant plot */}
       <div
         ref={valueRef}
-        className={cn('rounded-[1.6rem] border p-4 mb-4', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}
+        className={cn('rounded-none border p-4 mb-4', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}
         role="img"
         aria-label="Safety score vs property value quadrant"
       >
-        <p className="text-[10px] font-black uppercase tracking-widest mb-3 text-stone-500">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-3" style={{ color: '#5A6B7D' }}>
           Safety Score vs Assessed Value
         </p>
+        {/*
+          Capped, not fluid. `width="100%"` over a 280-unit viewBox let the plot
+          stretch to the full 1376px desktop panel, which scaled its 10px
+          quadrant labels to roughly 55px — the axis titles rendered larger than
+          the section headline. The plot is a fixed-size diagram, so it gets a
+          fixed size and the panel's width is spent on the charts that use it.
+        */}
         <svg
           width="100%"
           viewBox={`0 0 ${CHART_W + PAD * 2} ${CHART_H + PAD * 2}`}
-          style={{ display: 'block' }}
+          style={{ display: 'block', maxWidth: CHART_W + PAD * 2, marginRight: 'auto' }}
         >
-          {/* Quadrant zones */}
-          <rect x={PAD} y={PAD} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(248,250,252,0.8)' : 'rgba(255,255,255,0.01)'} />
-          <rect x={PAD + CHART_W / 2} y={PAD} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(240,253,244,0.8)' : 'rgba(52,211,153,0.02)'} />
-          <rect x={PAD} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(254,242,242,0.8)' : 'rgba(239,68,68,0.02)'} />
-          <rect x={PAD + CHART_W / 2} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill={isLight ? 'rgba(239,246,255,0.8)' : 'rgba(59,130,246,0.02)'} />
+          {/*
+            Quadrant zones. The washes used to be slate-50 / green-50 / red-50
+            / blue-50 at 80% — cold greys and pinks laid over a warm #F7F3EA
+            card, which is what made this plot look pasted in from another app.
+            Same four meanings, tinted from the severity ramp so they sit on
+            the card's own ground.
+          */}
+          <rect x={PAD} y={PAD} width={CHART_W / 2} height={CHART_H / 2} fill="rgba(90,107,125,0.07)" />
+          <rect x={PAD + CHART_W / 2} y={PAD} width={CHART_W / 2} height={CHART_H / 2} fill="rgba(46,139,122,0.11)" />
+          <rect x={PAD} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill="rgba(192,57,43,0.09)" />
+          <rect x={PAD + CHART_W / 2} y={PAD + CHART_H / 2} width={CHART_W / 2} height={CHART_H / 2} fill="rgba(74,144,217,0.11)" />
           {/* Dividing lines */}
-          <line x1={PAD} y1={PAD + CHART_H / 2} x2={PAD + CHART_W} y2={PAD + CHART_H / 2} stroke={isLight ? '#E7E0D2' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
-          <line x1={PAD + CHART_W / 2} y1={PAD} x2={PAD + CHART_W / 2} y2={PAD + CHART_H} stroke={isLight ? '#E7E0D2' : 'rgba(255,255,255,0.05)'} strokeWidth="1" strokeDasharray="4,4" />
-          {/* Quadrant labels */}
-          <text x={PAD + 6} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Transitioning</text>
-          <text x={PAD + CHART_W / 2 + 4} y={PAD + 14} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Premier</text>
-          <text x={PAD + 6} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Challenged</text>
-          <text x={PAD + CHART_W / 2 + 4} y={PAD + CHART_H - 4} fontSize="10" fontWeight="900" fill={isLight ? '#9AA6B2' : '#5A5247'}>Hidden Gem</text>
+          <line x1={PAD} y1={PAD + CHART_H / 2} x2={PAD + CHART_W} y2={PAD + CHART_H / 2} stroke="#C9D8E4" strokeWidth="1" strokeDasharray="4,4" />
+          <line x1={PAD + CHART_W / 2} y1={PAD} x2={PAD + CHART_W / 2} y2={PAD + CHART_H} stroke="#C9D8E4" strokeWidth="1" strokeDasharray="4,4" />
+          {/* Quadrant labels — the panel's mono label register, in SVG. */}
+          <text x={PAD + 6} y={PAD + 14} fontSize="10" fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1.2" fill="#5A6B7D">TRANSITIONING</text>
+          <text x={PAD + CHART_W / 2 + 4} y={PAD + 14} fontSize="10" fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1.2" fill="#1F6355">PREMIER</text>
+          <text x={PAD + 6} y={PAD + CHART_H - 4} fontSize="10" fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1.2" fill="#A6332A">CHALLENGED</text>
+          <text x={PAD + CHART_W / 2 + 4} y={PAD + CHART_H - 4} fontSize="10" fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1.2" fill="#2A6099">HIDDEN GEM</text>
           {/* City avg crosshair */}
           <line x1={PAD + CHART_W / 2 - 6} y1={PAD + CHART_H / 2} x2={PAD + CHART_W / 2 + 6} y2={PAD + CHART_H / 2} stroke="#6E6357" strokeWidth="1.5" />
           <line x1={PAD + CHART_W / 2} y1={PAD + CHART_H / 2 - 6} x2={PAD + CHART_W / 2} y2={PAD + CHART_H / 2 + 6} stroke="#6E6357" strokeWidth="1.5" />
-          <text x={PAD + CHART_W / 2 + 8} y={PAD + CHART_H / 2 - 4} fontSize="9" fill="#6E6357" fontWeight="700">City Avg</text>
+          <text x={PAD + CHART_W / 2 + 8} y={PAD + CHART_H / 2 - 4} fontSize="10" fill="#5A6B7D" fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1">CITY AVG</text>
           {/* Community dot with pulsing ring */}
           <motion.g
             initial={{ scale: 0, opacity: 0 }}
@@ -1025,22 +1119,22 @@ function PropertyValueContent({
             <circle cx={dotX} cy={dotY} r="7" fill={gaugeColor} />
           </motion.g>
           {/* Axis labels */}
-          <text x={PAD + CHART_W / 2} y={PAD + CHART_H + 18} fontSize="9" fill="#6E6357" textAnchor="middle" fontWeight="700">Safety Score →</text>
-          <text x={PAD - 20} y={PAD + CHART_H / 2} fontSize="9" fill="#6E6357" textAnchor="middle" transform={`rotate(-90, ${PAD - 20}, ${PAD + CHART_H / 2})`} fontWeight="700">Value →</text>
+          <text x={PAD + CHART_W / 2} y={PAD + CHART_H + 18} fontSize="10" fill="#5A6B7D" textAnchor="middle" fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1.2">SAFETY SCORE →</text>
+          <text x={PAD - 20} y={PAD + CHART_H / 2} fontSize="10" fill="#5A6B7D" textAnchor="middle" transform={`rotate(-90, ${PAD - 20}, ${PAD + CHART_H / 2})`} fontWeight="700" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" letterSpacing="1.2">VALUE →</text>
         </svg>
       </div>
 
       {/* Correlation callout */}
       {correlationText && combined.length >= 2 && (
-        <div className={cn('rounded-2xl border px-4 py-3 mb-4', isLight ? 'bg-[#E8F3FC] border-[#E8F3FC]' : 'bg-[#4A90D9]/5 border-[#4A90D9]/15')}>
-          <p className={cn('text-[13px] italic leading-relaxed', isLight ? 'text-[#174A6E]' : 'text-[#8DBBDB]')}>
+        <div className="rounded-none px-4 py-3 mb-4" style={{ background: '#E8F3FC', borderLeft: '3px solid #4A90D9' }}>
+          <p className="text-[13px] italic leading-relaxed" style={{ color: '#174A6E' }}>
             {correlationText}
           </p>
         </div>
       )}
 
       <div
-        className={cn('h-[280px] md:h-[320px] w-full rounded-[1.6rem] p-4 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}
+        className={cn('h-[280px] md:h-[320px] w-full rounded-none p-4 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}
         role="img"
         aria-label="Property value versus total crime by year"
       >
@@ -1054,8 +1148,8 @@ function PropertyValueContent({
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isLight ? 'rgba(0,0,0,0.07)' : 'rgba(148,163,184,0.15)'} />
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#5A5247' : '#6E6357', fontWeight: 700 }} dy={8} />
-            <YAxis yAxisId="crime" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isLight ? '#9AA6B2' : '#6E6357', fontWeight: 700 }} tickFormatter={fmtTick} orientation="left" />
-            <YAxis yAxisId="value" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#818cf8', fontWeight: 700 }} tickFormatter={fmtDollars} orientation="right" />
+            <YAxis yAxisId="crime" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#A6332A', fontWeight: 700 }} tickFormatter={fmtTick} orientation="left" />
+            <YAxis yAxisId="value" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#6A63A8', fontWeight: 700 }} tickFormatter={fmtDollars} orientation="right" />
             <Tooltip
               contentStyle={tooltipStyle}
               labelStyle={tooltipLabelStyle}
@@ -1069,31 +1163,31 @@ function PropertyValueContent({
               itemStyle={{ fontSize: 12, fontWeight: 'bold' }}
             />
             <Area yAxisId="crime" type="monotone" dataKey="TotalCrime" stroke="#C0392B" strokeWidth={2} fill="url(#aiCrime)" fillOpacity={1} isAnimationActive animationBegin={200} animationDuration={800} />
-            <Line  yAxisId="value" type="monotone" dataKey="AvgValue"   stroke="#818cf8" strokeWidth={3} dot={{ r: 4, fill: '#818cf8', strokeWidth: 2, stroke: isLight ? '#fff' : '#0B1F33' }} isAnimationActive animationBegin={200} animationDuration={800} />
+            <Line  yAxisId="value" type="monotone" dataKey="AvgValue"   stroke="#6A63A8" strokeWidth={3} dot={{ r: 4, fill: '#6A63A8', strokeWidth: 2, stroke: '#F7F3EA' }} isAnimationActive animationBegin={200} animationDuration={800} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
       {/* Insight row */}
       <div className="grid grid-cols-2 gap-3 mt-4">
-        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}>
-          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-stone-500">Avg. Assessed Value ({latestEntry.name})</p>
-          <p className="text-xl font-black text-[#4A90D9]">{fmtDollars(animatedValue)}</p>
+        <div className={cn('rounded-none p-3 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: '#5A6B7D' }}>Avg. Assessed Value ({latestEntry.name})</p>
+          <p className="font-display text-[28px] font-black tabular-nums leading-none" style={{ color: '#4F4A85' }}>{fmtDollars(animatedValue)}</p>
         </div>
-        <div className={cn('rounded-xl p-3 border', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}>
-          <p className="text-[10px] font-black uppercase tracking-wide mb-1 text-stone-500">Change vs {earliestEntry.name}</p>
+        <div className={cn('rounded-none p-3 border', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}>
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: '#5A6B7D' }}>Change vs {earliestEntry.name}</p>
           {valueChange !== null ? (
-            <p className={cn('text-xl font-black', valueChange >= 0 ? 'text-emerald-400' : 'text-red-400')}>
-              {valueChange >= 0 ? '↑' : '↓'} {animatedChange}%
+            <p className="font-display text-[28px] font-black tabular-nums leading-none" style={{ color: valueChange >= 0 ? '#1F6355' : '#A6332A' }}>
+              {valueChange >= 0 ? '↑' : '↓'}{animatedChange}%
             </p>
           ) : (
-            <p className="text-xl font-black text-stone-500">–</p>
+            <p className="font-display text-[28px] font-black leading-none" style={{ color: '#5A6B7D' }}>–</p>
           )}
         </div>
       </div>
 
       {/* Methodology note */}
-      <p className="text-[12px] leading-relaxed mt-3 italic text-stone-500">
+      <p className="text-[12px] leading-relaxed mt-3 italic" style={{ color: '#5A6B7D' }}>
         Assessed values are the City of Calgary's annual tax appraisal — they typically lag the real estate market by approximately one year. Cross-referencing with crime trends can reveal whether safety changes precede or follow property value shifts.
       </p>
     </Section>
@@ -1134,10 +1228,10 @@ function PropertyValueSection({
 
   if (propertyData.length === 0) {
     return (
-      <Section title="Property Value vs Safety" isLight={isLight}>
-        <div className={cn('rounded-2xl p-4 border flex items-start gap-2.5', isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.02] border-white/5')}>
-          <Info size={14} className={isLight ? 'text-stone-400 shrink-0 mt-0.5' : 'text-stone-600 shrink-0 mt-0.5'} />
-          <p className="text-sm text-stone-500">
+      <Section title="Property Value vs Safety" subtitle="Assessed values · City of Calgary" isLight={isLight}>
+        <div className={cn('rounded-none p-4 border flex items-start gap-2.5', isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.02] border-white/5')}>
+          <Info size={14} className={isLight ? 'text-[#5A6B7D] shrink-0 mt-0.5' : 'text-stone-600 shrink-0 mt-0.5'} />
+          <p className="text-[13.5px] leading-relaxed" style={{ color: '#5A6B7D' }}>
             {/* Industrial estates, parks and survey parcels have no homes to
                 value, so the city publishes no residential assessment for them.
                 Saying "not available" made a correct, expected result read as a
@@ -1207,10 +1301,21 @@ function KeySignalsSection({
     return 'neutral';
   }
 
-  function cardColors(type: 'up' | 'down' | 'neutral', light: boolean) {
-    if (type === 'up')   return { border: '#C0392B', iconBg: light ? 'bg-red-50 border-red-200' : 'bg-red-500/10 border-red-500/20',         icon: <TrendingUp size={24} className="text-red-400" />,     statColor: '#C0392B' };
-    if (type === 'down') return { border: '#3FA391', iconBg: light ? 'bg-emerald-50 border-emerald-200' : 'bg-emerald-500/10 border-emerald-500/20', icon: <TrendingDown size={24} className="text-emerald-400" />, statColor: '#3FA391' };
-    return { border: '#3b82f6', iconBg: light ? 'bg-[#E8F3FC] border-[#C9D8E4]' : 'bg-[#4A90D9]/10 border-[#4A90D9]/20',           icon: <ShieldCheck size={24} className="text-[#4A90D9]" />,  statColor: '#3b82f6' };
+  /*
+   * The badge is a solid block of the severity colour with the ink reversed
+   * out of it, rather than a pale tint of the same hue. A 24px glyph in
+   * #2E8B7A on an `emerald-50` wash reads at 1.6:1 — it looked fine against
+   * the card behind it and was illegible against the tint it actually sat on.
+   * Solid ground fixes that by construction and states the signal harder.
+   *
+   * The big figure keeps a darkened step of the same hue so it clears the
+   * card: #4A90D9 on #F7F3EA is 3.0:1, #2A6099 is 5.9:1.
+   */
+  function cardColors(type: 'up' | 'down' | 'neutral', _light: boolean) {
+    void _light;
+    if (type === 'up')   return { border: '#C0392B', badge: '#C0392B', icon: <TrendingUp   size={24} style={{ color: '#F2EFE8' }} />, statColor: '#A6332A' };
+    if (type === 'down') return { border: '#2E8B7A', badge: '#2E8B7A', icon: <TrendingDown size={24} style={{ color: '#F2EFE8' }} />, statColor: '#1F6355' };
+    return               { border: '#4A90D9', badge: '#2A6099', icon: <ShieldCheck  size={24} style={{ color: '#F2EFE8' }} />, statColor: '#2A6099' };
   }
 
   function extractStat(text: string): string | null {
@@ -1236,15 +1341,15 @@ function KeySignalsSection({
   const visibleCards = Math.min(3, n);
 
   return (
-    <Section title="Key Signals" isLight={isLight}>
+    <Section title="Key Signals" subtitle="What stands out in this community" isLight={isLight}>
       {/* Counter + progress bar above stack */}
-      <div className="flex items-center mb-3">
-        <p className="text-[11px] uppercase tracking-widest font-black text-stone-500 shrink-0">
+      <div className="flex items-center mb-3 md:max-w-[44rem]">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] tabular-nums shrink-0" style={{ color: '#5A6B7D' }}>
           {currentIdx + 1} / {n}
         </p>
-        <div className={cn('h-[3px] rounded-full flex-1 mx-3 overflow-hidden', isLight ? 'bg-stone-200' : 'bg-white/10')}>
+        <div className={cn('h-[3px] rounded-none flex-1 mx-3 overflow-hidden', isLight ? 'bg-[#E7E0D2]' : 'bg-white/10')}>
           <motion.div
-            className="h-full rounded-full bg-[#4A90D9]"
+            className="h-full rounded-none bg-[#4A90D9]"
             animate={{ width: `${((currentIdx + 1) / n) * 100}%` }}
             transition={{ duration: 0.3 }}
           />
@@ -1252,16 +1357,17 @@ function KeySignalsSection({
       </div>
 
       {/* Card stack */}
-      <div className="relative" style={{ minHeight: 240 }}>
+      <div className="relative md:max-w-[44rem]" style={{ minHeight: 240 }}>
         {/* Ghost card 2 (furthest back) */}
         {visibleCards >= 3 && (
           <div
-            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-stone-200' : 'bg-white/[0.03] border-white/10')}
+            className="absolute inset-x-0 top-0 rounded-none"
             style={{
               height: 200,
-              transform: 'scale(0.90) translateY(16px) rotate(1.5deg)',
+              background: '#FFFDF8',
+              border: '1px solid #E7E0D2',
+              transform: 'scale(0.92) translateY(18px) rotate(1deg)',
               transformOrigin: 'bottom center',
-              opacity: 0.5,
               zIndex: 1,
             }}
           />
@@ -1269,12 +1375,13 @@ function KeySignalsSection({
         {/* Ghost card 1 (middle) */}
         {visibleCards >= 2 && (
           <div
-            className={cn('absolute inset-x-0 top-0 rounded-3xl border', isLight ? 'bg-white border-stone-200' : 'bg-white/[0.03] border-white/10')}
+            className="absolute inset-x-0 top-0 rounded-none"
             style={{
               height: 200,
-              transform: 'scale(0.95) translateY(8px) rotate(-2deg)',
+              background: '#FFFDF8',
+              border: '1px solid #E7E0D2',
+              transform: 'scale(0.96) translateY(9px) rotate(-1.4deg)',
               transformOrigin: 'bottom center',
-              opacity: 0.7,
               zIndex: 2,
             }}
           />
@@ -1313,29 +1420,37 @@ function KeySignalsSection({
                   dragX.set(0);
                 }}
                 className={cn(
-                  'rounded-3xl border p-5 cursor-grab active:cursor-grabbing select-none',
-                  isLight ? 'bg-white border-stone-200' : 'bg-white/[0.04] border-white/10'
+                  'rounded-none border p-5 cursor-grab active:cursor-grabbing select-none',
+                  isLight ? 'bg-[#F7F3EA] border-[#E7E0D2]' : 'bg-white/[0.04] border-white/10'
                 )}
               >
                 <div className="flex items-start gap-4">
-                  {/* Icon badge */}
-                  <div className={cn('w-[52px] h-[52px] rounded-2xl flex items-center justify-center shrink-0 border', colors.iconBg)}>
+                  {/* Icon badge — solid severity, ink reversed out. */}
+                  <div
+                    className="w-[52px] h-[52px] rounded-none flex items-center justify-center shrink-0"
+                    style={{ background: colors.badge }}
+                  >
                     {colors.icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     {/* Big stat */}
                     {stat && (
-                      <p className="text-[40px] font-black leading-none mb-1" style={{ color: colors.statColor }}>
+                      <p
+                        className="font-display text-[44px] font-black leading-[0.86] tracking-[-0.035em] tabular-nums mb-1.5"
+                        style={{ color: colors.statColor }}
+                      >
                         {stat}
                       </p>
                     )}
                     {/* Insight text */}
-                    <p className={cn('text-[14px] font-bold leading-[1.6]', isLight ? 'text-stone-800' : 'text-white')}>
+                    <p className="text-[14px] font-bold leading-[1.55]" style={{ color: '#1C2B3A' }}>
                       {insight}
                     </p>
                   </div>
                 </div>
-                <p className="text-[10px] text-stone-500 mt-3 font-medium">← swipe to see next →</p>
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] mt-4" style={{ color: '#5A6B7D' }}>
+                  ← Swipe to see next →
+                </p>
               </motion.div>
             );
           })()}
@@ -1343,27 +1458,27 @@ function KeySignalsSection({
       </div>
 
       {/* Desktop arrow buttons */}
-      <div className="hidden md:flex items-center justify-center gap-3 mt-4">
+      <div className="hidden md:flex items-center justify-center gap-3 mt-4 md:max-w-[44rem]">
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={previous}
           className={cn(
-            'w-10 h-10 rounded-full border flex items-center justify-center text-lg font-black transition-colors',
-            isLight ? 'border-stone-200 bg-white hover:bg-stone-50 text-stone-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
+            'w-10 h-10 rounded-none border flex items-center justify-center text-lg font-black transition-colors',
+            isLight ? 'border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA] text-[#5A6B7D]' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
           )}
           aria-label="Previous insight"
         >
           ←
         </motion.button>
-        <span className="text-[11px] font-black text-stone-500">{currentIdx + 1} / {n}</span>
+        <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] tabular-nums" style={{ color: '#5A6B7D' }}>{currentIdx + 1} / {n}</span>
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={dismiss}
           className={cn(
-            'w-10 h-10 rounded-full border flex items-center justify-center text-lg font-black transition-colors',
-            isLight ? 'border-stone-200 bg-white hover:bg-stone-50 text-stone-600' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
+            'w-10 h-10 rounded-none border flex items-center justify-center text-lg font-black transition-colors',
+            isLight ? 'border-[#E7E0D2] bg-[#FFFDF8] hover:bg-[#F7F3EA] text-[#5A6B7D]' : 'border-white/10 bg-white/5 hover:bg-white/10 text-stone-300'
           )}
           aria-label="Next insight"
         >
@@ -1392,26 +1507,26 @@ const DATA_SOURCES = [
 function DataSourcesSection({ isLight }: { isLight: boolean }) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   return (
-    <Section title="Data Sources" isLight={isLight}>
+    <Section title="Data Sources" subtitle="Where every number on this page comes from" isLight={isLight}>
       <div className="space-y-2">
         {DATA_SOURCES.map(({ title, content }, idx) => (
           <div
             key={title}
-            className={cn('rounded-2xl border overflow-hidden', isLight ? 'border-stone-200' : 'border-white/10')}
+            className={cn('rounded-none border overflow-hidden', isLight ? 'border-[#E7E0D2]' : 'border-white/10')}
           >
             <button
               onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
               className={cn(
                 'w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors',
-                isLight ? 'bg-white hover:bg-stone-50' : 'bg-white/[0.02] hover:bg-white/[0.04]'
+                isLight ? 'bg-[#FFFDF8] hover:bg-[#F7F3EA]' : 'bg-white/[0.02] hover:bg-white/[0.04]'
               )}
             >
               <div className="flex items-center gap-2.5">
-                <Database size={13} className={isLight ? 'text-stone-400' : 'text-stone-500'} />
-                <span className={cn('text-sm font-bold', isLight ? 'text-stone-800' : 'text-white')}>{title}</span>
+                <Database size={13} className={isLight ? 'text-[#5A6B7D]' : 'text-stone-500'} />
+                <span className="text-[13.5px] font-bold" style={{ color: '#1C2B3A' }}>{title}</span>
               </div>
               <motion.div animate={{ rotate: openIdx === idx ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <ChevronDown size={15} className={isLight ? 'text-stone-400' : 'text-stone-500'} />
+                <ChevronDown size={15} className={isLight ? 'text-[#5A6B7D]' : 'text-stone-500'} />
               </motion.div>
             </button>
             <AnimatePresence initial={false}>
@@ -1423,7 +1538,7 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
                   transition={{ duration: 0.25, ease: 'easeInOut' }}
                   className="overflow-hidden"
                 >
-                  <p className={cn('px-4 pb-4 pt-1 text-[13px] leading-relaxed', isLight ? 'text-stone-600' : 'text-stone-400')}>
+                  <p className="px-4 pb-4 pt-1 text-[13px] leading-relaxed" style={{ color: '#5A6B7D' }}>
                     {content}
                   </p>
                 </motion.div>
@@ -1432,7 +1547,7 @@ function DataSourcesSection({ isLight }: { isLight: boolean }) {
           </div>
         ))}
       </div>
-      <p className={cn('text-[12px] mt-4 pt-4 border-t leading-relaxed', isLight ? 'text-stone-400 border-stone-200' : 'text-stone-600 border-white/5')}>
+      <p className={cn('text-[12px] mt-4 pt-4 border-t leading-relaxed', isLight ? 'text-[#5A6B7D] border-[#E7E0D2]' : 'text-stone-600 border-white/5')}>
         All figures reflect reported incidents only — not all crime is reported to police. Safety scores are normalized against the Calgary city-wide average.
       </p>
     </Section>

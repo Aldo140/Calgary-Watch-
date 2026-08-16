@@ -31,6 +31,10 @@ import {
   Radio,
   ShieldCheck,
   Users,
+  Eye,
+  Database,
+  Compass,
+  History,
   Lock,
   Crosshair,
 } from 'lucide-react';
@@ -91,13 +95,39 @@ const QUADRANTS = [
   { code: 'SE', name: 'Southeast', places: 'Inglewood · Forest Lawn · Seton · Mahogany', img: 'images/quadrant/quadrant-se-collage.webp', imgAlt: 'Collage of the Saddledome, Inglewood brick streets and southeast Calgary homes' },
 ];
 
-// "One day on the watch" — dawn to after-midnight camera dolly.
-const DAY_PLATES = [
-  { src: 'images/photo/calgary1.webp', time: '07:12', caption: 'First light over the core', note: 'quiet · 0 open reports', color: T.gold },
-  { src: 'images/photo/calgary5.webp', time: '12:38', caption: 'Three neighbours, one map', note: 'crime · graffiti logged, Kensington', color: '#ef4444' },
-  { src: 'images/photo/calgary7.webp', time: '19:26', caption: 'Saddledome from Scotsman Hill', note: 'traffic · Macleod Tr slowdown', color: '#f59e0b' },
-  { src: 'images/photo/calgary8.webp', time: '22:04', caption: 'Fireworks over Stampede Park', note: 'weather · clear skies, 14°C', color: '#60a5fa' },
-  { src: 'images/photo/calgary3.webp', time: '01:47', caption: 'Deerfoot after midnight', note: 'infrastructure · signal fault cleared', color: '#f97316' },
+/**
+ * "One day on the watch" — dawn to after-midnight.
+ *
+ * The captions used to be a travelogue: "First light over the core",
+ * "Saddledome from Scotsman Hill". Handsome, and they explained nothing about
+ * what this is. Each frame now carries one thing a first-time visitor needs —
+ * what the map is, who fills it, where the rest of the data comes from, how far
+ * it reaches, and what happens to a report afterwards — so the sequence is an
+ * introduction rather than a slideshow.
+ */
+const DAY_PLATES: Array<{
+  src: string; time: string; icon: ElementType; caption: string; note: string; color: string;
+}> = [
+  { src: 'images/photo/calgary1.webp', time: '07:12', icon: Eye,
+    caption: 'Check before you leave',
+    note: 'Nothing open near you this morning',
+    color: T.gold },
+  { src: 'images/photo/calgary5.webp', time: '12:38', icon: Users,
+    caption: 'Neighbours file it, not a call centre',
+    note: 'Graffiti logged in Kensington · 30 seconds',
+    color: '#ef4444' },
+  { src: 'images/photo/calgary7.webp', time: '19:26', icon: Database,
+    caption: 'City feeds land on the same map',
+    note: '511 Alberta · Macleod Trail slowdown',
+    color: '#f59e0b' },
+  { src: 'images/photo/calgary8.webp', time: '22:04', icon: Compass,
+    caption: 'All four quadrants, one view',
+    note: 'NW · NE · SW · SE, sorted by distance from you',
+    color: '#60a5fa' },
+  { src: 'images/photo/calgary3.webp', time: '01:47', icon: History,
+    caption: 'Reports stay, so patterns show',
+    note: 'Signal fault cleared · dated and attributed',
+    color: '#f97316' },
 ];
 
 function usePrefersReducedMotion(): boolean {
@@ -985,7 +1015,7 @@ function DayStories({ reduced }: { reduced: boolean }) {
         onScroll={onScroll}
         className="mt-6 flex gap-5 overflow-x-auto snap-x snap-mandatory no-scrollbar px-5 sm:px-8 pb-5"
       >
-        {DAY_PLATES.map((p, i) => (
+        {DAY_PLATES.map((p, i) => { const PlateIcon = p.icon; return (
           <motion.figure
             key={p.src}
             initial={reduced ? false : { opacity: 0, y: 24 }}
@@ -1015,12 +1045,15 @@ function DayStories({ reduced }: { reduced: boolean }) {
               <span className="absolute bottom-3 right-3 font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/75">Frame 0{i + 1}</span>
             </div>
             <figcaption className="px-3 pb-4 pt-4 text-[#06162F]">
-              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#E52C20]">{p.note}</p>
+              <p className="flex items-center gap-1.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#E52C20]">
+                <PlateIcon size={12} className="shrink-0" aria-hidden="true" />
+                {p.note}
+              </p>
               <p className="mt-1.5 font-display text-[19px] font-black uppercase leading-[1.02] tracking-[-0.02em]">{p.caption}</p>
             </figcaption>
             </div>
           </motion.figure>
-        ))}
+        ); })}
         <div className="w-1 shrink-0" aria-hidden="true" />
       </div>
 
@@ -1070,18 +1103,21 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
           <Eyebrow color="#E52C20" light>Field footage · Calgary</Eyebrow>
           <h2 className="mt-4 font-display text-5xl font-black uppercase leading-[0.84] tracking-[-0.04em] text-[#F2EFE8]">One day<br /><span className="text-[#E52C20]">on watch.</span></h2>
           <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-            {DAY_PLATES.map((p, i) => (
+            {DAY_PLATES.map((p, i) => { const PlateIcon = p.icon; return (
               <figure key={p.src} className="relative pt-1" style={{ rotate: `${i % 2 ? 0.6 : -0.6}deg` }}>
                 <div className="absolute inset-0 translate-x-2 translate-y-2 bg-[#E52C20]" aria-hidden="true" />
                 <div className="relative bg-[#F2EFE8] p-2">
                   <img src={publicAsset(p.src)} alt="" loading="lazy" className="w-full aspect-[4/3] object-cover saturate-[0.82] contrast-[1.1]" />
                   <figcaption className="px-3 pb-3 pt-4 text-[#06162F]">
-                    <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">{p.time} · {p.note}</p>
+                    <p className="flex items-center gap-1.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">
+                      <PlateIcon size={12} className="shrink-0" aria-hidden="true" />
+                      {p.time} · {p.note}
+                    </p>
                     <p className="mt-1 font-display text-lg font-black uppercase leading-tight">{p.caption}</p>
                   </figcaption>
                 </div>
               </figure>
-            ))}
+            ); })}
           </div>
         </div>
       </section>
@@ -1239,10 +1275,25 @@ function Quadrants({ reduced }: { reduced: boolean }) {
                 Every address<br />ends in a quadrant.
               </h2>
             </div>
-            <p className="max-w-lg text-[15px] leading-relaxed text-[#AFC5DF] sm:text-base">
-              Centre Street splits east from west; the Bow bends north from south.
-              Pick a direction and Calgary changes with it.
-            </p>
+            <div className="max-w-lg">
+              <p className="text-[15px] leading-relaxed text-[#AFC5DF] sm:text-base">
+                Centre Street splits east from west; the Bow bends north from south.
+                Calgary Watch covers all four the same way — every report, wherever it
+                is filed, on one map anyone can open without an account.
+              </p>
+              <ul className="mt-5 space-y-2.5">
+                {[
+                  { Icon: Users,    text: 'Filed by the neighbours who saw it' },
+                  { Icon: Database, text: 'Alongside police, 311, 511 and utility feeds' },
+                  { Icon: Compass,  text: 'Sorted by how far it is from where you stand' },
+                ].map(({ Icon, text }) => (
+                  <li key={text} className="flex items-start gap-2.5 text-[14px] leading-snug text-[#AFC5DF]">
+                    <Icon size={15} className="mt-[2px] shrink-0 text-[#E52C20]" aria-hidden="true" />
+                    <span>{text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </Reveal>
 

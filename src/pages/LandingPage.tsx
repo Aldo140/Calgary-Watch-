@@ -83,14 +83,6 @@ const TICKER_ITEMS: Array<{ icon: ElementType; color: string; title: string; are
 ];
 
 // "Near me" showcase — the neighbourhood radius view (Inglewood vantage).
-const NEARBY_POSTS: Array<{
-  icon: ElementType; color: string; title: string; meta: string; time: string; contact?: string;
-}> = [
-  { icon: Car, color: '#ef4444', title: 'Car break-in — glass on the road', meta: 'Inglewood · 400 m', time: '38 min' },
-  { icon: Bike, color: '#ef4444', title: 'Stolen bike — blue Norco Storm 3', meta: 'Ramsay · 1.2 km', time: '2 h', contact: 'Call Dana · 403-555-0119' },
-  { icon: Car, color: '#ef4444', title: 'Stolen vehicle — grey F-150', meta: 'Alyth · 2.4 km', time: '5 h' },
-  { icon: CloudRain, color: '#60a5fa', title: 'Icy sidewalk on the school route', meta: 'Inglewood · 650 m', time: '1 h' },
-];
 
 const QUADRANTS = [
   { code: 'NW', name: 'Northwest', places: 'Bowness · Kensington · Nose Hill · University District', img: 'images/quadrant-nw-collage.webp', imgAlt: 'Collage of the Peace Bridge, Bow River, Nose Hill and northwest Calgary' },
@@ -1900,175 +1892,229 @@ function Categories({ reduced }: { reduced: boolean }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// NEAR ME — "It starts on your street": neighbourhood radius view with
-// community posts (stolen bike with a contact number, car break-ins, …)
-// ---------------------------------------------------------------------------
+/**
+ * NEAR ME — the distance scale.
+ *
+ * The feature is one sentence: every report, sorted by how far it is from where
+ * you stand. So the section draws that literally — a measured scale from your
+ * doorstep to 3 km, with real reports pinned at their true distances. The
+ * clustering you can see (two inside 700 m, then a gap) is the argument the
+ * copy is making, made visually instead of asserted.
+ *
+ * It replaces a phone mock with a radar in it. That layout — copy left, device
+ * right — is what every product page does, and its radar repeated a device the
+ * signed-in briefing already uses. A scale is specific to this feature and
+ * belongs to nothing else on the page.
+ *
+ * Editorial layer, so poster grammar: paper slips at slight angles with hard
+ * vermilion offset shadows, mono labels, square corners, and the emblem doing
+ * the work an illustration should — marking where you stand.
+ */
+const NEAR_RANGE_M = 3000;
+
+/** Real distances, so the scale is a measurement rather than a decoration. */
+const NEAR_REPORTS: Array<{
+  icon: ElementType; title: string; area: string; metres: number; time: string; contact?: string;
+}> = [
+  { icon: Car,       title: 'Car break-in — glass on the road', area: 'Inglewood', metres: 400,  time: '38 min' },
+  { icon: CloudRain, title: 'Icy sidewalk on the school route',  area: 'Inglewood', metres: 650,  time: '1 h' },
+  { icon: Bike,      title: 'Stolen bike — blue Norco Storm 3',  area: 'Ramsay',    metres: 1200, time: '2 h', contact: 'Call Dana · 403-555-0119' },
+  { icon: Car,       title: 'Stolen vehicle — grey F-150',       area: 'Alyth',     metres: 2400, time: '5 h' },
+];
+
+const NEAR_PROMISES = [
+  { label: 'Coming soon', title: 'Post your stolen bike with a number',
+    body: 'The neighbour who spots it locked outside a train station calls you — not a call centre.' },
+  { title: 'See the pattern before you park',
+    body: 'Car break-ins cluster. Three reports on one block this week is worth knowing tonight.' },
+  { title: 'Everything within 3 km, sorted',
+    body: 'One tap shows what is open around you right now, nearest first, emergencies on top.' },
+];
+
+function formatMetres(m: number): string {
+  return m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1)} km`;
+}
+
 function NearMe({ reduced }: { reduced: boolean }) {
   return (
-    <section className="relative py-16 sm:py-20 lg:py-32 overflow-hidden" style={{ background: T.paper }}>
-      <div className="mx-auto max-w-[80rem] px-5 sm:px-8 grid lg:grid-cols-[6fr_5fr] gap-12 lg:gap-16 items-center">
-        {/* Copy */}
-        <div>
-          <Reveal>
-            <Eyebrow color={T.red}>Near me · your 3 km</Eyebrow>
-            <h2 className="mt-5 font-display font-extrabold tracking-[-0.025em] leading-[1.04]" style={{ color: T.ink, fontSize: 'clamp(2.2rem, 4.8vw, 4rem)' }}>
-              It starts on<br />your street.
+    <section className="relative overflow-hidden py-16 sm:py-20 lg:py-24" style={{ background: T.paper }}>
+      <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
+        {/* Header */}
+        <div className="lg:flex lg:items-end lg:justify-between lg:gap-12">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2.5">
+              <span className="h-[3px] w-[22px] shrink-0" style={{ background: '#E52C20' }} aria-hidden="true" />
+              <span className="font-mono text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: T.inkSoft }}>
+                Near me · your 3 km
+              </span>
+            </div>
+            <h2
+              className="mt-4 font-display font-black uppercase leading-[0.84] tracking-[-0.04em]"
+              style={{ color: T.ink, fontSize: 'clamp(2.3rem, 6.4vw, 4.6rem)' }}
+            >
+              It starts on
+              <br />
+              your <span style={{ color: '#E52C20' }}>street.</span>
             </h2>
-            <p className="mt-5 max-w-lg text-[16px] leading-relaxed" style={{ color: T.inkSoft }}>
-              The whole city matters, but your block matters more. The near-me
-              view sorts every report by distance from where you stand — so
-              Inglewood sees Inglewood first.
+            <p className="mt-5 max-w-[46ch] text-[14.5px] leading-[1.6] sm:text-[15.5px]" style={{ color: T.inkSoft }}>
+              The whole city matters, but your block matters more. Everything is sorted by how far it is
+              from where you stand — so Inglewood sees Inglewood first.
             </p>
-          </Reveal>
-
-          <div className="mt-9 space-y-6">
-            {[
-              {
-                icon: Bike,
-                color: '#ef4444',
-                title: 'Post your stolen bike with a number',
-                body: 'The neighbour who spots it locked outside a train station calls you — not a call centre.',
-                tag: 'Coming soon',
-              },
-              {
-                icon: Car,
-                color: '#f59e0b',
-                title: 'See the pattern before you park',
-                body: 'Car break-ins cluster. Three reports on one block this week is something worth knowing tonight.',
-              },
-              {
-                icon: Crosshair,
-                color: T.bow as string,
-                title: 'Everything within 3 km, sorted',
-                body: 'One tap on the map shows what\'s open around you right now, nearest first, emergencies on top.',
-              },
-            ].map((f, i) => (
-              <Reveal key={f.title} delay={i * 0.08}>
-                <div className="flex gap-4">
-                  <span className="mt-0.5 flex w-11 h-11 shrink-0 items-center justify-center rounded-xl" style={{ background: `${f.color}1c` }}>
-                    <f.icon size={19} style={{ color: f.color }} />
-                  </span>
-                  <div>
-                    <h3 className="font-display text-lg font-bold flex items-center gap-2.5 flex-wrap" style={{ color: T.ink }}>
-                      {f.title}
-                      {f.tag && (
-                        <span className="font-mono text-[8.5px] font-semibold tracking-[0.2em] uppercase px-2 py-1 rounded-full" style={{ background: `${T.gold}26`, color: '#8A6A16' }}>
-                          {f.tag}
-                        </span>
-                      )}
-                    </h3>
-                    <p className="mt-1.5 text-[14.5px] leading-relaxed max-w-md" style={{ color: T.inkSoft }}>{f.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
           </div>
 
-          <Reveal delay={0.2} className="mt-10">
-            <InkButton href="/map">
-              <Crosshair size={16} />
-              See what's near you
-              <ArrowRight size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </InkButton>
-          </Reveal>
+          {/* The city you are standing in. */}
+          <img
+            src={publicAsset('images/calgary-bow-emblem.webp')}
+            alt=""
+            width={900} height={900} loading="lazy"
+            className="mt-8 hidden w-40 shrink-0 opacity-90 lg:mt-0 lg:block xl:w-48"
+            aria-hidden="true"
+          />
         </div>
 
-        {/* Phone-frame near-me mock */}
-        <Reveal delay={0.1}>
-          <motion.div
-            initial={reduced ? false : { rotate: 3 }}
-            whileInView={{ rotate: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.9, ease: EASE }}
-            className="relative mx-auto w-full max-w-[24rem] rounded-[2.4rem] p-2.5 shadow-[0_44px_80px_-36px_rgba(28,43,58,0.55)]"
-            style={{ background: T.ink }}
-          >
-            <div className="overflow-hidden rounded-[1.9rem]" style={{ background: T.panel }}>
-              {/* mock header */}
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <div>
-                  <p className="font-mono text-[9px] tracking-[0.28em] uppercase" style={{ color: T.inkSoft }}>Near me</p>
-                  <p className="font-display text-base font-bold" style={{ color: T.ink }}>Inglewood · 3 km</p>
-                </div>
-                <span className="flex items-center gap-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em] px-2.5 py-1.5 rounded-full" style={{ background: `${T.bow}1a`, color: T.bow }}>
-                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.bow }} />
-                  Live
+        {/* ── The scale ────────────────────────────────────────────────────
+            Wide: distance runs left to right. Narrow: top to bottom, because a
+            phone reads down and a 3 km ruler across 340px is unreadable. */}
+        <div className="mt-12 sm:mt-14">
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: '#E52C20' }}>
+              Measured from you
+            </span>
+            <span className="h-px flex-1" style={{ background: T.line }} aria-hidden="true" />
+          </div>
+
+          {/* Wide */}
+          <div className="relative mt-10 hidden lg:block" style={{ height: '23rem' }}>
+            <div className="absolute inset-x-0 top-[9rem] h-[3px]" style={{ background: T.ink }} aria-hidden="true" />
+            {[0, 1000, 2000, 3000].map((m) => (
+              <div key={m} className="absolute top-[9rem] z-10" style={{ left: `${(m / NEAR_RANGE_M) * 100}%` }} aria-hidden="true">
+                <span className="block h-3.5 w-[3px] -translate-x-1/2" style={{ background: T.ink }} />
+                <span className="mt-1.5 block -translate-x-1/2 font-mono text-[10px] font-bold tabular-nums" style={{ color: T.inkSoft }}>
+                  {m === 0 ? 'YOU' : `${m / 1000} km`}
                 </span>
               </div>
+            ))}
 
-              {/* radius radar */}
-              <div className="relative mx-5 h-40 overflow-hidden rounded-2xl" style={{ background: '#EAF0F4', border: `1px solid ${T.line}` }} aria-hidden="true">
-                {[0.36, 0.66, 0.96].map((f, i) => (
-                  <motion.span
-                    key={f}
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                    style={{ width: `${f * 160}px`, height: `${f * 160}px`, border: `1px solid ${T.bow}55` }}
-                    initial={reduced ? false : { scale: 0.4, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.15 + i * 0.12, duration: 0.6, ease: EASE }}
+            {NEAR_REPORTS.map((r, i) => {
+              const pct = (r.metres / NEAR_RANGE_M) * 100;
+              const above = i % 2 === 0;
+              const tilt = [-1.4, 1.2, -1, 1.3][i] ?? 0;
+              return (
+                <motion.div
+                  key={r.title}
+                  className="absolute w-[15rem]"
+                  style={{
+                    left: `${pct}%`,
+                    ...(above ? { bottom: 'calc(100% - 7.4rem)' } : { top: '11.4rem' }),
+                    transform: `translateX(${i === NEAR_REPORTS.length - 1 ? '-72%' : '-14%'})`,
+                  }}
+                  initial={reduced ? false : { opacity: 0, y: above ? -14 : 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-70px' }}
+                  transition={{ delay: i * 0.09, duration: 0.5, ease: EASE }}
+                >
+                  <span
+                    className="absolute left-[14%] w-[3px]"
+                    style={{ background: '#E52C20', top: above ? '100%' : '-2.4rem', height: above ? '1.6rem' : '2.4rem' }}
+                    aria-hidden="true"
                   />
-                ))}
-                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <span className="absolute -inset-3 rounded-full animate-ping opacity-30" style={{ background: T.sky }} />
-                  <span className="relative block w-3.5 h-3.5 rounded-full border-2 border-[#fff]" style={{ background: T.sky }} />
+                  <NearSlip report={r} tilt={tilt} />
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Narrow */}
+          <ol className="relative mt-8 space-y-5 lg:hidden">
+            <span className="absolute bottom-4 left-[1.55rem] top-4 w-[3px]" style={{ background: T.line }} aria-hidden="true" />
+            {NEAR_REPORTS.map((r, i) => (
+              <motion.li
+                key={r.title}
+                className="relative pl-[3.6rem]"
+                initial={reduced ? false : { opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ delay: i * 0.07, duration: 0.45, ease: EASE }}
+              >
+                <span
+                  className="absolute left-0 top-4 w-[3.1rem] text-center font-mono text-[11px] font-black tabular-nums"
+                  style={{ color: '#E52C20' }}
+                >
+                  {formatMetres(r.metres)}
                 </span>
-                <span className="absolute left-1/2 top-[62%] ml-6 font-mono text-[8.5px] tracking-[0.14em] uppercase" style={{ color: T.inkSoft }}>You</span>
-                {[
-                  { left: '34%', top: '30%', color: '#ef4444' },
-                  { left: '68%', top: '58%', color: '#ef4444' },
-                  { left: '24%', top: '66%', color: '#60a5fa' },
-                  { left: '76%', top: '26%', color: '#ef4444' },
-                ].map((d, i) => (
-                  <motion.span
-                    key={d.left}
-                    className="absolute w-2 h-2 rounded-full"
-                    style={{ left: d.left, top: d.top, background: d.color, boxShadow: `0 0 8px 1px ${d.color}88` }}
-                    initial={reduced ? false : { scale: 0, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + i * 0.12, type: 'spring', stiffness: 320, damping: 16 }}
-                  />
-                ))}
-              </div>
+                <NearSlip report={r} tilt={[-1, 0.9, -0.8, 1][i] ?? 0} />
+              </motion.li>
+            ))}
+          </ol>
+        </div>
 
-              {/* nearby posts */}
-              <ul className="px-5 py-4 space-y-3">
-                {NEARBY_POSTS.map((post, i) => (
-                  <motion.li
-                    key={post.title}
-                    initial={reduced ? false : { opacity: 0, x: 18 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ delay: 0.2 + i * 0.1, duration: 0.5, ease: EASE }}
-                    className="rounded-xl p-3"
-                    style={{ background: T.paper, border: `1px solid ${T.line}` }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="flex w-8 h-8 shrink-0 items-center justify-center rounded-lg" style={{ background: `${post.color}1c` }}>
-                        <post.icon size={14} style={{ color: post.color }} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-bold leading-tight truncate" style={{ color: T.ink }}>{post.title}</p>
-                        <p className="font-mono text-[9.5px] mt-0.5" style={{ color: T.inkSoft }}>{post.meta} · {post.time} ago</p>
-                      </div>
-                    </div>
-                    {post.contact && (
-                      <div className="mt-2.5 flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: `${T.bow}12`, border: `1px dashed ${T.bow}55` }}>
-                        <Phone size={12} style={{ color: T.bow }} />
-                        <span className="font-mono text-[10.5px] font-bold tabular-nums" style={{ color: T.bow }}>{post.contact}</span>
-                        <span className="ml-auto font-mono text-[8px] uppercase tracking-[0.16em]" style={{ color: T.inkSoft }}>member post</span>
-                      </div>
-                    )}
-                  </motion.li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        </Reveal>
+        {/* What it buys you */}
+        <div className="mt-14 grid gap-4 sm:grid-cols-3 sm:gap-5">
+          {NEAR_PROMISES.map((p, i) => (
+            <motion.div
+              key={p.title}
+              className="relative p-5"
+              style={{ background: T.panel, border: `1px solid ${T.line}` }}
+              initial={reduced ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ delay: i * 0.07, duration: 0.5, ease: EASE }}
+            >
+              {p.label && (
+                <span
+                  className="mb-2 inline-block px-2 py-1 font-mono text-[9.5px] font-black uppercase tracking-[0.16em]"
+                  style={{ background: '#E52C20', color: '#F2EFE8' }}
+                >
+                  {p.label}
+                </span>
+              )}
+              <h3 className="font-display text-[1.05rem] font-black uppercase leading-[0.95] tracking-[-0.02em]" style={{ color: T.ink }}>
+                {p.title}
+              </h3>
+              <p className="mt-2 text-[13.5px] leading-[1.5]" style={{ color: T.inkSoft }}>{p.body}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <a
+          href="/map"
+          className="mt-10 inline-flex items-center gap-3 px-6 py-4 font-display text-[14px] font-black uppercase tracking-[-0.01em] transition-transform hover:-translate-y-1 active:translate-x-1 active:translate-y-1 active:shadow-none sm:text-[15px]"
+          style={{ background: T.ink, color: '#F2EFE8', boxShadow: '5px 5px 0 #E52C20' }}
+        >
+          See what&rsquo;s near you
+          <ArrowRight size={16} aria-hidden="true" />
+        </a>
       </div>
     </section>
+  );
+}
+
+/** One report, as a slip pinned to the scale. */
+function NearSlip({ report, tilt }: { report: (typeof NEAR_REPORTS)[number]; tilt: number }) {
+  const Icon = report.icon;
+  return (
+    <div
+      className="relative p-3.5"
+      style={{ background: T.panel, border: `1px solid ${T.line}`, boxShadow: '5px 5px 0 #E52C20', rotate: `${tilt}deg` }}
+    >
+      <div className="flex items-start gap-2.5">
+        <Icon size={15} className="mt-[2px] shrink-0" style={{ color: T.ink }} aria-hidden="true" />
+        <div className="min-w-0">
+          <p className="text-[13px] font-bold leading-snug" style={{ color: T.ink }}>{report.title}</p>
+          <p className="mt-1 font-mono text-[10.5px] tabular-nums" style={{ color: T.inkSoft }}>
+            {report.area} · {formatMetres(report.metres)} · {report.time} ago
+          </p>
+          {report.contact && (
+            <p
+              className="mt-2 inline-block px-2 py-1 font-mono text-[10px] font-bold"
+              style={{ background: '#EAE3D5', color: T.ink }}
+            >
+              {report.contact}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

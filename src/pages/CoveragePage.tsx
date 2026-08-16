@@ -351,10 +351,21 @@ export default function CoveragePage() {
               <span className="h-px flex-1 max-w-16 bg-[#2E8B7A]/30" aria-hidden="true" />
             </div>
 
-            <h1 className="text-[clamp(2.6rem,8vw,6rem)] font-black leading-[0.92] tracking-tight mb-6 max-w-4xl">
-              Calgary Area
-              <span className="block text-[#E52C20]">Safety Guide.</span>
-            </h1>
+            <div className="mb-6 flex items-start gap-6">
+              <h1 className="text-[clamp(2.6rem,8vw,6rem)] font-black leading-[0.92] tracking-tight max-w-4xl">
+                Calgary Area
+                <span className="block text-[#E52C20]">Safety Guide.</span>
+              </h1>
+              {/* The reach, drawn: a province with a heart in it says what
+                  "30+ communities, 100 km" says, before the number is read. */}
+              <img
+                src={publicAsset('images/alberta-heart.webp')}
+                alt=""
+                width={800} height={800} loading="lazy"
+                className="hidden w-28 shrink-0 self-center opacity-90 lg:block xl:w-36"
+                aria-hidden="true"
+              />
+            </div>
 
             <p className="text-base sm:text-lg text-stone-400 light:text-stone-600 max-w-2xl leading-relaxed mb-10 border-l-2 border-[#E52C20]/40 pl-4">
               Community reports and selected public-source incident information for Calgary

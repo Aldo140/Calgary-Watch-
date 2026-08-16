@@ -52,12 +52,19 @@ export function TimeWindowFilter({
               title={o.hint}
               aria-pressed={active}
               className={cn(
-                'inline-flex items-center gap-1 h-7 px-2.5 rounded-lg text-[0.7rem] font-bold whitespace-nowrap',
-                'transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500',
-                active
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-500/10 text-slate-500 hover:text-slate-700 light:hover:bg-slate-200',
+                // Square, mono, wide-tracked — these sat next to the squared
+                // feed chips as the only rounded controls left on the rail.
+                'inline-flex items-center gap-1.5 h-7 px-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] whitespace-nowrap',
+                'transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#4A90D9]',
               )}
+              style={
+                // Explicit colours, not `bg-slate-900 text-white`: index.css
+                // remaps both of those to light values, so the "active" pill
+                // would render dark-on-cream and read as unselected.
+                active
+                  ? { background: '#06162F', color: '#F7F3EA' }
+                  : { background: '#EDE7DA', color: '#5A5247' }
+              }
             >
               {o.label}
               {count !== undefined && (

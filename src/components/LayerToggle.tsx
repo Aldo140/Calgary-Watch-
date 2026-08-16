@@ -31,24 +31,24 @@ function OverlayRow({
       type="button"
       onClick={onToggle}
       aria-pressed={on}
-      className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-[#E8F3FC]"
+      className="flex w-full items-center gap-3 border-[1.5px] border-transparent px-2.5 py-2 text-left transition-colors hover:border-[#C9D8E4] hover:bg-[#E8F3FC]"
     >
       <span
-        className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-colors',
-          on ? 'bg-[#286FAF] text-[#F7FBFF]' : 'bg-[#E8F3FC] text-[#40566B]')}
+        className={cn('grid h-8 w-8 shrink-0 place-items-center transition-colors',
+          on ? 'bg-[#06162F] text-[#F2EFE8]' : 'bg-[#E8F3FC] text-[#40566B]')}
       >
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[12px] font-bold text-[#0B1F33]">{label}</span>
-        <span className="block text-[10.5px] text-[#52697D]">{meta}</span>
+        <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-[#0B1F33]">{label}</span>
+        <span className="mt-0.5 block text-[10.5px] text-[#52697D]">{meta}</span>
       </span>
       <span
-        className={cn('relative h-5 w-9 shrink-0 rounded-full transition-colors',
-          on ? 'bg-[#286FAF]' : 'bg-[#C9D8E4]')}
+        className={cn('relative h-5 w-9 shrink-0 transition-colors',
+          on ? 'bg-[#06162F]' : 'bg-[#9FB4C6]')}
       >
         <span
-          className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-[left]"
+          className="absolute top-0.5 h-4 w-4 bg-[#FFFDF8] transition-[left]"
           style={{ left: on ? 18 : 2 }}
         />
       </span>
@@ -103,8 +103,8 @@ export default function LayerToggle({
   if (isPinMode) return null;
 
   const chip =
-    'flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl px-3 transition-[background-color,color,transform] active:scale-[0.98] max-lg:flex-1 max-lg:justify-center md:gap-2 md:px-4';
-  const on = 'bg-[#286FAF] text-[#F7FBFF]';
+    'flex min-h-9 shrink-0 items-center gap-1.5 px-3 font-mono uppercase transition-[background-color,color,transform] active:scale-[0.98] max-lg:flex-1 max-lg:justify-center md:gap-2 md:px-4';
+  const on = 'bg-[#06162F] text-[#F2EFE8]';
   const off = 'text-[#40566B] hover:bg-[#E8F3FC]';
 
   /** Count of supplementary layers currently on, surfaced on the Layers chip. */
@@ -119,17 +119,17 @@ export default function LayerToggle({
       {/* Supplementary layers, opened from the Layers chip. */}
       {menuOpen && (
         <div
-          className="mb-2 rounded-2xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.98)] p-2 shadow-[0_10px_28px_rgba(11,31,51,0.20)] backdrop-blur-lg"
+          className="mb-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.98)] p-2 shadow-[0_10px_28px_rgba(11,31,51,0.20)] backdrop-blur-lg"
           role="group"
           aria-label="Additional map layers"
         >
-          <div className="flex items-center justify-between px-2 pb-1.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#40566B]">More layers</span>
+          <div className="-mx-2 -mt-2 mb-1.5 flex items-center justify-between bg-[#06162F] px-3 py-2">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#AFC5DF]">More layers</span>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
               aria-label="Close layers menu"
-              className="grid h-6 w-6 place-items-center rounded-lg text-[#52697D] hover:bg-[#E8F3FC]"
+              className="grid h-6 w-6 place-items-center text-[#F2EFE8] hover:bg-[rgba(242,239,232,0.16)]"
             >
               <X size={13} />
             </button>
@@ -154,7 +154,7 @@ export default function LayerToggle({
         </div>
       )}
 
-      <div className="flex items-center gap-1 whitespace-nowrap rounded-2xl border border-[#C9D8E4] bg-[rgba(248,250,252,0.96)] p-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
+      <div className="flex items-center gap-1 whitespace-nowrap border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] p-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
         {/* The Layers chip is now the control it always looked like. */}
         <button
           type="button"
@@ -162,14 +162,14 @@ export default function LayerToggle({
           aria-expanded={menuOpen}
           aria-label="More map layers"
           className={cn(
-            'relative flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl px-2.5 transition-colors active:scale-[0.98] md:px-3',
+            'relative flex min-h-9 shrink-0 items-center gap-1.5 px-2.5 transition-colors active:scale-[0.98] md:px-3',
             menuOpen || extrasOn > 0 ? on : off,
           )}
         >
           <Layers size={14} />
-          <span className="hidden text-[10px] font-black uppercase tracking-widest sm:inline md:text-[10px]">Layers</span>
+          <span className="hidden font-mono text-[10px] font-bold uppercase tracking-[0.18em] sm:inline">Layers</span>
           {extrasOn > 0 && !menuOpen && (
-            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#2E8B7A] ring-2 ring-[rgba(248,250,252,0.96)]" />
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 bg-[#2E8B7A] ring-2 ring-[rgba(255,253,248,0.96)]" />
           )}
         </button>
 
@@ -177,19 +177,19 @@ export default function LayerToggle({
 
         <button type="button" onClick={() => setShowLiveReports(!showLiveReports)} className={cn(chip, showLiveReports ? on : off)}>
           <Activity size={14} className="max-lg:shrink-0" />
-          <span className="text-[10px] md:text-xs font-bold max-lg:tracking-tight">Live</span>
-          <span className="hidden md:inline font-bold text-xs"> Reports</span>
+          <span className="text-[10px] font-bold tracking-[0.1em] md:text-[11px]">Live</span>
+          <span className="hidden font-bold text-[11px] tracking-[0.1em] md:inline">&nbsp;Reports</span>
         </button>
 
         <button type="button" onClick={() => setShowHeatmap(!showHeatmap)} className={cn(chip, showHeatmap ? on : off)}>
           <MapIcon size={14} className="max-lg:shrink-0" />
-          <span className="text-[10px] md:text-xs font-bold">Heatmap</span>
+          <span className="text-[10px] font-bold tracking-[0.1em] md:text-[11px]">Heatmap</span>
         </button>
 
         <button type="button" onClick={() => setShowCrimeLayer(!showCrimeLayer)} className={cn(chip, showCrimeLayer ? on : off)}>
           <ShieldCheck size={14} className="max-lg:shrink-0" />
-          <span className="text-[10px] md:text-xs font-bold">Crime</span>
-          <span className="hidden md:inline font-bold text-xs"> Stats</span>
+          <span className="text-[10px] font-bold tracking-[0.1em] md:text-[11px]">Crime</span>
+          <span className="hidden font-bold text-[11px] tracking-[0.1em] md:inline">&nbsp;Stats</span>
         </button>
       </div>
     </div>

@@ -8,7 +8,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'motion/react';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS, isPubliclyVisible } from '@/src/types';
-import { cn } from '@/src/lib/utils';
+import { cn, publicAsset } from '@/src/lib/utils';
 import { MapRef } from '@/src/components/Map';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import DemoBadge from '@/src/components/DemoBadge';
@@ -29,6 +29,14 @@ const P = {
   ink: '#0B1F33',
   soft: '#52697D',
   line: '#C9D8E4',
+  /** Masthead ground — the poster's navy, borrowed for the sheet header. */
+  ground: '#06162F',
+  /** The ink that reads on that ground. */
+  onGround: '#F2EFE8',
+  /** Eyebrow text on the ground. */
+  eyebrow: '#AFC5DF',
+  /** Interactive accent. Never vermilion — red means emergency here. */
+  accent: '#4A90D9',
 };
 
 // Category colour lives in src/lib/tokens.ts. This file used to keep its own
@@ -282,63 +290,91 @@ export default function MobileMapSheet({
     >
       <Drawer.Portal>
         <Drawer.Content
-          className="fixed bottom-0 left-0 right-0 z-[50] flex flex-col rounded-t-2xl outline-none lg:hidden shadow-[0_-4px_12px_rgba(11,31,51,0.16)]"
+          className="fixed bottom-0 left-0 right-0 z-[50] flex flex-col outline-none lg:hidden shadow-[0_-4px_12px_rgba(11,31,51,0.16)]"
           style={{
             maxHeight: '85vh',
             background: P.paper,
-            borderTop: `1px solid ${P.line}`,
             ...(isFormOpen ? { visibility: 'hidden', pointerEvents: 'none' } : {}),
           }}
         >
           <Drawer.Title className="sr-only">Incidents</Drawer.Title>
           <Drawer.Description className="sr-only">Browse and search Calgary incidents</Drawer.Description>
 
-          {/* Brand edge */}
-          <div
-            className="h-1 w-full shrink-0 rounded-t-2xl bg-[#4A90D9]"
-          />
+          {/* ── Masthead ────────────────────────────────────────────────────
+              The sheet's header is the panel's own ground rather than more
+              cream: navy, a coordinate stamp, a display headline and the Bow
+              emblem as a watermark. The drag handle sits on it in paper ink so
+              the whole block reads as one printed header. */}
+          <div className="relative shrink-0 overflow-hidden" style={{ background: P.ground }}>
+            <img
+              src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-5 -top-6 h-32 w-32 select-none object-contain opacity-[0.18]"
+              style={{ filter: 'invert(1)' }}
+            />
 
-          {/* Drag handle */}
-          <div className="flex justify-center pt-2 pb-1 shrink-0">
-            <div className="w-10 h-1 rounded-full" style={{ background: P.line }} />
-          </div>
+            {/* Drag handle */}
+            <div className="relative flex justify-center pt-2 pb-1.5">
+              <div className="w-10 h-1" style={{ background: 'rgba(242,239,232,0.42)' }} />
+            </div>
 
-          {/* ── COLLAPSED BAR ── */}
-          {isCollapsed && (
-            <div
-              className="flex items-center justify-between px-4 py-2 cursor-pointer"
-              onClick={() => setSnap(0.38)}
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="relative flex items-center justify-center w-2 h-2">
-                  <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-70" />
-                  <div className="relative w-2 h-2 rounded-full bg-emerald-500" />
+            {/* ── COLLAPSED BAR ── */}
+            {isCollapsed && (
+              <div
+                className="relative flex items-center justify-between px-4 pb-3 cursor-pointer"
+                onClick={() => setSnap(0.38)}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="relative flex items-center justify-center w-2 h-2">
+                    <div className="absolute inset-0 animate-ping opacity-70" style={{ background: '#7FDCC6' }} />
+                    <div className="relative w-2 h-2" style={{ background: '#7FDCC6' }} />
+                  </div>
+                  <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: P.onGround }}>
+                    {liveCount} live report{liveCount !== 1 ? 's' : ''}
+                  </span>
                 </div>
-                <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: P.ink }}>
-                  {liveCount} live report{liveCount !== 1 ? 's' : ''}
+                {/* This view's one hard-offset press. */}
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); onReportPress(); }}
+                  className="flex h-9 items-center gap-1.5 px-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none"
+                  style={{ background: P.onGround, color: P.ground, boxShadow: `4px 4px 0 ${P.accent}` }}
+                >
+                  <Plus size={11} />
+                  Report
+                </button>
+              </div>
+            )}
+
+            {/* ── OPEN MASTHEAD ── */}
+            {isOpen && (
+              <div className="relative flex items-end justify-between gap-3 px-4 pb-2.5">
+                <div className="min-w-0">
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: P.eyebrow }}>
+                    51.05°N · 114.07°W
+                  </p>
+                  <h2 className="mt-1 font-display text-[21px] font-black uppercase leading-[0.9] tracking-[-0.035em]" style={{ color: P.onGround }}>
+                    Calgary Watch
+                  </h2>
+                </div>
+                <span className="flex shrink-0 items-center gap-1.5 pb-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#7FDCC6' }}>
+                  <span className="h-1.5 w-1.5" style={{ background: '#7FDCC6' }} aria-hidden="true" />
+                  Live
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onReportPress(); }}
-                  className="flex h-9 items-center gap-1.5 rounded-xl px-3.5 text-[10px] font-black uppercase tracking-[0.12em] transition-transform active:scale-[0.98]"
-                style={{ background: P.ink, color: P.paper }}
-              >
-                <Plus size={11} />
-                Report
-              </button>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* ── OPEN CONTENT (peek + expanded) ── */}
           {isOpen && (
             <div className="flex flex-col flex-1 min-h-0">
 
               {/* Search + total count */}
-              <div className="px-3 pt-1 pb-2 shrink-0 flex items-center gap-2">
+              <div className="px-3 pt-2.5 pb-2 shrink-0 flex items-center gap-2">
                 <div
-                  className="flex h-11 flex-1 items-center gap-2 rounded-xl px-3"
-                  style={{ background: P.card, border: `1px solid ${P.line}` }}
+                  className="flex h-11 flex-1 items-center gap-2 px-3"
+                  style={{ background: P.card, border: `1.5px solid ${P.line}` }}
                 >
                   <Search size={15} className="shrink-0" style={{ color: P.soft }} />
                   <input
@@ -358,11 +394,11 @@ export default function MobileMapSheet({
                   )}
                 </div>
                 <div
-                  className="flex h-11 min-w-[52px] shrink-0 flex-col items-center justify-center rounded-xl px-3"
-                  style={{ background: P.ink }}
+                  className="flex h-11 min-w-[52px] shrink-0 flex-col items-center justify-center px-3"
+                  style={{ background: P.ground }}
                 >
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] leading-none" style={{ color: 'rgba(255,253,248,0.6)' }}>Total</span>
-                  <span className="text-[15px] font-black leading-none mt-0.5 tabular-nums" style={{ color: P.paper }}>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] leading-none" style={{ color: P.eyebrow }}>Total</span>
+                  <span className="font-display text-[16px] font-black leading-none mt-1 tabular-nums" style={{ color: P.onGround }}>
                     {filteredIncidents.length}
                   </span>
                 </div>
@@ -380,7 +416,7 @@ export default function MobileMapSheet({
                       <button
                         key={id}
                         onClick={() => onCategoryChange(id as IncidentCategory | 'all')}
-                        className="category-chip flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 text-[10.5px] font-bold transition-[background-color,border-color,color,transform] active:scale-[0.98]"
+                        className="category-chip flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap border-[1.5px] px-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] transition-[background-color,border-color,color,transform] active:scale-[0.98]"
                         style={isSelected
                           ? { background: color, borderColor: color, color: '#fff' }
                           : { background: P.paper, borderColor: P.line, color: P.soft }}
@@ -388,7 +424,7 @@ export default function MobileMapSheet({
                         <Icon size={12} className="category-chip-icon" style={{ color: isSelected ? '#fff' : color }} />
                         <span>{label}</span>
                         <span
-                          className="category-chip-count text-[10px] px-1.5 py-0.5 rounded-full font-black tabular-nums"
+                          className="category-chip-count font-sans text-[10px] px-1 py-0.5 font-black tabular-nums tracking-normal"
                           style={isSelected
                             ? { background: 'rgba(255,255,255,0.22)', color: '#fff' }
                             : { background: P.card, color: P.soft }}
@@ -420,8 +456,8 @@ export default function MobileMapSheet({
                     <select
                       value={sortBy}
                       onChange={e => setSortBy(e.target.value as SortBy)}
-                      className="rounded-lg px-2 h-7 text-[10px] font-bold focus:outline-none cursor-pointer"
-                      style={{ background: P.paper, border: `1px solid ${P.line}`, color: P.ink }}
+                      className="px-2 h-7 text-[10px] font-bold focus:outline-none cursor-pointer"
+                      style={{ background: P.paper, border: `1.5px solid ${P.line}`, color: P.ink }}
                     >
                       <option value="newest">Newest First</option>
                       <option value="oldest">Oldest First</option>
@@ -438,7 +474,7 @@ export default function MobileMapSheet({
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={() => setFeedFilter((value) => value === 'community' ? null : 'community')}
-                      className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
+                      className="px-3 h-7 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border-[1.5px] transition-all active:scale-95"
                       style={feedFilter === 'community'
                         ? { background: 'rgba(46,139,122,0.14)', borderColor: 'rgba(46,139,122,0.45)', color: '#1F6D5F' }
                         : { background: P.paper, borderColor: P.line, color: P.soft }}
@@ -447,7 +483,7 @@ export default function MobileMapSheet({
                     </button>
                     <button
                       onClick={() => setFeedFilter((value) => value === 'recent' ? null : 'recent')}
-                      className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
+                      className="px-3 h-7 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border-[1.5px] transition-all active:scale-95"
                       style={feedFilter === 'recent'
                         ? { background: P.ink, borderColor: P.ink, color: P.paper }
                         : { background: P.paper, borderColor: P.line, color: P.soft }}
@@ -457,8 +493,8 @@ export default function MobileMapSheet({
                     {hasActiveFilters && (
                       <button
                         onClick={clearAllFilters}
-                        className="px-3 h-7 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] border transition-all active:scale-95"
-                        style={{ borderColor: P.line, color: '#A6332A', background: P.paper }}
+                        className="px-3 h-7 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border-[1.5px] transition-all active:scale-95"
+                        style={{ borderColor: P.line, color: '#8E2B23', background: P.paper }}
                       >
                         Clear filters
                       </button>
@@ -483,8 +519,8 @@ export default function MobileMapSheet({
                         <button
                           key={name}
                           onClick={() => handleNeighborhoodSelect(name)}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl mb-1 text-left transition-colors"
-                          style={{ background: 'rgba(74,144,217,0.09)', border: '1px solid rgba(74,144,217,0.28)' }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 mb-1 text-left transition-colors"
+                          style={{ background: 'rgba(74,144,217,0.09)', border: '1.5px solid rgba(74,144,217,0.40)' }}
                         >
                           <MapPin size={14} className="shrink-0" style={{ color: '#4A90D9' }} />
                           <div className="min-w-0 flex-1">
@@ -513,10 +549,10 @@ export default function MobileMapSheet({
                             key={name}
                             onClick={() => handleNeighborhoodSelect(name)}
                             className={cn(
-                              'flex items-center gap-1.5 px-2.5 h-7 rounded-full text-[10px] font-bold transition-opacity hover:opacity-80',
+                              'flex items-center gap-1.5 px-2.5 h-7 text-[10px] font-bold transition-opacity hover:opacity-80',
                               cfg.bg,
                             )}
-                            style={{ border: `1px solid ${P.line}` }}
+                            style={{ border: `1.5px solid ${P.line}` }}
                             title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
                           >
                             <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', cfg.dot)} />
@@ -557,14 +593,19 @@ export default function MobileMapSheet({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.97 }}
                             onClick={() => handleIncidentSelect(incident)}
-                            className="w-full flex items-center gap-3 rounded-xl mb-1.5 px-3 py-2.5 text-left transition-transform active:scale-[0.99]"
+                            className="relative w-full flex items-center gap-3 mb-1.5 pl-4 pr-3 py-2.5 text-left transition-transform active:scale-[0.99]"
                             style={{
-                              background: isEmergency ? 'rgba(225,29,72,0.07)' : P.paper,
-                              border: `1px solid ${isEmergency ? 'rgba(225,29,72,0.35)' : P.line}`,
+                              background: isEmergency ? 'rgba(192,57,43,0.07)' : P.paper,
+                              border: `1.5px solid ${isEmergency ? '#C0392B' : P.line}`,
                             }}
                           >
                             <span
-                              className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isEmergency && 'animate-pulse')}
+                              className="pointer-events-none absolute inset-y-0 left-0 w-[3px]"
+                              style={{ background: catColor }}
+                              aria-hidden="true"
+                            />
+                            <span
+                              className={cn('flex h-8 w-8 shrink-0 items-center justify-center', isEmergency && 'animate-pulse')}
                               style={{ background: `${catColor}18`, color: catColor }}
                             >
                               <CategoryIcon size={14} />
@@ -583,7 +624,7 @@ export default function MobileMapSheet({
                               )}
                             </span>
                             {isNew && (
-                              <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
+                              <span className="shrink-0 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em]" style={{ background: '#2F6FB0', color: '#fff' }}>New</span>
                             )}
                             <ChevronRight size={14} className="shrink-0" style={{ color: P.soft }} />
                           </motion.button>
@@ -605,26 +646,26 @@ export default function MobileMapSheet({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           onClick={() => handleIncidentSelect(incident)}
-                          className="relative mb-2 w-full overflow-hidden rounded-2xl text-left transition-[border-color,background-color,box-shadow,transform] active:scale-[0.99]"
+                          className="relative mb-2 w-full overflow-hidden text-left transition-[border-color,background-color,box-shadow,transform] active:scale-[0.99]"
                           style={{
-                            background: isEmergency ? 'rgba(225,29,72,0.05)' : P.paper,
-                            border: `1px solid ${isEmergency ? 'rgba(225,29,72,0.4)' : isActive ? '#4A90D9' : P.line}`,
+                            background: isEmergency ? 'rgba(192,57,43,0.05)' : P.paper,
+                            border: `1.5px solid ${isEmergency ? '#C0392B' : isActive ? '#4A90D9' : P.line}`,
                             boxShadow: isActive ? '0 0 0 2px rgba(74,144,217,0.25)' : undefined,
                           }}
                         >
                           {isEmergency && (
-                            <div className="absolute top-0 right-0 flex items-center gap-1 px-2 py-0.5 rounded-bl-xl" style={{ background: '#C0392B' }}>
-                              <span className="text-[10px] font-black uppercase tracking-widest text-[#fff]">SOS</span>
+                            <div className="absolute top-0 right-0 flex items-center gap-1 px-2 py-0.5" style={{ background: '#C0392B' }}>
+                              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#fff]">SOS</span>
                             </div>
                           )}
 
                           <div className="flex gap-2.5 p-3">
                             <div
-                              className={cn('w-1 self-stretch rounded-full shrink-0', isEmergency && 'animate-pulse')}
+                              className={cn('w-[3px] self-stretch shrink-0', isEmergency && 'animate-pulse')}
                               style={{ background: catColor }}
                             />
                             <div
-                              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                              className="w-9 h-9 flex items-center justify-center shrink-0"
                               style={{ background: `${catColor}18`, color: catColor }}
                             >
                               <CategoryIcon size={16} />
@@ -632,26 +673,26 @@ export default function MobileMapSheet({
 
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-1 mb-0.5">
-                                <p className="text-[12.5px] font-black leading-tight line-clamp-2 flex-1" style={{ color: P.ink }}>
+                                <p className="font-display text-[13.5px] font-black leading-[1.12] tracking-[-0.02em] line-clamp-2 flex-1" style={{ color: P.ink }}>
                                   {incident.title}
                                 </p>
                                 <div className="flex items-center gap-1 shrink-0 ml-1">
                                   {incident.source_type === 'reddit_calgary' && (
-                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase" style={{ background: 'rgba(234,88,12,0.12)', color: '#C77F18', border: '1px solid rgba(234,88,12,0.3)' }}>Reddit</span>
+                                    <span className="px-1 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: '#F6E7D6', color: '#8A4B12', border: '1px solid #DCB78C' }}>Reddit</span>
                                   )}
                                   {incident.source_type === 'news_rss' && (
-                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase" style={{ background: 'rgba(147,51,234,0.1)', color: '#7E22CE', border: '1px solid rgba(147,51,234,0.3)' }}>News</span>
+                                    <span className="px-1 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: '#EDE6F7', color: '#573497', border: '1px solid #C3B2DE' }}>News</span>
                                   )}
                                   {incident.data_source === 'official' && incident.source_type !== 'reddit_calgary' && incident.source_type !== 'news_rss' && (
-                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase" style={{ background: 'rgba(14,165,233,0.12)', color: '#0369A1', border: '1px solid rgba(14,165,233,0.3)' }}>Official</span>
+                                    <span className="px-1 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: '#E8F3FC', color: '#1F5C93', border: '1px solid #A9C9E6' }}>Official</span>
                                   )}
                                   {isNew && (
-                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase animate-pulse" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
+                                    <span className="px-1 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] animate-pulse" style={{ background: '#2F6FB0', color: '#fff' }}>New</span>
                                   )}
                                 </div>
                               </div>
 
-                              <p className="font-mono text-[10px] mb-1.5" style={{ color: P.soft }}>
+                              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] mb-1.5" style={{ color: P.soft }}>
                                 <Clock size={9} className="inline mr-0.5 -mt-px" />
                                 {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'} · by {reporter.firstName}
                               </p>
@@ -661,8 +702,8 @@ export default function MobileMapSheet({
                                   <img
                                     src={incident.image_url}
                                     alt=""
-                                    className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                                    style={{ border: `1px solid ${P.line}` }}
+                                    className="h-14 w-14 shrink-0 object-cover"
+                                    style={{ border: `1.5px solid ${P.line}` }}
                                     loading="lazy"
                                   />
                                 )}
@@ -673,10 +714,10 @@ export default function MobileMapSheet({
 
                               <div className="flex items-center justify-between">
                                 <div
-                                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold"
+                                  className="flex items-center gap-1 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em]"
                                   style={
-                                    incident.verified_status === 'community_confirmed' ? { background: 'rgba(34,197,94,0.12)', color: '#1F6154' } :
-                                    incident.verified_status === 'multiple_reports' ? { background: 'rgba(234,179,8,0.14)', color: '#A16207' } :
+                                    incident.verified_status === 'community_confirmed' ? { background: '#DDEFE8', color: '#1F6154' } :
+                                    incident.verified_status === 'multiple_reports' ? { background: '#F7E9CE', color: '#87560F' } :
                                     { background: P.card, color: P.soft }
                                   }
                                 >
@@ -684,7 +725,7 @@ export default function MobileMapSheet({
                                   <span>{(incident.verified_status ?? 'unverified').replace(/_/g, ' ')}</span>
                                 </div>
                                 <div
-                                  className="w-7 h-7 rounded-full flex items-center justify-center border border-[#fff] shadow"
+                                  className="w-7 h-7 flex items-center justify-center border-[1.5px] border-[#FFFDF8]"
                                   style={{ background: catColor, color: '#fff' }}
                                 >
                                   {reporter.anonymous
@@ -706,26 +747,26 @@ export default function MobileMapSheet({
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex flex-col items-center justify-center py-10 text-center space-y-3"
                   >
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: P.card }}>
+                    <div className="w-16 h-16 flex items-center justify-center" style={{ background: P.card, border: `1.5px solid ${P.line}` }}>
                       <Search size={26} style={{ color: P.soft }} />
                     </div>
                     {hasActiveFilters ? (
                       <>
                         <div>
-                          <p className="font-bold text-sm" style={{ color: P.ink }}>No reports match</p>
+                          <p className="font-display text-base font-black uppercase tracking-[-0.02em]" style={{ color: P.ink }}>No reports match</p>
                           <p className="text-xs mt-1" style={{ color: P.soft }}>Try clearing your filters or searching a different term.</p>
                         </div>
                         <button
                           onClick={clearAllFilters}
                           className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-colors"
-                          style={{ color: '#4A90D9' }}
+                          style={{ color: '#2F6FB0' }}
                         >
                           Clear all filters
                         </button>
                       </>
                     ) : (
                       <div>
-                        <p className="font-bold text-sm" style={{ color: P.ink }}>All clear right now</p>
+                        <p className="font-display text-base font-black uppercase tracking-[-0.02em]" style={{ color: P.ink }}>All clear right now</p>
                         <p className="text-xs mt-1 max-w-[200px]" style={{ color: P.soft }}>No incidents in Calgary at the moment.</p>
                       </div>
                     )}
@@ -737,8 +778,8 @@ export default function MobileMapSheet({
                   <button
                     onClick={onLoadMore}
                     disabled={isLoadingMore}
-                    className="w-full mt-2 py-2.5 rounded-xl font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ border: `1px solid ${P.line}`, background: P.paper, color: P.ink }}
+                    className="w-full mt-2 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ border: `1.5px solid ${P.line}`, background: P.paper, color: P.ink }}
                   >
                     {isLoadingMore ? 'Loading more…' : 'Load older reports'}
                   </button>
@@ -749,7 +790,7 @@ export default function MobileMapSheet({
                   <button
                     onClick={() => setSnap(0.82)}
                     className="w-full flex items-center justify-center gap-1.5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-colors"
-                    style={{ color: '#4A90D9' }}
+                    style={{ color: '#2F6FB0' }}
                   >
                     <ChevronDown size={12} className="rotate-180" />
                     Show all {filteredIncidents.length} reports
@@ -763,8 +804,8 @@ export default function MobileMapSheet({
                   <button
                     type="button"
                     onClick={onReportPress}
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl text-[12.5px] font-black transition-transform active:scale-[0.98]"
-                    style={{ background: P.ink, color: P.paper }}
+                    className="flex h-12 w-[calc(100%-4px)] items-center justify-center gap-2 font-display text-[13px] font-black uppercase tracking-[0.02em] transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none"
+                    style={{ background: P.ground, color: P.onGround, boxShadow: `4px 4px 0 ${P.accent}` }}
                   >
                     <Plus size={15} />
                     Report an incident

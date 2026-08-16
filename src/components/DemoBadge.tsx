@@ -27,8 +27,8 @@ interface DemoBadgeProps {
 }
 
 const SIZES: Record<DemoBadgeSize, { chip: string; dot: string; caption: string }> = {
-  xs: { chip: 'text-[7.5px] px-1.5 py-[2px] gap-1 tracking-[0.16em]', dot: 'h-1 w-1', caption: 'text-[8.5px]' },
-  sm: { chip: 'text-[8.5px] px-2 py-[3px] gap-1.5 tracking-[0.18em]', dot: 'h-1.5 w-1.5', caption: 'text-[9.5px]' },
+  xs: { chip: 'text-[10px] px-1.5 py-[2px] gap-1 tracking-[0.16em]', dot: 'h-1 w-1', caption: 'text-[10px]' },
+  sm: { chip: 'text-[10px] px-2 py-[3px] gap-1.5 tracking-[0.18em]', dot: 'h-1.5 w-1.5', caption: 'text-[10px]' },
   md: { chip: 'text-[10px] px-2.5 py-1 gap-1.5 tracking-[0.18em]', dot: 'h-1.5 w-1.5', caption: 'text-[11px]' },
 };
 

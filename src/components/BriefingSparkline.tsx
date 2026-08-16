@@ -83,7 +83,7 @@ export default function BriefingSparkline({
         />
       </svg>
 
-      <div className="flex items-center justify-between font-mono text-[9.5px] font-bold tabular-nums" style={{ color: T.inkSoft }}>
+      <div className="flex items-center justify-between font-mono text-[10px] font-bold tabular-nums" style={{ color: T.inkSoft }}>
         <span>{data[0].year}</span>
         <span>{latest.sampleCount.toLocaleString()} properties</span>
         <span>{latest.year}</span>

@@ -361,7 +361,7 @@ export default function MobileMapSheet({
                   className="flex h-11 min-w-[52px] shrink-0 flex-col items-center justify-center rounded-xl px-3"
                   style={{ background: P.ink }}
                 >
-                  <span className="font-mono text-[7.5px] font-bold uppercase tracking-[0.14em] leading-none" style={{ color: 'rgba(255,253,248,0.6)' }}>Total</span>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] leading-none" style={{ color: 'rgba(255,253,248,0.6)' }}>Total</span>
                   <span className="text-[15px] font-black leading-none mt-0.5 tabular-nums" style={{ color: P.paper }}>
                     {filteredIncidents.length}
                   </span>
@@ -388,7 +388,7 @@ export default function MobileMapSheet({
                         <Icon size={12} className="category-chip-icon" style={{ color: isSelected ? '#fff' : color }} />
                         <span>{label}</span>
                         <span
-                          className="category-chip-count text-[9px] px-1.5 py-0.5 rounded-full font-black tabular-nums"
+                          className="category-chip-count text-[10px] px-1.5 py-0.5 rounded-full font-black tabular-nums"
                           style={isSelected
                             ? { background: 'rgba(255,255,255,0.22)', color: '#fff' }
                             : { background: P.card, color: P.soft }}
@@ -413,7 +413,7 @@ export default function MobileMapSheet({
                       ].map(({ dot, label }) => (
                         <div key={label} className="flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
-                          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.06em]" style={{ color: P.soft }}>{label}</span>
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.06em]" style={{ color: P.soft }}>{label}</span>
                         </div>
                       ))}
                     </div>
@@ -503,7 +503,7 @@ export default function MobileMapSheet({
                   <div className="py-3 mb-2" style={{ borderBottom: `1px solid ${P.line}` }}>
                     <div className="flex items-center gap-1.5 mb-2">
                       <Activity size={12} style={{ color: '#2E8B7A' }} />
-                      <span className="font-mono text-[9px] font-bold uppercase tracking-[0.22em]" style={{ color: P.soft }}>Live area pulse · 2 h</span>
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: P.soft }}>Live area pulse · 2 h</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {neighborhoodPulse.map(({ name, count, level }) => {
@@ -530,7 +530,7 @@ export default function MobileMapSheet({
                 )}
 
                 {/* Incident count label */}
-                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] mt-2 mb-2" style={{ color: P.soft }}>
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] mt-2 mb-2" style={{ color: P.soft }}>
                   {filteredIncidents.length === 0
                     ? 'No reports found'
                     : `${filteredIncidents.length} report${filteredIncidents.length !== 1 ? 's' : ''}${isPeek && filteredIncidents.length > 5 ? ' · top 5' : ''}`}
@@ -573,7 +573,7 @@ export default function MobileMapSheet({
                               <span className="block text-[12.5px] font-bold leading-tight truncate" style={{ color: P.ink }}>
                                 {incident.title}
                               </span>
-                              <span className="block font-mono text-[9px] mt-0.5 truncate" style={{ color: P.soft }}>
+                              <span className="block font-mono text-[10px] mt-0.5 truncate" style={{ color: P.soft }}>
                                 {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'}
                               </span>
                               {incident.data_source === 'demo' && (
@@ -583,7 +583,7 @@ export default function MobileMapSheet({
                               )}
                             </span>
                             {isNew && (
-                              <span className="shrink-0 rounded px-1.5 py-0.5 text-[7.5px] font-black uppercase" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
+                              <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black uppercase" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
                             )}
                             <ChevronRight size={14} className="shrink-0" style={{ color: P.soft }} />
                           </motion.button>
@@ -614,7 +614,7 @@ export default function MobileMapSheet({
                         >
                           {isEmergency && (
                             <div className="absolute top-0 right-0 flex items-center gap-1 px-2 py-0.5 rounded-bl-xl" style={{ background: '#C0392B' }}>
-                              <span className="text-[8px] font-black uppercase tracking-widest text-[#fff]">SOS</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest text-[#fff]">SOS</span>
                             </div>
                           )}
 
@@ -637,21 +637,21 @@ export default function MobileMapSheet({
                                 </p>
                                 <div className="flex items-center gap-1 shrink-0 ml-1">
                                   {incident.source_type === 'reddit_calgary' && (
-                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(234,88,12,0.12)', color: '#C77F18', border: '1px solid rgba(234,88,12,0.3)' }}>Reddit</span>
+                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase" style={{ background: 'rgba(234,88,12,0.12)', color: '#C77F18', border: '1px solid rgba(234,88,12,0.3)' }}>Reddit</span>
                                   )}
                                   {incident.source_type === 'news_rss' && (
-                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(147,51,234,0.1)', color: '#7E22CE', border: '1px solid rgba(147,51,234,0.3)' }}>News</span>
+                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase" style={{ background: 'rgba(147,51,234,0.1)', color: '#7E22CE', border: '1px solid rgba(147,51,234,0.3)' }}>News</span>
                                   )}
                                   {incident.data_source === 'official' && incident.source_type !== 'reddit_calgary' && incident.source_type !== 'news_rss' && (
-                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase" style={{ background: 'rgba(14,165,233,0.12)', color: '#0369A1', border: '1px solid rgba(14,165,233,0.3)' }}>Official</span>
+                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase" style={{ background: 'rgba(14,165,233,0.12)', color: '#0369A1', border: '1px solid rgba(14,165,233,0.3)' }}>Official</span>
                                   )}
                                   {isNew && (
-                                    <span className="px-1 py-0.5 rounded text-[7px] font-black uppercase animate-pulse" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
+                                    <span className="px-1 py-0.5 rounded text-[10px] font-black uppercase animate-pulse" style={{ background: '#4A90D9', color: '#fff' }}>New</span>
                                   )}
                                 </div>
                               </div>
 
-                              <p className="font-mono text-[9.5px] mb-1.5" style={{ color: P.soft }}>
+                              <p className="font-mono text-[10px] mb-1.5" style={{ color: P.soft }}>
                                 <Clock size={9} className="inline mr-0.5 -mt-px" />
                                 {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'} · by {reporter.firstName}
                               </p>
@@ -673,7 +673,7 @@ export default function MobileMapSheet({
 
                               <div className="flex items-center justify-between">
                                 <div
-                                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold"
+                                  className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold"
                                   style={
                                     incident.verified_status === 'community_confirmed' ? { background: 'rgba(34,197,94,0.12)', color: '#1F6154' } :
                                     incident.verified_status === 'multiple_reports' ? { background: 'rgba(234,179,8,0.14)', color: '#A16207' } :

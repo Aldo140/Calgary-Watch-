@@ -45,7 +45,7 @@ function buildIncidentUrl(incidentId: string): string {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.26em] flex items-center gap-2" style={{ color: P.soft }}>
+    <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.26em] flex items-center gap-2" style={{ color: P.soft }}>
       {children}
     </h3>
   );
@@ -247,7 +247,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
 
   const chip = (color: string, softBg: string, label: string, icon?: React.ReactNode) => (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.18em]"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
       style={{ background: softBg, color }}
     >
       {icon}
@@ -606,10 +606,10 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
 
               {/* Report ID + live footer (scrolls with content) */}
               <div className="flex items-center justify-between gap-3 pt-1">
-                <p className="font-mono text-[8.5px] uppercase tracking-[0.18em] truncate" style={{ color: P.soft }}>
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] truncate" style={{ color: P.soft }}>
                   ID · {incident.id}
                 </p>
-                <span className="inline-flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.18em] shrink-0" style={{ color: '#2E8B7A' }}>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] shrink-0" style={{ color: '#2E8B7A' }}>
                   <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: '#2E8B7A' }} />
                   Live
                 </span>

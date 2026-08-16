@@ -540,7 +540,7 @@ function OrbitingBadges() {
             <span className="text-base font-black tabular-nums" style={{ color: b.color }}>
               {b.label}
             </span>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-stone-500 light:text-stone-400">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-500 light:text-stone-400">
               {b.sub}
             </span>
           </motion.div>
@@ -905,7 +905,7 @@ export default function AboutPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.4, duration: 0.6 }}
           >
-            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
               Scroll
             </span>
             <motion.div
@@ -1366,7 +1366,7 @@ export default function AboutPage() {
                       <div className="w-11 h-11 rounded-xl bg-[#2E8B7A]/15 border border-[#2E8B7A]/25 flex items-center justify-center">
                         <HeartHandshake size={20} className="text-[#2E8B7A]" />
                       </div>
-                      <span className="text-[9px] font-black uppercase tracking-wider text-[#2E8B7A] bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-2.5 py-1 rounded-full">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#2E8B7A] bg-[#2E8B7A]/15 border border-[#2E8B7A]/30 px-2.5 py-1 rounded-full">
                         Open Positions
                       </span>
                     </div>
@@ -1455,7 +1455,7 @@ export default function AboutPage() {
                   <div className="w-10 h-10 rounded-xl bg-[#E52C20]/20 border border-[#E52C20]/35 flex items-center justify-center mb-1">
                     <Eye size={18} className="text-[#E52C20]" />
                   </div>
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#E52C20] bg-[#E52C20]/15 px-2.5 py-1 rounded w-fit">
+                  <span className="inline-block text-[10px] font-black uppercase tracking-widest text-[#E52C20] bg-[#E52C20]/15 px-2.5 py-1 rounded w-fit">
                     Our Team
                   </span>
                   <h3 className="text-2xl font-black tracking-tight">Always watching, always here</h3>
@@ -1493,11 +1493,11 @@ export default function AboutPage() {
                     <div className="w-10 h-10 rounded-xl bg-[#B0793C]/20 border border-[#B0793C]/35 flex items-center justify-center mb-1">
                       <Handshake size={18} className="text-[#B0793C]" />
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-[#B0793C] bg-[#B0793C]/15 border border-[#B0793C]/30 px-2.5 py-1 rounded-full">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#B0793C] bg-[#B0793C]/15 border border-[#B0793C]/30 px-2.5 py-1 rounded-full">
                       Open
                     </span>
                   </div>
-                  <span className="inline-block text-[9px] font-black uppercase tracking-widest text-[#B0793C] bg-[#B0793C]/15 px-2.5 py-1 rounded w-fit">
+                  <span className="inline-block text-[10px] font-black uppercase tracking-widest text-[#B0793C] bg-[#B0793C]/15 px-2.5 py-1 rounded w-fit">
                     Business Partners
                   </span>
                   <h3 className="text-2xl font-black tracking-tight">Grow with Calgary</h3>
@@ -1540,10 +1540,10 @@ export default function AboutPage() {
               <div className="relative p-8 flex flex-col md:flex-row md:items-center gap-8">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#E52C20] bg-[#E52C20]/10 px-2.5 py-1 rounded">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#E52C20] bg-[#E52C20]/10 px-2.5 py-1 rounded">
                       Funding
                     </span>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[#B0793C] bg-[#B0793C]/10 px-2.5 py-1 rounded">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#B0793C] bg-[#B0793C]/10 px-2.5 py-1 rounded">
                       Seeking Investors
                     </span>
                   </div>

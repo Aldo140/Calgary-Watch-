@@ -124,7 +124,7 @@ export default function LayerToggle({
           aria-label="Additional map layers"
         >
           <div className="flex items-center justify-between px-2 pb-1.5">
-            <span className="text-[9px] font-black uppercase tracking-widest text-[#40566B]">More layers</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#40566B]">More layers</span>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}

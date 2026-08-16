@@ -195,7 +195,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         const dot = document.createElement('span');
         dot.style.cssText = 'width:5px;height:5px;border-radius:50%;background:#F59E0B;flex:0 0 auto;';
         const label = document.createElement('span');
-        label.style.cssText = 'font-size:9.5px;font-weight:800;letter-spacing:0.02em;color:#7A5A0A;line-height:1.3;';
+        label.style.cssText = 'font-size:10px;font-weight:800;letter-spacing:0.02em;color:#7A5A0A;line-height:1.3;';
         label.textContent = 'Example report: see how reporting works';
         demoRow.append(dot, label);
         content.appendChild(demoRow);
@@ -789,7 +789,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       // Official source badge (small "C" for City) — no user data interpolated
       if ((incident as any).data_source === 'official') {
         const badge = document.createElement('div');
-        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#0ea5e9;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:white;line-height:1;z-index:20;';
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#0ea5e9;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:white;line-height:1;z-index:20;';
         badge.textContent = 'C';
         body.appendChild(badge);
       }
@@ -801,7 +801,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         body.style.borderStyle = 'dashed';
         body.style.borderColor = 'rgba(245,158,11,0.95)';
         const badge = document.createElement('div');
-        badge.style.cssText = 'position:absolute;top:-5px;right:-5px;padding:0 3px;height:13px;border-radius:7px;background:#F59E0B;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;color:#3B2705;line-height:1;letter-spacing:0.04em;z-index:20;';
+        badge.style.cssText = 'position:absolute;top:-5px;right:-5px;padding:0 3px;height:13px;border-radius:7px;background:#F59E0B;border:1.5px solid white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#3B2705;line-height:1;letter-spacing:0.04em;z-index:20;';
         badge.textContent = 'EG';
         badge.title = 'Example report';
         body.appendChild(badge);
@@ -946,7 +946,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
               </div>
               <img src="${src}" alt="Live traffic camera at ${cam.location}" width="250" height="167"
                    style="width:100%;border-radius:9px;display:block;background:#E8EEF3;object-fit:cover" />
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#52697D;margin-top:6px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#52697D;margin-top:6px">
                 Live frame · reopen to refresh
               </div>
             </div>`;
@@ -1035,14 +1035,14 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       return L.marker([cam.lat, cam.lng], { icon, zIndexOffset: -400 }).bindPopup(
         `<div style="width:224px;font-family:Inter,system-ui,sans-serif">
-           <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:0.14em;
+           <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.14em;
                        text-transform:uppercase;color:#C77F18">Safety camera</div>
            <div style="font-weight:800;font-size:13px;color:#0B1F33;line-height:1.3;margin-top:3px">${cam.intersection}</div>
            ${cam.direction ? `<div style="font-size:11.5px;color:#52697D;margin-top:2px">Watches ${cam.direction.toLowerCase()} traffic</div>` : ''}
            <div style="margin-top:7px;padding-top:7px;border-top:1px solid #E4E2DC;font-size:11px;color:#52697D;line-height:1.45">
              Tickets both running the red <strong style="color:#0B1F33">and</strong> speeding through the green.
            </div>
-           ${community ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#52697D;margin-top:6px">
+           ${community ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#52697D;margin-top:6px">
              ${community}${cam.ward ? ` &middot; Ward ${cam.ward}` : ''}
            </div>` : ''}
          </div>`,
@@ -1090,23 +1090,23 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
                 <span className="h-3.5 w-3.5 rounded-full border-2 border-[#2E8B7A] border-t-transparent animate-spin" aria-hidden="true" />
                 <div>
                   <p className="text-[10.5px] font-bold text-slate-800">Building the picture…</p>
-                  <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-slate-500">Aggregating 311 across 270+ communities</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">Aggregating 311 across 270+ communities</p>
                 </div>
               </div>
             ) : (
               <>
-                <p className="font-mono text-[8.5px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-1.5">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-1.5">
                   Community concern index
                 </p>
                 <div className="flex items-center gap-2.5">
                   {([['#2E8B7A', 'Calm'], ['#D4A843', 'Elevated'], ['#EA580C', 'High'], ['#DC2626', 'Hot']] as const).map(([c, l]) => (
                     <span key={l} className="flex items-center gap-1.5">
                       <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: c, opacity: 0.85 }} />
-                      <span className="text-[9.5px] font-bold text-slate-700">{l}</span>
+                      <span className="text-[10px] font-bold text-slate-700">{l}</span>
                     </span>
                   ))}
                 </div>
-                <p className="hidden lg:block mt-1.5 text-[9px] text-slate-500 font-medium">
+                <p className="hidden lg:block mt-1.5 text-[10px] text-slate-500 font-medium">
                   311 + community reports · tap a community for full intel
                 </p>
               </>

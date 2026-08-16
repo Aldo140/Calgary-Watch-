@@ -184,14 +184,14 @@ function CommunityCard({ c, index, navigate }: { c: typeof COMMUNITIES[0]; index
       {/* Type badge */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <span className={cn(
-          'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border',
+          'text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border',
           typeColor[c.type],
           'light:hidden',
         )}>
           {c.type}
         </span>
         <span className={cn(
-          'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border hidden',
+          'text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border hidden',
           typeColorLight[c.type],
           'light:inline-block',
         )}>
@@ -480,7 +480,7 @@ export default function CoveragePage() {
                 className="rounded-2xl border border-white/6 light:border-stone-200 bg-white/[0.02] light:bg-white p-5 flex flex-col justify-between"
               >
                 <div>
-                  <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-stone-500 mb-3">Every marker</p>
+                  <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-stone-500 mb-3">Every marker</p>
                   <p className="text-3xl font-black text-white light:text-stone-900">Source</p>
                   <p className="text-xs text-stone-400 light:text-stone-600 mt-1">shown on incident details</p>
                 </div>

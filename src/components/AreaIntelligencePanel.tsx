@@ -85,7 +85,7 @@ function Section({
         <div>
           <h3 className={cn('font-display text-xl font-bold leading-tight tracking-[-0.01em]', isLight ? 'text-[#1C2B3A]' : 'text-white')}>{title}</h3>
           {subtitle && (
-            <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] font-bold mt-1 text-stone-500">{subtitle}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] font-bold mt-1 text-stone-500">{subtitle}</p>
           )}
         </div>
       </div>
@@ -140,7 +140,7 @@ function HeroSection({
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-2">
           <MapPin size={11} style={{ color: '#2E8B7A' }} />
-          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.3em]" style={{ color: '#2E8B7A' }}>Area Intel · YYC</span>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#2E8B7A' }}>Area Intel · YYC</span>
         </div>
         <button
           onClick={onClose}
@@ -185,7 +185,7 @@ function HeroSection({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className={cn('text-[15px] font-black leading-none', isLight ? 'text-stone-900' : 'text-white')}>{animatedScore}</span>
-            <span className="text-[7px] text-stone-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
+            <span className="text-[10px] text-stone-500 uppercase tracking-wide leading-none mt-0.5">/ 100</span>
           </div>
         </div>
 
@@ -208,7 +208,7 @@ function HeroSection({
               'rounded-xl p-2 text-center border',
               isLight ? 'bg-white/60 border-black/10' : 'bg-white/[0.04] border-white/[0.07]',
             )}>
-              <p className="text-[7px] font-black uppercase tracking-wide text-stone-500 leading-none mb-1">{label}</p>
+              <p className="text-[10px] font-black uppercase tracking-wide text-stone-500 leading-none mb-1">{label}</p>
               <p className={cn('text-[11px] font-black truncate leading-none capitalize', color)}>{value}</p>
             </div>
           ))}
@@ -801,7 +801,7 @@ function TrendChartSection({
                 <p className={cn('text-sm font-black', color)}>
                   {isUp ? '↑' : '↓'} {Math.abs(delta)}%
                 </p>
-                <p className={cn('text-[9px] mt-0.5', isLight ? 'text-stone-400' : 'text-stone-600')}>vs prior year</p>
+                <p className={cn('text-[10px] mt-0.5', isLight ? 'text-stone-400' : 'text-stone-600')}>vs prior year</p>
               </div>
             );
           })}

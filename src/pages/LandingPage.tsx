@@ -222,7 +222,7 @@ function RiverRail({ progress }: { progress: MotionValue<number> }) {
           strip — rendering as "1145°C1EGORIES". Vertical text keeps the whole
           rail inside its own ~12px column at every scroll position. */}
       <span
-        className="font-mono text-[9px] tracking-[0.2em] mb-3"
+        className="font-mono text-[10px] tracking-[0.2em] mb-3"
         style={{ color: T.inkSoft, writingMode: 'vertical-rl', textOrientation: 'mixed' }}
       >
         51.05°N
@@ -248,7 +248,7 @@ function RiverRail({ progress }: { progress: MotionValue<number> }) {
         />
       </div>
       <span
-        className="font-mono text-[9px] tracking-[0.2em] mt-3"
+        className="font-mono text-[10px] tracking-[0.2em] mt-3"
         style={{ color: T.inkSoft, writingMode: 'vertical-rl', textOrientation: 'mixed' }}
       >
         114.07°W
@@ -450,7 +450,7 @@ function Nav() {
           />
           <span className="flex flex-col leading-none text-left">
             <span className={cn('font-display text-[17px] font-bold tracking-tight', solid ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
-            <span className={cn('mt-0.5 font-mono text-[8.5px] font-medium uppercase tracking-[0.34em]', solid ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Safety</span>
+            <span className={cn('mt-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.34em]', solid ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Safety</span>
           </span>
         </button>
 
@@ -504,7 +504,7 @@ function Nav() {
             </div>
 
             <div className="relative flex min-h-full flex-col px-5 pb-6 pt-8 sm:px-7">
-              <div className="mb-7 flex items-center justify-between border-b border-white/15 pb-4 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#AFC5DF]">
+              <div className="mb-7 flex items-center justify-between border-b border-white/15 pb-4 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#AFC5DF]">
                 <span>Calgary / 51.0447° N</span>
                 <span className="text-[#E52C20]">Navigation / 01</span>
               </div>
@@ -525,7 +525,7 @@ function Nav() {
                     transition={{ delay: 0.1 + index * 0.055, duration: 0.42, ease: EASE }}
                     className="group flex min-h-16 items-center gap-4 border-b border-white/15 py-3 font-display text-[clamp(1.55rem,8vw,2.25rem)] font-black uppercase leading-none tracking-[-0.035em]"
                   >
-                    <span className="w-6 font-mono text-[9px] tracking-normal text-[#E52C20]">{number}</span>
+                    <span className="w-6 font-mono text-[10px] tracking-normal text-[#E52C20]">{number}</span>
                     <span className="flex-1">{label}</span>
                     <ArrowUpRight size={20} className="text-[#AFC5DF] transition-transform group-active:translate-x-1 group-active:-translate-y-1" />
                   </motion.a>
@@ -603,7 +603,7 @@ function MobileHero({ reduced }: { reduced: boolean }) {
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#06162F]/70" aria-hidden="true" />
 
-      <div className="absolute left-4 top-[11.5%] z-[3] -rotate-3 bg-[#F2EFE8] px-2 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-[#06162F] shadow-[3px_3px_0_#E52C20]" aria-hidden="true">
+      <div className="absolute left-4 top-[11.5%] z-[3] -rotate-3 bg-[#F2EFE8] px-2 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#06162F] shadow-[3px_3px_0_#E52C20]" aria-hidden="true">
         Calgary / 51.0447° N
       </div>
       <motion.img
@@ -944,7 +944,7 @@ function DayPlate({ plate, i, count, progress }: {
           >
             {plate.time}
           </span>
-          <span className="absolute bottom-5 right-6 font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-white/75 sm:text-[10px]">
+          <span className="absolute bottom-5 right-6 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-white/75 sm:text-[10px]">
             YYC / Frame 0{i + 1}
           </span>
         </div>
@@ -991,7 +991,7 @@ function DayStories({ reduced }: { reduced: boolean }) {
             </h2>
           </div>
           <div className="mt-1 -rotate-3 border border-[#F2EFE8]/35 px-3 py-2 text-right font-mono uppercase text-[#AFC5DF]" aria-hidden="true">
-            <span className="block text-[8px] tracking-[0.2em]">Archive</span>
+            <span className="block text-[10px] tracking-[0.2em]">Archive</span>
             <span className="mt-1 block font-display text-xl font-black tracking-tight text-[#F2EFE8]">24H</span>
           </div>
         </div>
@@ -1042,7 +1042,7 @@ function DayStories({ reduced }: { reduced: boolean }) {
               >
                 {p.time}
               </span>
-              <span className="absolute bottom-3 right-3 font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/75">Frame 0{i + 1}</span>
+              <span className="absolute bottom-3 right-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">Frame 0{i + 1}</span>
             </div>
             <figcaption className="px-3 pb-4 pt-4 text-[#06162F]">
               <p className="flex items-center gap-1.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#E52C20]">
@@ -1058,7 +1058,7 @@ function DayStories({ reduced }: { reduced: boolean }) {
       </div>
 
       {/* swipe affordance */}
-      <div className="mt-2 px-5 sm:px-8 flex items-center justify-between border-t border-[#F2EFE8]/20 pt-4 font-mono text-[9px] uppercase tracking-[0.2em] text-[#AFC5DF]">
+      <div className="mt-2 px-5 sm:px-8 flex items-center justify-between border-t border-[#F2EFE8]/20 pt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#AFC5DF]">
         <span>Swipe the archive</span>
         <span className="flex items-center gap-2.5">
         <motion.span
@@ -1151,10 +1151,10 @@ function DayTunnel({ reduced }: { reduced: boolean }) {
           {['top-0 left-0 border-t border-l', 'top-0 right-0 border-t border-r', 'bottom-0 left-0 border-b border-l', 'bottom-0 right-0 border-b border-r'].map((pos) => (
             <span key={pos} className={cn('absolute w-5 h-5 sm:w-8 sm:h-8', pos)} style={{ borderColor: 'rgba(237,242,240,0.35)' }} />
           ))}
-          <span className="absolute top-1.5 left-8 sm:top-2 sm:left-12 font-mono text-[8.5px] sm:text-[10px] tracking-[0.3em] uppercase" style={{ color: T.nightSoft }}>
+          <span className="absolute top-1.5 left-8 sm:top-2 sm:left-12 font-mono text-[10px] sm:text-[10px] tracking-[0.3em] uppercase" style={{ color: T.nightSoft }}>
             Archive / YYC / 24H
           </span>
-          <span className="absolute top-1.5 right-8 sm:top-2 sm:right-12 font-mono text-[8.5px] sm:text-[10px] tracking-[0.3em] uppercase flex items-center gap-2" style={{ color: T.nightSoft }}>
+          <span className="absolute top-1.5 right-8 sm:top-2 sm:right-12 font-mono text-[10px] sm:text-[10px] tracking-[0.3em] uppercase flex items-center gap-2" style={{ color: T.nightSoft }}>
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.red }} />
             Live sequence
           </span>
@@ -1313,12 +1313,12 @@ function Quadrants({ reduced }: { reduced: boolean }) {
             <motion.article id="quadrant-mobile-panel" role="tabpanel" key={q.code} custom={direction} initial={reduced ? false : { opacity: 0, x: direction * 32 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? undefined : { opacity: 0, x: direction * -24 }} transition={{ duration: 0.38, ease: EASE }} className="relative -mx-5 min-h-[36rem] overflow-hidden sm:-mx-8">
               <img src={publicAsset(q.img)} alt={q.imgAlt} loading="lazy" decoding="async" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#06162F] via-[#06162F]/20 to-transparent" aria-hidden="true" />
-              <span className="absolute right-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[active].bearing} · {String(active + 1).padStart(2, '0')}/04</span>
+              <span className="absolute right-5 top-5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[active].bearing} · {String(active + 1).padStart(2, '0')}/04</span>
               <div className="absolute inset-x-5 bottom-8 sm:inset-x-8">
                 <span className="font-display text-[6.5rem] font-black leading-none tracking-[-0.04em] text-[#F2EFE8]/15" aria-hidden="true">{q.code}</span>
                 <h3 className="-mt-8 font-display text-4xl font-black uppercase tracking-[-0.03em] text-[#F2EFE8]">{q.name}</h3>
                 <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#D9E2EC]">{q.places}</p>
-                <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#F2EFE8]"><span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live</p>
+                <p className="mt-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#F2EFE8]"><span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live</p>
               </div>
             </motion.article>
           </AnimatePresence>
@@ -1332,7 +1332,7 @@ function Quadrants({ reduced }: { reduced: boolean }) {
                 <button key={quad.code} type="button" role="tab" aria-selected={isActive} onClick={() => pick(i)} onMouseEnter={() => pick(i)} onFocus={() => pick(i)} className="group relative min-w-0 overflow-hidden text-left outline-none transition-[flex] duration-700 ease-out focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E52C20]" style={{ flex: isActive ? '2.35 1 0%' : '0.72 1 0%' }}>
                   <img src={publicAsset(quad.img)} alt="" loading="lazy" decoding="async" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.015]" />
                   <div className="absolute inset-0 transition-colors duration-500" style={{ background: isActive ? 'linear-gradient(to top, rgba(6,22,47,0.94), rgba(6,22,47,0.04) 70%)' : 'rgba(6,22,47,0.62)' }} aria-hidden="true" />
-                  <span className="absolute left-5 top-5 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[i].bearing}</span>
+                  <span className="absolute left-5 top-5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2EFE8]">{QUAD_META[i].bearing}</span>
                   <span className="absolute right-0 top-0 h-full w-1 origin-top transition-transform duration-500" style={{ background: QUAD_META[i].color, transform: isActive ? 'scaleY(1)' : 'scaleY(0)' }} aria-hidden="true" />
                   <div className="absolute inset-x-5 bottom-6 sm:inset-x-7 sm:bottom-8">
                     <span className="block font-display text-[clamp(3.5rem,7vw,7rem)] font-black leading-[0.72] tracking-[-0.04em] text-[#F2EFE8]">{quad.code}</span>
@@ -1340,7 +1340,7 @@ function Quadrants({ reduced }: { reduced: boolean }) {
                       <div className="overflow-hidden">
                         <h3 className="mt-5 font-display text-3xl font-black uppercase tracking-[-0.03em] text-[#F2EFE8] xl:text-4xl">{quad.name}</h3>
                         <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#D9E2EC] xl:text-base">{quad.places}</p>
-                        <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#F2EFE8]"><span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live</p>
+                        <p className="mt-5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#F2EFE8]"><span className="h-2 w-2 bg-[#E52C20] motion-safe:animate-pulse" aria-hidden="true" />All five report types live</p>
                       </div>
                     </div>
                   </div>
@@ -1349,10 +1349,10 @@ function Quadrants({ reduced }: { reduced: boolean }) {
             })}
             <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
               <svg viewBox="0 0 1200 70" preserveAspectRatio="none" className="h-12 w-full opacity-90"><path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#F2EFE8" strokeWidth="14" /><path d="M0 37 C150 4 250 66 400 34 S690 9 840 39 S1080 55 1200 23" fill="none" stroke="#E52C20" strokeWidth="2.5" /></svg>
-              <span className="absolute left-5 top-1/2 -translate-y-1/2 bg-[#F2EFE8] px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">The Bow</span>
+              <span className="absolute left-5 top-1/2 -translate-y-1/2 bg-[#F2EFE8] px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#E52C20]">The Bow</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.18em] text-[#AFC5DF]"><span>Hover or focus a direction</span><span>Centre St × Bow River · Calgary, AB</span></div>
+          <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-[#AFC5DF]"><span>Hover or focus a direction</span><span>Centre St × Bow River · Calgary, AB</span></div>
         </Reveal>
       </div>
     </section>
@@ -2460,7 +2460,7 @@ function FilmStrip({ reduced }: { reduced: boolean }) {
             width={480} height={320}
             className="h-36 w-56 sm:h-44 sm:w-72 object-cover rounded-lg"
           />
-          <figcaption className="mt-2 flex items-center justify-between font-mono text-[9px] tracking-[0.18em] uppercase" style={{ color: T.nightSoft }}>
+          <figcaption className="mt-2 flex items-center justify-between font-mono text-[10px] tracking-[0.18em] uppercase" style={{ color: T.nightSoft }}>
             <span>{p.label}</span>
             <span style={{ color: T.bow }}>CW-{String(i + 1).padStart(2, '0')}</span>
           </figcaption>

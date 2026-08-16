@@ -126,6 +126,15 @@ must replace it with an explicit colour, not another Tailwind name.**
 literal Tailwind value, so two visually identical-looking classes can behave
 completely differently.
 
+**4. It only covers the *unprefixed* class.** The remap targets `.text-white`,
+not `.light\:text-white`. So in the same class list, `text-white` renders
+`#1f2937` while `light:text-white` renders true white. This is the detail that
+makes the pairs so confusing to read: in `bg-white text-stone-950
+light:bg-stone-950 light:text-white`, the light half is white-on-near-black at
+20:1 and perfectly fine, while the same words without the prefix would be
+invisible. Measure before you "fix" one of these — the sign-in button looks
+like the classic bug and is not.
+
 The safe move when touching any of these: replace the whole pair with **one
 explicit colour** (`style={{ color: '#1C2B3A' }}`) and look at the element
 afterwards. Never delete half of a pair, and never bulk-rename across the list.

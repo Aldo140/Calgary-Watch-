@@ -10,6 +10,7 @@ import { distanceMeters, type TrafficCamera } from '@/src/hooks/useTrafficCamera
 import { findSafetyCamerasNear, type SafetyCamera } from '@/src/hooks/useSafetyCameras';
 import { useTrafficVolumes, volumeAt } from '@/src/hooks/useTrafficVolumes';
 import { useCountUp } from '@/src/hooks/useCountUp';
+import { publicAsset } from '@/src/lib/utils';
 import BriefingRadar, { bearingDegrees, type RadarPoint } from '@/src/components/BriefingRadar';
 import BriefingSparkline from '@/src/components/BriefingSparkline';
 
@@ -438,6 +439,19 @@ export default function PersonalBriefing({
           className="relative shrink-0 overflow-hidden px-5 pb-6 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 sm:pb-7 sm:pt-7"
           style={{ background: `linear-gradient(155deg, ${T.deep} 0%, ${T.deep2} 100%)` }}
         >
+          {/* The city, inked into the masthead the way the feed rail does it.
+              The linocut is black ink, so on this dark ground it needs the
+              invert to read at all. Same technique as the sidebar, different
+              hue — this page is the warm one and should stay recognisably so. */}
+          <img
+            src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
+            alt=""
+            width={900} height={900} loading="lazy"
+            className="pointer-events-none absolute -right-10 -top-8 w-44 opacity-[0.13] sm:w-52"
+            style={{ filter: 'invert(1)' }}
+            aria-hidden="true"
+          />
+
           {/* Foothill contour — a warm landform, not a targeting reticle. */}
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-24 opacity-[0.16]">
             <svg viewBox="0 0 400 100" width="100%" height="100%" preserveAspectRatio="none" fill="none" stroke={T.page} strokeWidth="1">

@@ -5,26 +5,35 @@ import { X, Loader2, Navigation, MapPin, AlertTriangle, ExternalLink, Image, Sir
 import { INCIDENT_CATEGORY_VALUES } from '@/src/constants';
 import { uploadIncidentImage } from '@/src/lib/storage';
 import { motion, AnimatePresence } from 'motion/react';
+import { MAP, CATEGORY } from '@/src/lib/tokens';
+import { publicAsset } from '@/src/lib/utils';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-// ── Field-atlas palette (explicit hexes: several Tailwind color utilities are
-//    globally remapped in index.css) ──────────────────────────────────────────
+// ── Field-atlas palette ─────────────────────────────────────────────────────
+// Aliases onto MAP so this file holds no hex of its own; several Tailwind colour
+// utilities are globally remapped in index.css, so colour is applied inline.
 const P = {
-  paper: '#FFFDF8',
-  card: '#F7F3EA',
-  ink: '#1C2B3A',
-  soft: '#5A6B7D',
-  line: '#E7E0D2',
-  bow: '#2E8B7A',
-  sky: '#4A90D9',
+  paper: MAP.panel,
+  card: MAP.paper,
+  ink: MAP.ink,
+  soft: MAP.muted,
+  faint: MAP.faint,
+  line: MAP.line,
+  bow: MAP.ok,
+  sky: MAP.accent,
+  danger: MAP.danger,
 };
 
+// Severity ramp, straight from CATEGORY — the chips have to be the same colours
+// the pins are, or the form is teaching the wrong legend. Note infrastructure
+// is the ramp's slate-teal and NOT MAP.accent: the blue means "interactive"
+// everywhere else on the map and must not double as a category.
 const CATEGORY_CHIPS = [
-  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#C0392B' },
-  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#C77F18' },
-  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#4A90D9' },
-  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
-  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#C0392B' },
+  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: CATEGORY.crime },
+  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: CATEGORY.traffic },
+  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: CATEGORY.infrastructure },
+  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: CATEGORY.weather },
+  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: CATEGORY.emergency },
 ];
 
 // Approximate neighbourhood centres for Calgary.
@@ -108,7 +117,7 @@ function FieldLabel({ children, hint }: { children: React.ReactNode; hint?: stri
   return (
     <label className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2 flex items-baseline justify-between" style={{ color: P.soft }}>
       <span>{children}</span>
-      {hint && <span className="normal-case tracking-normal font-medium text-[10px]" style={{ color: '#9AA6B2' }}>{hint}</span>}
+      {hint && <span className="normal-case tracking-normal font-medium text-[10px]" style={{ color: P.faint }}>{hint}</span>}
     </label>
   );
 }
@@ -314,9 +323,17 @@ export default function IncidentForm({
   // ── Header: progress dots make the promise explicit — 2 steps, <30 s ──────
   const stepIndex = step === 'choose' ? 0 : 1;
   const header = (
-    <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-4 shrink-0 relative" style={{ borderBottom: `1px solid ${P.line}` }}>
-      <div className="absolute top-0 inset-x-0 h-1" style={{ background: `linear-gradient(to right, ${P.sky}, ${P.bow})` }} aria-hidden="true" />
-      <div>
+    <div className="relative flex items-start justify-between gap-3 overflow-hidden px-6 pt-5 pb-4 shrink-0" style={{ borderBottom: `1px solid ${P.line}` }}>
+      <div className="absolute top-0 inset-x-0 h-1" style={{ background: P.sky }} aria-hidden="true" />
+      {/* The city held in one frame, sitting behind the masthead. Decoration
+          only — it never enters the reading order and never takes a tap. */}
+      <img
+        src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
+        alt=""
+        width={800} height={800} loading="lazy" aria-hidden="true"
+        className="pointer-events-none absolute -right-9 -top-8 w-28 opacity-[0.05] select-none sm:w-36"
+      />
+      <div className="relative">
         <p className="font-mono text-[9px] font-bold uppercase tracking-[0.28em]" style={{ color: P.bow }}>
           New report · under 30 seconds
         </p>
@@ -327,7 +344,7 @@ export default function IncidentForm({
           {['Location', 'Details'].map((label, i) => (
             <span key={label} className="flex items-center gap-1.5">
               <span
-                className="flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-black transition-colors"
+                className="flex h-4 w-4 items-center justify-center text-[8px] font-black transition-colors"
                 style={i <= stepIndex ? { background: P.ink, color: P.paper } : { background: P.card, color: P.soft, border: `1px solid ${P.line}` }}
               >
                 {i < stepIndex ? <Check size={9} /> : i + 1}
@@ -343,7 +360,7 @@ export default function IncidentForm({
       <button
         type="button"
         onClick={handleClose}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-black/5"
+        className="relative flex h-9 w-9 shrink-0 items-center justify-center transition-colors hover:bg-black/5"
         style={{ color: P.soft }}
         aria-label="Close report form"
       >
@@ -367,10 +384,10 @@ export default function IncidentForm({
                 type="button"
                 whileTap={{ scale: 0.98 }}
                 onClick={handleUseCurrentLocation}
-                className="w-full p-4 rounded-2xl text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
-                style={{ background: P.paper, border: `1.5px solid ${P.line}`, boxShadow: '0 10px 24px -18px rgba(28,43,58,0.4)' }}
+                className="w-full p-4 text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
+                style={{ background: P.paper, border: `1.5px solid ${P.line}` }}
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(74,144,217,0.12)' }}>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }}>
                   <Navigation size={19} style={{ color: P.sky }} />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -380,7 +397,7 @@ export default function IncidentForm({
                 <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" style={{ color: P.sky }} />
               </motion.button>
             ) : (
-              <div className="p-4 rounded-2xl" style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.3)' }}>
+              <div className="p-4" style={{ background: 'rgba(199,127,24,0.09)', border: `1px solid ${P.line}`, borderLeft: `3px solid ${MAP.warn}` }}>
                 <div className="flex items-start gap-3">
                   <AlertTriangle size={15} className="mt-0.5 shrink-0" style={{ color: '#8A5710' }} />
                   <div className="flex-1 space-y-1.5">
@@ -407,10 +424,10 @@ export default function IncidentForm({
               type="button"
               whileTap={{ scale: 0.98 }}
               onClick={handlePinOnMap}
-              className="w-full p-4 rounded-2xl text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
-              style={{ background: P.paper, border: `1.5px solid ${P.line}`, boxShadow: '0 10px 24px -18px rgba(28,43,58,0.4)' }}
+              className="w-full p-4 text-left transition-all group flex items-center gap-4 hover:-translate-y-0.5"
+              style={{ background: P.paper, border: `1.5px solid ${P.line}` }}
             >
-              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(46,139,122,0.12)' }}>
+              <span className="relative flex h-11 w-11 shrink-0 items-center justify-center" style={{ background: 'rgba(46,139,122,0.12)' }}>
                 <span className="absolute inset-2 rounded-full animate-ping opacity-25" style={{ background: P.bow }} aria-hidden="true" />
                 <MapPin size={19} style={{ color: P.bow }} />
               </span>
@@ -423,7 +440,7 @@ export default function IncidentForm({
               <ArrowRight size={16} className="shrink-0 transition-transform group-hover:translate-x-1" style={{ color: P.bow }} />
             </motion.button>
 
-            <p className="pt-1 text-center font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: '#9AA6B2' }}>
+            <p className="pt-1 text-center font-mono text-[9px] uppercase tracking-[0.2em]" style={{ color: P.faint }}>
               The exact spot helps neighbours nearby
             </p>
           </div>
@@ -438,7 +455,7 @@ export default function IncidentForm({
             noValidate
           >
             {/* Location confirmation bar */}
-            <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
+            <div className="flex items-center justify-between gap-3 px-4 py-3" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
               <div className="flex items-center gap-2.5 min-w-0">
                 <MapPin size={14} className="shrink-0" style={{ color: P.bow }} />
                 <div className="min-w-0">
@@ -457,7 +474,7 @@ export default function IncidentForm({
                   setStep('choose');
                   setUsingGPS(false);
                 }}
-                className="shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors hover:bg-black/5"
+                className="shrink-0 text-[11px] font-bold px-3 py-1.5 transition-colors hover:bg-black/5"
                 style={{ color: P.ink, border: `1px solid ${P.line}`, background: P.paper }}
               >
                 Change
@@ -465,8 +482,8 @@ export default function IncidentForm({
             </div>
 
             {/* 911 notice — compact strip */}
-            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl" style={{ background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.25)' }}>
-              <AlertTriangle size={13} className="shrink-0" style={{ color: '#C0392B' }} />
+            <div className="flex items-center gap-2.5 px-3.5 py-2.5" style={{ background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.25)' }}>
+              <AlertTriangle size={13} className="shrink-0" style={{ color: P.danger }} />
               <p className="text-[11px] leading-snug font-medium" style={{ color: '#8A2A22' }}>
                 Not sent to police. Emergencies: call <b>911</b> — this alerts neighbours in parallel.
               </p>
@@ -483,7 +500,7 @@ export default function IncidentForm({
                       key={id}
                       type="button"
                       onClick={() => setValue('category', id, { shouldValidate: true, shouldDirty: true })}
-                      className="flex flex-col items-center gap-1 rounded-xl py-2.5 transition-all active:scale-95"
+                      className="flex flex-col items-center gap-1 py-2.5 transition-all active:scale-95"
                       style={active
                         ? { background: color, border: `1.5px solid ${color}`, color: '#fff' }
                         : { background: P.paper, border: `1.5px solid ${P.line}`, color: P.soft }}
@@ -501,9 +518,9 @@ export default function IncidentForm({
             <div>
               <FieldLabel>Neighbourhood</FieldLabel>
               {activeLocation && watchedNeighborhood && !neighborhoodOverride ? (
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
+                <div className="flex items-center justify-between px-4 py-3" style={{ background: 'rgba(46,139,122,0.09)', border: '1px solid rgba(46,139,122,0.35)' }}>
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full" style={{ background: P.bow }} />
+                    <span className="w-2 h-2" style={{ background: P.bow }} />
                     <span className="font-bold text-sm" style={{ color: P.ink }}>{watchedNeighborhood}</span>
                     <span className="font-mono text-[8.5px] font-bold uppercase tracking-[0.14em]" style={{ color: P.bow }}>Auto-detected</span>
                   </div>
@@ -520,7 +537,7 @@ export default function IncidentForm({
                 <div className="relative">
                   <select
                     {...register('neighborhood')}
-                    className="w-full appearance-none px-4 py-3 pr-10 rounded-xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9]"
+                    className="w-full appearance-none px-4 py-3 pr-10 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9]"
                     style={inputStyle}
                   >
                     <option value="">Select area</option>
@@ -535,7 +552,7 @@ export default function IncidentForm({
                 </div>
               )}
               {errors.neighborhood && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{errors.neighborhood.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{errors.neighborhood.message}</p>
               )}
             </div>
 
@@ -545,11 +562,11 @@ export default function IncidentForm({
               <input
                 {...register('title')}
                 placeholder="e.g. Stolen bike — blue Norco, 9 Ave SE"
-                className="w-full h-11 px-4 rounded-xl font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
+                className="w-full h-11 px-4 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
                 style={inputStyle}
               />
               {errors.title && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{errors.title.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{errors.title.message}</p>
               )}
             </div>
 
@@ -560,11 +577,11 @@ export default function IncidentForm({
                 {...register('description')}
                 placeholder="Give neighbours the details they need — what, when, anything identifying. Your bike's serial number. The truck's colour."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
+                className="w-full px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#4A90D9] placeholder:font-medium"
                 style={inputStyle}
               />
               {errors.description && (
-                <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{errors.description.message}</p>
+                <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{errors.description.message}</p>
               )}
             </div>
 
@@ -579,12 +596,12 @@ export default function IncidentForm({
                 Anyone can see this. Avoid faces, licence plates and house numbers.
               </p>
               {imagePreview ? (
-                <div className="relative rounded-xl overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
+                <div className="relative overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
                   <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
                   <button
                     type="button"
                     onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
-                    className="absolute top-2 right-2 p-1.5 rounded-lg transition-all"
+                    className="absolute top-2 right-2 p-1.5 transition-all"
                     style={{ background: 'rgba(28,43,58,0.8)', color: '#fff' }}
                     aria-label="Remove photo"
                   >
@@ -593,7 +610,7 @@ export default function IncidentForm({
                 </div>
               ) : (
                 <label
-                  className="flex items-center justify-center gap-3 w-full h-16 rounded-xl cursor-pointer transition-colors hover:bg-black/[0.02]"
+                  className="flex items-center justify-center gap-3 w-full h-16 cursor-pointer transition-colors hover:bg-black/[0.02]"
                   style={{ border: `1.5px dashed ${P.line}`, background: P.card }}
                 >
                   <Image size={18} style={{ color: P.soft }} />
@@ -618,18 +635,18 @@ export default function IncidentForm({
                   />
                 </label>
               )}
-              {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: '#C0392B' }}>{imageError}</p>}
+              {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: P.danger }}>{imageError}</p>}
             </div>
 
             {/* Anonymous toggle */}
             <label
-              className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors hover:bg-black/[0.02]"
+              className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-black/[0.02]"
               style={{ background: P.card, border: `1px solid ${P.line}` }}
             >
               <input
                 type="checkbox"
                 {...register('anonymous', { setValueAs: (v) => v === true })}
-                className="h-4 w-4 rounded cursor-pointer accent-[#2E8B7A]"
+                className="h-4 w-4 cursor-pointer accent-[#2E8B7A]"
               />
               <div className="flex-1">
                 <p className="text-xs font-bold" style={{ color: P.ink }}>Hide my name</p>
@@ -641,15 +658,15 @@ export default function IncidentForm({
                 </p>
               </div>
               <span
-                className="font-mono text-[8.5px] font-bold uppercase tracking-[0.12em] px-2 py-1 rounded-full"
-                style={isAnonymous ? { background: 'rgba(46,139,122,0.14)', color: P.bow } : { background: P.paper, color: '#9AA6B2', border: `1px solid ${P.line}` }}
+                className="font-mono text-[8.5px] font-bold uppercase tracking-[0.12em] px-2 py-1"
+                style={isAnonymous ? { background: 'rgba(46,139,122,0.14)', color: P.bow } : { background: P.paper, color: P.faint, border: `1px solid ${P.line}` }}
               >
                 {isAnonymous ? 'Name hidden' : 'Named'}
               </span>
             </label>
 
             {errors.root && (
-              <p className="text-xs font-bold px-1" role="alert" style={{ color: '#C0392B' }}>
+              <p className="text-xs font-bold px-1" role="alert" style={{ color: P.danger }}>
                 {errors.root.message}
               </p>
             )}
@@ -672,8 +689,8 @@ export default function IncidentForm({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-12 px-6 rounded-2xl font-black text-sm flex items-center gap-2 transition-transform active:scale-[0.97] disabled:opacity-50 whitespace-nowrap"
-                style={{ background: P.ink, color: P.paper, boxShadow: '0 14px 28px -14px rgba(28,43,58,0.55)' }}
+                className="h-12 px-6 font-black text-sm flex items-center gap-2 transition-transform hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-50 whitespace-nowrap"
+                style={{ background: P.ink, color: P.paper, boxShadow: `4px 4px 0 ${P.sky}` }}
               >
                 {isSubmitting ? (
                   <>
@@ -708,8 +725,8 @@ export default function IncidentForm({
       onClick={handleClose}
     >
       <div
-        className="relative z-50 w-full max-w-xl max-h-[90vh] rounded-3xl overflow-hidden flex flex-col shadow-[0_32px_80px_-32px_rgba(28,43,58,0.6)]"
-        style={{ background: P.paper, border: `1px solid ${P.line}` }}
+        className="relative z-50 w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_32px_80px_-32px_rgba(28,43,58,0.6)]"
+        style={{ background: P.paper, border: `1.5px solid ${P.ink}` }}
         onClick={(e) => e.stopPropagation()}
       >
         {header}
@@ -724,8 +741,8 @@ export default function IncidentForm({
         onClick={handleClose}
       />
       <div
-        className="fixed bottom-0 left-0 right-0 z-[111] rounded-t-[1.6rem] flex flex-col"
-        style={{ maxHeight: '92dvh', background: P.paper, borderTop: `1px solid ${P.line}`, ...hiddenStyle }}
+        className="fixed bottom-0 left-0 right-0 z-[111] flex flex-col"
+        style={{ maxHeight: '92dvh', background: P.paper, borderTop: `2px solid ${P.ink}`, ...hiddenStyle }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex-shrink-0 flex justify-center pt-3 pb-1">

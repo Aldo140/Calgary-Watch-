@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight, X, Layers as LayersIcon, Radio } from 'lucide-react';
+import { MAP, CATEGORY } from '@/src/lib/tokens';
+import { publicAsset } from '@/src/lib/utils';
 
 export type TourStep = {
   /** matches a [data-tour="…"] attribute; omit for a centered info card */
@@ -43,10 +45,10 @@ function StoryVisual({ kind }: { kind: NonNullable<TourStep['visual']> }) {
         {['You + neighbours', 'YYC Traffic', '311 requests', 'Water mains', 'Weather'].map((s, i) => (
           <span
             key={s}
-            className="rounded-full px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em]"
+            className="px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em]"
             style={i === 0
-              ? { background: '#1C2B3A', color: '#FFFDF8' }
-              : { background: 'rgba(74,144,217,0.1)', color: '#2563EB', border: '1px solid rgba(74,144,217,0.25)' }}
+              ? { background: MAP.ink, color: MAP.panel }
+              : { background: 'rgba(74,144,217,0.1)', color: MAP.accent, border: '1px solid rgba(74,144,217,0.25)' }}
           >
             {s}
           </span>
@@ -60,29 +62,29 @@ function StoryVisual({ kind }: { kind: NonNullable<TourStep['visual']> }) {
         <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#fff] shadow-md shrink-0" style={{ background: color }}>
           <span className="h-2.5 w-2.5 rounded-full bg-[#fff] opacity-90" />
           {withBadge && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[#fff] text-[8px] font-black text-[#fff]" style={{ background: '#0ea5e9' }}>
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[#fff] text-[8px] font-black text-[#fff]" style={{ background: MAP.accent }}>
               C
             </span>
           )}
         </span>
-        <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.12em] text-[#5A6B7D]">{label}</span>
+        <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.12em]" style={{ color: MAP.muted }}>{label}</span>
       </div>
     );
     return (
-      <div className="mt-3 flex items-center gap-6 rounded-xl p-3" style={{ background: '#F7F3EA', border: '1px solid #E7E0D2' }} aria-hidden="true">
-        {pin('#2563EB', true, 'City feed')}
-        {pin('#DC2626', false, 'Neighbour')}
+      <div className="mt-3 flex items-center gap-6 p-3" style={{ background: MAP.paper, border: `1px solid ${MAP.line}` }} aria-hidden="true">
+        {pin(MAP.accent, true, 'City feed')}
+        {pin(CATEGORY.crime, false, 'Neighbour')}
       </div>
     );
   }
   // fresh — post lifecycle strip
   return (
-    <div className="mt-3 flex items-center gap-2 rounded-xl p-3 font-mono text-[9px] font-bold uppercase tracking-[0.1em]" style={{ background: '#F7F3EA', border: '1px solid #E7E0D2', color: '#5A6B7D' }} aria-hidden="true">
-      <span className="rounded-full px-2 py-1" style={{ background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }}>Posted</span>
-      <span className="h-px flex-1" style={{ background: '#D9D2C3' }} />
+    <div className="mt-3 flex items-center gap-2 p-3 font-mono text-[9px] font-bold uppercase tracking-[0.1em]" style={{ background: MAP.paper, border: `1px solid ${MAP.line}`, color: MAP.muted }} aria-hidden="true">
+      <span className="px-2 py-1" style={{ background: 'rgba(46,139,122,0.14)', color: MAP.ok }}>Posted</span>
+      <span className="h-px flex-1" style={{ background: MAP.line }} />
       <span>24 h on the map</span>
-      <span className="h-px flex-1" style={{ background: '#D9D2C3' }} />
-      <span className="rounded-full px-2 py-1" style={{ background: 'rgba(90,107,125,0.12)' }}>Auto-removed</span>
+      <span className="h-px flex-1" style={{ background: MAP.line }} />
+      <span className="px-2 py-1" style={{ background: 'rgba(90,107,125,0.12)' }}>Auto-removed</span>
     </div>
   );
 }
@@ -212,12 +214,12 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
             left: rect!.left - pad,
             width: rect!.width + pad * 2,
             height: rect!.height + pad * 2,
-            borderRadius: 18,
+            borderRadius: 4,
             boxShadow: '0 0 0 9999px rgba(8, 18, 30, 0.72)',
-            border: '2px solid #4A90D9',
+            border: `2px solid ${MAP.accent}`,
           }}
         >
-          <span className="absolute -inset-1.5 rounded-[22px] border-2 border-[#4A90D9] opacity-40 animate-pulse" aria-hidden="true" />
+          <span className="absolute -inset-1.5 border-2 opacity-40 animate-pulse" style={{ borderColor: MAP.accent, borderRadius: 6 }} aria-hidden="true" />
         </motion.div>
       )}
 
@@ -226,13 +228,14 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
         const cardInner = (
           <>
             <div className="flex items-start justify-between gap-3">
-              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-[#2E8B7A]">
+              <p className="relative font-mono text-[9px] font-bold uppercase tracking-[0.24em]" style={{ color: MAP.ok }}>
                 {step.eyebrow ?? 'Tour'} · {index + 1}/{steps.length}
               </p>
               <button
                 type="button"
                 onClick={onFinish}
-                className="-mt-1 -mr-1 flex h-7 w-7 items-center justify-center rounded-full text-[#5A6B7D] hover:bg-black/5"
+                className="relative -mt-1 -mr-1 flex h-7 w-7 items-center justify-center hover:bg-black/5"
+                style={{ color: MAP.muted }}
                 aria-label="Skip tour"
               >
                 <X size={13} />
@@ -240,22 +243,22 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
             </div>
 
             {centered && (
-              <div className="mt-3 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'rgba(74,144,217,0.12)' }} aria-hidden="true">
-                {index === 0 ? <Radio size={18} className="text-[#4A90D9]" /> : <LayersIcon size={18} className="text-[#4A90D9]" />}
+              <div className="relative mt-3 flex h-10 w-10 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }} aria-hidden="true">
+                {index === 0 ? <Radio size={18} style={{ color: MAP.accent }} /> : <LayersIcon size={18} style={{ color: MAP.accent }} />}
               </div>
             )}
 
-            <h3 className="mt-2 font-display text-lg font-bold text-[#1C2B3A]">{step.title}</h3>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-[#5A6B7D]">{step.body}</p>
+            <h3 className="relative mt-2 font-display text-lg font-bold" style={{ color: MAP.ink }}>{step.title}</h3>
+            <p className="relative mt-1.5 text-[13px] leading-relaxed" style={{ color: MAP.muted }}>{step.body}</p>
             {step.visual && <StoryVisual kind={step.visual} />}
 
-            <div className="mt-4 flex items-center justify-between gap-3">
+            <div className="relative mt-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-1.5" aria-hidden="true">
                 {steps.map((s, i) => (
                   <span
                     key={`${s.title}-${i}`}
-                    className="h-1.5 rounded-full transition-all duration-300"
-                    style={{ width: i === index ? 16 : 5, background: i === index ? '#4A90D9' : '#D9D2C3' }}
+                    className="h-1.5 transition-all duration-300"
+                    style={{ width: i === index ? 16 : 5, background: i === index ? MAP.accent : MAP.line }}
                   />
                 ))}
               </div>
@@ -264,7 +267,8 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
                   <button
                     type="button"
                     onClick={() => setIndex(index - 1)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-[#1C2B3A] hover:bg-black/5"
+                    className="flex h-9 w-9 items-center justify-center hover:bg-black/5"
+                    style={{ color: MAP.ink }}
                     aria-label="Previous step"
                   >
                     <ArrowLeft size={14} />
@@ -273,8 +277,8 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
                 <button
                   type="button"
                   onClick={() => (isLast ? onFinish() : setIndex(index + 1))}
-                  className="flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-bold"
-                  style={{ background: '#1C2B3A', color: '#FFFDF8' }}
+                  className="flex h-9 items-center gap-1.5 px-4 text-[13px] font-bold transition-transform hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none"
+                  style={{ background: MAP.ink, color: MAP.panel, boxShadow: `4px 4px 0 ${MAP.accent}` }}
                 >
                   {isLast ? 'Got it' : 'Next'}
                   {!isLast && <ArrowRight size={13} />}
@@ -294,9 +298,17 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="pointer-events-auto w-full rounded-2xl p-5 sm:p-6 shadow-2xl"
-                style={{ maxWidth: 400, background: '#FFFDF8', border: '1px solid #D9D2C3' }}
+                className="pointer-events-auto relative w-full overflow-hidden p-5 sm:p-6 shadow-2xl"
+                style={{ maxWidth: 400, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
               >
+                {/* Decoration only: the city in one frame, behind the story
+                    cards that explain what the map is for. */}
+                <img
+                  src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
+                  alt=""
+                  width={800} height={800} loading="lazy" aria-hidden="true"
+                  className="pointer-events-none absolute -right-10 -top-10 w-40 opacity-[0.05] select-none"
+                />
                 {cardInner}
               </motion.div>
             </AnimatePresence>
@@ -309,8 +321,8 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute rounded-2xl p-5 shadow-2xl"
-              style={{ ...cardStyle, background: '#FFFDF8', border: '1px solid #D9D2C3' }}
+              className="absolute p-5 shadow-2xl"
+              style={{ ...cardStyle, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
             >
               {cardInner}
             </motion.div>

@@ -1797,7 +1797,7 @@ export default function MapPage() {
             className="block w-full text-left transition-transform active:scale-[0.99] p-3.5"
           >
             <span className="absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #2E8B7A, transparent 70%)' }} aria-hidden="true" />
-            <p className="font-mono text-[8px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
               Your briefing is ready
             </p>
             <p className={cn('font-black mt-1 truncate', compact ? 'text-[13px]' : 'text-[14.5px]')} style={{ color: '#FFFDF8' }}>
@@ -1815,14 +1815,14 @@ export default function MapPage() {
             )}
             {stats ? (
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="flex items-center gap-1.5 px-2 py-1 font-mono text-[8.5px] font-bold uppercase tracking-[0.1em]" style={{ background: `${stats.band.color}2e`, color: '#FFFDF8' }}>
+                <span className="flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: `${stats.band.color}2e`, color: '#FFFDF8' }}>
                   <span className="h-1.5 w-1.5 rounded-full" style={{ background: stats.band.color }} />
                   {stats.band.label}
                 </span>
-                <span className="px-2 py-1 font-mono text-[8.5px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
+                <span className="px-2 py-1 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
                   #{stats.rank} of {stats.count}
                 </span>
-                <span className="px-2 py-1 font-mono text-[8.5px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
+                <span className="px-2 py-1 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
                   {stats.entry.crime} concerns · {stats.entry.year}
                 </span>
               </div>
@@ -1831,7 +1831,7 @@ export default function MapPage() {
                 Reports near your door, cameras, and what your community reads
               </p>
             )}
-            <p className="mt-2 font-mono text-[8.5px] font-bold uppercase tracking-[0.16em]" style={{ color: '#7FB5A6' }}>
+            <p className="mt-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: '#7FB5A6' }}>
               Open your briefing →
             </p>
           </button>
@@ -1867,7 +1867,7 @@ export default function MapPage() {
         </span>
         <span className="min-w-0">
           <span className={cn('block font-bold text-[#1C2B3A] line-clamp-2 leading-snug', compact ? 'text-[11.5px]' : 'text-[12px]')}>{n.title}</span>
-          <span className="block font-mono text-[9px] text-[#5A6B7D] mt-0.5">
+          <span className="block font-mono text-[10px] text-[#5A6B7D] mt-0.5">
             {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </span>
@@ -2087,7 +2087,7 @@ export default function MapPage() {
                                 <Home size={15} className="text-[#2E8B7A]" />
                               </span>
                               <div className="min-w-0">
-                                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Report area</p>
+                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Report area</p>
                                 <p className="mt-0.5 text-sm font-bold truncate text-[#1C2B3A]">
                                   {preferredAddress || preferredNeighborhood || preferredInferredNeighborhood || 'No location set'}
                                 </p>
@@ -2098,13 +2098,13 @@ export default function MapPage() {
                                 <Bell size={15} className="text-[#4A90D9]" />
                               </span>
                               <div className="min-w-0 flex-1">
-                                <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Weekly digest</p>
+                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Weekly digest</p>
                                 <p className="mt-0.5 text-sm font-bold text-[#1C2B3A]">
                                   {userProfile?.weeklyDigestOptIn === true ? 'Neighbourhood stats + news, weekly' : 'Off'}
                                 </p>
                               </div>
                               <span
-                                className="shrink-0 font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] px-2 py-1"
+                                className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.14em] px-2 py-1"
                                 style={userProfile?.weeklyDigestOptIn === true
                                   ? { background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }
                                   : { background: '#F7F3EA', color: '#9AA6B2', border: '1px solid #E7E0D2' }}
@@ -2152,7 +2152,7 @@ export default function MapPage() {
                                   Address or nearby landmark
                                 </span>
                                 <span
-                                  className="px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.14em]"
+                                  className="px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em]"
                                   style={{ background: 'rgba(46,139,122,0.14)', color: '#2E8B7A' }}
                                 >
                                   Recommended
@@ -2651,7 +2651,7 @@ export default function MapPage() {
                 <p className="text-[12.5px] font-black tracking-tight text-stone-900 truncate">
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </p>
-                <p className="mt-1 truncate font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
+                <p className="mt-1 truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
                   {mapIncidents.length === 0 ? 'Be first to report' : 'Tap for the full feed'}
                 </p>
               </div>
@@ -2730,7 +2730,7 @@ export default function MapPage() {
             >
               <Bell size={18} className={cn(unreadNotifications > 0 && 'text-[#4A90D9]')} />
               {unreadNotifications > 0 && (
-                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-[#C0392B] text-[#FFFDF8] text-[9px] font-black rounded-full flex items-center justify-center border border-black/20">
+                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-[#C0392B] text-[#FFFDF8] text-[10px] font-black rounded-full flex items-center justify-center border border-black/20">
                   {unreadNotifications > 9 ? '9+' : unreadNotifications}
                 </span>
               )}
@@ -2746,7 +2746,7 @@ export default function MapPage() {
                 >
                   <div className="flex items-center justify-between px-3.5 py-3" style={{ borderBottom: '1px solid #E7E0D2' }}>
                     <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#5A6B7D]">Alerts</h3>
-                    <span className="flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
                       <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-[#2E8B7A]" />
                       Live
                     </span>
@@ -3132,7 +3132,7 @@ export default function MapPage() {
                         Real stats for your neighbourhood + community news, by email. Free, opt out anytime.
                       </span>
                     </span>
-                    <span className="shrink-0 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#2E8B7A]">
+                    <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#2E8B7A]">
                       {user ? 'Turn on' : 'Sign up'} →
                     </span>
                   </motion.button>
@@ -3156,7 +3156,7 @@ export default function MapPage() {
                 <h1 className="text-[12px] font-black tracking-tight text-[#0B1F33]">
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </h1>
-                <p className="mt-1 font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
+                <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
                   {filteredIncidentsCount} visible / Calgary Watch
                 </p>
               </div>
@@ -3215,7 +3215,7 @@ export default function MapPage() {
                   >
                     <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #E7E0D2' }}>
                       <h3 className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#5A6B7D]">Alerts</h3>
-                      <span className="flex items-center gap-1.5 font-mono text-[8.5px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
+                      <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#2E8B7A]">
                         <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-[#2E8B7A]" />
                         Live
                       </span>
@@ -3423,7 +3423,7 @@ export default function MapPage() {
 
           <div className="flex items-center gap-2 rounded-xl border border-[#C9D8E4] bg-[rgba(255,253,248,0.94)] px-3 py-2 shadow-[0_3px_8px_rgba(11,31,51,0.1)] backdrop-blur-lg">
             <ShieldAlert size={12} className="text-[#C77F18]" />
-            <span className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
               Verify before action.
             </span>
           </div>

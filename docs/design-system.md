@@ -91,12 +91,57 @@ crime is warm on the map and blue in the admin charts.
 
 ## The failure mode this codebase has
 
-This app is **light-only**: `@variant light (&)` in `index.css` makes every
-`light:` utility apply unconditionally. So `text-white light:text-slate-900`
-renders *slate*, and deleting the `light:` half silently leaves white text on a
-cream panel.
+Read this before changing a colour on any map-heavy screen.
 
-That has produced invisible text in "Sign In", the mobile live count, "Set Pin
-Here", "Cancel" and the account menu. When touching an existing component,
-prefer an explicit inline colour over the `light:` pair. Do not delete half of
-one.
+`index.css` lines 277–340 hold an **`!important` remap of specific dark-first
+class names to light values**. Not a theme, not a variant — a hard-coded list:
+
+```css
+.bg-slate-950  { background-color: rgba(246,239,226,0.96) !important; }
+.bg-slate-900  { background-color: rgba(255,251,245,0.96) !important; }
+.text-white    { color: #1f2937 !important; }
+.text-slate-300{ color: #44403c !important; }
+.text-slate-400{ color: #6b7280 !important; }
+.text-slate-500{ color: #78716c !important; }
+.border-white\/10, .bg-white\/5, .text-blue-400 …
+```
+
+Pages here are authored with dark utility names and rendered light by this
+remap. Three consequences, each of which has already cost real debugging time:
+
+**1. `text-white` is not white.** It is `#1f2937`. A pair like
+`text-white light:text-slate-900` renders dark because of the remap, not
+because the `light:` half won. Deleting either half changes what renders, and
+which one matters depends on whether the class is in the list above.
+
+**2. Renaming `slate-*` to `stone-*` silently escapes the remap.** `stone` is
+not in the list. `bg-slate-950` was rendering cream; `bg-stone-950` renders
+near-black. `text-slate-300` was rendering `#44403c`; `text-stone-300` is
+`#D6D3D1` — invisible on a cream panel. A bulk rename across the map chrome
+broke the loading shell, the account dropdown, the report tooltip, the sort
+select and eight menu rows in one pass. **If you rename a remapped class, you
+must replace it with an explicit colour, not another Tailwind name.**
+
+**3. It only covers the names on that list.** Anything outside it renders its
+literal Tailwind value, so two visually identical-looking classes can behave
+completely differently.
+
+The safe move when touching any of these: replace the whole pair with **one
+explicit colour** (`style={{ color: '#1C2B3A' }}`) and look at the element
+afterwards. Never delete half of a pair, and never bulk-rename across the list.
+
+This has produced invisible text in "Sign In", the mobile live count, "Set Pin
+Here", "Cancel", the account menu and the SOS close button. It is the single
+most expensive gotcha in this repo.
+
+## A trap in the Button component
+
+`ui/Button.tsx` used to ship `shadow-blue-500/20` on its primary variant. That
+sets `--tw-shadow-color`, which repaints **any** `shadow-[…]` a caller passes
+through `className` — so every hard-offset press placed on a Button rendered
+blue regardless of the colour written, including the SOS button's red one. The
+colour utilities are gone; keep it that way.
+
+Its base `active:scale-95` now only applies when the caller has not written
+their own `active:` press, because the two are different properties and
+otherwise compose into a button that shrinks *and* slides.

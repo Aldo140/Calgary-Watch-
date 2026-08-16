@@ -185,7 +185,7 @@ export default function Sidebar({
           />
         </div>
         <div className="flex h-11 min-w-[62px] flex-col items-center justify-center rounded-xl bg-[#0B1F33] px-3">
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.12em] leading-none text-[#C9D8E4]">Shown</span>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] leading-none text-[#C9D8E4]">Shown</span>
           <motion.span className="mt-1 text-base font-black leading-none tabular-nums text-[#FFFDF8]">
             {displayCount}
           </motion.span>
@@ -247,7 +247,7 @@ export default function Sidebar({
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-[#0B1F33]">Feed controls</span>
               {(feedFilter || searchQuery || selectedCategory !== 'all') && (
-                <span className="bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-blue-300 light:text-blue-700">
+                <span className="bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-blue-300 light:text-blue-700">
                   Filtered
                 </span>
               )}
@@ -434,7 +434,7 @@ export default function Sidebar({
                       {isEmergency && (
                         <div className="absolute right-3 top-3 flex items-center gap-1 bg-[#C0392B] px-2 py-1">
                           <Siren size={10} className="text-[#FFFDF8]" />
-                          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.18em] text-[#FFFDF8]">SOS</span>
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#FFFDF8]">SOS</span>
                         </div>
                       )}
 
@@ -468,27 +468,27 @@ export default function Sidebar({
                                     {incident.data_source === 'demo' && <DemoBadge size="xs" />}
                                     {/* Data-source badge — only for non-community reports */}
                                     {incident.source_type === 'reddit_calgary' && (
-                                      <span className="px-1.5 py-0.5 bg-orange-500/20 border border-orange-500/30 text-[8px] font-black text-orange-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-orange-500/20 border border-orange-500/30 text-[10px] font-black text-orange-400 uppercase tracking-tighter">
                                         Reddit
                                       </span>
                                     )}
                                     {incident.source_type === 'news_rss' && (
-                                      <span className="px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-[8px] font-black text-purple-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-purple-500/20 border border-purple-500/30 text-[10px] font-black text-purple-400 uppercase tracking-tighter">
                                         News
                                       </span>
                                     )}
                                     {incident.data_source === 'official' && incident.source_type !== 'reddit_calgary' && incident.source_type !== 'news_rss' && (
-                                      <span className="px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 text-[8px] font-black text-blue-400 uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 text-[10px] font-black text-blue-400 uppercase tracking-tighter">
                                         Official
                                       </span>
                                     )}
                                     {incident.data_source === 'system' && (
-                                      <span className="px-1.5 py-0.5 bg-[#E8F3FC] border border-[#C9D8E4] text-[8px] font-black text-[#5A6B7D] uppercase tracking-tighter">
+                                      <span className="px-1.5 py-0.5 bg-[#E8F3FC] border border-[#C9D8E4] text-[10px] font-black text-[#5A6B7D] uppercase tracking-tighter">
                                         Auto
                                       </span>
                                     )}
                                     {isNew && (
-                                      <span className="px-1.5 py-0.5 bg-[#4A90D9] text-[8px] font-black text-[#FFFDF8] uppercase tracking-tighter animate-pulse">
+                                      <span className="px-1.5 py-0.5 bg-[#4A90D9] text-[10px] font-black text-[#FFFDF8] uppercase tracking-tighter animate-pulse">
                                         New
                                       </span>
                                     )}
@@ -605,7 +605,7 @@ export default function Sidebar({
 
       {/* Sidebar Footer */}
       <div className="p-4 border-t border-[#E7E0D2] bg-[#F7F3EA]">
-        <p className="font-mono text-[9px] text-[#5A6B7D] font-bold uppercase tracking-[0.18em] text-center">
+        <p className="font-mono text-[10px] text-[#5A6B7D] font-bold uppercase tracking-[0.18em] text-center">
           Powered by Calgary Watch • Community Safety Platform
         </p>
       </div>

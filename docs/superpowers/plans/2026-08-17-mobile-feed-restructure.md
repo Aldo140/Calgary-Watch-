@@ -1855,7 +1855,7 @@ category chips have one home, and the bar finally opens a focused field."
 - [ ] **Step 1: Confirm the full suite and typecheck are green**
 
 Run: `npm run lint && npm test 2>&1 | tail -10`
-Expected: no TS errors; `# fail 0`; total 271 (240 baseline + 7 + 13 + 11).
+Expected: no TS errors; `# fail 0`; total 284 (240 baseline + 44 added across Tasks 1-5, including fix-round extractions: clampOffset, exceedsDragSlop, shouldAutoResolveNearest).
 
 - [ ] **Step 2: Sweep for orphaned symbols**
 

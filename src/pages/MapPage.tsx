@@ -7,7 +7,8 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
-import MobileMapSheet, { SnapPoint } from '@/src/components/MobileMapSheet';
+import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
+import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
 import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible } from '@/src/types';
@@ -712,7 +713,8 @@ export default function MapPage() {
   const nearMeScanTimer = useRef<number | null>(null);
   const NEAR_ME_RADIUS_KM = 3;
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [sheetSnap, setSheetSnap] = useState<SnapPoint>('80px');
+  const [sheetState, setSheetState] = useState<SheetState>('rail');
+  const sheetRef = useRef<MapSheetRef>(null);
   const [notifications, setNotifications] = useState<MapNotification[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -1075,6 +1077,18 @@ export default function MapPage() {
     startTransition(() => setSelectedIncident(incident));
   }, [handleMarkerClick]);
 
+  /**
+   * A row tap in the mobile sheet.
+   *
+   * Routed through handleMarkerClick rather than the sheet reaching into the map
+   * itself, so tapping a row and tapping its marker are one code path — which is
+   * what makes activeIncidentId correct for both.
+   */
+  const handleSheetIncidentClick = useCallback((incident: Incident) => {
+    handleMarkerClick(incident);
+    setSheetState('rail');
+  }, [handleMarkerClick]);
+
   const handleReportFromIncident = useCallback((incident: Incident) => {
     setSelectedIncident(null);
     setSelectedArea(null);
@@ -1082,7 +1096,7 @@ export default function MapPage() {
     setConfirmedPinLocation({ lat: incident.lat, lng: incident.lng });
     setIsPinMode(false);
     setIsFormOpen(true);
-    setSheetSnap('80px');
+    setSheetState('rail');
   }, []);
 
   /**
@@ -1661,6 +1675,15 @@ export default function MapPage() {
     setSelectedArea({ ...base, communityName: displayName });
   }, [incidents, mapRef, crimeStats, cityAverages]);
 
+  // Placed here rather than beside handleSheetIncidentClick because it closes
+  // over handleViewNeighborhood, which is a `const` declared just above —
+  // referencing it any earlier in the component body would throw a
+  // temporal-dead-zone ReferenceError on every render.
+  const handleSheetNeighbourhoodSelect = useCallback((name: string) => {
+    handleViewNeighborhood(name);
+    setSheetState('rail');
+  }, [handleViewNeighborhood]);
+
   useEffect(() => {
     // Require a registered address — neighborhood/inferred alone is not enough
     if (!user || !preferredAddress || profileNeedsSetup) return;
@@ -1733,9 +1756,15 @@ export default function MapPage() {
     if (notification.neighborhood) {
       handleViewNeighborhood(notification.neighborhood);
       setShowNotifications(false);
-      setSheetSnap('80px');
+      setSheetState('rail');
     }
   }, [handleViewNeighborhood]);
+
+  // The sheet used to collapse itself when pin mode began. Ownership of sheet
+  // position now sits here, so the page does it.
+  useEffect(() => {
+    if (isPinMode || isEmergencyPinMode) setSheetState('rail');
+  }, [isPinMode, isEmergencyPinMode]);
 
   // ── Live area snapshot for the neighbourhood-report notification ──────────
   // Registry-sourced inferredNeighborhood now matches 311 comm_name keys, so
@@ -1945,6 +1974,12 @@ export default function MapPage() {
       celebrate('Weekly digest on — your neighbourhood stats will land by email.');
     } catch { /* profile listener will re-sync */ }
   }, [user, celebrate]);
+
+  // Temporary — Task 6 replaces this with the real derived feed count shared
+  // with the chrome badge.
+  const feedCount = feedIncidents.filter(
+    (i) => selectedCategory === 'all' || i.category === selectedCategory,
+  ).length;
 
   return (
     <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
@@ -2591,36 +2626,38 @@ export default function MapPage() {
         />
 
         {/* Tap-to-close: transparent target covering exposed map when sheet is fully expanded */}
-        {sheetSnap === 0.82 && (
+        {sheetState === 'raised' && (
           <div
             className="fixed inset-x-0 top-0 z-[49] cursor-pointer lg:hidden"
             style={{ bottom: '82vh' }}
-            onClick={() => setSheetSnap('80px')}
+            onClick={() => setSheetState('rail')}
             aria-label="Tap to close sheet"
           />
         )}
 
         {/* Mobile Bottom Sheet */}
         <MobileMapSheet
+          ref={sheetRef}
           incidents={feedIncidents}
+          feedCount={feedCount}
           timeWindow={timeWindow}
           onTimeWindowChange={setTimeWindow}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          liveCount={mapIncidents.length}
-          mapRef={mapRef}
-          isPinMode={isPinMode || isEmergencyPinMode}
-          isFormOpen={isFormOpen}
-          snap={sheetSnap}
-          setSnap={setSheetSnap}
+          state={sheetState}
+          onStateChange={setSheetState}
+          userLocation={userLocation}
           hasMore={hasMoreIncidents}
           isLoadingMore={isLoadingMoreIncidents}
           onLoadMore={handleLoadMoreIncidents}
+          onIncidentClick={handleSheetIncidentClick}
+          onNeighbourhoodSelect={handleSheetNeighbourhoodSelect}
           onReportPress={() => {
-            setSheetSnap('80px');
+            setSheetState('rail');
             setIsFormOpen(true);
           }}
           activeIncidentId={activeIncidentId}
+          hidden={isFormOpen || isPinMode || isEmergencyPinMode}
         />
 
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
@@ -2642,7 +2679,7 @@ export default function MapPage() {
             <button
               type="button"
               data-tour="m-feed"
-              onClick={() => setSheetSnap(sheetSnap === '80px' ? 0.38 : 0.82)}
+              onClick={() => setSheetState('raised')}
               className="flex h-11 min-w-0 flex-1 items-center gap-3 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 text-left shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-transform active:scale-[0.99]"
             >
               <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
@@ -3503,7 +3540,7 @@ export default function MapPage() {
             onOpenArea={() => {
               if (briefingCommunity) {
                 handleViewNeighborhood(briefingCommunity);
-                setSheetSnap('80px');
+                setSheetState('rail');
               }
             }}
             onOpenSettings={() => openAuthPanel('settings')}

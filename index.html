@@ -190,6 +190,45 @@
     <!-- Firebase Auth / Firestore -->
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+    <!--
+      First-paint styling for the prerendered shell.
+
+      The build writes each route's real <h1> and description into #root so
+      crawlers get content without executing JavaScript. React replaces it on
+      mount (createRoot clears the container), but until then a visitor was
+      looking at raw black-on-white text — which read as a broken page or a
+      metadata dump rather than as Calgary Watch loading.
+
+      This is inline and not in the CSS bundle on purpose: it has to apply on
+      the very first paint, before any stylesheet has been fetched. The content
+      itself is unchanged and still fully visible to crawlers, so this styles
+      the page rather than hiding anything from anyone.
+    -->
+    <style>
+      html, body { background: #06162F; margin: 0; }
+      [data-prerendered-route] {
+        min-height: 100dvh;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 1rem; padding: 2rem 1.5rem; text-align: center;
+        background: #06162F; color: #F2EFE8;
+        font-family: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+      }
+      [data-prerendered-route] h1 {
+        margin: 0; max-width: 18ch;
+        font-size: clamp(1.6rem, 5.5vw, 2.9rem);
+        font-weight: 800; line-height: 1.05; letter-spacing: -0.03em;
+      }
+      [data-prerendered-route] p {
+        margin: 0; max-width: 46ch;
+        font-size: 0.95rem; line-height: 1.55; color: #AFC5DF;
+      }
+      [data-prerendered-route] a { color: #F2EFE8; }
+      @media (prefers-reduced-motion: no-preference) {
+        [data-prerendered-route] { animation: cw-shell-in 240ms ease-out both; }
+        @keyframes cw-shell-in { from { opacity: 0 } to { opacity: 1 } }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

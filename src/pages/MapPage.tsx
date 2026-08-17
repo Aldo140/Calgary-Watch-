@@ -715,7 +715,11 @@ export default function MapPage() {
    * near-me button all collapsed the sheet instead of acting. The height is
    * measured rather than assumed because it varies with
    * env(safe-area-inset-top), and a hard-coded guess meeting a variable-height
-   * element is exactly what caused the bug.
+   * element is exactly what caused the bug. This fixes Home and the search
+   * bar, which live inside the measured region; the category chip is gone
+   * (the sheet holds the only copy now); the near-me button lives in a
+   * separate sibling container and is raised above the scrim independently,
+   * by z-index, since its height doesn't need to be measured.
    */
   useEffect(() => {
     const el = chromeRef.current;
@@ -2736,10 +2740,13 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Mobile vertical action buttons (right edge) */}
+        {/* Mobile vertical action buttons (right edge). z-[51] (matching the
+            chrome bar) keeps these above the tap-to-close scrim (z-[49]) —
+            the container stays pointer-events-none between the buttons, so
+            the scrim still catches taps on the exposed map around them. */}
         <div
           className={cn(
-            'absolute right-3 top-28 z-30 flex flex-col gap-2 pointer-events-none text-[#0B1F33] transition-all duration-200 lg:hidden',
+            'absolute right-3 top-28 z-[51] flex flex-col gap-2 pointer-events-none text-[#0B1F33] transition-all duration-200 lg:hidden',
             (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible translate-x-4'
           )}
         >

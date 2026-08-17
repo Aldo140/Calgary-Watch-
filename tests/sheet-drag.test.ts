@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { resolveDragEnd } from '../src/hooks/useSheetDrag.ts';
+import { clampOffset, resolveDragEnd } from '../src/hooks/useSheetDrag.ts';
 
 const TRAVEL = 600; // px between rail and raised
 
@@ -71,5 +71,35 @@ describe('resolveDragEnd degenerate input', () => {
   it('holds state on a tap that did not move', () => {
     assert.equal(resolveDragEnd({ deltaY: 0, velocity: 0, travel: TRAVEL, state: 'rail' }), 'rail');
     assert.equal(resolveDragEnd({ deltaY: 0, velocity: 0, travel: TRAVEL, state: 'raised' }), 'raised');
+  });
+});
+
+describe('clampOffset from raised', () => {
+  const from = 'raised' as const;
+
+  it('clamps offset to [0, travel]', () => {
+    assert.equal(clampOffset(0, from, TRAVEL), 0);
+    assert.equal(clampOffset(300, from, TRAVEL), 300);
+    assert.equal(clampOffset(600, from, TRAVEL), 600);
+    assert.equal(clampOffset(800, from, TRAVEL), 600);
+  });
+
+  it('prevents upward drag when raised', () => {
+    assert.equal(clampOffset(-100, from, TRAVEL), 0);
+  });
+});
+
+describe('clampOffset from rail', () => {
+  const from = 'rail' as const;
+
+  it('clamps offset to [-travel, 0]', () => {
+    assert.equal(clampOffset(0, from, TRAVEL), 0);
+    assert.equal(clampOffset(-300, from, TRAVEL), -300);
+    assert.equal(clampOffset(-600, from, TRAVEL), -600);
+    assert.equal(clampOffset(-800, from, TRAVEL), -600);
+  });
+
+  it('prevents downward drag when rail', () => {
+    assert.equal(clampOffset(100, from, TRAVEL), 0);
   });
 });

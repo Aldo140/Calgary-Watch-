@@ -43,12 +43,28 @@ export function resolveDragEnd({ deltaY, velocity, travel, state }: DragEndInput
   return state;
 }
 
+/**
+ * Clamps a raw drag offset to the valid range for a given starting state.
+ *
+ * When dragging from raised, the sheet can move down to travel distance,
+ * but never upward past its current position. From rail, it can move up to
+ * travel distance, but never downward. This prevents visual overshoot.
+ */
+export function clampOffset(raw: number, startState: SheetState, travel: number): number {
+  if (startState === 'raised') {
+    return Math.max(0, Math.min(raw, travel));
+  } else {
+    return Math.min(0, Math.max(raw, -travel));
+  }
+}
+
 interface ActiveDrag {
   pointerId: number;
   startY: number;
   lastY: number;
   lastT: number;
   velocity: number;
+  startState: SheetState;
 }
 
 /**
@@ -83,8 +99,8 @@ export function useSheetDrag({
   const active = useRef<ActiveDrag | null>(null);
   const pending = useRef<{ pointerId: number; startY: number } | null>(null);
 
-  const begin = useCallback((pointerId: number, clientY: number, el: HTMLElement) => {
-    active.current = { pointerId, startY: clientY, lastY: clientY, lastT: performance.now(), velocity: 0 };
+  const begin = useCallback((pointerId: number, clientY: number, el: HTMLElement, startState: SheetState) => {
+    active.current = { pointerId, startY: clientY, lastY: clientY, lastT: performance.now(), velocity: 0, startState };
     setIsDragging(true);
     try {
       el.setPointerCapture(pointerId);
@@ -105,9 +121,10 @@ export function useSheetDrag({
 
       // Clamp so the sheet cannot be pulled past either end.
       const raw = clientY - drag.startY;
-      setOffsetY(state === 'raised' ? Math.max(0, raw) : Math.min(0, raw));
+      const clamped = clampOffset(raw, drag.startState, travel);
+      setOffsetY(clamped);
     },
-    [state],
+    [travel],
   );
 
   const finish = useCallback(() => {
@@ -121,15 +138,15 @@ export function useSheetDrag({
       deltaY: drag.lastY - drag.startY,
       velocity: drag.velocity,
       travel,
-      state,
+      state: drag.startState,
     });
-    if (next !== state) onStateChange(next);
-  }, [onStateChange, state, travel]);
+    if (next !== drag.startState) onStateChange(next);
+  }, [onStateChange, travel]);
 
   const headerHandlers = {
     onPointerDown: (e: ReactPointerEvent<HTMLElement>) => {
       if (!enabled) return;
-      begin(e.pointerId, e.clientY, e.currentTarget);
+      begin(e.pointerId, e.clientY, e.currentTarget, state);
     },
     onPointerMove: (e: ReactPointerEvent<HTMLElement>) => move(e.clientY),
     onPointerUp: () => finish(),
@@ -154,7 +171,7 @@ export function useSheetDrag({
       const atTop = (scrollRef.current?.scrollTop ?? 0) <= 0;
       if (delta > DRAG_SLOP && atTop) {
         pending.current = null;
-        begin(e.pointerId, candidate.startY, e.currentTarget);
+        begin(e.pointerId, candidate.startY, e.currentTarget, state);
         move(e.clientY);
       } else if (Math.abs(delta) > DRAG_SLOP) {
         // Upward, or not at the top: this is a scroll. Stop watching.

@@ -2708,11 +2708,16 @@ export default function MapPage() {
             >
               <Home size={18} />
             </button>
+            {/* No aria-label: it previously overrode the visible headline,
+                sub-label and count badge with static text that omitted the
+                count entirely (WCAG 2.5.3, Label in Name). Letting the
+                button's own content compute the accessible name means the
+                live count a reader can see is exactly what a voice-control
+                user can speak. */}
             <button
               type="button"
               data-tour="m-feed"
               onClick={() => sheetRef.current?.raiseAndFocusSearch()}
-              aria-label="Search reports and open the feed"
               className="flex h-11 min-w-0 flex-1 items-center gap-3 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 text-left shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-transform active:scale-[0.99]"
             >
               <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
@@ -2740,8 +2745,11 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Mobile vertical action buttons (right edge). z-[51] (matching the
-            chrome bar) keeps these above the tap-to-close scrim (z-[49]) —
+        {/* Mobile vertical action buttons (right edge). z-[51], matching the
+            chrome bar, keeps these above the tap-to-close scrim (z-[49]) and
+            below the raised sheet (z-[52] in MobileMapSheet.tsx — the sheet
+            must win where it overlaps this column, so its own masthead and
+            search row stay tappable instead of a button poking through) —
             the container stays pointer-events-none between the buttons, so
             the scrim still catches taps on the exposed map around them. */}
         <div

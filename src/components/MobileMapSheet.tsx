@@ -248,13 +248,6 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
   }, [hasLocation, state]);
 
   useEffect(() => {
-    try {
-      if (feedFilter) localStorage.setItem(FEED_FILTER_KEY, feedFilter);
-      else localStorage.removeItem(FEED_FILTER_KEY);
-    } catch { /* private mode */ }
-  }, [feedFilter]);
-
-  useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 200);
     return () => clearTimeout(t);
   }, [search]);
@@ -308,11 +301,24 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
 
   const hasActiveFilters = Boolean(feedFilter) || Boolean(search) || selectedCategory !== 'all';
 
+  // Same shape as handleSortChange below, and for the same reason: persist
+  // only on the reader's explicit choice, never from an effect keyed on the
+  // state itself, which cannot tell "the reader chose this" apart from "this
+  // is what we just read from storage at mount" and clobbers a stored value
+  // on every load.
+  const handleFeedFilterChange = useCallback((next: 'community' | 'recent' | null) => {
+    setFeedFilter(next);
+    try {
+      if (next) localStorage.setItem(FEED_FILTER_KEY, next);
+      else localStorage.removeItem(FEED_FILTER_KEY);
+    } catch { /* private mode */ }
+  }, []);
+
   const clearAllFilters = useCallback(() => {
-    setFeedFilter(null);
+    handleFeedFilterChange(null);
     setSearch('');
     onCategoryChange('all');
-  }, [onCategoryChange]);
+  }, [onCategoryChange, handleFeedFilterChange]);
 
   const handleNeighborhood = useCallback(
     (name: string) => {
@@ -358,7 +364,13 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       // together — this is exactly what the deleted `visibility: hidden`
       // vaul hack was actually doing.
       inert={hidden}
-      className="fixed inset-x-0 bottom-0 z-[50] flex flex-col lg:hidden"
+      // z-[52]: strictly above the chrome bar and the right-edge action
+      // column (both z-[51], MapPage.tsx), which are themselves above the
+      // tap-to-close scrim (z-[49]). Raising the sheet — rather than lowering
+      // the chrome — is deliberate: it keeps Home, near-me, notifications and
+      // account tappable in the band the sheet doesn't cover, while nothing
+      // floats over the sheet's own masthead/search row where it does.
+      className="fixed inset-x-0 bottom-0 z-[52] flex flex-col lg:hidden"
       style={{
         height: `${RAISED_FRACTION * 100}vh`,
         background: P.paper,
@@ -393,7 +405,12 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             <button
               type="button"
               onClick={() => onStateChange('raised')}
-              aria-label="Open the incident feed"
+              // The accessible name must contain the visible label (WCAG
+              // 2.5.3) — folding the count into the label rather than
+              // dropping aria-label keeps the "open the feed" action verb a
+              // screen-reader user would otherwise lose.
+              aria-label={`${feedCount} live report${feedCount !== 1 ? 's' : ''} — open the feed`}
+              aria-expanded={isRaised}
               className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
             >
               <span className="relative flex h-2 w-2 items-center justify-center">
@@ -432,6 +449,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
               type="button"
               onClick={() => onStateChange('rail')}
               aria-label="Lower the feed"
+              aria-expanded={isRaised}
               className="flex h-9 w-9 shrink-0 items-center justify-center"
               style={{ color: P.eyebrow }}
             >
@@ -465,8 +483,16 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
         </div>
       </div>
 
-      {/* Category chips — the only copy in the app now. */}
-      <div className="shrink-0 px-3 pb-2">
+      {/* Category chips — the only copy in the app now.
+          At rail, this row sits translated below the viewport (position:
+          fixed, so nothing scrolls it into view) but stays mounted for the
+          same reason the whole sheet does — see the section-level `inert`
+          comment above. `inert` removes it from the tab order and hit-testing
+          at rail without unmounting it. Never gate the search wrapper this
+          way: its input's synchronous focus() is the only thing that opens
+          the iOS keyboard from raiseAndFocusSearch, and `inert` would block
+          that focus() call outright. */}
+      <div className="shrink-0 px-3 pb-2" inert={state === 'rail'}>
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
           {CATEGORY_OPTIONS.map(({ id, label, Icon, color }) => {
             const count = id === 'all'
@@ -530,7 +556,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             <button
               type="button"
               aria-pressed={feedFilter === 'community'}
-              onClick={() => setFeedFilter((v) => (v === 'community' ? null : 'community'))}
+              onClick={() => handleFeedFilterChange(feedFilter === 'community' ? null : 'community')}
               className="h-7 border-[1.5px] px-3 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-transform active:scale-95"
               style={feedFilter === 'community'
                 ? { background: 'rgba(46,139,122,0.14)', borderColor: 'rgba(46,139,122,0.45)', color: '#1F6D5F' }
@@ -541,7 +567,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             <button
               type="button"
               aria-pressed={feedFilter === 'recent'}
-              onClick={() => setFeedFilter((v) => (v === 'recent' ? null : 'recent'))}
+              onClick={() => handleFeedFilterChange(feedFilter === 'recent' ? null : 'recent')}
               className="h-7 border-[1.5px] px-3 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-transform active:scale-95"
               style={feedFilter === 'recent'
                 ? { background: P.ink, borderColor: P.ink, color: P.paper }
@@ -563,10 +589,15 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
         </div>
       )}
 
-      {/* Scrollable list. Drags only from scrollTop 0 and only downward. */}
+      {/* Scrollable list. Drags only from scrollTop 0 and only downward.
+          At rail, up to 60 incident rows and the pulse buttons stay mounted
+          but translated offscreen with no visible focus ring reachable —
+          `inert` pulls them out of the tab order and hit-testing without
+          unmounting them, matching the chips row above. */}
       <div
         {...listHandlers}
         ref={scrollRef}
+        inert={state === 'rail'}
         className="flex-1 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] no-scrollbar"
         style={{
           overflowY: isRaised ? 'auto' : 'hidden',

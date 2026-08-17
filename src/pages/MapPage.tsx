@@ -7,7 +7,7 @@ import EmergencyModal, { EmergencySubmitData } from '@/src/components/EmergencyM
 import AreaIntelligencePanel from '@/src/components/AreaIntelligencePanel';
 import IncidentDetailPanel from '@/src/components/IncidentDetailPanel';
 import LayerToggle from '@/src/components/LayerToggle';
-import MobileMapSheet, { type MapSheetRef } from '@/src/components/MobileMapSheet';
+import MobileMapSheet, { type MapSheetRef, RAISED_FRACTION } from '@/src/components/MobileMapSheet';
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
@@ -33,17 +33,7 @@ import { categoryColor } from '@/src/lib/tokens';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
-
-function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371; // km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
+import { getDistance } from '@/src/lib/geo';
 
 function getCalgaryQuadrant(lat: number, lng: number) {
   const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
@@ -715,6 +705,34 @@ export default function MapPage() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [sheetState, setSheetState] = useState<SheetState>('rail');
   const sheetRef = useRef<MapSheetRef>(null);
+  const chromeRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Publish the chrome's height so the tap-to-close scrim can start below it.
+   *
+   * The scrim used to be `top-0` with `bottom: 82vh`, which put it over the
+   * chrome at every common phone height — a category chip, Home, and the
+   * near-me button all collapsed the sheet instead of acting. The height is
+   * measured rather than assumed because it varies with
+   * env(safe-area-inset-top), and a hard-coded guess meeting a variable-height
+   * element is exactly what caused the bug.
+   */
+  useEffect(() => {
+    const el = chromeRef.current;
+    if (!el) return;
+    const publish = () => {
+      document.documentElement.style.setProperty('--cw-chrome-h', `${el.offsetHeight}px`);
+    };
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(el);
+    window.addEventListener('orientationchange', publish);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('orientationchange', publish);
+      document.documentElement.style.removeProperty('--cw-chrome-h');
+    };
+  }, []);
   const [notifications, setNotifications] = useState<MapNotification[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -1501,13 +1519,6 @@ export default function MapPage() {
     setIsEmergencyOpen(false);
   }, []);
 
-  // filteredIncidentsCount is intentionally kept for the sidebar category badge
-  const filteredIncidentsCount = useMemo(
-    () =>
-      incidents.filter((i) => selectedCategory === 'all' || i.category === selectedCategory).length,
-    [incidents, selectedCategory]
-  );
-
   // Map shows all incidents: official API data (traffic, 311) + community posts.
   // Official incidents use expires_at for decay; community posts use 24h rolling decay.
   const mapIncidents = useMemo(() => {
@@ -1528,6 +1539,20 @@ export default function MapPage() {
     const cutoff = Date.now() - (timeWindow === '24h' ? 24 : 24 * 7) * 60 * 60 * 1000;
     return incidents.filter((i) => i.timestamp >= cutoff);
   }, [incidents, timeWindow]);
+
+  /**
+   * The one number the mobile feed reports.
+   *
+   * The value this replaces was derived straight from `incidents`, so it
+   * ignored the time window — the chrome badge and the sheet's rail could
+   * sit on screen together showing different totals for the same feed. This
+   * one is derived from `feedIncidents`, the same list that backs the rows
+   * both surfaces render, so they can no longer disagree.
+   */
+  const feedCount = useMemo(
+    () => feedIncidents.filter((i) => selectedCategory === 'all' || i.category === selectedCategory).length,
+    [feedIncidents, selectedCategory],
+  );
 
   // Incidents sorted by distance from user for the Near Me panel
   const nearMeIncidents = useMemo(() => {
@@ -1980,12 +2005,6 @@ export default function MapPage() {
       celebrate('Weekly digest on — your neighbourhood stats will land by email.');
     } catch { /* profile listener will re-sync */ }
   }, [user, celebrate]);
-
-  // Temporary — Task 6 replaces this with the real derived feed count shared
-  // with the chrome badge.
-  const feedCount = feedIncidents.filter(
-    (i) => selectedCategory === 'all' || i.category === selectedCategory,
-  ).length;
 
   return (
     <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
@@ -2631,13 +2650,15 @@ export default function MapPage() {
           isMapInteractive={!isFormOpen || isPinMode || isEmergencyPinMode || isEmergencyOpen}
         />
 
-        {/* Tap-to-close: transparent target covering exposed map when sheet is fully expanded */}
+        {/* Tap-to-close: covers the exposed map only. It starts below the chrome —
+            at top-0 it swallowed the chrome's own controls, so tapping Home or a
+            category chip collapsed the sheet instead of acting. */}
         {sheetState === 'raised' && (
           <div
-            className="fixed inset-x-0 top-0 z-[49] cursor-pointer lg:hidden"
-            style={{ bottom: '82vh' }}
+            className="fixed inset-x-0 z-[49] cursor-pointer lg:hidden"
+            style={{ top: 'var(--cw-chrome-h, 0px)', bottom: `${RAISED_FRACTION * 100}vh` }}
             onClick={() => setSheetState('rail')}
-            aria-label="Tap to close sheet"
+            aria-hidden="true"
           />
         )}
 
@@ -2668,8 +2689,9 @@ export default function MapPage() {
 
         {/* Mobile map chrome (Citizen-inspired glass bar + hero stats) - lg+ uses desktop header only */}
         <div
+          ref={chromeRef}
           className={cn(
-            'absolute inset-x-0 top-0 z-30 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] text-[#0B1F33] transition-all duration-200 pointer-events-none lg:hidden',
+            'absolute inset-x-0 top-0 z-[51] px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] text-[#0B1F33] transition-all duration-200 pointer-events-none lg:hidden',
             (isPinMode || isEmergencyPinMode) && 'opacity-0 invisible -translate-y-4'
           )}
         >
@@ -2685,18 +2707,19 @@ export default function MapPage() {
             <button
               type="button"
               data-tour="m-feed"
-              onClick={() => setSheetState('raised')}
+              onClick={() => sheetRef.current?.raiseAndFocusSearch()}
+              aria-label="Search reports and open the feed"
               className="flex h-11 min-w-0 flex-1 items-center gap-3 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 text-left shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg transition-transform active:scale-[0.99]"
             >
               <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-                <span className={cn('relative inline-flex h-2 w-2', mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />
+                <span className={cn('relative inline-flex h-2 w-2', feedCount > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />
               </span>
               <div className="min-w-0 flex-1 leading-none">
                 <p className="truncate font-display text-[13px] font-black tracking-[-0.02em] text-[#0B1F33]">
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </p>
                 <p className="mt-1 truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
-                  {mapIncidents.length === 0 ? 'Be first to report' : 'Tap for the full feed'}
+                  {feedCount === 0 ? 'Be first to report' : 'Tap to search the feed'}
                 </p>
               </div>
               {/* Colours are inline because the app's `light:` theme layer was
@@ -2706,40 +2729,10 @@ export default function MapPage() {
                 className="shrink-0 px-2 py-1 text-[11px] font-black tabular-nums"
                 style={{ background: '#06162F', color: '#F2EFE8' }}
               >
-                {filteredIncidentsCount}
+                {feedCount}
               </span>
               <Search size={15} className="shrink-0 text-[#40566B]" />
             </button>
-          </div>
-
-          {/* One-tap category filter — same state the sheet and sidebar use */}
-          <div className="pointer-events-auto -mx-3 mt-2 flex gap-1.5 overflow-x-auto px-3 pb-1 no-scrollbar">
-            {([
-              { key: 'all', label: 'All', color: '#1C2B3A' },
-              { key: 'crime', label: 'Crime', color: '#B5442F' },
-              { key: 'traffic', label: 'Traffic', color: '#C07A2A' },
-              { key: 'weather', label: 'Weather', color: '#6A63A8' },
-              { key: 'infrastructure', label: 'Infra', color: '#3E7D8C' },
-              { key: 'emergency', label: 'SOS', color: '#C0392B' },
-            ] as Array<{ key: IncidentCategory | 'all'; label: string; color: string }>).map((c) => {
-              const active = selectedCategory === c.key;
-              return (
-                <button
-                  key={c.key}
-                  type="button"
-                  onClick={() => setSelectedCategory(c.key)}
-                  className="inline-flex h-8 shrink-0 items-center gap-1.5 border-[1.5px] px-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.08em] shadow-[0_2px_4px_rgba(11,31,51,0.10)] backdrop-blur-lg transition-transform active:scale-[0.98]"
-                  style={active
-                    ? { background: '#06162F', borderColor: '#06162F', color: '#F2EFE8' }
-                    : { background: 'rgba(255,253,248,0.94)', borderColor: '#0B1F33', color: '#1C2B3A' }}
-                >
-                  {c.key !== 'all' && (
-                    <span className="h-1.5 w-1.5" style={{ background: active ? '#F2EFE8' : c.color }} aria-hidden="true" />
-                  )}
-                  {c.label}
-                </button>
-              );
-            })}
           </div>
         </div>
 
@@ -3198,7 +3191,7 @@ export default function MapPage() {
                   {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </h1>
                 <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
-                  {filteredIncidentsCount} visible / Calgary Watch
+                  {mapIncidents.length} visible / Calgary Watch
                 </p>
               </div>
             </div>

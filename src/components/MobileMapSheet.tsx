@@ -22,8 +22,14 @@ import { MAP } from '@/src/lib/tokens';
 const SORT_KEY = 'cw_sortBy';
 const FEED_FILTER_KEY = 'cw_feedFilter';
 
-/** Fraction of the viewport the raised sheet occupies. */
-const RAISED_FRACTION = 0.82;
+/**
+ * Fraction of the viewport the raised sheet occupies.
+ *
+ * Exported so the page's tap-to-close scrim can size itself off the same
+ * number instead of carrying a second `82vh` literal that could drift from
+ * this one.
+ */
+export const RAISED_FRACTION = 0.82;
 /**
  * Rough collapsed-rail height, in px — used only to seed `travel` for the
  * very first paint, before the masthead has ever been laid out and measured.

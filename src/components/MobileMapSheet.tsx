@@ -50,15 +50,6 @@ const CATEGORY_OPTIONS = [
   { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
 ] as const;
 
-function getNeighborhoodCenter(incidents: Incident[], name: string): { lat: number; lng: number } | null {
-  const matching = incidents.filter((i) => i.neighborhood === name && isFinite(i.lat) && isFinite(i.lng));
-  if (!matching.length) return null;
-  return {
-    lat: matching.reduce((s, i) => s + i.lat, 0) / matching.length,
-    lng: matching.reduce((s, i) => s + i.lng, 0) / matching.length,
-  };
-}
-
 export interface MapSheetRef {
   /**
    * Raise the sheet and put the caret in the search field in one motion.

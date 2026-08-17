@@ -1550,17 +1550,23 @@ export default function MapPage() {
   const handleViewNeighborhood = useCallback((neighborhood: string) => {
     setSelectedIncident(null);
     const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
-    if (isDesktop) {
-      const focusIncident = incidents
-        .filter((incident) => incident.neighborhood === neighborhood)
-        .sort((a, b) => b.timestamp - a.timestamp)[0];
+    // Shared by both branches: the desktop layout needs the 360px offsetX to
+    // clear the area panel, but mobile still needs the map to move — it was
+    // silently skipping the fly entirely, leaving the map static while the
+    // area panel opened underneath the sheet.
+    const focusIncident = incidents
+      .filter((incident) => incident.neighborhood === neighborhood)
+      .sort((a, b) => b.timestamp - a.timestamp)[0];
 
-      if (focusIncident) {
+    if (focusIncident) {
+      if (isDesktop) {
         mapRef.current?.flyToWithOffset(focusIncident.lat, focusIncident.lng, {
           zoom: 13,
           offsetX: 360,
           offsetY: 0,
         });
+      } else {
+        mapRef.current?.flyTo(focusIncident.lat, focusIncident.lng, 13);
       }
     }
     // Title-case the name so the panel header looks correct regardless of input case

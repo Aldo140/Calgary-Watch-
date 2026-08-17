@@ -12,9 +12,37 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { clampOffset, resolveDragEnd } from '../src/hooks/useSheetDrag.ts';
+import { clampOffset, exceedsDragSlop, resolveDragEnd } from '../src/hooks/useSheetDrag.ts';
 
 const TRAVEL = 600; // px between rail and raised
+
+describe('exceedsDragSlop', () => {
+  it('bidirectional: arms past the slop in either direction (the masthead)', () => {
+    assert.equal(exceedsDragSlop(7, true), true);
+    assert.equal(exceedsDragSlop(-7, true), true);
+  });
+
+  it('bidirectional: does not arm at or under the slop', () => {
+    assert.equal(exceedsDragSlop(6, true), false);
+    assert.equal(exceedsDragSlop(-6, true), false);
+    assert.equal(exceedsDragSlop(3, true), false);
+    assert.equal(exceedsDragSlop(0, true), false);
+  });
+
+  it('downward-only: arms past the slop going down (the list)', () => {
+    assert.equal(exceedsDragSlop(7, false), true);
+  });
+
+  it('downward-only: never arms on upward movement, however large', () => {
+    assert.equal(exceedsDragSlop(-7, false), false);
+    assert.equal(exceedsDragSlop(-500, false), false);
+  });
+
+  it('downward-only: does not arm at or under the slop', () => {
+    assert.equal(exceedsDragSlop(6, false), false);
+    assert.equal(exceedsDragSlop(0, false), false);
+  });
+});
 
 describe('resolveDragEnd from raised', () => {
   const from = 'raised' as const;

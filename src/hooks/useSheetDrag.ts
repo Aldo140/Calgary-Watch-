@@ -22,6 +22,23 @@ const FLING_VELOCITY = 0.5;
 const DRAG_SLOP = 6;
 
 /**
+ * Whether a pending pointer move has travelled far enough past `DRAG_SLOP` to
+ * become a drag rather than a tap or a scroll.
+ *
+ * `bidirectional` is true for the masthead, which drags both ways — the rail
+ * pulls up, the raised sheet pushes down. The list only ever arms downward;
+ * upward movement on the list is indistinguishable from an ordinary scroll,
+ * so its caller checks sign itself and only consults this for magnitude.
+ *
+ * Kept pure and separate from the hook for the same reason as `resolveDragEnd`
+ * — this repo has no component harness, so anything worth asserting has to be
+ * reachable from plain Node.
+ */
+export function exceedsDragSlop(deltaY: number, bidirectional: boolean): boolean {
+  return bidirectional ? Math.abs(deltaY) > DRAG_SLOP : deltaY > DRAG_SLOP;
+}
+
+/**
  * Where the sheet lands when the finger lifts.
  *
  * Kept pure and separate from the hook so the rule is testable without a DOM —
@@ -77,7 +94,9 @@ interface ActiveDrag {
  * froze form inputs after a pin drop three separate times.
  *
  * Two handler sets, because the two zones have different rules:
- *  - `headerHandlers` always drags.
+ *  - `headerHandlers` arms in either direction once movement passes
+ *    `DRAG_SLOP`, and not before — see the comment on its `onPointerDown` for
+ *    why `begin()`/`setPointerCapture` can't fire on `pointerdown` itself.
  *  - `listHandlers` drags only from `scrollTop === 0` and only downward, so
  *    mid-list scrolling is untouched.
  */
@@ -146,11 +165,39 @@ export function useSheetDrag({
   const headerHandlers = {
     onPointerDown: (e: ReactPointerEvent<HTMLElement>) => {
       if (!enabled) return;
-      begin(e.pointerId, e.clientY, e.currentTarget, state);
+      // Only a candidate. Calling begin()/setPointerCapture here, before a
+      // drag is confirmed, retargets the pointer's compatibility mouse
+      // events to this div for the rest of the gesture — on a browser where
+      // that includes `click`, every tap on the three buttons inside the
+      // masthead (expand, report, chevron) would go inert. It also sets
+      // isDragging unconditionally, killing the transform transition for a
+      // tap that was never a drag. Whether this becomes a drag is decided on
+      // the first move, once we know it travelled far enough to mean it.
+      pending.current = { pointerId: e.pointerId, startY: e.clientY };
     },
-    onPointerMove: (e: ReactPointerEvent<HTMLElement>) => move(e.clientY),
-    onPointerUp: () => finish(),
-    onPointerCancel: () => finish(),
+    onPointerMove: (e: ReactPointerEvent<HTMLElement>) => {
+      if (active.current) {
+        move(e.clientY);
+        return;
+      }
+      const candidate = pending.current;
+      if (!candidate || candidate.pointerId !== e.pointerId) return;
+      const delta = e.clientY - candidate.startY;
+      // Bidirectional: the rail drags up, the raised sheet drags down.
+      if (exceedsDragSlop(delta, true)) {
+        pending.current = null;
+        begin(e.pointerId, candidate.startY, e.currentTarget, state);
+        move(e.clientY);
+      }
+    },
+    onPointerUp: () => {
+      pending.current = null;
+      if (active.current) finish();
+    },
+    onPointerCancel: () => {
+      pending.current = null;
+      if (active.current) finish();
+    },
   };
 
   const listHandlers = {
@@ -169,11 +216,13 @@ export function useSheetDrag({
       if (!candidate || candidate.pointerId !== e.pointerId) return;
       const delta = e.clientY - candidate.startY;
       const atTop = (scrollRef.current?.scrollTop ?? 0) <= 0;
-      if (delta > DRAG_SLOP && atTop) {
+      // Downward only — dragging the list upward is indistinguishable from a
+      // normal scroll, so only a downward slop crossing arms the drag.
+      if (exceedsDragSlop(delta, false) && atTop) {
         pending.current = null;
         begin(e.pointerId, candidate.startY, e.currentTarget, state);
         move(e.clientY);
-      } else if (Math.abs(delta) > DRAG_SLOP) {
+      } else if (exceedsDragSlop(delta, true)) {
         // Upward, or not at the top: this is a scroll. Stop watching.
         pending.current = null;
       }

@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -14,26 +15,30 @@ import { cn, publicAsset } from '@/src/lib/utils';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import IncidentRow from '@/src/components/IncidentRow';
 import { useSheetDrag, type SheetState } from '@/src/hooks/useSheetDrag';
-import { resolveDefaultSort, sortIncidents, type SortBy } from '@/src/lib/feed';
+import { isSortBy, resolveDefaultSort, sortIncidents, type SortBy } from '@/src/lib/feed';
 import { getDistance } from '@/src/lib/geo';
 import { MAP } from '@/src/lib/tokens';
 
 const SORT_KEY = 'cw_sortBy';
 const FEED_FILTER_KEY = 'cw_feedFilter';
 
-/** Height of the collapsed rail, in px. Also the sheet's resting offset. */
-const RAIL_HEIGHT = 80;
 /** Fraction of the viewport the raised sheet occupies. */
 const RAISED_FRACTION = 0.82;
+/**
+ * Rough collapsed-rail height, in px — used only to seed `travel` for the
+ * very first paint, before the masthead has ever been laid out and measured.
+ * It never drives the actual resting position; see the `travel` state below.
+ */
+const INITIAL_RAIL_ESTIMATE = 66;
 
 // Palette aliases onto MAP so this file holds no hex of its own. Colour is
 // applied inline because index.css globally remaps Tailwind colour utilities.
 const P = {
   paper: MAP.panel,
-  card: MAP.paper,
-  ink: MAP.ink,
+  card: MAP.tint,
+  ink: MAP.inkDeep,
   soft: MAP.muted,
-  line: MAP.line,
+  line: MAP.lineCool,
   ground: '#06162F',
   onGround: '#F2EFE8',
   eyebrow: '#AFC5DF',
@@ -111,9 +116,10 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [feedFilter, setFeedFilter] = useState<'community' | 'recent' | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('newest');
-  const [sortRestored, setSortRestored] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const mastheadRef = useRef<HTMLDivElement>(null);
 
   const isRaised = state === 'raised';
   const hasLocation = Boolean(userLocation);
@@ -123,12 +129,28 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
   ).current;
 
-  // Distance between the two positions, in px. Recomputed on resize and
-  // rotation — a value captured once goes stale the moment the phone turns,
-  // and it is the denominator the commit threshold is measured against.
-  const [travel, setTravel] = useState(0);
-  useEffect(() => {
-    const measure = () => setTravel(Math.max(0, window.innerHeight * RAISED_FRACTION - RAIL_HEIGHT));
+  // Pixel distance between the two resting positions. Measured, not computed
+  // from a formula: the sheet's box is sized in `vh`, which resolves against
+  // the *large* viewport, while a formula built from window.innerHeight is
+  // the *layout* viewport — the two disagree the moment browser chrome (an
+  // iOS toolbar, an Android keyboard) changes the visible area, which made
+  // the sheet stop short of raised or refuse to track the finger at all. The
+  // seed value below is only a best-effort guess for the very first paint,
+  // before the masthead has been laid out; the layout effect corrects it
+  // before the browser gets a chance to show that guess on screen.
+  const [travel, setTravel] = useState(() =>
+    typeof window === 'undefined'
+      ? 0
+      : Math.max(0, window.innerHeight * RAISED_FRACTION - INITIAL_RAIL_ESTIMATE),
+  );
+  useLayoutEffect(() => {
+    const measure = () => {
+      const sheetHeight = sectionRef.current?.offsetHeight ?? 0;
+      const mastheadHeight = mastheadRef.current?.offsetHeight ?? 0;
+      if (sheetHeight > 0 && mastheadHeight > 0) {
+        setTravel(Math.max(0, sheetHeight - mastheadHeight));
+      }
+    };
     measure();
     window.addEventListener('resize', measure);
     window.addEventListener('orientationchange', measure);
@@ -136,7 +158,11 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       window.removeEventListener('resize', measure);
       window.removeEventListener('orientationchange', measure);
     };
-  }, []);
+    // Re-measures on every rail/raised toggle too, not just resize — the
+    // masthead's own content (and so its height) differs slightly between
+    // the two states, and this keeps travel matched to whichever variant is
+    // currently on screen rather than whatever last happened to be measured.
+  }, [state]);
 
   const { headerHandlers, listHandlers, offsetY, isDragging } = useSheetDrag({
     state,
@@ -153,26 +179,51 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     },
   }), [onStateChange]);
 
-  // Restore persisted preferences once, then resolve the effective sort. The
-  // stored value is deliberately not rewritten when it cannot be honoured —
-  // see resolveDefaultSort.
+  // The raw persisted value, kept current rather than re-read: set once from
+  // localStorage on mount, and updated in lockstep by the <select>'s onChange
+  // below whenever the reader makes an explicit choice. Using a ref rather
+  // than state means the one-time "location just arrived" resolution further
+  // down can always see the reader's latest intent without becoming a third
+  // effect that has to be kept in sync with it.
+  const storedSortRef = useRef<string | null>(null);
+  const locationAutoResolvedRef = useRef(false);
+
+  // Resolve the effective sort once at mount. hasLocation here is captured
+  // from *this* render only — geolocation resolves asynchronously in
+  // MapPage, so it is reliably false on the very first mount, which is
+  // exactly what must happen: a stored 'nearest' has to fall back rather
+  // than be treated as satisfied. It does not get overwritten by this,
+  // because persistence now happens only on user intent (the <select>'s
+  // onChange), never from an effect watching sortBy — an effect keyed on
+  // sortBy cannot tell "the reader chose this" apart from "this is what we
+  // just fell back to," and would happily persist the fallback over a
+  // perfectly good stored 'nearest' on every single load.
   useEffect(() => {
-    let storedSort: string | null = null;
     try {
-      storedSort = localStorage.getItem(SORT_KEY);
+      storedSortRef.current = localStorage.getItem(SORT_KEY);
       const f = localStorage.getItem(FEED_FILTER_KEY);
       if (f === 'community' || f === 'recent') setFeedFilter(f);
     } catch { /* private mode */ }
-    setSortBy(resolveDefaultSort(storedSort, hasLocation));
-    setSortRestored(true);
-    // Runs once; location arriving later must not re-sort under the reader.
+    setSortBy(resolveDefaultSort(storedSortRef.current, hasLocation));
+    // Runs once; location arriving later must not re-sort under the reader
+    // on its own — see the effect below for the one narrow exception.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // The one-time exception: nothing valid was persisted (a first visit, or a
+  // stored 'nearest' that just fell back above because location wasn't known
+  // yet) and location has now arrived. Resolve again, once, so 'nearest' can
+  // still become the default the way it would on a return visit. Gated on
+  // storedSortRef rather than sortBy, so a reader who picked something
+  // explicit — captured into the ref immediately by the <select>'s onChange,
+  // even before this fires — is never overwritten by it.
   useEffect(() => {
-    if (!sortRestored) return;
-    try { localStorage.setItem(SORT_KEY, sortBy); } catch { /* private mode */ }
-  }, [sortBy, sortRestored]);
+    if (!hasLocation || locationAutoResolvedRef.current) return;
+    locationAutoResolvedRef.current = true;
+    if (!isSortBy(storedSortRef.current)) {
+      setSortBy(resolveDefaultSort(storedSortRef.current, true));
+    }
+  }, [hasLocation]);
 
   useEffect(() => {
     try {
@@ -249,19 +300,42 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     [onNeighbourhoodSelect],
   );
 
+  // Persisting here, on the explicit choice, rather than from an effect
+  // watching sortBy — see the comment above storedSortRef — is what lets a
+  // stored 'nearest' survive a load where location hasn't resolved yet.
+  const handleSortChange = useCallback((next: SortBy) => {
+    setSortBy(next);
+    storedSortRef.current = next;
+    try { localStorage.setItem(SORT_KEY, next); } catch { /* private mode */ }
+  }, []);
+
   // Selection routes up to MapPage rather than reaching into the map, so a row
   // tap and a marker tap are the same code path and activeIncidentId is set
   // either way.
   const handleSelect = useCallback((incident: Incident) => onIncidentClick(incident), [onIncidentClick]);
 
-  const translate = hidden
-    ? '110%'
-    : `calc(${isRaised ? '0px' : `${100 * RAISED_FRACTION}vh - ${RAIL_HEIGHT}px`} + ${offsetY}px)`;
+  // Pure pixels, driven by the same measured `travel` the drag hook clamps
+  // and thresholds against — no `vh` here, on purpose. Mixing a CSS `vh`
+  // resting offset with a `window.innerHeight`-derived drag threshold was
+  // the original bug: the two only agreed when no browser UI was expanded.
+  // Using one measured number for both makes them agree by construction.
+  const translate = hidden ? '110%' : `${(isRaised ? 0 : travel) + offsetY}px`;
 
   return (
     <section
+      ref={sectionRef}
       aria-label="Incident feed"
       aria-hidden={hidden || undefined}
+      // `aria-hidden` alone hides the sheet from the accessibility tree but
+      // leaves every descendant — search input, chips, rows, footer button —
+      // in the tab order and pointer-hit-testable in every browser that
+      // doesn't honour `pointer-events: none` for focus. A keyboard user can
+      // still Tab into an invisible sheet, and if focus was already inside
+      // the search field when a report form opened, it stays parked in an
+      // aria-hidden subtree. `inert` removes focusability and hit-testing
+      // together — this is exactly what the deleted `visibility: hidden`
+      // vaul hack was actually doing.
+      inert={hidden}
       className="fixed inset-x-0 bottom-0 z-[50] flex flex-col lg:hidden"
       style={{
         height: `${RAISED_FRACTION * 100}vh`,
@@ -275,6 +349,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       {/* ── Masthead. Always the drag zone; touch-action is scoped here and
              nowhere else, which is the whole point of not using vaul. ──── */}
       <div
+        ref={mastheadRef}
         {...headerHandlers}
         className="relative shrink-0 overflow-hidden"
         style={{ background: P.ground, touchAction: 'none' }}
@@ -409,7 +484,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
               Sort
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortBy)}
+                onChange={(e) => handleSortChange(e.target.value as SortBy)}
                 className="ml-2 h-7 cursor-pointer px-2 text-[10px] font-bold focus:outline-none"
                 style={{ background: P.paper, border: `1.5px solid ${P.line}`, color: P.ink }}
               >

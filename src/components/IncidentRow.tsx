@@ -48,9 +48,9 @@ function IncidentRowBase({ incident, distanceKm, isActive, onSelect }: IncidentR
       aria-current={isActive ? 'true' : undefined}
       className="relative mb-1.5 flex w-full items-center gap-3 py-2.5 pl-4 pr-3 text-left transition-transform active:scale-[0.99]"
       style={{
-        background: isEmergency ? 'rgba(192,57,43,0.07)' : MAP.panel,
+        background: isEmergency ? `${MAP.danger}12` : MAP.panel,
         border: `1.5px solid ${isEmergency ? MAP.danger : isActive ? MAP.accent : MAP.line}`,
-        boxShadow: isActive ? '0 0 0 2px rgba(74,144,217,0.25)' : undefined,
+        boxShadow: isActive ? `0 0 0 2px ${MAP.accent}40` : undefined,
       }}
     >
       <span

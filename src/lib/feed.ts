@@ -39,6 +39,26 @@ export function resolveDefaultSort(persisted: unknown, hasLocation: boolean): So
 }
 
 /**
+ * Whether the sheet's one-time "location just arrived" re-resolution should
+ * actually resolve again. Two conditions, both required:
+ *
+ *  - the persisted value is either absent/invalid or exactly 'nearest' — an
+ *    explicit stored choice of anything else (e.g. 'oldest') must survive
+ *    untouched, so only an unset preference or one that could only have
+ *    fallen back for lack of location is eligible;
+ *  - the sheet is at rest on the rail — raised means the reader is already
+ *    mid-read, and resolving again would resort the list under their thumb.
+ *    They are left alone entirely rather than deferred, since a resort that
+ *    pounces once they lower the sheet is the same surprise, just delayed.
+ *
+ * Pure and separate from the effect that calls it so the gate is testable
+ * without a DOM, the same way resolveDefaultSort itself is.
+ */
+export function shouldAutoResolveNearest(persisted: unknown, sheetIsRail: boolean): boolean {
+  return (!isSortBy(persisted) || persisted === 'nearest') && sheetIsRail;
+}
+
+/**
  * Order the feed. Never mutates the input — `incidents` upstream is memoized
  * and sorting it in place would corrupt every other consumer.
  *

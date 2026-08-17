@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import type { Incident } from '../src/types/index.ts';
-import { isSortBy, resolveDefaultSort, sortIncidents } from '../src/lib/feed.ts';
+import { isSortBy, resolveDefaultSort, shouldAutoResolveNearest, sortIncidents } from '../src/lib/feed.ts';
 
 const DOWNTOWN = { lat: 51.0447, lng: -114.0719 };
 
@@ -63,6 +63,29 @@ describe('resolveDefaultSort', () => {
 
   it('does not strand the feed in nearest when location is unavailable', () => {
     assert.equal(resolveDefaultSort('nearest', false), 'newest');
+  });
+});
+
+describe('shouldAutoResolveNearest', () => {
+  it('resolves for a first-time visitor (nothing persisted) at rail', () => {
+    assert.equal(shouldAutoResolveNearest(null, true), true);
+    assert.equal(shouldAutoResolveNearest('rubbish', true), true);
+  });
+
+  it('resolves for a stored nearest that could only have fallen back, at rail', () => {
+    assert.equal(shouldAutoResolveNearest('nearest', true), true);
+  });
+
+  it('never resolves while the sheet is raised, regardless of what is stored', () => {
+    assert.equal(shouldAutoResolveNearest(null, false), false);
+    assert.equal(shouldAutoResolveNearest('nearest', false), false);
+    assert.equal(shouldAutoResolveNearest('oldest', false), false);
+  });
+
+  it('leaves an explicit non-nearest preference alone even at rail', () => {
+    assert.equal(shouldAutoResolveNearest('oldest', true), false);
+    assert.equal(shouldAutoResolveNearest('newest', true), false);
+    assert.equal(shouldAutoResolveNearest('verified', true), false);
   });
 });
 

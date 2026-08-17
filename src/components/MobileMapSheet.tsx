@@ -15,7 +15,7 @@ import { cn, publicAsset } from '@/src/lib/utils';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import IncidentRow from '@/src/components/IncidentRow';
 import { useSheetDrag, type SheetState } from '@/src/hooks/useSheetDrag';
-import { isSortBy, resolveDefaultSort, sortIncidents, type SortBy } from '@/src/lib/feed';
+import { resolveDefaultSort, shouldAutoResolveNearest, sortIncidents, type SortBy } from '@/src/lib/feed';
 import { getDistance } from '@/src/lib/geo';
 import { MAP } from '@/src/lib/tokens';
 
@@ -210,20 +210,36 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // The one-time exception: nothing valid was persisted (a first visit, or a
-  // stored 'nearest' that just fell back above because location wasn't known
-  // yet) and location has now arrived. Resolve again, once, so 'nearest' can
-  // still become the default the way it would on a return visit. Gated on
-  // storedSortRef rather than sortBy, so a reader who picked something
-  // explicit — captured into the ref immediately by the <select>'s onChange,
-  // even before this fires — is never overwritten by it.
+  // The one-time exception, fired at most once, gated on two conditions:
+  //
+  // 1. Nothing survives that isn't eligible for 'nearest' — either nothing
+  //    valid was persisted at all (a first visit), or what was persisted is
+  //    exactly 'nearest' (which fell back to 'newest' above only because
+  //    location wasn't known yet). A reader who stored something else
+  //    explicit, e.g. 'oldest', keeps it: it is valid and is not 'nearest',
+  //    so this condition is false and they are left alone — the preference
+  //    they picked, not merely "wasn't nearest", is what must survive.
+  // 2. The sheet is still at rest on the rail. Someone who has already
+  //    raised it and started reading is by definition mid-read; resolving
+  //    again out from under them would resort the list beneath their thumb,
+  //    which is exactly what firing on hasLocation alone used to risk. If
+  //    they were raised when location arrived, they're left alone entirely
+  //    — not deferred until they later lower the sheet, since a resort that
+  //    pounces later is the same surprise, just postponed.
+  //
+  // Together these let a stored 'nearest' actually take effect once location
+  // arrives (which storedSortRef alone made impossible, since 'nearest' is a
+  // valid SortBy and so always failed a plain isSortBy-only gate) without
+  // ever reordering the feed under a reader who is already looking at it.
+  // The two-condition check itself lives in shouldAutoResolveNearest, kept
+  // pure and tested the same way resolveDefaultSort already is.
   useEffect(() => {
     if (!hasLocation || locationAutoResolvedRef.current) return;
     locationAutoResolvedRef.current = true;
-    if (!isSortBy(storedSortRef.current)) {
+    if (shouldAutoResolveNearest(storedSortRef.current, state === 'rail')) {
       setSortBy(resolveDefaultSort(storedSortRef.current, true));
     }
-  }, [hasLocation]);
+  }, [hasLocation, state]);
 
   useEffect(() => {
     try {

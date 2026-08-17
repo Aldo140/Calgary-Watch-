@@ -60,6 +60,14 @@ export default function Sidebar({
     { id: 'weather',        label: 'Weather',    icon: CloudRain    },
   ] as const;
 
+  // Read-only at mount — this key is shared with the mobile sheet
+  // (MobileMapSheet.tsx), which also writes 'nearest', a mode this sidebar's
+  // <select> doesn't offer. A previous version of this effect had a sibling
+  // write effect keyed on [sortBy]/[feedFilter] that fired on every mount
+  // with whatever the state had just been initialised to, clobbering a
+  // stored 'nearest' (or any feedFilter) back to the default before the
+  // reader ever touched a control. Persisting now happens only from the
+  // explicit-choice handlers below, never from an effect watching state.
   useEffect(() => {
     try {
       const persistedSort = localStorage.getItem('cw_sortBy');
@@ -71,21 +79,24 @@ export default function Sidebar({
       if (persistedFeedFilter === 'community' || persistedFeedFilter === 'recent') {
         setFeedFilter(persistedFeedFilter);
       }
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try { localStorage.setItem('cw_sortBy', sortBy); } catch {}
-  }, [sortBy]);
-
-  useEffect(() => {
-    try {
-      if (feedFilter) localStorage.setItem('cw_feedFilter', feedFilter);
-      else localStorage.removeItem('cw_feedFilter');
+      // One-time migration cleanup of keys this app no longer reads.
       localStorage.removeItem('cw_verifiedOnly');
       localStorage.removeItem('cw_recentOnly');
     } catch {}
-  }, [feedFilter]);
+  }, []);
+
+  const persistSortBy = useCallback((next: 'newest' | 'oldest' | 'verified') => {
+    setSortBy(next);
+    try { localStorage.setItem('cw_sortBy', next); } catch {}
+  }, []);
+
+  const persistFeedFilter = useCallback((next: 'community' | 'recent' | null) => {
+    setFeedFilter(next);
+    try {
+      if (next) localStorage.setItem('cw_feedFilter', next);
+      else localStorage.removeItem('cw_feedFilter');
+    } catch {}
+  }, []);
 
   // Debounce search input by 200ms to avoid filtering on every keystroke
   useEffect(() => {
@@ -318,7 +329,7 @@ export default function Sidebar({
                   <span className="font-mono text-[10px] font-bold text-[#5A6B7D] uppercase tracking-[0.18em]">Sort by</span>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
+                    onChange={(e) => persistSortBy(e.target.value as any)}
                     className="bg-[#FFFDF8] border-[1.5px] border-[#C9D8E4] px-2.5 py-1.5 text-[10px] font-bold text-[#1C2B3A] focus:outline-none focus:ring-1 focus:ring-[#4A90D9]/50 cursor-pointer hover:border-[#4A90D9] transition-colors"
                   >
                     <option value="newest" style={{ background: '#FFFDF8', color: '#1C2B3A' }}>Newest First</option>
@@ -329,7 +340,7 @@ export default function Sidebar({
 
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <button
-                    onClick={() => setFeedFilter((prev) => prev === 'community' ? null : 'community')}
+                    onClick={() => persistFeedFilter(feedFilter === 'community' ? null : 'community')}
                     className={cn(
                       "px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border-[1.5px] transition-all",
                       feedFilter === 'community'
@@ -342,7 +353,7 @@ export default function Sidebar({
                   </button>
 
                   <button
-                    onClick={() => setFeedFilter((prev) => prev === 'recent' ? null : 'recent')}
+                    onClick={() => persistFeedFilter(feedFilter === 'recent' ? null : 'recent')}
                     className={cn(
                       "px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] border-[1.5px] transition-all",
                       feedFilter === 'recent'
@@ -357,7 +368,7 @@ export default function Sidebar({
                   {(feedFilter || searchQuery || selectedCategory !== 'all') && (
                     <button
                       onClick={() => {
-                        setFeedFilter(null);
+                        persistFeedFilter(null);
                         setSearchQuery('');
                         onCategoryChange('all');
                       }}
@@ -602,7 +613,7 @@ export default function Sidebar({
                         onClick={() => {
                           setSearchQuery('');
                           onCategoryChange('all');
-                          setFeedFilter(null);
+                          persistFeedFilter(null);
                         }}
                         className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#2F6FB0] hover:opacity-70 transition-opacity"
                       >

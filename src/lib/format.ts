@@ -10,7 +10,9 @@ export function formatDistance(km: number): string {
   const metres = Math.round((km * 1000) / 10) * 10;
   if (metres <= 0) return 'here';
   if (metres < 1000) return `${metres} m`;
-  const rounded = Math.round(km * 10) / 10;
-  if (rounded <= 10) return `${rounded.toFixed(1)} km`;
-  return `${Math.round(rounded)} km`;
+  if (km < 10) {
+    const rounded = Math.round(km * 10) / 10;
+    return `${rounded.toFixed(1)} km`;
+  }
+  return `${Math.round(km)} km`;
 }

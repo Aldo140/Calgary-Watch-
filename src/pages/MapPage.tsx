@@ -27,6 +27,7 @@ import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { useAirQuality } from '@/src/hooks/useAirQuality';
+import { useRiverLevels } from '@/src/hooks/useRiverLevels';
 import { useTrafficCameras, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import CameraViewer from '@/src/components/CameraViewer';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
@@ -662,6 +663,9 @@ export default function MapPage() {
   // Wildfire smoke is the one hazard nobody files a report about, because it is
   // a condition rather than an event. It has to come from a measurement.
   const airQualityIncidents = useAirQuality(isAuthReady);
+  // 2013 is why the rivers belong here. This reports the gauge and its trend —
+  // Alberta Emergency Alert, already ingested, issues the actual warnings.
+  const riverIncidents = useRiverLevels(isAuthReady);
   const suppressedIds = useSuppressedIds(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
   const { stats: statcanStats, yearlyStats: statcanYearlyStats } = useAlbertaMunicipalityCrimeStats();
@@ -1158,7 +1162,7 @@ export default function MapPage() {
     // suppression list. Applied here, after the merge, so it covers every
     // source uniformly.
     const combined = applySuppression(
-      [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents, ...airQualityIncidents],
+      [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents, ...airQualityIncidents, ...riverIncidents],
       suppressedIds,
     );
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
@@ -1184,7 +1188,7 @@ export default function MapPage() {
       if (!isDup) kept.push(inc);
     }
     return kept;
-  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, suppressedIds]);
+  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, riverIncidents, suppressedIds]);
 
   // Official community list + names observed in live data
   const officialCommunities = useCalgaryCommunities(Boolean(user));

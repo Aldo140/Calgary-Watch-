@@ -155,6 +155,13 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       const mastheadHeight = mastheadRef.current?.offsetHeight ?? 0;
       if (sheetHeight > 0 && mastheadHeight > 0) {
         setTravel(Math.max(0, sheetHeight - mastheadHeight));
+        // Publish the rail's real height so bottom-anchored overlays can clear
+        // it instead of guessing. Every one of them used to hardcode an offset
+        // — the Near Me panel sat at 24px and spent its whole life underneath
+        // the rail, buttons and all. The sheet is the only thing that knows
+        // this number, and it only knows it by measuring, so it says it out
+        // loud. Mirrors --cw-chrome-h, which MapPage publishes for the scrim.
+        document.documentElement.style.setProperty('--cw-rail-h', `${mastheadHeight}px`);
       }
     };
     measure();
@@ -169,6 +176,13 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     // the two states, and this keeps travel matched to whichever variant is
     // currently on screen rather than whatever last happened to be measured.
   }, [state]);
+
+  // Drop --cw-rail-h on unmount only. It cannot live in the measure effect's
+  // cleanup, which re-runs on every rail/raised toggle and would remove the
+  // property each time before re-publishing it.
+  useEffect(() => () => {
+    document.documentElement.style.removeProperty('--cw-rail-h');
+  }, []);
 
   const { headerHandlers, listHandlers, offsetY, isDragging } = useSheetDrag({
     state,

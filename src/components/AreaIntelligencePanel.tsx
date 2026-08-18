@@ -162,8 +162,18 @@ function HeroSection({
         src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
         alt=""
         aria-hidden="true"
-        /* Anchored bottom-right so it never sits under the close button. */
-        className="pointer-events-none absolute -right-12 -bottom-14 w-[220px] select-none opacity-[0.10] md:right-6 md:-bottom-16 md:w-[290px]"
+        /*
+         * Anchored bottom-right so it never sits under the close button.
+         *
+         * The mobile values used to be the desktop ones with the offsets
+         * pushed further out: 220px wide, dragged 48px past the right edge and
+         * 56px past the bottom, then clipped by this header's overflow-hidden.
+         * On a 375px-wide sheet that left a fragment — the emblem's top-left
+         * corner cut on two sides — which reads as a rendering fault rather
+         * than a watermark. Scaled to the narrower panel and pulled back inside
+         * the right edge, it bleeds off one edge instead of two.
+         */
+        className="pointer-events-none absolute -right-4 -bottom-7 w-[150px] select-none opacity-[0.10] md:right-6 md:-bottom-16 md:w-[290px]"
         style={{ filter: 'invert(1)' }}
       />
 

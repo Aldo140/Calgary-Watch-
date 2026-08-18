@@ -2793,7 +2793,12 @@ export default function MapPage() {
                   initial={{ opacity: 0, x: 8, scale: 0.96 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 8, scale: 0.96 }}
-              className="absolute right-full mr-3 top-0 w-[min(18.5rem,calc(100vw-5rem))] overflow-hidden z-50 shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
+              // z-[60] matches the account menu hanging off the same column.
+              // At z-50 this dropdown fell below the sheet (z-[52]) and had its
+              // lower half clipped whenever the feed was raised, while its
+              // sibling — anchored to the same buttons, opened the same way —
+              // rendered fine. Two dropdowns from one column behaved differently.
+              className="absolute right-full mr-3 top-0 w-[min(18.5rem,calc(100vw-5rem))] overflow-hidden z-[60] shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
               style={{ background: '#FFFDF8', border: '1.5px solid #0B1F33' }}
                 >
                   <div className="flex items-center justify-between bg-[#06162F] px-3.5 py-2.5">
@@ -2909,7 +2914,15 @@ export default function MapPage() {
               transition={{ type: 'spring', damping: 26, stiffness: 220 }}
               className={cn(
                 'absolute z-40 pointer-events-auto',
-                'bottom-6 left-3 right-3 lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
+                // Clears the sheet's rail rather than sitting under it. This
+                // panel used to be pinned 24px off the bottom, which put its
+                // action buttons behind the rail on every phone — it is opened
+                // by the locate button, so the one control that summons it was
+                // also the one thing guaranteed to be covered. The fallback
+                // matches the rail's typical measured height, so it is right
+                // even in the frame before the sheet has measured itself.
+                'bottom-[calc(var(--cw-rail-h,66px)+1.5rem)] left-3 right-3',
+                'lg:left-6 lg:right-auto lg:bottom-24 lg:w-[24rem]',
               )}
             >
               <div className="bg-[rgba(255,253,248,0.97)] backdrop-blur-md shadow-2xl overflow-hidden" style={{ border: '1.5px solid #0B1F33' }}>

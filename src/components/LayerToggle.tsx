@@ -114,7 +114,13 @@ export default function LayerToggle({
     <div
       ref={wrapRef}
       data-tour="layers"
-      className="absolute bottom-8 left-1/2 z-30 w-auto max-w-[min(94vw,34rem)] -translate-x-1/2 px-1 max-lg:bottom-[calc(5.5rem+env(safe-area-inset-bottom))] max-lg:max-w-[min(94vw,21rem)]"
+      // The mobile offset derives from the sheet's measured rail (--cw-rail-h)
+      // rather than the 5.5rem it used to hardcode. That guess cleared the old
+      // fixed 80px rail by a few pixels; the rail's height is now measured and
+      // can vary with the masthead, and this bar sits below the sheet in the
+      // stack, so a rail even slightly taller than the guess would have hidden
+      // it outright. rail + 1.375rem reproduces the previous position exactly.
+      className="absolute bottom-8 left-1/2 z-30 w-auto max-w-[min(94vw,34rem)] -translate-x-1/2 px-1 max-lg:bottom-[calc(var(--cw-rail-h,66px)+1.375rem+env(safe-area-inset-bottom))] max-lg:max-w-[min(94vw,21rem)]"
     >
       {/* Supplementary layers, opened from the Layers chip. */}
       {menuOpen && (

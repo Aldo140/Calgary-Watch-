@@ -1080,7 +1080,13 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
 
       {/* Community concern legend — visible while the crime layer is on */}
       {showCrimeLayer && isMapLoaded && (
-        <div className="absolute z-20 pointer-events-none left-1/2 -translate-x-1/2 bottom-[calc(9.6rem+env(safe-area-inset-bottom))] lg:left-20 lg:translate-x-0 lg:bottom-24">
+        /* Sits above the layer bar, not behind it. At z-20 this legend lost to
+              the very control that summons it — switch the crime layer on and the
+              key explaining it could disappear under the bar you just tapped,
+              especially once "More layers" expanded upward into the same band.
+              The offset derives from the measured rail so the ladder above it
+              (rail, layer bar, legend) holds whatever the masthead measures. */
+        <div className="absolute z-[31] pointer-events-none left-1/2 -translate-x-1/2 bottom-[calc(var(--cw-rail-h,66px)+5.5rem+env(safe-area-inset-bottom))] lg:left-20 lg:translate-x-0 lg:bottom-24">
           <div
             className="rounded-2xl px-3.5 py-2.5 lg:px-4 lg:py-3 shadow-xl backdrop-blur-xl"
             style={{ background: 'rgba(255,253,248,0.94)', border: '1px solid #E7E0D2' }}
@@ -1116,7 +1122,11 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       )}
 
       {isOutsideServiceArea && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(10rem+env(safe-area-inset-top))] lg:top-4">
+        /* Tucks under whatever the chrome actually measures. The 10rem it used
+            to clear was sized for a chrome that carried a category chip row;
+            that row was deleted, so this notice floated in open space well
+            below the bar it was meant to sit against. */
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-lg:top-[calc(var(--cw-chrome-h,66px)+0.75rem)] lg:top-4">
           <div className="px-3 py-2 rounded-xl border border-amber-400/30 bg-slate-950/85 text-amber-300 text-[11px] font-bold tracking-wide shadow-lg">
             Zoom in for Calgary metro coverage
           </div>
@@ -1126,7 +1136,10 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       {/* The camera layer is on but zoomed out past its threshold. Saying so
           beats leaving the user staring at a map that did not change. */}
       {camerasHiddenByZoom && !isPinMode && (
-        <div className="absolute left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none max-lg:bottom-[calc(9.5rem+env(safe-area-inset-bottom))] bottom-24">
+        /* One rung above the legend on the same ladder. These two used to sit
+              at 9.5rem and 9.6rem — a two-pixel gap — so running the camera and
+              crime layers together stacked one message on the other. */
+        <div className="absolute left-1/2 -translate-x-1/2 z-[31] pointer-events-none select-none max-lg:bottom-[calc(var(--cw-rail-h,66px)+9rem+env(safe-area-inset-bottom))] bottom-24">
           <div
             className="flex items-center gap-2 px-3.5 py-2 rounded-full shadow-lg whitespace-nowrap"
             style={{ background: '#F7F3EA', border: '1px solid rgba(11,31,51,0.14)' }}

@@ -26,7 +26,8 @@ import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipa
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
-import { useTrafficCameras } from '@/src/hooks/useTrafficCameras';
+import { useTrafficCameras, findNearestCamera } from '@/src/hooks/useTrafficCameras';
+import NearbyCameraPeek from '@/src/components/NearbyCameraPeek';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
 import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMatches, rankFullTextMatches } from '@/src/lib/address';
 import { categoryColor } from '@/src/lib/tokens';
@@ -678,15 +679,22 @@ export default function MapPage() {
   const [showCameras, setShowCameras] = useState(false);
   const [showSafetyCameras, setShowSafetyCameras] = useState(false);
   const [briefingOpen, setBriefingOpen] = useState(false);
-  // Only fetched once the layer is switched on.
-  // Also loaded when an incident is open, so its detail panel can show a
-  // camera overlooking that spot. One request, cached for the session.
-  const trafficCameras = useTrafficCameras(showCameras || Boolean(selectedIncident));
-  // Also loaded for the personal briefing, which counts them near a saved address.
-  const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
+  // Only fetched once the layer is switched on.
+  // Also loaded when an incident is open, so its detail panel can show a
+  // camera overlooking that spot. One request, cached for the session.
+  //
+  // Declared after nearMeOpen on purpose: this reads it, and a const read
+  // during render before its declaration is a TDZ ReferenceError.
+  const trafficCameras = useTrafficCameras(
+    // Also loaded for the Near Me panel, which shows the nearest camera's
+    // live frame the moment someone declares their location.
+    showCameras || Boolean(selectedIncident) || nearMeOpen,
+  );
+  // Also loaded for the personal briefing, which counts them near a saved address.
+  const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
   const [nearMeIndex, setNearMeIndex] = useState(0);
   // Radar-scan moment before results reveal — the pause builds anticipation
   // and makes the reveal land (Duolingo-style feedback loop).
@@ -1571,6 +1579,20 @@ export default function MapPage() {
       })
       .map(x => ({ ...x.i, _dist: x.dist })) as (Incident & { _dist: number })[];
   }, [incidents, userLocation]);
+
+  /**
+   * The traffic camera worth showing someone who has just located themselves.
+   *
+   * A wider radius than the 400 m the incident panel uses: that one is asking
+   * "does a camera overlook this exact report", which is a strict question. This
+   * one is asking "is there a picture of the streets around me", where a camera
+   * a few blocks away is still the answer. Beyond about a kilometre it stops
+   * being your neighbourhood and the card does not render at all.
+   */
+  const nearestCameraToUser = useMemo(() => {
+    if (!userLocation || trafficCameras.length === 0) return null;
+    return findNearestCamera(userLocation.lat, userLocation.lng, trafficCameras, 1000);
+  }, [userLocation, trafficCameras]);
 
   /** Latest nearby list, for callbacks that fire after a delay. */
   const nearMeIncidentsRef = useRef<(Incident & { _dist: number })[]>([]);
@@ -2979,6 +3001,24 @@ export default function MapPage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* The street itself, before the list of report titles.
+                        Someone checking a safety map before going out is asking
+                        what it is like out there; a photograph answers that more
+                        directly than any headline can. Only rendered when a
+                        camera is genuinely close — an image of an intersection
+                        two kilometres away answers a question nobody asked. */}
+                    {nearestCameraToUser && (
+                      <div className="mt-3.5">
+                        <NearbyCameraPeek
+                          camera={nearestCameraToUser.camera}
+                          distanceM={nearestCameraToUser.distanceM}
+                          onFocus={(camera) => {
+                            mapRef.current?.flyTo(camera.lat, camera.lng, 16);
+                          }}
+                        />
+                      </div>
+                    )}
 
                     <div className="mt-3.5 space-y-2">
                       <button

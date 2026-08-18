@@ -22,8 +22,15 @@ const AIR_ZONES: [string, number, number][] = [
 
 const REFRESH_MS = 30 * 60 * 1000;
 
-export function useAirQuality(isAuthReady: boolean): Incident[] {
-  const [incidents, setIncidents] = useState<Incident[]>([]);
+export interface AirQualityResult {
+  /** Above-threshold readings, shaped as map markers. */
+  incidents: Incident[];
+  /** Every reading that answered, including clean ones. */
+  readings: AirZoneReading[];
+}
+
+export function useAirQuality(isAuthReady: boolean): AirQualityResult {
+  const [result, setResult] = useState<AirQualityResult>({ incidents: [], readings: [] });
 
   useEffect(() => {
     if (!isAuthReady) return;
@@ -52,11 +59,16 @@ export function useAirQuality(isAuthReady: boolean): Incident[] {
       // Partial failures are fine — whichever zones answered still say
       // something true. An empty result only means nothing crossed the
       // threshold, which is the common case and the quiet one.
-      setIncidents(
-        readings
+      // Readings are kept whole, not just the alarming ones: the map wants
+      // markers above a threshold, but a personal briefing can honestly say
+      // "the air is clear today", which is only sayable if clean readings
+      // survive the trip.
+      setResult({
+        incidents: readings
           .map((r) => airQualityToIncident(r, now))
           .filter((i): i is Incident => i !== null),
-      );
+        readings,
+      });
     };
 
     void load();
@@ -70,5 +82,5 @@ export function useAirQuality(isAuthReady: boolean): Incident[] {
     };
   }, [isAuthReady]);
 
-  return incidents;
+  return result;
 }

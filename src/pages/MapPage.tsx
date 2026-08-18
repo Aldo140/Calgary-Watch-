@@ -27,6 +27,7 @@ import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
 import { useAirQuality } from '@/src/hooks/useAirQuality';
+import type { AirZoneReading } from '@/src/lib/airQuality';
 import { useRiverLevels } from '@/src/hooks/useRiverLevels';
 import { useTrafficCameras, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import CameraViewer from '@/src/components/CameraViewer';
@@ -662,7 +663,7 @@ export default function MapPage() {
   const powerOutageIncidents = usePowerOutages(isAuthReady);
   // Wildfire smoke is the one hazard nobody files a report about, because it is
   // a condition rather than an event. It has to come from a measurement.
-  const airQualityIncidents = useAirQuality(isAuthReady);
+  const { incidents: airQualityIncidents, readings: airReadings } = useAirQuality(isAuthReady);
   // 2013 is why the rivers belong here. This reports the gauge and its trend —
   // Alberta Emergency Alert, already ingested, issues the actual warnings.
   const riverIncidents = useRiverLevels(isAuthReady);
@@ -1847,6 +1848,19 @@ export default function MapPage() {
       { label: 'Calm', color: '#2E8B7A' };
     return { entry, total, rank, count: areaTotalsDesc.length, band };
   }, [crimeStats, areaTotalsDesc]);
+
+  /**
+   * The air reading the briefing quotes.
+   *
+   * Regional, and deliberately not measured at their address. Smoke arrives as
+   * an airmass, so a per-address request would be no more accurate while
+   * sending their home coordinates to a third party — which the briefing's own
+   * closing note promises does not happen.
+   */
+  const briefingAir = useMemo<AirZoneReading | null>(
+    () => airReadings.find((r) => r.zone === 'Calgary') ?? airReadings[0] ?? null,
+    [airReadings],
+  );
 
   /** The community the briefing is written about, from their saved location. */
   const briefingCommunity =
@@ -3591,6 +3605,7 @@ export default function MapPage() {
             digestOptIn={Boolean(userProfile?.weeklyDigestOptIn)}
             incidents={incidents}
             areaStats={briefingAreaStats}
+            airReading={briefingAir}
             safetyCameras={safetyCameras}
             trafficCameras={trafficCameras}
             onOpenArea={() => {

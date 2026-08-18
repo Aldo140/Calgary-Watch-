@@ -124,3 +124,27 @@ export function airQualityToIncident(reading: AirZoneReading, now: number): Inci
     expires_at: now + 2 * 60 * 60 * 1000,
   };
 }
+
+/**
+ * Band colours, for surfaces that show a reading rather than a marker.
+ *
+ * Drawn from the map's own severity ramp so a hazy day looks the same shade of
+ * concern wherever it appears. Deliberately never the emergency red: smoke is
+ * a health condition to plan around, not someone in danger.
+ */
+export const AIR_BAND_COLOUR: Record<AirBand, string> = {
+  good: '#2E8B7A',
+  moderate: '#C07A2A',
+  sensitive: '#C07A2A',
+  unhealthy: '#B5442F',
+  severe: '#B5442F',
+};
+
+/** Short label for a reading, for places too tight for the full title. */
+export const AIR_BAND_LABEL: Record<AirBand, string> = {
+  good: 'Clear',
+  moderate: 'Hazy',
+  sensitive: 'Poor for some',
+  unhealthy: 'Poor',
+  severe: 'Very poor',
+};

@@ -2,9 +2,15 @@ import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
-import { X, FileText, Camera, Video, Home, ArrowRight, Settings2, Compass, Sparkles } from 'lucide-react';
+import { X, FileText, Camera, Video, Home, ArrowRight, Settings2, Compass, Sparkles, Wind } from 'lucide-react';
 import type { Incident } from '@/src/types';
 import { useHomeLocation } from '@/src/hooks/useHomeLocation';
+import {
+  AIR_BAND_COLOUR,
+  AIR_BAND_LABEL,
+  classifyPm25,
+  type AirZoneReading,
+} from '@/src/lib/airQuality';
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { distanceMeters, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import { findSafetyCamerasNear, type SafetyCamera } from '@/src/hooks/useSafetyCameras';
@@ -133,6 +139,10 @@ interface PersonalBriefingProps {
   digestOptIn?: boolean;
   incidents: Incident[];
   areaStats: BriefingAreaStats | null;
+  /**
+   * Regional air quality. Regional on purpose — see the note where it renders.
+   */
+  airReading?: AirZoneReading | null;
   safetyCameras: SafetyCamera[];
   trafficCameras: TrafficCamera[];
   onOpenArea: () => void;
@@ -304,7 +314,7 @@ function ReportRow({
 
 export default function PersonalBriefing({
   open, onClose, displayName, photoURL, address, communityName, uid, memberSince, digestOptIn,
-  incidents, areaStats, safetyCameras, trafficCameras,
+  incidents, areaStats, airReading, safetyCameras, trafficCameras,
   onOpenArea, onOpenSettings, onSelectIncident, onOpenNearby,
 }: PersonalBriefingProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -356,6 +366,15 @@ export default function PersonalBriefing({
 
   /** The tightest ring that actually has something in it. */
   const ring = useMemo(() => selectRing(byDistance), [byDistance]);
+
+  /** Banded air reading, or null when the air is clean enough to say nothing. */
+  const airQuality = useMemo(() => {
+    if (!airReading) return null;
+    const assessment = classifyPm25(airReading.pm25);
+    return assessment
+      ? { reading: airReading, assessment, colour: AIR_BAND_COLOUR[assessment.band] }
+      : null;
+  }, [airReading]);
   const nearby = ring.items;
 
   const radarPoints = useMemo<RadarPoint[]>(() => {
@@ -630,6 +649,48 @@ export default function PersonalBriefing({
             </Section>
           )}
 
+          {/* ── Air ───────────────────────────────────────────────────────────
+              The one hazard nobody files a report about, because it is a
+              condition rather than an event. Present only when there is a
+              reading worth stating — the page's rule is that a section with no
+              data does not render, and "the air is normal" is not insight.
+
+              Regional, not per-address: smoke arrives as an airmass, so a
+              reading taken at their door would be no more accurate while
+              sending their coordinates to a third party. The closing note
+              promises that does not happen, and this keeps that true. */}
+          {airQuality && (
+            <Section eyebrow="In the air" title={airQuality.assessment.title} order={4}>
+              <div
+                className="mt-3 flex items-start gap-3.5 px-4 py-3.5"
+                style={{ background: `${airQuality.colour}12`, border: `1px solid ${airQuality.colour}44` }}
+              >
+                <span
+                  className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center"
+                  style={{ background: airQuality.colour, color: '#FFFDF8' }}
+                  aria-hidden="true"
+                >
+                  <Wind size={17} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[13.5px] font-bold leading-snug" style={{ color: T.ink }}>
+                    {airQuality.assessment.advice}
+                  </p>
+                  {/* The number is printed so the claim can be checked rather
+                      than trusted, and it is named as PM2.5 rather than dressed
+                      up as an AQHI figure this page does not compute. */}
+                  <p className="mt-1.5 font-mono text-[11px]" style={{ color: T.soft }}>
+                    {AIR_BAND_LABEL[airQuality.assessment.band]} · PM2.5 {airQuality.reading.pm25.toFixed(0)} µg/m³
+                    {typeof airQuality.reading.usAqi === 'number'
+                      ? ` · US AQI ${Math.round(airQuality.reading.usAqi)}`
+                      : ''}
+                    {' · regional reading'}
+                  </p>
+                </div>
+              </div>
+            </Section>
+          )}
+
           {home && (nearbySafety.length > 0 || nearbyTraffic.length > 0) && (
             <Section
               order={1} still={still} eyebrow="On your streets"
@@ -810,7 +871,8 @@ export default function PersonalBriefing({
               <strong style={{ color: T.ink }}>How this page was made.</strong> From three things you gave
               us — your name, your saved address, and the reports you have filed. Distances are worked out
               on your own device against the city&rsquo;s public property register, so your coordinates are
-              never sent to us or stored. Everything else is City of Calgary open data that anyone can look
+              never sent to us or stored. The air reading is a regional measurement for Calgary, not for your
+              address, so it says nothing about where you live. Everything else is City of Calgary open data that anyone can look
               up.{digestOptIn
                 ? ' You get the weekly email, so a shorter version of this lands in your inbox.'
                 : ' You are not signed up for the weekly email.'}

@@ -32,6 +32,8 @@ interface MapProps {
   /** Intersection safety cameras — the ones that issue tickets. */
   safetyCameras?: SafetyCamera[];
   crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
+  /** A camera pin was tapped — the page opens the large viewer. */
+  onCameraSelect?: (camera: TrafficCamera) => void;
   isMapInteractive?: boolean;
 }
 
@@ -51,7 +53,7 @@ export interface MapRef {
   clearUserLocation: () => void;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, safetyCameras, crimeStats, isMapInteractive = true }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, safetyCameras, crimeStats, onCameraSelect, isMapInteractive = true }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
@@ -80,11 +82,13 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const isPinModeRef = useRef(isPinMode);
   const onPinConfirmRef = useRef(onPinConfirm);
   const onMapClickRef = useRef(onMapClick);
+  const onCameraSelectRef = useRef(onCameraSelect);
 
   // Update refs on every render (no dep array → always current)
   useEffect(() => { isPinModeRef.current = isPinMode; });
   useEffect(() => { onPinConfirmRef.current = onPinConfirm; });
   useEffect(() => { onMapClickRef.current = onMapClick; });
+  useEffect(() => { onCameraSelectRef.current = onCameraSelect; });
 
   useEffect(() => {
     incidentsRef.current = incidents;
@@ -293,7 +297,15 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         map.current.zoomControl.setPosition('bottomleft');
       }
 
-      baseTileLayer.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            // CARTO Voyager rather than Positron ("light_all"). Positron is a near
+      // greyscale wash designed to disappear under dense data — on a phone,
+      // outdoors, it read as a blank sheet with pins on it, and gave a reader
+      // no way to orient themselves between the pins. Voyager keeps the same
+      // light, low-contrast base but restores the things people navigate by:
+      // green parks, blue river, legible road hierarchy. The Bow becoming
+      // visible matters more here than anywhere — Calgary is a city people
+      // describe in relation to it. Same CDN, so the CSP is unchanged.
+      baseTileLayer.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20,
@@ -936,23 +948,14 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     });
 
     const markers = trafficCameras.map((cam) =>
-      L.marker([cam.lat, cam.lng], { icon, zIndexOffset: -500 }).bindPopup(
-        () => {
-          const src = `${cam.imageUrl}?t=${Date.now()}`;
-          return `<div style="width:250px;font-family:Inter,system-ui,sans-serif">
-              <div style="font-weight:800;font-size:13px;color:#0B1F33;line-height:1.25">${cam.location}</div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#52697D;margin:2px 0 7px">
-                CITY OF CALGARY · ${cam.quadrant}
-              </div>
-              <img src="${src}" alt="Live traffic camera at ${cam.location}" width="250" height="167"
-                   style="width:100%;border-radius:9px;display:block;background:#E8EEF3;object-fit:cover" />
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#52697D;margin-top:6px">
-                Live frame · reopen to refresh
-              </div>
-            </div>`;
-        },
-        { maxWidth: 270, className: 'cw-camera-popup' },
-      ),
+      // A tap hands the camera up to React rather than opening a Leaflet
+      // popup. The popup was a ~250px thumbnail floating over the map with the
+      // map still competing to be the subject; the viewer it replaces fills the
+      // width and lets the reader walk the neighbouring intersections, which is
+      // what checking a route actually involves.
+      L.marker([cam.lat, cam.lng], { icon, zIndexOffset: -500 }).on('click', () => {
+        onCameraSelectRef.current?.(cam);
+      }),
     );
 
     const group = L.layerGroup(markers);
@@ -1078,49 +1081,6 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       {/* Vignette: stronger on small screens so map chrome & cards read like a premium safety app; lg+ unchanged */}
       <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-t to-transparent from-white/55 via-white/10 max-lg:from-white/50 max-lg:via-white/5 lg:from-white/40" />
 
-      {/* Community concern legend — visible while the crime layer is on */}
-      {showCrimeLayer && isMapLoaded && (
-        /* Sits above the layer bar, not behind it. At z-20 this legend lost to
-              the very control that summons it — switch the crime layer on and the
-              key explaining it could disappear under the bar you just tapped,
-              especially once "More layers" expanded upward into the same band.
-              The offset derives from the measured rail so the ladder above it
-              (rail, layer bar, legend) holds whatever the masthead measures. */
-        <div className="absolute z-[31] pointer-events-none left-1/2 -translate-x-1/2 bottom-[calc(var(--cw-rail-h,66px)+5.5rem+env(safe-area-inset-bottom))] lg:left-20 lg:translate-x-0 lg:bottom-24">
-          <div
-            className="rounded-2xl px-3.5 py-2.5 lg:px-4 lg:py-3 shadow-xl backdrop-blur-xl"
-            style={{ background: 'rgba(255,253,248,0.94)', border: '1px solid #E7E0D2' }}
-          >
-            {(!crimeStats || crimeStats.size === 0) ? (
-              <div className="flex items-center gap-2.5 py-0.5">
-                <span className="h-3.5 w-3.5 rounded-full border-2 border-[#2E8B7A] border-t-transparent animate-spin" aria-hidden="true" />
-                <div>
-                  <p className="text-[10.5px] font-bold text-slate-800">Building the picture…</p>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">Aggregating 311 across 270+ communities</p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-1.5">
-                  Community concern index
-                </p>
-                <div className="flex items-center gap-2.5">
-                  {([['#2E8B7A', 'Calm'], ['#D4A843', 'Elevated'], ['#EA580C', 'High'], ['#DC2626', 'Hot']] as const).map(([c, l]) => (
-                    <span key={l} className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: c, opacity: 0.85 }} />
-                      <span className="text-[10px] font-bold text-slate-700">{l}</span>
-                    </span>
-                  ))}
-                </div>
-                <p className="hidden lg:block mt-1.5 text-[10px] text-slate-500 font-medium">
-                  311 + community reports · tap a community for full intel
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
       {isOutsideServiceArea && (
         /* Tucks under whatever the chrome actually measures. The 10rem it used
             to clear was sized for a chrome that carried a category chip row;
@@ -1136,10 +1096,11 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       {/* The camera layer is on but zoomed out past its threshold. Saying so
           beats leaving the user staring at a map that did not change. */}
       {camerasHiddenByZoom && !isPinMode && (
-        /* One rung above the legend on the same ladder. These two used to sit
-              at 9.5rem and 9.6rem — a two-pixel gap — so running the camera and
-              crime layers together stacked one message on the other. */
-        <div className="absolute left-1/2 -translate-x-1/2 z-[31] pointer-events-none select-none max-lg:bottom-[calc(var(--cw-rail-h,66px)+9rem+env(safe-area-inset-bottom))] bottom-24">
+        /* Moved out of the bottom of the screen entirely. Five things were
+              competing for the 270px above the rail — layer bar, zoom buttons,
+              legend, SOS/Report column, this — and it is a transient status
+              message, the least anchored of them. The top band was empty. */
+        <div className="absolute left-1/2 -translate-x-1/2 z-[31] pointer-events-none select-none max-lg:top-[calc(var(--cw-chrome-h,66px)+3.5rem)] bottom-24 lg:bottom-24">
           <div
             className="flex items-center gap-2 px-3.5 py-2 rounded-full shadow-lg whitespace-nowrap"
             style={{ background: '#F7F3EA', border: '1px solid rgba(11,31,51,0.14)' }}

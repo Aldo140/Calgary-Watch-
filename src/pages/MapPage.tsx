@@ -26,8 +26,8 @@ import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipa
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
-import { useTrafficCameras, findNearestCamera } from '@/src/hooks/useTrafficCameras';
-import NearbyCameraPeek from '@/src/components/NearbyCameraPeek';
+import { useTrafficCameras, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
+import CameraViewer from '@/src/components/CameraViewer';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
 import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMatches, rankFullTextMatches } from '@/src/lib/address';
 import { categoryColor } from '@/src/lib/tokens';
@@ -682,6 +682,8 @@ export default function MapPage() {
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
+  /** The camera pin a reader tapped, or null when the viewer is closed. */
+  const [viewerCamera, setViewerCamera] = useState<TrafficCamera | null>(null);
   // Only fetched once the layer is switched on.
   // Also loaded when an incident is open, so its detail panel can show a
   // camera overlooking that spot. One request, cached for the session.
@@ -691,7 +693,9 @@ export default function MapPage() {
   const trafficCameras = useTrafficCameras(
     // Also loaded for the Near Me panel, which shows the nearest camera's
     // live frame the moment someone declares their location.
-    showCameras || Boolean(selectedIncident) || nearMeOpen,
+    // The viewer keeps them loaded while it is open so its walk-through has
+    // neighbours to step to even if the layer is switched off underneath it.
+    showCameras || Boolean(selectedIncident) || Boolean(viewerCamera),
   );
   // Also loaded for the personal briefing, which counts them near a saved address.
   const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
@@ -1579,20 +1583,6 @@ export default function MapPage() {
       })
       .map(x => ({ ...x.i, _dist: x.dist })) as (Incident & { _dist: number })[];
   }, [incidents, userLocation]);
-
-  /**
-   * The traffic camera worth showing someone who has just located themselves.
-   *
-   * A wider radius than the 400 m the incident panel uses: that one is asking
-   * "does a camera overlook this exact report", which is a strict question. This
-   * one is asking "is there a picture of the streets around me", where a camera
-   * a few blocks away is still the answer. Beyond about a kilometre it stops
-   * being your neighbourhood and the card does not render at all.
-   */
-  const nearestCameraToUser = useMemo(() => {
-    if (!userLocation || trafficCameras.length === 0) return null;
-    return findNearestCamera(userLocation.lat, userLocation.lng, trafficCameras, 1000);
-  }, [userLocation, trafficCameras]);
 
   /** Latest nearby list, for callbacks that fire after a delay. */
   const nearMeIncidentsRef = useRef<(Incident & { _dist: number })[]>([]);
@@ -2673,6 +2663,7 @@ export default function MapPage() {
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
+          onCameraSelect={setViewerCamera}
           isMapInteractive={!isFormOpen || isPinMode || isEmergencyPinMode || isEmergencyOpen}
         />
 
@@ -3001,24 +2992,6 @@ export default function MapPage() {
                         </p>
                       </div>
                     </div>
-
-                    {/* The street itself, before the list of report titles.
-                        Someone checking a safety map before going out is asking
-                        what it is like out there; a photograph answers that more
-                        directly than any headline can. Only rendered when a
-                        camera is genuinely close — an image of an intersection
-                        two kilometres away answers a question nobody asked. */}
-                    {nearestCameraToUser && (
-                      <div className="mt-3.5">
-                        <NearbyCameraPeek
-                          camera={nearestCameraToUser.camera}
-                          distanceM={nearestCameraToUser.distanceM}
-                          onFocus={(camera) => {
-                            mapRef.current?.flyTo(camera.lat, camera.lng, 16);
-                          }}
-                        />
-                      </div>
-                    )}
 
                     <div className="mt-3.5 space-y-2">
                       <button
@@ -3430,13 +3403,20 @@ export default function MapPage() {
           </div>
         </div>
 
+        <CameraViewer
+          camera={viewerCamera}
+          cameras={trafficCameras}
+          onClose={() => setViewerCamera(null)}
+          onFocus={(cam) => mapRef.current?.flyTo(cam.lat, cam.lng, 16)}
+        />
+
         {/* Emergency and report actions */}
         <div className={cn(
           // On a phone the layer bar sits 88–140px off the bottom, centred and
           // up to 20rem wide, which put it straight through the SOS/Report
           // column at 7rem. Lifting the column clear of it keeps both usable
           // one-handed instead of stacking two tap targets on top of each other.
-          'absolute right-3 z-30 flex flex-col items-end gap-2.5 bottom-[calc(10.25rem+env(safe-area-inset-bottom))] transition-all duration-200 md:right-5 md:max-lg:bottom-[calc(9.5rem+env(safe-area-inset-bottom))] lg:right-6 lg:bottom-24',
+          'absolute right-3 z-30 flex flex-col items-end gap-2.5 bottom-[calc(var(--cw-rail-h,66px)+1.375rem+var(--cw-layerbar-h,3.25rem)+0.75rem+env(safe-area-inset-bottom))] transition-all duration-200 md:right-5 lg:right-6 lg:bottom-24',
           (isPinMode || isEmergencyPinMode) && "opacity-0 invisible translate-x-4 pointer-events-none"
         )}>
           {/* SOS remains visually separate from standard reporting. */}
@@ -3506,6 +3486,7 @@ export default function MapPage() {
           setShowSafetyCameras={setShowSafetyCameras}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
+          crimeStats={crimeStats}
           isPinMode={isPinMode || isEmergencyPinMode}
         />
 

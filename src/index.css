@@ -45,7 +45,12 @@
 .leaflet-bar {
   border: none !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  margin-bottom: 112px !important;
+  /* Sits on the same line as the SOS/Report column, opposite side. The old
+     fixed 112px put these buttons underneath the layer bar, which renders
+     above them — the map's own zoom controls were being covered by the
+     app's chrome. Derived from the same measured ladder as everything
+     else above the rail. */
+  margin-bottom: calc(var(--cw-rail-h, 66px) + 1.375rem + var(--cw-layerbar-h, 3.25rem) + 0.75rem) !important;
   margin-left: 24px !important;
 }
 

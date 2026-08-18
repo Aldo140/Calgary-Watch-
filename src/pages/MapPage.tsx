@@ -26,6 +26,7 @@ import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipa
 import { usePropertyAssessments } from '@/src/hooks/usePropertyAssessments';
 import { useEdmontonOpenData } from '@/src/hooks/useEdmontonOpenData';
 import { usePowerOutages } from '@/src/hooks/usePowerOutages';
+import { useAirQuality } from '@/src/hooks/useAirQuality';
 import { useTrafficCameras, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import CameraViewer from '@/src/components/CameraViewer';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
@@ -658,6 +659,9 @@ export default function MapPage() {
   const edmontonOpenData = useEdmontonOpenData(isAuthReady);
   // ENMAX outages arrive already adapted into infrastructure incidents.
   const powerOutageIncidents = usePowerOutages(isAuthReady);
+  // Wildfire smoke is the one hazard nobody files a report about, because it is
+  // a condition rather than an event. It has to come from a measurement.
+  const airQualityIncidents = useAirQuality(isAuthReady);
   const suppressedIds = useSuppressedIds(isAuthReady);
   const { stats: crimeStats, yearlyStats: crimeYearlyStats } = useCrimeStats();
   const { stats: statcanStats, yearlyStats: statcanYearlyStats } = useAlbertaMunicipalityCrimeStats();
@@ -1154,7 +1158,7 @@ export default function MapPage() {
     // suppression list. Applied here, after the merge, so it covers every
     // source uniformly.
     const combined = applySuppression(
-      [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents],
+      [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents, ...airQualityIncidents],
       suppressedIds,
     );
     const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
@@ -1180,7 +1184,7 @@ export default function MapPage() {
       if (!isDup) kept.push(inc);
     }
     return kept;
-  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, suppressedIds]);
+  }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, suppressedIds]);
 
   // Official community list + names observed in live data
   const officialCommunities = useCalgaryCommunities(Boolean(user));

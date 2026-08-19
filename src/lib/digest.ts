@@ -198,8 +198,32 @@ export interface ScoredIncident {
   distanceM: number | null;
 }
 
+/**
+ * How much we actually know about where this person lives.
+ *
+ * The distinction matters more than it looks. "Nothing happened near you" and
+ * "we don't know where you are" produce the same empty list, and reporting the
+ * second as the first is a lie the reader has no way to detect — they would
+ * conclude their neighbourhood had a quiet week when in fact Calgary had a
+ * normal one and we never looked at their part of it.
+ *
+ *   home       a saved address resolved to coordinates → real distances
+ *   community  a neighbourhood name matched reports → no distances, real place
+ *   city       we could not place them, or their area had nothing → all Calgary
+ */
+export type DigestScope = 'home' | 'community' | 'city';
+
 export interface DigestSummary {
   weekKey: string;
+  scope: DigestScope;
+  /**
+   * True when the person has given us no usable location at all. Drives the
+   * one line of the email that asks for one — and nothing else, because
+   * somebody who has not set an address still deserves a useful digest.
+   */
+  needsLocation: boolean;
+  /** True when their own area was empty and the digest widened to the city. */
+  widenedToCity: boolean;
   /** Start of the seven-day window, inclusive. */
   since: number;
   until: number;
@@ -262,48 +286,103 @@ export function buildDigestSummary(options: {
   const rings = options.rings ?? DIGEST_RINGS;
   const since = now - WEEK_MS;
   const previousSince = since - WEEK_MS;
-  const areaName = (profile.neighborhood || profile.inferredNeighborhood || 'Calgary').trim();
 
+  const savedArea = (profile.neighborhood || profile.inferredNeighborhood || '').trim();
   const mailable = incidents.filter((i) => isMailable(i, now));
 
-  const inScope = (incident: Incident): number | null | false => {
-    if (home) {
-      const d = distanceMetres(home, { lat: incident.lat, lng: incident.lng });
-      return d <= rings[rings.length - 1].metres ? d : false;
-    }
-    return neighborhoodMatches(incident.neighborhood, areaName) ? null : false;
-  };
+  const inWindow = (i: Incident, from: number, to: number) =>
+    i.timestamp >= from && i.timestamp < to;
 
-  const collect = (from: number, to: number): ScoredIncident[] => {
-    const out: ScoredIncident[] = [];
-    for (const incident of mailable) {
-      if (incident.timestamp < from || incident.timestamp >= to) continue;
-      const d = inScope(incident);
-      if (d === false) continue;
-      out.push({ incident, distanceM: d });
-    }
-    return out;
-  };
-
-  const thisWeekAll = collect(since, now);
-  const previousAll = collect(previousSince, since);
-
-  // Tighten to the closest ring that holds anything. Name-matched areas have no
-  // distance to tighten on, so they use the whole set and the community's name.
-  let ringLabel = `in ${areaName}`;
-  let items = thisWeekAll;
+  // ── 1. A resolved address: real distances, tightest ring with anything ────
   if (home) {
+    const withDistance = (from: number, to: number): ScoredIncident[] => mailable
+      .filter((i) => inWindow(i, from, to))
+      .map((i) => ({ incident: i, distanceM: distanceMetres(home, { lat: i.lat, lng: i.lng }) }))
+      .filter((x) => (x.distanceM ?? Infinity) <= rings[rings.length - 1].metres);
+
+    const thisWeek = withDistance(since, now);
+    const lastWeek = withDistance(previousSince, since);
+
     for (let i = 0; i < rings.length; i += 1) {
-      const inRing = thisWeekAll.filter((x) => (x.distanceM ?? Infinity) <= rings[i].metres);
+      const inRing = thisWeek.filter((x) => (x.distanceM ?? Infinity) <= rings[i].metres);
       if (inRing.length > 0 || i === rings.length - 1) {
-        items = inRing;
-        ringLabel = rings[i].label;
-        break;
+        return finish({
+          scope: 'home',
+          areaName: savedArea || 'your area',
+          ringLabel: rings[i].label,
+          items: inRing,
+          previousTotal: lastWeek.filter((x) => (x.distanceM ?? Infinity) <= rings[i].metres).length,
+          needsLocation: false,
+          widenedToCity: false,
+          since, until: now,
+        });
       }
     }
   }
 
-  items.sort((a, b) => {
+  // ── 2. A neighbourhood name: match by name, no invented precision ─────────
+  if (savedArea) {
+    const named = (from: number, to: number): ScoredIncident[] => mailable
+      .filter((i) => inWindow(i, from, to) && neighborhoodMatches(i.neighborhood, savedArea))
+      .map((i) => ({ incident: i, distanceM: null }));
+
+    const thisWeek = named(since, now);
+    if (thisWeek.length > 0) {
+      return finish({
+        scope: 'community',
+        areaName: savedArea,
+        ringLabel: `in ${savedArea}`,
+        items: thisWeek,
+        previousTotal: named(previousSince, since).length,
+        needsLocation: false,
+        widenedToCity: false,
+        since, until: now,
+      });
+    }
+  }
+
+  // ── 3. Everything else: the city ─────────────────────────────────────────
+  //
+  // Reached by three different people: somebody who never set a location,
+  // somebody living outside the areas our reports cover, and somebody whose own
+  // community genuinely had a quiet week. All three are better served by a real
+  // digest of the city than by an empty page implying nothing happened. The
+  // flags below let the email say which of the three it is.
+  const cityWide = (from: number, to: number): ScoredIncident[] => mailable
+    .filter((i) => inWindow(i, from, to))
+    .map((i) => ({ incident: i, distanceM: null }));
+
+  return finish({
+    scope: 'city',
+    areaName: savedArea || 'Calgary',
+    ringLabel: 'across Calgary',
+    items: cityWide(since, now),
+    previousTotal: cityWide(previousSince, since).length,
+    needsLocation: !savedArea && !home,
+    widenedToCity: Boolean(savedArea || home),
+    since, until: now,
+  });
+}
+
+/**
+ * Shared tail: ordering, category counts and the derived fields.
+ *
+ * Distance sorts ascending where we have it — the whole point of the rail is a
+ * proximity ladder — and newest-first where we do not, because without a
+ * distance the only ordering a reader can feel is recency.
+ */
+function finish(parts: {
+  scope: DigestScope;
+  areaName: string;
+  ringLabel: string;
+  items: ScoredIncident[];
+  previousTotal: number;
+  needsLocation: boolean;
+  widenedToCity: boolean;
+  since: number;
+  until: number;
+}): DigestSummary {
+  const items = [...parts.items].sort((a, b) => {
     if (a.distanceM !== null && b.distanceM !== null && a.distanceM !== b.distanceM) {
       return a.distanceM - b.distanceM;
     }
@@ -314,34 +393,30 @@ export function buildDigestSummary(options: {
   for (const { incident } of items) {
     counts.set(incident.category, (counts.get(incident.category) ?? 0) + 1);
   }
-  const byCategory = DIGEST_CATEGORY_ORDER
-    .filter((c) => (counts.get(c) ?? 0) > 0)
-    .map((category) => ({
-      category,
-      label: DIGEST_CATEGORY_LABEL[category],
-      count: counts.get(category) ?? 0,
-      colour: DIGEST_CATEGORY_COLOUR[category],
-    }));
-
-  // Last week is measured over the same ring, or the comparison is meaningless.
-  const ringMetres = rings.find((r) => r.label === ringLabel)?.metres ?? Infinity;
-  const previousTotal = home
-    ? previousAll.filter((x) => (x.distanceM ?? Infinity) <= ringMetres).length
-    : previousAll.length;
 
   return {
-    weekKey: digestWeekKey(now),
-    since,
-    until: now,
-    ringLabel,
+    weekKey: digestWeekKey(parts.until),
+    scope: parts.scope,
+    needsLocation: parts.needsLocation,
+    widenedToCity: parts.widenedToCity,
+    since: parts.since,
+    until: parts.until,
+    ringLabel: parts.ringLabel,
     items,
     total: items.length,
-    byCategory,
-    previousTotal,
-    delta: items.length - previousTotal,
+    byCategory: DIGEST_CATEGORY_ORDER
+      .filter((c) => (counts.get(c) ?? 0) > 0)
+      .map((category) => ({
+        category,
+        label: DIGEST_CATEGORY_LABEL[category],
+        count: counts.get(category) ?? 0,
+        colour: DIGEST_CATEGORY_COLOUR[category],
+      })),
+    previousTotal: parts.previousTotal,
+    delta: items.length - parts.previousTotal,
     highlights: items.slice(0, MAX_HIGHLIGHTS),
     quiet: items.length === 0,
-    areaName,
+    areaName: parts.areaName,
   };
 }
 

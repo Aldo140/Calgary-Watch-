@@ -29,24 +29,76 @@ import { execFileSync } from 'node:child_process';
  * either treatment — and it is already the masthead rule's colour, so the
  * letterhead now reads as one piece rather than two.
  */
-const INK = '(168, 118, 58)';
+/**
+ * Warm cream, for a dark ground.
+ *
+ * The email is set dark, so the engravings are re-tinted to the same sandstone
+ * the body text uses — 13:1 against the page, which is well past the point
+ * where fine linework starts to close up. The alpha channel, where all the
+ * detail actually lives, is never touched.
+ *
+ * One tint for everything: mixing a white logo with a gold rule and a cream
+ * illustration is how a letterhead starts looking assembled rather than drawn.
+ */
+const INK = '(244, 238, 227)';
 
-/** 4x the logical size — the engravings carry fine linework. */
+/**
+ * 4x the logical size. These are engravings — at 2x the hatching on the shield
+ * turns to mush, and the difference costs a few KB on a message that is already
+ * carrying two images.
+ */
 const TARGETS = [
   { src: 'public/images/illustration/calgary-watch-shield.webp', out: 'public/images/email/shield.png', width: 152 },
   { src: 'public/images/illustration/calgary-skyline-rule.webp', out: 'public/images/email/skyline.png', width: 960 },
+  // The welcome email explains how the map is fed; these three carry that.
+  { src: 'public/images/illustration/process-signal.webp', out: 'public/images/email/step-signal.png', width: 176 },
+  { src: 'public/images/illustration/process-community.webp', out: 'public/images/email/step-community.png', width: 176 },
+  { src: 'public/images/illustration/process-megaphone.webp', out: 'public/images/email/step-megaphone.png', width: 176 },
+  // Sits under the sign-off, the way a seal would.
+  { src: 'public/images/illustration/calgary-bow-emblem.webp', out: 'public/images/email/emblem.png', width: 200 },
 ];
 
 const script = `
 import os
-from PIL import Image
+from PIL import Image, ImageOps
 os.makedirs('public/images/email', exist_ok=True)
+
+def alpha_for(im):
+    """Where is there ink?
+
+    Two kinds of source in this set. The shield, skyline and emblem are drawn on
+    transparency, so the alpha channel already answers the question. The three
+    process icons are flat RGB — dark linework printed on a cream disc — and
+    their alpha is a solid rectangle that says nothing.
+
+    For those, ink is derived from darkness: invert the greyscale, so the cream
+    paper falls to zero and drops out while the linework stays opaque. That
+    knocks the disc off and leaves the drawing, which is the only part that can
+    be re-tinted onto a dark ground without bringing a pale slab with it.
+    """
+    a = im.split()[3]
+    lo, hi = a.getextrema()
+    if lo < 250:
+        return a
+    grey = ImageOps.grayscale(im.convert('RGB'))
+    # These scans sit around 240 rather than 255, so a plain invert leaves the
+    # paper as a faint grey slab — visible on a dark page as a square edge
+    # around each icon. Autocontrast normalises the range, then the curve below
+    # drops everything under a third to nothing and lifts the rest, so the disc
+    # disappears and the linework keeps its weight instead of going spindly.
+    inverted = ImageOps.invert(ImageOps.autocontrast(grey, cutoff=1))
+    return inverted.point(lambda v: 0 if v < 86 else min(255, int((v - 86) * 1.75)))
+
 for src, out, width in ${JSON.stringify(TARGETS.map((t) => [t.src, t.out, t.width]))}:
     im = Image.open(src).convert('RGBA')
-    im = im.crop(im.split()[3].getbbox())          # trim transparent padding
+    mask = alpha_for(im)
+    im.putalpha(mask)
+    box = mask.getbbox()
+    if box:
+        im = im.crop(box)
     im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
     solid = Image.new('RGBA', im.size, ${INK} + (255,))
-    solid.putalpha(im.split()[3])                  # keep the linework, retint it
+    solid.putalpha(im.split()[3])
     solid.save(out, 'PNG', optimize=True)
     print(f'  {out}  {solid.size[0]}x{solid.size[1]}  {os.path.getsize(out)//1024} KB')
 `;

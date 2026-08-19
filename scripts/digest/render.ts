@@ -46,6 +46,7 @@ import {
 import { CID } from './art.js';
 import {
   CTA_LABEL,
+  locationPrompt,
   CTA_LABEL_QUIET,
   greeting,
   leadParagraph,
@@ -59,20 +60,41 @@ import {
  * `gold` is a step lighter than the app's #B0793C because it is used on navy
  * here rather than on sandstone, and the darker value fails contrast there.
  */
+/**
+ * Set dark, in Calgary's own colours.
+ *
+ * The ground is spruce-black rather than neutral grey: the foothills green the
+ * product already uses, taken down until it reads as ink. Type is the same
+ * Paskapoo sandstone the site is built on, which is what keeps a dark email
+ * warm instead of clinical.
+ *
+ * Every value here is checked against the surface it sits on by
+ * `npm run digest:contrast`, which fails the build below WCAG AA. Nothing in
+ * this object is a guess — see scripts/digest/contrast.ts.
+ */
 const C = {
-  /** Warm black. A blue-black read as institutional next to the sandstone. */
-  ink: '#2A2420',
-  /** Foothill green — the deepest thing on the page, used sparingly. */
-  deep: '#1F3D37',
-  sand: '#F4EEE3',
-  paper: '#FFFCF7',
-  line: '#E7DFD0',
-  edge: '#D5C9B6',
-  body: '#4A423A',
-  soft: '#7A6F62',
-  bow: '#2E8B7A',
-  gold: '#A8763A',
-  rail: '#F7F2E8',
+  /** The page behind everything. */
+  page: '#0E1A17',
+  /** Cards and the report rows that sit on the page. */
+  card: '#17251F',
+  /** The distance rail, one step up so the column reads as a gutter. */
+  rail: '#1E312A',
+  /** Hairlines and card borders. */
+  line: '#2C443B',
+  edge: '#3A5A4E',
+  /** Headings and anything that must not be missed. */
+  ink: '#F4EEE3',
+  /** Running text. */
+  body: '#DCD3C4',
+  /** Secondary text — still AA at the sizes it is used. */
+  soft: '#A6B8AE',
+  /** Bow River teal, lifted for a dark ground. */
+  bow: '#5CC3AA',
+  /** Sandstone gold, lifted for a dark ground. */
+  gold: '#E0AC63',
+  /** The one solid button. */
+  button: '#F4EEE3',
+  buttonInk: '#0E1A17',
 } as const;
 
 const DISPLAY = "Georgia,'Iowan Old Style','Times New Roman',Times,serif";
@@ -200,7 +222,7 @@ function masthead(dateLine: string): string {
                style="display:block;width:38px;height:51px;border:0;">
         </td>
         <td style="vertical-align:middle;">
-          <div class="cw-ink" style="font:700 13px/1 ${BODY};color:${C.deep};letter-spacing:2.6px;">
+          <div class="cw-ink" style="font:700 13px/1 ${BODY};color:${C.ink};letter-spacing:2.6px;">
             CALGARY&nbsp;WATCH
           </div>
           <div style="font:400 11px/1 ${BODY};color:${C.soft};padding-top:6px;">
@@ -257,7 +279,9 @@ function categoryLine(summary: DigestSummary): string {
   const parts = summary.byCategory
     .map((c) => `<span class="cw-ink" style="color:${C.ink};font-weight:700;">${c.count}</span> `
       + `${escapeHtml(c.label.toLowerCase())}`)
-    .join(`<span style="color:${C.soft};opacity:0.55;"> &nbsp;·&nbsp; </span>`);
+    // A solid value rather than opacity: the contrast audit reads colours, not
+  // alpha, so an opacity here would hide a real legibility problem from it.
+  .join(`<span style="color:${C.soft};"> &nbsp;·&nbsp; </span>`);
   return `<div class="cw-soft" style="font:400 13px/1.5 ${BODY};color:${C.soft};`
     + `padding-top:16px;">${parts}</div>`;
 }
@@ -285,11 +309,11 @@ function reportRow(item: ScoredIncident, origin: string): string {
   return `
   <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           class="cw-card" style="background:${C.paper};border:1px solid ${C.line};border-radius:3px;">
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
       <tr>
         <td width="76" class="cw-rail" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
                    padding:14px 6px;text-align:center;vertical-align:middle;">
-          <span class="cw-ink" style="font:700 11.5px/1.2 ${MONO};color:${C.deep};">${escapeHtml(rail)}</span>
+          <span class="cw-ink" style="font:700 11.5px/1.2 ${MONO};color:${C.ink};">${escapeHtml(rail)}</span>
         </td>
         <td style="padding:13px 16px;">
           <a href="${escapeHtml(origin)}/map?incident=${encodeURIComponent(item.incident.id)}"
@@ -326,10 +350,10 @@ function cta(origin: string, label: string): string {
   return `
   <tr><td style="padding:28px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-      <tr><td style="background:${C.deep};border-radius:3px;">
+      <tr><td style="background:${C.button};border-radius:3px;">
         <a href="${escapeHtml(origin)}/map"
            style="display:inline-block;padding:14px 26px;font:700 14px/1 ${BODY};
-                  color:#FFFCF7;text-decoration:none;">
+                  color:${C.buttonInk};text-decoration:none;">
           ${escapeHtml(label)}&nbsp;→
         </a>
       </td></tr>
@@ -359,9 +383,75 @@ function footer(unsubscribeUrl: string, branding: DigestBranding): string {
       { top: 15, color: C.soft, size: 12 })}
     ${p(`<a href="${escapeHtml(unsubscribeUrl)}" style="color:${C.bow};font-weight:700;`
       + `text-decoration:underline;">Unsubscribe</a>`
-      + `<span style="color:${C.edge};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`
+      + `<span style="color:${C.soft};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`
       + `<a href="${escapeHtml(branding.origin)}/privacy" style="color:${C.bow};`
       + `text-decoration:none;">Privacy</a>`, { top: 15, color: C.soft, size: 12 })}
+  </td></tr>`;
+}
+
+/**
+ * The one line asking somebody to tell us where they live.
+ *
+ * Only rendered for an account with no location at all — never for somebody
+ * whose neighbourhood simply had a quiet week, who would read it as being
+ * blamed for our empty list. Set apart from the body so it is clearly an aside
+ * rather than part of the week's news.
+ */
+function locationPromptBlock(summary: DigestSummary): string {
+  const prompt = locationPrompt(summary);
+  if (!prompt) return '';
+  return `
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+         class="cw-card" style="background:${C.card};border:1px solid ${C.line};
+                border-left:3px solid ${C.bow};border-radius:3px;margin-top:16px;">
+    <tr><td style="padding:14px 16px;">
+      <div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">
+        ${escapeHtml(prompt)}
+      </div>
+    </td></tr>
+  </table>`;
+}
+
+/**
+ * How the map is fed, as three illustrated steps.
+ *
+ * A table rather than stacked blocks so the three read as one row on a desktop
+ * client and stack cleanly on a phone. The icons are decorative — every step
+ * carries its own words — so their alt text is empty and a reader with images
+ * off loses nothing but the drawing.
+ */
+function processRow(): string {
+  const icons = [CID.stepSignal, CID.stepCommunity, CID.stepMegaphone];
+  const cells = WELCOME.steps.map((step, i) => `
+    <td width="33%" style="width:33.33%;padding:0 7px;vertical-align:top;text-align:center;">
+      <img src="cid:${icons[i]}" width="44" height="44" alt=""
+           style="display:block;margin:0 auto 10px;width:44px;height:44px;border:0;">
+      <div class="cw-ink" style="font:700 12.5px/1.3 ${BODY};color:${C.ink};">
+        ${escapeHtml(step.title)}
+      </div>
+      <div class="cw-soft" style="font:400 11.5px/1.5 ${BODY};color:${C.soft};padding-top:5px;">
+        ${escapeHtml(step.body)}
+      </div>
+    </td>`).join('');
+  return `
+  <tr><td style="padding:28px 29px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      <tr>${cells}</tr>
+    </table>
+  </td></tr>`;
+}
+
+/**
+ * The Bow emblem, under the sign-off, where a seal would sit.
+ *
+ * Small and centred. It closes the letter rather than decorating it, which is
+ * why it appears once and only in the message that is actually a letter.
+ */
+function emblem(): string {
+  return `
+  <tr><td style="padding:26px 36px 0;" align="center">
+    <img src="cid:${CID.emblem}" width="52" height="52" alt=""
+         style="display:block;width:52px;height:52px;border:0;">
   </td></tr>`;
 }
 
@@ -406,17 +496,17 @@ function shell(options: {
   }
 </style>
 </head>
-<body class="cw-page" style="margin:0;padding:0;background:${C.sand};-webkit-text-size-adjust:100%;">
+<body class="cw-page" style="margin:0;padding:0;background:${C.page};-webkit-text-size-adjust:100%;">
 <!-- Preheader: the grey line an inbox shows beside the subject. Hidden in the
      message itself so it is not repeated at the top of the page. -->
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
   ${escapeHtml(options.preheader)}
 </div>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-       class="cw-page" style="background:${C.sand};">
+       class="cw-page" style="background:${C.page};">
 <tr><td align="center" style="padding:30px 12px 44px;">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${SHELL_W}"
-         class="cw-shell" style="width:100%;max-width:${SHELL_W}px;background:${C.sand};">
+         class="cw-shell" style="width:100%;max-width:${SHELL_W}px;background:${C.page};">
     ${options.inner}
   </table>
 </td></tr>
@@ -443,6 +533,7 @@ export function renderDigestHtml(options: {
     <tr><td style="padding:26px 36px 0;">
       ${salutation(name, summary.until)}
       ${p(escapeHtml(leadParagraph(summary)), { top: 13 })}
+      ${locationPromptBlock(summary)}
       ${categoryLine(summary)}
     </td></tr>
     ${reportList(summary, origin)}
@@ -491,13 +582,14 @@ export function renderWelcomeHtml(options: {
       </div>
       ${note}
     </td></tr>
+    ${processRow()}
 
     <!-- The ask. Boxed so it reads as a question and not as another paragraph
          somebody can skim past — it is the only thing in the message that
          wants something back. -->
     <tr><td style="padding:26px 36px 0;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-             class="cw-card" style="background:${C.paper};border:1px solid ${C.line};
+             class="cw-card" style="background:${C.card};border:1px solid ${C.line};
                     border-left:3px solid ${C.bow};border-radius:3px;">
         <tr><td style="padding:18px 20px;">
           ${heading(WELCOME.askHeading)}
@@ -510,6 +602,7 @@ export function renderWelcomeHtml(options: {
         + `<span style="color:${C.soft};font-size:13px;">${escapeHtml(WELCOME.signOffRole)}</span>`,
         { top: 10 })}
     </td></tr>
+    ${emblem()}
 
     <tr><td style="padding:32px 36px 0;">
       <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>

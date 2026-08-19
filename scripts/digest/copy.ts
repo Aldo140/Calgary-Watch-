@@ -52,12 +52,38 @@ export function greeting(at: number): string {
  * something, and this only works if it reads like the second one.
  */
 export function leadParagraph(summary: DigestSummary): string {
+  const count = summary.total;
+  const verb = count === 1 ? 'thing was' : 'things were';
+
+  // Nothing at all, anywhere we looked. Only reachable when the city itself was
+  // silent for a week, which is close to impossible — but an email that renders
+  // a blank page because the ingest broke is worse than one that says so.
   if (summary.quiet) {
-    return `Nothing was reported ${summary.ringLabel} this week. `
-      + `Quiet weeks get sent too — it's worth knowing when nothing happened.`;
+    return summary.scope === 'city'
+      ? `No public reports came in anywhere in Calgary this week. That is unusual `
+        + `enough that it may be us rather than the city — we're looking.`
+      : `Nothing was reported ${summary.ringLabel} this week. `
+        + `Quiet weeks get sent too — it's worth knowing when nothing happened.`;
   }
-  const lead = `${spellCap(summary.total)} ${summary.total === 1 ? 'thing was' : 'things were'} `
-    + `reported ${summary.ringLabel} this week.`;
+
+  const lead = (() => {
+    switch (summary.scope) {
+      case 'home':
+      case 'community':
+        return `${spellCap(count)} ${verb} reported ${summary.ringLabel} this week.`;
+      case 'city':
+        // Never phrased as "near you". We do not know where they are, or their
+        // own area was empty — either way, claiming proximity would be false.
+        return summary.widenedToCity
+          ? `Your area was quiet this week, so here is what came in ${summary.ringLabel} `
+            + `instead — ${spell(count)} ${count === 1 ? 'report' : 'reports'} in all.`
+          : `${spellCap(count)} ${verb} reported ${summary.ringLabel} this week.`;
+    }
+  })();
+
+  // The week-over-week line is only meaningful against a like-for-like
+  // baseline, and a digest that just widened its own scope has none.
+  if (summary.widenedToCity) return lead;
   if (summary.delta === 0 && summary.previousTotal === 0) return lead;
   if (summary.delta === 0) return `${lead} Same as last week.`;
   const n = Math.abs(summary.delta);
@@ -66,9 +92,28 @@ export function leadParagraph(summary: DigestSummary): string {
     : `${lead} ${spellCap(n)} fewer than last week.`;
 }
 
+/**
+ * The nudge for somebody we cannot place.
+ *
+ * Shown only when there is genuinely no location on the account — never to
+ * somebody whose neighbourhood simply had a quiet week, who would rightly read
+ * it as being blamed for our empty list. It asks once, explains what it buys
+ * them, and does not repeat.
+ */
+export function locationPrompt(summary: DigestSummary): string | null {
+  if (!summary.needsLocation) return null;
+  return `This one covers the whole city, because your account doesn't have a `
+    + `neighbourhood on it yet. Add one and next Monday's will be about your `
+    + `blocks instead — how close each report was, and whether your week was `
+    + `busier than usual.`;
+}
+
 /** The line above the list. Says how the list is ordered, because it is. */
 export function listHeading(summary: DigestSummary): string {
-  return summary.total === 1 ? 'What happened' : 'What happened, closest first';
+  if (summary.total === 1) return 'What happened';
+  // Only claim an ordering the list actually has. Without distances the list is
+  // newest-first, and saying "closest first" would be a small, checkable lie.
+  return summary.scope === 'home' ? 'What happened, closest first' : 'What happened';
 }
 
 export const CTA_LABEL = 'See these on the map';
@@ -105,6 +150,19 @@ export const WELCOME = {
     `Every Monday you'll get a short read on your corner of the city: what happened near you, `
       + `how close it was, and whether the week was busier than usual. Quiet weeks get sent `
       + `too — that's worth knowing.`,
+  ],
+  /**
+   * How the map is fed, in three steps.
+   *
+   * Illustrated because this is the one thing about Calgary Watch people get
+   * wrong — they assume it is either all official data or all neighbours, and
+   * it is both. Three marks and six words each carry that faster than the
+   * paragraph above them does.
+   */
+  steps: [
+    { title: 'Official feeds', body: 'Calgary Police, 311 and 511 Alberta, pulled in automatically.' },
+    { title: 'Your neighbours', body: 'Anyone can report what they saw on their block.' },
+    { title: 'Monday morning', body: 'The week near you, in one short email.' },
   ],
   askHeading: 'One thing before you go',
   ask: `The site just got rebuilt, and we'd like to know what you make of it. What would make `

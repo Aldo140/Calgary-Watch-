@@ -394,6 +394,21 @@ describe('pipeline wiring', () => {
   it('defaults a manual run to sending nothing', () => {
     assert.match(workflow, /dry_run[\s\S]{0,200}default: true/);
   });
+
+  it('releases the ledger claim whenever nothing was actually sent', () => {
+    const weekly = readFileSync('scripts/digest/weekly.ts', 'utf8');
+    // A rehearsal that keeps its claim marks the week spent, and the real
+    // Monday run then skips everybody as already sent — which made the safest
+    // way to test the single most destructive thing you could do.
+    const block = weekly.slice(weekly.indexOf('if (result.skipped)'));
+    assert.match(block.slice(0, 300), /claim\.delete\(\)/);
+    assert.ok(!weekly.includes("'dry-run'"), 'a dry run must leave no ledger row at all');
+  });
+
+  it('keeps the allowlist wired into the workflow', () => {
+    // The one guard standing between a scheduled run and everybody's inbox.
+    assert.match(workflow, /DIGEST_ALLOWLIST/);
+  });
 });
 
 

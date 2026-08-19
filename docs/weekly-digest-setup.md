@@ -201,9 +201,10 @@ Every message goes to you instead of the real recipient, through the identical
 selection, rendering and ledger path. Check it in Gmail **and** on a phone.
 Click the unsubscribe link — it should land on the page and confirm.
 
-> Note: pass 2 claims the week in `digest_sends`. Before the real run, delete
-> the `digest_sends` documents it created, or the real run will correctly skip
-> everybody as already sent.
+> Rehearsals leave no trace: any send that did not actually reach the provider
+> — a dry run, or a recipient the allowlist refused — releases its ledger claim,
+> so the real run is not affected. The claim is still taken first, so the
+> ordering that makes duplicates impossible is exercised either way.
 
 **Pass 3 — one real recipient.**
 Run workflow with *dry run* off, *test email* blank, and your own account's uid

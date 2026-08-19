@@ -17,7 +17,8 @@
     "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
     "digest:weekly": "tsx scripts/digest/weekly.ts",
     "digest:preview": "tsx scripts/digest/preview.ts",
-    "digest:art": "tsx scripts/prepare-email-art.ts"
+    "digest:art": "tsx scripts/prepare-email-art.ts",
+    "digest:contrast": "tsx scripts/digest/audit.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

@@ -101,9 +101,15 @@ const shared = { summary, displayName: PROFILE.displayName, unsubscribeUrl: unsu
 function inlineArt(html: string): string {
   const asData = (path: string) =>
     `data:image/png;base64,${readFileSync(path).toString('base64')}`;
-  return html
-    .replace(/cid:cw-shield/g, asData('public/images/email/shield.png'))
-    .replace(/cid:cw-skyline/g, asData('public/images/email/skyline.png'));
+  const map: Record<string, string> = {
+    'cw-shield': 'shield', 'cw-skyline': 'skyline', 'cw-emblem': 'emblem',
+    'cw-step-signal': 'step-signal', 'cw-step-community': 'step-community',
+    'cw-step-megaphone': 'step-megaphone',
+  };
+  return html.replace(/cid:([a-z-]+)/g, (whole, cid: string) => {
+    const file = map[cid];
+    return file ? asData(`public/images/email/${file}.png`) : whole;
+  });
 }
 
 mkdirSync('dist-preview', { recursive: true });

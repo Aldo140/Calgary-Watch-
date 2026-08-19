@@ -21,6 +21,10 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const CID = {
   shield: 'cw-shield',
   skyline: 'cw-skyline',
+  stepSignal: 'cw-step-signal',
+  stepCommunity: 'cw-step-community',
+  stepMegaphone: 'cw-step-megaphone',
+  emblem: 'cw-emblem',
 } as const;
 
 function load(cid: string, relativePath: string): InlineImage {
@@ -38,14 +42,34 @@ function load(cid: string, relativePath: string): InlineImage {
  * Re-reading and re-encoding per message would turn a 90 KB constant into work
  * proportional to the size of the list, for a byte-identical result.
  */
-let cached: InlineImage[] | null = null;
+const cache = new Map<string, InlineImage[]>();
 
+/** The two marks every message carries. */
 export function letterheadImages(): InlineImage[] {
-  if (!cached) {
-    cached = [
+  if (!cache.has('letterhead')) {
+    cache.set('letterhead', [
       load(CID.shield, 'public/images/email/shield.png'),
       load(CID.skyline, 'public/images/email/skyline.png'),
-    ];
+      load(CID.emblem, 'public/images/email/emblem.png'),
+    ]);
   }
-  return cached;
+  return cache.get('letterhead')!;
+}
+
+/**
+ * The three step icons, carried only by the welcome.
+ *
+ * Attaching them to every weekly digest would add ~65 KB to a message that
+ * never shows them — twelve times a year, to every subscriber, for nothing.
+ */
+export function welcomeImages(): InlineImage[] {
+  if (!cache.has('welcome')) {
+    cache.set('welcome', [
+      ...letterheadImages(),
+      load(CID.stepSignal, 'public/images/email/step-signal.png'),
+      load(CID.stepCommunity, 'public/images/email/step-community.png'),
+      load(CID.stepMegaphone, 'public/images/email/step-megaphone.png'),
+    ]);
+  }
+  return cache.get('welcome')!;
 }

@@ -37,7 +37,8 @@ import {
   renderWelcomeText,
   type DigestBranding,
 } from '../scripts/digest/render.js';
-import { WELCOME, leadParagraph, spell, spellCap } from '../scripts/digest/copy.js';
+import { WELCOME, leadParagraph, listHeading, locationPrompt, spell, spellCap } from '../scripts/digest/copy.js';
+import { contrastFailures, contrastRatio, requiredRatio } from '../scripts/digest/contrast.js';
 import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js';
 import type { Incident } from '../src/types/index.js';
 
@@ -510,4 +511,145 @@ describe('voice', () => {
     });
     assert.ok(!/sorry|apolog|thank you for your (time|attention)|we're thrilled/i.test(html));
   });
+});
+
+// ── Every subscriber, not just the ideal one ────────────────────────────────
+
+describe('who gets a useful email', () => {
+  const city = [
+    incident({ id: 'far1', neighborhood: 'Bowness', lat: 51.0880, lng: -114.1950 }),
+    incident({ id: 'far2', neighborhood: 'Forest Lawn', lat: 51.0400, lng: -113.9700 }),
+    incident({ id: 'near', ...at(300), neighborhood: 'Beltline' }),
+  ];
+
+  it('gives a resolved address real distances', () => {
+    const s = buildDigestSummary({ incidents: city, profile: PROFILE, home: HOME, now: NOW });
+    assert.equal(s.scope, 'home');
+    assert.equal(s.needsLocation, false);
+    assert.ok(s.items.every((i) => i.distanceM !== null));
+  });
+
+  it('gives a neighbourhood name its community, without inventing distances', () => {
+    const s = buildDigestSummary({ incidents: city, profile: PROFILE, home: null, now: NOW });
+    assert.equal(s.scope, 'community');
+    assert.equal(s.ringLabel, 'in Beltline');
+    assert.ok(s.items.every((i) => i.distanceM === null));
+  });
+
+  it('never tells somebody with no location that their area was quiet', () => {
+    // The bug this prevents: an empty list because we do not know where they
+    // live, reported as "nothing happened near you" — a claim they have no way
+    // to check and which is simply false.
+    const noLocation: DigestRecipient = {
+      uid: 'n', email: 'n@e.com', weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const s = buildDigestSummary({ incidents: city, profile: noLocation, home: null, now: NOW });
+    assert.equal(s.scope, 'city');
+    assert.equal(s.needsLocation, true);
+    assert.equal(s.quiet, false, 'a city-wide digest still has content');
+    assert.equal(s.total, city.length);
+    assert.match(leadParagraph(s), /across Calgary/);
+    assert.ok(!/near you/i.test(leadParagraph(s)), 'must not claim proximity we cannot know');
+  });
+
+  it('still serves somebody outside the areas we cover', () => {
+    const elsewhere: DigestRecipient = {
+      uid: 'e', email: 'e@e.com', neighborhood: 'Saskatoon',
+      weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const s = buildDigestSummary({ incidents: city, profile: elsewhere, home: null, now: NOW });
+    assert.equal(s.scope, 'city');
+    assert.equal(s.widenedToCity, true);
+    assert.ok(s.total > 0, 'they get the city rather than an empty page');
+  });
+
+  it('widens to the city when their own area had a genuinely quiet week', () => {
+    const quietArea: DigestRecipient = {
+      uid: 'q', email: 'q@e.com', neighborhood: 'Tuxedo Park',
+      weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const s = buildDigestSummary({ incidents: city, profile: quietArea, home: null, now: NOW });
+    assert.equal(s.scope, 'city');
+    assert.equal(s.widenedToCity, true);
+    // ...and says so, rather than passing the city off as their neighbourhood.
+    assert.match(leadParagraph(s), /Your area was quiet/);
+  });
+
+  it('asks for a location only from people who have not given one', () => {
+    const noLocation: DigestRecipient = {
+      uid: 'n', email: 'n@e.com', weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const anonymous = buildDigestSummary({ incidents: city, profile: noLocation, home: null, now: NOW });
+    assert.ok(locationPrompt(anonymous), 'somebody unplaceable should be asked');
+
+    const quietArea: DigestRecipient = {
+      uid: 'q', email: 'q@e.com', neighborhood: 'Tuxedo Park',
+      weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const placed = buildDigestSummary({ incidents: city, profile: quietArea, home: null, now: NOW });
+    assert.equal(locationPrompt(placed), null,
+      'somebody whose area was merely quiet must not be told to fix their settings');
+  });
+
+  it('only claims the list is closest-first when it actually is', () => {
+    // Needs two nearby reports: a single-item list is headed "What happened"
+    // whatever the scope, because "closest first" says nothing about one row.
+    const twoNearby = [
+      incident({ id: 'n1', ...at(200), neighborhood: 'Beltline' }),
+      incident({ id: 'n2', ...at(500), neighborhood: 'Beltline' }),
+    ];
+    const withHome = buildDigestSummary({ incidents: twoNearby, profile: PROFILE, home: HOME, now: NOW });
+    assert.equal(withHome.scope, 'home');
+    assert.match(listHeading(withHome), /closest first/);
+
+    // Same two reports, no address: matched by name, so there are no distances
+    // and the ordering the heading would claim does not exist.
+    const withoutHome = buildDigestSummary({ incidents: twoNearby, profile: PROFILE, home: null, now: NOW });
+    assert.equal(withoutHome.scope, 'community');
+    assert.ok(!/closest/.test(listHeading(withoutHome)), 'no distances, no such claim');
+  });
+});
+
+// ── Legibility, measured rather than asserted ───────────────────────────────
+
+describe('contrast', () => {
+  const BRANDING_OK = BRANDING;
+  const cases: Array<[string, DigestRecipient, { lat: number; lng: number } | null]> = [
+    ['address', PROFILE, HOME],
+    ['neighbourhood', PROFILE, null],
+    ['no location', { uid: 'n', email: 'n@e.com', weeklyDigestOptIn: true, weeklyDigestOptInAt: 1 }, null],
+  ];
+
+  it('computes WCAG ratios correctly', () => {
+    // Black on white is the reference value in the spec: exactly 21:1.
+    assert.equal(Math.round(contrastRatio('#000000', '#FFFFFF')!), 21);
+    assert.equal(Math.round(contrastRatio('#FFFFFF', '#FFFFFF')!), 1);
+  });
+
+  it('applies the large-text threshold only where it applies', () => {
+    assert.equal(requiredRatio(14, false), 4.5);
+    assert.equal(requiredRatio(19, true), 3);    // 18.66px+ bold counts as large
+    assert.equal(requiredRatio(19, false), 4.5); // ...but not at normal weight
+    assert.equal(requiredRatio(24, false), 3);
+  });
+
+  for (const [label, profile, home] of cases) {
+    it(`every word is legible — ${label}`, () => {
+      const summary = buildDigestSummary({
+        incidents: [incident({ id: 'a', ...at(150) })], profile, home, now: NOW,
+      });
+      const shared = {
+        summary, displayName: 'Aldo',
+        unsubscribeUrl: unsubscribeUrl(BRANDING_OK.origin, 'u1', 'a'.repeat(32)),
+        branding: BRANDING_OK,
+      };
+      for (const [kind, html] of [
+        ['digest', renderDigestHtml(shared)], ['welcome', renderWelcomeHtml(shared)],
+      ] as const) {
+        const bad = contrastFailures(html);
+        assert.equal(bad.length, 0,
+          `${kind}: ${bad.map((f) => `${f.ratio}:1 ${f.colour} on ${f.background} "${f.text}"`).join('; ')}`);
+      }
+    });
+  }
 });

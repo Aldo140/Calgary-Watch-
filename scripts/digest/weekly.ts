@@ -57,7 +57,7 @@ import {
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
 import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { WELCOME } from './copy.js';
-import { letterheadImages } from './art.js';
+import { letterheadImages, welcomeImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
 import type { Incident } from '../../src/types/index.js';
 
@@ -167,9 +167,19 @@ async function ensureUnsubToken(db: Firestore, profile: DigestRecipient): Promis
  * size of the list to return almost entirely the same documents.
  */
 async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident[]> {
+  // The explicit descending order is load-bearing, not cosmetic.
+  //
+  // An equality filter plus a range filter and NO orderBy makes Firestore ask
+  // for an index ordered (visibility ASC, timestamp ASC) — which the project
+  // does not have, so the first run against production died with
+  // FAILED_PRECONDITION before a single message was built. Naming the order
+  // the project already indexes (visibility ASC, timestamp DESC) serves the
+  // same query from the existing composite, so no index has to be created or
+  // deployed. Newest-first also happens to be the order the digest wants.
   const snapshot = await db.collection('incidents')
     .where('visibility', '==', 'public')
     .where('timestamp', '>=', now - 2 * WEEK_MS)
+    .orderBy('timestamp', 'desc')
     .get();
 
   return snapshot.docs.map((doc) => {
@@ -287,7 +297,7 @@ async function run(): Promise<void> {
         html: render(shared),
         text: renderText(shared),
         unsubscribeUrl: unsubUrl,
-        inline: letterheadImages(),
+        inline: isFirstEmail ? welcomeImages() : letterheadImages(),
       };
 
       const result = await sendDigestEmail(email, sender);

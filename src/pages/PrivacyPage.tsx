@@ -122,7 +122,9 @@ export default function PrivacyPage() {
               rows={[
                 { what: 'Name, email address, profile photo', why: 'Attribute your reports; contact you about them', kept: 'Until you ask us to delete your account' },
                 { what: 'Account role and sign-up date', why: 'Decide who can moderate', kept: 'Until account deletion' },
-                { what: 'Weekly digest preference', why: 'Only send email you asked for', kept: 'Until you change it' },
+                { what: 'Weekly digest preference and the date you gave it', why: 'Only send email you asked for, and be able to show you asked', kept: 'Until you change it' },
+                { what: 'A random unsubscribe token', why: 'Let the link in a digest email work without signing in', kept: 'Until account deletion' },
+                { what: 'A record of each digest sent to you, and of any unsubscribe request', why: 'Avoid sending the same issue twice; prove a withdrawal was honoured', kept: 'Indefinitely, as a compliance record' },
                 { what: 'Administrator notes about you', why: 'Record moderation decisions', kept: 'Until account deletion' },
               ]}
             />

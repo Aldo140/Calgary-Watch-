@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Calgary Watch BIMI mark. SVG Tiny 1.2 Portable/Secure profile - the strict
+     subset mail providers accept as a sender avatar. Constraints and the DNS
+     record that points here are documented in docs/weekly-digest-setup.md. -->
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 512 512" width="512" height="512">
+  <title>Calgary Watch</title>
+  <rect width="512" height="512" fill="#1F3D37"/>
+  <path fill="#F4EEE3"
+        d="M256 96 386 156v118c0 74-52 138-130 154-78-16-130-80-130-154V156L256 96z"/>
+  <path fill="#2E8B7A"
+        d="M256 186c-32 0-58 26-58 58 0 36 58 92 58 92s58-56 58-92c0-32-26-58-58-58z"/>
+  <circle cx="256" cy="243" r="22" fill="#F4EEE3"/>
+</svg>

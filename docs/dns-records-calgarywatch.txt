@@ -1,0 +1,38 @@
+Resend DNS records for calgarywatch.ca — paste into Namecheap Advanced DNS.
+Domain id: 335d8a9c-ac37-4ff7-a5f9-55fc53b12326
+Host values are RELATIVE (Namecheap style) — do not append .calgarywatch.ca
+
+--- 1. DKIM  (Type: TXT Record) -------------------------------------------
+Host:
+resend._domainkey
+
+Value (ONE line, no spaces, no line breaks):
+p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC656Mmufq/1s6PRzbCrTQtWgLDOUR2wsIeUDtQhNp8ovHf/yg4uHTltCHebi6Q9qRyKmV/S9V7r5yMQIN+FyZBz9WYfilT1wBmScdx9LeP7XavwjWPJxKKMHjmFZ4t/yKC8Rd70dIbfX1an1hRTGzVgu2UhML7yiOjDSKC2BrOPwIDAQAB
+
+--- 2. SPF  (Type: TXT Record) --------------------------------------------
+Host:
+send
+
+Value:
+v=spf1 include:amazonses.com ~all
+
+--- 3. Bounce handling  (Type: MX Record, Priority 10) ---------------------
+Requires Mail Settings = Custom MX. Skip this one if you use Namecheap
+email forwarding on this domain and would rather keep it.
+Host:
+send
+
+Value:
+feedback-smtp.us-east-1.amazonses.com
+
+Priority:
+10
+
+--- 4. DMARC  (Type: TXT Record) ------------------------------------------
+Not from Resend. Inbox providers increasingly expect it. p=none is
+monitor-only; move to p=quarantine after a few clean weeks.
+Host:
+_dmarc
+
+Value:
+v=DMARC1; p=none; rua=mailto:jorti104@mtroyal.ca

@@ -14,7 +14,10 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "ingest:outages": "tsx scripts/ingest/power-outages.ts",
     "backfill:visibility": "tsx scripts/backfill-visibility.ts",
-    "repair:timestamps": "tsx scripts/repair-future-timestamps.ts"
+    "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
+    "digest:weekly": "tsx scripts/digest/weekly.ts",
+    "digest:preview": "tsx scripts/digest/preview.ts",
+    "digest:art": "tsx scripts/prepare-email-art.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

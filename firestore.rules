@@ -365,6 +365,47 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ── Weekly digest ────────────────────────────────────────────────
+    //
+    // The send ledger. Written only by scripts/digest/weekly.ts through the
+    // Admin SDK, which bypasses these rules entirely — so denying everything
+    // here costs the sender nothing. What it buys is that no client can read
+    // who is subscribed, what their neighbourhood is, or when they were last
+    // mailed, which is exactly the list an attacker would want.
+    match /digest_sends/{sendId} {
+      allow read, write: if false;
+    }
+
+    // Unsubscribe requests, filed by the link at the bottom of a digest email.
+    //
+    // The person clicking is signed out by definition, so this cannot be gated
+    // on auth — and a link that requires signing in first is not a working
+    // unsubscribe mechanism under CASL. It is gated on a per-account secret
+    // instead: the document id must be the uid, and the token in the payload
+    // must equal the one stored on that profile. `get()` inside a rule is not
+    // itself subject to read rules, which is what lets an anonymous write be
+    // checked against a profile only its owner can read.
+    //
+    // Consequences of the shape: editing the uid in the URL unsubscribes
+    // nobody, because the token will not match the other account. The 32-char
+    // length check stops an empty token matching a profile that has none.
+    // `processedAt` must arrive null — only the Monday job may stamp it, and it
+    // does that with admin credentials.
+    match /digest_unsubscribes/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if
+        request.resource.data.keys().hasOnly(['uid', 'token', 'requestedAt', 'processedAt', 'source']) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.token is string &&
+        request.resource.data.token.size() == 32 &&
+        request.resource.data.requestedAt is number &&
+        request.resource.data.processedAt == null &&
+        exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.get('digestUnsubToken', '') == request.resource.data.token;
+      // Deleting would destroy the proof that a withdrawal was honoured.
+      allow delete: if false;
+    }
+
     match /{path=**} {
       allow read, write: if false;
     }

@@ -291,17 +291,28 @@ async function run(): Promise<void> {
       };
 
       const result = await sendDigestEmail(email, sender);
-      if (result.blocked) {
-        // Release the claim: this person was never mailed, and must still be
-        // reachable in a later run once the allowlist is lifted.
+
+      // Nothing left the building — a dry run, or a recipient the allowlist
+      // refused. Release the claim.
+      //
+      // A claim that outlives a rehearsal is worse than no claim at all: the
+      // week is marked spent, and the REAL Monday run skips everybody as
+      // already sent. That turned the safest way to test into the one action
+      // guaranteed to break the next live send, and left "remember to delete
+      // the ledger rows afterwards" as a manual step nobody should be asked to
+      // remember. The claim is still taken first, so the ordering that makes
+      // duplicates impossible is exercised exactly as it will be in production.
+      if (result.skipped) {
         await claim.delete().catch(() => {});
         skipped += 1;
+        console.log(`[digest] ${result.blocked ? 'blocked' : 'dry run'} ${profile.uid}`
+          + ` — ${summary.total} report(s) ${summary.ringLabel}, claim released`);
         continue;
       }
       if (result.ok) {
         sent += 1;
         await claim.set({
-          status: result.skipped ? 'dry-run' : 'sent',
+          status: 'sent',
           sentAt: Date.now(),
           providerId: result.id ?? null,
           subject: email.subject,
@@ -309,7 +320,7 @@ async function run(): Promise<void> {
           reportCount: summary.total,
           ring: summary.ringLabel,
         }, { merge: true });
-        if (isFirstEmail && !result.skipped) {
+        if (isFirstEmail) {
           await db.collection('users').doc(profile.uid)
             .set({ digestWelcomeSentAt: Date.now() }, { merge: true });
         }

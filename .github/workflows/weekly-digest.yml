@@ -1,0 +1,69 @@
+name: Weekly Digest
+
+# Mondays, once. The cron is UTC and Calgary is not, so this fires 09:00 during
+# MDT and 08:00 during MST. That drift is deliberate: pinning the local hour
+# would need two schedules and a guard, and nobody minds a digest arriving an
+# hour early in January. What must not drift is the *week* it counts as, and
+# that is computed in America/Edmonton by digestWeekKey() rather than from cron.
+on:
+  schedule:
+    - cron: '0 15 * * 1'
+  # Manual runs are the supported way to rehearse. Both inputs below default to
+  # the safe setting, so pressing "Run workflow" without thinking sends nothing.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Render and log only — transmit nothing'
+        type: boolean
+        default: true
+      test_email:
+        description: 'Redirect every message to this address (leave blank for real recipients)'
+        type: string
+        default: ''
+      only_uid:
+        description: 'Restrict the run to a single account uid'
+        type: string
+        default: ''
+
+# A slow run must never overlap the next tick, and two overlapping runs are the
+# one thing the send ledger cannot fully protect against.
+concurrency:
+  group: 'weekly-digest'
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send weekly digest
+        run: npx tsx scripts/digest/weekly.ts
+        env:
+          # Same service-account secret the ingest pipelines use.
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # CASL: sender identity and a real mailing address are required in
+          # every message. render.ts refuses to build an email without them.
+          DIGEST_SENDER_NAME: ${{ vars.DIGEST_SENDER_NAME }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          DIGEST_SUPPORT_EMAIL: ${{ vars.DIGEST_SUPPORT_EMAIL }}
+          DIGEST_FROM: ${{ vars.DIGEST_FROM }}
+          DIGEST_ORIGIN: ${{ vars.DIGEST_ORIGIN }}
+          DIGEST_LIMIT: ${{ vars.DIGEST_LIMIT }}
+          # Scheduled runs always send for real; manual runs default to dry.
+          DIGEST_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          DIGEST_TEST_EMAIL: ${{ inputs.test_email }}
+          DIGEST_ONLY_UID: ${{ inputs.only_uid }}

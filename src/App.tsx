@@ -21,6 +21,7 @@ const CoveragePage = lazy(() => import('@/src/pages/CoveragePage'));
 const PrivacyPage  = lazy(() => import('@/src/pages/PrivacyPage'));
 const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
+const UnsubscribePage = lazy(() => import('@/src/pages/UnsubscribePage'));
 
 /**
  * Handles redirects from the 404.html hack.
@@ -149,6 +150,8 @@ export default function App() {
           <Route path="/admin/incidents" element={<AdminIncidentListPage />} />
           <Route path="/coverage" element={<CoveragePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          {/* Reached from a link in the weekly digest, always signed out. */}
+          <Route path="/unsubscribe" element={<UnsubscribePage />} />
           <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />
           <Route path="/airdrie-crime-map" element={<AirdrieCrimeMapPage />} />
           {/* Redirect unknown paths to landing page */}

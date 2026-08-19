@@ -43,6 +43,7 @@ import {
   type DigestSummary,
   type ScoredIncident,
 } from '../../src/lib/digest.js';
+import { CID } from './art.js';
 import {
   CTA_LABEL,
   CTA_LABEL_QUIET,
@@ -188,32 +189,57 @@ const SHELL_W = 560;
  */
 function masthead(dateLine: string): string {
   return `
-  <tr><td style="padding:34px 36px 0;">
+  <tr><td style="padding:32px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        <td style="vertical-align:baseline;">
-          <span style="font:700 13px/1 ${BODY};color:${C.deep};letter-spacing:2.6px;">
-            CALGARY&nbsp;WATCH
-          </span>
+        <td width="38" style="width:38px;padding-right:14px;vertical-align:middle;">
+          <!-- Inline part, not a hosted URL — see scripts/digest/art.ts. The
+               wordmark beside it is live text, so a reader with images off
+               still gets a masthead rather than an empty box. -->
+          <img src="cid:${CID.shield}" width="38" height="51" alt=""
+               style="display:block;width:38px;height:51px;border:0;">
         </td>
-        <td align="right" style="vertical-align:baseline;">
-          <span style="font:400 11.5px/1 ${BODY};color:${C.soft};">${escapeHtml(dateLine)}</span>
+        <td style="vertical-align:middle;">
+          <div class="cw-ink" style="font:700 13px/1 ${BODY};color:${C.deep};letter-spacing:2.6px;">
+            CALGARY&nbsp;WATCH
+          </div>
+          <div style="font:400 11px/1 ${BODY};color:${C.soft};padding-top:6px;">
+            ${escapeHtml(dateLine)}
+          </div>
         </td>
       </tr>
     </table>
-    <div style="height:2px;background:${C.gold};font-size:0;line-height:0;margin-top:11px;">&nbsp;</div>
+    <div style="height:2px;background:${C.gold};font-size:0;line-height:0;margin-top:13px;">&nbsp;</div>
+  </td></tr>`;
+}
+
+/**
+ * The skyline, as the rule above the footer.
+ *
+ * A plain hairline did the same structural job, but this is a Calgary paper and
+ * the city's own outline is the obvious thing to close on — the Tower, the
+ * downtown blocks, the spruce at either end. It earns its place by being the
+ * only illustration in the message and by sitting where a signature would.
+ */
+function skylineRule(): string {
+  return `
+  <tr><td style="padding:34px 36px 0;" align="center">
+    <img src="cid:${CID.skyline}" width="480" height="101" alt=""
+         style="display:block;width:100%;max-width:480px;height:auto;border:0;opacity:0.55;">
   </td></tr>`;
 }
 
 /** A paragraph in the body voice. One place, so leading never drifts. */
 function p(text: string, opts: { top?: number; color?: string; size?: number } = {}): string {
   const { top = 14, color = C.body, size = 15.5 } = opts;
-  return `<p style="margin:${top}px 0 0;font:400 ${size}px/1.62 ${BODY};color:${color};">${text}</p>`;
+  const tone = color === C.soft ? 'cw-soft' : 'cw-body';
+  return `<p class="${tone}" style="margin:${top}px 0 0;font:400 ${size}px/1.62 ${BODY};`
+    + `color:${color};">${text}</p>`;
 }
 
 /** The greeting, in the display face — the one place the serif goes large. */
 function salutation(name: string, at: number): string {
-  return `<div style="font:700 27px/1.25 ${DISPLAY};color:${C.ink};">
+  return `<div class="cw-ink" style="font:700 27px/1.25 ${DISPLAY};color:${C.ink};">
     ${escapeHtml(greeting(at))}, ${escapeHtml(name)}.
   </div>`;
 }
@@ -229,10 +255,11 @@ function salutation(name: string, at: number): string {
 function categoryLine(summary: DigestSummary): string {
   if (summary.byCategory.length === 0) return '';
   const parts = summary.byCategory
-    .map((c) => `<span style="color:${C.ink};font-weight:700;">${c.count}</span> `
+    .map((c) => `<span class="cw-ink" style="color:${C.ink};font-weight:700;">${c.count}</span> `
       + `${escapeHtml(c.label.toLowerCase())}`)
     .join(`<span style="color:${C.soft};opacity:0.55;"> &nbsp;·&nbsp; </span>`);
-  return `<div style="font:400 13px/1.5 ${BODY};color:${C.soft};padding-top:16px;">${parts}</div>`;
+  return `<div class="cw-soft" style="font:400 13px/1.5 ${BODY};color:${C.soft};`
+    + `padding-top:16px;">${parts}</div>`;
 }
 
 /** Small caps heading above a block. Quiet, warm, not a system label. */
@@ -258,18 +285,18 @@ function reportRow(item: ScoredIncident, origin: string): string {
   return `
   <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           style="background:${C.paper};border:1px solid ${C.line};border-radius:3px;">
+           class="cw-card" style="background:${C.paper};border:1px solid ${C.line};border-radius:3px;">
       <tr>
-        <td width="76" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
+        <td width="76" class="cw-rail" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
                    padding:14px 6px;text-align:center;vertical-align:middle;">
-          <span style="font:700 11.5px/1.2 ${MONO};color:${C.deep};">${escapeHtml(rail)}</span>
+          <span class="cw-ink" style="font:700 11.5px/1.2 ${MONO};color:${C.deep};">${escapeHtml(rail)}</span>
         </td>
         <td style="padding:13px 16px;">
           <a href="${escapeHtml(origin)}/map?incident=${encodeURIComponent(item.incident.id)}"
-             style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
+             class="cw-ink" style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
             ${escapeHtml(item.incident.title)}
           </a>
-          <div style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">
+          <div class="cw-soft" style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">
             ${escapeHtml(itemSubtitle(item))}
           </div>
         </td>
@@ -321,11 +348,10 @@ function cta(origin: string, label: string): string {
  */
 function footer(unsubscribeUrl: string, branding: DigestBranding): string {
   return `
-  <tr><td style="padding:34px 36px 38px;">
-    <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
+  <tr><td style="padding:14px 36px 38px;">
     ${p(`You're getting this because you turned on the weekly digest in your Calgary Watch `
       + `settings. It's built from your saved location and public reports on the map, `
-      + `nothing else.`, { top: 20, color: C.soft, size: 12 })}
+      + `nothing else.`, { top: 4, color: C.soft, size: 12 })}
     ${p(`<strong style="color:${C.body};">${escapeHtml(branding.senderName)}</strong><br>`
       + `${escapeHtml(branding.mailingAddress)}<br>`
       + `<a href="mailto:${escapeHtml(branding.supportEmail)}" `
@@ -347,22 +373,50 @@ function shell(options: {
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<!-- Light only. A client that inverted this would put white type on sandstone. -->
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>${escapeHtml(options.title)}</title>
+<style>
+  /*
+   * Dark mode, handled rather than suffered.
+   *
+   * Declaring "light only" does not stop Gmail: it inverts the page anyway,
+   * and because it leaves transparent PNGs alone, the letterhead ended up at
+   * 1.06:1 against its own background and disappeared. Two fixes, because no
+   * single one covers every client:
+   *
+   *   1. The artwork is tinted brand gold, which holds contrast on sandstone
+   *      AND on a dark ground — so even a client that force-inverts and
+   *      ignores everything below still shows a readable letterhead.
+   *   2. These rules, for the clients that do honour prefers-color-scheme
+   *      (Apple Mail, Outlook.com, Thunderbird), so they get a designed dark
+   *      version instead of an automatic approximation.
+   *
+   * !important is required: everything else in this document is an inline
+   * style, and inline styles otherwise win.
+   */
+  @media (prefers-color-scheme: dark) {
+    .cw-page, .cw-shell { background: #1A1714 !important; }
+    .cw-card { background: #241F1B !important; border-color: #3A322B !important; }
+    .cw-rail { background: #2C2621 !important; border-color: #3A322B !important; }
+    .cw-ink, .cw-ink a { color: #F2EAdE !important; }
+    .cw-soft { color: #A99C8C !important; }
+    .cw-body { color: #D6CCBE !important; }
+    .cw-hair { background: #3A322B !important; }
+  }
+</style>
 </head>
-<body style="margin:0;padding:0;background:${C.sand};-webkit-text-size-adjust:100%;">
+<body class="cw-page" style="margin:0;padding:0;background:${C.sand};-webkit-text-size-adjust:100%;">
 <!-- Preheader: the grey line an inbox shows beside the subject. Hidden in the
      message itself so it is not repeated at the top of the page. -->
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
   ${escapeHtml(options.preheader)}
 </div>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-       style="background:${C.sand};">
+       class="cw-page" style="background:${C.sand};">
 <tr><td align="center" style="padding:30px 12px 44px;">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${SHELL_W}"
-         style="width:100%;max-width:${SHELL_W}px;background:${C.sand};">
+         class="cw-shell" style="width:100%;max-width:${SHELL_W}px;background:${C.sand};">
     ${options.inner}
   </table>
 </td></tr>
@@ -393,6 +447,7 @@ export function renderDigestHtml(options: {
     </td></tr>
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+    ${skylineRule()}
     ${footer(unsubscribeUrl, branding)}`,
   });
 }
@@ -428,6 +483,12 @@ export function renderWelcomeHtml(options: {
     ${masthead(dateRange(summary))}
     <tr><td style="padding:26px 36px 0;">
       ${salutation(name, summary.until)}
+      <!-- Why it arrived, in the first line rather than the small print.
+           Somebody who does not remember signing up reaches for the spam
+           button long before they reach the footer. -->
+      <div class="cw-soft" style="font:400 12.5px/1.5 ${BODY};color:${C.soft};padding-top:11px;">
+        ${escapeHtml(WELCOME.reason)}
+      </div>
       ${note}
     </td></tr>
 
@@ -436,7 +497,7 @@ export function renderWelcomeHtml(options: {
          wants something back. -->
     <tr><td style="padding:26px 36px 0;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-             style="background:${C.paper};border:1px solid ${C.line};
+             class="cw-card" style="background:${C.paper};border:1px solid ${C.line};
                     border-left:3px solid ${C.bow};border-radius:3px;">
         <tr><td style="padding:18px 20px;">
           ${heading(WELCOME.askHeading)}
@@ -458,6 +519,7 @@ export function renderWelcomeHtml(options: {
     </td></tr>
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+    ${skylineRule()}
     ${footer(unsubscribeUrl, branding)}`,
   });
 }

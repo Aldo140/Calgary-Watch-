@@ -89,6 +89,13 @@ export const CTA_LABEL_QUIET = 'Have a look at the map';
  */
 export const WELCOME = {
   subject: 'Quick hello from Calgary Watch',
+  /**
+   * Why this landed in their inbox, said in the first line rather than buried
+   * in the footer. Somebody who does not remember signing up reaches for the
+   * spam button long before they reach the small print, and a spam complaint
+   * costs the whole list — so the reason goes where it will actually be read.
+   */
+  reason: `You're getting this because you enabled the weekly digest on Calgary Watch.`,
   paragraphs: [
     `Quick hello, since this is the first one.`,
     `Calgary Watch is a map of what's actually going on around your block — break-ins, `
@@ -100,12 +107,20 @@ export const WELCOME = {
       + `too — that's worth knowing.`,
   ],
   askHeading: 'One thing before you go',
-  ask: `The site just got rebuilt, and I'd like to know what you make of it. What would make `
+  ask: `The site just got rebuilt, and we'd like to know what you make of it. What would make `
     + `this email worth opening on a Monday? What's missing from the map? Reply to this one — `
-    + `it comes to me, not a support queue.`,
+    + `it comes straight to us, not a support queue.`,
   thanks: `Thanks for being early to this.`,
-  signOff: 'Aldo',
-  signOffRole: 'Calgary Watch',
+  /**
+   * Signed by the team, not by a person.
+   *
+   * A single name implies one inbox and one pair of hands, which sets an
+   * expectation about replies that a growing list cannot keep. "The Calgary
+   * Watch team" still reads as people rather than a system, and stays true
+   * whoever ends up answering.
+   */
+  signOff: 'The Calgary Watch team',
+  signOffRole: 'calgarywatch.ca',
   /** Introduces the digest below it, so the format explains itself once. */
   sampleIntro: `Here's this week's, so you can see what you're in for.`,
 } as const;

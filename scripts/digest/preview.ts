@@ -13,7 +13,7 @@
  * that break an email layout.
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
 import { renderDigestHtml, renderDigestText, renderWelcomeHtml, type DigestBranding } from './render.js';
 import type { Incident } from '../../src/types/index.js';
@@ -91,10 +91,25 @@ const summary = buildDigestSummary({ incidents: SAMPLE, profile: PROFILE, home: 
 const unsub = unsubscribeUrl(BRANDING.origin, PROFILE.uid, 'a'.repeat(32));
 const shared = { summary, displayName: PROFILE.displayName, unsubscribeUrl: unsub, branding: BRANDING };
 
+/**
+ * Swap the cid: references for data URIs.
+ *
+ * A browser cannot resolve `cid:` — that is a mail concept — so the preview
+ * would show two broken boxes and misrepresent the thing it exists to check.
+ * The real send attaches the identical bytes as inline parts.
+ */
+function inlineArt(html: string): string {
+  const asData = (path: string) =>
+    `data:image/png;base64,${readFileSync(path).toString('base64')}`;
+  return html
+    .replace(/cid:cw-shield/g, asData('public/images/email/shield.png'))
+    .replace(/cid:cw-skyline/g, asData('public/images/email/skyline.png'));
+}
+
 mkdirSync('dist-preview', { recursive: true });
-writeFileSync('dist-preview/digest.html', renderDigestHtml(shared));
+writeFileSync('dist-preview/digest.html', inlineArt(renderDigestHtml(shared)));
 writeFileSync('dist-preview/digest.txt', renderDigestText(shared));
-writeFileSync('dist-preview/welcome.html', renderWelcomeHtml(shared));
+writeFileSync('dist-preview/welcome.html', inlineArt(renderWelcomeHtml(shared)));
 
 console.log('Wrote dist-preview/digest.html, welcome.html and digest.txt');
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

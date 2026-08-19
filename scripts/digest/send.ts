@@ -12,12 +12,32 @@
  * cannot be bypassed by a mistake further up.
  */
 
+/** One image carried inside the message and referenced as `cid:<cid>`. */
+export interface InlineImage {
+  cid: string;
+  filename: string;
+  contentType: string;
+  /** Base64 payload, no data: prefix. */
+  base64: string;
+}
+
 export interface OutgoingEmail {
   to: string;
   subject: string;
   html: string;
   text: string;
   unsubscribeUrl: string;
+  /**
+   * Artwork sent as inline attachments rather than linked from the site.
+   *
+   * A hosted image is one missed deploy away from a broken rectangle in every
+   * message already delivered — which is exactly what happened the first time
+   * this shipped. An inline part travels with the mail, so it renders on a
+   * plane, behind a corporate proxy that strips remote content, and years after
+   * the asset path has been renamed. It costs a few KB per send and removes the
+   * entire class of failure.
+   */
+  inline?: InlineImage[];
 }
 
 export interface SendResult {
@@ -25,8 +45,10 @@ export interface SendResult {
   /** Provider message id, when it gave one. */
   id?: string;
   error?: string;
-  /** True when nothing was actually transmitted (dry run). */
+  /** True when nothing was actually transmitted (dry run, or blocked). */
   skipped?: boolean;
+  /** True when the allowlist refused this recipient. */
+  blocked?: boolean;
 }
 
 export interface SenderConfig {
@@ -40,6 +62,11 @@ export interface SenderConfig {
   testRecipient?: string;
   /** Hard ceiling on messages per run. */
   limit: number;
+  /**
+   * When non-empty, the ONLY addresses that may be sent to. Everything else is
+   * refused at the last step before the network call.
+   */
+  allowlist: string[];
   /** Milliseconds between provider calls. */
   throttleMs: number;
 }
@@ -62,6 +89,8 @@ export function loadSenderConfig(env: NodeJS.ProcessEnv = process.env): SenderCo
     // Default 50: high enough for the current list, low enough that a bug in
     // the recipient query cannot mail the whole database before anyone looks.
     limit: Number(env.DIGEST_LIMIT ?? '50'),
+    allowlist: (env.DIGEST_ALLOWLIST ?? '')
+      .split(',').map((a) => a.trim().toLowerCase()).filter(Boolean),
     throttleMs: Number(env.DIGEST_THROTTLE_MS ?? '600'),
   };
 }
@@ -100,6 +129,19 @@ async function postToResend(email: OutgoingEmail, config: SenderConfig): Promise
       html: email.html,
       text: email.text,
       ...(config.replyTo ? { reply_to: config.replyTo } : {}),
+      ...(email.inline?.length
+        ? {
+          attachments: email.inline.map((img) => ({
+            filename: img.filename,
+            content: img.base64,
+            content_id: img.cid,
+            content_type: img.contentType,
+            // `inline` keeps it out of the client's attachment list; without
+            // it the reader sees paperclips for the letterhead.
+            disposition: 'inline',
+          })),
+        }
+        : {}),
       headers: unsubscribeHeaders(email, config),
     }),
   });
@@ -123,6 +165,16 @@ async function postToResend(email: OutgoingEmail, config: SenderConfig): Promise
  */
 export async function sendDigestEmail(email: OutgoingEmail, config: SenderConfig): Promise<SendResult> {
   const recipient = config.testRecipient ?? email.to;
+
+  // The allowlist is checked here, after the redirect, so it governs the
+  // address that will actually be transmitted to rather than the one the
+  // caller intended. While a list is set, a scheduled run that would otherwise
+  // mail every subscriber can reach nobody else — the guarantee holds even if
+  // the workflow, the recipient query or the ledger is wrong.
+  if (config.allowlist.length > 0 && !config.allowlist.includes(recipient.toLowerCase())) {
+    console.log(`[digest] BLOCKED ${recipient} — not on DIGEST_ALLOWLIST`);
+    return { ok: true, skipped: true, blocked: true };
+  }
 
   if (config.dryRun) {
     console.log(`[digest] DRY RUN → ${recipient} :: ${email.subject}`);

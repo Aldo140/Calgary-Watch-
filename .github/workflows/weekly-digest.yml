@@ -63,6 +63,11 @@ jobs:
           DIGEST_FROM: ${{ vars.DIGEST_FROM }}
           DIGEST_ORIGIN: ${{ vars.DIGEST_ORIGIN }}
           DIGEST_LIMIT: ${{ vars.DIGEST_LIMIT }}
+          # SAFETY: while this repository variable is set, these are the only
+          # addresses that can be mailed — a scheduled run reaches nobody else,
+          # even if the recipient query or the ledger is wrong. Clear it in
+          # repo settings when the digest is ready to go out to real people.
+          DIGEST_ALLOWLIST: ${{ vars.DIGEST_ALLOWLIST }}
           # Scheduled runs always send for real; manual runs default to dry.
           DIGEST_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
           DIGEST_TEST_EMAIL: ${{ inputs.test_email }}

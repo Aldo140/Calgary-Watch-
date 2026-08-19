@@ -57,6 +57,7 @@ import {
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
 import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { WELCOME } from './copy.js';
+import { letterheadImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
 import type { Incident } from '../../src/types/index.js';
 
@@ -200,6 +201,11 @@ async function run(): Promise<void> {
 
   if (sender.dryRun) console.log('[digest] DRY RUN — nothing will be transmitted');
   if (sender.testRecipient) console.log(`[digest] TEST MODE — all mail → ${sender.testRecipient}`);
+  if (sender.allowlist.length > 0) {
+    console.log(`[digest] ALLOWLIST ACTIVE — only ${sender.allowlist.join(', ')} can be mailed`);
+  } else {
+    console.log('[digest] NO ALLOWLIST — every opted-in subscriber is in scope');
+  }
 
   const db = initFirebase();
 
@@ -281,9 +287,17 @@ async function run(): Promise<void> {
         html: render(shared),
         text: renderText(shared),
         unsubscribeUrl: unsubUrl,
+        inline: letterheadImages(),
       };
 
       const result = await sendDigestEmail(email, sender);
+      if (result.blocked) {
+        // Release the claim: this person was never mailed, and must still be
+        // reachable in a later run once the allowlist is lifted.
+        await claim.delete().catch(() => {});
+        skipped += 1;
+        continue;
+      }
       if (result.ok) {
         sent += 1;
         await claim.set({

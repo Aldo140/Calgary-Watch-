@@ -302,7 +302,7 @@ describe('rendering', () => {
     assert.equal(escapeHtml(`<&>"'`), '&lt;&amp;&gt;&quot;&#39;');
   });
 
-  it('contains no images at all, in either email', () => {
+  it('carries its artwork inline, never from a URL', () => {
     const s = buildDigestSummary({
       incidents: [incident({ id: 'a', ...at(100) })], profile: PROFILE, home: HOME, now: NOW,
     });
@@ -310,19 +310,28 @@ describe('rendering', () => {
       summary: s, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
       branding: BRANDING,
     };
-    for (const [label, html] of [['digest', renderDigestHtml(shared)], ['welcome', renderWelcomeHtml(shared)]] as const) {
-      // The masthead is typographic on purpose. A remote image is blocked by
-      // default in most clients, and a 404 (a missed deploy, a renamed path)
-      // becomes a broken-image icon in every message already sent — which is
-      // exactly what happened before this became a rule.
-      assert.equal((html.match(/<img\s/gi) ?? []).length, 0, `${label} must have no <img>`);
+    for (const [label, html] of [
+      ['digest', renderDigestHtml(shared)], ['welcome', renderWelcomeHtml(shared)],
+    ] as const) {
+      const imgs = html.match(/<img\s[^>]*>/gi) ?? [];
+      assert.ok(imgs.length > 0, `${label} should carry the letterhead`);
+      for (const img of imgs) {
+        // Every image is a cid: reference. A hosted URL is one missed deploy
+        // from a broken rectangle in mail that has already gone out, which is
+        // exactly how this broke the first time.
+        assert.match(img, /src="cid:/, `${label}: images must be inline parts`);
+        assert.ok(!/src="https?:/.test(img), `${label}: no remote image`);
+        // Decorative, because the wordmark beside it is live text — a reader
+        // with images off must still get a masthead, not an empty box.
+        assert.match(img, /alt=""/, `${label}: letterhead art is decorative`);
+        assert.match(img, /width="\d+"/, `${label}: images need explicit width`);
+      }
+      assert.ok(html.includes('CALGARY&nbsp;WATCH'), `${label} needs a live-text wordmark`);
       assert.ok(!/<script/i.test(html), `${label} must have no script`);
       assert.ok(!/<link\s/i.test(html), `${label} must have no external stylesheet`);
-      // ...and the brand must therefore be live text.
-      assert.ok(html.includes('CALGARY&nbsp;WATCH'), `${label} needs a typographic masthead`);
     }
   });
-});
+  });
 
 // ── Wiring ──────────────────────────────────────────────────────────────────
 
@@ -399,6 +408,21 @@ describe('the first email', () => {
     unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
     branding: BRANDING,
   };
+
+  it('says why it landed in their inbox, up top rather than in the footer', () => {
+    const html = renderWelcomeHtml(shared);
+    assert.ok(html.includes(escapeHtml(WELCOME.reason)), 'welcome must state the reason');
+    // Before the sign-off, not buried at the bottom with the legal text.
+    assert.ok(html.indexOf(escapeHtml(WELCOME.reason)) < html.indexOf(WELCOME.signOff),
+      'the reason must come before the sign-off');
+  });
+
+  it('is signed by the team, not by one person', () => {
+    const html = renderWelcomeHtml(shared);
+    assert.ok(html.includes('The Calgary Watch team'));
+    // A single name promises one pair of hands answering every reply.
+    assert.ok(!/—\s*Aldo/.test(html), 'must not be signed with an individual name');
+  });
 
   it('explains who this is and what will arrive', () => {
     const html = renderWelcomeHtml(shared);

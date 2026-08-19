@@ -43,6 +43,14 @@ import {
   type DigestSummary,
   type ScoredIncident,
 } from '../../src/lib/digest.js';
+import {
+  CTA_LABEL,
+  CTA_LABEL_QUIET,
+  greeting,
+  leadParagraph,
+  listHeading,
+  WELCOME,
+} from './copy.js';
 
 /**
  * The product's tokens, not a palette invented for email.
@@ -51,20 +59,22 @@ import {
  * here rather than on sandstone, and the darker value fails contrast there.
  */
 const C = {
-  ink: '#0B1F33',
-  inkStep: '#16304A',
-  sand: '#F2EBDD',
-  paper: '#FFFDF8',
-  line: '#E2D9C7',
-  edge: '#CFC2AA',
-  body: '#3C4A57',
-  soft: '#6B7A88',
+  /** Warm black. A blue-black read as institutional next to the sandstone. */
+  ink: '#2A2420',
+  /** Foothill green — the deepest thing on the page, used sparingly. */
+  deep: '#1F3D37',
+  sand: '#F4EEE3',
+  paper: '#FFFCF7',
+  line: '#E7DFD0',
+  edge: '#D5C9B6',
+  body: '#4A423A',
+  soft: '#7A6F62',
   bow: '#2E8B7A',
-  gold: '#C89355',
-  clay: '#B0503A',
+  gold: '#A8763A',
+  rail: '#F7F2E8',
 } as const;
 
-const DISPLAY = "Georgia,'Times New Roman',Times,serif";
+const DISPLAY = "Georgia,'Iowan Old Style','Times New Roman',Times,serif";
 const MONO = "'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
 const BODY = "-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif";
 
@@ -164,146 +174,102 @@ function dateRange(summary: DigestSummary): string {
 
 // ── HTML ────────────────────────────────────────────────────────────────────
 
+const SHELL_W = 560;
+
 /**
- * Navy masthead.
+ * The masthead — set, not illustrated.
  *
- * The mark is a bonus, not the identity: it is one small PNG served from the
- * site, and it will be blocked on first open for most readers. So the wordmark
- * beside it is live text on a navy cell, and the block reads correctly with
- * images off. Explicit width and height stop the layout collapsing while it
- * loads, and the alt text is empty because the wordmark already says it —
- * a screen reader should not hear "Calgary Watch" twice.
+ * There is no logo image, and that is a decision rather than a shortcut. Mail
+ * clients block remote images by default, so a masthead built on one is a
+ * broken rectangle on first open for most readers; and the moment the asset
+ * 404s — a missed deploy, a renamed path — every message already sent shows a
+ * broken-image icon forever. A typographic lockup cannot fail that way, loads
+ * instantly, and is what a letter from a person would have at the top anyway.
  */
-function masthead(summary: DigestSummary, origin: string): string {
+function masthead(dateLine: string): string {
   return `
-  <tr><td style="background:${C.ink};padding:22px 28px;">
+  <tr><td style="padding:34px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        <td width="34" style="width:34px;vertical-align:middle;padding-right:12px;">
-          <img src="${escapeHtml(origin)}/images/brand/email-mark.png" alt=""
-               width="34" height="21" style="display:block;width:34px;height:21px;border:0;">
+        <td style="vertical-align:baseline;">
+          <span style="font:700 13px/1 ${BODY};color:${C.deep};letter-spacing:2.6px;">
+            CALGARY&nbsp;WATCH
+          </span>
         </td>
-        <td style="vertical-align:middle;">
-          <div style="font:700 15px/1 ${DISPLAY};color:#FFFFFF;letter-spacing:0.3px;">
-            Calgary&nbsp;Watch
-          </div>
-          <div style="font:400 10px/1 ${MONO};color:${C.gold};letter-spacing:2.2px;padding-top:6px;">
-            WEEKLY BRIEF
-          </div>
-        </td>
-        <td align="right" style="vertical-align:middle;">
-          <div style="font:400 10px/1 ${MONO};color:#8FA3B5;letter-spacing:1.4px;">
-            ${escapeHtml(summary.weekKey)}
-          </div>
-          <div style="font:400 10px/1 ${MONO};color:#8FA3B5;letter-spacing:0.6px;padding-top:6px;">
-            ${escapeHtml(dateRange(summary))}
-          </div>
+        <td align="right" style="vertical-align:baseline;">
+          <span style="font:400 11.5px/1 ${BODY};color:${C.soft};">${escapeHtml(dateLine)}</span>
         </td>
       </tr>
     </table>
+    <div style="height:2px;background:${C.gold};font-size:0;line-height:0;margin-top:11px;">&nbsp;</div>
   </td></tr>`;
 }
 
-/** The area strip: which place this issue is about, stated once, in the rule. */
-function areaStrip(summary: DigestSummary): string {
-  return `
-  <tr><td style="background:${C.inkStep};padding:9px 28px;">
-    <div style="font:700 10px/1.4 ${MONO};color:${C.gold};letter-spacing:2.4px;">
-      ${escapeHtml(summary.areaName.toUpperCase())}
-    </div>
-  </td></tr>`;
+/** A paragraph in the body voice. One place, so leading never drifts. */
+function p(text: string, opts: { top?: number; color?: string; size?: number } = {}): string {
+  const { top = 14, color = C.body, size = 15.5 } = opts;
+  return `<p style="margin:${top}px 0 0;font:400 ${size}px/1.62 ${BODY};color:${color};">${text}</p>`;
 }
 
-/** The count is the headline. One number about one place is the whole message. */
-function headline(summary: DigestSummary, name: string): string {
-  const delta = deltaSentence(summary);
-  if (summary.quiet) {
-    return `
-    <tr><td style="padding:30px 28px 4px;">
-      <div style="font:400 14px/1.5 ${BODY};color:${C.soft};">Morning, ${escapeHtml(name)}.</div>
-      <div style="font:700 30px/1.2 ${DISPLAY};color:${C.ink};padding-top:12px;">
-        A quiet week.
-      </div>
-      <div style="font:400 15px/1.6 ${BODY};color:${C.body};padding-top:10px;">
-        Nothing was reported ${escapeHtml(summary.ringLabel)}. That is worth knowing too.
-      </div>
-    </td></tr>`;
-  }
-  return `
-  <tr><td style="padding:30px 28px 4px;">
-    <div style="font:400 14px/1.5 ${BODY};color:${C.soft};">Morning, ${escapeHtml(name)}.</div>
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="padding-top:10px;">
-      <tr>
-        <td style="vertical-align:middle;padding-right:14px;">
-          <div style="font:700 52px/1 ${DISPLAY};color:${C.ink};">${summary.total}</div>
-        </td>
-        <td style="vertical-align:middle;">
-          <div style="font:700 17px/1.3 ${DISPLAY};color:${C.ink};">
-            ${summary.total === 1 ? 'report' : 'reports'}
-          </div>
-          <div style="font:400 13px/1.4 ${BODY};color:${C.soft};padding-top:3px;">
-            ${escapeHtml(summary.ringLabel)}
-          </div>
-        </td>
-      </tr>
-    </table>
-    ${delta ? `<div style="font:400 13px/1.5 ${BODY};color:${C.soft};padding-top:12px;">
-      ${escapeHtml(delta)}
-    </div>` : ''}
-  </td></tr>`;
+/** The greeting, in the display face — the one place the serif goes large. */
+function salutation(name: string, at: number): string {
+  return `<div style="font:700 27px/1.25 ${DISPLAY};color:${C.ink};">
+    ${escapeHtml(greeting(at))}, ${escapeHtml(name)}.
+  </div>`;
 }
 
-/** Category counts, as a row of tiles. Only categories with something in them. */
-function counters(summary: DigestSummary): string {
+/**
+ * Category counts as one line, not a row of tiles.
+ *
+ * The tiles were three boxes that auto-sized to their labels, so "Crime" came
+ * out narrow and "Infrastructure" wide and the row read as a mistake. They also
+ * restated what the list below says, in a heavier form. One quiet line carries
+ * the same information and lets the reports be the thing you look at.
+ */
+function categoryLine(summary: DigestSummary): string {
   if (summary.byCategory.length === 0) return '';
-  const cells = summary.byCategory.map((c) => `
-    <td style="padding-right:7px;vertical-align:top;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-             style="background:${C.paper};border:1px solid ${C.line};border-top:2px solid ${c.colour};">
-        <tr><td style="padding:10px 12px;">
-          <div style="font:700 20px/1 ${DISPLAY};color:${C.ink};">${c.count}</div>
-          <div style="font:700 9px/1.3 ${MONO};color:${C.soft};letter-spacing:1.2px;padding-top:6px;">
-            ${escapeHtml(c.label.toUpperCase())}
-          </div>
-        </td></tr>
-      </table>
-    </td>`).join('');
-  return `
-  <tr><td style="padding:22px 28px 0;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-      <tr>${cells}</tr>
-    </table>
-  </td></tr>`;
+  const parts = summary.byCategory
+    .map((c) => `<span style="color:${C.ink};font-weight:700;">${c.count}</span> `
+      + `${escapeHtml(c.label.toLowerCase())}`)
+    .join(`<span style="color:${C.soft};opacity:0.55;"> &nbsp;·&nbsp; </span>`);
+  return `<div style="font:400 13px/1.5 ${BODY};color:${C.soft};padding-top:16px;">${parts}</div>`;
+}
+
+/** Small caps heading above a block. Quiet, warm, not a system label. */
+function heading(text: string): string {
+  return `<div style="font:700 11px/1 ${BODY};color:${C.gold};letter-spacing:1.9px;
+                      text-transform:uppercase;padding-bottom:12px;">${escapeHtml(text)}</div>`;
 }
 
 /**
  * A report, with its distance on the rail.
  *
- * The rail is the whole point of the layout: a monospace column the eye reads
- * downward as a proximity ladder before it reads any headline. Fixed width so
- * the numbers align, tinted so it reads as a gutter rather than a first word.
+ * The rail is the layout's one strong idea: a fixed-width column the eye reads
+ * downward as a proximity ladder — 240 m, 620 m, 880 m, 1.0 km — before it
+ * reads a single headline. How close it was is the question people open this
+ * with. Somebody who gave us only a community name has no distance to show, so
+ * their rail carries the weekday; it is never padded with a radius we did not
+ * measure.
  */
 function reportRow(item: ScoredIncident, origin: string): string {
   const rail = item.distanceM !== null
-    ? formatDigestDistance(item.distanceM).replace(' ', ' ')
+    ? formatDigestDistance(item.distanceM)
     : dayShort(item.incident.timestamp);
   return `
-  <tr><td style="padding-bottom:7px;">
+  <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           style="background:${C.paper};border:1px solid ${C.line};">
+           style="background:${C.paper};border:1px solid ${C.line};border-radius:3px;">
       <tr>
-        <td width="72" style="width:72px;background:#F7F1E5;border-right:1px solid ${C.line};
-                   padding:13px 8px;text-align:center;vertical-align:middle;">
-          <div style="font:700 11px/1.2 ${MONO};color:${C.ink};letter-spacing:0.2px;">
-            ${escapeHtml(rail)}
-          </div>
+        <td width="76" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
+                   padding:14px 6px;text-align:center;vertical-align:middle;">
+          <span style="font:700 11.5px/1.2 ${MONO};color:${C.deep};">${escapeHtml(rail)}</span>
         </td>
-        <td style="padding:12px 14px;">
+        <td style="padding:13px 16px;">
           <a href="${escapeHtml(origin)}/map?incident=${encodeURIComponent(item.incident.id)}"
-             style="font:700 14.5px/1.4 ${DISPLAY};color:${C.ink};text-decoration:none;">
+             style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
             ${escapeHtml(item.incident.title)}
           </a>
-          <div style="font:400 11.5px/1.4 ${BODY};color:${C.soft};padding-top:5px;">
+          <div style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">
             ${escapeHtml(itemSubtitle(item))}
           </div>
         </td>
@@ -312,52 +278,32 @@ function reportRow(item: ScoredIncident, origin: string): string {
   </td></tr>`;
 }
 
-/** A section eyebrow: gold tick, mono label, rule across the column. */
-function eyebrow(label: string): string {
-  return `
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr>
-      <td width="16" style="width:16px;padding-right:9px;">
-        <div style="height:3px;background:${C.gold};font-size:0;line-height:0;">&nbsp;</div>
-      </td>
-      <td width="1" style="white-space:nowrap;">
-        <div style="font:700 10px/1 ${MONO};color:${C.gold};letter-spacing:2.2px;">
-          ${escapeHtml(label)}
-        </div>
-      </td>
-      <td style="padding-left:10px;">
-        <div style="height:1px;background:${C.line};font-size:0;line-height:0;">&nbsp;</div>
-      </td>
-    </tr>
-  </table>`;
-}
-
-function body(summary: DigestSummary, origin: string): string {
+/** The report list, or nothing at all on a quiet week. */
+function reportList(summary: DigestSummary, origin: string): string {
   if (summary.quiet) return '';
   return `
-  <tr><td style="padding:26px 28px 0;">
-    ${eyebrow('WHAT HAPPENED')}
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           style="padding-top:12px;">
+  <tr><td style="padding:30px 36px 0;">
+    ${heading(listHeading(summary))}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       ${summary.highlights.map((i) => reportRow(i, origin)).join('')}
     </table>
-    ${summary.total > summary.highlights.length ? `
-    <div style="font:400 12px/1.5 ${BODY};color:${C.soft};padding-top:4px;">
-      ${summary.total - summary.highlights.length} more on the map.
-    </div>` : ''}
+    ${summary.total > summary.highlights.length
+      ? p(`${summary.total - summary.highlights.length} more are on the map.`,
+          { top: 10, color: C.soft, size: 13 })
+      : ''}
   </td></tr>`;
 }
 
 /** Table-and-padding button: the shape Outlook renders correctly. */
 function cta(origin: string, label: string): string {
   return `
-  <tr><td style="padding:26px 28px 0;">
+  <tr><td style="padding:28px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-      <tr><td style="background:${C.ink};">
+      <tr><td style="background:${C.deep};border-radius:3px;">
         <a href="${escapeHtml(origin)}/map"
-           style="display:inline-block;padding:13px 26px;font:700 12px/1 ${MONO};
-                  color:#FFFFFF;text-decoration:none;letter-spacing:1.4px;">
-          ${escapeHtml(label)}
+           style="display:inline-block;padding:14px 26px;font:700 14px/1 ${BODY};
+                  color:#FFFCF7;text-decoration:none;">
+          ${escapeHtml(label)}&nbsp;→
         </a>
       </td></tr>
     </table>
@@ -368,33 +314,60 @@ function cta(origin: string, label: string): string {
  * CASL footer.
  *
  * Sender identity, a real mailing address and a working unsubscribe are legal
- * requirements, not design elements. Nothing here is safe to trim for tidiness,
- * and the unsubscribe is styled to be found rather than hidden in grey — a link
- * somebody cannot see is what makes them press the spam button instead, which
- * costs far more than the unsubscribe would have.
+ * requirements, not design elements — nothing here is safe to trim for
+ * tidiness. The unsubscribe is styled to be found rather than hidden in grey: a
+ * link somebody cannot see is what makes them press the spam button instead,
+ * and that costs far more than the unsubscribe would have.
  */
 function footer(unsubscribeUrl: string, branding: DigestBranding): string {
   return `
-  <tr><td style="padding:30px 28px 34px;">
+  <tr><td style="padding:34px 36px 38px;">
     <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
-    <p style="margin:18px 0 0;font:400 11.5px/1.7 ${BODY};color:${C.soft};">
-      You are getting this because you turned on the weekly digest in your Calgary
-      Watch settings. It is built only from your saved location and public reports
-      on the map.
-    </p>
-    <p style="margin:14px 0 0;font:400 11.5px/1.7 ${BODY};color:${C.soft};">
-      <strong style="color:${C.body};">${escapeHtml(branding.senderName)}</strong><br>
-      ${escapeHtml(branding.mailingAddress)}<br>
-      <a href="mailto:${escapeHtml(branding.supportEmail)}" style="color:${C.bow};text-decoration:none;">
-        ${escapeHtml(branding.supportEmail)}</a>
-    </p>
-    <p style="margin:14px 0 0;font:400 11.5px/1.7 ${BODY};color:${C.soft};">
-      <a href="${escapeHtml(unsubscribeUrl)}"
-         style="color:${C.bow};font-weight:bold;text-decoration:underline;">Unsubscribe</a>
-      <span style="color:${C.edge};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
-      <a href="${escapeHtml(branding.origin)}/privacy" style="color:${C.bow};text-decoration:none;">Privacy</a>
-    </p>
+    ${p(`You're getting this because you turned on the weekly digest in your Calgary Watch `
+      + `settings. It's built from your saved location and public reports on the map, `
+      + `nothing else.`, { top: 20, color: C.soft, size: 12 })}
+    ${p(`<strong style="color:${C.body};">${escapeHtml(branding.senderName)}</strong><br>`
+      + `${escapeHtml(branding.mailingAddress)}<br>`
+      + `<a href="mailto:${escapeHtml(branding.supportEmail)}" `
+      + `style="color:${C.bow};text-decoration:none;">${escapeHtml(branding.supportEmail)}</a>`,
+      { top: 15, color: C.soft, size: 12 })}
+    ${p(`<a href="${escapeHtml(unsubscribeUrl)}" style="color:${C.bow};font-weight:700;`
+      + `text-decoration:underline;">Unsubscribe</a>`
+      + `<span style="color:${C.edge};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`
+      + `<a href="${escapeHtml(branding.origin)}/privacy" style="color:${C.bow};`
+      + `text-decoration:none;">Privacy</a>`, { top: 15, color: C.soft, size: 12 })}
   </td></tr>`;
+}
+
+/** The document shell. Both emails are the same page with a different middle. */
+function shell(options: {
+  title: string; preheader: string; inner: string;
+}): string {
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Light only. A client that inverted this would put white type on sandstone. -->
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>${escapeHtml(options.title)}</title>
+</head>
+<body style="margin:0;padding:0;background:${C.sand};-webkit-text-size-adjust:100%;">
+<!-- Preheader: the grey line an inbox shows beside the subject. Hidden in the
+     message itself so it is not repeated at the top of the page. -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  ${escapeHtml(options.preheader)}
+</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+       style="background:${C.sand};">
+<tr><td align="center" style="padding:30px 12px 44px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${SHELL_W}"
+         style="width:100%;max-width:${SHELL_W}px;background:${C.sand};">
+    ${options.inner}
+  </table>
+</td></tr>
+</table>
+</body></html>`;
 }
 
 export function renderDigestHtml(options: {
@@ -408,37 +381,85 @@ export function renderDigestHtml(options: {
   const { origin } = branding;
   const name = firstName(options.displayName);
 
-  return `<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<!-- Light only. A client that inverts this would put white type on sandstone. -->
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
-<title>${escapeHtml(digestSubject(summary))}</title>
-</head>
-<body style="margin:0;padding:0;background:${C.sand};-webkit-text-size-adjust:100%;">
-<!-- Preheader: the grey line an inbox shows beside the subject. Hidden in the
-     message itself so it is not repeated at the top of the page. -->
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  ${escapeHtml(deltaSentence(summary) ?? `Your week ${summary.ringLabel}.`)}
-</div>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-       style="background:${C.sand};">
-<tr><td align="center" style="padding:26px 10px;">
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600"
-         style="width:100%;max-width:600px;background:${C.sand};border:1px solid ${C.edge};">
-    ${masthead(summary, origin)}
-    ${areaStrip(summary)}
-    ${headline(summary, name)}
-    ${counters(summary)}
-    ${body(summary, origin)}
-    ${cta(origin, summary.quiet ? 'OPEN THE MAP' : 'SEE IT ON THE MAP')}
-    ${footer(unsubscribeUrl, branding)}
-  </table>
-</td></tr>
-</table>
-</body></html>`;
+  return shell({
+    title: digestSubject(summary),
+    preheader: leadParagraph(summary),
+    inner: `
+    ${masthead(dateRange(summary))}
+    <tr><td style="padding:26px 36px 0;">
+      ${salutation(name, summary.until)}
+      ${p(escapeHtml(leadParagraph(summary)), { top: 13 })}
+      ${categoryLine(summary)}
+    </td></tr>
+    ${reportList(summary, origin)}
+    ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+    ${footer(unsubscribeUrl, branding)}`,
+  });
+}
+
+/**
+ * The first email, sent once.
+ *
+ * Same shell and same digest underneath, so nobody has to learn a second
+ * format — but it opens with a note explaining who this is and what will
+ * arrive, and closes by asking what people want from it. A digest arriving
+ * cold from a half-remembered signup is indistinguishable from spam; this is
+ * the message that makes the next twelve months of them welcome.
+ */
+export function renderWelcomeHtml(options: {
+  summary: DigestSummary;
+  displayName?: string;
+  unsubscribeUrl: string;
+  branding: DigestBranding;
+}): string {
+  const { summary, unsubscribeUrl, branding } = options;
+  assertBrandingComplete(branding);
+  const { origin } = branding;
+  const name = firstName(options.displayName);
+
+  const note = WELCOME.paragraphs
+    .map((text, i) => p(escapeHtml(text), { top: i === 0 ? 13 : 14 }))
+    .join('');
+
+  return shell({
+    title: WELCOME.subject,
+    preheader: WELCOME.paragraphs[0],
+    inner: `
+    ${masthead(dateRange(summary))}
+    <tr><td style="padding:26px 36px 0;">
+      ${salutation(name, summary.until)}
+      ${note}
+    </td></tr>
+
+    <!-- The ask. Boxed so it reads as a question and not as another paragraph
+         somebody can skim past — it is the only thing in the message that
+         wants something back. -->
+    <tr><td style="padding:26px 36px 0;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+             style="background:${C.paper};border:1px solid ${C.line};
+                    border-left:3px solid ${C.bow};border-radius:3px;">
+        <tr><td style="padding:18px 20px;">
+          ${heading(WELCOME.askHeading)}
+          ${p(escapeHtml(WELCOME.ask), { top: 0, color: C.body, size: 14.5 })}
+        </td></tr>
+      </table>
+      ${p(escapeHtml(WELCOME.thanks), { top: 18 })}
+      ${p(`<span style="font:700 15.5px/1.5 ${DISPLAY};color:${C.ink};">— `
+        + `${escapeHtml(WELCOME.signOff)}</span><br>`
+        + `<span style="color:${C.soft};font-size:13px;">${escapeHtml(WELCOME.signOffRole)}</span>`,
+        { top: 10 })}
+    </td></tr>
+
+    <tr><td style="padding:32px 36px 0;">
+      <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
+      ${p(escapeHtml(WELCOME.sampleIntro), { top: 20, color: C.soft, size: 13.5 })}
+      ${p(escapeHtml(leadParagraph(summary)), { top: 12 })}
+      ${categoryLine(summary)}
+    </td></tr>
+    ${reportList(summary, origin)}
+    ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+    ${footer(unsubscribeUrl, branding)}`,
+  });
 }
 
 // ── Plain text ──────────────────────────────────────────────────────────────
@@ -509,4 +530,95 @@ export function renderDigestText(options: {
     `Privacy: ${branding.origin}/privacy`,
   );
   return lines.join('\n');
+}
+
+/**
+ * The welcome, as plain text.
+ *
+ * Kept in step with the HTML by construction: both read the same strings from
+ * copy.ts, so a wording change lands in both parts or neither. A message whose
+ * text alternative says something different from its HTML is worse than one
+ * with no alternative at all.
+ */
+export function renderWelcomeText(options: {
+  summary: DigestSummary;
+  displayName?: string;
+  unsubscribeUrl: string;
+  branding: DigestBranding;
+}): string {
+  const { summary, unsubscribeUrl, branding } = options;
+  assertBrandingComplete(branding);
+  const name = firstName(options.displayName);
+
+  const lines: string[] = [
+    'CALGARY WATCH',
+    dateRange(summary),
+    '',
+    `${greeting(summary.until)}, ${name}.`,
+    '',
+    ...WELCOME.paragraphs.flatMap((text) => [wrap(text), '']),
+    WELCOME.askHeading.toUpperCase(),
+    wrap(WELCOME.ask),
+    '',
+    WELCOME.thanks,
+    '',
+    `— ${WELCOME.signOff}`,
+    WELCOME.signOffRole,
+    '',
+    '--------------------------------------------------------------',
+    '',
+    WELCOME.sampleIntro,
+    '',
+    wrap(leadParagraph(summary)),
+  ];
+
+  if (!summary.quiet) {
+    lines.push(
+      '',
+      summary.byCategory
+        .map((c) => `${c.count} ${DIGEST_CATEGORY_LABEL[c.category].toLowerCase()}`)
+        .join('  ·  '),
+      '',
+      listHeading(summary).toUpperCase(),
+      '',
+    );
+    for (const item of summary.highlights) {
+      const rail = (item.distanceM !== null
+        ? formatDigestDistance(item.distanceM)
+        : dayShort(item.incident.timestamp)).padEnd(9);
+      lines.push(`${rail}${item.incident.title}`, `${' '.repeat(9)}${itemSubtitle(item)}`, '');
+    }
+    if (summary.total > summary.highlights.length) {
+      lines.push(`${summary.total - summary.highlights.length} more are on the map.`, '');
+    }
+  }
+
+  lines.push(
+    '',
+    `${CTA_LABEL}: ${branding.origin}/map`,
+    '',
+    '--------------------------------------------------------------',
+    "You're getting this because you turned on the weekly digest in",
+    'your Calgary Watch settings.',
+    '',
+    branding.senderName,
+    branding.mailingAddress,
+    branding.supportEmail,
+    '',
+    `Unsubscribe: ${unsubscribeUrl}`,
+    `Privacy: ${branding.origin}/privacy`,
+  );
+  return lines.join('\n');
+}
+
+/** Hard-wraps a paragraph at 62 columns, the width the text part is set to. */
+function wrap(text: string, width = 62): string {
+  const out: string[] = [];
+  let line = '';
+  for (const word of text.split(/\s+/)) {
+    if (line && (line + ' ' + word).length > width) { out.push(line); line = word; }
+    else line = line ? `${line} ${word}` : word;
+  }
+  if (line) out.push(line);
+  return out.join('\n');
 }

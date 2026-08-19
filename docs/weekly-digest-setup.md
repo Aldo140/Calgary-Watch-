@@ -213,6 +213,52 @@ Then leave the Monday schedule to run itself.
 
 ---
 
+## The sender avatar (BIMI) — optional, partly paid
+
+The grey default avatar beside `digest@calgarywatch.ca` is replaced through
+**BIMI** (Brand Indicators for Message Identification). The logo is built and
+committed at `public/bimi/logo.svg` — SVG Tiny 1.2 Portable/Secure, the strict
+profile mail providers require, validated against every constraint.
+
+Two DNS changes turn it on, both free:
+
+1. **Upgrade DMARC to enforcement.** BIMI is ignored at `p=none`. Edit the
+   `_dmarc` TXT record at Namecheap to:
+   ```
+   v=DMARC1; p=quarantine; rua=mailto:jorti104@mtroyal.ca
+   ```
+   Do this only after a few clean weeks of sending — enforcement tells inbox
+   providers to quarantine anything failing alignment, and turning it on before
+   your own mail is reliably aligned is how you quarantine yourself.
+
+2. **Add the BIMI record.** New TXT record at Namecheap:
+   - Host: `default._bimi`
+   - Value: `v=BIMI1; l=https://calgarywatch.ca/bimi/logo.svg;`
+
+   The SVG must be publicly reachable, so this only works after the site is
+   deployed with `public/bimi/logo.svg` in it.
+
+**What this actually gets you, honestly:**
+
+| Client | Result |
+|---|---|
+| Yahoo / AOL | Logo shows. Free. |
+| Fastmail, La Poste, others | Logo shows. Free. |
+| **Gmail** | **Logo does NOT show without a VMC** |
+| Apple Mail | Uses the recipient's contact photo; BIMI is not consulted |
+
+Gmail additionally requires a **Verified Mark Certificate** — an identity
+certificate from DigiCert or Entrust that costs roughly **US$1,000–1,500 a
+year** and requires a registered trademark on the logo. That is the honest
+state of BIMI: the free work below is worth doing and will show up in some
+inboxes, but the Gmail checkmark is a paid product and there is no way around
+it.
+
+If Gmail is where your users are and the certificate is not worth it, the
+cheaper win is that Gmail shows a coloured letter avatar derived from the
+sender name — which it already does — and reputation matters far more to
+whether the message is opened than the avatar does.
+
 ## Operating notes
 
 - **Schedule:** Mondays, `0 15 * * 1` UTC — 09:00 Calgary in summer, 08:00 in

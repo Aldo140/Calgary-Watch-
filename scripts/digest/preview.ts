@@ -15,10 +15,12 @@
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
-import { renderDigestHtml, renderDigestText, type DigestBranding } from './render.js';
+import { renderDigestHtml, renderDigestText, renderWelcomeHtml, type DigestBranding } from './render.js';
 import type { Incident } from '../../src/types/index.js';
 
-const NOW = Date.now();
+// A representative send: Monday 09:00 Calgary, which is when the job fires.
+// Previewing at "now" produced "Evening, …" and misrepresented the greeting.
+const NOW = Date.UTC(2026, 7, 17, 15, 0, 0);
 const HOUR = 3_600_000;
 const HOME = { lat: 51.0447, lng: -114.0719 };
 
@@ -92,6 +94,7 @@ const shared = { summary, displayName: PROFILE.displayName, unsubscribeUrl: unsu
 mkdirSync('dist-preview', { recursive: true });
 writeFileSync('dist-preview/digest.html', renderDigestHtml(shared));
 writeFileSync('dist-preview/digest.txt', renderDigestText(shared));
+writeFileSync('dist-preview/welcome.html', renderWelcomeHtml(shared));
 
-console.log('Wrote dist-preview/digest.html and dist-preview/digest.txt');
+console.log('Wrote dist-preview/digest.html, welcome.html and digest.txt');
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

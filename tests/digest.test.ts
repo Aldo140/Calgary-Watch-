@@ -33,8 +33,11 @@ import {
   escapeHtml,
   renderDigestHtml,
   renderDigestText,
+  renderWelcomeHtml,
+  renderWelcomeText,
   type DigestBranding,
 } from '../scripts/digest/render.js';
+import { WELCOME, leadParagraph, spell, spellCap } from '../scripts/digest/copy.js';
 import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js';
 import type { Incident } from '../src/types/index.js';
 
@@ -299,23 +302,25 @@ describe('rendering', () => {
     assert.equal(escapeHtml(`<&>"'`), '&lt;&amp;&gt;&quot;&#39;');
   });
 
-  it('carries no tracking pixel and stays readable with images off', () => {
+  it('contains no images at all, in either email', () => {
     const s = buildDigestSummary({
       incidents: [incident({ id: 'a', ...at(100) })], profile: PROFILE, home: HOME, now: NOW,
     });
-    const html = renderDigestHtml({
-      summary: s, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)), branding: BRANDING,
-    });
-    const imgs = html.match(/<img\s[^>]*>/gi) ?? [];
-    // Exactly one image, the masthead mark. More than that, or any image
-    // without dimensions, is how a tracking pixel gets in unnoticed.
-    assert.equal(imgs.length, 1, 'only the masthead mark may be an image');
-    assert.match(imgs[0], /width="34"/);
-    assert.match(imgs[0], /alt=""/, 'decorative: the wordmark beside it is live text');
-    // The brand name must be real text, so the masthead survives images-off.
-    assert.ok(html.includes('Calgary&nbsp;Watch'));
-    assert.ok(!/<script/i.test(html));
-    assert.ok(!/<link\s/i.test(html));
+    const shared = {
+      summary: s, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+      branding: BRANDING,
+    };
+    for (const [label, html] of [['digest', renderDigestHtml(shared)], ['welcome', renderWelcomeHtml(shared)]] as const) {
+      // The masthead is typographic on purpose. A remote image is blocked by
+      // default in most clients, and a 404 (a missed deploy, a renamed path)
+      // becomes a broken-image icon in every message already sent — which is
+      // exactly what happened before this became a rule.
+      assert.equal((html.match(/<img\s/gi) ?? []).length, 0, `${label} must have no <img>`);
+      assert.ok(!/<script/i.test(html), `${label} must have no script`);
+      assert.ok(!/<link\s/i.test(html), `${label} must have no external stylesheet`);
+      // ...and the brand must therefore be live text.
+      assert.ok(html.includes('CALGARY&nbsp;WATCH'), `${label} needs a typographic masthead`);
+    }
   });
 });
 
@@ -379,5 +384,91 @@ describe('pipeline wiring', () => {
 
   it('defaults a manual run to sending nothing', () => {
     assert.match(workflow, /dry_run[\s\S]{0,200}default: true/);
+  });
+});
+
+
+// ── The welcome email ───────────────────────────────────────────────────────
+
+describe('the first email', () => {
+  const summary = buildDigestSummary({
+    incidents: [incident({ id: 'a', ...at(150) })], profile: PROFILE, home: HOME, now: NOW,
+  });
+  const shared = {
+    summary, displayName: 'Aldo',
+    unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+    branding: BRANDING,
+  };
+
+  it('explains who this is and what will arrive', () => {
+    const html = renderWelcomeHtml(shared);
+    assert.ok(html.includes('Every Monday'), 'must say how often it comes');
+    assert.ok(/Calgary Police/.test(html), 'must say where the data comes from');
+  });
+
+  it('asks for a reply, and is signed by a person', () => {
+    const html = renderWelcomeHtml(shared);
+    assert.ok(html.includes('Reply to this one'), 'must invite a reply');
+    assert.ok(html.includes(WELCOME.signOff), 'must be signed');
+  });
+
+  it('still carries the week it was sent in, so the format explains itself', () => {
+    const html = renderWelcomeHtml(shared);
+    // Compared against the escaped form: the copy is full of apostrophes, and
+    // the renderer escapes them, so the raw string is never in the output.
+    assert.ok(html.includes(escapeHtml(WELCOME.sampleIntro)), 'welcome must introduce the sample digest');
+    assert.ok(html.includes('A report'), 'welcome must contain the week\'s reports');
+  });
+
+  it('carries the same CASL footer as every other message', () => {
+    for (const out of [renderWelcomeHtml(shared), renderWelcomeText(shared)]) {
+      assert.ok(out.includes(BRANDING.mailingAddress), 'CASL: mailing address');
+      assert.ok(out.includes(BRANDING.senderName), 'CASL: sender identity');
+      assert.ok(out.includes('nsubscribe'), 'CASL: unsubscribe');
+    }
+  });
+
+  it('says the same thing in the text part as in the HTML', () => {
+    // Both read from copy.ts, so a wording change lands in both or neither.
+    const text = renderWelcomeText(shared);
+    for (const para of WELCOME.paragraphs) {
+      const firstWords = para.split(/\s+/).slice(0, 4).join(' ');
+      assert.ok(text.includes(firstWords), `text part is missing: ${firstWords}`);
+    }
+  });
+});
+
+describe('voice', () => {
+  it('spells small numbers the way a person writes them', () => {
+    assert.equal(spell(4), 'four');
+    assert.equal(spell(10), 'ten');
+    assert.equal(spell(23), '23');
+    assert.equal(spellCap(3), 'Three');
+  });
+
+  it('puts the count in a sentence rather than leaving it as a metric', () => {
+    const s = buildDigestSummary({
+      incidents: [incident({ id: 'a', ...at(100) }), incident({ id: 'b', ...at(200) })],
+      profile: PROFILE, home: HOME, now: NOW,
+    });
+    assert.match(leadParagraph(s), /^Two things were reported/);
+  });
+
+  it('states a quiet week plainly instead of dressing it up', () => {
+    const s = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+    const lead = leadParagraph(s);
+    assert.match(lead, /Nothing was reported/);
+    assert.ok(!/unfortunately|sorry|no news is good news/i.test(lead));
+  });
+
+  it('never apologises for the email or thanks you for your attention', () => {
+    const s = buildDigestSummary({
+      incidents: [incident({ id: 'a', ...at(100) })], profile: PROFILE, home: HOME, now: NOW,
+    });
+    const html = renderDigestHtml({
+      summary: s, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+      branding: BRANDING,
+    });
+    assert.ok(!/sorry|apolog|thank you for your (time|attention)|we're thrilled/i.test(html));
   });
 });

@@ -55,7 +55,8 @@ import {
   type DigestRecipient,
 } from '../../src/lib/digest.js';
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
-import { assertBrandingComplete, renderDigestHtml, renderDigestText, type DigestBranding } from './render.js';
+import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
+import { WELCOME } from './copy.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
 import type { Incident } from '../../src/types/index.js';
 
@@ -133,6 +134,7 @@ async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
       weeklyDigestOptInAt: typeof d.weeklyDigestOptInAt === 'number' ? d.weeklyDigestOptInAt : null,
       weeklyDigestTopics: Array.isArray(d.weeklyDigestTopics) ? d.weeklyDigestTopics : [],
       digestUnsubToken: typeof d.digestUnsubToken === 'string' ? d.digestUnsubToken : undefined,
+      digestWelcomeSentAt: typeof d.digestWelcomeSentAt === 'number' ? d.digestWelcomeSentAt : null,
       // Kept out of DigestRecipient so it cannot reach a template by accident.
       _address: typeof d.address === 'string' ? d.address : '',
     } as DigestRecipient & { _address: string };
@@ -262,11 +264,22 @@ async function run(): Promise<void> {
       const token = await ensureUnsubToken(db, profile);
       const unsubUrl = unsubscribeUrl(origin, profile.uid, token);
 
+      // The first message anybody gets is the introduction, not a digest.
+      // A brief arriving cold from a half-remembered signup reads as spam, so
+      // one person gets one hello — tracked on the profile rather than by
+      // counting ledger rows, because the flag survives a ledger cleanup and
+      // costs no extra read.
+      const isFirstEmail = (profile as DigestRecipient & { digestWelcomeSentAt?: number | null })
+        .digestWelcomeSentAt == null;
+      const render = isFirstEmail ? renderWelcomeHtml : renderDigestHtml;
+      const renderText = isFirstEmail ? renderWelcomeText : renderDigestText;
+      const shared = { summary, displayName: profile.displayName, unsubscribeUrl: unsubUrl, branding };
+
       const email = {
         to: profile.email!.trim(),
-        subject: digestSubject(summary),
-        html: renderDigestHtml({ summary, displayName: profile.displayName, unsubscribeUrl: unsubUrl, branding }),
-        text: renderDigestText({ summary, displayName: profile.displayName, unsubscribeUrl: unsubUrl, branding }),
+        subject: isFirstEmail ? WELCOME.subject : digestSubject(summary),
+        html: render(shared),
+        text: renderText(shared),
         unsubscribeUrl: unsubUrl,
       };
 
@@ -278,10 +291,16 @@ async function run(): Promise<void> {
           sentAt: Date.now(),
           providerId: result.id ?? null,
           subject: email.subject,
+          kind: isFirstEmail ? 'welcome' : 'digest',
           reportCount: summary.total,
           ring: summary.ringLabel,
         }, { merge: true });
-        console.log(`[digest] sent ${profile.uid} — ${summary.total} report(s) ${summary.ringLabel}`);
+        if (isFirstEmail && !result.skipped) {
+          await db.collection('users').doc(profile.uid)
+            .set({ digestWelcomeSentAt: Date.now() }, { merge: true });
+        }
+        console.log(`[digest] sent ${profile.uid}${isFirstEmail ? ' (hello)' : ''}`
+          + ` — ${summary.total} report(s) ${summary.ringLabel}`);
       } else {
         failed += 1;
         // The provider rejected it, so nothing was delivered — release the

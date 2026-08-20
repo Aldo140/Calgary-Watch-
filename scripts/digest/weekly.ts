@@ -46,6 +46,8 @@ import { randomBytes } from 'node:crypto';
 import {
   buildDigestSummary,
   consentRefusal,
+  consentTimestamp,
+  consentTimestampIsInferred,
   digestSendId,
   digestSubject,
   digestWeekKey,
@@ -133,6 +135,12 @@ async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
       inferredNeighborhood: typeof d.inferredNeighborhood === 'string' ? d.inferredNeighborhood : undefined,
       weeklyDigestOptIn: d.weeklyDigestOptIn === true,
       weeklyDigestOptInAt: typeof d.weeklyDigestOptInAt === 'number' ? d.weeklyDigestOptInAt : null,
+      // Older evidence of the same consent, for accounts that predate the
+      // weeklyDigestOptInAt field. See consentTimestamp() in src/lib/digest.ts.
+      digestPromptedAt: typeof d.digestPromptedAt === 'number' ? d.digestPromptedAt : null,
+      onboardingCompletedAt: typeof d.onboardingCompletedAt === 'number' ? d.onboardingCompletedAt : null,
+      piiConsentAt: typeof d.piiConsentAt === 'number' ? d.piiConsentAt : null,
+      profileUpdatedAt: typeof d.profileUpdatedAt === 'number' ? d.profileUpdatedAt : null,
       weeklyDigestTopics: Array.isArray(d.weeklyDigestTopics) ? d.weeklyDigestTopics : [],
       digestUnsubToken: typeof d.digestUnsubToken === 'string' ? d.digestUnsubToken : undefined,
       digestWelcomeSentAt: typeof d.digestWelcomeSentAt === 'number' ? d.digestWelcomeSentAt : null,
@@ -247,6 +255,21 @@ async function run(): Promise<void> {
       console.log(`[digest] skip ${profile.uid}: ${refusal}`);
       skipped += 1;
       continue;
+    }
+
+    // Write the recovered date back, once. These accounts consented before the
+    // field existed; persisting our best evidence now means the record stops
+    // depending on a fallback chain and the next run reads it directly.
+    if (consentTimestampIsInferred(profile)) {
+      const recovered = consentTimestamp(profile)!;
+      await db.collection('users').doc(profile.uid).set({
+        weeklyDigestOptInAt: recovered,
+        weeklyDigestOptInAtSource: 'recovered',
+      }, { merge: true }).catch((error) => {
+        console.error(`[digest] could not backfill consent date for ${profile.uid}:`, error);
+      });
+      console.log(`[digest] recovered consent date for ${profile.uid}`
+        + ` (${new Date(recovered).toISOString().slice(0, 10)})`);
     }
 
     // Claim the week before doing anything that could send. A second run, a

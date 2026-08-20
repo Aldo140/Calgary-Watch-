@@ -17,6 +17,8 @@ import { describe, it } from 'node:test';
 import {
   buildDigestSummary,
   consentRefusal,
+  consentTimestamp,
+  consentTimestampIsInferred,
   deltaSentence,
   digestSendId,
   digestSubject,
@@ -652,4 +654,44 @@ describe('contrast', () => {
       }
     });
   }
+});
+
+// ── Consent that predates the field that records it ─────────────────────────
+
+describe('legacy consent', () => {
+  const legacy: DigestRecipient = {
+    uid: 'old', email: 'old@e.com', weeklyDigestOptIn: true,
+    weeklyDigestOptInAt: null, onboardingCompletedAt: 1_700_000_000_000,
+  };
+
+  it('still emails somebody who opted in before the timestamp existed', () => {
+    // Eight of the first fifteen subscribers were in exactly this state, and
+    // the gate was silently dropping every one of them.
+    assert.equal(consentRefusal(legacy), null);
+    assert.equal(consentTimestamp(legacy), 1_700_000_000_000);
+  });
+
+  it('prefers the direct field whenever it is there', () => {
+    const both = { ...legacy, weeklyDigestOptInAt: 1_800_000_000_000 };
+    assert.equal(consentTimestamp(both), 1_800_000_000_000);
+    assert.equal(consentTimestampIsInferred(both), false);
+  });
+
+  it('flags a recovered date so it can be written back', () => {
+    assert.equal(consentTimestampIsInferred(legacy), true);
+  });
+
+  it('is not a way in for somebody who never opted in', () => {
+    // The fallback only ever supplies a DATE for consent that already exists.
+    const never = { ...legacy, weeklyDigestOptIn: false };
+    assert.equal(consentTimestamp(never), null);
+    assert.equal(consentRefusal(never), 'not-opted-in');
+    const absent = { ...legacy, weeklyDigestOptIn: undefined };
+    assert.equal(consentTimestamp(absent), null);
+  });
+
+  it('refuses when the account can produce no evidence at all', () => {
+    const bare: DigestRecipient = { uid: 'b', email: 'b@e.com', weeklyDigestOptIn: true };
+    assert.equal(consentRefusal(bare), 'no-consent-timestamp');
+  });
 });

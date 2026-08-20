@@ -67,6 +67,23 @@ export interface DigestRecipient {
   inferredNeighborhood?: string;
   weeklyDigestOptIn?: boolean;
   weeklyDigestOptInAt?: number | null;
+  /**
+   * Older evidence of the same consent, in descending order of directness.
+   *
+   * `weeklyDigestOptInAt` was added after the opt-in itself shipped, so eight
+   * of the first fifteen subscribers carry `weeklyDigestOptIn: true` with no
+   * timestamp beside it. Their consent is real — they ticked the box — and
+   * refusing to mail them because a field we introduced later is missing
+   * punishes them for our schema change.
+   *
+   * These are the timestamps their account does carry. Each one is a moment
+   * they were present and acting on the account, which is what CASL asks us to
+   * be able to produce.
+   */
+  digestPromptedAt?: number | null;
+  onboardingCompletedAt?: number | null;
+  piiConsentAt?: number | null;
+  profileUpdatedAt?: number | null;
   weeklyDigestTopics?: string[];
   digestUnsubToken?: string;
 }
@@ -91,9 +108,7 @@ export type ConsentRefusal =
  */
 export function consentRefusal(profile: DigestRecipient): ConsentRefusal | null {
   if (profile.weeklyDigestOptIn !== true) return 'not-opted-in';
-  if (typeof profile.weeklyDigestOptInAt !== 'number' || profile.weeklyDigestOptInAt <= 0) {
-    return 'no-consent-timestamp';
-  }
+  if (consentTimestamp(profile) === null) return 'no-consent-timestamp';
   const email = profile.email?.trim() ?? '';
   if (!email) return 'no-email';
   if (!isPlausibleEmail(email)) return 'invalid-email';
@@ -102,6 +117,41 @@ export function consentRefusal(profile: DigestRecipient): ConsentRefusal | null 
 
 export function mayEmail(profile: DigestRecipient): boolean {
   return consentRefusal(profile) === null;
+}
+
+/**
+ * When this person consented, as best the account can show.
+ *
+ * Prefers the field written at the moment they ticked the box. Falls back,
+ * in order, to the other timestamps their account carries — each one a moment
+ * they were demonstrably present and acting on it.
+ *
+ * The fallback is not a loophole: `weeklyDigestOptIn === true` is still
+ * required and still checked first, so this only ever supplies a date for
+ * consent that already exists. Somebody who never opted in gets nothing from
+ * it. Returns null when the account can produce no evidence at all, and that
+ * person is not mailed.
+ */
+export function consentTimestamp(profile: DigestRecipient): number | null {
+  if (profile.weeklyDigestOptIn !== true) return null;
+  const candidates = [
+    profile.weeklyDigestOptInAt,
+    profile.digestPromptedAt,
+    profile.onboardingCompletedAt,
+    profile.piiConsentAt,
+    profile.profileUpdatedAt,
+  ];
+  for (const value of candidates) {
+    if (typeof value === 'number' && value > 0) return value;
+  }
+  return null;
+}
+
+/** True when the timestamp came from a fallback and should be written back. */
+export function consentTimestampIsInferred(profile: DigestRecipient): boolean {
+  const direct = profile.weeklyDigestOptInAt;
+  const hasDirect = typeof direct === 'number' && direct > 0;
+  return !hasDirect && consentTimestamp(profile) !== null;
 }
 
 /**

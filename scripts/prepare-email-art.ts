@@ -30,7 +30,13 @@ import { execFileSync } from 'node:child_process';
  * letterhead now reads as one piece rather than two.
  */
 /**
- * Warm near-black, for the sandstone ground the email is set on.
+ * The linework: warm white.
+ *
+ * The marks are set white on a black plate rather than dark on cream. That
+ * pairing is the only one where both requirements hold at once — the art is
+ * white on black, and the page text stays black on sandstone — and it is the
+ * most legible arrangement available, because a baked black plate is the
+ * highest-contrast surface in the message and cannot be repainted by a client.
  *
  * The email is set dark, so the engravings are re-tinted to the same sandstone
  * the body text uses — 13:1 against the page, which is well past the point
@@ -40,16 +46,19 @@ import { execFileSync } from 'node:child_process';
  * One tint for everything: mixing a white logo with a gold rule and a cream
  * illustration is how a letterhead starts looking assembled rather than drawn.
  */
-const INK = '(36, 30, 26)';
+const INK = '(250, 247, 240)';
 
 /**
- * The plate baked in behind every mark: the email's own page colour.
+ * The plate baked in behind every mark: near-black.
  *
- * Same value as C.page in render.ts. On the page as designed it is invisible;
- * on a client that forces dark it becomes a cream card the art stays legible
- * on. If one changes, change the other.
+ * Baked into the pixels rather than applied as CSS, because the clients that
+ * repaint a page background are the same ones that strip a <style> block, and
+ * an image's own pixels are the one thing none of them touch. That makes the
+ * mark's contrast independent of the page entirely: it reads as a black badge
+ * on the sandstone page as designed, and as a black badge on a page some
+ * client decided to darken. There is no state in which it disappears.
  */
-const PLATE = '(244, 238, 227)';
+const PLATE = '(18, 20, 19)';
 
 /**
  * 4x the logical size. These are engravings — at 2x the hatching on the shield

@@ -248,28 +248,23 @@ function masthead(dateLine: string): string {
 }
 
 /**
- * The skyline, as a printer's device sitting on the footer rule.
+ * The skyline, as a full-width band closing the letter.
  *
- * It was floating: a 100px picture centred in the gap between the button and
- * the legal text, touching nothing, doing no structural work and adding a
- * screen of height to every message. Now it sits directly on a hairline that
- * runs the full width of the column, so the two read as one rule with a mark
- * on it — the way a printer's device sits on a colophon — and the whole device
- * is half the height it was.
+ * It was a delicate line drawing, which worked while the art was dark ink on
+ * transparency. Now that every mark carries a baked black plate, a 230px
+ * version of it read as a black slab dropped in the gap above the footer.
  *
- * The negative margin is what closes the gap between the art and the line;
- * `vertical-align:bottom` alone leaves the image's descender space behind.
+ * So it becomes the thing it already wanted to be: a band the full width of
+ * the column, with the city in white across it. At that size the plate is the
+ * design rather than an artefact of it, and the band does the separating a
+ * hairline was doing — so the hairline goes, and the email loses a rule it no
+ * longer needs.
  */
 function skylineRule(): string {
   return `
   <tr><td style="padding:26px 36px 0;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-      <tr><td align="center" style="line-height:0;font-size:0;">
-        <img src="cid:${CID.skyline}" width="230" height="48" alt=""
-             style="display:block;width:230px;height:48px;border:0;margin-bottom:-3px;">
-      </td></tr>
-      <tr><td style="height:1px;background:${C.line};font-size:0;line-height:0;">&nbsp;</td></tr>
-    </table>
+    <img src="cid:${CID.skyline}" width="488" height="103" alt=""
+         style="display:block;width:100%;max-width:488px;height:auto;border:0;">
   </td></tr>`;
 }
 

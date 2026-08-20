@@ -852,3 +852,30 @@ describe('artwork is opaque', () => {
     assert.ok(bytes < 200_000, `weekly letterhead is ${Math.round(bytes / 1024)} KB`);
   });
 });
+
+// ── The page and the plate must be the same black ───────────────────────────
+
+describe('the seam', () => {
+  const renderSrc = readFileSync('scripts/digest/render.ts', 'utf8');
+  const artSrc = readFileSync('scripts/prepare-email-art.ts', 'utf8');
+
+  it('the plate baked into the art is exactly the page colour', () => {
+    // Two near-blacks do not blend, they seam. The plate was #121413 while the
+    // page was black, and every mark showed its own faint rectangle. They are
+    // the same constant now, and this is what stops them drifting apart again.
+    const page = /page:\s*'(#[0-9A-Fa-f]{6})'/.exec(renderSrc)?.[1];
+    const plate = /const PLATE = '\((\d+), (\d+), (\d+)\)'/.exec(artSrc);
+    assert.ok(page, 'could not find C.page');
+    assert.ok(plate, 'could not find PLATE');
+    const asHex = `#${[1, 2, 3].map((i) => Number(plate![i]).toString(16).padStart(2, '0')).join('')}`;
+    assert.equal(asHex.toLowerCase(), page!.toLowerCase(),
+      `page is ${page} but the baked plate is ${asHex} — every mark will show its edge`);
+  });
+
+  it('every mark is padded so no border pixel can differ from the page', () => {
+    // Cropping to the ink leaves linework touching the boundary; the shield
+    // measured 33 off the page value, which is the bright hairline that made
+    // each mark look pasted on. The margin is what removes it.
+    assert.match(artSrc, /margin = max\(5, round\(min\(art\.size\) \* 0\.05\)\)/);
+  });
+});

@@ -63,44 +63,45 @@ import {
  * here rather than on sandstone, and the darker value fails contrast there.
  */
 /**
- * Set light, and committed to it.
+ * Set on true black, and the artwork is set on the same true black.
  *
- * The dark version was correct in the file — inline background:#0E1A17 on the
- * body and on every table — and still arrived white in a real client. Mail
- * clients rewrite backgrounds and there is no declaration that reliably stops
- * them, which left cream artwork sitting on a white page. Designing against a
- * ground we do not control is the wrong bet, and it is why almost every large
- * sender ships light email.
+ * The marks carry a baked plate, because CSS behind an image cannot survive a
+ * client that repaints backgrounds. That solved the vanishing, but introduced
+ * the fault this palette fixes: the plate was #121413 — dark, and not the
+ * black the page was — so every mark showed its own rectangle. Blending two
+ * near-blacks is not something you can eyeball into place; they either share a
+ * value or they do not.
  *
- * So: Paskapoo sandstone, dark ink, dark artwork. `supported-color-schemes:
- * light` asks clients not to invert, and where one does anyway, the dark-mode
- * block below repaints the surfaces rather than leaving the client to guess.
+ * So PAGE and the plate in scripts/prepare-email-art.ts are both #000000,
+ * exactly. Not near-black, not a tuned approximation — the same constant, so
+ * the seam cannot exist. If one changes, the other must change with it, and
+ * a test asserts they still agree.
  *
- * Every value is checked against the surface it lands on by
- * `npm run digest:contrast`, which fails below WCAG AA.
+ * Everything else follows from that: white marks, light type. Every value is
+ * checked against the surface it lands on by `npm run digest:contrast`.
  */
 const C = {
-  /** The page behind everything. */
-  page: '#F4EEE3',
-  /** Cards and report rows. */
-  card: '#FFFCF7',
-  /** The distance rail, a step down so the column reads as a gutter. */
-  rail: '#F6F0E4',
-  line: '#E2D9C7',
-  edge: '#CBBDA6',
+  /** True black. Must equal PLATE in scripts/prepare-email-art.ts. */
+  page: '#000000',
+  /** Cards, lifted just enough to read as a surface. */
+  card: '#101010',
+  /** The distance rail, one step further up. */
+  rail: '#181818',
+  line: '#2C2C2C',
+  edge: '#3D3D3D',
   /** Headings and anything that must not be missed. */
-  ink: '#241E1A',
-  /** Running text. */
-  body: '#463D34',
-  /** Secondary text. Still AA at the sizes it is used. */
-  soft: '#655A4E',
-  /** Bow River teal, darkened for a light ground. */
-  bow: '#1C6B5B',
-  /** Sandstone gold, darkened for a light ground. */
-  gold: '#8A5C28',
+  ink: '#FFFFFF',
+  /** Running text. Warm, so a black page does not read as a terminal. */
+  body: '#E3DED4',
+  /** Secondary text. */
+  soft: '#A8A199',
+  /** Bow River teal, lifted for black. */
+  bow: '#5CC9AC',
+  /** Sandstone gold, lifted for black. */
+  gold: '#E3B26B',
   /** The one solid button. */
-  button: '#1F3D37',
-  buttonInk: '#FFFCF7',
+  button: '#FFFFFF',
+  buttonInk: '#000000',
 } as const;
 
 const DISPLAY = "Georgia,'Iowan Old Style','Times New Roman',Times,serif";
@@ -230,8 +231,8 @@ function masthead(dateLine: string): string {
           <!-- Inline part, not a hosted URL — see scripts/digest/art.ts. The
                wordmark beside it is live text, so a reader with images off
                still gets a masthead rather than an empty box. -->
-          <img src="cid:${CID.shield}" width="38" height="51" alt=""
-               style="display:block;width:38px;height:51px;border:0;">
+          <img src="cid:${CID.shield}" width="38" height="50" alt=""
+               style="display:block;width:38px;height:50px;border:0;">
         </td>
         <td style="vertical-align:middle;">
           <div class="cw-ink" style="font:700 13px/1 ${BODY};color:${C.ink};letter-spacing:2.6px;">
@@ -263,7 +264,7 @@ function masthead(dateLine: string): string {
 function skylineRule(): string {
   return `
   <tr><td style="padding:26px 36px 0;">
-    <img src="cid:${CID.skyline}" width="488" height="103" alt=""
+    <img src="cid:${CID.skyline}" width="488" height="111" alt=""
          style="display:block;width:100%;max-width:488px;height:auto;border:0;">
   </td></tr>`;
 }
@@ -542,8 +543,8 @@ function shell(options: {
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 <title>${escapeHtml(options.title)}</title>
 <style>
   /*
@@ -595,25 +596,19 @@ function shell(options: {
   }
 
   /*
-   * If a client insists on dark anyway.
-   *
-   * The page is designed light and asks not to be inverted; Gmail ignores
-   * that. Rather than let it invent a palette, these rules name one.
-   *
-   * They do nothing for the artwork, and cannot: the clients that force dark
-   * are the same clients that strip this block, so a CSS plate behind an image
-   * was never going to hold. The plate is baked into the PNG instead — see
-   * scripts/prepare-email-art.ts. An image's own pixels are the one thing no
-   * mail client repaints.
+   * The page is already black, so there is no dark variant to switch to.
+   * These rules exist for the opposite case: a client that decides to render a
+   * dark email on a light ground would otherwise put white type on white. They
+   * restate the surfaces so the message survives that too.
    */
-  @media (prefers-color-scheme: dark) {
-    .cw-page, .cw-shell { background: #1C1815 !important; }
-    .cw-card { background: #262019 !important; border-color: #3D352C !important; }
-    .cw-rail { background: #2F2820 !important; border-color: #3D352C !important; }
-    .cw-ink, .cw-ink a { color: #F6EFE3 !important; }
-    .cw-soft { color: #B3A796 !important; }
-    .cw-body { color: #DED4C5 !important; }
-    .cw-hair { background: #3D352C !important; }
+  @media (prefers-color-scheme: light) {
+    .cw-page, .cw-shell { background: #000000 !important; }
+    .cw-card { background: #101010 !important; border-color: #2C2C2C !important; }
+    .cw-rail { background: #181818 !important; border-color: #2C2C2C !important; }
+    .cw-ink, .cw-ink a { color: #FFFFFF !important; }
+    .cw-soft { color: #A8A199 !important; }
+    .cw-body { color: #E3DED4 !important; }
+    .cw-hair { background: #2C2C2C !important; }
   }
 </style>
 </head>

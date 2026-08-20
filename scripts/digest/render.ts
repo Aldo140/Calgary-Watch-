@@ -226,7 +226,7 @@ function masthead(dateLine: string): string {
   <tr><td style="padding:32px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        <td width="38" class="cw-plate" style="width:38px;padding-right:14px;vertical-align:middle;">
+        <td width="38" style="width:38px;padding-right:14px;vertical-align:middle;">
           <!-- Inline part, not a hosted URL — see scripts/digest/art.ts. The
                wordmark beside it is live text, so a reader with images off
                still gets a masthead rather than an empty box. -->
@@ -264,7 +264,7 @@ function skylineRule(): string {
   return `
   <tr><td style="padding:26px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-      <tr><td align="center" class="cw-plate" style="line-height:0;font-size:0;">
+      <tr><td align="center" style="line-height:0;font-size:0;">
         <img src="cid:${CID.skyline}" width="230" height="48" alt=""
              style="display:block;width:230px;height:48px;border:0;margin-bottom:-3px;">
       </td></tr>
@@ -508,7 +508,7 @@ function processRow(): string {
   const icons = [CID.stepSignal, CID.stepCommunity, CID.stepMegaphone];
   const cells = WELCOME.steps.map((step, i) => `
     <td width="33%" class="cw-step" style="width:33.33%;padding:0 7px;vertical-align:top;text-align:center;">
-      <img class="cw-plate" src="cid:${icons[i]}" width="44" height="44" alt=""
+      <img src="cid:${icons[i]}" width="44" height="44" alt=""
            style="display:block;margin:0 auto 10px;width:44px;height:44px;border:0;">
       <div class="cw-ink" style="font:700 12.5px/1.3 ${BODY};color:${C.ink};">
         ${escapeHtml(step.title)}
@@ -534,7 +534,7 @@ function processRow(): string {
 function emblem(): string {
   return `
   <tr><td style="padding:26px 36px 0;" align="center">
-    <img class="cw-plate" src="cid:${CID.emblem}" width="52" height="52" alt=""
+    <img src="cid:${CID.emblem}" width="52" height="52" alt=""
          style="display:block;width:52px;height:52px;border:0;">
   </td></tr>`;
 }
@@ -602,12 +602,14 @@ function shell(options: {
   /*
    * If a client insists on dark anyway.
    *
-   * The page is designed light and asks not to be inverted, but Gmail ignores
-   * that. Rather than let it invent a palette, these rules name one — and
-   * critically they keep .cw-plate light, because the artwork is dark ink on
-   * transparency and would otherwise disappear into the page it is drawn on.
-   * A small cream plate behind the marks is less elegant than a tinted asset,
-   * and it is the only version that cannot vanish.
+   * The page is designed light and asks not to be inverted; Gmail ignores
+   * that. Rather than let it invent a palette, these rules name one.
+   *
+   * They do nothing for the artwork, and cannot: the clients that force dark
+   * are the same clients that strip this block, so a CSS plate behind an image
+   * was never going to hold. The plate is baked into the PNG instead — see
+   * scripts/prepare-email-art.ts. An image's own pixels are the one thing no
+   * mail client repaints.
    */
   @media (prefers-color-scheme: dark) {
     .cw-page, .cw-shell { background: #1C1815 !important; }
@@ -617,7 +619,6 @@ function shell(options: {
     .cw-soft { color: #B3A796 !important; }
     .cw-body { color: #DED4C5 !important; }
     .cw-hair { background: #3D352C !important; }
-    .cw-plate { background: #F4EEE3 !important; border-radius: 4px !important; }
   }
 </style>
 </head>

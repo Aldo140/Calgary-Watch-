@@ -30,7 +30,7 @@ import { execFileSync } from 'node:child_process';
  * letterhead now reads as one piece rather than two.
  */
 /**
- * Warm cream, for a dark ground.
+ * Warm near-black, for the sandstone ground the email is set on.
  *
  * The email is set dark, so the engravings are re-tinted to the same sandstone
  * the body text uses — 13:1 against the page, which is well past the point
@@ -40,7 +40,7 @@ import { execFileSync } from 'node:child_process';
  * One tint for everything: mixing a white logo with a gold rule and a cream
  * illustration is how a letterhead starts looking assembled rather than drawn.
  */
-const INK = '(244, 238, 227)';
+const INK = '(36, 30, 26)';
 
 /**
  * 4x the logical size. These are engravings — at 2x the hatching on the shield

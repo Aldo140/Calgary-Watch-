@@ -12,6 +12,8 @@ import {
 } from '../../src/lib/digest.js';
 import { renderDigestHtml, renderWelcomeHtml, type DigestBranding } from './render.js';
 import { auditContrast } from './contrast.js';
+import { validateImages } from './images.js';
+import { letterheadImages, welcomeImages } from './art.js';
 import type { Incident } from '../../src/types/index.js';
 
 const NOW = Date.UTC(2026, 7, 17, 15);
@@ -88,8 +90,22 @@ for (const testCase of CASES) {
     checked += findings.length;
     const bad = findings.filter((f) => !f.passes);
     const label = `${testCase.name} / ${kind}`;
+
+    // Images are validated against the attachments this exact message ships.
+    const attached = kind === 'welcome' ? welcomeImages() : letterheadImages();
+    const imageProblems = validateImages(html, attached);
+    if (imageProblems.length > 0) {
+      failures += imageProblems.length;
+      console.log(`  FAIL  ${label.padEnd(34)} ${imageProblems.length} image problem(s)`);
+      for (const problem of imageProblems) {
+        console.log(`          [${problem.kind}] ${problem.detail}`);
+      }
+    }
+
     if (bad.length === 0) {
-      console.log(`  PASS  ${label.padEnd(34)} ${findings.length} text nodes, scope=${summary.scope}`);
+      console.log(`  ${imageProblems.length === 0 ? 'PASS' : '    '}  ${label.padEnd(34)} `
+        + `${findings.length} text nodes, ${(html.match(/<img\s/gi) ?? []).length} images, `
+        + `scope=${summary.scope}`);
     } else {
       failures += bad.length;
       console.log(`  FAIL  ${label.padEnd(34)} ${bad.length} of ${findings.length} below AA`);

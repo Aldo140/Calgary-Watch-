@@ -292,6 +292,45 @@ export interface DigestSummary {
   /** True when there is genuinely nothing to report. */
   quiet: boolean;
   areaName: string;
+  /**
+   * Where the week's reports actually landed, busiest first.
+   *
+   * Only populated for a city-wide digest, where it does the work the distance
+   * rail does for everybody else. "159 reports across Calgary" is a number
+   * nobody can hold; "Beltline 14, Forest Lawn 11, Bowness 9" is a picture of
+   * the week, and it is the one thing a reader with no saved location can
+   * still use — including to recognise their own neighbourhood in the list.
+   */
+  topAreas: Array<{ name: string; count: number }>;
+}
+
+/** Community names arrive in four house styles; display them in one. */
+export function displayAreaName(value: string): string {
+  return value.trim().replace(/\b[\w']+/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+}
+
+export const MAX_TOP_AREAS = 6;
+
+/**
+ * The busiest communities in a set of reports.
+ *
+ * Names are normalised for display and folded case-insensitively, because the
+ * same community reaches us as "Inglewood" from one feed and "inglewood" from
+ * another, and listing both would make the city look busier than it is.
+ */
+export function topAreasIn(items: ScoredIncident[], limit = MAX_TOP_AREAS): Array<{ name: string; count: number }> {
+  const counts = new Map<string, { name: string; count: number }>();
+  for (const { incident } of items) {
+    const raw = (incident.neighborhood ?? '').trim();
+    if (raw.length < 3) continue;
+    const key = raw.toLowerCase().replace(/[^a-z]/g, '');
+    const existing = counts.get(key);
+    if (existing) existing.count += 1;
+    else counts.set(key, { name: displayAreaName(raw), count: 1 });
+  }
+  return [...counts.values()]
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+    .slice(0, limit);
 }
 
 export const MAX_HIGHLIGHTS = 6;
@@ -467,6 +506,8 @@ function finish(parts: {
     highlights: items.slice(0, MAX_HIGHLIGHTS),
     quiet: items.length === 0,
     areaName: parts.areaName,
+    // Only the city-wide digest needs it; everybody else already has a place.
+    topAreas: parts.scope === 'city' ? topAreasIn(items) : [],
   };
 }
 

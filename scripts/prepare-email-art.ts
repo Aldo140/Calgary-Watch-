@@ -47,13 +47,18 @@ const INK = '(244, 238, 227)';
  * turns to mush, and the difference costs a few KB on a message that is already
  * carrying two images.
  */
-const TARGETS = [
+const TARGETS: Array<{ src: string; out: string; width: number; square?: boolean }> = [
   { src: 'public/images/illustration/calgary-watch-shield.webp', out: 'public/images/email/shield.png', width: 152 },
   { src: 'public/images/illustration/calgary-skyline-rule.webp', out: 'public/images/email/skyline.png', width: 960 },
   // The welcome email explains how the map is fed; these three carry that.
-  { src: 'public/images/illustration/process-signal.webp', out: 'public/images/email/step-signal.png', width: 176 },
-  { src: 'public/images/illustration/process-community.webp', out: 'public/images/email/step-community.png', width: 176 },
-  { src: 'public/images/illustration/process-megaphone.webp', out: 'public/images/email/step-megaphone.png', width: 176 },
+  // square: true pads to a square canvas. Cropping each icon to its own ink
+  // left three different aspect ratios — 1.08, 0.88, 1.22 — while the template
+  // renders them all at 44x44, so every one was being squashed a different
+  // amount. Padding makes the declared box honest and lines the three up on a
+  // shared baseline, which cropping never would.
+  { src: 'public/images/illustration/process-signal.webp', out: 'public/images/email/step-signal.png', width: 176, square: true },
+  { src: 'public/images/illustration/process-community.webp', out: 'public/images/email/step-community.png', width: 176, square: true },
+  { src: 'public/images/illustration/process-megaphone.webp', out: 'public/images/email/step-megaphone.png', width: 176, square: true },
   // Sits under the sign-off, the way a seal would.
   { src: 'public/images/illustration/calgary-bow-emblem.webp', out: 'public/images/email/emblem.png', width: 200 },
 ];
@@ -89,13 +94,20 @@ def alpha_for(im):
     inverted = ImageOps.invert(ImageOps.autocontrast(grey, cutoff=1))
     return inverted.point(lambda v: 0 if v < 86 else min(255, int((v - 86) * 1.75)))
 
-for src, out, width in ${JSON.stringify(TARGETS.map((t) => [t.src, t.out, t.width]))}:
+for src, out, width, square in ${JSON.stringify(TARGETS.map((t) => [t.src, t.out, t.width, t.square ? 1 : 0]))}:
     im = Image.open(src).convert('RGBA')
     mask = alpha_for(im)
     im.putalpha(mask)
     box = mask.getbbox()
     if box:
         im = im.crop(box)
+    if square:
+        # Fit inside a square and centre it, so the template's 44x44 is the
+        # truth rather than a squash, and the three icons share a baseline.
+        side = max(im.size)
+        canvas = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+        canvas.alpha_composite(im, ((side - im.width) // 2, (side - im.height) // 2))
+        im = canvas
     im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
     solid = Image.new('RGBA', im.size, ${INK} + (255,))
     solid.putalpha(im.split()[3])

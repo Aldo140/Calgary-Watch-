@@ -38,6 +38,7 @@
 import {
   DIGEST_CATEGORY_LABEL,
   deltaSentence,
+  displayAreaName,
   digestSubject,
   formatDigestDistance,
   type DigestSummary,
@@ -45,6 +46,7 @@ import {
 } from '../../src/lib/digest.js';
 import { CID } from './art.js';
 import {
+  areasHeading,
   CTA_LABEL,
   locationPrompt,
   CTA_LABEL_QUIET,
@@ -183,8 +185,14 @@ function sourceLabel(item: ScoredIncident): string {
  */
 function itemSubtitle(item: ScoredIncident): string {
   const bits = [sourceLabel(item)];
-  if (item.distanceM !== null) bits.push(dayLabel(item.incident.timestamp));
-  else if (item.incident.neighborhood) bits.push(item.incident.neighborhood);
+  if (item.distanceM !== null) {
+    // The rail carries the distance, so this line carries the day.
+    bits.push(dayLabel(item.incident.timestamp));
+  } else {
+    // No rail: this line carries everything the reader would otherwise lose.
+    if (item.incident.neighborhood) bits.push(displayAreaName(item.incident.neighborhood));
+    bits.push(dayLabel(item.incident.timestamp));
+  }
   return bits.join(' · ');
 }
 
@@ -303,6 +311,51 @@ function heading(text: string): string {
 }
 
 /**
+ * The busiest communities, as a ranked bar list.
+ *
+ * Shown only on a city-wide digest, where it does the job the distance rail
+ * does for everybody else: turns a number nobody can hold — 159 — into a shape
+ * they can read in two seconds, and gives a reader with no saved location the
+ * one thing they can still act on, which is recognising their own
+ * neighbourhood in the list.
+ *
+ * The bar is a table cell with a width percentage rather than a graphic: it
+ * renders in Outlook, needs no image, and cannot break.
+ */
+function topAreasBlock(summary: DigestSummary): string {
+  if (summary.topAreas.length === 0) return '';
+  const max = summary.topAreas[0].count || 1;
+  const rows = summary.topAreas.map((area) => {
+    const pct = Math.max(6, Math.round((area.count / max) * 100));
+    return `
+    <tr>
+      <td style="padding:0 10px 7px 0;width:41%;">
+        <span class="cw-body" style="font:400 12.5px/1.4 ${BODY};color:${C.body};">
+          ${escapeHtml(area.name)}
+        </span>
+      </td>
+      <td style="padding:0 8px 7px 0;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr><td style="width:${pct}%;background:${C.bow};height:7px;font-size:0;
+                     line-height:0;border-radius:2px;">&nbsp;</td>
+              <td style="font-size:0;line-height:0;">&nbsp;</td></tr>
+        </table>
+      </td>
+      <td align="right" style="padding:0 0 7px 0;width:30px;">
+        <span class="cw-ink" style="font:700 12px/1.4 ${MONO};color:${C.ink};">${area.count}</span>
+      </td>
+    </tr>`;
+  }).join('');
+  return `
+  <tr><td style="padding:28px 36px 0;">
+    ${heading(areasHeading(summary))}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      ${rows}
+    </table>
+  </td></tr>`;
+}
+
+/**
  * A report, with its distance on the rail.
  *
  * The rail is the layout's one strong idea: a fixed-width column the eye reads
@@ -313,9 +366,32 @@ function heading(text: string): string {
  * measure.
  */
 function reportRow(item: ScoredIncident, origin: string): string {
-  const rail = item.distanceM !== null
-    ? formatDigestDistance(item.distanceM)
-    : dayShort(item.incident.timestamp);
+  const title = `
+    <a href="${escapeHtml(origin)}/map?incident=${encodeURIComponent(item.incident.id)}"
+       style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
+      ${escapeHtml(item.incident.title)}
+    </a>
+    <div class="cw-soft" style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">
+      ${escapeHtml(itemSubtitle(item))}
+    </div>`;
+
+  // No distance, no rail.
+  //
+  // The rail exists to answer one question — how close was this — and it earns
+  // its 76px only when it can. Filling it with the weekday instead produced a
+  // column reading MON, MON, MON, MON down a city-wide digest: a fixed gutter
+  // spent on a value that repeats. Those readers get the full width, and the
+  // day moves into the subtitle where it costs nothing.
+  if (item.distanceM === null) {
+    return `
+  <tr><td style="padding-bottom:9px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+      <tr><td style="padding:13px 16px;">${title}</td></tr>
+    </table>
+  </td></tr>`;
+  }
+
   return `
   <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
@@ -323,17 +399,11 @@ function reportRow(item: ScoredIncident, origin: string): string {
       <tr>
         <td width="76" class="cw-rail" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
                    padding:14px 6px;text-align:center;vertical-align:middle;">
-          <span class="cw-ink" style="font:700 11.5px/1.2 ${MONO};color:${C.ink};">${escapeHtml(rail)}</span>
+          <span class="cw-ink" style="font:700 11.5px/1.2 ${MONO};color:${C.ink};">
+            ${escapeHtml(formatDigestDistance(item.distanceM))}
+          </span>
         </td>
-        <td style="padding:13px 16px;">
-          <a href="${escapeHtml(origin)}/map?incident=${encodeURIComponent(item.incident.id)}"
-             class="cw-ink" style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
-            ${escapeHtml(item.incident.title)}
-          </a>
-          <div class="cw-soft" style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">
-            ${escapeHtml(itemSubtitle(item))}
-          </div>
-        </td>
+        <td style="padding:13px 16px;">${title}</td>
       </tr>
     </table>
   </td></tr>`;
@@ -576,6 +646,7 @@ export function renderDigestHtml(options: {
       ${locationPromptBlock(summary)}
       ${categoryLine(summary)}
     </td></tr>
+    ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
     ${skylineRule()}
@@ -650,6 +721,7 @@ export function renderWelcomeHtml(options: {
       ${p(escapeHtml(leadParagraph(summary)), { top: 12 })}
       ${categoryLine(summary)}
     </td></tr>
+    ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
     ${skylineRule()}

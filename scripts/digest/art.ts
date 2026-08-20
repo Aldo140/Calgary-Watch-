@@ -50,7 +50,6 @@ export function letterheadImages(): InlineImage[] {
     cache.set('letterhead', [
       load(CID.shield, 'public/images/email/shield.png'),
       load(CID.skyline, 'public/images/email/skyline.png'),
-      load(CID.emblem, 'public/images/email/emblem.png'),
     ]);
   }
   return cache.get('letterhead')!;
@@ -59,13 +58,16 @@ export function letterheadImages(): InlineImage[] {
 /**
  * The three step icons, carried only by the welcome.
  *
- * Attaching them to every weekly digest would add ~65 KB to a message that
- * never shows them — twelve times a year, to every subscriber, for nothing.
+ * Attaching them to every weekly digest would add ~85 KB to a message that
+ * never shows them — every week, to every subscriber, for nothing. The emblem
+ * is in here for the same reason: it is the seal under the sign-off, and only
+ * the welcome has a sign-off to seal.
  */
 export function welcomeImages(): InlineImage[] {
   if (!cache.has('welcome')) {
     cache.set('welcome', [
       ...letterheadImages(),
+      load(CID.emblem, 'public/images/email/emblem.png'),
       load(CID.stepSignal, 'public/images/email/step-signal.png'),
       load(CID.stepCommunity, 'public/images/email/step-community.png'),
       load(CID.stepMegaphone, 'public/images/email/step-megaphone.png'),

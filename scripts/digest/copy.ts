@@ -71,13 +71,23 @@ export function leadParagraph(summary: DigestSummary): string {
       case 'home':
       case 'community':
         return `${spellCap(count)} ${verb} reported ${summary.ringLabel} this week.`;
-      case 'city':
-        // Never phrased as "near you". We do not know where they are, or their
-        // own area was empty — either way, claiming proximity would be false.
-        return summary.widenedToCity
-          ? `Your area was quiet this week, so here is what came in ${summary.ringLabel} `
-            + `instead — ${spell(count)} ${count === 1 ? 'report' : 'reports'} in all.`
-          : `${spellCap(count)} ${verb} reported ${summary.ringLabel} this week.`;
+      case 'city': {
+        // Never phrased as "near you": we either do not know where they are, or
+        // their own area was empty, and claiming proximity would be false.
+        //
+        // The count is stated but not led with. A city-wide week is around 160
+        // reports, and opening on that number reads as an alarm rather than a
+        // digest — it is a fact about Calgary, not about the reader. So the
+        // sentence leads with the shape of the week and puts the total second.
+        const shown = Math.min(summary.highlights.length, count);
+        if (summary.widenedToCity) {
+          return `Your own area was quiet this week, so this one covers the whole `
+            + `city — ${count} ${count === 1 ? 'report' : 'reports'} in all, `
+            + `with the ${shown} most recent below.`;
+        }
+        return `Calgary saw ${count} public ${count === 1 ? 'report' : 'reports'} this `
+          + `week. Here is where they landed, and the ${shown} most recent.`;
+      }
     }
   })();
 
@@ -114,6 +124,11 @@ export function listHeading(summary: DigestSummary): string {
   // Only claim an ordering the list actually has. Without distances the list is
   // newest-first, and saying "closest first" would be a small, checkable lie.
   return summary.scope === 'home' ? 'What happened, closest first' : 'What happened';
+}
+
+/** The heading over the busiest-communities list. */
+export function areasHeading(summary: DigestSummary): string {
+  return summary.topAreas.length === 1 ? 'Where it happened' : 'Busiest this week';
 }
 
 export const CTA_LABEL = 'See these on the map';

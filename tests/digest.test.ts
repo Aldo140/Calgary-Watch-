@@ -41,6 +41,8 @@ import {
 } from '../scripts/digest/render.js';
 import { WELCOME, leadParagraph, listHeading, locationPrompt, spell, spellCap } from '../scripts/digest/copy.js';
 import { contrastFailures, contrastRatio, requiredRatio } from '../scripts/digest/contrast.js';
+import { pngSize, validateImages } from '../scripts/digest/images.js';
+import { letterheadImages, welcomeImages } from '../scripts/digest/art.js';
 import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js';
 import type { Incident } from '../src/types/index.js';
 
@@ -550,8 +552,13 @@ describe('who gets a useful email', () => {
     assert.equal(s.needsLocation, true);
     assert.equal(s.quiet, false, 'a city-wide digest still has content');
     assert.equal(s.total, city.length);
-    assert.match(leadParagraph(s), /across Calgary/);
-    assert.ok(!/near you/i.test(leadParagraph(s)), 'must not claim proximity we cannot know');
+    // Assert the intent, not the wording: it must name the city as the scope
+    // and must never imply we know how close any of it was to them.
+    const lead = leadParagraph(s);
+    assert.match(lead, /Calgary/);
+    assert.ok(!/near you|around you|your block/i.test(lead),
+      'must not claim proximity we cannot know');
+    assert.ok(!/nothing|quiet/i.test(lead), 'must not report our ignorance as their quiet week');
   });
 
   it('still serves somebody outside the areas we cover', () => {
@@ -574,7 +581,9 @@ describe('who gets a useful email', () => {
     assert.equal(s.scope, 'city');
     assert.equal(s.widenedToCity, true);
     // ...and says so, rather than passing the city off as their neighbourhood.
-    assert.match(leadParagraph(s), /Your area was quiet/);
+    const lead = leadParagraph(s);
+    assert.match(lead, /own area was quiet/i);
+    assert.match(lead, /whole city/i);
   });
 
   it('asks for a location only from people who have not given one', () => {
@@ -693,5 +702,77 @@ describe('legacy consent', () => {
   it('refuses when the account can produce no evidence at all', () => {
     const bare: DigestRecipient = { uid: 'b', email: 'b@e.com', weeklyDigestOptIn: true };
     assert.equal(consentRefusal(bare), 'no-consent-timestamp');
+  });
+});
+
+// ── Images, the most reliable source of defects in this template ────────────
+
+describe('images', () => {
+  const summary = buildDigestSummary({
+    incidents: [incident({ id: 'a', ...at(150) })], profile: PROFILE, home: HOME, now: NOW,
+  });
+  const shared = {
+    summary, displayName: 'Aldo',
+    unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+    branding: BRANDING,
+  };
+
+  it('the weekly digest ships exactly the art it shows', () => {
+    const problems = validateImages(renderDigestHtml(shared), letterheadImages());
+    assert.deepEqual(problems, [], problems.map((p) => `${p.kind}: ${p.detail}`).join('; '));
+  });
+
+  it('the welcome ships exactly the art it shows', () => {
+    const problems = validateImages(renderWelcomeHtml(shared), welcomeImages());
+    assert.deepEqual(problems, [], problems.map((p) => `${p.kind}: ${p.detail}`).join('; '));
+  });
+
+  it('does not put the welcome-only art on every weekly digest', () => {
+    // The emblem and the three step icons are ~85 KB. Shipping them weekly to
+    // every subscriber, in a message that never shows them, is the kind of
+    // waste nobody notices because nothing visibly breaks.
+    const weeklyCids = letterheadImages().map((i) => i.cid);
+    assert.ok(!weeklyCids.includes('cw-emblem'));
+    assert.ok(!weeklyCids.some((c) => c.startsWith('cw-step-')));
+    assert.ok(welcomeImages().length > letterheadImages().length);
+  });
+
+  it('catches a cid that is referenced but not attached', () => {
+    const problems = validateImages('<img src="cid:nope" width="10" height="10" alt="">', []);
+    assert.equal(problems[0].kind, 'missing-attachment');
+  });
+
+  it('catches a hosted image, which is how this broke the first time', () => {
+    const problems = validateImages(
+      '<img src="https://calgarywatch.ca/x.png" width="10" height="10" alt="">', [],
+    );
+    assert.equal(problems[0].kind, 'remote-image');
+  });
+
+  it('catches art declared at the wrong aspect ratio', () => {
+    // The three step icons were cropped to their own ink, giving three
+    // different ratios, while the template rendered all of them at 44x44.
+    const [shield] = letterheadImages();
+    const squashed = `<img src="cid:${shield.cid}" width="40" height="200" alt="">`;
+    const problems = validateImages(squashed, [shield]);
+    assert.equal(problems[0].kind, 'distorted');
+  });
+
+  it('reads real dimensions out of the attached PNG', () => {
+    const [shield] = letterheadImages();
+    const size = pngSize(shield.base64);
+    assert.ok(size && size.width > 0 && size.height > 0);
+  });
+
+  it('requires dimensions and alt on every image', () => {
+    const [shield] = letterheadImages();
+    assert.equal(validateImages(`<img src="cid:${shield.cid}" alt="">`, [shield])[0].kind, 'no-dimensions');
+    const noAlt = `<img src="cid:${shield.cid}" width="38" height="51">`;
+    assert.ok(validateImages(noAlt, [shield]).some((p) => p.kind === 'no-alt'));
+  });
+
+  it('keeps the whole payload small enough to be welcome in an inbox', () => {
+    const bytes = welcomeImages().reduce((n, i) => n + Buffer.from(i.base64, 'base64').length, 0);
+    assert.ok(bytes < 250_000, `letterhead is ${Math.round(bytes / 1024)} KB`);
   });
 });

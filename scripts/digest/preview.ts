@@ -117,5 +117,23 @@ writeFileSync('dist-preview/digest.html', inlineArt(renderDigestHtml(shared)));
 writeFileSync('dist-preview/digest.txt', renderDigestText(shared));
 writeFileSync('dist-preview/welcome.html', inlineArt(renderWelcomeHtml(shared)));
 
+// What somebody with no saved location receives: the city-wide variant, which
+// is what eight of the first fifteen subscribers will actually get.
+const CITY_AREAS = ['Beltline', 'Forest Lawn', 'Bowness', 'inglewood', 'Varsity', 'Sunalta', 'Tuxedo Park'];
+const citySample: Incident[] = Array.from({ length: 47 }, (_, i) => ({
+  ...SAMPLE[i % SAMPLE.length],
+  id: `city${i}`,
+  neighborhood: CITY_AREAS[i % CITY_AREAS.length],
+  timestamp: NOW - (i % 7) * 24 * HOUR - HOUR,
+}));
+const cityProfile: DigestRecipient = { ...PROFILE, uid: 'city', neighborhood: undefined };
+const citySummary = buildDigestSummary({ incidents: citySample, profile: cityProfile, home: null, now: NOW });
+writeFileSync('dist-preview/city.html', inlineArt(renderDigestHtml({
+  summary: citySummary, displayName: PROFILE.displayName,
+  unsubscribeUrl: unsub, branding: BRANDING,
+})));
+console.log(`City variant: scope=${citySummary.scope}, ${citySummary.total} reports, `
+  + `top areas ${citySummary.topAreas.map((a) => `${a.name} ${a.count}`).join(', ')}`);
+
 console.log('Wrote dist-preview/digest.html, welcome.html and digest.txt');
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

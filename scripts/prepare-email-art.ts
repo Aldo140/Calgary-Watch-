@@ -49,7 +49,12 @@ import { execFileSync } from 'node:child_process';
 const INK = '(250, 247, 240)';
 
 /**
- * The plate baked in behind every mark: near-black.
+ * The plate baked in behind every mark: TRUE black, #000000.
+ *
+ * This must equal C.page in scripts/digest/render.ts exactly. It was
+ * near-black while the page was black, and every mark showed its own
+ * rectangle as a result — two dark values do not blend, they either match or
+ * they seam. A test asserts the two constants still agree.
  *
  * Baked into the pixels rather than applied as CSS, because the clients that
  * repaint a page background are the same ones that strip a <style> block, and
@@ -58,7 +63,7 @@ const INK = '(250, 247, 240)';
  * on the sandstone page as designed, and as a black badge on a page some
  * client decided to darken. There is no state in which it disappears.
  */
-const PLATE = '(18, 20, 19)';
+const PLATE = '(0, 0, 0)';
 
 /**
  * 4x the logical size. These are engravings — at 2x the hatching on the shield
@@ -138,8 +143,21 @@ for src, out, width, square, plate in ${JSON.stringify(TARGETS.map((t) => [t.src
         # ...then set it on an opaque plate, so the contrast lives inside the
         # file. Order matters: plating before tinting flattens the alpha the
         # tint depends on and yields a solid rectangle.
-        backing = Image.new('RGBA', im.size, ${PLATE} + (255,))
-        backing.alpha_composite(art)
+        # Pad before plating so the outermost pixels are guaranteed to be the
+        # page colour exactly.
+        #
+        # Cropping to the ink leaves the linework touching the boundary — the
+        # shield's edge measured 33 off the page value, which is precisely the
+        # thin bright seam that made every mark look like a pasted rectangle.
+        # Antialiasing accounts for another 2-3 on the others. A margin of pure
+        # plate removes the whole class of problem rather than tuning it down.
+        # Scaled off the SHORTER side. Using the longer one gave the 960px
+        # skyline a 48px margin top and bottom, turning a band into a slab.
+        margin = max(5, round(min(art.size) * 0.05))
+        backing = Image.new('RGBA',
+                            (art.size[0] + margin * 2, art.size[1] + margin * 2),
+                            ${PLATE} + (255,))
+        backing.alpha_composite(art, (margin, margin))
         # Drop the alpha channel outright rather than leaving it fully opaque.
         # A file that still declares transparency invites a client to do
         # something with it, and costs a byte per pixel to say nothing.

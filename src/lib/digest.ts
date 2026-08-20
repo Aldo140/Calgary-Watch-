@@ -519,9 +519,26 @@ function finish(parts: {
  * point of the digest is that it can be trusted when it does say something.
  */
 export function digestSubject(summary: DigestSummary): string {
-  if (summary.quiet) return `A quiet week in ${summary.areaName}`;
   const noun = summary.total === 1 ? 'report' : 'reports';
-  return `${summary.total} ${noun} near you this week — ${summary.areaName}`;
+
+  if (summary.quiet) {
+    return summary.scope === 'city'
+      ? 'A quiet week across Calgary'
+      : `A quiet week in ${displayAreaName(summary.areaName)}`;
+  }
+
+  switch (summary.scope) {
+    case 'home':
+      // The only scope that has measured distance, and so the only one allowed
+      // to say "near you" — the body was made honest about this and the subject
+      // was not, which shipped "50 reports near you" to somebody whose location
+      // we do not know. The subject line is the half most people read.
+      return `${summary.total} ${noun} near you this week — ${displayAreaName(summary.areaName)}`;
+    case 'community':
+      return `${summary.total} ${noun} in ${displayAreaName(summary.areaName)} this week`;
+    case 'city':
+      return `This week in Calgary — ${summary.total} ${noun}`;
+  }
 }
 
 /** "3 more than last week" / "same as last week", or null when there is no basis. */

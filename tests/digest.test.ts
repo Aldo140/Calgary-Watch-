@@ -776,3 +776,47 @@ describe('images', () => {
     assert.ok(bytes < 250_000, `letterhead is ${Math.round(bytes / 1024)} KB`);
   });
 });
+
+// ── The subject line, which is the half most people read ────────────────────
+
+describe('subject lines', () => {
+  const many = Array.from({ length: 12 }, (_, i) =>
+    incident({ id: `s${i}`, ...at(200 + i * 40), neighborhood: 'Beltline' }));
+
+  it('only says "near you" when a distance was actually measured', () => {
+    const home = buildDigestSummary({ incidents: many, profile: PROFILE, home: HOME, now: NOW });
+    assert.equal(home.scope, 'home');
+    assert.match(digestSubject(home), /near you/);
+  });
+
+  it('never says "near you" to somebody we could not place', () => {
+    // This shipped: "50 reports near you this week" to a city-wide digest for
+    // an account with no location on it at all.
+    const anonymous: DigestRecipient = {
+      uid: 'x', email: 'x@e.com', weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const city = buildDigestSummary({ incidents: many, profile: anonymous, home: null, now: NOW });
+    assert.equal(city.scope, 'city');
+    assert.ok(!/near you/i.test(digestSubject(city)), digestSubject(city));
+    assert.match(digestSubject(city), /Calgary/);
+  });
+
+  it('names the community when that is what we matched on', () => {
+    const community = buildDigestSummary({ incidents: many, profile: PROFILE, home: null, now: NOW });
+    assert.equal(community.scope, 'community');
+    assert.match(digestSubject(community), /in Beltline/);
+    assert.ok(!/near you/i.test(digestSubject(community)));
+  });
+
+  it('tidies the case community names arrive in', () => {
+    const messy: DigestRecipient = {
+      uid: 'm', email: 'm@e.com', neighborhood: 'inglewood',
+      weeklyDigestOptIn: true, weeklyDigestOptInAt: 1,
+    };
+    const s = buildDigestSummary({
+      incidents: [incident({ id: 'i', neighborhood: 'INGLEWOOD' })],
+      profile: messy, home: null, now: NOW,
+    });
+    assert.match(digestSubject(s), /Inglewood/);
+  });
+});

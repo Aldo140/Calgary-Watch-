@@ -63,40 +63,44 @@ import {
  * here rather than on sandstone, and the darker value fails contrast there.
  */
 /**
- * Set dark, in Calgary's own colours.
+ * Set light, and committed to it.
  *
- * The ground is spruce-black rather than neutral grey: the foothills green the
- * product already uses, taken down until it reads as ink. Type is the same
- * Paskapoo sandstone the site is built on, which is what keeps a dark email
- * warm instead of clinical.
+ * The dark version was correct in the file — inline background:#0E1A17 on the
+ * body and on every table — and still arrived white in a real client. Mail
+ * clients rewrite backgrounds and there is no declaration that reliably stops
+ * them, which left cream artwork sitting on a white page. Designing against a
+ * ground we do not control is the wrong bet, and it is why almost every large
+ * sender ships light email.
  *
- * Every value here is checked against the surface it sits on by
- * `npm run digest:contrast`, which fails the build below WCAG AA. Nothing in
- * this object is a guess — see scripts/digest/contrast.ts.
+ * So: Paskapoo sandstone, dark ink, dark artwork. `supported-color-schemes:
+ * light` asks clients not to invert, and where one does anyway, the dark-mode
+ * block below repaints the surfaces rather than leaving the client to guess.
+ *
+ * Every value is checked against the surface it lands on by
+ * `npm run digest:contrast`, which fails below WCAG AA.
  */
 const C = {
   /** The page behind everything. */
-  page: '#0E1A17',
-  /** Cards and the report rows that sit on the page. */
-  card: '#17251F',
-  /** The distance rail, one step up so the column reads as a gutter. */
-  rail: '#1E312A',
-  /** Hairlines and card borders. */
-  line: '#2C443B',
-  edge: '#3A5A4E',
+  page: '#F4EEE3',
+  /** Cards and report rows. */
+  card: '#FFFCF7',
+  /** The distance rail, a step down so the column reads as a gutter. */
+  rail: '#F6F0E4',
+  line: '#E2D9C7',
+  edge: '#CBBDA6',
   /** Headings and anything that must not be missed. */
-  ink: '#F4EEE3',
+  ink: '#241E1A',
   /** Running text. */
-  body: '#DCD3C4',
-  /** Secondary text — still AA at the sizes it is used. */
-  soft: '#A6B8AE',
-  /** Bow River teal, lifted for a dark ground. */
-  bow: '#5CC3AA',
-  /** Sandstone gold, lifted for a dark ground. */
-  gold: '#E0AC63',
+  body: '#463D34',
+  /** Secondary text. Still AA at the sizes it is used. */
+  soft: '#655A4E',
+  /** Bow River teal, darkened for a light ground. */
+  bow: '#1C6B5B',
+  /** Sandstone gold, darkened for a light ground. */
+  gold: '#8A5C28',
   /** The one solid button. */
-  button: '#F4EEE3',
-  buttonInk: '#0E1A17',
+  button: '#1F3D37',
+  buttonInk: '#FFFCF7',
 } as const;
 
 const DISPLAY = "Georgia,'Iowan Old Style','Times New Roman',Times,serif";
@@ -222,7 +226,7 @@ function masthead(dateLine: string): string {
   <tr><td style="padding:32px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        <td width="38" style="width:38px;padding-right:14px;vertical-align:middle;">
+        <td width="38" class="cw-plate" style="width:38px;padding-right:14px;vertical-align:middle;">
           <!-- Inline part, not a hosted URL — see scripts/digest/art.ts. The
                wordmark beside it is live text, so a reader with images off
                still gets a masthead rather than an empty box. -->
@@ -260,7 +264,7 @@ function skylineRule(): string {
   return `
   <tr><td style="padding:26px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-      <tr><td align="center" style="line-height:0;font-size:0;">
+      <tr><td align="center" class="cw-plate" style="line-height:0;font-size:0;">
         <img src="cid:${CID.skyline}" width="230" height="48" alt=""
              style="display:block;width:230px;height:48px;border:0;margin-bottom:-3px;">
       </td></tr>
@@ -504,7 +508,7 @@ function processRow(): string {
   const icons = [CID.stepSignal, CID.stepCommunity, CID.stepMegaphone];
   const cells = WELCOME.steps.map((step, i) => `
     <td width="33%" class="cw-step" style="width:33.33%;padding:0 7px;vertical-align:top;text-align:center;">
-      <img src="cid:${icons[i]}" width="44" height="44" alt=""
+      <img class="cw-plate" src="cid:${icons[i]}" width="44" height="44" alt=""
            style="display:block;margin:0 auto 10px;width:44px;height:44px;border:0;">
       <div class="cw-ink" style="font:700 12.5px/1.3 ${BODY};color:${C.ink};">
         ${escapeHtml(step.title)}
@@ -530,7 +534,7 @@ function processRow(): string {
 function emblem(): string {
   return `
   <tr><td style="padding:26px 36px 0;" align="center">
-    <img src="cid:${CID.emblem}" width="52" height="52" alt=""
+    <img class="cw-plate" src="cid:${CID.emblem}" width="52" height="52" alt=""
          style="display:block;width:52px;height:52px;border:0;">
   </td></tr>`;
 }
@@ -543,8 +547,8 @@ function shell(options: {
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<meta name="supported-color-schemes" content="light dark">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <title>${escapeHtml(options.title)}</title>
 <style>
   /*
@@ -595,14 +599,25 @@ function shell(options: {
     .cw-step img { margin-bottom: 6px !important; }
   }
 
+  /*
+   * If a client insists on dark anyway.
+   *
+   * The page is designed light and asks not to be inverted, but Gmail ignores
+   * that. Rather than let it invent a palette, these rules name one — and
+   * critically they keep .cw-plate light, because the artwork is dark ink on
+   * transparency and would otherwise disappear into the page it is drawn on.
+   * A small cream plate behind the marks is less elegant than a tinted asset,
+   * and it is the only version that cannot vanish.
+   */
   @media (prefers-color-scheme: dark) {
-    .cw-page, .cw-shell { background: #1A1714 !important; }
-    .cw-card { background: #241F1B !important; border-color: #3A322B !important; }
-    .cw-rail { background: #2C2621 !important; border-color: #3A322B !important; }
-    .cw-ink, .cw-ink a { color: #F2EAdE !important; }
-    .cw-soft { color: #A99C8C !important; }
-    .cw-body { color: #D6CCBE !important; }
-    .cw-hair { background: #3A322B !important; }
+    .cw-page, .cw-shell { background: #1C1815 !important; }
+    .cw-card { background: #262019 !important; border-color: #3D352C !important; }
+    .cw-rail { background: #2F2820 !important; border-color: #3D352C !important; }
+    .cw-ink, .cw-ink a { color: #F6EFE3 !important; }
+    .cw-soft { color: #B3A796 !important; }
+    .cw-body { color: #DED4C5 !important; }
+    .cw-hair { background: #3D352C !important; }
+    .cw-plate { background: #F4EEE3 !important; border-radius: 4px !important; }
   }
 </style>
 </head>

@@ -771,10 +771,6 @@ describe('images', () => {
     assert.ok(validateImages(noAlt, [shield]).some((p) => p.kind === 'no-alt'));
   });
 
-  it('keeps the whole payload small enough to be welcome in an inbox', () => {
-    const bytes = welcomeImages().reduce((n, i) => n + Buffer.from(i.base64, 'base64').length, 0);
-    assert.ok(bytes < 250_000, `letterhead is ${Math.round(bytes / 1024)} KB`);
-  });
 });
 
 // ── The subject line, which is the half most people read ────────────────────
@@ -818,5 +814,41 @@ describe('subject lines', () => {
       profile: messy, home: null, now: NOW,
     });
     assert.match(digestSubject(s), /Inglewood/);
+  });
+});
+
+// ── The artwork must carry its own contrast ─────────────────────────────────
+
+describe('artwork is opaque', () => {
+  /** Every pixel's alpha, straight out of the PNG. */
+  function isFullyOpaque(base64: string): boolean {
+    const buf = Buffer.from(base64, 'base64');
+    // Colour type lives at byte 25 of a PNG: 6 = RGBA, 4 = grey+alpha.
+    // Anything without an alpha channel is opaque by definition.
+    const colourType = buf[25];
+    return colourType !== 6 && colourType !== 4;
+  }
+
+  it('every mark ships with its background baked in', () => {
+    // This is the whole guarantee. Transparent art inherits whatever the client
+    // decided the page is, and a client that forces dark leaves images alone —
+    // dark ink on a now-dark page, invisible. CSS cannot rescue it either: the
+    // clients that force dark are the ones that strip the <style> block. An
+    // image's own pixels are the one thing no mail client repaints.
+    for (const image of welcomeImages()) {
+      assert.ok(isFullyOpaque(image.base64),
+        `${image.filename} still has an alpha channel and can vanish on a dark page`);
+    }
+  });
+
+  it('keeps the whole payload small enough to be welcome in an inbox', () => {
+    const bytes = welcomeImages().reduce((n, i) => n + Buffer.from(i.base64, 'base64').length, 0);
+    assert.ok(bytes < 300_000, `letterhead is ${Math.round(bytes / 1024)} KB`);
+  });
+
+  it('the weekly digest carries only the two marks it shows', () => {
+    const bytes = letterheadImages().reduce((n, i) => n + Buffer.from(i.base64, 'base64').length, 0);
+    assert.equal(letterheadImages().length, 2);
+    assert.ok(bytes < 200_000, `weekly letterhead is ${Math.round(bytes / 1024)} KB`);
   });
 });

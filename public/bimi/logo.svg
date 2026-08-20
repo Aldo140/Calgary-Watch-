@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Calgary Watch BIMI mark. SVG Tiny 1.2 Portable/Secure profile - the strict
-     subset mail providers accept as a sender avatar. Constraints and the DNS
-     record that points here are documented in docs/weekly-digest-setup.md. -->
+<!-- Calgary Watch BIMI mark. SVG Tiny 1.2 Portable/Secure — the strict subset
+     mail providers accept as a sender avatar. Flat fills only: gradients,
+     filters, scripts and external references are all outside the profile.
+     Setup and the DNS record are in docs/weekly-digest-setup.md. -->
 <svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 512 512" width="512" height="512">
   <title>Calgary Watch</title>
-  <rect width="512" height="512" fill="#1F3D37"/>
+
+  <!-- Spruce-black field, the same ground the email is set on, so the avatar
+       and the message it announces read as one thing. -->
+  <rect width="512" height="512" fill="#0E1A17"/>
+
+  <!-- Gold keyline, inset far enough to survive the circular crop every mail
+       client applies. It is the only ornament, and it is what stops the mark
+       dissolving into a dark inbox. -->
+  <circle cx="256" cy="256" r="222" fill="none" stroke="#E0AC63" stroke-width="6"/>
+  <circle cx="256" cy="256" r="206" fill="none" stroke="#E0AC63" stroke-width="2"/>
+
+  <!-- Shield. -->
   <path fill="#F4EEE3"
-        d="M256 96 386 156v118c0 74-52 138-130 154-78-16-130-80-130-154V156L256 96z"/>
-  <path fill="#2E8B7A"
-        d="M256 186c-32 0-58 26-58 58 0 36 58 92 58 92s58-56 58-92c0-32-26-58-58-58z"/>
-  <circle cx="256" cy="243" r="22" fill="#F4EEE3"/>
+        d="M256 116 372 170v106c0 66-47 124-116 139-69-15-116-73-116-139V170L256 116z"/>
+  <path fill="#0E1A17"
+        d="M256 136 353 181v95c0 57-40 107-97 121-57-14-97-64-97-121v-95L256 136z"/>
+
+  <!-- Foothills, along the base of the shield. -->
+  <path fill="#F4EEE3"
+        d="M168 300l34-42 26 32 30-38 32 40 24-30 30 38v22H168z"/>
+
+  <!-- The Calgary Tower: the one silhouette that reads at 32 pixels. -->
+  <rect x="248" y="166" width="16" height="26" fill="#F4EEE3"/>
+  <path fill="#F4EEE3" d="M232 192h48l-8 22h-32z"/>
+  <rect x="250" y="214" width="12" height="76" fill="#F4EEE3"/>
+  <rect x="240" y="286" width="32" height="10" fill="#F4EEE3"/>
+
+  <!-- Bow River, cutting the shield the way it cuts the city. -->
+  <path fill="#5CC3AA" d="M168 322h176v14H168z"/>
 </svg>

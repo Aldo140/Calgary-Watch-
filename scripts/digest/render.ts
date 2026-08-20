@@ -236,18 +236,28 @@ function masthead(dateLine: string): string {
 }
 
 /**
- * The skyline, as the rule above the footer.
+ * The skyline, as a printer's device sitting on the footer rule.
  *
- * A plain hairline did the same structural job, but this is a Calgary paper and
- * the city's own outline is the obvious thing to close on — the Tower, the
- * downtown blocks, the spruce at either end. It earns its place by being the
- * only illustration in the message and by sitting where a signature would.
+ * It was floating: a 100px picture centred in the gap between the button and
+ * the legal text, touching nothing, doing no structural work and adding a
+ * screen of height to every message. Now it sits directly on a hairline that
+ * runs the full width of the column, so the two read as one rule with a mark
+ * on it — the way a printer's device sits on a colophon — and the whole device
+ * is half the height it was.
+ *
+ * The negative margin is what closes the gap between the art and the line;
+ * `vertical-align:bottom` alone leaves the image's descender space behind.
  */
 function skylineRule(): string {
   return `
-  <tr><td style="padding:34px 36px 0;" align="center">
-    <img src="cid:${CID.skyline}" width="480" height="101" alt=""
-         style="display:block;width:100%;max-width:480px;height:auto;border:0;opacity:0.55;">
+  <tr><td style="padding:26px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      <tr><td align="center" style="line-height:0;font-size:0;">
+        <img src="cid:${CID.skyline}" width="230" height="48" alt=""
+             style="display:block;width:230px;height:48px;border:0;margin-bottom:-3px;">
+      </td></tr>
+      <tr><td style="height:1px;background:${C.line};font-size:0;line-height:0;">&nbsp;</td></tr>
+    </table>
   </td></tr>`;
 }
 
@@ -309,7 +319,7 @@ function reportRow(item: ScoredIncident, origin: string): string {
   return `
   <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+           class="cw-card cw-stack" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
       <tr>
         <td width="76" class="cw-rail" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
                    padding:14px 6px;text-align:center;vertical-align:middle;">
@@ -348,7 +358,7 @@ function reportList(summary: DigestSummary, origin: string): string {
 /** Table-and-padding button: the shape Outlook renders correctly. */
 function cta(origin: string, label: string): string {
   return `
-  <tr><td style="padding:28px 36px 0;">
+  <tr><td style="padding:24px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="background:${C.button};border-radius:3px;">
         <a href="${escapeHtml(origin)}/map"
@@ -372,7 +382,7 @@ function cta(origin: string, label: string): string {
  */
 function footer(unsubscribeUrl: string, branding: DigestBranding): string {
   return `
-  <tr><td style="padding:14px 36px 38px;">
+  <tr><td style="padding:16px 36px 30px;">
     ${p(`You're getting this because you turned on the weekly digest in your Calgary Watch `
       + `settings. It's built from your saved location and public reports on the map, `
       + `nothing else.`, { top: 4, color: C.soft, size: 12 })}
@@ -423,7 +433,7 @@ function locationPromptBlock(summary: DigestSummary): string {
 function processRow(): string {
   const icons = [CID.stepSignal, CID.stepCommunity, CID.stepMegaphone];
   const cells = WELCOME.steps.map((step, i) => `
-    <td width="33%" style="width:33.33%;padding:0 7px;vertical-align:top;text-align:center;">
+    <td width="33%" class="cw-step" style="width:33.33%;padding:0 7px;vertical-align:top;text-align:center;">
       <img src="cid:${icons[i]}" width="44" height="44" alt=""
            style="display:block;margin:0 auto 10px;width:44px;height:44px;border:0;">
       <div class="cw-ink" style="font:700 12.5px/1.3 ${BODY};color:${C.ink};">
@@ -435,7 +445,7 @@ function processRow(): string {
     </td>`).join('');
   return `
   <tr><td style="padding:28px 29px 0;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-stack">
       <tr>${cells}</tr>
     </table>
   </td></tr>`;
@@ -485,6 +495,36 @@ function shell(options: {
    * !important is required: everything else in this document is an inline
    * style, and inline styles otherwise win.
    */
+  /*
+   * Narrow screens.
+   *
+   * The distance rail is a fixed 76px column. On a 600px client that is a
+   * gutter; on a 360px phone it is a fifth of the screen, and it squeezed
+   * "Water main break — expect low pressure until Thursday afternoon" into six
+   * lines. The three process icons had the same problem in thirds.
+   *
+   * Both stack below 480px: the rail becomes a slim label above its headline,
+   * and the steps become full-width rows. Outlook on Windows ignores media
+   * queries entirely, which is fine — it is never 360px wide.
+   */
+  @media only screen and (max-width: 480px) {
+    .cw-stack, .cw-stack > tbody > tr, .cw-stack td {
+      display: block !important;
+      width: 100% !important;
+      /* Without this the cell's own padding is added to a full-width box and
+         the text runs out past the card border it is supposed to sit inside. */
+      box-sizing: border-box !important;
+    }
+    .cw-rail {
+      border-right: 0 !important;
+      border-bottom: 1px solid #2C443B !important;
+      text-align: left !important;
+      padding: 8px 14px !important;
+    }
+    .cw-step { padding: 0 0 18px 0 !important; }
+    .cw-step img { margin-bottom: 6px !important; }
+  }
+
   @media (prefers-color-scheme: dark) {
     .cw-page, .cw-shell { background: #1A1714 !important; }
     .cw-card { background: #241F1B !important; border-color: #3A322B !important; }
@@ -504,7 +544,7 @@ function shell(options: {
 </div>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
        class="cw-page" style="background:${C.page};">
-<tr><td align="center" style="padding:30px 12px 44px;">
+<tr><td align="center" style="padding:26px 12px 32px;">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${SHELL_W}"
          class="cw-shell" style="width:100%;max-width:${SHELL_W}px;background:${C.page};">
     ${options.inner}

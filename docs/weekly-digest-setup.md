@@ -184,8 +184,10 @@ box is about $100/year and is the usual answer for small operators.
 The Firebase deployment workflow now installs the isolated `functions/`
 package, syncs `RESEND_API_KEY` into Firebase Secret Manager, and deploys the
 function, Firestore rules, Storage rules, and site together on pushes to
-`main`. Confirm the DNS domain is verified before deploying; planner previews
-send from `digest@calgarywatch.ca`.
+`main`. Hosting and security rules deploy before the function so an IAM issue
+in Secret Manager cannot block an otherwise healthy site release. Confirm the
+DNS domain is verified before deploying; planner previews send from
+`digest@calgarywatch.ca`.
 
 For a manual deployment, run:
 

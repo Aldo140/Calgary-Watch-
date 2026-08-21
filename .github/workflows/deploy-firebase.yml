@@ -60,13 +60,16 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
+      - name: Deploy security rules
+        run: npx firebase-tools deploy --only firestore:rules,storage --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
+
       - name: Configure function email secret
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: printf '%s' "$RESEND_API_KEY" | npx firebase-tools functions:secrets:set RESEND_API_KEY --data-file - --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
 
-      - name: Deploy Functions and security rules
-        run: npx firebase-tools deploy --only functions,firestore:rules,storage --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
+      - name: Deploy email preview function
+        run: npx firebase-tools deploy --only functions --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
 
       - name: Notify Bing and AI search indexes
         shell: bash

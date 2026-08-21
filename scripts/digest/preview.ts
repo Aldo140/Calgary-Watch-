@@ -16,6 +16,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
 import { renderDigestHtml, renderDigestText, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { DIGEST_CONTRIBUTION_STYLES, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import type { Incident } from '../../src/types/index.js';
 
 // A representative send: Monday 09:00 Calgary, which is when the job fires.
@@ -102,7 +103,7 @@ function inlineArt(html: string): string {
   const asData = (path: string) =>
     `data:image/png;base64,${readFileSync(path).toString('base64')}`;
   const map: Record<string, string> = {
-    'cw-shield': 'shield', 'cw-skyline': 'skyline', 'cw-emblem': 'emblem',
+    'cw-logo': 'logo', 'cw-shield': 'shield', 'cw-skyline': 'skyline', 'cw-emblem': 'emblem',
     'cw-step-signal': 'step-signal', 'cw-step-community': 'step-community',
     'cw-step-megaphone': 'step-megaphone',
   };
@@ -116,6 +117,29 @@ mkdirSync('dist-preview', { recursive: true });
 writeFileSync('dist-preview/digest.html', inlineArt(renderDigestHtml(shared)));
 writeFileSync('dist-preview/digest.txt', renderDigestText(shared));
 writeFileSync('dist-preview/welcome.html', inlineArt(renderWelcomeHtml(shared)));
+
+// Every planner format gets a browser-openable proof. This prevents a format
+// that is not currently selected in the admin UI from becoming the unreviewed
+// branch of the production template.
+for (const style of DIGEST_CONTRIBUTION_STYLES) {
+  const contribution: DigestContribution = {
+    weekKey: summary.weekKey,
+    weekStart: NOW,
+    headline: style === 'news-brief'
+      ? 'Coverage expands across Calgary this Monday'
+      : style === 'personal-story'
+        ? 'What a quiet block taught us this week'
+        : 'A note before this week’s brief',
+    body: style === 'news-brief'
+      ? 'Calgary Watch added two new public-data feeds this week. Reports remain attributed, time-stamped and separated from neighbour submissions.\n\nNo account changes are required.'
+      : style === 'personal-story'
+        ? 'A neighbour wrote to say their block felt quiet, even though the city-wide count was busy. That distinction is why these emails begin close to home.\n\nThe useful question is not whether Calgary was busy. It is what changed around the places you know.'
+        : 'A short note from the Calgary Watch team can sit here when there is useful context that the automated report list cannot provide.\n\nThe personalized neighbourhood briefing still follows underneath.',
+    style,
+    status: 'published',
+  };
+  writeFileSync(`dist-preview/planner-${style}.html`, inlineArt(renderDigestHtml({ ...shared, contribution })));
+}
 
 // What somebody with no saved location receives: the city-wide variant, which
 // is what eight of the first fifteen subscribers will actually get.
@@ -135,5 +159,5 @@ writeFileSync('dist-preview/city.html', inlineArt(renderDigestHtml({
 console.log(`City variant: scope=${citySummary.scope}, ${citySummary.total} reports, `
   + `top areas ${citySummary.topAreas.map((a) => `${a.name} ${a.count}`).join(', ')}`);
 
-console.log('Wrote dist-preview/digest.html, welcome.html and digest.txt');
+console.log('Wrote digest, welcome and all three planner-format previews to dist-preview/');
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

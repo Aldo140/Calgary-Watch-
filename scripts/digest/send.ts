@@ -138,9 +138,6 @@ async function postToResend(email: OutgoingEmail, config: SenderConfig): Promise
             content: img.base64,
             content_id: img.cid,
             content_type: img.contentType,
-            // `inline` keeps it out of the client's attachment list; without
-            // it the reader sees paperclips for the letterhead.
-            disposition: 'inline',
           })),
         }
         : {}),

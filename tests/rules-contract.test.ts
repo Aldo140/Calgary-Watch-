@@ -172,6 +172,12 @@ describe('weekly email planner security', () => {
     assert.ok(functionSource.includes("'Idempotency-Key': `digest-planner-preview/${requestId}/${index}`"));
     assert.ok(functionSource.includes('to: [email]'));
   });
+
+  it('embeds the Calgary Watch logo in every admin proof', () => {
+    assert.ok(functionSource.includes('src="cid:${LOGO_CID}"'));
+    assert.ok(functionSource.includes('attachments: [logoAttachment()]'));
+    assert.ok(read('functions/package-assets.js').includes("public', 'images', 'email', 'logo.png"));
+  });
 });
 
 describe('moderation durability', () => {

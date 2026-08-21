@@ -17,6 +17,7 @@ Budget: about 45 minutes, most of it waiting for DNS.
 | The Monday job | `scripts/digest/weekly.ts` |
 | Admin contribution planner | `/admin` → Email planner |
 | Immediate admin preview function | `functions/index.js` |
+| Inline email identity assets | `public/images/email/` (packaged into the function before deploy) |
 | Offline preview | `scripts/digest/preview.ts` → `npm run digest:preview` |
 | Unsubscribe page | `src/pages/UnsubscribePage.tsx`, route `/unsubscribe` |
 | Rules for `digest_sends` / `digest_unsubscribes` | `firestore.rules` |
@@ -36,6 +37,22 @@ browser tab, removals keep the standard brief scheduled, and every publish,
 retest, or removal is recorded in the admin audit log. Preview messages are
 sent separately to each approved admin so their addresses are not exposed to
 one another.
+
+The email lifecycle deliberately uses three formats with separate purposes:
+
+- **Welcome letter:** sent once to introduce Calgary Watch and explain the
+  recurring brief. A weekly planner note never appears here.
+- **Weekly brief:** the recurring personalized Monday email. The planner can
+  add a neighbour note, news brief, or personal story before its automated
+  location-based content.
+- **Admin proof:** a private branded delivery check sent after publishing,
+  retesting, or removing a weekly note.
+
+All HTML formats carry the primary Calgary Watch plane logo and live-text
+wordmark. The logo travels as an inline CID attachment, so it is not dependent
+on a hosted image URL. The function predeploy step packages the same prepared
+logo used by the subscriber templates. The shield and Bow emblem remain
+secondary artwork with their own roles instead of substituting for the logo.
 
 ---
 

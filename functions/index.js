@@ -2,6 +2,8 @@ const { initializeApp } = require('firebase-admin/app');
 const { defineSecret } = require('firebase-functions/params');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { logger } = require('firebase-functions');
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
 
 initializeApp();
 
@@ -12,6 +14,18 @@ const STYLE_LABELS = {
   'news-brief': 'From the watch desk',
   'personal-story': 'This week in our community',
 };
+const LOGO_CID = 'cw-logo';
+
+let logoBase64;
+function logoAttachment() {
+  logoBase64 ||= readFileSync(join(__dirname, 'assets', 'logo.png')).toString('base64');
+  return {
+    filename: 'calgary-watch-logo.png',
+    content: logoBase64,
+    content_id: LOGO_CID,
+    content_type: 'image/png',
+  };
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -43,22 +57,58 @@ function renderPreview(value) {
     `<p style="margin:12px 0 0;font:400 15px/1.62 Arial,sans-serif;color:#DCD3C4;">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`
   )).join('');
 
+  const opening = (() => {
+    if (cancelled) {
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:6px;">
+        <tr><td style="padding:20px;">
+          <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
+          <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
+          ${paragraphs}
+        </td></tr>
+      </table>`;
+    }
+    if (value.style === 'news-brief') {
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:3px;">
+        <tr><td style="padding:18px 20px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</td>
+            <td align="right" style="font:400 10px/1 monospace;color:#A6B8AE;">${escapeHtml(value.planWeekKey)}</td>
+          </tr></table>
+          <div style="font:700 21px/1.3 Georgia,serif;color:#F4EEE3;padding-top:12px;">${escapeHtml(title)}</div>
+          ${paragraphs}
+        </td></tr>
+      </table>`;
+    }
+    if (value.style === 'personal-story') {
+      return `<div style="border-top:1px solid #3A5A4E;border-bottom:1px solid #3A5A4E;padding:19px 4px 20px;">
+        <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
+        <div style="font:700 23px/1.3 Georgia,serif;color:#F4EEE3;padding-top:12px;">${escapeHtml(title)}</div>
+        ${paragraphs}
+        <div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">From the Calgary Watch team</div>
+      </div>`;
+    }
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:6px;">
+      <tr><td style="padding:20px;">
+        <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
+        <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
+        ${paragraphs}
+      </td></tr>
+    </table>`;
+  })();
+
   const html = `<!doctype html><html><body style="margin:0;background:#0E1A17;color:#DCD3C4;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E1A17;">
       <tr><td align="center" style="padding:28px 12px;">
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
           <tr><td style="padding:0 24px 16px;border-bottom:2px solid #E0AC63;">
-            <div style="font:700 13px/1 Arial,sans-serif;color:#F4EEE3;letter-spacing:2.6px;">CALGARY WATCH</div>
-            <div style="font:400 11px/1 Arial,sans-serif;color:#A6B8AE;padding-top:7px;">Internal preview · ${escapeHtml(value.planWeekKey)}</div>
+            <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+              <td width="44" style="width:44px;padding-right:12px;vertical-align:middle;"><img src="cid:${LOGO_CID}" width="44" height="44" alt="" style="display:block;width:44px;height:44px;border:0;"></td>
+              <td style="vertical-align:middle;"><div style="font:700 13px/1 Arial,sans-serif;color:#F4EEE3;letter-spacing:2.6px;">CALGARY WATCH</div>
+              <div style="font:400 11px/1 Arial,sans-serif;color:#A6B8AE;padding-top:7px;">Admin proof · ${escapeHtml(value.planWeekKey)}</div></td>
+            </tr></table>
           </td></tr>
           <tr><td style="padding:22px 24px 0;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:6px;">
-              <tr><td style="padding:20px;">
-                <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
-                <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
-                ${paragraphs}
-              </td></tr>
-            </table>
+            ${opening}
           </td></tr>
           <tr><td style="padding:22px 24px 0;font:400 13px/1.55 Arial,sans-serif;color:#A6B8AE;">
             ${cancelled
@@ -129,6 +179,7 @@ exports.sendDigestPlannerPreview = onDocumentCreated({
             : `[Test] ${value.planWeekKey} weekly opening note`,
           html: preview.html,
           text: preview.text,
+          attachments: [logoAttachment()],
         }),
       });
       const payload = await response.json().catch(() => ({}));

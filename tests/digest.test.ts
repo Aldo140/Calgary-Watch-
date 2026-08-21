@@ -176,6 +176,40 @@ describe('weekly email planner', () => {
     });
     assert.ok(text.indexOf('<This week>') < text.indexOf('Morning,'));
   });
+
+  it('gives each editorial format its own purposeful structure', () => {
+    const summary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+    const shared = {
+      summary,
+      unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+      branding: BRANDING,
+    };
+    for (const style of ['neighbour-note', 'news-brief', 'personal-story'] as const) {
+      const html = renderDigestHtml({
+        ...shared,
+        contribution: {
+          weekKey: summary.weekKey,
+          weekStart: NOW,
+          headline: 'The right format for the job',
+          body: 'A useful opening note for this edition.',
+          style,
+          status: 'published',
+        },
+      });
+      assert.ok(html.includes(`cw-contribution-${style}`), `${style} lost its layout`);
+    }
+  });
+
+  it('keeps weekly contributions out of the one-time welcome template', () => {
+    const summary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+    const html = renderWelcomeHtml({
+      summary,
+      unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+      branding: BRANDING,
+    });
+    assert.ok(!html.includes('cw-contribution-'));
+    assert.ok(html.includes(escapeHtml(WELCOME.reason)));
+  });
 });
 
 // ── Selection ───────────────────────────────────────────────────────────────
@@ -379,6 +413,7 @@ describe('rendering', () => {
         assert.match(img, /width="\d+"/, `${label}: images need explicit width`);
       }
       assert.ok(html.includes('CALGARY&nbsp;WATCH'), `${label} needs a live-text wordmark`);
+      assert.ok(html.includes('src="cid:cw-logo"'), `${label} needs the primary Calgary Watch logo`);
       assert.ok(!/<script/i.test(html), `${label} must have no script`);
       assert.ok(!/<link\s/i.test(html), `${label} must have no external stylesheet`);
     }
@@ -799,23 +834,23 @@ describe('images', () => {
   it('catches art declared at the wrong aspect ratio', () => {
     // The three step icons were cropped to their own ink, giving three
     // different ratios, while the template rendered all of them at 44x44.
-    const [shield] = letterheadImages();
-    const squashed = `<img src="cid:${shield.cid}" width="40" height="200" alt="">`;
-    const problems = validateImages(squashed, [shield]);
+    const [logo] = letterheadImages();
+    const squashed = `<img src="cid:${logo.cid}" width="40" height="200" alt="">`;
+    const problems = validateImages(squashed, [logo]);
     assert.equal(problems[0].kind, 'distorted');
   });
 
   it('reads real dimensions out of the attached PNG', () => {
-    const [shield] = letterheadImages();
-    const size = pngSize(shield.base64);
+    const [logo] = letterheadImages();
+    const size = pngSize(logo.base64);
     assert.ok(size && size.width > 0 && size.height > 0);
   });
 
   it('requires dimensions and alt on every image', () => {
-    const [shield] = letterheadImages();
-    assert.equal(validateImages(`<img src="cid:${shield.cid}" alt="">`, [shield])[0].kind, 'no-dimensions');
-    const noAlt = `<img src="cid:${shield.cid}" width="38" height="51">`;
-    assert.ok(validateImages(noAlt, [shield]).some((p) => p.kind === 'no-alt'));
+    const [logo] = letterheadImages();
+    assert.equal(validateImages(`<img src="cid:${logo.cid}" alt="">`, [logo])[0].kind, 'no-dimensions');
+    const noAlt = `<img src="cid:${logo.cid}" width="44" height="44">`;
+    assert.ok(validateImages(noAlt, [logo]).some((p) => p.kind === 'no-alt'));
   });
 
 });

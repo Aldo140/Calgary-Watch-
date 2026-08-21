@@ -1,7 +1,7 @@
 /**
  * The letterhead.
  *
- * Two engravings from the site — the shield and the skyline rule — read from
+ * Two marks from the site — the primary plane logo and the skyline rule — read from
  * disk once per run and attached to every message as inline parts. They are not
  * linked from calgarywatch.ca on purpose: a hosted image is one missed deploy
  * or one renamed path away from a broken rectangle in every message already
@@ -19,6 +19,7 @@ import type { InlineImage } from './send.js';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 export const CID = {
+  logo: 'cw-logo',
   shield: 'cw-shield',
   skyline: 'cw-skyline',
   stepSignal: 'cw-step-signal',
@@ -44,11 +45,11 @@ function load(cid: string, relativePath: string): InlineImage {
  */
 const cache = new Map<string, InlineImage[]>();
 
-/** The two marks every message carries. */
+/** The primary logo and skyline every message carries. */
 export function letterheadImages(): InlineImage[] {
   if (!cache.has('letterhead')) {
     cache.set('letterhead', [
-      load(CID.shield, 'public/images/email/shield.png'),
+      load(CID.logo, 'public/images/email/logo.png'),
       load(CID.skyline, 'public/images/email/skyline.png'),
     ]);
   }

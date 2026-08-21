@@ -246,26 +246,24 @@ function dateRange(summary: DigestSummary): string {
 const SHELL_W = 560;
 
 /**
- * The masthead — set, not illustrated.
+ * The Calgary Watch logo lockup.
  *
- * There is no logo image, and that is a decision rather than a shortcut. Mail
- * clients block remote images by default, so a masthead built on one is a
- * broken rectangle on first open for most readers; and the moment the asset
- * 404s — a missed deploy, a renamed path — every message already sent shows a
- * broken-image icon forever. A typographic lockup cannot fail that way, loads
- * instantly, and is what a letter from a person would have at the top anyway.
+ * The primary plane mark is a real inline attachment and the wordmark remains live text.
+ * That gives the brand its proper mark when images are available without
+ * turning the whole identity into an empty rectangle when a client blocks
+ * images. It is embedded with the message, never fetched from a hosted URL.
  */
 function masthead(dateLine: string): string {
   return `
   <tr><td style="padding:32px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        <td width="38" style="width:38px;padding-right:14px;vertical-align:middle;">
+        <td width="44" style="width:44px;padding-right:12px;vertical-align:middle;">
           <!-- Inline part, not a hosted URL — see scripts/digest/art.ts. The
                wordmark beside it is live text, so a reader with images off
                still gets a masthead rather than an empty box. -->
-          <img src="cid:${CID.shield}" width="38" height="50" alt=""
-               style="display:block;width:38px;height:50px;border:0;">
+          <img src="cid:${CID.logo}" width="44" height="44" alt=""
+               style="display:block;width:44px;height:44px;border:0;">
         </td>
         <td style="vertical-align:middle;">
           <div class="cw-ink" style="font:700 13px/1 ${BODY};color:${C.ink};letter-spacing:2.6px;">
@@ -475,7 +473,14 @@ function heading(text: string): string {
                       text-transform:uppercase;padding-bottom:12px;">${escapeHtml(text)}</div>`;
 }
 
-/** Optional editor-written note. It is deliberately the first content block. */
+/**
+ * Optional editor-written note. It is deliberately the first content block.
+ *
+ * These are editorial formats inside the weekly template—not three competing
+ * email templates. Their structures differ because each has a different job:
+ * a neighbour note reads like a short team message, a news brief exposes its
+ * edition metadata, and a personal story gets quieter letter-like treatment.
+ */
 function contributionBlock(contribution: DigestContribution | undefined): string {
   if (!contribution?.body.trim()) return '';
   const copy = CONTRIBUTION_STYLE_COPY[contribution.style];
@@ -488,19 +493,62 @@ function contributionBlock(contribution: DigestContribution | undefined): string
     }))
     .join('');
 
-  return `
-  <tr><td style="padding:22px 36px 0;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:6px;">
-      <tr><td style="padding:19px 20px 20px;">
+  if (contribution.style === 'news-brief') {
+    return `
+    <tr><td style="padding:22px 36px 0;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+             class="cw-card cw-contribution-news-brief" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+        <tr><td style="padding:16px 20px 18px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <td style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.7px;text-transform:uppercase;">
+                ${escapeHtml(copy.emailLabel)}
+              </td>
+              <td align="right" style="font:400 10.5px/1 ${MONO};color:${C.soft};">
+                ${escapeHtml(contribution.weekKey)}
+              </td>
+            </tr>
+          </table>
+          <div class="cw-ink" style="font:700 20px/1.3 ${DISPLAY};color:${C.ink};padding-top:12px;">
+            ${escapeHtml(title)}
+          </div>
+          ${paragraphs}
+        </td></tr>
+      </table>
+    </td></tr>`;
+  }
+
+  if (contribution.style === 'personal-story') {
+    return `
+    <tr><td style="padding:25px 36px 0;">
+      <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
+      <div class="cw-contribution-personal-story" style="padding:19px 4px 20px;">
         ${heading(copy.emailLabel)}
-        <div class="cw-ink" style="font:700 21px/1.3 ${DISPLAY};color:${C.ink};">
+        <div class="cw-ink" style="font:700 23px/1.3 ${DISPLAY};color:${C.ink};max-width:430px;">
           ${escapeHtml(title)}
         </div>
         ${paragraphs}
-      </td></tr>
-    </table>
-  </td></tr>`;
+        <div class="cw-soft" style="font:600 12.5px/1.5 ${BODY};color:${C.soft};padding-top:15px;">
+          From the Calgary Watch team
+        </div>
+      </div>
+      <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
+    </td></tr>`;
+  }
+
+  return `
+    <tr><td style="padding:22px 36px 0;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+             class="cw-card cw-contribution-neighbour-note" style="background:${C.card};border:1px solid ${C.line};border-radius:6px;">
+        <tr><td style="padding:19px 20px 20px;">
+          ${heading(copy.emailLabel)}
+          <div class="cw-ink" style="font:700 21px/1.3 ${DISPLAY};color:${C.ink};">
+            ${escapeHtml(title)}
+          </div>
+          ${paragraphs}
+        </td></tr>
+      </table>
+    </td></tr>`;
 }
 
 /**

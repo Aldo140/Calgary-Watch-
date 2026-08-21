@@ -5,6 +5,9 @@
   "engines": {
     "node": "20"
   },
+  "scripts": {
+    "package-assets": "node package-assets.js"
+  },
   "dependencies": {
     "firebase-admin": "^13.7.0",
     "firebase-functions": "^6.4.0"

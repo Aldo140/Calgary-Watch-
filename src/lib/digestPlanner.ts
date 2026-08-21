@@ -3,6 +3,32 @@ import { digestWeekKey, WEEK_MS } from './digest';
 export const DIGEST_CONTRIBUTION_STYLES = ['neighbour-note', 'news-brief', 'personal-story'] as const;
 export type DigestContributionStyle = typeof DIGEST_CONTRIBUTION_STYLES[number];
 
+/**
+ * The three emails involved in the digest lifecycle are intentionally separate.
+ * Keeping this registry in shared code stops the admin console from presenting
+ * an editorial voice as though it were a different subscriber template.
+ */
+export const DIGEST_TEMPLATE_PURPOSES = [
+  {
+    id: 'welcome',
+    label: 'Welcome letter',
+    timing: 'First eligible send',
+    purpose: 'Introduces Calgary Watch and explains what arrives each Monday.',
+  },
+  {
+    id: 'weekly',
+    label: 'Weekly brief',
+    timing: 'Every later Monday',
+    purpose: 'Personalized local summary. This planner controls its optional opening note.',
+  },
+  {
+    id: 'admin-proof',
+    label: 'Admin proof',
+    timing: 'After publish or removal',
+    purpose: 'Private delivery check for approved administrators only.',
+  },
+] as const;
+
 export interface DigestContribution {
   weekKey: string;
   weekStart: number;
@@ -25,17 +51,17 @@ export const CONTRIBUTION_STYLE_COPY: Record<DigestContributionStyle, {
 }> = {
   'neighbour-note': {
     label: 'Neighbour note',
-    description: 'Warm, direct and community-minded.',
+    description: 'A short, practical message from the team.',
     emailLabel: 'A note from Calgary Watch',
   },
   'news-brief': {
     label: 'News brief',
-    description: 'Concise and factual, like a newsroom update.',
+    description: 'For factual updates, launches and service news.',
     emailLabel: 'From the watch desk',
   },
   'personal-story': {
     label: 'Personal story',
-    description: 'A more reflective first-person contribution.',
+    description: 'For a reflective first-person community story.',
     emailLabel: 'This week in our community',
   },
 };

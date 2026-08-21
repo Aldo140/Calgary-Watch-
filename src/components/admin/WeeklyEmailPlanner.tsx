@@ -3,8 +3,8 @@ import {
   collection, doc, getDoc, onSnapshot, query, runTransaction, where, writeBatch,
 } from 'firebase/firestore';
 import {
-  AlertTriangle, CalendarDays, Check, History, Loader2, MailCheck,
-  RefreshCw, Send, Trash2,
+  AlertTriangle, BookOpenText, CalendarDays, Check, History, Loader2, MailCheck,
+  Newspaper, RefreshCw, Send, ShieldCheck, Trash2,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -12,6 +12,7 @@ import { db } from '@/src/firebase';
 import {
   CONTRIBUTION_STYLE_COPY,
   DIGEST_CONTRIBUTION_STYLES,
+  DIGEST_TEMPLATE_PURPOSES,
   upcomingDigestWeeks,
   type DigestContribution,
   type DigestContributionStyle,
@@ -22,6 +23,12 @@ import {
 
 const MAX_BODY = 2400;
 const MIN_BODY = 20;
+
+const TEMPLATE_ICONS = {
+  welcome: BookOpenText,
+  weekly: Newspaper,
+  'admin-proof': ShieldCheck,
+} as const;
 
 type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
 type MessageTone = 'neutral' | 'ok' | 'attention' | 'critical';
@@ -100,6 +107,58 @@ function DeliveryStatus({ request }: { request: TestRequest | undefined }) {
           {request.submittedByEmail ? ` · requested by ${request.submittedByEmail}` : ''}
         </p>
       </div>
+    </div>
+  );
+}
+
+function OpeningPreview({
+  style, headline, paragraphs, weekKey,
+}: {
+  style: DigestContributionStyle;
+  headline: string;
+  paragraphs: string[];
+  weekKey: string;
+}) {
+  const copy = CONTRIBUTION_STYLE_COPY[style];
+  const content = (
+    <>
+      <p className="text-lg font-bold leading-snug" style={{ fontFamily: display, color: '#F4EEE3' }}>
+        {headline.trim() || copy.label}
+      </p>
+      <div className="mt-2 space-y-2 text-[0.82rem] leading-relaxed" style={{ color: '#DCD3C4' }}>
+        {paragraphs.length
+          ? paragraphs.map((paragraph, index) => <p key={index} className="whitespace-pre-line">{paragraph}</p>)
+          : <p style={{ color: '#A6B8AE' }}>Your optional opening note will appear here.</p>}
+      </div>
+    </>
+  );
+
+  if (style === 'news-brief') {
+    return (
+      <div className="rounded-sm border p-4" style={{ background: '#17251F', borderColor: '#2C443B' }}>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
+          <p className="text-[0.62rem]" style={{ color: '#A6B8AE', fontFamily: mono }}>{weekKey}</p>
+        </div>
+        {content}
+      </div>
+    );
+  }
+
+  if (style === 'personal-story') {
+    return (
+      <div className="border-y px-1 py-4" style={{ borderColor: '#3A5A4E' }}>
+        <p className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
+        {content}
+        <p className="mt-4 text-[0.72rem] font-semibold" style={{ color: '#A6B8AE' }}>From the Calgary Watch team</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border p-4" style={{ background: '#17251F', borderColor: '#2C443B' }}>
+      <p className="mb-2 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
+      {content}
     </div>
   );
 }
@@ -404,6 +463,33 @@ export function WeeklyEmailPlanner() {
         </div>
       </section>
 
+      <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="template-routing-title">
+        <div className="border-b px-4 py-3" style={{ borderColor: T.line }}>
+          <h2 id="template-routing-title" className="text-sm font-bold" style={{ color: T.ink }}>Template routing</h2>
+          <p className="mt-0.5 text-xs" style={{ color: T.muted }}>Each format has one job. Weekly edits never alter the subscriber welcome letter.</p>
+        </div>
+        <dl className="divide-y md:grid md:grid-cols-3 md:divide-x md:divide-y-0" style={{ borderColor: T.line }}>
+          {DIGEST_TEMPLATE_PURPOSES.map((template) => {
+            const Icon = TEMPLATE_ICONS[template.id];
+            const active = template.id === 'weekly';
+            return (
+              <div key={template.id} className="flex gap-3 p-4" style={{ background: active ? `${T.signal}0A` : T.card }}>
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg" style={{ background: active ? `${T.signal}16` : T.surface, color: active ? T.signal : T.muted }}>
+                  <Icon size={15} />
+                </span>
+                <div className="min-w-0">
+                  <dt className="flex flex-wrap items-center gap-2 text-xs font-bold" style={{ color: T.ink }}>
+                    {template.label}{active && <Chip tone="signal">Editing</Chip>}
+                  </dt>
+                  <dd className="mt-0.5 text-[0.68rem] font-semibold" style={{ color: active ? T.signal : T.muted }}>{template.timing}</dd>
+                  <dd className="mt-1 text-[0.7rem] leading-snug" style={{ color: T.muted }}>{template.purpose}</dd>
+                </div>
+              </div>
+            );
+          })}
+        </dl>
+      </section>
+
       {hasRemoteChange && (
         <div className="flex items-start justify-between gap-4 rounded-xl border p-4" style={{ background: `${T.critical}0A`, borderColor: `${T.critical}55` }} role="alert">
           <div className="flex min-w-0 gap-3">
@@ -418,10 +504,11 @@ export function WeeklyEmailPlanner() {
       )}
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(350px,0.92fr)]">
-        <Panel title="Opening note" subtitle="Optional. It appears before the automated neighbourhood briefing." action={saveState === 'loading' ? <Chip tone="attention"><Loader2 size={11} className="motion-safe:animate-spin" /> Loading</Chip> : undefined}>
+        <Panel title="Weekly opening note" subtitle="Optional. It appears only in the recurring weekly brief, before the automated neighbourhood briefing." action={saveState === 'loading' ? <Chip tone="attention"><Loader2 size={11} className="motion-safe:animate-spin" /> Loading</Chip> : undefined}>
           <form className="space-y-5" onSubmit={submit}>
             <fieldset>
-              <legend className="mb-2 text-xs font-semibold" style={{ color: T.ink }}>How should it read?</legend>
+              <legend className="text-xs font-semibold" style={{ color: T.ink }}>Editorial format</legend>
+              <p className="mb-2 mt-0.5 text-[0.7rem]" style={{ color: T.muted }}>Choose by purpose. This changes the note's structure, not the underlying weekly template.</p>
               <div className="grid gap-2 sm:grid-cols-3">
                 {DIGEST_CONTRIBUTION_STYLES.map((option) => {
                   const active = option === style;
@@ -438,6 +525,7 @@ export function WeeklyEmailPlanner() {
 
             <Field label="Headline (optional)">
               <input className={inputClass} style={inputStyle} maxLength={100} value={headline} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setHeadline(event.target.value)} placeholder="What should readers take away?" />
+              <p className="mt-1.5 text-[0.7rem]" style={{ color: T.muted }}>This labels the opening note. Subscriber subject lines remain personalized to their area.</p>
             </Field>
 
             <Field label="Your contribution">
@@ -470,17 +558,14 @@ export function WeeklyEmailPlanner() {
             <div className="p-3 sm:p-5" style={{ background: '#0E1A17' }}>
               <div className="mx-auto max-w-[34rem]" style={{ color: '#DCD3C4' }}>
                 <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: '#E0AC63' }}>
-                  <div><p className="text-[0.68rem] font-bold tracking-[0.16em]" style={{ color: '#F4EEE3' }}>CALGARY WATCH</p><p className="mt-1 text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.label}</p></div>
+                  <div className="flex items-center gap-2.5">
+                    <img src="/images/email/logo.png" width="40" height="40" alt="" className="h-10 w-10 object-contain" />
+                    <div><p className="text-[0.68rem] font-bold tracking-[0.16em]" style={{ color: '#F4EEE3' }}>CALGARY WATCH</p><p className="mt-1 text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.label}</p></div>
+                  </div>
                   <span className="text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.weekKey}</span>
                 </div>
                 <div className="py-5">
-                  <div className="rounded-lg p-4" style={{ background: '#17251F', border: '1px solid #2C443B' }}>
-                    <p className="text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{CONTRIBUTION_STYLE_COPY[style].emailLabel}</p>
-                    <p className="mt-2 text-lg font-bold leading-snug" style={{ fontFamily: display, color: '#F4EEE3' }}>{headline.trim() || CONTRIBUTION_STYLE_COPY[style].label}</p>
-                    <div className="mt-2 space-y-2 text-[0.82rem] leading-relaxed" style={{ color: '#DCD3C4' }}>
-                      {previewParagraphs.length ? previewParagraphs.map((paragraph, index) => <p key={index} className="whitespace-pre-line">{paragraph}</p>) : <p style={{ color: '#A6B8AE' }}>Your optional opening note will appear here.</p>}
-                    </div>
-                  </div>
+                  <OpeningPreview style={style} headline={headline} paragraphs={previewParagraphs} weekKey={selected?.weekKey ?? ''} />
                   <div className="pt-6">
                     <p className="text-xl font-bold" style={{ fontFamily: display, color: '#F4EEE3' }}>Morning, neighbour.</p>
                     <p className="mt-2 text-[0.78rem] leading-relaxed" style={{ color: '#A6B8AE' }}>The regular location-based summary, weekly comparison and report list continue below.</p>
@@ -491,7 +576,7 @@ export function WeeklyEmailPlanner() {
             </div>
           </Panel>
 
-          <Panel title="Test delivery" subtitle="Every publish, retest and removal is recorded." action={<History size={15} style={{ color: T.muted }} />}>
+          <Panel title="Admin proof delivery" subtitle="A private branded proof follows every publish, retest and removal." action={<History size={15} style={{ color: T.muted }} />}>
             <DeliveryStatus request={latestTest} />
             {latestTest?.error && <p className="mt-2 rounded-lg px-3 py-2 text-[0.7rem] leading-relaxed" style={{ background: `${T.critical}0A`, color: T.critical }}>{latestTest.error}</p>}
             {testRequests.length > 1 && (

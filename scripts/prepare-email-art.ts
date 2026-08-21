@@ -86,6 +86,10 @@ type Mark = {
 };
 
 const TARGETS: Mark[] = [
+  // Primary brand mark used in the public-site navigation and every email
+  // masthead. The shield remains a secondary illustration rather than being
+  // asked to stand in for the product logo.
+  { src: 'public/images/brand/calgary-watch-plane-mark.webp', out: 'public/images/email/logo.png', width: 176, mode: 'medallion', square: true },
   { src: 'public/images/illustration/calgary-watch-shield.webp', out: 'public/images/email/shield.png', width: 152, mode: 'linework' },
   { src: 'public/images/illustration/calgary-skyline-rule.webp', out: 'public/images/email/skyline.png', width: 960, mode: 'linework' },
   // The welcome email explains how the map is fed; these three carry that.

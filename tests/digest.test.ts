@@ -45,6 +45,11 @@ import { pngSize, validateImages } from '../scripts/digest/images.js';
 import { letterheadImages, welcomeImages } from '../scripts/digest/art.js';
 import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js';
 import type { Incident } from '../src/types/index.js';
+import {
+  normalizeDigestContribution,
+  upcomingDigestWeeks,
+  type DigestContribution,
+} from '../src/lib/digestPlanner.js';
 
 const NOW = Date.UTC(2026, 7, 19, 15, 0, 0); // 19 Aug 2026, 09:00 MDT
 const HOUR = 3_600_000;
@@ -128,6 +133,48 @@ describe('week identity', () => {
   it('matches the ISO-8601 format the ledger id is built from', () => {
     assert.match(digestWeekKey(NOW), /^\d{4}-W\d{2}$/);
     assert.equal(digestSendId('abc', '2026-W34'), 'abc_2026-W34');
+  });
+});
+
+describe('weekly email planner', () => {
+  it('offers the next Monday first and keeps every option in ISO week order', () => {
+    const weeks = upcomingDigestWeeks(NOW, 3);
+    assert.equal(weeks.length, 3);
+    assert.equal(weeks[0].weekKey, '2026-W35');
+    assert.equal(weeks[1].weekStart - weeks[0].weekStart, 7 * 86_400_000);
+  });
+
+  it('rejects empty or unknown contribution formats', () => {
+    assert.equal(normalizeDigestContribution({ weekKey: '2026-W35', body: '', style: 'news-brief' }), null);
+    assert.equal(normalizeDigestContribution({ weekKey: '2026-W35', body: 'Useful update', style: 'loud' }), null);
+  });
+
+  it('renders the planned note before the standard greeting and escapes admin input', () => {
+    const summary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+    const contribution: DigestContribution = {
+      weekKey: summary.weekKey,
+      weekStart: NOW,
+      headline: '<This week>',
+      body: 'A personal note & update.',
+      style: 'personal-story',
+      status: 'published',
+    };
+    const html = renderDigestHtml({
+      summary,
+      contribution,
+      unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+      branding: BRANDING,
+    });
+    assert.ok(html.indexOf('&lt;This week&gt;') < html.indexOf('Morning,'));
+    assert.ok(!html.includes('<This week>'));
+
+    const text = renderDigestText({
+      summary,
+      contribution,
+      unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)),
+      branding: BRANDING,
+    });
+    assert.ok(text.indexOf('<This week>') < text.indexOf('Morning,'));
   });
 });
 
@@ -877,5 +924,21 @@ describe('the seam', () => {
     // measured 33 off the page value, which is the bright hairline that made
     // each mark look pasted on. The margin is what removes it.
     assert.match(artSrc, /margin = max\(5, round\(min\(art\.size\) \* 0\.05\)\)/);
+  });
+
+  it('the build measures the plate it actually wrote, not the one it meant to', () => {
+    // Padding guarantees the border is plate before the file is encoded. The
+    // palette step happens after, and an adaptive palette is chosen from the
+    // image rather than declared — so the value that comes out is not promised
+    // to be the value that went in. It survives today only because the plate
+    // is the most common colour in each of these files, which is a fact about
+    // this artwork and not a rule about the pipeline.
+    //
+    // So the build reads its own output back and refuses to save a mark whose
+    // border has drifted at all. This asserts that check is still there, and
+    // still fails rather than warning: a warning in a script nobody watches on
+    // a Monday is the same as no check.
+    assert.match(artSrc, /border = \(\[check\.getpixel/);
+    assert.match(artSrc, /raise SystemExit\(f'\{out\}: border sits \{off\} off the plate/);
   });
 });

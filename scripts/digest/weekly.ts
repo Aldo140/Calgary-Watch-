@@ -56,6 +56,7 @@ import {
   WEEK_MS,
   type DigestRecipient,
 } from '../../src/lib/digest.js';
+import { normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
 import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { WELCOME } from './copy.js';
@@ -66,6 +67,7 @@ import type { Incident } from '../../src/types/index.js';
 const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
 const SENDS = 'digest_sends';
 const UNSUBS = 'digest_unsubscribes';
+const PLANS = 'weekly_email_plans';
 
 function initFirebase(): Firestore {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -196,6 +198,17 @@ async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident
   });
 }
 
+async function loadWeeklyContribution(db: Firestore, weekKey: string): Promise<DigestContribution | undefined> {
+  const snapshot = await db.collection(PLANS).doc(weekKey).get();
+  if (!snapshot.exists || snapshot.data()?.status !== 'published') return undefined;
+  const contribution = normalizeDigestContribution(snapshot.data());
+  if (!contribution) {
+    console.warn(`[digest] ${weekKey} has an invalid planner contribution; sending the default brief`);
+    return undefined;
+  }
+  return contribution;
+}
+
 // ── Run ─────────────────────────────────────────────────────────────────────
 
 async function run(): Promise<void> {
@@ -236,6 +249,8 @@ async function run(): Promise<void> {
 
   const incidents = await loadRecentIncidents(db, now);
   console.log(`[digest] ${incidents.length} public report(s) in the last 14 days`);
+  const contribution = await loadWeeklyContribution(db, weekKey);
+  console.log(`[digest] opening contribution ${contribution ? `revision ${contribution.revision ?? 1}` : 'not scheduled'}`);
 
   // Addresses repeat across a household; resolve each one once per run.
   const geocodeCache = new Map<string, HomeLocation | null>();
@@ -312,7 +327,13 @@ async function run(): Promise<void> {
         .digestWelcomeSentAt == null;
       const render = isFirstEmail ? renderWelcomeHtml : renderDigestHtml;
       const renderText = isFirstEmail ? renderWelcomeText : renderDigestText;
-      const shared = { summary, displayName: profile.displayName, unsubscribeUrl: unsubUrl, branding };
+      const shared = {
+        summary,
+        displayName: profile.displayName,
+        unsubscribeUrl: unsubUrl,
+        branding,
+        contribution: isFirstEmail ? undefined : contribution,
+      };
 
       const email = {
         to: profile.email!.trim(),

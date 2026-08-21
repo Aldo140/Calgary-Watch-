@@ -1,6 +1,6 @@
 # Calgary Watch
 
-> Calgary Watch is a free, community-powered incident and neighbourhood safety map for Calgary, Alberta, and surrounding communities. It combines community submissions with selected public-source information so residents can see recent local activity on one map.
+> See it. Share it. Calgary knows. Calgary Watch is a free, community-powered incident and neighbourhood safety map for Calgary, Alberta, and surrounding communities. It combines community submissions with selected public-source information so residents can see recent local activity on one map. Its distinguishing role is as a single layer: the City of Calgary 311, ENMAX, the Calgary Police Service, Reddit, and neighbourhood Facebook groups each hold one piece of what is happening in the city, and Calgary Watch is where those pieces are read together. It is not affiliated with, endorsed by, or operated by any of them, and does not replace them.
 
 Last updated: 2026-08-13
 Canonical website: https://calgarywatch.ca/

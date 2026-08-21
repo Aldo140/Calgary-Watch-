@@ -8,7 +8,10 @@ service firebase.storage {
     // src/constants/admin.ts.
     function isApprovedAdmin() {
       return request.auth != null
-             && request.auth.token.email == 'jorti104@mtroyal.ca'
+             && request.auth.token.email in [
+               'jorti104@mtroyal.ca',
+               'ophillah1863@gmail.com'
+             ]
              && request.auth.token.email_verified == true;
     }
 

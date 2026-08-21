@@ -1,5 +1,5 @@
 {
   "name": "Calgary Watch",
-  "description": "Real-time urban intelligence platform for Calgary. Community-submitted reports and historical crime data.",
+  "description": "See it. Share it. Calgary knows. The layer that brings Calgary's scattered incident sources into one map \u2014 community-submitted reports alongside attributed public data.",
   "requestFramePermissions": ["geolocation"]
 }

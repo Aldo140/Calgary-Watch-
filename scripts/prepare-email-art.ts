@@ -4,9 +4,8 @@
  *   npx tsx scripts/prepare-email-art.ts
  *
  * The originals are WebP, which Outlook on Windows cannot decode, so email gets
- * PNG. They are also near-black on transparency, so the ink is re-tinted while
- * the alpha channel — where all the engraved linework actually lives — is left
- * untouched. See INK below for why the colour is what it is.
+ * PNG. Everything below exists to make one guarantee: a mark's contrast lives
+ * inside its own pixels, so no client can repaint it away.
  *
  * Committed output rather than a build step: the weekly job reads these files
  * directly, and a cron that depends on an image pipeline is a cron that fails
@@ -18,109 +17,104 @@
 import { execFileSync } from 'node:child_process';
 
 /**
- * Brand gold, chosen for contrast on BOTH grounds.
+ * The linework: sandstone cream, the same value the body text uses.
  *
- * The art was originally re-tinted to the email's warm black, which looked
- * right until a reader opened it in Gmail's dark mode: the client inverts the
- * sandstone background to near-black but leaves transparent PNGs alone, so the
- * ink dropped to 1.06:1 against its own background and the letterhead vanished.
+ * The email is set on a dark ground, so the engravings are re-tinted to read
+ * against it — 13:1 against the page, which is well past the point where fine
+ * linework starts to close up. The alpha channel, where all the detail
+ * actually lives, is never touched.
  *
- * Gold sits at 3.4:1 on sandstone and 4.1:1 on a dark ground, so it survives
- * either treatment — and it is already the masthead rule's colour, so the
- * letterhead now reads as one piece rather than two.
+ * One tint for everything that is linework, because mixing a white logo with a
+ * gold rule and a cream illustration is how a letterhead starts looking
+ * assembled rather than drawn.
  */
-/**
- * The linework: warm white.
- *
- * The marks are set white on a black plate rather than dark on cream. That
- * pairing is the only one where both requirements hold at once — the art is
- * white on black, and the page text stays black on sandstone — and it is the
- * most legible arrangement available, because a baked black plate is the
- * highest-contrast surface in the message and cannot be repainted by a client.
- *
- * The email is set dark, so the engravings are re-tinted to the same sandstone
- * the body text uses — 13:1 against the page, which is well past the point
- * where fine linework starts to close up. The alpha channel, where all the
- * detail actually lives, is never touched.
- *
- * One tint for everything: mixing a white logo with a gold rule and a cream
- * illustration is how a letterhead starts looking assembled rather than drawn.
- */
-const INK = '(250, 247, 240)';
+const INK = '(244, 238, 227)';
 
 /**
- * The plate baked in behind every mark: TRUE black, #000000.
+ * The plate baked in behind every mark: spruce black, #0E1A17.
  *
- * This must equal C.page in scripts/digest/render.ts exactly. It was
- * near-black while the page was black, and every mark showed its own
- * rectangle as a result — two dark values do not blend, they either match or
- * they seam. A test asserts the two constants still agree.
+ * This must equal C.page in scripts/digest/render.ts exactly. A plate that is
+ * merely close to the page is worse than one that is obviously different —
+ * two near-blacks do not blend, they seam, and every mark shows its own
+ * rectangle. A test asserts the two constants still agree.
+ *
+ * It was #000000 for exactly one commit, and only because the plate could not
+ * be trusted to be anything else: the three process icons arrived as flat RGB
+ * with their ground baked in, so the ink had to be derived from darkness by a
+ * curve, and the safest page was the one that matched the crudest plate. True
+ * black was the surrender, not the design. The icons now arrive cut out, so
+ * the plate is a choice again, and the choice is the spruce this email was
+ * designed in.
  *
  * Baked into the pixels rather than applied as CSS, because the clients that
  * repaint a page background are the same ones that strip a <style> block, and
- * an image's own pixels are the one thing none of them touch. That makes the
- * mark's contrast independent of the page entirely: it reads as a black badge
- * on the sandstone page as designed, and as a black badge on a page some
- * client decided to darken. There is no state in which it disappears.
+ * an image's own pixels are the one thing none of them touch. There is no
+ * state in which a mark disappears.
  */
-const PLATE = '(0, 0, 0)';
+const PLATE = '(14, 26, 23)';
 
 /**
+ * Two kinds of mark, and the difference is what the artwork already carries.
+ *
+ * LINEWORK is a drawing on transparency: the shield, the skyline, the Bow
+ * emblem. Alpha describes the engraving, so the ink is re-tinted to INK and
+ * set on the plate.
+ *
+ * MEDALLION is a drawing that brought its own ground — the three process icons
+ * are dark engravings on a cream disc, and the disc is part of the drawing.
+ * They are placed as they are: no tint, no threshold, nothing derived. On the
+ * dark page they read as three pressed seals, and at the 44px the template
+ * gives them that is far more legible than cream hairlines would be.
+ *
+ * The disc used to be fought rather than used. The site's process artwork was
+ * flat RGB with a cream square behind it, so the alpha channel said nothing
+ * and ink had to be inferred from darkness — autocontrast, then a curve tuned
+ * to drop the paper and keep the line. It worked, in the way a tuned threshold
+ * works: until the next asset. Cut-out sources retire the whole approach.
+ *
  * 4x the logical size. These are engravings — at 2x the hatching on the shield
- * turns to mush, and the difference costs a few KB on a message that is already
- * carrying two images.
+ * turns to mush, and the difference costs a few KB on a message that is
+ * already carrying two images.
  */
-const TARGETS: Array<{ src: string; out: string; width: number; square?: boolean; plate?: boolean }> = [
-  { src: 'public/images/illustration/calgary-watch-shield.webp', out: 'public/images/email/shield.png', width: 152, plate: true },
-  { src: 'public/images/illustration/calgary-skyline-rule.webp', out: 'public/images/email/skyline.png', width: 960, plate: true },
+type Mark = {
+  src: string;
+  out: string;
+  width: number;
+  mode: 'linework' | 'medallion';
+  /** Pads to a square canvas so the template's fixed box is honest. */
+  square?: boolean;
+};
+
+const TARGETS: Mark[] = [
+  { src: 'public/images/illustration/calgary-watch-shield.webp', out: 'public/images/email/shield.png', width: 152, mode: 'linework' },
+  { src: 'public/images/illustration/calgary-skyline-rule.webp', out: 'public/images/email/skyline.png', width: 960, mode: 'linework' },
   // The welcome email explains how the map is fed; these three carry that.
   // square: true pads to a square canvas. Cropping each icon to its own ink
-  // left three different aspect ratios — 1.08, 0.88, 1.22 — while the template
-  // renders them all at 44x44, so every one was being squashed a different
-  // amount. Padding makes the declared box honest and lines the three up on a
-  // shared baseline, which cropping never would.
-  { src: 'public/images/illustration/process-signal.webp', out: 'public/images/email/step-signal.png', width: 176, square: true, plate: true },
-  { src: 'public/images/illustration/process-community.webp', out: 'public/images/email/step-community.png', width: 176, square: true, plate: true },
-  { src: 'public/images/illustration/process-megaphone.webp', out: 'public/images/email/step-megaphone.png', width: 176, square: true, plate: true },
+  // left three different aspect ratios while the template renders them all at
+  // 44x44, so every one was being squashed a different amount. Padding makes
+  // the declared box honest and lines the three up on a shared baseline.
+  { src: 'design-sources/email-cutouts/process-signal.webp', out: 'public/images/email/step-signal.png', width: 176, mode: 'medallion', square: true },
+  { src: 'design-sources/email-cutouts/process-community.webp', out: 'public/images/email/step-community.png', width: 176, mode: 'medallion', square: true },
+  { src: 'design-sources/email-cutouts/process-megaphone.webp', out: 'public/images/email/step-megaphone.png', width: 176, mode: 'medallion', square: true },
   // Sits under the sign-off, the way a seal would.
-  { src: 'public/images/illustration/calgary-bow-emblem.webp', out: 'public/images/email/emblem.png', width: 200, plate: true },
+  { src: 'public/images/illustration/calgary-bow-emblem.webp', out: 'public/images/email/emblem.png', width: 200, mode: 'linework' },
 ];
 
 const script = `
 import os
-from PIL import Image, ImageOps
+from PIL import Image
 os.makedirs('public/images/email', exist_ok=True)
 
-def alpha_for(im):
-    """Where is there ink?
+PLATE = ${PLATE}
 
-    Two kinds of source in this set. The shield, skyline and emblem are drawn on
-    transparency, so the alpha channel already answers the question. The three
-    process icons are flat RGB — dark linework printed on a cream disc — and
-    their alpha is a solid rectangle that says nothing.
-
-    For those, ink is derived from darkness: invert the greyscale, so the cream
-    paper falls to zero and drops out while the linework stays opaque. That
-    knocks the disc off and leaves the drawing, which is the only part that can
-    be re-tinted onto a dark ground without bringing a pale slab with it.
-    """
-    a = im.split()[3]
-    lo, hi = a.getextrema()
-    if lo < 250:
-        return a
-    grey = ImageOps.grayscale(im.convert('RGB'))
-    # These scans sit around 240 rather than 255, so a plain invert leaves the
-    # paper as a faint grey slab — visible on a dark page as a square edge
-    # around each icon. Autocontrast normalises the range, then the curve below
-    # drops everything under a third to nothing and lifts the rest, so the disc
-    # disappears and the linework keeps its weight instead of going spindly.
-    inverted = ImageOps.invert(ImageOps.autocontrast(grey, cutoff=1))
-    return inverted.point(lambda v: 0 if v < 86 else min(255, int((v - 86) * 1.75)))
-
-for src, out, width, square, plate in ${JSON.stringify(TARGETS.map((t) => [t.src, t.out, t.width, t.square ? 1 : 0, t.plate ? 1 : 0]))}:
+for src, out, width, mode, square in ${JSON.stringify(
+  TARGETS.map((t) => [t.src, t.out, t.width, t.mode, t.square ? 1 : 0]),
+)}:
     im = Image.open(src).convert('RGBA')
-    im.putalpha(alpha_for(im))
 
+    # Every source in this set carries a real alpha channel, so the bounding
+    # box of the ink is simply the bounding box of what is opaque. Nothing is
+    # inferred from colour any more.
     box = im.split()[3].getbbox()
     if box:
         im = im.crop(box)
@@ -135,37 +129,65 @@ for src, out, width, square, plate in ${JSON.stringify(TARGETS.map((t) => [t.src
 
     im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
 
-    # Tint the linework, keeping the alpha that describes it.
-    art = Image.new('RGBA', im.size, ${INK} + (255,))
-    art.putalpha(im.split()[3])
+    if mode == 'linework':
+        # Tint the drawing, keeping the alpha that describes it.
+        art = Image.new('RGBA', im.size, ${INK} + (255,))
+        art.putalpha(im.split()[3])
+    else:
+        # The medallion is already the finished drawing. Touch nothing.
+        art = im
 
-    if plate:
-        # ...then set it on an opaque plate, so the contrast lives inside the
-        # file. Order matters: plating before tinting flattens the alpha the
-        # tint depends on and yields a solid rectangle.
-        # Pad before plating so the outermost pixels are guaranteed to be the
-        # page colour exactly.
-        #
-        # Cropping to the ink leaves the linework touching the boundary — the
-        # shield's edge measured 33 off the page value, which is precisely the
-        # thin bright seam that made every mark look like a pasted rectangle.
-        # Antialiasing accounts for another 2-3 on the others. A margin of pure
-        # plate removes the whole class of problem rather than tuning it down.
-        # Scaled off the SHORTER side. Using the longer one gave the 960px
-        # skyline a 48px margin top and bottom, turning a band into a slab.
-        margin = max(5, round(min(art.size) * 0.05))
-        backing = Image.new('RGBA',
-                            (art.size[0] + margin * 2, art.size[1] + margin * 2),
-                            ${PLATE} + (255,))
-        backing.alpha_composite(art, (margin, margin))
-        # Drop the alpha channel outright rather than leaving it fully opaque.
-        # A file that still declares transparency invites a client to do
-        # something with it, and costs a byte per pixel to say nothing.
-        art = backing.convert('RGB')
+    # Set it on an opaque plate, so the contrast lives inside the file. Order
+    # matters for linework: plating before tinting flattens the alpha the tint
+    # depends on and yields a solid rectangle.
+    #
+    # Pad before plating so the outermost pixels are guaranteed to be the page
+    # colour exactly. Cropping to the ink leaves the drawing touching the
+    # boundary — the shield's edge measured 33 off the page value, which is
+    # precisely the thin bright seam that made every mark look like a pasted
+    # rectangle, and antialiasing accounts for another 2-3 on the others. A
+    # margin of pure plate removes the whole class of problem rather than
+    # tuning it down. Scaled off the SHORTER side: using the longer one gave
+    # the 960px skyline a 48px margin top and bottom, turning a band into a slab.
+    margin = max(5, round(min(art.size) * 0.05))
+    backing = Image.new('RGBA',
+                        (art.size[0] + margin * 2, art.size[1] + margin * 2),
+                        ${PLATE} + (255,))
+    backing.alpha_composite(art, (margin, margin))
+    # Drop the alpha channel outright rather than leaving it fully opaque. A
+    # file that still declares transparency invites a client to do something
+    # with it, and costs a byte per pixel to say nothing.
+    art = backing.convert('RGB')
+
+    # Then to a 64-colour palette, which is not a compromise on this artwork.
+    # Every mark is two hues — cream ink on the spruce plate — and what is left
+    # is the antialiasing ramp between them, which is one-dimensional and has
+    # nowhere near 64 steps in it. The medallions carry a paper texture that
+    # truecolour PNG cannot compress and a palette can: they came out at 49 KB
+    # each and land at 17, which is the difference between a welcome that costs
+    # 325 KB in every inbox and one that costs 115.
+    #
+    # Dithering is off deliberately. It buys nothing on a ramp this shallow and
+    # scatters noise that the next compressor has to carry.
+    art = art.convert('P', palette=Image.ADAPTIVE, colors=64, dither=Image.NONE)
+
+    # An adaptive palette is chosen from the image, so nothing in the process
+    # promises the plate comes out the exact value it went in as — and a plate
+    # one step off the page is the seam, again, arriving by a route nobody was
+    # watching. It survives today because the plate is the most common colour
+    # in every one of these files, which is a property of this artwork rather
+    # than a rule. So the border is measured and the build fails on any
+    # deviation at all, rather than shipping a mark that shows its rectangle.
+    check = art.convert('RGB')
+    w, h = check.size
+    border = ([check.getpixel((x, y)) for x in range(w) for y in (0, h - 1)]
+              + [check.getpixel((x, y)) for y in range(h) for x in (0, w - 1)])
+    off = max(max(abs(c - p) for c, p in zip(pixel, PLATE)) for pixel in border)
+    if off:
+        raise SystemExit(f'{out}: border sits {off} off the plate — the seam is back')
 
     art.save(out, 'PNG', optimize=True)
-    print(f'  {out}  {art.size[0]}x{art.size[1]}  {os.path.getsize(out)//1024} KB'
-          f'{"  (plated)" if plate else ""}')
+    print(f'  {out}  {art.size[0]}x{art.size[1]}  {os.path.getsize(out)//1024} KB  ({mode})')
 `;
 
 console.log('Rebuilding email letterhead…');

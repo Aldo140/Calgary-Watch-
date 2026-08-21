@@ -36,6 +36,7 @@ const storageRules = read('storage.rules');
 const appSource = read('src/App.tsx');
 const typesSource = read('src/types/index.ts');
 const adminConstants = read('src/constants/admin.ts');
+const functionSource = read('functions/index.js');
 
 /** Pulls a bracketed string-list out of the rules text. */
 function ruleList(source: string, marker: string): string[] {
@@ -136,6 +137,40 @@ describe('admin identity', () => {
     for (const email of emails) {
       assert.ok(storageRules.includes(email), `${email} missing from storage.rules`);
     }
+  });
+
+  it('the admin preview function mails the same approved accounts', () => {
+    for (const email of emails) {
+      assert.ok(functionSource.includes(email), `${email} missing from functions/index.js`);
+    }
+  });
+});
+
+describe('weekly email planner security', () => {
+  it('keeps plans admin-only and test status server-owned', () => {
+    const plans = firestoreRules.slice(
+      firestoreRules.indexOf('match /weekly_email_plans'),
+      firestoreRules.indexOf('match /digest_test_requests'),
+    );
+    const tests = firestoreRules.slice(
+      firestoreRules.indexOf('match /digest_test_requests'),
+      firestoreRules.indexOf('match /digest_unsubscribes'),
+    );
+    assert.match(plans, /allow read: if isAdmin\(\)/);
+    assert.doesNotMatch(plans, /allow read: if true/);
+    assert.match(tests, /allow create: if isAdmin\(\)/);
+    assert.match(tests, /allow update, delete: if false/);
+  });
+
+  it('supports explicit preview and cancellation notifications', () => {
+    assert.match(firestoreRules, /request\.resource\.data\.action in \['preview', 'cancelled'\]/);
+    assert.ok(functionSource.includes("['preview', 'cancelled'].includes(action)"));
+  });
+
+  it('delivers private, retry-safe copies to each admin', () => {
+    assert.ok(functionSource.includes('for (const [index, email] of ADMIN_EMAILS.entries())'));
+    assert.ok(functionSource.includes("'Idempotency-Key': `digest-planner-preview/${requestId}/${index}`"));
+    assert.ok(functionSource.includes('to: [email]'));
   });
 });
 

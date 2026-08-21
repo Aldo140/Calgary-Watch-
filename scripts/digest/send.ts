@@ -26,7 +26,8 @@ export interface OutgoingEmail {
   subject: string;
   html: string;
   text: string;
-  unsubscribeUrl: string;
+  /** Omitted for internal test messages, which are transactional admin mail. */
+  unsubscribeUrl?: string;
   /**
    * Artwork sent as inline attachments rather than linked from the site.
    *
@@ -110,6 +111,7 @@ export function loadSenderConfig(env: NodeJS.ProcessEnv = process.env): SenderCo
  * fix is a real POST endpoint, not this header.
  */
 export function unsubscribeHeaders(email: OutgoingEmail, config: SenderConfig): Record<string, string> {
+  if (!email.unsubscribeUrl) return {};
   return {
     'List-Unsubscribe': `<mailto:${config.supportEmail}?subject=unsubscribe>, <${email.unsubscribeUrl}>`,
   };

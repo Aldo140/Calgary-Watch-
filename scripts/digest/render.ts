@@ -44,6 +44,11 @@ import {
   type DigestSummary,
   type ScoredIncident,
 } from '../../src/lib/digest.js';
+import {
+  CONTRIBUTION_STYLE_COPY,
+  type DigestContribution,
+} from '../../src/lib/digestPlanner.js';
+import type { IncidentCategory } from '../../src/types/index.js';
 import { CID } from './art.js';
 import {
   areasHeading,
@@ -63,46 +68,74 @@ import {
  * here rather than on sandstone, and the darker value fails contrast there.
  */
 /**
- * Set on true black, and the artwork is set on the same true black.
+ * Set on spruce black, and the artwork is set on the same spruce black.
  *
  * The marks carry a baked plate, because CSS behind an image cannot survive a
  * client that repaints backgrounds. That solved the vanishing, but introduced
- * the fault this palette fixes: the plate was #121413 — dark, and not the
- * black the page was — so every mark showed its own rectangle. Blending two
+ * the fault this palette answers: the plate was #121413 — dark, and not the
+ * value the page was — so every mark showed its own rectangle. Blending two
  * near-blacks is not something you can eyeball into place; they either share a
- * value or they do not.
+ * constant or they do not.
  *
- * So PAGE and the plate in scripts/prepare-email-art.ts are both #000000,
- * exactly. Not near-black, not a tuned approximation — the same constant, so
- * the seam cannot exist. If one changes, the other must change with it, and
- * a test asserts they still agree.
+ * The first fix was to move the page to the plate: both #000000, and the seam
+ * genuinely could not exist. It also cost the email the ground it was designed
+ * on, to satisfy an image pipeline. The reason the plate had to be crude was
+ * that the process icons arrived with their ground baked in and their ink
+ * derived from a luminance curve; cut-out sources removed that constraint, so
+ * the direction reverses. The plate moves to the page.
  *
- * Everything else follows from that: white marks, light type. Every value is
- * checked against the surface it lands on by `npm run digest:contrast`.
+ * PAGE here and PLATE in scripts/prepare-email-art.ts are both #0E1A17,
+ * exactly. Not near, not tuned — the same constant, so the seam cannot exist.
+ * If one changes, the other must change with it, and a test asserts they still
+ * agree.
+ *
+ * Everything else follows from that: cream marks, sandstone type. Every value
+ * is checked against the surface it lands on by `npm run digest:contrast`.
  */
 const C = {
-  /** True black. Must equal PLATE in scripts/prepare-email-art.ts. */
-  page: '#000000',
+  /** Spruce black. Must equal PLATE in scripts/prepare-email-art.ts. */
+  page: '#0E1A17',
   /** Cards, lifted just enough to read as a surface. */
-  card: '#101010',
+  card: '#17251F',
   /** The distance rail, one step further up. */
-  rail: '#181818',
-  line: '#2C2C2C',
-  edge: '#3D3D3D',
+  rail: '#1E312A',
+  line: '#2C443B',
+  edge: '#3A5A4E',
   /** Headings and anything that must not be missed. */
-  ink: '#FFFFFF',
-  /** Running text. Warm, so a black page does not read as a terminal. */
-  body: '#E3DED4',
+  ink: '#F4EEE3',
+  /** Running text. Warm, so a dark page does not read as a terminal. */
+  body: '#DCD3C4',
   /** Secondary text. */
-  soft: '#A8A199',
-  /** Bow River teal, lifted for black. */
-  bow: '#5CC9AC',
-  /** Sandstone gold, lifted for black. */
-  gold: '#E3B26B',
+  soft: '#A6B8AE',
+  /** Bow River teal, lifted for the dark ground. */
+  bow: '#5CC3AA',
+  /** Sandstone gold, lifted for the dark ground. */
+  gold: '#E0AC63',
   /** The one solid button. */
-  button: '#FFFFFF',
-  buttonInk: '#000000',
+  button: '#F4EEE3',
+  buttonInk: '#0E1A17',
 } as const;
+
+/**
+ * The app's category colours, lifted for this ground.
+ *
+ * `DIGEST_CATEGORY_COLOUR` is tuned against sandstone, where #2F5F52 reads as
+ * a considered teal. On the spruce card it is a smudge — 1.6:1 against the
+ * surface it sits on. These are the same hues moved up until they separate
+ * from the card and from each other, which is the entire job of a category
+ * colour in a list somebody scans rather than reads.
+ *
+ * They are never used behind text. Every one of them appears as a bar, a
+ * swatch or a 3px edge, so the contrast audit has nothing to fail and no
+ * reader gets a label they cannot make out.
+ */
+const TONE: Record<IncidentCategory, string> = {
+  emergency: '#D2705C',
+  crime: '#D2705C',
+  traffic: '#E0AC63',
+  infrastructure: '#5CC3AA',
+  weather: '#A6B8AE',
+};
 
 const DISPLAY = "Georgia,'Iowan Old Style','Times New Roman',Times,serif";
 const MONO = "'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
@@ -251,15 +284,16 @@ function masthead(dateLine: string): string {
 /**
  * The skyline, as a full-width band closing the letter.
  *
- * It was a delicate line drawing, which worked while the art was dark ink on
- * transparency. Now that every mark carries a baked black plate, a 230px
- * version of it read as a black slab dropped in the gap above the footer.
+ * It went full width to hide a problem: while the plate was true black and the
+ * page was not, a 230px version read as a black slab dropped into the gap
+ * above the footer, and the only way to make the slab look intentional was to
+ * make it the width of the column.
  *
- * So it becomes the thing it already wanted to be: a band the full width of
- * the column, with the city in white across it. At that size the plate is the
- * design rather than an artefact of it, and the band does the separating a
- * hairline was doing — so the hairline goes, and the email loses a rule it no
- * longer needs.
+ * The plate is the page now, so the slab is gone and the width is no longer
+ * load-bearing. It stays anyway, because the wide version turned out to be the
+ * better drawing — the city reads as a horizon rather than a stamp, and the
+ * band does the separating a hairline used to do, which is why the hairline is
+ * gone and not coming back.
  */
 function skylineRule(): string {
   return `
@@ -285,29 +319,188 @@ function salutation(name: string, at: number): string {
 }
 
 /**
- * Category counts as one line, not a row of tiles.
+ * The week, as one glanceable panel.
  *
- * The tiles were three boxes that auto-sized to their labels, so "Crime" came
- * out narrow and "Infrastructure" wide and the row read as a mistake. They also
- * restated what the list below says, in a heavier form. One quiet line carries
- * the same information and lets the reports be the thing you look at.
+ * This replaced a single line of running text — "2 crime · 1 traffic · 1
+ * infrastructure" — which was accurate and told a reader nothing they could
+ * act on. Three questions get asked of a digest like this before any headline
+ * is read: how much, compared to what, and what kind. The panel answers all
+ * three in the order they are asked, and the eye gets them in one stop.
+ *
+ * The count is set large here without contradicting the lead paragraph, which
+ * still states it in a sentence. Those do different work: the sentence is
+ * somebody telling you something, the numeral is the thing you remember after
+ * closing the message. A digest that only had the numeral would read as a
+ * dashboard, and one that only had the sentence gives the week no shape.
+ *
+ * An earlier version of the breakdown was three auto-sized tiles, which came
+ * out narrow for "Crime" and wide for "Infrastructure" and read as a mistake.
+ * The bar avoids that by construction: the widths are the data, so there is no
+ * arrangement of labels that can make it look broken.
+ *
+ * Nothing here is an image. It is table cells with background colours, which
+ * is the one piece of layout every client renders — so the panel survives
+ * images being blocked, which is the state most of these are first read in.
  */
-function categoryLine(summary: DigestSummary): string {
-  if (summary.byCategory.length === 0) return '';
-  const parts = summary.byCategory
-    .map((c) => `<span class="cw-ink" style="color:${C.ink};font-weight:700;">${c.count}</span> `
-      + `${escapeHtml(c.label.toLowerCase())}`)
-    // A solid value rather than opacity: the contrast audit reads colours, not
-  // alpha, so an opacity here would hide a real legibility problem from it.
-  .join(`<span style="color:${C.soft};"> &nbsp;·&nbsp; </span>`);
-  return `<div class="cw-soft" style="font:400 13px/1.5 ${BODY};color:${C.soft};`
-    + `padding-top:16px;">${parts}</div>`;
+function weekBand(summary: DigestSummary): string {
+  if (summary.quiet || summary.total === 0) return '';
+
+  const noun = summary.total === 1 ? 'report' : 'reports';
+  const where = summary.scope === 'city' ? 'across Calgary' : summary.ringLabel;
+
+  // ── The delta, as a chip ──────────────────────────────────────────────────
+  // Only when there is a like-for-like baseline. A digest that just widened its
+  // own scope is comparing a city against a neighbourhood, and a chip reading
+  // "+140" would be a lie told confidently.
+  const chip = (() => {
+    if (summary.widenedToCity) return '';
+    if (summary.previousTotal === 0 && summary.total === 0) return '';
+    const n = Math.abs(summary.delta);
+    const text = summary.delta === 0
+      ? 'Same as last week'
+      : `${summary.delta > 0 ? '+' : '&minus;'}${n} vs last week`;
+    // Fewer reports is the good direction, so it gets the teal the product
+    // already uses for anything positive; more gets gold rather than red,
+    // because a busier week is information and not an alarm.
+    const colour = summary.delta === 0 ? C.soft : summary.delta > 0 ? C.gold : C.bow;
+    return `
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="background:${C.rail};border:1px solid ${C.line};border-radius:11px;
+                   padding:5px 11px;white-space:nowrap;">
+          <span style="font:700 11px/1 ${MONO};color:${colour};">${text}</span>
+        </td></tr>
+      </table>`;
+  })();
+
+  // ── The mix, as one bar ───────────────────────────────────────────────────
+  // Percentages are rounded, and rounding does not sum to 100. The remainder
+  // goes to the largest slice, where a percentage point is invisible, rather
+  // than to the last one, where it can double a small segment's width.
+  const mix = (() => {
+    if (summary.byCategory.length === 0) return '';
+    const parts = summary.byCategory.map((c) => ({
+      ...c,
+      // A single report out of 160 rounds to 0% and disappears from a bar it
+      // belongs in. Four percent is the narrowest slice that still reads as a
+      // slice at 490px, and the width it borrows comes off the largest.
+      pct: Math.max(4, Math.round((c.count / summary.total) * 100)),
+    }));
+    const largest = parts.reduce((a, b) => (a.pct >= b.pct ? a : b));
+    largest.pct += 100 - parts.reduce((n, c) => n + c.pct, 0);
+
+    const segments = parts.map((c, i) => `
+      <td style="width:${c.pct}%;background:${TONE[c.category]};height:9px;font-size:0;
+                 line-height:0;${i < parts.length - 1 ? `border-right:2px solid ${C.card};` : ''}">&nbsp;</td>`).join('');
+
+    // cw-stack turns the legend into one row per category below 480px, where
+    // five categories across cannot fit and would otherwise crush the labels.
+    const legend = parts.map((c) => `
+      <td style="padding:0 16px 0 0;vertical-align:middle;white-space:nowrap;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="9" style="width:9px;vertical-align:middle;">
+              <div style="width:9px;height:9px;background:${TONE[c.category]};
+                          border-radius:2px;font-size:0;line-height:0;">&nbsp;</div>
+            </td>
+            <td style="padding-left:7px;">
+              <span class="cw-soft" style="font:400 12px/1.4 ${BODY};color:${C.soft};">
+                ${escapeHtml(c.label)}
+              </span>
+              <span class="cw-ink" style="font:700 12px/1.4 ${MONO};color:${C.ink};">
+                &nbsp;${c.count}
+              </span>
+            </td>
+          </tr>
+        </table>
+      </td>`).join('');
+
+    return `
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+             style="border-radius:2px;overflow:hidden;">
+        <tr>${segments}</tr>
+      </table>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="cw-legend"
+             style="padding-top:11px;">
+        <tr>${legend}</tr>
+      </table>`;
+  })();
+
+  return `
+  <tr><td style="padding:22px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+      <tr><td style="padding:15px 18px 16px;">
+
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td style="vertical-align:middle;">
+              <div style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.9px;
+                          text-transform:uppercase;">This week</div>
+            </td>
+            <td align="right" style="vertical-align:middle;">
+              <div class="cw-soft" style="font:400 10.5px/1 ${MONO};color:${C.soft};
+                          letter-spacing:1px;text-transform:uppercase;">
+                ${escapeHtml(summary.areaName)}
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+               class="cw-count" style="padding-top:9px;">
+          <tr>
+            <td style="vertical-align:bottom;">
+              <span class="cw-ink" style="font:700 38px/1 ${DISPLAY};color:${C.ink};">
+                ${summary.total}
+              </span>
+              <span class="cw-body" style="font:400 13.5px/1.4 ${BODY};color:${C.body};">
+                &nbsp;${noun} ${escapeHtml(where)}
+              </span>
+            </td>
+            <td align="right" style="vertical-align:bottom;">${chip}</td>
+          </tr>
+        </table>
+
+        <div style="height:14px;font-size:0;line-height:0;">&nbsp;</div>
+        ${mix}
+
+      </td></tr>
+    </table>
+  </td></tr>`;
 }
 
 /** Small caps heading above a block. Quiet, warm, not a system label. */
 function heading(text: string): string {
   return `<div style="font:700 11px/1 ${BODY};color:${C.gold};letter-spacing:1.9px;
                       text-transform:uppercase;padding-bottom:12px;">${escapeHtml(text)}</div>`;
+}
+
+/** Optional editor-written note. It is deliberately the first content block. */
+function contributionBlock(contribution: DigestContribution | undefined): string {
+  if (!contribution?.body.trim()) return '';
+  const copy = CONTRIBUTION_STYLE_COPY[contribution.style];
+  const title = contribution.headline.trim() || copy.label;
+  const paragraphs = contribution.body
+    .split(/\n\s*\n/)
+    .map((text, index) => p(escapeHtml(text.trim()).replace(/\n/g, '<br>'), {
+      top: index === 0 ? 10 : 12,
+      size: 14.5,
+    }))
+    .join('');
+
+  return `
+  <tr><td style="padding:22px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:6px;">
+      <tr><td style="padding:19px 20px 20px;">
+        ${heading(copy.emailLabel)}
+        <div class="cw-ink" style="font:700 21px/1.3 ${DISPLAY};color:${C.ink};">
+          ${escapeHtml(title)}
+        </div>
+        ${paragraphs}
+      </td></tr>
+    </table>
+  </td></tr>`;
 }
 
 /**
@@ -382,12 +575,31 @@ function reportRow(item: ScoredIncident, origin: string): string {
   // column reading MON, MON, MON, MON down a city-wide digest: a fixed gutter
   // spent on a value that repeats. Those readers get the full width, and the
   // day moves into the subtitle where it costs nothing.
+  // The category, as a 3px edge down the left of the card.
+  //
+  // A list of twelve reports is read by sorting before it is read by reading,
+  // and the sort people actually run is "is this my problem" — a break-in and
+  // a lane closure are not the same kind of news. The edge answers that in
+  // peripheral vision, ahead of the headline, and costs no bytes and no image.
+  //
+  // It is a table cell and not `border-left`, for two reasons. The rules that
+  // restate the card for a client that repaints backgrounds carry
+  // `border-color: !important`, which silently ate the first version of this —
+  // it was in the HTML, correct, and painted the wrong colour in every preview.
+  // And Outlook on Windows is unreliable about borders on tables while being
+  // completely reliable about a cell with a background. A cell cannot lose.
+  const edge = `
+        <td width="3" class="cw-edge" style="width:3px;background:${TONE[item.incident.category]};
+                   font-size:0;line-height:0;">&nbsp;</td>`;
+
   if (item.distanceM === null) {
     return `
   <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
            class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
-      <tr><td style="padding:13px 16px;">${title}</td></tr>
+      <tr>${edge}
+        <td style="padding:13px 16px;">${title}</td>
+      </tr>
     </table>
   </td></tr>`;
   }
@@ -396,7 +608,7 @@ function reportRow(item: ScoredIncident, origin: string): string {
   <tr><td style="padding-bottom:9px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
            class="cw-card cw-stack" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
-      <tr>
+      <tr>${edge}
         <td width="76" class="cw-rail" style="width:76px;background:${C.rail};border-right:1px solid ${C.line};
                    padding:14px 6px;text-align:center;vertical-align:middle;">
           <span class="cw-ink" style="font:700 11.5px/1.2 ${MONO};color:${C.ink};">
@@ -425,7 +637,19 @@ function reportList(summary: DigestSummary, origin: string): string {
   </td></tr>`;
 }
 
-/** Table-and-padding button: the shape Outlook renders correctly. */
+/**
+ * Table-and-padding button: the shape Outlook renders correctly.
+ *
+ * One filled button, and one plain link under it. The button is what the week
+ * was about; the link is the other half of the product, and it is the reason
+ * there is anything to send next Monday. A map fed only by official feeds is a
+ * feed reader — the reports from neighbours are what makes it worth opening,
+ * and this is the only moment in the week when somebody is already thinking
+ * about what happened on their block.
+ *
+ * It is deliberately not a second button. Two buttons of equal weight is how a
+ * reader ends up choosing neither.
+ */
 function cta(origin: string, label: string): string {
   return `
   <tr><td style="padding:24px 36px 0;">
@@ -438,6 +662,11 @@ function cta(origin: string, label: string): string {
         </a>
       </td></tr>
     </table>
+    <div class="cw-soft" style="font:400 12.5px/1.5 ${BODY};color:${C.soft};padding-top:13px;">
+      Something happen on your block?
+      <a href="${escapeHtml(origin)}/map" style="color:${C.bow};text-decoration:none;
+         font-weight:700;">Add a report&nbsp;→</a>
+    </div>
   </td></tr>`;
 }
 
@@ -450,7 +679,14 @@ function cta(origin: string, label: string): string {
  * link somebody cannot see is what makes them press the spam button instead,
  * and that costs far more than the unsubscribe would have.
  */
-function footer(unsubscribeUrl: string, branding: DigestBranding): string {
+function footer(unsubscribeUrl: string, branding: DigestBranding, adminPreview = false): string {
+  if (adminPreview) {
+    return `
+    <tr><td style="padding:16px 36px 30px;">
+      ${p(`Internal preview for Calgary Watch administrators. This test was generated from the email planner and was not sent to subscribers.`, { top: 4, color: C.soft, size: 12 })}
+      ${p(`<a href="${escapeHtml(branding.origin)}/admin" style="color:${C.bow};font-weight:700;text-decoration:underline;">Open the email planner</a>`, { top: 13, color: C.soft, size: 12 })}
+    </td></tr>`;
+  }
   return `
   <tr><td style="padding:16px 36px 30px;">
     ${p(`You're getting this because you turned on the weekly digest in your Calgary Watch `
@@ -591,24 +827,43 @@ function shell(options: {
       text-align: left !important;
       padding: 8px 14px !important;
     }
+    .cw-edge { height: 3px !important; padding: 0 !important; }
+    /* The legend flows instead of stacking: five categories down the page is a
+       list, and the point of a legend is that it reads as one object. The
+       child combinator matters: cw-stack uses a plain descendant td, which
+       reaches into the swatch tables and puts every dot on its own line. */
+    .cw-legend > tbody > tr > td {
+      display: inline-block !important;
+      padding: 0 15px 7px 0 !important;
+    }
+    /* The chip drops under the count rather than crushing the ring label into
+       three lines next to it. */
+    .cw-count > tbody > tr > td {
+      display: block !important;
+      width: 100% !important;
+      text-align: left !important;
+    }
+    .cw-count > tbody > tr > td + td { padding-top: 13px !important; }
     .cw-step { padding: 0 0 18px 0 !important; }
     .cw-step img { margin-bottom: 6px !important; }
   }
 
   /*
-   * The page is already black, so there is no dark variant to switch to.
+   * The page is already dark, so there is no dark variant to switch to.
    * These rules exist for the opposite case: a client that decides to render a
-   * dark email on a light ground would otherwise put white type on white. They
-   * restate the surfaces so the message survives that too.
+   * dark email on a light ground would otherwise put cream type on white. They
+   * restate the surfaces so the message survives that too — and they restate
+   * them in the same values the marks are plated with, so a repainted page
+   * still meets the artwork at its own edge.
    */
   @media (prefers-color-scheme: light) {
-    .cw-page, .cw-shell { background: #000000 !important; }
-    .cw-card { background: #101010 !important; border-color: #2C2C2C !important; }
-    .cw-rail { background: #181818 !important; border-color: #2C2C2C !important; }
-    .cw-ink, .cw-ink a { color: #FFFFFF !important; }
-    .cw-soft { color: #A8A199 !important; }
-    .cw-body { color: #E3DED4 !important; }
-    .cw-hair { background: #2C2C2C !important; }
+    .cw-page, .cw-shell { background: #0E1A17 !important; }
+    .cw-card { background: #17251F !important; border-color: #2C443B !important; }
+    .cw-rail { background: #1E312A !important; border-color: #2C443B !important; }
+    .cw-ink, .cw-ink a { color: #F4EEE3 !important; }
+    .cw-soft { color: #A6B8AE !important; }
+    .cw-body { color: #DCD3C4 !important; }
+    .cw-hair { background: #2C443B !important; }
   }
 </style>
 </head>
@@ -635,6 +890,8 @@ export function renderDigestHtml(options: {
   displayName?: string;
   unsubscribeUrl: string;
   branding: DigestBranding;
+  contribution?: DigestContribution;
+  adminPreview?: boolean;
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -646,17 +903,18 @@ export function renderDigestHtml(options: {
     preheader: leadParagraph(summary),
     inner: `
     ${masthead(dateRange(summary))}
+    ${contributionBlock(options.contribution)}
     <tr><td style="padding:26px 36px 0;">
       ${salutation(name, summary.until)}
       ${p(escapeHtml(leadParagraph(summary)), { top: 13 })}
       ${locationPromptBlock(summary)}
-      ${categoryLine(summary)}
     </td></tr>
+    ${weekBand(summary)}
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
     ${skylineRule()}
-    ${footer(unsubscribeUrl, branding)}`,
+    ${footer(unsubscribeUrl, branding, options.adminPreview)}`,
   });
 }
 
@@ -725,8 +983,8 @@ export function renderWelcomeHtml(options: {
       <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
       ${p(escapeHtml(WELCOME.sampleIntro), { top: 20, color: C.soft, size: 13.5 })}
       ${p(escapeHtml(leadParagraph(summary)), { top: 12 })}
-      ${categoryLine(summary)}
     </td></tr>
+    ${weekBand(summary)}
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
@@ -742,6 +1000,8 @@ export function renderDigestText(options: {
   displayName?: string;
   unsubscribeUrl: string;
   branding: DigestBranding;
+  contribution?: DigestContribution;
+  adminPreview?: boolean;
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -753,9 +1013,22 @@ export function renderDigestText(options: {
     `${summary.weekKey}  ·  ${dateRange(summary)}`,
     summary.areaName.toUpperCase(),
     '',
-    `Morning, ${name}.`,
-    '',
   ];
+
+  if (options.contribution?.body.trim()) {
+    const contribution = options.contribution;
+    lines.push(
+      CONTRIBUTION_STYLE_COPY[contribution.style].emailLabel.toUpperCase(),
+      contribution.headline.trim() || CONTRIBUTION_STYLE_COPY[contribution.style].label,
+      '',
+      wrap(contribution.body.trim()),
+      '',
+      '--------------------------------------------------------------',
+      '',
+    );
+  }
+
+  lines.push(`Morning, ${name}.`, '');
 
   if (summary.quiet) {
     lines.push(
@@ -784,6 +1057,19 @@ export function renderDigestText(options: {
     if (summary.total > summary.highlights.length) {
       lines.push(`${summary.total - summary.highlights.length} more on the map.`, '');
     }
+  }
+
+  if (options.adminPreview) {
+    lines.push(
+      '',
+      `See it on the map: ${branding.origin}/map`,
+      '',
+      '--------------------------------------------------------------',
+      'Internal preview for Calgary Watch administrators.',
+      'This test was not sent to subscribers.',
+      `Open the email planner: ${branding.origin}/admin`,
+    );
+    return lines.join('\n');
   }
 
   lines.push(

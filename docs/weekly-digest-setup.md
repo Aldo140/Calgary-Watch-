@@ -15,13 +15,27 @@ Budget: about 45 minutes, most of it waiting for DNS.
 | HTML + plain-text email | `scripts/digest/render.ts` |
 | Resend transport, dry run, test redirect, per-run cap | `scripts/digest/send.ts` |
 | The Monday job | `scripts/digest/weekly.ts` |
+| Admin contribution planner | `/admin` → Email planner |
+| Immediate admin preview function | `functions/index.js` |
 | Offline preview | `scripts/digest/preview.ts` → `npm run digest:preview` |
 | Unsubscribe page | `src/pages/UnsubscribePage.tsx`, route `/unsubscribe` |
 | Rules for `digest_sends` / `digest_unsubscribes` | `firestore.rules` |
 | Schedule | `.github/workflows/weekly-digest.yml` |
 | Tests | `tests/digest.test.ts` |
 
-No new npm dependency was added. The sender calls Resend over `fetch`.
+The weekly sender adds no root npm dependency and calls Resend over `fetch`.
+The isolated `functions/` package carries only the Firebase runtime SDKs.
+
+The immediate planner preview uses Cloud Functions and therefore requires the
+Firebase project to be on the Blaze plan. The function is capped at three
+instances and only runs when an admin submits a planner entry.
+
+Planner publishes are conflict-safe: if another admin changes the same week,
+the stale draft cannot overwrite it. Unsaved copy is recovered for the current
+browser tab, removals keep the standard brief scheduled, and every publish,
+retest, or removal is recorded in the admin audit log. Preview messages are
+sent separately to each approved admin so their addresses are not exposed to
+one another.
 
 ---
 
@@ -165,16 +179,22 @@ box is about $100/year and is the usual answer for small operators.
 
 ---
 
-## Step 3 — deploy the rules and the site (5 min)
+## Step 3 — deploy the function, rules and site (5 min)
 
-The rules changes are **not** deployed by the existing hosting workflow.
+The Firebase deployment workflow now installs the isolated `functions/`
+package, syncs `RESEND_API_KEY` into Firebase Secret Manager, and deploys the
+function, Firestore rules, Storage rules, and site together on pushes to
+`main`. Confirm the DNS domain is verified before deploying; planner previews
+send from `digest@calgarywatch.ca`.
+
+For a manual deployment, run:
 
 ```bash
 npx firebase login          # if needed
-npx firebase deploy --only firestore:rules
+npm ci --prefix functions
+printf '%s' "$RESEND_API_KEY" | npx firebase-tools functions:secrets:set RESEND_API_KEY --data-file -
+npx firebase deploy --only functions,firestore:rules,storage,hosting
 ```
-
-Then push to `main`, which deploys the site including `/unsubscribe`.
 
 No new Firestore index is needed: the sender's
 `visibility == 'public' AND timestamp >= …` query is served by the existing
@@ -265,6 +285,12 @@ whether the message is opened than the avatar does.
 - **Schedule:** Mondays, `0 15 * * 1` UTC — 09:00 Calgary in summer, 08:00 in
   winter. The *week* a send belongs to is computed in `America/Edmonton`, so
   the hour drift cannot cause a double send.
+- **Planned opening note:** saving in the admin Email planner writes one
+  `weekly_email_plans/{isoWeek}` document and queues a test for every approved
+  admin. A Firestore-triggered function delivers it immediately; the browser
+  never receives the Resend key. Saving again replaces that edition's note and
+  queues a fresh test. The deployment workflow syncs `RESEND_API_KEY` into
+  Firebase Secret Manager before deploying the function.
 - **Idempotency:** each send claims `digest_sends/{uid}_{isoWeek}` before the
   provider is called. Re-running the workflow is safe.
 - **Unsubscribes** are honoured at the start of every run, before recipients

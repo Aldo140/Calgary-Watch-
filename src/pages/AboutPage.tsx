@@ -45,6 +45,10 @@ import {
   Cpu,
   Globe,
   TrendingUp,
+  Cone,
+  Siren,
+  MessagesSquare,
+  Layers,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -424,7 +428,7 @@ function ScrollingMarquee() {
     '47 Neighbourhoods',
     '<30s Report to Map',
     '100+ Contributors',
-    'Real-Time Awareness',
+    'See It. Share It. Calgary Knows.',
     'Calgary-First Platform',
   ];
   const doubled = [...items, ...items];
@@ -1280,6 +1284,114 @@ export default function AboutPage() {
             </motion.div>
           </div>
         </motion.section>
+
+        {/* ==============================================================
+            THE LAYER — why Calgary Watch is not another source
+
+            The differentiator was implied everywhere and stated nowhere:
+            every one of these services knows a real piece of the city, and
+            none of them knows the block you live on. Naming them is the
+            fastest way to explain what "Calgary knows" actually means.
+            The non-affiliation line is not boilerplate — it is the thing
+            that keeps naming CPS and 311 honest.
+            ============================================================== */}
+        <section className="py-24 md:py-36 px-6 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="grid md:grid-cols-[1fr_1.05fr] gap-14 md:gap-20 items-start">
+
+              {/* Left — the argument */}
+              <motion.div
+                initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="flex items-center gap-4 mb-8">
+                  <span className="w-10 h-px bg-[#E52C20]" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E52C20]">
+                    The difference
+                  </span>
+                </div>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.04] tracking-tight mb-6">
+                  Calgary already knows. It just knows it in{' '}
+                  <span className="text-[#E52C20]">five different places.</span>
+                </h2>
+                <p className="text-lg text-stone-400 light:text-stone-600 leading-relaxed mb-6">
+                  Every source below is real, and every one of them is right about
+                  something. None of them is about the block you live on, right now,
+                  in one view. That gap is the whole reason this exists.
+                </p>
+                <p className="font-black uppercase tracking-[0.06em] text-xl md:text-2xl text-white light:text-stone-900">
+                  See it. Share it.{' '}
+                  <span className="text-[#E52C20]">Calgary knows.</span>
+                </p>
+              </motion.div>
+
+              {/* Right — the five, then the convergence */}
+              <div className="space-y-3">
+                {[
+                  { icon: Cone, source: 'City of Calgary 311',
+                    knows: 'Knows the pothole, the graffiti, the bylaw complaint — once it has been filed, queued and assigned.' },
+                  { icon: Zap, source: 'ENMAX',
+                    knows: 'Knows the outage, with a restoration estimate for the grid rather than for your street.' },
+                  { icon: Siren, source: 'Calgary Police Service',
+                    knows: 'Knows the file number, and publishes the statistics after the fact.' },
+                  { icon: MessagesSquare, source: 'Reddit',
+                    knows: 'Knows the rumour — six hours later, three neighbourhoods off, and hard to check.' },
+                  { icon: Users, source: 'Your Facebook group',
+                    knows: 'Knows the truck that circled twice, if you are in the group and happen to scroll past it.' },
+                ].map(({ icon: Icon, source, knows }, i) => (
+                  <motion.div
+                    key={source}
+                    className="flex items-start gap-4 rounded-xl border border-white/8 light:border-stone-200 bg-white/[0.02] light:bg-stone-50/60 px-5 py-4"
+                    initial={prefersReducedMotion() ? undefined : { opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.55, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <Icon size={18} className="text-stone-500 light:text-stone-400 shrink-0 mt-0.5" aria-hidden="true" />
+                    <div>
+                      <p className="text-sm font-black tracking-tight text-white light:text-stone-900">
+                        {source}
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-stone-400 light:text-stone-600">
+                        {knows}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {/* The convergence */}
+                <motion.div
+                  className="relative overflow-hidden rounded-xl mt-6"
+                  initial={prefersReducedMotion() ? undefined : { opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#E52C20]/10 via-[#2E8B7A]/6 to-transparent light:from-[#F5EFE4]/80 light:to-teal-50/50" />
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#E52C20] via-[#2E8B7A] to-[#B0793C]" />
+                  <div className="relative flex items-start gap-4 px-6 py-6 pl-7">
+                    <Layers size={20} className="text-[#E52C20] shrink-0 mt-1" aria-hidden="true" />
+                    <div>
+                      <p className="text-xl md:text-2xl font-black tracking-tight leading-[1.2] text-white light:text-stone-900">
+                        Calgary Watch is none of these. It is where they meet.
+                      </p>
+                      <p className="mt-3 text-sm leading-relaxed text-stone-400 light:text-stone-600">
+                        Calgary Watch is not affiliated with, endorsed by, or operated
+                        by the City of Calgary, ENMAX, or the Calgary Police Service,
+                        and it does not replace any of them. It is the layer that holds
+                        what neighbours see alongside clearly attributed public data, so
+                        one map answers the question the others each answer a piece of.
+                        For an emergency, always call 911.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ==============================================================
             GET INVOLVED — trust-forward immersive panels

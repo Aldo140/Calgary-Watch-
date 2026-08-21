@@ -71,7 +71,11 @@ service cloud.firestore {
     }
 
     function isApprovedAdminToken() {
-      return request.auth.token.email == "jorti104@mtroyal.ca" && request.auth.token.email_verified == true;
+      return request.auth.token.email_verified == true &&
+             request.auth.token.email in [
+               "jorti104@mtroyal.ca",
+               "ophillah1863@gmail.com"
+             ];
     }
 
     // NOTE ON SYSTEM INGESTION
@@ -374,6 +378,65 @@ service cloud.firestore {
     // mailed, which is exactly the list an attacker would want.
     match /digest_sends/{sendId} {
       allow read, write: if false;
+    }
+
+    // One optional editor-written opening note per weekly edition. The week
+    // key is the document id, which makes the Monday sender's lookup a single
+    // read and makes replacement explicit in the planner UI.
+    match /weekly_email_plans/{weekKey} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() &&
+        weekKey.matches('^\\d{4}-W\\d{2}$') &&
+        request.resource.data.keys().hasOnly([
+          'weekKey', 'weekStart', 'headline', 'body', 'style', 'status',
+          'authorUid', 'authorEmail', 'authorName', 'createdAt', 'updatedAt', 'revision'
+        ]) &&
+        request.resource.data.weekKey == weekKey &&
+        request.resource.data.weekStart is number &&
+        request.resource.data.headline is string &&
+        request.resource.data.headline.size() <= 100 &&
+        request.resource.data.body is string &&
+        request.resource.data.body.size() >= 20 &&
+        request.resource.data.body.size() <= 2400 &&
+        request.resource.data.style in ['neighbour-note', 'news-brief', 'personal-story'] &&
+        request.resource.data.status == 'published' &&
+        request.resource.data.authorUid == request.auth.uid &&
+        request.resource.data.authorEmail == request.auth.token.email &&
+        request.resource.data.authorName is string &&
+        request.resource.data.authorName.size() <= 100 &&
+        request.resource.data.createdAt is number &&
+        request.resource.data.updatedAt is number &&
+        request.resource.data.revision is int &&
+        request.resource.data.revision > 0;
+      allow delete: if isAdmin();
+    }
+
+    // The browser can enqueue a test but cannot mark it delivered. A secure
+    // Firestore-triggered function holding the Resend key processes and stamps
+    // the record through the Admin SDK, which bypasses client rules.
+    match /digest_test_requests/{requestId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly([
+          'action', 'planWeekKey', 'headline', 'body', 'style', 'revision',
+          'submittedByUid', 'submittedByEmail', 'submittedAt', 'status', 'processedAt'
+        ]) &&
+        request.resource.data.action in ['preview', 'cancelled'] &&
+        request.resource.data.planWeekKey.matches('^\\d{4}-W\\d{2}$') &&
+        request.resource.data.headline is string &&
+        request.resource.data.headline.size() <= 100 &&
+        request.resource.data.body is string &&
+        request.resource.data.body.size() >= 20 &&
+        request.resource.data.body.size() <= 2400 &&
+        request.resource.data.style in ['neighbour-note', 'news-brief', 'personal-story'] &&
+        request.resource.data.revision is int &&
+        request.resource.data.revision > 0 &&
+        request.resource.data.submittedByUid == request.auth.uid &&
+        request.resource.data.submittedByEmail == request.auth.token.email &&
+        request.resource.data.submittedAt is number &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.processedAt == null;
+      allow update, delete: if false;
     }
 
     // Unsubscribe requests, filed by the link at the bottom of a digest email.

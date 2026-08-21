@@ -541,8 +541,9 @@ function Nav() {
                   <span className="flex items-center gap-3"><MapPin size={17} /> Open the live map</span>
                   <ArrowRight size={18} />
                 </a>
-                <p className="mt-5 max-w-[30ch] text-[12px] leading-relaxed text-[#AFC5DF]">
-                  Community reports and verified city data, in one clear view of Calgary.
+                <p className="mt-5 font-display text-[13px] font-black uppercase tracking-[0.06em] leading-[1.35] text-[#F2EFE8]">
+                  See it. Share it.{' '}
+                  <span className="text-[#E52C20]">Calgary knows.</span>
                 </p>
               </div>
             </div>
@@ -639,15 +640,17 @@ function MobileHero({ reduced }: { reduced: boolean }) {
           Community reports + verified data
         </div>
 
-        <h1 className="font-display text-[clamp(3.1rem,15.5vw,4.5rem)] font-black uppercase leading-[0.78] tracking-[-0.04em] text-[#F2EFE8] max-[340px]:text-[2.75rem]">
-          <span className="block">Know your</span>
-          <span className="relative mt-2 inline-block overflow-hidden pb-[0.13em] pr-3 text-[#E52C20]">
-            city.
+        <h1 className="font-display text-[clamp(2.2rem,10vw,3.2rem)] font-black uppercase leading-[0.82] tracking-[-0.04em] text-[#F2EFE8] max-[340px]:text-[2rem]">
+          <span className="block">See it.</span>
+          <span className="block">Share it.</span>
+          <span className="relative mt-1.5 block overflow-hidden pb-[0.13em] pr-3 text-[#E52C20]">
+            <span className="block">Calgary</span>
+            <span className="block">knows.</span>
             {!reduced && (
               <motion.span
                 className="absolute inset-y-0 w-8 -skew-x-12 bg-white/30 mix-blend-screen"
                 initial={{ x: '-180%' }}
-                animate={{ x: '600%' }}
+                animate={{ x: '1000%' }}
                 transition={{ duration: 1.2, delay: 0.7, repeat: Infinity, repeatDelay: 5.5, ease: [0.77, 0, 0.175, 1] }}
                 aria-hidden="true"
               />
@@ -656,7 +659,8 @@ function MobileHero({ reduced }: { reduced: boolean }) {
         </h1>
 
         <p className="mt-3 max-w-[33ch] text-[13px] font-medium leading-[1.5] text-[#D5DFEB] sm:text-[14px]">
-          Live reports and trusted city data, cut into one clear view of Calgary.
+          Calgary already tells you what's happening — in six different places.
+          This is the one map.
         </p>
 
         <div className="mt-4 grid grid-cols-[1fr_auto] gap-2.5">
@@ -780,16 +784,17 @@ function Hero({ reduced }: { reduced: boolean }) {
             Community reports + verified data
           </div>
 
-          <h1 className="font-display text-[clamp(5rem,9vw,9.5rem)] font-black uppercase leading-[0.76] tracking-[-0.04em] text-[#F2EFE8]">
-            <span className="block">Know</span>
-            <span className="block">your</span>
-            <span className="relative mt-3 inline-block overflow-hidden pb-[0.12em] pr-6 text-[#E52C20]">
-              city.
+          <h1 className="font-display text-[clamp(3.4rem,6.2vw,6.6rem)] font-black uppercase leading-[0.82] tracking-[-0.04em] text-[#F2EFE8]">
+            <span className="block">See it.</span>
+            <span className="block">Share it.</span>
+            <span className="relative mt-2 block overflow-hidden pb-[0.12em] pr-6 text-[#E52C20]">
+              <span className="block">Calgary</span>
+              <span className="block">knows.</span>
               {!reduced && (
                 <motion.span
                   className="absolute inset-y-0 w-12 -skew-x-12 bg-white/30 mix-blend-screen"
                   initial={{ x: '-180%' }}
-                  animate={{ x: '850%' }}
+                  animate={{ x: '1100%' }}
                   transition={{ duration: 1.4, delay: 0.8, repeat: Infinity, repeatDelay: 6, ease: [0.77, 0, 0.175, 1] }}
                   aria-hidden="true"
                 />
@@ -798,7 +803,8 @@ function Hero({ reduced }: { reduced: boolean }) {
           </h1>
 
           <p className="mt-5 max-w-[31rem] text-[clamp(1rem,1.2vw,1.2rem)] font-medium leading-relaxed text-[#D5DFEB]">
-            Live community reports and trusted city data, cut into one clear view of Calgary.
+            Calgary already tells you what's happening — in six different places.
+            This is the one map.
           </p>
 
           <div className="mt-7 flex items-center gap-4">
@@ -2545,7 +2551,7 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
           />
 
           <div className="relative">
-            <p className="font-mono text-[11px] uppercase tracking-[0.34em]" style={{ color: T.gold }}>The map is already on</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.34em]" style={{ color: T.gold }}>See it · Share it · Calgary knows</p>
             <h2 className="mt-5 font-display font-extrabold tracking-[-0.03em] leading-[0.98]" style={{ color: T.paper, fontSize: 'clamp(1.9rem, 6.6vw, 5.6rem)' }}>
               See what's happening<br />right now.
             </h2>
@@ -2594,9 +2600,14 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
                 className="h-11 w-11 shrink-0 object-contain"
                 aria-hidden="true"
               />
-              <p className="font-display text-lg font-bold" style={{ color: T.ink }}>Calgary Watch</p>
+              <div>
+                <p className="font-display text-lg font-bold leading-none" style={{ color: T.ink }}>Calgary Watch</p>
+                <p className="mt-1 font-display text-[11px] font-black uppercase tracking-[0.08em]" style={{ color: T.inkSoft }}>
+                  See it. Share it. <span style={{ color: T.red }}>Calgary knows.</span>
+                </p>
+              </div>
             </div>
-            <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed">
+            <p className="mt-3 max-w-sm text-[13px] leading-relaxed">
               A community safety map built by Calgarians, for Calgarians.
               Informational awareness only — always verify critical incidents
               with official agencies.

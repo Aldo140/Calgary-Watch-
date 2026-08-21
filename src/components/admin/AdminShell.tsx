@@ -52,7 +52,7 @@ export function AdminShell({
   // Every section stays reachable on a phone. A hidden tab is a function an
   // admin cannot perform on the device they actually carry, so the bar adapts
   // its columns instead of truncating the list.
-  const mobileItems = items.slice(0, 6);
+  const mobileItems = items;
 
   const go = (item: NavItem) => (item.href ? navigate(item.href) : onSelect(item.id));
 

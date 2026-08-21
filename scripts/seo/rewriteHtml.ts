@@ -207,7 +207,7 @@ export function buildStaticRouteBody(pathname: string): string {
 
   const summaries: Record<string, { heading: string; copy: string; links: [string, string][] }> = {
     '/': {
-      heading: 'Calgary crime. Mapped live. By neighbours.',
+      heading: 'See it. Share it. Calgary knows.',
       copy: 'Calgary Watch is a free Calgary crime map and neighbourhood safety network with recent community, traffic, weather, infrastructure, and emergency reports.',
       links: [['/map', 'Open the live Calgary crime map'], [GUIDE_PATH, 'Read the Calgary neighbourhood watch guide']],
     },

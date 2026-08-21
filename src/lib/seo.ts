@@ -37,7 +37,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/': {
     title: 'Calgary Crime Watch & Neighbourhood Safety Map',
     description:
-      'See live Calgary crime, traffic, weather and community incident reports on a free neighbourhood map. Browse without an account; sign in to report or get updates.',
+      'See it. Share it. Calgary knows. Live Calgary crime, traffic, weather and community reports on one free neighbourhood map. Sign in to report.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
@@ -46,7 +46,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/map': {
     title: 'Calgary Crime Map: Live Incidents Near You | Calgary Watch',
     description:
-      'Explore current community-reported crime, traffic, weather and emergency incidents across Calgary and Airdrie. Free to view; use Near Me or sign in to report.',
+      'See it. Share it. Calgary knows. Community-reported crime, traffic, weather and emergency incidents across Calgary and Airdrie, on one live map.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
@@ -55,7 +55,7 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/about': {
     title: 'About Calgary Watch | Community Crime & Safety Map',
     description:
-      'Learn how Calgary Watch combines community reports and public data to help Calgary-area neighbours see local incidents, share updates and stay informed.',
+      'Learn how Calgary Watch combines community reports and public data into one map for Calgary-area neighbours. See it. Share it. Calgary knows.',
     index: true,
     pageType: 'AboutPage',
     dateModified: LAST_MOD,

@@ -20,7 +20,7 @@ import {
 } from 'recharts';
 import {
   ExternalLink, FileText, Globe, LayoutDashboard, Loader2, Lock,
-  Map as MapIcon, RefreshCw, Save, Trash2, Users, Zap,
+  MailPlus, Map as MapIcon, RefreshCw, Save, Trash2, Users, Zap,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -28,6 +28,7 @@ import { isFirebaseConfigured } from '@/src/firebase';
 import { useAdminData } from '@/src/hooks/useAdminData';
 import { AdminShell, type NavItem } from '@/src/components/admin/AdminShell';
 import { AttentionQueue } from '@/src/components/admin/AttentionQueue';
+import { WeeklyEmailPlanner } from '@/src/components/admin/WeeklyEmailPlanner';
 import {
   AdminButton, Chip, EmptyState, Field, Figure, Panel, RecordList, SkeletonRows,
   StatGrid, StatTile, StatusDot, T, TimeAgo, display, inputClass, inputStyle, mono,
@@ -36,7 +37,7 @@ import {
 import { INCIDENT_CATEGORIES } from '@/src/constants';
 import { cn } from '@/src/lib/utils';
 
-type Section = 'desk' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city';
+type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city';
 
 const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
 
@@ -100,6 +101,7 @@ export default function AdminPage() {
       d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds;
     return [
       { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined },
+      { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus },
       { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText },
       { id: 'people', label: 'People', short: 'People', icon: Users },
       { id: 'feeds', label: 'Data feeds', short: 'Feeds', icon: Zap, count: failingFeeds, tone: 'critical' },
@@ -110,6 +112,7 @@ export default function AdminPage() {
 
   const titles: Record<Section, { title: string; subtitle: string }> = {
     desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
+    planner: { title: 'Email planner', subtitle: 'Add an optional opening note to an upcoming weekly brief' },
     reports: { title: 'Reports', subtitle: 'What is being reported, where, and when' },
     people: { title: 'People', subtitle: 'Who is signed up and who is contributing' },
     feeds: { title: 'Data feeds', subtitle: 'Live status of the sources behind the map' },
@@ -160,6 +163,7 @@ export default function AdminPage() {
       }
     >
       {section === 'desk' && <DeskSection d={d} />}
+      {section === 'planner' && <WeeklyEmailPlanner />}
       {section === 'reports' && <ReportsSection d={d} />}
       {section === 'people' && <PeopleSection d={d} />}
       {section === 'feeds' && <FeedsSection d={d} />}

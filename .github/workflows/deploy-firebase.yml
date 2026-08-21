@@ -44,6 +44,17 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
         run: npm run build
 
+      # Publish the UI before backend provisioning. This keeps ordinary site
+      # releases available even when a Google Cloud IAM or Secret Manager
+      # change needs attention.
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
+          projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+
       - name: Authenticate rule deployment
         uses: google-github-actions/auth@v3
         with:
@@ -56,14 +67,6 @@ jobs:
 
       - name: Deploy Functions and security rules
         run: npx firebase-tools deploy --only functions,firestore:rules,storage --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
-
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
 
       - name: Notify Bing and AI search indexes
         shell: bash

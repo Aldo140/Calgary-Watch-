@@ -47,6 +47,7 @@ import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js'
 import type { Incident } from '../src/types/index.js';
 import {
   contributionAppliesToScope,
+  DIGEST_TEMPLATE_PURPOSES,
   digestBodyPlainText,
   normalizeDigestContribution,
   normalizeDigestUrl,
@@ -141,6 +142,18 @@ describe('week identity', () => {
 });
 
 describe('weekly email planner', () => {
+  it('documents the exact recurring route and current recipient safety gate', () => {
+    const weekly = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'weekly');
+    const welcome = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'welcome');
+    const proof = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'admin-proof');
+    assert.match(weekly?.schedule ?? '', /Monday at 15:00 UTC/);
+    assert.match(weekly?.recipients ?? '', /jorti104@mtroyal\.ca/);
+    assert.match(weekly?.protection ?? '', /prevents duplicates/);
+    assert.match(welcome?.trigger ?? '', /never receives two/);
+    assert.match(proof?.schedule ?? '', /Event-driven, not part of the Monday schedule/);
+    assert.match(proof?.recipients ?? '', /ophillah1863@gmail\.com/);
+  });
+
   it('offers the next Monday first and keeps every option in ISO week order', () => {
     const weeks = upcomingDigestWeeks(NOW, 3);
     assert.equal(weeks.length, 3);

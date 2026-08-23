@@ -1,0 +1,57 @@
+name: Deploy Firebase Backend
+
+# Backend releases are deliberately separate from ordinary Hosting releases.
+# The Firebase service account must first be granted serviceusage.services.get;
+# until then a backend attempt cannot succeed and must not turn a healthy UI
+# deployment red. Run this workflow after that external IAM permission is fixed.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEPLOY to publish Firestore/Storage rules and email functions'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirm == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Install function dependencies
+        run: npm ci --prefix functions
+
+      - name: Authenticate Firebase CLI
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Deploy Firestore and Storage rules
+        run: npx firebase-tools deploy --only firestore:rules,storage --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
+
+      - name: Configure email provider secret
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: printf '%s' "$RESEND_API_KEY" | npx firebase-tools functions:secrets:set RESEND_API_KEY --data-file - --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
+
+      - name: Deploy admin email proof function
+        run: npx firebase-tools deploy --only functions --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive

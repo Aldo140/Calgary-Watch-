@@ -4,7 +4,7 @@ import {
 } from 'firebase/firestore';
 import {
   AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, FileText, Heading3,
-  History, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, Quote, RefreshCw,
+  HelpCircle, History, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, Quote, RefreshCw,
   Send, ShieldCheck, Smartphone, Sparkles, Trash2, Users,
 } from 'lucide-react';
 
@@ -235,6 +235,7 @@ export function WeeklyEmailPlanner() {
   const [previewMode, setPreviewMode] = useState<'visual' | 'text'>('visual');
   const [previewWidth, setPreviewWidth] = useState<'desktop' | 'mobile'>('desktop');
   const [previewScope, setPreviewScope] = useState<'local' | 'citywide'>('local');
+  const [activeTemplateId, setActiveTemplateId] = useState<(typeof DIGEST_TEMPLATE_PURPOSES)[number]['id']>('weekly');
   const [saveState, setSaveState] = useState<SaveState>('loading');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState<MessageTone>('neutral');
@@ -264,6 +265,8 @@ export function WeeklyEmailPlanner() {
   const canSubmit = !!db && !!user && !!selected && validBody && validCta && validBodyLinks && !hasOutlinePrompts
     && dirty && !hasRemoteChange && saveState !== 'saving';
   const latestTest = testRequests[0];
+  const activeTemplate = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === activeTemplateId)
+    ?? DIGEST_TEMPLATE_PURPOSES[1];
 
   useEffect(() => {
     if (!db) return;
@@ -648,29 +651,63 @@ export function WeeklyEmailPlanner() {
 
       <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="template-routing-title">
         <div className="border-b px-4 py-3" style={{ borderColor: T.line }}>
-          <h2 id="template-routing-title" className="text-sm font-bold" style={{ color: T.ink }}>Template routing</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="template-routing-title" className="text-sm font-bold" style={{ color: T.ink }}>Template routing</h2>
+            <span className="inline-flex items-center gap-1 text-[0.68rem] font-semibold" style={{ color: T.muted }}><HelpCircle size={13} /> Hover, focus or tap a format</span>
+          </div>
           <p className="mt-0.5 text-xs" style={{ color: T.muted }}>Each format has one job. Weekly edits never alter the subscriber welcome letter.</p>
         </div>
-        <dl className="divide-y md:grid md:grid-cols-3 md:divide-x md:divide-y-0" style={{ borderColor: T.line }}>
+        <div className="divide-y md:grid md:grid-cols-3 md:divide-x md:divide-y-0" style={{ borderColor: T.line }} role="list" aria-label="Email templates">
           {DIGEST_TEMPLATE_PURPOSES.map((template) => {
             const Icon = TEMPLATE_ICONS[template.id];
-            const active = template.id === 'weekly';
+            const editing = template.id === 'weekly';
+            const active = template.id === activeTemplateId;
             return (
-              <div key={template.id} className="flex gap-3 p-4" style={{ background: active ? `${T.signal}0A` : T.card }}>
+              <button
+                key={template.id}
+                type="button"
+                role="listitem"
+                aria-pressed={active}
+                aria-controls="template-routing-details"
+                onMouseEnter={() => setActiveTemplateId(template.id)}
+                onFocus={() => setActiveTemplateId(template.id)}
+                onClick={() => setActiveTemplateId(template.id)}
+                className="flex w-full gap-3 p-4 text-left transition-colors duration-150 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-[-2px]"
+                style={{ background: active ? `${T.signal}0A` : T.card, outlineColor: T.signal }}
+              >
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg" style={{ background: active ? `${T.signal}16` : T.surface, color: active ? T.signal : T.muted }}>
                   <Icon size={15} />
                 </span>
                 <div className="min-w-0">
-                  <dt className="flex flex-wrap items-center gap-2 text-xs font-bold" style={{ color: T.ink }}>
-                    {template.label}{active && <Chip tone="signal">Editing</Chip>}
-                  </dt>
-                  <dd className="mt-0.5 text-[0.68rem] font-semibold" style={{ color: active ? T.signal : T.muted }}>{template.timing}</dd>
-                  <dd className="mt-1 text-[0.7rem] leading-snug" style={{ color: T.muted }}>{template.purpose}</dd>
+                  <span className="flex flex-wrap items-center gap-2 text-xs font-bold" style={{ color: T.ink }}>
+                    {template.label}{editing && <Chip tone="signal">Editing</Chip>}
+                  </span>
+                  <span className="mt-0.5 block text-[0.68rem] font-semibold" style={{ color: active ? T.signal : T.muted }}>{template.timing}</span>
+                  <span className="mt-1 block text-[0.7rem] leading-snug" style={{ color: T.muted }}>{template.purpose}</span>
                 </div>
-              </div>
+              </button>
             );
           })}
-        </dl>
+        </div>
+        <div id="template-routing-details" className="border-t px-4 py-4" style={{ borderColor: T.line, background: `${T.signal}05` }} aria-live="polite">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-bold" style={{ color: T.ink }}>{activeTemplate.label}: exact delivery rules</p>
+            <Chip tone={activeTemplate.id === 'admin-proof' ? 'attention' : activeTemplate.id === 'weekly' ? 'signal' : 'neutral'}>{activeTemplate.timing}</Chip>
+          </div>
+          <dl className="mt-3 grid gap-3 md:grid-cols-2">
+            {[
+              ['When it runs', activeTemplate.schedule],
+              ['How it is chosen', activeTemplate.trigger],
+              ['Who receives it now', activeTemplate.recipients],
+              ['Safety and repeat rules', activeTemplate.protection],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-lg border p-3" style={{ borderColor: T.line, background: T.card }}>
+                <dt className="text-[0.66rem] font-bold uppercase tracking-[0.08em]" style={{ color: T.signal }}>{label}</dt>
+                <dd className="mt-1 text-[0.72rem] leading-relaxed" style={{ color: T.muted }}>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </section>
 
       {hasRemoteChange && (

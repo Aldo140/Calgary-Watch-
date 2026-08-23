@@ -1,4 +1,15 @@
-import { digestWeekKey, WEEK_MS, type DigestScope } from './digest';
+import {
+  compareDigestDeliveryPriority,
+  consentRefusal,
+  consentTimestamp,
+  digestDeliveryKind,
+  digestWeekKey,
+  WEEK_MS,
+  type ConsentRefusal,
+  type DigestDeliveryKind,
+  type DigestRecipient,
+  type DigestScope,
+} from './digest';
 
 export const DIGEST_CONTRIBUTION_STYLES = ['neighbour-note', 'news-brief', 'personal-story'] as const;
 export type DigestContributionStyle = typeof DIGEST_CONTRIBUTION_STYLES[number];
@@ -42,6 +53,79 @@ export const DIGEST_TEMPLATE_PURPOSES = [
     protection: 'Each request is processed once and reports delivery per administrator. Activation still requires the repository’s Firebase service account to receive its missing backend-deploy permission.',
   },
 ] as const;
+
+export type DigestAudienceStatus = 'scheduled' | 'held-allowlist' | 'held-limit' | 'attention';
+
+export interface DigestAudienceRow {
+  uid: string;
+  email: string;
+  displayName: string;
+  location: string;
+  kind: DigestDeliveryKind;
+  status: DigestAudienceStatus;
+  refusal: ConsentRefusal | null;
+  consentedAt: number | null;
+  welcomeSentAt: number | null;
+}
+
+export interface DigestAudienceForecast {
+  rows: DigestAudienceRow[];
+  allowlistActive: boolean;
+  limit: number;
+}
+
+/**
+ * Mirrors the Monday sender's consent, routing, priority, allowlist and cap.
+ * The admin forecast and the job therefore answer "who gets what?" identically.
+ */
+export function buildDigestAudienceForecast(
+  profiles: DigestRecipient[],
+  options: { allowlist?: string[]; limit?: number } = {},
+): DigestAudienceForecast {
+  const allowlist = new Set((options.allowlist ?? []).map((email) => email.trim().toLowerCase()).filter(Boolean));
+  const suppliedLimit = Number(options.limit ?? 50);
+  const limit = Number.isFinite(suppliedLimit) && suppliedLimit > 0 ? Math.floor(suppliedLimit) : 50;
+  const optedIn = profiles.filter((profile) => profile.weeklyDigestOptIn === true);
+  const eligible = optedIn.filter((profile) => consentRefusal(profile) === null)
+    .sort(compareDigestDeliveryPriority);
+  const statuses = new Map<string, DigestAudienceStatus>();
+  let scheduled = 0;
+
+  eligible.forEach((profile) => {
+    const permitted = allowlist.size === 0 || allowlist.has(profile.email?.trim().toLowerCase() ?? '');
+    if (!permitted) statuses.set(profile.uid, 'held-allowlist');
+    else if (scheduled >= limit) statuses.set(profile.uid, 'held-limit');
+    else {
+      statuses.set(profile.uid, 'scheduled');
+      scheduled += 1;
+    }
+  });
+
+  const statusOrder: Record<DigestAudienceStatus, number> = {
+    scheduled: 0,
+    'held-allowlist': 1,
+    'held-limit': 2,
+    attention: 3,
+  };
+  const rows = optedIn.map((profile): DigestAudienceRow => {
+    const refusal = consentRefusal(profile);
+    return {
+      uid: profile.uid,
+      email: profile.email?.trim() ?? '',
+      displayName: profile.displayName?.trim() ?? '',
+      location: profile.neighborhood?.trim() || profile.inferredNeighborhood?.trim() || 'City-wide',
+      kind: digestDeliveryKind(profile),
+      status: refusal ? 'attention' : statuses.get(profile.uid) ?? 'attention',
+      refusal,
+      consentedAt: consentTimestamp(profile),
+      welcomeSentAt: profile.digestWelcomeSentAt ?? null,
+    };
+  }).sort((a, b) => statusOrder[a.status] - statusOrder[b.status]
+    || (a.kind === b.kind ? 0 : a.kind === 'welcome' ? -1 : 1)
+    || (a.displayName || a.email).localeCompare(b.displayName || b.email));
+
+  return { rows, allowlistActive: allowlist.size > 0, limit };
+}
 
 export interface DigestContribution {
   weekKey: string;
@@ -226,6 +310,17 @@ export interface DigestWeekOption {
   weekKey: string;
   weekStart: number;
   label: string;
+}
+
+/** Exact next GitHub cron tick: Monday at 15:00 UTC, including today if pending. */
+export function nextDigestRunAt(when: Date | number = Date.now()): number {
+  const now = new Date(when);
+  const daysUntilMonday = (8 - now.getUTCDay()) % 7;
+  let candidate = Date.UTC(
+    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + daysUntilMonday, 15, 0, 0,
+  );
+  if (candidate <= now.getTime()) candidate += WEEK_MS;
+  return candidate;
 }
 
 function localCalendarParts(when: Date | number, timeZone: string) {

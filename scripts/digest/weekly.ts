@@ -49,6 +49,8 @@ import {
   consentTimestamp,
   consentTimestampIsInferred,
   digestSendId,
+  digestDeliveryKind,
+  compareDigestDeliveryPriority,
   digestSubject,
   digestWeekKey,
   isValidUnsubToken,
@@ -243,7 +245,7 @@ async function run(): Promise<void> {
   const honoured = await processUnsubscribes(db);
   if (honoured > 0) console.log(`[digest] honoured ${honoured} unsubscribe(s)`);
 
-  const recipients = await loadRecipients(db);
+  const recipients = (await loadRecipients(db)).sort(compareDigestDeliveryPriority);
   console.log(`[digest] ${recipients.length} profile(s) flagged for the digest`);
   if (recipients.length === 0) return;
 
@@ -323,8 +325,7 @@ async function run(): Promise<void> {
       // one person gets one hello — tracked on the profile rather than by
       // counting ledger rows, because the flag survives a ledger cleanup and
       // costs no extra read.
-      const isFirstEmail = (profile as DigestRecipient & { digestWelcomeSentAt?: number | null })
-        .digestWelcomeSentAt == null;
+      const isFirstEmail = digestDeliveryKind(profile) === 'welcome';
       const render = isFirstEmail ? renderWelcomeHtml : renderDigestHtml;
       const renderText = isFirstEmail ? renderWelcomeText : renderDigestText;
       const shared = {

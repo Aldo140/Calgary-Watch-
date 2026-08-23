@@ -20,6 +20,7 @@ import {
   consentTimestamp,
   consentTimestampIsInferred,
   deltaSentence,
+  digestDeliveryKind,
   digestSendId,
   digestSubject,
   digestWeekKey,
@@ -47,10 +48,12 @@ import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js'
 import type { Incident } from '../src/types/index.js';
 import {
   contributionAppliesToScope,
+  buildDigestAudienceForecast,
   DIGEST_TEMPLATE_PURPOSES,
   digestBodyPlainText,
   normalizeDigestContribution,
   normalizeDigestUrl,
+  nextDigestRunAt,
   parseDigestBody,
   upcomingDigestWeeks,
   type DigestContribution,
@@ -142,6 +145,40 @@ describe('week identity', () => {
 });
 
 describe('weekly email planner', () => {
+  it('routes each subscriber by their own first successful delivery', () => {
+    const lateSignup = { ...PROFILE, uid: 'late', weeklyDigestOptInAt: NOW };
+    assert.equal(digestDeliveryKind(lateSignup), 'welcome');
+    assert.equal(digestDeliveryKind({ ...lateSignup, digestWelcomeSentAt: NOW + HOUR }), 'weekly');
+  });
+
+  it('forecasts the actual next cron tick, including a pending Monday run', () => {
+    assert.equal(nextDigestRunAt(Date.UTC(2026, 7, 24, 14, 59)), Date.UTC(2026, 7, 24, 15));
+    assert.equal(nextDigestRunAt(Date.UTC(2026, 7, 24, 15)), Date.UTC(2026, 7, 31, 15));
+  });
+
+  it('forecasts the exact welcome and weekly split behind the safety gate', () => {
+    const profiles = [
+      { ...PROFILE, uid: 'welcome-allowed', email: 'allowed@example.com' },
+      { ...PROFILE, uid: 'welcome-held', email: 'held@example.com' },
+      { ...PROFILE, uid: 'weekly-allowed', email: 'weekly@example.com', digestWelcomeSentAt: NOW - HOUR },
+    ];
+    const forecast = buildDigestAudienceForecast(profiles, {
+      allowlist: ['allowed@example.com', 'weekly@example.com'], limit: 50,
+    });
+    assert.equal(forecast.rows.filter((row) => row.status === 'scheduled' && row.kind === 'welcome').length, 1);
+    assert.equal(forecast.rows.filter((row) => row.status === 'scheduled' && row.kind === 'weekly').length, 1);
+    assert.equal(forecast.rows.find((row) => row.uid === 'welcome-held')?.status, 'held-allowlist');
+  });
+
+  it('prioritizes first-time welcomes when the delivery cap is reached', () => {
+    const forecast = buildDigestAudienceForecast([
+      { ...PROFILE, uid: 'weekly', email: 'weekly@example.com', digestWelcomeSentAt: NOW - HOUR },
+      { ...PROFILE, uid: 'new', email: 'new@example.com', weeklyDigestOptInAt: NOW },
+    ], { limit: 1 });
+    assert.equal(forecast.rows.find((row) => row.status === 'scheduled')?.uid, 'new');
+    assert.equal(forecast.rows.find((row) => row.uid === 'weekly')?.status, 'held-limit');
+  });
+
   it('documents the exact recurring route and current recipient safety gate', () => {
     const weekly = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'weekly');
     const welcome = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'welcome');

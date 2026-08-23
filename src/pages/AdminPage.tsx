@@ -163,7 +163,7 @@ export default function AdminPage() {
       }
     >
       {section === 'desk' && <DeskSection d={d} />}
-      {section === 'planner' && <WeeklyEmailPlanner />}
+      {section === 'planner' && <WeeklyEmailPlanner profiles={d.digestSubscribers} profilesLoading={!d.digestSubscribersLoaded} profilesError={d.digestSubscribersError} />}
       {section === 'reports' && <ReportsSection d={d} />}
       {section === 'people' && <PeopleSection d={d} />}
       {section === 'feeds' && <FeedsSection d={d} />}

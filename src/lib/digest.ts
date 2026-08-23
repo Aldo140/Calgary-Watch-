@@ -86,6 +86,8 @@ export interface DigestRecipient {
   profileUpdatedAt?: number | null;
   weeklyDigestTopics?: string[];
   digestUnsubToken?: string;
+  /** Set only after the one-time welcome was successfully transmitted. */
+  digestWelcomeSentAt?: number | null;
 }
 
 export type ConsentRefusal =
@@ -117,6 +119,28 @@ export function consentRefusal(profile: DigestRecipient): ConsentRefusal | null 
 
 export function mayEmail(profile: DigestRecipient): boolean {
   return consentRefusal(profile) === null;
+}
+
+export type DigestDeliveryKind = 'welcome' | 'weekly';
+
+/** Every subscriber owns their own route; there is no global "first week". */
+export function digestDeliveryKind(profile: DigestRecipient): DigestDeliveryKind {
+  return profile.digestWelcomeSentAt == null ? 'welcome' : 'weekly';
+}
+
+/**
+ * Welcome recipients go first when a safety cap is active, then older consent
+ * dates first within each route. The dashboard uses this same comparator, so
+ * its projected first 50 are the exact first 50 the sender will attempt.
+ */
+export function compareDigestDeliveryPriority(a: DigestRecipient, b: DigestRecipient): number {
+  const aKind = digestDeliveryKind(a);
+  const bKind = digestDeliveryKind(b);
+  if (aKind !== bKind) return aKind === 'welcome' ? -1 : 1;
+  const consent = (consentTimestamp(a) ?? Number.MAX_SAFE_INTEGER)
+    - (consentTimestamp(b) ?? Number.MAX_SAFE_INTEGER);
+  if (consent !== 0) return consent;
+  return a.uid.localeCompare(b.uid);
 }
 
 /**

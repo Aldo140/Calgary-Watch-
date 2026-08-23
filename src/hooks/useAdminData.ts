@@ -33,6 +33,16 @@ export type UserProfile = {
   createdAt?: number;
   updatedAt?: number;
   notes?: string;
+  neighborhood?: string;
+  inferredNeighborhood?: string;
+  weeklyDigestOptIn?: boolean;
+  weeklyDigestOptInAt?: number | null;
+  digestPromptedAt?: number | null;
+  onboardingCompletedAt?: number | null;
+  piiConsentAt?: number | null;
+  profileUpdatedAt?: number | null;
+  weeklyDigestTopics?: string[];
+  digestWelcomeSentAt?: number | null;
 };
 
 export type PageViewDoc = {
@@ -104,6 +114,10 @@ export function useAdminData() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [communityStats, setCommunityStats] = useState<(CommunityStats & { id: string })[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [usersLoaded, setUsersLoaded] = useState(false);
+  const [digestSubscribers, setDigestSubscribers] = useState<UserProfile[]>([]);
+  const [digestSubscribersLoaded, setDigestSubscribersLoaded] = useState(false);
+  const [digestSubscribersError, setDigestSubscribersError] = useState('');
   const [pageViewDocs, setPageViewDocs] = useState<PageViewDoc[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
@@ -242,8 +256,26 @@ export function useAdminData() {
     });
 
     const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
-      setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
+      setUsers(snapshot.docs.map((row) => ({ ...row.data(), uid: row.id } as UserProfile)));
+      setUsersLoaded(true);
     });
+
+    // The general directory is intentionally capped for interface performance;
+    // the delivery forecast cannot be. This narrower query reads every opted-in
+    // profile so its counts still match the sender after the directory grows.
+    const unsubDigestSubscribers = onSnapshot(
+      query(collection(db, 'users'), where('weeklyDigestOptIn', '==', true)),
+      (snapshot) => {
+        setDigestSubscribers(snapshot.docs.map((row) => ({ ...row.data(), uid: row.id } as UserProfile)));
+        setDigestSubscribersLoaded(true);
+        setDigestSubscribersError('');
+      },
+      (error) => {
+        console.error('Could not load digest subscribers:', error);
+        setDigestSubscribersLoaded(true);
+        setDigestSubscribersError('Recipient profiles could not be loaded. Check the deployed admin read rules before relying on this forecast.');
+      },
+    );
 
     // Page views — real-time listener for chart/breakdown data (last 2000 docs)
     const unsubPageViews = onSnapshot(
@@ -273,7 +305,7 @@ export function useAdminData() {
       }
     );
 
-    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubPageViews(); unsubFlagged(); clearInterval(countInterval); };
+    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubDigestSubscribers(); unsubPageViews(); unsubFlagged(); clearInterval(countInterval); };
   }, [isAuthReady, isAdmin, user]);
 
   // ── API health polling ────────────────────────────────────────────────────
@@ -766,7 +798,8 @@ export function useAdminData() {
     setIsRefreshingUsers(true);
     try {
       const snap = await getDocs(collection(db, 'users'));
-      setUsers(snap.docs.map(d => d.data() as UserProfile));
+      setUsers(snap.docs.map(d => ({ ...d.data(), uid: d.id } as UserProfile)));
+      setUsersLoaded(true);
     } catch {}
     setIsRefreshingUsers(false);
   };
@@ -774,7 +807,8 @@ export function useAdminData() {
     // ── auth ──
     user, isAuthReady, isAdmin,
     // ── raw collections ──
-    incidents, communityStats, users, pageViewDocs, flaggedIncidents,
+    incidents, communityStats, users, usersLoaded, digestSubscribers, digestSubscribersLoaded, digestSubscribersError,
+    pageViewDocs, flaggedIncidents,
     crimeStats, crimeLoading, loadingData,
     // ── counters ──
     totalIncidents, emergencyIncidents, unresolvedIncidents, todayIncidents,

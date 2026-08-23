@@ -10,6 +10,7 @@ import {
 
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
+import type { UserProfile } from '@/src/hooks/useAdminData';
 import {
   CONTRIBUTION_STYLE_COPY,
   CONTRIBUTION_AUDIENCE_COPY,
@@ -30,6 +31,7 @@ import {
 import {
   AdminButton, Chip, Field, Panel, StatusDot, T, display, inputClass, inputStyle, mono,
 } from './ui';
+import { DigestAudienceForecast } from './DigestAudienceForecast';
 
 const MAX_BODY = 2400;
 const MIN_BODY = 20;
@@ -218,7 +220,7 @@ function OpeningPreview({
   );
 }
 
-export function WeeklyEmailPlanner() {
+export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }: { profiles: UserProfile[]; profilesLoading: boolean; profilesError: string }) {
   const { user } = useAuth();
   const weeks = useMemo(() => upcomingDigestWeeks(Date.now(), 8), []);
   const [plans, setPlans] = useState<Record<string, DigestContribution>>({});
@@ -666,6 +668,12 @@ export function WeeklyEmailPlanner() {
           })}
         </div>
       </section>
+
+      <DigestAudienceForecast
+        profiles={profiles}
+        loading={profilesLoading}
+        error={profilesError}
+      />
 
       <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="template-routing-title">
         <div className="border-b px-4 py-3" style={{ borderColor: T.line }}>

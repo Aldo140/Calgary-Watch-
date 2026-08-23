@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build && npm run prerender",
+    "build": "vite build && npm run prerender && npm run digest:publish-previews",
     "build:gh-pages": "vite build --base=/Calgary-Watch-/ && npm run prerender",
     "prerender": "tsx scripts/seo/prerender.ts",
     "preview": "vite preview",
@@ -17,6 +17,7 @@
     "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
     "digest:weekly": "tsx scripts/digest/weekly.ts",
     "digest:preview": "tsx scripts/digest/preview.ts",
+    "digest:publish-previews": "DIGEST_PREVIEW_DIR=dist/email-previews tsx scripts/digest/preview.ts",
     "digest:art": "tsx scripts/prepare-email-art.ts",
     "digest:contrast": "tsx scripts/digest/audit.ts"
   },

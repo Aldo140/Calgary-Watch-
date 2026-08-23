@@ -154,6 +154,18 @@ describe('weekly email planner', () => {
     assert.match(proof?.recipients ?? '', /ophillah1863@gmail\.com/);
   });
 
+  it('publishes the real welcome renderer for the admin preview', () => {
+    const plannerSource = readFileSync('src/components/admin/WeeklyEmailPlanner.tsx', 'utf8');
+    const packageSource = readFileSync('package.json', 'utf8');
+    const previewSource = readFileSync('scripts/digest/preview.ts', 'utf8');
+    assert.match(plannerSource, /email-previews\/welcome\.html/);
+    assert.match(plannerSource, /Actual production template/);
+    assert.match(packageSource, /digest:publish-previews/);
+    assert.match(previewSource, /renderWelcomeHtml\(shared\)/);
+    assert.match(previewSource, /noindex, nofollow/);
+    assert.match(previewSource, /aria-disabled/);
+  });
+
   it('offers the next Monday first and keeps every option in ISO week order', () => {
     const weeks = upcomingDigestWeeks(NOW, 3);
     assert.equal(weeks.length, 3);

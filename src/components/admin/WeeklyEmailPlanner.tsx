@@ -3,9 +3,9 @@ import {
   collection, doc, getDoc, onSnapshot, query, runTransaction, where, writeBatch,
 } from 'firebase/firestore';
 import {
-  AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, FileText, Heading3,
+  AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, Eye, FileText, Heading3,
   HelpCircle, History, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, Quote, RefreshCw,
-  Send, ShieldCheck, Smartphone, Sparkles, Trash2, Users,
+  Send, ShieldCheck, Smartphone, Sparkles, Trash2, Users, X,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -236,6 +236,9 @@ export function WeeklyEmailPlanner() {
   const [previewWidth, setPreviewWidth] = useState<'desktop' | 'mobile'>('desktop');
   const [previewScope, setPreviewScope] = useState<'local' | 'citywide'>('local');
   const [activeTemplateId, setActiveTemplateId] = useState<(typeof DIGEST_TEMPLATE_PURPOSES)[number]['id']>('weekly');
+  const [showWelcomePreview, setShowWelcomePreview] = useState(false);
+  const [welcomePreviewHtml, setWelcomePreviewHtml] = useState('');
+  const [welcomePreviewError, setWelcomePreviewError] = useState('');
   const [saveState, setSaveState] = useState<SaveState>('loading');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState<MessageTone>('neutral');
@@ -267,6 +270,21 @@ export function WeeklyEmailPlanner() {
   const latestTest = testRequests[0];
   const activeTemplate = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === activeTemplateId)
     ?? DIGEST_TEMPLATE_PURPOSES[1];
+  const welcomePreviewUrl = `${import.meta.env.BASE_URL}email-previews/welcome.html`;
+
+  async function openWelcomePreview() {
+    setShowWelcomePreview(true);
+    if (welcomePreviewHtml) return;
+    setWelcomePreviewError('');
+    try {
+      const response = await fetch(welcomePreviewUrl, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Preview returned HTTP ${response.status}`);
+      setWelcomePreviewHtml(await response.text());
+    } catch (error) {
+      console.error('Could not load welcome letter preview:', error);
+      setWelcomePreviewError('The welcome letter preview could not be loaded. The email template itself was not changed.');
+    }
+  }
 
   useEffect(() => {
     if (!db) return;
@@ -707,7 +725,55 @@ export function WeeklyEmailPlanner() {
               </div>
             ))}
           </dl>
+          {activeTemplate.id === 'welcome' && !showWelcomePreview && (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3" style={{ borderColor: T.line }}>
+              <p className="max-w-2xl text-[0.72rem] leading-relaxed" style={{ color: T.muted }}>See the complete production letter with its Calgary Watch logo, onboarding explanation, sample weekly brief and legal footer.</p>
+              <AdminButton variant="outline" size="sm" onClick={() => void openWelcomePreview()}><Eye size={14} /> Preview welcome letter</AdminButton>
+            </div>
+          )}
         </div>
+        {showWelcomePreview && (
+          <div className="border-t p-4 sm:p-5" style={{ borderColor: T.line, background: T.surface }}>
+            <div className="mx-auto max-w-[42rem]">
+              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-bold" style={{ color: T.ink }}>Welcome letter preview</p>
+                    <Chip tone="ok">Actual production template</Chip>
+                  </div>
+                  <p className="mt-1 text-[0.72rem] leading-relaxed" style={{ color: T.muted }}>Subject: “Quick hello from Calgary Watch” · Sample recipient: Vicky in Beltline</p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <a href={welcomePreviewUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[0.72rem] font-bold transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}><Eye size={13} /> Open full size</a>
+                  <AdminButton variant="ghost" size="sm" onClick={() => setShowWelcomePreview(false)} aria-label="Close welcome letter preview"><X size={14} /> Close</AdminButton>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }}>
+                {welcomePreviewError ? (
+                  <div className="flex min-h-64 flex-col items-center justify-center gap-3 p-6 text-center" role="alert">
+                    <AlertTriangle size={22} style={{ color: T.critical }} />
+                    <p className="max-w-md text-xs leading-relaxed" style={{ color: T.muted }}>{welcomePreviewError}</p>
+                    <AdminButton variant="outline" size="sm" onClick={() => { setWelcomePreviewHtml(''); void openWelcomePreview(); }}><RefreshCw size={13} /> Try again</AdminButton>
+                  </div>
+                ) : welcomePreviewHtml ? (
+                  <iframe
+                    srcDoc={welcomePreviewHtml}
+                    title="Calgary Watch welcome letter preview"
+                    className="block h-[46rem] w-full bg-white"
+                    sandbox=""
+                  />
+                ) : (
+                  <div className="h-[46rem] space-y-5 p-8 motion-safe:animate-pulse" aria-label="Loading welcome letter preview">
+                    <div className="mx-auto h-12 w-52 rounded-lg" style={{ background: T.line }} />
+                    <div className="mx-auto h-40 max-w-lg rounded-xl" style={{ background: T.surface }} />
+                    <div className="mx-auto h-56 max-w-lg rounded-xl" style={{ background: T.surface }} />
+                  </div>
+                )}
+              </div>
+              <p className="mt-2 text-center text-[0.68rem]" style={{ color: T.muted }}>Preview data is illustrative. Every real recipient receives their own location-aware sample and unsubscribe link.</p>
+            </div>
+          </div>
+        )}
       </section>
 
       {hasRemoteChange && (

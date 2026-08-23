@@ -113,10 +113,22 @@ function inlineArt(html: string): string {
   });
 }
 
-mkdirSync('dist-preview', { recursive: true });
-writeFileSync('dist-preview/digest.html', inlineArt(renderDigestHtml(shared)));
-writeFileSync('dist-preview/digest.txt', renderDigestText(shared));
-writeFileSync('dist-preview/welcome.html', inlineArt(renderWelcomeHtml(shared)));
+/**
+ * A hosted proof is view-only. Keep the exact email markup and artwork, but do
+ * not let a reviewer accidentally follow a fixture incident, open a mailto, or
+ * submit the sample unsubscribe token. The delivered email is not transformed.
+ */
+function browserPreview(html: string): string {
+  return inlineArt(html)
+    .replace('<head>', '<head><meta name="robots" content="noindex, nofollow">')
+    .replace(/\s+href="[^"]*"/g, ' aria-disabled="true"');
+}
+
+const OUTPUT_DIR = process.env.DIGEST_PREVIEW_DIR?.trim() || 'dist-preview';
+mkdirSync(OUTPUT_DIR, { recursive: true });
+writeFileSync(`${OUTPUT_DIR}/digest.html`, browserPreview(renderDigestHtml(shared)));
+writeFileSync(`${OUTPUT_DIR}/digest.txt`, renderDigestText(shared));
+writeFileSync(`${OUTPUT_DIR}/welcome.html`, browserPreview(renderWelcomeHtml(shared)));
 
 // Every planner format gets a browser-openable proof. This prevents a format
 // that is not currently selected in the admin UI from becoming the unreviewed
@@ -142,7 +154,7 @@ for (const style of DIGEST_CONTRIBUTION_STYLES) {
     ctaUrl: style === 'news-brief' ? 'https://calgarywatch.ca/map' : '',
     status: 'published',
   };
-  writeFileSync(`dist-preview/planner-${style}.html`, inlineArt(renderDigestHtml({ ...shared, contribution })));
+  writeFileSync(`${OUTPUT_DIR}/planner-${style}.html`, browserPreview(renderDigestHtml({ ...shared, contribution })));
 }
 
 // What somebody with no saved location receives: the city-wide variant, which
@@ -156,12 +168,12 @@ const citySample: Incident[] = Array.from({ length: 47 }, (_, i) => ({
 }));
 const cityProfile: DigestRecipient = { ...PROFILE, uid: 'city', neighborhood: undefined };
 const citySummary = buildDigestSummary({ incidents: citySample, profile: cityProfile, home: null, now: NOW });
-writeFileSync('dist-preview/city.html', inlineArt(renderDigestHtml({
+writeFileSync(`${OUTPUT_DIR}/city.html`, browserPreview(renderDigestHtml({
   summary: citySummary, displayName: PROFILE.displayName,
   unsubscribeUrl: unsub, branding: BRANDING,
 })));
 console.log(`City variant: scope=${citySummary.scope}, ${citySummary.total} reports, `
   + `top areas ${citySummary.topAreas.map((a) => `${a.name} ${a.count}`).join(', ')}`);
 
-console.log('Wrote digest, welcome and all three planner-format previews to dist-preview/');
+console.log(`Wrote digest, welcome and all three planner-format previews to ${OUTPUT_DIR}/`);
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

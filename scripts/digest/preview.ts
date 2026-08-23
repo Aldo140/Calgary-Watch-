@@ -130,12 +130,16 @@ for (const style of DIGEST_CONTRIBUTION_STYLES) {
       : style === 'personal-story'
         ? 'What a quiet block taught us this week'
         : 'A note before this week’s brief',
+    preheader: style === 'news-brief' ? 'Two new feeds, clearer attribution and the same location-first briefing.' : '',
     body: style === 'news-brief'
-      ? 'Calgary Watch added two new public-data feeds this week. Reports remain attributed, time-stamped and separated from neighbour submissions.\n\nNo account changes are required.'
+      ? 'Calgary Watch added two new public-data feeds this week. Reports remain **attributed, time-stamped and separated** from neighbour submissions.\n\n## What changes for readers\n\n- More timely service updates\n- The same location-first weekly brief\n\nNo account changes are required.'
       : style === 'personal-story'
-        ? 'A neighbour wrote to say their block felt quiet, even though the city-wide count was busy. That distinction is why these emails begin close to home.\n\nThe useful question is not whether Calgary was busy. It is what changed around the places you know.'
+        ? 'A neighbour wrote to say their block felt quiet, even though the city-wide count was busy. That distinction is why these emails begin close to home.\n\n> The useful question is not whether Calgary was busy. It is what changed around the places you know.'
         : 'A short note from the Calgary Watch team can sit here when there is useful context that the automated report list cannot provide.\n\nThe personalized neighbourhood briefing still follows underneath.',
     style,
+    byline: style === 'personal-story' ? 'By Maya, community editor' : '',
+    ctaLabel: style === 'news-brief' ? 'See what changed' : '',
+    ctaUrl: style === 'news-brief' ? 'https://calgarywatch.ca/map' : '',
     status: 'published',
   };
   writeFileSync(`dist-preview/planner-${style}.html`, inlineArt(renderDigestHtml({ ...shared, contribution })));

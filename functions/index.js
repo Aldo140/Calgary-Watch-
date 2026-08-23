@@ -36,6 +36,61 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function validHttpsUrl(value) {
+  if (!value) return '';
+  try {
+    const parsed = new URL(String(value).trim());
+    return parsed.protocol === 'https:' ? parsed.toString() : '';
+  } catch {
+    return '';
+  }
+}
+
+function inlineFormatting(value) {
+  const source = String(value);
+  const pattern = /\*\*([^*\n]+)\*\*|\[([^\]\n]+)\]\((https:\/\/[^\s)]+)\)/g;
+  let output = '';
+  let cursor = 0;
+  for (const match of source.matchAll(pattern)) {
+    output += escapeHtml(source.slice(cursor, match.index));
+    if (match[1]) output += `<strong style="font-weight:700;color:#F4EEE3;">${escapeHtml(match[1])}</strong>`;
+    else output += `<a href="${escapeHtml(match[3])}" style="color:#5CC3AA;font-weight:700;text-decoration:underline;">${escapeHtml(match[2])}</a>`;
+    cursor = match.index + match[0].length;
+  }
+  return output + escapeHtml(source.slice(cursor)).replace(/\n/g, '<br>');
+}
+
+function formattedBody(value) {
+  const lines = String(value).replace(/\r/g, '').split('\n');
+  const blocks = [];
+  let paragraph = [];
+  let list = [];
+  const flushParagraph = () => {
+    const text = paragraph.join('\n').trim();
+    if (text) blocks.push(`<p style="margin:12px 0 0;font:400 15px/1.62 Arial,sans-serif;color:#DCD3C4;">${inlineFormatting(text)}</p>`);
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (list.length) blocks.push(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">${list.map((item) => `<tr><td width="18" style="width:18px;vertical-align:top;color:#E0AC63;font:700 15px/1.6 Arial,sans-serif;">•</td><td style="padding-bottom:5px;color:#DCD3C4;font:400 15px/1.6 Arial,sans-serif;">${inlineFormatting(item)}</td></tr>`).join('')}</table>`);
+    list = [];
+  };
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) { flushParagraph(); flushList(); }
+    else if (/^##\s+/.test(trimmed)) { flushParagraph(); flushList(); blocks.push(`<div style="padding-top:15px;color:#F4EEE3;font:700 17px/1.35 Georgia,serif;">${inlineFormatting(trimmed.replace(/^##\s+/, ''))}</div>`); }
+    else if (/^>\s?/.test(trimmed)) { flushParagraph(); flushList(); blocks.push(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:13px;"><tr><td width="3" style="width:3px;background:#E0AC63;font-size:0;">&nbsp;</td><td style="padding-left:13px;color:#DCD3C4;font:italic 400 15px/1.62 Georgia,serif;">${inlineFormatting(trimmed.replace(/^>\s?/, ''))}</td></tr></table>`); }
+    else if (/^-\s+/.test(trimmed)) { flushParagraph(); list.push(trimmed.replace(/^-\s+/, '')); }
+    else { flushList(); paragraph.push(trimmed); }
+  }
+  flushParagraph(); flushList();
+  return blocks.join('');
+}
+
+function plainFormatting(value) {
+  return String(value).replace(/^##\s+/gm, '').replace(/^>\s?/gm, '').replace(/^-\s+/gm, '• ')
+    .replace(/\*\*([^*\n]+)\*\*/g, '$1').replace(/\[([^\]\n]+)\]\((https:\/\/[^\s)]+)\)/g, '$1 ($2)');
+}
+
 function validRequest(value) {
   const action = value?.action || 'preview';
   return value
@@ -43,19 +98,22 @@ function validRequest(value) {
     && /^\d{4}-W\d{2}$/.test(value.planWeekKey || '')
     && typeof value.headline === 'string'
     && value.headline.length <= 100
+    && (value.preheader === undefined || (typeof value.preheader === 'string' && value.preheader.length <= 140))
     && typeof value.body === 'string'
     && value.body.trim().length >= 20
     && value.body.length <= 2400
-    && Object.hasOwn(STYLE_LABELS, value.style);
+    && Object.hasOwn(STYLE_LABELS, value.style)
+    && (value.byline === undefined || (typeof value.byline === 'string' && value.byline.length <= 80))
+    && (value.ctaLabel === undefined || (typeof value.ctaLabel === 'string' && value.ctaLabel.length <= 50))
+    && (!value.ctaLabel && !value.ctaUrl || !!value.ctaLabel?.trim() && !!validHttpsUrl(value.ctaUrl));
 }
 
 function renderPreview(value) {
   const cancelled = value.action === 'cancelled';
   const label = cancelled ? 'Opening note removed' : STYLE_LABELS[value.style];
   const title = cancelled ? `${value.planWeekKey} will use the standard brief` : value.headline.trim() || label;
-  const paragraphs = value.body.trim().split(/\n\s*\n/).map((paragraph) => (
-    `<p style="margin:12px 0 0;font:400 15px/1.62 Arial,sans-serif;color:#DCD3C4;">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`
-  )).join('');
+  const paragraphs = formattedBody(value.body.trim());
+  const extras = `${value.byline?.trim() ? `<div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">${escapeHtml(value.byline.trim())}</div>` : ''}${value.ctaLabel?.trim() && validHttpsUrl(value.ctaUrl) ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:17px;"><tr><td style="background:#F4EEE3;border-radius:3px;"><a href="${escapeHtml(validHttpsUrl(value.ctaUrl))}" style="display:inline-block;padding:11px 17px;color:#0E1A17;font:700 13px/1 Arial,sans-serif;text-decoration:none;">${escapeHtml(value.ctaLabel.trim())} →</a></td></tr></table>` : ''}`;
 
   const opening = (() => {
     if (cancelled) {
@@ -63,7 +121,7 @@ function renderPreview(value) {
         <tr><td style="padding:20px;">
           <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
           <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
-          ${paragraphs}
+          ${paragraphs}${extras}
         </td></tr>
       </table>`;
     }
@@ -75,7 +133,7 @@ function renderPreview(value) {
             <td align="right" style="font:400 10px/1 monospace;color:#A6B8AE;">${escapeHtml(value.planWeekKey)}</td>
           </tr></table>
           <div style="font:700 21px/1.3 Georgia,serif;color:#F4EEE3;padding-top:12px;">${escapeHtml(title)}</div>
-          ${paragraphs}
+          ${paragraphs}${extras}
         </td></tr>
       </table>`;
     }
@@ -83,20 +141,20 @@ function renderPreview(value) {
       return `<div style="border-top:1px solid #3A5A4E;border-bottom:1px solid #3A5A4E;padding:19px 4px 20px;">
         <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
         <div style="font:700 23px/1.3 Georgia,serif;color:#F4EEE3;padding-top:12px;">${escapeHtml(title)}</div>
-        ${paragraphs}
-        <div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">From the Calgary Watch team</div>
+        ${paragraphs}${extras || '<div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">From the Calgary Watch team</div>'}
       </div>`;
     }
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:6px;">
       <tr><td style="padding:20px;">
         <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
         <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
-        ${paragraphs}
+        ${paragraphs}${extras}
       </td></tr>
     </table>`;
   })();
 
   const html = `<!doctype html><html><body style="margin:0;background:#0E1A17;color:#DCD3C4;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(value.preheader?.trim() || `Admin proof for ${value.planWeekKey}`)}</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E1A17;">
       <tr><td align="center" style="padding:28px 12px;">
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
@@ -128,7 +186,9 @@ function renderPreview(value) {
     label.toUpperCase(),
     title,
     '',
-    value.body.trim(),
+    plainFormatting(value.body.trim()),
+    ...(value.byline?.trim() ? ['', value.byline.trim()] : []),
+    ...(value.ctaLabel?.trim() && validHttpsUrl(value.ctaUrl) ? ['', `${value.ctaLabel.trim()}: ${validHttpsUrl(value.ctaUrl)}`] : []),
     '',
     cancelled
       ? 'This opening note was removed. The standard weekly email will still send.'

@@ -46,7 +46,10 @@ import { letterheadImages, welcomeImages } from '../scripts/digest/art.js';
 import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js';
 import type { Incident } from '../src/types/index.js';
 import {
+  digestBodyPlainText,
   normalizeDigestContribution,
+  normalizeDigestUrl,
+  parseDigestBody,
   upcomingDigestWeeks,
   type DigestContribution,
 } from '../src/lib/digestPlanner.js';
@@ -149,6 +152,31 @@ describe('weekly email planner', () => {
     assert.equal(normalizeDigestContribution({ weekKey: '2026-W35', body: 'Useful update', style: 'loud' }), null);
   });
 
+  it('parses a constrained editorial format without accepting unsafe links', () => {
+    const blocks = parseDigestBody('## Update\n\nA **clear** note with [details](https://calgarywatch.ca/map).\n\n- First\n- Second\n\n> Community voice');
+    assert.deepEqual(blocks.map((block) => block.type), ['heading', 'paragraph', 'list', 'quote']);
+    assert.equal(normalizeDigestUrl('javascript:alert(1)'), '');
+    assert.equal(normalizeDigestUrl('http://calgarywatch.ca'), '');
+    assert.equal(normalizeDigestUrl('https://calgarywatch.ca/map'), 'https://calgarywatch.ca/map');
+    assert.match(digestBodyPlainText('- **One**\n- [Two](https://example.com)'), /• One\n• Two \(https:\/\/example.com\)/);
+  });
+
+  it('normalizes attribution and secure calls to action', () => {
+    const contribution = normalizeDigestContribution({
+      weekKey: '2026-W35', body: 'A useful weekly contribution.', style: 'news-brief',
+      byline: 'By the watch desk', ctaLabel: 'Read more', ctaUrl: 'https://calgarywatch.ca/map',
+    });
+    assert.equal(contribution?.byline, 'By the watch desk');
+    assert.equal(contribution?.ctaLabel, 'Read more');
+    assert.equal(contribution?.ctaUrl, 'https://calgarywatch.ca/map');
+    const unsafe = normalizeDigestContribution({
+      weekKey: '2026-W35', body: 'A useful weekly contribution.', style: 'news-brief',
+      ctaLabel: 'Do not click', ctaUrl: 'javascript:alert(1)',
+    });
+    assert.equal(unsafe?.ctaLabel, '');
+    assert.equal(unsafe?.ctaUrl, '');
+  });
+
   it('renders the planned note before the standard greeting and escapes admin input', () => {
     const summary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
     const contribution: DigestContribution = {
@@ -175,6 +203,26 @@ describe('weekly email planner', () => {
       branding: BRANDING,
     });
     assert.ok(text.indexOf('<This week>') < text.indexOf('Morning,'));
+  });
+
+  it('renders structured formatting, attribution and CTA in HTML and plain text', () => {
+    const summary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+    const contribution: DigestContribution = {
+      weekKey: summary.weekKey, weekStart: NOW, headline: 'Structured edition',
+      preheader: 'A deliberate inbox preview line.',
+      body: '## What changed\n\nA **safer** update.\n\n- First item\n- Second item\n\n> A neighbour quote',
+      style: 'news-brief', status: 'published', byline: 'By the watch desk',
+      ctaLabel: 'See the map', ctaUrl: 'https://calgarywatch.ca/map',
+    };
+    const options = { summary, contribution, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)), branding: BRANDING };
+    const html = renderDigestHtml(options);
+    assert.match(html, /<strong[^>]*>safer<\/strong>/);
+    assert.match(html, /By the watch desk/);
+    assert.match(html, /See the map/);
+    assert.match(html, /A deliberate inbox preview line\./);
+    const text = renderDigestText(options);
+    assert.match(text, /• First item/);
+    assert.match(text, /See the map: https:\/\/calgarywatch.ca\/map/);
   });
 
   it('gives each editorial format its own purposeful structure', () => {

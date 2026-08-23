@@ -1,10 +1,11 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   collection, doc, getDoc, onSnapshot, query, runTransaction, where, writeBatch,
 } from 'firebase/firestore';
 import {
-  AlertTriangle, BookOpenText, CalendarDays, Check, History, Loader2, MailCheck,
-  Newspaper, RefreshCw, Send, ShieldCheck, Trash2,
+  AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, FileText, Heading3,
+  History, Link2, List, Loader2, MailCheck, Monitor, Newspaper, Quote, RefreshCw,
+  Send, ShieldCheck, Smartphone, Trash2,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -13,7 +14,11 @@ import {
   CONTRIBUTION_STYLE_COPY,
   DIGEST_CONTRIBUTION_STYLES,
   DIGEST_TEMPLATE_PURPOSES,
+  digestBodyPlainText,
+  normalizeDigestUrl,
+  parseDigestBody,
   upcomingDigestWeeks,
+  type DigestInlineToken,
   type DigestContribution,
   type DigestContributionStyle,
 } from '@/src/lib/digestPlanner';
@@ -48,16 +53,22 @@ type TestRequest = {
 
 type Draft = {
   headline: string;
+  preheader: string;
   body: string;
   style: DigestContributionStyle;
+  byline: string;
+  ctaLabel: string;
+  ctaUrl: string;
   baseRevision: number;
 };
 
 class PlannerConflictError extends Error {}
 
 const draftKey = (weekKey: string) => `cw_weekly_email_draft_${weekKey}`;
-const signature = (headline: string, body: string, style: DigestContributionStyle) =>
-  JSON.stringify([headline, body, style]);
+const signature = (
+  headline: string, preheader: string, body: string, style: DigestContributionStyle,
+  byline: string, ctaLabel: string, ctaUrl: string,
+) => JSON.stringify([headline, preheader, body, style, byline, ctaLabel, ctaUrl]);
 
 function formatTime(value: number | undefined): string {
   if (!value) return '';
@@ -71,7 +82,8 @@ function safeDraft(value: string | null): Draft | null {
   try {
     const draft = JSON.parse(value) as Partial<Draft>;
     if (
-      typeof draft.headline !== 'string' || typeof draft.body !== 'string' ||
+      typeof draft.headline !== 'string' || typeof draft.preheader !== 'string' || typeof draft.body !== 'string' ||
+      typeof draft.byline !== 'string' || typeof draft.ctaLabel !== 'string' || typeof draft.ctaUrl !== 'string' ||
       typeof draft.baseRevision !== 'number' ||
       !DIGEST_CONTRIBUTION_STYLES.includes(draft.style as DigestContributionStyle)
     ) return null;
@@ -79,6 +91,27 @@ function safeDraft(value: string | null): Draft | null {
   } catch {
     return null;
   }
+}
+
+function PreviewInline({ tokens }: { tokens: DigestInlineToken[] }) {
+  return <>{tokens.map((token, index) => {
+    if (token.type === 'strong') return <strong key={index} style={{ color: '#F4EEE3' }}>{token.text}</strong>;
+    if (token.type === 'link') return <span key={index} className="font-semibold underline" style={{ color: '#5CC3AA' }}>{token.text}</span>;
+    return <span key={index} className="whitespace-pre-line">{token.text}</span>;
+  })}</>;
+}
+
+function PreviewBody({ body }: { body: string }) {
+  const blocks = parseDigestBody(body);
+  if (!blocks.length) return <p style={{ color: '#A6B8AE' }}>Your optional opening note will appear here.</p>;
+  return <div className="mt-2 space-y-2.5 text-[0.82rem] leading-relaxed" style={{ color: '#DCD3C4' }}>
+    {blocks.map((block, index) => {
+      if (block.type === 'heading') return <p key={index} className="pt-1 text-[0.92rem] font-bold" style={{ fontFamily: display, color: '#F4EEE3' }}><PreviewInline tokens={block.content} /></p>;
+      if (block.type === 'quote') return <blockquote key={index} className="border-s-2 ps-3 italic" style={{ borderColor: '#E0AC63' }}><PreviewInline tokens={block.content} /></blockquote>;
+      if (block.type === 'list') return <ul key={index} className="space-y-1 ps-4">{block.items.map((item, itemIndex) => <li key={itemIndex} className="list-disc marker:text-[#E0AC63]"><PreviewInline tokens={item} /></li>)}</ul>;
+      return <p key={index}><PreviewInline tokens={block.content} /></p>;
+    })}
+  </div>;
 }
 
 function DeliveryStatus({ request }: { request: TestRequest | undefined }) {
@@ -112,12 +145,14 @@ function DeliveryStatus({ request }: { request: TestRequest | undefined }) {
 }
 
 function OpeningPreview({
-  style, headline, paragraphs, weekKey,
+  style, headline, body, weekKey, byline, ctaLabel,
 }: {
   style: DigestContributionStyle;
   headline: string;
-  paragraphs: string[];
+  body: string;
   weekKey: string;
+  byline: string;
+  ctaLabel: string;
 }) {
   const copy = CONTRIBUTION_STYLE_COPY[style];
   const content = (
@@ -125,11 +160,9 @@ function OpeningPreview({
       <p className="text-lg font-bold leading-snug" style={{ fontFamily: display, color: '#F4EEE3' }}>
         {headline.trim() || copy.label}
       </p>
-      <div className="mt-2 space-y-2 text-[0.82rem] leading-relaxed" style={{ color: '#DCD3C4' }}>
-        {paragraphs.length
-          ? paragraphs.map((paragraph, index) => <p key={index} className="whitespace-pre-line">{paragraph}</p>)
-          : <p style={{ color: '#A6B8AE' }}>Your optional opening note will appear here.</p>}
-      </div>
+      <PreviewBody body={body} />
+      {byline.trim() && <p className="mt-3 text-[0.72rem] font-semibold" style={{ color: '#A6B8AE' }}>{byline.trim()}</p>}
+      {ctaLabel.trim() && <span className="mt-4 inline-block rounded-sm px-3 py-2 text-[0.7rem] font-bold" style={{ background: '#F4EEE3', color: '#0E1A17' }}>{ctaLabel.trim()} →</span>}
     </>
   );
 
@@ -150,7 +183,7 @@ function OpeningPreview({
       <div className="border-y px-1 py-4" style={{ borderColor: '#3A5A4E' }}>
         <p className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
         {content}
-        <p className="mt-4 text-[0.72rem] font-semibold" style={{ color: '#A6B8AE' }}>From the Calgary Watch team</p>
+        {!byline.trim() && <p className="mt-4 text-[0.72rem] font-semibold" style={{ color: '#A6B8AE' }}>From the Calgary Watch team</p>}
       </div>
     );
   }
@@ -170,22 +203,35 @@ export function WeeklyEmailPlanner() {
   const [selectedWeek, setSelectedWeek] = useState(weeks[0]?.weekKey ?? '');
   const [loadedPlan, setLoadedPlan] = useState<DigestContribution | null>(null);
   const [headline, setHeadline] = useState('');
+  const [preheader, setPreheader] = useState('');
   const [body, setBody] = useState('');
   const [style, setStyle] = useState<DigestContributionStyle>('neighbour-note');
+  const [byline, setByline] = useState('');
+  const [ctaLabel, setCtaLabel] = useState('');
+  const [ctaUrl, setCtaUrl] = useState('');
+  const [previewMode, setPreviewMode] = useState<'visual' | 'text'>('visual');
+  const [previewWidth, setPreviewWidth] = useState<'desktop' | 'mobile'>('desktop');
   const [saveState, setSaveState] = useState<SaveState>('loading');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState<MessageTone>('neutral');
   const [testRequests, setTestRequests] = useState<TestRequest[]>([]);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   const selected = weeks.find((week) => week.weekKey === selectedWeek) ?? weeks[0];
   const loadedRevision = loadedPlan?.revision ?? 0;
-  const baseline = signature(loadedPlan?.headline ?? '', loadedPlan?.body ?? '', loadedPlan?.style ?? 'neighbour-note');
-  const dirty = saveState !== 'loading' && signature(headline, body, style) !== baseline;
+  const baseline = signature(
+    loadedPlan?.headline ?? '', loadedPlan?.preheader ?? '', loadedPlan?.body ?? '', loadedPlan?.style ?? 'neighbour-note',
+    loadedPlan?.byline ?? '', loadedPlan?.ctaLabel ?? '', loadedPlan?.ctaUrl ?? '',
+  );
+  const dirty = saveState !== 'loading'
+    && signature(headline, preheader, body, style, byline, ctaLabel, ctaUrl) !== baseline;
   const remoteRevision = plans[selectedWeek]?.revision ?? 0;
   const hasRemoteChange = saveState !== 'loading' && remoteRevision !== loadedRevision;
   const bodyLength = body.trim().length;
   const validBody = bodyLength >= MIN_BODY && body.length <= MAX_BODY;
-  const canSubmit = !!db && !!user && !!selected && validBody && dirty && !hasRemoteChange && saveState !== 'saving';
+  const hasCta = !!ctaLabel.trim() || !!ctaUrl.trim();
+  const validCta = !hasCta || (!!ctaLabel.trim() && !!normalizeDigestUrl(ctaUrl));
+  const canSubmit = !!db && !!user && !!selected && validBody && validCta && dirty && !hasRemoteChange && saveState !== 'saving';
   const latestTest = testRequests[0];
 
   useEffect(() => {
@@ -232,8 +278,12 @@ export function WeeklyEmailPlanner() {
 
       setLoadedPlan(plan);
       setHeadline(draft?.headline ?? plan?.headline ?? '');
+      setPreheader(draft?.preheader ?? plan?.preheader ?? '');
       setBody(draft?.body ?? plan?.body ?? '');
       setStyle(draft?.style ?? plan?.style ?? 'neighbour-note');
+      setByline(draft?.byline ?? plan?.byline ?? '');
+      setCtaLabel(draft?.ctaLabel ?? plan?.ctaLabel ?? '');
+      setCtaUrl(draft?.ctaUrl ?? plan?.ctaUrl ?? '');
       setSaveState('idle');
       if (draft) {
         setMessage('Unsaved work from this tab was restored.');
@@ -252,12 +302,12 @@ export function WeeklyEmailPlanner() {
   useEffect(() => {
     if (!selectedWeek || saveState === 'loading') return;
     if (dirty) {
-      const draft: Draft = { headline, body, style, baseRevision: loadedRevision };
+      const draft: Draft = { headline, preheader, body, style, byline, ctaLabel, ctaUrl, baseRevision: loadedRevision };
       sessionStorage.setItem(draftKey(selectedWeek), JSON.stringify(draft));
     } else {
       sessionStorage.removeItem(draftKey(selectedWeek));
     }
-  }, [body, dirty, headline, loadedRevision, saveState, selectedWeek, style]);
+  }, [body, byline, ctaLabel, ctaUrl, dirty, headline, loadedRevision, preheader, saveState, selectedWeek, style]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -284,8 +334,12 @@ export function WeeklyEmailPlanner() {
       action,
       planWeekKey: plan.weekKey,
       headline: plan.headline,
+      preheader: plan.preheader ?? '',
       body: plan.body,
       style: plan.style,
+      byline: plan.byline ?? '',
+      ctaLabel: plan.ctaLabel ?? '',
+      ctaUrl: plan.ctaUrl ?? '',
       revision: plan.revision ?? 1,
       submittedByUid: user!.uid,
       submittedByEmail: user!.email ?? '',
@@ -318,8 +372,12 @@ export function WeeklyEmailPlanner() {
           weekKey: selected.weekKey,
           weekStart: selected.weekStart,
           headline: headline.trim(),
+          preheader: preheader.trim(),
           body: body.trim(),
           style,
+          byline: byline.trim(),
+          ctaLabel: ctaLabel.trim(),
+          ctaUrl: ctaLabel.trim() ? normalizeDigestUrl(ctaUrl) : '',
           status: 'published',
           authorUid: user.uid,
           authorEmail: user.email ?? '',
@@ -334,14 +392,22 @@ export function WeeklyEmailPlanner() {
           action: server ? 'weekly_email_plan_update' : 'weekly_email_plan_create',
           targetCollection: 'weekly_email_plans', targetId: selected.weekKey,
           adminUid: user.uid, adminEmail: user.email ?? '', timestamp: now,
-          changes: { revision: savedPlan.revision, style, headline: savedPlan.headline, bodyLength: savedPlan.body.length },
+          changes: {
+            revision: savedPlan.revision, style, headline: savedPlan.headline,
+            bodyLength: savedPlan.body.length, hasPreheader: !!savedPlan.preheader,
+            hasByline: !!savedPlan.byline, hasCta: !!savedPlan.ctaUrl,
+          },
           metadata: { testRequestId: testRef.id },
         });
       });
 
       setLoadedPlan(savedPlan);
       setHeadline(savedPlan!.headline);
+      setPreheader(savedPlan!.preheader ?? '');
       setBody(savedPlan!.body);
+      setByline(savedPlan!.byline ?? '');
+      setCtaLabel(savedPlan!.ctaLabel ?? '');
+      setCtaUrl(savedPlan!.ctaUrl ?? '');
       sessionStorage.removeItem(draftKey(selected.weekKey));
       setSaveState('saved');
       setMessage('Scheduled. Test delivery has started for every admin.');
@@ -407,7 +473,7 @@ export function WeeklyEmailPlanner() {
       });
       sessionStorage.removeItem(draftKey(selectedWeek));
       setLoadedPlan(null);
-      setHeadline(''); setBody(''); setStyle('neighbour-note');
+      setHeadline(''); setPreheader(''); setBody(''); setStyle('neighbour-note'); setByline(''); setCtaLabel(''); setCtaUrl('');
       setSaveState('saved');
       setMessage('Opening note removed. The normal weekly brief remains scheduled, and every admin is being notified.');
       setMessageTone('ok');
@@ -424,10 +490,48 @@ export function WeeklyEmailPlanner() {
     }
   }
 
+  function insertFormatting(prefix: string, suffix = '', fallback = '') {
+    const field = bodyRef.current;
+    if (!field) return;
+    const start = field.selectionStart;
+    const end = field.selectionEnd;
+    const selectedText = body.slice(start, end) || fallback;
+    const next = `${body.slice(0, start)}${prefix}${selectedText}${suffix}${body.slice(end)}`;
+    if (next.length > MAX_BODY) return;
+    setBody(next);
+    requestAnimationFrame(() => {
+      field.focus();
+      field.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
+    });
+  }
+
+  function copyAnotherEdition() {
+    const source = weeks.map((week) => plans[week.weekKey]).find((plan) => plan && plan.weekKey !== selectedWeek);
+    if (!source) return;
+    setHeadline(source.headline);
+    setPreheader(source.preheader ?? '');
+    setBody(source.body);
+    setStyle(source.style);
+    setByline(source.byline ?? '');
+    setCtaLabel(source.ctaLabel ?? '');
+    setCtaUrl(source.ctaUrl ?? '');
+    setMessage(`Copied ${source.weekKey} into this draft. Review dates and links before scheduling.`);
+    setMessageTone('attention');
+  }
+
   const toneColor: Record<MessageTone, string> = {
     neutral: T.muted, ok: T.ok, attention: T.attention, critical: T.critical,
   };
-  const previewParagraphs = body.trim() ? body.trim().split(/\n\s*\n/) : [];
+  const wordCount = body.trim() ? digestBodyPlainText(body).trim().split(/\s+/).length : 0;
+  const readingSeconds = Math.max(5, Math.ceil((wordCount / 220) * 60));
+  const plainTextPreview = [
+    CONTRIBUTION_STYLE_COPY[style].emailLabel.toUpperCase(),
+    headline.trim() || CONTRIBUTION_STYLE_COPY[style].label,
+    '', digestBodyPlainText(body).trim(),
+    ...(byline.trim() ? ['', byline.trim()] : []),
+    ...(ctaLabel.trim() && normalizeDigestUrl(ctaUrl) ? ['', `${ctaLabel.trim()}: ${normalizeDigestUrl(ctaUrl)}`] : []),
+  ].join('\n');
+  const reusablePlan = weeks.some((week) => week.weekKey !== selectedWeek && plans[week.weekKey]);
 
   return (
     <div className="space-y-4">
@@ -504,7 +608,9 @@ export function WeeklyEmailPlanner() {
       )}
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(350px,0.92fr)]">
-        <Panel title="Weekly opening note" subtitle="Optional. It appears only in the recurring weekly brief, before the automated neighbourhood briefing." action={saveState === 'loading' ? <Chip tone="attention"><Loader2 size={11} className="motion-safe:animate-spin" /> Loading</Chip> : undefined}>
+        <Panel title="Weekly opening note" subtitle="Optional. It appears only in the recurring weekly brief, before the automated neighbourhood briefing." action={saveState === 'loading'
+          ? <Chip tone="attention"><Loader2 size={11} className="motion-safe:animate-spin" /> Loading</Chip>
+          : reusablePlan ? <AdminButton variant="ghost" size="sm" onClick={copyAnotherEdition} disabled={saveState === 'saving'}><Copy size={13} /> Reuse edition</AdminButton> : undefined}>
           <form className="space-y-5" onSubmit={submit}>
             <fieldset>
               <legend className="text-xs font-semibold" style={{ color: T.ink }}>Editorial format</legend>
@@ -528,16 +634,59 @@ export function WeeklyEmailPlanner() {
               <p className="mt-1.5 text-[0.7rem]" style={{ color: T.muted }}>This labels the opening note. Subscriber subject lines remain personalized to their area.</p>
             </Field>
 
+            <Field label="Inbox preview text (optional)">
+              <input className={inputClass} style={inputStyle} maxLength={140} value={preheader} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setPreheader(event.target.value)} placeholder="A short reason to open this week’s brief" />
+              <div className="mt-1.5 flex justify-between gap-3 text-[0.7rem]" style={{ color: T.muted }}><span>Appears beside the subject in many inboxes. The automatic area summary is the fallback.</span><span className="shrink-0 tabular-nums" style={{ fontFamily: mono }}>{preheader.length}/140</span></div>
+            </Field>
+
             <Field label="Your contribution">
-              <textarea className="w-full min-h-52 resize-y rounded-xl border px-3.5 py-3 text-sm leading-relaxed outline-none transition-colors duration-200 focus:border-slate-500 disabled:opacity-60" style={inputStyle} maxLength={MAX_BODY} value={body} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setBody(event.target.value)} placeholder="Write the note readers should see before their weekly briefing…" aria-describedby="planner-count planner-guidance planner-validation" />
+              <div className="mb-2 flex flex-wrap gap-1 rounded-lg p-1" style={{ background: T.surface }} role="toolbar" aria-label="Email formatting">
+                <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('**', '**', 'important text')}><Bold size={13} /> Bold</AdminButton>
+                <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('## ', '', 'Section heading')}><Heading3 size={13} /> Heading</AdminButton>
+                <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('- ', '', 'List item')}><List size={13} /> List</AdminButton>
+                <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('> ', '', 'Quoted text')}><Quote size={13} /> Quote</AdminButton>
+                <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('[', '](https://)', 'link text')}><Link2 size={13} /> Link</AdminButton>
+              </div>
+              <textarea ref={bodyRef} className="w-full min-h-60 resize-y rounded-xl border px-3.5 py-3 text-sm leading-relaxed outline-none transition-colors duration-200 focus:border-slate-500 disabled:opacity-60" style={inputStyle} maxLength={MAX_BODY} value={body} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setBody(event.target.value)} placeholder="Write the note readers should see before their weekly briefing…" aria-describedby="planner-count planner-guidance planner-validation" />
               <div className="mt-1.5 flex items-start justify-between gap-3 text-[0.7rem]" style={{ color: T.muted }}>
-                <span id="planner-guidance">Use a blank line for a new paragraph. Email-safe formatting is automatic.</span>
+                <span id="planner-guidance">Formatting is converted to email-safe HTML and a readable plain-text fallback.</span>
                 <span id="planner-count" className="shrink-0 tabular-nums" style={{ fontFamily: mono, color: body.length > MAX_BODY * 0.9 ? T.attention : T.muted }}>{body.length}/{MAX_BODY}</span>
               </div>
               <p id="planner-validation" className="mt-1 min-h-4 text-[0.7rem]" style={{ color: bodyLength > 0 && bodyLength < MIN_BODY ? T.attention : T.muted }}>
-                {bodyLength > 0 && bodyLength < MIN_BODY ? `${MIN_BODY - bodyLength} more characters needed.` : 'Aim for one to three short paragraphs.'}
+                {bodyLength > 0 && bodyLength < MIN_BODY ? `${MIN_BODY - bodyLength} more characters needed.` : `${wordCount} words · about ${readingSeconds} seconds to read`}
               </p>
             </Field>
+
+            <details className="rounded-xl border" style={{ borderColor: T.line }} open={!!(byline || ctaLabel || ctaUrl)}>
+              <summary className="cursor-pointer px-4 py-3 text-xs font-bold" style={{ color: T.ink }}>Attribution & call to action <span className="font-normal" style={{ color: T.muted }}>· optional</span></summary>
+              <div className="space-y-4 border-t px-4 py-4" style={{ borderColor: T.line }}>
+                <Field label="Attribution line">
+                  <input className={inputClass} style={inputStyle} maxLength={80} value={byline} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setByline(event.target.value)} placeholder="By Jane, Calgary Watch editor" />
+                  <p className="mt-1.5 text-[0.7rem]" style={{ color: T.muted }}>For personal stories, this replaces the standard team sign-off.</p>
+                </Field>
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+                  <Field label="Button label">
+                    <input className={inputClass} style={inputStyle} maxLength={50} value={ctaLabel} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setCtaLabel(event.target.value)} placeholder="Read the update" />
+                  </Field>
+                  <Field label="Button destination">
+                    <input className={inputClass} style={inputStyle} inputMode="url" maxLength={500} value={ctaUrl} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setCtaUrl(event.target.value)} placeholder="https://calgarywatch.ca/…" aria-invalid={hasCta && !validCta} />
+                  </Field>
+                </div>
+                {hasCta && !validCta && <p className="text-[0.7rem]" style={{ color: T.critical }}>Add both a button label and a secure https:// destination.</p>}
+              </div>
+            </details>
+
+            <div className="rounded-xl p-4" style={{ background: T.surface }} aria-label="Publishing preflight">
+              <p className="text-xs font-bold" style={{ color: T.ink }}>Publishing preflight</p>
+              <div className="mt-2 grid gap-2 text-[0.7rem] sm:grid-cols-2">
+                {[
+                  [validBody, `Contribution has ${MIN_BODY}–${MAX_BODY} characters`],
+                  [validCta, hasCta ? 'Call-to-action link is secure' : 'No optional call to action'],
+                  [!!selected, 'A specific weekly edition is selected'],
+                  [!hasRemoteChange, 'You are editing the latest revision'],
+                ].map(([ready, label]) => <span key={String(label)} className="flex items-center gap-2" style={{ color: ready ? T.ink : T.critical }}><StatusDot tone={ready ? 'ok' : 'critical'} />{label}</span>)}
+              </div>
+            </div>
 
             <div className="border-t pt-4" style={{ borderColor: T.line }}>
               <div className="flex flex-wrap items-center gap-2">
@@ -555,8 +704,23 @@ export function WeeklyEmailPlanner() {
 
         <div className="space-y-4 xl:sticky xl:top-24">
           <Panel title="Inbox preview" subtitle="A close representation of the opening subscribers will receive." action={<MailCheck size={16} style={{ color: T.signal }} />} padded={false}>
-            <div className="p-3 sm:p-5" style={{ background: '#0E1A17' }}>
-              <div className="mx-auto max-w-[34rem]" style={{ color: '#DCD3C4' }}>
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b px-3 py-2" style={{ borderColor: T.line, background: T.surface }}>
+              <div className="flex gap-1" aria-label="Preview content mode">
+                <AdminButton size="sm" variant={previewMode === 'visual' ? 'outline' : 'ghost'} tone={previewMode === 'visual' ? 'signal' : 'neutral'} onClick={() => setPreviewMode('visual')}><MailCheck size={13} /> Designed</AdminButton>
+                <AdminButton size="sm" variant={previewMode === 'text' ? 'outline' : 'ghost'} tone={previewMode === 'text' ? 'signal' : 'neutral'} onClick={() => setPreviewMode('text')}><FileText size={13} /> Plain text</AdminButton>
+              </div>
+              {previewMode === 'visual' && <div className="flex gap-1" aria-label="Preview width">
+                <AdminButton size="sm" variant={previewWidth === 'desktop' ? 'outline' : 'ghost'} tone={previewWidth === 'desktop' ? 'signal' : 'neutral'} onClick={() => setPreviewWidth('desktop')} title="Desktop width"><Monitor size={13} /></AdminButton>
+                <AdminButton size="sm" variant={previewWidth === 'mobile' ? 'outline' : 'ghost'} tone={previewWidth === 'mobile' ? 'signal' : 'neutral'} onClick={() => setPreviewWidth('mobile')} title="Mobile width"><Smartphone size={13} /></AdminButton>
+              </div>}
+            </div>
+            <div className="border-b px-4 py-3" style={{ borderColor: T.line, background: '#fff' }} aria-label="Inbox row preview">
+              <div className="flex min-w-0 gap-3 text-xs"><span className="shrink-0 font-bold" style={{ color: T.ink }}>Calgary Watch</span><p className="min-w-0 truncate" style={{ color: T.muted }}><strong style={{ color: T.ink }}>Your personalized weekly subject</strong> — {preheader.trim() || 'Automatic neighbourhood summary'}</p></div>
+            </div>
+            {previewMode === 'text' ? (
+              <pre className="max-h-[36rem] overflow-auto whitespace-pre-wrap p-5 text-xs leading-relaxed" style={{ background: '#0E1A17', color: '#DCD3C4', fontFamily: mono }}>{plainTextPreview}</pre>
+            ) : <div className="overflow-x-auto p-3 sm:p-5" style={{ background: '#0E1A17' }}>
+              <div className={`mx-auto transition-[max-width] duration-200 ${previewWidth === 'mobile' ? 'max-w-[20rem]' : 'max-w-[34rem]'}`} style={{ color: '#DCD3C4' }}>
                 <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: '#E0AC63' }}>
                   <div className="flex items-center gap-2.5">
                     <img src="/images/email/logo.png" width="40" height="40" alt="" className="h-10 w-10 object-contain" />
@@ -565,7 +729,7 @@ export function WeeklyEmailPlanner() {
                   <span className="text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.weekKey}</span>
                 </div>
                 <div className="py-5">
-                  <OpeningPreview style={style} headline={headline} paragraphs={previewParagraphs} weekKey={selected?.weekKey ?? ''} />
+                  <OpeningPreview style={style} headline={headline} body={body} weekKey={selected?.weekKey ?? ''} byline={byline} ctaLabel={validCta ? ctaLabel : ''} />
                   <div className="pt-6">
                     <p className="text-xl font-bold" style={{ fontFamily: display, color: '#F4EEE3' }}>Morning, neighbour.</p>
                     <p className="mt-2 text-[0.78rem] leading-relaxed" style={{ color: '#A6B8AE' }}>The regular location-based summary, weekly comparison and report list continue below.</p>
@@ -573,7 +737,7 @@ export function WeeklyEmailPlanner() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div>}
           </Panel>
 
           <Panel title="Admin proof delivery" subtitle="A private branded proof follows every publish, retest and removal." action={<History size={15} style={{ color: T.muted }} />}>

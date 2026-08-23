@@ -167,6 +167,15 @@ describe('weekly email planner security', () => {
     assert.ok(functionSource.includes("['preview', 'cancelled'].includes(action)"));
   });
 
+  it('permits constrained editorial controls and secure calls to action', () => {
+    for (const field of ['preheader', 'byline', 'ctaLabel', 'ctaUrl']) {
+      assert.ok(firestoreRules.includes(`'${field}'`), `${field} is missing from the Firestore contract`);
+      assert.ok(functionSource.includes(field), `${field} is missing from the proof renderer`);
+    }
+    assert.match(firestoreRules, /ctaUrl\.matches\('\^https:\/\/.\+'/);
+    assert.ok(functionSource.includes("parsed.protocol === 'https:'"));
+  });
+
   it('delivers private, retry-safe copies to each admin', () => {
     assert.ok(functionSource.includes('for (const [index, email] of ADMIN_EMAILS.entries())'));
     assert.ok(functionSource.includes("'Idempotency-Key': `digest-planner-preview/${requestId}/${index}`"));

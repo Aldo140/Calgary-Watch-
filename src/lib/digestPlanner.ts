@@ -33,8 +33,12 @@ export interface DigestContribution {
   weekKey: string;
   weekStart: number;
   headline: string;
+  preheader?: string;
   body: string;
   style: DigestContributionStyle;
+  byline?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
   status: 'published';
   authorUid?: string;
   authorEmail?: string;
@@ -42,6 +46,102 @@ export interface DigestContribution {
   createdAt?: number;
   updatedAt?: number;
   revision?: number;
+}
+
+export type DigestInlineToken =
+  | { type: 'text'; text: string }
+  | { type: 'strong'; text: string }
+  | { type: 'link'; text: string; url: string };
+
+export type DigestBodyBlock =
+  | { type: 'paragraph'; content: DigestInlineToken[] }
+  | { type: 'heading'; content: DigestInlineToken[] }
+  | { type: 'quote'; content: DigestInlineToken[] }
+  | { type: 'list'; items: DigestInlineToken[][] };
+
+/** Only web links are accepted in an email contribution. */
+export function normalizeDigestUrl(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'https:' ? parsed.toString() : '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * A deliberately small, deterministic formatting language for administrator copy.
+ * It is expressive enough for editorial hierarchy without accepting raw HTML.
+ */
+export function parseDigestInline(value: string): DigestInlineToken[] {
+  const tokens: DigestInlineToken[] = [];
+  const pattern = /\*\*([^*\n]+)\*\*|\[([^\]\n]+)\]\((https:\/\/[^\s)]+)\)/g;
+  let cursor = 0;
+  for (const match of value.matchAll(pattern)) {
+    const index = match.index ?? 0;
+    if (index > cursor) tokens.push({ type: 'text', text: value.slice(cursor, index) });
+    if (match[1]) tokens.push({ type: 'strong', text: match[1] });
+    else {
+      const url = normalizeDigestUrl(match[3]);
+      tokens.push(url
+        ? { type: 'link', text: match[2], url }
+        : { type: 'text', text: match[0] });
+    }
+    cursor = index + match[0].length;
+  }
+  if (cursor < value.length) tokens.push({ type: 'text', text: value.slice(cursor) });
+  return tokens.length ? tokens : [{ type: 'text', text: value }];
+}
+
+export function parseDigestBody(value: string): DigestBodyBlock[] {
+  const lines = value.replace(/\r/g, '').split('\n');
+  const blocks: DigestBodyBlock[] = [];
+  let paragraph: string[] = [];
+  let list: string[] = [];
+
+  const flushParagraph = () => {
+    const text = paragraph.join('\n').trim();
+    if (text) blocks.push({ type: 'paragraph', content: parseDigestInline(text) });
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (list.length) blocks.push({ type: 'list', items: list.map(parseDigestInline) });
+    list = [];
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushParagraph();
+      flushList();
+    } else if (/^##\s+/.test(trimmed)) {
+      flushParagraph(); flushList();
+      blocks.push({ type: 'heading', content: parseDigestInline(trimmed.replace(/^##\s+/, '')) });
+    } else if (/^>\s?/.test(trimmed)) {
+      flushParagraph(); flushList();
+      blocks.push({ type: 'quote', content: parseDigestInline(trimmed.replace(/^>\s?/, '')) });
+    } else if (/^-\s+/.test(trimmed)) {
+      flushParagraph();
+      list.push(trimmed.replace(/^-\s+/, ''));
+    } else {
+      flushList();
+      paragraph.push(trimmed);
+    }
+  }
+  flushParagraph();
+  flushList();
+  return blocks;
+}
+
+export function digestBodyPlainText(value: string): string {
+  return value
+    .replace(/^##\s+/gm, '')
+    .replace(/^>\s?/gm, '')
+    .replace(/^[-]\s+/gm, '• ')
+    .replace(/\*\*([^*\n]+)\*\*/g, '$1')
+    .replace(/\[([^\]\n]+)\]\((https:\/\/[^\s)]+)\)/g, '$1 ($2)');
 }
 
 export const CONTRIBUTION_STYLE_COPY: Record<DigestContributionStyle, {
@@ -113,7 +213,11 @@ export function normalizeDigestContribution(value: unknown): DigestContribution 
   if (!value || typeof value !== 'object') return null;
   const candidate = value as Partial<DigestContribution>;
   const headline = typeof candidate.headline === 'string' ? candidate.headline.trim().slice(0, 100) : '';
+  const preheader = typeof candidate.preheader === 'string' ? candidate.preheader.trim().slice(0, 140) : '';
   const body = typeof candidate.body === 'string' ? candidate.body.trim().slice(0, 2400) : '';
+  const byline = typeof candidate.byline === 'string' ? candidate.byline.trim().slice(0, 80) : '';
+  const ctaLabel = typeof candidate.ctaLabel === 'string' ? candidate.ctaLabel.trim().slice(0, 50) : '';
+  const ctaUrl = typeof candidate.ctaUrl === 'string' ? normalizeDigestUrl(candidate.ctaUrl) : '';
   const style = DIGEST_CONTRIBUTION_STYLES.includes(candidate.style as DigestContributionStyle)
     ? candidate.style as DigestContributionStyle
     : null;
@@ -123,8 +227,12 @@ export function normalizeDigestContribution(value: unknown): DigestContribution 
     weekKey: candidate.weekKey!,
     weekStart: typeof candidate.weekStart === 'number' ? candidate.weekStart : 0,
     headline,
+    preheader,
     body,
     style,
+    byline,
+    ctaLabel: ctaUrl && ctaLabel ? ctaLabel : '',
+    ctaUrl: ctaUrl && ctaLabel ? ctaUrl : '',
     status: 'published',
   };
 }

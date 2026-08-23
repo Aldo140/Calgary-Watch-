@@ -46,6 +46,9 @@ import {
 } from '../../src/lib/digest.js';
 import {
   CONTRIBUTION_STYLE_COPY,
+  digestBodyPlainText,
+  parseDigestBody,
+  type DigestInlineToken,
   type DigestContribution,
 } from '../../src/lib/digestPlanner.js';
 import type { IncidentCategory } from '../../src/types/index.js';
@@ -473,6 +476,39 @@ function heading(text: string): string {
                       text-transform:uppercase;padding-bottom:12px;">${escapeHtml(text)}</div>`;
 }
 
+function contributionInline(tokens: DigestInlineToken[]): string {
+  return tokens.map((token) => {
+    if (token.type === 'strong') return `<strong style="font-weight:700;color:${C.ink};">${escapeHtml(token.text)}</strong>`;
+    if (token.type === 'link') return `<a href="${escapeHtml(token.url)}" style="color:${C.bow};font-weight:700;text-decoration:underline;">${escapeHtml(token.text)}</a>`;
+    return escapeHtml(token.text).replace(/\n/g, '<br>');
+  }).join('');
+}
+
+function contributionContent(body: string): string {
+  return parseDigestBody(body).map((block, index) => {
+    if (block.type === 'heading') {
+      return `<div class="cw-ink" style="font:700 17px/1.35 ${DISPLAY};color:${C.ink};padding-top:${index ? 17 : 11}px;">${contributionInline(block.content)}</div>`;
+    }
+    if (block.type === 'quote') {
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:${index ? 15 : 11}px;"><tr><td width="3" style="width:3px;background:${C.gold};font-size:0;line-height:0;">&nbsp;</td><td class="cw-body" style="padding-left:13px;font:italic 400 14.5px/1.62 ${DISPLAY};color:${C.body};">${contributionInline(block.content)}</td></tr></table>`;
+    }
+    if (block.type === 'list') {
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:${index ? 13 : 10}px;">${block.items.map((item) => `<tr><td width="18" style="width:18px;vertical-align:top;font:700 15px/1.6 ${BODY};color:${C.gold};">•</td><td class="cw-body" style="padding:0 0 5px;font:400 14.5px/1.6 ${BODY};color:${C.body};">${contributionInline(item)}</td></tr>`).join('')}</table>`;
+    }
+    return p(contributionInline(block.content), { top: index === 0 ? 10 : 12, size: 14.5 });
+  }).join('');
+}
+
+function contributionExtras(contribution: DigestContribution): string {
+  const byline = contribution.byline?.trim()
+    ? `<div class="cw-soft" style="font:600 12.5px/1.5 ${BODY};color:${C.soft};padding-top:15px;">${escapeHtml(contribution.byline.trim())}</div>`
+    : '';
+  const cta = contribution.ctaLabel?.trim() && contribution.ctaUrl?.trim()
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:17px;"><tr><td style="background:${C.button};border-radius:3px;"><a href="${escapeHtml(contribution.ctaUrl)}" style="display:inline-block;padding:11px 17px;font:700 13px/1 ${BODY};color:${C.buttonInk};text-decoration:none;">${escapeHtml(contribution.ctaLabel)}&nbsp;→</a></td></tr></table>`
+    : '';
+  return byline + cta;
+}
+
 /**
  * Optional editor-written note. It is deliberately the first content block.
  *
@@ -485,13 +521,8 @@ function contributionBlock(contribution: DigestContribution | undefined): string
   if (!contribution?.body.trim()) return '';
   const copy = CONTRIBUTION_STYLE_COPY[contribution.style];
   const title = contribution.headline.trim() || copy.label;
-  const paragraphs = contribution.body
-    .split(/\n\s*\n/)
-    .map((text, index) => p(escapeHtml(text.trim()).replace(/\n/g, '<br>'), {
-      top: index === 0 ? 10 : 12,
-      size: 14.5,
-    }))
-    .join('');
+  const content = contributionContent(contribution.body);
+  const extras = contributionExtras(contribution);
 
   if (contribution.style === 'news-brief') {
     return `
@@ -512,7 +543,7 @@ function contributionBlock(contribution: DigestContribution | undefined): string
           <div class="cw-ink" style="font:700 20px/1.3 ${DISPLAY};color:${C.ink};padding-top:12px;">
             ${escapeHtml(title)}
           </div>
-          ${paragraphs}
+          ${content}${extras}
         </td></tr>
       </table>
     </td></tr>`;
@@ -527,10 +558,7 @@ function contributionBlock(contribution: DigestContribution | undefined): string
         <div class="cw-ink" style="font:700 23px/1.3 ${DISPLAY};color:${C.ink};max-width:430px;">
           ${escapeHtml(title)}
         </div>
-        ${paragraphs}
-        <div class="cw-soft" style="font:600 12.5px/1.5 ${BODY};color:${C.soft};padding-top:15px;">
-          From the Calgary Watch team
-        </div>
+        ${content}${extras || '<div class="cw-soft" style="font:600 12.5px/1.5 '+BODY+';color:'+C.soft+';padding-top:15px;">From the Calgary Watch team</div>'}
       </div>
       <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
     </td></tr>`;
@@ -545,7 +573,7 @@ function contributionBlock(contribution: DigestContribution | undefined): string
           <div class="cw-ink" style="font:700 21px/1.3 ${DISPLAY};color:${C.ink};">
             ${escapeHtml(title)}
           </div>
-          ${paragraphs}
+          ${content}${extras}
         </td></tr>
       </table>
     </td></tr>`;
@@ -948,7 +976,7 @@ export function renderDigestHtml(options: {
 
   return shell({
     title: digestSubject(summary),
-    preheader: leadParagraph(summary),
+    preheader: options.contribution?.preheader?.trim() || leadParagraph(summary),
     inner: `
     ${masthead(dateRange(summary))}
     ${contributionBlock(options.contribution)}
@@ -1069,7 +1097,11 @@ export function renderDigestText(options: {
       CONTRIBUTION_STYLE_COPY[contribution.style].emailLabel.toUpperCase(),
       contribution.headline.trim() || CONTRIBUTION_STYLE_COPY[contribution.style].label,
       '',
-      wrap(contribution.body.trim()),
+      wrap(digestBodyPlainText(contribution.body.trim())),
+      ...(contribution.byline?.trim() ? ['', contribution.byline.trim()] : []),
+      ...(contribution.ctaLabel?.trim() && contribution.ctaUrl?.trim()
+        ? ['', `${contribution.ctaLabel.trim()}: ${contribution.ctaUrl.trim()}`]
+        : []),
       '',
       '--------------------------------------------------------------',
       '',

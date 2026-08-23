@@ -38,6 +38,15 @@ retest, or removal is recorded in the admin audit log. Preview messages are
 sent separately to each approved admin so their addresses are not exposed to
 one another.
 
+The planner is a constrained editorial studio rather than a raw HTML editor.
+Admins can add subheadings, bold emphasis, bullet lists, quotations and secure
+links; set inbox preview text, an optional attribution line and one primary call-to-action; reuse a
+scheduled edition; and review desktop, mobile and plain-text previews. A live
+preflight checks content length, secure links, week selection and revision
+freshness before publishing. The same parser drives the subscriber HTML and
+plain-text alternative, while the proof function independently escapes and
+validates every field.
+
 The email lifecycle deliberately uses three formats with separate purposes:
 
 - **Welcome letter:** sent once to introduce Calgary Watch and explain the
@@ -310,6 +319,9 @@ whether the message is opened than the avatar does.
   never receives the Resend key. Saving again replaces that edition's note and
   queues a fresh test. The deployment workflow syncs `RESEND_API_KEY` into
   Firebase Secret Manager before deploying the function.
+- **Editorial syntax:** `## Heading`, `**bold**`, `- list item`, `> quotation`
+  and `[label](https://secure-link)` are supported. Raw HTML is always escaped.
+  Calls to action require both a short label and an `https://` destination.
 - **Idempotency:** each send claims `digest_sends/{uid}_{isoWeek}` before the
   provider is called. Re-running the workflow is safe.
 - **Unsubscribes** are honoured at the start of every run, before recipients

@@ -112,7 +112,7 @@ export default function AdminPage() {
 
   const titles: Record<Section, { title: string; subtitle: string }> = {
     desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
-    planner: { title: 'Email planner', subtitle: 'Add an optional opening note to an upcoming weekly brief' },
+    planner: { title: 'Email planner', subtitle: 'Prepare Monday’s edition, review recipients and understand every delivery route' },
     reports: { title: 'Reports', subtitle: 'What is being reported, where, and when' },
     people: { title: 'People', subtitle: 'Who is signed up and who is contributing' },
     feeds: { title: 'Data feeds', subtitle: 'Live status of the sources behind the map' },

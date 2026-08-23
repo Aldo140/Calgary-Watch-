@@ -19,6 +19,13 @@ const allowlist = String(import.meta.env.VITE_DIGEST_ALLOWLIST ?? '')
   .split(',').map((email) => email.trim().toLowerCase()).filter(Boolean);
 const configuredLimit = Number(import.meta.env.VITE_DIGEST_LIMIT ?? 50);
 
+/** One entry point keeps the overview and detailed audience view in lockstep. */
+export function configuredDigestAudienceForecast(profiles: UserProfile[]) {
+  return buildDigestAudienceForecast(
+    profiles as DigestRecipient[], { allowlist, limit: configuredLimit },
+  );
+}
+
 const refusalCopy: Record<ConsentRefusal, string> = {
   'not-opted-in': 'Not opted in',
   'no-consent-timestamp': 'Consent date is missing',
@@ -81,9 +88,7 @@ export function DigestAudienceForecast({ profiles, loading, error }: {
 }) {
   const [filter, setFilter] = useState<AudienceFilter>('all');
   const [search, setSearch] = useState('');
-  const forecast = useMemo(() => buildDigestAudienceForecast(
-    profiles as DigestRecipient[], { allowlist, limit: configuredLimit },
-  ), [profiles]);
+  const forecast = useMemo(() => configuredDigestAudienceForecast(profiles), [profiles]);
   const nextRun = useMemo(() => nextDigestRunAt(), []);
   const nextRunLabel = useMemo(() => new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric', year: 'numeric',

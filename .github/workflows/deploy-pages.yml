@@ -1,8 +1,10 @@
-name: Redirect www to Firebase Hosting
+name: Publish www redirect (requires DNS)
 
+# This artifact is ready for www.calgarywatch.ca, but the current DNS A record
+# points to Firebase Hosting instead of GitHub Pages. Publishing on every source
+# push cannot change that external routing, so this stays manual until DNS is
+# changed to the GitHub Pages target. Domain Availability reports the mismatch.
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -19,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

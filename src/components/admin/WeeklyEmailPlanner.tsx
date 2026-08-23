@@ -4,22 +4,27 @@ import {
 } from 'firebase/firestore';
 import {
   AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, FileText, Heading3,
-  History, Link2, List, Loader2, MailCheck, Monitor, Newspaper, Quote, RefreshCw,
-  Send, ShieldCheck, Smartphone, Trash2,
+  History, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, Quote, RefreshCw,
+  Send, ShieldCheck, Smartphone, Sparkles, Trash2, Users,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
 import {
   CONTRIBUTION_STYLE_COPY,
+  CONTRIBUTION_AUDIENCE_COPY,
+  CONTRIBUTION_OUTLINES,
+  DIGEST_CONTRIBUTION_AUDIENCES,
   DIGEST_CONTRIBUTION_STYLES,
   DIGEST_TEMPLATE_PURPOSES,
   digestBodyPlainText,
+  contributionAppliesToScope,
   normalizeDigestUrl,
   parseDigestBody,
   upcomingDigestWeeks,
   type DigestInlineToken,
   type DigestContribution,
+  type DigestContributionAudience,
   type DigestContributionStyle,
 } from '@/src/lib/digestPlanner';
 import {
@@ -33,6 +38,12 @@ const TEMPLATE_ICONS = {
   welcome: BookOpenText,
   weekly: Newspaper,
   'admin-proof': ShieldCheck,
+} as const;
+
+const AUDIENCE_ICONS = {
+  everyone: Users,
+  local: MapPin,
+  citywide: Newspaper,
 } as const;
 
 type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
@@ -56,19 +67,28 @@ type Draft = {
   preheader: string;
   body: string;
   style: DigestContributionStyle;
+  audience: DigestContributionAudience;
   byline: string;
   ctaLabel: string;
   ctaUrl: string;
   baseRevision: number;
+  ownerUid: string;
+  savedAt: number;
 };
 
 class PlannerConflictError extends Error {}
 
-const draftKey = (weekKey: string) => `cw_weekly_email_draft_${weekKey}`;
+const DRAFT_TTL = 30 * 24 * 60 * 60 * 1000;
+const draftKey = (uid: string, weekKey: string) => `cw_weekly_email_draft_${uid}_${weekKey}`;
+const draftRead = (key: string) => { try { return localStorage.getItem(key); } catch { return null; } };
+const draftRemove = (key: string) => { try { localStorage.removeItem(key); } catch { /* storage may be blocked */ } };
+const draftWrite = (key: string, value: Draft) => {
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
+};
 const signature = (
   headline: string, preheader: string, body: string, style: DigestContributionStyle,
-  byline: string, ctaLabel: string, ctaUrl: string,
-) => JSON.stringify([headline, preheader, body, style, byline, ctaLabel, ctaUrl]);
+  audience: DigestContributionAudience, byline: string, ctaLabel: string, ctaUrl: string,
+) => JSON.stringify([headline, preheader, body, style, audience, byline, ctaLabel, ctaUrl]);
 
 function formatTime(value: number | undefined): string {
   if (!value) return '';
@@ -77,15 +97,17 @@ function formatTime(value: number | undefined): string {
   }).format(new Date(value));
 }
 
-function safeDraft(value: string | null): Draft | null {
+function safeDraft(value: string | null, ownerUid: string): Draft | null {
   if (!value) return null;
   try {
     const draft = JSON.parse(value) as Partial<Draft>;
     if (
       typeof draft.headline !== 'string' || typeof draft.preheader !== 'string' || typeof draft.body !== 'string' ||
       typeof draft.byline !== 'string' || typeof draft.ctaLabel !== 'string' || typeof draft.ctaUrl !== 'string' ||
-      typeof draft.baseRevision !== 'number' ||
-      !DIGEST_CONTRIBUTION_STYLES.includes(draft.style as DigestContributionStyle)
+      typeof draft.baseRevision !== 'number' || typeof draft.savedAt !== 'number' || draft.ownerUid !== ownerUid ||
+      Date.now() - draft.savedAt > DRAFT_TTL ||
+      !DIGEST_CONTRIBUTION_STYLES.includes(draft.style as DigestContributionStyle) ||
+      !DIGEST_CONTRIBUTION_AUDIENCES.includes(draft.audience as DigestContributionAudience)
     ) return null;
     return draft as Draft;
   } catch {
@@ -206,11 +228,13 @@ export function WeeklyEmailPlanner() {
   const [preheader, setPreheader] = useState('');
   const [body, setBody] = useState('');
   const [style, setStyle] = useState<DigestContributionStyle>('neighbour-note');
+  const [audience, setAudience] = useState<DigestContributionAudience>('everyone');
   const [byline, setByline] = useState('');
   const [ctaLabel, setCtaLabel] = useState('');
   const [ctaUrl, setCtaUrl] = useState('');
   const [previewMode, setPreviewMode] = useState<'visual' | 'text'>('visual');
   const [previewWidth, setPreviewWidth] = useState<'desktop' | 'mobile'>('desktop');
+  const [previewScope, setPreviewScope] = useState<'local' | 'citywide'>('local');
   const [saveState, setSaveState] = useState<SaveState>('loading');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState<MessageTone>('neutral');
@@ -221,17 +245,24 @@ export function WeeklyEmailPlanner() {
   const loadedRevision = loadedPlan?.revision ?? 0;
   const baseline = signature(
     loadedPlan?.headline ?? '', loadedPlan?.preheader ?? '', loadedPlan?.body ?? '', loadedPlan?.style ?? 'neighbour-note',
+    loadedPlan?.audience ?? 'everyone',
     loadedPlan?.byline ?? '', loadedPlan?.ctaLabel ?? '', loadedPlan?.ctaUrl ?? '',
   );
   const dirty = saveState !== 'loading'
-    && signature(headline, preheader, body, style, byline, ctaLabel, ctaUrl) !== baseline;
+    && signature(headline, preheader, body, style, audience, byline, ctaLabel, ctaUrl) !== baseline;
   const remoteRevision = plans[selectedWeek]?.revision ?? 0;
   const hasRemoteChange = saveState !== 'loading' && remoteRevision !== loadedRevision;
   const bodyLength = body.trim().length;
   const validBody = bodyLength >= MIN_BODY && body.length <= MAX_BODY;
   const hasCta = !!ctaLabel.trim() || !!ctaUrl.trim();
   const validCta = !hasCta || (!!ctaLabel.trim() && !!normalizeDigestUrl(ctaUrl));
-  const canSubmit = !!db && !!user && !!selected && validBody && validCta && dirty && !hasRemoteChange && saveState !== 'saving';
+  const hasOutlinePrompts = /replace this/i.test(body);
+  const formattedLinks = [...body.matchAll(/\[[^\]\n]+\]\(([^)\n]*)\)/g)];
+  const validBodyLinks = !body.includes('](') || (
+    formattedLinks.length > 0 && formattedLinks.every((match) => !!normalizeDigestUrl(match[1]))
+  );
+  const canSubmit = !!db && !!user && !!selected && validBody && validCta && validBodyLinks && !hasOutlinePrompts
+    && dirty && !hasRemoteChange && saveState !== 'saving';
   const latestTest = testRequests[0];
 
   useEffect(() => {
@@ -265,28 +296,30 @@ export function WeeklyEmailPlanner() {
   }, [selectedWeek]);
 
   async function loadWeek(weekKey: string, discardDraft = false) {
-    if (!db) return;
+    if (!db || !user?.uid) return;
     setSaveState('loading');
     setMessage('');
     try {
       const snapshot = await getDoc(doc(db, 'weekly_email_plans', weekKey));
       const plan = snapshot.exists() ? snapshot.data() as DigestContribution : null;
       const revision = plan?.revision ?? 0;
-      const stored = discardDraft ? null : safeDraft(sessionStorage.getItem(draftKey(weekKey)));
+      const key = draftKey(user?.uid ?? '', weekKey);
+      const stored = discardDraft ? null : safeDraft(draftRead(key), user?.uid ?? '');
       const draft = stored?.baseRevision === revision ? stored : null;
-      if (stored && !draft) sessionStorage.removeItem(draftKey(weekKey));
+      if (stored && !draft) draftRemove(key);
 
       setLoadedPlan(plan);
       setHeadline(draft?.headline ?? plan?.headline ?? '');
       setPreheader(draft?.preheader ?? plan?.preheader ?? '');
       setBody(draft?.body ?? plan?.body ?? '');
       setStyle(draft?.style ?? plan?.style ?? 'neighbour-note');
+      setAudience(draft?.audience ?? plan?.audience ?? 'everyone');
       setByline(draft?.byline ?? plan?.byline ?? '');
       setCtaLabel(draft?.ctaLabel ?? plan?.ctaLabel ?? '');
       setCtaUrl(draft?.ctaUrl ?? plan?.ctaUrl ?? '');
       setSaveState('idle');
       if (draft) {
-        setMessage('Unsaved work from this tab was restored.');
+        setMessage('Your saved draft was restored on this device.');
         setMessageTone('attention');
       }
     } catch (error) {
@@ -297,17 +330,20 @@ export function WeeklyEmailPlanner() {
     }
   }
 
-  useEffect(() => { void loadWeek(selectedWeek); }, []);
+  useEffect(() => { if (user?.uid) void loadWeek(selectedWeek); }, [user?.uid]);
 
   useEffect(() => {
     if (!selectedWeek || saveState === 'loading') return;
     if (dirty) {
-      const draft: Draft = { headline, preheader, body, style, byline, ctaLabel, ctaUrl, baseRevision: loadedRevision };
-      sessionStorage.setItem(draftKey(selectedWeek), JSON.stringify(draft));
+      const draft: Draft = {
+        headline, preheader, body, style, audience, byline, ctaLabel, ctaUrl,
+        baseRevision: loadedRevision, ownerUid: user?.uid ?? '', savedAt: Date.now(),
+      };
+      draftWrite(draftKey(user?.uid ?? '', selectedWeek), draft);
     } else {
-      sessionStorage.removeItem(draftKey(selectedWeek));
+      draftRemove(draftKey(user?.uid ?? '', selectedWeek));
     }
-  }, [body, byline, ctaLabel, ctaUrl, dirty, headline, loadedRevision, preheader, saveState, selectedWeek, style]);
+  }, [audience, body, byline, ctaLabel, ctaUrl, dirty, headline, loadedRevision, preheader, saveState, selectedWeek, style, user?.uid]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -318,7 +354,7 @@ export function WeeklyEmailPlanner() {
 
   async function changeWeek(nextWeek: string) {
     if (nextWeek === selectedWeek) return;
-    if (dirty && !window.confirm('Leave this edition? Your unscheduled draft will stay in this browser tab.')) return;
+    if (dirty && !window.confirm('Leave this edition? Your draft will remain on this device.')) return;
     setSelectedWeek(nextWeek);
     setTestRequests([]);
     await loadWeek(nextWeek);
@@ -337,6 +373,7 @@ export function WeeklyEmailPlanner() {
       preheader: plan.preheader ?? '',
       body: plan.body,
       style: plan.style,
+      audience: plan.audience ?? 'everyone',
       byline: plan.byline ?? '',
       ctaLabel: plan.ctaLabel ?? '',
       ctaUrl: plan.ctaUrl ?? '',
@@ -375,6 +412,7 @@ export function WeeklyEmailPlanner() {
           preheader: preheader.trim(),
           body: body.trim(),
           style,
+          audience,
           byline: byline.trim(),
           ctaLabel: ctaLabel.trim(),
           ctaUrl: ctaLabel.trim() ? normalizeDigestUrl(ctaUrl) : '',
@@ -393,7 +431,7 @@ export function WeeklyEmailPlanner() {
           targetCollection: 'weekly_email_plans', targetId: selected.weekKey,
           adminUid: user.uid, adminEmail: user.email ?? '', timestamp: now,
           changes: {
-            revision: savedPlan.revision, style, headline: savedPlan.headline,
+            revision: savedPlan.revision, style, audience, headline: savedPlan.headline,
             bodyLength: savedPlan.body.length, hasPreheader: !!savedPlan.preheader,
             hasByline: !!savedPlan.byline, hasCta: !!savedPlan.ctaUrl,
           },
@@ -408,7 +446,7 @@ export function WeeklyEmailPlanner() {
       setByline(savedPlan!.byline ?? '');
       setCtaLabel(savedPlan!.ctaLabel ?? '');
       setCtaUrl(savedPlan!.ctaUrl ?? '');
-      sessionStorage.removeItem(draftKey(selected.weekKey));
+      draftRemove(draftKey(user.uid, selected.weekKey));
       setSaveState('saved');
       setMessage('Scheduled. Test delivery has started for every admin.');
       setMessageTone('ok');
@@ -471,9 +509,9 @@ export function WeeklyEmailPlanner() {
           changes: { removedRevision: loadedRevision }, metadata: { notificationRequestId: testRef.id },
         });
       });
-      sessionStorage.removeItem(draftKey(selectedWeek));
+      draftRemove(draftKey(user.uid, selectedWeek));
       setLoadedPlan(null);
-      setHeadline(''); setPreheader(''); setBody(''); setStyle('neighbour-note'); setByline(''); setCtaLabel(''); setCtaUrl('');
+      setHeadline(''); setPreheader(''); setBody(''); setStyle('neighbour-note'); setAudience('everyone'); setByline(''); setCtaLabel(''); setCtaUrl('');
       setSaveState('saved');
       setMessage('Opening note removed. The normal weekly brief remains scheduled, and every admin is being notified.');
       setMessageTone('ok');
@@ -505,6 +543,22 @@ export function WeeklyEmailPlanner() {
     });
   }
 
+  function insertLink() {
+    const field = bodyRef.current;
+    if (!field) return;
+    const start = field.selectionStart;
+    const end = field.selectionEnd;
+    const label = body.slice(start, end) || 'link text';
+    const inserted = `[${label}](https://)`;
+    if (body.length + inserted.length - (end - start) > MAX_BODY) return;
+    setBody(`${body.slice(0, start)}${inserted}${body.slice(end)}`);
+    requestAnimationFrame(() => {
+      const cursor = start + 1 + label.length + '](https://'.length;
+      field.focus();
+      field.setSelectionRange(cursor, cursor);
+    });
+  }
+
   function copyAnotherEdition() {
     const source = weeks.map((week) => plans[week.weekKey]).find((plan) => plan && plan.weekKey !== selectedWeek);
     if (!source) return;
@@ -512,6 +566,7 @@ export function WeeklyEmailPlanner() {
     setPreheader(source.preheader ?? '');
     setBody(source.body);
     setStyle(source.style);
+    setAudience(source.audience ?? 'everyone');
     setByline(source.byline ?? '');
     setCtaLabel(source.ctaLabel ?? '');
     setCtaUrl(source.ctaUrl ?? '');
@@ -519,11 +574,24 @@ export function WeeklyEmailPlanner() {
     setMessageTone('attention');
   }
 
+  function applyOutline() {
+    const outline = CONTRIBUTION_OUTLINES[style];
+    if ((headline.trim() || body.trim()) && !window.confirm('Replace the current headline and contribution with this outline?')) return;
+    setHeadline(outline.headline);
+    setBody(outline.body);
+    setMessage(`${outline.label} added. Replace every prompt before scheduling.`);
+    setMessageTone('attention');
+    requestAnimationFrame(() => bodyRef.current?.focus());
+  }
+
   const toneColor: Record<MessageTone, string> = {
     neutral: T.muted, ok: T.ok, attention: T.attention, critical: T.critical,
   };
   const wordCount = body.trim() ? digestBodyPlainText(body).trim().split(/\s+/).length : 0;
   const readingSeconds = Math.max(5, Math.ceil((wordCount / 220) * 60));
+  const previewShowsOpening = contributionAppliesToScope(
+    { audience }, previewScope === 'local' ? 'home' : 'city',
+  );
   const plainTextPreview = [
     CONTRIBUTION_STYLE_COPY[style].emailLabel.toUpperCase(),
     headline.trim() || CONTRIBUTION_STYLE_COPY[style].label,
@@ -564,6 +632,17 @@ export function WeeklyEmailPlanner() {
               ))}
             </select>
           </div>
+        </div>
+        <div className="mt-3 flex gap-1.5 overflow-x-auto border-t pt-3" style={{ borderColor: T.line }} aria-label="Eight-week editorial calendar">
+          {weeks.map((week, index) => {
+            const active = week.weekKey === selectedWeek;
+            const scheduled = !!plans[week.weekKey];
+            return <button key={week.weekKey} type="button" onClick={() => void changeWeek(week.weekKey)} aria-pressed={active} className="min-w-[7.25rem] rounded-lg px-3 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: active ? `${T.signal}10` : T.card, border: `1px solid ${active ? T.signal : T.line}`, outlineColor: T.signal }}>
+              <span className="flex items-center justify-between gap-2 text-[0.65rem] font-bold" style={{ color: active ? T.signal : T.ink }}><span>{index === 0 ? 'Next Monday' : week.weekKey}</span><StatusDot tone={scheduled ? 'ok' : 'neutral'} /></span>
+              <span className="mt-1 block text-[0.68rem]" style={{ color: T.muted }}>{week.label.split('–')[0].trim()}</span>
+              <span className="mt-0.5 block text-[0.62rem]" style={{ color: scheduled ? T.ok : T.muted }}>{scheduled ? 'Opening scheduled' : 'Standard brief'}</span>
+            </button>;
+          })}
         </div>
       </section>
 
@@ -627,6 +706,10 @@ export function WeeklyEmailPlanner() {
                   );
                 })}
               </div>
+              <div className="mt-2 flex items-center justify-between gap-3 rounded-lg px-3 py-2" style={{ background: T.surface }}>
+                <p className="text-[0.7rem] leading-snug" style={{ color: T.muted }}>{CONTRIBUTION_OUTLINES[style].label} gives this format a useful starting structure.</p>
+                <AdminButton variant="ghost" size="sm" onClick={applyOutline} disabled={saveState === 'loading' || saveState === 'saving'}><Sparkles size={13} /> Use outline</AdminButton>
+              </div>
             </fieldset>
 
             <Field label="Headline (optional)">
@@ -639,13 +722,29 @@ export function WeeklyEmailPlanner() {
               <div className="mt-1.5 flex justify-between gap-3 text-[0.7rem]" style={{ color: T.muted }}><span>Appears beside the subject in many inboxes. The automatic area summary is the fallback.</span><span className="shrink-0 tabular-nums" style={{ fontFamily: mono }}>{preheader.length}/140</span></div>
             </Field>
 
+            <fieldset>
+              <legend className="text-xs font-semibold" style={{ color: T.ink }}>Recipient audience</legend>
+              <p className="mb-2 mt-0.5 text-[0.7rem]" style={{ color: T.muted }}>Target only this optional opening. Every subscriber still receives their normal weekly brief.</p>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {DIGEST_CONTRIBUTION_AUDIENCES.map((option) => {
+                  const active = audience === option;
+                  const copy = CONTRIBUTION_AUDIENCE_COPY[option];
+                  const Icon = AUDIENCE_ICONS[option];
+                  return <button key={option} type="button" aria-pressed={active} onClick={() => setAudience(option)} disabled={saveState === 'loading' || saveState === 'saving'} className="rounded-xl p-3 text-left transition-colors duration-200 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ border: `1px solid ${active ? T.signal : T.line}`, background: active ? `${T.signal}0D` : T.card, outlineColor: T.signal }}>
+                    <span className="flex items-center gap-2 text-xs font-bold" style={{ color: active ? T.signal : T.ink }}><Icon size={14} />{copy.label}</span>
+                    <span className="mt-1 block text-[0.68rem] leading-snug" style={{ color: T.muted }}>{copy.description}</span>
+                  </button>;
+                })}
+              </div>
+            </fieldset>
+
             <Field label="Your contribution">
               <div className="mb-2 flex flex-wrap gap-1 rounded-lg p-1" style={{ background: T.surface }} role="toolbar" aria-label="Email formatting">
                 <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('**', '**', 'important text')}><Bold size={13} /> Bold</AdminButton>
                 <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('## ', '', 'Section heading')}><Heading3 size={13} /> Heading</AdminButton>
                 <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('- ', '', 'List item')}><List size={13} /> List</AdminButton>
                 <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('> ', '', 'Quoted text')}><Quote size={13} /> Quote</AdminButton>
-                <AdminButton variant="ghost" size="sm" onClick={() => insertFormatting('[', '](https://)', 'link text')}><Link2 size={13} /> Link</AdminButton>
+                <AdminButton variant="ghost" size="sm" onClick={insertLink}><Link2 size={13} /> Link</AdminButton>
               </div>
               <textarea ref={bodyRef} className="w-full min-h-60 resize-y rounded-xl border px-3.5 py-3 text-sm leading-relaxed outline-none transition-colors duration-200 focus:border-slate-500 disabled:opacity-60" style={inputStyle} maxLength={MAX_BODY} value={body} disabled={saveState === 'loading' || saveState === 'saving'} onChange={(event) => setBody(event.target.value)} placeholder="Write the note readers should see before their weekly briefing…" aria-describedby="planner-count planner-guidance planner-validation" />
               <div className="mt-1.5 flex items-start justify-between gap-3 text-[0.7rem]" style={{ color: T.muted }}>
@@ -681,7 +780,10 @@ export function WeeklyEmailPlanner() {
               <div className="mt-2 grid gap-2 text-[0.7rem] sm:grid-cols-2">
                 {[
                   [validBody, `Contribution has ${MIN_BODY}–${MAX_BODY} characters`],
+                  [!hasOutlinePrompts, hasOutlinePrompts ? 'Replace every outline prompt' : 'Outline prompts are complete'],
+                  [validBodyLinks, validBodyLinks ? 'Formatted links are secure' : 'Complete or remove unfinished links'],
                   [validCta, hasCta ? 'Call-to-action link is secure' : 'No optional call to action'],
+                  [true, `Audience: ${CONTRIBUTION_AUDIENCE_COPY[audience].label}`],
                   [!!selected, 'A specific weekly edition is selected'],
                   [!hasRemoteChange, 'You are editing the latest revision'],
                 ].map(([ready, label]) => <span key={String(label)} className="flex items-center gap-2" style={{ color: ready ? T.ink : T.critical }}><StatusDot tone={ready ? 'ok' : 'critical'} />{label}</span>)}
@@ -696,7 +798,7 @@ export function WeeklyEmailPlanner() {
               </div>
               <div className="mt-3 flex min-h-8 items-center gap-2">
                 {message && <p role="status" className="text-xs leading-snug" style={{ color: toneColor[messageTone] }}>{message}</p>}
-                {!message && dirty && <p className="text-xs" style={{ color: T.muted }}>Draft kept in this tab until you schedule or close it.</p>}
+                {!message && dirty && <p className="text-xs" style={{ color: T.muted }}>Per-admin draft saved on this device for 30 days.</p>}
               </div>
             </div>
           </form>
@@ -714,11 +816,18 @@ export function WeeklyEmailPlanner() {
                 <AdminButton size="sm" variant={previewWidth === 'mobile' ? 'outline' : 'ghost'} tone={previewWidth === 'mobile' ? 'signal' : 'neutral'} onClick={() => setPreviewWidth('mobile')} title="Mobile width"><Smartphone size={13} /></AdminButton>
               </div>}
             </div>
+            <div className="flex items-center justify-between gap-3 border-b px-3 py-2" style={{ borderColor: T.line, background: '#fff' }}>
+              <span className="text-[0.68rem] font-semibold" style={{ color: T.muted }}>Reader scenario</span>
+              <div className="flex gap-1">
+                <AdminButton size="sm" variant={previewScope === 'local' ? 'outline' : 'ghost'} tone={previewScope === 'local' ? 'signal' : 'neutral'} onClick={() => setPreviewScope('local')}><MapPin size={13} /> Local results</AdminButton>
+                <AdminButton size="sm" variant={previewScope === 'citywide' ? 'outline' : 'ghost'} tone={previewScope === 'citywide' ? 'signal' : 'neutral'} onClick={() => setPreviewScope('citywide')}><Newspaper size={13} /> City-wide</AdminButton>
+              </div>
+            </div>
             <div className="border-b px-4 py-3" style={{ borderColor: T.line, background: '#fff' }} aria-label="Inbox row preview">
               <div className="flex min-w-0 gap-3 text-xs"><span className="shrink-0 font-bold" style={{ color: T.ink }}>Calgary Watch</span><p className="min-w-0 truncate" style={{ color: T.muted }}><strong style={{ color: T.ink }}>Your personalized weekly subject</strong> — {preheader.trim() || 'Automatic neighbourhood summary'}</p></div>
             </div>
             {previewMode === 'text' ? (
-              <pre className="max-h-[36rem] overflow-auto whitespace-pre-wrap p-5 text-xs leading-relaxed" style={{ background: '#0E1A17', color: '#DCD3C4', fontFamily: mono }}>{plainTextPreview}</pre>
+              <pre className="max-h-[36rem] overflow-auto whitespace-pre-wrap p-5 text-xs leading-relaxed" style={{ background: '#0E1A17', color: '#DCD3C4', fontFamily: mono }}>{previewShowsOpening ? plainTextPreview : `OPENING NOTE NOT SHOWN\n\nThis ${previewScope} reader is outside the selected audience. Their normal personalized weekly brief continues unchanged.`}</pre>
             ) : <div className="overflow-x-auto p-3 sm:p-5" style={{ background: '#0E1A17' }}>
               <div className={`mx-auto transition-[max-width] duration-200 ${previewWidth === 'mobile' ? 'max-w-[20rem]' : 'max-w-[34rem]'}`} style={{ color: '#DCD3C4' }}>
                 <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: '#E0AC63' }}>
@@ -729,8 +838,10 @@ export function WeeklyEmailPlanner() {
                   <span className="text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.weekKey}</span>
                 </div>
                 <div className="py-5">
-                  <OpeningPreview style={style} headline={headline} body={body} weekKey={selected?.weekKey ?? ''} byline={byline} ctaLabel={validCta ? ctaLabel : ''} />
-                  <div className="pt-6">
+                  {previewShowsOpening
+                    ? <OpeningPreview style={style} headline={headline} body={body} weekKey={selected?.weekKey ?? ''} byline={byline} ctaLabel={validCta ? ctaLabel : ''} />
+                    : <div className="rounded-md border px-4 py-3 text-[0.72rem] leading-relaxed" style={{ borderColor: '#3A5A4E', color: '#A6B8AE' }}>This reader is outside the selected opening-note audience. Their standard weekly brief begins here.</div>}
+                  <div className={previewShowsOpening ? 'pt-6' : 'pt-4'}>
                     <p className="text-xl font-bold" style={{ fontFamily: display, color: '#F4EEE3' }}>Morning, neighbour.</p>
                     <p className="mt-2 text-[0.78rem] leading-relaxed" style={{ color: '#A6B8AE' }}>The regular location-based summary, weekly comparison and report list continue below.</p>
                     <div className="mt-4 rounded-md p-3" style={{ background: '#17251F', border: '1px solid #2C443B' }}><div className="flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-[0.12em]" style={{ color: '#E0AC63' }}><span>This week</span><span style={{ color: '#A6B8AE' }}>Your area</span></div></div>

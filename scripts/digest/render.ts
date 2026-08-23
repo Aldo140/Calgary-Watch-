@@ -46,6 +46,7 @@ import {
 } from '../../src/lib/digest.js';
 import {
   CONTRIBUTION_STYLE_COPY,
+  contributionAppliesToScope,
   digestBodyPlainText,
   parseDigestBody,
   type DigestInlineToken,
@@ -973,13 +974,16 @@ export function renderDigestHtml(options: {
   assertBrandingComplete(branding);
   const { origin } = branding;
   const name = firstName(options.displayName);
+  const contribution = contributionAppliesToScope(options.contribution, summary.scope)
+    ? options.contribution
+    : undefined;
 
   return shell({
     title: digestSubject(summary),
-    preheader: options.contribution?.preheader?.trim() || leadParagraph(summary),
+    preheader: contribution?.preheader?.trim() || leadParagraph(summary),
     inner: `
     ${masthead(dateRange(summary))}
-    ${contributionBlock(options.contribution)}
+    ${contributionBlock(contribution)}
     <tr><td style="padding:26px 36px 0;">
       ${salutation(name, summary.until)}
       ${p(escapeHtml(leadParagraph(summary)), { top: 13 })}
@@ -1083,6 +1087,9 @@ export function renderDigestText(options: {
   assertBrandingComplete(branding);
   const name = firstName(options.displayName);
   const delta = deltaSentence(summary);
+  const shownContribution = contributionAppliesToScope(options.contribution, summary.scope)
+    ? options.contribution
+    : undefined;
 
   const lines: string[] = [
     'CALGARY WATCH — WEEKLY BRIEF',
@@ -1091,8 +1098,8 @@ export function renderDigestText(options: {
     '',
   ];
 
-  if (options.contribution?.body.trim()) {
-    const contribution = options.contribution;
+  if (shownContribution?.body.trim()) {
+    const contribution = shownContribution;
     lines.push(
       CONTRIBUTION_STYLE_COPY[contribution.style].emailLabel.toUpperCase(),
       contribution.headline.trim() || CONTRIBUTION_STYLE_COPY[contribution.style].label,

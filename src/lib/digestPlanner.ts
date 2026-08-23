@@ -1,7 +1,9 @@
-import { digestWeekKey, WEEK_MS } from './digest';
+import { digestWeekKey, WEEK_MS, type DigestScope } from './digest';
 
 export const DIGEST_CONTRIBUTION_STYLES = ['neighbour-note', 'news-brief', 'personal-story'] as const;
 export type DigestContributionStyle = typeof DIGEST_CONTRIBUTION_STYLES[number];
+export const DIGEST_CONTRIBUTION_AUDIENCES = ['everyone', 'local', 'citywide'] as const;
+export type DigestContributionAudience = typeof DIGEST_CONTRIBUTION_AUDIENCES[number];
 
 /**
  * The three emails involved in the digest lifecycle are intentionally separate.
@@ -36,6 +38,7 @@ export interface DigestContribution {
   preheader?: string;
   body: string;
   style: DigestContributionStyle;
+  audience?: DigestContributionAudience;
   byline?: string;
   ctaLabel?: string;
   ctaUrl?: string;
@@ -46,6 +49,47 @@ export interface DigestContribution {
   createdAt?: number;
   updatedAt?: number;
   revision?: number;
+}
+
+export const CONTRIBUTION_AUDIENCE_COPY: Record<DigestContributionAudience, {
+  label: string;
+  description: string;
+}> = {
+  everyone: { label: 'Every weekly reader', description: 'Show this opening in every recurring digest.' },
+  local: { label: 'Local-result readers', description: 'Only readers whose digest stayed near their home or community.' },
+  citywide: { label: 'City-wide readers', description: 'Only readers receiving a Calgary-wide digest.' },
+};
+
+export const CONTRIBUTION_OUTLINES: Record<DigestContributionStyle, {
+  label: string;
+  headline: string;
+  body: string;
+}> = {
+  'neighbour-note': {
+    label: 'Practical update outline',
+    headline: 'What neighbours should know this week',
+    body: 'Replace this with the essential context in one or two sentences.\n\n## What to know\n\n- Replace this with the first useful point\n- Replace this with the second useful point',
+  },
+  'news-brief': {
+    label: 'Watch desk outline',
+    headline: 'This week’s Calgary Watch update',
+    body: 'Replace this with the verified news in one concise paragraph.\n\n## What changed\n\n- Replace this with a factual change\n- Replace this with a second factual change\n\n## What it means\n\nReplace this with the practical impact for readers.',
+  },
+  'personal-story': {
+    label: 'Community story outline',
+    headline: 'A moment from our community',
+    body: 'Replace this with the scene: who, where and what happened.\n\n> Replace this with the detail or quotation that carries the story.\n\nReplace this with the reflection and why it matters this week.',
+  },
+};
+
+export function contributionAppliesToScope(
+  contribution: Pick<DigestContribution, 'audience'> | undefined,
+  scope: DigestScope,
+): boolean {
+  const audience = contribution?.audience ?? 'everyone';
+  if (audience === 'local') return scope === 'home' || scope === 'community';
+  if (audience === 'citywide') return scope === 'city';
+  return true;
 }
 
 export type DigestInlineToken =
@@ -221,6 +265,9 @@ export function normalizeDigestContribution(value: unknown): DigestContribution 
   const style = DIGEST_CONTRIBUTION_STYLES.includes(candidate.style as DigestContributionStyle)
     ? candidate.style as DigestContributionStyle
     : null;
+  const audience = DIGEST_CONTRIBUTION_AUDIENCES.includes(candidate.audience as DigestContributionAudience)
+    ? candidate.audience as DigestContributionAudience
+    : 'everyone';
   if (!/^\d{4}-W\d{2}$/.test(candidate.weekKey ?? '') || !body || !style) return null;
   return {
     ...candidate,
@@ -230,6 +277,7 @@ export function normalizeDigestContribution(value: unknown): DigestContribution 
     preheader,
     body,
     style,
+    audience,
     byline,
     ctaLabel: ctaUrl && ctaLabel ? ctaLabel : '',
     ctaUrl: ctaUrl && ctaLabel ? ctaUrl : '',

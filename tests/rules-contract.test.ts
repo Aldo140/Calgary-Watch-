@@ -168,12 +168,13 @@ describe('weekly email planner security', () => {
   });
 
   it('permits constrained editorial controls and secure calls to action', () => {
-    for (const field of ['preheader', 'byline', 'ctaLabel', 'ctaUrl']) {
+    for (const field of ['preheader', 'audience', 'byline', 'ctaLabel', 'ctaUrl']) {
       assert.ok(firestoreRules.includes(`'${field}'`), `${field} is missing from the Firestore contract`);
       assert.ok(functionSource.includes(field), `${field} is missing from the proof renderer`);
     }
     assert.match(firestoreRules, /ctaUrl\.matches\('\^https:\/\/.\+'/);
     assert.ok(functionSource.includes("parsed.protocol === 'https:'"));
+    assert.match(firestoreRules, /audience in \['everyone', 'local', 'citywide'\]/);
   });
 
   it('delivers private, retry-safe copies to each admin', () => {

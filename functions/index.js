@@ -14,6 +14,11 @@ const STYLE_LABELS = {
   'news-brief': 'From the watch desk',
   'personal-story': 'This week in our community',
 };
+const AUDIENCE_LABELS = {
+  everyone: 'Every weekly reader',
+  local: 'Local-result readers only',
+  citywide: 'City-wide digest readers only',
+};
 const LOGO_CID = 'cw-logo';
 
 let logoBase64;
@@ -103,6 +108,7 @@ function validRequest(value) {
     && value.body.trim().length >= 20
     && value.body.length <= 2400
     && Object.hasOwn(STYLE_LABELS, value.style)
+    && (value.audience === undefined || Object.hasOwn(AUDIENCE_LABELS, value.audience))
     && (value.byline === undefined || (typeof value.byline === 'string' && value.byline.length <= 80))
     && (value.ctaLabel === undefined || (typeof value.ctaLabel === 'string' && value.ctaLabel.length <= 50))
     && (!value.ctaLabel && !value.ctaUrl || !!value.ctaLabel?.trim() && !!validHttpsUrl(value.ctaUrl));
@@ -111,6 +117,7 @@ function validRequest(value) {
 function renderPreview(value) {
   const cancelled = value.action === 'cancelled';
   const label = cancelled ? 'Opening note removed' : STYLE_LABELS[value.style];
+  const audienceLabel = AUDIENCE_LABELS[value.audience || 'everyone'];
   const title = cancelled ? `${value.planWeekKey} will use the standard brief` : value.headline.trim() || label;
   const paragraphs = formattedBody(value.body.trim());
   const extras = `${value.byline?.trim() ? `<div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">${escapeHtml(value.byline.trim())}</div>` : ''}${value.ctaLabel?.trim() && validHttpsUrl(value.ctaUrl) ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:17px;"><tr><td style="background:#F4EEE3;border-radius:3px;"><a href="${escapeHtml(validHttpsUrl(value.ctaUrl))}" style="display:inline-block;padding:11px 17px;color:#0E1A17;font:700 13px/1 Arial,sans-serif;text-decoration:none;">${escapeHtml(value.ctaLabel.trim())} →</a></td></tr></table>` : ''}`;
@@ -166,12 +173,13 @@ function renderPreview(value) {
             </tr></table>
           </td></tr>
           <tr><td style="padding:22px 24px 0;">
+            <div style="font:700 11px/1 Arial,sans-serif;color:#A6B8AE;padding-bottom:10px;">Audience: ${escapeHtml(audienceLabel)}</div>
             ${opening}
           </td></tr>
           <tr><td style="padding:22px 24px 0;font:400 13px/1.55 Arial,sans-serif;color:#A6B8AE;">
             ${cancelled
               ? 'This is an administrator-only confirmation. Subscribers will receive the standard weekly brief with no optional opening note.'
-              : 'This is an administrator-only test. The contribution will appear first in the selected weekly email; subscriber-specific reports follow underneath.'}
+              : `This is an administrator-only test. The contribution will appear first for ${escapeHtml(audienceLabel.toLowerCase())}; subscriber-specific reports follow underneath.`}
             <div style="padding-top:14px;"><a href="https://calgarywatch.ca/admin" style="color:#5CC3AA;font-weight:700;">Open the email planner →</a></div>
           </td></tr>
         </table>
@@ -184,6 +192,7 @@ function renderPreview(value) {
     value.planWeekKey,
     '',
     label.toUpperCase(),
+    `AUDIENCE: ${audienceLabel}`,
     title,
     '',
     plainFormatting(value.body.trim()),

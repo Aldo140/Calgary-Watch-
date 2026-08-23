@@ -47,6 +47,16 @@ freshness before publishing. The same parser drives the subscriber HTML and
 plain-text alternative, while the proof function independently escapes and
 validates every field.
 
+Admins can target the optional opening to every weekly reader, readers whose
+digest stayed near a home/community, or readers receiving the city-wide
+edition. Audience targeting never suppresses the automated digest itself. The
+preview can switch between local and city-wide reader scenarios before
+publishing. Purpose-built outlines provide a fast starting point, but the
+preflight blocks publication until every outline prompt is replaced. The
+eight-week rail makes scheduled gaps visible, and unsent drafts are stored per
+administrator on that device for 30 days instead of disappearing when a tab
+closes.
+
 The email lifecycle deliberately uses three formats with separate purposes:
 
 - **Welcome letter:** sent once to introduce Calgary Watch and explain the
@@ -322,6 +332,9 @@ whether the message is opened than the avatar does.
 - **Editorial syntax:** `## Heading`, `**bold**`, `- list item`, `> quotation`
   and `[label](https://secure-link)` are supported. Raw HTML is always escaped.
   Calls to action require both a short label and an `https://` destination.
+- **Audience targeting:** `everyone`, `local`, and `citywide` affect only the
+  optional opening. The welcome letter remains separate and the normal weekly
+  digest still sends to readers outside the chosen audience.
 - **Idempotency:** each send claims `digest_sends/{uid}_{isoWeek}` before the
   provider is called. Re-running the workflow is safe.
 - **Unsubscribes** are honoured at the start of every run, before recipients

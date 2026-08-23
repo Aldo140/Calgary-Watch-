@@ -46,6 +46,7 @@ import { letterheadImages, welcomeImages } from '../scripts/digest/art.js';
 import { loadSenderConfig, unsubscribeHeaders } from '../scripts/digest/send.js';
 import type { Incident } from '../src/types/index.js';
 import {
+  contributionAppliesToScope,
   digestBodyPlainText,
   normalizeDigestContribution,
   normalizeDigestUrl,
@@ -175,6 +176,28 @@ describe('weekly email planner', () => {
     });
     assert.equal(unsafe?.ctaLabel, '');
     assert.equal(unsafe?.ctaUrl, '');
+  });
+
+  it('targets optional openings without suppressing the underlying digest', () => {
+    assert.equal(contributionAppliesToScope({ audience: 'everyone' }, 'city'), true);
+    assert.equal(contributionAppliesToScope({ audience: 'local' }, 'home'), true);
+    assert.equal(contributionAppliesToScope({ audience: 'local' }, 'community'), true);
+    assert.equal(contributionAppliesToScope({ audience: 'local' }, 'city'), false);
+    assert.equal(contributionAppliesToScope({ audience: 'citywide' }, 'city'), true);
+    assert.equal(contributionAppliesToScope({ audience: 'citywide' }, 'home'), false);
+  });
+
+  it('omits an out-of-audience opening from both HTML and plain text', () => {
+    const summary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+    const contribution: DigestContribution = {
+      weekKey: summary.weekKey, weekStart: NOW, headline: 'City readers only',
+      body: 'This content should not reach a local digest.', style: 'news-brief',
+      audience: 'citywide', status: 'published',
+    };
+    const options = { summary, contribution, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)), branding: BRANDING };
+    assert.ok(!renderDigestHtml(options).includes('City readers only'));
+    assert.ok(!renderDigestText(options).includes('City readers only'));
+    assert.ok(renderDigestHtml(options).includes('Morning,'), 'the standard digest must remain');
   });
 
   it('renders the planned note before the standard greeting and escapes admin input', () => {

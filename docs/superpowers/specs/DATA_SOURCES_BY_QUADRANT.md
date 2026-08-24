@@ -26,25 +26,23 @@ The Calgary Watch ingestion pipeline now includes comprehensive crime incident a
 - **SW Quadrant:** Coach Hill, Signal Hill, West Springs, Southwest Calgary
 - **Downtown:** Core, Beltline, Mission, Hillhurst
 
-### 2. **Environment Canada Enhanced Weather Alerts** (`environment-canada-enhanced.ts`)
+### 2. **Environment Canada Weather Alerts** (`environment-canada.ts`)
 
 **What it covers:**
 - Active weather alerts (snow, rain, wind, etc.)
-- Directional information (e.g., "Snow moving from SW", "Rain coming from NE")
-- Wind speed information when available
-- Quadrant-specific impact areas
+- Exact official publication and expiry timestamps
+- Official affected-area names and alert text
+- Calgary-area geometry from the current MSC GeoMet OGC API
 
 **Organization:**
-- Weather events marked with quadrant prefix: `[SW] Heavy snow from northwest`
-- Directional compass descriptions: N, NE, E, SE, S, SW, W, NW
-- 8-point compass for granular direction info
-- TTL: 6 hours (weather alerts expire quickly)
+- Ended and expired notices are filtered out
+- Official alert geometry supplies the map location
+- The official expiry controls TTL, with a six-hour fallback only when absent
 
-**Enhanced Features:**
-- Automatically detects event centroid and quadrant
-- Extracts wind speed from descriptions
-- Formats descriptions with directional context
-- Includes affected area descriptions like "NE quadrant" or "North area"
+**Reliability:**
+- Uses `api.weather.gc.ca/collections/weather-alerts/items`
+- Rejects non-JSON error documents even when an upstream server returns HTTP 200
+- Replaced both retired WFS readers with one timestamped official source
 
 ### 3. **Calgary Infrastructure & Streets Alerts** (`calgary-infrastructure.ts`)
 
@@ -165,9 +163,7 @@ The pipeline will output:
 [ingest] Environment Canada: 2 alert(s).
 [ingest] 511 Alberta: 3 event(s).
 [ingest] Alberta Emergency Alert: 0 alert(s).
-[ingest] Reddit r/Calgary: 5 post(s).
 [ingest] News RSS feeds: 4 article(s).
-[ingest] Environment Canada Enhanced: 2 alert(s).
 [ingest] Calgary Police Service: 8 incident(s).
 [ingest] Calgary Infrastructure: 5 alert(s).
 [ingest] 14 existing ingested key(s) in Firestore.

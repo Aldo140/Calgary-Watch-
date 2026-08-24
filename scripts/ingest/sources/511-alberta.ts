@@ -5,7 +5,7 @@
  * We filter to a tight bounding box around Calgary Metro.
  *
  * API base: https://511.alberta.ca/api/v2
- * No authentication required for read-only access.
+ * Requires an ALBERTA_511_API_KEY from the official developer portal.
  */
 
 import type { IncidentCategory } from '../../../src/types/index.js';
@@ -74,7 +74,7 @@ const ROADWORK_CAP = 5;
 const TRAFFIC_TTL_MS  = 6 * 60 * 60 * 1000;  // 6 hours
 const CLOSURE_TTL_MS  = 12 * 60 * 60 * 1000; // 12 hours
 
-const API_URL = 'https://511.alberta.ca/api/v2/get/event?lang=English&format=json';
+const API_URL = 'https://511.alberta.ca/api/v2/get/event';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -146,7 +146,18 @@ export function clampToNow(ms: number, now: number = Date.now()): number {
 }
 
 export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
-  const res = await fetch(API_URL, {
+  const apiKey = process.env.ALBERTA_511_API_KEY?.trim();
+  if (!apiKey) {
+    console.log('[511 Alberta] Skipped — optional ALBERTA_511_API_KEY is not configured.');
+    return [];
+  }
+
+  const url = new URL(API_URL);
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('lang', 'en');
+  url.searchParams.set('key', apiKey);
+
+  const res = await fetch(url, {
     headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact jorti104@mtroyal.ca)' },
     signal: AbortSignal.timeout(15_000),
   });

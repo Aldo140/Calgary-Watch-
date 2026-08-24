@@ -21,9 +21,7 @@ import type { Firestore } from 'firebase-admin/firestore';
 import { fetchEnvironmentCanadaAlerts } from './sources/environment-canada.js';
 import { fetch511AlbertaEvents } from './sources/511-alberta.js';
 import { fetchAlbertaEmergencyAlerts } from './sources/alberta-emergency-alert.js';
-import { fetchRedditCalgary } from './sources/reddit.js';
 import { fetchNewsFeedsCalgary } from './sources/rss.js';
-import { fetchEnvironmentCanadaEnhanced } from './sources/environment-canada-enhanced.js';
 import { fetchCalgary311Crime } from './sources/calgary-311.js';
 import { fetchCalgaryPoliceNews } from './sources/calgary-police-news.js';
 import type { NormalizedIncident } from './types.js';
@@ -160,13 +158,11 @@ async function run(): Promise<void> {
   const db = initFirebase();
 
   // 2. Fetch all sources in parallel (failures are isolated).
-  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, reddit, newsFeeds, ecEnhanced, calgaryCrime, calgaryPolice] = await Promise.allSettled([
+  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, newsFeeds, calgaryCrime, calgaryPolice] = await Promise.allSettled([
     fetchEnvironmentCanadaAlerts(),
     fetch511AlbertaEvents(),
     fetchAlbertaEmergencyAlerts(),
-    fetchRedditCalgary(),
     fetchNewsFeedsCalgary(),
-    fetchEnvironmentCanadaEnhanced(),
     fetchCalgary311Crime(),
     fetchCalgaryPoliceNews(),
   ]);
@@ -208,28 +204,12 @@ async function run(): Promise<void> {
     console.error('[ingest] Alberta Emergency Alert failed:', albertaEmergencyAlerts.reason);
   }
 
-  if (reddit.status === 'fulfilled') {
-    console.log(`[ingest] Reddit r/Calgary: ${reddit.value.length} post(s).`);
-    allIncidents.push(...reddit.value);
-  } else {
-    console.error('[ingest] Reddit failed:', reddit.reason);
-  }
-
   if (newsFeeds.status === 'fulfilled') {
     console.log(`[ingest] News RSS feeds: ${newsFeeds.value.length} article(s).`);
     allIncidents.push(...newsFeeds.value);
   } else {
     console.error('[ingest] News RSS failed:', newsFeeds.reason);
   }
-
-  if (ecEnhanced.status === 'fulfilled') {
-    console.log(`[ingest] Environment Canada Enhanced: ${ecEnhanced.value.length} alert(s).`);
-    allIncidents.push(...ecEnhanced.value);
-  } else {
-    console.error('[ingest] Environment Canada Enhanced failed:', ecEnhanced.reason);
-  }
-
-
 
   // 3. Prune expired system incidents (targeted query, not a full-collection scan).
   const pruned = await pruneExpired(db);

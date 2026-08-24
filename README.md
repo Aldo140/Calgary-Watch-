@@ -260,19 +260,17 @@ which several of these scanners weigh as a legitimacy signal.
 
 | Source | Type |
 |--------|------|
-| Environment Canada Alerts | Weather warnings (15 Alberta zones) |
-| Environment Canada Enhanced | Detailed weather |
-| 511 Alberta | Traffic incidents |
+| Environment Canada OGC API | Active, timestamped weather warnings intersecting Calgary |
+| 511 Alberta (optional key) | Traffic incidents when `ALBERTA_511_API_KEY` is configured |
 | Alberta Emergency Alert | Provincial emergencies |
-| Reddit r/Calgary | Community signals |
 | News RSS (CBC, CTV, Global) | Local news |
-| Calgary Police Service | Crime statistics |
-| Calgary Open Data Infrastructure | 311 service requests / water main breaks |
+| Calgary Police Service newsroom | Timestamped police releases with named Calgary locations |
+| Calgary 311 Open Data | Recent property-crime-related resident service requests |
 | Edmonton Open Data (bylaw, 311, traffic) | Live Edmonton incidents |
 | Edmonton Police Service (EPS) Dashboard | Edmonton neighbourhood crime stats |
 | Statistics Canada WDS (Table 35-10-0183-01) | Annual crime baselines for RCMP towns |
 
-**Firestore optimisation:** A single `loadAndPrune()` read handles both deduplication and expiry cleanup in one collection scan per run. Expired incidents are hard-deleted (not soft-deleted) so the collection stays small. At 30-minute intervals = 48 runs/day, leaving ~1,000 reads per run within the 50,000/day free tier.
+**Firestore optimisation:** Stable source IDs allow direct create-or-refresh writes without a collection-wide deduplication read. Expiry cleanup uses a targeted query and hard-deletes stale system incidents.
 
 ---
 

@@ -32,3 +32,5 @@ jobs:
           # Generate it in Firebase Console → Project Settings → Service Accounts.
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID:  ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          # Optional. Register through the official 511 Alberta developer portal.
+          ALBERTA_511_API_KEY: ${{ secrets.ALBERTA_511_API_KEY }}

@@ -34,6 +34,13 @@ const LIVE_EVENT = {
 };
 
 describe('511 Alberta source shape', () => {
+  it('requires the official developer key and uses documented parameters', () => {
+    assert.match(SRC, /process\.env\.ALBERTA_511_API_KEY/);
+    assert.match(SRC, /searchParams\.set\('lang', 'en'\)/);
+    assert.match(SRC, /searchParams\.set\('key', apiKey\)/);
+    assert.doesNotMatch(SRC, /lang=English/);
+  });
+
   it('reads flat Latitude/Longitude, not a GeoJSON Geography object', () => {
     // The original bug: every record was dropped because Geography is absent.
     assert.match(SRC, /event\.Latitude/);

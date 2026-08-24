@@ -125,9 +125,13 @@ async function processUnsubscribes(db: Firestore): Promise<number> {
 
 async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
   const onlyUid = process.env.DIGEST_ONLY_UID?.trim();
+  const onlyEmail = process.env.DIGEST_ONLY_EMAIL?.trim().toLowerCase();
+  if (onlyUid && onlyEmail) throw new Error('Set DIGEST_ONLY_UID or DIGEST_ONLY_EMAIL, not both.');
   const snapshot = onlyUid
     ? await db.collection('users').where('uid', '==', onlyUid).get()
-    : await db.collection('users').where('weeklyDigestOptIn', '==', true).get();
+    : onlyEmail
+      ? await db.collection('users').where('email', '==', onlyEmail).get()
+      : await db.collection('users').where('weeklyDigestOptIn', '==', true).get();
 
   return snapshot.docs.map((doc) => {
     const d = doc.data();
@@ -366,6 +370,15 @@ async function run(): Promise<void> {
       }
       if (result.ok) {
         sent += 1;
+        // A redirected test proves the real rendered email without consuming
+        // Monday's ledger entry or advancing this person's welcome lifecycle.
+        // Otherwise a Sunday test would silently turn Monday's first welcome
+        // into a recurring brief and the preview action would change production.
+        if (sender.testRecipient) {
+          await claim.delete().catch(() => {});
+          console.log(`[digest] test delivered for ${profile.uid} → ${sender.testRecipient}; claim released`);
+          continue;
+        }
         await claim.set({
           status: 'sent',
           sentAt: Date.now(),

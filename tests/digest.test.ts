@@ -193,6 +193,16 @@ describe('weekly email planner', () => {
     assert.match(proof?.recipients ?? '', /ophillah1863@gmail\.com/);
   });
 
+  it('keeps manual email tests scoped and non-destructive', () => {
+    const workflow = readFileSync('.github/workflows/weekly-digest.yml', 'utf8');
+    const sender = readFileSync('scripts/digest/weekly.ts', 'utf8');
+    assert.match(workflow, /only_email:/);
+    assert.match(workflow, /DIGEST_ONLY_EMAIL/);
+    assert.match(sender, /if \(sender\.testRecipient\)/);
+    assert.match(sender, /test delivered.*claim released/);
+    assert.match(sender, /await claim\.delete/);
+  });
+
   it('publishes the real welcome renderer for the admin preview', () => {
     const plannerSource = readFileSync('src/components/admin/WeeklyEmailPlanner.tsx', 'utf8');
     const packageSource = readFileSync('package.json', 'utf8');

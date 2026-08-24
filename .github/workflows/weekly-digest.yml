@@ -24,6 +24,10 @@ on:
         description: 'Restrict the run to a single account uid'
         type: string
         default: ''
+      only_email:
+        description: 'Restrict the run to one subscriber email (safer for manual tests)'
+        type: string
+        default: ''
 
 # A slow run must never overlap the next tick, and two overlapping runs are the
 # one thing the send ledger cannot fully protect against.
@@ -72,3 +76,4 @@ jobs:
           DIGEST_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
           DIGEST_TEST_EMAIL: ${{ inputs.test_email }}
           DIGEST_ONLY_UID: ${{ inputs.only_uid }}
+          DIGEST_ONLY_EMAIL: ${{ inputs.only_email }}

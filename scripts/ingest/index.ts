@@ -25,6 +25,7 @@ import { fetchNewsFeedsCalgary } from './sources/rss.js';
 import { fetchCalgary311Crime } from './sources/calgary-311.js';
 import { fetchCalgaryPoliceNews } from './sources/calgary-police-news.js';
 import type { NormalizedIncident } from './types.js';
+import { DATA_SOURCE_BY_ID, type DataSourceId } from '../../src/config/dataSources.js';
 
 // ---------------------------------------------------------------------------
 // Firebase Admin init
@@ -152,64 +153,101 @@ async function upsertIncident(
 // Main
 // ---------------------------------------------------------------------------
 
+type SourceJob = {
+  id: DataSourceId;
+  fetch: () => Promise<NormalizedIncident[]>;
+  enabled?: boolean;
+};
+
+type SourceResult = {
+  id: DataSourceId;
+  status: 'ok' | 'error' | 'disabled';
+  incidents: NormalizedIncident[];
+  checkedAt: number;
+  durationMs: number;
+  error: string | null;
+};
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error ?? 'Unknown error');
+}
+
+async function runSource(job: SourceJob): Promise<SourceResult> {
+  const startedAt = Date.now();
+  if (job.enabled === false) {
+    return {
+      id: job.id, status: 'disabled', incidents: [], checkedAt: startedAt,
+      durationMs: 0, error: DATA_SOURCE_BY_ID.get(job.id)?.setupHint ?? 'Setup required.',
+    };
+  }
+  try {
+    const incidents = await job.fetch();
+    return {
+      id: job.id, status: 'ok', incidents, checkedAt: Date.now(),
+      durationMs: Date.now() - startedAt, error: null,
+    };
+  } catch (error) {
+    return {
+      id: job.id, status: 'error', incidents: [], checkedAt: Date.now(),
+      durationMs: Date.now() - startedAt, error: errorMessage(error),
+    };
+  }
+}
+
+async function publishSourceHealth(db: Firestore, results: SourceResult[]): Promise<void> {
+  const batch = db.batch();
+  for (const result of results) {
+    const source = DATA_SOURCE_BY_ID.get(result.id);
+    const ref = db.collection('ingestion_health').doc(result.id);
+    batch.set(ref, {
+      sourceId: result.id,
+      name: source?.name ?? result.id,
+      status: result.status,
+      checkedAt: result.checkedAt,
+      durationMs: result.durationMs,
+      recordCount: result.incidents.length,
+      error: result.error,
+      runId: process.env.GITHUB_RUN_ID ?? 'local',
+      ...(result.status === 'ok' ? { lastSuccessAt: result.checkedAt } : {}),
+    }, { merge: true });
+  }
+  await batch.commit();
+}
+
 async function run(): Promise<void> {
   console.log(`[ingest] Starting — ${new Date().toISOString()}`);
 
   const db = initFirebase();
 
-  // 2. Fetch all sources in parallel (failures are isolated).
-  const [ecAlerts, albertaTraffic, albertaEmergencyAlerts, newsFeeds, calgaryCrime, calgaryPolice] = await Promise.allSettled([
-    fetchEnvironmentCanadaAlerts(),
-    fetch511AlbertaEvents(),
-    fetchAlbertaEmergencyAlerts(),
-    fetchNewsFeedsCalgary(),
-    fetchCalgary311Crime(),
-    fetchCalgaryPoliceNews(),
-  ]);
+  // 2. Fetch all sources in parallel. Each result is persisted for the admin
+  // dashboard, so an isolated upstream failure is visible without preventing
+  // healthy sources from refreshing the public map.
+  const jobs: SourceJob[] = [
+    { id: 'calgary_311', fetch: fetchCalgary311Crime },
+    { id: 'calgary_police_news', fetch: fetchCalgaryPoliceNews },
+    { id: 'environment_canada', fetch: fetchEnvironmentCanadaAlerts },
+    { id: 'alberta_emergency', fetch: fetchAlbertaEmergencyAlerts },
+    { id: 'global_news', fetch: fetchNewsFeedsCalgary },
+    {
+      id: 'alberta_511', fetch: fetch511AlbertaEvents,
+      enabled: Boolean(process.env.ALBERTA_511_API_KEY?.trim()),
+    },
+  ];
+  const sourceResults = await Promise.all(jobs.map(runSource));
+  await publishSourceHealth(db, sourceResults);
 
-  const allIncidents: NormalizedIncident[] = [];
-
-  if (calgaryCrime.status === 'fulfilled') {
-    console.log(`[ingest] Calgary 311 property crime: ${calgaryCrime.value.length} report(s).`);
-    allIncidents.push(...calgaryCrime.value);
-  } else {
-    console.error('[ingest] Calgary 311 property crime failed:', calgaryCrime.reason);
+  for (const result of sourceResults) {
+    const name = DATA_SOURCE_BY_ID.get(result.id)?.shortName ?? result.id;
+    if (result.status === 'ok') {
+      console.log(`[ingest] ${name}: ${result.incidents.length} record(s) in ${result.durationMs}ms.`);
+    } else if (result.status === 'disabled') {
+      console.log(`[ingest] ${name}: setup required; source skipped.`);
+    } else {
+      console.error(`[ingest] ${name} failed in ${result.durationMs}ms: ${result.error}`);
+    }
   }
 
-  if (calgaryPolice.status === 'fulfilled') {
-    console.log(`[ingest] Calgary Police newsroom: ${calgaryPolice.value.length} release(s).`);
-    allIncidents.push(...calgaryPolice.value);
-  } else {
-    console.error('[ingest] Calgary Police newsroom failed:', calgaryPolice.reason);
-  }
-
-  if (ecAlerts.status === 'fulfilled') {
-    console.log(`[ingest] Environment Canada: ${ecAlerts.value.length} alert(s).`);
-    allIncidents.push(...ecAlerts.value);
-  } else {
-    console.error('[ingest] Environment Canada failed:', ecAlerts.reason);
-  }
-
-  if (albertaTraffic.status === 'fulfilled') {
-    console.log(`[ingest] 511 Alberta: ${albertaTraffic.value.length} event(s).`);
-    allIncidents.push(...albertaTraffic.value);
-  } else {
-    console.error('[ingest] 511 Alberta failed:', albertaTraffic.reason);
-  }
-
-  if (albertaEmergencyAlerts.status === 'fulfilled') {
-    console.log(`[ingest] Alberta Emergency Alert: ${albertaEmergencyAlerts.value.length} alert(s).`);
-    allIncidents.push(...albertaEmergencyAlerts.value);
-  } else {
-    console.error('[ingest] Alberta Emergency Alert failed:', albertaEmergencyAlerts.reason);
-  }
-
-  if (newsFeeds.status === 'fulfilled') {
-    console.log(`[ingest] News RSS feeds: ${newsFeeds.value.length} article(s).`);
-    allIncidents.push(...newsFeeds.value);
-  } else {
-    console.error('[ingest] News RSS failed:', newsFeeds.reason);
-  }
+  const allIncidents = sourceResults.flatMap((result) => result.incidents);
 
   // 3. Prune expired system incidents (targeted query, not a full-collection scan).
   const pruned = await pruneExpired(db);

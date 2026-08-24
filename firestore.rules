@@ -300,6 +300,14 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Scheduled ingestion writes one operational heartbeat per registered
+    // source through the Admin SDK. Health details are private to approved
+    // administrators and cannot be forged or edited by a browser client.
+    match /ingestion_health/{sourceId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     // city_requests: unauthenticated visitors can submit expansion requests.
     // Rate limiting is enforced on the client. Each document must only contain
     // the allowed fields; no PII beyond the city name is stored.

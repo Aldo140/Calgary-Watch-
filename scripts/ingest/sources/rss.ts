@@ -176,6 +176,7 @@ function dedupeKey(link: string): string {
 export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
   const now = Date.now();
   const results: NormalizedIncident[] = [];
+  const failures: string[] = [];
 
   await Promise.allSettled(
     FEEDS.map(async (feed) => {
@@ -189,7 +190,9 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
         });
 
         if (!res.ok) {
-          console.warn(`[rss] ${feed.name} responded ${res.status}`);
+          const message = `${feed.name} responded HTTP ${res.status}`;
+          failures.push(message);
+          console.warn(`[rss] ${message}`);
           return;
         }
 
@@ -239,10 +242,15 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
 
         console.log(`[rss] ${feed.name}: ${items.length} items parsed, ${results.filter(r => r.source_name === feed.name).length} matched.`);
       } catch (err) {
+        failures.push(err instanceof Error ? err.message : String(err ?? 'Unknown error'));
         console.warn(`[rss] ${feed.name} failed:`, err);
       }
     })
   );
+
+  if (failures.length === FEEDS.length) {
+    throw new Error(`Every configured news feed failed: ${failures.join('; ')}`);
+  }
 
   return results;
 }

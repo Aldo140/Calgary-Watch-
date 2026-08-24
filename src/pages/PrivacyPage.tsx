@@ -207,17 +207,24 @@ export default function PrivacyPage() {
               hosting). Google processes this data on our behalf and may store it outside Canada.
             </p>
             <p>
-              Pages also contact these sources for public information. They are not given anything
+              Some pages contact these sources for public information. They are not given anything
               about you beyond the ordinary network request your browser makes:
             </p>
             <ul className="ml-5 list-disc space-y-1">
               <li>City of Calgary and City of Edmonton Open Data — incidents, boundaries, assessments, traffic cameras</li>
-              <li>511 Alberta, Alberta Emergency Alert, Environment Canada — traffic, alerts and weather</li>
+              <li>Open-Meteo — current weather and air-quality conditions</li>
+              <li>Alberta Rivers — public river-level readings</li>
               <li>Statistics Canada — annual crime baselines</li>
               <li>OpenStreetMap and CARTO — map tiles</li>
               <li>Nominatim — address search</li>
               <li>EmailJS — sends volunteer and city-request emails</li>
             </ul>
+            <p>
+              Separate Calgary Watch scheduled jobs retrieve attributed public information from
+              Calgary 311, the Calgary Police newsroom, Environment Canada, Alberta Emergency
+              Alert, Global News Calgary, ENMAX and, when configured, 511 Alberta. Those server-side
+              requests do not include information about site visitors.
+            </p>
           </Section>
 
           <Section id="rights" title="Your rights">

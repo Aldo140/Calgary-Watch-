@@ -94,7 +94,7 @@ export default function AdminPage() {
   const [section, setSection] = useState<Section>('desk');
   const d = useAdminData();
 
-  const failingFeeds = d.apiHealths.filter((a) => a.status === 'error').length;
+  const failingFeeds = d.apiHealths.filter((a) => a.status === 'error' || a.status === 'stale').length;
 
   const navItems: NavItem[] = useMemo(() => {
     const needsAttention =
@@ -184,7 +184,6 @@ function DeskSection({ d }: { d: D }) {
         flagged={d.flaggedIncidents}
         pendingReview={d.pendingReviewIncidents}
         apiHealths={d.apiHealths}
-        incidents={d.incidents}
         onRestore={d.handleRestore}
         onDelete={d.handlePermanentDelete}
         onApprove={d.approveIncident}
@@ -485,48 +484,81 @@ function PeopleSection({ d }: { d: D }) {
 
 function FeedsSection({ d }: { d: D }) {
   const toneFor = (s: string): Tone =>
-    s === 'ok' ? 'ok' : s === 'slow' ? 'attention' : s === 'error' ? 'critical' : 'neutral';
+    s === 'ok' ? 'ok'
+      : s === 'slow' || s === 'disabled' ? 'attention'
+        : s === 'error' || s === 'stale' ? 'critical'
+          : 'neutral';
+  const statusCopy = (api: D['apiHealths'][number]) => {
+    if (api.status === 'disabled') return api.setupHint ?? 'Setup required';
+    if (api.status === 'stale') return `No check-in since ${api.lastChecked ? new Date(api.lastChecked).toLocaleString('en-CA') : 'unknown'}`;
+    if (api.status === 'error') return api.error ?? 'Not responding';
+    if (api.status === 'checking') return 'Checking now…';
+    if (api.status === 'idle') return 'Waiting for first health report';
+    const noun = api.healthMode === 'scheduled' ? 'produced' : 'returned';
+    return `${api.recordCount ?? 0} record${api.recordCount === 1 ? '' : 's'} ${noun}`;
+  };
+  const attention = d.apiHealths.filter((api) => ['error', 'stale', 'slow'].includes(api.status)).length;
+  const setupRequired = d.apiHealths.filter((api) => api.status === 'disabled').length;
+  const groups = ['Incident ingestion', 'Live map layers'] as const;
+
   return (
     <>
-      <Panel
-        title="Source health"
-        subtitle="Checked automatically every two minutes"
-        action={
-          <AdminButton size="sm" variant="outline" onClick={d.checkApis}>
-            <RefreshCw size={13} /> Check now
-          </AdminButton>
-        }
-        padded={false}
-      >
-        <ul className="divide-y divide-[#E4E2DC]">
-          {d.apiHealths.map((api) => (
-            <li key={api.id} className="p-3 flex items-center gap-3">
-              <StatusDot tone={toneFor(api.status)} pulse={api.status === 'checking'} />
-              <span className="min-w-0 flex-1">
-                <p className="text-sm font-semibold truncate" style={{ color: T.ink }}>{api.name}</p>
-                <p className="text-xs truncate" style={{ color: T.muted }}>
-                  {api.status === 'error'
-                    ? (api.error ?? 'Not responding')
-                    : api.status === 'checking'
-                      ? 'Checking…'
-                      : `${api.recordCount ?? 0} records`}
-                </p>
-              </span>
-              <span className="text-right shrink-0">
-                <Figure value={api.responseMs} unit="ms" size="sm" tone={toneFor(api.status)} />
-                <p className="text-[0.65rem] mt-0.5"><TimeAgo ts={api.lastChecked ?? undefined} /></p>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </Panel>
-
       <StatGrid>
         <StatTile label="Traffic events" value={d.liveTrafficCount} hint="Live from Calgary open data" />
         <StatTile label="Open 311 requests" value={d.live311Count} hint="Live from Calgary open data" />
-        <StatTile label="Feeds healthy" value={`${d.apiHealths.filter((a) => a.status === 'ok').length}/${d.apiHealths.length}`} tone="ok" />
-        <StatTile label="Feeds failing" value={d.apiHealths.filter((a) => a.status === 'error').length} tone="critical" />
+        <StatTile label="Sources healthy" value={`${d.apiHealths.filter((a) => a.status === 'ok').length}/${d.apiHealths.length}`} tone="ok" hint={`${d.apiHealths.length} registered sources`} />
+        <StatTile label="Needs attention" value={attention} tone={attention ? 'critical' : 'ok'} hint={setupRequired ? `${setupRequired} optional setup item` : 'No setup gaps'} />
       </StatGrid>
+
+      {groups.map((group) => (
+        <Panel
+          key={group}
+          title={group}
+          subtitle={group === 'Incident ingestion'
+            ? 'Actual GitHub Actions results reported by each scheduled source'
+            : 'Lightweight browser probes for layers fetched when someone opens the map'}
+          action={group === 'Live map layers' ? (
+            <AdminButton size="sm" variant="outline" onClick={d.checkApis}>
+              <RefreshCw size={13} /> Probe now
+            </AdminButton>
+          ) : undefined}
+          padded={false}
+        >
+          <ul className="divide-y divide-[#E4E2DC]">
+            {d.apiHealths.filter((api) => api.group === group).map((api) => (
+              <li key={api.id} className="p-3 flex items-start gap-3">
+                <span className="pt-1"><StatusDot tone={toneFor(api.status)} pulse={api.status === 'checking'} /></span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold" style={{ color: T.ink }}>{api.name}</p>
+                    {api.optional && <Chip tone={api.status === 'disabled' ? 'attention' : 'neutral'}>Optional</Chip>}
+                    <Chip tone={toneFor(api.status)}>{api.status === 'disabled' ? 'Setup required' : api.status}</Chip>
+                  </span>
+                  <p className="text-xs mt-0.5 leading-snug" style={{ color: T.muted }}>{api.description}</p>
+                  <p className="text-[0.68rem] mt-1" style={{ color: T.muted }}>
+                    {statusCopy(api)} · {api.cadence}
+                  </p>
+                </span>
+                <span className="text-right shrink-0 flex flex-col items-end gap-1">
+                  {api.responseMs !== null && api.status !== 'disabled' && (
+                    <Figure value={api.responseMs} unit="ms" size="sm" tone={toneFor(api.status)} />
+                  )}
+                  <TimeAgo ts={api.lastChecked ?? undefined} />
+                  <a
+                    href={api.homepage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[0.68rem] font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+                    style={{ color: T.signal, outlineColor: T.signal }}
+                  >
+                    Source <ExternalLink size={10} />
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ))}
     </>
   );
 }

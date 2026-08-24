@@ -24,6 +24,11 @@ import { Incident, CommunityStats, incidentVisibility } from '@/src/types';
 import { INCIDENT_CATEGORIES, LEGACY_INCIDENT_CATEGORIES } from '@/src/constants';
 import { deleteIncidentImage } from '@/src/lib/storage';
 import { suppressionDocId } from '@/src/lib/suppression';
+import {
+  DATA_SOURCES,
+  DIRECT_DATA_SOURCES,
+  type DataSourceDefinition,
+} from '@/src/config/dataSources';
 
 export type UserProfile = {
   uid: string;
@@ -56,15 +61,25 @@ export type PageViewDoc = {
   sessionId?: string;
 };
 
-export type ApiHealth = {
-  id: string;
-  name: string;
-  url: string;
-  status: 'idle' | 'checking' | 'ok' | 'slow' | 'error';
+export type ApiHealth = DataSourceDefinition & {
+  status: 'idle' | 'checking' | 'ok' | 'slow' | 'error' | 'stale' | 'disabled';
   recordCount: number | null;
   responseMs: number | null;
   lastChecked: number | null;
+  lastSuccessAt: number | null;
   error: string | null;
+  runId: string | null;
+};
+
+type ScheduledHealthDoc = {
+  sourceId?: string;
+  status?: 'ok' | 'error' | 'disabled';
+  recordCount?: number | null;
+  durationMs?: number | null;
+  checkedAt?: unknown;
+  lastSuccessAt?: unknown;
+  error?: string | null;
+  runId?: string | null;
 };
 
 export type EditableIncident = Pick<
@@ -82,12 +97,20 @@ export const VERIFIED_STATUSES: Incident['verified_status'][] = [
   'unverified', 'multiple_reports', 'community_confirmed', 'pending_review',
 ];
 
-export const API_ENDPOINTS: Pick<ApiHealth, 'id' | 'name' | 'url'>[] = [
-  { id: 'traffic',   name: 'Calgary Traffic',     url: 'https://data.calgary.ca/resource/35ra-9556.json?$limit=10&$order=start_dt%20DESC' },
-  { id: '311',       name: 'Calgary 311',          url: "https://data.calgary.ca/resource/iahh-g8bj.json?$limit=10&$where=status_description%3D'Open'&$order=requested_date%20DESC" },
-  { id: 'watermain', name: 'Water Main Breaks',    url: 'https://data.calgary.ca/resource/dpcu-jr23.json?$limit=10&$order=break_date%20DESC&status=ACTIVE' },
-  { id: 'weather',   name: 'Open-Meteo Weather',   url: 'https://api.open-meteo.com/v1/forecast?latitude=51.048&longitude=-114.065&current=temperature_2m,weathercode&timezone=America%2FEdmonton' },
-];
+export const API_ENDPOINTS = DIRECT_DATA_SOURCES;
+
+function emptyHealth(source: DataSourceDefinition): ApiHealth {
+  return {
+    ...source,
+    status: 'idle',
+    recordCount: null,
+    responseMs: null,
+    lastChecked: null,
+    lastSuccessAt: null,
+    error: null,
+    runId: null,
+  };
+}
 
 /** How long a suppression entry blocks re-ingestion of a record. */
 const SUPPRESSION_TTL_MS = 180 * 24 * 60 * 60 * 1000; // 180 days
@@ -128,13 +151,42 @@ export function useAdminData() {
 
   const [statsDrafts, setStatsDrafts] = useState<Record<string, EditableCommunityStats>>({});
   const [savingStatsId, setSavingStatsId] = useState<string | null>(null);
-  const [apiHealths, setApiHealths] = useState<ApiHealth[]>(
-    API_ENDPOINTS.map(e => ({ ...e, status: 'idle', recordCount: null, responseMs: null, lastChecked: null, error: null }))
+  const [directHealths, setDirectHealths] = useState<ApiHealth[]>(
+    DIRECT_DATA_SOURCES.map(emptyHealth),
   );
+  const [scheduledHealthDocs, setScheduledHealthDocs] = useState<Record<string, ScheduledHealthDoc>>({});
+  const [healthClock, setHealthClock] = useState(Date.now());
   const [liveTrafficCount, setLiveTrafficCount] = useState<number | null>(null);
   const [live311Count, setLive311Count] = useState<number | null>(null);
 
   const { stats: crimeStats, isLoading: crimeLoading } = useCrimeStats();
+
+  const apiHealths = useMemo<ApiHealth[]>(() => DATA_SOURCES.map((source) => {
+    if (source.healthMode === 'direct') {
+      return directHealths.find((health) => health.id === source.id) ?? emptyHealth(source);
+    }
+
+    const doc = scheduledHealthDocs[source.id];
+    if (!doc) return emptyHealth(source);
+    const checkedAt = coerceTimestamp(doc.checkedAt);
+    const lastSuccessAt = coerceTimestamp(doc.lastSuccessAt);
+    const staleAfterMs = (source.staleAfterMinutes ?? 90) * 60_000;
+    const rawStatus = doc.status ?? 'error';
+    const status: ApiHealth['status'] =
+      rawStatus !== 'disabled' && checkedAt > 0 && healthClock - checkedAt > staleAfterMs
+        ? 'stale'
+        : rawStatus;
+    return {
+      ...source,
+      status,
+      recordCount: typeof doc.recordCount === 'number' ? doc.recordCount : null,
+      responseMs: typeof doc.durationMs === 'number' ? doc.durationMs : null,
+      lastChecked: checkedAt || null,
+      lastSuccessAt: lastSuccessAt || null,
+      error: doc.error ?? null,
+      runId: doc.runId ?? null,
+    };
+  }), [directHealths, healthClock, scheduledHealthDocs]);
 
   // ── Audit log ──────────────────────────────────────────────────────────────
 
@@ -311,29 +363,65 @@ export function useAdminData() {
   // ── API health polling ────────────────────────────────────────────────────
 
   const checkApis = useCallback(async () => {
-    setApiHealths(prev => prev.map(h => ({ ...h, status: 'checking' as const })));
+    setDirectHealths(prev => prev.map(h => ({ ...h, status: 'checking' as const })));
     const results = await Promise.all(
-      API_ENDPOINTS.map(async (ep) => {
+      DIRECT_DATA_SOURCES.map(async (source): Promise<ApiHealth> => {
         const start = Date.now();
         try {
-          const res = await fetch(ep.url);
+          if (!source.checkUrl) throw new Error('No health-check URL configured');
+          const res = await fetch(source.checkUrl, { signal: AbortSignal.timeout(12_000) });
           const ms = Date.now() - start;
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
           const count = Array.isArray(data) ? data.length : (data ? 1 : 0);
-          return { ...ep, status: (ms > 2000 ? 'slow' : 'ok') as ApiHealth['status'], recordCount: count, responseMs: ms, lastChecked: Date.now(), error: null };
-        } catch (err: any) {
-          return { ...ep, status: 'error' as const, recordCount: null, responseMs: Date.now() - start, lastChecked: Date.now(), error: err?.message ?? 'Unknown error' };
+          const checkedAt = Date.now();
+          return {
+            ...source,
+            status: ms > 2000 ? 'slow' : 'ok',
+            recordCount: count,
+            responseMs: ms,
+            lastChecked: checkedAt,
+            lastSuccessAt: checkedAt,
+            error: null,
+            runId: null,
+          };
+        } catch (error: unknown) {
+          return {
+            ...source,
+            status: 'error',
+            recordCount: null,
+            responseMs: Date.now() - start,
+            lastChecked: Date.now(),
+            lastSuccessAt: null,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            runId: null,
+          };
         }
       })
     );
-    setApiHealths(results);
+    setDirectHealths(results);
   }, []);
+
+  useEffect(() => {
+    if (!isAuthReady || !isAdmin || !db) return;
+    const unsubscribe = onSnapshot(
+      collection(db, 'ingestion_health'),
+      (snapshot) => {
+        const next: Record<string, ScheduledHealthDoc> = {};
+        snapshot.docs.forEach((row) => { next[row.id] = row.data() as ScheduledHealthDoc; });
+        setScheduledHealthDocs(next);
+        setHealthClock(Date.now());
+      },
+      () => setScheduledHealthDocs({}),
+    );
+    const clock = setInterval(() => setHealthClock(Date.now()), 60_000);
+    return () => { unsubscribe(); clearInterval(clock); };
+  }, [isAuthReady, isAdmin]);
 
   useEffect(() => {
     if (!isAuthReady || !isAdmin) return;
     checkApis();
-    const interval = setInterval(checkApis, 2 * 60 * 1000);
+    const interval = setInterval(checkApis, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [isAuthReady, isAdmin, checkApis]);
 

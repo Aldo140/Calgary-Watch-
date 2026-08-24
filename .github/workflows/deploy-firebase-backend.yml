@@ -1,16 +1,24 @@
 name: Deploy Firebase Backend
 
 # Backend releases are deliberately separate from ordinary Hosting releases.
-# The Firebase service account must first be granted serviceusage.services.get;
-# until then a backend attempt cannot succeed and must not turn a healthy UI
-# deployment red. Run this workflow after that external IAM permission is fixed.
+# Rules-only releases are safe on the current Firebase plan. The `all` target
+# additionally deploys Cloud Functions and therefore requires the paid service
+# plus its IAM permissions; those limits never turn a healthy UI release red.
 on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type DEPLOY to publish Firestore/Storage rules and email functions'
+        description: 'Type DEPLOY to publish the selected backend target'
         required: true
         type: string
+      target:
+        description: 'Rules can deploy without the paid Cloud Functions service'
+        required: true
+        default: rules
+        type: choice
+        options:
+          - rules
+          - all
 
 permissions:
   contents: read
@@ -38,6 +46,7 @@ jobs:
         run: npm ci
 
       - name: Install function dependencies
+        if: ${{ inputs.target == 'all' }}
         run: npm ci --prefix functions
 
       - name: Authenticate Firebase CLI
@@ -49,9 +58,11 @@ jobs:
         run: npx firebase-tools deploy --only firestore:rules,storage --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
 
       - name: Configure email provider secret
+        if: ${{ inputs.target == 'all' }}
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: printf '%s' "$RESEND_API_KEY" | npx firebase-tools functions:secrets:set RESEND_API_KEY --data-file - --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}"
 
       - name: Deploy admin email proof function
+        if: ${{ inputs.target == 'all' }}
         run: npx firebase-tools deploy --only functions --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive

@@ -17,9 +17,6 @@ import { Incident } from '@/src/types';
 import type { ApiHealth } from '@/src/hooks/useAdminData';
 import { AdminButton, Chip, EmptyState, Panel, StatusDot, T, TimeAgo, display, type Tone } from './ui';
 
-/** How long the ingest may go quiet before it counts as a problem. */
-const STALE_INGEST_MS = 3 * 60 * 60 * 1000;
-
 type QueueItem = {
   id: string;
   rank: number;
@@ -36,7 +33,6 @@ export function AttentionQueue({
   flagged,
   pendingReview,
   apiHealths,
-  incidents,
   onRestore,
   onDelete,
   onApprove,
@@ -47,7 +43,6 @@ export function AttentionQueue({
   flagged: Incident[];
   pendingReview: Incident[];
   apiHealths: ApiHealth[];
-  incidents: Incident[];
   onRestore: (id: string) => void;
   onDelete: (id: string) => void;
   onApprove: (id: string) => void;
@@ -93,42 +88,30 @@ export function AttentionQueue({
     });
   }
 
-  // 2. API failures — the map is quietly missing a layer until this is fixed.
+  // 2. Source failures and stale scheduled runs — the map is quietly missing
+  // a layer until this is fixed. Optional sources awaiting setup stay visible
+  // in Data feeds without turning the whole desk red.
   for (const api of apiHealths) {
-    if (api.status !== 'error' && api.status !== 'slow') continue;
+    if (api.status !== 'error' && api.status !== 'slow' && api.status !== 'stale') continue;
+    const critical = api.status === 'error' || api.status === 'stale';
     items.push({
       id: `api-${api.id}`,
-      rank: api.status === 'error' ? 1 : 3,
-      tone: api.status === 'error' ? 'critical' : 'attention',
-      icon: api.status === 'error' ? WifiOff : Zap,
-      kind: api.status === 'error' ? 'Feed down' : 'Feed slow',
+      rank: critical ? 1 : 3,
+      tone: critical ? 'critical' : 'attention',
+      icon: critical ? WifiOff : Zap,
+      kind: api.status === 'stale' ? 'Ingest stale' : api.status === 'error' ? 'Feed down' : 'Feed slow',
       title: api.name,
       detail:
-        api.status === 'error'
+        api.status === 'stale'
+          ? `No scheduled check-in within ${api.staleAfterMinutes ?? 90} minutes`
+          : api.status === 'error'
           ? (api.error ?? 'Not responding')
           : `Responded in ${api.responseMs}ms`,
       ts: api.lastChecked ?? undefined,
     });
   }
 
-  // 3. Ingest gone quiet — no scheduled record has landed in hours.
-  const newestSystem = incidents
-    .filter((i) => i.authorUid === 'system')
-    .reduce((max, i) => Math.max(max, i.timestamp), 0);
-  if (newestSystem > 0 && Date.now() - newestSystem > STALE_INGEST_MS) {
-    items.push({
-      id: 'ingest-stale',
-      rank: 2,
-      tone: 'attention',
-      icon: WifiOff,
-      kind: 'Ingest quiet',
-      title: 'No new official records in over 3 hours',
-      detail: 'The scheduled ingest may have stopped. Check the Actions tab on GitHub.',
-      ts: newestSystem,
-    });
-  }
-
-  // 4. Reports awaiting a look.
+  // 3. Reports awaiting a look.
   for (const incident of pendingReview) {
     items.push({
       id: `pending-${incident.id}`,

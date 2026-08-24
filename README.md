@@ -16,11 +16,14 @@ Residents report incidents the moment they happen. Road closures, fires, floodin
 
 Calgary Watch is a live, community-powered safety map. Drop a pin, pick a category, attach an optional photo, and submit in under 30 seconds. The report goes live instantly. No app install needed — it works on any phone from the browser.
 
-The platform runs four data layers:
+The platform combines these data layers:
 
 - **Community Reports** — submitted by users in real time, labeled with trust indicators that improve as more users confirm them
-- **511 Alberta Traffic** — live traffic incidents from 511.alberta.ca, refreshed every 30 minutes
-- **Environment Canada Alerts** — official weather warnings and special statements covering 15 zones across Alberta
+- **Calgary Police Newsroom** — timestamped official releases with a named Calgary location
+- **Calgary 311 Property Reports** — recent property-crime-related resident service requests
+- **511 Alberta Traffic** — optional authenticated traffic ingestion when its developer key is configured
+- **Environment Canada Alerts** — active official warnings intersecting the Calgary area
+- **Alberta Emergency Alert & Global News** — attributed emergency and secondary local-news context
 - **Calgary & Edmonton Open Data** — service requests, bylaw, 311, and crime statistics via SODA API
 - **Statistics Canada Baselines** — annual crime data for RCMP-policed towns (Airdrie, Cochrane, Okotoks, Canmore, High River, Strathmore, Chestermere)
 - **ENMAX Power Outages** — live Calgary electricity outages, shown as an opt-in official layer separate from community reports
@@ -256,7 +259,7 @@ which several of these scanners weigh as a legitimacy signal.
 
 `scripts/ingest/index.ts` runs via GitHub Actions (`ingest-live-data.yml`) on a 30-minute cron schedule.
 
-**Data sources:**
+**Scheduled ingestion sources:**
 
 | Source | Type |
 |--------|------|
@@ -266,9 +269,11 @@ which several of these scanners weigh as a legitimacy signal.
 | Global News Calgary RSS | Secondary local safety news |
 | Calgary Police Service newsroom | Timestamped police releases with named Calgary locations |
 | Calgary 311 Open Data | Recent property-crime-related resident service requests |
-| Edmonton Open Data (bylaw, 311, traffic) | Live Edmonton incidents |
-| Edmonton Police Service (EPS) Dashboard | Edmonton neighbourhood crime stats |
-| Statistics Canada WDS (Table 35-10-0183-01) | Annual crime baselines for RCMP towns |
+| ENMAX outage feed | Server-cached power-outage snapshot every five minutes |
+
+The map also reads selected browser-live layers from Calgary Open Data and Open-Meteo. Edmonton Open Data, Edmonton dashboard statistics and Statistics Canada baselines are loaded by their relevant city-intelligence views rather than by the scheduled incident pipeline.
+
+Every scheduled source writes its latest outcome, duration and produced-record count to the admin-only `ingestion_health` collection. The admin dashboard combines those workflow check-ins with direct probes for browser-live layers, using the shared registry in `src/config/dataSources.ts`.
 
 **Firestore optimisation:** Stable source IDs allow direct create-or-refresh writes without a collection-wide deduplication read. Expiry cleanup uses a targeted query and hard-deletes stale system incidents.
 

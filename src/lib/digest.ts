@@ -17,6 +17,13 @@ import type { Incident, IncidentCategory } from '@/src/types';
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
+ * Older local crime can still be useful even when the current week is quiet.
+ * Counts and comparisons remain strictly seven-day figures; this wider window
+ * is used only to choose the small, clearly dated list of highlights.
+ */
+export const DIGEST_CONTEXT_MS = 28 * 24 * 60 * 60 * 1000;
+
+/**
  * Rings, widest-last, matching the personal briefing's.
  *
  * A digest that opens with "0 reports within a 15-minute walk" has reported the
@@ -270,6 +277,8 @@ export interface ScoredIncident {
   incident: Incident;
   /** Metres from home, or null when we only know the community name. */
   distanceM: number | null;
+  /** Older than the measured week and included only as useful local context. */
+  contextOnly?: boolean;
 }
 
 /**
@@ -313,6 +322,10 @@ export interface DigestSummary {
   delta: number;
   /** The handful the email actually lists. */
   highlights: ScoredIncident[];
+  /** Highlights that pre-date this week's measured window. */
+  contextHighlightCount: number;
+  /** This-week highlights, used to keep the “more on the map” count honest. */
+  currentHighlightCount: number;
   /** True when there is genuinely nothing to report. */
   quiet: boolean;
   areaName: string;
@@ -359,6 +372,87 @@ export function topAreasIn(items: ScoredIncident[], limit = MAX_TOP_AREAS): Arra
 
 export const MAX_HIGHLIGHTS = 6;
 
+const HIGHLIGHT_CATEGORY_WEIGHT: Record<IncidentCategory, number> = {
+  crime: 1_000,
+  emergency: 650,
+  traffic: 320,
+  weather: 180,
+  infrastructure: 80,
+};
+
+/** Remove boilerplate differences so six near-identical 311 rows cannot win. */
+function highlightFingerprint(incident: Incident): string {
+  return incident.title.toLowerCase()
+    .replace(/\b(reported|report|in|near|at|the|a|an)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 7)
+    .join(' ');
+}
+
+/**
+ * Rank what a person would actually choose to read, not merely what is newest.
+ * Crime leads, real neighbour reports and CPS releases receive a trust/interest
+ * lift, and proximity and recency settle otherwise comparable choices.
+ */
+export function digestHighlightScore(item: ScoredIncident, now: number): number {
+  const incident = item.incident;
+  const ageDays = Math.max(0, (now - incident.timestamp) / (24 * 60 * 60 * 1000));
+  const sourceBonus = incident.data_source === 'community'
+    ? 300
+    : incident.source_type === 'calgary_police_crime'
+      ? 260
+      : incident.source_type === 'news_rss'
+        ? 150
+        : 0;
+  const proximity = item.distanceM === null ? 0 : Math.max(0, 160 - item.distanceM / 60);
+  const confirmation = Math.min(80, Math.max(0, (incident.report_count ?? 1) - 1) * 20);
+  const actionWords = /\b(stolen|theft|break.?in|robbery|wanted|charged|arrest|fraud|vandal|assault|shoot|missing)\b/i
+    .test(`${incident.title} ${incident.description}`) ? 70 : 0;
+  return HIGHLIGHT_CATEGORY_WEIGHT[incident.category] + sourceBonus + proximity
+    + confirmation + actionWords + Math.max(0, 220 - ageDays * 8);
+}
+
+/** Crime-first, source-diverse highlights shared by welcome and weekly mail. */
+export function selectDigestHighlights(
+  candidates: ScoredIncident[],
+  now: number,
+  limit = MAX_HIGHLIGHTS,
+): ScoredIncident[] {
+  if (limit <= 0) return [];
+  const ranked = [...candidates].sort((a, b) =>
+    digestHighlightScore(b, now) - digestHighlightScore(a, now)
+      || b.incident.timestamp - a.incident.timestamp
+      || a.incident.id.localeCompare(b.incident.id));
+  const selected: ScoredIncident[] = [];
+  const ids = new Set<string>();
+  const fingerprints = new Set<string>();
+  const add = (item: ScoredIncident) => {
+    if (selected.length >= limit || ids.has(item.incident.id)) return;
+    const fingerprint = highlightFingerprint(item.incident);
+    if (fingerprint && fingerprints.has(fingerprint)) return;
+    selected.push(item);
+    ids.add(item.incident.id);
+    if (fingerprint) fingerprints.add(fingerprint);
+  };
+
+  // If a neighbour reported a crime, make room for that lived local context.
+  const neighbourCrime = ranked.find((item) =>
+    item.incident.category === 'crime' && item.incident.data_source === 'community');
+  if (neighbourCrime) add(neighbourCrime);
+
+  // Four of six are crime whenever the available evidence supports it.
+  const crimeTarget = Math.min(ranked.filter((item) => item.incident.category === 'crime').length,
+    Math.ceil(limit * 2 / 3));
+  for (const item of ranked) {
+    if (selected.filter((entry) => entry.incident.category === 'crime').length >= crimeTarget) break;
+    if (item.incident.category === 'crime') add(item);
+  }
+  for (const item of ranked) add(item);
+  return selected;
+}
+
 /**
  * Reports that are allowed to appear in somebody's inbox.
  *
@@ -399,6 +493,7 @@ export function buildDigestSummary(options: {
   const rings = options.rings ?? DIGEST_RINGS;
   const since = now - WEEK_MS;
   const previousSince = since - WEEK_MS;
+  const contextSince = now - DIGEST_CONTEXT_MS;
 
   const savedArea = (profile.neighborhood || profile.inferredNeighborhood || '').trim();
   const mailable = incidents.filter((i) => isMailable(i, now));
@@ -415,15 +510,18 @@ export function buildDigestSummary(options: {
 
     const thisWeek = withDistance(since, now);
     const lastWeek = withDistance(previousSince, since);
+    const context = withDistance(contextSince, now);
 
     for (let i = 0; i < rings.length; i += 1) {
       const inRing = thisWeek.filter((x) => (x.distanceM ?? Infinity) <= rings[i].metres);
-      if (inRing.length > 0 || i === rings.length - 1) {
+      const contextInRing = context.filter((x) => (x.distanceM ?? Infinity) <= rings[i].metres);
+      if (inRing.length > 0 || contextInRing.length > 0 || i === rings.length - 1) {
         return finish({
           scope: 'home',
           areaName: savedArea || 'your area',
           ringLabel: rings[i].label,
           items: inRing,
+          highlightPool: contextInRing,
           previousTotal: lastWeek.filter((x) => (x.distanceM ?? Infinity) <= rings[i].metres).length,
           needsLocation: false,
           widenedToCity: false,
@@ -440,12 +538,14 @@ export function buildDigestSummary(options: {
       .map((i) => ({ incident: i, distanceM: null }));
 
     const thisWeek = named(since, now);
-    if (thisWeek.length > 0) {
+    const context = named(contextSince, now);
+    if (thisWeek.length > 0 || context.length > 0) {
       return finish({
         scope: 'community',
         areaName: savedArea,
         ringLabel: `in ${savedArea}`,
         items: thisWeek,
+        highlightPool: context,
         previousTotal: named(previousSince, since).length,
         needsLocation: false,
         widenedToCity: false,
@@ -470,6 +570,7 @@ export function buildDigestSummary(options: {
     areaName: savedArea || 'Calgary',
     ringLabel: 'across Calgary',
     items: cityWide(since, now),
+    highlightPool: cityWide(contextSince, now),
     previousTotal: cityWide(previousSince, since).length,
     needsLocation: !savedArea && !home,
     widenedToCity: Boolean(savedArea || home),
@@ -489,6 +590,7 @@ function finish(parts: {
   areaName: string;
   ringLabel: string;
   items: ScoredIncident[];
+  highlightPool?: ScoredIncident[];
   previousTotal: number;
   needsLocation: boolean;
   widenedToCity: boolean;
@@ -506,6 +608,13 @@ function finish(parts: {
   for (const { incident } of items) {
     counts.set(incident.category, (counts.get(incident.category) ?? 0) + 1);
   }
+
+  const highlightPool = (parts.highlightPool ?? items).map((item) => ({
+    ...item,
+    contextOnly: item.incident.timestamp < parts.since,
+  }));
+  const highlights = selectDigestHighlights(highlightPool, parts.until);
+  const contextHighlightCount = highlights.filter((item) => item.contextOnly).length;
 
   return {
     weekKey: digestWeekKey(parts.until),
@@ -527,7 +636,9 @@ function finish(parts: {
       })),
     previousTotal: parts.previousTotal,
     delta: items.length - parts.previousTotal,
-    highlights: items.slice(0, MAX_HIGHLIGHTS),
+    highlights,
+    contextHighlightCount,
+    currentHighlightCount: highlights.length - contextHighlightCount,
     quiet: items.length === 0,
     areaName: parts.areaName,
     // Only the city-wide digest needs it; everybody else already has a place.

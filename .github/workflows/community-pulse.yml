@@ -1,13 +1,13 @@
 name: Community Pulse
 
-# Checks the randomized Calgary-time daily plan once an hour. The publisher
+# Checks the randomized Calgary-time daily plan twice an hour. The publisher
 # emits only clearly badged example reports and atomically skips anything that
 # has already been posted. The UTC ranges cover 07:00-22:00 in Calgary through
 # both MST and MDT; the script itself owns the exact local-time guardrails.
 
 on:
   schedule:
-    - cron: '17 0-5,13-23 * * *'
+    - cron: '7,37 0-5,13-23 * * *'
   workflow_dispatch:
 
 concurrency:

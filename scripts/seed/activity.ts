@@ -8,7 +8,7 @@
 
 import { pathToFileURL } from 'node:url';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 type WindowName = 'morning' | 'afternoon' | 'evening';
 
@@ -23,7 +23,7 @@ interface ExampleTemplate {
   id: string;
   title: string;
   description: string;
-  category: 'crime' | 'traffic' | 'infrastructure' | 'weather';
+  category: 'crime';
   neighborhood: string;
   lat: number;
   lng: number;
@@ -39,7 +39,7 @@ interface PulseState {
   recentTemplateIds: string[];
 }
 
-const PLAN_VERSION = 2;
+const PLAN_VERSION = 3;
 const CALGARY_TIME_ZONE = 'America/Edmonton';
 
 export const POSTING_WINDOWS: Record<WindowName, { start: number; end: number }> = {
@@ -53,34 +53,36 @@ export const POSTING_WINDOWS: Record<WindowName, { start: number; end: number }>
  * - no violence, drugs, identifiable people, homes, named businesses, or
  *   official/police claims;
  * - locations are approximate neighbourhood anchors around public space;
- * - wording, posting window, and season must agree.
+ * - every example is crime-related; wording ranges from casual to formal so
+ *   the demo feed resembles the different ways real people write;
+ * - wording and posting window must agree.
  */
 export const QUEUE: ExampleTemplate[] = [
   {
     id: 'beltline-window-break',
-    title: 'Car window found smashed this morning',
-    description: 'Parked on the street overnight and found the passenger window broken before work. Nothing valuable was left inside, but it is a good reminder to keep even small bags and cables out of view.',
+    title: 'ugh, car window smashed overnight',
+    description: 'Came out for work and the passenger window was gone. Nothing big was in there, just a charging cable. heads up if you park around here.',
     category: 'crime', neighborhood: 'Beltline', lat: 51.0381, lng: -114.0680,
     windows: ['morning'],
   },
   {
     id: 'hillhurst-car-rummaged',
-    title: 'Vehicle was rummaged through overnight',
-    description: 'The doors may have been left unlocked and the glove box was open this morning. Only loose change appears to be missing. Double-check your doors before turning in tonight.',
+    title: 'Pretty sure someone went through my car',
+    description: 'Glove box was open this morning and the change tray was empty. I mightve missed the lock last night tbh, worth double checking yours.',
     category: 'crime', neighborhood: 'Hillhurst', lat: 51.0563, lng: -114.0903,
     windows: ['morning'],
   },
   {
     id: 'bowness-vehicle-missing',
-    title: 'Vehicle missing from an overnight parking spot',
-    description: 'The vehicle was left in a public parking area last night and was not there this morning. The owner is checking towing records and filing a report. Keep keys and registration secure.',
+    title: 'Vehicle missing from overnight parking spot',
+    description: 'A vehicle left in the public lot last night was no longer there this morning. Towing records are being checked and a police report is being filed.',
     category: 'crime', neighborhood: 'Bowness', lat: 51.0975, lng: -114.1807,
     windows: ['morning'],
   },
   {
     id: 'brentwood-plate-missing',
-    title: 'Licence plate taken from parked vehicle',
-    description: 'Noticed the rear plate missing during a walk-around before leaving today. The screws were gone too. Worth taking a quick look at your vehicle before driving.',
+    title: 'rear plate stolen off my car',
+    description: 'Noticed before pulling out that the plate and screws were both gone. Never thought to check for that before... maybe take a quick look at yours.',
     category: 'crime', neighborhood: 'Brentwood', lat: 51.0788, lng: -114.1440,
     windows: ['morning', 'afternoon'],
   },
@@ -93,29 +95,29 @@ export const QUEUE: ExampleTemplate[] = [
   },
   {
     id: 'mission-door-handles',
-    title: 'Someone checking parked-car door handles',
-    description: 'A person was seen trying several vehicle handles along a public parking row, then moved on when other people arrived. No confrontation—lock up and avoid leaving belongings visible.',
+    title: 'Heads up — someone checking car doors',
+    description: 'Saw someone try a few handles along the public parking row, then take off when more people came around. Didnt confront them. Lock up and bring your stuff inside.',
     category: 'crime', neighborhood: 'Mission', lat: 51.0347, lng: -114.0670,
     windows: ['evening'],
   },
   {
-    id: 'kensington-unwanted-interaction',
-    title: 'Uncomfortable interaction on the pathway',
-    description: 'Someone repeatedly asked for personal information and continued walking alongside after being told no. They left when the pathway became busier. No threats were made; consider walking with others after dark.',
+    id: 'kensington-lobby-parcel',
+    title: 'Package taken from apartment lobby',
+    description: 'Courier photo shows the box inside the lobby, but it was gone about 20 mins later. Building manager is checking the camera and the delivery was reported.',
     category: 'crime', neighborhood: 'Kensington', lat: 51.0603, lng: -114.0903,
-    windows: ['evening'],
-  },
-  {
-    id: 'bridgeland-parking-interaction',
-    title: 'Concerning interaction near a public parking area',
-    description: 'Someone stood very close while asking persistent questions about where a driver lived. The driver returned to a busier area and the person left. Create distance and head toward other people.',
-    category: 'crime', neighborhood: 'Bridgeland', lat: 51.0602, lng: -114.0412,
     windows: ['afternoon', 'evening'],
   },
   {
+    id: 'bridgeland-storage-locker',
+    title: 'Storage locker lock cut',
+    description: 'Found the lock cut and a couple small things missing from the shared storage room. Management has the report and is reviewing who entered the building.',
+    category: 'crime', neighborhood: 'Bridgeland', lat: 51.0602, lng: -114.0412,
+    windows: ['morning', 'afternoon'],
+  },
+  {
     id: 'eau-claire-bike',
-    title: 'Bike missing from a public rack',
-    description: 'A commuter bike was locked to a public rack for about an hour and was gone on return. The cable lock had been cut. A U-lock through the frame is the safer option in busy areas.',
+    title: 'Bike taken from the public rack',
+    description: 'Was inside for maybe an hour and came back to a cut cable lock. Bike is gone. Use a proper U-lock here, the thin cable definately wasnt enough.',
     category: 'crime', neighborhood: 'Eau Claire', lat: 51.0538, lng: -114.0757,
     windows: ['afternoon', 'evening'],
   },
@@ -127,46 +129,46 @@ export const QUEUE: ExampleTemplate[] = [
     windows: ['afternoon', 'evening'],
   },
   {
-    id: 'inglewood-poor-detour',
-    title: 'Construction detour is easy to miss',
-    description: 'One follow-up sign is turned away from traffic, and several drivers have had to double back. Slow down through the temporary route and leave room for sudden turns.',
-    category: 'traffic', neighborhood: 'Inglewood', lat: 51.0406, lng: -114.0201,
+    id: 'inglewood-garage-door',
+    title: 'Garage side door looks like it was pried',
+    description: 'Fresh damage showed up around the latch overnight. Nothing seems missing, but the door no longer closes properly. Reported it and added a temporary brace.',
+    category: 'crime', neighborhood: 'Inglewood', lat: 51.0406, lng: -114.0201,
+    windows: ['morning'],
+  },
+  {
+    id: 'crescent-heights-parcel',
+    title: 'Parcel disappeared from front step',
+    description: 'Delivery photo shows it arrived around lunch, but it was gone by the time anyone got home. Checking with neighbours for camera footage.',
+    category: 'crime', neighborhood: 'Crescent Heights', lat: 51.0694, lng: -114.0625,
+    windows: ['afternoon', 'evening'],
+  },
+  {
+    id: 'sunnyside-bike-lock',
+    title: 'Cut bike lock left beside rack',
+    description: 'There is a cut cable lock beside the public rack and no bike with it. Posting in case the owner is looking for the spot or nearby camera coverage.',
+    category: 'crime', neighborhood: 'Sunnyside', lat: 51.0563, lng: -114.0903,
+    windows: ['afternoon', 'evening'],
+  },
+  {
+    id: 'ramsay-shed-lock',
+    title: 'Shed lock damaged overnight',
+    description: 'The lock was bent and there are new marks around the latch. It does not look like entry was gained, but a report has been made for the record.',
+    category: 'crime', neighborhood: 'Ramsay', lat: 51.0284, lng: -114.0353,
+    windows: ['morning'],
+  },
+  {
+    id: 'mckenzie-mailbox',
+    title: 'Community mailbox doors forced open',
+    description: 'A couple of compartments appear bent open. Mail delivery has been notified; if you use this box, check whether anything is missing.',
+    category: 'crime', neighborhood: 'McKenzie Towne', lat: 50.9083, lng: -113.9534,
     windows: ['morning', 'afternoon'],
   },
   {
-    id: 'crescent-heights-pothole',
-    title: 'Deep pothole in the curb lane',
-    description: 'The hole is difficult to see until the last moment and drivers are moving around it quickly. Keep extra space and avoid a sudden lane change.',
-    category: 'infrastructure', neighborhood: 'Crescent Heights', lat: 51.0694, lng: -114.0625,
-    windows: ['morning', 'afternoon'],
-  },
-  {
-    id: 'sunnyside-light-out',
-    title: 'Pathway light is out along a dark stretch',
-    description: 'Several lights are off along the same section, making the path hard to see after sunset. Use the better-lit route nearby until it is repaired.',
-    category: 'infrastructure', neighborhood: 'Sunnyside', lat: 51.0563, lng: -114.0903,
+    id: 'inglewood-alley-prowl',
+    title: 'possible car prowler in the alley',
+    description: 'Someone was lingering around parked cars and looking through windows for a while. They left when a garage light came on. no confrontation, just a heads up.',
+    category: 'crime', neighborhood: 'Inglewood', lat: 51.0406, lng: -114.0201,
     windows: ['evening'],
-  },
-  {
-    id: 'ramsay-black-ice',
-    title: 'Black ice on the pathway',
-    description: 'A shaded section is much slicker than the surrounding pavement this morning. Take short steps or use the cleared street-side route until it is sanded.',
-    category: 'weather', neighborhood: 'Ramsay', lat: 51.0284, lng: -114.0353,
-    windows: ['morning'], months: [1, 2, 3, 11, 12],
-  },
-  {
-    id: 'mckenzie-hail',
-    title: 'Fast hail cell moving through the area',
-    description: 'Pea-sized hail came down for several minutes and the road surface is briefly covered. Visibility is improving, but leave extra stopping room until it clears.',
-    category: 'weather', neighborhood: 'McKenzie Towne', lat: 50.9083, lng: -113.9534,
-    windows: ['afternoon', 'evening'], months: [5, 6, 7, 8, 9],
-  },
-  {
-    id: 'inglewood-standing-water',
-    title: 'Standing water collecting near an underpass',
-    description: 'The curb lane has pooled after the rain and smaller vehicles are turning around instead of crossing. Use another route and never enter water if the depth is unclear.',
-    category: 'infrastructure', neighborhood: 'Inglewood', lat: 51.0406, lng: -114.0201,
-    windows: ['afternoon', 'evening'], months: [4, 5, 6, 7, 8, 9, 10],
   },
 ];
 
@@ -175,6 +177,35 @@ function initFirebase() {
   if (!json) throw new Error('FIREBASE_SERVICE_ACCOUNT env var not set');
   if (!getApps().length) initializeApp({ credential: cert(JSON.parse(json)) });
   return getFirestore();
+}
+
+/**
+ * Migration that runs safely with every pulse check. Only known seeder-owned
+ * demo documents are touched; a real resident report that was ever mislabelled
+ * as demo remains protected.
+ */
+export async function purgeNonCrimeExamples(db: Firestore): Promise<number> {
+  const snapshot = await db.collection('incidents').where('data_source', '==', 'demo').get();
+  const seedAuthors = new Set(['seed', 'community', 'demo']);
+  const retiredTitles = new Set([
+    'Uncomfortable interaction on the pathway',
+    'Concerning interaction near a public parking area',
+    'Construction detour is easy to miss',
+    'Deep pothole in the curb lane',
+    'Pathway light is out along a dark stretch',
+    'Black ice on the pathway',
+    'Fast hail cell moving through the area',
+    'Standing water collecting near an underpass',
+  ]);
+  const deletable = snapshot.docs.filter((doc) =>
+    seedAuthors.has(String(doc.get('authorUid') ?? ''))
+      && (doc.get('category') !== 'crime' || retiredTitles.has(String(doc.get('title') ?? ''))));
+  for (let offset = 0; offset < deletable.length; offset += 400) {
+    const batch = db.batch();
+    for (const doc of deletable.slice(offset, offset + 400)) batch.delete(doc.ref);
+    await batch.commit();
+  }
+  return deletable.length;
 }
 
 function randomInt(min: number, max: number, random: () => number): number {
@@ -217,9 +248,9 @@ export function createDailyPlan(
   recentTemplateIds: string[] = [],
   random: () => number = Math.random,
 ): PlannedPost[] {
-  const count = randomInt(2, 3, random);
+  const count = randomInt(1, 3, random);
   const allWindows: WindowName[] = ['morning', 'afternoon', 'evening'];
-  const windows = count === 3 ? allWindows : shuffle(allWindows, random).slice(0, 2);
+  const windows = count === 3 ? allWindows : shuffle(allWindows, random).slice(0, count);
   const usedIds = new Set<string>();
   const usedNeighborhoods = new Set<string>();
   const recentIds = new Set(recentTemplateIds);
@@ -241,14 +272,17 @@ export function createDailyPlan(
   }).sort((a, b) => a.dueMinute - b.dueMinute);
 }
 
-/** Select one due item so delayed jobs cannot flood the feed. */
+/** Select one recently due item; stale jobs never backfill old posts at night. */
 export function selectDuePost(
   currentMinute: number,
   plan: PlannedPost[],
   published: string[],
 ): PlannedPost | null {
   const sent = new Set(published);
-  return plan.find((item) => item.dueMinute <= currentMinute && !sent.has(item.id)) ?? null;
+  return plan.find((item) =>
+    item.dueMinute <= currentMinute
+      && currentMinute - item.dueMinute <= 50
+      && !sent.has(item.id)) ?? null;
 }
 
 export function calgaryClock(now = new Date()): { date: string; month: number; minute: number } {
@@ -268,6 +302,8 @@ export function calgaryClock(now = new Date()): { date: string; month: number; m
 
 async function run() {
   const db = initFirebase();
+  const removed = await purgeNonCrimeExamples(db);
+  if (removed > 0) console.log(`[pulse] Removed ${removed} non-crime example report(s).`);
   const now = new Date();
   const clock = calgaryClock(now);
   const stateRef = db.collection('meta').doc('pulse');

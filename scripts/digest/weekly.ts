@@ -52,9 +52,9 @@ import {
   digestDeliveryKind,
   digestSubject,
   digestWeekKey,
+  DIGEST_CONTEXT_MS,
   isValidUnsubToken,
   unsubscribeUrl,
-  WEEK_MS,
   type DigestRecipient,
 } from '../../src/lib/digest.js';
 import { buildDigestAudienceForecast, normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
@@ -175,11 +175,11 @@ async function ensureUnsubToken(db: Firestore, profile: DigestRecipient): Promis
 // ── Incidents ───────────────────────────────────────────────────────────────
 
 /**
- * Two weeks of public reports, fetched once for the whole run.
+ * Four weeks of public reports, fetched once for the whole run.
  *
- * Fourteen days because the digest states a week-over-week change, and one
- * query because per-recipient queries would multiply Firestore reads by the
- * size of the list to return almost entirely the same documents.
+ * Fourteen days are required for the week-over-week count. The extra two weeks
+ * let a quiet neighbourhood show a useful, explicitly dated local crime item
+ * instead of filling the email with unrelated city infrastructure.
  */
 async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident[]> {
   // The explicit descending order is load-bearing, not cosmetic.
@@ -193,7 +193,7 @@ async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident
   // deployed. Newest-first also happens to be the order the digest wants.
   const snapshot = await db.collection('incidents')
     .where('visibility', '==', 'public')
-    .where('timestamp', '>=', now - 2 * WEEK_MS)
+    .where('timestamp', '>=', now - DIGEST_CONTEXT_MS)
     .orderBy('timestamp', 'desc')
     .get();
 
@@ -276,7 +276,7 @@ async function run(): Promise<void> {
   if (recipients.length === 0) return;
 
   const incidents = await loadRecentIncidents(db, now);
-  console.log(`[digest] ${incidents.length} public report(s) in the last 14 days`);
+  console.log(`[digest] ${incidents.length} public report(s) in the last 28 days`);
   const contribution = await loadWeeklyContribution(db, weekKey);
   console.log(`[digest] opening contribution ${contribution ? `revision ${contribution.revision ?? 1}` : 'not scheduled'}`);
 

@@ -24,6 +24,7 @@ import {
   digestSendId,
   digestSubject,
   digestWeekKey,
+  selectDigestHighlights,
   isMailable,
   isValidUnsubToken,
   mayEmail,
@@ -468,6 +469,38 @@ describe('summary', () => {
     });
     assert.equal(digestSubject(s), '2 reports near you this week — Beltline');
   });
+
+  it('uses older nearby crime as dated context without inflating this week’s count', () => {
+    const s = buildDigestSummary({
+      incidents: [
+        incident({ id: 'water', category: 'infrastructure', ...at(150), timestamp: NOW - HOUR }),
+        incident({ id: 'old-crime', category: 'crime', ...at(200), timestamp: NOW - 18 * 86_400_000,
+          source_type: 'calgary_police_crime', source_name: 'Calgary Police Service' }),
+      ],
+      profile: PROFILE, home: HOME, now: NOW,
+    });
+    assert.equal(s.total, 1, 'the seven-day metric must remain a seven-day metric');
+    assert.equal(s.highlights[0].incident.id, 'old-crime');
+    assert.equal(s.highlights[0].contextOnly, true);
+    assert.equal(s.contextHighlightCount, 1);
+  });
+
+  it('makes highlights mostly crime and reserves space for a real neighbour report', () => {
+    const candidates = [
+      ...Array.from({ length: 5 }, (_, index) => ({
+        incident: incident({ id: `crime-${index}`, category: 'crime',
+          data_source: index === 4 ? 'community' : 'official', timestamp: NOW - (index + 1) * HOUR }),
+        distanceM: 500 + index * 100,
+      })),
+      ...Array.from({ length: 5 }, (_, index) => ({
+        incident: incident({ id: `infra-${index}`, category: 'infrastructure', timestamp: NOW - index * 1_000 }),
+        distanceM: 20 + index,
+      })),
+    ];
+    const highlights = selectDigestHighlights(candidates, NOW);
+    assert.ok(highlights.filter((item) => item.incident.category === 'crime').length >= 4);
+    assert.ok(highlights.some((item) => item.incident.data_source === 'community'));
+  });
 });
 
 describe('neighbourhood matching', () => {
@@ -549,6 +582,18 @@ describe('rendering', () => {
     });
     assert.ok(!html.includes('<img src=x'));
     assert.ok(html.includes('&lt;img src=x'));
+  });
+
+  it('links every highlight with the map’s real deep-link parameter', () => {
+    const summary = buildDigestSummary({
+      incidents: [incident({ id: 'linked-report', ...at(100) })],
+      profile: PROFILE, home: HOME, now: NOW,
+    });
+    const html = renderDigestHtml({
+      summary, unsubscribeUrl: unsubscribeUrl(BRANDING.origin, 'u1', 'a'.repeat(32)), branding: BRANDING,
+    });
+    assert.match(html, /\/map\?i=linked-report/);
+    assert.doesNotMatch(html, /\/map\?incident=/);
   });
 
   it('escapes every HTML-significant character', () => {

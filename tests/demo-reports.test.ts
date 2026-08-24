@@ -46,9 +46,15 @@ describe('example report publisher', () => {
     }
   });
 
-  it('demonstrates more than one category', () => {
+  it('contains crime examples only', () => {
     const categories = new Set([...QUEUE_SRC.matchAll(/category: '(\w+)'/g)].map((m) => m[1]));
-    assert.ok(categories.size >= 3, `expected varied categories, got ${[...categories].join(', ')}`);
+    assert.deepEqual([...categories], ['crime']);
+  });
+
+  it('includes recognizably different writing styles without hiding the example label', () => {
+    assert.match(QUEUE_SRC, /\b(?:ugh|tbh|heads up)\b/i);
+    assert.match(QUEUE_SRC, /police report is being filed|reported it/i);
+    assert.match(QUEUE_SRC, /\b(?:mightve|didnt|definately)\b/i);
   });
 });
 

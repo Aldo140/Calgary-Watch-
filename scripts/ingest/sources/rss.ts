@@ -6,7 +6,8 @@
  *
  * No API key required.
  * Dedup key: news_rss:<sha1-of-link>
- * TTL: 12 hours from ingest (news stories stay relevant longer than Reddit posts)
+ * Crime stories remain available for the weekly digest; time-sensitive road,
+ * weather and service items retain short expiry windows.
  */
 
 import { createHash } from 'crypto';
@@ -217,6 +218,7 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
           results.push({
             title: item.title.slice(0, 100),
             description: cleanDesc,
+            timestamp: pubMs,
             category,
             neighborhood: location.neighborhood,
             lat: location.lat,
@@ -226,7 +228,11 @@ export async function fetchNewsFeedsCalgary(): Promise<NormalizedIncident[]> {
             source_type: 'news_rss',
             data_source: 'official',
             dedup_key: dedupeKey(item.link),
-            expires_at: pubMs + 12 * 60 * 60 * 1000, // 12 hours from article publish
+            expires_at: pubMs + (category === 'crime'
+              ? 28 * 24 * 60 * 60 * 1000
+              : category === 'emergency'
+                ? 3 * 24 * 60 * 60 * 1000
+                : 2 * 24 * 60 * 60 * 1000),
             verified_status: 'community_confirmed',
             report_count: 1,
             email: 'ingest@calgarywatch.app',

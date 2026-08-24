@@ -83,10 +83,10 @@ export function leadParagraph(summary: DigestSummary): string {
         if (summary.widenedToCity) {
           return `Your own area was quiet this week, so this one covers the whole `
             + `city — ${count} ${count === 1 ? 'report' : 'reports'} in all, `
-            + `with the ${shown} most recent below.`;
+            + `with the ${shown} most useful safety reports below.`;
         }
         return `Calgary saw ${count} public ${count === 1 ? 'report' : 'reports'} this `
-          + `week. Here is where they landed, and the ${shown} most recent.`;
+        + `week. Here is where they landed, and the ${shown} most useful safety reports.`;
       }
     }
   })();
@@ -120,6 +120,7 @@ export function locationPrompt(summary: DigestSummary): string | null {
 
 /** The line above the list. Says how the list is ordered, because it is. */
 export function listHeading(summary: DigestSummary): string {
+  if (summary.contextHighlightCount > 0) return 'Crime and safety worth knowing';
   if (summary.total === 1) return 'What happened';
   // Only claim an ordering the list actually has. Without distances the list is
   // newest-first, and saying "closest first" would be a small, checkable lie.

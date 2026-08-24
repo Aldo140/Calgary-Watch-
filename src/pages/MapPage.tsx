@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CALGARY_CENTER } from '@/src/constants';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
-import { collection, onSnapshot, query, where, orderBy, limit, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, orderBy, limit, getDoc, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
@@ -1328,14 +1328,40 @@ export default function MapPage() {
 
   useEffect(() => {
     const targetId = searchParams.get('i');
-    if (!targetId || deepLinkHandledRef.current || incidents.length === 0) return;
+    if (!targetId || deepLinkHandledRef.current) return;
     const target = incidents.find((inc) => inc.id === targetId);
     if (target) {
       deepLinkHandledRef.current = true;
       handleMarkerClick(target);
       startTransition(() => setSelectedIncident(target));
+      return;
     }
-  }, [searchParams, incidents, handleMarkerClick]);
+
+    // Email highlights may deliberately use an older local crime report that
+    // is no longer inside the map's newest-60 page. Resolve that exact public
+    // document instead of opening a map that appears to have lost its link.
+    if (!db || !isAuthReady) return;
+    let cancelled = false;
+    getDoc(doc(db, 'incidents', targetId)).then((snapshot) => {
+      if (cancelled || !snapshot.exists()) return;
+      const data = snapshot.data();
+      const fetched = {
+        id: snapshot.id,
+        ...data,
+        lat: Number(data.lat),
+        lng: Number(data.lng),
+      } as Incident;
+      if (!isPubliclyVisible(fetched) || !Number.isFinite(fetched.lat) || !Number.isFinite(fetched.lng)) return;
+      if (typeof fetched.expires_at === 'number' && fetched.expires_at <= Date.now()) return;
+      deepLinkHandledRef.current = true;
+      setFirebaseIncidents((previous) => previous.some((item) => item.id === fetched.id)
+        ? previous
+        : [fetched, ...previous]);
+      handleMarkerClick(fetched);
+      startTransition(() => setSelectedIncident(fetched));
+    }).catch((error) => console.error('Failed to load linked incident:', error));
+    return () => { cancelled = true; };
+  }, [searchParams, incidents, handleMarkerClick, isAuthReady]);
 
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams);

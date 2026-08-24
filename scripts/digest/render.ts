@@ -205,7 +205,7 @@ function fmt(timestamp: number, opts: Intl.DateTimeFormatOptions): string {
     .format(new Date(timestamp));
 }
 
-const dayLabel = (t: number) => fmt(t, { weekday: 'long' });
+const dateLabel = (t: number) => fmt(t, { weekday: 'short', day: 'numeric', month: 'short' });
 /** Three letters for the rail, where the column is only wide enough for that. */
 const dayShort = (t: number) => fmt(t, { weekday: 'short' }).toUpperCase().slice(0, 3);
 
@@ -229,11 +229,11 @@ function itemSubtitle(item: ScoredIncident): string {
   const bits = [sourceLabel(item)];
   if (item.distanceM !== null) {
     // The rail carries the distance, so this line carries the day.
-    bits.push(dayLabel(item.incident.timestamp));
+    bits.push(dateLabel(item.incident.timestamp));
   } else {
     // No rail: this line carries everything the reader would otherwise lose.
     if (item.incident.neighborhood) bits.push(displayAreaName(item.incident.neighborhood));
-    bits.push(dayLabel(item.incident.timestamp));
+    bits.push(dateLabel(item.incident.timestamp));
   }
   return bits.join(' · ');
 }
@@ -637,7 +637,7 @@ function topAreasBlock(summary: DigestSummary): string {
  */
 function reportRow(item: ScoredIncident, origin: string): string {
   const title = `
-    <a href="${escapeHtml(origin)}/map?incident=${encodeURIComponent(item.incident.id)}"
+    <a href="${escapeHtml(origin)}/map?i=${encodeURIComponent(item.incident.id)}"
        style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
       ${escapeHtml(item.incident.title)}
     </a>
@@ -700,15 +700,15 @@ function reportRow(item: ScoredIncident, origin: string): string {
 
 /** The report list, or nothing at all on a quiet week. */
 function reportList(summary: DigestSummary, origin: string): string {
-  if (summary.quiet) return '';
+  if (summary.highlights.length === 0) return '';
   return `
   <tr><td style="padding:30px 36px 0;">
     ${heading(listHeading(summary))}
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       ${summary.highlights.map((i) => reportRow(i, origin)).join('')}
     </table>
-    ${summary.total > summary.highlights.length
-      ? p(`${summary.total - summary.highlights.length} more are on the map.`,
+    ${summary.total > summary.currentHighlightCount
+      ? p(`${summary.total - summary.currentHighlightCount} more from this week are on the map.`,
           { top: 10, color: C.soft, size: 13 })
       : ''}
   </td></tr>`;
@@ -1122,6 +1122,15 @@ export function renderDigestText(options: {
       'A quiet week.',
       `Nothing was reported ${summary.ringLabel}. That is worth knowing too.`,
     );
+    if (summary.highlights.length > 0) {
+      lines.push('', listHeading(summary).toUpperCase(), '');
+      for (const item of summary.highlights) {
+        const rail = (item.distanceM !== null
+          ? formatDigestDistance(item.distanceM)
+          : dayShort(item.incident.timestamp)).padEnd(9);
+        lines.push(`${rail}${item.incident.title}`, `${' '.repeat(9)}${itemSubtitle(item)}`, '');
+      }
+    }
   } else {
     lines.push(
       `${summary.total} ${summary.total === 1 ? 'report' : 'reports'} ${summary.ringLabel}.`,
@@ -1131,7 +1140,7 @@ export function renderDigestText(options: {
       '',
       summary.byCategory.map((c) => `${c.count} ${DIGEST_CATEGORY_LABEL[c.category].toLowerCase()}`).join('  ·  '),
       '',
-      'WHAT HAPPENED',
+      listHeading(summary).toUpperCase(),
       '',
     );
     for (const item of summary.highlights) {
@@ -1141,8 +1150,8 @@ export function renderDigestText(options: {
         : dayShort(item.incident.timestamp)).padEnd(9);
       lines.push(`${rail}${item.incident.title}`, `${' '.repeat(9)}${itemSubtitle(item)}`, '');
     }
-    if (summary.total > summary.highlights.length) {
-      lines.push(`${summary.total - summary.highlights.length} more on the map.`, '');
+    if (summary.total > summary.currentHighlightCount) {
+      lines.push(`${summary.total - summary.currentHighlightCount} more from this week on the map.`, '');
     }
   }
 
@@ -1218,7 +1227,7 @@ export function renderWelcomeText(options: {
     wrap(leadParagraph(summary)),
   ];
 
-  if (!summary.quiet) {
+  if (!summary.quiet || summary.highlights.length > 0) {
     lines.push(
       '',
       summary.byCategory
@@ -1234,8 +1243,8 @@ export function renderWelcomeText(options: {
         : dayShort(item.incident.timestamp)).padEnd(9);
       lines.push(`${rail}${item.incident.title}`, `${' '.repeat(9)}${itemSubtitle(item)}`, '');
     }
-    if (summary.total > summary.highlights.length) {
-      lines.push(`${summary.total - summary.highlights.length} more are on the map.`, '');
+    if (summary.total > summary.currentHighlightCount) {
+      lines.push(`${summary.total - summary.currentHighlightCount} more from this week are on the map.`, '');
     }
   }
 

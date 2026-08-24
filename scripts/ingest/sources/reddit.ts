@@ -184,6 +184,7 @@ export async function fetchRedditCalgary(): Promise<NormalizedIncident[]> {
     results.push({
       title: cleanText(post.title, 100),
       description,
+      timestamp: post.created_utc * 1000,
       category,
       neighborhood: location.neighborhood,
       lat: location.lat,
@@ -191,7 +192,7 @@ export async function fetchRedditCalgary(): Promise<NormalizedIncident[]> {
       source_name: 'Reddit r/Calgary',
       source_url: `https://reddit.com${post.permalink}`,
       source_type: 'reddit_calgary',
-      data_source: 'official',
+      data_source: 'system',
       dedup_key: `reddit:${post.id}`,
       expires_at: now + 6 * 60 * 60 * 1000, // 6 hours
       verified_status: 'community_confirmed',

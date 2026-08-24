@@ -45,6 +45,7 @@ jobs:
           DIGEST_ORIGIN: ${{ vars.DIGEST_ORIGIN }}
           VITE_DIGEST_ALLOWLIST: ${{ vars.DIGEST_ALLOWLIST }}
           VITE_DIGEST_LIMIT: ${{ vars.DIGEST_LIMIT }}
+          VITE_DIGEST_PROOF_ENABLED: ${{ vars.DIGEST_PROOF_ENABLED }}
         run: npm run build
 
       # Publish the UI before backend provisioning. This keeps ordinary site

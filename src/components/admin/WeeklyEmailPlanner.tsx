@@ -35,6 +35,7 @@ import { configuredDigestAudienceForecast, DigestAudienceForecast } from './Dige
 
 const MAX_BODY = 2400;
 const MIN_BODY = 20;
+const PROOF_SERVICE_ENABLED = String(import.meta.env.VITE_DIGEST_PROOF_ENABLED ?? '').toLowerCase() === 'true';
 
 const TEMPLATE_ICONS = {
   welcome: BookOpenText,
@@ -51,7 +52,8 @@ const AUDIENCE_ICONS = {
 type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
 type MessageTone = 'neutral' | 'ok' | 'attention' | 'critical';
 type TestStatus = 'pending' | 'sending' | 'retrying' | 'sent' | 'partial' | 'failed';
-type PlannerView = 'overview' | 'compose' | 'audience' | 'templates';
+type PlannerView = 'overview' | 'preview' | 'compose' | 'audience' | 'templates';
+type SubscriberPreview = 'weekly-local' | 'weekly-city' | 'welcome';
 
 type TestRequest = {
   id: string;
@@ -221,6 +223,85 @@ function OpeningPreview({
   );
 }
 
+function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined }) {
+  const [route, setRoute] = useState<SubscriberPreview>('weekly-local');
+  const [html, setHtml] = useState('');
+  const [error, setError] = useState('');
+  const routeConfig: Record<SubscriberPreview, { label: string; detail: string; file: string }> = {
+    'weekly-local': { label: 'Weekly · local', detail: 'For readers with nearby results', file: 'digest.html' },
+    'weekly-city': { label: 'Weekly · city-wide', detail: 'For readers without a local result set', file: 'city.html' },
+    welcome: { label: 'Welcome letter', detail: 'Each subscriber’s first eligible send', file: 'welcome.html' },
+  };
+  const active = routeConfig[route];
+
+  useEffect(() => {
+    let cancelled = false;
+    setHtml('');
+    setError('');
+    fetch(`${import.meta.env.BASE_URL}email-previews/${active.file}`, { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.text();
+      })
+      .then((value) => { if (!cancelled) setHtml(value); })
+      .catch((reason) => {
+        console.error('Could not load production email preview:', reason);
+        if (!cancelled) setError('The production preview could not be loaded. No email or schedule was changed.');
+      });
+    return () => { cancelled = true; };
+  }, [active.file]);
+
+  const weekly = route !== 'welcome';
+  return (
+    <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="production-email-title">
+      <header className="border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line }}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 id="production-email-title" className="text-sm font-bold" style={{ color: T.ink }}>Subscriber email preview</h2>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed" style={{ color: T.muted }}>This is the production template—not an admin-proof approximation. The reports, greeting, subject, distances and unsubscribe link are rebuilt for each person when Monday’s job runs.</p>
+          </div>
+          <Chip tone="ok"><Eye size={11} /> Production template</Chip>
+        </div>
+        <div className="mt-4 grid gap-1 rounded-lg p-1 sm:grid-cols-3" style={{ background: T.surface }} aria-label="Choose recipient email route">
+          {(Object.keys(routeConfig) as SubscriberPreview[]).map((id) => {
+            const selectedRoute = route === id;
+            return <button key={id} type="button" aria-pressed={selectedRoute} onClick={() => setRoute(id)} className="rounded-md px-3 py-2 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: selectedRoute ? T.card : 'transparent', color: selectedRoute ? T.signal : T.ink, boxShadow: selectedRoute ? `0 1px 3px ${T.rail}14` : 'none', outlineColor: T.signal }}><span className="block text-xs font-bold">{routeConfig[id].label}</span><span className="mt-0.5 block text-[0.66rem]" style={{ color: T.muted }}>{routeConfig[id].detail}</span></button>;
+          })}
+        </div>
+      </header>
+
+      {weekly && plan && (
+        <div className="border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line, background: `${T.signal}05` }}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div><p className="text-xs font-bold" style={{ color: T.ink }}>Approved opening for this Monday</p><p className="mt-0.5 text-[0.68rem]" style={{ color: T.muted }}>These exact words are inserted before the personalized report section for {CONTRIBUTION_AUDIENCE_COPY[plan.audience ?? 'everyone'].label.toLowerCase()}.</p></div>
+            <Chip tone="ok"><Check size={11} /> Revision {plan.revision ?? 1}</Chip>
+          </div>
+          <div className="mt-3 max-w-[34rem] rounded-lg p-4" style={{ background: '#0E1A17' }}><OpeningPreview style={plan.style} headline={plan.headline} body={plan.body} weekKey={plan.weekKey} byline={plan.byline ?? ''} ctaLabel={plan.ctaLabel ?? ''} /></div>
+        </div>
+      )}
+
+      <div className="grid border-b md:grid-cols-3" style={{ borderColor: T.line }}>
+        {[
+          ['Fixed for everyone', weekly ? 'Branding, layout, legal footer and report structure' : 'Branding, onboarding explanation and legal footer'],
+          ['Personalized Monday', weekly ? 'Name, subject, location, latest reports and distances' : 'Name, location and that week’s current sample briefing'],
+          ['Delivery rule', weekly ? 'Only after that person’s welcome was delivered' : 'Only when no successful welcome is recorded'],
+        ].map(([label, value]) => <div key={label} className="border-b px-4 py-3 last:border-b-0 md:border-b-0 md:border-e md:last:border-e-0" style={{ borderColor: T.line }}><p className="text-[0.66rem] font-bold" style={{ color: T.ink }}>{label}</p><p className="mt-1 text-[0.68rem] leading-relaxed" style={{ color: T.muted }}>{value}</p></div>)}
+      </div>
+
+      <div className="p-3 sm:p-5" style={{ background: T.surface }}>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs font-bold" style={{ color: T.ink }}>{active.label} · representative subscriber</p>
+          <a href={`${import.meta.env.BASE_URL}email-previews/${active.file}`} target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border bg-white px-2.5 text-[0.72rem] font-bold focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}><Eye size={13} /> Open full size</a>
+        </div>
+        <div className="mx-auto max-w-[42rem] overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }}>
+          {error ? <div className="flex min-h-64 flex-col items-center justify-center gap-2 p-6 text-center" role="alert"><AlertTriangle size={20} style={{ color: T.critical }} /><p className="max-w-md text-xs" style={{ color: T.muted }}>{error}</p></div> : html ? <iframe srcDoc={html} title={`${active.label} production email preview`} className="block h-[48rem] w-full bg-white" sandbox="" /> : <div className="h-[48rem] space-y-5 p-8 motion-safe:animate-pulse" aria-label="Loading production email preview"><div className="mx-auto h-12 w-52 rounded-lg" style={{ background: T.line }} /><div className="mx-auto h-40 max-w-lg rounded-xl" style={{ background: T.card }} /><div className="mx-auto h-56 max-w-lg rounded-xl" style={{ background: T.card }} /></div>}
+        </div>
+        <p className="mt-2 text-center text-[0.68rem]" style={{ color: T.muted }}>Representative data makes the layout reviewable before Monday. Recipient-specific values are produced only when the send job reads that person’s profile and the latest reports.</p>
+      </div>
+    </section>
+  );
+}
+
 export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }: { profiles: UserProfile[]; profilesLoading: boolean; profilesError: string }) {
   const { user } = useAuth();
   const weeks = useMemo(() => upcomingDigestWeeks(Date.now(), 8), []);
@@ -269,7 +350,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   const validBodyLinks = !body.includes('](') || (
     formattedLinks.length > 0 && formattedLinks.every((match) => !!normalizeDigestUrl(match[1]))
   );
-  const canSubmit = !!db && !!user && !!selected && validBody && validCta && validBodyLinks && !hasOutlinePrompts
+  const canSubmit = PROOF_SERVICE_ENABLED && !!db && !!user && !!selected && validBody && validCta && validBodyLinks && !hasOutlinePrompts
     && dirty && !hasRemoteChange && saveState !== 'saving';
   const latestTest = testRequests[0];
   const activeTemplate = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === activeTemplateId)
@@ -473,7 +554,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
       setCtaUrl(savedPlan!.ctaUrl ?? '');
       draftRemove(draftKey(user.uid, selected.weekKey));
       setSaveState('saved');
-      setMessage('Scheduled. Test delivery has started for every admin.');
+      setMessage('Approved for Monday. Test delivery has started for every admin.');
       setMessageTone('ok');
     } catch (error) {
       if (error instanceof PlannerConflictError) {
@@ -490,7 +571,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   }
 
   async function resendTest() {
-    if (!db || !user || !loadedPlan || dirty || hasRemoteChange || saveState === 'saving') return;
+    if (!PROOF_SERVICE_ENABLED || !db || !user || !loadedPlan || dirty || hasRemoteChange || saveState === 'saving') return;
     setSaveState('saving');
     const testRef = doc(collection(db, 'digest_test_requests'));
     const auditRef = doc(collection(db, 'admin_audit_logs'));
@@ -626,6 +707,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   ].join('\n');
   const reusablePlan = weeks.some((week) => week.weekKey !== selectedWeek && plans[week.weekKey]);
   const preflightIssues = [
+    ...(!PROOF_SERVICE_ENABLED ? ['Enable Firebase Cloud Functions before approval so every admin receives the required proof'] : []),
     ...(!validBody ? [bodyLength === 0 ? 'Write the opening note' : body.length > MAX_BODY ? `Shorten the note by ${body.length - MAX_BODY} characters` : `${MIN_BODY - bodyLength} more characters needed`] : []),
     ...(hasOutlinePrompts ? ['Replace the outline prompts'] : []),
     ...(!validBodyLinks ? ['Finish or remove the incomplete body link'] : []),
@@ -640,11 +722,13 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   const scheduledWeekly = scheduledAudience.filter((row) => row.kind === 'weekly').length;
   const heldAudience = audienceForecast.rows.filter((row) => row.status.startsWith('held-')).length;
   const attentionAudience = audienceForecast.rows.filter((row) => row.status === 'attention').length;
+  const showComposerNavigation = plannerView === 'compose' || dirty || !!loadedPlan;
   const plannerViews: Array<{ id: PlannerView; label: string; description: string; icon: typeof LayoutDashboard }> = [
-    { id: 'overview', label: 'Overview', description: 'Monday at a glance', icon: LayoutDashboard },
-    { id: 'compose', label: 'Opening note', description: 'Write and preview', icon: PenLine },
+    { id: 'overview', label: 'This Monday', description: 'Sent and pending', icon: LayoutDashboard },
+    { id: 'preview', label: 'Email preview', description: 'What readers receive', icon: Eye },
+    ...(showComposerNavigation ? [{ id: 'compose' as const, label: 'Opening note', description: dirty ? 'Draft needs approval' : 'Optional contribution', icon: PenLine }] : []),
     { id: 'audience', label: 'Recipients', description: 'Who gets which email', icon: Users },
-    { id: 'templates', label: 'Templates', description: 'Delivery rules', icon: FileText },
+    { id: 'templates', label: 'Delivery rules', description: 'How routing works', icon: FileText },
   ];
 
   async function openNextCompose() {
@@ -655,15 +739,23 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
     await loadWeek(nextWeek.weekKey);
   }
 
+  function selectPlannerView(view: PlannerView) {
+    setPlannerView(view);
+    if (view !== 'overview' || dirty || !nextWeek || selectedWeek === nextWeek.weekKey) return;
+    setSelectedWeek(nextWeek.weekKey);
+    setTestRequests([]);
+    void loadWeek(nextWeek.weekKey);
+  }
+
   return (
     <div className="space-y-4">
       <nav className="overflow-x-auto rounded-xl border bg-white p-1.5" style={{ borderColor: T.line }} aria-label="Email planner sections">
-        <div className="grid min-w-[42rem] grid-cols-4 gap-1">
+        <div className="flex min-w-max gap-1">
           {plannerViews.map((item) => {
             const Icon = item.icon;
             const active = plannerView === item.id;
             return (
-              <button key={item.id} type="button" aria-current={active ? 'page' : undefined} onClick={() => setPlannerView(item.id)} className="flex min-h-12 items-center gap-2.5 rounded-lg px-3 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: active ? T.rail : 'transparent', color: active ? '#fff' : T.ink, outlineColor: T.signal }}>
+              <button key={item.id} type="button" aria-current={active ? 'page' : undefined} onClick={() => selectPlannerView(item.id)} className="flex min-h-12 min-w-[9.5rem] flex-1 items-center gap-2.5 rounded-lg px-3 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: active ? T.rail : 'transparent', color: active ? '#fff' : T.ink, outlineColor: T.signal }}>
                 <Icon size={15} className="shrink-0" style={{ color: active ? '#fff' : T.muted }} />
                 <span className="min-w-0">
                   <span className="block text-xs font-bold">{item.label}</span>
@@ -675,54 +767,38 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
         </div>
       </nav>
 
+      {plannerView === 'preview' && <ProductionEmailViewer plan={nextPlan} />}
+
       {plannerView === 'overview' && (
         <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="email-overview-title">
-          <div className="grid lg:grid-cols-[minmax(0,1fr)_19rem]">
-            <div className="p-5 sm:p-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <Chip tone="signal"><CalendarDays size={11} /> Next Monday</Chip>
-                {nextPlan ? <Chip tone="ok"><Check size={11} /> Opening scheduled</Chip> : <Chip>Standard brief only</Chip>}
-              </div>
-              <h2 id="email-overview-title" className="mt-3 text-xl font-bold tracking-[-0.02em]" style={{ fontFamily: display, color: T.ink }}>{nextWeek?.label}</h2>
-              <p className="mt-1 max-w-2xl text-sm leading-relaxed" style={{ color: T.muted }}>
-                {nextPlan
-                  ? `The personalized weekly brief will begin with “${nextPlan.headline || CONTRIBUTION_STYLE_COPY[nextPlan.style]?.label || 'Editorial note'}”. Publishing automatically queues a private proof for the admin team.`
-                  : 'No admin action is required. Every eligible subscriber still receives the standard personalized brief; an opening note is completely optional.'}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <AdminButton tone="signal" onClick={() => void openNextCompose()}><PenLine size={14} /> {dirty ? 'Continue unsaved note' : nextPlan ? 'Review opening note' : 'Add opening note'}</AdminButton>
-                <AdminButton variant="outline" onClick={() => setPlannerView('audience')}><Users size={14} /> Review recipients</AdminButton>
-              </div>
+          <header className="flex flex-wrap items-start justify-between gap-3 border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line }}>
+            <div><h2 id="email-overview-title" className="text-base font-bold" style={{ color: T.ink }}>This Monday’s send</h2><p className="mt-0.5 text-xs" style={{ color: T.muted }}>{nextWeek?.label} · automatic run at 15:00 UTC (09:00 MDT / 08:00 MST)</p></div>
+            <div className="flex flex-wrap gap-2"><AdminButton tone="signal" onClick={() => setPlannerView('preview')}><Eye size={14} /> See the exact emails</AdminButton><AdminButton variant="outline" onClick={() => setPlannerView('audience')}><Users size={14} /> See recipients</AdminButton></div>
+          </header>
+
+          <div className="divide-y" style={{ borderColor: T.line }}>
+            <div className="grid gap-3 px-4 py-4 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-center sm:px-5">
+              <p className="text-xs font-bold" style={{ color: T.ink }}>Subscriber delivery</p>
+              <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: profilesError ? T.critical : profilesLoading ? T.attention : T.ok }}><StatusDot tone={profilesError ? 'critical' : profilesLoading ? 'attention' : 'ok'} pulse={profilesLoading} /> {profilesError ? 'Forecast unavailable' : profilesLoading ? 'Checking recipients' : 'Ready for Monday'}</p><p className="mt-1 text-[0.7rem] leading-relaxed" style={{ color: T.muted }}>{profilesLoading ? 'Loading recipient forecast…' : profilesError ? 'Open Recipients to review the connection error before relying on these counts.' : `${scheduledAudience.length} scheduled: ${scheduledWelcome} welcome ${scheduledWelcome === 1 ? 'letter' : 'letters'} and ${scheduledWeekly} weekly ${scheduledWeekly === 1 ? 'brief' : 'briefs'}.`}</p></div>
+              <span className="text-xs tabular-nums" style={{ color: heldAudience || attentionAudience ? T.attention : T.muted, fontFamily: mono }}>{heldAudience + attentionAudience} held</span>
             </div>
-            <div className="border-t p-5 lg:border-s lg:border-t-0" style={{ borderColor: T.line, background: T.surface }}>
-              <p className="text-xs font-bold" style={{ color: T.ink }}>Projected delivery</p>
-              {profilesError ? (
-                <p className="mt-3 text-xs leading-relaxed" style={{ color: T.critical }}>Recipient counts are unavailable. Open Recipients for the connection error.</p>
-              ) : profilesLoading ? (
-                <div className="mt-3 space-y-2 motion-safe:animate-pulse"><div className="h-7 rounded-md bg-white" /><div className="h-7 rounded-md bg-white" /><div className="h-7 rounded-md bg-white" /></div>
-              ) : (
-                <dl className="mt-3 space-y-2.5">
-                  {[
-                    ['Welcome letters', scheduledWelcome],
-                    ['Weekly briefs', scheduledWeekly],
-                    ['Held by safety settings', heldAudience],
-                  ].map(([label, value]) => <div key={String(label)} className="flex items-center justify-between gap-4"><dt className="text-xs" style={{ color: T.muted }}>{label}</dt><dd className="text-sm font-bold tabular-nums" style={{ color: T.ink, fontFamily: mono }}>{value}</dd></div>)}
-                  {attentionAudience > 0 && <div className="flex items-center justify-between gap-4"><dt className="text-xs" style={{ color: T.critical }}>Needs attention</dt><dd className="text-sm font-bold tabular-nums" style={{ color: T.critical, fontFamily: mono }}>{attentionAudience}</dd></div>}
-                </dl>
-              )}
-              <button type="button" onClick={() => setPlannerView('audience')} className="mt-4 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2" style={{ color: T.signal, outlineColor: T.signal }}>See names and delivery reasons →</button>
+
+            <div className="grid gap-3 px-4 py-4 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-center sm:px-5">
+              <p className="text-xs font-bold" style={{ color: T.ink }}>Optional opening</p>
+              {dirty ? <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.attention }}><StatusDot tone="attention" /> Draft waiting for approval</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>Your draft is saved on this device. The last approved email remains unchanged until you publish.</p></div> : nextPlan ? <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.ok }}><StatusDot tone="ok" /> Approved and scheduled</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>“{nextPlan.headline || CONTRIBUTION_STYLE_COPY[nextPlan.style]?.label || 'Editorial note'}” · revision {nextPlan.revision ?? 1}</p></div> : <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.ink }}><StatusDot tone="neutral" /> Not requested</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>The standard weekly email sends normally. Nothing is pending.</p></div>}
+              {(dirty || nextPlan) && <AdminButton variant="ghost" size="sm" onClick={() => void openNextCompose()}>{dirty ? 'Finish approval' : 'Review'}</AdminButton>}
+            </div>
+
+            <div className="grid gap-3 px-4 py-4 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-center sm:px-5">
+              <p className="text-xs font-bold" style={{ color: T.ink }}>Admin proof</p>
+              {!PROOF_SERVICE_ENABLED ? <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.critical }}><StatusDot tone="critical" /> Setup required</p><p className="mt-1 text-[0.7rem] leading-relaxed" style={{ color: T.muted }}>Google Cloud Functions is disabled, so test requests cannot be delivered yet. Subscriber automation remains separate.</p></div> : nextPlan && selectedWeek === nextWeek?.weekKey ? <DeliveryStatus request={latestTest} /> : <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.muted }}><StatusDot tone="neutral" /> {nextPlan ? 'Load the opening to check proof status' : 'Not required'}</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>{nextPlan ? 'Proof history is attached to the approved edition.' : 'Proofs are sent only when an optional opening is published, updated or removed.'}</p></div>}
+              {!PROOF_SERVICE_ENABLED ? <a href="https://console.cloud.google.com/apis/library/cloudfunctions.googleapis.com?project=calgary-map-e70bb" target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center justify-center rounded-lg border px-2.5 text-[0.72rem] font-bold focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}>Enable service</a> : nextPlan && selectedWeek === nextWeek?.weekKey && <AdminButton variant="outline" size="sm" onClick={() => void resendTest()} disabled={dirty || hasRemoteChange || saveState === 'saving'}>{saveState === 'saving' ? <Loader2 size={13} className="motion-safe:animate-spin" /> : <Send size={13} />} Send test</AdminButton>}
             </div>
           </div>
-          <div className="border-t px-5 py-4 sm:px-6" style={{ borderColor: T.line }}>
-            <p className="text-xs font-bold" style={{ color: T.ink }}>What the system does automatically</p>
-            <ol className="mt-3 grid gap-3 md:grid-cols-3">
-              {[
-                ['Choose the route', 'Each person receives their one-time welcome first, then weekly briefs.'],
-                ['Build current reports', 'Monday’s latest reports and each subscriber’s saved location are added automatically.'],
-                ['Send and protect', 'One email per person, unsubscribe checks, safety limits and delivery records are enforced.'],
-              ].map(([title, copy], index) => <li key={title} className="flex gap-3"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[0.68rem] font-bold" style={{ background: T.rail, color: '#fff', fontFamily: mono }}>{index + 1}</span><span><strong className="block text-xs" style={{ color: T.ink }}>{title}</strong><span className="mt-0.5 block text-[0.7rem] leading-relaxed" style={{ color: T.muted }}>{copy}</span></span></li>)}
-            </ol>
-          </div>
+
+          {message && <div className="border-t px-4 py-3 sm:px-5" style={{ borderColor: T.line }}><p role="status" className="text-xs" style={{ color: toneColor[messageTone] }}>{message}</p></div>}
+
+          {!dirty && !nextPlan && <div className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 sm:px-5" style={{ borderColor: T.line, background: T.surface }}><p className="text-[0.7rem]" style={{ color: T.muted }}>Need to add context this week? Personal stories, newsroom notes and announcements are available only when requested.</p><AdminButton variant="ghost" size="sm" onClick={() => void openNextCompose()}><PenLine size={13} /> Add optional opening</AdminButton></div>}
         </section>
       )}
 
@@ -735,7 +811,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-bold" style={{ color: T.ink }}>{selected?.label}</p>
-                {loadedPlan ? <Chip tone="ok"><Check size={11} /> Scheduled</Chip> : <Chip>Standard brief only</Chip>}
+                {loadedPlan ? <Chip tone="ok"><Check size={11} /> Approved</Chip> : <Chip>Optional draft</Chip>}
                 {dirty && <Chip tone="attention">Unsaved draft</Chip>}
               </div>
               <p className="mt-0.5 text-xs" style={{ color: T.muted }}>
@@ -750,7 +826,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
             <select id="planner-week" className={inputClass} style={inputStyle} value={selectedWeek} onChange={(event) => void changeWeek(event.target.value)}>
               {weeks.map((week, index) => (
                 <option key={week.weekKey} value={week.weekKey}>
-                  {plans[week.weekKey] ? 'Scheduled · ' : ''}{index === 0 ? 'Next · ' : ''}{week.label}
+                  {plans[week.weekKey] ? 'Approved · ' : ''}{index === 0 ? 'Next · ' : ''}{week.label}
                 </option>
               ))}
             </select>
@@ -765,7 +841,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
               return <button key={week.weekKey} type="button" onClick={() => void changeWeek(week.weekKey)} aria-pressed={active} className="min-w-[7.25rem] rounded-lg px-3 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: active ? `${T.signal}10` : T.card, border: `1px solid ${active ? T.signal : T.line}`, outlineColor: T.signal }}>
                 <span className="flex items-center justify-between gap-2 text-[0.65rem] font-bold" style={{ color: active ? T.signal : T.ink }}><span>{index === 0 ? 'Next Monday' : week.weekKey}</span><StatusDot tone={scheduled ? 'ok' : 'neutral'} /></span>
                 <span className="mt-1 block text-[0.68rem]" style={{ color: T.muted }}>{week.label.split('–')[0].trim()}</span>
-                <span className="mt-0.5 block text-[0.62rem]" style={{ color: scheduled ? T.ok : T.muted }}>{scheduled ? 'Opening scheduled' : 'Standard brief'}</span>
+                <span className="mt-0.5 block text-[0.62rem]" style={{ color: scheduled ? T.ok : T.muted }}>{scheduled ? 'Opening approved' : 'Standard brief'}</span>
               </button>;
             })}
           </div>
@@ -996,8 +1072,8 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
 
             <div className="border-t pt-4" style={{ borderColor: T.line }}>
               <div className="flex flex-wrap items-center gap-2">
-                <AdminButton type="submit" tone="signal" disabled={!canSubmit}>{saveState === 'saving' ? <><Loader2 size={14} className="motion-safe:animate-spin" /> Working…</> : <><Send size={14} /> Schedule & test</>}</AdminButton>
-                {loadedPlan && <AdminButton variant="outline" size="sm" onClick={() => void resendTest()} disabled={dirty || hasRemoteChange || saveState === 'saving'}><RefreshCw size={13} /> Send test again</AdminButton>}
+                <AdminButton type="submit" tone="signal" disabled={!canSubmit}>{saveState === 'saving' ? <><Loader2 size={14} className="motion-safe:animate-spin" /> Working…</> : <><Send size={14} /> Approve & send test</>}</AdminButton>
+                {loadedPlan && <AdminButton variant="outline" size="sm" onClick={() => void resendTest()} disabled={!PROOF_SERVICE_ENABLED || dirty || hasRemoteChange || saveState === 'saving'} title={!PROOF_SERVICE_ENABLED ? 'Enable Firebase Cloud Functions to deliver admin proofs' : undefined}><RefreshCw size={13} /> Send test again</AdminButton>}
                 {loadedPlan && <AdminButton variant="ghost" tone="critical" size="sm" onClick={() => void unschedule()} disabled={dirty || hasRemoteChange || saveState === 'saving'}><Trash2 size={13} /> Remove note</AdminButton>}
               </div>
               <div className="mt-3 flex min-h-8 items-center gap-2">

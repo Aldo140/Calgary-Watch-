@@ -50,7 +50,6 @@ import {
   consentTimestampIsInferred,
   digestSendId,
   digestDeliveryKind,
-  compareDigestDeliveryPriority,
   digestSubject,
   digestWeekKey,
   isValidUnsubToken,
@@ -58,7 +57,7 @@ import {
   WEEK_MS,
   type DigestRecipient,
 } from '../../src/lib/digest.js';
-import { normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
+import { buildDigestAudienceForecast, normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
 import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { WELCOME } from './copy.js';
@@ -238,6 +237,9 @@ async function run(): Promise<void> {
 
   if (sender.dryRun) console.log('[digest] DRY RUN — nothing will be transmitted');
   if (sender.testRecipient) console.log(`[digest] TEST MODE — all mail → ${sender.testRecipient}`);
+  if (sender.testRecipient && !process.env.DIGEST_ONLY_UID?.trim() && !process.env.DIGEST_ONLY_EMAIL?.trim()) {
+    throw new Error('A live redirected test must set DIGEST_ONLY_UID or DIGEST_ONLY_EMAIL to prevent duplicate test deliveries.');
+  }
   if (sender.allowlist.length > 0) {
     console.log(`[digest] ALLOWLIST ACTIVE — only ${sender.allowlist.join(', ')} can be mailed`);
   } else {
@@ -249,8 +251,28 @@ async function run(): Promise<void> {
   const honoured = await processUnsubscribes(db);
   if (honoured > 0) console.log(`[digest] honoured ${honoured} unsubscribe(s)`);
 
-  const recipients = (await loadRecipients(db)).sort(compareDigestDeliveryPriority);
-  console.log(`[digest] ${recipients.length} profile(s) flagged for the digest`);
+  const loadedRecipients = await loadRecipients(db);
+  console.log(`[digest] ${loadedRecipients.length} profile(s) flagged for the digest`);
+  if (loadedRecipients.length === 0) return;
+  if (sender.testRecipient && loadedRecipients.length !== 1) {
+    throw new Error(`A redirected test must resolve exactly one subscriber; resolved ${loadedRecipients.length}.`);
+  }
+
+  // Freeze the audience before rendering or sending. This is the same planner
+  // used by the admin forecast: consent, route priority, duplicate addresses,
+  // allowlist and cap are resolved once, so a failure midway through cannot
+  // pull an unplanned 17th or 51st person into the run.
+  const forecast = buildDigestAudienceForecast(loadedRecipients, {
+    allowlist: sender.testRecipient ? [] : sender.allowlist,
+    limit: sender.limit,
+  });
+  const byUid = new Map(loadedRecipients.map((profile) => [profile.uid, profile]));
+  const recipients = forecast.rows
+    .filter((row) => row.status === 'scheduled')
+    .map((row) => byUid.get(row.uid))
+    .filter((profile): profile is DigestRecipient => !!profile);
+  const held = forecast.rows.length - recipients.length;
+  console.log(`[digest] frozen plan — ${recipients.length} delivery attempt(s), ${held} held, cap ${forecast.limit}`);
   if (recipients.length === 0) return;
 
   const incidents = await loadRecentIncidents(db, now);
@@ -266,11 +288,6 @@ async function run(): Promise<void> {
   let failed = 0;
 
   for (const profile of recipients) {
-    if (sent >= sender.limit) {
-      console.warn(`[digest] hit DIGEST_LIMIT (${sender.limit}); stopping early`);
-      break;
-    }
-
     const refusal = consentRefusal(profile);
     if (refusal) {
       console.log(`[digest] skip ${profile.uid}: ${refusal}`);
@@ -410,6 +427,7 @@ async function run(): Promise<void> {
     await sleep(sender.throttleMs);
   }
 
+  if (sent > recipients.length) throw new Error('Invariant failed: delivered more messages than the frozen plan.');
   console.log(`[digest] done — sent ${sent}, skipped ${skipped}, failed ${failed}`);
   if (failed > 0) process.exitCode = 1;
 }

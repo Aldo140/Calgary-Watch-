@@ -179,6 +179,26 @@ describe('weekly email planner', () => {
     assert.equal(forecast.rows.find((row) => row.uid === 'weekly')?.status, 'held-limit');
   });
 
+  it('plans at most one delivery per normalized email address', () => {
+    const forecast = buildDigestAudienceForecast([
+      { ...PROFILE, uid: 'a-first', email: 'Neighbour@Example.com' },
+      { ...PROFILE, uid: 'z-duplicate', email: ' neighbour@example.com ' },
+      { ...PROFILE, uid: 'other', email: 'other@example.com' },
+    ]);
+    assert.equal(forecast.rows.filter((row) => row.status === 'scheduled').length, 2);
+    assert.equal(forecast.rows.find((row) => row.uid === 'z-duplicate')?.status, 'held-duplicate');
+  });
+
+  it('freezes the dynamic audience at the eligible count without exceeding the cap', () => {
+    const sixteen = Array.from({ length: 16 }, (_, index) => ({
+      ...PROFILE, uid: `person-${index}`, email: `person-${index}@example.com`,
+    }));
+    assert.equal(buildDigestAudienceForecast(sixteen, { limit: 50 }).rows.filter((row) => row.status === 'scheduled').length, 16);
+    const seventeen = [...sixteen, { ...PROFILE, uid: 'person-16', email: 'person-16@example.com' }];
+    assert.equal(buildDigestAudienceForecast(seventeen, { limit: 50 }).rows.filter((row) => row.status === 'scheduled').length, 17);
+    assert.equal(buildDigestAudienceForecast(seventeen, { limit: 16 }).rows.filter((row) => row.status === 'scheduled').length, 16);
+  });
+
   it('documents the exact recurring route without hard-coding temporary deployment gates', () => {
     const weekly = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'weekly');
     const welcome = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'welcome');
@@ -201,6 +221,8 @@ describe('weekly email planner', () => {
     assert.match(sender, /if \(sender\.testRecipient\)/);
     assert.match(sender, /test delivered.*claim released/);
     assert.match(sender, /await claim\.delete/);
+    assert.match(sender, /must resolve exactly one subscriber/);
+    assert.match(sender, /frozen plan/);
   });
 
   it('publishes the real welcome renderer for the admin preview', () => {

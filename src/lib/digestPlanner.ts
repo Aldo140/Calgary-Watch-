@@ -54,7 +54,7 @@ export const DIGEST_TEMPLATE_PURPOSES = [
   },
 ] as const;
 
-export type DigestAudienceStatus = 'scheduled' | 'held-allowlist' | 'held-limit' | 'attention';
+export type DigestAudienceStatus = 'scheduled' | 'held-allowlist' | 'held-limit' | 'held-duplicate' | 'attention';
 
 export interface DigestAudienceRow {
   uid: string;
@@ -89,14 +89,18 @@ export function buildDigestAudienceForecast(
   const eligible = optedIn.filter((profile) => consentRefusal(profile) === null)
     .sort(compareDigestDeliveryPriority);
   const statuses = new Map<string, DigestAudienceStatus>();
+  const plannedEmails = new Set<string>();
   let scheduled = 0;
 
   eligible.forEach((profile) => {
-    const permitted = allowlist.size === 0 || allowlist.has(profile.email?.trim().toLowerCase() ?? '');
+    const email = profile.email?.trim().toLowerCase() ?? '';
+    const permitted = allowlist.size === 0 || allowlist.has(email);
     if (!permitted) statuses.set(profile.uid, 'held-allowlist');
+    else if (plannedEmails.has(email)) statuses.set(profile.uid, 'held-duplicate');
     else if (scheduled >= limit) statuses.set(profile.uid, 'held-limit');
     else {
       statuses.set(profile.uid, 'scheduled');
+      plannedEmails.add(email);
       scheduled += 1;
     }
   });
@@ -104,8 +108,9 @@ export function buildDigestAudienceForecast(
   const statusOrder: Record<DigestAudienceStatus, number> = {
     scheduled: 0,
     'held-allowlist': 1,
-    'held-limit': 2,
-    attention: 3,
+    'held-duplicate': 2,
+    'held-limit': 3,
+    attention: 4,
   };
   const rows = optedIn.map((profile): DigestAudienceRow => {
     const refusal = consentRefusal(profile);

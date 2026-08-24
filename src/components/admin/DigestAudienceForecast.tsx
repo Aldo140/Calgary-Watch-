@@ -37,6 +37,7 @@ const statusCopy: Record<DigestAudienceStatus, { label: string; tone: 'ok' | 'at
   scheduled: { label: 'Sending Monday', tone: 'ok' },
   'held-allowlist': { label: 'Held by allowlist', tone: 'attention' },
   'held-limit': { label: 'Held by send cap', tone: 'attention' },
+  'held-duplicate': { label: 'Duplicate email held', tone: 'attention' },
   attention: { label: 'Needs attention', tone: 'critical' },
 };
 
@@ -99,6 +100,7 @@ export function DigestAudienceForecast({ profiles, loading, error }: {
   const held = forecast.rows.filter((row) => row.status.startsWith('held-')).length;
   const heldByAllowlist = forecast.rows.filter((row) => row.status === 'held-allowlist').length;
   const heldByLimit = forecast.rows.filter((row) => row.status === 'held-limit').length;
+  const heldAsDuplicate = forecast.rows.filter((row) => row.status === 'held-duplicate').length;
   const attention = forecast.rows.filter((row) => row.status === 'attention').length;
   const configuredWelcome = forecast.rows.filter((row) => row.kind === 'welcome' && !row.refusal).length;
   const configuredWeekly = forecast.rows.filter((row) => row.kind === 'weekly' && !row.refusal).length;
@@ -146,7 +148,7 @@ export function DigestAudienceForecast({ profiles, loading, error }: {
           ['Sending next Monday', scheduled.length, 'The current safety configuration'],
           ['Welcome letters', scheduledWelcome, `${configuredWelcome} eligible for this route`],
           ['Weekly briefs', scheduledWeekly, `${configuredWeekly} eligible for this route`],
-          ['Held', held, `${heldByAllowlist} allowlist · ${heldByLimit} send cap`],
+          ['Held', held, `${heldByAllowlist} allowlist · ${heldByLimit} send cap · ${heldAsDuplicate} duplicate`],
           ['Needs attention', attention, 'Opted in but not legally mailable'],
         ].map(([label, value, hint]) => (
           <div key={String(label)} className="min-w-[10.5rem] flex-1 px-4 py-3">

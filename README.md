@@ -263,7 +263,7 @@ which several of these scanners weigh as a legitimacy signal.
 | Environment Canada OGC API | Active, timestamped weather warnings intersecting Calgary |
 | 511 Alberta (optional key) | Traffic incidents when `ALBERTA_511_API_KEY` is configured |
 | Alberta Emergency Alert | Provincial emergencies |
-| News RSS (CBC, CTV, Global) | Local news |
+| Global News Calgary RSS | Secondary local safety news |
 | Calgary Police Service newsroom | Timestamped police releases with named Calgary locations |
 | Calgary 311 Open Data | Recent property-crime-related resident service requests |
 | Edmonton Open Data (bylaw, 311, traffic) | Live Edmonton incidents |

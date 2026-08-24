@@ -1,5 +1,5 @@
 /**
- * News RSS feeds — CTV Calgary & Global News Calgary
+ * News RSS feeds — Global News Calgary
  *
  * Fetches and parses RSS/Atom XML feeds from Calgary local news outlets,
  * filters for safety-relevant stories, and normalises them.
@@ -23,10 +23,6 @@ const FEEDS = [
   {
     name: 'Global News Calgary',
     url: 'https://globalnews.ca/calgary/feed/',
-  },
-  {
-    name: 'CBC Calgary',
-    url: 'https://www.cbc.ca/webfeed/rss/rss-canada-calgary',
   },
 ];
 

@@ -405,6 +405,12 @@ service cloud.firestore {
       allow create, delete: if false;
     }
 
+    // Ephemeral token-to-subscriber mappings for redirected admin proofs.
+    // They are created and removed only by the Admin SDK reply jobs.
+    match /digest_reply_routes/{routeId} {
+      allow read, write: if false;
+    }
+
     // One optional editor-written opening note per weekly edition. The week
     // key is the document id, which makes the Monday sender's lookup a single
     // read and makes replacement explicit in the planner UI.

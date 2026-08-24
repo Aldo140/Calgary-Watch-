@@ -37,6 +37,13 @@ describe('digest reply routing', () => {
     assert.match(weekly, /replyToken,/);
     assert.match(weekly, /tokenizedReplyAddress\(sender\.inboundAddress, replyToken\)/);
   });
+
+  it('keeps manual proofs separate from Monday while retaining reply context', () => {
+    assert.match(weekly, /claimWeekKey = sender\.testRecipient/);
+    assert.match(weekly, /REPLY_ROUTES\)\.doc\(replyToken\)\.set/);
+    assert.match(weekly, /await claim\.delete/);
+    assert.match(sync, /collection\(REPLY_ROUTES\)\.doc\(token\)/);
+  });
 });
 
 describe('reply synchronization safety', () => {
@@ -66,6 +73,7 @@ describe('admin reply inbox', () => {
     assert.match(block.slice(0, 1200), /allow read: if isAdmin\(\)/);
     assert.match(block.slice(0, 1200), /changedKeys\(\)\.hasOnly/);
     assert.match(block.slice(0, 1200), /allow create, delete: if false/);
+    assert.match(rules, /match \/digest_reply_routes\/[\s\S]*allow read, write: if false/);
   });
 
   it('supports a compact response workflow without rendering inbound HTML', () => {

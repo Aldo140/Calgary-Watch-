@@ -13,6 +13,7 @@ import { FieldValue, getFirestore, type Firestore } from 'firebase-admin/firesto
 const RESEND_API = 'https://api.resend.com';
 const REPLIES = 'digest_replies';
 const SENDS = 'digest_sends';
+const REPLY_ROUTES = 'digest_reply_routes';
 const HEALTH = 'ingestion_health';
 const SOURCE_ID = 'resend_inbound';
 const MAX_BODY_CHARS = 20_000;
@@ -135,9 +136,12 @@ async function resendGet<T>(path: string, apiKey: string): Promise<T> {
 async function matchingSend(db: Firestore, token: string | null) {
   if (!token) return null;
   const snapshot = await db.collection(SENDS).where('replyToken', '==', token).limit(1).get();
-  if (snapshot.empty) return null;
-  const row = snapshot.docs[0];
-  return { id: row.id, ...row.data() } as Record<string, unknown>;
+  if (!snapshot.empty) {
+    const row = snapshot.docs[0];
+    return { id: row.id, ...row.data() } as Record<string, unknown>;
+  }
+  const route = await db.collection(REPLY_ROUTES).doc(token).get();
+  return route.exists ? { id: route.id, ...route.data() } as Record<string, unknown> : null;
 }
 
 async function publishHealth(
@@ -253,6 +257,16 @@ async function run(): Promise<void> {
     if (!expired.empty) {
       const batch = db.batch();
       expired.docs.forEach((row) => batch.delete(row.ref));
+      await batch.commit();
+    }
+
+    const expiredRoutes = await db.collection(REPLY_ROUTES)
+      .where('expiresAt', '<', Date.now())
+      .limit(200)
+      .get();
+    if (!expiredRoutes.empty) {
+      const batch = db.batch();
+      expiredRoutes.docs.forEach((row) => batch.delete(row.ref));
       await batch.commit();
     }
 

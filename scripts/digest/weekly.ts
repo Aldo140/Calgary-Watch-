@@ -67,6 +67,7 @@ import type { Incident } from '../../src/types/index.js';
 
 const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
 const SENDS = 'digest_sends';
+const REPLY_ROUTES = 'digest_reply_routes';
 const UNSUBS = 'digest_unsubscribes';
 const PLANS = 'weekly_email_plans';
 
@@ -329,8 +330,14 @@ async function run(): Promise<void> {
     // Claim the week before doing anything that could send. A second run, a
     // manual re-run or an overlapping job all lose the race here rather than
     // in somebody's inbox.
-    const claim = db.collection(SENDS).doc(digestSendId(profile.uid, weekKey));
     const replyToken = randomBytes(10).toString('hex');
+    // A manual redirected proof must not collide with (or consume) Monday's
+    // production ledger row. GitHub's run identity still gives the proof an
+    // idempotent claim while it is being delivered.
+    const claimWeekKey = sender.testRecipient
+      ? `${weekKey}_test_${process.env.GITHUB_RUN_ID ?? replyToken}`
+      : weekKey;
+    const claim = db.collection(SENDS).doc(digestSendId(profile.uid, claimWeekKey));
     try {
       await claim.create({
         uid: profile.uid,
@@ -411,6 +418,18 @@ async function run(): Promise<void> {
         // Otherwise a Sunday test would silently turn Monday's first welcome
         // into a recurring brief and the preview action would change production.
         if (sender.testRecipient) {
+          // Keep only the reply-routing context after releasing the temporary
+          // send claim. This lets an admin reply to a proof without making the
+          // proof count as the subscriber's Monday delivery.
+          await db.collection(REPLY_ROUTES).doc(replyToken).set({
+            uid: profile.uid,
+            weekKey,
+            kind: isFirstEmail ? 'welcome' : 'digest',
+            subject: email.subject,
+            test: true,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 180 * 24 * 60 * 60 * 1000,
+          });
           await claim.delete().catch(() => {});
           console.log(`[digest] test delivered for ${profile.uid} → ${sender.testRecipient}; claim released`);
           continue;

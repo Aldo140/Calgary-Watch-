@@ -85,7 +85,7 @@ export default function AdminIncidentListPage() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'community' | 'official' | 'anonymous' | 'images'>('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'community' | 'official' | 'example' | 'anonymous' | 'images'>('all');
   const [sort, setSort] = useState<'newest' | 'oldest' | 'status' | 'reports'>('newest');
   const [drafts, setDrafts] = useState<Record<string, IncidentDraft>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -139,6 +139,7 @@ export default function AdminIncidentListPage() {
         const matchesSource =
           sourceFilter === 'community' ? (!incident.data_source || incident.data_source === 'community') :
           sourceFilter === 'official' ? incident.data_source === 'official' :
+          sourceFilter === 'example' ? incident.data_source === 'demo' :
           sourceFilter === 'anonymous' ? Boolean(incident.anonymous) :
           sourceFilter === 'images' ? Boolean(incident.image_url) :
           true;
@@ -158,8 +159,9 @@ export default function AdminIncidentListPage() {
 
   const incidentStats = useMemo(() => ({
     total: incidents.length,
-    pending: incidents.filter((i) => i.verified_status !== 'community_confirmed').length,
+    pending: incidents.filter((i) => i.data_source !== 'demo' && i.verified_status !== 'community_confirmed').length,
     anonymous: incidents.filter((i) => i.anonymous).length,
+    examples: incidents.filter((i) => i.data_source === 'demo').length,
     images: incidents.filter((i) => i.image_url).length,
   }), [incidents]);
 
@@ -288,6 +290,7 @@ export default function AdminIncidentListPage() {
                 <FilterChip active={sourceFilter === 'all'} onClick={() => setSourceFilter('all')}>All sources</FilterChip>
                 <FilterChip active={sourceFilter === 'community'} onClick={() => setSourceFilter('community')}>Community</FilterChip>
                 <FilterChip active={sourceFilter === 'official'} onClick={() => setSourceFilter('official')}>Official</FilterChip>
+                <FilterChip active={sourceFilter === 'example'} onClick={() => setSourceFilter('example')} count={incidentStats.examples}>Examples</FilterChip>
                 <FilterChip active={sourceFilter === 'anonymous'} onClick={() => setSourceFilter('anonymous')} count={incidentStats.anonymous}>Anonymous</FilterChip>
                 <FilterChip active={sourceFilter === 'images'} onClick={() => setSourceFilter('images')} count={incidentStats.images}>With photo</FilterChip>
               </FilterRow>
@@ -315,6 +318,7 @@ export default function AdminIncidentListPage() {
             <StatTile label="Total reports" value={incidentStats.total} />
             <StatTile label="Not yet confirmed" value={incidentStats.pending} tone="attention" />
             <StatTile label="Anonymous" value={incidentStats.anonymous} />
+            <StatTile label="Examples" value={incidentStats.examples} tone="attention" />
             <StatTile label="With a photo" value={incidentStats.images} />
           </StatGrid>
 
@@ -348,6 +352,7 @@ export default function AdminIncidentListPage() {
                           <span className="min-w-0 flex-1">
                             <span className="flex items-center gap-1.5 flex-wrap">
                               <CategoryChip category={incident.category} />
+                              {incident.data_source === 'demo' && <Chip tone="attention">Example</Chip>}
                               {incident.anonymous && <Chip>anon</Chip>}
                               {incident.image_url && <Chip><ImageIcon size={10} /> photo</Chip>}
                               {incidentVisibility(incident) === 'flagged' && <Chip tone="critical"><EyeOff size={10} /> hidden</Chip>}
@@ -435,7 +440,11 @@ function IncidentEditor({
     <Panel
       title="Edit report"
       subtitle={new Date(incident.timestamp).toLocaleString('en-CA')}
-      action={dirty ? <Chip tone="attention">Unsaved</Chip> : undefined}
+      action={incident.data_source === 'demo'
+        ? <Chip tone="attention">Example</Chip>
+        : dirty
+          ? <Chip tone="attention">Unsaved</Chip>
+          : undefined}
     >
       <div className="space-y-3">
         <Field label="Title">
@@ -490,6 +499,11 @@ function IncidentEditor({
         )}
 
         <div className="rounded-lg border p-3 space-y-1.5 text-xs" style={{ borderColor: T.line, background: T.surface }}>
+          {incident.data_source === 'demo' && (
+            <p className="mb-2 text-xs font-medium leading-relaxed" style={{ color: T.attention }}>
+              Seeded example. Publicly styled as an anonymous community report; excluded from digest, counts and safety signals.
+            </p>
+          )}
           <Row label="Reporter" value={incident.anonymous ? 'Anonymous' : (incident.reporter?.displayName || incident.name || 'Unknown')} />
           <Row label="Account" value={incident.reporter?.email || '—'} mono />
           <Row label="Author UID" value={incident.authorUid || '—'} mono />

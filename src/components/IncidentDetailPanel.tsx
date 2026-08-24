@@ -6,7 +6,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import DemoBadge from '@/src/components/DemoBadge';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 import { CATEGORY } from '@/src/lib/tokens';
@@ -441,27 +440,6 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                 </div>
               )}
 
-              {/* Sample reports are called out before the source ledger — the
-                  detail panel is where someone goes to decide whether to act on
-                  a report, so it must be unmissable here. */}
-              {incident.data_source === 'demo' && (
-                <div
-                  className="rounded-none p-3.5 space-y-2"
-                  style={{
-                    backgroundImage: 'repeating-linear-gradient(135deg, rgba(138,87,16,0.12) 0 4px, transparent 4px 9px)',
-                    backgroundColor: 'rgba(199,127,24,0.12)',
-                    border: '1px solid rgba(199,127,24,0.48)',
-                  }}
-                >
-                  <DemoBadge size="md" />
-                  <p className="text-[11.5px] font-medium leading-relaxed" style={{ color: '#7A6642' }}>
-                    Calgary Watch publishes a small number of example reports to show how reporting
-                    works. This is not a real incident, nobody submitted it, and it is excluded from
-                    every safety score, count and neighbourhood statistic.
-                  </p>
-                </div>
-              )}
-
               {/* Source + reporter, one compact ledger */}
               <div className="space-y-2.5">
                 <SectionLabel><ShieldCheck size={12} /> Source</SectionLabel>
@@ -480,7 +458,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                       </p>
                       <p className="text-[10.5px] font-medium" style={{ color: P.soft }}>
                         {incident.data_source === 'demo'
-                          ? 'Illustrative example — not a real report'
+                          ? 'Illustrative anonymous example — not a real incident'
                           : isSystem
                             ? 'Official / synced feed'
                             : 'Community report'}

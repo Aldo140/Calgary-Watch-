@@ -366,15 +366,16 @@ export function useAdminData() {
 
   // ── KPI derivations ───────────────────────────────────────────────────────
 
-  const totalIncidents     = incidents.length;
-  const emergencyIncidents = incidents.filter((i) => i.category === 'emergency').length;
-  const unresolvedIncidents = incidents.filter((i) => i.verified_status !== 'community_confirmed').length;
-  const todayIncidents     = incidents.filter((i) => Date.now() - i.timestamp < 86_400_000).length;
+  const realIncidents      = useMemo(() => incidents.filter((i) => i.data_source !== 'demo'), [incidents]);
+  const totalIncidents     = realIncidents.length;
+  const emergencyIncidents = realIncidents.filter((i) => i.category === 'emergency').length;
+  const unresolvedIncidents = realIncidents.filter((i) => i.verified_status !== 'community_confirmed').length;
+  const todayIncidents     = realIncidents.filter((i) => Date.now() - i.timestamp < 86_400_000).length;
   const totalUsers         = users.length;
   const adminUsers         = users.filter((u) => u.role === 'admin').length;
   const viewOnlyUsers      = totalUsers - adminUsers;
   const uniqueReporterEmails = new Set(
-    incidents.map((i) => i.email).filter(e => e && e !== 'anonymous@calgarywatch.app' && e !== 'opendata@calgary.ca')
+    realIncidents.map((i) => i.email).filter(e => e && e !== 'anonymous@calgarywatch.app' && e !== 'opendata@calgary.ca')
   ).size;
   const averageSafety = useMemo(() => {
     if (communityStats.length === 0) return 0;
@@ -385,19 +386,20 @@ export function useAdminData() {
   const pendingReviewIncidents = incidents.filter((i) =>
     i.verified_status === 'unverified' &&
     i.data_source !== 'system' &&
+    i.data_source !== 'demo' &&
     Date.now() - i.timestamp < MODERATION_WINDOW_MS
   );
 
-  const officialTrafficCount   = incidents.filter((i) => i.source_type === '511_alberta_traffic').length;
-  const official311Count       = incidents.filter((i) => i.source_type === 'calgary_infrastructure').length;
-  const officialCrimeCount     = incidents.filter((i) => i.source_type === 'calgary_police_crime').length;
-  const communityReportCount   = incidents.filter((i) => !i.data_source || i.data_source === 'community').length;
+  const officialTrafficCount   = realIncidents.filter((i) => i.source_type === '511_alberta_traffic').length;
+  const official311Count       = realIncidents.filter((i) => i.source_type === 'calgary_infrastructure').length;
+  const officialCrimeCount     = realIncidents.filter((i) => i.source_type === 'calgary_police_crime').length;
+  const communityReportCount   = realIncidents.filter((i) => !i.data_source || i.data_source === 'community').length;
 
   // ── Incident chart data ───────────────────────────────────────────────────
 
   const categoryChartData = useMemo(() => {
     const counts: Record<string, number> = {};
-    incidents.forEach((i) => { counts[i.category] = (counts[i.category] ?? 0) + 1; });
+    realIncidents.forEach((i) => { counts[i.category] = (counts[i.category] ?? 0) + 1; });
     // Series come from the shared category list, plus any legacy categories
     // still present on old documents, so this chart cannot silently omit a
     // category the rest of the app accepts.
@@ -413,12 +415,12 @@ export function useAdminData() {
         color: '#10b981',
       })),
     ].filter((d) => d.value > 0);
-  }, [incidents]);
+  }, [realIncidents]);
 
   const userRoleChartData = useMemo(() => {
     let admins = 0, postingUsers = 0, lurkingUsers = 0;
-    const posterEmails = new Set(incidents.map(i => i.email).filter(Boolean));
-    const posterUids   = new Set(incidents.map(i => (i as any).uid).filter(Boolean));
+    const posterEmails = new Set(realIncidents.map(i => i.email).filter(Boolean));
+    const posterUids   = new Set(realIncidents.map(i => (i as any).uid).filter(Boolean));
     users.forEach(u => {
       if (u.role === 'admin') admins++;
       else if (posterEmails.has(u.email) || posterUids.has(u.uid)) postingUsers++;
@@ -429,17 +431,17 @@ export function useAdminData() {
       { name: 'View-Only Users', value: lurkingUsers, color: '#4A90D9' },
       { name: 'Admins',          value: admins,       color: '#2E8B7A' },
     ].filter((d) => d.value > 0);
-  }, [users, incidents]);
+  }, [users, realIncidents]);
 
   const trustChartData = useMemo(() => {
     const counts: Record<string, number> = {};
-    incidents.forEach((i) => { counts[i.verified_status] = (counts[i.verified_status] ?? 0) + 1; });
+    realIncidents.forEach((i) => { counts[i.verified_status] = (counts[i.verified_status] ?? 0) + 1; });
     return [
       { name: 'Unverified',          value: counts['unverified']          ?? 0, color: '#64748b' },
       { name: 'Multiple Reports',    value: counts['multiple_reports']    ?? 0, color: '#f59e0b' },
       { name: 'Community Confirmed', value: counts['community_confirmed'] ?? 0, color: '#22c55e' },
     ].filter((d) => d.value > 0);
-  }, [incidents]);
+  }, [realIncidents]);
 
   const timelineChartData = useMemo(() => {
     const days = 14;
@@ -449,12 +451,12 @@ export function useAdminData() {
       const date = new Date(now - d * 86400000);
       buckets[date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })] = 0;
     }
-    incidents.forEach((i) => {
+    realIncidents.forEach((i) => {
       const key = new Date(i.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
       if (key in buckets) buckets[key]++;
     });
     return Object.entries(buckets).map(([date, count]) => ({ date, count }));
-  }, [incidents]);
+  }, [realIncidents]);
 
   // Sparkline data for page views KPI (last 14 days daily buckets)
   const pageViewsSparklineData = useMemo(() => {
@@ -479,13 +481,13 @@ export function useAdminData() {
 
   const neighborhoodChartData = useMemo(() => {
     const counts: Record<string, number> = {};
-    incidents.forEach((i) => {
+    realIncidents.forEach((i) => {
       if (i.neighborhood) counts[i.neighborhood] = (counts[i.neighborhood] ?? 0) + 1;
     });
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1]).slice(0, 8)
       .map(([name, count]) => ({ name, count }));
-  }, [incidents]);
+  }, [realIncidents]);
 
   const safetyChartData = useMemo(() =>
     communityStats.slice().sort((a, b) => b.safety_score - a.safety_score).slice(0, 10)
@@ -500,9 +502,9 @@ export function useAdminData() {
 
   const hourlyChartData = useMemo(() => {
     const buckets = Array.from({ length: 24 }, (_, h) => ({ hour: `${h}:00`, count: 0 }));
-    incidents.forEach((i) => { buckets[new Date(i.timestamp).getHours()].count++; });
+    realIncidents.forEach((i) => { buckets[new Date(i.timestamp).getHours()].count++; });
     return buckets;
-  }, [incidents]);
+  }, [realIncidents]);
 
   const categoryByDayData = useMemo(() => {
     const days = 7;
@@ -512,16 +514,16 @@ export function useAdminData() {
       const date = new Date(now - d * 86400000).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
       result[date] = { emergency: 0, crime: 0, traffic: 0, infrastructure: 0, weather: 0 };
     }
-    incidents.forEach((i) => {
+    realIncidents.forEach((i) => {
       const key = new Date(i.timestamp).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
       if (result[key] && i.category in result[key]) result[key][i.category]++;
     });
     return Object.entries(result).map(([date, cats]) => ({ date, ...cats }));
-  }, [incidents]);
+  }, [realIncidents]);
 
   const topReportersData = useMemo(() => {
     const counts: Record<string, { name: string; count: number }> = {};
-    incidents.forEach((i) => {
+    realIncidents.forEach((i) => {
       const uid = (i as any).authorUid;
       const key = uid || i.email || 'unknown';
       if (!counts[key]) {
@@ -534,11 +536,11 @@ export function useAdminData() {
       .filter(r => r.name !== 'Calgary 311 Sync' && r.name !== 'City of Calgary Traffic' && r.name !== 'Calgary Police Service')
       .sort((a, b) => b.count - a.count).slice(0, 8)
       .map(r => ({ name: r.name.length > 14 ? r.name.slice(0, 14) + '…' : r.name, count: r.count }));
-  }, [incidents, users]);
+  }, [realIncidents, users]);
 
   const newestSignups = useMemo(() => {
     const firstReportByUser = new globalThis.Map<string, number>();
-    incidents.forEach((incident) => {
+    realIncidents.forEach((incident) => {
       const keys = [(incident as any).authorUid, incident.email].filter(Boolean) as string[];
       keys.forEach((key) => {
         const existing = firstReportByUser.get(key);
@@ -550,14 +552,14 @@ export function useAdminData() {
       .map((profile) => ({
         ...profile,
         joinedAt: coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || firstReportByUser.get(profile.uid) || firstReportByUser.get(profile.email) || 0,
-        reports: incidents.filter((i) =>
+        reports: realIncidents.filter((i) =>
           ((i as any).authorUid && (i as any).authorUid === profile.uid) ||
           (i.email && i.email === profile.email && i.email !== 'anonymous@calgarywatch.app')
         ).length,
       }))
       .sort((a, b) => b.joinedAt - a.joinedAt)
       .slice(0, 5);
-  }, [users, incidents]);
+  }, [users, realIncidents]);
 
   // User growth sparkline (registrations per day, last 14 days)
   // We don't have createdAt on UserProfile, so we proxy via first report date
@@ -571,7 +573,7 @@ export function useAdminData() {
     }
     // Proxy: count distinct new authors each day from incidents
     const seenAuthors = new Set<string>();
-    incidents.slice().sort((a, b) => a.timestamp - b.timestamp).forEach((i) => {
+    realIncidents.slice().sort((a, b) => a.timestamp - b.timestamp).forEach((i) => {
       const uid = (i as any).authorUid || i.email;
       if (!uid || seenAuthors.has(uid)) return;
       seenAuthors.add(uid);
@@ -579,7 +581,7 @@ export function useAdminData() {
       if (key in buckets) buckets[key]++;
     });
     return Object.entries(buckets).map(([date, count]) => ({ date, count }));
-  }, [incidents]);
+  }, [realIncidents]);
 
   const userGrowthSparklineData = useMemo(
     () => userGrowthData.map(d => d.count),

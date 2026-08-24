@@ -2,8 +2,9 @@
  * Calgary Watch — randomized example community pulse.
  *
  * These records are illustrative, never fabricated community submissions.
- * `data_source: 'demo'` gives them an Example badge and excludes them from
- * safety scores, counts, and neighbourhood intelligence.
+ * `data_source: 'demo'` excludes them from safety intelligence and email, and
+ * exposes their origin to admins. Public rows use the ordinary anonymous
+ * community-report presentation; opened details retain a provenance note.
  */
 
 import { pathToFileURL } from 'node:url';
@@ -184,7 +185,7 @@ function initFirebase() {
  * demo documents are touched; a real resident report that was ever mislabelled
  * as demo remains protected.
  */
-export async function purgeNonCrimeExamples(db: Firestore): Promise<number> {
+export async function maintainExamples(db: Firestore): Promise<{ removed: number; normalized: number }> {
   const snapshot = await db.collection('incidents').where('data_source', '==', 'demo').get();
   const seedAuthors = new Set(['seed', 'community', 'demo']);
   const retiredTitles = new Set([
@@ -205,7 +206,26 @@ export async function purgeNonCrimeExamples(db: Firestore): Promise<number> {
     for (const doc of deletable.slice(offset, offset + 400)) batch.delete(doc.ref);
     await batch.commit();
   }
-  return deletable.length;
+  const deletableIds = new Set(deletable.map((doc) => doc.id));
+  const normalizable = snapshot.docs.filter((doc) =>
+    seedAuthors.has(String(doc.get('authorUid') ?? ''))
+      && !deletableIds.has(doc.id)
+      && (doc.get('anonymous') !== true
+        || doc.get('name') !== 'Anonymous'
+        || doc.get('source_name') !== 'Community report'));
+  for (let offset = 0; offset < normalizable.length; offset += 400) {
+    const batch = db.batch();
+    for (const doc of normalizable.slice(offset, offset + 400)) {
+      batch.set(doc.ref, {
+        anonymous: true,
+        name: 'Anonymous',
+        source_name: 'Community report',
+        updatedAt: FieldValue.serverTimestamp(),
+      }, { merge: true });
+    }
+    await batch.commit();
+  }
+  return { removed: deletable.length, normalized: normalizable.length };
 }
 
 function randomInt(min: number, max: number, random: () => number): number {
@@ -302,8 +322,9 @@ export function calgaryClock(now = new Date()): { date: string; month: number; m
 
 async function run() {
   const db = initFirebase();
-  const removed = await purgeNonCrimeExamples(db);
-  if (removed > 0) console.log(`[pulse] Removed ${removed} non-crime example report(s).`);
+  const maintenance = await maintainExamples(db);
+  if (maintenance.removed > 0) console.log(`[pulse] Removed ${maintenance.removed} non-crime example report(s).`);
+  if (maintenance.normalized > 0) console.log(`[pulse] Normalized ${maintenance.normalized} anonymous example report(s).`);
   const now = new Date();
   const clock = calgaryClock(now);
   const stateRef = db.collection('meta').doc('pulse');
@@ -346,9 +367,9 @@ async function run() {
       lng: template.lng,
       timestamp,
       email: 'examples@calgarywatch.ca',
-      name: 'Calgary Watch',
-      source_name: 'Calgary Watch example',
-      anonymous: false,
+      name: 'Anonymous',
+      source_name: 'Community report',
+      anonymous: true,
       verified_status: 'unverified',
       visibility: 'public',
       report_count: 1,

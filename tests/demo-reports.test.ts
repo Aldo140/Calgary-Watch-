@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-import { isDemoIncident } from '../src/types/index.js';
+import { isCommunityFacingIncident, isDemoIncident } from '../src/types/index.js';
 import { useNeighborhoodPulse } from '../src/hooks/useNeighborhoodPulse.js';
 
 const ACTIVITY_SRC = readFileSync('scripts/seed/activity.ts', 'utf8');
@@ -29,10 +29,11 @@ describe('example report publisher', () => {
     assert.doesNotMatch(ACTIVITY_SRC, /data_source: 'community'/);
   });
 
-  it('does not attribute examples to invented residents', () => {
-    // Reports signed "Megan T." are indistinguishable from a real neighbour's.
+  it('presents examples through the anonymous community-report identity', () => {
     assert.doesNotMatch(ACTIVITY_SRC, /name: '[A-Z][a-z]+ [A-Z]\.'/);
-    assert.match(ACTIVITY_SRC, /name: 'Calgary Watch'/);
+    assert.match(ACTIVITY_SRC, /name: 'Anonymous'/);
+    assert.match(ACTIVITY_SRC, /anonymous: true/);
+    assert.match(ACTIVITY_SRC, /source_name: 'Community report'/);
   });
 
   it('sets an expiry so examples cannot outlive the publisher', () => {
@@ -51,7 +52,7 @@ describe('example report publisher', () => {
     assert.deepEqual([...categories], ['crime']);
   });
 
-  it('includes recognizably different writing styles without hiding the example label', () => {
+  it('includes recognizably different writing styles', () => {
     assert.match(QUEUE_SRC, /\b(?:ugh|tbh|heads up)\b/i);
     assert.match(QUEUE_SRC, /police report is being filed|reported it/i);
     assert.match(QUEUE_SRC, /\b(?:mightve|didnt|definately)\b/i);
@@ -64,6 +65,31 @@ describe('isDemoIncident', () => {
     assert.equal(isDemoIncident({ data_source: 'community' }), false);
     assert.equal(isDemoIncident({ data_source: 'official' }), false);
     assert.equal(isDemoIncident({ data_source: undefined }), false);
+  });
+});
+
+describe('example presentation boundaries', () => {
+  it('includes examples in public community tabs', () => {
+    assert.equal(isCommunityFacingIncident({ data_source: 'demo' }), true);
+    assert.equal(isCommunityFacingIncident({ data_source: 'community' }), true);
+    assert.equal(isCommunityFacingIncident({ data_source: 'official' }), false);
+  });
+
+  it('uses the standard public row and marker presentation', () => {
+    const row = readFileSync('src/components/IncidentRow.tsx', 'utf8');
+    const sidebar = readFileSync('src/components/Sidebar.tsx', 'utf8');
+    const map = readFileSync('src/components/Map.tsx', 'utf8');
+    assert.doesNotMatch(row, /DemoBadge|Example report/);
+    assert.doesNotMatch(sidebar, /DemoBadge|Example report/);
+    assert.doesNotMatch(map, /data_source === 'demo'|Example report/);
+  });
+
+  it('retains quiet public provenance and an explicit admin label', () => {
+    const detail = readFileSync('src/components/IncidentDetailPanel.tsx', 'utf8');
+    const admin = readFileSync('src/pages/admin/AdminIncidentListPage.tsx', 'utf8');
+    assert.match(detail, /Illustrative anonymous example — not a real incident/);
+    assert.match(admin, /data_source === 'demo'/);
+    assert.match(admin, />Example</);
   });
 });
 

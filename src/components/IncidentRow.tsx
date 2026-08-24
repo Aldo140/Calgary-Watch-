@@ -4,7 +4,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { CATEGORY_ICONS, type Incident } from '@/src/types';
 import { MAP, categoryColor } from '@/src/lib/tokens';
 import { formatDistance } from '@/src/lib/format';
-import DemoBadge from '@/src/components/DemoBadge';
 import { cn } from '@/src/lib/utils';
 
 export interface IncidentRowProps {
@@ -73,11 +72,6 @@ function IncidentRowBase({ incident, distanceKm, isActive, onSelect }: IncidentR
         <span className="mt-0.5 block truncate font-mono text-[10px]" style={{ color: MAP.muted }}>
           {meta}
         </span>
-        {incident.data_source === 'demo' && (
-          <span className="mt-1 block">
-            <DemoBadge size="xs" />
-          </span>
-        )}
       </span>
 
       {isEmergency && (

@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
-import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS } from '@/src/types';
+import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS, isCommunityFacingIncident } from '@/src/types';
 import { formatDistanceToNow } from 'date-fns';
 import { Search, Layers, Maximize2, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { categoryColor } from '@/src/lib/tokens';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
-import DemoBadge from '@/src/components/DemoBadge';
 
 interface SidebarProps {
   incidents: Incident[];
@@ -118,7 +117,7 @@ export default function Sidebar({
           (i.neighborhood || '').toLowerCase().includes(q);
         const matchesFeedFilter =
           feedFilter === 'community'
-            ? (!i.data_source || i.data_source === 'community')
+            ? isCommunityFacingIncident(i)
             : feedFilter === 'recent'
               ? (Date.now() - i.timestamp) <= 2 * 60 * 60 * 1000
               : true;
@@ -499,10 +498,6 @@ export default function Sidebar({
                                 <div className="flex flex-col gap-1.5">
                                   <h3 className="line-clamp-2 font-display text-[15px] font-black leading-[1.12] tracking-[-0.02em] text-[#0B1F33] transition-colors group-hover:text-[#4A90D9]">{incident.title}</h3>
                                   <div className="flex items-center gap-1.5 flex-wrap">
-                                    {/* Sample reports are labelled before any other
-                                        source badge — it is the most important thing
-                                        to know about the row. */}
-                                    {incident.data_source === 'demo' && <DemoBadge size="xs" />}
                                     {/* Data-source badge — only for non-community reports */}
                                     {/* Source badges share one register: mono,
                                         wide uppercase tracking, square, and an

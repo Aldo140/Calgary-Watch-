@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { Search, X, ChevronDown, Plus, Activity, Layers, Siren, AlertCircle, Car, Construction, CloudRain } from 'lucide-react';
 import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
-import { Incident, IncidentCategory, isPubliclyVisible } from '@/src/types';
+import { Incident, IncidentCategory, isCommunityFacingIncident, isPubliclyVisible } from '@/src/types';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import IncidentRow from '@/src/components/IncidentRow';
@@ -293,7 +293,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       .filter((i) => selectedCategory === 'all' || i.category === selectedCategory)
       .filter((i) =>
         feedFilter === 'community'
-          ? !i.data_source || i.data_source === 'community'
+          ? isCommunityFacingIncident(i)
           : feedFilter === 'recent'
             ? Date.now() - i.timestamp <= 2 * 60 * 60 * 1000
             : true,

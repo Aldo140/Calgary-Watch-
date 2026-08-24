@@ -246,6 +246,7 @@ exports.sendDigestPlannerPreview = onDocumentCreated({
           subject: value.action === 'cancelled'
             ? `[Cancelled] ${value.planWeekKey} weekly opening note`
             : `[Test] ${value.planWeekKey} weekly opening note`,
+          reply_to: 'jorti104@mtroyal.ca',
           html: preview.html,
           text: preview.text,
           attachments: [logoAttachment()],

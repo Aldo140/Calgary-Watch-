@@ -8,7 +8,7 @@
  */
 
 export type DataSourceHealthMode = 'scheduled' | 'direct';
-export type DataSourceGroup = 'Incident ingestion' | 'Live map layers';
+export type DataSourceGroup = 'Incident ingestion' | 'Live map layers' | 'Email operations';
 
 export interface DataSourceDefinition {
   id: string;
@@ -106,6 +106,18 @@ export const DATA_SOURCES = [
     cadence: 'Every 5 minutes',
     staleAfterMinutes: 20,
     homepage: 'https://powerservices.enmax.com/',
+  },
+  {
+    id: 'resend_inbound',
+    name: 'Resend reply inbox',
+    shortName: 'Email replies',
+    description: 'Subscriber replies synchronized into the admin-only inbox without paid server functions.',
+    group: 'Email operations',
+    healthMode: 'scheduled',
+    cadence: 'Every 10 minutes',
+    staleAfterMinutes: 35,
+    setupHint: 'Add the Resend receiving address as DIGEST_INBOUND_ADDRESS.',
+    homepage: 'https://resend.com/emails/receiving',
   },
   {
     id: 'calgary_traffic',

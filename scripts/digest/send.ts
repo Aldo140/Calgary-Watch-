@@ -28,6 +28,8 @@ export interface OutgoingEmail {
   text: string;
   /** Omitted for internal test messages, which are transactional admin mail. */
   unsubscribeUrl?: string;
+  /** Per-message reply route; overrides the sender-level fallback. */
+  replyTo?: string;
   /**
    * Artwork sent as inline attachments rather than linked from the site.
    *
@@ -57,6 +59,8 @@ export interface SenderConfig {
   /** e.g. `Calgary Watch <digest@calgarywatch.ca>` */
   from: string;
   replyTo?: string;
+  /** Resend receiving address used for tokenized subscriber reply routing. */
+  inboundAddress?: string;
   supportEmail: string;
   dryRun: boolean;
   /** When set, every message is redirected here instead of the real recipient. */
@@ -83,7 +87,8 @@ export function loadSenderConfig(env: NodeJS.ProcessEnv = process.env): SenderCo
   return {
     apiKey,
     from: env.DIGEST_FROM ?? 'Calgary Watch <digest@calgarywatch.ca>',
-    replyTo: env.DIGEST_REPLY_TO,
+    replyTo: env.DIGEST_INBOUND_ADDRESS?.trim() || env.DIGEST_REPLY_TO?.trim() || env.DIGEST_SUPPORT_EMAIL?.trim(),
+    inboundAddress: env.DIGEST_INBOUND_ADDRESS?.trim() || undefined,
     supportEmail: env.DIGEST_SUPPORT_EMAIL ?? 'hello@calgarywatch.ca',
     dryRun,
     testRecipient: env.DIGEST_TEST_EMAIL?.trim() || undefined,
@@ -130,7 +135,7 @@ async function postToResend(email: OutgoingEmail, config: SenderConfig): Promise
       subject: email.subject,
       html: email.html,
       text: email.text,
-      ...(config.replyTo ? { reply_to: config.replyTo } : {}),
+      ...(email.replyTo || config.replyTo ? { reply_to: email.replyTo || config.replyTo } : {}),
       ...(email.inline?.length
         ? {
           attachments: email.inline.map((img) => ({

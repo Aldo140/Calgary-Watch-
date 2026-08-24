@@ -388,6 +388,23 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Resend inbound mail is synchronized by GitHub Actions through the Admin
+    // SDK. Message contents and subscriber identity never leave the approved
+    // admin surface. Admins may only change workflow fields, not forge mail.
+    match /digest_replies/{replyId} {
+      allow read: if isAdmin();
+      allow update: if isAdmin() &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'status', 'note', 'openedAt', 'handledAt', 'handledByUid',
+          'handledByEmail', 'updatedAt'
+        ]) &&
+        request.resource.data.status in ['unread', 'open', 'handled', 'archived'] &&
+        request.resource.data.note is string &&
+        request.resource.data.note.size() <= 1000 &&
+        request.resource.data.updatedAt is number;
+      allow create, delete: if false;
+    }
+
     // One optional editor-written opening note per weekly edition. The week
     // key is the document id, which makes the Monday sender's lookup a single
     // read and makes replacement explicit in the planner UI.

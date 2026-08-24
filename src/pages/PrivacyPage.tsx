@@ -13,7 +13,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 
-const UPDATED = '15 August 2026';
+const UPDATED = '24 August 2026';
 const CONTACT = 'jorti104@mtroyal.ca';
 
 const T = {
@@ -125,6 +125,7 @@ export default function PrivacyPage() {
                 { what: 'Weekly digest preference and the date you gave it', why: 'Only send email you asked for, and be able to show you asked', kept: 'Until you change it' },
                 { what: 'A random unsubscribe token', why: 'Let the link in a digest email work without signing in', kept: 'Until account deletion' },
                 { what: 'A record of each digest sent to you, and of any unsubscribe request', why: 'Avoid sending the same issue twice; prove a withdrawal was honoured', kept: 'Indefinitely, as a compliance record' },
+                { what: 'A reply you send to a Calgary Watch email, including sender, subject, message text and attachment names', why: 'Let approved administrators read and respond to subscriber feedback', kept: 'Up to 180 days' },
                 { what: 'Administrator notes about you', why: 'Record moderation decisions', kept: 'Until account deletion' },
               ]}
             />
@@ -218,12 +219,18 @@ export default function PrivacyPage() {
               <li>OpenStreetMap and CARTO — map tiles</li>
               <li>Nominatim — address search</li>
               <li>EmailJS — sends volunteer and city-request emails</li>
+              <li>Resend — sends weekly emails and, when you reply, receives that response for the private administrator inbox</li>
             </ul>
             <p>
               Separate Calgary Watch scheduled jobs retrieve attributed public information from
               Calgary 311, the Calgary Police newsroom, Environment Canada, Alberta Emergency
               Alert, Global News Calgary, ENMAX and, when configured, 511 Alberta. Those server-side
               requests do not include information about site visitors.
+            </p>
+            <p>
+              Replies to Calgary Watch emails are synchronized from Resend into an
+              administrator-only inbox. We store plain text rather than active email HTML, do not
+              download attachments automatically, and remove synchronized replies after 180 days.
             </p>
           </Section>
 

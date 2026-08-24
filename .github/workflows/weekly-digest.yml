@@ -64,6 +64,10 @@ jobs:
           DIGEST_SENDER_NAME: ${{ vars.DIGEST_SENDER_NAME }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
           DIGEST_SUPPORT_EMAIL: ${{ vars.DIGEST_SUPPORT_EMAIL }}
+          # A configured Resend receiving address gets a unique plus-token per
+          # subscriber; until then replies safely fall back to DIGEST_REPLY_TO.
+          DIGEST_INBOUND_ADDRESS: ${{ vars.DIGEST_INBOUND_ADDRESS }}
+          DIGEST_REPLY_TO: ${{ vars.DIGEST_REPLY_TO }}
           DIGEST_FROM: ${{ vars.DIGEST_FROM }}
           DIGEST_ORIGIN: ${{ vars.DIGEST_ORIGIN }}
           DIGEST_LIMIT: ${{ vars.DIGEST_LIMIT }}

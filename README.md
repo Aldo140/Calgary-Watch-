@@ -78,6 +78,19 @@ The platform combines these data layers:
 - Traffic analytics: page views, referrer breakdown, UTM campaign tracking
 - User directory with role management
 - Community Stats editor for neighbourhood safety scores
+- Email planner with exact welcome/weekly previews, recipient routing and optional opening notes
+- Admin-only reader reply inbox synchronized from Resend every ten minutes, with unread, handled and archive states
+
+### Weekly Email Replies
+
+The weekly sender always has a human reply fallback through `DIGEST_REPLY_TO`.
+When `DIGEST_INBOUND_ADDRESS` is configured with a Resend Receiving address,
+each delivery gets an opaque plus-address token. The scheduled
+`sync-email-replies.yml` workflow retrieves unseen inbound messages through the
+Resend Received Emails API, matches the token to the private `digest_sends`
+ledger and writes sanitized plain text to `digest_replies`. Replies are visible
+only to approved administrators and expire after 180 days. Attachment metadata
+is shown, but files are never downloaded automatically.
 
 ---
 

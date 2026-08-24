@@ -4,7 +4,7 @@ import {
 } from 'firebase/firestore';
 import {
   AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, Eye, FileText, Heading3,
-  HelpCircle, History, LayoutDashboard, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, PenLine, Quote, RefreshCw,
+  HelpCircle, History, Inbox, LayoutDashboard, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, PenLine, Quote, RefreshCw,
   Send, ShieldCheck, Smartphone, Sparkles, Trash2, Users, X,
 } from 'lucide-react';
 
@@ -32,6 +32,7 @@ import {
   AdminButton, Chip, Field, Panel, StatusDot, T, display, inputClass, inputStyle, mono,
 } from './ui';
 import { configuredDigestAudienceForecast, DigestAudienceForecast } from './DigestAudienceForecast';
+import { DigestReplyInbox } from './DigestReplyInbox';
 
 const MAX_BODY = 2400;
 const MIN_BODY = 20;
@@ -52,7 +53,7 @@ const AUDIENCE_ICONS = {
 type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
 type MessageTone = 'neutral' | 'ok' | 'attention' | 'critical';
 type TestStatus = 'pending' | 'sending' | 'retrying' | 'sent' | 'partial' | 'failed';
-type PlannerView = 'overview' | 'preview' | 'compose' | 'audience' | 'templates';
+type PlannerView = 'overview' | 'replies' | 'preview' | 'compose' | 'audience' | 'templates';
 type SubscriberPreview = 'weekly-local' | 'weekly-city' | 'welcome';
 
 type TestRequest = {
@@ -725,6 +726,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   const showComposerNavigation = plannerView === 'compose' || dirty || !!loadedPlan;
   const plannerViews: Array<{ id: PlannerView; label: string; description: string; icon: typeof LayoutDashboard }> = [
     { id: 'overview', label: 'This Monday', description: 'Sent and pending', icon: LayoutDashboard },
+    { id: 'replies', label: 'Replies', description: 'Reader responses', icon: Inbox },
     { id: 'preview', label: 'Email preview', description: 'What readers receive', icon: Eye },
     ...(showComposerNavigation ? [{ id: 'compose' as const, label: 'Opening note', description: dirty ? 'Draft needs approval' : 'Optional contribution', icon: PenLine }] : []),
     { id: 'audience', label: 'Recipients', description: 'Who gets which email', icon: Users },
@@ -768,6 +770,8 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
       </nav>
 
       {plannerView === 'preview' && <ProductionEmailViewer plan={nextPlan} />}
+
+      {plannerView === 'replies' && <DigestReplyInbox />}
 
       {plannerView === 'overview' && (
         <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="email-overview-title">

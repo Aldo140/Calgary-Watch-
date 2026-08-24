@@ -28,13 +28,13 @@ describe('operational data-source registry', () => {
     }
   });
 
-  it('registers every scheduled incident job plus ENMAX', () => {
-    const expected = [
+  it('registers every scheduled incident job plus operational email sync', () => {
+    const incidentExpected = [
       'calgary_311', 'calgary_police_news', 'environment_canada',
       'alberta_emergency', 'global_news', 'alberta_511', 'enmax_outages',
     ];
-    assert.deepEqual(SCHEDULED_DATA_SOURCES.map((source) => source.id), expected);
-    for (const id of expected.slice(0, -1)) assert.match(ingest, new RegExp(`id: '${id}'`));
+    assert.deepEqual(SCHEDULED_DATA_SOURCES.map((source) => source.id), [...incidentExpected, 'resend_inbound']);
+    for (const id of incidentExpected.slice(0, -1)) assert.match(ingest, new RegExp(`id: '${id}'`));
     assert.match(outages, /doc\('enmax_outages'\)/);
   });
 
@@ -72,6 +72,7 @@ describe('source health contract', () => {
     assert.match(adminHook, /\? 'stale'/);
     assert.match(adminPage, /Incident ingestion/);
     assert.match(adminPage, /Live map layers/);
+    assert.match(adminPage, /Email operations/);
     assert.match(adminPage, /Setup required/);
   });
 });

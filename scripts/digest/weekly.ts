@@ -70,6 +70,13 @@ const SENDS = 'digest_sends';
 const UNSUBS = 'digest_unsubscribes';
 const PLANS = 'weekly_email_plans';
 
+export function tokenizedReplyAddress(inbox: string | undefined, token: string): string | undefined {
+  if (!inbox) return undefined;
+  const match = inbox.trim().match(/^([^@]+)@([^@]+)$/);
+  if (!match) return inbox;
+  return `${match[1]}+${token}@${match[2]}`;
+}
+
 function initFirebase(): Firestore {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountJson) {
@@ -247,6 +254,15 @@ async function run(): Promise<void> {
   }
 
   const db = initFirebase();
+  if (!sender.inboundAddress) {
+    const replyHealth = await db.collection('ingestion_health').doc('resend_inbound').get().catch(() => null);
+    const discovered = replyHealth?.data()?.inboundAddress;
+    if (typeof discovered === 'string' && discovered.includes('@')) {
+      sender.inboundAddress = discovered;
+      sender.replyTo = discovered;
+      console.log(`[digest] reader replies route through ${discovered}`);
+    }
+  }
 
   const honoured = await processUnsubscribes(db);
   if (honoured > 0) console.log(`[digest] honoured ${honoured} unsubscribe(s)`);
@@ -314,12 +330,14 @@ async function run(): Promise<void> {
     // manual re-run or an overlapping job all lose the race here rather than
     // in somebody's inbox.
     const claim = db.collection(SENDS).doc(digestSendId(profile.uid, weekKey));
+    const replyToken = randomBytes(10).toString('hex');
     try {
       await claim.create({
         uid: profile.uid,
         weekKey,
         claimedAt: now,
         status: 'claimed',
+        replyToken,
       });
     } catch {
       console.log(`[digest] skip ${profile.uid}: already sent for ${weekKey}`);
@@ -363,6 +381,7 @@ async function run(): Promise<void> {
         html: render(shared),
         text: renderText(shared),
         unsubscribeUrl: unsubUrl,
+        replyTo: tokenizedReplyAddress(sender.inboundAddress, replyToken) ?? sender.replyTo,
         inline: isFirstEmail ? welcomeImages() : letterheadImages(),
       };
 

@@ -94,7 +94,9 @@ export default function AdminPage() {
   const [section, setSection] = useState<Section>('desk');
   const d = useAdminData();
 
-  const failingFeeds = d.apiHealths.filter((a) => a.status === 'error' || a.status === 'stale').length;
+  const failingFeeds = d.apiHealths.filter((a) =>
+    a.status === 'error' || a.status === 'stale' || (a.status === 'disabled' && !a.optional),
+  ).length;
 
   const navItems: NavItem[] = useMemo(() => {
     const needsAttention =
@@ -497,9 +499,11 @@ function FeedsSection({ d }: { d: D }) {
     const noun = api.healthMode === 'scheduled' ? 'produced' : 'returned';
     return `${api.recordCount ?? 0} record${api.recordCount === 1 ? '' : 's'} ${noun}`;
   };
-  const attention = d.apiHealths.filter((api) => ['error', 'stale', 'slow'].includes(api.status)).length;
+  const attention = d.apiHealths.filter((api) =>
+    ['error', 'stale', 'slow'].includes(api.status) || (api.status === 'disabled' && !api.optional),
+  ).length;
   const setupRequired = d.apiHealths.filter((api) => api.status === 'disabled').length;
-  const groups = ['Incident ingestion', 'Live map layers'] as const;
+  const groups = ['Incident ingestion', 'Live map layers', 'Email operations'] as const;
 
   return (
     <>
@@ -516,7 +520,9 @@ function FeedsSection({ d }: { d: D }) {
           title={group}
           subtitle={group === 'Incident ingestion'
             ? 'Actual GitHub Actions results reported by each scheduled source'
-            : 'Lightweight browser probes for layers fetched when someone opens the map'}
+            : group === 'Live map layers'
+              ? 'Lightweight browser probes for layers fetched when someone opens the map'
+              : 'Reply synchronization and other scheduled email infrastructure'}
           action={group === 'Live map layers' ? (
             <AdminButton size="sm" variant="outline" onClick={d.checkApis}>
               <RefreshCw size={13} /> Probe now

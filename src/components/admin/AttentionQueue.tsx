@@ -92,18 +92,21 @@ export function AttentionQueue({
   // a layer until this is fixed. Optional sources awaiting setup stay visible
   // in Data feeds without turning the whole desk red.
   for (const api of apiHealths) {
-    if (api.status !== 'error' && api.status !== 'slow' && api.status !== 'stale') continue;
+    if (api.status === 'disabled' && api.optional) continue;
+    if (api.status !== 'error' && api.status !== 'slow' && api.status !== 'stale' && api.status !== 'disabled') continue;
     const critical = api.status === 'error' || api.status === 'stale';
     items.push({
       id: `api-${api.id}`,
-      rank: critical ? 1 : 3,
+      rank: critical ? 1 : api.status === 'disabled' ? 2 : 3,
       tone: critical ? 'critical' : 'attention',
       icon: critical ? WifiOff : Zap,
-      kind: api.status === 'stale' ? 'Ingest stale' : api.status === 'error' ? 'Feed down' : 'Feed slow',
+      kind: api.status === 'stale' ? 'Ingest stale' : api.status === 'error' ? 'Feed down' : api.status === 'disabled' ? 'Setup required' : 'Feed slow',
       title: api.name,
       detail:
         api.status === 'stale'
           ? `No scheduled check-in within ${api.staleAfterMinutes ?? 90} minutes`
+          : api.status === 'disabled'
+            ? (api.setupHint ?? api.error ?? 'Configuration is incomplete')
           : api.status === 'error'
           ? (api.error ?? 'Not responding')
           : `Responded in ${api.responseMs}ms`,

@@ -50,7 +50,7 @@ export const DIGEST_TEMPLATE_PURPOSES = [
     schedule: 'Event-driven, not part of the Monday schedule. Publishing, updating, removing, or manually retesting an opening creates a proof request immediately.',
     trigger: 'The Firebase preview function renders the selected edition and sends an individually addressed proof. Removing an opening sends a cancellation notice instead.',
     recipients: 'Only jorti104@mtroyal.ca and ophillah1863@gmail.com are approved. Subscriber addresses are never used for proofs.',
-    protection: 'Each request is processed once and reports delivery per administrator. Activation still requires the repository’s Firebase service account to receive its missing backend-deploy permission.',
+    protection: 'Each request is processed once and reports delivery per administrator. Activation requires the Firebase Blaze plan, the Resend secret and a successful backend deployment.',
   },
 ] as const;
 

@@ -14,6 +14,8 @@ const rss = readFileSync('scripts/ingest/sources/rss.ts', 'utf8');
 const adminHook = readFileSync('src/hooks/useAdminData.ts', 'utf8');
 const adminPage = readFileSync('src/pages/AdminPage.tsx', 'utf8');
 const rules = readFileSync('firestore.rules', 'utf8');
+const backendWorkflow = readFileSync('.github/workflows/deploy-firebase-backend.yml', 'utf8');
+const rulesDeploy = readFileSync('scripts/deploy-firestore-rules.mjs', 'utf8');
 
 describe('operational data-source registry', () => {
   it('has unique stable IDs and complete operator-facing metadata', () => {
@@ -52,6 +54,11 @@ describe('source health contract', () => {
     assert.match(ingest, /collection\('ingestion_health'\)/);
     assert.match(outages, /collection\('ingestion_health'\)/);
     assert.match(rules, /match \/ingestion_health\/\{sourceId\}[\s\S]*?allow read: if isAdmin\(\);[\s\S]*?allow write: if false;/);
+  });
+
+  it('deploys Firestore-only changes without the CLI service-usage preflight', () => {
+    assert.match(backendWorkflow, /node scripts\/deploy-firestore-rules\.mjs/);
+    assert.match(rulesDeploy, /releaseFirestoreRulesetFromSource\(source\)/);
   });
 
   it('reports a broken news transport as an error instead of a healthy empty feed', () => {

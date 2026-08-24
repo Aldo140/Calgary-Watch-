@@ -56,7 +56,9 @@ jobs:
 
       - name: Deploy Firestore rules
         if: ${{ inputs.target == 'rules' }}
-        run: npx firebase-tools deploy --only firestore:rules --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+        run: node scripts/deploy-firestore-rules.mjs
 
       - name: Deploy Firestore and Storage rules
         if: ${{ inputs.target == 'all' }}

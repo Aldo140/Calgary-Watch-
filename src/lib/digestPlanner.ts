@@ -29,7 +29,7 @@ export const DIGEST_TEMPLATE_PURPOSES = [
     purpose: 'Introduces Calgary Watch and explains what arrives each Monday.',
     schedule: 'Checked by the Monday run at 15:00 UTC — 09:00 in Calgary during daylight time and 08:00 during standard time.',
     trigger: 'Used when an opted-in recipient has no successful welcome recorded. It replaces that week’s brief; the person never receives two Calgary Watch emails from the same run.',
-    recipients: 'Automated sending is currently safety-limited to jorti104@mtroyal.ca. Other eligible subscribers are skipped until the GitHub allowlist is cleared; every run also has a 50-delivery ceiling.',
+    recipients: 'Every eligible opted-in subscriber whose first successful welcome is still pending. The live Recipients view shows any deployment allowlist or send-cap holds before Monday.',
     protection: 'After a successful delivery, digestWelcomeSentAt is recorded. Future Monday runs route that recipient to the weekly brief instead.',
   },
   {
@@ -39,7 +39,7 @@ export const DIGEST_TEMPLATE_PURPOSES = [
     purpose: 'Personalized local summary. This planner controls its optional opening note.',
     schedule: 'Runs every Monday at 15:00 UTC — 09:00 MDT or 08:00 MST. The edition week is calculated in America/Edmonton so daylight-saving time cannot move it into the wrong week.',
     trigger: 'Used for an eligible opted-in recipient whose welcome was already delivered. A published planner note is inserted first only when its selected audience matches that recipient’s local or city-wide summary.',
-    recipients: 'Automated sending is currently safety-limited to jorti104@mtroyal.ca. Clearing DIGEST_ALLOWLIST in GitHub enables eligible opted-in subscribers, with a hard ceiling of 50 successful deliveries per run.',
+    recipients: 'Every eligible opted-in subscriber whose welcome was already delivered. The live Recipients view applies the current deployment safety settings and 50-delivery ceiling.',
     protection: 'One send-ledger record per recipient and Calgary week prevents duplicates. Manual workflow runs are dry by default and transmit nothing unless an operator deliberately changes the controls.',
   },
   {

@@ -179,12 +179,14 @@ describe('weekly email planner', () => {
     assert.equal(forecast.rows.find((row) => row.uid === 'weekly')?.status, 'held-limit');
   });
 
-  it('documents the exact recurring route and current recipient safety gate', () => {
+  it('documents the exact recurring route without hard-coding temporary deployment gates', () => {
     const weekly = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'weekly');
     const welcome = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'welcome');
     const proof = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === 'admin-proof');
     assert.match(weekly?.schedule ?? '', /Monday at 15:00 UTC/);
-    assert.match(weekly?.recipients ?? '', /jorti104@mtroyal\.ca/);
+    assert.match(weekly?.recipients ?? '', /Every eligible opted-in subscriber/);
+    assert.doesNotMatch(weekly?.recipients ?? '', /jorti104@mtroyal\.ca/);
+    assert.doesNotMatch(welcome?.recipients ?? '', /jorti104@mtroyal\.ca/);
     assert.match(weekly?.protection ?? '', /prevents duplicates/);
     assert.match(welcome?.trigger ?? '', /never receives two/);
     assert.match(proof?.schedule ?? '', /Event-driven, not part of the Monday schedule/);

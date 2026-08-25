@@ -30,4 +30,11 @@ describe('traffic camera tutorial', () => {
     assert.match(tour, /motion-safe:animate-pulse/);
     assert.match(viewer, /guidedPreview/);
   });
+
+  it('keeps the full lesson sequence in a compact card', () => {
+    assert.match(tour, /const cardW = Math\.min\(328, vw - 24\)/);
+    assert.match(tour, /Step \{index \+ 1\} of \{steps\.length\}/);
+    assert.match(tour, /className="absolute p-4/);
+    assert.doesNotMatch(tour, /publicAsset/);
+  });
 });

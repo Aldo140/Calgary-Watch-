@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { ArrowLeft, ArrowRight, X, Layers as LayersIcon, Radio, Video } from 'lucide-react';
+import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { MAP, CATEGORY } from '@/src/lib/tokens';
-import { publicAsset } from '@/src/lib/utils';
 
 export type TourStep = {
   /** matches a [data-tour="…"] attribute; omit for a centered info card */
   target?: string;
   title: string;
   body: string;
-  /** small mono eyebrow above the title on centered cards */
-  eyebrow?: string;
+  /** Short context label shown beside the step count. */
+  context?: string;
   /** mini illustration on centered story cards */
   visual?: 'sources' | 'pins' | 'fresh';
   /** Camera viewer needs a viewport-specific card position that leaves the frame visible. */
@@ -20,21 +19,21 @@ export type TourStep = {
 // Centered story steps — the "why" of the map, shown on both form factors.
 const STORY_STEPS: TourStep[] = [
   {
-    eyebrow: 'Why this exists',
+    context: 'Why it exists',
     title: 'One map, every source',
-    body: 'What\'s happening in Calgary is scattered across a dozen sites. Calgary Watch merges resident reports with official feeds into one live picture — cross-checked and de-duplicated.',
+    body: 'Calgary Watch combines neighbour reports and official feeds into one live, cross-checked map.',
     visual: 'sources',
   },
   {
-    eyebrow: 'Reading the pins',
+    context: 'Reading pins',
     title: 'The little C means "City"',
-    body: 'Pins wearing a blue C badge sync automatically from official City of Calgary data. Pins without it are reports posted by neighbours like you.',
+    body: 'A blue C marks official City data. Pins without it come from neighbours.',
     visual: 'pins',
   },
   {
-    eyebrow: 'Always fresh',
+    context: 'Freshness',
     title: "Today's city, not last month's",
-    body: 'Pins retire on their own — community posts after 24 hours, official ones when their source expires. Nothing stale, ever. History lives in each neighbourhood\'s Area Intel.',
+    body: 'Community posts leave after 24 hours; official pins leave when their source expires. Older activity stays in Area Intel.',
     visual: 'fresh',
   },
 ];
@@ -43,11 +42,11 @@ const STORY_STEPS: TourStep[] = [
 function StoryVisual({ kind }: { kind: NonNullable<TourStep['visual']> }) {
   if (kind === 'sources') {
     return (
-      <div className="mt-3 flex flex-wrap gap-1.5" aria-hidden="true">
+      <div className="mt-2 flex flex-wrap gap-1" aria-hidden="true">
         {['You + neighbours', 'YYC Traffic', '311 requests', 'Water mains', 'Weather'].map((s, i) => (
           <span
             key={s}
-            className="px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.12em]"
+            className="px-2 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.08em]"
             style={i === 0
               ? { background: MAP.ink, color: MAP.panel }
               : { background: 'rgba(74,144,217,0.1)', color: MAP.accent, border: '1px solid rgba(74,144,217,0.25)' }}
@@ -61,19 +60,19 @@ function StoryVisual({ kind }: { kind: NonNullable<TourStep['visual']> }) {
   if (kind === 'pins') {
     const pin = (color: string, withBadge: boolean, label: string) => (
       <div className="flex items-center gap-2.5">
-        <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#fff] shadow-md shrink-0" style={{ background: color }}>
-          <span className="h-2.5 w-2.5 rounded-full bg-[#fff] opacity-90" />
+        <span className="relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-[#fff] shadow-sm" style={{ background: color }}>
+          <span className="h-2 w-2 rounded-full bg-[#fff] opacity-90" />
           {withBadge && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[#fff] text-[8px] font-black text-[#fff]" style={{ background: MAP.accent }}>
               C
             </span>
           )}
         </span>
-        <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.12em]" style={{ color: MAP.muted }}>{label}</span>
+        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.08em]" style={{ color: MAP.muted }}>{label}</span>
       </div>
     );
     return (
-      <div className="mt-3 flex items-center gap-6 p-3" style={{ background: MAP.paper, border: `1px solid ${MAP.line}` }} aria-hidden="true">
+      <div className="mt-2 flex items-center gap-5 px-2.5 py-2" style={{ background: MAP.paper, border: `1px solid ${MAP.line}` }} aria-hidden="true">
         {pin(MAP.accent, true, 'City feed')}
         {pin(CATEGORY.crime, false, 'Neighbour')}
       </div>
@@ -81,42 +80,42 @@ function StoryVisual({ kind }: { kind: NonNullable<TourStep['visual']> }) {
   }
   // fresh — post lifecycle strip
   return (
-    <div className="mt-3 flex items-center gap-2 p-3 font-mono text-[9px] font-bold uppercase tracking-[0.1em]" style={{ background: MAP.paper, border: `1px solid ${MAP.line}`, color: MAP.muted }} aria-hidden="true">
-      <span className="px-2 py-1" style={{ background: 'rgba(46,139,122,0.14)', color: MAP.ok }}>Posted</span>
+    <div className="mt-2 flex items-center gap-1.5 px-2.5 py-2 font-mono text-[8px] font-bold uppercase tracking-[0.06em]" style={{ background: MAP.paper, border: `1px solid ${MAP.line}`, color: MAP.muted }} aria-hidden="true">
+      <span className="px-1.5 py-0.5" style={{ background: 'rgba(46,139,122,0.14)', color: MAP.ok }}>Posted</span>
       <span className="h-px flex-1" style={{ background: MAP.line }} />
       <span>24 h on the map</span>
       <span className="h-px flex-1" style={{ background: MAP.line }} />
-      <span className="px-2 py-1" style={{ background: 'rgba(90,107,125,0.12)' }}>Auto-removed</span>
+      <span className="px-1.5 py-0.5" style={{ background: 'rgba(90,107,125,0.12)' }}>Removed</span>
     </div>
   );
 }
 
 const DESKTOP_STEPS: TourStep[] = [
   STORY_STEPS[0],
-  { target: 'feed', title: 'Your live feed', body: 'Every current report, newest first — community and official together. Click any card to fly to it on the map.' },
+  { target: 'feed', title: 'Your live feed', body: 'See current community and official reports, newest first. Select one to find it on the map.' },
   STORY_STEPS[1],
   STORY_STEPS[2],
-  { target: 'report', title: 'Report in under 30 seconds', body: 'Drop a pin, pick a category, write one line. Add a photo if it helps. You can post anonymously.' },
-  { target: 'sos', title: 'Emergency SOS', body: 'For active emergencies. Always call 911 first — this alerts neighbours watching the map in parallel.' },
-  { target: 'layers', title: 'Open the Layers menu', body: 'This button keeps extra map context close without crowding the main controls. The tutorial will open it for you.' },
-  { target: 'traffic-cameras', title: 'Turn on traffic cameras', body: 'Traffic Cameras adds City of Calgary public webcams. Camera pins appear once the map is close enough to a specific intersection.' },
-  { target: 'camera-viewer', placement: 'camera', title: 'See the road before you go', body: 'Tap any navy camera pin to open this large live still. Use the arrows to check nearby intersections and Refresh for a newer frame.' },
-  { target: 'alerts', title: 'Alerts land here', body: 'New reports appear as they happen — including your neighbourhood report when your profile has a saved area.' },
-  { target: 'locate', title: 'Find yourself', body: 'Jump to your GPS position. Reports sort around wherever you are.' },
+  { target: 'report', title: 'Report in under 30 seconds', body: 'Drop a pin, choose a category and add one line. Photos and anonymous posting are optional.' },
+  { target: 'sos', title: 'Emergency SOS', body: 'Call 911 first. SOS also alerts neighbours watching the map during an active emergency.' },
+  { target: 'layers', title: 'Open Layers', body: 'Layers keeps extra map context nearby without crowding your main controls.' },
+  { target: 'traffic-cameras', title: 'Turn on traffic cameras', body: 'This adds City webcams. Zoom near an intersection to reveal its camera pin.' },
+  { target: 'camera-viewer', placement: 'camera', title: 'See the road before you go', body: 'Open any navy pin. Use the arrows for nearby intersections or Refresh for a newer image.' },
+  { target: 'alerts', title: 'Alerts land here', body: 'New reports appear here, including activity in your saved neighbourhood.' },
+  { target: 'locate', title: 'Find yourself', body: 'Jump to your GPS location and sort reports around you.' },
 ];
 
 const MOBILE_STEPS: TourStep[] = [
   STORY_STEPS[0],
-  { target: 'm-feed', title: 'The city feed', body: 'Tap here to raise the sheet — every live report, newest first. The chips below filter by category in one tap.' },
+  { target: 'm-feed', title: 'The city feed', body: 'Raise the sheet for every live report, newest first. Filter with the category chips.' },
   STORY_STEPS[1],
   STORY_STEPS[2],
-  { target: 'near-me', title: 'Near me', body: 'Scans everything within 3 km of you — nearest first, emergencies on top.' },
-  { target: 'report', title: 'Report in under 30 seconds', body: 'Drop a pin, pick a category, write one line. Anonymous if you prefer.' },
-  { target: 'sos', title: 'Emergency SOS', body: 'For active emergencies. Always call 911 first — this alerts neighbours in parallel.' },
-  { target: 'layers', title: 'Open the Layers menu', body: 'Extra map context lives here, kept separate so the one-handed controls stay clean.' },
-  { target: 'traffic-cameras', title: 'Turn on traffic cameras', body: 'Traffic Cameras adds public City of Calgary webcams. The tutorial turns the layer on for you.' },
-  { target: 'camera-viewer', placement: 'camera', title: 'Check a live camera image', body: 'Tap a navy camera pin to open this full-width still. Swipe through nearby intersections with the arrow buttons, or load a newer frame.' },
-  { target: 'm-alerts', title: 'Alerts land here', body: 'New reports appear as they happen, with an unread badge.' },
+  { target: 'near-me', title: 'Near me', body: 'See reports within 3 km, nearest first and emergencies on top.' },
+  { target: 'report', title: 'Report in under 30 seconds', body: 'Drop a pin, choose a category and add one line. Anonymous posting is optional.' },
+  { target: 'sos', title: 'Emergency SOS', body: 'Call 911 first. SOS also alerts nearby neighbours during an active emergency.' },
+  { target: 'layers', title: 'Open Layers', body: 'Extra map context stays here so one-handed controls remain clear.' },
+  { target: 'traffic-cameras', title: 'Turn on traffic cameras', body: 'This adds public City webcams. The tutorial enables the layer for you.' },
+  { target: 'camera-viewer', placement: 'camera', title: 'Check a live camera image', body: 'Open a navy pin. Use the arrows for nearby intersections or Refresh for a newer image.' },
+  { target: 'm-alerts', title: 'Alerts land here', body: 'New reports appear here with an unread count.' },
 ];
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -195,7 +194,7 @@ export default function MapTour({
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const pad = 8;
-  const cardW = Math.min(360, vw - 32);
+  const cardW = Math.min(328, vw - 24);
   const isLast = index === steps.length - 1;
   const centered = !step.target || !rect;
 
@@ -210,7 +209,7 @@ export default function MapTour({
       if (vw < 1024) {
         // The viewer is a bottom sheet on phones; keep instructions in the
         // open map area above it so neither the image nor its arrows are hidden.
-        cardStyle = { top: 12 + (window.visualViewport?.offsetTop ?? 0), left: 12, width: cardW };
+        cardStyle = { top: 8 + (window.visualViewport?.offsetTop ?? 0), left: 12, width: cardW };
       } else {
         const rightSpace = vw - (r.left + r.width);
         const left = rightSpace >= cardW + 16
@@ -275,14 +274,14 @@ export default function MapTour({
       {(() => {
         const cardInner = (
           <>
-            <div className="flex items-start justify-between gap-3">
-              <p className="relative font-mono text-[9px] font-bold uppercase tracking-[0.24em]" style={{ color: MAP.ok }}>
-                {step.eyebrow ?? 'Tour'} · {index + 1}/{steps.length}
+            <div className="flex items-center justify-between gap-3">
+              <p className="relative text-[11px] font-semibold" style={{ color: MAP.ok }}>
+                {step.context ? `${step.context} · ` : ''}Step {index + 1} of {steps.length}
               </p>
               <button
                 type="button"
                 onClick={onFinish}
-                className="relative -mt-1 -mr-1 flex h-7 w-7 items-center justify-center hover:bg-black/5"
+                className="relative -mr-1 flex h-7 w-7 items-center justify-center hover:bg-black/5"
                 style={{ color: MAP.muted }}
                 aria-label="Skip tour"
               >
@@ -290,23 +289,17 @@ export default function MapTour({
               </button>
             </div>
 
-            {centered && (
-              <div className="relative mt-3 flex h-10 w-10 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }} aria-hidden="true">
-                {step.target === 'camera-viewer' ? <Video size={18} style={{ color: MAP.accent }} /> : index === 0 ? <Radio size={18} style={{ color: MAP.accent }} /> : <LayersIcon size={18} style={{ color: MAP.accent }} />}
-              </div>
-            )}
-
-            <h3 className="relative mt-2 font-display text-lg font-bold" style={{ color: MAP.ink }}>{step.title}</h3>
-            <p className="relative mt-1.5 text-[13px] leading-relaxed" style={{ color: MAP.muted }}>{step.body}</p>
+            <h3 className="relative mt-1 font-display text-[16px] font-bold leading-tight" style={{ color: MAP.ink }}>{step.title}</h3>
+            <p className="relative mt-1 text-xs leading-[1.45]" style={{ color: MAP.muted }}>{step.body}</p>
             {step.visual && <StoryVisual kind={step.visual} />}
 
-            <div className="relative mt-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5" aria-hidden="true">
+            <div className="relative mt-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-1" aria-hidden="true">
                 {steps.map((s, i) => (
                   <span
                     key={`${s.title}-${i}`}
-                    className="h-1.5 transition-all duration-300"
-                    style={{ width: i === index ? 16 : 5, background: i === index ? MAP.accent : MAP.line }}
+                    className="h-1 transition-all duration-200"
+                    style={{ width: i === index ? 12 : 4, background: i === index ? MAP.accent : MAP.line }}
                   />
                 ))}
               </div>
@@ -325,7 +318,7 @@ export default function MapTour({
                 <button
                   type="button"
                   onClick={() => (isLast ? onFinish() : setIndex(index + 1))}
-                  className="flex h-9 items-center gap-1.5 px-4 text-[13px] font-bold transition-transform hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none"
+                  className="flex h-9 items-center gap-1.5 px-3.5 text-xs font-bold transition-transform hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none"
                   style={{ background: MAP.ink, color: MAP.panel, boxShadow: `4px 4px 0 ${MAP.accent}` }}
                 >
                   {isLast ? 'Got it' : 'Next'}
@@ -346,17 +339,9 @@ export default function MapTour({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: reduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="pointer-events-auto relative w-full overflow-hidden p-5 shadow-[0_4px_8px_rgba(6,22,47,0.28)] sm:p-6"
-                style={{ maxWidth: 400, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
+                className="pointer-events-auto relative w-full overflow-hidden p-4 shadow-[0_4px_8px_rgba(6,22,47,0.28)]"
+                style={{ maxWidth: 352, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
               >
-                {/* Decoration only: the city in one frame, behind the story
-                    cards that explain what the map is for. */}
-                <img
-                  src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
-                  alt=""
-                  width={800} height={800} loading="lazy" aria-hidden="true"
-                  className="pointer-events-none absolute -right-10 -top-10 w-40 opacity-[0.05] select-none"
-                />
                 {cardInner}
               </motion.div>
             </AnimatePresence>
@@ -369,7 +354,7 @@ export default function MapTour({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute p-5 shadow-[0_4px_8px_rgba(6,22,47,0.28)]"
+              className="absolute p-4 shadow-[0_4px_8px_rgba(6,22,47,0.28)]"
               style={{ ...cardStyle, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
             >
               {cardInner}

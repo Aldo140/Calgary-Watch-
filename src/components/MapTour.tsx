@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, X, Layers as LayersIcon, Radio } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { ArrowLeft, ArrowRight, X, Layers as LayersIcon, Radio, Video } from 'lucide-react';
 import { MAP, CATEGORY } from '@/src/lib/tokens';
 import { publicAsset } from '@/src/lib/utils';
 
@@ -13,6 +13,8 @@ export type TourStep = {
   eyebrow?: string;
   /** mini illustration on centered story cards */
   visual?: 'sources' | 'pins' | 'fresh';
+  /** Camera viewer needs a viewport-specific card position that leaves the frame visible. */
+  placement?: 'camera';
 };
 
 // Centered story steps — the "why" of the map, shown on both form factors.
@@ -96,7 +98,9 @@ const DESKTOP_STEPS: TourStep[] = [
   STORY_STEPS[2],
   { target: 'report', title: 'Report in under 30 seconds', body: 'Drop a pin, pick a category, write one line. Add a photo if it helps. You can post anonymously.' },
   { target: 'sos', title: 'Emergency SOS', body: 'For active emergencies. Always call 911 first — this alerts neighbours watching the map in parallel.' },
-  { target: 'layers', title: 'Map layers', body: 'Toggle live reports, the density heatmap, and the crime-stats overlay for every community.' },
+  { target: 'layers', title: 'Open the Layers menu', body: 'This button keeps extra map context close without crowding the main controls. The tutorial will open it for you.' },
+  { target: 'traffic-cameras', title: 'Turn on traffic cameras', body: 'Traffic Cameras adds City of Calgary public webcams. Camera pins appear once the map is close enough to a specific intersection.' },
+  { target: 'camera-viewer', placement: 'camera', title: 'See the road before you go', body: 'Tap any navy camera pin to open this large live still. Use the arrows to check nearby intersections and Refresh for a newer frame.' },
   { target: 'alerts', title: 'Alerts land here', body: 'New reports appear as they happen — including your neighbourhood report when your profile has a saved area.' },
   { target: 'locate', title: 'Find yourself', body: 'Jump to your GPS position. Reports sort around wherever you are.' },
 ];
@@ -109,7 +113,9 @@ const MOBILE_STEPS: TourStep[] = [
   { target: 'near-me', title: 'Near me', body: 'Scans everything within 3 km of you — nearest first, emergencies on top.' },
   { target: 'report', title: 'Report in under 30 seconds', body: 'Drop a pin, pick a category, write one line. Anonymous if you prefer.' },
   { target: 'sos', title: 'Emergency SOS', body: 'For active emergencies. Always call 911 first — this alerts neighbours in parallel.' },
-  { target: 'layers', title: 'Map layers', body: 'Toggle live reports, the heatmap, and community crime stats.' },
+  { target: 'layers', title: 'Open the Layers menu', body: 'Extra map context lives here, kept separate so the one-handed controls stay clean.' },
+  { target: 'traffic-cameras', title: 'Turn on traffic cameras', body: 'Traffic Cameras adds public City of Calgary webcams. The tutorial turns the layer on for you.' },
+  { target: 'camera-viewer', placement: 'camera', title: 'Check a live camera image', body: 'Tap a navy camera pin to open this full-width still. Swipe through nearby intersections with the arrow buttons, or load a newer frame.' },
   { target: 'm-alerts', title: 'Alerts land here', body: 'New reports appear as they happen, with an unread badge.' },
 ];
 
@@ -125,16 +131,27 @@ function measure(target: string): Rect | null {
   return { top: r.top, left: r.left, width: r.width, height: r.height };
 }
 
-export default function MapTour({ open, onFinish }: { open: boolean; onFinish: () => void }) {
+const DYNAMIC_TARGETS = new Set(['traffic-cameras', 'camera-viewer']);
+
+export default function MapTour({
+  open,
+  onFinish,
+  onStepChange,
+}: {
+  open: boolean;
+  onFinish: () => void;
+  onStepChange?: (target?: string) => void;
+}) {
   const [index, setIndex] = useState(0);
   const [rect, setRect] = useState<Rect | null>(null);
+  const reduceMotion = useReducedMotion();
 
   // Pick the step set for the current form factor. Targeted steps whose anchor
   // is missing/invisible right now are dropped; centered steps always survive.
   const steps = useMemo(() => {
     if (!open || typeof window === 'undefined') return [];
     const base = window.innerWidth >= 1024 ? DESKTOP_STEPS : MOBILE_STEPS;
-    return base.filter((s) => !s.target || measure(s.target) !== null);
+    return base.filter((s) => !s.target || DYNAMIC_TARGETS.has(s.target) || measure(s.target) !== null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -156,6 +173,23 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
     };
   }, [open, remeasure]);
 
+  // Some steps intentionally reveal their own target: the layer row is hidden
+  // until Layers opens, and the viewer does not exist until a camera loads.
+  // Tell the map which stage is active, then observe the portal/menu until its
+  // real geometry exists instead of falling back to a fake illustration.
+  useEffect(() => {
+    if (!open || !step) return;
+    onStepChange?.(step.target);
+    remeasure();
+    const observer = new MutationObserver(remeasure);
+    observer.observe(document.body, { childList: true, subtree: true });
+    const settle = window.setTimeout(remeasure, 350);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(settle);
+    };
+  }, [open, step, onStepChange, remeasure]);
+
   if (!open || steps.length === 0 || !step) return null;
 
   const vw = window.innerWidth;
@@ -172,21 +206,35 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
   let cardStyle: React.CSSProperties = {};
   if (!centered) {
     const r = rect!;
-    const huge = r.height > vh * 0.55 || r.width > vw * 0.8;
-    if (huge && r.width < vw * 0.6) {
-      const rightSpace = vw - (r.left + r.width);
-      const left = rightSpace > cardW + 24 ? r.left + r.width + 16 : Math.max(12, r.left - cardW - 16);
-      cardStyle = { top: Math.max(16, Math.round(vh * 0.32)), left, width: cardW };
-    } else {
-      const spaceBelow = vh - (r.top + r.height) > 240;
-      const spaceAbove = r.top > 240;
-      const left = Math.max(12, Math.min(r.left + r.width / 2 - cardW / 2, vw - cardW - 12));
-      if (spaceBelow) {
-        cardStyle = { top: Math.min(r.top + r.height + pad + 12, vh - 260), left, width: cardW };
-      } else if (spaceAbove) {
-        cardStyle = { bottom: Math.max(16, Math.min(vh - r.top + pad + 12, vh - 120)), left, width: cardW };
+    if (step.placement === 'camera') {
+      if (vw < 1024) {
+        // The viewer is a bottom sheet on phones; keep instructions in the
+        // open map area above it so neither the image nor its arrows are hidden.
+        cardStyle = { top: 12 + (window.visualViewport?.offsetTop ?? 0), left: 12, width: cardW };
       } else {
-        cardStyle = { top: Math.max(16, Math.round(vh / 2 - 150)), left, width: cardW };
+        const rightSpace = vw - (r.left + r.width);
+        const left = rightSpace >= cardW + 16
+          ? r.left + r.width + 16
+          : Math.max(12, r.left - cardW - 16);
+        cardStyle = { top: Math.max(16, Math.min(r.top, vh - 260)), left, width: cardW };
+      }
+    } else {
+      const huge = r.height > vh * 0.55 || r.width > vw * 0.8;
+      if (huge && r.width < vw * 0.6) {
+        const rightSpace = vw - (r.left + r.width);
+        const left = rightSpace > cardW + 24 ? r.left + r.width + 16 : Math.max(12, r.left - cardW - 16);
+        cardStyle = { top: Math.max(16, Math.round(vh * 0.32)), left, width: cardW };
+      } else {
+        const spaceBelow = vh - (r.top + r.height) > 240;
+        const spaceAbove = r.top > 240;
+        const left = Math.max(12, Math.min(r.left + r.width / 2 - cardW / 2, vw - cardW - 12));
+        if (spaceBelow) {
+          cardStyle = { top: Math.min(r.top + r.height + pad + 12, vh - 260), left, width: cardW };
+        } else if (spaceAbove) {
+          cardStyle = { bottom: Math.max(16, Math.min(vh - r.top + pad + 12, vh - 120)), left, width: cardW };
+        } else {
+          cardStyle = { top: Math.max(16, Math.round(vh / 2 - 150)), left, width: cardW };
+        }
       }
     }
   }
@@ -197,7 +245,7 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
       {centered ? (
         <motion.div
           key={`dim-${index}`}
-          initial={{ opacity: 0 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0"
           style={{ background: 'rgba(8, 18, 30, 0.72)' }}
@@ -205,9 +253,9 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
       ) : (
         <motion.div
           key={`spot-${step.target}`}
-          initial={{ opacity: 0 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: reduceMotion ? 0 : 0.25 }}
           className="absolute pointer-events-none"
           style={{
             top: rect!.top - pad,
@@ -219,7 +267,7 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
             border: `2px solid ${MAP.accent}`,
           }}
         >
-          <span className="absolute -inset-1.5 border-2 opacity-40 animate-pulse" style={{ borderColor: MAP.accent, borderRadius: 6 }} aria-hidden="true" />
+          <span className="absolute -inset-1.5 border-2 opacity-40 motion-safe:animate-pulse" style={{ borderColor: MAP.accent, borderRadius: 6 }} aria-hidden="true" />
         </motion.div>
       )}
 
@@ -244,7 +292,7 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
 
             {centered && (
               <div className="relative mt-3 flex h-10 w-10 items-center justify-center" style={{ background: 'rgba(74,144,217,0.12)' }} aria-hidden="true">
-                {index === 0 ? <Radio size={18} style={{ color: MAP.accent }} /> : <LayersIcon size={18} style={{ color: MAP.accent }} />}
+                {step.target === 'camera-viewer' ? <Video size={18} style={{ color: MAP.accent }} /> : index === 0 ? <Radio size={18} style={{ color: MAP.accent }} /> : <LayersIcon size={18} style={{ color: MAP.accent }} />}
               </div>
             )}
 
@@ -294,11 +342,11 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
             <AnimatePresence mode="wait">
               <motion.div
                 key={`card-${index}`}
-                initial={{ opacity: 0, y: 14, scale: 0.96 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="pointer-events-auto relative w-full overflow-hidden p-5 sm:p-6 shadow-2xl"
+                transition={{ duration: reduceMotion ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="pointer-events-auto relative w-full overflow-hidden p-5 shadow-[0_4px_8px_rgba(6,22,47,0.28)] sm:p-6"
                 style={{ maxWidth: 400, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
               >
                 {/* Decoration only: the city in one frame, behind the story
@@ -317,11 +365,11 @@ export default function MapTour({ open, onFinish }: { open: boolean; onFinish: (
           <AnimatePresence mode="wait">
             <motion.div
               key={`card-${index}`}
-              initial={{ opacity: 0, y: 12, scale: 0.97 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute p-5 shadow-2xl"
+              transition={{ duration: reduceMotion ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute p-5 shadow-[0_4px_8px_rgba(6,22,47,0.28)]"
               style={{ ...cardStyle, background: MAP.panel, border: `1.5px solid ${MAP.ink}` }}
             >
               {cardInner}

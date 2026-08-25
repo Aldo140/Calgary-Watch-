@@ -41,9 +41,11 @@ export interface CameraViewerProps {
   onClose: () => void;
   /** Move the map to whichever camera the reader lands on. */
   onFocus?: (camera: TrafficCamera) => void;
+  /** The map tour owns focus and narration while showing this real viewer. */
+  guidedPreview?: boolean;
 }
 
-export default function CameraViewer({ camera, cameras, onClose, onFocus }: CameraViewerProps) {
+export default function CameraViewer({ camera, cameras, onClose, onFocus, guidedPreview = false }: CameraViewerProps) {
   const [current, setCurrent] = useState<TrafficCamera | null>(camera);
   const [nonce, setNonce] = useState(() => Date.now());
   const [failed, setFailed] = useState(false);
@@ -100,7 +102,7 @@ export default function CameraViewer({ camera, cameras, onClose, onFocus }: Came
   // Escape closes, arrows walk. A viewer over a draggable map must never trap
   // the reader, and the close button takes focus so the keyboard starts inside.
   useEffect(() => {
-    if (!current) return;
+    if (!current || guidedPreview) return;
     closeRef.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -109,7 +111,7 @@ export default function CameraViewer({ camera, cameras, onClose, onFocus }: Came
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [current, onClose, step]);
+  }, [current, guidedPreview, onClose, step]);
 
   if (!current || typeof document === 'undefined') return null;
 
@@ -121,9 +123,10 @@ export default function CameraViewer({ camera, cameras, onClose, onFocus }: Came
   return createPortal(
     <div
       className="fixed inset-0 z-[130] flex items-end justify-center lg:items-center"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Traffic camera at ${current.location}`}
+      role={guidedPreview ? undefined : 'dialog'}
+      aria-modal={guidedPreview ? undefined : 'true'}
+      aria-hidden={guidedPreview || undefined}
+      aria-label={guidedPreview ? undefined : `Traffic camera at ${current.location}`}
     >
       <button
         type="button"
@@ -134,6 +137,7 @@ export default function CameraViewer({ camera, cameras, onClose, onFocus }: Came
       />
 
       <div
+        data-tour="camera-viewer"
         className="relative w-full max-w-xl"
         style={{ background: MAP.panel, border: `1.5px solid ${MAP.inkDeep}` }}
       >

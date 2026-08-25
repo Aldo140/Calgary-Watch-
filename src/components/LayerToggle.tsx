@@ -17,21 +17,25 @@ interface LayerToggleProps {
   isPinMode?: boolean;
   /** Drives the concern-index key — this bar's own legend, docked to it. */
   crimeStats?: Map<string, CrimeStatEntry>;
+  /** Lets the guided tour reveal nested controls without synthetic clicks. */
+  tourTarget?: string;
 }
 
 /** One overlay in the "More layers" panel. */
 function OverlayRow({
-  icon, label, meta, on, onToggle,
+  icon, label, meta, on, onToggle, tourTarget,
 }: {
   icon: React.ReactNode;
   label: string;
   meta: string;
   on: boolean;
   onToggle: () => void;
+  tourTarget?: string;
 }) {
   return (
     <button
       type="button"
+      data-tour={tourTarget}
       onClick={onToggle}
       aria-pressed={on}
       className="flex w-full items-center gap-3 border-[1.5px] border-transparent px-2.5 py-2 text-left transition-colors hover:border-[#C9D8E4] hover:bg-[#E8F3FC]"
@@ -84,6 +88,7 @@ export default function LayerToggle({
   setShowSafetyCameras,
   isPinMode = false,
   crimeStats,
+  tourTarget,
 }: LayerToggleProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -135,6 +140,11 @@ export default function LayerToggle({
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (tourTarget === 'traffic-cameras') setMenuOpen(true);
+    else if (tourTarget === 'layers' || tourTarget === 'camera-viewer') setMenuOpen(false);
+  }, [tourTarget]);
+
   if (isPinMode) return null;
 
   const chip =
@@ -148,7 +158,6 @@ export default function LayerToggle({
   return (
     <div
       ref={wrapRef}
-      data-tour="layers"
       // The mobile offset derives from the sheet's measured rail (--cw-rail-h)
       // rather than the 5.5rem it used to hardcode. That guess cleared the old
       // fixed 80px rail by a few pixels; the rail's height is now measured and
@@ -231,6 +240,7 @@ export default function LayerToggle({
             <OverlayRow
               icon={<Video size={15} />}
               label="Traffic cameras"
+              tourTarget="traffic-cameras"
               meta="City of Calgary · live · zoom in"
               on={showCameras}
               onToggle={() => setShowCameras(!showCameras)}
@@ -250,6 +260,7 @@ export default function LayerToggle({
         {/* The Layers chip is now the control it always looked like. */}
         <button
           type="button"
+          data-tour="layers"
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
           aria-label="More map layers"

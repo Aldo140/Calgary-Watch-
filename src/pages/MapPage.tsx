@@ -2022,6 +2022,8 @@ export default function MapPage() {
   // profile-setup panel was shown here). Returning users are never interrupted
   // — they can replay it from the avatar menu → "App tour".
   const [tourOpen, setTourOpen] = useState(false);
+  const [tourTarget, setTourTarget] = useState<string>();
+  const tourOpenedCameraRef = useRef(false);
   const wasNewSignupRef = useRef(false);
   useEffect(() => {
     if (profileNeedsSetup) wasNewSignupRef.current = true;
@@ -2039,14 +2041,45 @@ export default function MapPage() {
 
   const finishTour = useCallback(() => {
     setTourOpen(false);
+    setTourTarget(undefined);
+    if (tourOpenedCameraRef.current) {
+      setViewerCamera(null);
+      tourOpenedCameraRef.current = false;
+    }
     try { localStorage.setItem('cw_tour_done_v1', '1'); } catch { /* private mode */ }
   }, []);
 
   const replayTour = useCallback(() => {
     setShowUserMenu(false);
     setShowNotifications(false);
+    setViewerCamera(null);
+    setTourTarget(undefined);
     setTourOpen(true);
   }, []);
+
+  const handleTourStepChange = useCallback((target?: string) => {
+    setTourTarget(target);
+    if (target === 'traffic-cameras' || target === 'camera-viewer') setShowCameras(true);
+  }, []);
+
+  useEffect(() => {
+    if (!tourOpen) return;
+    if (tourTarget !== 'camera-viewer') {
+      if (tourOpenedCameraRef.current) {
+        setViewerCamera(null);
+        tourOpenedCameraRef.current = false;
+      }
+      return;
+    }
+    if (viewerCamera || trafficCameras.length === 0) return;
+    const camera = [...trafficCameras].sort((a, b) =>
+      getDistance(CALGARY_CENTER.lat, CALGARY_CENTER.lng, a.lat, a.lng)
+      - getDistance(CALGARY_CENTER.lat, CALGARY_CENTER.lng, b.lat, b.lng))[0];
+    if (!camera) return;
+    tourOpenedCameraRef.current = true;
+    setViewerCamera(camera);
+    mapRef.current?.flyTo(camera.lat, camera.lng, 16);
+  }, [tourOpen, tourTarget, trafficCameras, viewerCamera]);
 
   // ── One-time weekly-digest prompt ──────────────────────────────────────────
   // Users who haven't turned the digest on get exactly one nudge after sign-in
@@ -2685,7 +2718,7 @@ export default function MapPage() {
       </AnimatePresence>
 
       {/* First-run coach-mark tour */}
-      <MapTour open={tourOpen} onFinish={finishTour} />
+      <MapTour open={tourOpen} onFinish={finishTour} onStepChange={handleTourStepChange} />
 
       {/* Sidebar Feed - Desktop */}
       <div className="relative z-40 hidden h-full shrink-0 flex-col lg:flex" data-tour="feed">
@@ -3467,6 +3500,7 @@ export default function MapPage() {
           cameras={trafficCameras}
           onClose={() => setViewerCamera(null)}
           onFocus={(cam) => mapRef.current?.flyTo(cam.lat, cam.lng, 16)}
+          guidedPreview={tourOpen && tourTarget === 'camera-viewer'}
         />
 
         {/* Emergency and report actions */}
@@ -3546,6 +3580,7 @@ export default function MapPage() {
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
           crimeStats={crimeStats}
+          tourTarget={tourOpen ? tourTarget : undefined}
           isPinMode={isPinMode || isEmergencyPinMode}
         />
 

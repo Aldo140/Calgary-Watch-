@@ -110,13 +110,27 @@ async function processUnsubscribes(db: Firestore): Promise<number> {
   for (const request of pending.docs) {
     const uid = request.id;
     try {
-      await db.collection('users').doc(uid).set({
+      const requestData = request.data();
+      const profileRef = db.collection('users').doc(uid);
+      const profile = await profileRef.get();
+      const requestedAt = typeof requestData.requestedAt === 'number' ? requestData.requestedAt : 0;
+      const newConsentAt = profile.data()?.weeklyDigestOptIn === true
+        && typeof profile.data()?.weeklyDigestOptInAt === 'number'
+        ? profile.data()!.weeklyDigestOptInAt as number
+        : 0;
+      if (newConsentAt > requestedAt) {
+        await request.ref.set({ processedAt: Date.now(), outcome: 'superseded-by-new-consent' }, { merge: true });
+        console.log(`[digest] kept ${uid} subscribed: consent is newer than the opt-out request`);
+        continue;
+      }
+      await profileRef.set({
         weeklyDigestOptIn: false,
         weeklyDigestOptInAt: null,
         weeklyDigestTopics: [],
         digestUnsubscribedAt: Date.now(),
+        digestUnsubscribeSource: 'email-link',
       }, { merge: true });
-      await request.ref.set({ processedAt: Date.now() }, { merge: true });
+      await request.ref.set({ processedAt: Date.now(), outcome: 'unsubscribed' }, { merge: true });
       honoured += 1;
       console.log(`[digest] unsubscribed ${uid}`);
     } catch (error) {

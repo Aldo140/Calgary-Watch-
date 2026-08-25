@@ -77,6 +77,8 @@ type UserProfileSettings = {
   onboardingCompletedAt?: number;
   /** Set the first (and only) time the weekly-digest prompt is shown */
   digestPromptedAt?: number;
+  digestUnsubscribedAt?: number | null;
+  digestUnsubscribeSource?: string | null;
 };
 
 const FALLBACK_NEIGHBORHOODS = [
@@ -1282,6 +1284,7 @@ export default function MapPage() {
     }
 
     try {
+      const optedOutNow = userProfile?.weeklyDigestOptIn === true && !profileDraft.weeklyDigestOptIn;
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         displayName: user.displayName || userProfile?.displayName || 'Calgary User',
@@ -1300,6 +1303,12 @@ export default function MapPage() {
         weeklyDigestTopics: profileDraft.weeklyDigestOptIn
           ? ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates']
           : [],
+        digestUnsubscribedAt: optedOutNow
+          ? Date.now()
+          : profileDraft.weeklyDigestOptIn ? null : (userProfile?.digestUnsubscribedAt ?? null),
+        digestUnsubscribeSource: optedOutNow
+          ? 'account-settings'
+          : profileDraft.weeklyDigestOptIn ? null : (userProfile?.digestUnsubscribeSource ?? null),
         profileUpdatedAt: Date.now(),
       }, { merge: true });
       setIsEditingPreferences(false);
@@ -2064,6 +2073,8 @@ export default function MapPage() {
         weeklyDigestOptIn: true,
         weeklyDigestOptInAt: Date.now(),
         weeklyDigestTopics: ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates'],
+        digestUnsubscribedAt: null,
+        digestUnsubscribeSource: null,
         profileUpdatedAt: Date.now(),
       }, { merge: true });
       celebrate('Weekly digest on — your neighbourhood stats will land by email.');

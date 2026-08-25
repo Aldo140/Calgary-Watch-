@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import {
-  ArrowLeft, FileText, Loader2, Lock, Save, Search, Trash2, Users, X,
+  ArrowLeft, FileText, Loader2, Lock, Mail, MailCheck, MailX, Save, Search, Trash2, Users, X,
 } from 'lucide-react';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, isFirebaseConfigured } from '@/src/firebase';
@@ -22,6 +22,7 @@ import {
   inputClass, inputStyle, mono,
 } from '@/src/components/admin/ui';
 import { cn } from '@/src/lib/utils';
+import { consentRefusal, consentTimestamp, digestDeliveryKind, type DigestRecipient } from '@/src/lib/digest';
 
 type UserProfile = {
   uid: string;
@@ -32,10 +33,65 @@ type UserProfile = {
   updatedAt?: number;
   notes?: string;
   weeklyDigestOptIn?: boolean;
+  weeklyDigestOptInAt?: number | null;
   digestPromptedAt?: number;
+  onboardingCompletedAt?: number;
+  piiConsentAt?: number;
+  profileUpdatedAt?: number;
+  digestWelcomeSentAt?: number | null;
+  digestUnsubscribedAt?: number | null;
+  digestUnsubscribeSource?: string | null;
   neighborhood?: string;
   inferredNeighborhood?: string;
 };
+
+type DigestUnsubscribeRequest = {
+  uid: string;
+  requestedAt?: number;
+  processedAt?: number | null;
+  source?: string;
+};
+
+type DigestAudienceStatus =
+  | 'active-welcome'
+  | 'active-weekly'
+  | 'pending-unsubscribe'
+  | 'unsubscribed'
+  | 'needs-attention'
+  | 'not-subscribed';
+
+type DigestFilter = 'all' | 'active' | DigestAudienceStatus;
+
+const digestStatusCopy: Record<DigestAudienceStatus, string> = {
+  'active-welcome': 'Welcome next',
+  'active-weekly': 'Weekly brief',
+  'pending-unsubscribe': 'Opt-out pending',
+  unsubscribed: 'Unsubscribed',
+  'needs-attention': 'Needs attention',
+  'not-subscribed': 'Not subscribed',
+};
+
+function digestAudienceStatus(profile: UserProfile, request?: DigestUnsubscribeRequest): DigestAudienceStatus {
+  const consentAt = consentTimestamp(profile as DigestRecipient) ?? 0;
+  const requestedAt = coerceTimestamp(request?.requestedAt);
+  const processedAt = coerceTimestamp(request?.processedAt);
+  const requestWasSuperseded = profile.weeklyDigestOptIn === true && consentAt > requestedAt;
+  if (request && !processedAt && !requestWasSuperseded) return 'pending-unsubscribe';
+  if (profile.weeklyDigestOptIn === true) {
+    if ((processedAt && !requestWasSuperseded) || consentRefusal(profile as DigestRecipient)) return 'needs-attention';
+    return digestDeliveryKind(profile as DigestRecipient) === 'welcome' ? 'active-welcome' : 'active-weekly';
+  }
+  if (profile.digestUnsubscribedAt || request?.processedAt) return 'unsubscribed';
+  return 'not-subscribed';
+}
+
+function statusTone(status: DigestAudienceStatus): 'neutral' | 'signal' | 'ok' | 'attention' | 'critical' {
+  if (status === 'active-welcome') return 'signal';
+  if (status === 'active-weekly') return 'ok';
+  if (status === 'pending-unsubscribe') return 'attention';
+  if (status === 'needs-attention') return 'critical';
+  return 'neutral';
+}
 
 type ProfileDraft = { displayName: string; role: 'user' | 'admin' };
 
@@ -93,11 +149,13 @@ export default function AdminUserListPage() {
   const uidParam = params.get('uid');
 
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [unsubscribes, setUnsubscribes] = useState<DigestUnsubscribeRequest[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUid, setSelectedUid] = useState<string | null>(uidParam);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user' | 'reporters'>('all');
+  const [digestFilter, setDigestFilter] = useState<DigestFilter>('all');
   const [sort, setSort] = useState<'newest' | 'oldest' | 'reports' | 'name'>('newest');
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [draftProfiles, setDraftProfiles] = useState<Record<string, ProfileDraft>>({});
@@ -109,6 +167,9 @@ export default function AdminUserListPage() {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
       setLoading(false);
     });
+    const unsubDigest = onSnapshot(query(collection(db, 'digest_unsubscribes'), limit(200)), (snapshot) => {
+      setUnsubscribes(snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as DigestUnsubscribeRequest)));
+    });
     const unsubIncidents = onSnapshot(
       query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)),
       (snapshot) => {
@@ -119,8 +180,13 @@ export default function AdminUserListPage() {
         );
       },
     );
-    return () => { unsubUsers(); unsubIncidents(); };
+    return () => { unsubUsers(); unsubDigest(); unsubIncidents(); };
   }, []);
+
+  const unsubscribeByUid = useMemo(
+    () => new globalThis.Map(unsubscribes.map((request) => [request.uid, request])),
+    [unsubscribes],
+  );
 
   const reportsByUserKey = useMemo(() => {
     const map = new globalThis.Map<string, Incident[]>();
@@ -142,12 +208,15 @@ export default function AdminUserListPage() {
     const reports = reportsByUserKey.get(profile.uid) ?? reportsByUserKey.get(profile.email) ?? [];
     const joinedAt = coerceTimestamp(profile.createdAt) || coerceTimestamp(profile.updatedAt) || 0;
     const anonymousCount = reports.filter((r) => r.anonymous).length;
+    const unsubscribeRequest = unsubscribeByUid.get(profile.uid);
+    const digestStatus = digestAudienceStatus(profile, unsubscribeRequest);
     const searchBlob = [
       profile.displayName, profile.email, profile.notes,
+      digestStatusCopy[digestStatus], unsubscribeRequest?.source, profile.digestUnsubscribeSource,
       ...reports.map((i) => `${i.title} ${i.description} ${i.neighborhood}`),
     ].join(' ').toLowerCase();
-    return { ...profile, joinedAt, reports, anonymousCount, searchBlob };
-  }), [users, reportsByUserKey]);
+    return { ...profile, joinedAt, reports, anonymousCount, searchBlob, digestStatus, unsubscribeRequest };
+  }), [users, reportsByUserKey, unsubscribeByUid]);
 
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -156,6 +225,8 @@ export default function AdminUserListPage() {
         if (roleFilter === 'admin' && profile.role !== 'admin') return false;
         if (roleFilter === 'user' && profile.role === 'admin') return false;
         if (roleFilter === 'reporters' && profile.reports.length === 0) return false;
+        if (digestFilter === 'active' && !profile.digestStatus.startsWith('active-')) return false;
+        if (digestFilter !== 'all' && digestFilter !== 'active' && profile.digestStatus !== digestFilter) return false;
         if (!q) return true;
         return profile.searchBlob.includes(q);
       })
@@ -165,7 +236,7 @@ export default function AdminUserListPage() {
         if (sort === 'reports') return b.reports.length - a.reports.length;
         return (a.displayName || a.email || '').localeCompare(b.displayName || b.email || '');
       });
-  }, [enrichedUsers, search, sort, roleFilter]);
+  }, [enrichedUsers, search, sort, roleFilter, digestFilter]);
 
   const selectedUser = filteredUsers.find((p) => p.uid === selectedUid) || filteredUsers[0] || null;
 
@@ -173,7 +244,12 @@ export default function AdminUserListPage() {
     total: users.length,
     admins: users.filter((p) => p.role === 'admin').length,
     reporters: enrichedUsers.filter((p) => p.reports.length > 0).length,
-    digest: users.filter((p) => p.weeklyDigestOptIn === true).length,
+    digest: enrichedUsers.filter((p) => p.digestStatus.startsWith('active-')).length,
+    welcome: enrichedUsers.filter((p) => p.digestStatus === 'active-welcome').length,
+    weekly: enrichedUsers.filter((p) => p.digestStatus === 'active-weekly').length,
+    pendingOptOut: enrichedUsers.filter((p) => p.digestStatus === 'pending-unsubscribe').length,
+    unsubscribed: enrichedUsers.filter((p) => p.digestStatus === 'unsubscribed').length,
+    needsAttention: enrichedUsers.filter((p) => p.digestStatus === 'needs-attention').length,
   }), [users, enrichedUsers]);
 
   const getProfileDraft = (profile: UserProfile): ProfileDraft =>
@@ -217,7 +293,7 @@ export default function AdminUserListPage() {
     setSelectedUid(null);
   };
 
-  const hasFilters = Boolean(search || roleFilter !== 'all');
+  const hasFilters = Boolean(search || roleFilter !== 'all' || digestFilter !== 'all');
 
   return (
     <AdminGuard>
@@ -273,20 +349,30 @@ export default function AdminUserListPage() {
               <FilterChip active={roleFilter === 'user'} onClick={() => setRoleFilter('user')}>View only</FilterChip>
               <FilterChip active={roleFilter === 'reporters'} onClick={() => setRoleFilter('reporters')} count={userStats.reporters}>Reporters</FilterChip>
               {hasFilters && (
-                <FilterChip active={false} onClick={() => { setSearch(''); setRoleFilter('all'); }}>
+                <FilterChip active={false} onClick={() => { setSearch(''); setRoleFilter('all'); setDigestFilter('all'); }}>
                   <X size={12} /> Clear
                 </FilterChip>
               )}
+            </FilterRow>
+            <FilterRow>
+              <span className="mr-1 inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: T.muted }}><Mail size={13} /> Email</span>
+              <FilterChip active={digestFilter === 'all'} onClick={() => setDigestFilter('all')}>All statuses</FilterChip>
+              <FilterChip active={digestFilter === 'active'} onClick={() => setDigestFilter('active')} count={userStats.digest}>Active</FilterChip>
+              <FilterChip active={digestFilter === 'active-welcome'} onClick={() => setDigestFilter('active-welcome')} count={userStats.welcome}>Welcome next</FilterChip>
+              <FilterChip active={digestFilter === 'active-weekly'} onClick={() => setDigestFilter('active-weekly')} count={userStats.weekly}>Weekly brief</FilterChip>
+              <FilterChip active={digestFilter === 'pending-unsubscribe'} onClick={() => setDigestFilter('pending-unsubscribe')} count={userStats.pendingOptOut}>Opt-out pending</FilterChip>
+              <FilterChip active={digestFilter === 'unsubscribed'} onClick={() => setDigestFilter('unsubscribed')} count={userStats.unsubscribed}>Unsubscribed</FilterChip>
+              {userStats.needsAttention > 0 && <FilterChip active={digestFilter === 'needs-attention'} onClick={() => setDigestFilter('needs-attention')} count={userStats.needsAttention}>Needs attention</FilterChip>}
             </FilterRow>
           </div>
         </header>
 
         <main className="px-4 lg:px-7 py-4 max-w-[1500px] space-y-4">
           <StatGrid>
-            <StatTile label="Accounts" value={userStats.total} />
-            <StatTile label="Admins" value={userStats.admins} tone="signal" />
-            <StatTile label="Have reported" value={userStats.reporters} tone="ok" />
-            <StatTile label="Weekly digest" value={userStats.digest} hint="Opted in" />
+            <StatTile label="Active digest" value={userStats.digest} hint="Legally mailable" tone="ok" onClick={() => setDigestFilter('active')} />
+            <StatTile label="Welcome next" value={userStats.welcome} hint="First eligible send" tone="signal" onClick={() => setDigestFilter('active-welcome')} />
+            <StatTile label="Weekly brief" value={userStats.weekly} hint="Welcome completed" onClick={() => setDigestFilter('active-weekly')} />
+            <StatTile label="Opt-outs" value={userStats.unsubscribed + userStats.pendingOptOut} hint={userStats.pendingOptOut ? `${userStats.pendingOptOut} awaiting processing` : 'No requests pending'} tone={userStats.pendingOptOut ? 'attention' : 'neutral'} onClick={() => setDigestFilter(userStats.pendingOptOut ? 'pending-unsubscribe' : 'unsubscribed')} />
           </StatGrid>
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem] items-start">
@@ -323,6 +409,7 @@ export default function AdminUserListPage() {
                                 {profile.displayName || 'Unnamed'}
                               </p>
                               {profile.role === 'admin' && <Chip tone="signal">admin</Chip>}
+                              <Chip tone={statusTone(profile.digestStatus)}>{digestStatusCopy[profile.digestStatus]}</Chip>
                             </span>
                             <p className="text-xs truncate" style={{ color: T.muted }}>{profile.email}</p>
                           </span>
@@ -384,7 +471,7 @@ function UserEditor({
   onDelete,
   onViewReports,
 }: {
-  profile: UserProfile & { joinedAt: number; reports: Incident[]; anonymousCount: number };
+  profile: UserProfile & { joinedAt: number; reports: Incident[]; anonymousCount: number; digestStatus: DigestAudienceStatus; unsubscribeRequest?: DigestUnsubscribeRequest };
   draft: ProfileDraft;
   notes: string;
   saving: boolean;
@@ -434,10 +521,11 @@ function UserEditor({
           <div className="rounded-lg border p-3 space-y-1.5 text-xs" style={{ borderColor: T.line, background: T.surface }}>
             <InfoRow label="UID" value={profile.uid} mono />
             <InfoRow label="Neighbourhood" value={profile.neighborhood || profile.inferredNeighborhood || '—'} />
-            <InfoRow label="Weekly digest" value={profile.weeklyDigestOptIn ? 'Opted in' : 'Not subscribed'} />
           </div>
         </div>
       </Panel>
+
+      <DigestSubscriptionPanel profile={profile} />
 
       <Panel
         title="Admin notes"
@@ -489,6 +577,57 @@ function UserEditor({
         </AdminButton>
       </Panel>
     </div>
+  );
+}
+
+function fullDate(value: unknown): string {
+  const timestamp = coerceTimestamp(value);
+  if (!timestamp) return '—';
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Edmonton', year: 'numeric', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit',
+  }).format(new Date(timestamp));
+}
+
+function DigestSubscriptionPanel({ profile }: {
+  profile: UserProfile & { digestStatus: DigestAudienceStatus; unsubscribeRequest?: DigestUnsubscribeRequest };
+}) {
+  const request = profile.unsubscribeRequest;
+  const consentAt = consentTimestamp(profile as DigestRecipient);
+  const optedOutAt = profile.digestUnsubscribedAt || request?.processedAt || request?.requestedAt;
+  const source = profile.digestUnsubscribeSource || request?.source;
+  const explanation = profile.digestStatus === 'active-welcome'
+    ? 'Subscribed and eligible. Their first successful Monday delivery will be the welcome letter.'
+    : profile.digestStatus === 'active-weekly'
+      ? 'Subscribed and eligible. Their welcome was delivered, so future Mondays use the weekly brief.'
+      : profile.digestStatus === 'pending-unsubscribe'
+        ? 'Their email-link request is recorded. The sender processes it before selecting its next audience.'
+        : profile.digestStatus === 'unsubscribed'
+          ? 'Removed from the Monday audience. Their account and reports remain untouched.'
+          : profile.digestStatus === 'needs-attention'
+            ? 'The profile says subscribed, but required consent or email evidence is missing. No email will be sent.'
+            : 'This account has not opted into the weekly digest.';
+
+  return (
+    <Panel
+      title="Weekly email"
+      subtitle="Consent and delivery history"
+      action={<Chip tone={statusTone(profile.digestStatus)}>{digestStatusCopy[profile.digestStatus]}</Chip>}
+    >
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-full" style={{ background: `${statusTone(profile.digestStatus) === 'ok' ? T.ok : T.signal}14`, color: profile.digestStatus.includes('unsubscribe') ? T.muted : T.signal }}>
+          {profile.digestStatus.includes('unsubscribe') ? <MailX size={15} /> : profile.digestStatus.startsWith('active-') ? <MailCheck size={15} /> : <Mail size={15} />}
+        </span>
+        <p className="text-xs leading-relaxed" style={{ color: T.muted }}>{explanation}</p>
+      </div>
+      <div className="mt-3 space-y-1.5 border-t pt-3 text-xs" style={{ borderColor: T.line }}>
+        <InfoRow label="Consent recorded" value={fullDate(consentAt)} />
+        <InfoRow label="Welcome delivered" value={fullDate(profile.digestWelcomeSentAt)} />
+        {request && <InfoRow label={profile.weeklyDigestOptIn ? 'Last opt-out request' : 'Opt-out requested'} value={fullDate(request.requestedAt)} />}
+        {optedOutAt && <InfoRow label="Unsubscribed" value={fullDate(optedOutAt)} />}
+        {source && <InfoRow label="Source" value={source === 'email-link' ? 'Email unsubscribe link' : source === 'account-settings' ? 'Account settings' : source} />}
+      </div>
+    </Panel>
   );
 }
 

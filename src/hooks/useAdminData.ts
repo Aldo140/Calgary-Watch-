@@ -48,6 +48,8 @@ export type UserProfile = {
   profileUpdatedAt?: number | null;
   weeklyDigestTopics?: string[];
   digestWelcomeSentAt?: number | null;
+  digestUnsubscribedAt?: number | null;
+  digestUnsubscribeSource?: string | null;
 };
 
 export type PageViewDoc = {

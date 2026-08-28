@@ -2,10 +2,11 @@ name: Ingest Power Outages
 
 on:
   schedule:
-    # Every 5 minutes — the fastest cadence GitHub Actions allows, and the
+    # Every 5 minutes, offset from :00 where GitHub reports peak scheduler load.
+    # This is the fastest cadence GitHub Actions allows, and the
     # minimum polling interval we permit against the undocumented ENMAX feed.
     # GitHub delays scheduled runs under load, so treat this as best-effort.
-    - cron: '*/5 * * * *'
+    - cron: '3/5 * * * *'
   # Allow a manual trigger from the Actions tab for testing.
   workflow_dispatch:
 

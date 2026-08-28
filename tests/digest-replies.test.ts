@@ -48,7 +48,7 @@ describe('digest reply routing', () => {
 
 describe('reply synchronization safety', () => {
   it('runs on the free-plan GitHub scheduler and reports source health', () => {
-    assert.match(workflow, /cron: '\*\/10 \* \* \* \*'/);
+    assert.match(workflow, /cron: '7\/10 \* \* \* \*'/);
     assert.match(workflow, /RESEND_API_KEY/);
     assert.match(sync, /collection\(HEALTH\)\.doc\(SOURCE_ID\)/);
   });

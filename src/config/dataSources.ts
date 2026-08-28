@@ -27,6 +27,24 @@ export interface DataSourceDefinition {
   checkUrl?: string;
 }
 
+export type DataSourceOperationalStatus =
+  | 'idle' | 'checking' | 'ok' | 'slow' | 'error' | 'stale' | 'disabled';
+
+/**
+ * Optional sources awaiting credentials are inventory, not outages. Keep them
+ * visible to operators without depressing the active-source health ratio.
+ */
+export function summarizeDataSourceHealth(
+  sources: readonly { status: DataSourceOperationalStatus; optional?: boolean }[],
+) {
+  const active = sources.filter((source) => !(source.optional && source.status === 'disabled'));
+  return {
+    healthy: active.filter((source) => source.status === 'ok').length,
+    active: active.length,
+    optionalSetup: sources.filter((source) => source.optional && source.status === 'disabled').length,
+  };
+}
+
 export const DATA_SOURCES = [
   {
     id: 'calgary_311',
@@ -104,7 +122,7 @@ export const DATA_SOURCES = [
     group: 'Incident ingestion',
     healthMode: 'scheduled',
     cadence: 'Every 5 minutes',
-    staleAfterMinutes: 20,
+    staleAfterMinutes: 45,
     homepage: 'https://powerservices.enmax.com/',
   },
   {
@@ -115,7 +133,7 @@ export const DATA_SOURCES = [
     group: 'Live map layers',
     healthMode: 'scheduled',
     cadence: 'Every 5 minutes',
-    staleAfterMinutes: 12,
+    staleAfterMinutes: 30,
     optional: true,
     setupHint: 'Add TRAFFIC_FLOW_URL and, when required, TRAFFIC_FLOW_TOKEN. The public layer uses a labelled annual baseline until configured.',
     homepage: 'https://data.calgary.ca/Transportation-Transit/Traffic-Volumes-Flow/cauu-7hnw',
@@ -128,7 +146,7 @@ export const DATA_SOURCES = [
     group: 'Email operations',
     healthMode: 'scheduled',
     cadence: 'Every 10 minutes',
-    staleAfterMinutes: 35,
+    staleAfterMinutes: 60,
     setupHint: 'Add the Resend receiving address as DIGEST_INBOUND_ADDRESS.',
     homepage: 'https://resend.com/emails/receiving',
   },

@@ -28,6 +28,7 @@ import {
   DATA_SOURCES,
   DIRECT_DATA_SOURCES,
   type DataSourceDefinition,
+  type DataSourceOperationalStatus,
 } from '@/src/config/dataSources';
 
 export type UserProfile = {
@@ -64,7 +65,7 @@ export type PageViewDoc = {
 };
 
 export type ApiHealth = DataSourceDefinition & {
-  status: 'idle' | 'checking' | 'ok' | 'slow' | 'error' | 'stale' | 'disabled';
+  status: DataSourceOperationalStatus;
   recordCount: number | null;
   responseMs: number | null;
   lastChecked: number | null;

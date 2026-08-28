@@ -2,8 +2,8 @@ name: Ingest Live Data
 
 on:
   schedule:
-    # Every 30 minutes — halves daily Firestore reads vs the prior 15-min schedule.
-    - cron: '*/30 * * * *'
+    # Avoid :00/:30, where GitHub documents higher schedule delays and drops.
+    - cron: '13,43 * * * *'
   # Allow a manual trigger from the Actions tab for testing.
   workflow_dispatch:
 

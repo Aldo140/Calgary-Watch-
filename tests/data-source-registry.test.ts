@@ -6,6 +6,7 @@ import {
   DATA_SOURCES,
   DIRECT_DATA_SOURCES,
   SCHEDULED_DATA_SOURCES,
+  summarizeDataSourceHealth,
 } from '../src/config/dataSources.js';
 
 const ingest = readFileSync('scripts/ingest/index.ts', 'utf8');
@@ -17,6 +18,10 @@ const adminPage = readFileSync('src/pages/AdminPage.tsx', 'utf8');
 const rules = readFileSync('firestore.rules', 'utf8');
 const backendWorkflow = readFileSync('.github/workflows/deploy-firebase-backend.yml', 'utf8');
 const rulesDeploy = readFileSync('scripts/deploy-firestore-rules.mjs', 'utf8');
+const liveWorkflow = readFileSync('.github/workflows/ingest-live-data.yml', 'utf8');
+const outageWorkflow = readFileSync('.github/workflows/ingest-power-outages.yml', 'utf8');
+const trafficWorkflow = readFileSync('.github/workflows/ingest-traffic-flow.yml', 'utf8');
+const repliesWorkflow = readFileSync('.github/workflows/sync-email-replies.yml', 'utf8');
 
 describe('operational data-source registry', () => {
   it('has unique stable IDs and complete operator-facing metadata', () => {
@@ -52,6 +57,21 @@ describe('operational data-source registry', () => {
 });
 
 describe('source health contract', () => {
+  it('does not count optional sources awaiting setup as unhealthy active feeds', () => {
+    assert.deepEqual(summarizeDataSourceHealth([
+      { status: 'ok' },
+      { status: 'stale' },
+      { status: 'disabled', optional: true },
+    ]), { healthy: 1, active: 2, optionalSetup: 1 });
+  });
+
+  it('offsets scheduled jobs from the top-of-hour congestion window', () => {
+    assert.match(liveWorkflow, /cron: '13,43 \* \* \* \*'/);
+    assert.match(outageWorkflow, /cron: '3\/5 \* \* \* \*'/);
+    assert.match(trafficWorkflow, /cron: '4\/5 \* \* \* \*'/);
+    assert.match(repliesWorkflow, /cron: '7\/10 \* \* \* \*'/);
+  });
+
   it('persists actual scheduled results and makes them admin-readable only', () => {
     assert.match(ingest, /collection\('ingestion_health'\)/);
     assert.match(outages, /collection\('ingestion_health'\)/);

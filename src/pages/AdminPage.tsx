@@ -35,6 +35,7 @@ import {
   CATEGORY_COLOR, type Tone,
 } from '@/src/components/admin/ui';
 import { INCIDENT_CATEGORIES } from '@/src/constants';
+import { summarizeDataSourceHealth } from '@/src/config/dataSources';
 import { cn } from '@/src/lib/utils';
 
 type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city';
@@ -503,6 +504,7 @@ function FeedsSection({ d }: { d: D }) {
     ['error', 'stale', 'slow'].includes(api.status) || (api.status === 'disabled' && !api.optional),
   ).length;
   const setupRequired = d.apiHealths.filter((api) => api.status === 'disabled').length;
+  const sourceSummary = summarizeDataSourceHealth(d.apiHealths);
   const groups = ['Incident ingestion', 'Live map layers', 'Email operations'] as const;
 
   return (
@@ -510,8 +512,8 @@ function FeedsSection({ d }: { d: D }) {
       <StatGrid>
         <StatTile label="Traffic events" value={d.liveTrafficCount} hint="Live from Calgary open data" />
         <StatTile label="Open 311 requests" value={d.live311Count} hint="Live from Calgary open data" />
-        <StatTile label="Sources healthy" value={`${d.apiHealths.filter((a) => a.status === 'ok').length}/${d.apiHealths.length}`} tone="ok" hint={`${d.apiHealths.length} registered sources`} />
-        <StatTile label="Needs attention" value={attention} tone={attention ? 'critical' : 'ok'} hint={setupRequired ? `${setupRequired} optional setup item` : 'No setup gaps'} />
+        <StatTile label="Active sources" value={`${sourceSummary.healthy}/${sourceSummary.active}`} tone={sourceSummary.healthy === sourceSummary.active ? 'ok' : 'critical'} hint={`${d.apiHealths.length} registered · ${sourceSummary.optionalSetup} optional setup`} />
+        <StatTile label="Needs attention" value={attention} tone={attention ? 'critical' : 'ok'} hint={setupRequired ? `${setupRequired} setup item${setupRequired === 1 ? '' : 's'}` : 'No setup gaps'} />
       </StatGrid>
 
       {groups.map((group) => (

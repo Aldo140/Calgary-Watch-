@@ -165,3 +165,26 @@ export const MAP = {
   /** Danger. Was also #EF4444, #E11D48, #B91C1C, #7F1D1D. */
   danger: '#C0392B',
 } as const;
+
+/**
+ * Traffic is a map data vocabulary, not a new palette. Keeping labels, colour,
+ * and stroke patterns together stops the legend, roads, and inspector from
+ * drifting apart. Dash patterns make observed conditions readable without
+ * relying on colour alone.
+ */
+export const TRAFFIC_FLOW = {
+  observed: {
+    free: { label: 'Moving', color: MAP.ok, dashArray: undefined },
+    moderate: { label: 'Slower', color: '#D4A843', dashArray: '14 5' },
+    heavy: { label: 'Heavy', color: MAP.warn, dashArray: '7 5' },
+    stopped: { label: 'Stopped', color: MAP.danger, dashArray: '2 5' },
+    unknown: { label: 'Unknown', color: MAP.muted, dashArray: '4 5' },
+  },
+  baseline: {
+    low: { label: 'Low', color: '#A9CBE8', dashArray: '6 7' },
+    medium: { label: 'Medium', color: '#6FA4D2', dashArray: '6 7' },
+    high: { label: 'High', color: '#3D7EB8', dashArray: '6 7' },
+    very_high: { label: 'Very high', color: '#174F82', dashArray: '6 7' },
+    unknown: { label: 'Unknown', color: '#7E94A8', dashArray: '6 7' },
+  },
+} as const;

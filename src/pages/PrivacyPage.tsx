@@ -13,7 +13,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 
-const UPDATED = '24 August 2026';
+const UPDATED = '28 August 2026';
 const CONTACT = 'jorti104@mtroyal.ca';
 
 const T = {
@@ -202,6 +202,22 @@ export default function PrivacyPage() {
             </p>
           </Section>
 
+          <Section id="traffic-flow" title="Traffic flow and public cameras">
+            <p>
+              The traffic-flow layer is designed around roads, not people. When a live aggregate
+              provider is configured, Calgary Watch stores road-segment speeds, counts, confidence,
+              timestamps and road geometry. It rejects records containing device, trip, licence-plate,
+              face or vehicle identifiers. Until then, the layer is clearly labelled as an annual
+              traffic-volume baseline rather than live movement.
+            </p>
+            <p>
+              Public City traffic-camera images remain separate from flow measurements. Calgary Watch
+              does not perform licence-plate recognition, face recognition, cross-camera matching or
+              persistent vehicle tracking. Opening a camera requests that public still image from the
+              City camera host.
+            </p>
+          </Section>
+
           <Section id="third-parties" title="Who else is involved">
             <p>
               The service runs on Google Firebase (authentication, database, file storage and
@@ -224,7 +240,8 @@ export default function PrivacyPage() {
             <p>
               Separate Calgary Watch scheduled jobs retrieve attributed public information from
               Calgary 311, the Calgary Police newsroom, Environment Canada, Alberta Emergency
-              Alert, Global News Calgary, ENMAX and, when configured, 511 Alberta. Those server-side
+              Alert, Global News Calgary, ENMAX and, when configured, 511 Alberta and an aggregate
+              traffic-flow provider. Those server-side
               requests do not include information about site visitors.
             </p>
             <p>

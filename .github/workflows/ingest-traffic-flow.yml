@@ -1,0 +1,35 @@
+name: Ingest Aggregate Traffic Flow
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    # Avoid consuming a runner every five minutes before a provider exists.
+    # Manual runs remain available for setup verification.
+    if: github.event_name == 'workflow_dispatch' || vars.TRAFFIC_FLOW_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish privacy-safe traffic snapshot
+        run: npx tsx scripts/ingest/traffic-flow.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          TRAFFIC_FLOW_URL: ${{ secrets.TRAFFIC_FLOW_URL }}
+          TRAFFIC_FLOW_TOKEN: ${{ secrets.TRAFFIC_FLOW_TOKEN }}
+          TRAFFIC_FLOW_SOURCE: ${{ vars.TRAFFIC_FLOW_SOURCE }}
+          TRAFFIC_FLOW_PUBLIC_URL: ${{ vars.TRAFFIC_FLOW_PUBLIC_URL }}

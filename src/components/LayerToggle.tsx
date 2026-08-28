@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CrimeStatEntry } from '@/src/hooks/useCrimeStats';
-import { Layers, Activity, Map as MapIcon, ShieldCheck, Video, Camera, X } from 'lucide-react';
+import { Layers, Activity, Map as MapIcon, ShieldCheck, Video, Camera, Gauge, X } from 'lucide-react';
+import type { TrafficFlowMode } from '@/src/types/trafficFlow';
+import { TRAFFIC_FLOW } from '@/src/lib/tokens';
 import { cn } from '@/src/lib/utils';
 
 interface LayerToggleProps {
@@ -14,6 +16,13 @@ interface LayerToggleProps {
   setShowCameras: (show: boolean) => void;
   showSafetyCameras: boolean;
   setShowSafetyCameras: (show: boolean) => void;
+  showTrafficFlow: boolean;
+  setShowTrafficFlow: (show: boolean) => void;
+  trafficFlowMode?: TrafficFlowMode;
+  trafficSegmentCount?: number;
+  trafficFlowStale?: boolean;
+  trafficFlowLoading?: boolean;
+  trafficFlowError?: string | null;
   isPinMode?: boolean;
   /** Drives the concern-index key — this bar's own legend, docked to it. */
   crimeStats?: Map<string, CrimeStatEntry>;
@@ -38,17 +47,17 @@ function OverlayRow({
       data-tour={tourTarget}
       onClick={onToggle}
       aria-pressed={on}
-      className="flex w-full items-center gap-3 border-[1.5px] border-transparent px-2.5 py-2 text-left transition-colors hover:border-[#C9D8E4] hover:bg-[#E8F3FC]"
+      className="flex min-h-12 w-full items-center gap-3 border-[1.5px] border-transparent px-2.5 py-1.5 text-left transition-colors hover:border-[#C9D8E4] hover:bg-[#E8F3FC] active:bg-[#DCECF8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#4A90D9]"
     >
       <span
-        className={cn('grid h-8 w-8 shrink-0 place-items-center transition-colors',
+        className={cn('grid h-10 w-10 shrink-0 place-items-center transition-colors',
           on ? 'bg-[#06162F] text-[#F2EFE8]' : 'bg-[#E8F3FC] text-[#40566B]')}
       >
         {icon}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-[#0B1F33]">{label}</span>
-        <span className="mt-0.5 block text-[10.5px] text-[#52697D]">{meta}</span>
+        <span className="mt-0.5 block text-[12px] leading-snug text-[#52697D] md:text-[11px]">{meta}</span>
       </span>
       <span
         className={cn('relative h-5 w-9 shrink-0 transition-colors',
@@ -86,6 +95,13 @@ export default function LayerToggle({
   setShowCameras,
   showSafetyCameras,
   setShowSafetyCameras,
+  showTrafficFlow,
+  setShowTrafficFlow,
+  trafficFlowMode,
+  trafficSegmentCount = 0,
+  trafficFlowStale = false,
+  trafficFlowLoading = false,
+  trafficFlowError = null,
   isPinMode = false,
   crimeStats,
   tourTarget,
@@ -148,12 +164,15 @@ export default function LayerToggle({
   if (isPinMode) return null;
 
   const chip =
-    'flex min-h-9 shrink-0 items-center gap-1.5 px-3 font-mono uppercase transition-[background-color,color,transform] active:scale-[0.98] max-lg:flex-1 max-lg:justify-center md:gap-2 md:px-4';
+    'flex min-h-11 shrink-0 items-center gap-1 px-2 font-mono uppercase transition-[background-color,color,transform] duration-200 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#4A90D9] max-lg:flex-1 max-lg:justify-center md:gap-2 md:px-4 lg:min-h-9';
   const on = 'bg-[#06162F] text-[#F2EFE8]';
   const off = 'text-[#40566B] hover:bg-[#E8F3FC]';
 
   /** Count of supplementary layers currently on, surfaced on the Layers chip. */
-  const extrasOn = (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0);
+  const extrasOn = (showCameras ? 1 : 0) + (showSafetyCameras ? 1 : 0) + (showTrafficFlow ? 1 : 0);
+  const closeMenuOnTouch = () => {
+    if (window.matchMedia('(max-width: 767px), (pointer: coarse)').matches) setMenuOpen(false);
+  };
 
   return (
     <div
@@ -217,20 +236,58 @@ export default function LayerToggle({
         </div>
       )}
 
+      {showTrafficFlow && (
+        <div
+          className="mb-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.98)] px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg"
+          role="group"
+          aria-label={trafficFlowMode === 'baseline' ? 'Typical road demand key' : 'Traffic flow key'}
+          aria-live="polite"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#40566B]">
+              {trafficFlowLoading ? 'Loading roads…' : trafficFlowError && trafficSegmentCount === 0 ? 'Traffic data unavailable' : trafficFlowMode === 'baseline' ? 'Typical demand · not live' : trafficFlowStale ? 'Traffic flow · stale' : 'Traffic flow'}
+            </p>
+            {trafficSegmentCount > 0 && <span className="text-[11px] font-bold text-[#52697D]">{trafficSegmentCount} roads</span>}
+          </div>
+          {trafficFlowLoading ? (
+            <div className="mt-2 grid grid-cols-4 gap-2" role="status">
+              <span className="sr-only">Loading traffic roads</span>
+              {[0, 1, 2, 3].map((item) => <span key={item} className="h-5 animate-pulse bg-[#E8F3FC] motion-reduce:animate-none" />)}
+            </div>
+          ) : trafficFlowError && trafficSegmentCount === 0 ? (
+            <p className="mt-1.5 text-[12px] leading-snug text-[#40566B]">The source could not be reached. The layer will retry automatically.</p>
+          ) : (
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {(trafficFlowMode === 'baseline'
+                ? Object.values(TRAFFIC_FLOW.baseline).slice(0, 4)
+                : Object.values(TRAFFIC_FLOW.observed).slice(0, 4)
+              ).map((item) => (
+                <span key={item.label} className="min-w-0">
+                  <svg className="h-2 w-full" viewBox="0 0 48 6" preserveAspectRatio="none" aria-hidden="true">
+                    <line x1="1" y1="3" x2="47" y2="3" stroke={item.color} strokeWidth="4" strokeDasharray={item.dashArray} strokeLinecap="round" />
+                  </svg>
+                  <span className="mt-0.5 block truncate text-[10.5px] font-bold text-[#40566B]">{item.label}</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Supplementary layers, opened from the Layers chip. */}
       {menuOpen && (
         <div
-          className="mb-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.98)] p-2 shadow-[0_10px_28px_rgba(11,31,51,0.20)] backdrop-blur-lg"
+          className="mb-2 max-h-[min(52dvh,24rem)] overflow-y-auto border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.98)] p-2 shadow-[0_4px_8px_rgba(11,31,51,0.20)] backdrop-blur-lg"
           role="group"
           aria-label="Additional map layers"
         >
-          <div className="-mx-2 -mt-2 mb-1.5 flex items-center justify-between bg-[#06162F] px-3 py-2">
+          <div className="-mx-2 -mt-2 mb-1.5 flex min-h-11 items-center justify-between bg-[#06162F] pl-3 pr-1">
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#AFC5DF]">More layers</span>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
               aria-label="Close layers menu"
-              className="grid h-6 w-6 place-items-center text-[#F2EFE8] hover:bg-[rgba(242,239,232,0.16)]"
+              className="grid h-11 w-11 place-items-center text-[#F2EFE8] transition-colors hover:bg-[rgba(242,239,232,0.16)] active:bg-[rgba(242,239,232,0.24)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#AFC5DF]"
             >
               <X size={13} />
             </button>
@@ -238,19 +295,28 @@ export default function LayerToggle({
 
           <div className="space-y-0.5">
             <OverlayRow
+              icon={<Gauge size={15} />}
+              label="Traffic flow"
+              meta={trafficFlowLoading ? 'Loading road segments…' : trafficFlowError && trafficSegmentCount === 0 ? 'Source temporarily unavailable' : trafficFlowMode === 'baseline'
+                ? `${trafficSegmentCount || 'City'} roads · typical demand`
+                : trafficFlowStale ? `${trafficSegmentCount} roads · update delayed` : `${trafficSegmentCount || 'Live'} road segments`}
+              on={showTrafficFlow}
+              onToggle={() => { setShowTrafficFlow(!showTrafficFlow); closeMenuOnTouch(); }}
+            />
+            <OverlayRow
               icon={<Video size={15} />}
               label="Traffic cameras"
               tourTarget="traffic-cameras"
               meta="City of Calgary · live · zoom in"
               on={showCameras}
-              onToggle={() => setShowCameras(!showCameras)}
+              onToggle={() => { setShowCameras(!showCameras); closeMenuOnTouch(); }}
             />
             <OverlayRow
               icon={<Camera size={15} />}
               label="Safety cameras"
               meta="57 fixed · red light and speed"
               on={showSafetyCameras}
-              onToggle={() => setShowSafetyCameras(!showSafetyCameras)}
+              onToggle={() => { setShowSafetyCameras(!showSafetyCameras); closeMenuOnTouch(); }}
             />
           </div>
         </div>
@@ -265,7 +331,7 @@ export default function LayerToggle({
           aria-expanded={menuOpen}
           aria-label="More map layers"
           className={cn(
-            'relative flex min-h-9 shrink-0 items-center gap-1.5 px-2.5 transition-colors active:scale-[0.98] md:px-3',
+            'relative flex min-h-11 shrink-0 items-center gap-1.5 px-2.5 transition-colors duration-200 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#4A90D9] md:px-3 lg:min-h-9',
             menuOpen || extrasOn > 0 ? on : off,
           )}
         >
@@ -278,18 +344,18 @@ export default function LayerToggle({
 
         <span className="h-6 w-px shrink-0 bg-[#C9D8E4]" aria-hidden="true" />
 
-        <button type="button" onClick={() => setShowLiveReports(!showLiveReports)} className={cn(chip, showLiveReports ? on : off)}>
+        <button type="button" aria-pressed={showLiveReports} onClick={() => setShowLiveReports(!showLiveReports)} className={cn(chip, showLiveReports ? on : off)}>
           <Activity size={14} className="max-lg:shrink-0" />
           <span className="text-[10px] font-bold tracking-[0.1em] md:text-[11px]">Live</span>
           <span className="hidden font-bold text-[11px] tracking-[0.1em] md:inline">&nbsp;Reports</span>
         </button>
 
-        <button type="button" onClick={() => setShowHeatmap(!showHeatmap)} className={cn(chip, showHeatmap ? on : off)}>
+        <button type="button" aria-pressed={showHeatmap} onClick={() => setShowHeatmap(!showHeatmap)} className={cn(chip, showHeatmap ? on : off)}>
           <MapIcon size={14} className="max-lg:shrink-0" />
           <span className="text-[10px] font-bold tracking-[0.1em] md:text-[11px]">Heatmap</span>
         </button>
 
-        <button type="button" onClick={() => setShowCrimeLayer(!showCrimeLayer)} className={cn(chip, showCrimeLayer ? on : off)}>
+        <button type="button" aria-pressed={showCrimeLayer} onClick={() => setShowCrimeLayer(!showCrimeLayer)} className={cn(chip, showCrimeLayer ? on : off)}>
           <ShieldCheck size={14} className="max-lg:shrink-0" />
           <span className="text-[10px] font-bold tracking-[0.1em] md:text-[11px]">Crime</span>
           <span className="hidden font-bold text-[11px] tracking-[0.1em] md:inline">&nbsp;Stats</span>

@@ -27,6 +27,7 @@ The platform combines these data layers:
 - **Calgary & Edmonton Open Data** — service requests, bylaw, 311, and crime statistics via SODA API
 - **Statistics Canada Baselines** — annual crime data for RCMP-policed towns (Airdrie, Cochrane, Okotoks, Canmore, High River, Strathmore, Chestermere)
 - **ENMAX Power Outages** — live Calgary electricity outages, shown as an opt-in official layer separate from community reports
+- **Traffic Flow** — privacy-safe aggregate road conditions when a provider is configured, with an explicitly labelled annual-volume fallback
 
 ---
 
@@ -154,6 +155,39 @@ npm test                                                  # normalization + clas
 
 **Firestore cost:** 1 document write per run (~288/day, free tier 20k) and 1
 document read per visitor who switches the layer on.
+
+### Aggregate Traffic Flow
+
+The optional traffic-flow pipeline publishes one normalized snapshot to
+`live_data/traffic_flow` every five minutes. The public document contains only
+road geometry, aggregate speed/count, confidence, trend, freshness and source
+attribution. Provider records containing device, trip, plate, face, trajectory
+or vehicle identifiers are rejected rather than sanitized after publication.
+
+Until a provider is configured, the public layer fetches Calgary's annual road
+volume dataset and labels it **Typical demand · not live**. This keeps the
+feature useful without representing annual counts as live movement.
+
+Provider payloads may be an array, `{ "segments": [] }`, or a GeoJSON Feature
+Collection. Common field aliases are accepted for segment ID, road name,
+average speed, free-flow speed, vehicle count, confidence, trend and timestamp.
+Coordinates default to GeoJSON `[longitude, latitude]`; an array payload can set
+`coordinateOrder: "lat_lng"` on a segment when required.
+
+```bash
+FIREBASE_SERVICE_ACCOUNT='{...}' \
+TRAFFIC_FLOW_URL='https://provider.example/aggregate-segments' \
+TRAFFIC_FLOW_TOKEN='{optional bearer token}' \
+TRAFFIC_FLOW_SOURCE='Provider display name' \
+npm run ingest:traffic-flow
+```
+
+`TRAFFIC_FLOW_URL` and `TRAFFIC_FLOW_TOKEN` belong in GitHub Actions secrets.
+`TRAFFIC_FLOW_SOURCE` and the optional `TRAFFIC_FLOW_PUBLIC_URL` attribution page
+belong in repository variables. Set the repository variable
+`TRAFFIC_FLOW_ENABLED=true` after the provider is ready; until then scheduled
+runs consume no runner time, while manual setup runs remain available. The fetch URL is never written to Firestore,
+because vendor URLs sometimes contain credentials in their query strings.
 
 ### Moderation Suppression
 

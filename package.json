@@ -13,6 +13,7 @@
     "lint": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "ingest:outages": "tsx scripts/ingest/power-outages.ts",
+    "ingest:traffic-flow": "tsx scripts/ingest/traffic-flow.ts",
     "backfill:visibility": "tsx scripts/backfill-visibility.ts",
     "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
     "digest:weekly": "tsx scripts/digest/weekly.ts",

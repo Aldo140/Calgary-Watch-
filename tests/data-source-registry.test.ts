@@ -10,6 +10,7 @@ import {
 
 const ingest = readFileSync('scripts/ingest/index.ts', 'utf8');
 const outages = readFileSync('scripts/ingest/power-outages.ts', 'utf8');
+const trafficFlow = readFileSync('scripts/ingest/traffic-flow.ts', 'utf8');
 const rss = readFileSync('scripts/ingest/sources/rss.ts', 'utf8');
 const adminHook = readFileSync('src/hooks/useAdminData.ts', 'utf8');
 const adminPage = readFileSync('src/pages/AdminPage.tsx', 'utf8');
@@ -33,9 +34,10 @@ describe('operational data-source registry', () => {
       'calgary_311', 'calgary_police_news', 'environment_canada',
       'alberta_emergency', 'global_news', 'alberta_511', 'enmax_outages',
     ];
-    assert.deepEqual(SCHEDULED_DATA_SOURCES.map((source) => source.id), [...incidentExpected, 'resend_inbound']);
+    assert.deepEqual(SCHEDULED_DATA_SOURCES.map((source) => source.id), [...incidentExpected, 'aggregate_traffic_flow', 'resend_inbound']);
     for (const id of incidentExpected.slice(0, -1)) assert.match(ingest, new RegExp(`id: '${id}'`));
     assert.match(outages, /doc\('enmax_outages'\)/);
+    assert.match(trafficFlow, /doc\(SOURCE_ID\)/);
   });
 
   it('gives every direct layer a browser-safe probe', () => {
@@ -53,6 +55,7 @@ describe('source health contract', () => {
   it('persists actual scheduled results and makes them admin-readable only', () => {
     assert.match(ingest, /collection\('ingestion_health'\)/);
     assert.match(outages, /collection\('ingestion_health'\)/);
+    assert.match(trafficFlow, /collection\('ingestion_health'\)/);
     assert.match(rules, /match \/ingestion_health\/\{sourceId\}[\s\S]*?allow read: if isAdmin\(\);[\s\S]*?allow write: if false;/);
   });
 

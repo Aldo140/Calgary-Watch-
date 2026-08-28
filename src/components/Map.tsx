@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 're
 import L from 'leaflet';
 import type { TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import type { SafetyCamera } from '@/src/hooks/useSafetyCameras';
+import type { TrafficSegmentState } from '@/src/types/trafficFlow';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -13,6 +14,7 @@ if (typeof window !== 'undefined') {
 import { CALGARY_CENTER } from '@/src/constants';
 import { Incident } from '@/src/types';
 import { cn } from '@/src/lib/utils';
+import { TRAFFIC_FLOW } from '@/src/lib/tokens';
 
 interface MapProps {
   incidents: Incident[];
@@ -31,9 +33,13 @@ interface MapProps {
   trafficCameras?: TrafficCamera[];
   /** Intersection safety cameras — the ones that issue tickets. */
   safetyCameras?: SafetyCamera[];
+  /** Privacy-safe aggregate road states, rendered as coloured polylines. */
+  trafficSegments?: TrafficSegmentState[];
+  selectedTrafficSegmentId?: string | null;
   crimeStats?: Map<string, { crime: number; disorder: number; year: number }>;
   /** A camera pin was tapped — the page opens the large viewer. */
   onCameraSelect?: (camera: TrafficCamera) => void;
+  onTrafficSegmentSelect?: (segment: TrafficSegmentState) => void;
   isMapInteractive?: boolean;
 }
 
@@ -53,7 +59,7 @@ export interface MapRef {
   clearUserLocation: () => void;
 }
 
-const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, safetyCameras, crimeStats, onCameraSelect, isMapInteractive = true }, ref) => {
+const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick, onViewNeighborhood, onViewIncident, showLiveReports, showHeatmap, isPinMode = false, onPinConfirm, onPinCancel, showCrimeLayer = false, trafficCameras, safetyCameras, trafficSegments, selectedTrafficSegmentId, crimeStats, onCameraSelect, onTrafficSegmentSelect, isMapInteractive = true }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<{ [key: string]: L.Marker }>({});
@@ -61,6 +67,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const heatmapLayer = useRef<any>(null);
   const cameraLayer = useRef<L.LayerGroup | null>(null);
   const safetyCameraLayer = useRef<L.LayerGroup | null>(null);
+  const trafficFlowLayer = useRef<L.LayerGroup | null>(null);
   const baseTileLayer = useRef<L.TileLayer | null>(null);
   const popup = useRef<L.Popup | null>(null);
   const serviceAreaLayer = useRef<L.LayerGroup | null>(null);
@@ -83,12 +90,14 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const onPinConfirmRef = useRef(onPinConfirm);
   const onMapClickRef = useRef(onMapClick);
   const onCameraSelectRef = useRef(onCameraSelect);
+  const onTrafficSegmentSelectRef = useRef(onTrafficSegmentSelect);
 
   // Update refs on every render (no dep array → always current)
   useEffect(() => { isPinModeRef.current = isPinMode; });
   useEffect(() => { onPinConfirmRef.current = onPinConfirm; });
   useEffect(() => { onMapClickRef.current = onMapClick; });
   useEffect(() => { onCameraSelectRef.current = onCameraSelect; });
+  useEffect(() => { onTrafficSegmentSelectRef.current = onTrafficSegmentSelect; });
 
   useEffect(() => {
     incidentsRef.current = incidents;
@@ -884,6 +893,59 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       heatmapLayer.current = null;
     }
   }, [incidents, showLiveReports, showHeatmap, onMarkerClick, isMapLoaded, isHeatPluginReady]);
+
+  /**
+   * Aggregate traffic-flow layer. Solid lines are current/estimated readings;
+   * dashed blue lines are the explicitly non-live annual-demand fallback.
+   */
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+    if (trafficFlowLayer.current) {
+      map.current.removeLayer(trafficFlowLayer.current);
+      trafficFlowLayer.current = null;
+    }
+    if (!trafficSegments || trafficSegments.length === 0) return;
+
+    let flowPane = map.current.getPane('trafficFlowPane');
+    if (!flowPane) {
+      flowPane = map.current.createPane('trafficFlowPane');
+      // Above polygon overlays such as community statistics, below markers.
+      flowPane.style.zIndex = '430';
+    }
+
+    const lines = trafficSegments.map((segment) => {
+      const baseline = segment.mode === 'baseline';
+      const visual = baseline ? TRAFFIC_FLOW.baseline[segment.demand] : TRAFFIC_FLOW.observed[segment.condition];
+      const selected = segment.id === selectedTrafficSegmentId;
+      const line = L.polyline(segment.geometry, {
+        pane: 'trafficFlowPane',
+        color: visual.color,
+        weight: selected ? 10 : baseline ? 5 : 7,
+        opacity: selected ? 1 : baseline ? 0.72 : 0.84,
+        dashArray: visual.dashArray,
+        lineCap: 'round',
+        lineJoin: 'round',
+        bubblingMouseEvents: false,
+      });
+      line.on('click', () => onTrafficSegmentSelectRef.current?.(segment));
+      const tooltip = document.createElement('span');
+      tooltip.textContent = baseline
+        ? `${segment.name} · ${segment.demand.replace('_', ' ')} typical demand`
+        : `${segment.name} · ${segment.condition} traffic`;
+      line.bindTooltip(tooltip, { sticky: true, direction: 'top', opacity: 0.96 });
+      return line;
+    });
+
+    const group = L.layerGroup(lines).addTo(map.current);
+    trafficFlowLayer.current = group;
+
+    return () => {
+      if (map.current && trafficFlowLayer.current) {
+        map.current.removeLayer(trafficFlowLayer.current);
+        trafficFlowLayer.current = null;
+      }
+    };
+  }, [trafficSegments, selectedTrafficSegmentId, isMapLoaded]);
 
   /**
    * Traffic camera layer.

@@ -31,6 +31,9 @@ import type { AirZoneReading } from '@/src/lib/airQuality';
 import { useRiverLevels } from '@/src/hooks/useRiverLevels';
 import { useTrafficCameras, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import CameraViewer from '@/src/components/CameraViewer';
+import TrafficFlowPanel from '@/src/components/TrafficFlowPanel';
+import { useTrafficFlow } from '@/src/hooks/useTrafficFlow';
+import type { TrafficSegmentState } from '@/src/types/trafficFlow';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
 import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMatches, rankFullTextMatches } from '@/src/lib/address';
 import { categoryColor } from '@/src/lib/tokens';
@@ -689,12 +692,15 @@ export default function MapPage() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showCameras, setShowCameras] = useState(false);
   const [showSafetyCameras, setShowSafetyCameras] = useState(false);
+  const [showTrafficFlow, setShowTrafficFlow] = useState(false);
   const [briefingOpen, setBriefingOpen] = useState(false);
   const [showCrimeLayer, setShowCrimeLayer] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [nearMeOpen, setNearMeOpen] = useState(false);
   /** The camera pin a reader tapped, or null when the viewer is closed. */
   const [viewerCamera, setViewerCamera] = useState<TrafficCamera | null>(null);
+  const [selectedTrafficSegment, setSelectedTrafficSegment] = useState<TrafficSegmentState | null>(null);
+  const trafficFlow = useTrafficFlow(showTrafficFlow);
   // Only fetched once the layer is switched on.
   // Also loaded when an incident is open, so its detail panel can show a
   // camera overlooking that spot. One request, cached for the session.
@@ -706,7 +712,7 @@ export default function MapPage() {
     // live frame the moment someone declares their location.
     // The viewer keeps them loaded while it is open so its walk-through has
     // neighbours to step to even if the layer is switched off underneath it.
-    showCameras || Boolean(selectedIncident) || Boolean(viewerCamera),
+    showCameras || Boolean(selectedIncident) || Boolean(viewerCamera) || Boolean(selectedTrafficSegment),
   );
   // Also loaded for the personal briefing, which counts them near a saved address.
   const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
@@ -2751,11 +2757,18 @@ export default function MapPage() {
           showCrimeLayer={showCrimeLayer}
           trafficCameras={showCameras ? trafficCameras : undefined}
           safetyCameras={showSafetyCameras ? safetyCameras : undefined}
+          trafficSegments={showTrafficFlow ? trafficFlow.snapshot?.segments : undefined}
+          selectedTrafficSegmentId={selectedTrafficSegment?.id}
           crimeStats={crimeStats}
           isPinMode={isPinMode || isEmergencyPinMode}
           onPinConfirm={isEmergencyPinMode ? handleEmergencyPinConfirm : handlePinConfirm}
           onPinCancel={isEmergencyPinMode ? handleEmergencyPinCancel : handlePinCancel}
           onCameraSelect={setViewerCamera}
+          onTrafficSegmentSelect={(segment) => {
+            setSelectedTrafficSegment(segment);
+            setSelectedIncident(null);
+            setSelectedArea(null);
+          }}
           isMapInteractive={!isFormOpen || isPinMode || isEmergencyPinMode || isEmergencyOpen}
         />
 
@@ -3577,6 +3590,16 @@ export default function MapPage() {
           setShowCameras={setShowCameras}
           showSafetyCameras={showSafetyCameras}
           setShowSafetyCameras={setShowSafetyCameras}
+          showTrafficFlow={showTrafficFlow}
+          setShowTrafficFlow={(show) => {
+            setShowTrafficFlow(show);
+            if (!show) setSelectedTrafficSegment(null);
+          }}
+          trafficFlowMode={trafficFlow.snapshot?.mode}
+          trafficSegmentCount={trafficFlow.snapshot?.segments.length ?? 0}
+          trafficFlowStale={trafficFlow.stale}
+          trafficFlowLoading={trafficFlow.loading || (showTrafficFlow && !trafficFlow.snapshot && !trafficFlow.error)}
+          trafficFlowError={trafficFlow.error}
           showCrimeLayer={showCrimeLayer}
           setShowCrimeLayer={setShowCrimeLayer}
           crimeStats={crimeStats}
@@ -3613,6 +3636,15 @@ export default function MapPage() {
           onViewNeighborhood={handleViewNeighborhood}
           onReportIncident={handleReportFromIncident}
           trafficCameras={trafficCameras}
+        />
+        <TrafficFlowPanel
+          segment={selectedTrafficSegment}
+          cameras={trafficCameras}
+          onClose={() => setSelectedTrafficSegment(null)}
+          onOpenCamera={(camera) => {
+            setViewerCamera(camera);
+            mapRef.current?.flyTo(camera.lat, camera.lng, 15);
+          }}
         />
         <AreaIntelligencePanel
           data={selectedArea}

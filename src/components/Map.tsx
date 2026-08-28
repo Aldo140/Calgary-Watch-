@@ -6,6 +6,9 @@ import type { TrafficSegmentState } from '@/src/types/trafficFlow';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import type { MaplibreGL } from '@maplibre/maplibre-gl-leaflet';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
 // Expose Leaflet globally for plugins
 if (typeof window !== 'undefined') {
@@ -15,6 +18,7 @@ import { CALGARY_CENTER } from '@/src/constants';
 import { Incident } from '@/src/types';
 import { cn } from '@/src/lib/utils';
 import { TRAFFIC_FLOW } from '@/src/lib/tokens';
+import { createCalgaryWatchPositronStyle, OPENFREEMAP_POSITRON_STYLE_URL } from '@/src/lib/mapBasemap';
 
 interface MapProps {
   incidents: Incident[];
@@ -68,7 +72,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
   const cameraLayer = useRef<L.LayerGroup | null>(null);
   const safetyCameraLayer = useRef<L.LayerGroup | null>(null);
   const trafficFlowLayer = useRef<L.LayerGroup | null>(null);
-  const baseTileLayer = useRef<L.TileLayer | null>(null);
+  const baseMapLayer = useRef<L.Layer | null>(null);
   const popup = useRef<L.Popup | null>(null);
   const serviceAreaLayer = useRef<L.LayerGroup | null>(null);
   const serviceAreaBounds = useRef<L.LatLngBounds | null>(null);
@@ -276,6 +280,9 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     if (map.current || !mapContainer.current) return;
     const containerEl = mapContainer.current;
     let popupClickHandler: ((e: Event) => void) | null = null;
+    let basemapCancelled = false;
+    let basemapTimeout: number | null = null;
+    let vectorBaseLayer: InstanceType<typeof MaplibreGL> | null = null;
 
     try {
       // Initialize Leaflet map
@@ -292,19 +299,83 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         map.current.zoomControl.setPosition('bottomleft');
       }
 
-            // CARTO Voyager rather than Positron ("light_all"). Positron is a near
-      // greyscale wash designed to disappear under dense data — on a phone,
-      // outdoors, it read as a blank sheet with pins on it, and gave a reader
-      // no way to orient themselves between the pins. Voyager keeps the same
-      // light, low-contrast base but restores the things people navigate by:
-      // green parks, blue river, legible road hierarchy. The Bow becoming
-      // visible matters more here than anywhere — Calgary is a city people
-      // describe in relation to it. OSM's standard layer is keyless and keeps
-      // the public map independent of a CARTO account or browser token.
-      baseTileLayer.current = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Start with a dependable raster canvas, then promote the modern vector
+      // basemap only after it has loaded. Users never see an empty map when
+      // WebGL, the style request, or OpenFreeMap is unavailable.
+      const fallbackLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map.current);
+      baseMapLayer.current = fallbackLayer;
+
+      const loadModernBasemap = async () => {
+        try {
+          const response = await fetch(OPENFREEMAP_POSITRON_STYLE_URL);
+          if (!response.ok) return;
+          const providerStyle = await response.json();
+          if (basemapCancelled || !map.current) return;
+
+          // Keep the heavier vector renderer off the initial map-page path.
+          // The raster canvas is interactive immediately while this downloads.
+          const [{ maplibreGL }, { setWorkerUrl }] = await Promise.all([
+            import('@maplibre/maplibre-gl-leaflet'),
+            import('maplibre-gl'),
+          ]);
+          if (basemapCancelled || !map.current) return;
+          setWorkerUrl(maplibreWorkerUrl);
+
+          vectorBaseLayer = maplibreGL({
+            style: createCalgaryWatchPositronStyle(providerStyle),
+            interactive: false,
+            attributionControl: {
+              customAttribution: 'OpenFreeMap © OpenMapTiles · Data © OpenStreetMap contributors',
+            },
+          }).addTo(map.current);
+
+          const vectorMap = vectorBaseLayer.getMaplibreMap();
+          vectorBaseLayer.getContainer().style.zIndex = '2';
+          let resourceFailures = 0;
+          let promoted = false;
+
+          const restoreFallback = () => {
+            if (basemapCancelled || !map.current || !vectorBaseLayer) return;
+            vectorBaseLayer.remove();
+            vectorBaseLayer = null;
+            if (!map.current.hasLayer(fallbackLayer)) fallbackLayer.addTo(map.current);
+            baseMapLayer.current = fallbackLayer;
+          };
+
+          vectorMap.on('error', () => {
+            resourceFailures += 1;
+            if (resourceFailures >= 3) restoreFallback();
+          });
+
+          const promoteVectorBasemap = () => {
+            if (basemapCancelled || !map.current || !vectorBaseLayer) return;
+            promoted = true;
+            if (basemapTimeout !== null) window.clearTimeout(basemapTimeout);
+            fallbackLayer.remove();
+            baseMapLayer.current = vectorBaseLayer;
+          };
+
+          // With an in-memory style MapLibre can finish its first load during
+          // the Leaflet adapter's addTo() call. Check synchronously, then keep
+          // both lifecycle events as guards for slower devices and networks.
+          if (vectorMap.loaded()) promoteVectorBasemap();
+          else {
+            vectorMap.once('load', promoteVectorBasemap);
+            vectorMap.once('idle', promoteVectorBasemap);
+          }
+
+          basemapTimeout = window.setTimeout(() => {
+            if (!promoted) restoreFallback();
+          }, 10_000);
+        } catch {
+          // The raster layer is already visible and intentionally needs no key.
+        }
+      };
+
+      void loadModernBasemap();
 
       // Use refs so this single handler always calls the latest callbacks.
       // (Leaflet handlers set up here can't close over changing React props.)
@@ -345,6 +416,8 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
     }
 
     return () => {
+      basemapCancelled = true;
+      if (basemapTimeout !== null) window.clearTimeout(basemapTimeout);
       if (popupClickHandler) {
         containerEl.removeEventListener('click', popupClickHandler);
       }
@@ -352,6 +425,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       clusterGroup.current = null;
       map.current?.remove();
       map.current = null;
+      baseMapLayer.current = null;
     };
   }, []);
 
@@ -1072,7 +1146,7 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
         : '';
 
       return L.marker([cam.lat, cam.lng], { icon, zIndexOffset: -400 }).bindPopup(
-        `<div style="width:224px;font-family:Inter,system-ui,sans-serif">
+        `<div style="width:224px;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.14em;
                        text-transform:uppercase;color:#C77F18">Safety camera</div>
            <div style="font-weight:800;font-size:13px;color:#0B1F33;line-height:1.3;margin-top:3px">${cam.intersection}</div>

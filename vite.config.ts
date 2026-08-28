@@ -22,6 +22,12 @@ export default defineConfig(() => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    // MapLibre's Vite worker URL must be emitted by the worker pipeline rather
+    // than folded into the dependency optimizer, or a fresh dev install can
+    // briefly point at a worker file that does not exist.
+    optimizeDeps: {
+      exclude: ['maplibre-gl'],
+    },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
     },

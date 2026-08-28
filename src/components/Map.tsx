@@ -299,11 +299,11 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       // light, low-contrast base but restores the things people navigate by:
       // green parks, blue river, legible road hierarchy. The Bow becoming
       // visible matters more here than anywhere — Calgary is a city people
-      // describe in relation to it. Same CDN, so the CSP is unchanged.
-      baseTileLayer.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20,
+      // describe in relation to it. OSM's standard layer is keyless and keeps
+      // the public map independent of a CARTO account or browser token.
+      baseTileLayer.current = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
       }).addTo(map.current);
 
       // Use refs so this single handler always calls the latest callbacks.

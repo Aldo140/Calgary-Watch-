@@ -1612,11 +1612,16 @@ export default function MapPage() {
     return visible.filter(i => i.category === selectedCategory || i.category === 'emergency');
   }, [incidents, selectedCategory]);
 
-  /** The feed's view of the world: category-independent, narrowed by time only. */
+  /**
+   * The report feed is Calgary-focused. Edmonton Open Data can still render as
+   * geographic context on the map, but never enters the desktop sidebar or the
+   * mobile sheet where noisy records could outrank local reports.
+   */
   const feedIncidents = useMemo(() => {
-    if (timeWindow === 'all') return incidents;
+    const localFeed = incidents.filter((incident) => incident.source_type !== 'edmonton_open_data');
+    if (timeWindow === 'all') return localFeed;
     const cutoff = Date.now() - (timeWindow === '24h' ? 24 : 24 * 7) * 60 * 60 * 1000;
-    return incidents.filter((i) => i.timestamp >= cutoff);
+    return localFeed.filter((incident) => incident.timestamp >= cutoff);
   }, [incidents, timeWindow]);
 
   /**

@@ -28,7 +28,7 @@ function stableRowId(prefix: string, upstreamId: string | undefined, ...parts: (
 // ── Bylaw classifier ─────────────────────────────────────────────────────────
 // complaint_category / type_of_complaint → IncidentCategory
 // Returns null to drop the row entirely (e.g. business licensing).
-function classifyBylaw(category: string, type: string): IncidentCategory | null {
+export function classifyEdmontonBylaw(category: string, type: string): IncidentCategory | null {
   const cat = category.toLowerCase();
   const typ = type.toLowerCase();
 
@@ -45,7 +45,9 @@ function classifyBylaw(category: string, type: string): IncidentCategory | null 
 
   if (/\b(snow|ice)\b/i.test(cat)) return 'weather';
 
-  if (/fire pit|firework|firecracker/i.test(typ)) return 'emergency';
+  // These are bylaw complaints, not active fire dispatches. Treating them as
+  // emergencies let routine Edmonton records outrank real Calgary alerts.
+  if (/fire pit|firework|firecracker/i.test(typ)) return 'crime';
 
   if (/property|development|maintenance/i.test(cat)) return 'infrastructure';
   if (/waste|dump|litter|obstruction/i.test(typ)) return 'infrastructure';
@@ -81,11 +83,39 @@ function classify311(serviceCategory: string, serviceDesc: string): IncidentCate
 
 // ── Traffic classifier ───────────────────────────────────────────────────────
 // activity_type / description → IncidentCategory
-function classifyTraffic(activityType: string, description: string): IncidentCategory {
+export function classifyEdmontonTraffic(activityType: string, description: string): IncidentCategory {
   if (/traffic incident/i.test(activityType)) return 'traffic';
   if (/special event/i.test(activityType)) return 'traffic';
-  if (/utility emergency/i.test(description)) return 'emergency';
+  // "Utility emergency" is the road-disruption label, not a public emergency.
+  if (/utility emergency/i.test(description)) return 'infrastructure';
   return 'infrastructure'; // road construction, utility work, bridge work, etc.
+}
+
+const EDMONTON_CATEGORY_PRIORITY: Record<IncidentCategory, number> = {
+  crime: 0,
+  weather: 1,
+  infrastructure: 2,
+  traffic: 3,
+  emergency: 4,
+};
+
+/**
+ * Keep half of Edmonton's accepted API rows, deterministically. Crime leads the
+ * retained set; emergency-labelled rows are last as a defensive fallback for
+ * future upstream schema changes. Stable ordering prevents the visible map set
+ * from flickering between five-minute refreshes.
+ */
+export function curateEdmontonReports(rows: Incident[], retention = 0.5): Incident[] {
+  if (rows.length === 0 || retention <= 0) return [];
+  const target = Math.min(rows.length, Math.max(1, Math.round(rows.length * retention)));
+
+  return [...rows]
+    .sort((a, b) => (
+      EDMONTON_CATEGORY_PRIORITY[a.category] - EDMONTON_CATEGORY_PRIORITY[b.category]
+      || b.timestamp - a.timestamp
+      || a.id.localeCompare(b.id)
+    ))
+    .slice(0, target);
 }
 
 function toTitleCase(s: string): string {
@@ -113,7 +143,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
             const lat = parseFloat(row.latitude ?? '');
             const lng = parseFloat(row.longitude ?? '');
             if (isNaN(lat) || isNaN(lng)) continue;
-            const category = classifyBylaw(row.complaint_category ?? '', row.type_of_complaint ?? '');
+            const category = classifyEdmontonBylaw(row.complaint_category ?? '', row.type_of_complaint ?? '');
             if (!category) continue;
             const title = bylawTitle(row.complaint_category ?? 'Bylaw Complaint', row.type_of_complaint ?? '');
             const street = row.full_name_of_street ? ` on ${toTitleCase(row.full_name_of_street)}` : '';
@@ -190,7 +220,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
             const lng = coords[0];
             const lat = coords[1];
             if (isNaN(lat) || isNaN(lng)) continue;
-            const category = classifyTraffic(row.activity_type ?? '', row.description ?? '');
+            const category = classifyEdmontonTraffic(row.activity_type ?? '', row.description ?? '');
             const rawDesc = row.description ?? row.activity_type ?? 'Disruption';
             const title = toTitleCase(rawDesc);
             const street = row.on_street ? ` on ${toTitleCase(row.on_street)}` : '';
@@ -219,7 +249,7 @@ export function useEdmontonOpenData(isAuthReady: boolean): Incident[] {
         }
       } catch { /* silent */ }
 
-      if (!cancelled) setIncidents(results);
+      if (!cancelled) setIncidents(curateEdmontonReports(results));
     };
 
     fetchAll();

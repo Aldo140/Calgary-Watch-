@@ -79,9 +79,10 @@ interface IncidentDetailPanelProps {
   onClose: () => void;
   onViewNeighborhood: (neighborhood: string) => void;
   onReportIncident: (incident: Incident) => void;
+  onOpenCamera: (camera: TrafficCamera) => void;
 }
 
-export default function IncidentDetailPanel({ incident, trafficCameras, onClose, onViewNeighborhood, onReportIncident }: IncidentDetailPanelProps) {
+export default function IncidentDetailPanel({ incident, trafficCameras, onClose, onViewNeighborhood, onReportIncident, onOpenCamera }: IncidentDetailPanelProps) {
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false
   );
@@ -380,7 +381,43 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
 
             {/* ── Scrollable body ─────────────────────────────────────────── */}
             <div className={cn('flex-1 overflow-y-auto no-scrollbar', isMobileSheet ? 'px-5 py-5 space-y-6' : 'px-6 py-6 space-y-7')}>
-              {/* Description — first, it's what people opened this for */}
+              {nearbyCamera && (
+                <div className="space-y-2.5">
+                  <SectionLabel>Referenced camera nearby</SectionLabel>
+                  <button
+                    type="button"
+                    onClick={() => onOpenCamera(nearbyCamera.camera)}
+                    className="block w-full overflow-hidden text-left transition-opacity hover:opacity-95 active:opacity-90"
+                    style={{ border: `1px solid ${P.line}`, background: P.paper }}
+                  >
+                    <img
+                      src={`${nearbyCamera.camera.imageUrl}?t=${cameraStamp}`}
+                      alt={`Current City of Calgary traffic-camera view at ${nearbyCamera.camera.location}`}
+                      loading="eager"
+                      className="h-40 w-full object-cover sm:h-48"
+                      style={{ background: P.card }}
+                    />
+                    <span className="flex items-center justify-between gap-3 px-3.5 py-3">
+                      <span className="min-w-0">
+                        <span className="block text-[12.5px] font-black leading-tight" style={{ color: P.ink }}>
+                          {nearbyCamera.camera.location}
+                        </span>
+                        <span className="mt-0.5 block font-mono text-[10px] tracking-[0.04em]" style={{ color: P.soft }}>
+                          {Math.round(nearbyCamera.distanceM)} M AWAY · CURRENT VIEW
+                        </span>
+                        <span className="mt-1 block text-[11px] leading-snug" style={{ color: P.soft }}>
+                          Street context only—not footage of this report.
+                        </span>
+                      </span>
+                      <span className="inline-flex min-h-11 shrink-0 items-center gap-1.5 px-3 text-[11px] font-bold" style={{ background: P.ground, color: P.onGround }}>
+                        View <ArrowRight size={12} />
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {/* The report itself follows any directly referenced street view. */}
               <div className="space-y-2.5">
                 <SectionLabel>What was reported</SectionLabel>
                 <div className="relative rounded-none p-4 pl-5" style={{ background: P.card, borderTop: `1px solid ${P.line}`, borderRight: `1px solid ${P.line}`, borderBottom: `1px solid ${P.line}` }}>
@@ -390,42 +427,6 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   </p>
                 </div>
               </div>
-
-              {/*
-                A city camera overlooking this spot.
-                
-                Deliberately labelled as the current view, never as footage of
-                the report. The image is a live frame pulled now — for a
-                collision filed twenty minutes ago it may well show the scene,
-                but for a break-in from Tuesday it shows an empty street, and a
-                safety app must not let a reader mistake one for the other. The
-                distance is stated so they can judge how relevant it is.
-              */}
-              {nearbyCamera && (
-                <div className="space-y-2.5">
-                  <SectionLabel>Live view nearby</SectionLabel>
-                  <div className="rounded-none overflow-hidden" style={{ border: `1px solid ${P.line}` }}>
-                    <img
-                      src={`${nearbyCamera.camera.imageUrl}?t=${cameraStamp}`}
-                      alt={`Live City of Calgary traffic camera at ${nearbyCamera.camera.location}`}
-                      loading="lazy"
-                      className="w-full object-cover max-h-56" style={{ background: P.card }}
-                    />
-                    <div className="px-3 py-2.5 space-y-1" style={{ background: P.paper }}>
-                      <p className="text-[12.5px] font-black leading-tight" style={{ color: P.ink }}>
-                        {nearbyCamera.camera.location}
-                      </p>
-                      <p className="font-mono text-[10px] tracking-[0.06em]" style={{ color: P.soft }}>
-                        {Math.round(nearbyCamera.distanceM)} M AWAY · CITY OF CALGARY
-                        {nearbyCamera.camera.quadrant ? ` · ${nearbyCamera.camera.quadrant}` : ''}
-                      </p>
-                      <p className="text-[11px] leading-snug" style={{ color: P.soft }}>
-                        Current conditions at this intersection — not footage of this report.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {incident.image_url && (
                 <div className="space-y-2.5">

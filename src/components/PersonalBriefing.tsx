@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
-import { X, FileText, Camera, Video, Home, ArrowRight, Settings2, Compass, Sparkles, Wind } from 'lucide-react';
+import { X, FileText, Camera, Home, ArrowRight, Settings2, Compass, Sparkles, Wind, Eye } from 'lucide-react';
 import type { Incident } from '@/src/types';
 import { useHomeLocation } from '@/src/hooks/useHomeLocation';
 import {
@@ -19,6 +19,7 @@ import { useCountUp } from '@/src/hooks/useCountUp';
 import { publicAsset } from '@/src/lib/utils';
 import BriefingRadar, { bearingDegrees, type RadarPoint } from '@/src/components/BriefingRadar';
 import BriefingSparkline from '@/src/components/BriefingSparkline';
+import { curatePersonalStories } from '@/src/lib/reportCuration';
 
 /**
  * What one neighbour's corner of Calgary looks like this week.
@@ -148,6 +149,8 @@ interface PersonalBriefingProps {
   onOpenArea: () => void;
   onOpenSettings: () => void;
   onSelectIncident: (incident: Incident) => void;
+  /** Opens a referenced public camera in the full camera viewer. */
+  onOpenCamera: (camera: TrafficCamera) => void;
   /** Opens the map's 3 km flip-through, which this page links out to. */
   onOpenNearby: () => void;
 }
@@ -310,12 +313,64 @@ function ReportRow({
   );
 }
 
+const STORY_TONE: Record<Incident['category'], string> = {
+  emergency: T.clay,
+  crime: '#9B3A35',
+  weather: '#5F6599',
+  infrastructure: '#3E7180',
+  traffic: '#8A7430',
+};
+
+/** One of the two editorial leads: enough context to decide whether to open. */
+function FeaturedStory({
+  item, index, onOpen, still,
+}: {
+  item: { incident: Incident; distanceM: number };
+  index: number;
+  onOpen: () => void;
+  still: boolean;
+}) {
+  const { incident, distanceM } = item;
+  return (
+    <motion.li
+      initial={still ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: still ? 0 : 0.34 + index * 0.07, duration: 0.3, ease: 'easeOut' }}
+    >
+      <button
+        type="button"
+        onClick={onOpen}
+        className="w-full px-4 py-4 text-left transition-colors hover:bg-white/50 active:bg-white/70"
+        style={{ background: T.card, border: `1px solid ${T.edge}` }}
+      >
+        <span className="flex items-center justify-between gap-3">
+          <span className="text-[11px] font-extrabold" style={{ color: STORY_TONE[incident.category] }}>
+            {titleCase(incident.category)} · {sourceLabel(incident)}
+          </span>
+          <span className="shrink-0 font-mono text-[10px] font-bold tabular-nums" style={{ color: T.soft }}>
+            {formatDistance(distanceM)}
+          </span>
+        </span>
+        <span className="mt-1.5 block text-[16px] font-extrabold leading-snug" style={{ color: T.ink }}>
+          {incident.title}
+        </span>
+        <span className="mt-1.5 block line-clamp-3 text-[13px] leading-relaxed" style={{ color: T.soft }}>
+          {incident.description}
+        </span>
+        <span className="mt-2.5 inline-flex items-center gap-1 text-[11.5px] font-bold" style={{ color: T.deep2 }}>
+          Read full report <ArrowRight size={12} />
+        </span>
+      </button>
+    </motion.li>
+  );
+}
+
 // ── Page ────────────────────────────────────────────────────────────────────
 
 export default function PersonalBriefing({
   open, onClose, displayName, photoURL, address, communityName, uid, memberSince, digestOptIn,
   incidents, areaStats, airReading, safetyCameras, trafficCameras,
-  onOpenArea, onOpenSettings, onSelectIncident, onOpenNearby,
+  onOpenArea, onOpenSettings, onSelectIncident, onOpenCamera, onOpenNearby,
 }: PersonalBriefingProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const issuedAtRef = useRef<number>(Date.now());
@@ -352,14 +407,14 @@ export default function PersonalBriefing({
    * Every report the map carries, by distance from their door.
    *
    * Deliberately not restricted to community posts: police records, 311
-   * service requests, 511 road closures and utility outages are all things
-   * happening on their street, and excluding them is what made this section
-   * read empty on a block that plainly was not.
+   * service requests and utility outages can all carry useful local context.
+   * Routine traffic rows stay on the live map instead of overwhelming a
+   * personal report that is meant to be read, not scanned while commuting.
    */
   const byDistance = useMemo(() => {
     if (!home) return [];
     return incidents
-      .filter((i) => i.data_source !== 'demo' && Number.isFinite(i.lat) && Number.isFinite(i.lng))
+      .filter((i) => i.data_source !== 'demo' && i.category !== 'traffic' && Number.isFinite(i.lat) && Number.isFinite(i.lng))
       .map((incident) => ({ incident, distanceM: distanceMeters(home.lat, home.lng, incident.lat, incident.lng) }))
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [incidents, home]);
@@ -376,14 +431,16 @@ export default function PersonalBriefing({
       : null;
   }, [airReading]);
   const nearby = ring.items;
+  const stories = useMemo(() => curatePersonalStories(nearby, issuedAt), [nearby, issuedAt]);
+  const selectedStories = useMemo(() => [...stories.leads, ...stories.crimes], [stories]);
 
   const radarPoints = useMemo<RadarPoint[]>(() => {
     if (!home) return [];
-    return nearby.map(({ incident, distanceM }) => ({
+    return selectedStories.map(({ incident, distanceM }) => ({
       incident, distanceM,
       bearing: bearingDegrees(home.lat, home.lng, incident.lat, incident.lng),
     }));
-  }, [home, nearby]);
+  }, [home, selectedStories]);
 
   const nearbySafety = useMemo(
     () => (home ? findSafetyCamerasNear(home.lat, home.lng, safetyCameras, WALK_M) : []),
@@ -400,6 +457,37 @@ export default function PersonalBriefing({
 
   const latestValue = propertyData.length > 0 ? propertyData[propertyData.length - 1] : null;
   const band = areaStats ? bandFor(areaStats.rank, areaStats.count) : null;
+  const areaReportTotal = areaStats ? areaStats.crime + areaStats.disorder : 0;
+  const areaCrimeShare = areaReportTotal > 0 && areaStats
+    ? Math.round((areaStats.crime / areaReportTotal) * 100)
+    : 0;
+  const areaRankPercent = areaStats?.count
+    ? Math.max(1, Math.ceil((areaStats.rank / areaStats.count) * 100))
+    : 0;
+  const assessmentChange = propertyData.length >= 2
+    ? ((propertyData[propertyData.length - 1].avgValue - propertyData[0].avgValue) / Math.max(propertyData[0].avgValue, 1)) * 100
+    : null;
+  const communitySignals = useMemo(() => {
+    const signals: string[] = [];
+    if (areaStats && band) {
+      signals.push(
+        `${areaLabel} sits in the top ${areaRankPercent}% of Calgary communities by recorded crime and disorder volume—not by personal risk.`,
+      );
+      signals.push(
+        areaCrimeShare >= 50
+          ? `${areaCrimeShare}% of the recorded activity is classified as criminal offences; the rest is disorder calls.`
+          : `Disorder calls make up ${100 - areaCrimeShare}% of recorded activity, more than criminal offences.`,
+      );
+    }
+    if (assessmentChange !== null && Math.abs(assessmentChange) >= 0.5) {
+      const firstYear = propertyData[0].year;
+      const lastYear = propertyData[propertyData.length - 1].year;
+      signals.push(
+        `Average assessed home value ${assessmentChange > 0 ? 'rose' : 'fell'} ${Math.abs(assessmentChange).toFixed(1)}% from ${firstYear} to ${lastYear}.`,
+      );
+    }
+    return signals;
+  }, [areaStats, band, areaLabel, areaRankPercent, areaCrimeShare, assessmentChange, propertyData]);
 
   /**
    * The one number this page is about.
@@ -415,14 +503,14 @@ export default function PersonalBriefing({
    * A giant "0" reads as a broken widget rather than as good news, so the
    * all-clear is a sentence instead of a figure.
    */
-  const allClear = Boolean(home) && nearby.length === 0;
+  const allClear = Boolean(home) && selectedStories.length === 0;
   const headline: { figure: number; label: string; sub: string } | null = addressPending || allClear
     ? null
     : home
     ? {
-        figure: nearby.length,
-        label: nearby.length === 1 ? 'thing reported near you' : 'things reported near you',
-        sub: ring.label,
+        figure: selectedStories.length,
+        label: selectedStories.length === 1 ? 'report worth a closer look' : 'reports worth a closer look',
+        sub: `${ring.label} · traffic stays on the map`,
       }
     : areaStats
       ? {
@@ -484,7 +572,7 @@ export default function PersonalBriefing({
 
           <button
             ref={closeRef} type="button" onClick={onClose} aria-label="Close"
-            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid h-9 w-9 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-6 sm:top-6"
+            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid h-11 w-11 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-6 sm:top-6"
             style={{ background: 'rgba(245,239,228,0.16)', color: T.page }}
           >
             <X size={17} />
@@ -528,6 +616,34 @@ export default function PersonalBriefing({
                 <span className="font-bold" style={{ color: '#FDFAF3' }}>{address || areaLabel}</span>
               </span>
             </p>
+
+            {areaStats && band && (
+              <div
+                className="mt-4 px-3.5 py-3"
+                style={{ background: 'rgba(253,250,243,0.10)', border: '1px solid rgba(253,250,243,0.20)' }}
+              >
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-[11px] font-bold" style={{ color: '#C3D6CE' }}>Community report-volume rank</p>
+                    <p className="mt-0.5 text-[20px] font-extrabold tabular-nums" style={{ color: '#FDFAF3' }}>
+                      #{areaStats.rank} <span className="text-[12px] font-semibold" style={{ color: '#C3D6CE' }}>of {areaStats.count}</span>
+                    </p>
+                  </div>
+                  <span className="shrink-0 px-2 py-1 text-[11px] font-extrabold" style={{ background: band.color, color: '#FFFDF8' }}>
+                    {band.label}
+                  </span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden" style={{ background: 'rgba(253,250,243,0.16)' }} aria-hidden="true">
+                  <div
+                    className="h-full"
+                    style={{ width: `${Math.max(3, ((areaStats.count - areaStats.rank + 1) / areaStats.count) * 100)}%`, background: '#E8B871' }}
+                  />
+                </div>
+                <p className="mt-1.5 text-[10.5px] leading-snug" style={{ color: '#C3D6CE' }}>
+                  Based on reported volume, not a safety grade.
+                </p>
+              </div>
+            )}
           </motion.div>
 
           {allClear && (
@@ -564,30 +680,108 @@ export default function PersonalBriefing({
 
         {/* ── Page ──────────────────────────────────────────────────────────── */}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-8 pt-6 sm:px-8">
+          {home && (nearbySafety.length > 0 || nearbyTraffic.length > 0) && (
+            <Section
+              order={0} still={still} eyebrow="Closest street context"
+              title="Cameras within your walk"
+            >
+              {nearbyTraffic[0] && (
+                <button
+                  type="button"
+                  onClick={() => { onOpenCamera(nearbyTraffic[0].camera); onClose(); }}
+                  className="block w-full overflow-hidden text-left transition-opacity hover:opacity-95 active:opacity-90"
+                  style={{ border: `1px solid ${T.edge}`, background: T.card }}
+                >
+                  <img
+                    src={`${nearbyTraffic[0].camera.imageUrl}?t=${issuedAt}`}
+                    alt={`Current public traffic-camera view at ${nearbyTraffic[0].camera.location}`}
+                    loading="lazy"
+                    className="h-36 w-full object-cover sm:h-44"
+                    style={{ background: T.line }}
+                  />
+                  <span className="flex items-center justify-between gap-3 px-3.5 py-3">
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 text-[11px] font-bold" style={{ color: T.deep2 }}>
+                        <Eye size={13} /> Referenced public camera
+                      </span>
+                      <span className="mt-0.5 block truncate text-[13.5px] font-extrabold" style={{ color: T.ink }}>
+                        {nearbyTraffic[0].camera.location}
+                      </span>
+                      <span className="block text-[11.5px]" style={{ color: T.soft }}>
+                        {formatDistance(nearbyTraffic[0].distanceM)} away · current view, not report footage
+                      </span>
+                    </span>
+                    <span className="inline-flex h-10 shrink-0 items-center gap-1.5 px-3 text-[11.5px] font-bold" style={{ background: T.deep, color: T.page }}>
+                      Open <ArrowRight size={12} />
+                    </span>
+                  </span>
+                </button>
+              )}
+
+              <div className="mt-2.5 grid grid-cols-2 gap-2.5">
+                <Stat count={nearbySafety.length} still={still} tone={T.gold} label="Safety cameras that ticket" />
+                <Stat count={nearbyTraffic.length} still={still} tone={T.deep2} label="Public camera views" />
+              </div>
+
+              {nearbySafety.length > 0 && (
+                <ul className="mt-2.5 space-y-2">
+                  {nearbySafety.slice(0, 3).map(({ camera, distanceM }) => {
+                    const daily = volumeAt(camera.lat, camera.lng, volumes);
+                    return (
+                      <li
+                        key={camera.id}
+                        className="flex items-start gap-3 px-3.5 py-3"
+                        style={{ background: T.card, border: `1px solid ${T.line}` }}
+                      >
+                        <Camera size={15} className="mt-[2px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[13px] font-bold leading-snug" style={{ color: T.ink }}>
+                            {camera.intersection}
+                          </span>
+                          <span className="block text-[11.5px]" style={{ color: T.soft }}>
+                            {formatDistance(distanceM)} away
+                            {camera.direction ? ` · watches ${camera.direction.toLowerCase()} traffic` : ''}
+                          </span>
+                          {daily && (
+                            <span className="mt-1.5 inline-block px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(176,121,60,0.14)', color: '#8A5710' }}>
+                              {Math.round(daily).toLocaleString()} vehicles a day
+                            </span>
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <p className="mt-2.5 text-[12px] leading-relaxed" style={{ color: T.soft }}>
+                Public cameras show current road conditions. Safety-camera locations describe fixed enforcement; neither is footage of a report.
+              </p>
+            </Section>
+          )}
+
           {home && (
             <Section
               order={0} still={still}
               eyebrow={ring.label}
               title={
-                nearby.length === 0
+                selectedStories.length === 0
                   ? 'A quiet stretch around you'
                   : ring.widened
-                    ? "What's happening in your wider neighbourhood"
-                    : "What's happening near you"
+                    ? 'The stories worth knowing further out'
+                    : 'The stories worth knowing near you'
               }
             >
-              {ring.widened && nearby.length > 0 && (
+              {ring.widened && selectedStories.length > 0 && (
                 <p className="mb-3 text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
-                  Nothing at all inside a {WALK_MIN}-minute walk of your door — no neighbour reports, no
-                  police records, no road or utility work. So this is the ring around that:{' '}
+                  Nothing substantive appeared inside a {WALK_MIN}-minute walk, so this edition widens to{' '}
                   <strong style={{ color: T.ink }}>{ring.label}</strong>.
                 </p>
               )}
 
-              {nearby.length === 0 ? (
+              {selectedStories.length === 0 ? (
                 <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
-                  Nothing has been reported anywhere near you — not by a neighbour, not by police, not by
-                  311 or the road and utility feeds. That is the best thing this page can tell you.
+                  No crime, emergency, weather or infrastructure report nearby needs a closer look right now.
+                  Routine traffic updates remain available on the live map.
                 </p>
               ) : (
                 <>
@@ -602,28 +796,50 @@ export default function PersonalBriefing({
                       />
                     </div>
                     <p className="text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
-                      Your home is the middle. Every dot is something real — a neighbour&rsquo;s report, a
-                      police record, road work, an outage — placed at the direction and distance it
-                      actually happened. North is up, and a dot on the outer ring is the full{' '}
+                      Your home is the middle. This edition selects useful local stories rather than filling
+                      the page with routine road notices. North is up; the outer ring is{' '}
                       {ring.metres >= 1000 ? `${(ring.metres / 1000).toFixed(1)} km` : `${ring.metres} m`}{' '}
                       away. Tap one to read it.
                     </p>
                   </div>
 
-                  <ul className="mt-4 space-y-2">
-                    {nearby.slice(0, 5).map(({ incident, distanceM }, i) => (
-                      <ReportRow
-                        key={incident.id} incident={incident} index={i} still={still}
-                        badge={formatDistance(distanceM)}
-                        sub={`${sourceLabel(incident)} · ${titleCase(incident.category)} · ${formatDistanceToNow(incident.timestamp)} ago`}
-                        onOpen={() => { onSelectIncident(incident); onClose(); }}
-                      />
-                    ))}
-                  </ul>
-                  {nearby.length > 5 && (
-                    <p className="mt-2.5 text-[12.5px] font-semibold" style={{ color: T.soft }}>
-                      and {nearby.length - 5} more {ring.label}
-                    </p>
+                  {stories.leads.length > 0 && (
+                    <div className="mt-5">
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <h4 className="text-[13px] font-extrabold" style={{ color: T.ink }}>Two stories to know</h4>
+                        <span className="text-[11px] font-semibold" style={{ color: T.soft }}>Selected for relevance</span>
+                      </div>
+                      <ul className="space-y-2.5">
+                        {stories.leads.map((item, index) => (
+                          <FeaturedStory
+                            key={item.incident.id}
+                            item={item}
+                            index={index}
+                            still={still}
+                            onOpen={() => { onSelectIncident(item.incident); onClose(); }}
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {stories.crimes.length > 0 && (
+                    <div className="mt-5">
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <h4 className="text-[13px] font-extrabold" style={{ color: T.ink }}>Crime reports near you</h4>
+                        <span className="text-[11px] font-semibold" style={{ color: T.soft }}>Up to five</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {stories.crimes.map(({ incident, distanceM }, index) => (
+                          <ReportRow
+                            key={incident.id} incident={incident} index={index} still={still}
+                            badge={formatDistance(distanceM)}
+                            sub={`${sourceLabel(incident)} · ${formatDistanceToNow(incident.timestamp)} ago`}
+                            onOpen={() => { onSelectIncident(incident); onClose(); }}
+                          />
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </>
               )}
@@ -640,7 +856,7 @@ export default function PersonalBriefing({
                   <span className="min-w-0">
                     <span className="block text-[14px] font-black leading-tight">Look further out</span>
                     <span className="block text-[11.5px] opacity-75">
-                      Flip through everything within {NEARBY_KM} km, one at a time
+                      Open the complete map, including live traffic, within {NEARBY_KM} km
                     </span>
                   </span>
                 </span>
@@ -691,78 +907,10 @@ export default function PersonalBriefing({
             </Section>
           )}
 
-          {home && (nearbySafety.length > 0 || nearbyTraffic.length > 0) && (
-            <Section
-              order={1} still={still} eyebrow="On your streets"
-              title={`Cameras within your walk`}
-            >
-              <div className="grid grid-cols-2 gap-2.5">
-                <Stat count={nearbySafety.length} still={still} tone={T.gold} label="Safety cameras that ticket" />
-                <Stat count={nearbyTraffic.length} still={still} tone={T.deep2} label="Public traffic cameras" />
-              </div>
-
-              {nearbySafety.length > 0 && (
-                <ul className="mt-2.5 space-y-2">
-                  {nearbySafety.slice(0, 3).map(({ camera, distanceM }) => {
-                    const daily = volumeAt(camera.lat, camera.lng, volumes);
-                    return (
-                      <li
-                        key={camera.id}
-                        className="flex items-start gap-3 px-3.5 py-3"
-                        style={{ background: T.card, border: `1px solid ${T.line}` }}
-                      >
-                        <Camera size={15} className="mt-[2px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-bold leading-snug" style={{ color: T.ink }}>
-                            {camera.intersection}
-                          </span>
-                          <span className="block text-[11.5px]" style={{ color: T.soft }}>
-                            {formatDistance(distanceM)} away
-                            {camera.direction ? ` · watches ${camera.direction.toLowerCase()} traffic` : ''}
-                          </span>
-                          {daily && (
-                            <span
-                              className="mt-1.5 inline-block rounded-lg px-2 py-0.5 font-mono text-[10px] font-bold tabular-nums"
-                              style={{ background: 'rgba(176,121,60,0.14)', color: '#8A5710' }}
-                            >
-                              {Math.round(daily).toLocaleString()} vehicles a day
-                            </span>
-                          )}
-                        </span>
-                      </li>
-                    );
-                  })}
-                  {nearbySafety.length > 3 && (
-                    <li className="pt-0.5 text-[12.5px] font-semibold" style={{ color: T.soft }}>
-                      and {nearbySafety.length - 3} more inside the same walk
-                    </li>
-                  )}
-                </ul>
-              )}
-
-              {nearbyTraffic.length > 0 && (
-                <p className="mt-2.5 flex items-start gap-2 text-[12.5px] leading-relaxed" style={{ color: T.soft }}>
-                  <Video size={13} className="mt-[3px] shrink-0" style={{ color: T.deep2 }} aria-hidden="true" />
-                  <span>
-                    The traffic cameras are public webcams you can look through yourself — switch the layer
-                    on from the map.
-                  </span>
-                </p>
-              )}
-
-              <p className="mt-2.5 text-[12.5px] leading-relaxed" style={{ color: T.soft }}>
-                Safety cameras ticket for running the red <strong style={{ color: T.ink }}>and</strong> for
-                speeding through the green. The city does not publish how many tickets each one writes, or
-                where mobile photo radar sets up — so this is where the fixed cameras are and how busy their
-                roads are, not a ranking of which one catches most.
-              </p>
-            </Section>
-          )}
-
           {(areaStats || latestValue) && (
             <Section
               order={2} still={still} eyebrow={areaLabel}
-              title="How your community is doing"
+              title="Your community rank and signals"
             >
               <img
                 src={publicAsset('images/illustration/process-community.webp')}
@@ -773,16 +921,55 @@ export default function PersonalBriefing({
               />
               {areaStats && band && (
                 <>
-                  <p className="text-[14.5px] leading-relaxed" style={{ color: T.soft }}>
-                    Against every other Calgary community, {areaLabel} sits{' '}
-                    <strong style={{ color: band.color }}>{band.label.toLowerCase()}</strong> — number{' '}
-                    <strong style={{ color: T.ink }}>{areaStats.rank}</strong> of {areaStats.count} by how
-                    much gets reported.
-                  </p>
+                  <div className="px-4 py-4" style={{ background: T.deep, color: T.page }}>
+                    <div className="flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-[11px] font-semibold" style={{ color: '#C3D6CE' }}>Calgary community ranking</p>
+                        <p className="mt-1 text-[26px] font-extrabold leading-none tabular-nums">
+                          #{areaStats.rank} <span className="text-[13px] font-semibold" style={{ color: '#C3D6CE' }}>of {areaStats.count}</span>
+                        </p>
+                      </div>
+                      <span className="px-2.5 py-1.5 text-[11px] font-extrabold" style={{ background: band.color, color: '#FFFDF8' }}>
+                        {band.label} volume
+                      </span>
+                    </div>
+                    <div className="mt-3 h-2 overflow-hidden" style={{ background: 'rgba(245,239,228,0.16)' }}>
+                      <div
+                        className="h-full"
+                        style={{ width: `${Math.max(3, ((areaStats.count - areaStats.rank + 1) / areaStats.count) * 100)}%`, background: '#E8B871' }}
+                      />
+                    </div>
+                    <p className="mt-2 text-[11px] leading-snug" style={{ color: '#C3D6CE' }}>
+                      Top {areaRankPercent}% by recorded crime and disorder volume in {areaStats.year}. This compares reporting volume—not danger or personal risk.
+                    </p>
+                  </div>
                   <div className="mt-3 grid grid-cols-2 gap-2.5">
                     <Stat count={areaStats.crime} still={still} label={`Criminal offences in ${areaStats.year}`} />
                     <Stat count={areaStats.disorder} still={still} label={`Disorder calls in ${areaStats.year}`} />
                   </div>
+                  <div className="mt-3 divide-y" style={{ borderColor: T.line }}>
+                    <p className="flex items-start justify-between gap-4 py-2.5 text-[12.5px] leading-snug" style={{ borderColor: T.line, color: T.soft }}>
+                      <span>Share recorded as criminal offences</span>
+                      <strong className="shrink-0 tabular-nums" style={{ color: T.ink }}>{areaCrimeShare}%</strong>
+                    </p>
+                    <p className="flex items-start justify-between gap-4 py-2.5 text-[12.5px] leading-snug" style={{ borderColor: T.line, color: T.soft }}>
+                      <span>Total recorded crime + disorder</span>
+                      <strong className="shrink-0 tabular-nums" style={{ color: T.ink }}>{areaReportTotal.toLocaleString()}</strong>
+                    </p>
+                  </div>
+                  {communitySignals.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-[13px] font-extrabold" style={{ color: T.ink }}>What stands out</h4>
+                      <ul className="mt-1.5 divide-y" style={{ borderColor: T.line }}>
+                        {communitySignals.map((signal) => (
+                          <li key={signal} className="flex items-start gap-2.5 py-2.5 text-[12.5px] leading-relaxed" style={{ borderColor: T.line, color: T.soft }}>
+                            <Sparkles size={14} className="mt-[2px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />
+                            <span>{signal}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </>
               )}
 

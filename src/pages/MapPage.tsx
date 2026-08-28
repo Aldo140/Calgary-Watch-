@@ -36,6 +36,7 @@ import { useTrafficFlow } from '@/src/hooks/useTrafficFlow';
 import type { TrafficSegmentState } from '@/src/types/trafficFlow';
 import { useSafetyCameras } from '@/src/hooks/useSafetyCameras';
 import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMatches, rankFullTextMatches } from '@/src/lib/address';
+import { curateTrafficReports } from '@/src/lib/reportCuration';
 import { categoryColor } from '@/src/lib/tokens';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
@@ -712,7 +713,7 @@ export default function MapPage() {
     // live frame the moment someone declares their location.
     // The viewer keeps them loaded while it is open so its walk-through has
     // neighbours to step to even if the layer is switched off underneath it.
-    showCameras || Boolean(selectedIncident) || Boolean(viewerCamera) || Boolean(selectedTrafficSegment),
+    showCameras || briefingOpen || Boolean(selectedIncident) || Boolean(viewerCamera) || Boolean(selectedTrafficSegment),
   );
   // Also loaded for the personal briefing, which counts them near a saved address.
   const safetyCameras = useSafetyCameras(showSafetyCameras || Boolean(user));
@@ -1174,7 +1175,19 @@ export default function MapPage() {
       [...firebaseIncidents, ...officialOpenData, ...edmontonOpenData, ...weatherAlerts, ...powerOutageIncidents, ...airQualityIncidents, ...riverIncidents],
       suppressedIds,
     );
-    const unique = new globalThis.Map(combined.map((i: Incident) => [i.id, i]));
+    // Reduce API-sourced traffic by exactly 15% after every source is merged,
+    // so City traffic and ingested 511 rows share one selection rule. Community
+    // observations are never dropped by this API-density control.
+    const apiTraffic = combined.filter((incident) =>
+      incident.category === 'traffic' && incident.data_source === 'official'
+    );
+    const keptTrafficIds = new Set(curateTrafficReports(apiTraffic).map((incident) => incident.id));
+    const densityCurated = combined.filter((incident) =>
+      incident.category !== 'traffic'
+      || incident.data_source !== 'official'
+      || keptTrafficIds.has(incident.id)
+    );
+    const unique = new globalThis.Map(densityCurated.map((i: Incident) => [i.id, i]));
     const filtered = [...unique.values()]
       .filter((i) => {
         if (i.expires_at) return i.expires_at > now;
@@ -1929,63 +1942,74 @@ export default function MapPage() {
         <div key={n.id} className="p-2">
           <div
             className="relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #1C2B3A 0%, #24466B 80%)', border: '1.5px solid rgba(46,139,122,0.55)' }}
+            style={{ background: '#10283D', border: '1.5px solid #2E8B7A' }}
           >
           <button
             type="button"
             onClick={() => handleNotificationClick(n)}
-            className="block w-full text-left transition-transform active:scale-[0.99] p-3.5"
+            className="block w-full p-3.5 text-left transition-colors hover:bg-white/[0.04] active:bg-white/[0.07]"
           >
-            <span className="absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #2E8B7A, transparent 70%)' }} aria-hidden="true" />
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: '#7FB5A6' }}>
-              Your briefing is ready
-            </p>
-            <p className={cn('font-black mt-1 truncate', compact ? 'text-[13px]' : 'text-[14.5px]')} style={{ color: '#FFFDF8' }}>
-              {areaName}
-            </p>
+            <span className="flex items-start gap-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center" style={{ background: '#2E8B7A', color: '#FFFDF8' }}>
+                <Bell size={16} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[11px] font-bold" style={{ color: '#86CDBB' }}>Personalized report ready</span>
+                <span className={cn('mt-0.5 block font-black leading-tight', compact ? 'text-[15px]' : 'text-[16px]')} style={{ color: '#FFFDF8' }}>
+                  {areaName}
+                </span>
+              </span>
+            </span>
             {/* Without this the card shows only the resolved community name and
                 the user has no idea where it came from. */}
             {n.basis && (
-              <p className="mt-1 flex items-start gap-1.5 text-[10px] font-medium leading-snug" style={{ color: '#9AA6B2' }}>
-                <MapPin size={10} className="mt-[1px] shrink-0" aria-hidden="true" />
+              <p className="mt-2.5 flex items-start gap-1.5 text-[11px] font-medium leading-snug" style={{ color: '#B9CBDA' }}>
+                <MapPin size={11} className="mt-[1px] shrink-0" aria-hidden="true" />
                 <span className="min-w-0">
-                  From your saved location · <span className="font-bold" style={{ color: '#C9D8E4' }}>{n.basis}</span>
+                  Built from <span className="font-bold" style={{ color: '#F2EFE8' }}>{n.basis}</span>
                 </span>
               </p>
             )}
             {stats ? (
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="flex items-center gap-1.5 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: `${stats.band.color}2e`, color: '#FFFDF8' }}>
-                  <span className="h-1.5 w-1.5" style={{ background: stats.band.color }} />
-                  {stats.band.label}
+              <div className="mt-3 border-y py-2.5" style={{ borderColor: 'rgba(201,216,228,0.18)' }}>
+                <span className="flex items-center justify-between gap-3">
+                  <span>
+                    <span className="block text-[10px] font-semibold" style={{ color: '#AFC5DF' }}>City report-volume rank</span>
+                    <span className="mt-0.5 block text-[17px] font-black tabular-nums" style={{ color: '#FFFDF8' }}>
+                      #{stats.rank} <span className="text-[11px] font-semibold" style={{ color: '#AFC5DF' }}>of {stats.count}</span>
+                    </span>
+                  </span>
+                  <span className="px-2 py-1 text-[10.5px] font-bold" style={{ background: stats.band.color, color: '#FFFDF8' }}>
+                    {stats.band.label}
+                  </span>
                 </span>
-                <span className="px-2 py-1 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
-                  #{stats.rank} of {stats.count}
+                <span className="mt-2 block h-1.5 overflow-hidden" style={{ background: 'rgba(201,216,228,0.16)' }} aria-hidden="true">
+                  <span className="block h-full" style={{ width: `${Math.max(3, ((stats.count - stats.rank + 1) / stats.count) * 100)}%`, background: '#78C7B2' }} />
                 </span>
-                <span className="px-2 py-1 font-mono text-[10px] font-bold tabular-nums" style={{ background: 'rgba(255,253,248,0.12)', color: '#C9D8E4' }}>
-                  {stats.entry.crime} concerns · {stats.entry.year}
+                <span className="mt-1.5 block text-[10.5px]" style={{ color: '#AFC5DF' }}>
+                  {(stats.entry.crime + stats.entry.disorder).toLocaleString()} recorded crime + disorder · {stats.entry.year}
                 </span>
               </div>
             ) : (
-              <p className="mt-1.5 text-[10px] font-medium" style={{ color: '#9AA6B2' }}>
-                Reports near your door, cameras, and what your community reads
+              <p className="mt-2.5 text-[11px] font-medium" style={{ color: '#AFC5DF' }}>
+                Two lead stories, local crime, nearby cameras and community signals
               </p>
             )}
-            <p className="mt-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: '#7FB5A6' }}>
-              Open your briefing →
-            </p>
+            <span className="mt-3 flex min-h-11 items-center justify-between gap-3 px-3 text-[12px] font-black" style={{ background: '#F2EFE8', color: '#10283D' }}>
+              Open full report <ArrowRight size={14} />
+            </span>
           </button>
           {/* Sibling of the main button, not nested inside it — nesting
               interactive elements breaks keyboard and screen-reader behaviour. */}
-          <div className="px-3.5 pb-3">
+          <div className="px-3.5 pb-3 pt-0.5">
             <button
               type="button"
               onClick={() => {
                 setShowNotifications(false);
                 openAuthPanel('settings');
               }}
-              className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] underline underline-offset-2 transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{ color: '#7FB5A6' }}
+              className="min-h-9 text-[11px] font-semibold underline underline-offset-2 transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ color: '#86CDBB' }}
             >
               Change location settings
             </button>
@@ -2905,43 +2929,6 @@ export default function MapPage() {
                 </span>
               )}
             </button>
-            <AnimatePresence>
-              {showNotifications && (
-                <motion.div
-                  initial={{ opacity: 0, x: 8, scale: 0.96 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 8, scale: 0.96 }}
-              // z-[60] matches the account menu hanging off the same column.
-              // At z-50 this dropdown fell below the sheet (z-[52]) and had its
-              // lower half clipped whenever the feed was raised, while its
-              // sibling — anchored to the same buttons, opened the same way —
-              // rendered fine. Two dropdowns from one column behaved differently.
-              className="absolute right-full mr-3 top-0 w-[min(18.5rem,calc(100vw-5rem))] overflow-hidden z-[60] shadow-[0_10px_28px_rgba(11,31,51,0.20)]"
-              style={{ background: '#FFFDF8', border: '1.5px solid #0B1F33' }}
-                >
-                  <div className="flex items-center justify-between bg-[#06162F] px-3.5 py-2.5">
-                    <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#AFC5DF]">Alerts</h3>
-                    <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[#7FDCC6]">
-                      <span className="h-1.5 w-1.5 animate-pulse bg-[#7FDCC6]" />
-                      Live
-                    </span>
-                  </div>
-                  <div className="max-h-56 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="px-4 py-6 text-center">
-                        <span className="mx-auto flex h-10 w-10 items-center justify-center" style={{ background: '#E8F3FC' }}>
-                          <Bell size={15} className="text-[#5A6B7D]" />
-                        </span>
-                        <p className="mt-2 text-[11.5px] font-bold text-[#1C2B3A]">All caught up</p>
-                        <p className="text-[10px] text-[#5A6B7D] mt-0.5">New reports will land here as they happen.</p>
-                      </div>
-                    ) : (
-                      notifications.map((n) => renderNotificationRow(n, true))
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
           <div className="relative pointer-events-auto">
             {user ? (
@@ -3322,6 +3309,70 @@ export default function MapPage() {
           )}
         </AnimatePresence>
 
+        {/* On phones this is a real bottom sheet, not a narrow popover hanging
+            from the map button. It gets its own stacking context so the report
+            preview can never fall behind the draggable feed sheet. */}
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              className="fixed inset-0 z-[80] lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              <button
+                type="button"
+                aria-label="Close notifications"
+                onClick={() => setShowNotifications(false)}
+                className="absolute inset-0 h-full w-full bg-[#06162F]/45"
+              />
+              <motion.section
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="mobile-notifications-title"
+                className="absolute inset-x-0 bottom-0 flex max-h-[82dvh] flex-col overflow-hidden bg-[#FFFDF8] pb-[env(safe-area-inset-bottom)]"
+                style={{ borderTop: '1.5px solid #0B1F33' }}
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="flex justify-center py-2" aria-hidden="true">
+                  <span className="h-1 w-10 rounded-full bg-[#C9D8E4]" />
+                </div>
+                <div className="flex items-center justify-between border-b border-[#D9E3EC] px-4 pb-3">
+                  <div>
+                    <h3 id="mobile-notifications-title" className="text-[17px] font-black leading-tight text-[#0B1F33]">Notifications</h3>
+                    <p className="mt-0.5 text-[11.5px] text-[#5A6B7D]">Personal reports and live updates for your saved area</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(false)}
+                    className="grid size-11 shrink-0 place-items-center text-[#40566B] transition-colors active:bg-[#E8F3FC]"
+                    aria-label="Close notifications"
+                  >
+                    <X size={19} />
+                  </button>
+                </div>
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-1">
+                  {notifications.length === 0 ? (
+                    <div className="px-5 py-10 text-center">
+                      <span className="mx-auto flex size-11 items-center justify-center bg-[#E8F3FC]">
+                        <Bell size={17} className="text-[#5A6B7D]" />
+                      </span>
+                      <p className="mt-3 text-[14px] font-black text-[#1C2B3A]">All caught up</p>
+                      <p className="mx-auto mt-1 max-w-64 text-[12px] leading-relaxed text-[#5A6B7D]">New reports for your saved area will appear here.</p>
+                    </div>
+                  ) : (
+                    notifications.map((notification) => renderNotificationRow(notification, false))
+                  )}
+                </div>
+              </motion.section>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Desktop map command bar */}
         <div className="pointer-events-none absolute left-5 right-5 top-5 z-30 hidden items-center justify-between lg:flex">
           <div className="pointer-events-auto flex h-13 items-center gap-1 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] py-1 pl-2 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
@@ -3400,7 +3451,7 @@ export default function MapPage() {
                         Live
                       </span>
                     </div>
-                    <div className="max-h-64 overflow-y-auto">
+                    <div className="max-h-[min(70dvh,34rem)] overflow-y-auto overscroll-contain">
                       {notifications.length === 0 ? (
                         <div className="px-4 py-7 text-center">
                           <span className="mx-auto flex h-10 w-10 items-center justify-center" style={{ background: '#E8F3FC' }}>
@@ -3636,6 +3687,11 @@ export default function MapPage() {
           onViewNeighborhood={handleViewNeighborhood}
           onReportIncident={handleReportFromIncident}
           trafficCameras={trafficCameras}
+          onOpenCamera={(camera) => {
+            setSelectedIncident(null);
+            setViewerCamera(camera);
+            mapRef.current?.flyTo(camera.lat, camera.lng, 16);
+          }}
         />
         <TrafficFlowPanel
           segment={selectedTrafficSegment}
@@ -3731,6 +3787,10 @@ export default function MapPage() {
               startNearMeScan();
             }}
             onSelectIncident={(incident) => startTransition(() => setSelectedIncident(incident))}
+            onOpenCamera={(camera) => {
+              setViewerCamera(camera);
+              mapRef.current?.flyTo(camera.lat, camera.lng, 16);
+            }}
           />
         )}
       </main>

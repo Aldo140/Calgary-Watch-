@@ -42,6 +42,7 @@ import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 import { getDistance } from '@/src/lib/geo';
+import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 
 function getCalgaryQuadrant(lat: number, lng: number) {
   const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
@@ -3380,20 +3381,15 @@ export default function MapPage() {
 
         {/* Desktop map command bar */}
         <div className="pointer-events-none absolute left-5 right-5 top-5 z-30 hidden items-center justify-between lg:flex">
-          <div className="pointer-events-auto flex h-13 items-center gap-1 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] py-1 pl-2 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
-            <div className="flex items-center gap-2.5 border-r-[1.5px] border-[#C9D8E4] pr-3">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-[#E8F3FC]">
-                <img src="/images/brand/calgary-watch-plane-mark.webp" alt="" width={19} height={19} className="size-[19px] object-contain" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-              </span>
-              <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className={cn('relative inline-flex h-2 w-2', mapIncidents.length > 0 ? 'bg-[#2E8B7A]' : 'bg-[#5A6B7D]')} />
-              </span>
-              <div className="leading-none">
-                <h1 className="font-display text-[13px] font-black tracking-[-0.02em] text-[#0B1F33]">
-                  {selectedCategory === 'all' ? 'All live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
+          <div className="pointer-events-auto flex h-13 items-center gap-1 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] py-1 pl-1 pr-1.5 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
+            <div className="flex items-center gap-3 border-r-[1.5px] border-[#C9D8E4] py-0.5 pl-0.5 pr-4">
+              <DesktopMapBrandMark compact />
+              <div className="min-w-[8.5rem] leading-none">
+                <h1 className="font-display text-[14px] font-black tracking-[-0.02em] text-[#0B1F33]">
+                  {selectedCategory === 'all' ? 'Live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
                 </h1>
-                <p className="mt-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#5A6B7D]">
-                  {mapIncidents.length} visible / Calgary Watch
+                <p className="mt-1.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#5A6B7D]">
+                  {mapIncidents.length} visible now
                 </p>
               </div>
             </div>

@@ -7,6 +7,7 @@ import { cn, publicAsset } from '@/src/lib/utils';
 import { categoryColor } from '@/src/lib/tokens';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
+import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 
 interface SidebarProps {
   incidents: Incident[];
@@ -184,18 +185,17 @@ export default function Sidebar({
           </span>
         </div>
 
-        <div className="relative mt-3 flex items-end gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center bg-[#F2EFE8]">
-            <img src="/icon.svg" alt="" width={26} height={26} className="size-[26px]" />
-          </span>
-          <h1 className="font-display text-[29px] font-black uppercase leading-[0.82] tracking-[-0.04em] text-[#F2EFE8]">
-            Calgary<br />Watch
-          </h1>
+        <div className="relative mt-4 flex items-center gap-3.5">
+          <DesktopMapBrandMark tone="dark" />
+          <div className="min-w-0">
+            <h1 className="font-display text-[25px] font-black leading-none tracking-[-0.03em] text-[#F2EFE8]">
+              Calgary Watch
+            </h1>
+            <p className="mt-2 font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#AFC5DF]">
+              Community incident map
+            </p>
+          </div>
         </div>
-
-        <p className="relative mt-3 border-t border-[#F2EFE8]/20 pt-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#AFC5DF]">
-          Community incident map
-        </p>
       </div>
 
       <div className="flex items-center gap-2.5 px-4 pt-4">

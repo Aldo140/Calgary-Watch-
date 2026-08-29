@@ -23,6 +23,7 @@ import { db, isFirebaseConfigured } from '@/src/firebase';
 import { Incident, IncidentCategory, incidentVisibility } from '@/src/types';
 import { INCIDENT_CATEGORY_VALUES } from '@/src/constants';
 import { VERIFIED_STATUSES } from '@/src/hooks/useAdminData';
+import { aggregateFeedback, type IncidentFeedback } from '@/src/lib/feedback';
 import {
   AdminButton, Chip, EmptyState, Field, Figure, FilterChip, FilterRow, Panel,
   SearchField, SkeletonRows, StatGrid, StatTile, T, TimeAgo, display,
@@ -88,6 +89,7 @@ export default function AdminIncidentListPage() {
   const uidFilter = params.get('uid') ?? '';
 
   const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [feedback, setFeedback] = useState<IncidentFeedback[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -130,8 +132,32 @@ export default function AdminIncidentListPage() {
     const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
     });
-    return () => { unsubIncidents(); unsubUsers(); };
+    const unsubFeedback = onSnapshot(collection(db, 'incident_feedback'), (snapshot) => {
+      setFeedback(snapshot.docs.map((row) => row.data() as IncidentFeedback));
+    }, () => setFeedback([]));
+    return () => { unsubIncidents(); unsubUsers(); unsubFeedback(); };
   }, []);
+
+  // Resident corroboration per incident, and the set moderators should look at
+  // first: reports where neighbours disagree (some say active, some resolved).
+  const feedbackByIncident = useMemo(() => {
+    const groups = new globalThis.Map<string, IncidentFeedback[]>();
+    for (const f of feedback) {
+      if (!f?.incidentId) continue;
+      const list = groups.get(f.incidentId);
+      if (list) list.push(f); else groups.set(f.incidentId, [f]);
+    }
+    const now = Date.now();
+    const map = new globalThis.Map<string, ReturnType<typeof aggregateFeedback>>();
+    for (const [incidentId, docs] of groups) map.set(incidentId, aggregateFeedback(docs, now));
+    return map;
+  }, [feedback]);
+
+  const disputedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const [incidentId, agg] of feedbackByIncident) if (agg.disputed) ids.add(incidentId);
+    return ids;
+  }, [feedbackByIncident]);
 
   const userByKey = useMemo(() => {
     const map = new globalThis.Map<string, UserProfile>();
@@ -180,10 +206,11 @@ export default function AdminIncidentListPage() {
     official: incidents.filter(isOperationalIncident).length,
     pending: incidents.filter((i) => isResidentSubmission(i) && i.verified_status !== 'community_confirmed').length,
     anonymous: incidents.filter((i) => isResidentSubmission(i) && i.anonymous).length,
+    disputed: incidents.filter((i) => disputedIds.has(i.id)).length,
     examples: incidents.filter(isAdminExampleIncident).length,
     hidden: incidents.filter((i) => isResidentSubmission(i) && incidentVisibility(i) !== 'public').length,
     images: incidents.filter((i) => isResidentSubmission(i) && i.image_url).length,
-  }), [incidents]);
+  }), [incidents, disputedIds]);
 
   const oldestTimestamp = useMemo(() => filteredIncidents.reduce((oldest, incident) => {
     if (!incident.timestamp) return oldest;
@@ -358,6 +385,7 @@ export default function AdminIncidentListPage() {
           <StatGrid>
             <StatTile label="Resident reports" value={incidentStats.total} />
             <StatTile label="Not yet confirmed" value={incidentStats.pending} tone="attention" />
+            <StatTile label="Disputed by residents" value={incidentStats.disputed} tone="attention" />
             <StatTile label="Anonymous" value={incidentStats.anonymous} />
             <StatTile label="API records" value={incidentStats.official} />
             <StatTile label="Examples" value={incidentStats.examples} tone="attention" />
@@ -423,6 +451,7 @@ export default function AdminIncidentListPage() {
                               {incident.anonymous && <Chip>anon</Chip>}
                               {incident.image_url && <Chip><ImageIcon size={10} /> photo</Chip>}
                               {incidentVisibility(incident) !== 'public' && <Chip tone="critical"><EyeOff size={10} /> hidden</Chip>}
+                              {disputedIds.has(incident.id) && <Chip tone="critical">disputed</Chip>}
                               {isDirty(incident) && <Chip tone="attention">unsaved</Chip>}
                             </span>
                             <p className="text-sm font-semibold mt-1 leading-snug line-clamp-1" style={{ color: T.ink }}>

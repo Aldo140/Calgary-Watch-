@@ -96,6 +96,13 @@ type UserProfileSettings = {
   watchRadiusM?: number;
   /** "My Watch" — categories the reader wants; absent/empty means all. */
   watchCategories?: IncidentCategory[];
+  /** Instant alerts (Phase 3): opt-in, quiet hours, and category narrowing. */
+  alertsEnabled?: boolean;
+  alertCategories?: IncidentCategory[];
+  alertQuietStartHour?: number;
+  alertQuietEndHour?: number;
+  /** Server-side dedup cursor for the alert-sending job. */
+  alertLastSentAt?: number;
 };
 
 const FALLBACK_NEIGHBORHOODS = [
@@ -2256,6 +2263,15 @@ export default function MapPage() {
     } catch { /* profile listener will re-sync */ }
   }, [user, celebrate]);
 
+  // Instant alerts write straight to the profile — small, independent controls
+  // that must not wait on the larger report-area form's save cycle.
+  const updateAlertPrefs = useCallback(async (patch: Partial<UserProfileSettings>) => {
+    if (!user || !db) return;
+    try {
+      await setDoc(doc(db, 'users', user.uid), { ...patch, profileUpdatedAt: Date.now() }, { merge: true });
+    } catch { /* profile listener will re-sync */ }
+  }, [user]);
+
   return (
     <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
@@ -2425,6 +2441,89 @@ export default function MapPage() {
                               </span>
                             </div>
                           </div>
+
+                          {/* ── Instant alerts (Phase 3) ─────────────────────
+                              Direct-write controls: independent of the report-
+                              area form, they take effect the moment they change. */}
+                          {(() => {
+                            const alertsOn = userProfile?.alertsEnabled === true;
+                            const quietOn = typeof userProfile?.alertQuietStartHour === 'number'
+                              && typeof userProfile?.alertQuietEndHour === 'number';
+                            const alertCats = userProfile?.alertCategories ?? [];
+                            return (
+                              <div style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => void updateAlertPrefs({ alertsEnabled: !alertsOn })}
+                                  aria-pressed={alertsOn}
+                                  className="flex w-full items-center gap-3 p-4 text-left"
+                                >
+                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center" style={{ background: 'rgba(192,57,43,0.12)' }}>
+                                    <Siren size={15} className="text-[#C0392B]" />
+                                  </span>
+                                  <span className="min-w-0 flex-1">
+                                    <span className="block font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#5A6B7D]">Instant alerts</span>
+                                    <span className="mt-0.5 block text-sm font-bold text-[#1C2B3A]">
+                                      {alertsOn ? 'Emergencies + nearby neighbour reports' : 'Off'}
+                                    </span>
+                                  </span>
+                                  <span
+                                    className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.14em] px-2 py-1"
+                                    style={alertsOn
+                                      ? { background: 'rgba(192,57,43,0.14)', color: '#C0392B' }
+                                      : { background: '#F7F3EA', color: '#9AA6B2', border: '1px solid #E7E0D2' }}
+                                  >
+                                    {alertsOn ? 'On' : 'Off'}
+                                  </span>
+                                </button>
+
+                                {alertsOn && (
+                                  <div className="space-y-3 px-4 pb-4" style={{ borderTop: '1px dashed #E7E0D2' }}>
+                                    <label className="mt-3 flex cursor-pointer items-center gap-2.5">
+                                      <input
+                                        type="checkbox"
+                                        checked={quietOn}
+                                        onChange={(e) => void updateAlertPrefs(e.target.checked
+                                          ? { alertQuietStartHour: 22, alertQuietEndHour: 7 }
+                                          : { alertQuietStartHour: undefined, alertQuietEndHour: undefined })}
+                                        className="h-4 w-4 shrink-0"
+                                        style={{ accentColor: '#C0392B' }}
+                                      />
+                                      <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
+                                        <strong style={{ color: '#1C2B3A' }}>Quiet hours 10 PM–7 AM.</strong> Emergencies still come through.
+                                      </span>
+                                    </label>
+                                    <div className="space-y-1.5">
+                                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                        Alert categories <span style={{ color: '#9AA6B2' }}>· all if none picked</span>
+                                      </p>
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {DIGEST_CATEGORY_ORDER.map((cat) => {
+                                          const on = alertCats.includes(cat);
+                                          return (
+                                            <button
+                                              key={cat}
+                                              type="button"
+                                              aria-pressed={on}
+                                              onClick={() => void updateAlertPrefs({
+                                                alertCategories: on ? alertCats.filter((c) => c !== cat) : [...alertCats, cat],
+                                              })}
+                                              className="px-2.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em]"
+                                              style={on
+                                                ? { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }
+                                                : { background: '#FFFDF8', color: '#5A6B7D', border: '1.5px solid #C9D8E4' }}
+                                            >
+                                              {DIGEST_CATEGORY_LABEL[cat]}
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
 
                           <button
                             type="button"

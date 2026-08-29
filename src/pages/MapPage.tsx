@@ -84,6 +84,12 @@ type UserProfileSettings = {
   digestPromptedAt?: number;
   digestUnsubscribedAt?: number | null;
   digestUnsubscribeSource?: string | null;
+  /** "My Watch" — epoch ms the reader last opened the since-you-last-checked panel. */
+  watchLastSeenAt?: number;
+  /** "My Watch" — metres from home the reader cares about; absent means no radius filter. */
+  watchRadiusM?: number;
+  /** "My Watch" — categories the reader wants; absent/empty means all. */
+  watchCategories?: IncidentCategory[];
 };
 
 const FALLBACK_NEIGHBORHOODS = [

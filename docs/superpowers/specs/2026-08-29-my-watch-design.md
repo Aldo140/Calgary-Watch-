@@ -174,7 +174,26 @@ product_events   (W1)   ─► activation/retention funnel
 
 - `product_events`: create-only, shape-validated, no read for clients.
 - `incident_feedback`: create/update only where doc id == `{auth.uid}_{incidentId}`;
-  no deletes by clients; validated `kind` enum.
+  no deletes by clients; validated `kind` enum. **Read is owner+admin only** —
+  the doc id is the writer's uid, so world-readable feedback would leak who
+  said what about which report (the same identity leak the `incident_reporters`
+  split avoids). The public reads counts, not names.
+
+### Feedback privacy architecture (decided during W2b)
+
+Public corroboration counts (great for trust and traffic) must not come at the
+cost of exposing who corroborated. So:
+
+- Per-user `incident_feedback` is **private** (owner + admin read).
+- An `onIncidentFeedbackWritten` **Cloud Function** recomputes counts-only
+  fields on the incident document: `feedback_corroborations`,
+  `feedback_disputed`, `feedback_resolved`, `feedback_last_active`. These are
+  public (incident read is public) and clients cannot spoof them — the incident
+  update rules use `changedKeys().hasOnly([...])` allowlists that exclude them.
+- The detail panel reads the public aggregate from the incident and reads only
+  the reader's *own* feedback doc to show which button they pressed.
+- The weekly digest and the admin queue read feedback with the Admin SDK /
+  admin rule, so they are unaffected.
 
 ## Testing
 

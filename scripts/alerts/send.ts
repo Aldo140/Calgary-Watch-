@@ -30,7 +30,7 @@ import type { Firestore } from 'firebase-admin/firestore';
 import type { Incident } from '../../src/types/index.js';
 import { selectAlerts } from '../../src/lib/alerts.js';
 import { readAlertPreferences, type AlertProfileFields } from '../../src/lib/alertProfile.js';
-import { formatRelativeTime } from '../../src/lib/format.js';
+import { renderAlertEmail } from './render.js';
 import { loadSenderConfig, sendDigestEmail, sleep, type OutgoingEmail } from '../digest/send.js';
 
 const ORIGIN = 'https://calgarywatch.ca';
@@ -89,40 +89,7 @@ async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident
 }
 
 function renderAlert(recipient: AlertRecipient, alerts: Incident[], now: number): OutgoingEmail {
-  const lead = alerts[0];
-  const more = alerts.length - 1;
-  const subject = alerts.length === 1
-    ? `Nearby: ${lead.title}`
-    : `${alerts.length} alerts near you — ${lead.title}${more > 0 ? ` +${more}` : ''}`;
-
-  const line = (i: Incident) =>
-    `• ${i.title} — ${i.neighborhood || 'Calgary'} · ${formatRelativeTime(i.timestamp, now)}`;
-  const text = [
-    `Reports near you on Calgary Watch:`,
-    '',
-    ...alerts.map(line),
-    '',
-    `See the map: ${ORIGIN}/map`,
-    '',
-    `You are getting this because instant alerts are on. Turn them off any time in your Calgary Watch settings.`,
-  ].join('\n');
-
-  const rows = alerts.map((i) => `
-    <tr><td style="padding:10px 0;border-bottom:1px solid #E7E0D2;">
-      <strong style="color:#0B1F33;">${escapeHtml(i.title)}</strong><br/>
-      <span style="color:#5A6B7D;font-size:13px;">${escapeHtml(i.neighborhood || 'Calgary')} · ${escapeHtml(formatRelativeTime(i.timestamp, now))}</span>
-    </td></tr>`).join('');
-  const html = `
-  <div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;color:#1C2B3A;">
-    <h1 style="font-size:18px;color:#06162F;">Reports near you</h1>
-    <table style="width:100%;border-collapse:collapse;">${rows}</table>
-    <p style="margin-top:18px;"><a href="${ORIGIN}/map" style="color:#2F6FB0;font-weight:bold;">Open the map →</a></p>
-    <p style="color:#9AA6B2;font-size:12px;margin-top:20px;">
-      Instant alerts are on for your account. Turn them off any time in your Calgary Watch settings.
-    </p>
-  </div>`;
-
-  return { to: recipient.email, subject, html, text };
+  return { to: recipient.email, ...renderAlertEmail(alerts, now, ORIGIN) };
 }
 
 /**
@@ -156,10 +123,6 @@ async function sendPush(recipient: AlertRecipient, alerts: Incident[], dryRun: b
   } catch (error) {
     console.warn(`[alerts] push failed ${recipient.uid}: ${error instanceof Error ? error.message : String(error)}`);
   }
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 }
 
 async function run(): Promise<void> {

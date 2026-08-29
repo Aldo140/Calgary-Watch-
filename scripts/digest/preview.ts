@@ -16,6 +16,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
 import { renderDigestHtml, renderDigestText, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { renderAlertEmail } from '../alerts/render.js';
 import { DIGEST_CONTRIBUTION_STYLES, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import type { Incident } from '../../src/types/index.js';
 
@@ -129,6 +130,16 @@ mkdirSync(OUTPUT_DIR, { recursive: true });
 writeFileSync(`${OUTPUT_DIR}/digest.html`, browserPreview(renderDigestHtml(shared)));
 writeFileSync(`${OUTPUT_DIR}/digest.txt`, renderDigestText(shared));
 writeFileSync(`${OUTPUT_DIR}/welcome.html`, browserPreview(renderWelcomeHtml(shared)));
+
+// Instant-alert email — the between-digest urgent nudge. A believable mix: an
+// emergency (which always alerts) plus two nearby neighbour reports.
+const ALERT_SAMPLE: Incident[] = [
+  { ...SAMPLE[0], id: 'a-emerg', title: 'Grass fire near the pathway', category: 'emergency', neighborhood: 'Sunalta', timestamp: NOW - 12 * 60_000 },
+  { ...SAMPLE[0], id: 'a-crime', title: 'Break and enter on the 200 block', category: 'crime', neighborhood: 'Beltline', timestamp: NOW - 40 * 60_000 },
+  { ...SAMPLE[0], id: 'a-crime2', title: 'Catalytic converter theft reported', category: 'crime', neighborhood: 'Beltline', timestamp: NOW - 95 * 60_000 },
+];
+writeFileSync(`${OUTPUT_DIR}/alert.html`, browserPreview(renderAlertEmail(ALERT_SAMPLE, NOW, 'https://calgarywatch.ca').html));
+writeFileSync(`${OUTPUT_DIR}/alert.txt`, renderAlertEmail(ALERT_SAMPLE, NOW, 'https://calgarywatch.ca').text);
 
 // Every planner format gets a browser-openable proof. This prevents a format
 // that is not currently selected in the admin UI from becoming the unreviewed

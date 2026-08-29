@@ -54,7 +54,7 @@ type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
 type MessageTone = 'neutral' | 'ok' | 'attention' | 'critical';
 type TestStatus = 'pending' | 'sending' | 'retrying' | 'sent' | 'partial' | 'failed';
 type PlannerView = 'overview' | 'replies' | 'preview' | 'compose' | 'audience' | 'templates';
-type SubscriberPreview = 'weekly-local' | 'weekly-city' | 'welcome';
+type SubscriberPreview = 'weekly-local' | 'weekly-city' | 'welcome' | 'alert';
 
 type TestRequest = {
   id: string;
@@ -232,6 +232,7 @@ function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined 
     'weekly-local': { label: 'Weekly · local', detail: 'For readers with nearby results', file: 'digest.html' },
     'weekly-city': { label: 'Weekly · city-wide', detail: 'For readers without a local result set', file: 'city.html' },
     welcome: { label: 'Welcome letter', detail: 'Each subscriber’s first eligible send', file: 'welcome.html' },
+    alert: { label: 'Instant alert', detail: 'Between-digest urgent nearby reports', file: 'alert.html' },
   };
   const active = routeConfig[route];
 
@@ -252,7 +253,24 @@ function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined 
     return () => { cancelled = true; };
   }, [active.file]);
 
-  const weekly = route !== 'welcome';
+  const weekly = route === 'weekly-local' || route === 'weekly-city';
+  const previewFacts: Array<[string, string]> = route === 'alert'
+    ? [
+        ['Fixed for everyone', 'Branding and a short list of nearby reports'],
+        ['Personalized', 'Only the reports that matched this reader’s zones and categories'],
+        ['Delivery rule', 'Between digests when something worth interrupting for happens nearby, outside quiet hours'],
+      ]
+    : weekly
+      ? [
+          ['Fixed for everyone', 'Branding, layout, legal footer and report structure'],
+          ['Personalized Monday', 'Name, subject, location, latest reports and distances'],
+          ['Delivery rule', 'Only after that person’s welcome was delivered'],
+        ]
+      : [
+          ['Fixed for everyone', 'Branding, onboarding explanation and legal footer'],
+          ['Personalized Monday', 'Name, location and that week’s current sample briefing'],
+          ['Delivery rule', 'Only when no successful welcome is recorded'],
+        ];
   return (
     <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="production-email-title">
       <header className="border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line }}>
@@ -282,11 +300,7 @@ function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined 
       )}
 
       <div className="grid border-b md:grid-cols-3" style={{ borderColor: T.line }}>
-        {[
-          ['Fixed for everyone', weekly ? 'Branding, layout, legal footer and report structure' : 'Branding, onboarding explanation and legal footer'],
-          ['Personalized Monday', weekly ? 'Name, subject, location, latest reports and distances' : 'Name, location and that week’s current sample briefing'],
-          ['Delivery rule', weekly ? 'Only after that person’s welcome was delivered' : 'Only when no successful welcome is recorded'],
-        ].map(([label, value]) => <div key={label} className="border-b px-4 py-3 last:border-b-0 md:border-b-0 md:border-e md:last:border-e-0" style={{ borderColor: T.line }}><p className="text-[0.66rem] font-bold" style={{ color: T.ink }}>{label}</p><p className="mt-1 text-[0.68rem] leading-relaxed" style={{ color: T.muted }}>{value}</p></div>)}
+        {previewFacts.map(([label, value]) =><div key={label} className="border-b px-4 py-3 last:border-b-0 md:border-b-0 md:border-e md:last:border-e-0" style={{ borderColor: T.line }}><p className="text-[0.66rem] font-bold" style={{ color: T.ink }}>{label}</p><p className="mt-1 text-[0.68rem] leading-relaxed" style={{ color: T.muted }}>{value}</p></div>)}
       </div>
 
       <div className="p-3 sm:p-5" style={{ background: T.surface }}>

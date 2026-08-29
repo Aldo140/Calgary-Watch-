@@ -15,7 +15,7 @@ import { cn, publicAsset } from '@/src/lib/utils';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import IncidentRow from '@/src/components/IncidentRow';
 import { useSheetDrag, type SheetState } from '@/src/hooks/useSheetDrag';
-import { resolveDefaultSort, shouldAutoResolveNearest, sortIncidents, type SortBy } from '@/src/lib/feed';
+import { isRecentIncident, resolveDefaultSort, shouldAutoResolveNearest, sortIncidents, type SortBy } from '@/src/lib/feed';
 import { getDistance } from '@/src/lib/geo';
 import { MAP } from '@/src/lib/tokens';
 
@@ -295,7 +295,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
         feedFilter === 'community'
           ? isCommunityFacingIncident(i)
           : feedFilter === 'recent'
-            ? Date.now() - i.timestamp <= 2 * 60 * 60 * 1000
+            ? isRecentIncident(i)
             : true,
       )
       .filter((i) =>

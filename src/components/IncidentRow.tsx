@@ -1,9 +1,8 @@
 import { memo } from 'react';
 import { AlertCircle, ChevronRight } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
 import { CATEGORY_ICONS, type Incident } from '@/src/types';
 import { MAP, categoryColor } from '@/src/lib/tokens';
-import { formatDistance } from '@/src/lib/format';
+import { formatDistance, formatRelativeTime } from '@/src/lib/format';
 import { cn } from '@/src/lib/utils';
 
 export interface IncidentRowProps {
@@ -31,7 +30,7 @@ function IncidentRowBase({ incident, distanceKm, isActive, onSelect }: IncidentR
   const isOfficial = incident.data_source === 'official' || incident.data_source === 'system';
 
   const meta = [
-    `${formatDistanceToNow(incident.timestamp)} ago`,
+    formatRelativeTime(incident.timestamp),
     distanceKm === null ? '' : formatDistance(distanceKm),
     incident.neighborhood || 'Calgary',
   ]

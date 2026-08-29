@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { formatDistance } from '../src/lib/format.ts';
+import { formatDistance, formatRelativeTime } from '../src/lib/format.ts';
 
 describe('formatDistance', () => {
   it('states sub-kilometre distances in metres, rounded to ten', () => {
@@ -45,5 +45,22 @@ describe('formatDistance', () => {
     assert.equal(formatDistance(Number.NaN), '');
     assert.equal(formatDistance(Number.POSITIVE_INFINITY), '');
     assert.equal(formatDistance(-1), '');
+  });
+});
+
+describe('formatRelativeTime', () => {
+  const NOW = 1_700_000_000_000;
+  const HOUR = 60 * 60 * 1000;
+
+  it('reads a past time as "ago"', () => {
+    assert.equal(formatRelativeTime(NOW - 5 * 60 * 1000, NOW), '5 minutes ago');
+    assert.equal(formatRelativeTime(NOW - 24 * HOUR, NOW), '1 day ago');
+  });
+
+  it('reads a future time as "in", not "ago" — a planned outage that starts tomorrow has not happened', () => {
+    // Regression: the old `formatDistanceToNow(t) + " ago"` pattern rendered a
+    // future outage start as "1 day ago". Direction must survive.
+    assert.equal(formatRelativeTime(NOW + 24 * HOUR, NOW), 'in 1 day');
+    assert.equal(formatRelativeTime(NOW + 2 * HOUR, NOW), 'in about 2 hours');
   });
 });

@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import type { Incident } from '../src/types/index.ts';
-import { isSortBy, resolveDefaultSort, shouldAutoResolveNearest, sortIncidents } from '../src/lib/feed.ts';
+import { isRecentIncident, isSortBy, resolveDefaultSort, shouldAutoResolveNearest, sortIncidents } from '../src/lib/feed.ts';
 
 const DOWNTOWN = { lat: 51.0447, lng: -114.0719 };
 
@@ -63,6 +63,30 @@ describe('resolveDefaultSort', () => {
 
   it('does not strand the feed in nearest when location is unavailable', () => {
     assert.equal(resolveDefaultSort('nearest', false), 'newest');
+  });
+});
+
+describe('isRecentIncident', () => {
+  const NOW = 1_700_000_000_000;
+  const HOUR = 60 * 60 * 1000;
+
+  it('accepts incidents from within the last two hours', () => {
+    assert.equal(isRecentIncident(incident({ id: 'a', timestamp: NOW }), NOW), true);
+    assert.equal(isRecentIncident(incident({ id: 'b', timestamp: NOW - HOUR }), NOW), true);
+    assert.equal(isRecentIncident(incident({ id: 'c', timestamp: NOW - 2 * HOUR }), NOW), true);
+  });
+
+  it('rejects incidents older than two hours', () => {
+    assert.equal(isRecentIncident(incident({ id: 'd', timestamp: NOW - 2 * HOUR - 1 }), NOW), false);
+    assert.equal(isRecentIncident(incident({ id: 'e', timestamp: NOW - 24 * HOUR }), NOW), false);
+  });
+
+  it('rejects future-dated incidents — a planned outage that starts tomorrow is not "recent"', () => {
+    // Regression: a bare `age <= 2h` check treats a negative age as recent, so
+    // planned power outages (timestamped at their future start, up to 48h out)
+    // leaked into the "Recent 2h" feed reading "1 day ago".
+    assert.equal(isRecentIncident(incident({ id: 'f', timestamp: NOW + HOUR }), NOW), false);
+    assert.equal(isRecentIncident(incident({ id: 'g', timestamp: NOW + 24 * HOUR }), NOW), false);
   });
 });
 

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeTime } from '@/src/lib/format';
 import { X, FileText, Camera, Home, ArrowRight, Settings2, Compass, Sparkles, Wind, Eye } from 'lucide-react';
 import type { Incident } from '@/src/types';
 import { useHomeLocation } from '@/src/hooks/useHomeLocation';
@@ -834,7 +834,7 @@ export default function PersonalBriefing({
                           <ReportRow
                             key={incident.id} incident={incident} index={index} still={still}
                             badge={formatDistance(distanceM)}
-                            sub={`${sourceLabel(incident)} · ${formatDistanceToNow(incident.timestamp)} ago`}
+                            sub={`${sourceLabel(incident)} · ${formatRelativeTime(incident.timestamp)}`}
                             onOpen={() => { onSelectIncident(incident); onClose(); }}
                           />
                         ))}
@@ -1012,7 +1012,7 @@ export default function PersonalBriefing({
                   <ReportRow
                     key={incident.id} incident={incident} index={i} still={still}
                     icon={<Sparkles size={15} className="mt-[3px] shrink-0" style={{ color: T.gold }} aria-hidden="true" />}
-                    sub={`${formatDistanceToNow(incident.timestamp)} ago${
+                    sub={`${formatRelativeTime(incident.timestamp)}${
                       incident.report_count > 1 ? ` · ${incident.report_count} neighbours backed it up` : ''
                     }`}
                     onOpen={() => { onSelectIncident(incident); onClose(); }}

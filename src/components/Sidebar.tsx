@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
 import { Incident, IncidentCategory, CATEGORY_ICONS, STATUS_ICONS, isCommunityFacingIncident } from '@/src/types';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeTime } from '@/src/lib/format';
 import { Search, Layers, Maximize2, AlertCircle, Car, Construction, CloudRain, User, Siren, Activity, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { categoryColor } from '@/src/lib/tokens';
+import { isRecentIncident } from '@/src/lib/feed';
 import { motion, AnimatePresence, useSpring, useTransform } from 'motion/react';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
@@ -120,7 +121,7 @@ export default function Sidebar({
           feedFilter === 'community'
             ? isCommunityFacingIncident(i)
             : feedFilter === 'recent'
-              ? (Date.now() - i.timestamp) <= 2 * 60 * 60 * 1000
+              ? isRecentIncident(i)
               : true;
         return matchesCategory && matchesSearch && matchesFeedFilter;
       })
@@ -535,7 +536,7 @@ export default function Sidebar({
                                   </div>
                                 </div>
                                 <span className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#5A6B7D]">
-                                  {formatDistanceToNow(incident.timestamp)} ago · {incident.neighborhood || 'Calgary'} · by {getReporterDisplay(incident).firstName}
+                                  {formatRelativeTime(incident.timestamp)} · {incident.neighborhood || 'Calgary'} · by {getReporterDisplay(incident).firstName}
                                 </span>
                               </div>
                             </div>

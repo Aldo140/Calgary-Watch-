@@ -16,6 +16,24 @@ export function isSortBy(value: unknown): value is SortBy {
   return typeof value === 'string' && SORT_VALUES.includes(value);
 }
 
+/** The "Recent" feed filter's window: incidents from the last two hours. */
+export const RECENT_WINDOW_MS = 2 * 60 * 60 * 1000;
+
+/**
+ * Whether an incident falls inside the "Recent 2h" window.
+ *
+ * The window is the *past* two hours, so the age must be non-negative. That
+ * lower bound is the whole point of this helper: planned power outages carry a
+ * future start time as their `timestamp` (up to 48h out), and a bare
+ * `age <= 2h` check is also satisfied by a *negative* age, so scheduled work
+ * would flood the recent view reading "1 day ago". Requiring `age >= 0` keeps
+ * the filter to things that have actually happened.
+ */
+export function isRecentIncident(incident: Incident, now: number = Date.now()): boolean {
+  const age = now - incident.timestamp;
+  return age >= 0 && age <= RECENT_WINDOW_MS;
+}
+
 /** Verification strength, strongest first. */
 const VERIFIED_SCORE: Record<string, number> = {
   community_confirmed: 3,

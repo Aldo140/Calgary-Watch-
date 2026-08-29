@@ -46,9 +46,11 @@
     },
     {
       "id": "seo-2026-08-29-query-ctr-v2",
-      "status": "awaiting_deployment",
-      "deployedOn": null,
-      "commits": [],
+      "status": "active",
+      "deployedOn": "2026-08-29",
+      "commits": [
+        "e520f7e48f5de28367af265499b2e094bf86ecc9"
+      ],
       "routes": ["/map", "/calgary-neighbourhood-watch", "/airdrie-crime-map", "/privacy"],
       "targetQueries": [
         "calgary crime map",

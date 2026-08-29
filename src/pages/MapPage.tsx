@@ -21,6 +21,7 @@ import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, where, orderBy, limit, getDoc, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
 import { buildWatchFeed } from '@/src/lib/watch';
+import { DIGEST_CATEGORY_ORDER, DIGEST_CATEGORY_LABEL } from '@/src/lib/digest';
 import { mergeWatchState, readLocalWatch, writeLocalWatch } from '@/src/lib/watchProfile';
 import { logProductEvent } from '@/src/lib/productEvents';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
@@ -769,7 +770,7 @@ export default function MapPage() {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [authPanelMode, setAuthPanelMode] = useState<'signin' | 'settings'>('signin');
   const [userProfile, setUserProfile] = useState<UserProfileSettings | null>(null);
-  const [profileDraft, setProfileDraft] = useState({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false });
+  const [profileDraft, setProfileDraft] = useState({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false, digestCategories: [] as IncidentCategory[] });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
@@ -857,7 +858,7 @@ export default function MapPage() {
   useEffect(() => {
     if (!user || !db) {
       setUserProfile(null);
-      setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false });
+      setProfileDraft({ neighborhood: '', address: '', inferredNeighborhood: '', piiConsent: false, weeklyDigestOptIn: false, digestCategories: [] as IncidentCategory[] });
       if (!user) lastNeighborhoodReportUidRef.current = null;
       return;
     }
@@ -873,6 +874,7 @@ export default function MapPage() {
         // Newsletter consent must be an explicit opt-in. Missing legacy values
         // are treated as no consent, not as permission to send email.
         weeklyDigestOptIn: profile.weeklyDigestOptIn === true,
+        digestCategories: profile.digestCategories || [],
       });
 
       // Resolve inferredNeighborhood from the saved address.
@@ -1375,7 +1377,8 @@ export default function MapPage() {
   const isDirty =
     profileDraft.address !== (userProfile?.address ?? '') ||
     profileDraft.neighborhood !== (userProfile?.neighborhood ?? '') ||
-    profileDraft.weeklyDigestOptIn !== (userProfile?.weeklyDigestOptIn ?? false);
+    profileDraft.weeklyDigestOptIn !== (userProfile?.weeklyDigestOptIn ?? false) ||
+    profileDraft.digestCategories.join(',') !== (userProfile?.digestCategories ?? []).join(',');
 
   const preferredNeighborhood = (userProfile?.neighborhood || '').trim();
   const preferredInferredNeighborhood = (userProfile?.inferredNeighborhood || '').trim();
@@ -1423,6 +1426,7 @@ export default function MapPage() {
         weeklyDigestTopics: profileDraft.weeklyDigestOptIn
           ? ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates']
           : [],
+        digestCategories: profileDraft.weeklyDigestOptIn ? profileDraft.digestCategories : [],
         digestUnsubscribedAt: optedOutNow
           ? Date.now()
           : profileDraft.weeklyDigestOptIn ? null : (userProfile?.digestUnsubscribedAt ?? null),
@@ -2636,6 +2640,41 @@ export default function MapPage() {
                             </span>
                           </label>
 
+                          {/* Category preference — only meaningful once the digest
+                              is on. Empty selection means every category, so the
+                              default (nothing ticked) reads as "all". */}
+                          {profileDraft.weeklyDigestOptIn && (
+                            <div className="space-y-2 px-1">
+                              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                Digest topics <span style={{ color: '#9AA6B2' }}>· all if none picked</span>
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {DIGEST_CATEGORY_ORDER.map((cat) => {
+                                  const on = profileDraft.digestCategories.includes(cat);
+                                  return (
+                                    <button
+                                      key={cat}
+                                      type="button"
+                                      aria-pressed={on}
+                                      onClick={() => setProfileDraft((prev) => ({
+                                        ...prev,
+                                        digestCategories: on
+                                          ? prev.digestCategories.filter((c) => c !== cat)
+                                          : [...prev.digestCategories, cat],
+                                      }))}
+                                      className="px-2.5 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] transition-colors"
+                                      style={on
+                                        ? { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }
+                                        : { background: '#FFFDF8', color: '#5A6B7D', border: '1.5px solid #C9D8E4' }}
+                                    >
+                                      {DIGEST_CATEGORY_LABEL[cat]}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
                           {profileSaveError && (
                             <p className="px-3 py-2.5 text-[13px] font-bold"
                                style={{ background: 'rgba(192,57,43,0.08)', border: '1.5px solid rgba(192,57,43,0.45)', color: '#96271C' }}>
@@ -2665,6 +2704,7 @@ export default function MapPage() {
                                     inferredNeighborhood: userProfile?.inferredNeighborhood || '',
                                     piiConsent: Boolean(userProfile?.piiConsentAt),
                                     weeklyDigestOptIn: userProfile?.weeklyDigestOptIn === true,
+                                    digestCategories: userProfile?.digestCategories || [],
                                   });
                                   setProfileSaveError(null);
                                 }}

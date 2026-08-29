@@ -279,6 +279,8 @@ export interface ScoredIncident {
   distanceM: number | null;
   /** Older than the measured week and included only as useful local context. */
   contextOnly?: boolean;
+  /** Distinct residents who corroborated this report (from incident_feedback). */
+  corroborations?: number;
 }
 
 /**
@@ -407,7 +409,11 @@ export function digestHighlightScore(item: ScoredIncident, now: number): number 
         ? 150
         : 0;
   const proximity = item.distanceM === null ? 0 : Math.max(0, 160 - item.distanceM / 60);
-  const confirmation = Math.min(80, Math.max(0, (incident.report_count ?? 1) - 1) * 20);
+  // Confidence rises with either duplicate reports or resident corroboration —
+  // whichever is the stronger signal. Corroboration lets neighbours contribute
+  // the confirmation that report_count alone used to carry.
+  const backing = Math.max(Math.max(0, (incident.report_count ?? 1) - 1), item.corroborations ?? 0);
+  const confirmation = Math.min(80, backing * 20);
   const actionWords = /\b(stolen|theft|break.?in|robbery|wanted|charged|arrest|fraud|vandal|assault|shoot|missing)\b/i
     .test(`${incident.title} ${incident.description}`) ? 70 : 0;
   return HIGHLIGHT_CATEGORY_WEIGHT[incident.category] + sourceBonus + proximity
@@ -488,6 +494,8 @@ export function buildDigestSummary(options: {
   home?: Point | null;
   now: number;
   rings?: ReadonlyArray<{ metres: number; label: string }>;
+  /** Resident corroboration counts by incident id, from incident_feedback. */
+  corroborations?: ReadonlyMap<string, number>;
 }): DigestSummary {
   const { incidents, profile, home, now } = options;
   const rings = options.rings ?? DIGEST_RINGS;
@@ -526,6 +534,7 @@ export function buildDigestSummary(options: {
           needsLocation: false,
           widenedToCity: false,
           since, until: now,
+          corroborations: options.corroborations,
         });
       }
     }
@@ -550,6 +559,7 @@ export function buildDigestSummary(options: {
         needsLocation: false,
         widenedToCity: false,
         since, until: now,
+        corroborations: options.corroborations,
       });
     }
   }
@@ -575,6 +585,7 @@ export function buildDigestSummary(options: {
     needsLocation: !savedArea && !home,
     widenedToCity: Boolean(savedArea || home),
     since, until: now,
+    corroborations: options.corroborations,
   });
 }
 
@@ -596,6 +607,7 @@ function finish(parts: {
   widenedToCity: boolean;
   since: number;
   until: number;
+  corroborations?: ReadonlyMap<string, number>;
 }): DigestSummary {
   const items = [...parts.items].sort((a, b) => {
     if (a.distanceM !== null && b.distanceM !== null && a.distanceM !== b.distanceM) {
@@ -612,6 +624,7 @@ function finish(parts: {
   const highlightPool = (parts.highlightPool ?? items).map((item) => ({
     ...item,
     contextOnly: item.incident.timestamp < parts.since,
+    corroborations: parts.corroborations?.get(item.incident.id) ?? item.corroborations ?? 0,
   }));
   const highlights = selectDigestHighlights(highlightPool, parts.until);
   const contextHighlightCount = highlights.filter((item) => item.contextOnly).length;

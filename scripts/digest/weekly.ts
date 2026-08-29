@@ -58,6 +58,7 @@ import {
   type DigestRecipient,
 } from '../../src/lib/digest.js';
 import { buildDigestAudienceForecast, normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
+import { aggregateFeedback, type IncidentFeedback } from '../../src/lib/feedback.js';
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
 import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { WELCOME } from './copy.js';
@@ -225,6 +226,29 @@ async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident
   });
 }
 
+/**
+ * Resident corroboration per incident, from incident_feedback. Feedback is
+ * small relative to the incident set, so one read of the collection is cheaper
+ * than a per-incident query, and the aggregate reuses the same reducer the map
+ * detail panel uses so the two never drift.
+ */
+async function loadCorroborations(db: Firestore, now: number): Promise<Map<string, number>> {
+  const snapshot = await db.collection('incident_feedback').get();
+  const byIncident = new Map<string, IncidentFeedback[]>();
+  for (const doc of snapshot.docs) {
+    const d = doc.data() as IncidentFeedback;
+    if (!d?.incidentId) continue;
+    const list = byIncident.get(d.incidentId);
+    if (list) list.push(d);
+    else byIncident.set(d.incidentId, [d]);
+  }
+  const out = new Map<string, number>();
+  for (const [incidentId, docs] of byIncident) {
+    out.set(incidentId, aggregateFeedback(docs, now).corroborations);
+  }
+  return out;
+}
+
 async function loadWeeklyContribution(db: Firestore, weekKey: string): Promise<DigestContribution | undefined> {
   const snapshot = await db.collection(PLANS).doc(weekKey).get();
   if (!snapshot.exists || snapshot.data()?.status !== 'published') return undefined;
@@ -308,6 +332,8 @@ async function run(): Promise<void> {
 
   const incidents = await loadRecentIncidents(db, now);
   console.log(`[digest] ${incidents.length} public report(s) in the last 28 days`);
+  const corroborations = await loadCorroborations(db, now);
+  console.log(`[digest] resident corroboration on ${corroborations.size} report(s)`);
   const contribution = await loadWeeklyContribution(db, weekKey);
   console.log(`[digest] opening contribution ${contribution ? `revision ${contribution.revision ?? 1}` : 'not scheduled'}`);
 
@@ -376,7 +402,7 @@ async function run(): Promise<void> {
         home = geocodeCache.get(address) ?? null;
       }
 
-      const summary = buildDigestSummary({ incidents, profile, home, now });
+      const summary = buildDigestSummary({ incidents, profile, home, now, corroborations });
       const token = await ensureUnsubToken(db, profile);
       const unsubUrl = unsubscribeUrl(origin, profile.uid, token);
 

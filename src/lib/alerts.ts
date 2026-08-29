@@ -76,6 +76,19 @@ export function isWithinQuietHours(prefs: AlertPreferences, now: number): boolea
  * future-dated planned item), a real community report, in an allowed category,
  * inside a watched zone — and is dropped entirely during quiet hours.
  */
+/**
+ * The title and body of the push notification for a set of alerts. Shared by
+ * the sender and the admin preview so what a moderator reviews is exactly what
+ * a phone shows.
+ */
+export function alertPushContent(alerts: Incident[]): { title: string; body: string } {
+  const lead = alerts[0];
+  return {
+    title: alerts.length === 1 ? 'Report near you' : `${alerts.length} reports near you`,
+    body: alerts.length === 1 ? (lead?.title ?? '') : `${lead?.title ?? ''} +${alerts.length - 1} more`,
+  };
+}
+
 export function selectAlerts(input: {
   incidents: Incident[];
   prefs: AlertPreferences;

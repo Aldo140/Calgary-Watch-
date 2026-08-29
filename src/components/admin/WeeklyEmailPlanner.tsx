@@ -3,13 +3,15 @@ import {
   collection, doc, getDoc, onSnapshot, query, runTransaction, where, writeBatch,
 } from 'firebase/firestore';
 import {
-  AlertTriangle, Bold, BookOpenText, CalendarDays, Check, Copy, Eye, FileText, Heading3,
+  AlertTriangle, Bell, Bold, BookOpenText, CalendarDays, Check, Copy, Eye, FileText, Heading3,
   HelpCircle, History, Inbox, LayoutDashboard, Link2, List, Loader2, MailCheck, MapPin, Monitor, Newspaper, PenLine, Quote, RefreshCw,
   Send, ShieldCheck, Smartphone, Sparkles, Trash2, Users, X,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
+import { alertPushContent } from '@/src/lib/alerts';
+import type { Incident } from '@/src/types';
 import type { UserProfile } from '@/src/hooks/useAdminData';
 import {
   CONTRIBUTION_STYLE_COPY,
@@ -224,6 +226,40 @@ function OpeningPreview({
   );
 }
 
+/**
+ * A mock of the browser/phone push that rides along with the alert email, built
+ * from the same alertPushContent the sender uses so the two never diverge. The
+ * sample mirrors the alert-email fixture (an emergency + two nearby reports).
+ */
+function PushNotificationPreview() {
+  const sample = [
+    { title: 'Grass fire near the pathway' },
+    { title: 'Break and enter on the 200 block' },
+    { title: 'Catalytic converter theft reported' },
+  ] as unknown as Incident[];
+  const { title, body } = alertPushContent(sample);
+  return (
+    <div className="mx-auto mb-4 max-w-[26rem]">
+      <p className="mb-2 flex items-center gap-1.5 text-[0.68rem] font-bold" style={{ color: T.muted }}>
+        <Smartphone size={12} /> Also delivered as a push notification
+      </p>
+      <div className="flex items-start gap-3 rounded-2xl p-3 shadow-sm" style={{ background: '#F4F5F7', border: '1px solid #E2E5EA' }}>
+        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ background: '#06162F' }}>
+          <Bell size={17} className="text-[#F2EFE8]" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 text-[0.64rem]" style={{ color: '#6B7280' }}>
+            <span className="font-semibold" style={{ color: '#374151' }}>Calgary Watch</span>
+            <span>· now</span>
+          </div>
+          <p className="mt-0.5 text-[0.82rem] font-bold leading-tight" style={{ color: '#111827' }}>{title}</p>
+          <p className="mt-0.5 text-[0.76rem] leading-snug" style={{ color: '#4B5563' }}>{body}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined }) {
   const [route, setRoute] = useState<SubscriberPreview>('weekly-local');
   const [html, setHtml] = useState('');
@@ -308,6 +344,7 @@ function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined 
           <p className="text-xs font-bold" style={{ color: T.ink }}>{active.label} · representative subscriber</p>
           <a href={`${import.meta.env.BASE_URL}email-previews/${active.file}`} target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border bg-white px-2.5 text-[0.72rem] font-bold focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}><Eye size={13} /> Open full size</a>
         </div>
+        {route === 'alert' && <PushNotificationPreview />}
         <div className="mx-auto max-w-[42rem] overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }}>
           {error ? <div className="flex min-h-64 flex-col items-center justify-center gap-2 p-6 text-center" role="alert"><AlertTriangle size={20} style={{ color: T.critical }} /><p className="max-w-md text-xs" style={{ color: T.muted }}>{error}</p></div> : html ? <iframe srcDoc={html} title={`${active.label} production email preview`} className="block h-[48rem] w-full bg-white" sandbox="" /> : <div className="h-[48rem] space-y-5 p-8 motion-safe:animate-pulse" aria-label="Loading production email preview"><div className="mx-auto h-12 w-52 rounded-lg" style={{ background: T.line }} /><div className="mx-auto h-40 max-w-lg rounded-xl" style={{ background: T.card }} /><div className="mx-auto h-56 max-w-lg rounded-xl" style={{ background: T.card }} /></div>}
         </div>

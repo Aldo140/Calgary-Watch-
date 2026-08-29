@@ -28,7 +28,7 @@ import { getMessaging } from 'firebase-admin/messaging';
 import type { Firestore } from 'firebase-admin/firestore';
 
 import type { Incident } from '../../src/types/index.js';
-import { selectAlerts } from '../../src/lib/alerts.js';
+import { selectAlerts, alertPushContent } from '../../src/lib/alerts.js';
 import { readAlertPreferences, type AlertProfileFields } from '../../src/lib/alertProfile.js';
 import { renderAlertEmail } from './render.js';
 import { loadSenderConfig, sendDigestEmail, sleep, type OutgoingEmail } from '../digest/send.js';
@@ -99,9 +99,7 @@ function renderAlert(recipient: AlertRecipient, alerts: Incident[], now: number)
  */
 async function sendPush(recipient: AlertRecipient, alerts: Incident[], dryRun: boolean): Promise<void> {
   if (recipient.pushTokens.length === 0) return;
-  const lead = alerts[0];
-  const title = alerts.length === 1 ? 'Report near you' : `${alerts.length} reports near you`;
-  const body = alerts.length === 1 ? lead.title : `${lead.title} +${alerts.length - 1} more`;
+  const { title, body } = alertPushContent(alerts);
   if (dryRun) {
     console.log(`[alerts] dry run — would push to ${recipient.pushTokens.length} device(s) for ${recipient.uid}`);
     return;

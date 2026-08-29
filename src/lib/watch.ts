@@ -95,9 +95,13 @@ export function buildWatchFeed(input: {
   const { incidents, home, since, prefs, now } = input;
 
   const items: WatchItem[] = incidents
-    // "Since you last checked": strictly newer than the last-seen mark. A null
-    // mark is a first visit, so nothing is filtered out.
-    .filter((i) => since === null || i.timestamp > since)
+    // "Since you last checked" is a window of things that have *happened*:
+    // newer than the last-seen mark (a null mark is a first visit, so no lower
+    // bound) and not in the future. The upper bound matters — planned outages
+    // carry their future start time as a timestamp, and without it a work order
+    // scheduled for tomorrow would surface as "new since you looked" every time
+    // the reader checks, never clearing.
+    .filter((i) => (since === null || i.timestamp > since) && i.timestamp <= now)
     .filter((i) => prefs.categories.length === 0 || prefs.categories.includes(i.category))
     .map((i) => ({
       incident: i,

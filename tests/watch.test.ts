@@ -49,6 +49,25 @@ describe('buildWatchFeed — since window', () => {
     assert.deepEqual(feed.items.map((i) => i.incident.id), ['new']);
   });
 
+  it('excludes future-dated incidents — a planned outage tomorrow has not happened "since"', () => {
+    const feed = buildWatchFeed({
+      incidents: [
+        inc({ id: 'past', timestamp: NOW - 10 * 60_000, data_source: 'community' }),
+        inc({
+          id: 'future-outage',
+          timestamp: NOW + 24 * 60 * 60_000,
+          data_source: 'official',
+          category: 'infrastructure',
+        }),
+      ],
+      home: HOME,
+      since: NOW - 60 * 60_000,
+      prefs: { radiusM: null, categories: [] },
+      now: NOW,
+    });
+    assert.deepEqual(feed.items.map((i) => i.incident.id), ['past']);
+  });
+
   it('with since=null returns everything (first visit)', () => {
     const feed = buildWatchFeed({
       incidents: [inc({ id: 'a' }), inc({ id: 'b', timestamp: NOW - 9e8 })],

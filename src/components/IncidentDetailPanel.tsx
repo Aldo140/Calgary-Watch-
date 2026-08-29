@@ -2,12 +2,15 @@ import { Incident, STATUS_ICONS, CATEGORY_ICONS, FLAG_THRESHOLD, isPubliclyVisib
 import { findNearestCamera, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
 import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeTime } from '@/src/lib/format';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
+import { useIncidentFeedback } from '@/src/hooks/useIncidentFeedback';
+import { feedbackSummary, type FeedbackKind } from '@/src/lib/feedback';
+import { recordFeedback } from '@/src/lib/feedbackClient';
 import { CATEGORY } from '@/src/lib/tokens';
 
 // ── Field-atlas palette (matches the landing brand; explicit hexes on purpose:
@@ -89,6 +92,10 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
   // Must be declared before any early return to satisfy Rules of Hooks
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
+  // Resident lifecycle for this report — declared before the early return to
+  // satisfy the Rules of Hooks; the hook no-ops for a null incident.
+  const { aggregate: feedbackAgg, myKind } = useIncidentFeedback(incident?.id ?? null);
+  const [feedbackPending, setFeedbackPending] = useState<FeedbackKind | null>(null);
   const [flagged, setFlagged] = useState(false);
   const [flagConfirm, setFlagConfirm] = useState(false);
   const [flagging, setFlagging] = useState(false);
@@ -108,6 +115,13 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
   }, []);
 
   if (!incident) return null;
+
+  const submitFeedback = async (kind: FeedbackKind) => {
+    if (!user || feedbackPending) return;
+    setFeedbackPending(kind);
+    await recordFeedback(incident.id, kind, user.uid);
+    setFeedbackPending(null);
+  };
 
   const isSystem = (incident.data_source != null && incident.data_source !== 'community') || incident.authorUid === 'system';
 
@@ -192,11 +206,11 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
 
   const incidentUrl = buildIncidentUrl(incident.id);
   const emoji = CATEGORY_EMOJI[incident.category] ?? '📍';
-  const timeAgo = formatDistanceToNow(incident.timestamp);
+  const relativeTime = formatRelativeTime(incident.timestamp);
 
   const tweetText = [
     `${emoji} ${incident.title}`,
-    `📍 ${incident.neighborhood || 'Calgary'} · ${timeAgo} ago`,
+    `📍 ${incident.neighborhood || 'Calgary'} · ${relativeTime}`,
     '',
     incidentUrl,
     '',
@@ -237,7 +251,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
 
   const encodedUrl = encodeURIComponent(incidentUrl);
   const encodedTitle = encodeURIComponent(`Calgary Watch: ${incident.title}`);
-  const encodedBody = encodeURIComponent(`${incident.title}\n${incident.neighborhood || 'Calgary'} · ${timeAgo} ago\n\n${incidentUrl}`);
+  const encodedBody = encodeURIComponent(`${incident.title}\n${incident.neighborhood || 'Calgary'} · ${relativeTime}\n\n${incidentUrl}`);
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${incident.title} — ${incidentUrl}`)}`;
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
   const emailUrl = `mailto:?subject=${encodedTitle}&body=${encodedBody}`;
@@ -352,7 +366,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   </span>
                   <span className="inline-flex items-center gap-1.5">
                     <Clock size={11} />
-                    {timeAgo} ago
+                    {relativeTime}
                   </span>
                 </div>
               </div>
@@ -406,6 +420,44 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   </p>
                 </div>
               </div>
+
+              {/* Resident lifecycle — only for community reports; official feeds
+                  (outages, weather) are not corroborated this way. */}
+              {!isSystem && (
+                <div className="space-y-2.5">
+                  <SectionLabel>Neighbour confirmation</SectionLabel>
+                  <p className="text-[12.5px] font-bold" style={{ color: P.ink }}>
+                    {feedbackSummary(feedbackAgg, Date.now())}
+                  </p>
+                  {user ? (
+                    <div className="flex flex-wrap gap-2">
+                      {([
+                        ['saw_it', 'I saw this too'],
+                        ['still_happening', 'Still happening'],
+                        ['resolved', 'Seems resolved'],
+                      ] as [FeedbackKind, string][]).map(([kind, label]) => (
+                        <button
+                          key={kind}
+                          type="button"
+                          disabled={feedbackPending !== null}
+                          onClick={() => void submitFeedback(kind)}
+                          aria-pressed={myKind === kind}
+                          className="inline-flex min-h-11 items-center px-3 py-2 text-[12px] font-bold transition-colors disabled:opacity-60"
+                          style={
+                            myKind === kind
+                              ? { background: P.ground, color: P.onGround, border: `1px solid ${P.ground}` }
+                              : { background: P.paper, color: P.ink, border: `1px solid ${P.line}` }
+                          }
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11.5px]" style={{ color: P.soft }}>Sign in to add your confirmation.</p>
+                  )}
+                </div>
+              )}
 
               {incident.image_url && (
                 <div className="space-y-2.5">

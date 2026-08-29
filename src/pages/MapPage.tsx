@@ -24,6 +24,7 @@ import { buildWatchFeed } from '@/src/lib/watch';
 import { DIGEST_CATEGORY_ORDER, DIGEST_CATEGORY_LABEL } from '@/src/lib/digest';
 import { mergeWatchState, readLocalWatch, writeLocalWatch } from '@/src/lib/watchProfile';
 import { logProductEvent } from '@/src/lib/productEvents';
+import { enablePush, disablePush, isPushSupported, isPushConfigured, pushPermission, type PushStatus } from '@/src/lib/push';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
 import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipalityCrimeStats';
@@ -103,6 +104,8 @@ type UserProfileSettings = {
   alertQuietEndHour?: number;
   /** Server-side dedup cursor for the alert-sending job. */
   alertLastSentAt?: number;
+  /** Registered browser-push tokens for this reader (W3-5). */
+  pushTokens?: string[];
 };
 
 const FALLBACK_NEIGHBORHOODS = [
@@ -2272,6 +2275,23 @@ export default function MapPage() {
     } catch { /* profile listener will re-sync */ }
   }, [user]);
 
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushResult, setPushResult] = useState<PushStatus | null>(null);
+  const togglePush = useCallback(async () => {
+    if (!user || pushBusy) return;
+    setPushBusy(true);
+    try {
+      if (pushPermission() === 'granted') {
+        await disablePush(user.uid);
+        setPushResult(null);
+      } else {
+        setPushResult(await enablePush(user.uid));
+      }
+    } finally {
+      setPushBusy(false);
+    }
+  }, [user, pushBusy]);
+
   return (
     <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
@@ -2493,6 +2513,29 @@ export default function MapPage() {
                                         <strong style={{ color: '#1C2B3A' }}>Quiet hours 10 PM–7 AM.</strong> Emergencies still come through.
                                       </span>
                                     </label>
+
+                                    {/* Browser push — only rendered where the browser
+                                        supports it and a VAPID key is configured, so it
+                                        stays invisible until push is fully set up. */}
+                                    {isPushSupported() && isPushConfigured() && (
+                                      <div className="flex items-center justify-between gap-3">
+                                        <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
+                                          <strong style={{ color: '#1C2B3A' }}>Browser push on this device.</strong>{' '}
+                                          {pushResult === 'denied' ? 'Permission was blocked in your browser.' : 'Get alerts even when the tab is closed.'}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          disabled={pushBusy}
+                                          onClick={() => void togglePush()}
+                                          className="shrink-0 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.14em] disabled:opacity-60"
+                                          style={pushPermission() === 'granted'
+                                            ? { background: 'rgba(46,139,122,0.14)', color: '#2E8B7A', border: '1.5px solid rgba(46,139,122,0.45)' }
+                                            : { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }}
+                                        >
+                                          {pushBusy ? '…' : pushPermission() === 'granted' ? 'On' : 'Enable'}
+                                        </button>
+                                      </div>
+                                    )}
                                     <div className="space-y-1.5">
                                       <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
                                         Alert categories <span style={{ color: '#9AA6B2' }}>· all if none picked</span>

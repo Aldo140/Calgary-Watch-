@@ -24,6 +24,7 @@
 
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getMessaging } from 'firebase-admin/messaging';
 import type { Firestore } from 'firebase-admin/firestore';
 
 import type { Incident } from '../../src/types/index.js';
@@ -48,6 +49,7 @@ interface AlertRecipient {
   displayName?: string;
   profile: Record<string, unknown>;
   alertLastSentAt: number | null;
+  pushTokens: string[];
 }
 
 async function loadAlertRecipients(db: Firestore): Promise<AlertRecipient[]> {
@@ -66,6 +68,7 @@ async function loadAlertRecipients(db: Firestore): Promise<AlertRecipient[]> {
         displayName: typeof d.displayName === 'string' ? d.displayName : undefined,
         profile: d,
         alertLastSentAt: typeof d.alertLastSentAt === 'number' ? d.alertLastSentAt : null,
+        pushTokens: Array.isArray(d.pushTokens) ? d.pushTokens.filter((t: unknown): t is string => typeof t === 'string') : [],
       };
     })
     .filter((r) => r.email && r.profile.alertsEnabled === true)
@@ -122,6 +125,39 @@ function renderAlert(recipient: AlertRecipient, alerts: Incident[], now: number)
   return { to: recipient.email, subject, html, text };
 }
 
+/**
+ * Deliver a push to the reader's registered devices, alongside the email. Best
+ * effort: a bad token is pruned, and any failure is swallowed so it never
+ * blocks the run. A dry run logs and sends nothing.
+ */
+async function sendPush(recipient: AlertRecipient, alerts: Incident[], dryRun: boolean): Promise<void> {
+  if (recipient.pushTokens.length === 0) return;
+  const lead = alerts[0];
+  const title = alerts.length === 1 ? 'Report near you' : `${alerts.length} reports near you`;
+  const body = alerts.length === 1 ? lead.title : `${lead.title} +${alerts.length - 1} more`;
+  if (dryRun) {
+    console.log(`[alerts] dry run — would push to ${recipient.pushTokens.length} device(s) for ${recipient.uid}`);
+    return;
+  }
+  try {
+    const res = await getMessaging().sendEachForMulticast({
+      tokens: recipient.pushTokens,
+      notification: { title, body },
+      data: { url: `${ORIGIN}/map` },
+    });
+    // Prune tokens the provider rejected as unregistered.
+    const dead: string[] = [];
+    res.responses.forEach((r, i) => { if (!r.success) dead.push(recipient.pushTokens[i]); });
+    if (dead.length) {
+      const { FieldValue } = await import('firebase-admin/firestore');
+      await getFirestore().collection('users').doc(recipient.uid)
+        .update({ pushTokens: FieldValue.arrayRemove(...dead) }).catch(() => {});
+    }
+  } catch (error) {
+    console.warn(`[alerts] push failed ${recipient.uid}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 }
@@ -152,11 +188,13 @@ async function run(): Promise<void> {
     const result = await sendDigestEmail(email, config);
     if (result.ok && !result.skipped) {
       sent += 1;
+      await sendPush(recipient, alerts, config.dryRun);
       // Advance the cursor only on a real send, so a dry run never suppresses
       // the next live run's alerts.
       await db.collection('users').doc(recipient.uid).set({ alertLastSentAt: now }, { merge: true }).catch(() => {});
       console.log(`[alerts] sent ${alerts.length} to ${recipient.uid}`);
     } else if (result.skipped) {
+      await sendPush(recipient, alerts, true);
       console.log(`[alerts] dry run — would send ${alerts.length} to ${recipient.uid}`);
     } else {
       failed += 1;

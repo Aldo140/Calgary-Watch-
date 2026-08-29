@@ -66,7 +66,7 @@ jobs:
         run: npx firebase-tools deploy --only firestore:rules,storage --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
 
       - name: Configure email provider secret
-        if: ${{ inputs.target == 'all' || inputs.target == 'functions' }}
+        if: ${{ inputs.target == 'all' }}
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: printf '%s' "$RESEND_API_KEY" | npx firebase-tools functions:secrets:set RESEND_API_KEY --data-file - --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}"

@@ -373,6 +373,26 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Product activation funnel (My Watch). Records THAT a step happened, never
+    // WHERE someone lives or WHAT they wrote: the client sanitizes props, and
+    // this rule is the backstop — any document still carrying a locating field
+    // is refused. Events are immutable and readable only by admins.
+    match /product_events/{eventId} {
+      allow create: if isAuthenticated() &&
+                    request.resource.data.name is string &&
+                    request.resource.data.name.size() <= 40 &&
+                    request.resource.data.ts is number &&
+                    !('address' in request.resource.data) &&
+                    !('description' in request.resource.data) &&
+                    !('title' in request.resource.data) &&
+                    !('email' in request.resource.data) &&
+                    !('lat' in request.resource.data) &&
+                    !('lng' in request.resource.data) &&
+                    !('distanceM' in request.resource.data);
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
     // Official third-party snapshots published by the ingest pipeline
     // (e.g. live_data/power_outages from the ENMAX feed).
     // Public read so the map layer works for signed-out visitors. Writes come

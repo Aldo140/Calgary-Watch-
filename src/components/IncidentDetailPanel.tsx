@@ -1,12 +1,12 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS, FLAG_THRESHOLD, isPubliclyVisible } from '@/src/types';
 import { findNearestCamera, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, Trash2, ArrowRight } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn, publicAsset } from '@/src/lib/utils';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 import { CATEGORY } from '@/src/lib/tokens';
 
@@ -93,16 +93,11 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
   const [flagConfirm, setFlagConfirm] = useState(false);
   const [flagging, setFlagging] = useState(false);
   const [flagError, setFlagError] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState(false);
 
   useEffect(() => {
     setFlagged(false);
     setFlagConfirm(false);
     setFlagError(false);
-    setDeleteConfirm(false);
-    setDeleteError(false);
   }, [incident?.id]);
 
   useEffect(() => {
@@ -132,22 +127,6 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
     !alreadyFlaggedByMe &&
     isPubliclyVisible(incident) &&
     user?.uid !== incident.authorUid;
-  const canDelete = Boolean(user) && !isSystem && user?.uid === incident.authorUid;
-
-  const handleDelete = async () => {
-    if (!user || !db || !incident.id) return;
-    setDeleteError(false);
-    setDeleting(true);
-    try {
-      await deleteDoc(doc(db, 'incidents', incident.id));
-      onClose();
-    } catch {
-      setDeleteError(true);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   const handleFlag = async () => {
     if (!user || !db || !incident.id) return;
     setFlagError(false);
@@ -558,44 +537,9 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
               </div>
 
               {/* Moderation */}
-              {(canDelete || canFlag) && (
+              {canFlag && (
                 <div className="space-y-2">
-                  {canDelete && (
-                    deleteConfirm ? (
-                      <div className="rounded-none overflow-hidden" style={{ border: '1px solid rgba(192,57,43,0.38)', background: 'rgba(192,57,43,0.08)' }}>
-                        <div className="flex gap-2 items-center p-3">
-                          <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#A6332A' }}>Delete your report permanently?</p>
-                          <button
-                            onClick={() => void handleDelete()}
-                            disabled={deleting}
-                            className="px-3 py-1.5 rounded-none text-[11px] font-black transition-all disabled:opacity-50"
-                            style={{ background: '#C0392B', color: '#fff' }}
-                          >
-                            {deleting ? 'Deleting…' : 'Delete'}
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirm(false)}
-                            className="px-3 py-1.5 rounded-none text-[11px] font-black"
-                            style={{ background: P.card, color: P.ink, border: `1px solid ${P.line}` }}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                        {deleteError && <p className="px-3 pb-3 text-[11px] font-bold" style={{ color: '#C0392B' }}>Failed to delete. Try again.</p>}
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeleteConfirm(true)}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-none h-10 font-mono text-[10px] font-bold uppercase tracking-[0.18em] transition-colors hover:bg-[rgba(192,57,43,0.08)]"
-                        style={{ color: '#A6332A', border: `1px solid ${P.line}` }}
-                      >
-                        <Trash2 size={13} />
-                        Delete my report
-                      </button>
-                    )
-                  )}
-                  {canFlag && (
-                    flagConfirm ? (
+                  {flagConfirm ? (
                       <div className="rounded-none overflow-hidden" style={{ border: '1px solid rgba(199,127,24,0.42)', background: 'rgba(199,127,24,0.09)' }}>
                         <div className="flex gap-2 items-center p-3">
                           <p className="flex-1 text-[11.5px] font-bold" style={{ color: '#8A5710' }}>
@@ -630,8 +574,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                         <Flag size={13} />
                         Report inappropriate
                       </button>
-                    )
-                  )}
+                    )}
                 </div>
               )}
 

@@ -32,6 +32,7 @@ export interface SeoConfig {
 export const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
 export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero/hero-wide.webp';
 const LAST_MOD = '2026-08-13';
+const SEO_REFRESH_MOD = '2026-08-29';
 
 export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/': {
@@ -44,12 +45,12 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/map': {
-    title: 'Calgary Crime Map: Live Incidents Near You | Calgary Watch',
+    title: 'Calgary Crime Map: Recent Reports Near You | Calgary Watch',
     description:
-      'See it. Share it. Calgary knows. Community-reported crime, traffic, weather and emergency incidents across Calgary and Airdrie, on one live map.',
+      'Check recent Calgary crime, traffic, weather, infrastructure and emergency reports near you. Every map marker includes its time and source.',
     index: true,
     pageType: 'WebPage',
-    dateModified: LAST_MOD,
+    dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
   '/about': {
@@ -71,26 +72,53 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/calgary-neighbourhood-watch': {
-    title: 'Calgary Neighbourhood Watch Guide | Crime Map & Reporting',
+    title: 'Calgary Crime Map & Neighbourhood Watch Guide',
     description:
-      'Check recent incidents near you, understand Calgary crime-map sources, learn how Block Watch differs, and choose 911 or police non-emergency when needed.',
+      'Check recent Calgary reports near you, understand crime-map sources, learn how Block Watch differs, and choose the right official reporting channel.',
     index: true,
     pageType: 'WebPage',
-    dateModified: LAST_MOD,
+    dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
   '/airdrie-crime-map': {
-    title: 'Airdrie Crime Map: Community Reports & Official Sources',
+    title: 'Airdrie Crime Map: Recent Reports & Official RCMP Map',
     description:
-      'View recent Airdrie-area community reports, compare the official City of Airdrie crime map, and find the correct RCMP emergency and non-emergency contacts.',
+      'Check recent Airdrie-area community reports and compare the City of Airdrie’s official map for crime reported to RCMP. Includes reporting contacts.',
     index: true,
     pageType: 'WebPage',
-    dateModified: LAST_MOD,
+    dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
   '/admin': {
     title: 'Admin Portal | Calgary Watch',
     description: 'Administrative dashboard for Calgary Watch operations and moderation.',
+    index: false,
+    pageType: 'WebPage',
+  },
+  '/admin/users': {
+    title: 'User Directory | Calgary Watch Admin',
+    description: 'Administrative user directory for Calgary Watch.',
+    index: false,
+    pageType: 'WebPage',
+  },
+  '/admin/incidents': {
+    title: 'Report Directory | Calgary Watch Admin',
+    description: 'Administrative report directory for Calgary Watch.',
+    index: false,
+    pageType: 'WebPage',
+  },
+  '/privacy': {
+    title: 'Privacy Policy | Calgary Watch',
+    description:
+      'Learn what Calgary Watch collects, why it is needed, how long it is retained, and how to exercise your privacy choices.',
+    index: true,
+    pageType: 'WebPage',
+    dateModified: SEO_REFRESH_MOD,
+    image: DEFAULT_IMAGE,
+  },
+  '/unsubscribe': {
+    title: 'Email Preferences | Calgary Watch',
+    description: 'Update Calgary Watch email preferences securely.',
     index: false,
     pageType: 'WebPage',
   },
@@ -113,11 +141,15 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
   ],
   '/calgary-neighbourhood-watch': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
-    { name: 'Calgary Neighbourhood Watch Guide', item: `${PRODUCTION_ORIGIN}/calgary-neighbourhood-watch` },
+    { name: 'Calgary Crime Map & Neighbourhood Watch Guide', item: `${PRODUCTION_ORIGIN}/calgary-neighbourhood-watch` },
   ],
   '/airdrie-crime-map': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
     { name: 'Airdrie Crime Map Guide', item: `${PRODUCTION_ORIGIN}/airdrie-crime-map` },
+  ],
+  '/privacy': [
+    { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
+    { name: 'Privacy Policy', item: `${PRODUCTION_ORIGIN}/privacy` },
   ],
 };
 
@@ -125,6 +157,12 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
 export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
   .filter(([, config]) => config.index)
   .map(([route]) => route);
+
+/**
+ * Public utility pages also need correct first-response robots/canonical tags.
+ * They are rendered as static files but deliberately excluded from the sitemap.
+ */
+export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe'];
 
 export function getSeoConfig(pathname: string): SeoConfig {
   return ROUTE_SEO[pathname] ?? ROUTE_SEO['/'];

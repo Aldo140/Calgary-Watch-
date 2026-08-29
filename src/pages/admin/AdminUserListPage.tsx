@@ -9,13 +9,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import {
   ArrowLeft, FileText, Loader2, Lock, Mail, MailCheck, MailX, Save, Search, Trash2, Users, X,
 } from 'lucide-react';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, isFirebaseConfigured } from '@/src/firebase';
-import { Incident, incidentVisibility } from '@/src/types';
+import { Incident } from '@/src/types';
 import {
   AdminButton, Chip, EmptyState, Field, Figure, FilterChip, FilterRow, Panel,
   SearchField, SkeletonRows, StatGrid, StatTile, T, TimeAgo, display,
@@ -23,6 +23,7 @@ import {
 } from '@/src/components/admin/ui';
 import { cn } from '@/src/lib/utils';
 import { consentRefusal, consentTimestamp, digestDeliveryKind, type DigestRecipient } from '@/src/lib/digest';
+import { adminIncidentTimestamp } from '@/src/lib/adminIncidentPolicy';
 
 type UserProfile = {
   uid: string;
@@ -171,12 +172,15 @@ export default function AdminUserListPage() {
       setUnsubscribes(snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as DigestUnsubscribeRequest)));
     });
     const unsubIncidents = onSnapshot(
-      query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)),
+      collection(db, 'incidents'),
       (snapshot) => {
         setIncidents(
           snapshot.docs
-            .map((row) => ({ id: row.id, ...row.data() } as Incident))
-            .filter((row) => incidentVisibility(row) !== 'deleted'),
+            .map((row) => {
+              const data = row.data();
+              return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
+            })
+            .sort((a, b) => b.timestamp - a.timestamp),
         );
       },
     );

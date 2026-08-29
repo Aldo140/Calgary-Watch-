@@ -15,7 +15,7 @@ import {
   outputPathForRoute,
   upsertMeta,
 } from '../scripts/seo/rewriteHtml.js';
-import { PRERENDER_ROUTES, PRODUCTION_ORIGIN, ROUTE_SEO } from '../src/lib/seo.js';
+import { PRERENDER_OUTPUT_ROUTES, PRERENDER_ROUTES, PRODUCTION_ORIGIN, ROUTE_SEO } from '../src/lib/seo.js';
 
 /** Mirrors the real index.html, including its multi-line meta tags. */
 const SHELL = `<!doctype html>
@@ -35,6 +35,8 @@ const SHELL = `<!doctype html>
     <meta name="twitter:description" content="old twitter description" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="canonical" href="https://calgarywatch.ca/" />
+    <link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/" />
+    <link rel="alternate" hreflang="x-default" href="https://calgarywatch.ca/" />
     <script type="module" src="/assets/index-abc123.js"></script>
   </head>
   <body><div id="root"></div></body>
@@ -43,7 +45,7 @@ const SHELL = `<!doctype html>
 describe('renderRouteHtml', () => {
   it('bakes the route title into the static HTML', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
-    assert.match(html, /<title>Calgary Crime Map: Live Incidents Near You \| Calgary Watch<\/title>/);
+    assert.match(html, /<title>Calgary Crime Map: Recent Reports Near You \| Calgary Watch<\/title>/);
     assert.doesNotMatch(html, /<title>Calgary Watch \| Real-Time Community Safety Map<\/title>/);
   });
 
@@ -58,20 +60,22 @@ describe('renderRouteHtml', () => {
     const html = renderRouteHtml(SHELL, '/coverage', PRODUCTION_ORIGIN);
     assert.match(html, /<link rel="canonical" href="https:\/\/calgarywatch\.ca\/coverage" \/>/);
     assert.match(html, /<meta property="og:url" content="https:\/\/calgarywatch\.ca\/coverage" \/>/);
+    assert.match(html, /hreflang="en-CA" href="https:\/\/calgarywatch\.ca\/coverage"/);
+    assert.match(html, /hreflang="x-default" href="https:\/\/calgarywatch\.ca\/coverage"/);
   });
 
   it('keeps a single og:title / twitter:title after rewriting', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
     assert.equal((html.match(/property=["']og:title["']/g) ?? []).length, 1);
     assert.equal((html.match(/name=["']twitter:title["']/g) ?? []).length, 1);
-    assert.match(html, /<meta property="og:title" content="Calgary Crime Map: Live Incidents Near You \| Calgary Watch" \/>/);
+    assert.match(html, /<meta property="og:title" content="Calgary Crime Map: Recent Reports Near You \| Calgary Watch" \/>/);
   });
 
   it('leaves the module script intact and places readable content in the app shell', () => {
     const html = renderRouteHtml(SHELL, '/map', PRODUCTION_ORIGIN);
     assert.match(html, /<script type="module" src="\/assets\/index-abc123\.js"><\/script>/);
     assert.match(html, /<div id="root"><main data-prerendered-route="\/map">/);
-    assert.match(html, /<h1>Calgary Crime Map<\/h1>/);
+    assert.match(html, /<h1>Calgary crime map with recent reports near you<\/h1>/);
   });
 
   it('provides substantive non-JavaScript content for every indexable route', () => {
@@ -133,6 +137,23 @@ describe('renderRouteHtml', () => {
     assert.ok(!PRERENDER_ROUTES.includes('/admin'));
     assert.equal(ROUTE_SEO['/admin'].index, false);
   });
+
+  it('gives privacy its own canonical while keeping private utility routes out of search', () => {
+    const privacy = renderRouteHtml(SHELL, '/privacy', PRODUCTION_ORIGIN);
+    assert.match(privacy, /<title>Privacy Policy \| Calgary Watch<\/title>/);
+    assert.match(privacy, /canonical" href="https:\/\/calgarywatch\.ca\/privacy/);
+    assert.ok(PRERENDER_ROUTES.includes('/privacy'));
+    for (const route of ['/unsubscribe', '/admin', '/admin/users', '/admin/incidents']) {
+      assert.equal(ROUTE_SEO[route].index, false, `${route} must be noindex`);
+      assert.ok(!PRERENDER_ROUTES.includes(route));
+    }
+    assert.ok(PRERENDER_OUTPUT_ROUTES.includes('/unsubscribe'), 'unsubscribe needs static noindex metadata');
+    assert.ok(!PRERENDER_OUTPUT_ROUTES.includes('/admin'), 'robots.txt already blocks admin surfaces');
+
+    const unsubscribe = renderRouteHtml(SHELL, '/unsubscribe', PRODUCTION_ORIGIN);
+    assert.match(unsubscribe, /name="robots" content="noindex, nofollow"/);
+    assert.match(unsubscribe, /canonical" href="https:\/\/calgarywatch\.ca\/unsubscribe/);
+  });
 });
 
 describe('outputPathForRoute', () => {
@@ -143,6 +164,7 @@ describe('outputPathForRoute', () => {
     assert.equal(outputPathForRoute('/about'), 'about.html');
     assert.equal(outputPathForRoute('/coverage'), 'coverage.html');
     assert.equal(outputPathForRoute('/airdrie-crime-map'), 'airdrie-crime-map.html');
+    assert.equal(outputPathForRoute('/unsubscribe'), 'unsubscribe.html');
   });
 
   it('maps the root route onto index.html', () => {

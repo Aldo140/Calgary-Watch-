@@ -91,6 +91,21 @@ export function upsertCanonical(html: string, href: string): string {
   return html.replace('</head>', `    ${tag}\n  </head>`);
 }
 
+/** Keep language alternates on the same route as its canonical. */
+export function upsertAlternate(
+  html: string,
+  hreflang: 'en-CA' | 'x-default',
+  href: string,
+): string {
+  const tag = `<link rel="alternate" hreflang="${hreflang}" href="${escapeAttr(href)}" />`;
+  const existing = new RegExp(
+    `<link[^>]*rel=["']alternate["'][^>]*hreflang=["']${hreflang}["'][^>]*>`,
+    'i',
+  );
+  if (existing.test(html)) return html.replace(existing, tag);
+  return html.replace('</head>', `    ${tag}\n  </head>`);
+}
+
 /** Replace the <title> element's text. */
 export function upsertTitle(html: string, title: string): string {
   const tag = `<title>${escapeText(title)}</title>`;
@@ -177,8 +192,8 @@ export function buildStaticRouteBody(pathname: string): string {
       <article>
         <header>
           <p>Independent community safety guide · Reviewed ${escapeText(GUIDE_UPDATED)}</p>
-          <h1>Calgary neighbourhood watch, without the guesswork.</h1>
-          <p>See what has recently been reported near you, understand where the information came from, and choose the right official channel when something needs action.</p>
+          <h1>Calgary crime map and neighbourhood watch, without the guesswork.</h1>
+          <p>Check recent Calgary reports near you, understand where the information came from, and choose the right official channel when something needs action.</p>
           <p>${staticLink('/map', 'Check incidents near me')} · ${staticLink('/map?report=true', 'Sign in to report')}</p>
         </header>
         <section>
@@ -212,9 +227,9 @@ export function buildStaticRouteBody(pathname: string): string {
       links: [['/map', 'Open the live Calgary crime map'], [GUIDE_PATH, 'Read the Calgary neighbourhood watch guide']],
     },
     '/map': {
-      heading: 'Calgary Crime Map',
-      copy: 'Explore recent community-reported and public-source incidents across Calgary and nearby communities. Check the time and source on each marker; Calgary Watch is not a police dispatch feed.',
-      links: [[GUIDE_PATH, 'How to interpret activity near you'], ['/about', 'How Calgary Watch works']],
+      heading: 'Calgary crime map with recent reports near you',
+      copy: 'Explore recent community observations and attributed public-source reports across Calgary and nearby communities. Crime, traffic, weather, infrastructure and emergency markers each include a report time and source. Calgary Watch supports local awareness; it is not a police scanner, dispatch feed or officer tracker.',
+      links: [[GUIDE_PATH, 'Understand Calgary crime maps and current activity'], [AIRDRIE_GUIDE_PATH, 'Compare Airdrie crime-map sources'], ['/about', 'How Calgary Watch verifies report sources']],
     },
     '/about': {
       heading: 'How Calgary Watch works',
@@ -225,6 +240,11 @@ export function buildStaticRouteBody(pathname: string): string {
       heading: 'Calgary-area community coverage',
       copy: 'Calgary Watch supports reports across Calgary, Airdrie, Cochrane, Okotoks, Chestermere, and other nearby Alberta communities.',
       links: [['/map', 'View the Calgary-area incident map'], [AIRDRIE_GUIDE_PATH, 'Read the Airdrie crime map guide'], [GUIDE_PATH, 'Read the neighbourhood watch guide']],
+    },
+    '/privacy': {
+      heading: 'Calgary Watch privacy policy',
+      copy: 'Read what Calgary Watch collects, why each piece of information is needed, how long it is retained, and how to make a privacy request. Public incident reports do not expose a reporter email address.',
+      links: [['/map', 'Return to the Calgary crime map'], ['/about', 'Learn how Calgary Watch works']],
     },
   };
   const summary = summaries[pathname];
@@ -280,6 +300,8 @@ export function renderRouteHtml(shell: string, pathname: string, origin: string)
   html = upsertMeta(html, 'name', 'twitter:description', config.description);
 
   html = upsertCanonical(html, pageUrl);
+  html = upsertAlternate(html, 'en-CA', pageUrl);
+  html = upsertAlternate(html, 'x-default', pageUrl);
   html = upsertJsonLd(html, buildPageJsonLd(pathname, origin));
   html = upsertStaticRouteBody(html, pathname);
 

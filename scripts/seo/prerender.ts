@@ -11,8 +11,9 @@
  * (Facebook, LinkedIn, Slack, X) do not — sharing a link to /map showed
  * homepage metadata.
  *
- * This writes a real dist/<route>/index.html per indexable route with the tags
- * baked in. Firebase Hosting and GitHub Pages both serve a matching static file
+ * This writes a real dist/<route>.html for each search route, plus selected
+ * utility routes that need first-response noindex metadata. Firebase Hosting
+ * and GitHub Pages both serve a matching static file
  * before falling through to the SPA rewrite, so crawlers get correct markup
  * while the app itself still boots and behaves exactly as before.
  *
@@ -22,7 +23,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PRERENDER_ROUTES, PRODUCTION_ORIGIN } from '../../src/lib/seo.js';
+import { PRERENDER_OUTPUT_ROUTES, PRODUCTION_ORIGIN } from '../../src/lib/seo.js';
 import { outputPathForRoute, renderRouteHtml } from './rewriteHtml.js';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -41,7 +42,7 @@ async function run(): Promise<void> {
 
   let written = 0;
 
-  for (const route of PRERENDER_ROUTES) {
+  for (const route of PRERENDER_OUTPUT_ROUTES) {
     const html = renderRouteHtml(shell, route, PRODUCTION_ORIGIN);
     const outPath = join(DIST, outputPathForRoute(route));
 

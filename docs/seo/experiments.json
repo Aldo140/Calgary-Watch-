@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "site": "https://calgarywatch.ca",
+  "experiments": [
+    {
+      "id": "seo-2026-08-02-crawlable-routes",
+      "status": "measured",
+      "deployedOn": "2026-08-02",
+      "commits": [
+        "3127800116dd13300f6d54b6847c42980ea28922",
+        "420806e3c4a1c4f89f591446cd5424e58c412165"
+      ],
+      "routes": ["/", "/map", "/about", "/coverage"],
+      "hypothesis": "Route-specific prerendered metadata and canonical URLs will make non-home pages independently crawlable.",
+      "measurement": {
+        "source": "src/pages/calgarywatch.ca-Performance-on-Search-2026-08-29 - Queries.pdf",
+        "limitations": "Both comparison windows occur after deployment, so this report cannot provide a clean pre-deployment control."
+      }
+    },
+    {
+      "id": "seo-2026-08-13-local-intent-v1",
+      "status": "measured",
+      "deployedOn": "2026-08-13",
+      "commits": [
+        "64ad2698213d90f2d26ecd26955a23be55991281",
+        "d53e72ffc6c8706ae65cc80ac2b35c94634aa60c",
+        "6c22d3ae401a445026135c4a44dac5cb61425379",
+        "5971dc6c1dfed1cb05d3e196b3984a38742db2a7"
+      ],
+      "routes": ["/", "/map", "/calgary-neighbourhood-watch", "/airdrie-crime-map"],
+      "targetQueries": [
+        "calgary crime map",
+        "crime map calgary",
+        "neighbourhood watch",
+        "block watch calgary",
+        "airdrie crime map"
+      ],
+      "hypothesis": "Query-aligned titles, crawlable links, and focused guide pages will improve discovery and ranking for local safety searches.",
+      "measurement": {
+        "source": "src/pages/calgarywatch.ca-Performance-on-Search-2026-08-29 - Queries.pdf",
+        "before": "2026-08-08/2026-08-14",
+        "after": "2026-08-15/2026-08-21",
+        "assessment": "positive_direction_low_confidence",
+        "limitations": "The before window contains roughly one day after deployment, indexing can lag, and query volumes are small. Treat changes as associated with the release, not proof of causation."
+      }
+    },
+    {
+      "id": "seo-2026-08-29-query-ctr-v2",
+      "status": "awaiting_deployment",
+      "deployedOn": null,
+      "commits": [],
+      "routes": ["/map", "/calgary-neighbourhood-watch", "/airdrie-crime-map", "/privacy"],
+      "targetQueries": [
+        "calgary crime map",
+        "crime map calgary",
+        "current police activity near me",
+        "police map",
+        "neighbourhood watch",
+        "block watch calgary",
+        "airdrie crime map"
+      ],
+      "hypothesis": "More accurate recent-report wording, aligned title and H1 text, stronger internal anchors, and corrected canonical alternates will improve qualified CTR without sacrificing average position.",
+      "measurement": {
+        "source": "Search Console three-month summary supplied 2026-08-29 and the full query PDF",
+        "evaluateAfterDays": 28,
+        "baseline": {
+          "calgary crime map": {
+            "clicks": 4,
+            "impressions": 185,
+            "ctr": 0.0216
+          },
+          "homepage": {
+            "clicks": 243,
+            "impressions": 2473,
+            "ctr": 0.0983
+          }
+        },
+        "successCriteria": [
+          "The Calgary crime-map query cluster gains CTR versus the prior equivalent 28-day period.",
+          "Average position is stable or improves; CTR gains caused only by lost impressions do not count as success.",
+          "The guide pages gain non-branded impressions and clicks without cannibalizing /map."
+        ]
+      }
+    }
+  ]
+}

@@ -257,6 +257,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
     if (!isAuthReady) return;
 
     const fetchOpenData = async () => {
+      const fetchedAt = Date.now();
       const trafficIncidents: Incident[] = [];
       const three11Incidents: Incident[] = [];
       const infrastructureIncidents: Incident[] = [];
@@ -300,7 +301,10 @@ function useOfficialOpenData(isAuthReady: boolean) {
             tDesc = `Traffic disruption in ${quadrant}. Check 511 Alberta for updates.`;
           }
 
-          const ts = new Date(item.start_dt || new Date()).getTime();
+          const parsedStart = Date.parse(item.start_dt || '');
+          // Planned work can have a future start. Keep ordering honest by
+          // stamping it when first observed, never in the future.
+          const ts = Number.isFinite(parsedStart) ? Math.min(parsedStart, fetchedAt) : fetchedAt;
           trafficIncidents.push({
             id: `yyc-traffic-${item.id || `${String(item.incident_info || 'unk').replace(/[^a-zA-Z0-9]/g, '').slice(0, 32)}-${lat.toFixed(3)}-${lng.toFixed(3)}`}`,
             title: tTitle, description: tDesc, category: 'traffic' as IncidentCategory,
@@ -309,7 +313,9 @@ function useOfficialOpenData(isAuthReady: boolean) {
             anonymous: false, verified_status: 'community_confirmed' as const, report_count: 1,
             data_source: 'official' as const, source_name: 'City of Calgary Open Data',
             source_url: 'https://data.calgary.ca/dataset/Traffic-Incidents/35ra-9556',
-            expires_at: ts + 8 * 60 * 60 * 1000,
+            // This endpoint contains active incidents. Keep each row until
+            // shortly after the next refresh even when its start time is old.
+            expires_at: fetchedAt + 90 * 60 * 1000,
           });
         }
       } catch (err) {
@@ -318,12 +324,14 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
       // ── Calgary 311 — isolated so a failure never blocks traffic ──────────
       try {
-        // Socrata API — simplified query without date filtering (less likely to fail)
-        // Note: data.calgary.ca may have rate limits or field structure issues
+        const recent311Cutoff = new Date(fetchedAt - 7 * 24 * 60 * 60 * 1000)
+          .toISOString().slice(0, 19);
         const three11Url =
           'https://data.calgary.ca/resource/iahh-g8bj.json' +
-          '?$limit=50' +
-          '&$where=' + encodeURIComponent("status_description='Open'") +
+          '?$limit=100' +
+          '&$where=' + encodeURIComponent(
+            `status_description='Open' AND requested_date > '${recent311Cutoff}'`,
+          ) +
           '&$order=' + encodeURIComponent('requested_date DESC');
 
         const three11Res = await fetch(three11Url);
@@ -354,35 +362,11 @@ function useOfficialOpenData(isAuthReady: boolean) {
           if (cleanTitle.includes('Disturbance and Behavioural Concerns')) cleanTitle = 'Public Disturbance';
 
           const area = item.comm_name ? `in ${item.comm_name}` : 'in Calgary';
-          let cleanDesc: string;
-          if (sName.includes('graffiti')) {
-            cleanDesc = `Graffiti reported on public property ${area}. City crews scheduled for removal.`;
-          } else if (sName.includes('pothole') || sName.includes('road surface') || sName.includes('pavement')) {
-            cleanDesc = `Road surface damage ${area}. Repair crews have been dispatched.`;
-          } else if (sName.includes('spill') || sName.includes('hazmat') || sName.includes('contamination')) {
-            cleanDesc = `Hazardous spill or contamination reported ${area}. Environmental response team notified.`;
-          } else if (sName.includes('noise') || sName.includes('disturbance') || sName.includes('nuisance')) {
-            cleanDesc = `Noise or public disturbance complaint filed ${area}. Bylaw officers have been dispatched.`;
-          } else if (sName.includes('bylaw') && sName.includes('animal')) {
-            cleanDesc = `Animal control complaint ${area}. Officers en route.`;
-          } else if (sName.includes('bylaw')) {
-            cleanDesc = `Bylaw violation reported ${area}. Officers assigned to investigate.`;
-          } else if (sName.includes('street light') || sName.includes('light out') || sName.includes('signal')) {
-            cleanDesc = `Street light or signal outage ${area}. Electrical crew scheduled for repair.`;
-          } else if (sName.includes('water main') || sName.includes('water break') || sName.includes('watermain')) {
-            cleanDesc = `Water main issue reported ${area}. Utilities crew dispatched — local service may be affected.`;
-          } else if (sName.includes('sewer') || sName.includes('drain') || sName.includes('flood')) {
-            cleanDesc = `Drainage or sewer problem ${area}. City utilities team has been notified.`;
-          } else if (sName.includes('fire') || sName.includes('danger') || sName.includes('emergency')) {
-            cleanDesc = `Emergency hazard reported ${area}. Response crews have been alerted.`;
-          } else if (sName.includes('bridge') || sName.includes('overpass') || sName.includes('infrastructure')) {
-            cleanDesc = `Infrastructure concern flagged ${area}. Engineering crew assigned to inspect.`;
-          } else if (sName.includes('sidewalk') || sName.includes('curb') || sName.includes('pedestrian')) {
-            cleanDesc = `Sidewalk or pedestrian path damage ${area}. Maintenance crew scheduled.`;
-          } else {
-            const responsible = item.agency_responsible?.replace('CS - ', '') || 'City Crews';
-            cleanDesc = `${cleanTitle} reported ${area}. ${responsible} assigned to respond.`;
-          }
+          const status = item.status_description ? ` Current 311 status: ${item.status_description}.` : '';
+          // Do not turn a service request into an invented dispatch claim. The
+          // API proves that a resident filed it; it does not prove an officer
+          // or crew is currently en route.
+          const cleanDesc = `${cleanTitle} reported to City of Calgary 311 ${area}.${status} This is a resident service request, not a police-confirmed offence.`;
 
           three11Incidents.push({
             id: `yyc-311-${item.service_request_id}`,
@@ -392,7 +376,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
             anonymous: false, verified_status: 'community_confirmed' as const, report_count: 1,
             data_source: 'official' as const, source_name: 'Calgary 311',
             source_url: 'https://data.calgary.ca/dataset/311-Service-Requests/iahh-g8bj',
-            expires_at: timestamp + 24 * 60 * 60 * 1000,
+            expires_at: timestamp + 7 * 24 * 60 * 60 * 1000,
           });
         }
       } catch (err) {
@@ -2152,6 +2136,7 @@ export default function MapPage() {
 
   return (
     <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
+      <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
       <AnimatePresence>
         {isLoading && (
           <motion.div
@@ -3385,9 +3370,9 @@ export default function MapPage() {
             <div className="flex items-center gap-3 border-r-[1.5px] border-[#C9D8E4] py-0.5 pl-0.5 pr-4">
               <DesktopMapBrandMark compact />
               <div className="min-w-[8.5rem] leading-none">
-                <h1 className="font-display text-[14px] font-black tracking-[-0.02em] text-[#0B1F33]">
+                <h2 className="font-display text-[14px] font-black tracking-[-0.02em] text-[#0B1F33]">
                   {selectedCategory === 'all' ? 'Live reports' : `${selectedCategory.charAt(0).toUpperCase()}${selectedCategory.slice(1)} reports`}
-                </h1>
+                </h2>
                 <p className="mt-1.5 font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#5A6B7D]">
                   {mapIncidents.length} visible now
                 </p>

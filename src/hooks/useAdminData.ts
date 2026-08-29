@@ -25,6 +25,12 @@ import { INCIDENT_CATEGORIES, LEGACY_INCIDENT_CATEGORIES } from '@/src/constants
 import { deleteIncidentImage } from '@/src/lib/storage';
 import { suppressionDocId } from '@/src/lib/suppression';
 import {
+  adminIncidentTimestamp,
+  canPermanentlyDeleteIncident,
+  isOperationalIncident,
+  isResidentSubmission,
+} from '@/src/lib/adminIncidentPolicy';
+import {
   DATA_SOURCES,
   DIRECT_DATA_SOURCES,
   type DataSourceDefinition,
@@ -240,10 +246,15 @@ export function useAdminData() {
   };
 
   const handlePermanentDelete = async (incidentId: string) => {
-    if (!window.confirm('Permanently delete this incident? This cannot be undone.')) return;
     if (!db || deletingId) return;
-    setDeletingId(incidentId);
     const target = incidents.find((i) => i.id === incidentId);
+    if (!target) return;
+    if (!canPermanentlyDeleteIncident(target)) {
+      alert('Resident submissions are retained permanently. Use Hide to remove this report from the public map.');
+      return;
+    }
+    if (!window.confirm('Permanently delete this non-resident record? This cannot be undone.')) return;
+    setDeletingId(incidentId);
     const isIngested =
       target?.authorUid === 'system' ||
       (target?.data_source != null && target.data_source !== 'community');
@@ -293,11 +304,18 @@ export function useAdminData() {
     if (!isAuthReady || !user || !isAdmin || !db) return;
 
     const unsubIncidents = onSnapshot(
-      query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(500)),
+      collection(db, 'incidents'),
       (snapshot) => {
+        // Admin is the permanent record. Hidden resident submissions stay here
+        // for all-time review even though public map queries cannot see them.
+        // Reading the collection directly also includes legacy rows without a
+        // timestamp field; orderBy(timestamp) silently excludes those rows.
         const rows = snapshot.docs
-          .map((row) => ({ id: row.id, ...row.data() } as Incident))
-          .filter((row) => incidentVisibility(row) !== 'deleted');
+          .map((row) => {
+            const data = row.data();
+            return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
+          })
+          .sort((a, b) => b.timestamp - a.timestamp);
         setIncidents(rows);
         setLoadingData(false);
       }
@@ -457,8 +475,15 @@ export function useAdminData() {
 
   // ── KPI derivations ───────────────────────────────────────────────────────
 
-  const realIncidents      = useMemo(() => incidents.filter((i) => i.data_source !== 'demo'), [incidents]);
+  // Moderation analytics are resident-first. API records are a separate,
+  // reproducible operational feed and must not inflate community KPIs.
+  const realIncidents      = useMemo(() => incidents.filter(isResidentSubmission), [incidents]);
+  const operationalIncidents = useMemo(() => incidents.filter(isOperationalIncident), [incidents]);
+  const storedIncidentCount = incidents.length;
   const totalIncidents     = realIncidents.length;
+  const officialReportCount = operationalIncidents.length;
+  const anonymousCommunityCount = realIncidents.filter((i) => i.anonymous).length;
+  const hiddenCommunityCount = realIncidents.filter((i) => incidentVisibility(i) !== 'public').length;
   const emergencyIncidents = realIncidents.filter((i) => i.category === 'emergency').length;
   const unresolvedIncidents = realIncidents.filter((i) => i.verified_status !== 'community_confirmed').length;
   const todayIncidents     = realIncidents.filter((i) => Date.now() - i.timestamp < 86_400_000).length;
@@ -475,16 +500,15 @@ export function useAdminData() {
 
   const MODERATION_WINDOW_MS = 30 * 60 * 1000;
   const pendingReviewIncidents = incidents.filter((i) =>
+    isResidentSubmission(i) &&
     i.verified_status === 'unverified' &&
-    i.data_source !== 'system' &&
-    i.data_source !== 'demo' &&
     Date.now() - i.timestamp < MODERATION_WINDOW_MS
   );
 
-  const officialTrafficCount   = realIncidents.filter((i) => i.source_type === '511_alberta_traffic').length;
-  const official311Count       = realIncidents.filter((i) => i.source_type === 'calgary_infrastructure').length;
-  const officialCrimeCount     = realIncidents.filter((i) => i.source_type === 'calgary_police_crime').length;
-  const communityReportCount   = realIncidents.filter((i) => !i.data_source || i.data_source === 'community').length;
+  const officialTrafficCount   = operationalIncidents.filter((i) => i.source_type === '511_alberta_traffic').length;
+  const official311Count       = operationalIncidents.filter((i) => i.source_type === 'calgary_open_data' || i.source_type === 'calgary_infrastructure').length;
+  const officialCrimeCount     = operationalIncidents.filter((i) => i.source_type === 'calgary_police_crime' || i.source_type === 'news_rss').length;
+  const communityReportCount   = realIncidents.length;
 
   // ── Incident chart data ───────────────────────────────────────────────────
 
@@ -904,7 +928,9 @@ export function useAdminData() {
     pageViewDocs, flaggedIncidents,
     crimeStats, crimeLoading, loadingData,
     // ── counters ──
-    totalIncidents, emergencyIncidents, unresolvedIncidents, todayIncidents,
+    totalIncidents, officialReportCount, storedIncidentCount,
+    anonymousCommunityCount, hiddenCommunityCount,
+    emergencyIncidents, unresolvedIncidents, todayIncidents,
     totalUsers, adminUsers, viewOnlyUsers, uniqueReporterEmails,
     totalPageViews, uniqueSessions, avgPagesPerSession,
     liveTrafficCount, live311Count, averageSafety,

@@ -24,13 +24,13 @@
 
   <url>
     <loc>https://calgarywatch.ca/map</loc>
-    <lastmod>2026-08-13</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.95</priority>
     <image:image>
       <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
-      <image:title>Calgary Crime Map — Live Incidents Near You</image:title>
-      <image:caption>Real-time interactive map showing community-reported safety incidents across the Calgary metro area</image:caption>
+      <image:title>Calgary Crime Map — Recent Reports Near You</image:title>
+      <image:caption>Interactive map showing recent community and attributed public-source safety reports across the Calgary metro area</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
     </image:image>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/map" />
@@ -72,13 +72,13 @@
 
   <url>
     <loc>https://calgarywatch.ca/calgary-neighbourhood-watch</loc>
-    <lastmod>2026-08-13</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.90</priority>
     <image:image>
       <image:loc>https://calgarywatch.ca/images/hero/hero-wide.webp</image:loc>
-      <image:title>Calgary Neighbourhood Watch Guide</image:title>
-      <image:caption>How to check recent incidents near you and choose the right Calgary reporting channel</image:caption>
+      <image:title>Calgary Crime Map and Neighbourhood Watch Guide</image:title>
+      <image:caption>How to use the Calgary crime map, check recent incidents near you, and choose the right reporting channel</image:caption>
       <image:geo_location>Calgary, Alberta, Canada</image:geo_location>
     </image:image>
     <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/calgary-neighbourhood-watch" />
@@ -86,7 +86,7 @@
 
   <url>
     <loc>https://calgarywatch.ca/airdrie-crime-map</loc>
-    <lastmod>2026-08-13</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.90</priority>
     <image:image>
@@ -100,19 +100,25 @@
 
   <url>
     <loc>https://calgarywatch.ca/llms.txt</loc>
-    <lastmod>2026-08-13</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.40</priority>
   </url>
 
   <url>
     <loc>https://calgarywatch.ca/llms-full.txt</loc>
-    <lastmod>2026-08-13</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.35</priority>
   </url>
 
 
 
-  <url><loc>https://calgarywatch.ca/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url>
+    <loc>https://calgarywatch.ca/privacy</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calgarywatch.ca/privacy" />
+  </url>
 </urlset>

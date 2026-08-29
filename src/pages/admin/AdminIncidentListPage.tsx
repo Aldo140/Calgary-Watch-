@@ -13,7 +13,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import {
   ArrowLeft, Code2, EyeOff, FileText, Image as ImageIcon, Loader2, Lock,
   Save, Search, Trash2, UserRound, X,
@@ -29,6 +29,15 @@ import {
   inputClass, inputStyle, mono, CategoryChip,
 } from '@/src/components/admin/ui';
 import { cn } from '@/src/lib/utils';
+import {
+  adminIncidentTimestamp,
+  canPermanentlyDeleteIncident,
+  isAdminExampleIncident,
+  isOperationalIncident,
+  isResidentSubmission,
+  matchesAdminSourceFilter,
+  type AdminSourceFilter,
+} from '@/src/lib/adminIncidentPolicy';
 
 type UserProfile = { uid: string; email: string; displayName: string; role: 'user' | 'admin' };
 type IncidentDraft = Pick<
@@ -85,22 +94,36 @@ export default function AdminIncidentListPage() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'community' | 'official' | 'example' | 'anonymous' | 'images'>('all');
+  // The archive exists first for resident submissions. API records remain
+  // available as an operational tab, but never crowd out the default view.
+  const [sourceFilter, setSourceFilter] = useState<AdminSourceFilter>('community');
   const [sort, setSort] = useState<'newest' | 'oldest' | 'status' | 'reports'>('newest');
   const [drafts, setDrafts] = useState<Record<string, IncidentDraft>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
   const [rawView, setRawView] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     if (!db) { setLoading(false); return; }
+    // Read the collection itself: orderBy(timestamp) silently excludes legacy
+    // documents that do not contain that field, which made old submissions
+    // disappear from the purported all-time archive.
     const unsubIncidents = onSnapshot(
-      query(collection(db, 'incidents'), orderBy('timestamp', 'desc'), limit(300)),
+      collection(db, 'incidents'),
       (snapshot) => {
         setIncidents(
           snapshot.docs
-            .map((row) => ({ id: row.id, ...row.data() } as Incident))
-            .filter((row) => incidentVisibility(row) !== 'deleted'),
+            .map((row) => {
+              const data = row.data();
+              return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
+            }),
         );
+        setLoadError('');
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Could not load report history:', error);
+        setLoadError('The all-time report archive could not be loaded. Check the deployed admin read rules.');
         setLoading(false);
       },
     );
@@ -136,13 +159,7 @@ export default function AdminIncidentListPage() {
         const matchesUid = !uidFilter || incident.authorUid === uidFilter;
         const matchesCategory = !categoryFilter || incident.category === categoryFilter;
         const matchesStatus = !statusFilter || incident.verified_status === statusFilter;
-        const matchesSource =
-          sourceFilter === 'community' ? (!incident.data_source || incident.data_source === 'community') :
-          sourceFilter === 'official' ? incident.data_source === 'official' :
-          sourceFilter === 'example' ? incident.data_source === 'demo' :
-          sourceFilter === 'anonymous' ? Boolean(incident.anonymous) :
-          sourceFilter === 'images' ? Boolean(incident.image_url) :
-          true;
+        const matchesSource = matchesAdminSourceFilter(incident, sourceFilter);
         const matchesSearch = !q || incident.searchBlob.includes(q);
         return matchesUid && matchesCategory && matchesStatus && matchesSource && matchesSearch;
       })
@@ -158,12 +175,29 @@ export default function AdminIncidentListPage() {
     filteredIncidents.find((incident) => incident.id === selectedId) || filteredIncidents[0] || null;
 
   const incidentStats = useMemo(() => ({
-    total: incidents.length,
-    pending: incidents.filter((i) => i.data_source !== 'demo' && i.verified_status !== 'community_confirmed').length,
-    anonymous: incidents.filter((i) => i.anonymous).length,
-    examples: incidents.filter((i) => i.data_source === 'demo').length,
-    images: incidents.filter((i) => i.image_url).length,
+    stored: incidents.length,
+    total: incidents.filter(isResidentSubmission).length,
+    official: incidents.filter(isOperationalIncident).length,
+    pending: incidents.filter((i) => isResidentSubmission(i) && i.verified_status !== 'community_confirmed').length,
+    anonymous: incidents.filter((i) => isResidentSubmission(i) && i.anonymous).length,
+    examples: incidents.filter(isAdminExampleIncident).length,
+    hidden: incidents.filter((i) => isResidentSubmission(i) && incidentVisibility(i) !== 'public').length,
+    images: incidents.filter((i) => isResidentSubmission(i) && i.image_url).length,
   }), [incidents]);
+
+  const oldestTimestamp = useMemo(() => filteredIncidents.reduce((oldest, incident) => {
+    if (!incident.timestamp) return oldest;
+    return oldest === 0 ? incident.timestamp : Math.min(oldest, incident.timestamp);
+  }, 0), [filteredIncidents]);
+
+  const apiSourceBreakdown = useMemo(() => {
+    const counts = new globalThis.Map<string, number>();
+    incidents.filter(isOperationalIncident).forEach((incident) => {
+      const label = incident.source_name || incident.source_type || 'Unlabelled API source';
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  }, [incidents]);
 
   const getDraft = (incident: Incident): IncidentDraft => drafts[incident.id] || {
     title: incident.title,
@@ -222,6 +256,10 @@ export default function AdminIncidentListPage() {
   };
 
   const deleteIncident = async (incident: Incident) => {
+    if (!canPermanentlyDeleteIncident(incident)) {
+      window.alert('Resident submissions are retained permanently. Use Hide from map instead.');
+      return;
+    }
     if (!db || !window.confirm(`Delete "${incident.title}" permanently? This cannot be undone.`)) return;
     await deleteDoc(doc(db, 'incidents', incident.id));
     setSelectedId(null);
@@ -249,13 +287,15 @@ export default function AdminIncidentListPage() {
               </button>
               <div className="min-w-0 flex-1">
                 <h1 className="text-[1.05rem] lg:text-[1.3rem] font-bold leading-tight" style={{ fontFamily: display, color: T.ink }}>
-                  Every report
+                  Report history
                 </h1>
                 <p className="text-xs" style={{ color: T.muted }}>
                   <span className="tabular-nums" style={{ fontFamily: mono }}>{filteredIncidents.length}</span>
-                  {' of '}
-                  <span className="tabular-nums" style={{ fontFamily: mono }}>{incidents.length}</span>
-                  {' shown'}
+                  {' shown · '}
+                  <span className="tabular-nums" style={{ fontFamily: mono }}>{incidentStats.total}</span>
+                  {' resident retained · '}
+                  <span className="tabular-nums" style={{ fontFamily: mono }}>{incidentStats.official}</span>
+                  {' API current'}
                   {uidFilter && ' · filtered to one reporter'}
                 </p>
               </div>
@@ -287,11 +327,12 @@ export default function AdminIncidentListPage() {
 
             <div className="mt-2 space-y-1.5">
               <FilterRow>
-                <FilterChip active={sourceFilter === 'all'} onClick={() => setSourceFilter('all')}>All sources</FilterChip>
-                <FilterChip active={sourceFilter === 'community'} onClick={() => setSourceFilter('community')}>Community</FilterChip>
-                <FilterChip active={sourceFilter === 'official'} onClick={() => setSourceFilter('official')}>Official</FilterChip>
+                <FilterChip active={sourceFilter === 'all'} onClick={() => setSourceFilter('all')}>All reports</FilterChip>
+                <FilterChip active={sourceFilter === 'community'} onClick={() => setSourceFilter('community')} count={incidentStats.total}>Community history</FilterChip>
+                <FilterChip active={sourceFilter === 'official'} onClick={() => setSourceFilter('official')} count={incidentStats.official}>API / official</FilterChip>
                 <FilterChip active={sourceFilter === 'example'} onClick={() => setSourceFilter('example')} count={incidentStats.examples}>Examples</FilterChip>
                 <FilterChip active={sourceFilter === 'anonymous'} onClick={() => setSourceFilter('anonymous')} count={incidentStats.anonymous}>Anonymous</FilterChip>
+                <FilterChip active={sourceFilter === 'hidden'} onClick={() => setSourceFilter('hidden')} count={incidentStats.hidden}>Hidden</FilterChip>
                 <FilterChip active={sourceFilter === 'images'} onClick={() => setSourceFilter('images')} count={incidentStats.images}>With photo</FilterChip>
               </FilterRow>
               <FilterRow>
@@ -315,23 +356,49 @@ export default function AdminIncidentListPage() {
 
         <main className="px-4 lg:px-7 py-4 max-w-[1500px] space-y-4">
           <StatGrid>
-            <StatTile label="Total reports" value={incidentStats.total} />
+            <StatTile label="Resident reports" value={incidentStats.total} />
             <StatTile label="Not yet confirmed" value={incidentStats.pending} tone="attention" />
             <StatTile label="Anonymous" value={incidentStats.anonymous} />
+            <StatTile label="API records" value={incidentStats.official} />
             <StatTile label="Examples" value={incidentStats.examples} tone="attention" />
+            <StatTile label="Hidden from map" value={incidentStats.hidden} tone="attention" />
             <StatTile label="With a photo" value={incidentStats.images} />
+            <StatTile label="All stored records" value={incidentStats.stored} />
           </StatGrid>
+
+          <Panel title="Resident archive" subtitle="Permanent history, separate from temporary API data">
+            <p className="text-sm leading-relaxed" style={{ color: T.muted }}>
+              Community and anonymous submissions are retained for all-time moderation. API and official records are reproducible operational data: they live under their own tab and expire according to the source’s freshness window.
+            </p>
+            {apiSourceBreakdown.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2" aria-label="Current API records by source">
+                {apiSourceBreakdown.map(([source, count]) => (
+                  <Chip key={source}>{source} · {count}</Chip>
+                ))}
+              </div>
+            )}
+          </Panel>
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_26rem] items-start">
             {/* List */}
-            <Panel title="Records" subtitle={`Sorted by ${sort}`} padded={false}>
+            <Panel
+              title="All-time records"
+              subtitle={`Sorted by ${sort}${oldestTimestamp ? ` · archive begins ${new Date(oldestTimestamp).toLocaleDateString('en-CA')}` : ''}`}
+              padded={false}
+            >
               {loading ? (
                 <div className="p-4"><SkeletonRows rows={6} /></div>
+              ) : loadError ? (
+                <EmptyState icon={<FileText size={26} />} title="History unavailable" body={loadError} />
               ) : filteredIncidents.length === 0 ? (
                 <EmptyState
                   icon={<FileText size={26} />}
-                  title="No reports match"
-                  body={hasFilters ? 'Try widening the filters or clearing the search.' : 'Reports will appear here as soon as they are submitted.'}
+                  title={sourceFilter === 'community' && !search && !categoryFilter && !statusFilter && !uidFilter
+                    ? 'No resident history found'
+                    : 'No reports match'}
+                  body={sourceFilter === 'community' && !search && !categoryFilter && !statusFilter && !uidFilter
+                    ? 'The archive loaded, but no retained community submissions were found. API records are kept separately and do not count as resident history.'
+                    : hasFilters ? 'Try widening the filters or clearing the search.' : 'Reports will appear here as soon as they are submitted.'}
                   action={hasFilters ? <AdminButton size="sm" variant="outline" onClick={clearFilters}>Clear filters</AdminButton> : undefined}
                 />
               ) : (
@@ -352,10 +419,10 @@ export default function AdminIncidentListPage() {
                           <span className="min-w-0 flex-1">
                             <span className="flex items-center gap-1.5 flex-wrap">
                               <CategoryChip category={incident.category} />
-                              {incident.data_source === 'demo' && <Chip tone="attention">Example</Chip>}
+                              {isAdminExampleIncident(incident) && <Chip tone="attention">Example</Chip>}
                               {incident.anonymous && <Chip>anon</Chip>}
                               {incident.image_url && <Chip><ImageIcon size={10} /> photo</Chip>}
-                              {incidentVisibility(incident) === 'flagged' && <Chip tone="critical"><EyeOff size={10} /> hidden</Chip>}
+                              {incidentVisibility(incident) !== 'public' && <Chip tone="critical"><EyeOff size={10} /> hidden</Chip>}
                               {isDirty(incident) && <Chip tone="attention">unsaved</Chip>}
                             </span>
                             <p className="text-sm font-semibold mt-1 leading-snug line-clamp-1" style={{ color: T.ink }}>
@@ -440,7 +507,7 @@ function IncidentEditor({
     <Panel
       title="Edit report"
       subtitle={new Date(incident.timestamp).toLocaleString('en-CA')}
-      action={incident.data_source === 'demo'
+      action={isAdminExampleIncident(incident)
         ? <Chip tone="attention">Example</Chip>
         : dirty
           ? <Chip tone="attention">Unsaved</Chip>
@@ -499,7 +566,7 @@ function IncidentEditor({
         )}
 
         <div className="rounded-lg border p-3 space-y-1.5 text-xs" style={{ borderColor: T.line, background: T.surface }}>
-          {incident.data_source === 'demo' && (
+          {isAdminExampleIncident(incident) && (
             <p className="mb-2 text-xs font-medium leading-relaxed" style={{ color: T.attention }}>
               Seeded example. Publicly styled as an anonymous community report; excluded from digest, counts and safety signals.
             </p>
@@ -547,9 +614,15 @@ function IncidentEditor({
                 <EyeOff size={14} /> Hide from map
               </AdminButton>
             )}
-            <AdminButton variant="outline" tone="critical" onClick={onDelete} className={visible ? undefined : 'flex-1'}>
-              <Trash2 size={14} /> Delete permanently
-            </AdminButton>
+            {canPermanentlyDeleteIncident(incident) ? (
+              <AdminButton variant="outline" tone="critical" onClick={onDelete} className={visible ? undefined : 'flex-1'}>
+                <Trash2 size={14} /> Delete permanently
+              </AdminButton>
+            ) : (
+              <p className="flex-1 self-center text-xs leading-snug" style={{ color: T.muted }}>
+                Resident submissions are retained permanently.
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 export const GUIDE_PATH = '/calgary-neighbourhood-watch';
-export const GUIDE_UPDATED = '2026-08-13';
+export const GUIDE_UPDATED = '2026-08-29';
 
 export const GUIDE_SOURCES = [
   {

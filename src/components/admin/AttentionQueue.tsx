@@ -15,6 +15,7 @@ import { AlertOctagon, CheckCircle2, Eye, EyeOff, RotateCcw, ShieldQuestion, Tra
 import { Link } from 'react-router-dom';
 import { Incident } from '@/src/types';
 import type { ApiHealth } from '@/src/hooks/useAdminData';
+import { canPermanentlyDeleteIncident } from '@/src/lib/adminIncidentPolicy';
 import { AdminButton, Chip, EmptyState, Panel, StatusDot, T, TimeAgo, display, type Tone } from './ui';
 
 type QueueItem = {
@@ -74,15 +75,17 @@ export function AttentionQueue({
           >
             <RotateCcw size={13} /> {restoringId === incident.id ? 'Restoring' : 'Restore'}
           </AdminButton>
-          <AdminButton
-            size="sm"
-            variant="outline"
-            tone="critical"
-            onClick={() => onDelete(incident.id)}
-            disabled={deletingId === incident.id}
-          >
-            <Trash2 size={13} /> Delete
-          </AdminButton>
+          {canPermanentlyDeleteIncident(incident) && (
+            <AdminButton
+              size="sm"
+              variant="outline"
+              tone="critical"
+              onClick={() => onDelete(incident.id)}
+              disabled={deletingId === incident.id}
+            >
+              <Trash2 size={13} /> Delete
+            </AdminButton>
+          )}
         </>
       ),
     });

@@ -255,7 +255,13 @@ service cloud.firestore {
                     resource.data.get('authorUid', '') != 'system' &&
                     resource.data.get('authorUid', '') != request.auth.uid;
 
-      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.authorUid);
+      // Resident submissions are part of the permanent moderation record.
+      // They can be hidden through `visibility`, never physically deleted.
+      // Admin deletion remains available for API/system rows and known legacy
+      // example identities.
+      allow delete: if isAdmin() &&
+                    (resource.data.get('data_source', '') in ['official', 'system', 'demo'] ||
+                     resource.data.get('authorUid', '') in ['system', 'seed', 'demo', 'community']);
     }
 
     // Reporter identity, split out of the public incident document.

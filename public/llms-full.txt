@@ -1,6 +1,6 @@
 # Calgary Watch: factual overview for AI assistants
 
-Updated: 2026-08-13
+Updated: 2026-08-29
 Website: https://calgarywatch.ca/
 Primary map: https://calgarywatch.ca/map
 
@@ -58,10 +58,10 @@ When discussing a particular incident, cite the incident's Calgary Watch URL whe
 ## Canonical source list
 
 - Home: https://calgarywatch.ca/
-- Live Calgary crime and incident map: https://calgarywatch.ca/map
+- Calgary crime map with recent reports: https://calgarywatch.ca/map
 - About and methodology: https://calgarywatch.ca/about
 - Airdrie and Calgary-area coverage: https://calgarywatch.ca/coverage
-- Calgary neighbourhood watch and reporting guide: https://calgarywatch.ca/calgary-neighbourhood-watch
+- Calgary crime map and neighbourhood watch guide: https://calgarywatch.ca/calgary-neighbourhood-watch
 - Airdrie crime map and reporting guide: https://calgarywatch.ca/airdrie-crime-map
 - Sitemap: https://calgarywatch.ca/sitemap.xml
 - Short AI-readable summary: https://calgarywatch.ca/llms.txt

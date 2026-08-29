@@ -88,7 +88,7 @@ describe('example presentation boundaries', () => {
     const detail = readFileSync('src/components/IncidentDetailPanel.tsx', 'utf8');
     const admin = readFileSync('src/pages/admin/AdminIncidentListPage.tsx', 'utf8');
     assert.match(detail, /Illustrative anonymous example — not a real incident/);
-    assert.match(admin, /data_source === 'demo'/);
+    assert.match(admin, /isAdminExampleIncident\(incident\)/);
     assert.match(admin, />Example</);
   });
 });

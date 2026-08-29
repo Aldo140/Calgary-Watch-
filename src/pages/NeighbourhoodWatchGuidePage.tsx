@@ -35,7 +35,7 @@ const markerChecks = [
 export default function NeighbourhoodWatchGuidePage() {
   return (
     <div className="min-h-dvh bg-[#F7F3EA] text-[#06162F]">
-      <GuideNav locationLabel="Calgary neighbourhood guide" />
+      <GuideNav locationLabel="Calgary crime map guide" />
       <main>
         <section className="relative overflow-hidden border-b border-[#DCD2C0] bg-[#EAE3D5]" aria-labelledby="guide-title">
           <div className="absolute inset-y-0 right-0 hidden w-[38%] bg-[#E52C20] lg:block" aria-hidden="true" />
@@ -50,10 +50,10 @@ export default function NeighbourhoodWatchGuidePage() {
               </div>
 
               <h1 id="guide-title" className="max-w-3xl text-balance font-display text-[clamp(3rem,7vw,5.75rem)] font-black leading-[0.93] tracking-[-0.035em] text-[#06162F]">
-                Know what’s happening <span className="text-[#B8241A]">around your block.</span>
+                Calgary crime map <span className="text-[#B8241A]">and neighbourhood watch.</span>
               </h1>
               <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-[#5A5247] sm:text-xl sm:leading-9">
-                Calgary neighbourhood watch starts with clear local context. See recent reports, understand their source, and know which official channel to use when something needs action.
+                Check recent reports near you, understand what each source can prove, and know which official channel to use when something needs action.
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

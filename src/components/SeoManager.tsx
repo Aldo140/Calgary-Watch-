@@ -42,6 +42,17 @@ const setCanonical = (href: string) => {
   link.setAttribute('href', href);
 };
 
+const setAlternate = (hreflang: 'en-CA' | 'x-default', href: string) => {
+  let link = document.head.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${hreflang}"]`);
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', 'alternate');
+    link.setAttribute('hreflang', hreflang);
+    document.head.appendChild(link);
+  }
+  link.setAttribute('href', href);
+};
+
 const injectJsonLd = (id: string, data: object) => {
   let el = document.head.querySelector<HTMLScriptElement>(`script[data-ld="${id}"]`);
   if (!el) {
@@ -74,6 +85,8 @@ export default function SeoManager() {
     setMeta('twitter:description', 'name', config.description);
 
     setCanonical(pageUrl);
+    setAlternate('en-CA', pageUrl);
+    setAlternate('x-default', pageUrl);
 
     // Per-route WebPage JSON-LD — helps Google understand page type, breadcrumb, and freshness
     injectJsonLd('page-schema', buildPageJsonLd(location.pathname, SITE_ORIGIN));

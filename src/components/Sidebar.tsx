@@ -188,9 +188,9 @@ export default function Sidebar({
         <div className="relative mt-4 flex items-center gap-3.5">
           <DesktopMapBrandMark tone="dark" />
           <div className="min-w-0">
-            <h1 className="font-display text-[25px] font-black leading-none tracking-[-0.03em] text-[#F2EFE8]">
+            <p className="font-display text-[25px] font-black leading-none tracking-[-0.03em] text-[#F2EFE8]">
               Calgary Watch
-            </h1>
+            </p>
             <p className="mt-2 font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#AFC5DF]">
               Community incident map
             </p>

@@ -74,6 +74,8 @@ describe('randomized daily community pulse plan', () => {
     ];
     assert.equal(selectDuePost(499, plan, []), null);
     assert.equal(selectDuePost(530, plan, [])?.id, 'a');
+    assert.equal(selectDuePost(590, plan, [])?.id, 'a', 'a delayed scheduled job still publishes the planned example');
+    assert.equal(selectDuePost(591, plan, []), null, 'the catch-up window remains bounded');
     assert.equal(selectDuePost(720, plan, ['a'])?.id, 'b');
     assert.equal(selectDuePost(800, plan, ['a', 'b']), null);
     assert.equal(selectDuePost(800, plan, []), null, 'hours-old targets must not suddenly appear at night');

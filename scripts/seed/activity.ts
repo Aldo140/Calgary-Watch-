@@ -40,7 +40,7 @@ interface PulseState {
   recentTemplateIds: string[];
 }
 
-const PLAN_VERSION = 3;
+const PLAN_VERSION = 4;
 const CALGARY_TIME_ZONE = 'America/Edmonton';
 
 export const POSTING_WINDOWS: Record<WindowName, { start: number; end: number }> = {
@@ -292,7 +292,7 @@ export function createDailyPlan(
   }).sort((a, b) => a.dueMinute - b.dueMinute);
 }
 
-/** Select one recently due item; stale jobs never backfill old posts at night. */
+/** Select one recently due item; tolerate delayed Actions jobs, not old posts. */
 export function selectDuePost(
   currentMinute: number,
   plan: PlannedPost[],
@@ -301,7 +301,7 @@ export function selectDuePost(
   const sent = new Set(published);
   return plan.find((item) =>
     item.dueMinute <= currentMinute
-      && currentMinute - item.dueMinute <= 50
+      && currentMinute - item.dueMinute <= 90
       && !sent.has(item.id)) ?? null;
 }
 

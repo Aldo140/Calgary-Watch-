@@ -196,14 +196,14 @@ function DeskSection({ d }: { d: D }) {
       />
 
       <StatGrid>
-        <StatTile label="Reports today" value={d.todayIncidents} tone="signal" hint="Last 24 hours" />
-        <StatTile label="Total reports" value={d.totalIncidents} hint="Loaded in console" />
+        <StatTile label="Resident reports today" value={d.todayIncidents} tone="signal" hint="Community submissions · last 24 hours" />
+        <StatTile label="Resident report history" value={d.totalIncidents} hint="Retained permanently" />
         <StatTile label="Registered users" value={d.totalUsers} hint={`${d.adminUsers} admin`} />
         <StatTile label="Page views" value={d.totalPageViews} hint={`${d.uniqueSessions} sessions`} />
       </StatGrid>
 
       <div className="grid gap-4 lg:grid-cols-3 items-start">
-        <Panel title="Reports over time" subtitle="Daily volume" className="lg:col-span-2">
+        <Panel title="Community reports over time" subtitle="Resident submissions only" className="lg:col-span-2">
           <ChartFrame height={200}>
             <AreaChart data={d.timelineChartData} margin={{ top: 4, right: 8, left: -22, bottom: 0 }}>
               <defs>
@@ -231,7 +231,7 @@ function DeskSection({ d }: { d: D }) {
 
           <Panel title="Momentum" subtitle="Recent direction">
             <div className="space-y-3">
-              <TrendRow label="Reports" data={d.incidentSparklineData} tone={T.signal} />
+              <TrendRow label="Community" data={d.incidentSparklineData} tone={T.signal} />
               <TrendRow label="Page views" data={d.pageViewsSparklineData} tone={T.ok} />
               <TrendRow label="Signups" data={d.userGrowthSparklineData} tone={T.attention} />
             </div>
@@ -278,18 +278,30 @@ function ReportsSection({ d }: { d: D }) {
   return (
     <>
       <Panel
-        title="Every report"
-        subtitle="Search, edit and moderate individual records"
+        title="Report history"
+        subtitle="Resident submissions are permanent; API records are temporary and separate"
         action={
           <Link to="/admin/incidents">
-            <AdminButton size="sm" tone="signal">Open list <ExternalLink size={13} /></AdminButton>
+            <AdminButton size="sm" tone="signal">Open history <ExternalLink size={13} /></AdminButton>
           </Link>
         }
       >
         <div className="flex items-center gap-5 flex-wrap">
           <span className="flex items-baseline gap-1.5">
             <Figure value={d.totalIncidents} size="lg" />
-            <span className="text-xs" style={{ color: T.muted }}>records</span>
+            <span className="text-xs" style={{ color: T.muted }}>resident reports</span>
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <Figure value={d.anonymousCommunityCount} size="lg" />
+            <span className="text-xs" style={{ color: T.muted }}>anonymous</span>
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <Figure value={d.hiddenCommunityCount} size="lg" tone="attention" />
+            <span className="text-xs" style={{ color: T.muted }}>hidden, retained</span>
+          </span>
+          <span className="flex items-baseline gap-1.5">
+            <Figure value={d.officialReportCount} size="lg" />
+            <span className="text-xs" style={{ color: T.muted }}>current API records</span>
           </span>
           <span className="flex items-baseline gap-1.5">
             <Figure value={d.pendingReviewIncidents.length} size="lg" tone="attention" />
@@ -303,7 +315,7 @@ function ReportsSection({ d }: { d: D }) {
       </Panel>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="By category" subtitle="Share of all reports">
+        <Panel title="By category" subtitle="Resident reports only">
           <ChartFrame height={210}>
             <PieChart>
               <Pie data={d.categoryChartData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2}>
@@ -317,7 +329,7 @@ function ReportsSection({ d }: { d: D }) {
           <Legend items={d.categoryChartData.map((c, i) => ({ label: c.name, value: c.value, color: CATEGORY_COLOR[c.name.toLowerCase()] ?? c.color ?? CHART_COLORS[i % CHART_COLORS.length] }))} />
         </Panel>
 
-        <Panel title="By trust level" subtitle="How reports get verified">
+        <Panel title="By trust level" subtitle="Resident reports only">
           <ChartFrame height={210}>
             <PieChart>
               <Pie data={d.trustChartData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2}>

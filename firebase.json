@@ -88,6 +88,19 @@
         ]
       },
       {
+        "source": "/seo-release.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
+          }
+        ]
+      },
+      {
         "source": "**/*.html",
         "headers": [
           {

@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -58,6 +60,18 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+
+      - name: Record SEO deployment marker
+        shell: bash
+        run: |
+          marker_commit="$(node -p "require('./dist/seo-release.json').commit")"
+          marker_experiments="$(node -p "require('./dist/seo-release.json').activeExperiments.map((item) => item.id).join(', ') || 'none'")"
+          {
+            echo "## SEO deployment"
+            echo "- Production commit: \`$marker_commit\`"
+            echo "- Active experiments: $marker_experiments"
+            echo "- Live marker: https://calgarywatch.ca/seo-release.json"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Notify Bing and AI search indexes
         shell: bash

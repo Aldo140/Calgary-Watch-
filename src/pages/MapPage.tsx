@@ -11,7 +11,7 @@ import MobileMapSheet, { type MapSheetRef, RAISED_FRACTION } from '@/src/compone
 import type { SheetState } from '@/src/hooks/useSheetDrag';
 import MapTour from '@/src/components/MapTour';
 import { Button } from '@/src/components/ui/Button';
-import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible } from '@/src/types';
+import { Incident, IncidentCategory, AreaIntelligence, isPubliclyVisible, isCommunityFacingIncident } from '@/src/types';
 import { getAreaIntelligence } from '@/src/services/mockData';
 import { Plus, Navigation, ShieldAlert, LogOut, Database, Bell, Search, X, LogIn, Home, LayoutDashboard, Siren, Settings, HelpCircle, MapPin, Check, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -20,6 +20,9 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { db, handleFirestoreError, OperationType } from '@/src/firebase';
 import { collection, onSnapshot, query, where, orderBy, limit, getDoc, getDocs, startAfter, QueryDocumentSnapshot, DocumentData, doc, setDoc, writeBatch } from 'firebase/firestore';
 import { cn } from '@/src/lib/utils';
+import { buildWatchFeed } from '@/src/lib/watch';
+import { mergeWatchState, readLocalWatch, writeLocalWatch } from '@/src/lib/watchProfile';
+import { logProductEvent } from '@/src/lib/productEvents';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
 import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipalityCrimeStats';
@@ -1203,6 +1206,111 @@ export default function MapPage() {
     return kept;
   }, [firebaseIncidents, officialOpenData, edmontonOpenData, weatherAlerts, powerOutageIncidents, airQualityIncidents, riverIncidents, suppressedIds]);
 
+  // ── My Watch ────────────────────────────────────────────────────────────────
+  // The reader's persisted "last checked" mark, radius and categories. The
+  // signed-in profile is the source of truth and follows them across devices;
+  // localStorage is the signed-out fallback. Read once per profile change.
+  const watchState = useMemo(() => {
+    const local = typeof window !== 'undefined'
+      ? readLocalWatch(window.localStorage)
+      : { lastSeenAt: null, radiusM: null, categories: [] as IncidentCategory[] };
+    return mergeWatchState(
+      userProfile
+        ? {
+            lastSeenAt: userProfile.watchLastSeenAt,
+            radiusM: userProfile.watchRadiusM,
+            categories: userProfile.watchCategories,
+          }
+        : null,
+      local,
+    );
+  }, [userProfile]);
+
+  // What changed near the reader since they last looked. Home is GPS when we
+  // have it; buildWatchFeed falls back to recency+section ordering without it.
+  const watchFeed = useMemo(
+    () => buildWatchFeed({
+      incidents,
+      home: userLocation,
+      since: watchState.lastSeenAt,
+      prefs: { radiusM: watchState.radiusM, categories: watchState.categories },
+      now: Date.now(),
+    }),
+    [incidents, userLocation, watchState],
+  );
+
+  // Seed the notification panel from the since-you-last-checked set on the
+  // first load for a returning reader (one with a stored mark). First-time
+  // readers keep the original empty-then-live behaviour rather than being
+  // buried under every currently-loaded incident.
+  const seededWatchRef = useRef(false);
+  useEffect(() => {
+    if (seededWatchRef.current) return;
+    if (!hasInitializedIncidents.current) return;
+    if (watchState.lastSeenAt === null) return;
+    seededWatchRef.current = true;
+    const seed: MapNotification[] = watchFeed.items.slice(0, 20).map((it) => ({
+      id: it.incident.id,
+      title: it.incident.title,
+      timestamp: it.incident.timestamp,
+      neighborhood: it.incident.neighborhood,
+      kind: 'incident' as const,
+    }));
+    if (seed.length === 0) return;
+    setNotifications((prev) => {
+      const seen = new Set(prev.map((p) => p.id));
+      return [...seed.filter((s) => !seen.has(s.id)), ...prev].slice(0, 20);
+    });
+    setUnreadNotifications(seed.length);
+  }, [watchFeed, watchState.lastSeenAt]);
+
+  // Advance and persist the "last checked" mark when the reader opens the
+  // panel: local always, profile when signed in, plus one funnel event.
+  const advanceWatchSeen = useCallback(() => {
+    const now = Date.now();
+    if (typeof window !== 'undefined') {
+      writeLocalWatch(window.localStorage, { ...watchState, lastSeenAt: now });
+    }
+    if (user && db) {
+      void setDoc(doc(db, 'users', user.uid), { watchLastSeenAt: now, profileUpdatedAt: now }, { merge: true })
+        .catch(() => { /* profile listener will re-sync */ });
+    }
+    logProductEvent('watch_opened', { count: watchFeed.items.length });
+  }, [watchState, user, watchFeed.items.length]);
+
+  // Advance the mark exactly on the open transition. Kept as an effect rather
+  // than folded into toggleNotifications because that callback is defined
+  // earlier in the component, before advanceWatchSeen exists.
+  const watchPanelWasOpen = useRef(false);
+  useEffect(() => {
+    if (showNotifications && !watchPanelWasOpen.current) advanceWatchSeen();
+    watchPanelWasOpen.current = showNotifications;
+  }, [showNotifications, advanceWatchSeen]);
+
+  // report_viewed at a single choke point — a detail panel can be opened from
+  // the sidebar, the sheet, a marker, or a deep link, and one effect on the
+  // selected incident covers them all without touching each call site.
+  const viewedIncidentRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedIncident) {
+      viewedIncidentRef.current = null;
+      return;
+    }
+    if (selectedIncident.id === viewedIncidentRef.current) return;
+    viewedIncidentRef.current = selectedIncident.id;
+    logProductEvent('report_viewed', {
+      section: isCommunityFacingIncident(selectedIncident) ? 'community' : 'official',
+      category: selectedIncident.category,
+    });
+  }, [selectedIncident]);
+
+  // report_started on the open transition of the report form.
+  const reportFormWasOpen = useRef(false);
+  useEffect(() => {
+    if (isFormOpen && !reportFormWasOpen.current) logProductEvent('report_started');
+    reportFormWasOpen.current = isFormOpen;
+  }, [isFormOpen]);
+
   // Official community list + names observed in live data
   const officialCommunities = useCalgaryCommunities(Boolean(user));
   const neighborhoodSuggestions = useMemo(() => {
@@ -1503,6 +1611,7 @@ export default function MapPage() {
             });
           }
           await batch.commit();
+          logProductEvent('report_submitted', { category: incidentData.category });
           celebrate('Signal live — neighbours nearby can see it now.');
         } catch (error) {
           console.error('[CalgaryWatch] Report submission failed:', error);
@@ -2136,6 +2245,7 @@ export default function MapPage() {
         digestUnsubscribeSource: null,
         profileUpdatedAt: Date.now(),
       }, { merge: true });
+      logProductEvent('digest_enabled');
       celebrate('Weekly digest on — your neighbourhood stats will land by email.');
     } catch { /* profile listener will re-sync */ }
   }, [user, celebrate]);
@@ -3341,7 +3451,11 @@ export default function MapPage() {
                 <div className="flex items-center justify-between border-b border-[#D9E3EC] px-4 pb-3">
                   <div>
                     <h3 id="mobile-notifications-title" className="text-[17px] font-black leading-tight text-[#0B1F33]">Notifications</h3>
-                    <p className="mt-0.5 text-[11.5px] text-[#5A6B7D]">Personal reports and live updates for your saved area</p>
+                    <p className="mt-0.5 text-[11.5px] text-[#5A6B7D]">
+                      {watchFeed.sinceSummary
+                        ? `Since you last checked — ${watchFeed.sinceSummary}`
+                        : 'Personal reports and live updates for your saved area'}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -3443,6 +3557,11 @@ export default function MapPage() {
                         Live
                       </span>
                     </div>
+                    {watchFeed.sinceSummary && (
+                      <p className="border-b border-[#D9E3EC] bg-[#F4F8FC] px-4 py-2 text-[11px] font-semibold text-[#1C2B3A]">
+                        Since you last checked — {watchFeed.sinceSummary}
+                      </p>
+                    )}
                     <div className="max-h-[min(70dvh,34rem)] overflow-y-auto overscroll-contain">
                       {notifications.length === 0 ? (
                         <div className="px-4 py-7 text-center">

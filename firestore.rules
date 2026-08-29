@@ -280,6 +280,25 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Resident corroboration on a report: "I saw this too", "still happening",
+    // "seems resolved". Read is public so a neighbour reading the map sees how
+    // many others backed a report — the document holds no identity beyond the
+    // writer's own uid. One record per user per incident is enforced by the id:
+    // it must be the writer's uid joined to the incident, so a report cannot be
+    // ballot-stuffed. Never deletable by a client — a retracted opinion is an
+    // update to a new kind, and the original signal stays auditable.
+    match /incident_feedback/{feedbackId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() &&
+                    feedbackId == (request.auth.uid + '_' + request.resource.data.incidentId) &&
+                    request.resource.data.uid == request.auth.uid &&
+                    request.resource.data.incidentId is string &&
+                    request.resource.data.kind in ['saw_it', 'still_happening', 'resolved'] &&
+                    request.resource.data.createdAt is number &&
+                    request.resource.data.updatedAt is number;
+      allow delete: if false;
+    }
+
     // Durable suppression for records the moderator cannot delete for good:
     // ingest re-upserts by dedup_key on every run, and browser-derived civic
     // records are rebuilt from the upstream API on every page load. Both

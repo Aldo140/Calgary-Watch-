@@ -108,6 +108,41 @@ describe('reporter PII split', () => {
   });
 });
 
+describe('incident_feedback lifecycle', () => {
+  const block = firestoreRules.slice(
+    firestoreRules.indexOf('match /incident_feedback/'),
+    firestoreRules.indexOf('match /', firestoreRules.indexOf('match /incident_feedback/') + 1),
+  );
+
+  it('is present', () => {
+    assert.ok(block.length > 0, 'incident_feedback rule block not found');
+  });
+
+  it('is never deletable by a client', () => {
+    const deleteRule = block.slice(block.indexOf('allow delete:'), block.indexOf('\n', block.indexOf('allow delete:')));
+    assert.ok(deleteRule.includes('if false'), 'resident feedback must not be client-deletable');
+  });
+
+  it('ties the document id to the writer to enforce one record per user', () => {
+    assert.ok(
+      block.includes("request.auth.uid + '_' + request.resource.data.incidentId"),
+      'the id must be uid+incident so a report cannot be ballot-stuffed',
+    );
+  });
+
+  it('accepts exactly the FeedbackKind values the client writes', () => {
+    // Source of truth: the union in src/lib/feedback.ts.
+    const feedbackSource = read('src/lib/feedback.ts');
+    const kinds = /export type FeedbackKind =\s*([^;]+);/.exec(feedbackSource)![1]
+      .split('|')
+      .map((s) => s.trim().replace(/['"]/g, ''))
+      .filter(Boolean);
+    for (const kind of kinds) {
+      assert.ok(block.includes(`'${kind}'`), `client writes kind "${kind}" but the rule rejects it`);
+    }
+  });
+});
+
 describe('flag threshold', () => {
   it('rules and client agree on how many flags hide a report', () => {
     const inRules = /function flagThreshold\(\)\s*\{\s*return (\d+);/.exec(firestoreRules);

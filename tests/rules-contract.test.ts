@@ -123,6 +123,13 @@ describe('incident_feedback lifecycle', () => {
     assert.ok(deleteRule.includes('if false'), 'resident feedback must not be client-deletable');
   });
 
+  it('is not world-readable — per-user feedback identity stays private', () => {
+    const readRule = block.slice(block.indexOf('allow read:'), block.indexOf(';', block.indexOf('allow read:')));
+    assert.ok(!readRule.includes('if true'), 'who left feedback must never be world-readable');
+    assert.ok(readRule.includes('isAdmin()') && readRule.includes('request.auth.uid'),
+      'read must be limited to the owner and admins');
+  });
+
   it('ties the document id to the writer to enforce one record per user', () => {
     assert.ok(
       block.includes("request.auth.uid + '_' + request.resource.data.incidentId"),

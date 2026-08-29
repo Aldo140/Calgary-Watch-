@@ -8,8 +8,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/src/firebase';
-import { useIncidentFeedback } from '@/src/hooks/useIncidentFeedback';
-import { feedbackSummary, type FeedbackKind } from '@/src/lib/feedback';
+import { useMyIncidentFeedback } from '@/src/hooks/useIncidentFeedback';
+import { feedbackSummary, incidentFeedbackAggregate, type FeedbackKind } from '@/src/lib/feedback';
 import { recordFeedback } from '@/src/lib/feedbackClient';
 import { CATEGORY } from '@/src/lib/tokens';
 
@@ -92,9 +92,10 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
   // Must be declared before any early return to satisfy Rules of Hooks
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
-  // Resident lifecycle for this report — declared before the early return to
-  // satisfy the Rules of Hooks; the hook no-ops for a null incident.
-  const { aggregate: feedbackAgg, myKind } = useIncidentFeedback(incident?.id ?? null);
+  // Resident lifecycle — the reader's own answer (owner-readable). The public
+  // corroboration aggregate is read from the incident's own fields below.
+  // Declared before the early return to satisfy the Rules of Hooks.
+  const myKind = useMyIncidentFeedback(incident?.id ?? null);
   const [feedbackPending, setFeedbackPending] = useState<FeedbackKind | null>(null);
   const [flagged, setFlagged] = useState(false);
   const [flagConfirm, setFlagConfirm] = useState(false);
@@ -427,7 +428,7 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                 <div className="space-y-2.5">
                   <SectionLabel>Neighbour confirmation</SectionLabel>
                   <p className="text-[12.5px] font-bold" style={{ color: P.ink }}>
-                    {feedbackSummary(feedbackAgg, Date.now())}
+                    {feedbackSummary(incidentFeedbackAggregate(incident), Date.now())}
                   </p>
                   {user ? (
                     <div className="flex flex-wrap gap-2">

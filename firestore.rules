@@ -281,14 +281,17 @@ service cloud.firestore {
     }
 
     // Resident corroboration on a report: "I saw this too", "still happening",
-    // "seems resolved". Read is public so a neighbour reading the map sees how
-    // many others backed a report — the document holds no identity beyond the
-    // writer's own uid. One record per user per incident is enforced by the id:
-    // it must be the writer's uid joined to the incident, so a report cannot be
-    // ballot-stuffed. Never deletable by a client — a retracted opinion is an
-    // update to a new kind, and the original signal stays auditable.
+    // "seems resolved". Per-user feedback is NOT world-readable — the doc id is
+    // the writer's uid, so exposing it would leak who said what about which
+    // report, the same identity leak the incident_reporters split avoids. Only
+    // the owner (to show which button they pressed) and admins may read it. The
+    // public sees counts on the incident document instead, written by the
+    // feedback Cloud Function. One record per user per incident is enforced by
+    // the id. Never deletable by a client — a retracted opinion is an update to
+    // a new kind, and the original signal stays auditable.
     match /incident_feedback/{feedbackId} {
-      allow read: if true;
+      allow read: if isAdmin() ||
+                  (isAuthenticated() && feedbackId == (request.auth.uid + '_' + resource.data.incidentId));
       allow create, update: if isAuthenticated() &&
                     feedbackId == (request.auth.uid + '_' + request.resource.data.incidentId) &&
                     request.resource.data.uid == request.auth.uid &&

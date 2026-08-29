@@ -1,6 +1,7 @@
 const { initializeApp } = require('firebase-admin/app');
 const { defineSecret } = require('firebase-functions/params');
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentWritten } = require('firebase-functions/v2/firestore');
+const { getFirestore } = require('firebase-admin/firestore');
 const { logger } = require('firebase-functions');
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
@@ -272,4 +273,54 @@ exports.sendDigestPlannerPreview = onDocumentCreated({
   await ref.set({ status, processedAt: retryableFailure ? null : Date.now(), recipients: results, error }, { merge: true });
   if (retryableFailure) throw new Error(error || 'A planner preview delivery will be retried.');
   logger.info('Planner preview processed', { requestId, delivered, recipients: ADMIN_EMAILS.length, status });
+});
+
+/**
+ * Maintain the public resident-corroboration aggregate on an incident.
+ *
+ * Per-user feedback in incident_feedback is owner-private (its doc id is the
+ * writer's uid), so the map cannot read it directly without leaking who said
+ * what. This trigger recomputes counts-only fields on the incident document
+ * whenever a feedback record changes — the public sees "Backed by 3 neighbours"
+ * without seeing which neighbours. The reducer mirrors aggregateFeedback in
+ * src/lib/feedback.ts; keep the two in sync.
+ */
+exports.onIncidentFeedbackWritten = onDocumentWritten('incident_feedback/{feedbackId}', async (event) => {
+  const after = event.data && event.data.after && event.data.after.data();
+  const before = event.data && event.data.before && event.data.before.data();
+  const incidentId = (after && after.incidentId) || (before && before.incidentId);
+  if (!incidentId) return;
+
+  const db = getFirestore();
+  const snapshot = await db.collection('incident_feedback').where('incidentId', '==', incidentId).get();
+
+  let sawIt = 0;
+  let stillHappening = 0;
+  let resolved = 0;
+  let lastActiveAt = null;
+  snapshot.forEach((doc) => {
+    const d = doc.data();
+    if (d.kind === 'saw_it') sawIt += 1;
+    else if (d.kind === 'still_happening') stillHappening += 1;
+    else if (d.kind === 'resolved') resolved += 1;
+    if (d.kind === 'saw_it' || d.kind === 'still_happening') {
+      const t = typeof d.updatedAt === 'number' ? d.updatedAt : 0;
+      lastActiveAt = lastActiveAt === null ? t : Math.max(lastActiveAt, t);
+    }
+  });
+  const corroborations = sawIt + stillHappening;
+
+  try {
+    // update(), not set(merge): never conjure a phantom incident for feedback
+    // that points at a browser-derived record which lives only in the API feed.
+    await db.collection('incidents').doc(incidentId).update({
+      feedback_corroborations: corroborations,
+      feedback_disputed: corroborations > 0 && resolved > 0,
+      feedback_resolved: resolved > 0 && resolved >= corroborations,
+      feedback_last_active: lastActiveAt,
+    });
+    logger.info('Aggregated incident feedback', { incidentId, corroborations, resolved });
+  } catch (error) {
+    logger.warn('Feedback target incident not updatable', { incidentId, error: error instanceof Error ? error.message : String(error) });
+  }
 });

@@ -112,6 +112,16 @@ export interface Incident {
   flagged_by?: string[];
   flag_count?: number;
   flagged_at?: number;
+  /**
+   * Public resident-corroboration aggregate, maintained by the
+   * onIncidentFeedbackWritten Cloud Function. Only counts and flags are public
+   * here — who left the feedback lives in the owner-private incident_feedback
+   * collection, mirroring the incident_reporters PII split.
+   */
+  feedback_corroborations?: number;
+  feedback_disputed?: boolean;
+  feedback_resolved?: boolean;
+  feedback_last_active?: number | null;
   deletedAt?: number;
   deletedBy?: string;
   /** @deprecated Superseded by `visibility`. Retained for old documents. */

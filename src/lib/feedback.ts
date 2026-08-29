@@ -14,6 +14,7 @@
  * without Firestore.
  */
 
+import type { Incident } from '@/src/types';
 import { formatRelativeTime } from '@/src/lib/format';
 
 export type FeedbackKind = 'saw_it' | 'still_happening' | 'resolved';
@@ -80,6 +81,27 @@ export function aggregateFeedback(docs: IncidentFeedback[], _now: number): Feedb
     lastActiveAt,
     resolvedByResidents: resolved > 0 && resolved >= corroborations,
     disputed: stillHappening + sawIt > 0 && resolved > 0,
+  };
+}
+
+/**
+ * The public aggregate as carried on an incident document, maintained by the
+ * feedback Cloud Function. This is what the map and detail panel read — counts
+ * only, never identities. Absent fields (function has not run yet) read as an
+ * empty aggregate rather than an error.
+ */
+export function incidentFeedbackAggregate(incident: Pick<Incident,
+  'feedback_corroborations' | 'feedback_disputed' | 'feedback_resolved' | 'feedback_last_active'>): FeedbackAggregate {
+  const corroborations = incident.feedback_corroborations ?? 0;
+  const resolvedByResidents = incident.feedback_resolved ?? false;
+  return {
+    total: corroborations + (resolvedByResidents || incident.feedback_disputed ? 1 : 0),
+    corroborations,
+    stillHappening: 0,
+    resolved: resolvedByResidents ? 1 : 0,
+    lastActiveAt: incident.feedback_last_active ?? null,
+    resolvedByResidents,
+    disputed: incident.feedback_disputed ?? false,
   };
 }
 

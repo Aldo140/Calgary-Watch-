@@ -18,6 +18,7 @@ import {
   aggregateFeedback,
   feedbackSummary,
   feedbackDocId,
+  incidentFeedbackAggregate,
   type IncidentFeedback,
 } from '../src/lib/feedback.ts';
 
@@ -87,6 +88,31 @@ describe('aggregateFeedback', () => {
     // the later write wins
     assert.equal(a.resolved, 1);
     assert.equal(a.corroborations, 0);
+  });
+});
+
+describe('incidentFeedbackAggregate — public fields on the incident', () => {
+  it('reads counts from the incident document (function-maintained)', () => {
+    const agg = incidentFeedbackAggregate({
+      feedback_corroborations: 3,
+      feedback_disputed: false,
+      feedback_resolved: false,
+      feedback_last_active: NOW - 24 * MIN,
+    });
+    assert.equal(agg.corroborations, 3);
+    assert.equal(agg.lastActiveAt, NOW - 24 * MIN);
+    assert.equal(feedbackSummary(agg, NOW), 'Last seen active 24 minutes ago');
+  });
+
+  it('is empty when the incident carries no aggregate yet', () => {
+    const agg = incidentFeedbackAggregate({});
+    assert.equal(agg.total, 0);
+    assert.equal(feedbackSummary(agg, NOW), 'No recent confirmation');
+  });
+
+  it('surfaces a resident-resolved incident', () => {
+    const agg = incidentFeedbackAggregate({ feedback_corroborations: 0, feedback_resolved: true });
+    assert.equal(feedbackSummary(agg, NOW), 'Reported resolved by nearby residents');
   });
 });
 

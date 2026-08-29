@@ -81,6 +81,8 @@ type UserProfileSettings = {
   weeklyDigestOptIn?: boolean;
   weeklyDigestOptInAt?: number;
   weeklyDigestTopics?: string[];
+  /** Categories the reader chose for their weekly digest; empty/absent = all. */
+  digestCategories?: IncidentCategory[];
   profileUpdatedAt?: number;
   onboardingCompletedAt?: number;
   /** Set the first (and only) time the weekly-digest prompt is shown */

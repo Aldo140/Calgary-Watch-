@@ -80,4 +80,28 @@ describe('buildDigestSummary — corroboration threading', () => {
     assert.ok(summary.highlights.length >= 1);
     assert.equal(summary.highlights[0].incident.id, 'backed');
   });
+
+  it('filters the digest to the reader\'s chosen categories', () => {
+    const incidents = [
+      inc({ id: 'crime', category: 'crime', neighborhood: 'Beltline' }),
+      inc({ id: 'traffic', category: 'traffic', neighborhood: 'Beltline' }),
+    ];
+    const summary = buildDigestSummary({
+      incidents,
+      profile: recipient,
+      now: NOW,
+      categories: ['crime'],
+    });
+    assert.ok(summary.items.every((it) => it.incident.category === 'crime'));
+    assert.ok(!summary.items.some((it) => it.incident.id === 'traffic'));
+  });
+
+  it('an empty category list means every category (unchanged behaviour)', () => {
+    const incidents = [
+      inc({ id: 'crime', category: 'crime', neighborhood: 'Beltline' }),
+      inc({ id: 'traffic', category: 'traffic', neighborhood: 'Beltline' }),
+    ];
+    const summary = buildDigestSummary({ incidents, profile: recipient, now: NOW, categories: [] });
+    assert.equal(summary.items.length, 2);
+  });
 });

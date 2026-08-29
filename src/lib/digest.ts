@@ -92,6 +92,8 @@ export interface DigestRecipient {
   piiConsentAt?: number | null;
   profileUpdatedAt?: number | null;
   weeklyDigestTopics?: string[];
+  /** Categories the reader chose for their digest; empty/absent means all. */
+  digestCategories?: IncidentCategory[];
   digestUnsubToken?: string;
   /** Set only after the one-time welcome was successfully transmitted. */
   digestWelcomeSentAt?: number | null;
@@ -496,6 +498,8 @@ export function buildDigestSummary(options: {
   rings?: ReadonlyArray<{ metres: number; label: string }>;
   /** Resident corroboration counts by incident id, from incident_feedback. */
   corroborations?: ReadonlyMap<string, number>;
+  /** Categories the reader wants; empty/absent means every category. */
+  categories?: readonly IncidentCategory[];
 }): DigestSummary {
   const { incidents, profile, home, now } = options;
   const rings = options.rings ?? DIGEST_RINGS;
@@ -504,7 +508,12 @@ export function buildDigestSummary(options: {
   const contextSince = now - DIGEST_CONTEXT_MS;
 
   const savedArea = (profile.neighborhood || profile.inferredNeighborhood || '').trim();
-  const mailable = incidents.filter((i) => isMailable(i, now));
+  // A chosen category set narrows every scope below; empty means no preference,
+  // so the digest reads exactly as it did before anyone picked topics.
+  const categories = options.categories ?? [];
+  const mailable = incidents
+    .filter((i) => isMailable(i, now))
+    .filter((i) => categories.length === 0 || categories.includes(i.category));
 
   const inWindow = (i: Incident, from: number, to: number) =>
     i.timestamp >= from && i.timestamp < to;

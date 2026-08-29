@@ -172,6 +172,7 @@ async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
       piiConsentAt: typeof d.piiConsentAt === 'number' ? d.piiConsentAt : null,
       profileUpdatedAt: typeof d.profileUpdatedAt === 'number' ? d.profileUpdatedAt : null,
       weeklyDigestTopics: Array.isArray(d.weeklyDigestTopics) ? d.weeklyDigestTopics : [],
+      digestCategories: Array.isArray(d.digestCategories) ? d.digestCategories : [],
       digestUnsubToken: typeof d.digestUnsubToken === 'string' ? d.digestUnsubToken : undefined,
       digestWelcomeSentAt: typeof d.digestWelcomeSentAt === 'number' ? d.digestWelcomeSentAt : null,
       // Kept out of DigestRecipient so it cannot reach a template by accident.
@@ -402,7 +403,7 @@ async function run(): Promise<void> {
         home = geocodeCache.get(address) ?? null;
       }
 
-      const summary = buildDigestSummary({ incidents, profile, home, now, corroborations });
+      const summary = buildDigestSummary({ incidents, profile, home, now, corroborations, categories: profile.digestCategories });
       const token = await ensureUnsubToken(db, profile);
       const unsubUrl = unsubscribeUrl(origin, profile.uid, token);
 

@@ -1,0 +1,68 @@
+name: Incident Alerts
+
+# Between-digest instant alerts. Intentionally MANUAL-ONLY for now: there is no
+# schedule until a maintainer has rehearsed a dry run and one live test send and
+# is satisfied the eligibility and cursor logic behave against real data. To go
+# live, uncomment the `schedule` block below (every 15 minutes is the intent)
+# AND clear DIGEST_ALLOWLIST in repo settings.
+on:
+  # schedule:
+  #   - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Render and log only — transmit nothing'
+        type: boolean
+        default: true
+      test_email:
+        description: 'Redirect every message to this address (leave blank for real recipients)'
+        type: string
+        default: ''
+      only_uid:
+        description: 'Restrict the run to a single account uid'
+        type: string
+        default: ''
+      only_email:
+        description: 'Restrict the run to one account email (safest for a manual test)'
+        type: string
+        default: ''
+
+concurrency:
+  group: 'incident-alerts'
+  cancel-in-progress: false
+
+jobs:
+  alerts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send incident alerts
+        run: npx tsx scripts/alerts/send.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_SUPPORT_EMAIL: ${{ vars.DIGEST_SUPPORT_EMAIL }}
+          DIGEST_REPLY_TO: ${{ vars.DIGEST_REPLY_TO }}
+          DIGEST_FROM: ${{ vars.DIGEST_FROM }}
+          DIGEST_LIMIT: ${{ vars.DIGEST_LIMIT }}
+          # SAFETY: while this repo variable is set, only these addresses can be
+          # mailed — a run reaches nobody else even if the query is wrong.
+          DIGEST_ALLOWLIST: ${{ vars.DIGEST_ALLOWLIST }}
+          # Manual runs default to dry; there is no scheduled run yet.
+          DIGEST_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          DIGEST_TEST_EMAIL: ${{ inputs.test_email }}
+          ALERT_ONLY_UID: ${{ inputs.only_uid }}
+          ALERT_ONLY_EMAIL: ${{ inputs.only_email }}

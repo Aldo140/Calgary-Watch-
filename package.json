@@ -24,7 +24,9 @@
     "digest:publish-previews": "tsx scripts/digest/publishPreviews.ts",
     "digest:art": "tsx scripts/prepare-email-art.ts",
     "digest:contrast": "tsx scripts/digest/audit.ts",
-    "send:alerts": "tsx scripts/alerts/send.ts"
+    "send:alerts": "tsx scripts/alerts/send.ts",
+    "discovery:ingest": "tsx scripts/discovery/ingest.ts",
+    "discovery:export": "tsx scripts/discovery/export.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

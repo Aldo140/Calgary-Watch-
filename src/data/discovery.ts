@@ -1,3 +1,5 @@
+import inventory from '../generated/discovery-index.json';
+import type { MarketOccurrence } from '../types/discovery';
 import type { DiscoveryEntity, EntityBase } from '../types/discovery';
 import { createDiscoveryRepository } from '../lib/discovery';
 
@@ -15,4 +17,4 @@ export const discoveryFixtures: DiscoveryEntity[] = [
   { ...base, kind: 'guide', id: 'guide-preview', slug: 'a-day-by-the-bow', title: 'A day by the Bow', summary: 'Slow down. Follow the river. See where the afternoon takes you.', categories: ['outdoors'], tags: ['date night'], introduction: 'A preview of entity-based Calgary guides.', methodology: 'Development sample; editorial review and source verification are required before publication.', entries: [{ entityId: 'event-walk', note: 'Start with a walk.' }], relatedGuideIds: [], image: { src: '/images/photo/calgary4.webp', alt: 'Calgary’s Peace Bridge' } },
   { ...base, kind: 'neighbourhood', id: 'neighbourhood-preview', slug: 'downtown-preview', title: 'Downtown', summary: 'Find a different rhythm in the heart of the city.', categories: ['neighbourhoods'], tags: ['downtown'], quadrant: 'Centre', entityIds: ['event-walk'], image: { src: '/images/photo/calgary1.webp', alt: 'Downtown Calgary skyline' } },
 ];
-export const discoveryRepository = createDiscoveryRepository(discoveryFixtures, [], import.meta.env?.DEV ?? false);
+export const discoveryRepository = createDiscoveryRepository(inventory.entities as DiscoveryEntity[], inventory.occurrences as MarketOccurrence[]);

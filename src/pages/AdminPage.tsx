@@ -1,3 +1,4 @@
+import { DiscoveryContent } from '../components/admin/DiscoveryContent';
 /**
  * Calgary Watch — admin console.
  *
@@ -178,7 +179,8 @@ export default function AdminPage() {
       {section === 'feeds' && <FeedsSection d={d} />}
       {section === 'visitors' && <VisitorsSection d={d} />}
       {section === 'city' && <CitySection d={d} />}
-      {(['content', 'demand', 'partners'] as Section[]).includes(section) && <Panel title={titles[section].title}><p style={{ color: T.muted, padding: 20 }}>This workspace is being prepared. {section === 'content' ? 'Source verification and publishing controls will arrive with the first Events and Markets inventory.' : section === 'demand' ? 'No search queries are being collected yet. Future aggregate records will exclude identity and location data.' : 'Claim review and outreach tracking are not enabled yet. Paid placement will be labelled and will not confer editorial selection.'}</p></Panel>}
+      {section === 'content' && <DiscoveryContent />}
+      {(['demand', 'partners'] as Section[]).includes(section) && <Panel title={titles[section].title}><p style={{ color: T.muted, padding: 20 }}>This workspace is being prepared. {section === 'content' ? 'Source verification and publishing controls will arrive with the first Events and Markets inventory.' : section === 'demand' ? 'No search queries are being collected yet. Future aggregate records will exclude identity and location data.' : 'Claim review and outreach tracking are not enabled yet. Paid placement will be labelled and will not confer editorial selection.'}</p></Panel>}
     </AdminShell>
   );
 }

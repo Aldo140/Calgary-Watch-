@@ -1,0 +1,30 @@
+import { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase';
+import type { DiscoveryEntity, EntitySubmission, InventorySubmissionInput } from '../../types/discovery';
+import { InventoryForm } from '../discovery/InventoryForm';
+import { discoveryCall } from '../../lib/discoveryApi';
+import '../../styles/discovery.css';
+
+type RecordRow=DiscoveryEntity & {revision:number;duplicateIds?:string[]};
+type Raw={entityId:string;input:InventorySubmissionInput;sourceId:string;sourceRecordId:string;cancelled:boolean};
+type Source={id:string;name:string;approved:boolean};
+export function DiscoveryContent() {
+  const [records,setRecords]=useState<RecordRow[]>([]);const [submissions,setSubmissions]=useState<EntitySubmission[]>([]);const [sources,setSources]=useState<Source[]>([]);const [raw,setRaw]=useState<Raw[]>([]);
+  const [filter,setFilter]=useState('pending');const [kind,setKind]=useState('all');const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [message,setMessage]=useState('');
+  const [editor,setEditor]=useState<{input?:InventorySubmissionInput;sourceId:string;recordId:string;submissionId?:string;cancelled?:boolean}|null>(null);
+  const [ack,setAck]=useState(false);
+  async function load() { if(!db)return;const data=await Promise.all(['events','markets','entity_submissions','discovery_sources','discovery_source_records'].map(c=>getDocs(collection(db!,c))));setRecords([...data[0].docs,...data[1].docs].map(d=>d.data() as RecordRow));setSubmissions(data[2].docs.map(d=>d.data() as EntitySubmission));setSources(data[3].docs.map(d=>d.data() as Source));setRaw(data[4].docs.map(d=>d.data() as Raw)); }
+  useEffect(()=>{void load().catch(e=>setError(e.message));},[]);
+  async function run(data:unknown) { setBusy(true);setError('');setMessage('');try{await discoveryCall('manageDiscovery',data);await load();setMessage('Saved. Published changes appear on the public site after the next verified export and Hosting release.');}catch(e){setError(e instanceof Error?e.message:'Save failed');throw e;}finally{setBusy(false);} }
+  const act=(data:unknown)=>void run(data).catch(()=>{});
+  return <section className="cw-content-workspace"><h2>Events & Markets</h2><p>Review official sources and confirmed dates before publishing. Verification expires after 14 days. Source changes return a listing to review.</p>
+    <div className="cw-content-actions"><button disabled={busy} onClick={()=>void load().catch(e=>setError(e.message))}>Refresh</button><button onClick={()=>setEditor({sourceId:sources.find(s=>s.approved)?.id||'',recordId:crypto.randomUUID()})}>Add listing</button><label>Type<select value={kind} onChange={e=>setKind(e.target.value)}><option value="all">All</option><option value="event">Events</option><option value="market">Markets</option></select></label><label>Status<select value={filter} onChange={e=>setFilter(e.target.value)}>{['pending','draft','published','archived'].map(s=><option key={s}>{s}</option>)}</select></label></div>
+    {error&&<p role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
+    {editor&&<section className="cw-content-editor"><h3>{editor.submissionId?'Review suggestion':'Edit listing'}</h3><label>Verified source<select value={editor.sourceId} onChange={e=>setEditor({...editor,sourceId:e.target.value})}><option value="">Choose approved source</option>{sources.filter(s=>s.approved).map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>{!sources.length&&<p>No approved sources have been imported yet. Run the reviewed source import before saving listings.</p>}<InventoryForm key={editor.recordId} initial={editor.input} busy={busy} label="Save to pending review" onSave={async input=>{await run({action:editor.submissionId?'review-submission':'save',input,sourceId:editor.sourceId,recordId:editor.recordId,id:editor.submissionId,cancelled:editor.cancelled});setEditor(null);}}/><button onClick={()=>setEditor(null)}>Close editor</button></section>}
+    <label><input type="checkbox" checked={ack} onChange={e=>setAck(e.target.checked)}/> I have reviewed any duplicate warnings before publishing.</label>
+    {records.filter(r=>r.status===filter&&(kind==='all'||r.kind===kind)).map(r=><article className="cw-content-record" key={r.id}><h3>{r.title}</h3><p>{r.kind} · {r.status}{r.kind==='event'&&r.cancelled?' · Cancelled':''} · Last verified: {r.verifiedAt||'Never'}</p><p>Fetched: {r.fetchedAt||'Unknown'}</p>{r.sources.map(s=><a href={s.url} target="_blank" rel="noreferrer" key={s.url}>{s.name} ↗ </a>)}{!!r.duplicateIds?.length&&<p role="status">Possible duplicates: {r.duplicateIds.map(id=>records.find(e=>e.id===id)?.title||id).join(', ')}</p>}<div className="cw-content-actions"><button disabled={busy} onClick={()=>{const source=raw.find(x=>x.entityId===r.id);if(source)setEditor({input:source.input,sourceId:source.sourceId,recordId:source.sourceRecordId,cancelled:source.cancelled});else setError('Original source record is missing.');}}>Edit</button>{(['publish','draft','archive','cancel'] as const).map(action=><button disabled={busy || (action==='publish'&&!!r.duplicateIds?.length&&!ack)} key={action} onClick={()=>act({kind:r.kind,id:r.id,revision:r.revision,action,acknowledgeDuplicates:ack})}>{({publish:'Verify & publish',draft:'Unpublish to draft',archive:'Archive',cancel:'Mark cancelled'})[action]}</button>)}</div></article>)}
+    {!records.some(r=>r.status===filter&&(kind==='all'||r.kind===kind))&&<p>No {filter} listings.</p>}
+    <h2>Organizer suggestions</h2>{submissions.filter(s=>s.status==='pending').map(s=><article key={s.id} className="cw-content-record"><h3>{s.input.title}</h3><p>{s.input.summary}</p><a href={s.input.sourceUrl} target="_blank" rel="noreferrer">Suggested source ↗</a><div className="cw-content-actions"><button onClick={()=>setEditor({input:s.input,sourceId:'',recordId:`submission-${s.id}`,submissionId:s.id})}>Check & edit</button><button disabled={busy} onClick={()=>act({action:'review-submission',id:s.id,reject:true})}>Reject</button></div></article>)}
+  </section>;
+}

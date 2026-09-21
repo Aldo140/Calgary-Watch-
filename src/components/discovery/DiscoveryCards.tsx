@@ -18,4 +18,4 @@ export const BusinessCard = DiscoveryCard;
 export const GuideCard = DiscoveryCard;
 export const NeighbourhoodCard = DiscoveryCard;
 export function EditorialGrid({ children }: { children: ReactNode }) { return <div className="cw-editorial-grid">{children}</div>; }
-export function EmptyInventory({ type }: { type: string }) { return <div className="cw-empty"><h3>Good {type} are worth checking.</h3><p>We’re putting together our first collection. Have something Calgary should know about?</p><a className="cw-text-link" href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`CalgaryWatch ${type} suggestion`)}`}>Share a suggestion <ArrowUpRight size={18} /></a></div>; }
+export function EmptyInventory({ type }: { type: string }) { return <div className="cw-empty"><h3>No matching {type} right now.</h3><p>Try another date or filter. Have something Calgary should know about?</p><Link className="cw-text-link" to="/submit">Share a suggestion <ArrowUpRight size={18} /></Link></div>; }

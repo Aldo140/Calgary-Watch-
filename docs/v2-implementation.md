@@ -1,5 +1,7 @@
 # CalgaryWatch V2 — foundation milestone
 
+Phase 2 implementation and release requirements are documented in [Events & Markets operations](events-markets-operations.md). The notes below describe the original foundation milestone, not the current production activation status.
+
 ## Execution plan and architecture decisions
 
 - `src/types/discovery.ts`: provenance-bearing discovery entities; market master and occurrences are separate. Business partner state is independent of editorial selection.

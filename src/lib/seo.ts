@@ -1,5 +1,6 @@
+import { discoveryIndexingEnabled } from './discoveryPublication';
 import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
-import { DISCOVERY_SECTIONS } from './discovery';
+import { DISCOVERY_SECTIONS, type DiscoveryRepository } from './discovery';
 import { discoveryRepository } from '../data/discovery';
 import { buildEntityJsonLd, indexableEntities } from './discoverySeo';
 import {
@@ -184,11 +185,11 @@ export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
  */
 export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
 
-export function getSeoConfig(pathname: string): SeoConfig {
+export function getSeoConfig(pathname: string, repository: DiscoveryRepository = discoveryRepository): SeoConfig {
   const [section, slug] = pathname.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
-  const entity = kind && slug ? discoveryRepository.find(kind, slug) : undefined;
-  if (entity) return { title: `${entity.title} | CalgaryWatch`, description: entity.summary, index: indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
+  const entity = kind && slug ? repository.find(kind, slug) : undefined;
+  if (entity) return { title: `${entity.title} | CalgaryWatch`, description: entity.summary, index: discoveryIndexingEnabled && indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
   return ROUTE_SEO[pathname] ?? { title: 'Listing unavailable | CalgaryWatch', description: 'This listing has not been published or could not be found.', index: false, pageType: 'WebPage' };
 }
 
@@ -204,13 +205,13 @@ export const ROBOTS_NOINDEX = 'noindex, nofollow';
  * WebPage JSON-LD for a route. Shared so the prerendered markup and the
  * client-injected script are byte-identical.
  */
-export function buildPageJsonLd(pathname: string, origin: string): object {
-  const config = getSeoConfig(pathname);
+export function buildPageJsonLd(pathname: string, origin: string, repository: DiscoveryRepository = discoveryRepository): object {
+  const config = getSeoConfig(pathname, repository);
   const pageUrl = pageUrlFor(pathname, origin);
   const crumbs = ROUTE_BREADCRUMBS[pathname] ?? ROUTE_BREADCRUMBS['/'];
   const [section, slug] = pathname.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
-  const entity = kind && slug ? discoveryRepository.find(kind, slug) : undefined;
+  const entity = kind && slug ? repository.find(kind, slug) : undefined;
 
   return {
     '@context': 'https://schema.org',
@@ -235,7 +236,7 @@ export function buildPageJsonLd(pathname: string, origin: string): object {
         item: c.item,
       })),
     },
-    ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin) } : {}),
+    ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences()) } : {}),
     ...(pathname === GUIDE_PATH
       ? {
           about: [

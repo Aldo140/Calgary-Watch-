@@ -12,6 +12,8 @@ import {
   getSeoConfig,
   pageUrlFor,
 } from '../../src/lib/seo.js';
+import { discoveryRepository } from '../../src/data/discovery';
+import { DISCOVERY_SECTIONS, entityPath } from '../../src/lib/discovery';
 import {
   GUIDE_COMPARISON,
   GUIDE_FAQS,
@@ -260,7 +262,12 @@ export function buildStaticRouteBody(pathname: string): string {
 
 /** Place route content inside the React mount point for the first response. */
 export function upsertStaticRouteBody(html: string, pathname: string): string {
-  const body = buildStaticRouteBody(pathname);
+  const entity = discoveryRepository.list().find(e => entityPath(e) === pathname);
+  const section = DISCOVERY_SECTIONS.find(s => pathname === s.path);
+  const dated = (start: string, end: string) => `${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(start))} to ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(end))} (Calgary time)`;
+  const sourceLinks = entity?.sources.map(s=>staticLink(s.url,s.name)).join(' · ');
+  const dates = entity?.kind === 'event' ? `<p>${escapeText(dated(entity.start,entity.end))}${entity.cancelled ? ' — Cancelled' : ''}</p>` : entity?.kind === 'market' ? `<ul>${discoveryRepository.occurrences().filter(o=>o.marketId===entity.id).map(o=>`<li>${escapeText(dated(o.start,o.end))}${o.cancelled?' — Cancelled':''}</li>`).join('')}</ul>` : '';
+  const body = entity ? `<main><article><h1>${escapeText(entity.title)}</h1><p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname);
   if (!body) return html;
   return html.replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, `<div id="root">${body}</div>`);
 }

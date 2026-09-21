@@ -572,6 +572,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Discovery is published through a verified static snapshot. Raw inventory,
+    // review records and source payloads are never readable by public clients.
+    match /{collection}/{id} {
+      allow read: if collection in ['events', 'markets', 'market_occurrences', 'discovery_sources', 'discovery_source_records', 'discovery_audit'] && isAdmin();
+      allow write: if false; // Trusted callable service/Admin SDK only.
+    }
+    match /entity_submissions/{id} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.submittedBy == request.auth.uid);
+      allow write: if false; // Callable validates strict DTOs and enforces per-user quotas.
+    }
     match /{path=**} {
       allow read, write: if false;
     }

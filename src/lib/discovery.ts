@@ -1,3 +1,4 @@
+import { publishedInventory } from './discoveryPublication';
 import type { DiscoveryEntity, EntityKind, MarketOccurrence } from '../types/discovery';
 
 export const DISCOVERY_SECTIONS = [
@@ -48,6 +49,6 @@ export interface DiscoveryRepository {
   find(kind: EntityKind, slug: string): DiscoveryEntity | undefined;
 }
 export function createDiscoveryRepository(entities: DiscoveryEntity[], occurrences: MarketOccurrence[] = [], development = false): DiscoveryRepository {
-  const visible = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || !e.developmentOnly));
+  const visible = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e)));
   return { list: () => visible, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
 }

@@ -13,6 +13,7 @@ import { collection, addDoc } from 'firebase/firestore';
 // failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const OriginalLandingPage = lazy(() => import('@/src/pages/LandingPage'));
+const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
 const DiscoveryPage = lazy(() => import('@/src/pages/DiscoveryPage'));
 const MapPage     = lazy(() => import('@/src/pages/MapPage'));
 const AboutPage   = lazy(() => import('@/src/pages/AboutPage'));
@@ -145,6 +146,7 @@ export default function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/submit" element={<SubmitDiscoveryPage />} />
           <Route path="/community" element={<OriginalLandingPage />} />
           <Route path="/events" element={<DiscoveryPage />} />
           <Route path="/events/:slug" element={<DiscoveryPage />} />

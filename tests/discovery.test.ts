@@ -31,7 +31,7 @@ describe('Discovery publication boundary', () => {
     assert.equal(createDiscoveryRepository([{ ...discoveryFixtures[0], status: 'draft' }], [], true).list().length, 0);
   });
   it('generates entity-specific structured data and deduplicates sitemap paths', () => {
-    const event = { ...discoveryFixtures[0], developmentOnly: false, verification: 'source-checked' as const, sources: [{ kind: 'official' as const, name: 'Organizer', url: 'https://example.org/event' }] };
+    const event = { ...discoveryFixtures[0], developmentOnly: false, verifiedAt: new Date().toISOString(), verification: 'source-checked' as const, sources: [{ kind: 'official' as const, name: 'Organizer', url: 'https://example.org/event' }] };
     assert.equal((buildEntityJsonLd(event, 'https://calgarywatch.ca') as Record<string, unknown>)['@type'], 'Event');
     const xml = buildSitemap([entityPath(event)], [event], 'https://calgarywatch.ca');
     assert.equal((xml.match(/<url>/g) || []).length, 1);

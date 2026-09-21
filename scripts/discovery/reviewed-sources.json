@@ -1,0 +1,124 @@
+[
+  {
+    "source": {
+      "id": "alcove",
+      "name": "Alcove Centre for the Arts",
+      "approved": true,
+      "hosts": [
+        "www.alcoveartscentre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "love-letters-2026-09-26",
+        "input": {
+          "kind": "event",
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "tags": [],
+          "organizer": "Alcove Centre for the Arts",
+          "pricing": "paid",
+          "title": "Love Letters From the Diaspora",
+          "summary": "An evening of storytelling, poetry and an open mic at Alcove Beltline.",
+          "description": "Presented by The Fourth Space. All ages welcome. The venue lists admission at $5 plus fees and tax; confirm ticket availability with the organizer. Steps are required to enter the Beltline venue.",
+          "address": "1040 8 Street SW, Calgary, Alberta",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://www.alcoveartscentre.ca/upcomingprograms/love-letters-from-the-diaspora",
+          "start": "2026-09-26T18:00:00-06:00",
+          "end": "2026-09-26T20:30:00-06:00"
+        }
+      },
+      {
+        "id": "comics-workshop-2026-09-27",
+        "input": {
+          "kind": "event",
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "tags": [],
+          "organizer": "Alcove Centre for the Arts",
+          "pricing": "unknown",
+          "title": "Comics Workshop: Concept to Comic",
+          "summary": "Explore comic storytelling with Daniele and Gabe at Alcove Core.",
+          "description": "Registration is required. Admission is by donation. The organizer recommends ages 16 and over unless accompanied by a parent or guardian; all skill levels are welcome.",
+          "address": "244 7 Avenue SW, Calgary, Alberta",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.alcoveartscentre.ca/upcomingprograms/comics-workshop-sept-27",
+          "start": "2026-09-27T13:30:00-06:00",
+          "end": "2026-09-27T15:30:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "farmers-makers",
+      "name": "Farmers & Makers Market",
+      "approved": true,
+      "hosts": [
+        "www.farmersmakersmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "cspace-outdoor-2026",
+        "input": {
+          "kind": "market",
+          "title": "Farmers & Makers Market at cSPACE",
+          "summary": "A Saturday outdoor market featuring local growers, food producers and makers.",
+          "description": "The organizer lists the 2026 outdoor season from May 23 through October 17, with markets each Saturday from 10 a.m. to 2 p.m. Check the organizer for changes before travelling.",
+          "address": "1721 29 Avenue SW, Calgary, Alberta",
+          "neighbourhood": "Marda Loop",
+          "organizer": "Calgary Earth Market Society",
+          "sourceUrl": "https://www.farmersmakersmarket.ca/cspace",
+          "categories": [
+            "food",
+            "outdoor"
+          ],
+          "tags": [
+            "local makers"
+          ],
+          "amenities": [
+            "Outdoor market",
+            "Live music",
+            "Accessible",
+            "Compost"
+          ],
+          "parking": "The organizer lists two-hour on-street parking.",
+          "petFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-09-26",
+              "start": "2026-09-26T10:00:00-06:00",
+              "end": "2026-09-26T14:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-10-03",
+              "start": "2026-10-03T10:00:00-06:00",
+              "end": "2026-10-03T14:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-10-10",
+              "start": "2026-10-10T10:00:00-06:00",
+              "end": "2026-10-10T14:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-10-17",
+              "start": "2026-10-17T10:00:00-06:00",
+              "end": "2026-10-17T14:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

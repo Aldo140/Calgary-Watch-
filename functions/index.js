@@ -324,3 +324,6 @@ exports.onIncidentFeedbackWritten = onDocumentWritten('incident_feedback/{feedba
     logger.warn('Feedback target incident not updatable', { incidentId, error: error instanceof Error ? error.message : String(error) });
   }
 });
+
+// Events and Markets moderation and public suggestion boundary.
+Object.assign(exports, require('./discovery.cjs'));

@@ -1627,7 +1627,7 @@ export default function AboutPage() {
                   </ul>
                   <MagneticButton
                     tag="a"
-                    href="mailto:jorti104@mtroyal.ca?subject=Partnership%20Inquiry"
+                    href="mailto:aldo@calgarywatch.ca?subject=Partnership%20Inquiry"
                     className="inline-flex items-center gap-2 text-sm font-black text-[#B0793C] hover:text-amber-300 transition-colors cursor-pointer w-fit"
                   >
                     <Mail size={14} />
@@ -1688,7 +1688,7 @@ export default function AboutPage() {
                 </div>
                 <MagneticButton
                   tag="a"
-                  href="mailto:jorti104@mtroyal.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
+                  href="mailto:aldo@calgarywatch.ca?subject=Investment%20Inquiry%20-%20Calgary%20Watch"
                   className="shrink-0 inline-flex items-center gap-2.5 rounded-xl px-7 py-3.5 bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] text-white text-sm font-black shadow-xl shadow-[#E52C20]/20 hover:shadow-[#E52C20]/35 transition-shadow cursor-pointer whitespace-nowrap"
                 >
                   <Mail size={15} />
@@ -1728,11 +1728,11 @@ export default function AboutPage() {
               </p>
               <MagneticButton
                 tag="a"
-                href="mailto:jorti104@mtroyal.ca"
+                href="mailto:aldo@calgarywatch.ca"
                 className="inline-flex items-center gap-3 rounded-xl px-8 py-4 text-base font-black text-white bg-gradient-to-r from-[#E52C20] to-[#2E8B7A] shadow-xl shadow-[#E52C20]/20 hover:shadow-[#E52C20]/35 transition-shadow cursor-pointer"
               >
                 <Mail size={18} />
-                jorti104@mtroyal.ca
+                aldo@calgarywatch.ca
                 <ArrowRight size={16} />
               </MagneticButton>
             </motion.div>
@@ -1830,7 +1830,7 @@ export default function AboutPage() {
               Live Map
             </button>
             <a
-              href="mailto:jorti104@mtroyal.ca"
+              href="mailto:aldo@calgarywatch.ca"
               className="text-xs text-stone-600 light:text-stone-500 hover:text-[#E52C20] transition-colors font-bold uppercase tracking-wider"
             >
               Contact

@@ -8,12 +8,12 @@
 #
 # https://www.rfc-editor.org/rfc/rfc9116
 
-Contact: mailto:jorti104@mtroyal.ca
+Contact: mailto:aldo@calgarywatch.ca
 Expires: 2027-01-01T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://calgarywatch.ca/.well-known/security.txt
 Policy: https://github.com/Aldo140/Calgary-Watch-/blob/main/README.md
 
-# Calgary Watch is a non-profit, community-run incident map for Calgary and
+# Calgary Watch is a free community awareness platform for Calgary and
 # surrounding Alberta communities. Source is public:
 # https://github.com/Aldo140/Calgary-Watch-

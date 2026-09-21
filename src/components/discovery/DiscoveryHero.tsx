@@ -1,0 +1,7 @@
+import { Link } from 'react-router-dom';
+import { GlobalSearch } from '../site/GlobalSearch';
+
+export function IntentChips() { return <nav className="cw-intents" aria-label="Explore by interest">{[
+  ['This Weekend', '/events/this-weekend'], ['Tonight', '/events/today?time=tonight'], ['Markets', '/markets'], ['Date Night', '/search?q=date+night'], ['Food', '/local/food'], ['Near Me', '/neighbourhoods'],
+].map(([label, to]) => <Link key={label} to={to}>{label} <span aria-hidden="true">↗</span></Link>)}</nav>; }
+export function DiscoveryHero() { return <><section className="cw-hero cw-wrap"><div className="cw-hero-copy"><p className="cw-eyebrow">Your city. Your next great day.</p><h1>What’s happening<br />in <em>Calgary?</em></h1><p className="cw-hero-description">Events, markets, local places and what’s happening around you — all in one place.</p><GlobalSearch /><p className="cw-hero-footnote">Big plans. Small discoveries. Start here.</p></div><figure className="cw-hero-image"><img src="/images/photo/calgary5.webp" alt="Friends finding their next stop together in Calgary" width="1200" height="677" fetchPriority="high" /><figcaption>A little closer to the people and places around you.</figcaption></figure></section><div className="cw-wrap"><IntentChips /><div className="cw-pulse"><span>Calgary right now</span><p>Community reports · Traffic · Weather · Outages</p><Link to="/map">Open Live Map ↗</Link></div></div></>; }

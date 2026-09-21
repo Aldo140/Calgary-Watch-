@@ -158,7 +158,7 @@ export async function fetch511AlbertaEvents(): Promise<NormalizedIncident[]> {
   url.searchParams.set('key', apiKey);
 
   const res = await fetch(url, {
-    headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact jorti104@mtroyal.ca)' },
+    headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact aldo@calgarywatch.ca)' },
     signal: AbortSignal.timeout(15_000),
   });
 

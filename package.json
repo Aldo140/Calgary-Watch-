@@ -21,7 +21,7 @@
     "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
     "digest:weekly": "tsx scripts/digest/weekly.ts",
     "digest:preview": "tsx scripts/digest/preview.ts",
-    "digest:publish-previews": "DIGEST_PREVIEW_DIR=dist/email-previews tsx scripts/digest/preview.ts",
+    "digest:publish-previews": "tsx scripts/digest/publishPreviews.ts",
     "digest:art": "tsx scripts/prepare-email-art.ts",
     "digest:contrast": "tsx scripts/digest/audit.ts",
     "send:alerts": "tsx scripts/alerts/send.ts"

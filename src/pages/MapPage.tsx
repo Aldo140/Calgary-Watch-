@@ -938,6 +938,25 @@ export default function MapPage() {
     }
   }, [searchParams, isAuthReady, user, openAuthPanel, setSearchParams]);
 
+  // `?settings=alerts` — the deep link the instant-alert email points at so a
+  // reader can turn alerts off or retune them. Opens account settings (or the
+  // sign-in panel first) and strips the param.
+  useEffect(() => {
+    if (searchParams.get('settings') !== 'alerts' || !isAuthReady) return;
+    if (!user) {
+      openAuthPanel('signin');
+    } else {
+      // The summary view (not the address-edit form) is where the alert
+      // controls live, so openAuthPanel's default is exactly right here.
+      openAuthPanel('settings');
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.delete('settings');
+        return next;
+      }, { replace: true });
+    }
+  }, [searchParams, isAuthReady, user, openAuthPanel, setSearchParams]);
+
 
   // Upper bound on the skeleton only. The incidents listener clears isLoading
   // as soon as the first snapshot lands, so a fast connection never waits the

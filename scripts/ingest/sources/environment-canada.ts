@@ -93,7 +93,7 @@ export async function fetchEnvironmentCanadaAlerts(): Promise<NormalizedIncident
   const response = await fetch(url, {
     headers: {
       Accept: 'application/geo+json, application/json',
-      'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact jorti104@mtroyal.ca)',
+      'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact aldo@calgarywatch.ca)',
     },
     signal: AbortSignal.timeout(15_000),
   });

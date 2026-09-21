@@ -1,6 +1,6 @@
 # Calgary Watch
 
-![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey) ![Non-Profit](https://img.shields.io/badge/org-Non--Profit-teal)
+![Status](https://img.shields.io/badge/status-active-brightgreen) ![Framework](https://img.shields.io/badge/framework-React%2019-blue) ![Database](https://img.shields.io/badge/database-Firestore-orange) ![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey)
 
 Real-time incident map for Calgary, Edmonton, and surrounding Alberta communities.
 
@@ -8,7 +8,7 @@ Residents report incidents the moment they happen. Road closures, fires, floodin
 
 **[Live Site](https://calgarywatch.ca)** | **[GitHub](https://github.com/Aldo140/Calgary-Watch-)**
 
-> Calgary Watch is a non-profit initiative. We are actively seeking volunteers and partners to grow the platform.
+> CalgaryWatch is free for residents. V2 adds Calgary discovery alongside the existing Live map. See docs/v2-implementation.md for scope and rollout status.
 
 ---
 
@@ -398,7 +398,7 @@ npx tsx scripts/ingest/index.ts
 
 ## Contributing
 
-Calgary Watch is a non-profit community project. Contributions welcome.
+CalgaryWatch is free for residents. Contributions welcome.
 
 To volunteer, visit [calgarywatch.ca](https://calgarywatch.ca) and submit the volunteer form, or open an issue on GitHub.
 

@@ -166,7 +166,7 @@ export default function UnsubscribePage() {
                   Open settings
                 </Link>
                 <a
-                  href="mailto:jorti104@mtroyal.ca?subject=Unsubscribe%20from%20the%20weekly%20digest"
+                  href="mailto:aldo@calgarywatch.ca?subject=Unsubscribe%20from%20the%20weekly%20digest"
                   className="inline-flex items-center gap-2 px-5 py-3 text-[14px] font-bold"
                   style={{ border: `1.5px solid ${T.line}`, color: T.ink }}
                 >

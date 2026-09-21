@@ -108,6 +108,114 @@
             "value": "no-cache, no-store, must-revalidate"
           }
         ]
+      },
+      {
+        "source": "/events",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/events/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/markets",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/markets/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/local",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/local/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/guides",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/guides/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/neighbourhoods",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/neighbourhoods/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/search",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/search/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, follow"
+          }
+        ]
       }
     ]
   }

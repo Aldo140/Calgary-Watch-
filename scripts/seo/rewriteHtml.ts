@@ -221,10 +221,15 @@ export function buildStaticRouteBody(pathname: string): string {
   }
 
   const summaries: Record<string, { heading: string; copy: string; links: [string, string][] }> = {
-    '/': {
+    '/community': {
       heading: 'See it. Share it. Calgary knows.',
-      copy: 'Calgary Watch is a free Calgary crime map and neighbourhood safety network with recent community, traffic, weather, infrastructure, and emergency reports.',
-      links: [['/map', 'Open the live Calgary crime map'], [GUIDE_PATH, 'Read the Calgary neighbourhood watch guide']],
+      copy: 'The original Calgary Watch community homepage. Explore recent community reports, traffic, weather, infrastructure and emergencies.',
+      links: [['/map', 'Open the live map'], ['/', 'Explore Calgary'], ['/about', 'About Calgary Watch']],
+    },
+    '/': {
+      heading: 'What’s happening in Calgary?',
+      copy: 'Events, markets, local places and what’s happening around you — all in one place. Our first discovery collections are being prepared. CalgaryWatch Live brings together community reports, traffic, weather and outages. See it. Share it. Calgary knows.',
+      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/guides', 'Guides'], ['/neighbourhoods', 'Neighbourhoods'], ['/map', 'Open Live Map']],
     },
     '/map': {
       heading: 'Calgary crime map with recent reports near you',
@@ -287,6 +292,7 @@ export function renderRouteHtml(shell: string, pathname: string, origin: string)
   const pageUrl = pageUrlFor(pathname, origin);
 
   let html = shell;
+  if (pathname !== '/') html = html.replace(/<link[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '');
   html = upsertTitle(html, config.title);
   html = upsertMeta(html, 'name', 'description', config.description);
   html = upsertMeta(html, 'name', 'robots', config.index ? ROBOTS_INDEX : ROBOTS_NOINDEX);

@@ -1,93 +1,47 @@
-# Calgary Watch — design system
+# CalgaryWatch ? design system
 
-The site is converting to the language of the landing hero: a screen-printed
-poster. It does not convert uniformly, because a gig poster and an incident map
-are not trying to do the same thing.
+## Master brand
+CalgaryWatch answers ?What?s happening in Calgary?? Discovery and Live are two modes of one product. Use the CALGARYWATCH wordmark without a Community Safety subtitle. A single future primary mark can replace it; the plane, shield and Bow illustrations remain secondary heritage artwork.
 
-Colours live in `src/lib/tokens.ts`. Import from there rather than pasting hex
-literals — that habit is what produced three different colours for "crime".
+## Discovery and editorial
+Clean, warm editorial surfaces. One clear hero proposition, one human Calgary image, useful search, asymmetric grids and generous space. Use image scale and typography for hierarchy. Avoid rotating cards, constant tickers, offset shadows, glass effects and decorative motion. Page content lives in small reusable components rather than a monolithic landing page.
 
----
+## Live
+Keep the existing map and its established interaction model. Use deep navy, timestamps and precise source language for the homepage Live preview. The exact Live tagline is ?See it. Share it. Calgary knows.? Emergencies are never presented as lifestyle content or advertising opportunities.
 
-## The poster language
+## Admin
+Reuse AdminShell, useAdminData, attention queues and audit patterns. New workspaces are Content, Demand and Partners. Unimplemented workspaces must say so; do not show fictional metrics or controls that imply persistence.
 
-What the hero is made of, so it can be recognised and reused:
+## Typography
+Bricolage Grotesque: display and editorial headings, sentence case. Inter: readable body and UI. IBM Plex Mono: timestamps, coordinates and data labels only. Small uppercase eyebrow labels are permitted; body copy is never uppercase. Headings must have semantic order independent of font size.
 
-| Device | Value |
-|---|---|
-| Ground | `#06162F` near-black navy |
-| Ink | `#F2EFE8` warm off-white — a *foreground*, not a background |
-| Accent | `#E52C20` vermilion, load-bearing |
-| Display type | Bricolage, `font-black`, UPPERCASE, `leading-[0.76]`, `tracking-[-0.04em]` |
-| Label type | 9–12px, `font-black`, UPPERCASE, `tracking-[0.18em]` — wide *positive* tracking |
-| Depth | `shadow-[4px_4px_0_#E52C20]` — zero blur, pure offset, in the accent |
-| Press | `hover:-translate-y-1` + `active:translate-x-1 active:translate-y-1 active:shadow-none` |
-| Angle | `-rotate-2`, `rotate-6` — pinned paper, never a grid |
-| Corners | zero radius |
+## Colour
+Discovery tokens are scoped to .cw-site in src/styles/discovery.css:
+- Background #FAF8F3; surface #FFFFFF; text #151515; muted #565A61.
+- Border #D8D9D7; brand #1554D1; Live #06162F.
+- Red remains reserved for emergency/severity; do not make it a generic discovery CTA colour.
+Legacy map CATEGORY and admin CHART_SERIES palettes remain independent because severity and data series serve different purposes.
 
-The press is the best of these: the offset shadow *is* the depth, so pressing
-collapses the button into the page. Reuse it for primary actions anywhere.
+## Spacing and cards
+Maximum reading grid 1320px including gutters. Desktop gutters 44px; mobile 20px. Section spacing 40?65px. Use open editorial cards with 3:2-ish imagery, category, headline and summary. Borders separate sections; avoid a dashboard of boxed tiles. Hero corners may be softly shaped; ordinary controls remain restrained.
 
----
+## Photography
+Use local optimized assets with truthful alt text, dimensions and provenance. The foundation reuses existing city photography; rights/provenance should be reviewed before adding new assets. One high-priority hero image; lower images lazy load. Do not mislabel generic stock as a particular venue or imply fixture images document a real event.
 
-## The three layers
+## Motion
+Use short hover affordances only in discovery. Respect prefers-reduced-motion. No animation should compete with reading or search. Keep map animation isolated to the Live bundle.
 
-**1. Editorial** — landing, about, coverage.
-The full poster. Everything in the table above.
+## Accessibility
+Target WCAG 2.2 AA: visible keyboard focus, skip link, labelled search, semantic headings, navigation landmarks, 44px primary touch targets, 200% zoom and small-screen reflow. Never communicate severity or paid status by colour alone. Check actual computed contrast because legacy utility names can be misleading.
 
-**2. Masthead** — the header of a panel or page inside the app.
-The bridge. Poster *devices* on the surface's own ground: a coordinate stamp,
-a hard-offset press on the primary action, mono labels in wide uppercase
-tracking, square corners on small chips. Headlines stay sentence case where the
-surface is meant to feel warm — the personal briefing greets someone by name,
-and `KNOW YOUR CITY.` is the wrong register for that.
+## Data visualization and provenance
+Never invent live counts, availability, trending ranks or freshness. Show sources and timestamps on entity details. Market masters and occurrences are distinct. Development fixtures must be labelled and excluded from production and indexing. An honest empty state is the correct presentation when verified inventory is missing.
 
-**3. Data** — map chrome, cards, lists, forms, tables.
-Stays legible. Borrows only the label register and square corners on chips.
+## Sponsored content
+Label paid placements ?Sponsored? or ?Featured Partner.? Keep claimed, listed, editorial selection and partner states separate. Payment cannot establish a ?best? editorial ranking. No ads inside emergency information. Use only verified organizational claims; ?Free for residents? is acceptable without inventing a legal status.
 
-Two rules that hold the third layer together:
-
-- **No hard shadows.** One is a signature; twelve is noise.
-- **No uppercase body.** `leading-[0.76]` black caps is magnificent at 9vw and
-  unreadable across forty rows.
-
----
-
-## Red
-
-`POSTER.accent` and `CATEGORY.emergency` are both red and mean different
-things: one is the brand's ink, the other is *someone is in danger*.
-
-**They must never appear in the same view.** The layer rule keeps them apart —
-editorial surfaces carry no incident severity, and data surfaces carry no
-marketing accent. Where they would otherwise meet, severity wins.
-
-This is true by construction almost everywhere: the landing page renders no
-severity colours, and the app renders no marketing accent. Keep it that way. If
-a marketing CTA ever has to sit next to an incident chip, the CTA gives up the
-red.
-
-**The one exception is the legend.** "What we track" on the landing page shows
-the five category markers, and a legend has to be the real colours or it is not
-a legend. So that section carries the severity palette and spends *no*
-vermilion at all — the badges hold every colour on screen and the type stays
-ink. That is also why its headline is not accented: tinting it with one
-category would be arbitrary, and tinting it with the brand red would break the
-very rule the section exists to illustrate.
-
----
-
-## Two palettes, on purpose
-
-`CATEGORY` and `CHART_SERIES` are deliberately different.
-
-A map needs hues that read as **severity** — red for harm, amber for
-disruption, cool for the merely broken. A chart needs six hues that stay apart
-from each other at a glance. Optimising one for the other makes both worse, so
-they are separate by intent rather than by accident. That distinction is why
-crime is warm on the map and blue in the admin charts.
-
----
+## Legacy CSS compatibility
+New discovery UI uses explicit scoped CSS variables. Do not bulk-replace dark Tailwind utility classes in legacy surfaces. Existing safety/admin pages migrate progressively only with visual verification.
 
 ## The failure mode this codebase has
 

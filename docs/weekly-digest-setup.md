@@ -1,7 +1,8 @@
+> September 2026: Microsoft 365 now handles the primary mailbox aldo@calgarywatch.ca. Preserve its root MX/SPF and Microsoft DKIM records. Resend uses its own sending subdomain and selector. Do not follow the historical Email Forwarding instructions below or create a second DMARC record; update the existing record only after checking all senders. Runtime secrets and provider status must be verified separately from this document.
+
 # Weekly digest — setup runbook
 
-Everything in code is done. What remains is five accounts-and-DNS tasks that
-can only be performed by a person with the credentials, plus one rehearsal.
+This runbook contains historical setup notes. Verify current provider state before acting.
 
 Budget: about 45 minutes, most of it waiting for DNS.
 
@@ -102,7 +103,7 @@ root SPF record shows as "Locked by". Namecheap will not accept a new MX record
 in that mode, and Resend wants one on the `send` subdomain for bounce handling.
 
 - **If you do not use `@calgarywatch.ca` forwarding** (most likely — your
-  contact address is `jorti104@mtroyal.ca`): switch Mail Settings to
+  contact address is `aldo@calgarywatch.ca`): switch Mail Settings to
   **Custom MX** and add all four records below. This is the clean path.
 - **If you do use forwarding**: leave Mail Settings alone and add only the
   three TXT records. Resend will still verify on DKIM, but bounces route
@@ -119,7 +120,7 @@ column below — no `.calgarywatch.ca` suffix.
 | 1 | TXT Record | `resend._domainkey` | the DKIM key — see `docs/dns-records-calgarywatch.txt` | — |
 | 2 | TXT Record | `send` | `v=spf1 include:amazonses.com ~all` | — |
 | 3 | MX Record | `send` | `feedback-smtp.us-east-1.amazonses.com` | `10` |
-| 4 | TXT Record | `_dmarc` | `v=DMARC1; p=none; rua=mailto:jorti104@mtroyal.ca` | — |
+| 4 | TXT Record | `_dmarc` | `v=DMARC1; p=none; rua=mailto:aldo@calgarywatch.ca` | — |
 
 Leave TTL on **Automatic** for all four.
 
@@ -156,7 +157,7 @@ Already set on `Aldo140/Calgary-Watch-`:
 | Secret | `RESEND_API_KEY` | set (verified working) |
 | Variable | `DIGEST_SENDER_NAME` | `Calgary Watch` |
 | Variable | `DIGEST_MAILING_ADDRESS` | `2011 Ulster Road NW, Calgary, AB` |
-| Variable | `DIGEST_SUPPORT_EMAIL` | `jorti104@mtroyal.ca` |
+| Variable | `DIGEST_SUPPORT_EMAIL` | `aldo@calgarywatch.ca` |
 | Variable | `DIGEST_ORIGIN` | `https://calgarywatch.ca` |
 | Variable | `DIGEST_LIMIT` | `50` |
 | Variable | `DIGEST_FROM` | `Calgary Watch <onboarding@resend.dev>` — **temporary**, see below |
@@ -284,7 +285,7 @@ Two DNS changes turn it on, both free:
 1. **Upgrade DMARC to enforcement.** BIMI is ignored at `p=none`. Edit the
    `_dmarc` TXT record at Namecheap to:
    ```
-   v=DMARC1; p=quarantine; rua=mailto:jorti104@mtroyal.ca
+   v=DMARC1; p=quarantine; rua=mailto:aldo@calgarywatch.ca
    ```
    Do this only after a few clean weeks of sending — enforcement tells inbox
    providers to quarantine anything failing alignment, and turning it on before

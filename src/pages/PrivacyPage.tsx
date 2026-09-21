@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 
 const UPDATED = '28 August 2026';
-const CONTACT = 'jorti104@mtroyal.ca';
+const CONTACT = 'aldo@calgarywatch.ca';
 
 const T = {
   paper: '#F7F3EA',
@@ -105,8 +105,8 @@ export default function PrivacyPage() {
           What we collect, and what we do with it.
         </h1>
         <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-          Calgary Watch is a free, non-profit community safety map. We do not sell personal
-          information, we do not run advertising, and we do not track you across other websites.
+          Calgary Watch is a free Calgary discovery and community awareness platform. We do not sell personal
+          information, and we do not track you across other websites. Sponsored placements, when offered, are labelled and are independent of editorial selections.
           This page describes exactly what the service stores. Last updated {UPDATED}.
         </p>
 
@@ -301,7 +301,7 @@ export default function PrivacyPage() {
 
           <Section id="contact" title="Contact">
             <p>
-              Calgary Watch is a non-profit community project based in Calgary, Alberta. Questions,
+              Calgary Watch is a community platform based in Calgary, Alberta. Questions,
               access requests and complaints all go to the same place:
             </p>
             <a

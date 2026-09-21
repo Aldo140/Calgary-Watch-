@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
-const robots = readFileSync('public/robots.txt', 'utf8');
+const robots = readFileSync('public/robots.txt', 'utf8').replace(/\r\n/g, '\n');
 const llms = readFileSync('public/llms.txt', 'utf8');
 const llmsFull = readFileSync('public/llms-full.txt', 'utf8');
 const indexHtml = readFileSync('index.html', 'utf8');

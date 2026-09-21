@@ -37,7 +37,7 @@ const INCIDENTS = [
 const BRANDING: DigestBranding = {
   senderName: 'Calgary Watch',
   mailingAddress: '2011 Ulster Road NW, Calgary, AB T2N 4G6',
-  supportEmail: 'jorti104@mtroyal.ca',
+  supportEmail: 'aldo@calgarywatch.ca',
   origin: 'https://calgarywatch.ca',
 };
 

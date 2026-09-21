@@ -311,7 +311,7 @@ function LegalModal({ legalModal, onClose }: { legalModal: 'privacy' | 'terms' |
       hrefLabel: 'Read the full privacy policy',
     },
     terms: { title: 'Terms of Use', body: 'Calgary Watch is for informational awareness only. Always verify critical incidents with official agencies. Misleading or abusive submissions may be removed by administrators.' },
-    contact: { title: 'Contact', body: 'For support, account issues, data access or deletion requests, contact: jorti104@mtroyal.ca' },
+    contact: { title: 'Contact', body: 'For support, account issues, data access or deletion requests, contact: aldo@calgarywatch.ca' },
   }[legalModal] as { title: string; body: string; href?: string; hrefLabel?: string };
 
   return (
@@ -827,7 +827,7 @@ function Hero({ reduced }: { reduced: boolean }) {
           </div>
 
           <div className="mt-8 flex max-w-[34rem] items-center justify-between border-t border-[#F2EFE8]/20 pt-4 font-display text-[10px] font-bold uppercase tracking-[0.14em] text-[#AFC5DF]">
-            <span>Free / non-profit</span>
+            <span>Free for residents</span>
             <span>All four quadrants</span>
             <span>Built for neighbours</span>
           </div>
@@ -2266,7 +2266,7 @@ function NightWatch({ reduced }: { reduced: boolean }) {
 
         <Reveal delay={0.2} className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4">
           {[
-            { icon: Users, text: 'Community-run, non-profit' },
+            { icon: Users, text: 'Free for residents' },
             { icon: Crosshair, text: 'Near-me view: your 3 km, nearest first' },
             { icon: Lock, text: 'Anonymous reporting available' },
             { icon: ShieldCheck, text: 'Admin-reviewed submissions' },
@@ -2309,7 +2309,7 @@ function Coverage() {
     } catch { /* continue */ } finally { setSubmitting(false); }
     const subject = encodeURIComponent(`City Expansion Request: ${city}`);
     const body = encodeURIComponent(`Hello Calgary Watch team,\n\nPlease add support for ${city}.\n\nRequested via landing page at ${new Date(requestedAt).toISOString()}.`);
-    window.open(`mailto:jorti104@mtroyal.ca?subject=${subject}&body=${body}`, '_blank');
+    window.open(`mailto:aldo@calgarywatch.ca?subject=${subject}&body=${body}`, '_blank');
     setMessage(`Request queued for ${city}. Thank you.`);
     setCityRequest('');
   };

@@ -38,7 +38,7 @@ import { INCIDENT_CATEGORIES } from '@/src/constants';
 import { summarizeDataSourceHealth } from '@/src/config/dataSources';
 import { cn } from '@/src/lib/utils';
 
-type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city';
+type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city' | 'content' | 'demand' | 'partners';
 
 const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
 
@@ -105,6 +105,9 @@ export default function AdminPage() {
     return [
       { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined },
       { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus },
+      { id: 'content', label: 'Discovery content', short: 'Content', icon: FileText },
+      { id: 'demand', label: 'Search demand', short: 'Demand', icon: Globe },
+      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Users },
       { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText },
       { id: 'people', label: 'People', short: 'People', icon: Users },
       { id: 'feeds', label: 'Data feeds', short: 'Feeds', icon: Zap, count: failingFeeds, tone: 'critical' },
@@ -114,6 +117,9 @@ export default function AdminPage() {
   }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds]);
 
   const titles: Record<Section, { title: string; subtitle: string }> = {
+    content: { title: 'Discovery content', subtitle: 'Events, recurring markets, businesses, guides and neighbourhoods' },
+    demand: { title: 'Search demand', subtitle: 'Understand what Calgary is looking for' },
+    partners: { title: 'Local partners', subtitle: 'Claims and commercial relationships, separate from editorial selections' },
     desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
     planner: { title: 'Email planner', subtitle: 'Prepare Monday’s edition, review recipients and understand every delivery route' },
     reports: { title: 'Reports', subtitle: 'What is being reported, where, and when' },
@@ -172,6 +178,7 @@ export default function AdminPage() {
       {section === 'feeds' && <FeedsSection d={d} />}
       {section === 'visitors' && <VisitorsSection d={d} />}
       {section === 'city' && <CitySection d={d} />}
+      {(['content', 'demand', 'partners'] as Section[]).includes(section) && <Panel title={titles[section].title}><p style={{ color: T.muted, padding: 20 }}>This workspace is being prepared. {section === 'content' ? 'Source verification and publishing controls will arrive with the first Events and Markets inventory.' : section === 'demand' ? 'No search queries are being collected yet. Future aggregate records will exclude identity and location data.' : 'Claim review and outreach tracking are not enabled yet. Paid placement will be labelled and will not confer editorial selection.'}</p></Panel>}
     </AdminShell>
   );
 }

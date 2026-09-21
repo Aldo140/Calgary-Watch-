@@ -139,7 +139,7 @@ function buildDescription(entry: AlertEntry): string {
 
 export async function fetchAlbertaEmergencyAlerts(): Promise<NormalizedIncident[]> {
   const res = await fetch(FEED_URL, {
-    headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact jorti104@mtroyal.ca)' },
+    headers: { 'User-Agent': 'CalgaryWatch/1.0 (community safety app; contact aldo@calgarywatch.ca)' },
     signal: AbortSignal.timeout(15_000),
   });
 

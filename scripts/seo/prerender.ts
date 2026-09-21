@@ -23,7 +23,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PRERENDER_OUTPUT_ROUTES, PRODUCTION_ORIGIN } from '../../src/lib/seo.js';
+import { PRERENDER_OUTPUT_ROUTES, PRERENDER_ROUTES, PRODUCTION_ORIGIN } from '../../src/lib/seo.js';
+import { buildSitemap } from '../../src/lib/discoverySeo.js';
 import { outputPathForRoute, renderRouteHtml } from './rewriteHtml.js';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -53,6 +54,8 @@ async function run(): Promise<void> {
   }
 
   console.log(`[prerender] Wrote ${written} page(s).`);
+  // Verified discovery inventory will be passed here by the publishing adapter.
+  await writeFile(join(DIST, 'sitemap.xml'), buildSitemap(PRERENDER_ROUTES, [], PRODUCTION_ORIGIN), 'utf8');
 }
 
 run().catch((error) => {

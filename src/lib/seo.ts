@@ -1,4 +1,7 @@
 import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
+import { DISCOVERY_SECTIONS } from './discovery';
+import { discoveryRepository } from '../data/discovery';
+import { buildEntityJsonLd, indexableEntities } from './discoverySeo';
 import {
   AIRDRIE_GUIDE_FAQS,
   AIRDRIE_GUIDE_PATH,
@@ -35,10 +38,17 @@ const LAST_MOD = '2026-08-13';
 const SEO_REFRESH_MOD = '2026-08-29';
 
 export const ROUTE_SEO: Record<string, SeoConfig> = {
+  '/community': {
+    title: 'Calgary Watch Community | See it. Share it. Calgary knows.',
+    description: 'The original Calgary Watch homepage. Explore the community safety platform and open the live map for local reports, traffic, weather and outages.',
+    index: true,
+    pageType: 'WebPage',
+    image: DEFAULT_IMAGE,
+  },
   '/': {
-    title: 'Calgary Crime Watch & Neighbourhood Safety Map',
+    title: 'What’s happening in Calgary? | CalgaryWatch',
     description:
-      'See it. Share it. Calgary knows. Live Calgary crime, traffic, weather and community reports on one free neighbourhood map. Sign in to report.',
+      'Discover Calgary events, markets, local places and neighbourhoods, alongside live community reports, traffic, weather and outages.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
@@ -124,8 +134,18 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
   },
 };
 
+// Inventory shells stay noindex until they contain verified, useful content.
+for (const section of DISCOVERY_SECTIONS) {
+  ROUTE_SEO[section.path] = { title: `${section.label} in Calgary | CalgaryWatch`, description: `Explore Calgary ${section.label.toLowerCase()}. Our first verified collection is being prepared.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
+}
+ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Find events, markets, local places, guides and neighbourhoods.', index: false, pageType: 'CollectionPage' };
+for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
+  ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
+}
+
 /** Breadcrumb entries per route for JSON-LD. */
 export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]> = {
+  '/community': [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Original Calgary Watch homepage', item: `${PRODUCTION_ORIGIN}/community` }],
   '/': [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }],
   '/map': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
@@ -162,10 +182,14 @@ export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
  * Public utility pages also need correct first-response robots/canonical tags.
  * They are rendered as static files but deliberately excluded from the sitemap.
  */
-export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe'];
+export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
 
 export function getSeoConfig(pathname: string): SeoConfig {
-  return ROUTE_SEO[pathname] ?? ROUTE_SEO['/'];
+  const [section, slug] = pathname.split('/').filter(Boolean);
+  const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
+  const entity = kind && slug ? discoveryRepository.find(kind, slug) : undefined;
+  if (entity) return { title: `${entity.title} | CalgaryWatch`, description: entity.summary, index: indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
+  return ROUTE_SEO[pathname] ?? { title: 'Listing unavailable | CalgaryWatch', description: 'This listing has not been published or could not be found.', index: false, pageType: 'WebPage' };
 }
 
 /** Absolute URL for a route, given the origin the page is being served from. */
@@ -184,6 +208,9 @@ export function buildPageJsonLd(pathname: string, origin: string): object {
   const config = getSeoConfig(pathname);
   const pageUrl = pageUrlFor(pathname, origin);
   const crumbs = ROUTE_BREADCRUMBS[pathname] ?? ROUTE_BREADCRUMBS['/'];
+  const [section, slug] = pathname.split('/').filter(Boolean);
+  const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
+  const entity = kind && slug ? discoveryRepository.find(kind, slug) : undefined;
 
   return {
     '@context': 'https://schema.org',
@@ -208,6 +235,7 @@ export function buildPageJsonLd(pathname: string, origin: string): object {
         item: c.item,
       })),
     },
+    ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin) } : {}),
     ...(pathname === GUIDE_PATH
       ? {
           about: [

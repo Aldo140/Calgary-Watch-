@@ -29,6 +29,12 @@ The first command validates without connecting to Firestore. The second requires
 
 `InventoryProvider` supports independent providers. EditorialFileProvider handles sourced manual entries; JsonFeedProvider consumes an approved HTTPS endpoint returning `{id,input,cancelled?}[]`, with time/size limits and redirects disabled. This is an explicit adapter contract, not a claim that an organizer offers a compatible API. No undocumented API or broad scrape is configured. Additional provider-specific feed adapters can implement the same interface.
 
+### Automatic Calgary event import
+
+The scheduled `Ingest Calgary events` workflow uses Ticketmaster's documented Discovery API with Calgary's market ID (`108`) and imports the next 90 days into the pending Events queue. Create a free Ticketmaster developer API key, add it to the repository's GitHub Actions secrets as `TICKETMASTER_API_KEY`, then run the workflow once manually to verify the source. The workflow runs every six hours afterward. Events without confirmed local start/end times or a Canadian venue are skipped rather than assigned guessed values.
+
+Ticketmaster imports are deliberately not auto-published. An administrator must review the source link, date, venue and duplicate warning in Admin -> Discovery content, then choose Verify & publish. The next Hosting release exports the verified snapshot to the public site. This keeps automatic collection from becoming automatic publication of unreviewed listings.
+
 Stable provider + source-record IDs update records in a transaction. Cross-provider title/address/time matches produce review warnings rather than silently merging distinct events. An unchanged fetch preserves publication and verification time; a changed fetch returns content to pending. Removed market occurrences are retained as cancelled. An archived record stays archived during ingestion. The editor rejects stale revisions when a concurrent import changes a record.
 
 ## Release sequence

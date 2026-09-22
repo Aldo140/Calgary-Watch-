@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { inventoryDatabase } from './firebase';
-import { JsonFeedProvider, EditorialFileProvider, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
+import { JsonFeedProvider, EditorialFileProvider, TicketmasterProvider, RecurringMarketProvider, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
 import store from '../../functions/discovery-store.cjs';
 import domain from '../../functions/discovery-domain.cjs';
 
@@ -10,10 +10,16 @@ const write = process.argv.includes('--write');
 if (!file) throw Error('Use --file=path/to/provider-batch.json [--write]');
 const batches: { source: SourceConfig; records?: SourceRecord[] }[] = JSON.parse(await readFile(file,'utf8'));
 for (const batch of batches) {
-  const provider: InventoryProvider = batch.records ? new EditorialFileProvider(batch.source,batch.records) : new JsonFeedProvider(batch.source);
+  const provider: InventoryProvider = batch.records ? new EditorialFileProvider(batch.source,batch.records) : batch.source.provider === 'ticketmaster' ? new TicketmasterProvider(batch.source) : batch.source.provider === 'recurring-market' ? new RecurringMarketProvider(batch.source) : new JsonFeedProvider(batch.source);
   const records = await provider.fetch();
   // Validate the entire provider batch before starting mutations.
-  records.forEach(r => domain.normalizeRecord(r.input,provider.source,r.id));
+  records.forEach(r => {
+    try { domain.normalizeRecord(r.input, provider.source, r.id); }
+    catch (error) {
+      const hostname = (() => { try { return new URL(r.input.sourceUrl).hostname; } catch { return 'invalid-url'; } })();
+      throw Error(`${error instanceof Error ? error.message : String(error)} [source host: ${hostname}]`);
+    }
+  });
   if (!write) { console.log(`${provider.source.name}: ${records.length} valid records (dry run)`); continue; }
   const db = inventoryDatabase();
   await db.collection('discovery_sources').doc(provider.source.id).set(provider.source);

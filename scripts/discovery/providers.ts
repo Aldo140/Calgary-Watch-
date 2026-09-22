@@ -1,5 +1,5 @@
-import type { InventorySubmissionInput } from '../../src/types/discovery';
-export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; feedUrl?: string }
+import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
+export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market'; markets?: RecurringMarketDefinition[] }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
 /** Explicit JSON contract; adapters translate provider-specific APIs into this shape. */
@@ -17,4 +17,159 @@ export class JsonFeedProvider implements InventoryProvider {
 export class EditorialFileProvider implements InventoryProvider {
   constructor(public source: SourceConfig, private records: SourceRecord[]) {}
   async fetch() { return this.records; }
+}
+
+interface TicketmasterEvent {
+  id?: string; name?: string; description?: string; info?: string; url?: string;
+  dates?: { start?: { localDate?: string; localTime?: string }; end?: { localDate?: string; localTime?: string } };
+  priceRanges?: Array<{ min?: number; max?: number }>;
+  classifications?: Array<{ segment?: { name?: string }; genre?: { name?: string } }>;
+  _embedded?: { venues?: Array<{ name?: string; address?: { line1?: string }; city?: { name?: string }; state?: { stateCode?: string }; country?: { countryCode?: string }; location?: { latitude?: string; longitude?: string } }> };
+}
+
+export function calgaryOffset(local: string): string {
+  const wall = Date.parse(`${local}Z`);
+  if (!Number.isFinite(wall)) throw Error(`Invalid Ticketmaster local date: ${local}`);
+  let instant = wall;
+  for (let i = 0; i < 3; i++) {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(instant).map(part => [part.type, part.value]));
+    const localAsUtc = Date.parse(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}Z`);
+    instant += wall - localAsUtc;
+  }
+  const minutes = Math.round((wall - instant) / 60000); const sign = minutes >= 0 ? '+' : '-'; const absolute = Math.abs(minutes);
+  return `${sign}${String(Math.floor(absolute / 60)).padStart(2, '0')}:${String(absolute % 60).padStart(2, '0')}`;
+}
+
+function localDateTime(date?: string, time?: string): string | null {
+  if (!date || !time) return null;
+  return `${date}T${time}${calgaryOffset(`${date}T${time}`)}`;
+}
+
+function estimatedEnd(start: string): string {
+  return new Date(Date.parse(start) + 3 * 60 * 60 * 1000).toISOString();
+}
+
+function ticketmasterDate(value: Date): string {
+  return value.toISOString().replace(/\.\d{3}Z$/, 'Z');
+}
+
+function clean(value: string | undefined, fallback: string): string {
+  return (value?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || fallback).slice(0, 5_000);
+}
+
+function ticketmasterCategories(event: TicketmasterEvent): string[] {
+  const names = (event.classifications ?? []).flatMap(classification => [classification.segment?.name, classification.genre?.name]).filter(value => Boolean(value?.trim())).map(value => value!.trim().toLowerCase());
+  const categories = new Set<string>();
+  if (names.some(name => /music|concert/.test(name))) categories.add('music');
+  if (names.some(name => /arts|theatre|theater|film|comedy/.test(name))) categories.add('arts');
+  if (names.some(name => /sport/.test(name))) categories.add('sports');
+  if (names.some(name => /family/.test(name))) categories.add('family');
+  if (names.length) categories.add(names[0]);
+  return [...categories].slice(0, 5);
+}
+
+export function mapTicketmasterEvents(events: TicketmasterEvent[]): SourceRecord[] {
+  return events.flatMap(event => {
+    const start = localDateTime(event.dates?.start?.localDate, event.dates?.start?.localTime);
+    const end = localDateTime(event.dates?.end?.localDate, event.dates?.end?.localTime) || (start ? estimatedEnd(start) : null);
+    const venue = event._embedded?.venues?.[0];
+    if (!event.id || !event.name?.trim() || !event.url?.trim() || !start || !end || venue?.country?.countryCode !== 'CA') return [];
+    const address = [venue.address?.line1, venue.city?.name, venue.state?.stateCode].map(value => value?.trim()).filter(Boolean).join(', ');
+    if (!address) return [];
+    const prices = event.priceRanges?.filter(price => Number.isFinite(price.min) && Number.isFinite(price.max));
+    const title = clean(event.name, 'Calgary event');
+    return [{ id: event.id, input: { kind: 'event', title, summary: clean(event.info || event.description, `${title} in Calgary.`), description: clean(event.description || event.info, `${title}. Check the organizer for current details.`), address, organizer: 'Ticketmaster event listing', sourceUrl: event.url.trim(), categories: ticketmasterCategories(event), tags: [], start, end, ...(event.dates?.end?.localDate && event.dates?.end?.localTime ? {} : { endTimeEstimated: true }), pricing: prices?.length ? 'paid' : 'unknown', ...(prices?.[0] ? { priceRange: [prices[0].min!, prices[0].max!] as [number, number] } : {}), ...(venue.name?.trim() ? { venue: venue.name.trim() } : {}), tickets: event.url.trim() } as InventorySubmissionInput }];
+  });
+}
+
+export class TicketmasterProvider implements InventoryProvider {
+  constructor(public source: SourceConfig) {}
+  async fetch(): Promise<SourceRecord[]> {
+    const apiKey = process.env.TICKETMASTER_API_KEY?.trim();
+    if (!apiKey) throw Error('TICKETMASTER_API_KEY is not configured');
+    const from = new Date(); const to = new Date(from.getTime() + 90 * 24 * 60 * 60 * 1000);
+    const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
+    url.searchParams.set('apikey', apiKey); url.searchParams.set('countryCode', 'CA'); url.searchParams.set('marketId', '108'); url.searchParams.set('startDateTime', ticketmasterDate(from)); url.searchParams.set('endDateTime', ticketmasterDate(to)); url.searchParams.set('includeTBA', 'no'); url.searchParams.set('includeTBD', 'no'); url.searchParams.set('sort', 'date,asc'); url.searchParams.set('size', '200');
+    const response = await fetch(url, { signal: AbortSignal.timeout(20_000), headers: { Accept: 'application/json', 'User-Agent': 'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
+    if (!response.ok) {
+      const detail = (await response.text()).replace(/\s+/g, ' ').slice(0, 300);
+      throw Error(`Ticketmaster API returned HTTP ${response.status}${detail ? `: ${detail}` : ''}`);
+    }
+    const body = await response.json() as { _embedded?: { events?: TicketmasterEvent[] } };
+    const events = body._embedded?.events ?? [];
+    const records = mapTicketmasterEvents(events);
+    const missingDates = events.filter(event => !localDateTime(event.dates?.start?.localDate, event.dates?.start?.localTime) || !localDateTime(event.dates?.end?.localDate, event.dates?.end?.localTime)).length;
+    const missingVenue = events.filter(event => !event._embedded?.venues?.[0]).length;
+    const missingCanadianVenue = events.filter(event => event._embedded?.venues?.[0] && event._embedded.venues[0].country?.countryCode !== 'CA').length;
+    console.log(`[Ticketmaster] ${events.length} event(s) received, ${records.length} accepted; ${missingDates} missing confirmed dates, ${missingVenue} missing venues, ${missingCanadianVenue} outside Canada.`);
+    return records;
+  }
+}
+
+/**
+ * A weekly recurring market (e.g. a community farmers' market) with no feed/API of its own.
+ * Occurrence dates are computed relative to "now" each ingest run rather than hardcoded, so
+ * the market always carries a fresh window of upcoming dates instead of going stale.
+ */
+export interface RecurringMarketDefinition {
+  id: string; title: string; summary: string; description: string;
+  address: string; venue?: string; neighbourhood?: string;
+  organizer: string; sourceUrl: string;
+  categories: string[]; tags: string[];
+  amenities: string[]; parking?: string; transit?: string; petFriendly?: boolean; familyFriendly?: boolean;
+  /** 0 = Sunday .. 6 = Saturday, evaluated in America/Edmonton. */
+  dayOfWeek: number;
+  /** "HH:MM:SS" local wall-clock time. */
+  startTime: string; endTime: string;
+  /** Inclusive "YYYY-MM-DD" bounds for a seasonal market; omit for year-round. */
+  seasonStart?: string; seasonEnd?: string;
+  /** How many upcoming dates to publish as occurrences. Defaults to 8. */
+  occurrenceCount?: number;
+}
+
+const WEEKDAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function nextOccurrenceDates(market: RecurringMarketDefinition, now: Date): string[] {
+  const count = market.occurrenceCount ?? 8;
+  const dates: string[] = [];
+  const cursor = new Date(now.getTime());
+  for (let i = 0; i < 400 && dates.length < count; i++) {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }).formatToParts(cursor).map(part => [part.type, part.value]));
+    const dateStr = `${parts.year}-${parts.month}-${parts.day}`;
+    if (WEEKDAY_ABBR.indexOf(parts.weekday) === market.dayOfWeek && (!market.seasonStart || dateStr >= market.seasonStart) && (!market.seasonEnd || dateStr <= market.seasonEnd)) dates.push(dateStr);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return dates;
+}
+
+export class RecurringMarketProvider implements InventoryProvider {
+  constructor(public source: SourceConfig, private now: Date = new Date()) {}
+  async fetch(): Promise<SourceRecord[]> {
+    const markets = this.source.markets ?? [];
+    const now = this.now;
+    const records = markets.map(market => {
+      const occurrences = nextOccurrenceDates(market, now).map(date => ({
+        sourceRecordId: `${market.id}:${date}`,
+        start: `${date}T${market.startTime}${calgaryOffset(`${date}T${market.startTime}`)}`,
+        end: `${date}T${market.endTime}${calgaryOffset(`${date}T${market.endTime}`)}`,
+        cancelled: false,
+      }));
+      const input: MarketSubmissionInput = {
+        kind: 'market', title: market.title, summary: market.summary, description: market.description,
+        address: market.address, organizer: market.organizer, sourceUrl: market.sourceUrl,
+        categories: market.categories, tags: market.tags,
+        occurrences, amenities: market.amenities,
+        ...(market.venue ? { venue: market.venue } : {}),
+        ...(market.neighbourhood ? { neighbourhood: market.neighbourhood } : {}),
+        ...(market.parking ? { parking: market.parking } : {}),
+        ...(market.transit ? { transit: market.transit } : {}),
+        ...(market.petFriendly !== undefined ? { petFriendly: market.petFriendly } : {}),
+        ...(market.familyFriendly !== undefined ? { familyFriendly: market.familyFriendly } : {}),
+      };
+      return { id: market.id, input: input as InventorySubmissionInput };
+    }).filter(record => (record.input as MarketSubmissionInput).occurrences.length > 0);
+    const skipped = markets.length - records.length;
+    console.log(`[Recurring markets] ${markets.length} configured, ${records.length} with upcoming dates${skipped ? `, ${skipped} out of season` : ''}.`);
+    return records;
+  }
 }

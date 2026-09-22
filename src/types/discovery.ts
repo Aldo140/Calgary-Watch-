@@ -13,6 +13,7 @@ export interface EntityBase {
 export interface Location { address: string; coordinates?: { lat: number; lng: number }; venue?: string }
 export interface Event extends EntityBase, Location {
   kind: 'event'; start: string; end: string; timezone: 'America/Edmonton';
+  endTimeEstimated?: boolean;
   pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string;
   organizer: string; cancelled?: boolean;
 }
@@ -31,8 +32,8 @@ export interface Guide extends EntityBase { kind: 'guide'; introduction: string;
 export interface Neighbourhood extends EntityBase { kind: 'neighbourhood'; quadrant: string; entityIds: string[] }
 export interface VendorAppearance { vendorId: string; marketOccurrenceId: string; source: EntitySource }
 export interface ClaimRequest { id: string; entityId: string; requesterUid: string; status: 'pending' | 'approved' | 'rejected'; createdAt: string }
-export interface SubmissionBase { title: string; summary: string; description: string; address: string; organizer: string; sourceUrl: string; categories: string[]; tags: string[]; neighbourhood?: string }
-export interface EventSubmissionInput extends SubmissionBase { kind: 'event'; start: string; end: string; pricing: 'free' | 'paid' | 'unknown' }
+export interface SubmissionBase { title: string; summary: string; description: string; address: string; venue?: string; organizer: string; sourceUrl: string; categories: string[]; tags: string[]; neighbourhood?: string }
+export interface EventSubmissionInput extends SubmissionBase { kind: 'event'; start: string; end: string; endTimeEstimated?: boolean; pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string }
 export interface MarketSubmissionInput extends SubmissionBase { kind: 'market'; occurrences: { sourceRecordId: string; start: string; end: string; cancelled: boolean }[]; amenities: string[]; parking?: string; transit?: string; petFriendly?: boolean; familyFriendly?: boolean }
 export interface BusinessSubmissionInput extends SubmissionBase { kind: 'business'; website?: string }
 export type InventorySubmissionInput = EventSubmissionInput | MarketSubmissionInput;

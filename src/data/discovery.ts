@@ -17,4 +17,14 @@ export const discoveryFixtures: DiscoveryEntity[] = [
   { ...base, kind: 'guide', id: 'guide-preview', slug: 'a-day-by-the-bow', title: 'A day by the Bow', summary: 'Slow down. Follow the river. See where the afternoon takes you.', categories: ['outdoors'], tags: ['date night'], introduction: 'A preview of entity-based Calgary guides.', methodology: 'Development sample; editorial review and source verification are required before publication.', entries: [{ entityId: 'event-walk', note: 'Start with a walk.' }], relatedGuideIds: [], image: { src: '/images/photo/calgary4.webp', alt: 'Calgary’s Peace Bridge' } },
   { ...base, kind: 'neighbourhood', id: 'neighbourhood-preview', slug: 'downtown-preview', title: 'Downtown', summary: 'Find a different rhythm in the heart of the city.', categories: ['neighbourhoods'], tags: ['downtown'], quadrant: 'Centre', entityIds: ['event-walk'], image: { src: '/images/photo/calgary1.webp', alt: 'Downtown Calgary skyline' } },
 ];
-export const discoveryRepository = createDiscoveryRepository(inventory.entities as DiscoveryEntity[], inventory.occurrences as MarketOccurrence[]);
+// Local dev has no Firestore export to read from, so discovery-index.json ships empty
+// (see scripts/discovery/export.ts, which only runs with real credentials in CI). Fall
+// back to the illustrative fixtures so `npm run dev` isn't blank. import.meta.env.DEV is
+// statically false for `vite build`, so this can never ship in a production bundle; the
+// optional chain also covers plain-Node execution (tests, the prerender/SEO scripts),
+// where import.meta.env doesn't exist at all outside Vite.
+const isDevServer = Boolean(import.meta.env?.DEV);
+const entities = isDevServer
+  ? [...(inventory.entities as DiscoveryEntity[]), ...discoveryFixtures]
+  : (inventory.entities as DiscoveryEntity[]);
+export const discoveryRepository = createDiscoveryRepository(entities, inventory.occurrences as MarketOccurrence[], isDevServer);

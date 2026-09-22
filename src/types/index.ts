@@ -122,6 +122,8 @@ export interface Incident {
   feedback_disputed?: boolean;
   feedback_resolved?: boolean;
   feedback_last_active?: number | null;
+  /** Distinct residents who left any feedback — the true one-per-user count. */
+  feedback_total?: number;
   deletedAt?: number;
   deletedBy?: string;
   /** @deprecated Superseded by `visibility`. Retained for old documents. */

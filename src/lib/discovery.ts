@@ -9,6 +9,7 @@ export const DISCOVERY_SECTIONS = [
   { path: '/neighbourhoods', label: 'Neighbourhoods', kind: 'neighbourhood' },
 ] as const;
 export const LOCAL_CATEGORIES = ['food', 'shopping', 'services', 'arts'];
+export const QUADRANTS = ['NW', 'NE', 'SW', 'SE'];
 export function entityPath(entity: Pick<DiscoveryEntity, 'kind' | 'slug'>): string {
   return `${DISCOVERY_SECTIONS.find(s => s.kind === entity.kind)!.path}/${entity.slug}`;
 }

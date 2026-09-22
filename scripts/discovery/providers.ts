@@ -24,7 +24,9 @@ interface TicketmasterEvent {
   dates?: { start?: { localDate?: string; localTime?: string }; end?: { localDate?: string; localTime?: string } };
   priceRanges?: Array<{ min?: number; max?: number }>;
   classifications?: Array<{ segment?: { name?: string }; genre?: { name?: string } }>;
-  _embedded?: { venues?: Array<{ name?: string; address?: { line1?: string }; city?: { name?: string }; state?: { stateCode?: string }; country?: { countryCode?: string }; location?: { latitude?: string; longitude?: string } }> };
+  promoter?: { name?: string };
+  promoters?: Array<{ name?: string }>;
+  _embedded?: { venues?: Array<{ name?: string; address?: { line1?: string }; city?: { name?: string }; state?: { stateCode?: string }; country?: { countryCode?: string }; location?: { latitude?: string; longitude?: string } }>; attractions?: Array<{ name?: string }> };
 }
 
 export function calgaryOffset(local: string): string {
@@ -57,6 +59,17 @@ function clean(value: string | undefined, fallback: string): string {
   return (value?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() || fallback).slice(0, 5_000);
 }
 
+/** Ticketmaster is the ticketing/listing source, not necessarily who organizes the
+ * event — fall back through promoter(s), then the headline attraction, before
+ * admitting Ticketmaster doesn't say. Never claim Ticketmaster itself is the organizer. */
+function ticketmasterOrganizer(event: TicketmasterEvent): string {
+  const promoter = event.promoter?.name?.trim() || event.promoters?.find(p => p.name?.trim())?.name?.trim();
+  if (promoter) return clean(promoter, promoter);
+  const attraction = event._embedded?.attractions?.find(a => a.name?.trim())?.name?.trim();
+  if (attraction) return clean(attraction, attraction);
+  return 'Organizer not listed — see ticket source';
+}
+
 function ticketmasterCategories(event: TicketmasterEvent): string[] {
   const names = (event.classifications ?? []).flatMap(classification => [classification.segment?.name, classification.genre?.name]).filter(value => Boolean(value?.trim())).map(value => value!.trim().toLowerCase());
   const categories = new Set<string>();
@@ -78,30 +91,42 @@ export function mapTicketmasterEvents(events: TicketmasterEvent[]): SourceRecord
     if (!address) return [];
     const prices = event.priceRanges?.filter(price => Number.isFinite(price.min) && Number.isFinite(price.max));
     const title = clean(event.name, 'Calgary event');
-    return [{ id: event.id, input: { kind: 'event', title, summary: clean(event.info || event.description, `${title} in Calgary.`), description: clean(event.description || event.info, `${title}. Check the organizer for current details.`), address, organizer: 'Ticketmaster event listing', sourceUrl: event.url.trim(), categories: ticketmasterCategories(event), tags: [], start, end, ...(event.dates?.end?.localDate && event.dates?.end?.localTime ? {} : { endTimeEstimated: true }), pricing: prices?.length ? 'paid' : 'unknown', ...(prices?.[0] ? { priceRange: [prices[0].min!, prices[0].max!] as [number, number] } : {}), ...(venue.name?.trim() ? { venue: venue.name.trim() } : {}), tickets: event.url.trim() } as InventorySubmissionInput }];
+    return [{ id: event.id, input: { kind: 'event', title, summary: clean(event.info || event.description, `${title} in Calgary.`), description: clean(event.description || event.info, `${title}. Check the organizer for current details.`), address, organizer: ticketmasterOrganizer(event), sourceUrl: event.url.trim(), categories: ticketmasterCategories(event), tags: [], start, end, ...(event.dates?.end?.localDate && event.dates?.end?.localTime ? {} : { endTimeEstimated: true }), pricing: prices?.length ? 'paid' : 'unknown', ...(prices?.[0] ? { priceRange: [prices[0].min!, prices[0].max!] as [number, number] } : {}), ...(venue.name?.trim() ? { venue: venue.name.trim() } : {}), tickets: event.url.trim() } as InventorySubmissionInput }];
   });
 }
 
 export class TicketmasterProvider implements InventoryProvider {
+  // Discovery API caps a page at 200 results; Calgary's 90-day window normally fits
+  // in one, but a busy season (Stampede, playoffs) can exceed it. Walk pages until
+  // the API says there are no more, capped well above anything Calgary plausibly
+  // produces in 90 days so a bug elsewhere can't spin this into an unbounded loop.
+  private static readonly PAGE_SIZE = 200;
+  private static readonly MAX_PAGES = 10;
+
   constructor(public source: SourceConfig) {}
   async fetch(): Promise<SourceRecord[]> {
     const apiKey = process.env.TICKETMASTER_API_KEY?.trim();
     if (!apiKey) throw Error('TICKETMASTER_API_KEY is not configured');
     const from = new Date(); const to = new Date(from.getTime() + 90 * 24 * 60 * 60 * 1000);
-    const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
-    url.searchParams.set('apikey', apiKey); url.searchParams.set('countryCode', 'CA'); url.searchParams.set('marketId', '108'); url.searchParams.set('startDateTime', ticketmasterDate(from)); url.searchParams.set('endDateTime', ticketmasterDate(to)); url.searchParams.set('includeTBA', 'no'); url.searchParams.set('includeTBD', 'no'); url.searchParams.set('sort', 'date,asc'); url.searchParams.set('size', '200');
-    const response = await fetch(url, { signal: AbortSignal.timeout(20_000), headers: { Accept: 'application/json', 'User-Agent': 'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
-    if (!response.ok) {
-      const detail = (await response.text()).replace(/\s+/g, ' ').slice(0, 300);
-      throw Error(`Ticketmaster API returned HTTP ${response.status}${detail ? `: ${detail}` : ''}`);
+    const events: TicketmasterEvent[] = [];
+    let totalPages = 1;
+    for (let page = 0; page < totalPages && page < TicketmasterProvider.MAX_PAGES; page++) {
+      const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
+      url.searchParams.set('apikey', apiKey); url.searchParams.set('countryCode', 'CA'); url.searchParams.set('marketId', '108'); url.searchParams.set('startDateTime', ticketmasterDate(from)); url.searchParams.set('endDateTime', ticketmasterDate(to)); url.searchParams.set('includeTBA', 'no'); url.searchParams.set('includeTBD', 'no'); url.searchParams.set('sort', 'date,asc'); url.searchParams.set('size', String(TicketmasterProvider.PAGE_SIZE)); url.searchParams.set('page', String(page));
+      const response = await fetch(url, { signal: AbortSignal.timeout(20_000), headers: { Accept: 'application/json', 'User-Agent': 'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
+      if (!response.ok) {
+        const detail = (await response.text()).replace(/\s+/g, ' ').slice(0, 300);
+        throw Error(`Ticketmaster API returned HTTP ${response.status}${detail ? `: ${detail}` : ''}`);
+      }
+      const body = await response.json() as { _embedded?: { events?: TicketmasterEvent[] }; page?: { totalPages?: number } };
+      events.push(...(body._embedded?.events ?? []));
+      totalPages = Math.min(body.page?.totalPages ?? 1, TicketmasterProvider.MAX_PAGES);
     }
-    const body = await response.json() as { _embedded?: { events?: TicketmasterEvent[] } };
-    const events = body._embedded?.events ?? [];
     const records = mapTicketmasterEvents(events);
     const missingDates = events.filter(event => !localDateTime(event.dates?.start?.localDate, event.dates?.start?.localTime) || !localDateTime(event.dates?.end?.localDate, event.dates?.end?.localTime)).length;
     const missingVenue = events.filter(event => !event._embedded?.venues?.[0]).length;
     const missingCanadianVenue = events.filter(event => event._embedded?.venues?.[0] && event._embedded.venues[0].country?.countryCode !== 'CA').length;
-    console.log(`[Ticketmaster] ${events.length} event(s) received, ${records.length} accepted; ${missingDates} missing confirmed dates, ${missingVenue} missing venues, ${missingCanadianVenue} outside Canada.`);
+    console.log(`[Ticketmaster] ${events.length} event(s) received across ${totalPages} page(s), ${records.length} accepted; ${missingDates} missing confirmed dates, ${missingVenue} missing venues, ${missingCanadianVenue} outside Canada.`);
     return records;
   }
 }

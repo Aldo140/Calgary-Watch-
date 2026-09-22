@@ -38,6 +38,19 @@ describe('Strict submission and source boundaries',()=>{
     assert.deepEqual(domain.duplicateCandidates(a,[b]),[b.id]);
     assert.deepEqual(domain.duplicateCandidates({...a,start:'2026-10-26T18:00:00-06:00'},[b]),[]);
   });
+  it('catches near-duplicates across differently-worded venue/address and near-identical titles',()=>{
+    // The same real-world case: one source names the venue, the other gives its street
+    // address; one source adds a promoter credit to the title. Exact-string matching
+    // would miss this; token-overlap matching should not.
+    const a=domain.normalizeRecord({...event,title:'Fall Harvest Night Market',venue:'Scotiabank Saddledome'},source,'a').entity;
+    const b=domain.normalizeRecord({...event,title:'Fall Harvest Night Market presented by XYZ',address:'555 Saddledome Rise SE, Calgary, AB'},{...source,id:'other'},'b').entity;
+    assert.deepEqual(domain.duplicateCandidates(a,[b]),[b.id]);
+  });
+  it('does not flag unrelated events at the same venue and time as duplicates',()=>{
+    const a=domain.normalizeRecord({...event,title:'Morning Yoga',venue:'Scotiabank Saddledome'},source,'a').entity;
+    const b=domain.normalizeRecord({...event,title:'Evening Hockey Game',venue:'Scotiabank Saddledome'},{...source,id:'other'},'b').entity;
+    assert.deepEqual(domain.duplicateCandidates(a,[b]),[]);
+  });
 });
 
 describe('Publication and SEO',()=>{

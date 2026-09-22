@@ -22,7 +22,7 @@ export function QuadrantExplorer() {
       </div>
       <nav className="cw-quadrants-grid" aria-label="Explore Calgary by quadrant">
         {QUADRANTS.map(q => (
-          <Link key={q.code} to="/neighbourhoods">
+          <Link key={q.code} to={`/neighbourhoods?quadrant=${q.code}`}>
             <img src={q.image} alt="" aria-hidden="true" loading="lazy" />
             <span className="cw-quadrants-code">{q.code}</span>
             <div className="cw-quadrants-copy"><strong>{q.name}</strong><small>{q.blurb}</small></div>

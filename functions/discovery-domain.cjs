@@ -49,9 +49,31 @@ function normalizeRecord(input, source, recordId, now = new Date().toISOString()
   return { entity, occurrences };
 }
 
+// Two sources rarely spell the same event/venue identically ("Scotiabank Saddledome"
+// vs "555 Saddledome Rise SE"), so duplicate detection compares token overlap rather
+// than exact-normalized strings. Street numbers and generic address words (types,
+// directions, city/province) are noise for this purpose and are dropped before
+// comparing; the venue name field is preferred over the raw address when both exist.
+const LOCATION_STOPWORDS = new Set(['street','st','avenue','ave','avenu','drive','dr','road','rd','way','boulevard','blvd','trail','tr','crescent','cres','close','cl','court','ct','place','pl','lane','ln','park','pk','gate','gt','row','rise','bay','manor','mount','mt','se','sw','ne','nw','n','s','e','w','ab','alberta','calgary','canada']);
+function tokens(text, stopwords) {
+  const words = (text || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w && !/^\d+$/.test(w) && !stopwords?.has(w));
+  return new Set(words);
+}
+function jaccard(a, b) {
+  if (!a.size && !b.size) return 0;
+  const intersection = [...a].filter(x => b.has(x)).length;
+  return intersection / new Set([...a, ...b]).size;
+}
 function duplicateCandidates(entity, entities) {
-  const key = e => `${slugify(e.title)}:${slugify(e.address || '')}`;
-  return entities.filter(e => e.id !== entity.id && e.kind === entity.kind && e.status !== 'archived' && key(e) === key(entity) && (e.kind !== 'event' || Math.abs(Date.parse(e.start) - Date.parse(entity.start)) < 12 * 3600000)).map(e => e.id);
+  const titleTokens = e => tokens(e.title);
+  const locationTokens = e => tokens(e.venue || e.address, LOCATION_STOPWORDS);
+  const entityTitle = titleTokens(entity); const entityLocation = locationTokens(entity);
+  return entities.filter(e =>
+    e.id !== entity.id && e.kind === entity.kind && e.status !== 'archived'
+    && jaccard(titleTokens(e), entityTitle) >= 0.5
+    && jaccard(locationTokens(e), entityLocation) >= 0.4
+    && (e.kind !== 'event' || Math.abs(Date.parse(e.start) - Date.parse(entity.start)) < 12 * 3600000)
+  ).map(e => e.id);
 }
 function isFresh(entity, now = new Date()) { const age = now.getTime() - Date.parse(entity.verifiedAt || ''); return Number.isFinite(age) && age >= -300000 && age <= 14 * 86400000; }
 function eligible(entity, now = new Date()) { return entity.status === 'published' && entity.verification === 'source-checked' && !entity.developmentOnly && isFresh(entity, now) && entity.sources?.length > 0 && entity.sources.every(s => ['official','editorial'].includes(s.kind) && /^https:\/\//.test(s.url)); }

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
-import type { DiscoveryEntity } from '../../types/discovery';
+import type { DiscoveryEntity, EntityKind } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 
 export function SectionHeading({ title, to, label = 'Explore all', eyebrow }: { title: string; to?: string; label?: string; eyebrow?: string }) {
@@ -18,4 +18,7 @@ export const BusinessCard = DiscoveryCard;
 export const GuideCard = DiscoveryCard;
 export const NeighbourhoodCard = DiscoveryCard;
 export function EditorialGrid({ children }: { children: ReactNode }) { return <div className="cw-editorial-grid">{children}</div>; }
-export function EmptyInventory({ type }: { type: string }) { return <div className="cw-empty"><h3>No matching {type} right now.</h3><p>Try another date or filter. Have something Calgary should know about?</p><Link className="cw-text-link" to="/submit">Share a suggestion <ArrowUpRight size={18} /></Link></div>; }
+export function EmptyInventory({ type, kind }: { type: string; kind?: EntityKind }) {
+  const submittable = kind === 'event' || kind === 'market';
+  return <div className="cw-empty"><h3>No matching {type} right now.</h3><p>Try another date or filter. Have something Calgary should know about?</p><Link className="cw-text-link" to={submittable ? `/submit?type=${kind}` : '/submit'}>Share a suggestion <ArrowUpRight size={18} /></Link></div>;
+}

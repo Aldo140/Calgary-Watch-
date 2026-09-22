@@ -7,8 +7,8 @@ const local = (iso: string) => {
   return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
 };
 const instant = (value: string) => { const [day,time]=value.split('T'); const [h,m]=time.split(':').map(Number); return new Date(calgaryInstant(day,h+m/60)).toISOString(); };
-export function InventoryForm({ initial, onSave, busy, label='Send for review' }: { initial?: InventorySubmissionInput; onSave: (input:InventorySubmissionInput)=>Promise<void>; busy:boolean; label?:string }) {
-  const [kind,setKind]=useState<'event'|'market'>(initial?.kind || 'event');
+export function InventoryForm({ initial, onSave, busy, label='Send for review', defaultKind }: { initial?: InventorySubmissionInput; onSave: (input:InventorySubmissionInput)=>Promise<void>; busy:boolean; label?:string; defaultKind?:'event'|'market' }) {
+  const [kind,setKind]=useState<'event'|'market'>(initial?.kind || defaultKind || 'event');
   const [dates,setDates]=useState(initial?.kind==='market' ? initial.occurrences.map(o=>({...o,start:local(o.start),end:local(o.end)})) : [{sourceRecordId:crypto.randomUUID(),start:initial?.kind==='event'?local(initial.start):'',end:initial?.kind==='event'?local(initial.end):'',cancelled:false}]);
   const [error,setError]=useState('');
   async function submit(e:FormEvent<HTMLFormElement>) {

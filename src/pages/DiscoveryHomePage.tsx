@@ -15,7 +15,7 @@ export default function DiscoveryHomePage() {
   const entities = filterInventory(discoveryRepository.list(), discoveryRepository.occurrences());
   const section = (kind: EntityKind, title: string, path: string, label: string, weekend = false) => {
     const items = entities.filter(e => e.kind === kind && (!weekend || e.kind !== 'event' || matchesPeriod(e.start, e.end, 'this-weekend')));
-    return <section className={`cw-section cw-section-${kind}`}><SectionHeading title={title} to={path} />{items.length ? <EditorialGrid>{items.map(e => <DiscoveryCard key={e.id} entity={e} />)}</EditorialGrid> : <EmptyInventory type={label} />}</section>;
+    return <section className={`cw-section cw-section-${kind}`}><SectionHeading title={title} to={path} />{items.length ? <EditorialGrid>{items.map(e => <DiscoveryCard key={e.id} entity={e} />)}</EditorialGrid> : <EmptyInventory type={label} kind={kind} />}</section>;
   };
   return <SiteLayout><DiscoveryHero /><ModesSplit /><div className="cw-wrap cw-home-content">
     <section className="cw-start-panel" aria-labelledby="cw-start-heading">

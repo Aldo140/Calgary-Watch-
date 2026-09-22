@@ -1,13 +1,12 @@
 import { filterInventory } from '../lib/discoveryCalendar';
 import { Link } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
-import { DiscoveryHero } from '../components/discovery/DiscoveryHero';
+import { CityHero } from '../components/discovery/CityHero';
 import { ModesSplit } from '../components/discovery/ModesSplit';
 import { QuadrantExplorer } from '../components/discovery/QuadrantExplorer';
 import { Marquee } from '../components/discovery/Marquee';
 import { StatsBar } from '../components/discovery/StatsBar';
 import { AuthorityBand } from '../components/discovery/AuthorityBand';
-import { ThisWeek } from '../components/discovery/ThisWeek';
 import { GuidesSpotlight } from '../components/discovery/GuidesSpotlight';
 import { DiscoveryCard, EditorialGrid, EmptyInventory, SectionHeading } from '../components/discovery/DiscoveryCards';
 import { LivePreview } from '../components/discovery/LivePreview';
@@ -24,9 +23,7 @@ export default function DiscoveryHomePage() {
   };
   const topTicker = ["WHAT'S HAPPENING", '🎉', 'THIS WEEKEND', '📅', 'IN YOUR NEIGHBOURHOOD', '📍', 'RIGHT NOW', '⚡'];
   const liveTicker = ['SEE IT', '👀', 'SHARE IT', '📣', 'CALGARY KNOWS', '🧠'];
-  return <SiteLayout><DiscoveryHero /><div className="cw-wrap cw-home-content">
-    <ThisWeek entities={entities} occurrences={discoveryRepository.occurrences()} />
-    </div><ModesSplit /><Marquee items={topTicker} /><AuthorityBand /><StatsBar /><div className="cw-wrap cw-home-content">
+  return <SiteLayout><CityHero entities={entities} occurrences={discoveryRepository.occurrences()} /><ModesSplit /><Marquee items={topTicker} /><AuthorityBand /><StatsBar /><div className="cw-wrap cw-home-content">
     <section className="cw-start-panel" aria-labelledby="cw-start-heading">
       <div className="cw-start-copy"><p className="cw-eyebrow">Start somewhere good</p><h2 id="cw-start-heading">Make a day of it.</h2><p>Pick a direction and let Calgary fill in the rest.</p></div>
       <nav className="cw-start-links" aria-label="Start exploring Calgary">

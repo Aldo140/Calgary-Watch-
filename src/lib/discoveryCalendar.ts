@@ -1,5 +1,5 @@
 import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
-import { calgaryDate, matchesPeriod } from './discovery';
+import { calgaryDate, entityPath, matchesPeriod } from './discovery';
 /** Convert a wall clock time using the zone's actual offset (including DST). */
 export function calgaryInstant(day: string, hour: number): number {
   const wall = Date.parse(`${day}T00:00:00Z`) + hour * 3600000;
@@ -34,4 +34,26 @@ export function filterInventory(entities: readonly DiscoveryEntity[], occurrence
     }
     return !filter || [...e.categories,...e.tags].some(c=>c.toLowerCase().replace(/s$/,'')===filter.replace(/s$/,''));
   });
+}
+
+export interface DayItem { date: string; title: string; to: string; venue?: string }
+
+/** Real events + market occurrences over the next `days` days, grouped by Calgary
+ * calendar date — the day-by-day "what's on" list, not a fabricated activity feed. */
+export function upcomingByDay(entities: readonly DiscoveryEntity[], occurrences: readonly MarketOccurrence[], days = 7, now = new Date()): [string, DayItem[]][] {
+  const cutoff = calgaryDate(new Date(now.getTime() + days * 86400000));
+  const items: DayItem[] = [];
+  for (const e of entities) {
+    if (e.kind === 'event' && !e.cancelled && Date.parse(e.end) > now.getTime()) {
+      items.push({ date: calgaryDate(new Date(e.start)), title: e.title, to: entityPath(e), venue: e.venue || e.neighbourhood });
+    }
+    if (e.kind === 'market') {
+      for (const o of occurrences.filter(o => o.marketId === e.id && !o.cancelled && Date.parse(o.end) > now.getTime())) {
+        items.push({ date: calgaryDate(new Date(o.start)), title: e.title, to: entityPath(e), venue: e.venue || e.neighbourhood });
+      }
+    }
+  }
+  const grouped = new Map<string, DayItem[]>();
+  for (const item of items.filter(i => i.date <= cutoff)) (grouped.get(item.date) ?? grouped.set(item.date, []).get(item.date)!).push(item);
+  return [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(0, 5);
 }

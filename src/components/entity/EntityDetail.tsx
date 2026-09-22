@@ -9,7 +9,7 @@ export function EntityDetail({ entity, related, occurrences = [] }: { entity: Di
   const next = dates.find(o => !o.cancelled);
   const format = (value: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full', timeStyle: 'short' }).format(new Date(value));
   return <article className="cw-detail"><p className="cw-eyebrow">{entity.kind}{entity.developmentOnly ? ' · Illustrative preview' : ''}</p><h1>{entity.title}</h1><p className="cw-lead">{entity.summary}</p>
-    {entity.image && <img className="cw-detail-image" src={entity.image.src} alt={entity.image.alt} width="1200" height="677" />}
+    {entity.image && <figure className="cw-detail-image-wrap"><img className="cw-detail-image" src={entity.image.src} alt={entity.image.alt} width="1200" height="677" />{entity.image.credit && <figcaption className="cw-image-credit">{entity.image.credit}</figcaption>}</figure>}
     {entity.kind === 'business' && entity.partner && <p className="cw-preview-note">Sponsored · {entity.sponsorshipDisclosure || 'Featured partner placement. Payment does not imply editorial selection.'}</p>}
     <p>{entity.description}</p>
     {'address' in entity && <p><strong>Location:</strong> {entity.address}</p>}

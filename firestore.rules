@@ -74,7 +74,8 @@ service cloud.firestore {
       return request.auth.token.email_verified == true &&
              request.auth.token.email in [
                "jorti104@mtroyal.ca",
-               "ophillah1863@gmail.com"
+               "ophillah1863@gmail.com",
+               "aldo@calgarywatch.ca"
              ];
     }
 

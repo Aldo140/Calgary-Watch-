@@ -8,16 +8,31 @@ const date = v => { if (typeof v !== 'string' || !/(Z|[+-]\d\d:\d\d)$/.test(v) |
 const range = v => { date(v.start); date(v.end); if (Date.parse(v.end) <= Date.parse(v.start)) throw Error('End must follow start'); };
 const strings = v => { if (!Array.isArray(v) || v.length > 30) throw Error('Expected a short list'); return v.map(x => text(x, 80)); };
 const slugify = v => v.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Optional and provider-supplied, never required: a public submitter with no photo or an
+// editorial entry with no coordinates is still a valid listing. Image credit is retained
+// so displayed photography always carries visible provenance, never anonymous imagery.
+const image = v => {
+  if (!v || typeof v !== 'object' || Object.keys(v).some(k => !['src','alt','credit'].includes(k))) throw Error('Invalid image fields');
+  const out = { src: https(v.src), alt: text(v.alt, 300) };
+  if (v.credit !== undefined) out.credit = text(v.credit, 200);
+  return out;
+};
+const coordinates = v => {
+  if (!v || typeof v !== 'object' || Object.keys(v).some(k => !['lat','lng'].includes(k)) || typeof v.lat !== 'number' || typeof v.lng !== 'number' || !Number.isFinite(v.lat) || !Number.isFinite(v.lng) || Math.abs(v.lat) > 90 || Math.abs(v.lng) > 180) throw Error('Invalid coordinates');
+  return { lat: v.lat, lng: v.lng };
+};
 
 function validateSubmission(input) {
   if (!input || !['event', 'market'].includes(input.kind)) throw Error('Only events and markets are supported');
-  const common = ['kind','title','summary','description','address','venue','organizer','sourceUrl','categories','tags','neighbourhood'];
+  const common = ['kind','title','summary','description','address','venue','organizer','sourceUrl','categories','tags','neighbourhood','image','coordinates'];
   const specific = input.kind === 'event' ? ['start','end','endTimeEstimated','pricing','priceRange','tickets'] : ['occurrences','amenities','parking','transit','petFriendly','familyFriendly'];
   if (Object.keys(input).some(k => ![...common,...specific].includes(k))) throw Error('Submission contains privileged or unknown fields');
   for (const key of ['title','summary','description','address','organizer']) text(input[key], key === 'description' ? 5000 : 500);
   if (input.venue !== undefined) text(input.venue, 300);
   https(input.sourceUrl); strings(input.categories); strings(input.tags);
   if (input.neighbourhood !== undefined) text(input.neighbourhood, 120);
+  if (input.image !== undefined) image(input.image);
+  if (input.coordinates !== undefined) coordinates(input.coordinates);
   if (input.kind === 'event') {
     range(input); if (input.endTimeEstimated !== undefined && typeof input.endTimeEstimated !== 'boolean') throw Error('Invalid estimated end time flag'); if (!['free','paid','unknown'].includes(input.pricing)) throw Error('Invalid pricing');
     if (input.tickets !== undefined) https(input.tickets);
@@ -43,10 +58,25 @@ function normalizeRecord(input, source, recordId, now = new Date().toISOString()
   if (!source.approved || !Array.isArray(source.hosts) || !source.hosts.includes(new URL(input.sourceUrl).hostname)) throw Error('Source is not approved for this URL');
   const id = hash(`${source.id}:${recordId}`);
   const provenance = { name: source.name, url: https(input.sourceUrl), kind: source.kind || 'official', retrievedAt: now };
-  const base = { id, kind: input.kind, slug: `${slugify(input.title) || input.kind}-${id.slice(0,6)}`, title: input.title.trim(), summary: input.summary.trim(), description: input.description.trim(), categories: strings(input.categories), tags: strings(input.tags), address: input.address.trim(), organizer: input.organizer.trim(), sources: [provenance], sourceId: source.id, sourceRecordId: recordId, fetchedAt: now, updatedAt: now, status: 'pending', verification: 'unverified', ...(input.venue ? { venue: input.venue.trim() } : {}), ...(input.neighbourhood ? { neighbourhood: input.neighbourhood } : {}) };
+  const base = { id, kind: input.kind, slug: `${slugify(input.title) || input.kind}-${id.slice(0,6)}`, title: input.title.trim(), summary: input.summary.trim(), description: input.description.trim(), categories: strings(input.categories), tags: strings(input.tags), address: input.address.trim(), organizer: input.organizer.trim(), sources: [provenance], sourceId: source.id, sourceRecordId: recordId, fetchedAt: now, updatedAt: now, status: 'pending', verification: 'unverified', ...(input.venue ? { venue: input.venue.trim() } : {}), ...(input.neighbourhood ? { neighbourhood: input.neighbourhood } : {}), ...(input.image ? { image: image(input.image) } : {}), ...(input.coordinates ? { coordinates: coordinates(input.coordinates) } : {}) };
   const entity = input.kind === 'event' ? { ...base, start: input.start, end: input.end, timezone: TIMEZONE, ...(input.endTimeEstimated ? { endTimeEstimated: true } : {}), pricing: input.pricing, ...(input.priceRange ? { priceRange: input.priceRange } : {}), ...(input.tickets ? { tickets: input.tickets } : {}), cancelled: false } : { ...base, amenities: input.amenities, vendorIds: [], images: [], ...Object.fromEntries(['parking','transit','petFriendly','familyFriendly'].filter(k => input[k] !== undefined).map(k => [k,input[k]])) };
   const occurrences = input.kind === 'market' ? input.occurrences.map(o => ({ id: hash(`${id}:${o.sourceRecordId}`), marketId: id, sourceRecordId: o.sourceRecordId, start: o.start, end: o.end, cancelled: o.cancelled, timezone: TIMEZONE, source: provenance })) : [];
   return { entity, occurrences };
+}
+
+// A recurring market's occurrence window rolls forward every ingest run (this week's
+// date drops off, next week's is appended) even when nothing about the market itself
+// changed. That's not new content and shouldn't re-open review. It only counts as a
+// rolling window when every occurrence that was still upcoming in the OLD input is
+// present, unchanged, in the NEW input — an actual schedule/venue/detail edit, or a
+// newly cancelled upcoming date, fails that check and correctly falls back to review.
+function isRecurringWindowRoll(oldInput, newInput, now = new Date()) {
+  if (!oldInput || oldInput.kind !== 'market' || newInput.kind !== 'market') return false;
+  const { occurrences: oldOcc, ...oldMaster } = oldInput;
+  const { occurrences: newOcc, ...newMaster } = newInput;
+  if (JSON.stringify(oldMaster) !== JSON.stringify(newMaster)) return false;
+  const stillUpcoming = oldOcc.filter(o => Date.parse(o.end) > now.getTime());
+  return stillUpcoming.every(o => newOcc.some(n => n.sourceRecordId === o.sourceRecordId && n.start === o.start && n.end === o.end && n.cancelled === o.cancelled));
 }
 
 // Two sources rarely spell the same event/venue identically ("Scotiabank Saddledome"
@@ -86,4 +116,4 @@ function publishSnapshot(entities, occurrences, now = new Date()) {
   const publicEntities = visible.map(e => Object.fromEntries(fields.filter(k=>e[k]!==undefined).map(k=>[k,e[k]])));
   return { version: 1, generatedAt: now.toISOString(), entities: publicEntities, occurrences: occurrences.filter(o => ids.has(o.marketId) && Date.parse(o.end) > Date.parse(o.start)).map(o=>Object.fromEntries(['id','marketId','sourceRecordId','start','end','timezone','cancelled','source'].filter(k=>o[k]!==undefined).map(k=>[k,o[k]]))) };
 }
-module.exports = { validateSubmission, normalizeRecord, duplicateCandidates, isFresh, eligible, publishSnapshot, hash };
+module.exports = { validateSubmission, normalizeRecord, duplicateCandidates, isRecurringWindowRoll, isFresh, eligible, publishSnapshot, hash };

@@ -9,7 +9,7 @@ const { join } = require('node:path');
 initializeApp();
 
 const RESEND_API_KEY = defineSecret('RESEND_API_KEY');
-const ADMIN_EMAILS = ['jorti104@mtroyal.ca', 'ophillah1863@gmail.com'];
+const ADMIN_EMAILS = ['jorti104@mtroyal.ca', 'ophillah1863@gmail.com', 'aldo@calgarywatch.ca'];
 const STYLE_LABELS = {
   'neighbour-note': 'A note from Calgary Watch',
   'news-brief': 'From the watch desk',

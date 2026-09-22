@@ -32,7 +32,7 @@ export interface Guide extends EntityBase { kind: 'guide'; introduction: string;
 export interface Neighbourhood extends EntityBase { kind: 'neighbourhood'; quadrant: string; entityIds: string[] }
 export interface VendorAppearance { vendorId: string; marketOccurrenceId: string; source: EntitySource }
 export interface ClaimRequest { id: string; entityId: string; requesterUid: string; status: 'pending' | 'approved' | 'rejected'; createdAt: string }
-export interface SubmissionBase { title: string; summary: string; description: string; address: string; venue?: string; organizer: string; sourceUrl: string; categories: string[]; tags: string[]; neighbourhood?: string }
+export interface SubmissionBase { title: string; summary: string; description: string; address: string; venue?: string; organizer: string; sourceUrl: string; categories: string[]; tags: string[]; neighbourhood?: string; image?: EntityImage; coordinates?: { lat: number; lng: number } }
 export interface EventSubmissionInput extends SubmissionBase { kind: 'event'; start: string; end: string; endTimeEstimated?: boolean; pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string }
 export interface MarketSubmissionInput extends SubmissionBase { kind: 'market'; occurrences: { sourceRecordId: string; start: string; end: string; cancelled: boolean }[]; amenities: string[]; parking?: string; transit?: string; petFriendly?: boolean; familyFriendly?: boolean }
 export interface BusinessSubmissionInput extends SubmissionBase { kind: 'business'; website?: string }

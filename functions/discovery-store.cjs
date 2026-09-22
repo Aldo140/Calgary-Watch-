@@ -1,4 +1,4 @@
-const { normalizeRecord, duplicateCandidates, hash } = require('./discovery-domain.cjs');
+const { normalizeRecord, duplicateCandidates, isRecurringWindowRoll, hash } = require('./discovery-domain.cjs');
 const collectionFor = kind => kind === 'event' ? 'events' : 'markets';
 
 async function ingestRecord(db, input, source, recordId, options = {}) {
@@ -11,9 +11,22 @@ async function ingestRecord(db, input, source, recordId, options = {}) {
     const [previous, all, oldDates, previousRaw] = await Promise.all([tx.get(entityRef), tx.get(db.collection(collectionFor(input.kind))), tx.get(db.collection('market_occurrences').where('marketId','==',entityRef.id)), tx.get(rawRef)]);
     const duplicates = duplicateCandidates(normalized.entity, all.docs.map(d => d.data()));
     const old = previous.data();
-    if (old && JSON.stringify(previousRaw.data()?.input) === JSON.stringify(input) && previousRaw.data()?.cancelled === (options.cancelled === true)) {
+    const oldRaw = previousRaw.data();
+    const sameCancelledFlag = oldRaw?.cancelled === (options.cancelled === true);
+    if (old && JSON.stringify(oldRaw?.input) === JSON.stringify(input) && sameCancelledFlag) {
       tx.update(entityRef, { fetchedAt: now });
       tx.update(rawRef, { fetchedAt: now });
+      return { id: old.id, revision: old.revision, duplicateIds: duplicates };
+    }
+    // A recurring market's occurrence window rolling forward is not new content — the
+    // market itself is unchanged, so preserve its existing publication/verification
+    // rather than sending an already-reviewed, unchanged market back into the queue.
+    if (old && old.status === 'published' && sameCancelledFlag && isRecurringWindowRoll(oldRaw?.input, input, new Date(now))) {
+      tx.update(entityRef, { fetchedAt: now, updatedAt: now });
+      const rolledIds = new Set(normalized.occurrences.map(o => o.id));
+      for (const oldDate of oldDates.docs) if (!rolledIds.has(oldDate.id)) tx.set(oldDate.ref, { ...oldDate.data(), cancelled: true, updatedAt: now });
+      for (const o of normalized.occurrences) tx.set(db.collection('market_occurrences').doc(o.id), o);
+      tx.set(rawRef, { input, sourceId: source.id, sourceRecordId: recordId, fetchedAt: now, entityId: old.id, cancelled: options.cancelled === true });
       return { id: old.id, revision: old.revision, duplicateIds: duplicates };
     }
     // Re-fetches never silently republish changed content or resurrect archives.

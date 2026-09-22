@@ -464,6 +464,11 @@ describe('new inventory always lands pending, never auto-published', () => {
   });
 
   it('re-ingesting an unchanged record does not bump its revision or reset its moderation status', () => {
-    assert.match(discoveryStoreSource, /if \(old && JSON\.stringify\(previousRaw\.data\(\)\?\.input\) === JSON\.stringify\(input\)/);
+    assert.match(discoveryStoreSource, /if \(old && JSON\.stringify\(oldRaw\?\.input\) === JSON\.stringify\(input\) && sameCancelledFlag\)/);
+  });
+
+  it('a rolling recurring-market occurrence window does not reopen review on an unchanged, published market', () => {
+    assert.match(discoveryStoreSource, /isRecurringWindowRoll\(oldRaw\?\.input, input, new Date\(now\)\)/);
+    assert.match(discoveryStoreSource, /old\.status === 'published' && sameCancelledFlag && isRecurringWindowRoll/);
   });
 });

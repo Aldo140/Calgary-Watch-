@@ -53,6 +53,30 @@ describe('Strict submission and source boundaries',()=>{
   });
 });
 
+describe('Recurring market occurrence-window rolling',()=>{
+  const now=new Date('2026-09-21T12:00:00Z');
+  const upcoming={sourceRecordId:'sep-23',start:'2026-09-23T15:00:00-06:00',end:'2026-09-23T19:00:00-06:00',cancelled:false};
+  const past={sourceRecordId:'sep-16',start:'2026-09-16T15:00:00-06:00',end:'2026-09-16T19:00:00-06:00',cancelled:false};
+  const nextWeek={sourceRecordId:'sep-30',start:'2026-09-30T15:00:00-06:00',end:'2026-09-30T19:00:00-06:00',cancelled:false};
+  const recurringMarket:MarketSubmissionInput={...market,occurrences:[past,upcoming]};
+
+  it('treats dropping an expired date and appending a new one as a pure window roll',()=>{
+    const rolled={...recurringMarket,occurrences:[upcoming,nextWeek]};
+    assert.equal(domain.isRecurringWindowRoll(recurringMarket,rolled,now),true);
+  });
+  it('is not a window roll if a still-upcoming occurrence itself changed',()=>{
+    const movedTime={...recurringMarket,occurrences:[past,{...upcoming,start:'2026-09-23T18:00:00-06:00',end:'2026-09-23T22:00:00-06:00'}]};
+    assert.equal(domain.isRecurringWindowRoll(recurringMarket,movedTime,now),false);
+  });
+  it('is not a window roll if any master field (venue, amenities, organizer, ...) changed',()=>{
+    const newVenue={...recurringMarket,venue:'A Different Venue'};
+    assert.equal(domain.isRecurringWindowRoll(recurringMarket,newVenue,now),false);
+  });
+  it('is not a window roll for a non-market kind',()=>{
+    assert.equal(domain.isRecurringWindowRoll(event,event,now),false);
+  });
+});
+
 describe('Publication and SEO',()=>{
   it('uses the same approved repository for entity metadata and JSON-LD',()=>{
     const e=published();const repository=createDiscoveryRepository([e]);const path=`/events/${e.slug}`;
@@ -136,5 +160,28 @@ describe('Persistence lifecycle',()=>{
     await store.ingestRecord(db,{...market,occurrences:[{...market.occurrences[0],sourceRecordId:'saturday-2'}]},source,'m');
     const dates=[...db.data.entries()].filter(([k])=>k.startsWith('market_occurrences/')).map(([,v])=>v);
     assert.equal(dates.length,2);assert.equal(dates.filter(d=>d.cancelled).length,1);assert.ok(dates.every(d=>d.marketId===m.id));
+  });
+  it('a rolling occurrence window preserves publication; a real market change still requires review',async()=>{
+    const db=memoryStore();
+    const iso=(deltaMs:number)=>new Date(Date.now()+deltaMs).toISOString();const day=86400000;
+    const stillUpcoming={sourceRecordId:'still-upcoming',start:iso(2*day),end:iso(2*day+4*3600000),cancelled:false};
+    const expired={sourceRecordId:'expired',start:iso(-5*day),end:iso(-5*day+4*3600000),cancelled:false};
+    const nextWindow={sourceRecordId:'next-window',start:iso(9*day),end:iso(9*day+4*3600000),cancelled:false};
+    const recurring={...market,occurrences:[expired,stillUpcoming]};
+    const a=await store.ingestRecord(db,recurring,source,'recurring-market');
+    await store.moderate(db,{kind:'market',id:a.id,revision:a.revision,action:'publish',acknowledgeDuplicates:true},'admin');
+    const revisionBefore=db.data.get(`markets/${a.id}`).revision;
+    assert.equal(db.data.get(`markets/${a.id}`).status,'published');
+
+    // Window rolls forward: the expired date drops off, the still-upcoming one is untouched, a new future one is appended.
+    await store.ingestRecord(db,{...recurring,occurrences:[stillUpcoming,nextWindow]},source,'recurring-market');
+    assert.equal(db.data.get(`markets/${a.id}`).status,'published');
+    assert.equal(db.data.get(`markets/${a.id}`).revision,revisionBefore);
+    const occurrenceIds=[...db.data.entries()].filter(([k,v])=>k.startsWith('market_occurrences/')&&v.marketId===a.id&&!v.cancelled).map(([,v])=>v.sourceRecordId).sort();
+    assert.deepEqual(occurrenceIds,['next-window','still-upcoming']);
+
+    // A genuine change to the market itself still requires review, even mid-rolling-window.
+    await store.ingestRecord(db,{...recurring,venue:'A Different Venue',occurrences:[stillUpcoming,nextWindow]},source,'recurring-market');
+    assert.equal(db.data.get(`markets/${a.id}`).status,'pending');
   });
 });

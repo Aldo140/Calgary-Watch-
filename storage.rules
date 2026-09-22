@@ -10,7 +10,8 @@ service firebase.storage {
       return request.auth != null
              && request.auth.token.email in [
                'jorti104@mtroyal.ca',
-               'ophillah1863@gmail.com'
+               'ophillah1863@gmail.com',
+               'aldo@calgarywatch.ca'
              ]
              && request.auth.token.email_verified == true;
     }

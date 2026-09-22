@@ -20,6 +20,48 @@ describe('Ticketmaster Calgary provider', () => {
     assert.equal(mapTicketmasterEvents([{ id: 'us', name: 'US event', url: 'https://www.ticketmaster.ca/event/us', dates: { start: { localDate: '2026-10-03', localTime: '19:00:00' }, end: { localDate: '2026-10-03', localTime: '21:00:00' } }, _embedded: { venues: [{ country: { countryCode: 'US' }, address: { line1: 'Elsewhere' } }] } }]).length, 0);
   });
 
+  describe('image and coordinates', () => {
+    it('preserves the venue coordinates Ticketmaster supplies', () => {
+      const [record] = mapTicketmasterEvents([{ ...baseEvent, _embedded: { venues: [{ ...baseEvent._embedded.venues[0], location: { latitude: '51.0447', longitude: '-114.0719' } }] } }]);
+      assert.deepEqual(record.input.coordinates, { lat: 51.0447, lng: -114.0719 });
+      assert.doesNotThrow(() => domain.validateSubmission(record.input));
+    });
+
+    it('discards missing or "0,0" placeholder coordinates rather than storing junk data', () => {
+      const [missing] = mapTicketmasterEvents([baseEvent]);
+      assert.equal(missing.input.coordinates, undefined);
+      const [zero] = mapTicketmasterEvents([{ ...baseEvent, _embedded: { venues: [{ ...baseEvent._embedded.venues[0], location: { latitude: '0', longitude: '0' } }] } }]);
+      assert.equal(zero.input.coordinates, undefined);
+    });
+
+    it('picks the widest 16:9 image when one is offered, and attaches provenance credit', () => {
+      const [record] = mapTicketmasterEvents([{ ...baseEvent, images: [
+        { url: 'https://s1.ticketm.net/small.jpg', width: 100, ratio: '16_9' },
+        { url: 'https://s1.ticketm.net/wide.jpg', width: 1024, ratio: '16_9' },
+        { url: 'https://s1.ticketm.net/tall.jpg', width: 2000, ratio: '3_2' },
+      ] }]);
+      assert.equal(record.input.image?.src, 'https://s1.ticketm.net/wide.jpg');
+      assert.equal(record.input.image?.credit, 'Image via Ticketmaster');
+      assert.match(record.input.image?.alt ?? '', /Calgary Concert/);
+      assert.doesNotThrow(() => domain.validateSubmission(record.input));
+    });
+
+    it('falls back to the largest image when no 16:9 crop is offered', () => {
+      const [record] = mapTicketmasterEvents([{ ...baseEvent, images: [
+        { url: 'https://s1.ticketm.net/small.jpg', width: 100, ratio: '3_2' },
+        { url: 'https://s1.ticketm.net/big.jpg', width: 800, ratio: '3_2' },
+      ] }]);
+      assert.equal(record.input.image?.src, 'https://s1.ticketm.net/big.jpg');
+    });
+
+    it('never stores an insecure image URL and has no image when Ticketmaster supplies none', () => {
+      const [insecure] = mapTicketmasterEvents([{ ...baseEvent, images: [{ url: 'http://s1.ticketm.net/insecure.jpg', width: 800, ratio: '16_9' }] }]);
+      assert.equal(insecure.input.image, undefined);
+      const [none] = mapTicketmasterEvents([baseEvent]);
+      assert.equal(none.input.image, undefined);
+    });
+  });
+
   describe('organizer semantics', () => {
     it('never claims Ticketmaster itself is the organizer', () => {
       const [record] = mapTicketmasterEvents([baseEvent]);

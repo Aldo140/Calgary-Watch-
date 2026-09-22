@@ -6,7 +6,7 @@ const options = { region: 'northamerica-northeast1', maxInstances: 5 };
 function database() { return getFirestore(process.env.DISCOVERY_DATABASE_ID || '(default)'); }
 async function assertAdmin(db, auth) {
   if (!auth) throw new HttpsError('unauthenticated','Sign in first.');
-  const approved = auth.token.email_verified === true && ['jorti104@mtroyal.ca','ophillah1863@gmail.com'].includes(auth.token.email);
+  const approved = auth.token.email_verified === true && ['jorti104@mtroyal.ca','ophillah1863@gmail.com','aldo@calgarywatch.ca'].includes(auth.token.email);
   if (!approved && (await db.collection('users').doc(auth.uid).get()).data()?.role !== 'admin') throw new HttpsError('permission-denied','Administrator access required.');
 }
 exports.submitDiscovery = onCall(options, async request => {

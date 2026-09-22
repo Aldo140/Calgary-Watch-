@@ -26,6 +26,7 @@ interface TicketmasterEvent {
   classifications?: Array<{ segment?: { name?: string }; genre?: { name?: string } }>;
   promoter?: { name?: string };
   promoters?: Array<{ name?: string }>;
+  images?: Array<{ url?: string; width?: number; height?: number; ratio?: string }>;
   _embedded?: { venues?: Array<{ name?: string; address?: { line1?: string }; city?: { name?: string }; state?: { stateCode?: string }; country?: { countryCode?: string }; location?: { latitude?: string; longitude?: string } }>; attractions?: Array<{ name?: string }> };
 }
 
@@ -70,6 +71,25 @@ function ticketmasterOrganizer(event: TicketmasterEvent): string {
   return 'Organizer not listed — see ticket source';
 }
 
+/** Ticketmaster's Discovery API supplies event-specific promotional images as part of
+ * normal, intended use of the API — not scraped or hotlinked from elsewhere. Prefer a
+ * wide 16:9 crop (what the card/hero layouts expect), else the largest image offered.
+ * Credit is always attached so displayed photography carries visible provenance. */
+function ticketmasterImage(event: TicketmasterEvent, title: string): { src: string; alt: string; credit: string } | undefined {
+  const candidates = (event.images ?? []).filter((img): img is { url: string; width?: number; height?: number; ratio?: string } => !!img.url && /^https:\/\//.test(img.url));
+  if (!candidates.length) return undefined;
+  const best = candidates.find(img => img.ratio === '16_9' && (img.width ?? 0) >= 640) ?? [...candidates].sort((a, b) => (b.width ?? 0) - (a.width ?? 0))[0];
+  return { src: best.url, alt: `Promotional image for ${title}`, credit: 'Image via Ticketmaster' };
+}
+
+/** Discards the coordinate pair rather than store it when the venue payload has none,
+ * or when it's the common "0,0" placeholder some feeds use for "not actually known." */
+function ticketmasterCoordinates(venue?: { location?: { latitude?: string; longitude?: string } }): { lat: number; lng: number } | undefined {
+  const lat = Number(venue?.location?.latitude); const lng = Number(venue?.location?.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180 || (lat === 0 && lng === 0)) return undefined;
+  return { lat, lng };
+}
+
 function ticketmasterCategories(event: TicketmasterEvent): string[] {
   const names = (event.classifications ?? []).flatMap(classification => [classification.segment?.name, classification.genre?.name]).filter(value => Boolean(value?.trim())).map(value => value!.trim().toLowerCase());
   const categories = new Set<string>();
@@ -91,7 +111,9 @@ export function mapTicketmasterEvents(events: TicketmasterEvent[]): SourceRecord
     if (!address) return [];
     const prices = event.priceRanges?.filter(price => Number.isFinite(price.min) && Number.isFinite(price.max));
     const title = clean(event.name, 'Calgary event');
-    return [{ id: event.id, input: { kind: 'event', title, summary: clean(event.info || event.description, `${title} in Calgary.`), description: clean(event.description || event.info, `${title}. Check the organizer for current details.`), address, organizer: ticketmasterOrganizer(event), sourceUrl: event.url.trim(), categories: ticketmasterCategories(event), tags: [], start, end, ...(event.dates?.end?.localDate && event.dates?.end?.localTime ? {} : { endTimeEstimated: true }), pricing: prices?.length ? 'paid' : 'unknown', ...(prices?.[0] ? { priceRange: [prices[0].min!, prices[0].max!] as [number, number] } : {}), ...(venue.name?.trim() ? { venue: venue.name.trim() } : {}), tickets: event.url.trim() } as InventorySubmissionInput }];
+    const image = ticketmasterImage(event, title);
+    const coordinates = ticketmasterCoordinates(venue);
+    return [{ id: event.id, input: { kind: 'event', title, summary: clean(event.info || event.description, `${title} in Calgary.`), description: clean(event.description || event.info, `${title}. Check the organizer for current details.`), address, organizer: ticketmasterOrganizer(event), sourceUrl: event.url.trim(), categories: ticketmasterCategories(event), tags: [], start, end, ...(event.dates?.end?.localDate && event.dates?.end?.localTime ? {} : { endTimeEstimated: true }), pricing: prices?.length ? 'paid' : 'unknown', ...(prices?.[0] ? { priceRange: [prices[0].min!, prices[0].max!] as [number, number] } : {}), ...(venue.name?.trim() ? { venue: venue.name.trim() } : {}), ...(image ? { image } : {}), ...(coordinates ? { coordinates } : {}), tickets: event.url.trim() } as InventorySubmissionInput }];
   });
 }
 

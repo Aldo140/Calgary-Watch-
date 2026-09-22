@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Calendar } from 'lucide-react';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { upcomingByDay } from '../../lib/discoveryCalendar';
@@ -48,23 +49,30 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
         {TOPICS.map(t => <Link key={t.label} to={t.to}>{t.label}</Link>)}
       </nav>
       <div className="cw-wrap cw-cityhero-grid">
-        <div className="cw-cityhero-main">
+        <div className="cw-cityhero-intro">
           <h1>What's happening in Calgary?</h1>
+          <p>Real events, markets and city updates — sourced and dated, not guessed at.</p>
           <GlobalSearch />
+        </div>
+        <div className="cw-cityhero-main">
           {featured.length ? <div className="cw-cityhero-features">
             {featured[0] && <FeatureCard entity={featured[0]} size="lg" />}
             {featured[1] && <FeatureCard entity={featured[1]} size="md" />}
           </div> : <p className="cw-thisweek-empty">Nothing published yet — check back soon.</p>}
         </div>
         <aside className="cw-cityhero-sidebar" aria-label="This week in Calgary">
-          <h2>This week</h2>
+          <div className="cw-cityhero-sidebar-heading">
+            <span className="cw-cityhero-calendar" aria-hidden="true"><Calendar size={16} /><b>{new Date().getDate()}</b></span>
+            <h2>This week</h2>
+            <Link className="cw-text-link" to="/events">See all</Link>
+          </div>
           {byDay.length ? byDay.map(([date, items]) => (
             <div className="cw-cityhero-day" key={date}>
               <p className="cw-thisweek-date">{dayLabel(date)}</p>
               <ul>{items.map((item, i) => <li key={i}><Link to={item.to}>{item.title}</Link>{item.venue ? <small> · {item.venue}</small> : null}</li>)}</ul>
             </div>
           )) : <p className="cw-thisweek-empty">No confirmed dates yet.</p>}
-          <Link className="cw-text-link" to="/map">Open Live Map ↗</Link>
+          <Link className="cw-text-link cw-cityhero-livelink" to="/map">Open Live Map ↗</Link>
         </aside>
       </div>
     </section>

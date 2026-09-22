@@ -53,6 +53,15 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
           <h1>What's happening in Calgary?</h1>
           <p>Real events, markets and city updates — sourced and dated, not guessed at.</p>
           <GlobalSearch />
+          <div className="cw-cityhero-brief">
+            <div className="cw-cityhero-brief-banner" aria-hidden="true">
+              <img src="/images/illustration/calgary-skyline-rule.webp" alt="" loading="lazy" />
+              <span>THE WEEKLY CALGARY BRIEF</span>
+            </div>
+            <h2>Get the weekly brief</h2>
+            <p>One email a week: what's on, what's new and what changed near you.</p>
+            <Link className="cw-button" to="/map?settings=alerts">Subscribe free</Link>
+          </div>
         </div>
         <div className="cw-cityhero-main">
           {featured.length ? <div className="cw-cityhero-features">

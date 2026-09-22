@@ -35,6 +35,14 @@ import { loadSenderConfig, sendDigestEmail, sleep, type OutgoingEmail } from '..
 
 const ORIGIN = 'https://calgarywatch.ca';
 const DEFAULT_LOOKBACK_MS = 6 * 60 * 60 * 1000;
+/**
+ * The furthest back a catch-up run will look, however stale a reader's cursor
+ * is. A schedule that was paused for a week should not replay a week of
+ * reports the first time it wakes; it also bounds the incident read.
+ */
+const MAX_CATCHUP_MS = 72 * 60 * 60 * 1000;
+/** Hard ceiling on the incident snapshot, newest kept. */
+const INCIDENT_QUERY_LIMIT = 500;
 
 function initFirebase(): Firestore {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -75,12 +83,22 @@ async function loadAlertRecipients(db: Firestore): Promise<AlertRecipient[]> {
     .filter((r) => !onlyEmail || r.email.toLowerCase() === onlyEmail);
 }
 
-async function loadRecentIncidents(db: Firestore, now: number): Promise<Incident[]> {
-  const lookback = Number(process.env.ALERT_LOOKBACK_HOURS ?? '6') * 60 * 60 * 1000;
+/**
+ * Load every public report that could still be new to *someone* on this run.
+ * The window has to reach back to the oldest recipient cursor — a fixed 6h
+ * window silently drops everything between 6h ago and a staler cursor — but is
+ * floored at MAX_CATCHUP so a long pause does not replay days of reports, and
+ * capped at INCIDENT_QUERY_LIMIT rows.
+ */
+async function loadRecentIncidents(db: Firestore, now: number, earliestSince: number): Promise<Incident[]> {
+  const envLookback = Number(process.env.ALERT_LOOKBACK_HOURS ?? '6') * 60 * 60 * 1000;
+  const floor = now - MAX_CATCHUP_MS;
+  const from = Math.max(floor, Math.min(earliestSince, now - Math.max(envLookback, DEFAULT_LOOKBACK_MS)));
   const snapshot = await db.collection('incidents')
     .where('visibility', '==', 'public')
-    .where('timestamp', '>=', now - Math.max(lookback, DEFAULT_LOOKBACK_MS))
+    .where('timestamp', '>=', from)
     .orderBy('timestamp', 'desc')
+    .limit(INCIDENT_QUERY_LIMIT)
     .get();
   return snapshot.docs.map((doc) => {
     const d = doc.data();
@@ -133,15 +151,20 @@ async function run(): Promise<void> {
   console.log(`[alerts] ${recipients.length} account(s) with instant alerts on`);
   if (recipients.length === 0) return;
 
-  const incidents = await loadRecentIncidents(db, now);
-  console.log(`[alerts] ${incidents.length} recent public report(s) to consider`);
+  const cursorFor = (r: AlertRecipient) => r.alertLastSentAt ?? now - DEFAULT_LOOKBACK_MS;
+  const earliestSince = recipients.reduce((min, r) => Math.min(min, cursorFor(r)), now);
+  const incidents = await loadRecentIncidents(db, now, earliestSince);
+  console.log(`[alerts] ${incidents.length} public report(s) since ${new Date(Math.max(earliestSince, now - MAX_CATCHUP_MS)).toISOString()}`);
 
   let sent = 0;
   let failed = 0;
+  let cursorFailures = 0;
   for (const recipient of recipients.slice(0, config.limit)) {
     const prefs = readAlertPreferences(recipient.profile as AlertProfileFields);
     if (!prefs.enabled) continue;
-    const since = recipient.alertLastSentAt ?? now - DEFAULT_LOOKBACK_MS;
+    // Clamp the cursor to the catch-up floor so a very stale account does not
+    // get a burst of everything the loaded window happens to contain.
+    const since = Math.max(cursorFor(recipient), now - MAX_CATCHUP_MS);
     const alerts = selectAlerts({ incidents, prefs, since, now }).slice(0, 5);
     if (alerts.length === 0) continue;
 
@@ -151,8 +174,14 @@ async function run(): Promise<void> {
       sent += 1;
       await sendPush(recipient, alerts, config.dryRun);
       // Advance the cursor only on a real send, so a dry run never suppresses
-      // the next live run's alerts.
-      await db.collection('users').doc(recipient.uid).set({ alertLastSentAt: now }, { merge: true }).catch(() => {});
+      // the next live run's alerts. A failure here means the same alerts resend
+      // next run (a duplicate email), so it is surfaced, not swallowed.
+      try {
+        await db.collection('users').doc(recipient.uid).set({ alertLastSentAt: now }, { merge: true });
+      } catch (error) {
+        cursorFailures += 1;
+        console.warn(`[alerts] cursor NOT advanced for ${recipient.uid} — alerts may resend: ${error instanceof Error ? error.message : String(error)}`);
+      }
       console.log(`[alerts] sent ${alerts.length} to ${recipient.uid}`);
     } else if (result.skipped) {
       await sendPush(recipient, alerts, true);
@@ -164,8 +193,8 @@ async function run(): Promise<void> {
     await sleep(config.throttleMs);
   }
 
-  console.log(`[alerts] done — ${sent} sent, ${failed} failed`);
-  if (failed > 0) process.exitCode = 1;
+  console.log(`[alerts] done — ${sent} sent, ${failed} failed, ${cursorFailures} cursor write failure(s)`);
+  if (failed > 0 || cursorFailures > 0) process.exitCode = 1;
 }
 
 run().catch((error) => {

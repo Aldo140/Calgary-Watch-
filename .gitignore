@@ -22,3 +22,4 @@ design-sources/*
 # Digest email preview output (npm run digest:preview)
 dist-preview/
 functions/assets/
+.vercel

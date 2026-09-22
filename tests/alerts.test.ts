@@ -82,6 +82,21 @@ describe('isWithinQuietHours', () => {
     assert.equal(isWithinQuietHours(p, at(12)), true);
     assert.equal(isWithinQuietHours(p, at(20)), false);
   });
+
+  it('reads the window in the reader timezone, not UTC', () => {
+    // 06:00 UTC is 23:00 the evening before in Edmonton (MST, UTC-7) and
+    // 15:00 the same day in Tokyo (UTC+9) — one instant, opposite verdicts
+    // against a 22:00-07:00 window.
+    const window = { startHour: 22, endHour: 7 };
+    assert.equal(isWithinQuietHours(prefs({ quietHours: window, timezone: 'America/Edmonton' }), at(6)), true);
+    assert.equal(isWithinQuietHours(prefs({ quietHours: window, timezone: 'Asia/Tokyo' }), at(6)), false);
+  });
+
+  it('falls back to UTC when the timezone string is unusable', () => {
+    const p = prefs({ quietHours: { startHour: 22, endHour: 7 }, timezone: 'Not/AZone' });
+    assert.equal(isWithinQuietHours(p, at(3)), true); // 03:00 UTC, inside the window
+    assert.equal(isWithinQuietHours(p, at(12)), false);
+  });
 });
 
 describe('selectAlerts', () => {

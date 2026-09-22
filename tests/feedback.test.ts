@@ -114,6 +114,16 @@ describe('incidentFeedbackAggregate — public fields on the incident', () => {
     const agg = incidentFeedbackAggregate({ feedback_corroborations: 0, feedback_resolved: true });
     assert.equal(feedbackSummary(agg, NOW), 'Reported resolved by nearby residents');
   });
+
+  it('uses the function-written distinct-resident total when present', () => {
+    const agg = incidentFeedbackAggregate({ feedback_total: 5, feedback_corroborations: 3, feedback_resolved: true });
+    assert.equal(agg.total, 5);
+  });
+
+  it('falls back to a derived total for pre-feedback_total documents', () => {
+    const agg = incidentFeedbackAggregate({ feedback_corroborations: 2, feedback_disputed: true });
+    assert.equal(agg.total, 3); // 2 corroborations + 1 for the disputing side
+  });
 });
 
 describe('feedbackSummary', () => {

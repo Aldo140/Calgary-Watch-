@@ -285,7 +285,15 @@ exports.sendDigestPlannerPreview = onDocumentCreated({
  * without seeing which neighbours. The reducer mirrors aggregateFeedback in
  * src/lib/feedback.ts; keep the two in sync.
  */
-exports.onIncidentFeedbackWritten = onDocumentWritten('incident_feedback/{feedbackId}', async (event) => {
+exports.onIncidentFeedbackWritten = onDocumentWritten({
+  document: 'incident_feedback/{feedbackId}',
+  // Same region as the rest of this codebase's functions; the default
+  // (us-central1) would scatter the deployment.
+  region: 'northamerica-northeast1',
+  // A burst of corroboration on one hot report should not fan out unbounded
+  // instances, each re-reading the whole feedback set.
+  maxInstances: 10,
+}, async (event) => {
   const after = event.data && event.data.after && event.data.after.data();
   const before = event.data && event.data.before && event.data.before.data();
   const incidentId = (after && after.incidentId) || (before && before.incidentId);
@@ -294,6 +302,9 @@ exports.onIncidentFeedbackWritten = onDocumentWritten('incident_feedback/{feedba
   const db = getFirestore();
   const snapshot = await db.collection('incident_feedback').where('incidentId', '==', incidentId).get();
 
+  // This reducer MUST stay in lockstep with aggregateFeedback() in
+  // src/lib/feedback.ts — same tie-breaks, same field semantics. The doc id is
+  // uid + '_' + incidentId, so snapshot.size is the distinct-resident count.
   let sawIt = 0;
   let stillHappening = 0;
   let resolved = 0;
@@ -303,9 +314,8 @@ exports.onIncidentFeedbackWritten = onDocumentWritten('incident_feedback/{feedba
     if (d.kind === 'saw_it') sawIt += 1;
     else if (d.kind === 'still_happening') stillHappening += 1;
     else if (d.kind === 'resolved') resolved += 1;
-    if (d.kind === 'saw_it' || d.kind === 'still_happening') {
-      const t = typeof d.updatedAt === 'number' ? d.updatedAt : 0;
-      lastActiveAt = lastActiveAt === null ? t : Math.max(lastActiveAt, t);
+    if ((d.kind === 'saw_it' || d.kind === 'still_happening') && typeof d.updatedAt === 'number') {
+      lastActiveAt = lastActiveAt === null ? d.updatedAt : Math.max(lastActiveAt, d.updatedAt);
     }
   });
   const corroborations = sawIt + stillHappening;
@@ -314,12 +324,13 @@ exports.onIncidentFeedbackWritten = onDocumentWritten('incident_feedback/{feedba
     // update(), not set(merge): never conjure a phantom incident for feedback
     // that points at a browser-derived record which lives only in the API feed.
     await db.collection('incidents').doc(incidentId).update({
+      feedback_total: snapshot.size,
       feedback_corroborations: corroborations,
       feedback_disputed: corroborations > 0 && resolved > 0,
       feedback_resolved: resolved > 0 && resolved >= corroborations,
       feedback_last_active: lastActiveAt,
     });
-    logger.info('Aggregated incident feedback', { incidentId, corroborations, resolved });
+    logger.info('Aggregated incident feedback', { incidentId, total: snapshot.size, corroborations, resolved });
   } catch (error) {
     logger.warn('Feedback target incident not updatable', { incidentId, error: error instanceof Error ? error.message : String(error) });
   }

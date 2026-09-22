@@ -91,7 +91,6 @@ export interface DigestRecipient {
   onboardingCompletedAt?: number | null;
   piiConsentAt?: number | null;
   profileUpdatedAt?: number | null;
-  weeklyDigestTopics?: string[];
   /** Categories the reader chose for their digest; empty/absent means all. */
   digestCategories?: IncidentCategory[];
   digestUnsubToken?: string;

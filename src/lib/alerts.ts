@@ -40,6 +40,35 @@ export interface AlertPreferences {
   categories: IncidentCategory[];
   /** Emergencies bypass zones, categories and quiet hours when true. */
   emergencyAlways: boolean;
+  /**
+   * IANA timezone (e.g. `America/Edmonton`) the quiet-hours window is expressed
+   * in. Absent means UTC — which is almost never what a reader wants, so the
+   * client captures `Intl.DateTimeFormat().resolvedOptions().timeZone` when
+   * alerts are switched on.
+   */
+  timezone?: string;
+}
+
+/**
+ * The reader's local wall-clock hour at `now`, in their configured timezone.
+ * Falls back to UTC when no timezone is set or the zone string is unusable, so
+ * a legacy profile still yields a defined (if blunt) answer.
+ */
+export function localHourAt(now: number, timezone: string | undefined): number {
+  if (timezone) {
+    try {
+      const hour = new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        hour: 'numeric',
+        hour12: false,
+      }).formatToParts(new Date(now)).find((p) => p.type === 'hour')?.value;
+      const parsed = Number(hour);
+      if (Number.isFinite(parsed)) return parsed % 24; // "24" at midnight in some engines
+    } catch {
+      /* bad zone string — fall through to UTC */
+    }
+  }
+  return new Date(now).getUTCHours();
 }
 
 /** Whether an incident falls inside a watched zone. */
@@ -54,14 +83,14 @@ export function zoneMatchesIncident(zone: WatchZone, incident: Incident): boolea
 /**
  * Whether `now` falls in the reader's quiet window.
  *
- * The hour is read in UTC here; the delivery layer is responsible for passing a
- * moment already aligned to the reader's timezone. A window whose start is after
- * its end wraps past midnight (22 → 07 covers the night).
+ * `now` is a plain epoch-ms instant; the window is compared against the
+ * reader's own wall clock (`prefs.timezone`, UTC if unset). A window whose
+ * start is after its end wraps past midnight (22 → 07 covers the night).
  */
 export function isWithinQuietHours(prefs: AlertPreferences, now: number): boolean {
   const q = prefs.quietHours;
   if (!q || q.startHour === q.endHour) return false;
-  const hour = new Date(now).getUTCHours();
+  const hour = localHourAt(now, prefs.timezone);
   return q.startHour < q.endHour
     ? hour >= q.startHour && hour < q.endHour
     : hour >= q.startHour || hour < q.endHour;

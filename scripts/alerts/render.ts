@@ -11,18 +11,41 @@ export interface RenderedAlert {
   subject: string;
   html: string;
   text: string;
+  /** Deep link to the alert settings, carried into List-Unsubscribe. */
+  unsubscribeUrl: string;
 }
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 }
 
+/**
+ * A subject line is a header, not HTML — escaping it would show `&amp;` to the
+ * reader. What actually matters is that a report title cannot inject a newline
+ * (header splitting) or run unboundedly long. Replace every control character
+ * with a space, collapse whitespace, cap the length.
+ */
+function sanitizeSubject(s: string): string {
+  const clean = Array.from(s, (ch) => {
+    const code = ch.codePointAt(0) ?? 0;
+    return code < 0x20 || code === 0x7f ? ' ' : ch;
+  })
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return clean.length > 150 ? `${clean.slice(0, 147)}...` : clean;
+}
+
 export function renderAlertEmail(alerts: Incident[], now: number, origin: string): RenderedAlert {
   const lead = alerts[0];
   const more = alerts.length - 1;
-  const subject = alerts.length === 1
-    ? `Nearby: ${lead.title}`
-    : `${alerts.length} alerts near you — ${lead.title}${more > 0 ? ` +${more}` : ''}`;
+  const subject = sanitizeSubject(
+    alerts.length === 1
+      ? `Nearby: ${lead.title}`
+      : `${alerts.length} alerts near you — ${lead.title}${more > 0 ? ` +${more}` : ''}`,
+  );
+
+  const settingsUrl = `${origin}/map?settings=alerts`;
 
   const line = (i: Incident) =>
     `• ${i.title} — ${i.neighborhood || 'Calgary'} · ${formatRelativeTime(i.timestamp, now)}`;
@@ -33,7 +56,7 @@ export function renderAlertEmail(alerts: Incident[], now: number, origin: string
     '',
     `See the map: ${origin}/map`,
     '',
-    'You are getting this because instant alerts are on. Turn them off any time in your Calgary Watch settings.',
+    `You are getting this because instant alerts are on for your account. Turn them off: ${settingsUrl}`,
   ].join('\n');
 
   const rows = alerts.map((i) => `
@@ -47,9 +70,10 @@ export function renderAlertEmail(alerts: Incident[], now: number, origin: string
     <table style="width:100%;border-collapse:collapse;">${rows}</table>
     <p style="margin-top:18px;"><a href="${origin}/map" style="color:#2F6FB0;font-weight:bold;">Open the map &rarr;</a></p>
     <p style="color:#9AA6B2;font-size:12px;margin-top:20px;">
-      Instant alerts are on for your account. Turn them off any time in your Calgary Watch settings.
+      Instant alerts are on for your account.
+      <a href="${settingsUrl}" style="color:#9AA6B2;">Turn them off or change what you hear about</a>.
     </p>
   </div>`;
 
-  return { subject, html, text };
+  return { subject, html, text, unsubscribeUrl: settingsUrl };
 }

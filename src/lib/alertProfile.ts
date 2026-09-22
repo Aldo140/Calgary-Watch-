@@ -19,6 +19,10 @@ export interface AlertProfileFields {
   alertCategories?: IncidentCategory[];
   alertQuietStartHour?: number;
   alertQuietEndHour?: number;
+  /** IANA zone the quiet-hours bounds are in; captured when alerts turn on. */
+  alertTimezone?: string;
+  /** Opt out of always-on emergency alerts. Absent/true keeps them on. */
+  alertEmergencyAlways?: boolean;
 }
 
 export function readAlertPreferences(profile: AlertProfileFields): AlertPreferences & { enabled: boolean } {
@@ -37,6 +41,9 @@ export function readAlertPreferences(profile: AlertProfileFields): AlertPreferen
     zones,
     quietHours,
     categories: Array.isArray(profile.alertCategories) ? profile.alertCategories : [],
-    emergencyAlways: true,
+    // On by default — a reader has to explicitly set this false to stop
+    // emergency alerts, and doing so is their call to make.
+    emergencyAlways: profile.alertEmergencyAlways !== false,
+    timezone: typeof profile.alertTimezone === 'string' && profile.alertTimezone ? profile.alertTimezone : undefined,
   };
 }

@@ -73,4 +73,6 @@ jobs:
 
       - name: Deploy backend functions
         if: ${{ inputs.target == 'all' || inputs.target == 'functions' }}
-        run: npx firebase-tools deploy --only functions --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive
+        # --force so a function that changes region (delete-old + create-new)
+        # does not wedge the non-interactive run waiting on a delete prompt.
+        run: npx firebase-tools deploy --only functions --project "${{ secrets.VITE_FIREBASE_PROJECT_ID }}" --non-interactive --force

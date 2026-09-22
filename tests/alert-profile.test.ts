@@ -55,4 +55,16 @@ describe('readAlertPreferences', () => {
     assert.equal(readAlertPreferences({ alertsEnabled: true }).enabled, true);
     assert.equal(readAlertPreferences({}).enabled, false);
   });
+
+  it('carries the stored quiet-hours timezone through, blank as undefined', () => {
+    assert.equal(readAlertPreferences({ alertTimezone: 'America/Edmonton' }).timezone, 'America/Edmonton');
+    assert.equal(readAlertPreferences({ alertTimezone: '' }).timezone, undefined);
+    assert.equal(readAlertPreferences({}).timezone, undefined);
+  });
+
+  it('keeps emergency alerts on unless explicitly disabled', () => {
+    assert.equal(readAlertPreferences({}).emergencyAlways, true);
+    assert.equal(readAlertPreferences({ alertEmergencyAlways: true }).emergencyAlways, true);
+    assert.equal(readAlertPreferences({ alertEmergencyAlways: false }).emergencyAlways, false);
+  });
 });

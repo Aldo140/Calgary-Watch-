@@ -91,11 +91,14 @@ export function aggregateFeedback(docs: IncidentFeedback[], _now: number): Feedb
  * empty aggregate rather than an error.
  */
 export function incidentFeedbackAggregate(incident: Pick<Incident,
-  'feedback_corroborations' | 'feedback_disputed' | 'feedback_resolved' | 'feedback_last_active'>): FeedbackAggregate {
+  'feedback_total' | 'feedback_corroborations' | 'feedback_disputed' | 'feedback_resolved' | 'feedback_last_active'>): FeedbackAggregate {
   const corroborations = incident.feedback_corroborations ?? 0;
   const resolvedByResidents = incident.feedback_resolved ?? false;
   return {
-    total: corroborations + (resolvedByResidents || incident.feedback_disputed ? 1 : 0),
+    // The function writes the true distinct-resident count; the derived fallback
+    // is only for incidents last aggregated before feedback_total existed.
+    total: incident.feedback_total
+      ?? corroborations + (resolvedByResidents || incident.feedback_disputed ? 1 : 0),
     corroborations,
     stillHappening: 0,
     resolved: resolvedByResidents ? 1 : 0,

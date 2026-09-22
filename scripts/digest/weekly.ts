@@ -127,7 +127,6 @@ async function processUnsubscribes(db: Firestore): Promise<number> {
       await profileRef.set({
         weeklyDigestOptIn: false,
         weeklyDigestOptInAt: null,
-        weeklyDigestTopics: [],
         digestUnsubscribedAt: Date.now(),
         digestUnsubscribeSource: 'email-link',
       }, { merge: true });
@@ -171,7 +170,6 @@ async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
       onboardingCompletedAt: typeof d.onboardingCompletedAt === 'number' ? d.onboardingCompletedAt : null,
       piiConsentAt: typeof d.piiConsentAt === 'number' ? d.piiConsentAt : null,
       profileUpdatedAt: typeof d.profileUpdatedAt === 'number' ? d.profileUpdatedAt : null,
-      weeklyDigestTopics: Array.isArray(d.weeklyDigestTopics) ? d.weeklyDigestTopics : [],
       digestCategories: Array.isArray(d.digestCategories) ? d.digestCategories : [],
       digestUnsubToken: typeof d.digestUnsubToken === 'string' ? d.digestUnsubToken : undefined,
       digestWelcomeSentAt: typeof d.digestWelcomeSentAt === 'number' ? d.digestWelcomeSentAt : null,

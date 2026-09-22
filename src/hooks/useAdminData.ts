@@ -53,7 +53,6 @@ export type UserProfile = {
   onboardingCompletedAt?: number | null;
   piiConsentAt?: number | null;
   profileUpdatedAt?: number | null;
-  weeklyDigestTopics?: string[];
   digestWelcomeSentAt?: number | null;
   digestUnsubscribedAt?: number | null;
   digestUnsubscribeSource?: string | null;

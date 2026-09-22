@@ -24,7 +24,7 @@ import { buildWatchFeed } from '@/src/lib/watch';
 import { DIGEST_CATEGORY_ORDER, DIGEST_CATEGORY_LABEL } from '@/src/lib/digest';
 import { mergeWatchState, readLocalWatch, writeLocalWatch } from '@/src/lib/watchProfile';
 import { logProductEvent } from '@/src/lib/productEvents';
-import { enablePush, disablePush, isPushSupported, isPushConfigured, pushPermission, type PushStatus } from '@/src/lib/push';
+import { enablePush, disablePush, isPushSupported, isPushConfigured, isPushEnabledHere, type PushStatus } from '@/src/lib/push';
 import { SidebarSkeleton, MapShimmer } from '@/src/components/SkeletonLoader';
 import { useCrimeStats, computeCityAverages } from '@/src/hooks/useCrimeStats';
 import { useAlbertaMunicipalityCrimeStats } from '@/src/hooks/useAlbertaMunicipalityCrimeStats';
@@ -82,7 +82,6 @@ type UserProfileSettings = {
   piiConsentAt?: number;
   weeklyDigestOptIn?: boolean;
   weeklyDigestOptInAt?: number;
-  weeklyDigestTopics?: string[];
   /** Categories the reader chose for their weekly digest; empty/absent = all. */
   digestCategories?: IncidentCategory[];
   profileUpdatedAt?: number;
@@ -102,6 +101,12 @@ type UserProfileSettings = {
   alertCategories?: IncidentCategory[];
   alertQuietStartHour?: number;
   alertQuietEndHour?: number;
+  /** IANA timezone the quiet-hours bounds are read in; captured at opt-in. */
+  alertTimezone?: string;
+  /** Extra named areas (beyond home) the reader wants alerted about. */
+  alertZones?: { id: string; label: string; neighborhood: string; radiusM: number }[];
+  /** Set false to stop always-on emergency alerts. Absent/true keeps them on. */
+  alertEmergencyAlways?: boolean;
   /** Server-side dedup cursor for the alert-sending job. */
   alertLastSentAt?: number;
   /** Registered browser-push tokens for this reader (W3-5). */
@@ -1452,9 +1457,6 @@ export default function MapPage() {
         weeklyDigestOptInAt: profileDraft.weeklyDigestOptIn
           ? (userProfile?.weeklyDigestOptInAt || Date.now())
           : null,
-        weeklyDigestTopics: profileDraft.weeklyDigestOptIn
-          ? ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates']
-          : [],
         digestCategories: profileDraft.weeklyDigestOptIn ? profileDraft.digestCategories : [],
         digestUnsubscribedAt: optedOutNow
           ? Date.now()
@@ -2275,7 +2277,6 @@ export default function MapPage() {
       await setDoc(doc(db, 'users', user.uid), {
         weeklyDigestOptIn: true,
         weeklyDigestOptInAt: Date.now(),
-        weeklyDigestTopics: ['weekly_crime_stats', 'neighbourhood_incidents', 'market_events', 'community_updates'],
         digestUnsubscribedAt: null,
         digestUnsubscribeSource: null,
         profileUpdatedAt: Date.now(),
@@ -2296,20 +2297,42 @@ export default function MapPage() {
 
   const [pushBusy, setPushBusy] = useState(false);
   const [pushResult, setPushResult] = useState<PushStatus | null>(null);
+  const [pushEnabledHere, setPushEnabledHere] = useState(() => isPushEnabledHere());
   const togglePush = useCallback(async () => {
     if (!user || pushBusy) return;
     setPushBusy(true);
     try {
-      if (pushPermission() === 'granted') {
+      // Key off our own local flag, not Notification.permission — the browser
+      // never reverts permission to "default" when a token is revoked, so that
+      // check would strand the toggle permanently in the "on" state.
+      if (isPushEnabledHere()) {
         await disablePush(user.uid);
         setPushResult(null);
       } else {
         setPushResult(await enablePush(user.uid));
       }
     } finally {
+      setPushEnabledHere(isPushEnabledHere());
       setPushBusy(false);
     }
   }, [user, pushBusy]);
+
+  // Turning instant alerts off is also a clean opt-out of push on this device —
+  // otherwise a live token keeps this browser buzzing for alerts the reader
+  // just switched off.
+  const toggleAlerts = useCallback(async (turnOn: boolean) => {
+    if (!user) return;
+    if (turnOn) {
+      let tz: string | undefined;
+      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || undefined; } catch { tz = undefined; }
+      await updateAlertPrefs({ alertsEnabled: true, ...(tz ? { alertTimezone: tz } : {}) });
+    } else {
+      await updateAlertPrefs({ alertsEnabled: false });
+      await disablePush(user.uid);
+      setPushEnabledHere(false);
+      setPushResult(null);
+    }
+  }, [user, updateAlertPrefs]);
 
   return (
     <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
@@ -2489,11 +2512,19 @@ export default function MapPage() {
                             const quietOn = typeof userProfile?.alertQuietStartHour === 'number'
                               && typeof userProfile?.alertQuietEndHour === 'number';
                             const alertCats = userProfile?.alertCategories ?? [];
+                            const emergencyOn = userProfile?.alertEmergencyAlways !== false;
+                            const homeArea = preferredNeighborhood || preferredInferredNeighborhood;
+                            const extraZones = userProfile?.alertZones ?? [];
+                            const pushOnHere = pushEnabledHere;
+                            const pushHint = pushResult === 'denied' ? 'Permission was blocked in your browser.'
+                              : pushResult === 'unavailable' ? 'Not available in this preview build.'
+                              : pushResult === 'error' ? 'Could not turn on — try again.'
+                              : 'Get alerts even when the tab is closed.';
                             return (
                               <div style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4' }}>
                                 <button
                                   type="button"
-                                  onClick={() => void updateAlertPrefs({ alertsEnabled: !alertsOn })}
+                                  onClick={() => void toggleAlerts(!alertsOn)}
                                   aria-pressed={alertsOn}
                                   className="flex w-full items-center gap-3 p-4 text-left"
                                 >
@@ -2518,7 +2549,74 @@ export default function MapPage() {
 
                                 {alertsOn && (
                                   <div className="space-y-3 px-4 pb-4" style={{ borderTop: '1px dashed #E7E0D2' }}>
-                                    <label className="mt-3 flex cursor-pointer items-center gap-2.5">
+                                    {/* Coverage — an alert only fires inside a watched
+                                        area, so say plainly which areas those are. */}
+                                    {homeArea ? (
+                                      <p className="mt-3 text-[13px]" style={{ color: '#5A6B7D' }}>
+                                        Nearby-report alerts cover <strong style={{ color: '#1C2B3A' }}>{[homeArea, ...extraZones.map((z) => z.neighborhood)].join(', ')}</strong>.
+                                      </p>
+                                    ) : (
+                                      <p className="mt-3 text-[13px]" style={{ color: '#C0392B' }}>
+                                        Set a neighbourhood in <strong>Your report area</strong> above so we know where to alert you. Emergency alerts still reach you meanwhile.
+                                      </p>
+                                    )}
+
+                                    {/* Additional watched areas (Work, School, family). */}
+                                    <div className="space-y-1.5">
+                                      <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#5A6B7D' }}>
+                                        Other areas to watch
+                                      </p>
+                                      {extraZones.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5">
+                                          {extraZones.map((z) => (
+                                            <button
+                                              key={z.id}
+                                              type="button"
+                                              onClick={() => void updateAlertPrefs({ alertZones: extraZones.filter((e) => e.id !== z.id) })}
+                                              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-bold"
+                                              style={{ background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }}
+                                            >
+                                              {z.neighborhood} <X size={11} />
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                      <input
+                                        type="text"
+                                        placeholder="Add a neighbourhood, then Enter"
+                                        className="w-full px-3 py-2 text-[13px]"
+                                        style={{ background: '#FFFDF8', border: '1.5px solid #C9D8E4' }}
+                                        onKeyDown={(e) => {
+                                          if (e.key !== 'Enter') return;
+                                          e.preventDefault();
+                                          const name = (e.currentTarget.value || '').trim().slice(0, 80);
+                                          if (!name) return;
+                                          const exists = extraZones.some((z) => z.neighborhood.toLowerCase() === name.toLowerCase())
+                                            || name.toLowerCase() === homeArea.toLowerCase();
+                                          if (!exists && extraZones.length < 6) {
+                                            void updateAlertPrefs({
+                                              alertZones: [...extraZones, { id: `z${Date.now().toString(36)}`, label: name, neighborhood: name, radiusM: 0 }],
+                                            });
+                                          }
+                                          e.currentTarget.value = '';
+                                        }}
+                                      />
+                                    </div>
+
+                                    <label className="flex cursor-pointer items-center gap-2.5">
+                                      <input
+                                        type="checkbox"
+                                        checked={emergencyOn}
+                                        onChange={(e) => void updateAlertPrefs({ alertEmergencyAlways: e.target.checked })}
+                                        className="h-4 w-4 shrink-0"
+                                        style={{ accentColor: '#C0392B' }}
+                                      />
+                                      <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
+                                        <strong style={{ color: '#1C2B3A' }}>Always alert me to emergencies</strong>, anywhere in the city and at any hour.
+                                      </span>
+                                    </label>
+
+                                    <label className="flex cursor-pointer items-center gap-2.5">
                                       <input
                                         type="checkbox"
                                         checked={quietOn}
@@ -2529,7 +2627,7 @@ export default function MapPage() {
                                         style={{ accentColor: '#C0392B' }}
                                       />
                                       <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
-                                        <strong style={{ color: '#1C2B3A' }}>Quiet hours 10 PM–7 AM.</strong> Emergencies still come through.
+                                        <strong style={{ color: '#1C2B3A' }}>Quiet hours 10 PM–7 AM your time.</strong> {emergencyOn ? 'Emergencies still come through.' : 'Nothing comes through.'}
                                       </span>
                                     </label>
 
@@ -2540,18 +2638,18 @@ export default function MapPage() {
                                       <div className="flex items-center justify-between gap-3">
                                         <span className="text-[13px]" style={{ color: '#5A6B7D' }}>
                                           <strong style={{ color: '#1C2B3A' }}>Browser push on this device.</strong>{' '}
-                                          {pushResult === 'denied' ? 'Permission was blocked in your browser.' : 'Get alerts even when the tab is closed.'}
+                                          {pushHint}
                                         </span>
                                         <button
                                           type="button"
                                           disabled={pushBusy}
                                           onClick={() => void togglePush()}
                                           className="shrink-0 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.14em] disabled:opacity-60"
-                                          style={pushPermission() === 'granted'
+                                          style={pushOnHere
                                             ? { background: 'rgba(46,139,122,0.14)', color: '#2E8B7A', border: '1.5px solid rgba(46,139,122,0.45)' }
                                             : { background: '#06162F', color: '#F2EFE8', border: '1.5px solid #06162F' }}
                                         >
-                                          {pushBusy ? '…' : pushPermission() === 'granted' ? 'On' : 'Enable'}
+                                          {pushBusy ? '…' : pushOnHere ? 'Turn off' : 'Enable'}
                                         </button>
                                       </div>
                                     )}

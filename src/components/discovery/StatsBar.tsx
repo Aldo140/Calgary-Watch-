@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
 /**
  * Every number here has to be true, not just plausible — PRODUCT.md rules out invented
@@ -8,11 +8,11 @@ import { useEffect, useRef, useState } from 'react';
  * live pipelines, DISCOVERY_SECTIONS + Live = 6 ways in). Update the page-view figure
  * here as it grows — never let it go stale in the other direction.
  */
-const STATS: { countTo?: number; suffix?: string; display?: string; label: string; color: 'cyan' | 'green' | 'purple' | 'orange' }[] = [
-  { countTo: 100, suffix: 'K+', label: 'Page views and counting', color: 'cyan' },
-  { countTo: 7, label: 'Live city data sources tracked', color: 'green' },
-  { countTo: 6, label: 'Ways to know your city, one site', color: 'purple' },
-  { display: '24/7', label: 'Community reporting, always on', color: 'orange' },
+const STATS: { countTo?: number; suffix?: string; display?: string; label: string; color: 'cyan' | 'green' | 'purple' | 'orange'; width: string }[] = [
+  { countTo: 100, suffix: 'K+', label: 'Page views and counting', color: 'cyan', width: '46%' },
+  { countTo: 7, label: 'Live city data sources tracked', color: 'green', width: '20%' },
+  { countTo: 6, label: 'Ways to know your city, one site', color: 'purple', width: '17%' },
+  { display: '24/7', label: 'Community reporting, always on', color: 'orange', width: '32%' },
 ];
 
 /** Fires once, the first time the element scrolls into view. */
@@ -63,8 +63,8 @@ export function StatsBar() {
       </div>
       <div className={`cw-stats-grid${inView ? ' cw-stats-in-view' : ''}`} ref={ref}>
         {STATS.map((s, i) => (
-          <div className={`cw-stat cw-stat-${s.color}`} key={s.label} style={{ transitionDelay: `${i * 90}ms` }}>
-            <b><StatValue stat={s} active={inView} /></b>
+          <div className={`cw-stat cw-stat-${s.color}`} key={s.label} style={{ transitionDelay: `${i * 110}ms` }}>
+            <b style={{ '--stat-width': s.width } as CSSProperties}><StatValue stat={s} active={inView} /></b>
             <span>{s.label}</span>
           </div>
         ))}

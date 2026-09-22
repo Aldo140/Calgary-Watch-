@@ -24,8 +24,9 @@ export default function DiscoveryHomePage() {
   };
   const topTicker = ["WHAT'S HAPPENING", '🎉', 'THIS WEEKEND', '📅', 'IN YOUR NEIGHBOURHOOD', '📍', 'RIGHT NOW', '⚡'];
   const liveTicker = ['SEE IT', '👀', 'SHARE IT', '📣', 'CALGARY KNOWS', '🧠'];
-  return <SiteLayout><DiscoveryHero /><ModesSplit /><Marquee items={topTicker} /><AuthorityBand /><StatsBar /><div className="cw-wrap cw-home-content">
+  return <SiteLayout><DiscoveryHero /><div className="cw-wrap cw-home-content">
     <LatestAndEvents entities={entities} occurrences={discoveryRepository.occurrences()} />
+    </div><ModesSplit /><Marquee items={topTicker} /><AuthorityBand /><StatsBar /><div className="cw-wrap cw-home-content">
     <section className="cw-start-panel" aria-labelledby="cw-start-heading">
       <div className="cw-start-copy"><p className="cw-eyebrow">Start somewhere good</p><h2 id="cw-start-heading">Make a day of it.</h2><p>Pick a direction and let Calgary fill in the rest.</p></div>
       <nav className="cw-start-links" aria-label="Start exploring Calgary">

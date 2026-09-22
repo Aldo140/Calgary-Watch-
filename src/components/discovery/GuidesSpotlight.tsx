@@ -31,9 +31,9 @@ export function GuidesSpotlight({ entities }: { entities: DiscoveryEntity[] }) {
             </li>
           ))}
         </ul>}
-        <Link className="cw-guides-spotlight-feature" to={entityPath(featured)}>
+        <Link className={`cw-guides-spotlight-feature${featured.image ? '' : ' cw-guides-spotlight-feature-noimage'}`} to={entityPath(featured)}>
           {featured.image && <img src={featured.image.src} alt={featured.image.alt} loading="lazy" />}
-          <div className="cw-guides-spotlight-feature-copy"><strong>{featured.title}</strong><p>{featured.summary}</p></div>
+          <div className={`cw-guides-spotlight-feature-copy${featured.image ? '' : ' cw-guides-spotlight-feature-copy-noimage'}`}><strong>{featured.title}</strong><p>{featured.summary}</p></div>
         </Link>
       </div>
     </section>

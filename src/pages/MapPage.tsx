@@ -47,6 +47,7 @@ import PersonalBriefing from '@/src/components/PersonalBriefing';
 import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 import { getDistance } from '@/src/lib/geo';
+import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
 
 function getCalgaryQuadrant(lat: number, lng: number) {
@@ -365,23 +366,15 @@ function useOfficialOpenData(isAuthReady: boolean) {
         if (!three11Res.ok) throw new Error(`311 API ${three11Res.status}`);
         const three11Data: any[] = await three11Res.json();
 
-        const boring = ['tree', 'shrub', 'waste', 'recycling', 'grass', 'weeds', 'license', 'tax', 'inquiry', 'cart', 'backlane', 'contact us', 'feedback', 'missed collection', 'water main', 'watermain', 'water break'];
-
         for (const item of three11Data) {
           const lat = parseFloat(item.latitude);
           const lng = parseFloat(item.longitude);
           if (!isFinite(lat) || !isFinite(lng)) continue;
 
-          const sName = (item.service_name || '').toLowerCase();
-          if (boring.some(b => sName.includes(b))) continue;
-
-          let category: IncidentCategory = 'infrastructure';
-          if (sName.includes('road') || sName.includes('traffic') || sName.includes('pothole') || sName.includes('pavement') || sName.includes('sidewalk') || sName.includes('signal')) category = 'traffic';
-          if (sName.includes('snow') || sName.includes('ice') || sName.includes('drain') || sName.includes('spill') || sName.includes('water') || sName.includes('flood')) category = 'weather';
-          if (sName.includes('bylaw') || sName.includes('disturbance') || sName.includes('noise') || sName.includes('graffiti')) category = 'crime';
-          if (sName.includes('hazard') || sName.includes('emergency') || sName.includes('danger') || sName.includes('fire')) category = 'emergency';
-
-          if (category === 'traffic') continue;
+          // Never 'emergency': a 311 row is a resident service request, and
+          // loose "fire" matching once flagged fire-code questions as emergencies.
+          const category = classify311Service(item.service_name);
+          if (!category) continue;
 
           const timestamp = new Date(item.requested_date || new Date()).getTime();
           let cleanTitle = item.service_name || 'City Service Issue';

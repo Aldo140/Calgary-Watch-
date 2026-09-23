@@ -119,7 +119,7 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
 
           <GlobalSearch />
           <div className="cw-cityhero-proof" aria-label="CalgaryWatch coverage">
-            <span>Local sources</span><span>Real dates</span><span>Updated daily</span>
+            <span>Local sources</span><span>Real dates</span><span>Source checked</span>
           </div>
 
           <Link className="cw-cityhero-inbox-link" to="/map?settings=alerts">A little Calgary in your inbox <ArrowUpRight size={16} /></Link>

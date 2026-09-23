@@ -57,3 +57,54 @@ export function upcomingByDay(entities: readonly DiscoveryEntity[], occurrences:
   for (const item of items.filter(i => i.date <= cutoff)) (grouped.get(item.date) ?? grouped.set(item.date, []).get(item.date)!).push(item);
   return [...grouped.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(0, 5);
 }
+
+export interface AgendaItem {
+  key: string;
+  kind: 'event' | 'market';
+  title: string;
+  to: string;
+  place?: string;
+  start: string;
+  end: string;
+  free: boolean;
+  indoor: boolean;
+  outdoor: boolean;
+}
+export interface AgendaDay { date: string; items: AgendaItem[] }
+
+/** Calgary calendar date `offset` days after `day` (YYYY-MM-DD, DST-proof via noon UTC). */
+export function addCalgaryDays(day: string, offset: number): string {
+  const d = new Date(`${day}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + offset);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Every one of the next `days` Calgary dates — empty days included, so a quiet
+ * Tuesday reads as quiet rather than disappearing — with the events and market
+ * occurrences that overlap it. A multi-day event appears on each day it runs. */
+export function weekAgenda(entities: readonly DiscoveryEntity[], occurrences: readonly MarketOccurrence[], days = 7, now = new Date()): AgendaDay[] {
+  const today = calgaryDate(now);
+  const week: AgendaDay[] = Array.from({ length: days }, (_, i) => ({ date: addCalgaryDays(today, i), items: [] }));
+  const place = (e: DiscoveryEntity) => ('venue' in e && e.venue) || e.neighbourhood || undefined;
+  const add = (e: DiscoveryEntity, kind: AgendaItem['kind'], key: string, start: string, end: string) => {
+    if (!(Date.parse(end) > now.getTime())) return;
+    const from = calgaryDate(new Date(start)), to = calgaryDate(new Date(end));
+    const tags = [...e.categories, ...e.tags].map(t => t.toLowerCase());
+    for (const day of week) {
+      if (day.date < from || day.date > to) continue;
+      day.items.push({
+        key, kind, title: e.title, to: entityPath(e), place: place(e), start, end,
+        free: e.kind === 'event' && e.pricing === 'free',
+        indoor: tags.includes('indoor'), outdoor: tags.includes('outdoor') || tags.includes('outdoors'),
+      });
+    }
+  };
+  for (const e of entities) {
+    if (e.kind === 'event' && !e.cancelled) add(e, 'event', e.id, e.start, e.end);
+    if (e.kind === 'market') {
+      for (const o of occurrences) if (o.marketId === e.id && !o.cancelled) add(e, 'market', `${e.id}:${o.start}`, o.start, o.end);
+    }
+  }
+  for (const day of week) day.items.sort((a, b) => Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
+  return week;
+}

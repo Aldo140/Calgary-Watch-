@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Menu, X, Search } from 'lucide-react';
-import { DISCOVERY_SECTIONS } from '../../lib/discovery';
+import { ArrowUpRight, Search } from 'lucide-react';
 import '../../styles/discovery.css';
+import '../../styles/site-nav.css';
 
 export function Wordmark() {
   return (
     <Link className="cw-wordmark" to="/" aria-label="CalgaryWatch home">
-      <img 
-        className="cw-wordmark-logo" 
-        src="/images/brand/calgarywatch-city-spark-v2.webp" 
-        width="42" 
-        height="42" 
-        alt="" 
-        aria-hidden="true" 
+      <img
+        className="cw-wordmark-logo"
+        src="/images/brand/calgarywatch-city-spark-v2.webp"
+        width="42"
+        height="42"
+        alt=""
+        aria-hidden="true"
         onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/brand/calgary-watch-plane-mark.webp'; }}
       />
       CALGARY<span>WATCH</span><span className="cw-brand-dot" aria-hidden="true">•</span>
@@ -21,88 +21,117 @@ export function Wordmark() {
   );
 }
 
+const SECTIONS = [
+  { to: '/events', label: 'Events', note: 'What’s on, day by day' },
+  { to: '/markets', label: 'Markets', note: 'Farmers’ and makers’ markets' },
+  { to: '/neighbourhoods', label: 'Neighbourhoods', note: 'The city, quadrant by quadrant' },
+  { to: '/guides', label: 'Guides', note: 'Self-guided days out' },
+  { to: '/local', label: 'Local', note: 'Independent places worth knowing' },
+];
+
+/**
+ * One header for every Discovery page. Desktop: brand, sections, then the
+ * three things people come back for (search, the live map, the email).
+ * Mobile: brand plus Live, search and a full-screen menu. On the homepage it
+ * floats transparently over the live sky until you scroll.
+ */
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
-  const menuButton = useRef<HTMLButtonElement>(null);
+  const burger = useRef<HTMLButtonElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setOpen(false);
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  return (
-    <header className="cw-header">
-      <div className="cw-wrap cw-header-inner">
-        <button 
-          ref={menuButton} 
-          className="cw-menu-button cw-menu-button-labeled" 
-          onClick={() => setOpen(!open)} 
-          aria-expanded={open} 
-          aria-controls="cw-mobile-nav" 
-          aria-label={open ? 'Close menu' : 'Open menu'}
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-          <span>Menu</span>
-        </button>
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = 'hidden';
+    sheet.current?.querySelector<HTMLElement>('a')?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setOpen(false); burger.current?.focus(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => { root.style.overflow = previous; window.removeEventListener('keydown', onKey); };
+  }, [open]);
+
+  const overlay = pathname === '/' && !scrolled && !open;
+
+  return (
+    <header className="cw-nav" data-scrolled={scrolled} data-overlay={overlay} data-open={open}>
+      <div className="cw-wrap cw-nav-bar">
         <Wordmark />
 
-        <div className="cw-header-actions">
-          <Link to="/search" className="cw-header-search-icon" aria-label="Search CalgaryWatch">
-            <Search size={19} />
-          </Link>
-          <Link className="cw-button cw-subscribe-button" to="/map?settings=alerts">
-            <span className="cw-sub-desktop">Subscribe</span>
-            <span className="cw-sub-mobile">Join</span>
-          </Link>
+        <nav className="cw-nav-links" aria-label="Main">
+          {SECTIONS.map(s => <NavLink key={s.to} to={s.to} className="cw-nav-link">{s.label}</NavLink>)}
+          <NavLink to="/community" className="cw-nav-link">Community</NavLink>
+        </nav>
+
+        <div className="cw-nav-actions">
+          <Link to="/search" className="cw-nav-icon" aria-label="Search CalgaryWatch"><Search size={19} /></Link>
+          <Link to="/map" className="cw-nav-live"><span className="cw-nav-pulse" aria-hidden="true" /><span>Live<span className="cw-nav-live-long"> map</span></span></Link>
+          <Link to="/map?settings=alerts" className="cw-nav-cta">Subscribe</Link>
+          <button
+            ref={burger}
+            type="button"
+            className="cw-nav-burger"
+            aria-expanded={open}
+            aria-controls="cw-nav-sheet"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            onClick={() => setOpen(o => !o)}
+          >
+            <span aria-hidden="true" /><span aria-hidden="true" />
+          </button>
         </div>
       </div>
 
-      <nav 
-        id="cw-mobile-nav" 
-        className={`cw-mobile-nav ${open ? 'cw-mobile-nav-open' : ''}`} 
-        hidden={!open} 
-        aria-label="Main navigation" 
-        onKeyDown={e => { if (e.key === 'Escape') { setOpen(false); menuButton.current?.focus(); } }}
-      >
-        <div className="cw-mobile-nav-drawer">
-          <div className="cw-mobile-nav-meta">
-            <span className="cw-mobile-nav-tag">CALGARY NAVIGATION</span>
-            <span className="cw-mobile-nav-status">● LIVE</span>
-          </div>
-
-          <div className="cw-mobile-nav-links">
-            {DISCOVERY_SECTIONS.map(s => (
-              <NavLink key={s.path} to={s.path} className="cw-mobile-nav-item">
-                <span>{s.label}</span>
-                <ArrowUpRight size={16} aria-hidden="true" />
-              </NavLink>
-            ))}
-          </div>
-
-          <div className="cw-mobile-nav-special">
-            <NavLink to="/community" className="cw-mobile-nav-community-card">
-              <span className="cw-mobile-card-tag">Around your neighbourhood</span>
+      <div id="cw-nav-sheet" ref={sheet} className="cw-nav-sheet" hidden={!open} role="dialog" aria-modal="true" aria-label="Menu">
+        <div className="cw-wrap cw-nav-sheet-inner">
+          <nav aria-label="Sections">
+            <ol className="cw-nav-sheet-links">
+              {SECTIONS.map((s, i) => (
+                <li key={s.to} style={{ ['--i' as string]: i }}>
+                  <NavLink to={s.to}>
+                    <span className="cw-nav-sheet-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                    <strong>{s.label}</strong>
+                    <small>{s.note}</small>
+                  </NavLink>
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <div className="cw-nav-sheet-cards">
+            <Link to="/map" className="cw-nav-card cw-nav-card-live">
+              <span className="cw-nav-card-tag"><span className="cw-nav-pulse" aria-hidden="true" /> CalgaryWatch Live</span>
+              <strong>Live map</strong>
+              <small>Reports, traffic, weather, outages and river levels, with sources.</small>
+              <ArrowUpRight size={20} aria-hidden="true" />
+            </Link>
+            <Link to="/community" className="cw-nav-card">
+              <span className="cw-nav-card-tag">Around your block</span>
               <strong>Community Watch</strong>
-              <small>Live incident feed, filters &amp; report verification</small>
-              <b aria-hidden="true">→</b>
-            </NavLink>
-            <Link to="/map" className="cw-mobile-nav-map-card">
-              <span className="cw-mobile-card-tag cw-tag-amber">Real-Time</span>
-              <strong>Live Radar &amp; Map</strong>
-              <small>Bow River telemetry, cameras &amp; road conditions</small>
-              <b aria-hidden="true">↗</b>
+              <small>Neighbourhood reports and how verification works.</small>
+              <ArrowUpRight size={20} aria-hidden="true" />
             </Link>
           </div>
-
-          <div className="cw-mobile-nav-bottom">
-            <Link to="/map?settings=alerts" className="cw-mobile-pref-link">
-              Account &amp; Email Preferences
-            </Link>
+          <div className="cw-nav-sheet-foot">
+            <Link to="/map?settings=alerts" className="cw-nav-cta cw-nav-cta-block">Get the Monday email</Link>
+            <p><Link to="/about">About</Link><Link to="/coverage">Coverage</Link><Link to="/privacy">Privacy</Link></p>
           </div>
         </div>
-      </nav>
+      </div>
     </header>
   );
 }

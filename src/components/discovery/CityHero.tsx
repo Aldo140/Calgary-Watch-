@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Calendar, Compass, MapPin, Sparkles, Sun, Waves, Wind } from 'lucide-react';
+import { ArrowUpRight, Calendar, Compass, MapPin, Sparkles } from 'lucide-react';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { upcomingByDay } from '../../lib/discoveryCalendar';
@@ -92,7 +92,7 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
       if (aIsUpcoming !== bIsUpcoming) return aIsUpcoming ? -1 : 1;
       return aIsUpcoming ? aDate - bDate : bDate - aDate;
     })
-    .slice(0, 2);
+    .slice(0, 1);
   const byDay = upcomingByDay(entities, occurrences);
   const dayLabel = (iso: string) => new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton',
@@ -112,32 +112,10 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
 
       <div className="cw-wrap cw-cityhero-grid">
         <div className="cw-cityhero-intro">
-          <Link to="/map" className="cw-cityhero-telemetry" aria-label="Open Calgary live radar map">
-            <span className="cw-telemetry-live"><span className="cw-radar-dot" aria-hidden="true" /> LIVE WATCH</span>
-            <span className="cw-telemetry-item">51.0447° N · Bow 56.4 m³/s</span>
-            <span className="cw-telemetry-item cw-telemetry-chip">Air: Good</span>
-            <ArrowUpRight size={13} className="cw-telemetry-arrow" aria-hidden="true" />
-          </Link>
+          <img className="cw-cityhero-brandmark" src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" aria-hidden="true" />
           <p className="cw-cityhero-kicker"><Sparkles size={15} /> Calgary, Alberta <span>City guide + live watch</span></p>
           <h1><span>What's happening</span><em>in Calgary?</em></h1>
           <p className="cw-cityhero-deck">Real events, markets and city updates — sourced and dated, not guessed at.</p>
-
-          <div className="cw-cityhero-conditions" aria-label="Live Calgary weather and river telemetry">
-            <div className="cw-hero-cond-item">
-              <Sun size={13} className="cw-cond-sun" aria-hidden="true" />
-              <span><strong>18°C</strong> Sunny · Chinook</span>
-            </div>
-            <span className="cw-hero-cond-div" aria-hidden="true">·</span>
-            <div className="cw-hero-cond-item">
-              <Waves size={13} className="cw-cond-water" aria-hidden="true" />
-              <span>Bow: <strong>56.4 m³/s</strong></span>
-            </div>
-            <span className="cw-hero-cond-div" aria-hidden="true">·</span>
-            <div className="cw-hero-cond-item">
-              <Wind size={13} className="cw-cond-air" aria-hidden="true" />
-              <span>AQHI: <strong>2 (Low)</strong></span>
-            </div>
-          </div>
 
           <GlobalSearch />
           <div className="cw-cityhero-proof" aria-label="CalgaryWatch coverage">
@@ -151,7 +129,6 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
           {featured.length ? (
             <div className="cw-cityhero-features">
               <FeatureCard entity={featured[0]} size="lg" occurrences={occurrences} />
-              {featured[1] && <FeatureCard entity={featured[1]} size="md" occurrences={occurrences} />}
             </div>
           ) : <p className="cw-thisweek-empty">Nothing published yet — check back soon.</p>}
         </div>

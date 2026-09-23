@@ -5,14 +5,11 @@ import { CityHero } from '../components/discovery/CityHero';
 import { ModesSplit } from '../components/discovery/ModesSplit';
 import { QuadrantExplorer } from '../components/discovery/QuadrantExplorer';
 import { Marquee } from '../components/discovery/Marquee';
-import { StatsBar } from '../components/discovery/StatsBar';
-import { AuthorityBand } from '../components/discovery/AuthorityBand';
 import { GuidesSpotlight } from '../components/discovery/GuidesSpotlight';
 import { DiscoveryCard, EditorialGrid, EmptyInventory, SectionHeading } from '../components/discovery/DiscoveryCards';
 import { CityServicesShowcase } from '../components/discovery/CityServicesShowcase';
 import { WeeklyBrief } from '../components/discovery/WeeklyBrief';
 import { RecurringNow } from '../components/discovery/RecurringNow';
-import { NeighborhoodTrendingStories } from '../components/discovery/NeighborhoodTrendingStories';
 import { FloatingCityDock } from '../components/discovery/FloatingCityDock';
 import { EditorialDivider } from '../components/discovery/EditorialDivider';
 import { discoveryRepository } from '../data/discovery';
@@ -28,25 +25,15 @@ export default function DiscoveryHomePage() {
   const topTicker = [
     "WHAT'S HAPPENING", '🎉',
     'THIS WEEKEND', '📅',
-    'BOW RIVER 56.4 m³/s', '🌊',
+    'BOW & ELBOW RIVERS', '🌊',
     'HISTORIC INGLEWOOD', '📍',
     'FARMERS MARKETS', '🥖',
     'BELTLINE CYCLE TRACK', '🚲',
     'KENSINGTON CAFES', '☕',
     'NOSE HILL RIDGES', '🏔️',
-    'REAL-TIME YYC', '⚡'
+    'CALGARY, CURATED', '⚡'
   ];
-  const liveTicker = [
-    'SEE IT', '👀',
-    'SHARE IT', '📣',
-    'CALGARY KNOWS', '🧠',
-    'TRAFFIC & TRANSIT CAMS', '🚆',
-    'ENMAX POWER WATCH', '⚡',
-    'BOW & ELBOW GAUGES', '🌊',
-    'NEIGHBOURHOOD DISPATCHES', '📍',
-    'GROUND-TRUTHED TELEMETRY', '🛡️'
-  ];
-  return <SiteLayout><CityHero entities={entities} occurrences={discoveryRepository.occurrences()} /><ModesSplit /><Marquee items={topTicker} /><AuthorityBand /><StatsBar /><EditorialDivider label="THE CALGARY REGISTRY · TWO RIVERS · FOUR QUADRANTS" emblem="bow" /><div className="cw-wrap cw-home-content">
+  return <SiteLayout><CityHero entities={entities} occurrences={discoveryRepository.occurrences()} /><ModesSplit /><Marquee items={topTicker} /><EditorialDivider label="THE CALGARY REGISTRY · TWO RIVERS · FOUR QUADRANTS" emblem="bow" /><div className="cw-wrap cw-home-content">
     <section className="cw-start-panel" aria-labelledby="cw-start-heading">
       <div className="cw-start-copy">
         <div className="cw-stamp-pill" aria-hidden="true">
@@ -57,8 +44,8 @@ export default function DiscoveryHomePage() {
         <h2 id="cw-start-heading">Make a day of it.</h2>
         <p>Pick a direction and let Calgary fill in the rest.</p>
         <div className="cw-start-perks" aria-hidden="true">
-          <span>✦ 3 Sourced Paths</span>
-          <span>✦ Fresh Friday Drops</span>
+          <span>✦ Three ways into the city</span>
+          <span>✦ Sources on every listing</span>
         </div>
       </div>
       <nav className="cw-start-links" aria-label="Start exploring Calgary">
@@ -72,7 +59,7 @@ export default function DiscoveryHomePage() {
             loading="lazy" 
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/photo/calgary3.webp'; }}
           />
-          <span className="cw-start-link-subtag" aria-hidden="true">2 CURATED EVENTS</span>
+          <span className="cw-start-link-subtag" aria-hidden="true">CURATED CITY PICKS</span>
           <span>WEEKEND</span>
           <strong>Make weekend plans</strong>
           <small>Events, shows and things worth leaving home for</small>
@@ -92,7 +79,7 @@ export default function DiscoveryHomePage() {
             loading="lazy" 
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/photo/calgary5.webp'; }}
           />
-          <span className="cw-start-link-subtag" aria-hidden="true">4 ACTIVE MARKETS</span>
+          <span className="cw-start-link-subtag" aria-hidden="true">VERIFIED SCHEDULES</span>
           <span>LOCAL</span>
           <strong>Find a market</strong>
           <small>Local makers, food and a slower Saturday</small>
@@ -115,7 +102,7 @@ export default function DiscoveryHomePage() {
             loading="lazy" 
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/photo/calgary4.webp'; }}
           />
-          <span className="cw-start-link-subtag" aria-hidden="true">7 CIVIC FEEDS</span>
+          <span className="cw-start-link-subtag" aria-hidden="true">OPEN THE LIVE MAP</span>
           <span>LIVE</span>
           <strong>See Calgary live</strong>
           <small>Reports, traffic, weather and outages nearby</small>
@@ -213,7 +200,7 @@ export default function DiscoveryHomePage() {
       </nav>
     </section>
     <GuidesSpotlight entities={entities} />
-    </div><EditorialDivider label="CURATED DISCOVERY · LIVE CIVIC TELEMETRY" /><Marquee items={liveTicker} variant="dark" /><CityServicesShowcase /><NeighborhoodTrendingStories /><EditorialDivider label="COMMUNITY INTELLIGENCE · VERIFIED SOURCING" emblem="bow" /><div className="cw-wrap cw-home-content">
+    </div><EditorialDivider label="EXPLORE · WATCH · CONNECT · STAY IN THE LOOP" /><CityServicesShowcase /><EditorialDivider label="COMMUNITY INTELLIGENCE · VERIFIED SOURCING" emblem="bow" /><div className="cw-wrap cw-home-content">
     {section('business', 'Keep it local.', '/local', 'local places')}
     <QuadrantExplorer />
     {section('neighbourhood', 'Every neighbourhood has a story.', '/neighbourhoods', 'neighbourhood guides')}

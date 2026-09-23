@@ -79,4 +79,18 @@ describe('Discovery routes and presentation', () => {
     const html = renderRouteHtml(shell, '/events', 'https://calgarywatch.ca');
     assert.match(html, /noindex, nofollow/); assert.ok(!html.includes('rel="preload"'));
   });
+  it('loads verified real events in generated inventory and validates their fields', () => {
+    const raw = readFileSync('src/generated/discovery-index.json', 'utf8');
+    const index = JSON.parse(raw);
+    const events = index.entities.filter((e: { kind: string }) => e.kind === 'event');
+    assert.ok(events.length >= 2, 'Expected at least 2 verified events in discovery-index.json');
+    for (const event of events) {
+      assert.ok(event.title, 'Event must have a title');
+      assert.ok(event.start.includes('-06:00') || event.start.includes('-07:00'), 'Event start must have valid Calgary offset');
+      assert.equal(event.status, 'published');
+      assert.equal(event.verification, 'source-checked');
+      assert.ok(event.sources?.length, 'Event must have source attribution');
+    }
+  });
 });
+

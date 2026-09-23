@@ -1,6 +1,1772 @@
 {
   "version": 1,
-  "generatedAt": null,
-  "entities": [],
-  "occurrences": []
+  "generatedAt": "2026-09-22T15:39:17.436Z",
+  "entities": [
+    {
+      "id": "d6d4476cb83f44b8639ea3ecfd7c",
+      "kind": "market",
+      "slug": "hillhurst-sunnyside-farmers-market-d6d447",
+      "title": "Hillhurst Sunnyside Farmers' Market",
+      "summary": "A year-round Wednesday farmers' market run by the Hillhurst Sunnyside Community Association.",
+      "description": "Weekly community farmers' market at the Hillhurst Sunnyside Community Centre, running year-round every Wednesday afternoon. Local produce, food vendors and makers, and a community social gathering as much as a market.",
+      "categories": [
+        "market",
+        "food"
+      ],
+      "tags": [
+        "farmers market",
+        "local vendors",
+        "weekly"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://farmersmarket.hsca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-09-22T15:39:17.436Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T15:39:17.436Z",
+      "fetchedAt": "2026-09-22T15:39:17.436Z",
+      "updatedAt": "2026-09-22T15:39:17.436Z",
+      "sourceId": "recurring-markets-calgary",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market",
+      "neighbourhood": "Hillhurst",
+      "address": "1320 5 Ave NW, Calgary, AB",
+      "venue": "Hillhurst Sunnyside Community Centre",
+      "organizer": "Hillhurst Sunnyside Community Association",
+      "amenities": [
+        "local produce",
+        "food vendors",
+        "makers"
+      ],
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-market-v1.webp",
+          "alt": "Hillhurst Sunnyside Farmers Market fresh produce and community stalls"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-market-v1.webp",
+        "alt": "Hillhurst Sunnyside Farmers Market fresh produce and community stalls"
+      }
+    },
+    {
+      "id": "f9e4cdd719a09b4128a1865e055e",
+      "kind": "market",
+      "slug": "bridgeland-riverside-farmers-market-f9e4cd",
+      "title": "Bridgeland-Riverside Farmers' Market",
+      "summary": "A seasonal Thursday farmers' market outside the BRCA Hall in Bridgeland.",
+      "description": "Seasonal community farmers' market outside the Bridgeland-Riverside Community Association hall, running Thursday afternoons through the summer and early fall market season.",
+      "categories": [
+        "market",
+        "food"
+      ],
+      "tags": [
+        "farmers market",
+        "local vendors",
+        "seasonal"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://bridgelandfm.ca/location-hours",
+          "kind": "official",
+          "retrievedAt": "2026-09-22T15:39:17.436Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T15:39:17.436Z",
+      "fetchedAt": "2026-09-22T15:39:17.436Z",
+      "updatedAt": "2026-09-22T15:39:17.436Z",
+      "sourceId": "recurring-markets-calgary",
+      "sourceRecordId": "bridgeland-riverside-farmers-market",
+      "neighbourhood": "Bridgeland",
+      "address": "917 Centre Ave NE, Calgary, AB",
+      "venue": "BRCA Hall",
+      "organizer": "Bridgeland-Riverside Community Association",
+      "amenities": [
+        "local produce",
+        "food vendors",
+        "makers"
+      ],
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [
+        {
+          "src": "/images/photo/calgary1.webp",
+          "alt": "Bridgeland-Riverside Farmers Market outside BRCA Hall overlooking the city"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary1.webp",
+        "alt": "Bridgeland-Riverside Farmers Market outside BRCA Hall overlooking the city"
+      }
+    },
+    {
+      "id": "f100f20bace6917b47385f90a0d2",
+      "kind": "market",
+      "slug": "calgary-farmers-market-west-f100f2",
+      "title": "Calgary Farmers' Market West",
+      "summary": "A year-round market and food hall with Alberta growers, makers and places to eat.",
+      "description": "Calgary Farmers' Market West is open year-round with local produce, prepared food, Alberta-made goods, a food hall and family amenities. Official hours are Wednesday through Saturday from 9 a.m. to 7 p.m. and Sunday from 9 a.m. to 5 p.m.",
+      "categories": [
+        "market",
+        "food"
+      ],
+      "tags": [
+        "farmers market",
+        "local vendors",
+        "year-round",
+        "food hall"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+          "kind": "official",
+          "retrievedAt": "2026-09-22T15:39:17.436Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T15:39:17.436Z",
+      "fetchedAt": "2026-09-22T15:39:17.436Z",
+      "updatedAt": "2026-09-22T15:39:17.436Z",
+      "sourceId": "recurring-markets-calgary",
+      "sourceRecordId": "calgary-farmers-market-west",
+      "neighbourhood": "Greenwood/Greenbriar",
+      "address": "25 Greenbriar Dr NW, Calgary, AB",
+      "venue": "Calgary Farmers' Market West",
+      "organizer": "Calgary Farmers' Market",
+      "amenities": [
+        "free parking",
+        "food hall",
+        "kids zone",
+        "accessible"
+      ],
+      "parking": "Free parking in market lots and on nearby streets.",
+      "petFriendly": false,
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-market-v1.webp",
+          "alt": "Calgary Farmers Market West local stalls and food hall"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-market-v1.webp",
+        "alt": "Calgary Farmers Market West local stalls and food hall"
+      }
+    },
+    {
+      "id": "2a55ade6e02d4308cc4f09f59f02",
+      "kind": "market",
+      "slug": "calgary-farmers-market-south-2a55ad",
+      "title": "Calgary Farmers' Market South",
+      "summary": "Calgary's year-round south market for local produce, prepared food and Alberta makers.",
+      "description": "Calgary Farmers' Market South is open year-round from Thursday through Sunday, with local growers, food vendors, handmade goods, a food hall and family amenities.",
+      "categories": [
+        "market",
+        "food"
+      ],
+      "tags": [
+        "farmers market",
+        "local vendors",
+        "year-round",
+        "food hall"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/faqs/",
+          "kind": "official",
+          "retrievedAt": "2026-09-22T15:39:17.436Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T15:39:17.436Z",
+      "fetchedAt": "2026-09-22T15:39:17.436Z",
+      "updatedAt": "2026-09-22T15:39:17.436Z",
+      "sourceId": "recurring-markets-calgary",
+      "sourceRecordId": "calgary-farmers-market-south",
+      "neighbourhood": "Fairview Industrial",
+      "address": "510 77 Ave SE, Calgary, AB",
+      "venue": "Calgary Farmers' Market South",
+      "organizer": "Calgary Farmers' Market",
+      "amenities": [
+        "free parking",
+        "food hall",
+        "kids zone",
+        "accessible"
+      ],
+      "parking": "Free parking in market lots and on nearby streets.",
+      "petFriendly": false,
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [
+        {
+          "src": "/images/photo/calgary5.webp",
+          "alt": "Calgary Farmers Market South community produce and Alberta makers"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary5.webp",
+        "alt": "Calgary Farmers Market South community produce and Alberta makers"
+      }
+    },
+    {
+      "id": "3e483396c1c2ea35ca05c3f284e3",
+      "kind": "market",
+      "slug": "crossroads-market-3e4833",
+      "title": "Crossroads Market",
+      "summary": "A year-round weekend market with fresh food, local vendors, antiques and a food court.",
+      "description": "Crossroads Market has welcomed Calgarians since 1987. The indoor market is open year-round every Friday, Saturday and Sunday from 9 a.m. to 5 p.m., with fresh food, local vendors, crafts, antiques and a food court.",
+      "categories": [
+        "market",
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "public market",
+        "local vendors",
+        "year-round",
+        "weekend"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.crossroadsmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-09-22T15:39:17.436Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T15:39:17.436Z",
+      "fetchedAt": "2026-09-22T15:39:17.436Z",
+      "updatedAt": "2026-09-22T15:39:17.436Z",
+      "sourceId": "recurring-markets-calgary",
+      "sourceRecordId": "crossroads-market",
+      "neighbourhood": "Ramsay",
+      "address": "1235 26 Ave SE, Calgary, AB",
+      "venue": "Crossroads Market",
+      "organizer": "Crossroads Market",
+      "amenities": [
+        "food court",
+        "fresh food",
+        "local vendors"
+      ],
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [
+        {
+          "src": "/images/photo/calgary2.webp",
+          "alt": "Crossroads Market food stalls, crafts, and antiques"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary2.webp",
+        "alt": "Crossroads Market food stalls, crafts, and antiques"
+      }
+    },
+    {
+      "id": "ec8af09816f955c314652ffe376b",
+      "kind": "market",
+      "slug": "farmers-makers-market-at-cspace-ec8af0",
+      "title": "Farmers & Makers Market at cSPACE",
+      "summary": "A Saturday market with local farms, food makers, artists, food trucks and live music.",
+      "description": "The nonprofit Calgary Earth Market Society runs this Alberta Approved Farmers' Market every Saturday during its outdoor season. The 2026 season runs May 23 through October 17 from 10 a.m. to 2 p.m. at cSPACE Marda Loop.",
+      "categories": [
+        "market",
+        "food",
+        "arts"
+      ],
+      "tags": [
+        "farmers market",
+        "makers",
+        "live music",
+        "seasonal"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.farmersmakersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-09-22T15:39:17.436Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T15:39:17.436Z",
+      "fetchedAt": "2026-09-22T15:39:17.436Z",
+      "updatedAt": "2026-09-22T15:39:17.436Z",
+      "sourceId": "recurring-markets-calgary",
+      "sourceRecordId": "farmers-makers-market-marda-loop",
+      "neighbourhood": "South Calgary",
+      "address": "1721 29 Ave SW, Calgary, AB",
+      "venue": "cSPACE Marda Loop",
+      "organizer": "Calgary Earth Market Society",
+      "amenities": [
+        "live music",
+        "food trucks",
+        "kids program",
+        "accessible",
+        "pet friendly"
+      ],
+      "petFriendly": true,
+      "familyFriendly": true,
+      "vendorIds": [],
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "Farmers and Makers Market at cSPACE Marda Loop with food trucks and music"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Farmers and Makers Market at cSPACE Marda Loop with food trucks and music"
+      }
+    },
+    {
+      "id": "hood-inglewood-se",
+      "kind": "neighbourhood",
+      "slug": "inglewood",
+      "title": "Inglewood",
+      "summary": "Calgary’s oldest historic neighbourhood, packed with red-brick heritage, artisan shops, craft breweries, and river pathways.",
+      "description": "Established in 1875 alongside Fort Calgary, Inglewood is Calgary’s cultural and heritage cornerstone. 9th Avenue SE features independent record stores, boutique coffee roasters, vintage clothing emporiums, and renowned dining, all framed by the curve of the Bow River and the Inglewood Bird Sanctuary.",
+      "categories": [
+        "neighbourhoods",
+        "heritage",
+        "walkable"
+      ],
+      "tags": [
+        "SE",
+        "historic",
+        "craft breweries",
+        "bow river",
+        "9 ave se"
+      ],
+      "quadrant": "SE",
+      "sources": [
+        {
+          "name": "City of Calgary Heritage & Inglewood BRZ",
+          "url": "https://www.calgary.ca/planning/projects/inglewood.html",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/quadrant/quadrant-se-collage.webp",
+        "alt": "Inglewood historic brick streetscape and Bow River bend"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "hood-kensington-nw",
+      "kind": "neighbourhood",
+      "slug": "kensington",
+      "title": "Kensington",
+      "summary": "An energetic, tree-lined urban village across the river from downtown, centred on 10th Street NW and Kensington Road.",
+      "description": "Kensington is Calgary’s iconic pedestrian-friendly urban hub. Home to over 250 independent businesses, vibrant patios, indie cinema, and Riley Park, it acts as the primary northwest gateway across the Bow River via the Peace Bridge.",
+      "categories": [
+        "neighbourhoods",
+        "shopping",
+        "walkable",
+        "food"
+      ],
+      "tags": [
+        "NW",
+        "10 st nw",
+        "riley park",
+        "peace bridge",
+        "pedestrian"
+      ],
+      "quadrant": "NW",
+      "sources": [
+        {
+          "name": "Kensington BRZ & City of Calgary",
+          "url": "https://kensingtonyyc.com/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/quadrant/quadrant-nw-collage.webp",
+        "alt": "Kensington 10th Street NW and Peace Bridge entrance"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "hood-beltline-sw",
+      "kind": "neighbourhood",
+      "slug": "beltline",
+      "title": "Beltline",
+      "summary": "Calgary’s vibrant inner-city core, buzzing with high-density dining, 17th Ave retail, historic Central Memorial Park, and public art.",
+      "description": "Positioned immediately south of the Canadian Pacific mainline and downtown towers, the Beltline is Calgary’s most dense and bustling urban neighborhood. Renowned for 17th Avenue SW (the Red Mile), the annual BUMP festival mural galleries, and Central Memorial Park.",
+      "categories": [
+        "neighbourhoods",
+        "food",
+        "arts",
+        "nightlife"
+      ],
+      "tags": [
+        "SW",
+        "17 ave sw",
+        "central memorial park",
+        "bump murals",
+        "dining"
+      ],
+      "quadrant": "SW",
+      "sources": [
+        {
+          "name": "Beltline Urban Development & City of Calgary",
+          "url": "https://www.beltlineyyc.ca/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/quadrant/quadrant-sw-collage.webp",
+        "alt": "Beltline 17th Avenue SW and Central Memorial Park"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "hood-bridgeland-riverside-ne",
+      "kind": "neighbourhood",
+      "slug": "bridgeland-riverside",
+      "title": "Bridgeland-Riverside",
+      "summary": "A sun-drenched escarpment village known for Italian bakeries, Murdock Park panoramic skyline views, and riverside parklets.",
+      "description": "Nestled between the bluff hills and the north bank of the Bow River, Bridgeland is renowned for its welcoming European café culture along 1st Avenue NE, the scenic 4th Street flyover connection to downtown, and extensive community programming centered at the BRCA hall.",
+      "categories": [
+        "neighbourhoods",
+        "food",
+        "walkable",
+        "parks"
+      ],
+      "tags": [
+        "NE",
+        "1 ave ne",
+        "murdock park",
+        "italian bakery",
+        "bow river"
+      ],
+      "quadrant": "NE",
+      "sources": [
+        {
+          "name": "Bridgeland-Riverside Community Association",
+          "url": "https://www.brcacalgary.org/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/quadrant/quadrant-ne-collage.webp",
+        "alt": "Bridgeland 1st Avenue NE and skyline views from Murdoch Park"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "hood-marda-loop-sw",
+      "kind": "neighbourhood",
+      "slug": "marda-loop",
+      "title": "Marda Loop",
+      "summary": "Southwest Calgary’s favourite creative high street, featuring 33rd Avenue boutiques, cSPACE Marda Loop arts incubator, and lively patios.",
+      "description": "Taking its name from the historic Marda Theatre and the streetcar turnaround loop, Marda Loop has grown into a bustling pedestrian destination anchored along 33rd and 34th Avenues SW. Cultural life converges at cSPACE King Edward, a heritage sandstone school transformed into studios and weekend farmers markets.",
+      "categories": [
+        "neighbourhoods",
+        "shopping",
+        "arts",
+        "food"
+      ],
+      "tags": [
+        "SW",
+        "33 ave sw",
+        "cspace",
+        "boutiques",
+        "patios"
+      ],
+      "quadrant": "SW",
+      "sources": [
+        {
+          "name": "Marda Loop BRZ",
+          "url": "https://visitmardaloop.com/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary5.webp",
+        "alt": "Marda Loop 33rd Avenue pedestrian streetscape"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "hood-bowness-nw",
+      "kind": "neighbourhood",
+      "slug": "bowness",
+      "title": "Bowness",
+      "summary": "A storied Bow Valley river town incorporated into Calgary, celebrated for Bowness Park lagoon, mature cottonwood groves, and small-town spirit.",
+      "description": "Once an independent town destination connected by streetcar, Bowness maintains an unmistakable pride of place along the Bow River. Home to Bowness Park’s iconic boat lagoon and winter ice trail, Main Street (Bowness Road) local shops, and direct access to Shouldice Park.",
+      "categories": [
+        "neighbourhoods",
+        "parks",
+        "outdoors",
+        "family"
+      ],
+      "tags": [
+        "NW",
+        "bowness park",
+        "lagoon",
+        "bow river",
+        "historic"
+      ],
+      "quadrant": "NW",
+      "sources": [
+        {
+          "name": "Bowness Community Association & City of Calgary",
+          "url": "https://mybowness.com/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary4.webp",
+        "alt": "Bowness Park lagoon and pathway bridge"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "hood-ramsay-se",
+      "kind": "neighbourhood",
+      "slug": "ramsay",
+      "title": "Ramsay",
+      "summary": "Hilltop heritage community overlooking the confluence, featuring red-brick alleyways, artisan workshops, and sweeping Stampede Park vistas.",
+      "description": "Directly east of the Elbow River and south of Inglewood, Ramsay climbs the Scotsman’s Hill escarpment. Renowned for its preserved historic workers’ cottages, active laneway tool shares, independent design studios, and the iconic city panorama from Scotsman’s Hill.",
+      "categories": [
+        "neighbourhoods",
+        "heritage",
+        "arts",
+        "scenic"
+      ],
+      "tags": [
+        "SE",
+        "scotsmans hill",
+        "heritage brick",
+        "elbow river",
+        "artisan"
+      ],
+      "quadrant": "SE",
+      "sources": [
+        {
+          "name": "Ramsay Community Association",
+          "url": "https://www.ramsaycalgary.ca/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary2.webp",
+        "alt": "Ramsay historic cottage streetscape and skyline ridge"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "entityIds": []
+    },
+    {
+      "id": "guide-bow-river-trail",
+      "kind": "guide",
+      "slug": "a-day-along-the-bow-river",
+      "title": "A Day Along the Bow River",
+      "summary": "From Harvie Passage to the Peace Bridge: 12 km of world-class riverfront paths, public art, and island parklets.",
+      "description": "The Bow River is the spine of Calgary life. This curated itinerary guides you along paved shared paths from the whitewater rapids at Harvie Passage through St. Patrick’s Island, past Prince’s Island Park, and beneath Santiago Calatrava’s Peace Bridge.",
+      "categories": [
+        "guides",
+        "outdoors",
+        "walking",
+        "scenic"
+      ],
+      "tags": [
+        "bow river",
+        "peace bridge",
+        "st patricks island",
+        "harvie passage"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Parks & Pathway Guide",
+          "url": "https://www.calgary.ca/parks/pathways.html",
+          "kind": "editorial"
+        }
+      ],
+      "image": {
+        "src": "/images/hero/calgarywatch-city-guide-v1.webp",
+        "alt": "Peace Bridge and Bow River trail skyline view"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "introduction": "Calgary boasts the largest paved urban pathway network in North America. This route showcases the city at its most natural and connected.",
+      "methodology": "Ground-truthed by CalgaryWatch editors with accessibility notes, bike parking locations, and seasonal riverflow telemetry.",
+      "entries": [],
+      "relatedGuideIds": []
+    },
+    {
+      "id": "guide-farmers-markets",
+      "kind": "guide",
+      "slug": "calgary-farmers-markets-guide",
+      "title": "Calgary Farmers’ Markets & Artisan Food Halls",
+      "summary": "Where to find Alberta sourdough, organic foothills produce, local apiaries, and slow-morning market breakfasts.",
+      "description": "From century-old Crossroads Market to modern community popups at Hillhurst Sunnyside, Bridgeland, and cSPACE Marda Loop, this guide maps Calgary’s best local food hubs.",
+      "categories": [
+        "guides",
+        "food",
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "farmers market",
+        "local food",
+        "alberta growers",
+        "bakeries"
+      ],
+      "sources": [
+        {
+          "name": "CalgaryWatch Editorial Selection",
+          "url": "https://calgarywatch.ca/markets",
+          "kind": "editorial"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-market-v1.webp",
+        "alt": "Calgary farmers market fresh produce and artisan food stalls"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "introduction": "Every quadrant of Calgary has its own weekend market ritual. Here is where the city comes to taste what our province grows.",
+      "methodology": "Curated and verified with published market coordinators, seasonal calendars, and transit accessibility notes.",
+      "entries": [],
+      "relatedGuideIds": []
+    },
+    {
+      "id": "guide-historic-laneways",
+      "kind": "guide",
+      "slug": "historic-laneways-and-craft-coffee",
+      "title": "Historic Laneways & Craft Coffee of Inglewood and Ramsay",
+      "summary": "Discover red-brick carriage houses, roasteries, and independent record stores across Calgary’s oldest postal codes.",
+      "description": "A relaxed walking loop connecting 9th Avenue SE in Inglewood to the sandstone ridge of Ramsay. Enjoy specialty single-origin espresso, hidden courtyard bakeries, and century-old architectural character.",
+      "categories": [
+        "guides",
+        "heritage",
+        "food",
+        "walkable"
+      ],
+      "tags": [
+        "coffee",
+        "inglewood",
+        "ramsay",
+        "brick laneways",
+        "walking"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Heritage Authority & Local Historians",
+          "url": "https://www.calgary.ca/heritage.html",
+          "kind": "editorial"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Calgary historic brick laneway and cozy patio café"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z",
+      "introduction": "Calgary’s historical character is best experienced on foot, where sandstone foundation blocks meet contemporary craft coffee.",
+      "methodology": "Vetted with Calgary heritage building registries and verified independently by local contributors.",
+      "entries": [],
+      "relatedGuideIds": []
+    },
+    {
+      "id": "biz-rosso-inglewood",
+      "kind": "business",
+      "slug": "rosso-coffee-roasters-inglewood",
+      "name": "Rosso Coffee Roasters — Inglewood",
+      "title": "Rosso Coffee Roasters — Inglewood",
+      "summary": "Direct-trade coffee roasted right in SE Calgary, served alongside fresh sourdough pastries in a light-filled industrial brick room.",
+      "description": "A beloved Calgary institution since 2007. Rosso’s Inglewood outpost offers single-origin pour-overs, cold brew, and a welcoming meeting space for neighbours and Bow River cyclists.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "coffee",
+        "inglewood",
+        "pastries",
+        "patio"
+      ],
+      "address": "1402 9 Ave SE, Calgary, AB",
+      "neighbourhood": "Inglewood",
+      "sources": [
+        {
+          "name": "Official Business Registry & Website",
+          "url": "https://rossocoffeeroasters.com/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary2.webp",
+        "alt": "Rosso Coffee Roasters café patio on 9th Ave SE"
+      },
+      "images": [
+        {
+          "src": "/images/photo/calgary2.webp",
+          "alt": "Rosso Coffee Roasters interior and espresso machine"
+        }
+      ],
+      "socials": {
+        "website": "https://rossocoffeeroasters.com"
+      },
+      "services": [
+        "Takeout",
+        "Dine-in",
+        "Retail Beans",
+        "Patio"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z"
+    },
+    {
+      "id": "biz-higher-ground-kensington",
+      "kind": "business",
+      "slug": "higher-ground-cafe-kensington",
+      "name": "Higher Ground Café — Kensington",
+      "title": "Higher Ground Café — Kensington",
+      "summary": "A staple 10th Street NW gathering place serving 100% organic, fair-trade coffee and warm comfort meals until late.",
+      "description": "An anchor of Kensington for over twenty years. Features a fireplace, local art displays on brick walls, and late operating hours popular with university students and neighbours.",
+      "categories": [
+        "food"
+      ],
+      "tags": [
+        "organic coffee",
+        "kensington",
+        "fireplace",
+        "late night"
+      ],
+      "address": "1126 10 St NW, Calgary, AB",
+      "neighbourhood": "Kensington",
+      "sources": [
+        {
+          "name": "Kensington BRZ & Official Website",
+          "url": "https://highergroundcafe.ca/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary1.webp",
+        "alt": "Higher Ground Cafe on 10th Street NW Kensington"
+      },
+      "images": [
+        {
+          "src": "/images/photo/calgary1.webp",
+          "alt": "Higher Ground Cafe storefront"
+        }
+      ],
+      "socials": {
+        "website": "https://highergroundcafe.ca"
+      },
+      "services": [
+        "Organic Coffee",
+        "Late Night",
+        "Outdoor Seating"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z"
+    },
+    {
+      "id": "biz-cspace-marda-loop",
+      "kind": "business",
+      "slug": "cspace-marda-loop-creative-hub",
+      "name": "cSPACE Marda Loop Creative Hub",
+      "title": "cSPACE Marda Loop Creative Hub",
+      "summary": "A historic sandstone school turned vibrant multi-disciplinary creative hub with galleries, studios, and weekend farmers markets.",
+      "description": "Preserving the historic 1912 King Edward School, cSPACE provides workspace for more than 30 artists, creative entrepreneurs, a community coffee shop, and regular indoor-outdoor artisan fairs.",
+      "categories": [
+        "arts",
+        "services",
+        "shopping"
+      ],
+      "tags": [
+        "cspace",
+        "marda loop",
+        "sandstone",
+        "art gallery",
+        "studios"
+      ],
+      "address": "1721 29 Ave SW, Calgary, AB",
+      "neighbourhood": "Marda Loop",
+      "sources": [
+        {
+          "name": "cSPACE Projects",
+          "url": "https://cspaceprojects.com/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "cSPACE Marda Loop sandstone schoolhouse and courtyard"
+      },
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "cSPACE Marda Loop community gathering"
+        }
+      ],
+      "socials": {
+        "website": "https://cspaceprojects.com"
+      },
+      "services": [
+        "Galleries",
+        "Artist Studios",
+        "Community Events",
+        "Coffee Bar"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z"
+    },
+    {
+      "id": "biz-lukes-drug-mart-bridgeland",
+      "kind": "business",
+      "slug": "lukes-drug-mart-bridgeland",
+      "name": "Luke’s Drug Mart — Bridgeland",
+      "title": "Luke’s Drug Mart — Bridgeland",
+      "summary": "Calgary’s oldest independent pharmacy, transformed into a cultural hub with specialty vinyl, soft serve ice cream, and espresso.",
+      "description": "Operating in Bridgeland since 1951, Luke’s blends a neighborhood pharmacy with curated vinyl records, specialty groceries, Four Barrel espresso, and seasonal soft serve.",
+      "categories": [
+        "shopping",
+        "food",
+        "services"
+      ],
+      "tags": [
+        "vinyl",
+        "soft serve",
+        "bridgeland",
+        "independent pharmacy",
+        "espresso"
+      ],
+      "address": "112 4 St NE, Calgary, AB",
+      "neighbourhood": "Bridgeland",
+      "sources": [
+        {
+          "name": "Luke’s Drug Mart Official & Bridgeland BRZ",
+          "url": "https://lukesdrugmart.com/",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary3.webp",
+        "alt": "Luke’s Drug Mart in Bridgeland"
+      },
+      "images": [
+        {
+          "src": "/images/photo/calgary3.webp",
+          "alt": "Luke’s Drug Mart shelves and vinyl records"
+        }
+      ],
+      "socials": {
+        "website": "https://lukesdrugmart.com"
+      },
+      "services": [
+        "Pharmacy",
+        "Vinyl Records",
+        "Coffee Bar",
+        "Specialty Groceries"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T16:44:40.770Z",
+      "updatedAt": "2026-09-22T16:44:40.770Z"
+    },
+    {
+      "id": "event-alcove-love-letters",
+      "kind": "event",
+      "slug": "love-letters-from-the-diaspora",
+      "title": "Love Letters From the Diaspora",
+      "summary": "An evening of storytelling, poetry and an open mic at Alcove Beltline.",
+      "description": "Presented by The Fourth Space. All ages welcome. The venue lists admission at $5 plus fees and tax; confirm ticket availability with the organizer. Steps are required to enter the Beltline venue.",
+      "categories": [
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "poetry",
+        "storytelling",
+        "beltline",
+        "open mic"
+      ],
+      "start": "2026-09-26T18:00:00-06:00",
+      "end": "2026-09-26T20:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "organizer": "Alcove Centre for the Arts",
+      "address": "1040 8 Street SW, Calgary, Alberta",
+      "neighbourhood": "Beltline",
+      "sources": [
+        {
+          "name": "Alcove Centre for the Arts",
+          "url": "https://www.alcoveartscentre.ca/upcomingprograms/love-letters-from-the-diaspora",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Love Letters From the Diaspora storytelling at Alcove Beltline"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T21:52:55.422Z",
+      "updatedAt": "2026-09-22T21:52:55.422Z"
+    },
+    {
+      "id": "event-alcove-comics-workshop",
+      "kind": "event",
+      "slug": "comics-workshop-concept-to-comic",
+      "title": "Comics Workshop: Concept to Comic",
+      "summary": "Explore comic storytelling with Daniele and Gabe at Alcove Core.",
+      "description": "Registration is required. Admission is by donation. The organizer recommends ages 16 and over unless accompanied by a parent or guardian; all skill levels are welcome.",
+      "categories": [
+        "arts",
+        "indoor"
+      ],
+      "tags": [
+        "comics",
+        "workshop",
+        "downtown",
+        "sketching"
+      ],
+      "start": "2026-09-27T13:30:00-06:00",
+      "end": "2026-09-27T15:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Alcove Centre for the Arts",
+      "address": "244 7 Avenue SW, Calgary, Alberta",
+      "neighbourhood": "Downtown",
+      "sources": [
+        {
+          "name": "Alcove Centre for the Arts",
+          "url": "https://www.alcoveartscentre.ca/upcomingprograms/comics-workshop-sept-27",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary1.webp",
+        "alt": "Comics Workshop at Alcove Core in downtown Calgary"
+      },
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-09-22T21:52:55.422Z",
+      "updatedAt": "2026-09-22T21:52:55.422Z"
+    }
+  ],
+  "occurrences": [
+    {
+      "id": "6038adc9a19e7cd6c0f2aea2b2d5",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-09-23:15:00:00",
+      "start": "2026-09-23T15:00:00-06:00",
+      "end": "2026-09-23T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "4f42d34a03560c3afe62d0f1599c",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-09-30:15:00:00",
+      "start": "2026-09-30T15:00:00-06:00",
+      "end": "2026-09-30T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "4f9774df12ceb053eeff5798a1a0",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-10-07:15:00:00",
+      "start": "2026-10-07T15:00:00-06:00",
+      "end": "2026-10-07T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "1b7c0895541971c0344e1dbd9739",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-10-14:15:00:00",
+      "start": "2026-10-14T15:00:00-06:00",
+      "end": "2026-10-14T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "b51de8ea480d71c283b57d960864",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-10-21:15:00:00",
+      "start": "2026-10-21T15:00:00-06:00",
+      "end": "2026-10-21T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "4e1a9c0b27cae6b9e67f73ef7c65",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-10-28:15:00:00",
+      "start": "2026-10-28T15:00:00-06:00",
+      "end": "2026-10-28T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "4b2ba0e06ede1d679f82702b2621",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-11-04:15:00:00",
+      "start": "2026-11-04T15:00:00-07:00",
+      "end": "2026-11-04T19:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "cead2178823f61f35d68a657b12f",
+      "marketId": "d6d4476cb83f44b8639ea3ecfd7c",
+      "sourceRecordId": "hillhurst-sunnyside-farmers-market:2026-11-11:15:00:00",
+      "start": "2026-11-11T15:00:00-07:00",
+      "end": "2026-11-11T19:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://farmersmarket.hsca.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "757a9e3c10e0655ef9ec1bf3460d",
+      "marketId": "f9e4cdd719a09b4128a1865e055e",
+      "sourceRecordId": "bridgeland-riverside-farmers-market:2026-09-24:15:30:00",
+      "start": "2026-09-24T15:30:00-06:00",
+      "end": "2026-09-24T19:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://bridgelandfm.ca/location-hours",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "850ec3b9429a31308563272b7ec5",
+      "marketId": "f9e4cdd719a09b4128a1865e055e",
+      "sourceRecordId": "bridgeland-riverside-farmers-market:2026-10-01:15:30:00",
+      "start": "2026-10-01T15:30:00-06:00",
+      "end": "2026-10-01T19:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://bridgelandfm.ca/location-hours",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "4cd3cf165d89847b394b275f4f85",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-09-23:09:00:00",
+      "start": "2026-09-23T09:00:00-06:00",
+      "end": "2026-09-23T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "2ae54f978583dbe1594f007b3d5e",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-09-24:09:00:00",
+      "start": "2026-09-24T09:00:00-06:00",
+      "end": "2026-09-24T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "094a7e5ef9e98224a780da6199b9",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-09-25:09:00:00",
+      "start": "2026-09-25T09:00:00-06:00",
+      "end": "2026-09-25T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "a2a4443f5c8bb4247eb6a2f61c07",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-09-26:09:00:00",
+      "start": "2026-09-26T09:00:00-06:00",
+      "end": "2026-09-26T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "a328eafa0e5d4931b63e6251a1dd",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-09-27:09:00:00",
+      "start": "2026-09-27T09:00:00-06:00",
+      "end": "2026-09-27T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "eb686c68c0dbf1e7c129c6623d16",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-09-30:09:00:00",
+      "start": "2026-09-30T09:00:00-06:00",
+      "end": "2026-09-30T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "9469e44e90c4955573ea9c74adbf",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-01:09:00:00",
+      "start": "2026-10-01T09:00:00-06:00",
+      "end": "2026-10-01T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "106719240ff2d9c9bfc0e0debc71",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-02:09:00:00",
+      "start": "2026-10-02T09:00:00-06:00",
+      "end": "2026-10-02T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "42fcdcbb9a7682d9958ab095fdd9",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-03:09:00:00",
+      "start": "2026-10-03T09:00:00-06:00",
+      "end": "2026-10-03T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "6a75bae27e456ee708f43cc30a65",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-04:09:00:00",
+      "start": "2026-10-04T09:00:00-06:00",
+      "end": "2026-10-04T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "9d8ed2a97f1efdbe864e0de2b3b7",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-07:09:00:00",
+      "start": "2026-10-07T09:00:00-06:00",
+      "end": "2026-10-07T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "468a44d77a1575dd035e794ead08",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-08:09:00:00",
+      "start": "2026-10-08T09:00:00-06:00",
+      "end": "2026-10-08T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "abec890e165a37aafade347e8579",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-09-24:09:00:00",
+      "start": "2026-09-24T09:00:00-06:00",
+      "end": "2026-09-24T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "b37f8abc7b757b1ad7f7218da830",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-09-25:09:00:00",
+      "start": "2026-09-25T09:00:00-06:00",
+      "end": "2026-09-25T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "c14b5a21481b20412acb976a1802",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-09-26:09:00:00",
+      "start": "2026-09-26T09:00:00-06:00",
+      "end": "2026-09-26T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "0625c80060eebf5cd6dd756fe97e",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-09-27:09:00:00",
+      "start": "2026-09-27T09:00:00-06:00",
+      "end": "2026-09-27T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "34ae1674209f19dd2be8266a51c6",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-01:09:00:00",
+      "start": "2026-10-01T09:00:00-06:00",
+      "end": "2026-10-01T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "4d1a3d93074634e38996ddde715a",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-02:09:00:00",
+      "start": "2026-10-02T09:00:00-06:00",
+      "end": "2026-10-02T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "936e96a2d18c63e8816741f855d1",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-03:09:00:00",
+      "start": "2026-10-03T09:00:00-06:00",
+      "end": "2026-10-03T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "5b7c4acc3d355877682e599c552e",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-04:09:00:00",
+      "start": "2026-10-04T09:00:00-06:00",
+      "end": "2026-10-04T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "aaef949ec4bf8a224c485bd97352",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-08:09:00:00",
+      "start": "2026-10-08T09:00:00-06:00",
+      "end": "2026-10-08T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "5bf10192e19f5be731799b888413",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-09:09:00:00",
+      "start": "2026-10-09T09:00:00-06:00",
+      "end": "2026-10-09T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "a552a91eb9f5cfde11791b5c34a6",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-10:09:00:00",
+      "start": "2026-10-10T09:00:00-06:00",
+      "end": "2026-10-10T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "ba467bdd932cd8ab9f99fc6ed4e4",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-11:09:00:00",
+      "start": "2026-10-11T09:00:00-06:00",
+      "end": "2026-10-11T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "39a04f574089c8bbd7c1d72dfeec",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-09-25:09:00:00",
+      "start": "2026-09-25T09:00:00-06:00",
+      "end": "2026-09-25T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "b6fbac587c985dd7adf78eb17bf1",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-09-26:09:00:00",
+      "start": "2026-09-26T09:00:00-06:00",
+      "end": "2026-09-26T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "94c8b8df527c9487256357e0a574",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-09-27:09:00:00",
+      "start": "2026-09-27T09:00:00-06:00",
+      "end": "2026-09-27T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "ff83151eb9e73bec981e79c8236b",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-02:09:00:00",
+      "start": "2026-10-02T09:00:00-06:00",
+      "end": "2026-10-02T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "f6a23dec1f8a2325fba7b60a4d35",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-03:09:00:00",
+      "start": "2026-10-03T09:00:00-06:00",
+      "end": "2026-10-03T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "3c9e1f131bcb01f634de926e7464",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-04:09:00:00",
+      "start": "2026-10-04T09:00:00-06:00",
+      "end": "2026-10-04T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "fe934f31a04ac9604a4f4a1b3dad",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-09:09:00:00",
+      "start": "2026-10-09T09:00:00-06:00",
+      "end": "2026-10-09T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "530d1940bafc8886bd0ffd393b45",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-10:09:00:00",
+      "start": "2026-10-10T09:00:00-06:00",
+      "end": "2026-10-10T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "fe5e30a1a6d8064dd3e051faee05",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-11:09:00:00",
+      "start": "2026-10-11T09:00:00-06:00",
+      "end": "2026-10-11T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "f37dccaca2e3c33464c1733710b5",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-16:09:00:00",
+      "start": "2026-10-16T09:00:00-06:00",
+      "end": "2026-10-16T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "043bba0fa9b3f8b1ebc42bfe22a2",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-17:09:00:00",
+      "start": "2026-10-17T09:00:00-06:00",
+      "end": "2026-10-17T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "994b12c3c6663725a17c99ec47be",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-18:09:00:00",
+      "start": "2026-10-18T09:00:00-06:00",
+      "end": "2026-10-18T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "6de79c74f172d60f3bb7fb5b1be9",
+      "marketId": "ec8af09816f955c314652ffe376b",
+      "sourceRecordId": "farmers-makers-market-marda-loop:2026-09-26:10:00:00",
+      "start": "2026-09-26T10:00:00-06:00",
+      "end": "2026-09-26T14:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.farmersmakersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "f99e7b27693533ae83c87bbcdcd3",
+      "marketId": "ec8af09816f955c314652ffe376b",
+      "sourceRecordId": "farmers-makers-market-marda-loop:2026-10-03:10:00:00",
+      "start": "2026-10-03T10:00:00-06:00",
+      "end": "2026-10-03T14:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.farmersmakersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "0d7e065b1fac77417b8d9459aeff",
+      "marketId": "ec8af09816f955c314652ffe376b",
+      "sourceRecordId": "farmers-makers-market-marda-loop:2026-10-10:10:00:00",
+      "start": "2026-10-10T10:00:00-06:00",
+      "end": "2026-10-10T14:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.farmersmakersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    },
+    {
+      "id": "6d5c2834a74853f079c58d3948e3",
+      "marketId": "ec8af09816f955c314652ffe376b",
+      "sourceRecordId": "farmers-makers-market-marda-loop:2026-10-17:10:00:00",
+      "start": "2026-10-17T10:00:00-06:00",
+      "end": "2026-10-17T14:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.farmersmakersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-09-22T15:39:17.436Z"
+      }
+    }
+  ]
 }

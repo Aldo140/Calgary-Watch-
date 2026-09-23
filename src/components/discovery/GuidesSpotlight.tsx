@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Compass, MapPin, Sparkles } from 'lucide-react';
 import type { DiscoveryEntity, Guide } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { EmptyInventory } from './DiscoveryCards';
@@ -17,24 +17,75 @@ export function GuidesSpotlight({ entities }: { entities: DiscoveryEntity[] }) {
     <section className="cw-guides-spotlight" aria-labelledby="cw-guides-heading">
       <div className="cw-guides-spotlight-heading">
         <span className="cw-accent-bar" aria-hidden="true" />
-        <h2 id="cw-guides-heading">Guides</h2>
-        <Link className="cw-text-link" to="/guides">View all <ArrowUpRight size={18} /></Link>
+        <div>
+          <p className="cw-eyebrow"><Compass size={13} /> Field Guides</p>
+          <h2 id="cw-guides-heading">Take the scenic route.</h2>
+        </div>
+        <Link className="cw-text-link" to="/guides">View all guides <ArrowUpRight size={18} /></Link>
       </div>
       <div className="cw-guides-spotlight-grid">
-        {list.length > 0 && <ul className="cw-guides-spotlight-list">
-          {list.map(g => (
-            <li key={g.id}>
-              <Link to={entityPath(g)}>
-                {g.image && <img src={g.image.src} alt="" loading="lazy" />}
-                <div><span className="cw-eyebrow">{g.categories[0] || 'Guide'}</span><strong>{g.title}</strong></div>
-              </Link>
-            </li>
-          ))}
-        </ul>}
-        <Link className={`cw-guides-spotlight-feature${featured.image ? '' : ' cw-guides-spotlight-feature-noimage'}`} to={entityPath(featured)}>
-          {featured.image && <img src={featured.image.src} alt={featured.image.alt} loading="lazy" />}
-          <div className={`cw-guides-spotlight-feature-copy${featured.image ? '' : ' cw-guides-spotlight-feature-copy-noimage'}`}><strong>{featured.title}</strong><p>{featured.summary}</p></div>
-        </Link>
+        {list.length > 0 && (
+          <ul className="cw-guides-spotlight-list">
+            {list.map(g => {
+              const imgSrc = g.image?.src || '/images/hero/calgarywatch-city-guide-v1.webp';
+              const imgAlt = g.image?.alt || `${g.title} in Calgary`;
+              const stops = g.entries?.length || 3;
+              return (
+                <li key={g.id}>
+                  <Link to={entityPath(g)} className="cw-guide-list-item">
+                    <div className="cw-guide-list-thumb">
+                      <img 
+                        src={imgSrc} 
+                        alt={imgAlt} 
+                        loading="lazy" 
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/calgarywatch-city-guide-v1.webp'; }}
+                      />
+                    </div>
+                    <div className="cw-guide-list-copy">
+                      <div className="cw-guide-list-meta">
+                        <span className="cw-eyebrow">{g.categories[0] || 'Guide'}</span>
+                        <span className="cw-guide-stops-chip">{stops} stops</span>
+                      </div>
+                      <strong>{g.title}</strong>
+                    </div>
+                    <ArrowUpRight size={16} className="cw-guide-arrow" aria-hidden="true" />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {(() => {
+          const featImg = featured.image?.src || '/images/hero/calgarywatch-city-guide-v1.webp';
+          const featAlt = featured.image?.alt || `${featured.title} Calgary guide`;
+          const featStops = featured.entries?.length || 4;
+          return (
+            <Link className="cw-guides-spotlight-feature" to={entityPath(featured)}>
+              <div className="cw-guide-feature-art">
+                <img 
+                  src={featImg} 
+                  alt={featAlt} 
+                  loading="lazy" 
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/calgarywatch-city-guide-v1.webp'; }}
+                />
+                <span className="cw-guide-feature-badge">
+                  <Sparkles size={12} /> FEATURED FIELD GUIDE
+                </span>
+                <span className="cw-guide-stops-stamp">
+                  <MapPin size={12} /> {featStops} Curated Stops
+                </span>
+              </div>
+              <div className="cw-guides-spotlight-feature-copy">
+                <span className="cw-eyebrow">{featured.categories[0] || 'Curated Itinerary'}</span>
+                <strong>{featured.title}</strong>
+                <p>{featured.summary}</p>
+                <span className="cw-guide-read-pill">
+                  Read Field Guide <ArrowUpRight size={14} />
+                </span>
+              </div>
+            </Link>
+          );
+        })()}
       </div>
     </section>
   );

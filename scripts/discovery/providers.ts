@@ -164,10 +164,11 @@ export interface RecurringMarketDefinition {
   organizer: string; sourceUrl: string;
   categories: string[]; tags: string[];
   amenities: string[]; parking?: string; transit?: string; petFriendly?: boolean; familyFriendly?: boolean;
-  /** 0 = Sunday .. 6 = Saturday, evaluated in America/Edmonton. */
-  dayOfWeek: number;
-  /** "HH:MM:SS" local wall-clock time. */
-  startTime: string; endTime: string;
+  /** One or more weekly opening windows, evaluated in America/Edmonton. */
+  schedules?: Array<{ dayOfWeek: number; startTime: string; endTime: string }>;
+  /** Legacy single-day schedule. Prefer schedules for new records. */
+  dayOfWeek?: number;
+  startTime?: string; endTime?: string;
   /** Inclusive "YYYY-MM-DD" bounds for a seasonal market; omit for year-round. */
   seasonStart?: string; seasonEnd?: string;
   /** How many upcoming dates to publish as occurrences. Defaults to 8. */
@@ -176,17 +177,28 @@ export interface RecurringMarketDefinition {
 
 const WEEKDAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function nextOccurrenceDates(market: RecurringMarketDefinition, now: Date): string[] {
+function recurringSchedules(market: RecurringMarketDefinition) {
+  if (market.schedules?.length) return market.schedules;
+  if (market.dayOfWeek === undefined || !market.startTime || !market.endTime) throw Error(`Recurring market ${market.id} has no schedule`);
+  return [{ dayOfWeek: market.dayOfWeek, startTime: market.startTime, endTime: market.endTime }];
+}
+
+function nextOccurrenceSlots(market: RecurringMarketDefinition, now: Date) {
   const count = market.occurrenceCount ?? 8;
-  const dates: string[] = [];
+  const slots: Array<{ date: string; startTime: string; endTime: string }> = [];
+  const schedules = recurringSchedules(market);
   const cursor = new Date(now.getTime());
-  for (let i = 0; i < 400 && dates.length < count; i++) {
+  for (let i = 0; i < 400 && slots.length < count; i++) {
     const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }).formatToParts(cursor).map(part => [part.type, part.value]));
     const dateStr = `${parts.year}-${parts.month}-${parts.day}`;
-    if (WEEKDAY_ABBR.indexOf(parts.weekday) === market.dayOfWeek && (!market.seasonStart || dateStr >= market.seasonStart) && (!market.seasonEnd || dateStr <= market.seasonEnd)) dates.push(dateStr);
+    if ((!market.seasonStart || dateStr >= market.seasonStart) && (!market.seasonEnd || dateStr <= market.seasonEnd)) {
+      for (const schedule of schedules) {
+        if (WEEKDAY_ABBR.indexOf(parts.weekday) === schedule.dayOfWeek && slots.length < count) slots.push({ date: dateStr, startTime: schedule.startTime, endTime: schedule.endTime });
+      }
+    }
     cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
-  return dates;
+  return slots;
 }
 
 export class RecurringMarketProvider implements InventoryProvider {
@@ -195,10 +207,10 @@ export class RecurringMarketProvider implements InventoryProvider {
     const markets = this.source.markets ?? [];
     const now = this.now;
     const records = markets.map(market => {
-      const occurrences = nextOccurrenceDates(market, now).map(date => ({
-        sourceRecordId: `${market.id}:${date}`,
-        start: `${date}T${market.startTime}${calgaryOffset(`${date}T${market.startTime}`)}`,
-        end: `${date}T${market.endTime}${calgaryOffset(`${date}T${market.endTime}`)}`,
+      const occurrences = nextOccurrenceSlots(market, now).map(slot => ({
+        sourceRecordId: `${market.id}:${slot.date}:${slot.startTime}`,
+        start: `${slot.date}T${slot.startTime}${calgaryOffset(`${slot.date}T${slot.startTime}`)}`,
+        end: `${slot.date}T${slot.endTime}${calgaryOffset(`${slot.date}T${slot.endTime}`)}`,
         cancelled: false,
       }));
       const input: MarketSubmissionInput = {

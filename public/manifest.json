@@ -1,10 +1,10 @@
 {
-  "short_name": "Calgary Watch",
-  "name": "Calgary Crime Watch & Neighbourhood Safety Map",
+  "short_name": "CalgaryWatch",
+  "name": "CalgaryWatch — City Discovery and Live Awareness",
   "icons": [
     {
-      "src": "./icon.svg",
-      "type": "image/svg+xml",
+      "src": "./images/brand/calgarywatch-city-spark-v2.webp",
+      "type": "image/webp",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
@@ -13,5 +13,5 @@
   "background_color": "#020617",
   "display": "standalone",
   "theme_color": "#020617",
-  "description": "See it. Share it. Calgary knows. Live Calgary crime and community incident map with neighbourhood safety reports."
+  "description": "Events, markets, local places and live city updates for Calgary."
 }

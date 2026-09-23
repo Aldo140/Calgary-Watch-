@@ -1,3 +1,5 @@
+import { SiteHeader } from '../components/site/SiteLayout';
+import { CommunityWelcome } from '../components/discovery/CommunityWelcome';
 import { useEffect, useRef, useState, memo } from 'react';
 import type { ReactNode, ElementType, CSSProperties } from 'react';
 import {
@@ -37,6 +39,7 @@ import {
   History,
   Lock,
   Crosshair,
+  Sparkles,
 } from 'lucide-react';
 import { publicAsset, cn } from '@/src/lib/utils';
 import { db } from '@/src/firebase';
@@ -441,24 +444,27 @@ function Nav() {
           aria-label="Calgary Watch home"
         >
           <img
-            src={publicAsset('images/brand/calgary-watch-plane-mark.webp')}
+            src={publicAsset('images/brand/calgarywatch-city-spark-v2.webp')}
             alt=""
             width={40}
             height={40}
-            className="h-11 w-12 object-contain"
+            className="h-10 w-10 object-contain drop-shadow-[1px_1px_0_rgba(0,194,224,0.35)]"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <span className="flex flex-col leading-none text-left">
-            <span className={cn('font-display text-[17px] font-bold tracking-tight', solid ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>Calgary Watch</span>
-            <span className={cn('mt-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.34em]', solid ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Safety</span>
+            <span className={cn('font-display text-[18px] font-black tracking-tight', solid ? 'text-[#1C2B3A]' : 'text-[#EDF2F0]')}>
+              CALGARY<span className="text-[#00c2e0]">WATCH</span><span className="text-[#00c2e0] ml-0.5">•</span>
+            </span>
+            <span className={cn('mt-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.24em]', solid ? 'text-[#5A6B7D]' : 'text-[#AFC5DF]')}>Community Watch</span>
           </span>
         </button>
 
         <div className="hidden md:flex items-center gap-1" style={{ color: solid ? T.ink : T.nightText }}>
+          <a href="/" className={cn(link, 'text-[#00c2e0] font-bold flex items-center gap-1')}>← Discover Calgary</a>
           <a href="#features" className={link}>What we track</a>
           <a href="#how-it-works" className={link}>How it works</a>
+          <a href="/coverage" className={link}>Coverage</a>
           <a href="/about" className={link}>About</a>
-          <a href="/coverage" className={link}>Airdrie &amp; area coverage</a>
         </div>
 
         <div className="flex items-center gap-2">
@@ -499,22 +505,25 @@ function Nav() {
             className="absolute inset-x-0 top-full z-[60] h-[calc(100dvh-4rem)] md:hidden overflow-y-auto bg-[#06162F] text-[#F2EFE8]"
           >
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-              <img src={publicAsset('images/brand/calgary-watch-plane-mark.webp')} alt="" className="absolute -right-20 top-4 size-80 rotate-6 object-contain opacity-[0.1]" />
+              <img src={publicAsset('images/brand/calgarywatch-city-spark-v2.webp')} alt="" className="absolute -right-20 top-4 size-80 rotate-6 object-contain opacity-[0.1]" />
               <div className="absolute -left-20 top-[43%] h-16 w-[140%] -rotate-6 bg-[#E52C20]/15" />
             </div>
 
             <div className="relative flex min-h-full flex-col px-5 pb-6 pt-8 sm:px-7">
               <div className="mb-7 flex items-center justify-between border-b border-white/15 pb-4 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#AFC5DF]">
                 <span>Calgary / 51.0447° N</span>
-                <span className="text-[#E52C20]">Navigation / 01</span>
+                <span className="text-[#00c2e0]">Navigation / 01</span>
               </div>
 
               <div className="flex flex-col">
                 {[
-                  ['01', 'What we track', '#features'],
-                  ['02', 'How it works', '#how-it-works'],
-                  ['03', 'About', '/about'],
-                  ['04', 'Area coverage', '/coverage'],
+                  ['01', 'Discover Calgary', '/'],
+                  ['02', 'Weekend Plans', '/events/this-weekend'],
+                  ['03', 'Local Markets', '/markets'],
+                  ['04', 'What we track', '#features'],
+                  ['05', 'How it works', '#how-it-works'],
+                  ['06', 'Area coverage', '/coverage'],
+                  ['07', 'About CalgaryWatch', '/about'],
                 ].map(([number, label, href], index) => (
                   <motion.a
                     key={href}
@@ -522,10 +531,10 @@ function Nav() {
                     onClick={() => setMenuOpen(false)}
                     initial={{ opacity: 0, x: -24 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + index * 0.055, duration: 0.42, ease: EASE }}
-                    className="group flex min-h-16 items-center gap-4 border-b border-white/15 py-3 font-display text-[clamp(1.55rem,8vw,2.25rem)] font-black uppercase leading-none tracking-[-0.035em]"
+                    transition={{ delay: 0.1 + index * 0.045, duration: 0.42, ease: EASE }}
+                    className="group flex min-h-14 items-center gap-4 border-b border-white/15 py-2.5 font-display text-[clamp(1.35rem,7vw,2rem)] font-black uppercase leading-none tracking-[-0.035em]"
                   >
-                    <span className="w-6 font-mono text-[10px] tracking-normal text-[#E52C20]">{number}</span>
+                    <span className="w-6 font-mono text-[10px] tracking-normal text-[#00c2e0]">{number}</span>
                     <span className="flex-1">{label}</span>
                     <ArrowUpRight size={20} className="text-[#AFC5DF] transition-transform group-active:translate-x-1 group-active:-translate-y-1" />
                   </motion.a>
@@ -2636,6 +2645,62 @@ function Finale({ openLegal, reduced }: { openLegal: (m: 'privacy' | 'terms' | '
 }
 
 // ---------------------------------------------------------------------------
+// DISCOVERY BRIDGE — connects the Community page to Discovery guides
+// ---------------------------------------------------------------------------
+function DiscoveryBridge() {
+  return (
+    <section className="relative overflow-hidden py-16 sm:py-20 border-y-2 border-[#1C2B3A]" style={{ background: '#FFFDF8' }}>
+      <div className="mx-auto max-w-[88rem] px-5 sm:px-8">
+        <div className="rounded-3xl border-3 border-[#06162F] bg-[#FAF8F3] p-8 sm:p-12 shadow-[8px_8px_0_#00c2e0]">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#ffdf4f] border-2 border-[#06162f] rounded-full text-[10px] font-black uppercase tracking-[0.14em] text-[#06162f] mb-4">
+                <Sparkles size={13} />
+                <span>Part of CalgaryWatch</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-[#06162F]">
+                Beyond the watch: Discover what's on in Calgary.
+              </h2>
+              <p className="mt-3 text-base text-[#475569] leading-relaxed">
+                When you're not tracking alerts, find what makes this city worth living in: curated weekend plans, local farmers markets, independent bakeries, and neighbourhood walking guides.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <a
+                  href="/"
+                  className="inline-flex items-center justify-center gap-2 rounded-full px-7 h-[48px] text-[14px] font-extrabold uppercase tracking-wide bg-[#06162F] text-white border-2 border-[#06162F] shadow-[4px_4px_0_#ffdf4f] hover:translate-y-[-2px] transition-transform"
+                >
+                  Explore Calgary Discovery <ArrowUpRight size={17} />
+                </a>
+                <a href="/events/this-weekend" className="font-bold text-sm text-[#067a8c] hover:underline flex items-center gap-1">
+                  Weekend events ↗
+                </a>
+                <a href="/markets" className="font-bold text-sm text-[#067a8c] hover:underline flex items-center gap-1">
+                  Local markets ↗
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 shrink-0">
+              <div className="relative overflow-hidden rounded-2xl border-2 border-[#06162f] shadow-[6px_6px_0_#06162f] max-w-[280px]">
+                <img
+                  src={publicAsset('images/hero/calgarywatch-city-guide-v1.webp')}
+                  alt="Calgary Discovery City Guide"
+                  className="w-full h-44 object-cover"
+                />
+                <div className="p-3 bg-white border-t border-[#06162f]">
+                  <span className="text-[10px] font-black uppercase text-[#067a8c] tracking-wider block">Editorial Guide</span>
+                  <strong className="text-xs font-bold text-[#06162f] block leading-tight">One city. Two ways to know it.</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // PAGE
 // ---------------------------------------------------------------------------
 export default function LandingPage() {
@@ -2652,15 +2717,17 @@ export default function LandingPage() {
         @keyframes lp-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
       `}</style>
 
-      <Nav />
+      <div className="cw-site cw-community-header"><a className="cw-skip" href="#community-main">Skip to content</a><SiteHeader /></div>
       {!reduced && <RiverRail progress={scrollYProgress} />}
 
-      <main>
+      <main id="community-main">
         <Hero reduced={reduced} />
+        <div className="cw-site cw-community-integration"><div className="cw-wrap"><CommunityWelcome /></div></div>
         <Ticker reduced={reduced} />
         <DayTunnel reduced={reduced} />
         <Quadrants reduced={reduced} />
         <SignalFlight reduced={reduced} />
+        <DiscoveryBridge />
         <Categories reduced={reduced} />
         <NearMe reduced={reduced} />
         <NightWatch reduced={reduced} />

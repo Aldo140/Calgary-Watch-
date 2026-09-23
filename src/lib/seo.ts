@@ -34,7 +34,7 @@ export interface SeoConfig {
 }
 
 export const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
-export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero/hero-wide.webp';
+export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp';
 const LAST_MOD = '2026-08-13';
 const SEO_REFRESH_MOD = '2026-08-29';
 

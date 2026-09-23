@@ -40,6 +40,31 @@ describe('Recurring market provider', () => {
     assert.equal(afterDst?.start.endsWith('-07:00'), true);
   });
 
+  it('supports one market opening on several weekdays without duplicating the listing', async () => {
+    const provider = new RecurringMarketProvider(source([{
+      ...yearRound,
+      dayOfWeek: undefined,
+      startTime: undefined,
+      endTime: undefined,
+      schedules: [
+        { dayOfWeek: 5, startTime: '09:00:00', endTime: '17:00:00' },
+        { dayOfWeek: 6, startTime: '10:00:00', endTime: '16:00:00' },
+        { dayOfWeek: 0, startTime: '09:00:00', endTime: '17:00:00' },
+      ],
+      occurrenceCount: 5,
+    }]), new Date('2026-09-21T12:00:00Z'));
+    const records = await provider.fetch();
+    assert.equal(records.length, 1);
+    if (records[0].input.kind !== 'market') throw Error('expected market');
+    assert.deepEqual(records[0].input.occurrences.map(o => [o.start.slice(0, 10), o.start.slice(11, 19)]), [
+      ['2026-09-25', '09:00:00'],
+      ['2026-09-26', '10:00:00'],
+      ['2026-09-27', '09:00:00'],
+      ['2026-10-02', '09:00:00'],
+      ['2026-10-03', '10:00:00'],
+    ]);
+  });
+
   it('respects season bounds and produces no occurrences once the season has ended', async () => {
     const seasonal: RecurringMarketDefinition = { ...yearRound, id: 'seasonal-market', dayOfWeek: 4, seasonStart: '2026-06-18', seasonEnd: '2026-10-01' };
     const inSeason = await new RecurringMarketProvider(source([seasonal]), new Date('2026-09-21T12:00:00Z')).fetch();

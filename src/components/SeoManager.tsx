@@ -79,8 +79,8 @@ export default function SeoManager() {
     setMeta('og:title', 'property', config.title);
     setMeta('og:description', 'property', config.description);
     setMeta('og:url', 'property', pageUrl);
-    setMeta('og:image', 'property', config.image ?? 'https://calgarywatch.ca/images/photo/calgary5.webp');
-    setMeta('twitter:image', 'name', config.image ?? 'https://calgarywatch.ca/images/photo/calgary5.webp');
+    setMeta('og:image', 'property', config.image ?? 'https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp');
+    setMeta('twitter:image', 'name', config.image ?? 'https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp');
 
     setMeta('twitter:title', 'name', config.title);
     setMeta('twitter:description', 'name', config.description);

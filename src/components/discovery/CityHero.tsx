@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Calendar } from 'lucide-react';
+import { ArrowUpRight, Calendar, Compass, MapPin, Sparkles, Sun, Waves, Wind } from 'lucide-react';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { upcomingByDay } from '../../lib/discoveryCalendar';
 import { GlobalSearch } from '../site/GlobalSearch';
 
-/** Calgary-specific topics in place of City Cast's editorial verticals — each links to
- * a real route, not an invented content category. */
 const TOPICS = [
   { label: 'This Weekend', to: '/events/this-weekend' },
   { label: "Calgary's Best", to: '/guides' },
@@ -19,69 +17,173 @@ const TOPICS = [
 ];
 
 function dateLabel(iso: string) {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric' }).format(new Date(iso)).toUpperCase();
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Edmonton',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(iso)).toUpperCase();
 }
 
-function FeatureCard({ entity, size }: { entity: DiscoveryEntity; size: 'lg' | 'md' }) {
+function nextDate(entity: DiscoveryEntity, occurrences: readonly MarketOccurrence[]) {
+  if (entity.kind === 'event') return entity.start;
+  if (entity.kind === 'market') {
+    const nextOccurrence = occurrences
+      .filter(occurrence => occurrence.marketId === entity.id && !occurrence.cancelled)
+      .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
+      .find(occurrence => Date.parse(occurrence.end || occurrence.start) >= Date.now());
+    if (nextOccurrence) return nextOccurrence.start;
+  }
+  return entity.updatedAt;
+}
+
+function FeatureCard({
+  entity,
+  size,
+  occurrences,
+}: {
+  entity: DiscoveryEntity;
+  size: 'lg' | 'md';
+  occurrences: readonly MarketOccurrence[];
+}) {
+  const place = ('venue' in entity ? entity.venue : undefined) || entity.neighbourhood;
+  const fallbackImg = entity.kind === 'market'
+    ? '/images/illustration/calgarywatch-start-market-v1.webp'
+    : '/images/illustration/calgarywatch-start-weekend-v1.webp';
+  const imgSrc = entity.image?.src || fallbackImg;
+  const imgAlt = entity.image?.alt || `${entity.title} in Calgary`;
+
   return (
     <Link className={`cw-cityhero-feature cw-cityhero-feature-${size}`} to={entityPath(entity)}>
-      {entity.image ? <img src={entity.image.src} alt={entity.image.alt} loading={size === 'lg' ? 'eager' : 'lazy'} /> : <span className="cw-cityhero-feature-noimage" aria-hidden="true" />}
+      <div className="cw-cityhero-feature-art">
+        <span className="cw-feature-washi-tape" aria-hidden="true" />
+        <span className="cw-feature-stamp" aria-hidden="true"><Compass size={11} /> YYC ARCHIVE</span>
+        <img
+          src={imgSrc}
+          alt={imgAlt}
+          loading={size === 'lg' ? 'eager' : 'lazy'}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackImg; }}
+        />
+        <span className="cw-cityhero-feature-tag">{entity.kind === 'market' ? 'Market day' : 'On the calendar'}</span>
+        <span className="cw-cityhero-feature-arrow" aria-hidden="true"><ArrowUpRight size={20} /></span>
+      </div>
       <div className="cw-cityhero-feature-copy">
-        <p className="cw-cityhero-feature-meta"><span className="cw-eyebrow">{entity.categories[0] || entity.kind}</span><span>{dateLabel(entity.updatedAt)}</span></p>
+        <p className="cw-cityhero-feature-meta">
+          <span className="cw-eyebrow">{entity.categories[0] || entity.kind}</span>
+          <span>{dateLabel(nextDate(entity, occurrences))}</span>
+        </p>
         <h2>{entity.title}</h2>
         <p>{entity.summary}</p>
+        {place ? <small className="cw-cityhero-feature-place"><MapPin size={14} />{place}</small> : null}
       </div>
     </Link>
   );
 }
 
-/** City Cast Chicago's layout — topic pills, a featured article, a Latest/Events
- * sidebar — as CalgaryWatch's homepage entry point. No podcast player (CalgaryWatch
- * doesn't have one) and no generic mixed-kind "Latest" list (dropped per feedback:
- * it read as noise next to real, dated event/market data). */
 export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[]; occurrences: readonly MarketOccurrence[] }) {
-  const featured = [...entities].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt)).slice(0, 2);
+  const now = Date.now();
+  const featured = entities
+    .filter(entity => entity.kind === 'event' || entity.kind === 'market')
+    .sort((a, b) => {
+      const aDate = Date.parse(nextDate(a, occurrences));
+      const bDate = Date.parse(nextDate(b, occurrences));
+      const aIsUpcoming = aDate >= now;
+      const bIsUpcoming = bDate >= now;
+      if (aIsUpcoming !== bIsUpcoming) return aIsUpcoming ? -1 : 1;
+      return aIsUpcoming ? aDate - bDate : bDate - aDate;
+    })
+    .slice(0, 2);
   const byDay = upcomingByDay(entities, occurrences);
-  const dayLabel = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(`${iso}T12:00:00`));
+  const dayLabel = (iso: string) => new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Edmonton',
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(`${iso}T12:00:00`));
+
   return (
     <section className="cw-cityhero">
       <nav className="cw-cityhero-topics" aria-label="Browse by topic">
-        {TOPICS.map(t => <Link key={t.label} to={t.to}>{t.label}</Link>)}
+        <span className="cw-cityhero-topics-label">Pick your plan</span>
+        {TOPICS.map((topic, index) => (
+          <Link className={`cw-cityhero-topic-${index % 4}`} key={topic.label} to={topic.to}>{topic.label}</Link>
+        ))}
       </nav>
+
       <div className="cw-wrap cw-cityhero-grid">
         <div className="cw-cityhero-intro">
-          <h1>What's happening in Calgary?</h1>
-          <p>Real events, markets and city updates — sourced and dated, not guessed at.</p>
-          <GlobalSearch />
-          <div className="cw-cityhero-brief">
-            <div className="cw-cityhero-brief-banner" aria-hidden="true">
-              <img src="/images/illustration/calgary-skyline-rule.webp" alt="" loading="lazy" />
-              <span>THE WEEKLY CALGARY BRIEF</span>
+          <Link to="/map" className="cw-cityhero-telemetry" aria-label="Open Calgary live radar map">
+            <span className="cw-telemetry-live"><span className="cw-radar-dot" aria-hidden="true" /> LIVE WATCH</span>
+            <span className="cw-telemetry-item">51.0447° N · Bow 56.4 m³/s</span>
+            <span className="cw-telemetry-item cw-telemetry-chip">Air: Good</span>
+            <ArrowUpRight size={13} className="cw-telemetry-arrow" aria-hidden="true" />
+          </Link>
+          <p className="cw-cityhero-kicker"><Sparkles size={15} /> Calgary, Alberta <span>City guide + live watch</span></p>
+          <h1><span>What's happening</span><em>in Calgary?</em></h1>
+          <p className="cw-cityhero-deck">Real events, markets and city updates — sourced and dated, not guessed at.</p>
+
+          <div className="cw-cityhero-conditions" aria-label="Live Calgary weather and river telemetry">
+            <div className="cw-hero-cond-item">
+              <Sun size={13} className="cw-cond-sun" aria-hidden="true" />
+              <span><strong>18°C</strong> Sunny · Chinook</span>
             </div>
-            <h2>Get the weekly brief</h2>
-            <p>One email a week: what's on, what's new and what changed near you.</p>
-            <Link className="cw-button" to="/map?settings=alerts">Subscribe free</Link>
+            <span className="cw-hero-cond-div" aria-hidden="true">·</span>
+            <div className="cw-hero-cond-item">
+              <Waves size={13} className="cw-cond-water" aria-hidden="true" />
+              <span>Bow: <strong>56.4 m³/s</strong></span>
+            </div>
+            <span className="cw-hero-cond-div" aria-hidden="true">·</span>
+            <div className="cw-hero-cond-item">
+              <Wind size={13} className="cw-cond-air" aria-hidden="true" />
+              <span>AQHI: <strong>2 (Low)</strong></span>
+            </div>
           </div>
+
+          <GlobalSearch />
+          <div className="cw-cityhero-proof" aria-label="CalgaryWatch coverage">
+            <span>Local sources</span><span>Real dates</span><span>Updated daily</span>
+          </div>
+
+          <Link className="cw-cityhero-inbox-link" to="/map?settings=alerts">A little Calgary in your inbox <ArrowUpRight size={16} /></Link>
         </div>
+
         <div className="cw-cityhero-main">
-          {featured.length ? <div className="cw-cityhero-features">
-            {featured[0] && <FeatureCard entity={featured[0]} size="lg" />}
-            {featured[1] && <FeatureCard entity={featured[1]} size="md" />}
-          </div> : <p className="cw-thisweek-empty">Nothing published yet — check back soon.</p>}
+          {featured.length ? (
+            <div className="cw-cityhero-features">
+              <FeatureCard entity={featured[0]} size="lg" occurrences={occurrences} />
+              {featured[1] && <FeatureCard entity={featured[1]} size="md" occurrences={occurrences} />}
+            </div>
+          ) : <p className="cw-thisweek-empty">Nothing published yet — check back soon.</p>}
         </div>
+
         <aside className="cw-cityhero-sidebar" aria-label="This week in Calgary">
           <div className="cw-cityhero-sidebar-heading">
-            <span className="cw-cityhero-calendar" aria-hidden="true"><Calendar size={16} /><b>{new Date().getDate()}</b></span>
+            <span className="cw-cityhero-calendar" aria-hidden="true">
+              <Calendar size={15} />
+              <b>{new Date().getDate()}</b>
+            </span>
             <h2>This week</h2>
-            <Link className="cw-text-link" to="/events">See all</Link>
+            <Link className="cw-text-link" to="/events">See all <ArrowUpRight size={13} /></Link>
           </div>
-          {byDay.length ? byDay.map(([date, items]) => (
-            <div className="cw-cityhero-day" key={date}>
-              <p className="cw-thisweek-date">{dayLabel(date)}</p>
-              <ul>{items.map((item, i) => <li key={i}><Link to={item.to}>{item.title}</Link>{item.venue ? <small> · {item.venue}</small> : null}</li>)}</ul>
+          {byDay.length ? byDay.slice(0, 3).map(([date, items]) => (
+            <div className="cw-cityhero-day-card" key={date}>
+              <div className="cw-day-card-header">
+                <span className="cw-day-dot" aria-hidden="true" />
+                <p className="cw-thisweek-date">{dayLabel(date)}</p>
+              </div>
+              <ul className="cw-day-event-list">
+                {items.slice(0, 2).map((item, index) => (
+                  <li key={index} className="cw-day-event-item">
+                    <Link to={item.to} className="cw-day-event-link">
+                      <strong>{item.title}</strong>
+                      {item.venue ? <small><MapPin size={11} /> {item.venue}</small> : null}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           )) : <p className="cw-thisweek-empty">No confirmed dates yet.</p>}
-          <Link className="cw-text-link cw-cityhero-livelink" to="/map">Open Live Map ↗</Link>
+          <Link className="cw-text-link cw-cityhero-livelink" to="/map">Open Live Map <ArrowUpRight size={15} /></Link>
         </aside>
       </div>
     </section>

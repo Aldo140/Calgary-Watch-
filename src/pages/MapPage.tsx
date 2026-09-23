@@ -1544,6 +1544,29 @@ export default function MapPage() {
     }
   }, [selectedIncident, searchParams, setSearchParams]);
 
+  const coordDeepLinkHandledRef = useRef(false);
+  useEffect(() => {
+    if (coordDeepLinkHandledRef.current) return;
+    const latStr = searchParams.get('lat');
+    const lngStr = searchParams.get('lng');
+    const actionStr = searchParams.get('action');
+
+    if (actionStr === 'report') {
+      setIsFormOpen(true);
+    }
+
+    if (latStr && lngStr) {
+      const lat = parseFloat(latStr);
+      const lng = parseFloat(lngStr);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        coordDeepLinkHandledRef.current = true;
+        window.requestAnimationFrame(() => {
+          mapRef.current?.flyTo(lat, lng, 15);
+        });
+      }
+    }
+  }, [searchParams]);
+
   const [isPinMode, setIsPinMode] = useState(false);
   // Coordinates captured the moment "Set Pin Here" fires - stored in MapPage
   // state so there is zero prop-chain timing involved.

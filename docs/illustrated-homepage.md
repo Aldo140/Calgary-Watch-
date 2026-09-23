@@ -4,9 +4,9 @@
 
 Keep the existing paper-collage identity: navy, cyan, golden yellow, warm cream, editorial typography, illustrated Calgary landmarks and offset ink shadows.
 
-Homepage sequence: focused search and one featured listing; discovery/live orientation; quick plan cards; a short selection of current inventory; mood cards and guides; interactive illustrated service stories; community stories; local places and quadrant exploration; illustrated email brief.
+Homepage sequence: focused search and one featured listing; discovery/live orientation; quick plan cards; a short selection of current inventory; mood cards and guides; interactive illustrated service stories; local places and quadrant exploration; illustrated email brief.
 
-Services use existing destinations: discovery and neighbourhood guides, live map, Community Watch, and email preferences. Illustrations explain each service without presenting invented incidents, audience counts or sample schedules as live information. Existing trending-story content is outside this visual pass.
+Services use existing destinations: discovery and neighbourhood guides, live map, Community Watch, and email preferences. Illustrations explain each service without presenting invented incidents, audience counts or sample schedules as live information. The homepage omits the static trending-story dataset and hardcoded weather, air-quality and river readings; live conditions belong on the sourced map.
 
 Desktop hero: one feature, three preview days, restrained decoration, compact email link. Mobile: horizontally browsable topics, full-width search, one feature, asymmetric plan/mood cards, 2-by-2 service controls, artwork above service copy, compact quadrant tiles, stacked newsletter card. Homepage inventory previews are capped; Explore all retains access to full listings.
 

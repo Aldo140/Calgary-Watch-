@@ -190,6 +190,20 @@ const Map = forwardRef<MapRef, MapProps>(({ incidents, onMarkerClick, onMapClick
       const wrapper = document.createElement('div');
       wrapper.className = 'min-w-[264px] max-w-[300px] overflow-hidden rounded-2xl bg-[#F8FAFC] text-[#0B1F33] shadow-[0_4px_10px_rgba(11,31,51,0.18)] ring-1 ring-[#C9D8E4]';
 
+      // A reporter's photo is the most useful thing in the popup — it used to
+      // be dropped here entirely, so a report with a picture looked identical
+      // to one without. Decoding failures hide the frame rather than leaving a
+      // broken-image placeholder over the report.
+      if (incident.image_url) {
+        const photo = document.createElement('img');
+        photo.src = incident.image_url;
+        photo.alt = '';
+        photo.loading = 'lazy';
+        photo.className = 'block w-full h-36 object-cover bg-[#E8F3FC]';
+        photo.addEventListener('error', () => photo.remove());
+        wrapper.appendChild(photo);
+      }
+
       const content = document.createElement('div');
       content.className = 'p-4 space-y-3';
 

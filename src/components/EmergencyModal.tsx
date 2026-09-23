@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { publicAsset } from '@/src/lib/utils';
 import { MAP, CATEGORY } from '@/src/lib/tokens';
-import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, AlertTriangle } from 'lucide-react';
+import { Siren, X, Loader2, MapPin, AlertCircle, Car, Construction, CloudRain, Navigation, AlertTriangle, Image as ImageIcon } from 'lucide-react';
+import { uploadIncidentImage } from '@/src/lib/storage';
 
 const NEIGHBOURHOODS = [
   { name: 'Downtown', lat: 51.0478, lng: -114.0625 },
@@ -56,6 +57,7 @@ export interface EmergencySubmitData {
   neighborhood: string;
   lat: number;
   lng: number;
+  image_url?: string;
 }
 
 interface EmergencyModalProps {
@@ -71,6 +73,8 @@ interface EmergencyModalProps {
   /** Called when user wants to place a crosshair pin */
   onRequestMapPin?: () => void;
   isPinMode?: boolean;
+  /** Owner of the Storage upload path; photos are skipped when absent. */
+  userUid?: string;
 }
 
 export default function EmergencyModal({
@@ -83,12 +87,16 @@ export default function EmergencyModal({
   userName,
   onRequestMapPin,
   isPinMode = false,
+  userUid,
 }: EmergencyModalProps) {
   const [selectedType, setSelectedType] = useState<string>('emergency');
   const [description, setDescription] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   // 'choose' = pick location method; 'form' = fill in details
   const [step, setStep] = useState<'choose' | 'form'>('choose');
   const submitDebounceRef = useRef(0);
@@ -121,12 +129,27 @@ export default function EmergencyModal({
     setIsSubmitting(true);
     const label = EMERGENCY_TYPES.find((t) => t.id === selectedType)?.label ?? 'Emergency';
     const title = `${label}: ${description.trim().slice(0, 60)}`;
-    onSubmit({ category: selectedType, title, description: description.trim(), neighborhood: neighborhood.trim(), lat: activeLocation.lat, lng: activeLocation.lng });
+
+    // An urgent report must reach the map even if its attachment does not, so
+    // a failed upload is logged and dropped rather than blocking the send.
+    let image_url: string | undefined;
+    if (imageFile && userUid) {
+      try {
+        image_url = await uploadIncidentImage(userUid, imageFile);
+      } catch (error) {
+        console.error('[CalgaryWatch] Emergency photo upload failed; sending report without it:', error);
+      }
+    }
+
+    onSubmit({ category: selectedType, title, description: description.trim(), neighborhood: neighborhood.trim(), lat: activeLocation.lat, lng: activeLocation.lng, ...(image_url ? { image_url } : {}) });
     setSubmitted(true);
     setTimeout(() => {
       setDescription('');
       setNeighborhood('');
       setSelectedType('emergency');
+      setImageFile(null);
+      setImagePreview(null);
+      setImageError(null);
       setSubmitted(false);
       setStep('choose');
       onClose();
@@ -137,6 +160,9 @@ export default function EmergencyModal({
   const handleClose = () => {
     setDescription('');
     setNeighborhood('');
+    setImageFile(null);
+    setImagePreview(null);
+    setImageError(null);
     setStep('choose');
     setSubmitted(false);
     onClose();
@@ -327,6 +353,54 @@ export default function EmergencyModal({
                       {description.trim().length >= 5 ? '✓ Ready to send' : `${Math.max(0, 5 - description.trim().length)} more characters`}
                     </p>
                   </div>
+
+                  {/* Photo — optional, and never allowed to hold up an SOS. */}
+                  {userUid && (
+                    <div>
+                      <p className="font-mono text-[9.5px] font-bold uppercase tracking-[0.22em] mb-2" style={{ color: MAP.muted }}>Photo (optional)</p>
+                      {imagePreview ? (
+                        <div className="relative overflow-hidden" style={{ border: `1.5px solid ${MAP.line}` }}>
+                          <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
+                            className="absolute top-2 right-2 p-1.5"
+                            style={{ background: 'rgba(28,43,58,0.8)', color: '#fff' }}
+                            aria-label="Remove photo"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <label
+                          className="flex items-center justify-center gap-3 w-full h-14 cursor-pointer transition-colors hover:bg-black/[0.02]"
+                          style={{ border: `1.5px dashed ${MAP.line}`, background: MAP.paper }}
+                        >
+                          <ImageIcon size={17} style={{ color: MAP.muted }} />
+                          <span className="text-sm font-bold" style={{ color: MAP.muted }}>Attach a photo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] ?? null;
+                              setImageError(null);
+                              if (!file) { setImageFile(null); setImagePreview(null); return; }
+                              if (file.size > 25 * 1024 * 1024) {
+                                setImageError('Photo must be under 25 MB.');
+                                setImageFile(null);
+                                setImagePreview(null);
+                                return;
+                              }
+                              setImageFile(file);
+                              setImagePreview(URL.createObjectURL(file));
+                            }}
+                          />
+                        </label>
+                      )}
+                      {imageError && <p className="text-xs mt-1.5 font-bold" style={{ color: MAP.danger }}>{imageError}</p>}
+                    </div>
+                  )}
 
                   {/* Reporter */}
                   <div className="flex items-center gap-2.5 px-3.5 py-2.5" style={{ background: MAP.paper, border: `1px solid ${MAP.line}` }}>

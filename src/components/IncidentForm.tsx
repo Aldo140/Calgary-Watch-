@@ -169,6 +169,10 @@ export default function IncidentForm({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  // Set when the photo upload fails. The written report is the valuable part,
+  // so a failed photo offers an explicit way through instead of trapping the
+  // reporter behind an error they cannot clear.
+  const [photoUploadFailed, setPhotoUploadFailed] = useState(false);
   const isLgUp = useLgUp();
   // 'choose'  = picking location method
   // 'pinning' = crosshair active on map; form hidden
@@ -258,7 +262,7 @@ export default function IncidentForm({
   }, [imagePreview]);
 
   const handleFormSubmit = useCallback(
-    async (data: IncidentFormData) => {
+    async (data: IncidentFormData, options: { skipPhoto?: boolean } = {}) => {
       clearErrors('root');
       if (!activeLocation) {
         setError('root', { type: 'manual', message: 'Location is missing. Tap Change and pick a location again.' });
@@ -269,19 +273,31 @@ export default function IncidentForm({
       setIsSubmitting(true);
       try {
         let image_url: string | undefined;
-        if (imageFile) {
-          image_url = await uploadIncidentImage(userUid, imageFile);
+        if (imageFile && !options.skipPhoto) {
+          try {
+            image_url = await uploadIncidentImage(userUid, imageFile);
+          } catch (uploadError) {
+            // The photo failed, but the report itself is still good. Stop here
+            // with the typed report intact and offer a way past it, rather than
+            // discarding everything the reporter wrote over an attachment.
+            const msg = uploadError instanceof Error ? uploadError.message : 'The photo could not be uploaded.';
+            setImageError(msg);
+            setPhotoUploadFailed(true);
+            setError('root', { type: 'manual', message: 'Your report is ready, but the photo could not be attached.' });
+            return;
+          }
         }
         onSubmit({ ...data, ...activeLocation, ...(image_url ? { image_url } : {}) });
         reset({ category: 'crime', anonymous: false, title: '', description: '', neighborhood: '' });
         setImageFile(null);
         setImagePreview(null);
         setImageError(null);
+        setPhotoUploadFailed(false);
         setStep('choose');
         setUsingGPS(false);
         onClose();
       } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+        const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
         setError('root', { type: 'manual', message: msg });
       } finally {
         submitLockRef.current = false;
@@ -303,6 +319,7 @@ export default function IncidentForm({
     setImageFile(null);
     setImagePreview(null);
     setImageError(null);
+    setPhotoUploadFailed(false);
     setStep('choose');
     setUsingGPS(false);
     onClose();
@@ -449,7 +466,7 @@ export default function IncidentForm({
       {step === 'form' && (
         <motion.div key="form" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} transition={{ duration: 0.18 }}>
           <form
-            onSubmit={handleSubmit(handleFormSubmit)}
+            onSubmit={handleSubmit((data) => handleFormSubmit(data))}
             className="flex flex-col gap-5 p-6"
             onClick={(e) => e.stopPropagation()}
             noValidate
@@ -600,7 +617,7 @@ export default function IncidentForm({
                   <img src={imagePreview} alt="Preview" className="w-full max-h-40 object-cover" />
                   <button
                     type="button"
-                    onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); }}
+                    onClick={() => { setImageFile(null); setImagePreview(null); setImageError(null); setPhotoUploadFailed(false); }}
                     className="absolute top-2 right-2 p-1.5 transition-all"
                     style={{ background: 'rgba(28,43,58,0.8)', color: '#fff' }}
                     aria-label="Remove photo"
@@ -617,14 +634,21 @@ export default function IncidentForm({
                   <span className="text-sm font-bold" style={{ color: P.soft }}>Attach a photo</span>
                   <input
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    // Broad accept on purpose: HEIC and oversized phone photos
+                    // are converted to JPEG before upload, so filtering them out
+                    // of the picker would reject photos we can actually handle.
+                    accept="image/*"
                     className="sr-only"
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
                       setImageError(null);
+                      setPhotoUploadFailed(false);
                       if (!file) { setImageFile(null); setImagePreview(null); return; }
-                      if (file.size > 5 * 1024 * 1024) {
-                        setImageError('Photo must be under 5 MB.');
+                      // Generous gate: anything past here is downscaled and
+                      // re-encoded to fit the 5 MB upload ceiling, so rejecting
+                      // at 5 MB here would turn ordinary phone photos away.
+                      if (file.size > 25 * 1024 * 1024) {
+                        setImageError('Photo must be under 25 MB.');
                         setImageFile(null);
                         setImagePreview(null);
                         return;
@@ -666,9 +690,22 @@ export default function IncidentForm({
             </label>
 
             {errors.root && (
-              <p className="text-xs font-bold px-1" role="alert" style={{ color: P.danger }}>
-                {errors.root.message}
-              </p>
+              <div className="px-1 space-y-2" role="alert">
+                <p className="text-xs font-bold" style={{ color: P.danger }}>
+                  {errors.root.message}
+                </p>
+                {photoUploadFailed && (
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={handleSubmit((data) => handleFormSubmit(data, { skipPhoto: true }))}
+                    className="w-full px-3 py-2.5 text-[11px] font-black uppercase tracking-[0.1em] transition-colors disabled:opacity-60"
+                    style={{ background: P.ink, color: '#fff' }}
+                  >
+                    Post the report without the photo
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Submit row */}

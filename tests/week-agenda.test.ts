@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { addCalgaryDays, weekAgenda } from '../src/lib/discoveryCalendar';
-import { summarize, summarizeReports } from '../src/lib/homeClaims';
+import { pickExampleReport, summarize, summarizeReports, timeAgo } from '../src/lib/homeClaims';
 import { discoveryFixtures } from '../src/data/discovery';
 import type { DiscoveryEntity, MarketOccurrence } from '../src/types/discovery';
 
@@ -97,5 +97,30 @@ describe('homepage claims', () => {
     const t = now.getTime();
     const many = Array.from({ length: 3 }, () => ({ visibility: 'public', category: 'traffic', timestamp: t - 1000 }) as any);
     assert.equal(summarizeReports(many, t, 3).capped, true);
+  });
+});
+
+describe('example report', () => {
+  const t = now.getTime();
+  const r = (o: object) => ({ id: 'x', title: 'Vandalism reported in Bowness', visibility: 'public', category: 'traffic', timestamp: t - 3600000, ...o }) as any;
+
+  it('prefers the newest crime report, only from public, real, current rows', () => {
+    const pick = pickExampleReport([
+      r({ id: 'a', category: 'traffic', timestamp: t - 60000 }),
+      r({ id: 'b', category: 'crime', timestamp: t - 7200000 }),
+      r({ id: 'c', category: 'crime', timestamp: t - 60000, data_source: 'demo' }),
+      r({ id: 'd', category: 'crime', timestamp: t - 60000, visibility: 'hidden' }),
+    ], t);
+    assert.equal(pick?.id, 'b');
+  });
+
+  it('falls back to the newest of any kind, and to nothing when all are stale', () => {
+    assert.equal(pickExampleReport([r({ id: 'a' })], t)?.id, 'a');
+    assert.equal(pickExampleReport([r({ timestamp: t - 2 * 86400000 })], t), null);
+  });
+
+  it('says how long ago plainly', () => {
+    assert.equal(timeAgo(t - 5 * 60000, t), '5 min ago');
+    assert.equal(timeAgo(t - 3 * 3600000, t), '3 h ago');
   });
 });

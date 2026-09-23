@@ -3,6 +3,8 @@ import { SiteLayout } from '../components/site/SiteLayout';
 import { HomeHero } from '../components/home/HomeHero';
 import { WeekPlanner } from '../components/home/WeekPlanner';
 import { LiveNow } from '../components/home/LiveNow';
+import { WhatsHere } from '../components/home/WhatsHere';
+import { useLivePulse } from '../hooks/useLivePulse';
 import { QuadrantMap } from '../components/home/QuadrantMap';
 import { SlowerPlans, MondayDigest } from '../components/home/SlowerPlans';
 import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
@@ -21,6 +23,7 @@ export default function DiscoveryHomePage() {
   const entities = discoveryRepository.list();
   const days = useMemo(() => weekAgenda(entities, discoveryRepository.occurrences()), [entities]);
   const weather = useCalgaryWeather();
+  const pulse = useLivePulse(true);
   const [selected, setSelected] = useState(() => Math.max(0, days.findIndex(d => d.items.length)));
 
   const pickDay = (index: number) => {
@@ -32,10 +35,13 @@ export default function DiscoveryHomePage() {
     <SiteLayout>
       <div className="cw-home2">
         <HomeHero days={days} weather={weather} onPickDay={pickDay} />
+        <div className="cw-wrap h-here-wrap">
+          <WhatsHere days={days} entities={entities} pulse={pulse} />
+        </div>
         <div className="cw-wrap h-week-wrap">
           <WeekPlanner days={days} forecast={weather.daily} selected={selected} onSelect={setSelected} />
         </div>
-        <LiveNow weather={weather} />
+        <LiveNow weather={weather} pulse={pulse} />
         <div className="cw-wrap h-body">
           <QuadrantMap entities={entities} />
           <SlowerPlans entities={entities} />

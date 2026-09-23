@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
-import { useInView } from '../../hooks/useInView';
-import { useLivePulse } from '../../hooks/useLivePulse';
+import type { LivePulse } from '../../hooks/useLivePulse';
 import type { CalgaryWeather } from '../../hooks/useCalgaryWeather';
 import { describeSky } from '../../lib/weatherCodes';
 import { AIR_BAND_LABEL, classifyPm25 } from '../../lib/airQuality';
@@ -15,16 +14,15 @@ const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', h
  * brand split. Every number here is read at view time from its named source;
  * a tile whose source fails disappears instead of showing a stand-in.
  */
-export function LiveNow({ weather }: { weather: CalgaryWeather }) {
-  const [ref, inView] = useInView(0.1);
-  const { reports, air } = useLivePulse(inView);
+export function LiveNow({ weather, pulse }: { weather: CalgaryWeather; pulse: LivePulse }) {
+  const { reports, air } = pulse;
   const now = weather.current;
   const sky = now ? describeSky(now.code, now.isDay) : null;
   const airBand = air.pm25 !== undefined ? (classifyPm25(air.pm25)?.band ?? 'good') : null;
   const categories = INCIDENT_CATEGORIES.filter(c => reports.byCategory[c.value]);
 
   return (
-    <section className="h-live" aria-labelledby="h-live-title" ref={ref}>
+    <section className="h-live" aria-labelledby="h-live-title">
       <div className="cw-wrap h-live-grid">
         <div className="h-live-lead">
           <p className="h-live-eyebrow"><span className="h-pulse" aria-hidden="true" /> CalgaryWatch Live</p>

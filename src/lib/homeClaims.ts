@@ -40,3 +40,27 @@ export function summarizeReports(incidents: Incident[], now: number, sampleSize:
   const capped = incidents.length >= sampleSize && incidents.every(i => i.timestamp > now - REPORT_WINDOW_MS);
   return { total: recent.length, capped, byCategory };
 }
+
+export interface ExampleReport { id: string; title: string; neighborhood?: string; category: IncidentCategory; timestamp: number }
+
+/**
+ * One real, current report to show as an example of what the live map holds.
+ * Same visibility rules as the counts; prefers a crime or safety report (the
+ * thing people most want to know about their block), else the newest of any
+ * kind. Returns null rather than reaching back further than the window.
+ */
+export function pickExampleReport(incidents: Incident[], now: number): ExampleReport | null {
+  const recent = incidents
+    .filter(i => isPubliclyVisible(i) && !isDemoIncident(i) && i.timestamp > now - REPORT_WINDOW_MS && i.timestamp <= now + 60000
+      && !(i.expires_at && i.expires_at < now) && typeof i.title === 'string' && i.title.trim())
+    .sort((a, b) => b.timestamp - a.timestamp);
+  const pick = recent.find(i => i.category === 'crime') ?? recent[0];
+  return pick ? { id: pick.id, title: pick.title.trim(), neighborhood: pick.neighborhood, category: pick.category, timestamp: pick.timestamp } : null;
+}
+
+export function timeAgo(timestamp: number, now: number) {
+  const minutes = Math.max(1, Math.round((now - timestamp) / 60000));
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  return `${hours} h ago`;
+}

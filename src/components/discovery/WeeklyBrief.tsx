@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Mail, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Mail } from 'lucide-react';
 
 export function WeeklyBrief() {
   const highlights = [
     '✦ Top Weekend Picks & Shows',
     '✦ Farmers Market Schedules',
     '✦ River Flow & Pathway Closures',
-    '✦ Delivered Friday at 7:00 AM',
+    '✦ Your saved email preferences',
   ];
 
   return (
@@ -34,8 +34,8 @@ export function WeeklyBrief() {
           <em>goes a very long way.</em>
         </h2>
         <p>
-          Join thousands of Calgarians who receive our weekly curated dispatch every Friday morning. 
-          The best weekend picks, river and pathway alerts, and neighbourhood discoveries.
+          Choose the weekly community brief in your CalgaryWatch email preferences. Weekend picks
+          and local discovery coverage can grow as verified inventory becomes available.
         </p>
         <div className="cw-brief-highlights" aria-label="What's included in the brief">
           {highlights.map(h => (
@@ -47,7 +47,7 @@ export function WeeklyBrief() {
             Join the Weekly Brief <ArrowUpRight size={17} />
           </Link>
           <small className="cw-brief-reassurance">
-            Free forever · Zero spam · One-click unsubscribe anytime
+            Free to join · Manage preferences anytime · One-click unsubscribe
           </small>
         </div>
       </div>

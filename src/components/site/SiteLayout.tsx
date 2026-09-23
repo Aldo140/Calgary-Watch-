@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Menu, X, Search } from 'lucide-react';
+import { ArrowUpRight, Menu, X, Search, UserRound } from 'lucide-react';
 import { DISCOVERY_SECTIONS } from '../../lib/discovery';
 import '../../styles/discovery.css';
 
@@ -48,12 +48,20 @@ export function SiteHeader() {
 
         <Wordmark />
 
+        <nav className="cw-desktop-nav" aria-label="Primary navigation">
+          {DISCOVERY_SECTIONS.map(section => (
+            <NavLink key={section.path} to={section.path}>{section.label}</NavLink>
+          ))}
+          <NavLink to="/map">Live</NavLink>
+        </nav>
+
         <div className="cw-header-actions">
           <Link to="/search" className="cw-header-search-icon" aria-label="Search CalgaryWatch">
             <Search size={19} />
           </Link>
-          <Link className="cw-button cw-subscribe-button" to="/map?settings=alerts">
-            <span className="cw-sub-desktop">Subscribe</span>
+          <Link className="cw-button cw-subscribe-button" to="/map?settings=account">
+            <UserRound size={16} aria-hidden="true" />
+            <span className="cw-sub-desktop">My Calgary</span>
             <span className="cw-sub-mobile">Join</span>
           </Link>
         </div>
@@ -97,8 +105,8 @@ export function SiteHeader() {
           </div>
 
           <div className="cw-mobile-nav-bottom">
-            <Link to="/map?settings=alerts" className="cw-mobile-pref-link">
-              Account &amp; Email Preferences
+            <Link to="/map?settings=account" className="cw-mobile-pref-link">
+              My Calgary &amp; email preferences
             </Link>
           </div>
         </div>

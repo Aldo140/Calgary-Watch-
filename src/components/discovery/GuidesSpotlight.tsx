@@ -3,6 +3,7 @@ import { ArrowUpRight, Compass, MapPin, Sparkles } from 'lucide-react';
 import type { DiscoveryEntity, Guide } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { EmptyInventory } from './DiscoveryCards';
+import { entityImageAlt } from '../../lib/discoveryImages';
 
 /** Eater Travel's layout — a short list plus one large featured card — reads better for
  * guides than a plain grid, since a guide usually deserves more than a thumbnail. Falls
@@ -28,8 +29,8 @@ export function GuidesSpotlight({ entities }: { entities: DiscoveryEntity[] }) {
           <ul className="cw-guides-spotlight-list">
             {list.map(g => {
               const imgSrc = g.image?.src || '/images/hero/calgarywatch-city-guide-v1.webp';
-              const imgAlt = g.image?.alt || `${g.title} in Calgary`;
-              const stops = g.entries?.length || 3;
+              const imgAlt = entityImageAlt(g.image);
+              const stops = g.entries?.length ?? 0;
               return (
                 <li key={g.id}>
                   <Link to={entityPath(g)} className="cw-guide-list-item">
@@ -38,13 +39,16 @@ export function GuidesSpotlight({ entities }: { entities: DiscoveryEntity[] }) {
                         src={imgSrc} 
                         alt={imgAlt} 
                         loading="lazy" 
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/calgarywatch-city-guide-v1.webp'; }}
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/hero/calgarywatch-city-guide-v1.webp';
+                          e.currentTarget.alt = '';
+                        }}
                       />
                     </div>
                     <div className="cw-guide-list-copy">
                       <div className="cw-guide-list-meta">
                         <span className="cw-eyebrow">{g.categories[0] || 'Guide'}</span>
-                        <span className="cw-guide-stops-chip">{stops} stops</span>
+                        {stops > 0 && <span className="cw-guide-stops-chip">{stops} {stops === 1 ? 'stop' : 'stops'}</span>}
                       </div>
                       <strong>{g.title}</strong>
                     </div>
@@ -57,8 +61,8 @@ export function GuidesSpotlight({ entities }: { entities: DiscoveryEntity[] }) {
         )}
         {(() => {
           const featImg = featured.image?.src || '/images/hero/calgarywatch-city-guide-v1.webp';
-          const featAlt = featured.image?.alt || `${featured.title} Calgary guide`;
-          const featStops = featured.entries?.length || 4;
+          const featAlt = entityImageAlt(featured.image);
+          const featStops = featured.entries?.length ?? 0;
           return (
             <Link className="cw-guides-spotlight-feature" to={entityPath(featured)}>
               <div className="cw-guide-feature-art">
@@ -66,14 +70,17 @@ export function GuidesSpotlight({ entities }: { entities: DiscoveryEntity[] }) {
                   src={featImg} 
                   alt={featAlt} 
                   loading="lazy" 
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/calgarywatch-city-guide-v1.webp'; }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/hero/calgarywatch-city-guide-v1.webp';
+                    e.currentTarget.alt = '';
+                  }}
                 />
                 <span className="cw-guide-feature-badge">
                   <Sparkles size={12} /> FEATURED FIELD GUIDE
                 </span>
-                <span className="cw-guide-stops-stamp">
-                  <MapPin size={12} /> {featStops} Curated Stops
-                </span>
+                {featStops > 0 && <span className="cw-guide-stops-stamp">
+                  <MapPin size={12} /> {featStops} {featStops === 1 ? 'Curated Stop' : 'Curated Stops'}
+                </span>}
               </div>
               <div className="cw-guides-spotlight-feature-copy">
                 <span className="cw-eyebrow">{featured.categories[0] || 'Curated Itinerary'}</span>

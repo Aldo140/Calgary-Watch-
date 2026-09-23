@@ -1,6 +1,7 @@
 import { upcomingOccurrences } from '../../lib/discoveryCalendar';
 import { Link } from 'react-router-dom';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
+import { entityImageAlt } from '../../lib/discoveryImages';
 import { DiscoveryCard } from '../discovery/DiscoveryCards';
 
 export function SourceBadge({ entity }: { entity: DiscoveryEntity }) { return <aside className="cw-sources"><h2>Know the source</h2><p>{entity.verification === 'source-checked' ? 'Source checked' : 'Not yet verified'} · Last checked {entity.verifiedAt || entity.updatedAt}</p>{entity.sources.map((source, i) => <a key={i} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>)}</aside>; }
@@ -9,7 +10,7 @@ export function EntityDetail({ entity, related, occurrences = [] }: { entity: Di
   const next = dates.find(o => !o.cancelled);
   const format = (value: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full', timeStyle: 'short' }).format(new Date(value));
   return <article className="cw-detail"><p className="cw-eyebrow">{entity.kind}{entity.developmentOnly ? ' · Illustrative preview' : ''}</p><h1>{entity.title}</h1><p className="cw-lead">{entity.summary}</p>
-    {entity.image && <figure className="cw-detail-image-wrap"><img className="cw-detail-image" src={entity.image.src} alt={entity.image.alt} width="1200" height="677" />{entity.image.credit && <figcaption className="cw-image-credit">{entity.image.credit}</figcaption>}</figure>}
+    {entity.image && <figure className="cw-detail-image-wrap"><img className="cw-detail-image" src={entity.image.src} alt={entityImageAlt(entity.image)} width="1200" height="677" />{entity.image.credit && <figcaption className="cw-image-credit">{entity.image.credit}</figcaption>}</figure>}
     {entity.kind === 'business' && entity.partner && <p className="cw-preview-note">Sponsored · {entity.sponsorshipDisclosure || 'Featured partner placement. Payment does not imply editorial selection.'}</p>}
     <p>{entity.description}</p>
     {'address' in entity && <p><strong>Location:</strong> {entity.address}</p>}

@@ -19,8 +19,7 @@ export function ModesSplit() {
       <div className="cw-modes-grid">
         <Link to="/events/this-weekend" className="cw-mode cw-mode-discover">
           <div className="cw-mode-top-badge cw-mode-badge-discover" aria-hidden="true">
-            <span>✦ FIELD GUIDE ARCHIVE</span>
-            <small>48 Sourced Places</small>
+            <span>City discovery</span>
           </div>
           <img src="/images/hero/calgarywatch-city-guide-v1.webp" alt="An illustrated Calgary city guide with the skyline, Bow River, Peace Bridge, markets and pathways" loading="lazy" />
           <div className="cw-mode-copy">
@@ -30,7 +29,7 @@ export function ModesSplit() {
             <div className="cw-mode-tags">
               <span>✦ Weekend Plans</span>
               <span>✦ Local Markets</span>
-              <span>✦ 7 Neighbourhoods</span>
+              <span>✦ Neighbourhood Guides</span>
             </div>
             <b className="cw-mode-cta" aria-hidden="true">Explore Discovery ↗</b>
           </div>
@@ -38,8 +37,7 @@ export function ModesSplit() {
         <Link to="/map" className="cw-mode cw-mode-live">
           <div className="cw-mode-top-badge cw-mode-badge-live" aria-hidden="true">
             <span className="cw-mode-pulse-dot" />
-            <span>REAL-TIME PULSE</span>
-            <small>7 Verified Feeds</small>
+            <span>CalgaryWatch Live</span>
           </div>
           <img src="/images/hero/calgarywatch-live-watch-v1.webp" alt="An illustrated Calgary nocturnal live watch scene with glowing Calgary Tower, Peace Bridge, radar pulses and community report markers" loading="lazy" />
           <div className="cw-mode-copy">

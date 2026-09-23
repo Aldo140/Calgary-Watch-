@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Calendar, MapPin, Tag } from 'lucide-react';
 import type { DiscoveryEntity, EntityKind } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
+import { entityImageAlt } from '../../lib/discoveryImages';
 
 export function SectionHeading({ title, to, label = 'Explore all', eyebrow }: { title: string; to?: string; label?: string; eyebrow?: string }) {
   return <div className="cw-section-heading"><div>{eyebrow && <p className="cw-eyebrow">{eyebrow}</p>}<h2>{title}</h2></div>{to && <Link className="cw-text-link" to={to}>{label} <ArrowUpRight size={18} /></Link>}</div>;
@@ -19,7 +20,9 @@ export function DiscoveryCard({ entity }: { entity: DiscoveryEntity }) {
     ? '/images/photo/calgary1.webp'
     : '/images/photo/calgary2.webp';
   const imgSrc = entity.image?.src || fallbackImage;
-  const imgAlt = entity.image?.alt || `${entity.title} in Calgary`;
+  // Shared fallbacks are editorial artwork, not evidence of a particular entity.
+  // Keep them decorative instead of implying that they document the listing.
+  const imgAlt = entityImageAlt(entity.image);
 
   const eventDate = entity.kind === 'event' && entity.start ? new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton',
@@ -48,7 +51,10 @@ export function DiscoveryCard({ entity }: { entity: DiscoveryEntity }) {
             loading="lazy" 
             width="720" 
             height="480"
-            onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackImage; }}
+            onError={(e) => {
+              e.currentTarget.src = fallbackImage;
+              e.currentTarget.alt = '';
+            }}
           />
           {eventDate && (
             <span className="cw-card-date-badge">

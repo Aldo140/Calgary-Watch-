@@ -4,6 +4,7 @@ import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { upcomingByDay } from '../../lib/discoveryCalendar';
 import { GlobalSearch } from '../site/GlobalSearch';
+import { entityImageAlt } from '../../lib/discoveryImages';
 
 const TOPICS = [
   { label: 'This Weekend', to: '/events/this-weekend' },
@@ -51,7 +52,7 @@ function FeatureCard({
     ? '/images/illustration/calgarywatch-start-market-v1.webp'
     : '/images/illustration/calgarywatch-start-weekend-v1.webp';
   const imgSrc = entity.image?.src || fallbackImg;
-  const imgAlt = entity.image?.alt || `${entity.title} in Calgary`;
+  const imgAlt = entityImageAlt(entity.image);
 
   return (
     <Link className={`cw-cityhero-feature cw-cityhero-feature-${size}`} to={entityPath(entity)}>
@@ -62,7 +63,10 @@ function FeatureCard({
           src={imgSrc}
           alt={imgAlt}
           loading={size === 'lg' ? 'eager' : 'lazy'}
-          onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackImg; }}
+          onError={(e) => {
+            e.currentTarget.src = fallbackImg;
+            e.currentTarget.alt = '';
+          }}
         />
         <span className="cw-cityhero-feature-tag">{entity.kind === 'market' ? 'Market day' : 'On the calendar'}</span>
         <span className="cw-cityhero-feature-arrow" aria-hidden="true"><ArrowUpRight size={20} /></span>
@@ -151,7 +155,6 @@ export function CityHero({ entities, occurrences }: { entities: DiscoveryEntity[
           {featured.length ? (
             <div className="cw-cityhero-features">
               <FeatureCard entity={featured[0]} size="lg" occurrences={occurrences} />
-              {featured[1] && <FeatureCard entity={featured[1]} size="md" occurrences={occurrences} />}
             </div>
           ) : <p className="cw-thisweek-empty">Nothing published yet — check back soon.</p>}
         </div>

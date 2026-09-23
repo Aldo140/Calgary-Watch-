@@ -944,10 +944,11 @@ export default function MapPage() {
   }, [searchParams, isAuthReady, user, openAuthPanel, setSearchParams]);
 
   // `?settings=alerts` — the deep link the instant-alert email points at so a
-  // reader can turn alerts off or retune them. Opens account settings (or the
-  // sign-in panel first) and strips the param.
+  // `?settings=account` is the equivalent entry point from product navigation.
+  // Both open account settings (or sign-in first) and strip the one-shot param.
   useEffect(() => {
-    if (searchParams.get('settings') !== 'alerts' || !isAuthReady) return;
+    const settingsTarget = searchParams.get('settings');
+    if ((settingsTarget !== 'alerts' && settingsTarget !== 'account') || !isAuthReady) return;
     if (!user) {
       openAuthPanel('signin');
     } else {

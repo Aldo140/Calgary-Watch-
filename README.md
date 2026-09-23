@@ -225,7 +225,7 @@ Deploy order:
 
 1. `npm run backfill:visibility -- --commit`
 2. `firebase deploy --only firestore:indexes` — wait for the indexes to finish building
-3. `firebase deploy --only firestore:rules`
+3. `firebase deploy --only firestore:rules,storage`
 4. Deploy the client
 
 ### Domain Reputation and ISP-Level Blocking

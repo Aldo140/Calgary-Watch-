@@ -55,7 +55,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Deploy Firestore rules
+      - name: Deploy Firestore and Storage rules
         if: ${{ inputs.target == 'rules' }}
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}

@@ -1,6 +1,6 @@
 import { Incident, STATUS_ICONS, CATEGORY_ICONS, FLAG_THRESHOLD, isPubliclyVisible } from '@/src/types';
 import { findNearestCamera, type TrafficCamera } from '@/src/hooks/useTrafficCameras';
-import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, ArrowRight } from 'lucide-react';
+import { X, MapPin, Clock, ShieldCheck, Share2, Navigation, Layers, ExternalLink, User, AlertCircle, Link, Twitter, Mail, MessageCircle, Facebook, Siren, Flag, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatRelativeTime } from '@/src/lib/format';
 import { cn, publicAsset } from '@/src/lib/utils';
@@ -411,6 +411,30 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                 </div>
               )}
 
+              {/* The reporter's own photo leads. It used to sit below the
+                  confirmation block at thumbnail height, where the single most
+                  direct piece of evidence in the report was easy to scroll
+                  past. */}
+              {incident.image_url && (
+                <div className="space-y-2.5">
+                  <SectionLabel><ImageIcon size={12} /> Reporter's photo</SectionLabel>
+                  <a
+                    href={incident.image_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                    style={{ border: `1px solid ${P.line}` }}
+                  >
+                    <img
+                      src={incident.image_url}
+                      alt="Photo submitted with this report"
+                      loading="lazy"
+                      className="w-full rounded-none object-cover max-h-[420px]"
+                    />
+                  </a>
+                </div>
+              )}
+
               {/* The report itself follows any directly referenced street view. */}
               <div className="space-y-2.5">
                 <SectionLabel>What was reported</SectionLabel>
@@ -457,19 +481,6 @@ export default function IncidentDetailPanel({ incident, trafficCameras, onClose,
                   ) : (
                     <p className="text-[11.5px]" style={{ color: P.soft }}>Sign in to add your confirmation.</p>
                   )}
-                </div>
-              )}
-
-              {incident.image_url && (
-                <div className="space-y-2.5">
-                  <SectionLabel>Photo</SectionLabel>
-                  <img
-                    src={incident.image_url}
-                    alt="Incident photo"
-                    loading="lazy"
-                    className="w-full rounded-none object-cover max-h-64"
-                    style={{ border: `1px solid ${P.line}` }}
-                  />
                 </div>
               )}
 

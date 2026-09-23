@@ -547,7 +547,7 @@ export default function Sidebar({
                               <img
                                 src={incident.image_url}
                                 alt=""
-                                className="h-16 w-16 shrink-0 border-[1.5px] border-[#C9D8E4] object-cover"
+                                className="h-24 w-24 shrink-0 border-[1.5px] border-[#C9D8E4] object-cover"
                                 loading="lazy"
                               />
                             )}

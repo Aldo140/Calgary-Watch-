@@ -1724,6 +1724,7 @@ export default function MapPage() {
             visibility: 'public',
             flag_count: 0,
             flagged_by: [],
+            ...(data.image_url ? { image_url: data.image_url } : {}),
           });
           if (user.email) {
             batch.set(doc(db!, 'incident_reporters', incidentRef.id), {
@@ -4158,6 +4159,7 @@ export default function MapPage() {
           locationAvailable={!!userLocation}
           onRequestMapPin={handleEmergencyRequestPin}
           isPinMode={isEmergencyPinMode}
+          userUid={user?.uid}
           userName={
             user
               ? ((user.displayName?.split(/\s+/)[0]) || user.email?.split('@')[0] || 'User')

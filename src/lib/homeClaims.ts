@@ -50,10 +50,10 @@ export function recentPins(incidents: Incident[], now: number, max = 40): Exampl
     .filter(i => isPubliclyVisible(i) && !isDemoIncident(i) && i.timestamp > now - REPORT_WINDOW_MS && !(i.expires_at && i.expires_at < now)
       && Number.isFinite(i.lat) && Number.isFinite(i.lng) && i.lat > 50.8 && i.lat < 51.3 && i.lng > -114.4 && i.lng < -113.8)
     .slice(0, max)
-    .map(i => ({ id: i.id, title: (i.title ?? '').trim(), neighborhood: i.neighborhood, category: i.category, timestamp: i.timestamp, lat: i.lat, lng: i.lng }));
+    .map(i => ({ id: i.id, title: (i.title ?? '').trim(), neighborhood: i.neighborhood, category: i.category, timestamp: i.timestamp, lat: i.lat, lng: i.lng, source: !i.data_source || i.data_source === 'community' ? 'Neighbour report' : (i.source_name || 'Official source') }));
 }
 
-export interface ExampleReport { id: string; title: string; neighborhood?: string; category: IncidentCategory; timestamp: number; lat?: number; lng?: number }
+export interface ExampleReport { id: string; title: string; neighborhood?: string; category: IncidentCategory; timestamp: number; lat?: number; lng?: number; source?: string }
 
 /**
  * One real, current report to show as an example of what the live map holds.

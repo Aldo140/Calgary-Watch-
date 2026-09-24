@@ -57,6 +57,42 @@ function CityMap({ pins }: { pins: ExampleReport[] }) {
   );
 }
 
+const EXAMPLES: ExampleReport[] = [
+  { id: 'ex1', title: 'Car break-in, glass on the street', neighborhood: 'Inglewood', category: 'crime', timestamp: 0, source: 'Neighbour report' },
+  { id: 'ex2', title: 'Road closed after a collision', neighborhood: 'Beltline', category: 'traffic', timestamp: 0, source: 'City of Calgary' },
+  { id: 'ex3', title: 'Power out on several blocks', neighborhood: 'Bowness', category: 'infrastructure', timestamp: 0, source: 'ENMAX' },
+];
+const deviceClock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+
+/** The app as it looks on a phone: a map strip and a sheet of the latest reports. */
+function PhonePreview({ pins, now }: { pins: ExampleReport[]; now: number }) {
+  const real = pins.filter(p => p.title).slice(0, 3);
+  const cards = real.length ? real : EXAMPLES;
+  const label = (c: string) => INCIDENT_CATEGORIES.find(x => x.value === c)?.label ?? c;
+  return (
+    <div className="cm-device" aria-hidden="true">
+      <div className="cm-device-screen">
+        <div className="cm-device-top"><span className="cm-pulse" />CalgaryWatch Live<span className="cm-device-time">{deviceClock.format(now || Date.now())}</span></div>
+        <div className="cm-device-map"><CityMap pins={pins} /></div>
+        <div className="cm-device-sheet">
+          <p className="cm-device-sheet-head">{real.length ? 'Latest in Calgary' : 'Example reports'}</p>
+          {cards.map(r => (
+            <div key={r.id} className="cm-device-card">
+              <i style={{ background: COLOR[r.category] ?? '#00c2e0' }} />
+              <div>
+                <small>{label(r.category)}{r.neighborhood ? ` · ${r.neighborhood}` : ''}</small>
+                <b>{r.title}</b>
+                <em>{r.source ?? 'Report'}{real.length ? ` · ${timeAgo(r.timestamp, now)}` : ''}</em>
+              </div>
+            </div>
+          ))}
+          {!real.length ? <div className="cm-device-card cm-device-backed"><ShieldCheck size={14} /> Backed by 3 neighbours</div> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PhoneMock() {
   return (
     <div className="cm-phone" aria-hidden="true">
@@ -172,7 +208,8 @@ export default function CommunityPage() {
               </ul>
             </div>
             <div className="cm-hero-map">
-              <CityMap pins={recent} />
+              <div className="cm-hero-mapbg"><CityMap pins={recent} /></div>
+              <PhonePreview pins={recent} now={checkedAt ?? 0} />
               <div className="cm-map-card" aria-live="polite">
                 {status === 'ready' ? (
                   <>

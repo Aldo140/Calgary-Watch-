@@ -143,6 +143,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
       <div className="h-ways-head">
         <h2 id="h-ways-title">One city, <span>five ways in.</span></h2>
         <p>What’s on, what’s open and what’s going on near you. Every example below is real and current.</p>
+        <span className="h-ways-swipe" aria-hidden="true">Swipe →</span>
       </div>
 
       <ul className="h-ways-grid">

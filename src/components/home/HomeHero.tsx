@@ -21,7 +21,7 @@ const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', h
 
 /** A torn paper edge (the site's collage language) where the page meets the scene.
  * Deterministic, so it never shifts between renders. */
-const TEAR = (() => {
+export const TEAR = (() => {
   let seed = 9;
   const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
   const pts: string[] = [];

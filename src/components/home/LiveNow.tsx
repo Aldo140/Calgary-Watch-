@@ -6,6 +6,7 @@ import { describeSky } from '../../lib/weatherCodes';
 import { AIR_BAND_LABEL, classifyPm25 } from '../../lib/airQuality';
 import { INCIDENT_CATEGORIES } from '../../constants';
 import { SkyGlyph } from './WeekPlanner';
+import { TEAR } from './HomeHero';
 
 const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
@@ -23,10 +24,13 @@ export function LiveNow({ weather, pulse }: { weather: CalgaryWeather; pulse: Li
 
   return (
     <section className="h-live" aria-labelledby="h-live-title">
+      <svg className="h-live-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d={TEAR} className="h-tear-paper" />
+      </svg>
       <div className="cw-wrap h-live-grid">
         <div className="h-live-lead">
           <p className="h-live-eyebrow"><span className="h-pulse" aria-hidden="true" /> CalgaryWatch Live</p>
-          <h2 id="h-live-title">Right now in Calgary.</h2>
+          <h2 id="h-live-title">Right now <span>in Calgary.</span></h2>
           <p>Public reports, road and weather conditions, outages and river levels, all on one map with the source shown.</p>
           <Link className="h-btn h-btn-live" to="/map">Open the live map <ArrowUpRight size={18} /></Link>
         </div>
@@ -64,6 +68,9 @@ export function LiveNow({ weather, pulse }: { weather: CalgaryWeather; pulse: Li
           ) : reports.status === 'loading' || reports.status === 'idle' ? <div className="h-fact h-fact-loading h-fact-reports" aria-hidden="true" /> : null}
         </dl>
       </div>
+      <svg className="h-live-tear h-live-tear-bottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d={TEAR} className="h-tear-paper" />
+      </svg>
     </section>
   );
 }

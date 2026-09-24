@@ -77,6 +77,7 @@ export function WeekPlanner({ days, forecast, selected, onSelect }: {
         </p>
       </div>
 
+      <div className="h-days-scroll">
       <div className="h-days" role="tablist" aria-label="Choose a day" onKeyDown={onKey}>
         <svg className="h-line" viewBox={`0 0 ${days.length * 100} 100`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <defs>
@@ -125,6 +126,7 @@ export function WeekPlanner({ days, forecast, selected, onSelect }: {
             </button>
           );
         })}
+      </div>
       </div>
 
       <div className="h-day-panel" role="tabpanel" id="h-day-panel" aria-labelledby={`h-day-${selected}`}>

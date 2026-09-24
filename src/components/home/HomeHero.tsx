@@ -17,6 +17,7 @@ const INTENTS = [
 ];
 
 const dateline = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
+const shortDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
 /** A torn paper edge (the site's collage language) where the page meets the scene.
@@ -85,16 +86,23 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
       />
       <div className="cw-wrap h-hero-inner">
         <p className="h-dateline">
-          <span>{dateline.format(new Date(now))}</span>
-          <span aria-hidden="true">·</span>
-          <span>Calgary</span>
+          <span className="h-dateline-live" title={`Live sky: the sun’s real position${current ? ' and current Calgary weather' : ''}`}>
+            <span className="h-pulse" aria-hidden="true" />Live sky · {clock.format(new Date(now))}
+          </span>
+          <span className="h-date-long">{dateline.format(new Date(now))}</span>
+          <span className="h-date-short">{shortDate.format(new Date(now))}</span>
+          <span className="h-date-city" aria-hidden="true">·</span>
+          <span className="h-date-city">Calgary</span>
           {current && sky ? (
             <Link to="/map" className="h-dateline-wx" title="Current conditions: open the live map">
               <SkyGlyph icon={sky.icon} size={15} /> {Math.round(current.temp)}° {sky.label.toLowerCase()}
             </Link>
           ) : null}
         </p>
-        <h1 id="h-hero-title">What’s happening <em>in Calgary.</em></h1>
+        <h1 id="h-hero-title">
+          What’s happening <em>in Calgary.</em>
+          <img className="h-hero-mark" src="/images/brand/calgarywatch-city-spark-v2.webp" width="72" height="72" alt="" aria-hidden="true" />
+        </h1>
         <p className="h-summary">
           {summarize(days)}{' '}
           {firstWeekend > 0 ? <button type="button" onClick={() => onPickDay(firstWeekend)}>See the weekend</button> : null}

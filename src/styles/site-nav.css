@@ -139,6 +139,8 @@
   .cw-nav .cw-wrap.cw-nav-bar { padding-left: 16px; padding-right: 10px; gap: 10px; }
   .cw-nav .cw-wordmark { font-size: 18px; gap: 7px; }
   .cw-nav .cw-wordmark-logo { width: 28px; height: 28px; }
+  /* On the homepage the mark sits in the hero; it returns to the bar once you scroll. */
+  .cw-nav[data-overlay='true'] .cw-wordmark-logo { display: none; }
   .cw-nav-live-long { display: none; }
   .cw-site .cw-nav-live { height: 38px; padding: 0 12px; font-size: 13px; }
   .cw-site .cw-nav-icon { width: 40px; height: 40px; }

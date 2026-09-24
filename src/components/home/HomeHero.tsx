@@ -100,9 +100,10 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
           ) : null}
         </p>
         <h1 id="h-hero-title">
-          <span className="h-h1-top">What’s<span className="h-mark-slot" aria-hidden="true">
-            <img className="h-hero-mark" src="/images/brand/calgarywatch-city-spark-v2.webp" width="72" height="72" alt="" />
-          </span></span> happening <em>in Calgary.</em>
+          <span className="h-h1-line">What’s</span> <span className="h-h1-line">happening</span> <em>in Calgary.</em>
+          <span className="h-mark-slot" aria-hidden="true">
+            <img className="h-hero-mark" src="/images/brand/calgarywatch-city-spark-v2.webp" width="160" height="160" alt="" />
+          </span>
         </h1>
         <p className="h-summary">
           {summarize(days)}{' '}

@@ -127,18 +127,8 @@
   background: rgba(4, 10, 28, .5); color: #fff; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
 }
 /* Phone headline: the mark fills the space beside "What's", centred both ways. */
-.cw-home2 .h-mark-slot { flex: 1; position: relative; align-self: stretch; --mark-y: 50%; }
-.cw-home2 .h-mark-slot::before {
-  content: ''; position: absolute; left: 50%; top: var(--mark-y); width: 2.1em; height: 2.1em; transform: translate(-50%, -50%);
-  border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .5), rgba(255, 255, 255, .12) 45%, rgba(255, 255, 255, 0) 70%);
-}
-.cw-home2 .h-hero[data-tone='light'] .h-mark-slot::before { background: radial-gradient(circle, rgba(255, 214, 92, .28), rgba(255, 214, 92, .06) 45%, rgba(255, 214, 92, 0) 70%); }
-.cw-home2 .h-hero-mark {
-  position: absolute; left: 50%; top: var(--mark-y); width: 1.16em; height: 1.16em; margin: -.58em 0 0 -.58em;
-  animation: h-mark-in .8s cubic-bezier(.2, 1.4, .4, 1) both, h-mark-float 6s ease-in-out .8s infinite;
-}
-@keyframes h-mark-in { from { transform: scale(.5); opacity: 0; } }
-@keyframes h-mark-float { 50% { transform: translateY(-.05em); } }
+.cw-home2 .h-hero-mark { width: min(92%, 2.5em); height: auto; aspect-ratio: 1; animation: h-mark-in .7s cubic-bezier(.2, 1.4, .4, 1) both; }
+@keyframes h-mark-in { from { transform: scale(.6); opacity: 0; } }
 
 
 .cw-home2 .h-tear { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(34px, 4vw, 60px); display: block; }
@@ -305,7 +295,7 @@
 @media (max-width: 640px) {
   .cw-home2 .cw-wrap { padding-left: 16px; padding-right: 16px; }
   .cw-home2 .h-hero { margin-top: -62px; min-height: 900px; padding: calc(62px + 28px) 0 120px; }
-  .cw-home2 .h-hero h1 { font-size: clamp(46px, 14vw, 62px); }
+  .cw-home2 .h-hero h1 { font-size: clamp(44px, 12.8vw, 62px); }
   .cw-home2 .h-summary { margin: 16px 0 20px; font-size: 16px; }
   .cw-home2 .h-hero { min-height: max(620px, 100vh); min-height: max(620px, 100svh); padding-bottom: 0; }
   .cw-home2 .h-dateline { margin-bottom: 16px; }
@@ -315,9 +305,10 @@
   .cw-home2 .h-dateline { gap: 8px; font-size: 12px; }
   .cw-home2 .h-date-short { display: inline-flex; }
   .cw-home2 .h-date-long, .cw-home2 .h-date-city { display: none; }
-  .cw-home2 .h-hero h1 { max-width: none; }
-  .cw-home2 .h-h1-top { display: flex; }
-  .cw-home2 .h-mark-slot { display: flex; }
+  /* The mark takes the whole empty block right of the headline, centred both ways. */
+  .cw-home2 .h-hero h1 { max-width: none; display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 8px; }
+  .cw-home2 .h-hero h1 .h-h1-line, .cw-home2 .h-hero h1 em { grid-column: 1; }
+  .cw-home2 .h-mark-slot { display: flex; grid-column: 2; grid-row: 1 / span 3; align-items: center; justify-content: center; }
   .cw-home2 .h-facts { grid-template-columns: minmax(0, 1fr); }
   .cw-home2 .h-fact { min-height: 0; }
   .cw-home2 .h-guides a { grid-template-columns: 40px minmax(0, 1fr) 18px; gap: 12px; }

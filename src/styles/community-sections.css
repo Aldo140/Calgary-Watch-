@@ -255,3 +255,70 @@
 
 .lh-ticker-spacer { height: 56px; }
 .lh-stats div:last-child { border-right: 0; }
+
+/* ── Phones ───────────────────────────────────────────────────────── */
+.cx-dots { display: none; }
+@media (max-width: 640px) {
+  /* Hero: buttons side by side, tighter rhythm */
+  .lh-ctas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; }
+  .lh-cta { justify-content: center; padding: 14px 12px; font-size: 14.5px; }
+  .lh-kicker { gap: 8px; font-size: 11px; }
+  .lh-stats { margin-top: 28px !important; }
+  .lh-ticker-spacer { height: 36px; }
+
+  /* Five sources: compact stack first, every description visible */
+  .cx-layers { padding: 64px 0 56px; }
+  .cx-layers-grid { gap: 8px; }
+  .cx-stack { order: -1; max-width: 300px; margin: 0 auto -10px; }
+  .cx-stack svg { max-height: 330px; }
+  .cx-layers-grid > div:first-child { order: 0; }
+  .cx-layer-list { margin-top: 22px !important; gap: 6px; }
+  .cx-layer-list button { padding: 12px 14px; border-color: rgba(10, 26, 51, .08); background: #fff; }
+  .cx-layer-list button[aria-pressed='true'] { transform: none; }
+  .cx-layer-list button small { max-height: none; margin-top: 4px; font-size: 13.5px; }
+  .cx-layer-list button b { font-size: 17px; }
+
+  /* How it works: a swipeable carousel */
+  .cx-how { padding: 64px 0 48px; }
+  .cx-head { margin-bottom: 28px; }
+  .cx-steps { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 4px 16px 10px; scrollbar-width: none; }
+  .cx-steps::-webkit-scrollbar { display: none; }
+  .cx-step-wrap { flex: 0 0 82%; scroll-snap-align: center; padding: 18px 14px 20px; border-radius: 24px; background: #fff; box-shadow: 0 18px 36px -26px rgba(10, 26, 51, .5); }
+  .cx-step figcaption { font-size: 17px; margin-bottom: 14px; text-align: left; }
+  .cx-step figcaption span { width: 28px; height: 28px; font-size: 14px; flex: none; }
+  .cx-mini { width: 200px; height: 400px; border-radius: 34px; padding: 8px; }
+  .cx-mini-screen { border-radius: 27px; }
+  .cx-mini-map { height: 210px; }
+  .cx-step-wrap > p { font-size: 14px; }
+  .cx-dots { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+  .cx-dots button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 0; border-radius: 999px; background: #dfe6f1; color: #4d5767; font: 700 12px Inter, sans-serif; cursor: pointer; }
+  .cx-dots button i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .5; }
+  .cx-dots button[aria-selected='true'] { background: var(--navy); color: #fff; }
+  .cx-dots button[aria-selected='true'] i { background: var(--yellow); opacity: 1; }
+
+  /* Street: smaller radar, email tucked under it */
+  .cx-street { padding: 64px 0; }
+  .cx-radar { max-width: 300px; }
+  .cx-ring-key { margin: 20px 0 24px !important; }
+  .cx-email { margin: -28px 6px 0; }
+
+  /* Trust, alongside, FAQ, closing: tighter spacing */
+  .cx-trust, .cx-along, .cx-faq { padding: 64px 0; }
+  .cx-trust-grid, .cx-along-grid { gap: 24px; }
+  .cx-report h3 { font-size: 19px; }
+  .cx-911 { margin-top: 28px; padding: 14px 16px; }
+  .cx-911 p { font-size: 14.5px; }
+  .cx-faq-list summary { font-size: 16px; padding: 16px; }
+  .cx-faq-list details p { padding: 0 16px 16px; font-size: 15px; }
+  .cx-close { padding: 72px 0 48px; }
+  .cx-close-ctas { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; }
+  .cx-close-ctas .cx-btn { justify-content: center; padding: 14px 10px; font-size: 14px; }
+}
+@media (max-width: 640px) {
+  .lh-cta { white-space: nowrap; gap: 6px; padding: 14px 8px; font-size: 14px; }
+  .cx-stack { order: 1; margin: 18px auto 0; max-width: 280px; }
+  .cx-mini { height: 420px; }
+}
+@media (max-width: 360px) {
+  .lh-ctas { grid-template-columns: 1fr; }
+}

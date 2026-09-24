@@ -119,6 +119,16 @@ function MiniPhone({ children, step, title }: { children: React.ReactNode; step:
 }
 
 export function HowItWorks() {
+  const [step, setStep] = useState(0);
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const slide = el.scrollWidth / 3;
+    setStep(Math.min(2, Math.max(0, Math.round(el.scrollLeft / slide))));
+  };
+  const goTo = (i: number) => {
+    const el = document.getElementById('cx-steps');
+    el?.scrollTo({ left: (el.scrollWidth / 3) * i, behavior: 'smooth' });
+  };
   return (
     <section className="cx-how" aria-labelledby="cx-how-title">
       <div className="cw-wrap">
@@ -127,7 +137,7 @@ export function HowItWorks() {
           <h2 id="cx-how-title">From your phone to the map <span>in about a minute.</span></h2>
           <p className="cx-lead">Official sources are pinned automatically. A neighbour report takes three steps.</p>
         </div>
-        <div className="cx-steps">
+        <div className="cx-steps" id="cx-steps" onScroll={onScroll}>
           <svg className="cx-steps-line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M60,20 C250,-10 330,50 500,20 S760,-10 940,20" /></svg>
           <div className="cx-step-wrap">
             <MiniPhone step={1} title="Someone posts what they saw">
@@ -167,6 +177,11 @@ export function HowItWorks() {
             </MiniPhone>
             <p>People nearby tap once: “I saw this too”, “Still happening” or “Seems resolved”. The report shows the count.</p>
           </div>
+        </div>
+        <div className="cx-dots" role="tablist" aria-label="Steps">
+          {['Post', 'Pinned', 'Confirmed'].map((t, i) => (
+            <button key={t} type="button" role="tab" aria-selected={step === i} aria-label={`Step ${i + 1}: ${t}`} onClick={() => goTo(i)}><i />{t}</button>
+          ))}
         </div>
         <p className="cx-note">Example screens, not real reports.</p>
       </div>

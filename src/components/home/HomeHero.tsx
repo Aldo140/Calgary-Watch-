@@ -122,10 +122,6 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
         <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
         <path d={TEAR} className="h-tear-paper" />
       </svg>
-      <p className="h-sky-caption">
-        <span className="h-pulse" aria-hidden="true" />
-        Live sky: <span className="h-cap-long">the sun’s real position{current ? ' and current Calgary weather' : ''}</span><span className="h-cap-short">real sun{current ? ' & weather' : ''}</span> · {clock.format(new Date(now))}
-      </p>
     </section>
   );
 }

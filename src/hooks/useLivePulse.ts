@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 import type { Incident, IncidentCategory } from '@/src/types';
-import { pickExampleReport, summarizeReports, type ExampleReport } from '@/src/lib/homeClaims';
+import { pickExampleReport, recentPins, summarizeReports, type ExampleReport } from '@/src/lib/homeClaims';
 
 const SAMPLE = 60;
 
 export interface LivePulse {
-  reports: { status: 'idle' | 'loading' | 'ready' | 'error'; total: number; capped: boolean; byCategory: Partial<Record<IncidentCategory, number>>; checkedAt?: number; example?: ExampleReport | null };
+  reports: { status: 'idle' | 'loading' | 'ready' | 'error'; total: number; capped: boolean; byCategory: Partial<Record<IncidentCategory, number>>; checkedAt?: number; example?: ExampleReport | null; recent?: ExampleReport[] };
   air: { status: 'idle' | 'loading' | 'ready' | 'error'; pm25?: number };
 }
 
@@ -31,7 +31,7 @@ export function useLivePulse(enabled: boolean): LivePulse {
           if (cancelled) return;
           const now = Date.now();
           const incidents = snap.docs.map(d => ({ id: d.id, ...d.data() }) as Incident);
-          setReports({ status: 'ready', checkedAt: now, example: pickExampleReport(incidents, now), ...summarizeReports(incidents, now, SAMPLE) });
+          setReports({ status: 'ready', checkedAt: now, example: pickExampleReport(incidents, now), recent: recentPins(incidents, now), ...summarizeReports(incidents, now, SAMPLE) });
         })
         .catch(() => { if (!cancelled) setReports(r => ({ ...r, status: 'error' })); });
     } else {

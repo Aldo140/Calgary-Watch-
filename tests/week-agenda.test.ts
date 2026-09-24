@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { addCalgaryDays, weekAgenda } from '../src/lib/discoveryCalendar';
-import { pickExampleReport, summarize, summarizeReports, timeAgo } from '../src/lib/homeClaims';
+import { pickExampleReport, recentPins, summarize, summarizeReports, timeAgo } from '../src/lib/homeClaims';
 import { discoveryFixtures } from '../src/data/discovery';
 import type { DiscoveryEntity, MarketOccurrence } from '../src/types/discovery';
 
@@ -122,5 +122,20 @@ describe('example report', () => {
   it('says how long ago plainly', () => {
     assert.equal(timeAgo(t - 5 * 60000, t), '5 min ago');
     assert.equal(timeAgo(t - 3 * 3600000, t), '3 h ago');
+  });
+});
+
+describe('recent pins', () => {
+  const t = now.getTime();
+  const r = (o: object) => ({ id: 'x', title: 'Report', visibility: 'public', category: 'crime', timestamp: t - 3600000, lat: 51.04, lng: -114.07, ...o }) as any;
+  it('keeps only public, real, current reports with a Calgary position', () => {
+    const pins = recentPins([
+      r({ id: 'a' }),
+      r({ id: 'b', lat: 53.5, lng: -113.5 }),
+      r({ id: 'c', data_source: 'demo' }),
+      r({ id: 'd', timestamp: t - 3 * 86400000 }),
+      r({ id: 'e', lat: undefined }),
+    ], t);
+    assert.deepEqual(pins.map(p => p.id), ['a']);
   });
 });

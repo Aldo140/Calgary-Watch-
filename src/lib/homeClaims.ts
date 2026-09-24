@@ -41,6 +41,18 @@ export function summarizeReports(incidents: Incident[], now: number, sampleSize:
   return { total: recent.length, capped, byCategory };
 }
 
+/**
+ * Real report locations for a map illustration: the same public, non-demo, current
+ * reports the counts use, restricted to ones with a Calgary-area position.
+ */
+export function recentPins(incidents: Incident[], now: number, max = 40): ExampleReport[] {
+  return incidents
+    .filter(i => isPubliclyVisible(i) && !isDemoIncident(i) && i.timestamp > now - REPORT_WINDOW_MS && !(i.expires_at && i.expires_at < now)
+      && Number.isFinite(i.lat) && Number.isFinite(i.lng) && i.lat > 50.8 && i.lat < 51.3 && i.lng > -114.4 && i.lng < -113.8)
+    .slice(0, max)
+    .map(i => ({ id: i.id, title: (i.title ?? '').trim(), neighborhood: i.neighborhood, category: i.category, timestamp: i.timestamp, lat: i.lat, lng: i.lng }));
+}
+
 export interface ExampleReport { id: string; title: string; neighborhood?: string; category: IncidentCategory; timestamp: number; lat?: number; lng?: number }
 
 /**

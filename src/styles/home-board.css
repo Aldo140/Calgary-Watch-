@@ -27,11 +27,16 @@
   display: grid; gap: 18px;
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
-.cw-home2 .h-way-market { grid-column: 1 / 6; grid-row: 1; }
-.cw-home2 .h-way-event { grid-column: 6 / 10; grid-row: 1; }
-.cw-home2 .h-way-live { grid-column: 10 / 13; grid-row: 1 / 3; }
-.cw-home2 .h-way-hood { grid-column: 1 / 5; grid-row: 2; }
-.cw-home2 .h-way-mail { grid-column: 5 / 10; grid-row: 2; }
+/* Community Watch is the headline way in: a wide column spanning both rows. */
+.cw-home2 .h-way-market { grid-column: 1 / 5; grid-row: 1; }
+.cw-home2 .h-way-event { grid-column: 5 / 8; grid-row: 1; }
+.cw-home2 .h-way-live { grid-column: 8 / 13; grid-row: 1 / 3; }
+.cw-home2 .h-way-hood { grid-column: 1 / 4; grid-row: 2; }
+.cw-home2 .h-way-mail { grid-column: 4 / 8; grid-row: 2; }
+.cw-home2 .h-way-live .h-way-head strong { font-size: clamp(28px, 2.8vw, 38px); }
+.cw-home2 .h-way-live .h-way-desc { font-size: 16px; }
+.cw-home2 .h-way-more { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 4px; padding: 10px 16px; border-radius: 999px; background: var(--b-yellow); color: var(--b-ink); font: 700 14px/1 Inter, sans-serif; border: 2px solid var(--b-ink); }
+.cw-home2 .h-way-live > a:hover .h-way-more { background: #fff; }
 
 .cw-home2 .h-way > a {
   --w-bg: #fff; --w-ink: var(--b-ink); --w-muted: #3d4148;
@@ -478,4 +483,17 @@
   .cw-home2 .h-mini-small { font: 700 11px var(--h-mono); fill: var(--b-ink); }
   .cw-home2 .h-mini-light { fill: #fff; }
   .cw-home2 .h-mini-light.h-mini-big { font-size: 30px; }
+}
+
+/* Phones: Community Watch gets a full-width feature strip with a big radar. */
+@media (max-width: 700px) {
+  .cw-home2 .h-strip-live > a { grid-template-columns: minmax(0, 1fr) 34px; grid-template-rows: auto auto; row-gap: 14px; padding: 12px 12px 16px; }
+  .cw-home2 .h-strip-live .h-strip-art { grid-column: 1 / -1; width: 100%; height: 190px; }
+  .cw-home2 .h-strip-live .h-strip-art > svg { width: auto; height: 100%; margin: 0 auto; }
+  .cw-home2 .h-strip-live .h-strip-text b { font-size: 20px; }
+  .cw-home2 .h-strip-live { transform: none !important; }
+}
+.cw-home2 .h-way-head strong { min-width: 0; }
+@media (min-width: 1101px) {
+  .cw-home2 .h-way-hood .h-way-head strong { font-size: clamp(19px, 1.75vw, 25px); }
 }

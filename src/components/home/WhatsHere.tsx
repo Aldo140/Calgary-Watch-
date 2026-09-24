@@ -222,7 +222,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           ) : <span className="h-ticket"><span className="h-ticket-main"><b>See what’s listed</b></span></span>}
         </Card>
 
-        <Card to="/map" n="03" title="Live safety map" desc="Crime and safety reports from neighbours, plus Calgary Police news releases, closures and outages. Each one shows its source." className="h-way-live">
+        <Card to="/community" n="03" title="Community Watch" desc="A live crime and safety map for Calgary: reports from your neighbours, plus Calgary Police news releases, closures and outages, each with its source." className="h-way-live">
           <span className="h-way-kinds">
             <small>The kinds of reports you’ll see</small>
             <span>{REPORT_KINDS.map(k => <i key={k}>{k}</i>)}</span>
@@ -239,6 +239,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
               : <span className="h-dispatch-skeleton" />}
             {status === 'ready' && total ? <em>{total}{capped ? '+' : ''} public report{total === 1 ? '' : 's'} in the last 24 hours</em> : null}
           </span>
+          <span className="h-way-more">See how Community Watch works</span>
         </Card>
 
         <Card to={hood ? entityPath(hood) : '/neighbourhoods'} n="04" title="Neighbourhoods" desc="Guides to the city’s pockets, quadrant by quadrant." className="h-way-hood">
@@ -267,7 +268,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           art={<MiniTicket day={event ? dayShort.format(new Date(event.start)) : undefined} num={event ? dayNum.format(new Date(event.start)) : undefined} />}>
           {event ? <><b>{event.title}</b><em>{clock.format(new Date(event.start))}{placeOf(event) ? ` · ${placeOf(event)}` : ''}</em></> : <b>See what’s listed</b>}
         </Strip>
-        <Strip to="/map" n="03" name="Live safety map" what="· reports near you" className="h-strip-live" art={<Radar report={report} />}>
+        <Strip to="/community" n="03" name="Community Watch" what="· crime & safety map" className="h-strip-live" art={<Radar report={report} />}>
           {report
             ? <><b>{report.title}</b><em><span className="h-pulse" aria-hidden="true" /> {timeAgo(report.timestamp, checkedAt ?? report.timestamp)}{report.neighborhood && !report.title.includes(report.neighborhood) ? ` · ${report.neighborhood}` : ''}</em></>
             : <><b>Break-ins, stolen bikes, closures, outages</b><em>{status === 'ready' ? (total ? `${total}${capped ? '+' : ''} reports in the last 24 hours` : 'Quiet for the last 24 hours') : 'Each report shows its source'}</em></>}

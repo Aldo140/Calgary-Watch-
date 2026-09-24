@@ -12,10 +12,11 @@ import { collection, addDoc } from 'firebase/firestore';
 // Lazy-load every page so the initial bundle stays minimal and module-eval
 // failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
-const OriginalLandingPage = lazy(() => import('@/src/pages/LandingPage'));
+const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
 const DiscoveryPage = lazy(() => import('@/src/pages/DiscoveryPage'));
 const MapPage     = lazy(() => import('@/src/pages/MapPage'));
+const NotFoundPage = lazy(() => import('@/src/pages/NotFoundPage'));
 const AboutPage   = lazy(() => import('@/src/pages/AboutPage'));
 const AdminPage   = lazy(() => import('@/src/pages/AdminPage'));
 const AdminUserListPage = lazy(() => import('@/src/pages/admin/AdminUserListPage'));
@@ -147,7 +148,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/submit" element={<SubmitDiscoveryPage />} />
-          <Route path="/community" element={<OriginalLandingPage />} />
+          <Route path="/community" element={<CommunityPage />} />
           <Route path="/events" element={<DiscoveryPage />} />
           <Route path="/events/:slug" element={<DiscoveryPage />} />
           <Route path="/markets" element={<DiscoveryPage />} />
@@ -171,7 +172,7 @@ export default function App() {
           <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />
           <Route path="/airdrie-crime-map" element={<AirdrieCrimeMapPage />} />
           {/* Redirect unknown paths to landing page */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

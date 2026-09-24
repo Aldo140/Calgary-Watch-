@@ -138,9 +138,8 @@
 @keyframes h-train { 0% { transform: translateX(-200px); } 55%, 100% { transform: translateX(1800px); } }
 .cw-home2 .h-cyclist { animation: h-ride 30s linear infinite; }
 @keyframes h-ride {
-  0% { transform: translate(400px, 762px); opacity: 0; } 3% { opacity: 1; }
-  25% { transform: translate(590px, 752px); }
-  47% { opacity: 1; } 50%, 100% { transform: translate(780px, 762px); opacity: 0; }
+  0% { transform: translate(566px, 800px) scale(1.1); opacity: 0; } 4% { opacity: 1; }
+  44% { opacity: 1; } 48%, 100% { transform: translate(757px, 713px) scale(.4); opacity: 0; }
 }
 .cw-home2 .h-geese { animation: h-geese 64s linear infinite; }
 @keyframes h-geese { 0% { transform: translateX(1760px); } 60%, 100% { transform: translateX(-160px); } }

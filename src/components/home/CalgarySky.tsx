@@ -249,18 +249,27 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
         <path d="M120,730h60M340,748h90M980,736h70M1260,756h110M620,778h80M1460,774h60" />
       </g>
 
-      {/* Peace Bridge */}
-      <path d="M400,764Q590,746 780,764" fill="none" stroke={mix('#efe6d6', p.ground, night * 0.6)} strokeWidth="4" />
+      {/* Peace Bridge: a red helix tube from the near bank to the far one, in perspective.
+          The near end dips below the shoreline so the bank (drawn next) anchors it. */}
+      <path d="M724,714L790,714L786,709L728,709Z" fill={mix('#efe6d6', p.ground, 0.35 + night * 0.4)} />
+      <path d="M506,812Q640,750 734,716L792,716Q690,760 626,812Z" fill={mix('#0b1a2a', p.ground, 0.4)} opacity=".3" transform="translate(16 8)" />
+      <path d="M510,808Q640,748 736,712L778,712Q684,756 618,808Z" fill={mix('#efe6d6', p.ground, night * 0.6)} />
+      <path d="M510,808Q640,748 736,712L736,697Q640,728 510,768Z" fill="url(#hs-helix)" opacity=".5" />
       <g className="h-cyclist" fill="none" stroke={mix(p.city, '#000000', 0.3)} strokeWidth="1.6" strokeLinecap="round">
         <circle cx="-5" cy="-3.5" r="3.3" /><circle cx="5" cy="-3.5" r="3.3" />
         <path d="M-5,-3.5L-1,-8L4,-8L5,-3.5M-1,-8L-3,-12M-3,-12L1,-17M1,-17L4,-10" />
         <circle cx="2" cy="-19.5" r="2.2" fill={mix(p.city, '#000000', 0.3)} stroke="none" />
       </g>
-      <path d="M420,742Q590,722 760,742L760,760Q590,742 420,760Z" fill="url(#hs-helix)" />
-      <path d="M420,742Q590,722 760,742L760,760Q590,742 420,760Z" fill="none" stroke="#e2403a" strokeWidth="2.5" />
+      <path d="M618,808Q684,756 778,712L778,697Q690,736 618,768Z" fill="url(#hs-helix)" />
+      <path d="M510,768Q564,748 618,768Q690,736 778,697Q757,690 736,697Q640,728 510,768Z" fill="url(#hs-helix)" />
+      <g fill="none" stroke="#e2403a" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round">
+        <path d="M618,808Q684,756 778,712M618,768Q690,736 778,697M510,768Q640,728 736,697M736,697Q757,690 778,697V712" />
+        <path d="M510,812V768Q564,748 618,768V812" strokeWidth="3.5" />
+      </g>
 
       <path d={`M-20,800Q300,786 620,796T1300,794T1620,800V900H-20Z`} fill={p.ground} />
       <path d="M-20,842Q400,826 800,840T1620,836" fill="none" stroke={mix('#efe6d6', p.ground, 0.55 + night * 0.3)} strokeWidth="5" />
+      <path d="M544,836Q548,820 554,808L598,808Q606,820 610,836Q578,832 544,836Z" fill={mix('#efe6d6', p.ground, 0.55 + night * 0.3)} />
       {trees.map((t, i) => (
         <g key={i} fill={mix(p.ground, i % 2 ? p.hills : '#000000', 0.35)}>
           <rect x={t.x - 2} y={800 - t.h * 0.3} width="4" height={t.h * 0.3 + 4} />

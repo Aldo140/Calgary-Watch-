@@ -4,6 +4,7 @@ import { SiteLayout } from '../components/site/SiteLayout';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { INCIDENT_CATEGORIES } from '../constants';
 import { timeAgo, type ExampleReport } from '../lib/homeClaims';
+import { COMMUNITY_FAQS } from '../content/communityWatch';
 import '../styles/community.css';
 
 /** Site-wide reach the owner reports; update here when it changes. */
@@ -157,7 +158,7 @@ export default function CommunityPage() {
         <section className="cm-hero" aria-labelledby="cm-title">
           <div className="cw-wrap cm-hero-grid">
             <div className="cm-hero-copy">
-              <p className="cm-kicker"><span className="cm-pulse" aria-hidden="true" />CalgaryWatch Community Watch</p>
+              <p className="cm-kicker"><span className="cm-pulse" aria-hidden="true" />Calgary crime watch · Community Watch</p>
               <h1 id="cm-title">Crime and safety reports from your neighbours, <span>on one map.</span></h1>
               <p className="cm-lead">Calgarians post what they see. We add Calgary Police news releases, City of Calgary data, weather alerts and power outages. Everything is pinned where it happened, with its source.</p>
               <div className="cm-ctas">
@@ -282,6 +283,21 @@ export default function CommunityPage() {
               {['Community Facebook group', 'Nextdoor', 'Local news'].map((t, i) => <span key={t} className={`cm-bubble cm-bubble-${i}`}>{t}</span>)}
               <svg viewBox="0 0 120 40" className="cm-arrow"><path d="M4,20H104M92,8L108,20L92,32" fill="none" stroke="#151515" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg>
               <span className="cm-onemap"><MapPin size={20} /> One map</span>
+            </div>
+          </section>
+
+          <section className="cm-section" aria-labelledby="cm-faq">
+            <div className="cm-head">
+              <h2 id="cm-faq">Questions people ask</h2>
+              <p>Straight answers about the Calgary crime map.</p>
+            </div>
+            <div className="cm-faq">
+              {COMMUNITY_FAQS.map(f => (
+                <details key={f.question}>
+                  <summary>{f.question}</summary>
+                  <p>{f.answer}</p>
+                </details>
+              ))}
             </div>
           </section>
 

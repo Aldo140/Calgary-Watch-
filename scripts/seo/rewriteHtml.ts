@@ -224,14 +224,14 @@ export function buildStaticRouteBody(pathname: string): string {
 
   const summaries: Record<string, { heading: string; copy: string; links: [string, string][] }> = {
     '/community': {
-      heading: 'See it. Share it. Calgary knows.',
-      copy: 'The original Calgary Watch community homepage. Explore recent community reports, traffic, weather, infrastructure and emergencies.',
-      links: [['/map', 'Open the live map'], ['/', 'Explore Calgary'], ['/about', 'About Calgary Watch']],
+      heading: 'Calgary crime watch: crime and safety reports from your neighbours, on one map.',
+      copy: 'CalgaryWatch Community Watch is a free live crime and safety map for Calgary. Neighbours post what they see, and we add Calgary Police news releases, City of Calgary 311 and traffic data, weather and emergency alerts and power outages. Every pin shows its source. It works alongside Block Watch, neighbourhood watch groups, Facebook groups and Nextdoor. In an emergency call 911.',
+      links: [['/map', 'Open the Calgary crime map'], [GUIDE_PATH, 'Start a neighbourhood watch'], ['/coverage', 'Every source we use'], [AIRDRIE_GUIDE_PATH, 'Airdrie crime map guide']],
     },
     '/': {
-      heading: 'What’s happening in Calgary?',
-      copy: 'Events, markets, local places and what’s happening around you — all in one place. Our first discovery collections are being prepared. CalgaryWatch Live brings together community reports, traffic, weather and outages. See it. Share it. Calgary knows.',
-      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/guides', 'Guides'], ['/neighbourhoods', 'Neighbourhoods'], ['/map', 'Open Live Map']],
+      heading: 'What’s happening in Calgary.',
+      copy: 'CalgaryWatch is Calgary’s crime watch: a live Calgary crime map and public safety map, plus events, markets and local places. Community Watch puts crime and safety reports from neighbours next to Calgary Police news releases, City data, weather and outages. The week planner lists real events and markets by day.',
+      links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/neighbourhoods', 'Neighbourhoods']],
     },
     '/map': {
       heading: 'Calgary crime map with recent reports near you',
@@ -244,8 +244,8 @@ export function buildStaticRouteBody(pathname: string): string {
       links: [['/map', 'View the live map'], [GUIDE_PATH, 'Neighbourhood watch and reporting guide']],
     },
     '/coverage': {
-      heading: 'Calgary-area community coverage',
-      copy: 'Calgary Watch supports reports across Calgary, Airdrie, Cochrane, Okotoks, Chestermere, and other nearby Alberta communities.',
+      heading: 'Where every pin on the Calgary safety map comes from',
+      copy: 'Every source behind the CalgaryWatch map: neighbour reports, Calgary Police news releases, City of Calgary 311, traffic and water main breaks, Environment Canada and Alberta Emergency Alerts, ENMAX outages and river levels, with how often each updates. Built for Calgary.',
       links: [['/map', 'View the Calgary-area incident map'], [AIRDRIE_GUIDE_PATH, 'Read the Airdrie crime map guide'], [GUIDE_PATH, 'Read the neighbourhood watch guide']],
     },
     '/privacy': {

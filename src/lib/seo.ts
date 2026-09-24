@@ -1,5 +1,6 @@
 import { discoveryIndexingEnabled } from './discoveryPublication';
 import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
+import { COMMUNITY_FAQS, COMMUNITY_PATH } from '@/src/content/communityWatch';
 import { DISCOVERY_SECTIONS, type DiscoveryRepository } from './discovery';
 import { discoveryRepository } from '../data/discovery';
 import { buildEntityJsonLd, indexableEntities } from './discoverySeo';
@@ -40,16 +41,16 @@ const SEO_REFRESH_MOD = '2026-08-29';
 
 export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/community': {
-    title: 'Calgary Watch Community | See it. Share it. Calgary knows.',
-    description: 'The original Calgary Watch homepage. Explore the community safety platform and open the live map for local reports, traffic, weather and outages.',
+    title: 'Calgary Crime Watch: Live Community Safety Map | CalgaryWatch',
+    description: 'Calgary’s community watch map: crime and safety reports from neighbours, Calgary Police news releases, City of Calgary data and alerts, pinned where they happened. Free.',
     index: true,
     pageType: 'WebPage',
     image: DEFAULT_IMAGE,
   },
   '/': {
-    title: 'What’s happening in Calgary? | CalgaryWatch',
+    title: 'Calgary Crime Watch, Live Safety Map & Events | CalgaryWatch',
     description:
-      'Discover Calgary events, markets, local places and neighbourhoods, alongside live community reports, traffic, weather and outages.',
+      'What’s happening in Calgary: a live Calgary crime map from neighbours and official sources, plus events, markets and local places. Free, Calgary only.',
     index: true,
     pageType: 'WebPage',
     dateModified: LAST_MOD,
@@ -237,7 +238,16 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
       })),
     },
     ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences()) } : {}),
-    ...(pathname === GUIDE_PATH
+    ...(pathname === COMMUNITY_PATH
+      ? {
+          about: ['Calgary crime map', 'Calgary crime watch', 'Community watch', 'Calgary public safety map'],
+          mainEntity: COMMUNITY_FAQS.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+          })),
+        }
+      : pathname === GUIDE_PATH
       ? {
           about: [
             'Calgary neighbourhood watch',

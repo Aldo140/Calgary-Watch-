@@ -4,6 +4,8 @@ import { SiteLayout } from '../components/site/SiteLayout';
 import { GlobalSearch } from '../components/site/GlobalSearch';
 import { DiscoveryCard, EmptyInventory } from '../components/discovery/DiscoveryCards';
 import { EntityDetail } from '../components/entity/EntityDetail';
+import { ListingBoard } from '../components/discovery/ListingBoard';
+import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
 import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
 
@@ -27,6 +29,24 @@ export default function DiscoveryPage() {
   const groups = searchEntities(filterInventory(all, discoveryRepository.occurrences()), q);
   const title = missing ? 'This page isn’t here yet.' : search ? 'Find your next Calgary thing.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
   const relatedIds = entity?.kind === 'guide' ? entity.entries.map(e => e.entityId) : entity?.kind === 'neighbourhood' ? entity.entityIds : [];
+  if ((root === 'events' || root === 'markets') && !entity && !missing) {
+    const filterLinks = [
+      { to: `/${root}`, label: `All ${root}`, current: !slug },
+      { to: `/${root}/this-weekend`, label: 'This weekend', current: period === 'this-weekend' },
+      ...(root === 'events' ? [
+        { to: '/events/today', label: 'Today', current: period === 'today' && !isTonight },
+        { to: '/events/today?time=tonight', label: 'Tonight', current: isTonight },
+      ] : []),
+    ];
+    const interestLinks = root === 'events' ? ['free', 'family', 'music', 'food', 'arts', 'outdoor', 'indoor'].map(f => ({
+      to: `${pathname}?${new URLSearchParams({ ...(isTonight ? { time: 'tonight' } : {}), filter: f })}`,
+      label: f[0].toUpperCase() + f.slice(1), current: params.get('filter') === f,
+    })) : undefined;
+    return <SiteLayout><div className="cw-wrap cw-page">
+      <ListingBoard root={root} title={title} items={items} occurrences={discoveryRepository.occurrences()} filters={filterLinks} interests={interestLinks}
+        emptyCta={<EmptyInventory type={section?.label.toLowerCase() || 'discoveries'} kind={section?.kind} />} />
+    </div></SiteLayout>;
+  }
   return <SiteLayout><div className="cw-wrap cw-page">
     <nav className="cw-breadcrumb" aria-label="Breadcrumb"><Link to="/">Home</Link> / {section && <Link to={section.path}>{section.label}</Link>}{slug && <> / {entity?.title || slug}</>}</nav>
     {entity ? <EntityDetail entity={entity} occurrences={discoveryRepository.occurrences()} related={all.filter(e => relatedIds.includes(e.id))} /> : <><header className="cw-page-heading"><p className="cw-eyebrow">CalgaryWatch discovery</p><h1>{title}</h1><p className="cw-lead">{missing ? 'The listing may have moved or hasn’t been published.' : 'Good plans begin with a little local knowledge.'}</p></header>

@@ -1,4 +1,5 @@
 import { upcomingOccurrences } from '../../lib/discoveryCalendar';
+import { EventArt, MarketArt } from '../discovery/ListingArt';
 import { Link } from 'react-router-dom';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { DiscoveryCard } from '../discovery/DiscoveryCards';
@@ -9,7 +10,9 @@ export function EntityDetail({ entity, related, occurrences = [] }: { entity: Di
   const next = dates.find(o => !o.cancelled);
   const format = (value: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full', timeStyle: 'short' }).format(new Date(value));
   return <article className="cw-detail"><p className="cw-eyebrow">{entity.kind}{entity.developmentOnly ? ' · Illustrative preview' : ''}</p><h1>{entity.title}</h1><p className="cw-lead">{entity.summary}</p>
-    {entity.image && <figure className="cw-detail-image-wrap"><img className="cw-detail-image" src={entity.image.src} alt={entity.image.alt} width="1200" height="677" />{entity.image.credit && <figcaption className="cw-image-credit">{entity.image.credit}</figcaption>}</figure>}
+    {entity.kind === 'market' || (entity.kind === 'event' && !/^https:\/\//.test(entity.image?.src ?? ''))
+      ? <figure className="cw-detail-image-wrap cw-detail-art">{entity.kind === 'market' ? <MarketArt id={entity.id} title={entity.title} /> : <EventArt id={entity.id} title={entity.title} categories={entity.categories} />}</figure>
+      : entity.image && <figure className="cw-detail-image-wrap"><img className="cw-detail-image" src={entity.image.src} alt={entity.image.alt} width="1200" height="677" />{entity.image.credit && <figcaption className="cw-image-credit">{entity.image.credit}</figcaption>}</figure>}
     {entity.kind === 'business' && entity.partner && <p className="cw-preview-note">Sponsored · {entity.sponsorshipDisclosure || 'Featured partner placement. Payment does not imply editorial selection.'}</p>}
     <p>{entity.description}</p>
     {'address' in entity && <p><strong>Location:</strong> {entity.address}</p>}

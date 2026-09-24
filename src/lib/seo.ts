@@ -74,9 +74,9 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     image: DEFAULT_IMAGE,
   },
   '/coverage': {
-    title: 'Calgary Area Safety Map Coverage | Calgary Watch',
+    title: 'Calgary Safety Map Sources | Calgary Watch',
     description:
-      'See where Calgary Watch can accept or display community and public-source incident reports across Calgary, Airdrie, Cochrane, Okotoks and nearby communities.',
+      'Every source behind the Calgary Watch safety map: neighbour reports, Calgary Police news releases, City of Calgary 311 and traffic, weather and emergency alerts, and power outages, with how often each updates.',
     index: true,
     pageType: 'CollectionPage',
     dateModified: LAST_MOD,

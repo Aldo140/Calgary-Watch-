@@ -1,220 +1,289 @@
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Check,
-  CircleDot,
-  Eye,
-  MapPin,
-  Radio,
-  Users,
-} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, ArrowUpRight, Bell, ChevronDown, EyeOff, Flag, MapPin, Phone, Radio, ShieldCheck, Timer } from 'lucide-react';
+import { SiteLayout } from '../components/site/SiteLayout';
 import {
   GUIDE_COMPARISON,
   GUIDE_FAQS,
   GUIDE_SOURCES,
   GUIDE_UPDATED,
 } from '@/src/content/neighbourhoodWatchGuide';
-import {
-  GuideAnchorNav,
-  GuideFaqs,
-  GuideFinalCta,
-  GuideFooter,
-  GuideNav,
-  GuideReportingBand,
-  GuideSources,
-} from '@/src/components/guides/GuideUI';
+import '../styles/community.css';
+import '../styles/watch-guide.css';
 
-const focusRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E52C20] focus-visible:ring-offset-2';
-
-const markerChecks = [
-  { label: 'Time', copy: 'How recently was it reported?', color: '#E52C20' },
-  { label: 'Source', copy: 'Community observation or attributed public source?', color: '#2E8B7A' },
-  { label: 'Status', copy: 'Is it unverified, corroborated, or official?', color: '#B0793C' },
+const TOC = [
+  { href: '#understand-the-map', label: 'Read the map' },
+  { href: '#start-a-watch', label: 'Start a watch' },
+  { href: '#choose-a-source', label: 'Which source to use' },
+  { href: '#reporting', label: 'Reporting' },
+  { href: '#questions', label: 'Questions' },
 ];
+
+const CHECKS = [
+  { label: 'Time', copy: 'When was it reported? A report from this morning means more than one from four days ago.', tone: 'red' },
+  { label: 'Source', copy: 'Did a neighbour post it, or did it come from Calgary Police, the City or another official source?', tone: 'navy' },
+  { label: 'Status', copy: 'Have neighbours confirmed it, marked it still happening, or marked it resolved?', tone: 'blue' },
+] as const;
+
+const STEPS = [
+  {
+    title: 'Meet your neighbours',
+    body: 'Knock on a few doors or put a note in the lobby. Swap names and a way to reach each other with the people who want to take part.',
+  },
+  {
+    title: 'Pick one place to share',
+    body: 'A group chat or email list is enough. Agree to share what you saw, where and when. Don’t post names or photos of people who haven’t done anything.',
+  },
+  {
+    title: 'Agree on who calls police',
+    body: <>Anyone who sees an emergency or a crime in progress calls 911. For anything else, call Calgary Police non-emergency at <span className="wg-nw">403-266-1234</span>.</>,
+  },
+  {
+    title: 'Watch the area together',
+    body: 'Check the CalgaryWatch map for reports near you, and have everyone sign up for the free Monday email for your area.',
+  },
+];
+
+/** A row of Calgary houses with a few pins over them, drawn in the site's ink-outline style. */
+function StreetArt() {
+  const ink = { stroke: '#151515', strokeWidth: 2.5, strokeLinejoin: 'round' as const };
+  const houses = [
+    { x: 24, top: 212, peak: 162, body: '#ffdf4f', door: '#06162f' },
+    { x: 146, top: 196, peak: 146, body: '#ffe1dc', door: '#00c2e0' },
+    { x: 268, top: 218, peak: 172, body: '#dfe7ff', door: '#ff5a4e' },
+    { x: 390, top: 202, peak: 152, body: '#c9f2d4', door: '#ffdf4f' },
+  ];
+  const pin = 'M0,0C-8,-10 -12,-16 -12,-22A12,12 0 1 1 12,-22C12,-16 8,-10 0,0Z';
+  return (
+    <figure className="wg-art">
+      <svg viewBox="0 0 520 400" role="img" aria-label="Illustration of a row of Calgary houses with map pins over two of them">
+        <rect width="520" height="400" fill="#d7f3f9" />
+        {/* skyline and the Calgary Tower, far off */}
+        <g fill="#b3dcea">
+          <rect x="30" y="120" width="34" height="90" />
+          <rect x="68" y="96" width="26" height="114" />
+          <rect x="300" y="110" width="30" height="100" />
+          <rect x="334" y="130" width="40" height="80" />
+          <path d="M118,210V96h6V210Z" />
+          <path d="M108,98h26l-4,-12h-18Z" />
+          <rect x="119" y="72" width="4" height="14" />
+        </g>
+        <circle cx="452" cy="68" r="26" fill="#ffdf4f" {...ink} />
+        {/* ground */}
+        <rect y="298" width="520" height="18" fill="#c9f2d4" />
+        <rect y="316" width="520" height="16" fill="#fffdf7" />
+        <path d="M0,298H520M0,316H520M0,332H520" fill="none" {...ink} />
+        <rect y="332" width="520" height="68" fill="#06162f" />
+        <path d="M14,366H520" stroke="#ffdf4f" strokeWidth="5" strokeDasharray="28 20" />
+        {houses.map((h) => {
+          const cx = h.x + 53;
+          return (
+            <g key={h.x}>
+              <rect x={h.x} y={h.top} width="106" height={298 - h.top} fill={h.body} {...ink} />
+              <path d={`M${h.x - 8},${h.top}L${cx},${h.peak}L${h.x + 114},${h.top}Z`} fill="#06162f" {...ink} />
+              <rect x={cx - 12} y="256" width="24" height="42" rx="2" fill={h.door} {...ink} />
+              <circle cx={cx + 6} cy="278" r="2.2" fill="#151515" />
+              {[h.x + 12, h.x + 74].map((wx) => (
+                <g key={wx}>
+                  <rect x={wx} y={h.top + 16} width="20" height="20" fill="#fffdf7" {...ink} />
+                  <path d={`M${wx + 10},${h.top + 16}V${h.top + 36}M${wx},${h.top + 26}H${wx + 20}`} fill="none" stroke="#151515" strokeWidth="2" />
+                </g>
+              ))}
+            </g>
+          );
+        })}
+        {/* shrubs */}
+        {[16, 136, 258, 380, 506].map((x) => <circle key={x} cx={x} cy="296" r="11" fill="#2fb86a" {...ink} />)}
+        {/* pins */}
+        <g transform="translate(199 138) scale(1.35)"><path d={pin} fill="#ff5a4e" {...ink} strokeWidth={1.8} /><circle cy="-22" r="4.5" fill="#fff" /></g>
+        <g transform="translate(443 144) scale(1.2)"><path d={pin} fill="#00c2e0" {...ink} strokeWidth={2} /><circle cy="-22" r="4.5" fill="#fff" /></g>
+        <g transform="translate(300 360) scale(1.1)"><path d={pin} fill="#ffdf4f" {...ink} strokeWidth={2} /><circle cy="-22" r="4.5" fill="#151515" /></g>
+        {/* neighbour confirmation bubble */}
+        <g transform="translate(222 58)">
+          <rect width="142" height="34" rx="17" fill="#fff" {...ink} />
+          <path d="M16,33L6,46L30,33" fill="#fff" {...ink} />
+          <rect x="3" y="31" width="30" height="4" fill="#fff" />
+          <text x="71" y="22" textAnchor="middle" className="wg-art-bubble">I saw this too</text>
+        </g>
+      </svg>
+    </figure>
+  );
+}
 
 export default function NeighbourhoodWatchGuidePage() {
   return (
-    <div className="min-h-dvh bg-[#F7F3EA] text-[#06162F]">
-      <GuideNav locationLabel="Calgary crime map guide" />
-      <main>
-        <section className="relative overflow-hidden border-b border-[#DCD2C0] bg-[#EAE3D5]" aria-labelledby="guide-title">
-          <div className="absolute inset-y-0 right-0 hidden w-[38%] bg-[#E52C20] lg:block" aria-hidden="true" />
-          <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[minmax(0,1.04fr)_minmax(24rem,0.96fr)] lg:items-center lg:gap-16 lg:py-20">
-            <div className="max-w-3xl">
-              <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                <span className="inline-flex items-center gap-2 font-black text-[#2E8B7A]">
-                  <CircleDot size={15} aria-hidden="true" /> Independent Calgary guide
-                </span>
-                <span className="text-[#8A8073]" aria-hidden="true">/</span>
-                <span className="font-semibold text-[#6E6357]">Reviewed {GUIDE_UPDATED}</span>
+    <SiteLayout>
+      <div className="cm wg">
+        <section className="cm-hero" aria-labelledby="guide-title">
+          <div className="cw-wrap cm-hero-grid">
+            <div className="wg-hero-copy">
+              <p className="cm-kicker">Calgary neighbourhood watch guide · Reviewed {GUIDE_UPDATED}</p>
+              <h1 id="guide-title">Calgary crime map and <span>neighbourhood watch.</span></h1>
+              <p className="cm-lead">How to check recent reports near you, what each source can and can’t tell you, how to start a watch on your street or in your building, and who to call when something needs action.</p>
+              <div className="cm-ctas">
+                <Link className="cm-btn cm-btn-primary" to="/map"><MapPin size={18} aria-hidden="true" /> Check reports near me</Link>
+                <Link className="cm-btn" to="/community">How Community Watch works <ArrowRight size={18} aria-hidden="true" /></Link>
               </div>
-
-              <h1 id="guide-title" className="max-w-3xl text-balance font-display text-[clamp(3rem,7vw,5.75rem)] font-black leading-[0.93] tracking-[-0.035em] text-[#06162F]">
-                Calgary crime map <span className="text-[#B8241A]">and neighbourhood watch.</span>
-              </h1>
-              <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-[#5A5247] sm:text-xl sm:leading-9">
-                Check recent reports near you, understand what each source can prove, and know which official channel to use when something needs action.
-              </p>
-
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <a href="/map" className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#06162F] px-6 font-black text-[#F2EFE8] transition-colors hover:bg-[#06162F] active:bg-[#0B1B14] ${focusRing}`}>
-                  <MapPin size={17} aria-hidden="true" /> Check incidents near me
-                </a>
-                <a href="/map?report=true" className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-[#D8CEBC] bg-[#F7F3EA] px-6 font-black text-[#06162F] transition-colors hover:border-[#E52C20] hover:bg-[#EFE6D6] ${focusRing}`}>
-                  Sign in to report <ArrowRight size={17} aria-hidden="true" />
-                </a>
+              <div className="wg-hero-tels">
+                <a href="tel:911" className="wg-tel wg-tel-911"><small>Immediate danger</small>Call 911</a>
+                <a href="tel:4032661234" className="wg-tel"><small>Police, not in progress</small>403-266-1234</a>
               </div>
-
-              <p className="mt-7 flex max-w-2xl items-start gap-3 border-y border-[#B0793C] py-4 text-sm font-semibold leading-6 text-[#5A5247]">
-                <Eye className="mt-0.5 shrink-0 text-[#9A7318]" size={18} aria-hidden="true" />
-                Calgary Watch is an independent community map—not a Calgary Police Service dispatch feed or officer tracker.
-              </p>
+              <p className="wg-hero-note">CalgaryWatch is an independent community map. It is not a Calgary Police Service dispatch feed or officer tracker.</p>
             </div>
-
-            <div className="relative lg:py-5">
-              <div className="absolute -bottom-4 -left-4 top-10 w-20 bg-[#2E8B7A] sm:-left-6" aria-hidden="true" />
-              <figure className="relative overflow-hidden rounded-2xl bg-[#06162F] shadow-[0_24px_60px_rgba(11,31,51,0.22)]">
-                <img
-                  src="/images/photo/calgary5.webp"
-                  alt="Three Calgary residents looking at a phone together downtown"
-                  width={1200}
-                  height={677}
-                  fetchPriority="high"
-                  className="aspect-[4/3] w-full object-cover object-center sm:aspect-[16/10] lg:aspect-[4/5]"
-                />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-[linear-gradient(transparent,rgba(7,23,39,0.94))] px-5 pb-5 pt-20 text-[#F2EFE8] sm:px-6 sm:pb-6">
-                  <span className="block text-xs font-black uppercase tracking-[0.16em] text-[#E52C20]">Community awareness</span>
-                  <span className="mt-1 block max-w-sm text-lg font-black leading-6">Useful context, without speculation or alarm.</span>
-                </figcaption>
-              </figure>
-              <div className="relative -mt-px grid grid-cols-2 overflow-hidden rounded-b-2xl border-x border-b border-[#DCD2C0] bg-[#F7F3EA] sm:absolute sm:-bottom-5 sm:-right-5 sm:w-[21rem] sm:rounded-xl sm:border sm:shadow-lg">
-                <a href="tel:911" className={`min-h-16 border-r border-[#E52C20] bg-[#FFF4F1] px-4 py-3 transition-colors hover:bg-[#FFE7E2] ${focusRing}`}>
-                  <span className="block text-[0.68rem] font-black uppercase tracking-wider text-[#8F1D14]">Immediate danger</span>
-                  <span className="mt-1 block font-black text-[#B42318]">Call 911</span>
-                </a>
-                <a href="tel:4032661234" className={`min-h-16 px-4 py-3 transition-colors hover:bg-[#EAE3D5] ${focusRing}`}>
-                  <span className="block text-[0.68rem] font-black uppercase tracking-wider text-[#6E6357]">Not in progress</span>
-                  <span className="mt-1 block font-black text-[#06162F]">403-266-1234</span>
-                </a>
-              </div>
-            </div>
+            <StreetArt />
           </div>
         </section>
 
-        <GuideAnchorNav items={[
-          { href: '#understand-the-map', label: 'Understand the map' },
-          { href: '#choose-a-source', label: 'Choose a source' },
-          { href: '#reporting', label: 'Reporting' },
-          { href: '#questions', label: 'Questions' },
-        ]} />
+        <div className="cw-wrap">
+          <nav className="wg-toc" aria-label="On this page">
+            <span>On this page</span>
+            <ul>
+              {TOC.map((item) => <li key={item.href}><a href={item.href}>{item.label}</a></li>)}
+            </ul>
+          </nav>
 
-        <section id="understand-the-map" className="scroll-mt-28 bg-[#F7F3EA]" aria-labelledby="near-me-heading">
-          <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24">
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:gap-20">
-              <div>
-                <span className="font-mono text-sm font-black text-[#B8241A]">01 / READ THE MAP</span>
-                <h2 id="near-me-heading" className="mt-4 max-w-3xl text-balance font-display text-4xl font-black leading-tight tracking-[-0.03em] md:text-5xl">
-                  “Current police activity near me” can mean several different things.
-                </h2>
-                <div className="mt-7 max-w-3xl space-y-5 text-pretty text-lg leading-8 text-[#6E6357]">
-                  <p>People use that phrase for a siren nearby, a collision-related road closure, a community observation, or official reported-crime statistics. No single public map contains every live police call or officer location.</p>
-                  <p>Calgary Watch shows recent community observations and selected public-source incidents. It supports awareness, but it cannot confirm that police attended an event.</p>
-                </div>
-              </div>
-
-              <aside className="self-start border-t-4 border-[#E52C20] bg-[#EAE3D5] px-6 py-7 sm:px-8 sm:py-9" aria-label="How to read a map marker">
-                <div className="flex items-center gap-3">
-                  <Eye className="text-[#B8241A]" size={23} aria-hidden="true" />
-                  <h3 className="text-xl font-black tracking-[-0.02em]">Read every marker in context</h3>
-                </div>
-                <ul className="mt-7">
-                  {markerChecks.map((item) => (
-                    <li key={item.label} className="grid grid-cols-[4px_5rem_1fr] gap-4 border-t border-[#DCD2C0] py-5 first:border-t-0 first:pt-0 last:pb-0">
-                      <span className="h-full min-h-10" style={{ backgroundColor: item.color }} aria-hidden="true" />
-                      <strong className="text-sm text-[#06162F]">{item.label}</strong>
-                      <span className="text-sm leading-6 text-[#6E6357]">{item.copy}</span>
-                    </li>
-                  ))}
-                </ul>
-              </aside>
+          <section id="understand-the-map" className="cm-section wg-anchor" aria-labelledby="near-me-heading">
+            <div className="cm-head">
+              <h2 id="near-me-heading">What a Calgary crime map can show near you</h2>
+              <p>“Police activity near me” can mean a siren, a road closure, a neighbour’s report or official crime statistics. No public map shows every live police call or where officers are.</p>
             </div>
-          </div>
-        </section>
+            <p className="wg-prose">CalgaryWatch shows recent reports from neighbours alongside official sources such as Calgary Police news releases and City of Calgary data. It helps you know what’s going on nearby, but it can’t confirm that police attended. Before you decide what a pin means, check three things:</p>
+            <ul className="cm-shows wg-checks">
+              {CHECKS.map((c, i) => (
+                <li key={c.label} className={`cm-show cm-tone-${c.tone}`}>
+                  <span className="wg-check-n" aria-hidden="true">{i + 1}</span>
+                  <strong>{c.label}</strong>
+                  <p>{c.copy}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
 
-        <section id="choose-a-source" className="scroll-mt-28 bg-[#06162F] text-[#F2EFE8]" aria-labelledby="source-heading">
-          <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24">
-            <div className="max-w-3xl">
-              <span className="font-mono text-sm font-black text-[#E52C20]">02 / CHOOSE THE RIGHT SOURCE</span>
-              <h2 id="source-heading" className="mt-4 text-balance font-display text-4xl font-black leading-tight tracking-[-0.03em] md:text-5xl">One question. Four different routes.</h2>
-              <p className="mt-5 max-w-2xl text-pretty text-lg leading-8 text-[#D8CEBC]">A community map, official statistics, and emergency reporting each do a different job. Start with what you actually need to know.</p>
+          <section id="start-a-watch" className="cm-section wg-anchor" aria-labelledby="start-heading">
+            <div className="cm-head">
+              <h2 id="start-heading">How to start a neighbourhood watch in Calgary</h2>
+              <p>A watch for your street or building doesn’t need a budget or a formal group. It needs a few neighbours who agree on how to share and who to call.</p>
             </div>
-
-            <ol className="mt-10 border-y border-[rgba(255,255,255,0.18)]">
-              {GUIDE_COMPARISON.map((row, index) => (
-                <li key={row.need} className="grid gap-4 border-b border-[rgba(255,255,255,0.18)] py-6 last:border-b-0 sm:grid-cols-[3rem_minmax(0,1fr)_minmax(12rem,0.55fr)_auto] sm:items-center sm:gap-6 md:py-7">
-                  <span className="font-mono text-xl font-black text-[#E52C20]" aria-hidden="true">0{index + 1}</span>
-                  <p className="max-w-xl text-lg font-black leading-7 text-[#F2EFE8]">{row.need}</p>
-                  <p className="text-sm font-semibold leading-6 text-[#C6BCA9]">{row.source}</p>
-                  <a
-                    href={row.action}
-                    rel={row.action.startsWith('http') ? 'external' : undefined}
-                    className={`group inline-flex min-h-11 items-center gap-2 font-black text-[#E52C20] transition-colors hover:text-[#F2EFE8] ${focusRing}`}
-                  >
-                    {row.actionLabel}
-                    {row.action.startsWith('http') ? <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" /> : <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" />}
-                  </a>
+            <ol className="cm-steps wg-steps">
+              {STEPS.map((s, i) => (
+                <li key={s.title}>
+                  <span className="cm-step-n">{i + 1}</span>
+                  <h3>{s.title}</h3>
+                  <p>{s.body}</p>
                 </li>
               ))}
             </ol>
-          </div>
-        </section>
+          </section>
 
-        <section className="bg-[#DDF4EE]" aria-labelledby="block-watch-heading">
-          <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
-            <div className="px-5 py-16 sm:px-8 md:py-24 lg:pr-16">
-              <span className="font-mono text-sm font-black text-[#2E8B7A]">03 / KNOW THE DIFFERENCE</span>
-              <h2 id="block-watch-heading" className="mt-4 max-w-2xl text-balance font-display text-4xl font-black leading-tight tracking-[-0.03em] md:text-5xl">Block Watch and Calgary Watch are different.</h2>
-              <div className="mt-7 max-w-2xl space-y-5 text-pretty text-lg leading-8 text-[#345E57]">
-                <p><strong className="text-[#06162F]">Block Watch</strong> generally means neighbours organizing on their own block to reduce opportunities for crime, share prevention information, and report suspicious activity through the appropriate channels.</p>
-                <p><strong className="text-[#06162F]">Calgary Watch</strong> is an independent public map for recent reports across many communities. It is not a Block Watch chapter or a Calgary Police Service program.</p>
-              </div>
+          <section id="choose-a-source" className="cm-section wg-anchor" aria-labelledby="source-heading">
+            <div className="cm-head">
+              <h2 id="source-heading">Which source to use for what</h2>
+              <p>A community map, official statistics and emergency lines each do a different job. Start with what you need to know.</p>
             </div>
-
-            <div className="bg-[#2E8B7A] px-5 py-16 text-[#F2EFE8] sm:px-8 md:py-24 lg:px-16">
-              <div className="flex size-12 items-center justify-center rounded-xl bg-[#06162F] text-[#E52C20]">
-                <Users size={23} aria-hidden="true" />
-              </div>
-              <div className="mt-7 flex items-center gap-3">
-                <Radio size={20} aria-hidden="true" />
-                <h3 className="text-2xl font-black">A useful neighbourhood routine</h3>
-              </div>
-              <ol className="mt-7 border-y border-[rgba(255,255,255,0.28)]">
-                {[
-                  'Check the time, source, and status.',
-                  'Use 911 or police non-emergency when required.',
-                  'Share only what you observed; protect people’s privacy.',
-                ].map((step) => (
-                  <li key={step} className="grid grid-cols-[2rem_1fr] gap-4 border-b border-[rgba(255,255,255,0.28)] py-5 last:border-b-0">
-                    <Check className="mt-0.5 text-[#F2EFE8]" size={20} strokeWidth={3} aria-hidden="true" />
-                    <span className="font-bold leading-6 text-[#F2EFE8]">{step}</span>
+            <ol className="wg-routes">
+              {GUIDE_COMPARISON.map((row, i) => {
+                const external = row.action.startsWith('http');
+                const inner = <>{row.actionLabel} {external ? <ArrowUpRight size={16} aria-hidden="true" /> : <ArrowRight size={16} aria-hidden="true" />}</>;
+                return (
+                  <li key={row.need} className={row.action === 'tel:911' ? 'wg-route-911' : undefined}>
+                    <span className="wg-route-n" aria-hidden="true">0{i + 1}</span>
+                    <div>
+                      <strong>{row.need}</strong>
+                      <p>{row.source.replace('Calgary Watch', 'CalgaryWatch')}</p>
+                    </div>
+                    {row.action.startsWith('/')
+                      ? <Link className="wg-route-go" to={row.action}>{inner}</Link>
+                      : <a className="wg-route-go" href={row.action} rel={external ? 'external' : undefined}>{inner}</a>}
                   </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        </section>
+                );
+              })}
+            </ol>
+          </section>
 
-        <GuideReportingBand
-          title="Report through the right channel first."
-          body="Call 911 for an emergency or crime in progress. For a Calgary police matter that is not in progress, call 403-266-1234. Posting to Calgary Watch does not create a police report."
-          phoneHref="tel:4032661234"
-          phoneLabel="Police non-emergency"
-        />
-        <GuideFaqs title="Questions people ask before opening the map." faqs={GUIDE_FAQS} />
-        <GuideSources title="Official Calgary references" sources={GUIDE_SOURCES} />
-        <GuideFinalCta title="Start with what is near you." body="Browse recent reports for free. Check the timestamp and source on every marker before deciding what it means." />
-      </main>
-      <GuideFooter extraLink={{ href: '/airdrie-crime-map', label: 'Airdrie guide' }} />
-    </div>
+          <section className="cm-section" aria-labelledby="block-watch-heading">
+            <div className="cm-head">
+              <h2 id="block-watch-heading">Block Watch and CalgaryWatch are different</h2>
+              <p>They can work well together, but one doesn’t replace the other.</p>
+            </div>
+            <div className="wg-compare">
+              <div className="wg-compare-card">
+                <p className="cm-eyebrow">Block Watch</p>
+                <p>Neighbours organizing on their own block to reduce opportunities for crime, share prevention tips, and report suspicious activity through the right channels.</p>
+              </div>
+              <div className="wg-compare-card wg-compare-cw">
+                <p className="cm-eyebrow">CalgaryWatch</p>
+                <p>An independent public map of recent reports across Calgary. It is not a Block Watch chapter or a Calgary Police Service program.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="cm-section" aria-labelledby="cw-heading">
+            <div className="cm-head">
+              <h2 id="cw-heading">What CalgaryWatch adds for your street</h2>
+              <p>Free to browse. You only need an account to post a report.</p>
+            </div>
+            <ul className="cm-trust-grid">
+              <li><MapPin size={22} aria-hidden="true" /><strong>Reports from neighbours</strong><p>Signed-in residents post what they see, pinned where it happened. Posting anonymously is optional, and your email is never shown.</p></li>
+              <li><Radio size={22} aria-hidden="true" /><strong>Official sources, pinned automatically</strong><p>Calgary Police news releases, City 311, traffic, weather and emergency alerts, and ENMAX power outages.</p></li>
+              <li><ShieldCheck size={22} aria-hidden="true" /><strong>Neighbours can back it up</strong><p>People nearby can tap “I saw this too”, “Still happening” or “Seems resolved”.</p></li>
+              <li><Flag size={22} aria-hidden="true" /><strong>Bad reports get hidden</strong><p>When two people flag a report, it comes off the map.</p></li>
+              <li><Timer size={22} aria-hidden="true" /><strong>Reports expire</strong><p>Neighbour reports come off the map after 5 days.</p></li>
+              <li className="cm-trust-911"><EyeOff size={22} aria-hidden="true" /><strong>Not a police feed</strong><p>CalgaryWatch doesn’t show dispatch calls or where officers are, and posting here doesn’t create a police report.</p></li>
+            </ul>
+            <div className="wg-email">
+              <div>
+                <strong>A free Monday email for your area</strong>
+                <p>Reports within a 15-minute walk of home first, then 3 km and 10 km when it’s quiet. Opt in only.</p>
+              </div>
+              <Link className="cm-btn cm-btn-primary" to="/map?settings=alerts"><Bell size={18} aria-hidden="true" /> Get the Monday email</Link>
+            </div>
+          </section>
+
+          <section id="reporting" className="cm-section wg-anchor wg-report" aria-labelledby="report-heading">
+            <div>
+              <p className="cm-eyebrow">Reporting</p>
+              <h2 id="report-heading">Report through the right channel first</h2>
+              <p>Call 911 for an emergency or a crime in progress. For a Calgary police matter that isn’t in progress, call <span className="wg-nw">403-266-1234</span>. Posting on CalgaryWatch can let neighbours know, but it does not create a police report.</p>
+            </div>
+            <div className="wg-report-tels">
+              <a href="tel:911" className="wg-tel wg-tel-911"><small>Emergency or crime in progress</small><Phone size={18} aria-hidden="true" /> 911</a>
+              <a href="tel:4032661234" className="wg-tel"><small>Police non-emergency</small><Phone size={18} aria-hidden="true" /> 403-266-1234</a>
+            </div>
+          </section>
+
+          <section id="questions" className="cm-section wg-anchor" aria-labelledby="faq-heading">
+            <div className="cm-head">
+              <h2 id="faq-heading">Common questions</h2>
+              <p>What the map can show, what it can’t confirm, and when to use an official service.</p>
+            </div>
+            <div className="wg-faq">
+              {GUIDE_FAQS.map((faq) => (
+                <details key={faq.question}>
+                  <summary>{faq.question}<ChevronDown size={20} aria-hidden="true" /></summary>
+                  <p>{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section className="cm-section" aria-labelledby="sources-heading">
+            <div className="cm-head">
+              <h2 id="sources-heading">Official Calgary references</h2>
+              <p>Use these when you need official confirmation or to make a report.</p>
+            </div>
+            <ul className="wg-sources">
+              {GUIDE_SOURCES.map((s) => (
+                <li key={s.url}><a href={s.url} rel="external">{s.name}<ArrowUpRight size={18} aria-hidden="true" /></a></li>
+              ))}
+            </ul>
+          </section>
+
+          <nav className="cm-more" aria-label="Next steps">
+            <Link to="/map"><strong>Open the live map</strong><span>Recent reports near you, with sources</span><ArrowUpRight size={18} aria-hidden="true" /></Link>
+            <Link to="/community"><strong>How Community Watch works</strong><span>Posting, confirming and flagging reports</span><ArrowUpRight size={18} aria-hidden="true" /></Link>
+            <Link to="/airdrie-crime-map"><strong>Airdrie crime map guide</strong><span>Community reports and Airdrie’s official crime map</span><ArrowUpRight size={18} aria-hidden="true" /></Link>
+          </nav>
+        </div>
+      </div>
+    </SiteLayout>
   );
 }

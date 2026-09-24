@@ -11,11 +11,11 @@ const NAVY = '#0a1a33';
 /* ── 1. What's on the map: stacked layers ─────────────────────────── */
 
 const LAYERS = [
-  { key: 'neighbours', name: 'Neighbour reports', body: 'Break-ins, stolen bikes, suspicious activity, fires and crashes, posted by signed-in Calgarians.', color: '#ef4444' },
-  { key: 'police', name: 'Calgary Police news', body: 'Arrests, public warnings and appeals from the Calgary Police Service newsroom.', color: '#1554d1' },
-  { key: 'city', name: 'City of Calgary', body: 'Safety-related 311 requests, traffic incidents and water main breaks.', color: '#00a8c6' },
-  { key: 'alerts', name: 'Weather & emergency alerts', body: 'Environment Canada warnings and Alberta Emergency Alerts.', color: '#8b5cf6' },
-  { key: 'power', name: 'Power & rivers', body: 'ENMAX power outages and Bow and Elbow river levels.', color: '#f59e0b' },
+  { key: 'neighbours', name: 'Neighbour reports', body: 'Break-ins, stolen bikes, suspicious activity, fires and crashes, posted by signed-in Calgarians.', fresh: 'Live', color: '#ef4444' },
+  { key: 'police', name: 'Calgary Police news', body: 'Arrests, public warnings and appeals from the Calgary Police Service newsroom. Not a dispatch feed.', fresh: 'Every 30 min', color: '#1554d1' },
+  { key: 'city', name: 'City of Calgary', body: 'Traffic incidents, water main breaks and safety-related 311 requests.', fresh: 'Every 5 min', color: '#00a8c6' },
+  { key: 'alerts', name: 'Weather & emergency alerts', body: 'Environment Canada warnings and Alberta Emergency Alerts.', fresh: 'Every 30 min', color: '#8b5cf6' },
+  { key: 'power', name: 'Power & rivers', body: 'ENMAX outages every 5 minutes; Bow and Elbow river levels every 30.', fresh: 'Every 5–30 min', color: '#f59e0b' },
 ] as const;
 
 /** Marks drawn flat on each plane, in plane coordinates (-100..100). */
@@ -31,7 +31,7 @@ function Plane({ cy, color, active, kind, top }: { cy: number; color: string; ac
   return (
     <g transform={`translate(260 ${cy - (active ? 22 : 0)})`} className="cx-plane" style={{ transition: 'transform .45s cubic-bezier(.2,.8,.2,1)' }}>
       <g transform="matrix(0.8,0.46,-0.8,0.46,0,0)">
-        <rect x="-100" y="-100" width="200" height="200" rx="14" fill={top ? '#0d2447' : '#fff'} stroke={active || top ? color : 'rgba(10,26,51,.18)'} strokeWidth={active ? 4 : 2} opacity={top || active ? 1 : .92} />
+        <rect x="-100" y="-100" width="200" height="200" rx="14" fill={top ? '#0d2447' : active ? '#fff' : '#eef2f8'} stroke={active || top ? color : 'rgba(10,26,51,.14)'} strokeWidth={active ? 4 : 1.5} />{active && !top ? <rect x="-100" y="-100" width="200" height="200" rx="14" fill={color} opacity=".08" /> : null}
         {top ? (
           <>
             <path d="M-100,-10 C-40,0 -20,30 30,20 S80,40 100,80" fill="none" stroke="#00c2e0" strokeWidth="9" strokeLinecap="round" opacity=".8" />
@@ -67,13 +67,13 @@ export function MapLayers({ pulse }: { pulse: LivePulse }) {
         <div>
           <p className="cx-eyebrow">What’s on the map</p>
           <h2 id="cx-layers-title">Five sources. <span>One map.</span></h2>
-          <p className="cx-lead">Neighbour reports and official sources, stacked into one picture of your city. Every pin keeps its source.</p>
+          <p className="cx-lead">What each source covers, and how fresh it is.</p>
           <ul className="cx-layer-list" onMouseLeave={() => setTouched(false)}>
             {LAYERS.map((l, i) => (
               <li key={l.key}>
                 <button type="button" aria-pressed={active === i} onMouseEnter={() => { setActive(i); setTouched(true); }} onFocus={() => { setActive(i); setTouched(true); }} onClick={() => { setActive(i); setTouched(true); }} style={{ ['--c' as string]: l.color }}>
                   <i />
-                  <span><b>{l.name}</b><small>{l.body}</small></span>
+                  <span><b>{l.name}<em>{l.fresh}</em></b><small>{l.body}</small></span>
                 </button>
               </li>
             ))}
@@ -125,7 +125,7 @@ export function HowItWorks() {
         <div className="cx-head">
           <p className="cx-eyebrow">How it works</p>
           <h2 id="cx-how-title">From your phone to the map <span>in about a minute.</span></h2>
-          <p className="cx-lead">Official sources are pinned automatically. Neighbour reports take three steps.</p>
+          <p className="cx-lead">Official sources are pinned automatically. A neighbour report takes three steps.</p>
         </div>
         <div className="cx-steps">
           <svg className="cx-steps-line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M60,20 C250,-10 330,50 500,20 S760,-10 940,20" /></svg>
@@ -141,7 +141,7 @@ export function HowItWorks() {
                 <div className="cx-post">Post report</div>
               </div>
             </MiniPhone>
-            <p>A signed-in Calgarian adds a headline, the neighbourhood and an optional photo, and drops a pin. Anonymous if they want.</p>
+            <p>Headline, neighbourhood, an optional photo and a pin. Sign-in is required, so every report comes from a real account, but your name can stay hidden.</p>
           </div>
           <div className="cx-step-wrap">
             <MiniPhone step={2} title="It’s pinned where it happened">
@@ -153,7 +153,7 @@ export function HowItWorks() {
                 <div className="cx-rcard"><i style={{ background: '#ef4444' }} /><div><small>Crime · Manchester</small><b>Smoke coming from a building</b><em><UserRound size={11} /> Neighbour report · just now</em></div></div>
               </div>
             </MiniPhone>
-            <p>Every pin says where it came from: a neighbour, Calgary Police, the City or another official source.</p>
+            <p>It’s on the map for everyone right away, and in the next Monday email for people who live nearby.</p>
           </div>
           <div className="cx-step-wrap">
             <MiniPhone step={3} title="Neighbours back it up">
@@ -165,7 +165,7 @@ export function HowItWorks() {
                 <div className="cx-backed"><ShieldCheck size={15} /> Backed by 4 neighbours</div>
               </div>
             </MiniPhone>
-            <p>People nearby tap “I saw this too”, “Still happening” or “Seems resolved”, so you can tell what’s confirmed.</p>
+            <p>People nearby tap once: “I saw this too”, “Still happening” or “Seems resolved”. The report shows the count.</p>
           </div>
         </div>
         <p className="cx-note">Example screens, not real reports.</p>
@@ -235,7 +235,6 @@ export function StreetFirst() {
 const TRUST = [
   { icon: UserRound, title: 'Who posted it', body: 'A neighbour, Calgary Police, the City or another official source. Neighbours can stay anonymous; their email is never shown.' },
   { icon: Clock, title: 'When', body: 'Every report shows when it was posted, so you can tell old news from now.' },
-  { icon: ShieldCheck, title: 'Whether others saw it', body: 'Neighbours confirm it, say it’s still happening, or mark it resolved.' },
   { icon: Flag, title: 'Flag it if it’s wrong', body: 'When two different people flag a report, it comes off the map for review.' },
   { icon: Timer, title: 'It doesn’t linger', body: 'Neighbour reports come off the map after 5 days.' },
 ];
@@ -247,7 +246,7 @@ export function TrustAnatomy() {
         <div className="cx-head">
           <p className="cx-eyebrow">Can you trust what you see?</p>
           <h2 id="cx-trust-title">Every report shows you <span>how much to trust it.</span></h2>
-          <p className="cx-lead">Neighbour reports aren’t checked by police. Here’s what’s on each one so you can judge for yourself.</p>
+          <p className="cx-lead">Neighbour reports aren’t checked by police. Four things on every report tell you how much weight to give it.</p>
         </div>
         <div className="cx-trust-grid">
           <div className="cx-anatomy" aria-hidden="true">
@@ -260,12 +259,11 @@ export function TrustAnatomy() {
               <p className="cx-report-where"><MapPin size={14} /> 9 Ave SE, Inglewood <span className="cx-tag cx-tag-2"><b>2</b>12 min ago</span></p>
               <p className="cx-report-body">Passenger window smashed on a grey hatchback overnight. Glass is still on the sidewalk.</p>
               <div className="cx-report-confirm">
-                <span className="cx-tag cx-tag-3"><b>3</b></span>
                 <i className="on"><Check size={12} /> I saw this too · 3</i><i>Still happening</i><i>Seems resolved</i>
               </div>
               <div className="cx-report-foot">
-                <span className="cx-tag cx-tag-4"><b>4</b><Flag size={13} /> Flag</span>
-                <span className="cx-tag cx-tag-5"><b>5</b><Timer size={13} /> Leaves the map in 4 days</span>
+                <span className="cx-tag cx-tag-4"><b>3</b><Flag size={13} /> Flag</span>
+                <span className="cx-tag cx-tag-5"><b>4</b><Timer size={13} /> Leaves the map in 4 days</span>
               </div>
             </div>
             <p className="cx-note">Example report.</p>
@@ -289,9 +287,9 @@ export function TrustAnatomy() {
 
 export function Alongside() {
   const feeds = [
-    { name: 'Your community Facebook group', line: '“Anyone else hear sirens on 17th Ave?”', c: '#1554d1' },
-    { name: 'Nextdoor', line: '“Package taken off our porch this afternoon.”', c: '#1f8a4c' },
-    { name: 'Local news', line: '“Police investigate overnight break-ins in the Beltline.”', c: '#ef4444' },
+    { name: 'Community Facebook group', best: 'Best for talking it through', line: '“Anyone else hear sirens on 17th Ave?”', c: '#1554d1' },
+    { name: 'Nextdoor', best: 'Best for your immediate block', line: '“Package taken off our porch this afternoon.”', c: '#1f8a4c' },
+    { name: 'Local news', best: 'Best for the full story', line: '“Police investigate overnight break-ins in the Beltline.”', c: '#ef4444' },
   ];
   return (
     <section className="cx-along" aria-labelledby="cx-along-title">
@@ -299,13 +297,13 @@ export function Alongside() {
         <div>
           <p className="cx-eyebrow">Use it alongside what you already have</p>
           <h2 id="cx-along-title">Keep your Facebook group <span>and Nextdoor.</span></h2>
-          <p className="cx-lead">CalgaryWatch doesn’t replace them. It adds a map: the posts and headlines you already read, pinned where they happened, so you can see what’s near you and what isn’t.</p>
+          <p className="cx-lead">Each is good at something different. CalgaryWatch is best for the whole city at a glance: neighbour reports and official updates, on one map, with how far each is from you.</p>
         </div>
         <div className="cx-funnel" aria-hidden="true">
           <div className="cx-feeds">
             {feeds.map((f, i) => (
               <div key={f.name} className="cx-feed" style={{ ['--c' as string]: f.c, animationDelay: `${i * 0.4}s` }}>
-                <small><i />{f.name}</small>
+                <small><i />{f.name}<span>{f.best}</span></small>
                 <p>{f.line}</p>
               </div>
             ))}
@@ -316,7 +314,7 @@ export function Alongside() {
             {[[40, 38, '#ef4444'], [58, 55, '#1554d1'], [30, 62, '#1f8a4c']].map(([l, t, c], i) => (
               <span key={i} className="cx-onemap-pin" style={{ left: `${l}%`, top: `${t}%`, color: c as string, animationDelay: `${0.6 + i * 0.4}s` }}><MapPin size={26} fill="currentColor" stroke="#fff" /></span>
             ))}
-            <b>One map</b>
+            <b>The whole city, on one map</b>
           </div>
         </div>
       </div>
@@ -356,8 +354,8 @@ export function Closing({ views, pulse }: { views: string; pulse: LivePulse }) {
       <div className="cx-close-bg" aria-hidden="true"><CityMap pins={pulse.reports.recent ?? []} className="cx-close-map" labels={false} quads={false} /></div>
       <div className="cw-wrap cx-close-inner">
         <p className="cx-eyebrow cx-eyebrow-light">Built in Calgary, for Calgary</p>
-        <h2 id="cx-close-title">Small, local, and <span>growing every day.</span></h2>
-        <p className="cx-lead cx-lead-light">CalgaryWatch covers Calgary and nowhere else. {views} views from Calgarians so far, and it gets more useful with every neighbour who posts what they see.</p>
+        <h2 id="cx-close-title">It gets better with <span>every neighbour.</span></h2>
+        <p className="cx-lead cx-lead-light">CalgaryWatch is built in Calgary and still small. The next report that helps someone on your street could be yours.</p>
         <div className="cx-close-ctas">
           <Link className="cx-btn cx-btn-yellow" to="/map">Open the live map <ArrowUpRight size={18} /></Link>
           <Link className="cx-btn cx-btn-ghost" to="/map?report=true"><Plus size={18} /> Post a report</Link>

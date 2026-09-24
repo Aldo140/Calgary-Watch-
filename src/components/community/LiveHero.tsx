@@ -16,7 +16,6 @@ const EXAMPLES: ExampleReport[] = [
   { id: 'ex4', title: 'Bike stolen from a garage', neighborhood: 'Kensington', category: 'crime', timestamp: 0, source: 'Neighbour report' },
 ];
 
-const SOURCES = ['Neighbour reports', 'Calgary Police news releases', 'City of Calgary 311', 'Traffic incidents', 'Water main breaks', 'Environment Canada warnings', 'Alberta Emergency Alerts', 'ENMAX power outages', 'Bow & Elbow river levels'];
 
 function ReportCard({ r, now, real }: { r: ExampleReport; now: number; real: boolean }) {
   return (
@@ -80,14 +79,14 @@ export function LiveHero({ pulse, views }: { pulse: LivePulse; views: string }) 
         <div className="lh-copy">
           <p className="lh-kicker"><span className="lh-live"><span />Live</span>Calgary crime watch · Community Watch</p>
           <h1 id="cm-title">Crime and safety reports from your neighbours, <span>on one map.</span></h1>
-          <p className="lh-lead">Calgarians post what they see. We add Calgary Police news releases, City of Calgary data, weather alerts and power outages, each pinned where it happened, with its source.</p>
+          <p className="lh-lead">Calgarians post what they see, next to updates from Calgary Police, the City and Environment Canada. Open the map to see what’s happening near you right now.</p>
           <div className="lh-ctas">
             <Link className="lh-cta lh-cta-primary" to="/map">Open the live map <ArrowUpRight size={18} /></Link>
             <Link className="lh-cta" to="/map?report=true"><Plus size={18} /> Post a report</Link>
           </div>
           <dl className="lh-stats">
             {status === 'ready' ? <div><dt>Reports, last 24 h</dt><dd>{total}{capped ? '+' : ''}</dd></div> : <div><dt>Cost</dt><dd>Free</dd></div>}
-            {hoods ? <div><dt>Neighbourhoods</dt><dd>{hoods}</dd></div> : <div><dt>Sources</dt><dd>{SOURCES.length}</dd></div>}
+            {hoods ? <div><dt>Neighbourhoods</dt><dd>{hoods}</dd></div> : null}
             <div><dt>Views from Calgarians</dt><dd>{views}</dd></div>
           </dl>
         </div>
@@ -106,17 +105,17 @@ export function LiveHero({ pulse, views }: { pulse: LivePulse; views: string }) 
         </div>
       </div>
 
-      <div className="lh-ticker" aria-label="What’s on the map">
+      {hasReal ? <div className="lh-ticker" aria-label="Latest reports">
         <div className="lh-ticker-track">
           {[0, 1].map(copy => (
             <span key={copy} aria-hidden={copy === 1}>
-              {(hasReal ? real.slice(0, 12).map(r => `${label(r.category)} · ${r.title}${r.neighborhood ? ` · ${r.neighborhood}` : ''}`) : SOURCES).map((t, i) => (
+              {real.slice(0, 12).map(r => `${label(r.category)} · ${r.title}${r.neighborhood ? ` · ${r.neighborhood}` : ''}`).map((t, i) => (
                 <b key={i}><i />{t}</b>
               ))}
             </span>
           ))}
         </div>
-      </div>
+      </div> : <div className="lh-ticker-spacer" />}
     </section>
   );
 }

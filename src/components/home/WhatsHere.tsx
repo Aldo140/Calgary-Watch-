@@ -126,6 +126,50 @@ function Envelope() {
   );
 }
 
+/* ── Phone strips: one row per way in, a live mini-artwork on the left ── */
+
+function MiniMarket({ day, time }: { day?: string; time?: string }) {
+  return (
+    <svg viewBox="0 0 96 96" aria-hidden="true" focusable="false">
+      <rect width="96" height="96" fill="#fff5cc" />
+      {Array.from({ length: 6 }, (_, i) => <rect key={i} x={i * 16} y="0" width="16" height="22" fill={i % 2 ? '#fff' : '#1554d1'} />)}
+      {Array.from({ length: 6 }, (_, i) => <path key={i} d={`M${i * 16},21a8,8 0 0 0 16,0Z`} fill={i % 2 ? '#fff' : '#1554d1'} stroke="#151515" strokeWidth="2" />)}
+      <path d="M0,21H96" stroke="#151515" strokeWidth="2" />
+      <text x="48" y="64" textAnchor="middle" className="h-mini-big">{(day ?? 'MKT').toUpperCase()}</text>
+      {time ? <text x="48" y="82" textAnchor="middle" className="h-mini-small">{time}</text> : null}
+    </svg>
+  );
+}
+
+function MiniTicket({ day, num }: { day?: string; num?: string }) {
+  return (
+    <svg viewBox="0 0 96 96" aria-hidden="true" focusable="false">
+      <rect width="96" height="96" fill="#bdf1f9" />
+      <g transform="rotate(-8 48 50)">
+        <path d="M18,20H78V42A7,7 0 0 0 78,56V80H18V56A7,7 0 0 0 18,42Z" fill="#1554d1" stroke="#151515" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M26,49H70" stroke="#fff" strokeWidth="1.5" strokeDasharray="3 3" opacity=".6" />
+        <text x="48" y="37" textAnchor="middle" className="h-mini-small h-mini-light">{(day ?? 'NEXT').toUpperCase()}</text>
+        <text x="48" y="74" textAnchor="middle" className="h-mini-big h-mini-light">{num ?? '→'}</text>
+      </g>
+    </svg>
+  );
+}
+
+function Strip({ to, n, name, what, className, art, children }: { to: string; n: string; name: string; what: string; className: string; art: ReactNode; children: ReactNode }) {
+  return (
+    <li className={`h-strip ${className}`}>
+      <Link to={to}>
+        <span className="h-strip-art">{art}<b>{n}</b></span>
+        <span className="h-strip-text">
+          <small><strong>{name}</strong> {what}</small>
+          {children}
+        </span>
+        <span className="h-strip-go" aria-hidden="true"><ArrowUpRight size={16} /></span>
+      </Link>
+    </li>
+  );
+}
+
 /**
  * A one-glance tour of what the site holds, each card carrying a real,
  * current example: a market actually on this weekend, an event actually
@@ -213,6 +257,30 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           </span>
         </Card>
       </ul>
+
+      <ol className="h-strips">
+        <Strip to={market ? market.to : '/markets'} n="01" name="Markets" what="· farmers’ & makers’" className="h-strip-market"
+          art={<MiniMarket day={market ? dayShort.format(new Date(market.start)) : undefined} time={market ? clock.format(new Date(market.start)) : undefined} />}>
+          {market ? <><b>{market.title}</b><em>{weekendMarket ? 'This weekend' : 'Next up'}{placeOf(market) ? ` · ${placeOf(market)}` : ''}</em></> : <b>Browse every market</b>}
+        </Strip>
+        <Strip to={event ? event.to : '/events'} n="02" name="Events" what="· shows, talks, workshops" className="h-strip-event"
+          art={<MiniTicket day={event ? dayShort.format(new Date(event.start)) : undefined} num={event ? dayNum.format(new Date(event.start)) : undefined} />}>
+          {event ? <><b>{event.title}</b><em>{clock.format(new Date(event.start))}{placeOf(event) ? ` · ${placeOf(event)}` : ''}</em></> : <b>See what’s listed</b>}
+        </Strip>
+        <Strip to="/map" n="03" name="Live safety map" what="· reports near you" className="h-strip-live" art={<Radar report={report} />}>
+          {report
+            ? <><b>{report.title}</b><em><span className="h-pulse" aria-hidden="true" /> {timeAgo(report.timestamp, checkedAt ?? report.timestamp)}{report.neighborhood && !report.title.includes(report.neighborhood) ? ` · ${report.neighborhood}` : ''}</em></>
+            : <><b>Break-ins, stolen bikes, closures, outages</b><em>{status === 'ready' ? (total ? `${total}${capped ? '+' : ''} reports in the last 24 hours` : 'Quiet for the last 24 hours') : 'Each report shows its source'}</em></>}
+        </Strip>
+        <Strip to={hood ? entityPath(hood) : '/neighbourhoods'} n="04" name="Neighbourhoods" what="· guides by quadrant" className="h-strip-hood" art={<QuadrantMap quadrant={hood?.quadrant} />}>
+          <b>{hood ? hood.title : 'Explore by quadrant'}</b>
+          <em>{hood ? `Today’s pick · ${hood.quadrant}` : 'NW · NE · SW · SE'}</em>
+        </Strip>
+        <Strip to="/map?settings=alerts" n="05" name="Monday digest" what="· your area’s week" className="h-strip-mail" art={<Envelope />}>
+          <b>What was reported near home</b>
+          <em>15-min walk · 3 km · 10 km</em>
+        </Strip>
+      </ol>
     </section>
   );
 }

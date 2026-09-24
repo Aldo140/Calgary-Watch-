@@ -155,6 +155,9 @@
 .cw-home2 .h-sky-stars circle { animation: h-twinkle 4s ease-in-out infinite; }
 @keyframes h-twinkle { 50% { opacity: .35; } }
 .cw-home2 .h-cloud { animation: h-drift var(--drift, 90s) ease-in-out infinite alternate; }
+  .cw-home2 .h-mist { animation: h-mist 38s ease-in-out infinite alternate; }
+.cw-home2 .h-mist-slow { animation-duration: 52s; animation-delay: -20s; }
+@keyframes h-mist { from { transform: translateX(-26px); } to { transform: translateX(26px); } }
 @keyframes h-drift { from { transform: translateX(-70px); } to { transform: translateX(70px); } }
 .cw-home2 .h-sky-rain { animation: h-fall .9s linear infinite; }
 .cw-home2 .h-sky-snow { animation: h-fall 14s linear infinite; }

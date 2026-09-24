@@ -186,6 +186,22 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
 
       <path d={ridge(FAR)} fill={p.far} />
       <path d={caps(FAR, 450)} fill={mix('#ffffff', p.top, 0.12 + night * 0.55)} />
+      {/* Cloud settling into the far-right valleys, as it does along the Rockies; thicker as real cover rises. */}
+      <g className="h-mist" fill={mix(p.cloud, p.far, 0.22)} opacity={0.72 + (cloudCover / 100) * 0.28}>
+        <g transform="translate(1300 404)">
+          <ellipse rx="150" ry="20" /><circle cx="-60" cy="-14" r="30" /><circle cx="-8" cy="-26" r="40" /><circle cx="52" cy="-12" r="28" />
+        </g>
+        <g transform="translate(1482 432) scale(1.15)">
+          <ellipse rx="160" ry="22" /><circle cx="-70" cy="-12" r="28" /><circle cx="-18" cy="-28" r="42" /><circle cx="40" cy="-18" r="34" /><circle cx="92" cy="-8" r="24" />
+        </g>
+        <g transform="translate(1600 372)">
+          <ellipse rx="90" ry="16" /><circle cx="-24" cy="-18" r="30" /><circle cx="22" cy="-10" r="24" />
+        </g>
+      </g>
+      <g className="h-mist h-mist-slow" fill={mix(p.cloud, '#ffffff', 0.25)} opacity={0.55 + (cloudCover / 100) * 0.3}>
+        <ellipse cx="1342" cy="330" rx="78" ry="9" />
+        <ellipse cx="1330" cy="318" rx="46" ry="7" />
+      </g>
       <path d={ridge(NEAR)} fill={p.near} />
       <path d={caps(NEAR, 560)} fill={mix('#ffffff', p.top, 0.22 + night * 0.55)} opacity=".85" />
       <rect x="0" y="420" width={W} height={RIVER - 420} fill="url(#hs-haze)" />

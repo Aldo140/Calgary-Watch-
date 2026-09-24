@@ -5,7 +5,6 @@ import { useLivePulse } from '../hooks/useLivePulse';
 import { INCIDENT_CATEGORIES } from '../constants';
 import { timeAgo, type ExampleReport } from '../lib/homeClaims';
 import { COMMUNITY_FAQS } from '../content/communityWatch';
-import { Confirmers, NeighbourWithPhone, Poster, Reader, SourceBadge } from '../components/community/People';
 import '../styles/community.css';
 
 /** Site-wide reach the owner reports; update here when it changes. */
@@ -160,8 +159,8 @@ export default function CommunityPage() {
           <div className="cw-wrap cm-hero-grid">
             <div className="cm-hero-copy">
               <p className="cm-kicker"><span className="cm-pulse" aria-hidden="true" />Calgary crime watch · Community Watch</p>
-              <h1 id="cm-title">See what’s happening <span>on your street.</span></h1>
-              <p className="cm-lead">Crime and safety reports from your Calgary neighbours, on one map. We add Calgary Police news releases, City of Calgary data, weather alerts and power outages, each pinned where it happened, with its source.</p>
+              <h1 id="cm-title">Crime and safety reports from your neighbours, <span>on one map.</span></h1>
+              <p className="cm-lead">Calgarians post what they see. We add Calgary Police news releases, City of Calgary data, weather alerts and power outages. Everything is pinned where it happened, with its source.</p>
               <div className="cm-ctas">
                 <Link className="cm-btn cm-btn-primary" to="/map">Open the live map <ArrowUpRight size={18} /></Link>
                 <Link className="cm-btn" to="/map?report=true">Post a report</Link>
@@ -173,15 +172,7 @@ export default function CommunityPage() {
               </ul>
             </div>
             <div className="cm-hero-map">
-              <div className="cm-map-sticker"><CityMap pins={recent} /></div>
-              <NeighbourWithPhone className="cw-sticker cm-hero-person" />
-              <ul className="cm-sources" aria-label="Sources on the map">
-                <li><SourceBadge kind="police" className="cw-sticker" /><span>Calgary Police news</span></li>
-                <li><SourceBadge kind="city" className="cw-sticker" /><span>City of Calgary</span></li>
-                <li><SourceBadge kind="alert" className="cw-sticker" /><span>Weather &amp; alerts</span></li>
-                <li><SourceBadge kind="power" className="cw-sticker" /><span>Power outages</span></li>
-              </ul>
-              <svg className="cm-flow" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M22,70 C30,52 36,46 48,44" /><path d="M88,14 C80,22 74,30 66,36" /></svg>
+              <CityMap pins={recent} />
               <div className="cm-map-card" aria-live="polite">
                 {status === 'ready' ? (
                   <>
@@ -233,7 +224,6 @@ export default function CommunityPage() {
                 <span className="cm-step-n">1</span>
                 <h3>Someone posts it</h3>
                 <p>A signed-in Calgarian adds a headline, the neighbourhood and an optional photo, and drops a pin. You can post anonymously.</p>
-                <Poster className="cw-sticker cm-step-person" />
                 <PhoneMock />
               </li>
               <li>
@@ -246,7 +236,6 @@ export default function CommunityPage() {
                 <span className="cm-step-n">3</span>
                 <h3>Neighbours back it up</h3>
                 <p>People nearby can tap “I saw this too”, “Still happening” or “Seems resolved”, so you can tell what’s confirmed.</p>
-                <Confirmers className="cw-sticker cm-step-pair" />
                 <ConfirmMock />
               </li>
             </ol>
@@ -266,10 +255,7 @@ export default function CommunityPage() {
               <Link className="cm-btn cm-btn-primary" to="/map?settings=alerts"><Bell size={18} /> Get the Monday email</Link>
               <p className="cm-small">Opt in only. Unsubscribe in one click.</p>
             </div>
-            <div className="cm-rings-wrap">
-              <Rings />
-              <Reader className="cw-sticker cm-reader" />
-            </div>
+            <Rings />
           </section>
 
           <section className="cm-section cm-trust" aria-labelledby="cm-trust">

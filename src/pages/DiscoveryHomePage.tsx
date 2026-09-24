@@ -11,6 +11,7 @@ import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
 import { weekAgenda } from '../lib/discoveryCalendar';
 import { discoveryRepository } from '../data/discovery';
 import '../styles/home.css';
+import '../styles/home-board.css';
 
 /**
  * The homepage answers one question — what's happening in Calgary — in the
@@ -35,7 +36,7 @@ export default function DiscoveryHomePage() {
     <SiteLayout>
       <div className="cw-home2">
         <HomeHero days={days} weather={weather} onPickDay={pickDay} />
-        <div className="cw-wrap h-here-wrap">
+        <div className="cw-wrap h-ways-wrap">
           <WhatsHere days={days} entities={entities} pulse={pulse} />
         </div>
         <div className="cw-wrap h-week-wrap">

@@ -41,7 +41,7 @@ export function summarizeReports(incidents: Incident[], now: number, sampleSize:
   return { total: recent.length, capped, byCategory };
 }
 
-export interface ExampleReport { id: string; title: string; neighborhood?: string; category: IncidentCategory; timestamp: number }
+export interface ExampleReport { id: string; title: string; neighborhood?: string; category: IncidentCategory; timestamp: number; lat?: number; lng?: number }
 
 /**
  * One real, current report to show as an example of what the live map holds.
@@ -55,7 +55,9 @@ export function pickExampleReport(incidents: Incident[], now: number): ExampleRe
       && !(i.expires_at && i.expires_at < now) && typeof i.title === 'string' && i.title.trim())
     .sort((a, b) => b.timestamp - a.timestamp);
   const pick = recent.find(i => i.category === 'crime') ?? recent[0];
-  return pick ? { id: pick.id, title: pick.title.trim(), neighborhood: pick.neighborhood, category: pick.category, timestamp: pick.timestamp } : null;
+  if (!pick) return null;
+  const located = Number.isFinite(pick.lat) && Number.isFinite(pick.lng);
+  return { id: pick.id, title: pick.title.trim(), neighborhood: pick.neighborhood, category: pick.category, timestamp: pick.timestamp, ...(located ? { lat: pick.lat, lng: pick.lng } : {}) };
 }
 
 export function timeAgo(timestamp: number, now: number) {

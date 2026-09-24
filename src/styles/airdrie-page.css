@@ -1,0 +1,131 @@
+/* Airdrie crime-map guide. Builds on community.css (.cm-*); only page-specific pieces live here. */
+.ad .cm-hero h1 { font-size: clamp(38px, 5vw, 68px); }
+
+/* Hero contacts */
+.ad-quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px !important; }
+.ad-quick a {
+  display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border: 2px solid rgba(255, 255, 255, .35); border-radius: 14px;
+  font: 800 17px/1.1 var(--display); color: #fff; transition: background .15s;
+}
+.ad-quick a:hover { background: rgba(255, 255, 255, .08); }
+.ad-quick small { font: 600 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .07em; color: rgba(255, 255, 255, .65); }
+.ad-quick-911 a { border-color: var(--ink); background: var(--red); box-shadow: 3px 3px 0 #fff; }
+.ad-quick-911 a:hover { background: #ff6f64; }
+.ad-quick-911 small { color: rgba(21, 21, 21, .75); }
+.ad-quick-911 a { color: var(--ink); }
+
+/* Corridor map */
+.ad-map-wrap { position: relative; max-width: 440px; justify-self: center; width: 100%; }
+.ad-map { display: block; width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 22px; box-shadow: 6px 6px 0 var(--cyan); }
+.ad-map-calgary { fill: #dfe7ff; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.ad-map-airdrie { fill: var(--yellow); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.ad-map-bow { fill: none; stroke: var(--cyan); stroke-width: 5; stroke-linecap: round; }
+.ad-map-hwy { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 10 6; }
+.ad-map-hwy-tag rect { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+.ad-map-hwy-tag text { font: 700 10px var(--mono); fill: var(--ink); }
+.ad-map-edge { stroke: var(--red); stroke-width: 2; stroke-dasharray: 3 4; }
+.ad-map-note { font: 600 9.5px var(--mono); fill: #b3261e; }
+.ad-map-city { font: 800 22px var(--display); letter-spacing: -.02em; fill: var(--ink); }
+.ad-map-sub { font: 600 10.5px Inter, sans-serif; fill: #2e3238; }
+.ad-map-north circle { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+.ad-map-north path { fill: var(--ink); }
+.ad-map-north text { font: 700 11px var(--mono); fill: var(--ink); }
+.ad-map-card {
+  position: absolute; left: -14px; bottom: 18px; max-width: 250px; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 14px;
+  background: #fff; color: var(--ink); box-shadow: 4px 4px 0 var(--ink); transform: rotate(-2deg); font: 400 14px/1.4 Inter, sans-serif;
+}
+
+/* What you will / won't find */
+.ad-shows { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ad-shows .cm-show-icon svg { width: 28px; height: 28px; color: var(--ink); }
+.ad-wont { margin-top: 22px; padding: 20px 22px; border: 2px solid var(--ink); border-radius: 20px; background: var(--card); }
+.ad-wont h3 { font: 800 21px/1.15 var(--display); letter-spacing: -.02em; margin-bottom: 14px; }
+.ad-wont ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; }
+.ad-wont li { display: flex; gap: 10px; align-items: flex-start; font: 400 15px/1.45 Inter, sans-serif; color: #2e3238; }
+.ad-wont li svg { flex: none; margin-top: 1px; padding: 2px; border: 2px solid var(--ink); border-radius: 50%; background: #ffe1dc; color: var(--ink); width: 22px; height: 22px; }
+.ad-wont b { color: var(--ink); }
+
+/* Two maps */
+.ad-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.ad-card { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 26px; border: 2px solid var(--ink); border-radius: 24px; box-shadow: 6px 6px 0 var(--ink); }
+.ad-card h3 { font: 800 clamp(24px, 2.4vw, 30px)/1.05 var(--display); letter-spacing: -.03em; }
+.ad-card > p:not(.ad-tag) { font: 400 16px/1.55 Inter, sans-serif; }
+.ad-card .cm-btn { margin-top: auto; }
+.ad-card-navy { background: var(--navy); color: #fff; }
+.ad-card-navy > p:not(.ad-tag) { color: rgba(255, 255, 255, .82); }
+.ad-card-yellow { background: var(--yellow); color: var(--ink); }
+.ad-card-yellow > p:not(.ad-tag) { color: var(--ink); }
+.ad-tag { padding: 5px 10px; border: 1.5px solid currentColor; border-radius: 999px; font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.ad-btn-ink { background: var(--navy); border-color: var(--ink); color: #fff !important; box-shadow: 4px 4px 0 #fff; }
+.ad-btn-ink:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #fff; }
+.ad-note { margin-top: 18px !important; padding: 14px 16px; border: 2px dashed var(--ink); border-radius: 14px; font: 500 15px/1.5 Inter, sans-serif; color: #2e3238; }
+
+/* Source picker rows */
+.ad-rows { display: grid; gap: 12px; }
+.ad-rows li {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; align-items: center; gap: 12px 24px;
+  padding: 16px 18px; border: 2px solid var(--ink); border-radius: 18px; background: #fff;
+}
+.ad-rows small { display: block; margin-bottom: 5px; font: 600 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.ad-row-need { font: 700 16px/1.35 Inter, sans-serif; color: var(--ink); }
+.ad-row-src { font: 400 15px/1.4 Inter, sans-serif; color: #2e3238; }
+.ad-row-act {
+  display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 10px 16px; border: 2px solid var(--ink); border-radius: 999px;
+  background: var(--yellow); font: 700 14px/1 Inter, sans-serif; white-space: nowrap; transition: transform .15s, box-shadow .15s;
+}
+.ad-row-act:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--ink); }
+.ad-rows .ad-row-911 { background: var(--navy); }
+.ad-row-911 .ad-row-need, .ad-row-911 .ad-row-src { color: #fff; }
+.ad-row-911 small { color: rgba(255, 255, 255, .6); }
+.ad-row-911 .ad-row-act { background: var(--red); }
+
+
+/* Reporting channels */
+.ad-channels { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ad-link { color: var(--blue) !important; font-weight: 700; text-decoration: underline !important; text-underline-offset: 2px; }
+
+/* FAQ */
+.ad-faq { display: grid; gap: 12px; }
+.ad-faq details { border: 2px solid var(--ink); border-radius: 18px; background: #fff; }
+.ad-faq details[open] { box-shadow: 5px 5px 0 var(--ink); background: var(--card); }
+.ad-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; cursor: pointer; list-style: none; }
+.ad-faq summary::-webkit-details-marker { display: none; }
+.ad-faq summary::after { content: '+'; flex: none; width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--yellow); font: 800 18px/1 var(--display); }
+.ad-faq details[open] summary::after { content: '–'; }
+.ad-faq h3 { font: 800 19px/1.25 var(--display); letter-spacing: -.01em; }
+.ad-faq details > p { padding: 0 18px 18px; max-width: 46em; font: 400 16px/1.6 Inter, sans-serif; color: #2e3238; }
+
+/* Official references */
+.ad-sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ad-sources a {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; height: 100%; padding: 16px 18px; border: 2px solid var(--ink); border-radius: 16px;
+  background: #fff; font: 700 15px/1.35 Inter, sans-serif; transition: transform .15s, box-shadow .15s;
+}
+.ad-sources a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
+.ad-sources svg { flex: none; }
+
+.ad-more { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: clamp(56px, 7vw, 96px); }
+
+@media (max-width: 1100px) {
+  .ad-shows, .ad-channels, .ad-more { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .ad-map-card { left: 0; }
+}
+@media (max-width: 760px) {
+  .ad-two, .ad-wont ul, .ad-sources { grid-template-columns: minmax(0, 1fr); }
+  .ad-rows li { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+@media (max-width: 640px) {
+  .ad .cm-hero h1 { font-size: 38px; }
+  .ad-quick { gap: 8px; }
+  .ad-quick a { padding: 8px 11px; font-size: 15px; }
+  .ad-map-card { position: relative; left: auto; bottom: auto; margin: -26px 12px 0; max-width: none; }
+  .ad-shows { grid-template-columns: minmax(0, 1fr); }
+  .ad-channels, .ad-more { grid-template-columns: minmax(0, 1fr); }
+  .ad-card { padding: 20px 18px; box-shadow: 5px 5px 0 var(--ink); }
+  .ad-wont { padding: 16px; }
+  .ad-faq h3 { font-size: 17px; }
+  .ad-faq summary { padding: 14px; }
+  .ad-faq details > p { padding: 0 14px 16px; font-size: 15px; }
+}

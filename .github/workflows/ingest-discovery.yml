@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   ingest:
@@ -19,10 +20,15 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Import Ticketmaster events for review
+      - name: Import events and markets (trusted feeds publish, others wait for review)
         run: npm run discovery:ingest -- --file=scripts/discovery/automatic-sources.json --write
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
           TICKETMASTER_API_KEY: ${{ secrets.TICKETMASTER_API_KEY }}
+      # The site is a static build, so newly published listings only appear after a rebuild.
+      - name: Rebuild the site with the latest listings
+        run: gh workflow run deploy-firebase.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

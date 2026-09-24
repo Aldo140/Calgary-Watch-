@@ -1,5 +1,5 @@
 import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
-export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market'; markets?: RecurringMarketDefinition[] }
+export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market'; markets?: RecurringMarketDefinition[] }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
 /** Explicit JSON contract; adapters translate provider-specific APIs into this shape. */
@@ -101,8 +101,14 @@ function ticketmasterCategories(event: TicketmasterEvent): string[] {
   return [...categories].slice(0, 5);
 }
 
+/** Ticketmaster's market 108 spans southern Alberta; the homepage promises Calgary. */
+const CALGARY_AREA = /^(calgary|airdrie|cochrane|chestermere|okotoks|tsuut['’]?ina( nation)?)$/i;
+/** Listings that are products sold alongside a show, not things to go to. */
+const NOT_AN_EVENT = /\b(parking|upsell|upgrade|vip (package|experience|upgrade)|premium (package|seating upgrade)|hospitality package|add-?on|voucher|gift card|merch(andise)? bundle|fast lane|lounge access|tailgate pass|season tickets?)\b/i;
+
 export function mapTicketmasterEvents(events: TicketmasterEvent[]): SourceRecord[] {
   return events.flatMap(event => {
+    if (NOT_AN_EVENT.test(event.name ?? '') || !CALGARY_AREA.test(event._embedded?.venues?.[0]?.city?.name?.trim() ?? '')) return [];
     const start = localDateTime(event.dates?.start?.localDate, event.dates?.start?.localTime);
     const end = localDateTime(event.dates?.end?.localDate, event.dates?.end?.localTime) || (start ? estimatedEnd(start) : null);
     const venue = event._embedded?.venues?.[0];

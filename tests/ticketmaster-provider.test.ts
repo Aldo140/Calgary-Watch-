@@ -13,7 +13,7 @@ describe('Ticketmaster Calgary provider', () => {
   });
 
   it('marks events without organizer end dates as estimated and drops non-Canadian venues', () => {
-    const estimated = mapTicketmasterEvents([{ id: 'missing-end', name: 'TBA', url: 'https://www.ticketmaster.ca/event/x', dates: { start: { localDate: '2026-10-03', localTime: '19:00:00' } }, _embedded: { venues: [{ country: { countryCode: 'CA' }, address: { line1: 'Calgary' } }] } }]);
+    const estimated = mapTicketmasterEvents([{ id: 'missing-end', name: 'TBA', url: 'https://www.ticketmaster.ca/event/x', dates: { start: { localDate: '2026-10-03', localTime: '19:00:00' } }, _embedded: { venues: [{ country: { countryCode: 'CA' }, address: { line1: 'Calgary' }, city: { name: 'Calgary' } }] } }]);
     assert.equal(estimated.length, 1);
     assert.equal(estimated[0].input.kind, 'event');
     if (estimated[0].input.kind === 'event') assert.equal(estimated[0].input.endTimeEstimated, true);
@@ -129,5 +129,21 @@ describe('Ticketmaster Calgary provider', () => {
         process.env.TICKETMASTER_API_KEY = originalKey;
       }
     });
+  });
+});
+describe('Ticketmaster listings that are not Calgary events', () => {
+  it('drops parking, upgrades and packages sold alongside a show', () => {
+    for (const name of ['Parking: Calgary Flames vs Oilers', 'VIP Package - Big Tour', 'Season Tickets 2026', 'Premium Seating Upgrade']) {
+      assert.equal(mapTicketmasterEvents([{ ...baseEvent, name }]).length, 0, name);
+    }
+    assert.equal(mapTicketmasterEvents([{ ...baseEvent, name: 'Parkway Drive' }]).length, 1);
+  });
+
+  it('keeps Calgary and nearby towns, drops the rest of southern Alberta', () => {
+    const at = (city: string) => mapTicketmasterEvents([{ ...baseEvent, _embedded: { venues: [{ ...baseEvent._embedded.venues[0], city: { name: city } }] } }]).length;
+    assert.equal(at('Calgary'), 1);
+    assert.equal(at('Airdrie'), 1);
+    assert.equal(at('Lethbridge'), 0);
+    assert.equal(at('Red Deer'), 0);
   });
 });

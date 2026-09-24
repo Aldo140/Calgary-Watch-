@@ -13,8 +13,15 @@ async function ingestRecord(db, input, source, recordId, options = {}) {
     const old = previous.data();
     const oldRaw = previousRaw.data();
     const sameCancelledFlag = oldRaw?.cancelled === (options.cancelled === true);
+    // Approved official feeds (see automatic-sources.json) publish without an editor, labelled
+    // 'source-feed' rather than 'source-checked'. An editor's draft or archive always wins, and a
+    // possible duplicate still waits for review.
+    const autoPublish = source.autoPublish === true && source.kind === 'official' && duplicates.length === 0;
+    const feedPublished = { status: 'published', verification: 'source-feed', verifiedAt: now };
     if (old && JSON.stringify(oldRaw?.input) === JSON.stringify(input) && sameCancelledFlag) {
-      tx.update(entityRef, { fetchedAt: now });
+      // A trusted feed still listing it re-confirms it, so it doesn't age out of the 14-day freshness window.
+      const reconfirmed = autoPublish && old.status === 'pending' ? feedPublished : autoPublish && old.verification === 'source-feed' ? { verifiedAt: now } : {};
+      tx.update(entityRef, { fetchedAt: now, ...reconfirmed });
       tx.update(rawRef, { fetchedAt: now });
       return { id: old.id, revision: old.revision, duplicateIds: duplicates };
     }
@@ -22,7 +29,7 @@ async function ingestRecord(db, input, source, recordId, options = {}) {
     // market itself is unchanged, so preserve its existing publication/verification
     // rather than sending an already-reviewed, unchanged market back into the queue.
     if (old && old.status === 'published' && sameCancelledFlag && isRecurringWindowRoll(oldRaw?.input, input, new Date(now))) {
-      tx.update(entityRef, { fetchedAt: now, updatedAt: now });
+      tx.update(entityRef, { fetchedAt: now, updatedAt: now, ...(autoPublish && old.verification === 'source-feed' ? { verifiedAt: now } : {}) });
       const rolledIds = new Set(normalized.occurrences.map(o => o.id));
       for (const oldDate of oldDates.docs) if (!rolledIds.has(oldDate.id)) tx.set(oldDate.ref, { ...oldDate.data(), cancelled: true, updatedAt: now });
       for (const o of normalized.occurrences) tx.set(db.collection('market_occurrences').doc(o.id), o);
@@ -31,7 +38,9 @@ async function ingestRecord(db, input, source, recordId, options = {}) {
     }
     // Re-fetches never silently republish changed content or resurrect archives.
     // Keep a stable canonical URL through title and schedule corrections.
-    const entity = { ...normalized.entity, ...(old ? { slug: old.slug, status: old.status === 'archived' ? 'archived' : 'pending', revision: (old.revision || 0) + 1 } : { revision: 1 }), duplicateIds: duplicates };
+    const heldByEditor = old && (old.status === 'archived' || (autoPublish && old.status === 'draft'));
+    const status = heldByEditor ? old.status : autoPublish ? 'published' : 'pending';
+    const entity = { ...normalized.entity, ...(old ? { slug: old.slug, revision: (old.revision || 0) + 1 } : { revision: 1 }), status, ...(status === 'published' ? feedPublished : {}), duplicateIds: duplicates };
     tx.set(entityRef, entity);
     const newIds = new Set(normalized.occurrences.map(o => o.id));
     for (const oldDate of oldDates.docs) if (!newIds.has(oldDate.id)) tx.set(oldDate.ref, { ...oldDate.data(), cancelled: true, updatedAt: now });

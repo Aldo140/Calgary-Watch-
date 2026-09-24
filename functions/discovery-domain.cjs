@@ -106,7 +106,7 @@ function duplicateCandidates(entity, entities) {
   ).map(e => e.id);
 }
 function isFresh(entity, now = new Date()) { const age = now.getTime() - Date.parse(entity.verifiedAt || ''); return Number.isFinite(age) && age >= -300000 && age <= 14 * 86400000; }
-function eligible(entity, now = new Date()) { return entity.status === 'published' && entity.verification === 'source-checked' && !entity.developmentOnly && isFresh(entity, now) && entity.sources?.length > 0 && entity.sources.every(s => ['official','editorial'].includes(s.kind) && /^https:\/\//.test(s.url)); }
+function eligible(entity, now = new Date()) { return entity.status === 'published' && ['source-checked', 'source-feed'].includes(entity.verification) && !entity.developmentOnly && isFresh(entity, now) && entity.sources?.length > 0 && entity.sources.every(s => ['official','editorial'].includes(s.kind) && /^https:\/\//.test(s.url)); }
 function publishSnapshot(entities, occurrences, now = new Date()) {
   const visible = entities.filter(e => ['event','market'].includes(e.kind) && eligible(e, now));
   const ids = new Set(visible.map(e => e.id));

@@ -4,9 +4,20 @@
       "id": "ticketmaster-calgary",
       "name": "Ticketmaster Calgary events",
       "approved": true,
-      "hosts": ["app.ticketmaster.com", "www.ticketmaster.ca", "ticketmaster.ca", "www.ticketmaster.com", "ticketmaster.com", "werklundcentre.ca", "www.werklundcentre.ca", "ticketweb.ca", "www.ticketweb.ca"],
+      "hosts": [
+        "app.ticketmaster.com",
+        "www.ticketmaster.ca",
+        "ticketmaster.ca",
+        "www.ticketmaster.com",
+        "ticketmaster.com",
+        "werklundcentre.ca",
+        "www.werklundcentre.ca",
+        "ticketweb.ca",
+        "www.ticketweb.ca"
+      ],
       "kind": "official",
-      "provider": "ticketmaster"
+      "provider": "ticketmaster",
+      "autoPublish": true
     }
   },
   {
@@ -14,7 +25,13 @@
       "id": "recurring-markets-calgary",
       "name": "Recurring Calgary community markets",
       "approved": true,
-      "hosts": ["farmersmarket.hsca.ca", "bridgelandfm.ca", "calgaryfarmersmarket.ca", "www.crossroadsmarket.ca", "www.farmersmakersmarket.ca"],
+      "hosts": [
+        "farmersmarket.hsca.ca",
+        "bridgelandfm.ca",
+        "calgaryfarmersmarket.ca",
+        "www.crossroadsmarket.ca",
+        "www.farmersmakersmarket.ca"
+      ],
       "kind": "official",
       "provider": "recurring-market",
       "markets": [
@@ -28,9 +45,20 @@
           "neighbourhood": "Hillhurst",
           "organizer": "Hillhurst Sunnyside Community Association",
           "sourceUrl": "https://farmersmarket.hsca.ca/",
-          "categories": ["market", "food"],
-          "tags": ["farmers market", "local vendors", "weekly"],
-          "amenities": ["local produce", "food vendors", "makers"],
+          "categories": [
+            "market",
+            "food"
+          ],
+          "tags": [
+            "farmers market",
+            "local vendors",
+            "weekly"
+          ],
+          "amenities": [
+            "local produce",
+            "food vendors",
+            "makers"
+          ],
           "familyFriendly": true,
           "dayOfWeek": 3,
           "startTime": "15:00:00",
@@ -47,9 +75,20 @@
           "neighbourhood": "Bridgeland",
           "organizer": "Bridgeland-Riverside Community Association",
           "sourceUrl": "https://bridgelandfm.ca/location-hours",
-          "categories": ["market", "food"],
-          "tags": ["farmers market", "local vendors", "seasonal"],
-          "amenities": ["local produce", "food vendors", "makers"],
+          "categories": [
+            "market",
+            "food"
+          ],
+          "tags": [
+            "farmers market",
+            "local vendors",
+            "seasonal"
+          ],
+          "amenities": [
+            "local produce",
+            "food vendors",
+            "makers"
+          ],
           "familyFriendly": true,
           "dayOfWeek": 4,
           "startTime": "15:30:00",
@@ -68,18 +107,51 @@
           "neighbourhood": "Greenwood/Greenbriar",
           "organizer": "Calgary Farmers' Market",
           "sourceUrl": "https://calgaryfarmersmarket.ca/cfm-west/",
-          "categories": ["market", "food"],
-          "tags": ["farmers market", "local vendors", "year-round", "food hall"],
-          "amenities": ["free parking", "food hall", "kids zone", "accessible"],
+          "categories": [
+            "market",
+            "food"
+          ],
+          "tags": [
+            "farmers market",
+            "local vendors",
+            "year-round",
+            "food hall"
+          ],
+          "amenities": [
+            "free parking",
+            "food hall",
+            "kids zone",
+            "accessible"
+          ],
           "parking": "Free parking in market lots and on nearby streets.",
           "familyFriendly": true,
           "petFriendly": false,
           "schedules": [
-            { "dayOfWeek": 3, "startTime": "09:00:00", "endTime": "19:00:00" },
-            { "dayOfWeek": 4, "startTime": "09:00:00", "endTime": "19:00:00" },
-            { "dayOfWeek": 5, "startTime": "09:00:00", "endTime": "19:00:00" },
-            { "dayOfWeek": 6, "startTime": "09:00:00", "endTime": "19:00:00" },
-            { "dayOfWeek": 0, "startTime": "09:00:00", "endTime": "17:00:00" }
+            {
+              "dayOfWeek": 3,
+              "startTime": "09:00:00",
+              "endTime": "19:00:00"
+            },
+            {
+              "dayOfWeek": 4,
+              "startTime": "09:00:00",
+              "endTime": "19:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "09:00:00",
+              "endTime": "19:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "09:00:00",
+              "endTime": "19:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            }
           ],
           "occurrenceCount": 12
         },
@@ -93,17 +165,46 @@
           "neighbourhood": "Fairview Industrial",
           "organizer": "Calgary Farmers' Market",
           "sourceUrl": "https://calgaryfarmersmarket.ca/faqs/",
-          "categories": ["market", "food"],
-          "tags": ["farmers market", "local vendors", "year-round", "food hall"],
-          "amenities": ["free parking", "food hall", "kids zone", "accessible"],
+          "categories": [
+            "market",
+            "food"
+          ],
+          "tags": [
+            "farmers market",
+            "local vendors",
+            "year-round",
+            "food hall"
+          ],
+          "amenities": [
+            "free parking",
+            "food hall",
+            "kids zone",
+            "accessible"
+          ],
           "parking": "Free parking in market lots and on nearby streets.",
           "familyFriendly": true,
           "petFriendly": false,
           "schedules": [
-            { "dayOfWeek": 4, "startTime": "09:00:00", "endTime": "17:00:00" },
-            { "dayOfWeek": 5, "startTime": "09:00:00", "endTime": "17:00:00" },
-            { "dayOfWeek": 6, "startTime": "09:00:00", "endTime": "17:00:00" },
-            { "dayOfWeek": 0, "startTime": "09:00:00", "endTime": "17:00:00" }
+            {
+              "dayOfWeek": 4,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            }
           ],
           "occurrenceCount": 12
         },
@@ -117,14 +218,39 @@
           "neighbourhood": "Ramsay",
           "organizer": "Crossroads Market",
           "sourceUrl": "https://www.crossroadsmarket.ca/",
-          "categories": ["market", "food", "shopping"],
-          "tags": ["public market", "local vendors", "year-round", "weekend"],
-          "amenities": ["food court", "fresh food", "local vendors"],
+          "categories": [
+            "market",
+            "food",
+            "shopping"
+          ],
+          "tags": [
+            "public market",
+            "local vendors",
+            "year-round",
+            "weekend"
+          ],
+          "amenities": [
+            "food court",
+            "fresh food",
+            "local vendors"
+          ],
           "familyFriendly": true,
           "schedules": [
-            { "dayOfWeek": 5, "startTime": "09:00:00", "endTime": "17:00:00" },
-            { "dayOfWeek": 6, "startTime": "09:00:00", "endTime": "17:00:00" },
-            { "dayOfWeek": 0, "startTime": "09:00:00", "endTime": "17:00:00" }
+            {
+              "dayOfWeek": 5,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "09:00:00",
+              "endTime": "17:00:00"
+            }
           ],
           "occurrenceCount": 12
         },
@@ -138,9 +264,24 @@
           "neighbourhood": "South Calgary",
           "organizer": "Calgary Earth Market Society",
           "sourceUrl": "https://www.farmersmakersmarket.ca/",
-          "categories": ["market", "food", "arts"],
-          "tags": ["farmers market", "makers", "live music", "seasonal"],
-          "amenities": ["live music", "food trucks", "kids program", "accessible", "pet friendly"],
+          "categories": [
+            "market",
+            "food",
+            "arts"
+          ],
+          "tags": [
+            "farmers market",
+            "makers",
+            "live music",
+            "seasonal"
+          ],
+          "amenities": [
+            "live music",
+            "food trucks",
+            "kids program",
+            "accessible",
+            "pet friendly"
+          ],
           "familyFriendly": true,
           "petFriendly": true,
           "dayOfWeek": 6,
@@ -150,7 +291,8 @@
           "seasonEnd": "2026-10-17",
           "occurrenceCount": 8
         }
-      ]
+      ],
+      "autoPublish": true
     }
   }
 ]

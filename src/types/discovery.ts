@@ -5,7 +5,7 @@ export interface EntityImage { src: string; alt: string; credit?: string }
 export interface EntityBase {
   id: string; kind: EntityKind; slug: string; title: string; summary: string; description: string;
   categories: string[]; tags: string[]; sources: EntitySource[]; image?: EntityImage;
-  status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked';
+  status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked' | 'source-feed';
   verifiedAt?: string; fetchedAt?: string; sourceId?: string; sourceRecordId?: string;
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
   scores?: { featured?: number; editorial?: number; demand?: number; popularity?: number };

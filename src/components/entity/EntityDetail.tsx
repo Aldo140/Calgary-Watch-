@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { DiscoveryCard } from '../discovery/DiscoveryCards';
 
-export function SourceBadge({ entity }: { entity: DiscoveryEntity }) { return <aside className="cw-sources"><h2>Know the source</h2><p>{entity.verification === 'source-checked' ? 'Source checked' : 'Not yet verified'} · Last checked {entity.verifiedAt || entity.updatedAt}</p>{entity.sources.map((source, i) => <a key={i} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>)}</aside>; }
+export function SourceBadge({ entity }: { entity: DiscoveryEntity }) { return <aside className="cw-sources"><h2>Know the source</h2><p>{entity.verification === 'source-checked' ? 'Source checked' : entity.verification === 'source-feed' ? `Listed from ${entity.sources[0]?.name ?? 'the organizer'}` : 'Not yet verified'} · Last checked {entity.verifiedAt || entity.updatedAt}</p>{entity.sources.map((source, i) => <a key={i} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>)}</aside>; }
 export function EntityDetail({ entity, related, occurrences = [] }: { entity: DiscoveryEntity; related: DiscoveryEntity[]; occurrences?: readonly MarketOccurrence[] }) {
   const dates = entity.kind === 'market' ? upcomingOccurrences(occurrences, entity.id) : [];
   const next = dates.find(o => !o.cancelled);

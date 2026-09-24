@@ -185,3 +185,29 @@ describe('Persistence lifecycle',()=>{
     assert.equal(db.data.get(`markets/${a.id}`).status,'pending');
   });
 });
+
+describe('Trusted feeds publish without an editor',()=>{
+  const feed={...source,autoPublish:true};
+  it('publishes a new record from an approved official feed, labelled as feed-sourced',async()=>{
+    const db=memoryStore();const a=await store.ingestRecord(db,event,feed,'e');
+    const saved=db.data.get(`events/${a.id}`);
+    assert.equal(saved.status,'published');assert.equal(saved.verification,'source-feed');
+    assert.equal(domain.eligible(saved),true);
+  });
+  it('drains an unchanged record still waiting from before the feed was trusted',async()=>{
+    const db=memoryStore();const a=await store.ingestRecord(db,event,source,'e');
+    assert.equal(db.data.get(`events/${a.id}`).status,'pending');
+    await store.ingestRecord(db,event,feed,'e');
+    assert.equal(db.data.get(`events/${a.id}`).status,'published');
+  });
+  it('never overrides an editor who unpublished or archived it',async()=>{
+    const db=memoryStore();const a=await store.ingestRecord(db,event,feed,'e');
+    await store.moderate(db,{kind:'event',id:a.id,revision:a.revision,action:'draft'},'admin');
+    await store.ingestRecord(db,{...event,start:'2026-09-26T19:00:00-06:00'},feed,'e');
+    assert.equal(db.data.get(`events/${a.id}`).status,'draft');
+  });
+  it('only trusts official sources',async()=>{
+    const db=memoryStore();const a=await store.ingestRecord(db,event,{...feed,kind:'editorial'},'e');
+    assert.equal(db.data.get(`events/${a.id}`).status,'pending');
+  });
+});

@@ -16,9 +16,9 @@ const ELBOW: [number, number][] = [[50.96, -114.19], [50.975, -114.15], [50.99, 
 /** [name, lat, lng, label dx, label dy, anchor] — the downtown cluster fans out so labels don't collide. */
 const PLACES: [string, number, number, number?, number?, ('start' | 'end')?][] = [['Downtown', 51.0478, -114.0593, 6, 14], ['Kensington', 51.0529, -114.0913, -6, -5, 'end'], ['Bridgeland', 51.0545, -114.0391, 6, -6], ['Inglewood', 51.0369, -114.0189], ['Marda Loop', 51.0232, -114.1062], ['Bowness', 51.0906, -114.2083], ['Forest Lawn', 51.0419, -113.9636], ['Airport', 51.1215, -114.0076], ['Chinook', 50.9981, -114.0733], ['Shawnessy', 50.9086, -114.0717], ['Tuscany', 51.1255, -114.2515]];
 
-export function CityMap({ pins, className = 'cm-city', labels = true }: { pins: ExampleReport[]; className?: string; labels?: boolean }) {
+export function CityMap({ pins, className = 'cm-city', labels = true, quads = true, viewBox = '0 0 400 440' }: { pins: ExampleReport[]; className?: string; labels?: boolean; quads?: boolean; viewBox?: string }) {
   return (
-    <svg className={className} viewBox="0 0 400 440" role="img" aria-label={pins.length ? `Map of Calgary with ${pins.length} reports from the last 24 hours` : 'Map of Calgary'}>
+    <svg className={className} viewBox={viewBox} preserveAspectRatio="xMidYMid slice" role="img" aria-label={pins.length ? `Map of Calgary with ${pins.length} reports from the last 24 hours` : 'Map of Calgary'}>
       <defs>
         <pattern id="cm-grid" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16,0H0V16" fill="none" stroke="rgba(255,255,255,.05)" /></pattern>
       </defs>
@@ -35,7 +35,7 @@ export function CityMap({ pins, className = 'cm-city', labels = true }: { pins: 
           <text x={dx} y={dy} textAnchor={anchor}>{name}</text>
         </g>
       ))}
-      <text className="cm-quad" x="34" y="44">NW</text><text className="cm-quad" x="340" y="44">NE</text><text className="cm-quad" x="34" y="420">SW</text><text className="cm-quad" x="340" y="420">SE</text>
+      {quads ? <><text className="cm-quad" x="34" y="44">NW</text><text className="cm-quad" x="340" y="44">NE</text><text className="cm-quad" x="34" y="420">SW</text><text className="cm-quad" x="340" y="420">SE</text></> : null}
       {pins.map((p, i) => (
         <g key={p.id} transform={`translate(${px(p.lng!).toFixed(1)} ${py(p.lat!).toFixed(1)})`}>
           <g className="cm-pin" style={{ animationDelay: `${(i % 12) * 0.12}s` }}>

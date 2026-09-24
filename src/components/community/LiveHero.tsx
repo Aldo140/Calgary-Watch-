@@ -42,7 +42,7 @@ function Phone({ cards, pins, now, real }: { cards: ExampleReport[]; pins: Examp
           <span className="lh-search"><Search size={13} /> Search a neighbourhood</span>
         </div>
         <div className="lh-map">
-          <CityMap pins={pins} className="lh-city" />
+          <CityMap pins={pins} className="lh-city" quads={false} viewBox="140 140 170 130" />
           <span className="lh-you"><span /></span>
         </div>
         <div className="lh-sheet">
@@ -74,7 +74,7 @@ export function LiveHero({ pulse, views }: { pulse: LivePulse; views: string }) 
   return (
     <section className="lh" aria-labelledby="cm-title">
       <div className="lh-bg" aria-hidden="true">
-        <CityMap pins={recent} className="lh-bgmap" labels={false} />
+        <CityMap pins={recent} className="lh-bgmap" labels={false} quads={false} />
       </div>
       <div className="cw-wrap lh-grid">
         <div className="lh-copy">

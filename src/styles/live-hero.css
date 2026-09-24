@@ -165,3 +165,8 @@
 .lh-float-1 { right: -13%; top: 54%; }
 .lh-float-2 { left: -6%; bottom: 6%; }
 @media (max-width: 960px) { .lh-float-0 { right: 0; } .lh-float-1 { right: -2%; } .lh-float-2 { left: 0; } }
+
+.lh .lh-city, .lh .lh-city { width: 100%; height: 100%; margin: 0; display: block; }
+@media (max-width: 640px) { .lh .lh-city { margin: 0; } }
+.lh-city .cm-place text { font-size: 7px; }
+.lh-city .cm-place circle { r: 1.6; }

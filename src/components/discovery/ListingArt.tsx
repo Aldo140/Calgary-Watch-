@@ -170,3 +170,97 @@ export const EventArt = memo(function EventArt({ id, title, categories }: { id: 
     </svg>
   );
 });
+
+const SHOP_WAYS = [
+  { wall: '#dfe7ff', facade: '#1554d1', trim: '#ffdf4f', a: '#ffffff', b: '#1554d1', door: '#ffdf4f' },
+  { wall: '#fff5cc', facade: '#1f8a4c', trim: '#ffffff', a: '#ffdf4f', b: '#1f8a4c', door: '#ffdf4f' },
+  { wall: '#c9f2d4', facade: '#06162f', trim: '#00c2e0', a: '#00c2e0', b: '#ffffff', door: '#00c2e0' },
+  { wall: '#ffd8c2', facade: '#b8472a', trim: '#ffdf4f', a: '#ffffff', b: '#b8472a', door: '#06162f' },
+  { wall: '#d7f3f9', facade: '#7b4bd8', trim: '#ffdf4f', a: '#ffdf4f', b: '#7b4bd8', door: '#ffffff' },
+];
+
+type ShopGlyph = 'cup' | 'record' | 'frame' | 'bag';
+export function shopGlyph(tags: string[], categories: string[]): ShopGlyph {
+  const t = [...tags, ...categories].join(' ').toLowerCase();
+  if (/vinyl|record/.test(t)) return 'record';
+  if (/coffee|espresso|cafe|café|bakery|pastr/.test(t)) return 'cup';
+  if (/art|gallery|studio/.test(t)) return 'frame';
+  return 'bag';
+}
+
+/** Sign text: the business name before any "— Neighbourhood" suffix. */
+function signName(title: string) {
+  return title.split(/\s+[—–-]\s+/)[0].toUpperCase();
+}
+
+export const ShopArt = memo(function ShopArt({ id, title, tags, categories }: { id: string; title: string; tags: string[]; categories: string[] }) {
+  const r = seeded(id);
+  const w = SHOP_WAYS[Math.floor(r() * SHOP_WAYS.length)];
+  const glyph = shopGlyph(tags, categories);
+  const name = signName(title);
+  const pid = `sa-${id.slice(0, 10)}`;
+  return (
+    <svg className="cw-art" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" role="img" aria-label={`Illustrated storefront for ${title}`}>
+      <defs>
+        <pattern id={`${pid}-brick`} width="24" height="12" patternUnits="userSpaceOnUse">
+          <path d="M0,0H24M0,6H24M6,0V6M18,6V12" stroke={INK} strokeWidth="1" opacity=".12" fill="none" />
+        </pattern>
+        <pattern id={`${pid}-dots`} width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill={INK} opacity=".08" /></pattern>
+      </defs>
+      <rect width="400" height="260" fill={w.wall} />
+      <rect width="400" height="260" fill={`url(#${pid}-dots)`} />
+      <rect x="0" y="232" width="400" height="28" fill="#cfcac0" />
+      <path d="M0,232H400" stroke={INK} strokeWidth="2.5" />
+      <rect x="44" y="30" width="312" height="203" fill={w.facade} stroke={INK} strokeWidth="2.5" />
+      <rect x="44" y="30" width="312" height="203" fill={`url(#${pid}-brick)`} />
+      <rect x="36" y="22" width="328" height="14" fill={w.trim} stroke={INK} strokeWidth="2.5" />
+      <rect x="66" y="46" width="268" height="36" rx="4" fill="#1f2a2e" stroke={INK} strokeWidth="2.5" />
+      <text x="200" y="70" textAnchor="middle" fill="#fff" textLength={name.length * 12.5 > 244 ? 244 : undefined} lengthAdjust="spacingAndGlyphs" style={{ font: '800 17px "Bricolage Grotesque", Inter, sans-serif', letterSpacing: '.04em' }}>{name}</text>
+      {Array.from({ length: 11 }, (_, i) => <rect key={i} x={52 + i * 27} y="90" width="27" height="24" fill={i % 2 ? w.b : w.a} />)}
+      {Array.from({ length: 11 }, (_, i) => <path key={i} d={`M${52 + i * 27},113a13.5,13.5 0 0 0 27,0Z`} fill={i % 2 ? w.b : w.a} stroke={INK} strokeWidth="2.2" />)}
+      <rect x="52" y="90" width="297" height="24" fill="none" stroke={INK} strokeWidth="2.5" />
+      <rect x="64" y="136" width="176" height="84" fill="#ffe9a8" stroke={INK} strokeWidth="2.5" />
+      <path d="M152,136V220M64,178H240" stroke={INK} strokeWidth="2" opacity=".5" />
+      <path d="M72,144L96,144L72,168Z" fill="#fff" opacity=".55" />
+      <g transform="translate(152 178)">
+        {glyph === 'cup' ? (
+          <g>
+            <path d="M-22,-14H18V8A14,14 0 0 1 4,22H-8A14,14 0 0 1 -22,8Z" fill="#fff" stroke={INK} strokeWidth="2.5" />
+            <path d="M18,-6h6a7,7 0 0 1 0,14h-7" fill="none" stroke={INK} strokeWidth="2.5" />
+            <path d="M-12,-22q4,-6 0,-12M-2,-22q4,-6 0,-12M8,-22q4,-6 0,-12" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+          </g>
+        ) : glyph === 'record' ? (
+          <g>
+            <circle r="30" fill={INK} />
+            <circle r="22" fill="none" stroke="#fff" strokeOpacity=".2" />
+            <circle r="10" fill={w.trim} stroke={INK} strokeWidth="2" />
+            <circle r="2.5" fill={INK} />
+          </g>
+        ) : glyph === 'frame' ? (
+          <g transform="rotate(-4)">
+            <rect x="-30" y="-24" width="60" height="48" fill="#fff" stroke={INK} strokeWidth="2.5" />
+            <circle cx="-10" cy="-4" r="9" fill={w.trim} stroke={INK} strokeWidth="2" />
+            <path d="M-2,16L12,-10L24,16Z" fill={w.facade} stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+          </g>
+        ) : (
+          <g>
+            <path d="M-22,-10H22L18,26H-18Z" fill="#fff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+            <path d="M-10,-10V-18A10,10 0 0 1 10,-18V-10" fill="none" stroke={INK} strokeWidth="2.5" />
+          </g>
+        )}
+      </g>
+      <rect x="262" y="136" width="70" height="97" fill={w.door} stroke={INK} strokeWidth="2.5" />
+      <rect x="274" y="148" width="46" height="36" fill="#ffe9a8" stroke={INK} strokeWidth="2" />
+      <circle cx="320" cy="200" r="3.5" fill={INK} />
+      <text x="297" y="170" textAnchor="middle" fill={INK} style={{ font: '800 10px "IBM Plex Mono", monospace' }}>OPEN</text>
+      {[[30, 232], [372, 232]].map(([x, y], i) => (
+        <g key={i}>
+          <path d={`M${x - 12},${y}L${x - 9},${y - 20}H${x + 9}L${x + 12},${y}Z`} fill="#c98b4b" stroke={INK} strokeWidth="2.2" />
+          <circle cx={x - 6} cy={y - 28} r="10" fill="#3fbf6a" stroke={INK} strokeWidth="2" />
+          <circle cx={x + 6} cy={y - 30} r="10" fill="#3fbf6a" stroke={INK} strokeWidth="2" />
+          <circle cx={x} cy={y - 38} r="10" fill="#3fbf6a" stroke={INK} strokeWidth="2" />
+        </g>
+      ))}
+    </svg>
+  );
+});

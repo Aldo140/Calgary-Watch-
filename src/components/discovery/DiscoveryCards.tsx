@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Calendar, MapPin, Tag } from 'lucide-react';
 import type { DiscoveryEntity, EntityKind } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
-import { EventArt, MarketArt } from './ListingArt';
+import { EventArt, MarketArt, ShopArt } from './ListingArt';
 
 export function SectionHeading({ title, to, label = 'Explore all', eyebrow }: { title: string; to?: string; label?: string; eyebrow?: string }) {
   return <div className="cw-section-heading"><div>{eyebrow && <p className="cw-eyebrow">{eyebrow}</p>}<h2>{title}</h2></div>{to && <Link className="cw-text-link" to={to}>{label} <ArrowUpRight size={18} /></Link>}</div>;
@@ -45,6 +45,8 @@ export function DiscoveryCard({ entity }: { entity: DiscoveryEntity }) {
         <div className="cw-card-image">
           {entity.kind === 'market'
             ? <MarketArt id={entity.id} title={entity.title} />
+            : entity.kind === 'business'
+            ? <ShopArt id={entity.id} title={entity.title} tags={entity.tags} categories={entity.categories} />
             : entity.kind === 'event' && !/^https:\/\//.test(entity.image?.src ?? '')
             ? <EventArt id={entity.id} title={entity.title} categories={entity.categories} />
             : <img

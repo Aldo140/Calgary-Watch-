@@ -5,6 +5,8 @@ import { GlobalSearch } from '../components/site/GlobalSearch';
 import { DiscoveryCard, EmptyInventory } from '../components/discovery/DiscoveryCards';
 import { EntityDetail } from '../components/entity/EntityDetail';
 import { ListingBoard } from '../components/discovery/ListingBoard';
+import { LocalBoard } from '../components/discovery/LocalBoard';
+import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
 import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
@@ -29,6 +31,9 @@ export default function DiscoveryPage() {
   const groups = searchEntities(filterInventory(all, discoveryRepository.occurrences()), q);
   const title = missing ? 'This page isn’t here yet.' : search ? 'Find your next Calgary thing.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
   const relatedIds = entity?.kind === 'guide' ? entity.entries.map(e => e.entityId) : entity?.kind === 'neighbourhood' ? entity.entityIds : [];
+  if (root === 'local' && !entity && !missing) {
+    return <SiteLayout><div className="cw-wrap cw-page"><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></div></SiteLayout>;
+  }
   if ((root === 'events' || root === 'markets') && !entity && !missing) {
     const filterLinks = [
       { to: `/${root}`, label: `All ${root}`, current: !slug },

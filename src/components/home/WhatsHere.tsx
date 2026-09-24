@@ -31,6 +31,9 @@ function radarPoint(lat: number, lng: number) {
   return { x: 100 + x * k, y: 100 + y * k };
 }
 
+/** Kinds of report, not current ones; the real latest report is shown below them. */
+const REPORT_KINDS = ['Bike stolen', 'Car break-in', 'Suspicious person on the CTrain', 'Police news release', 'Road closure', 'Power outage'];
+
 const QUAD_PIN: Record<string, [number, number]> = { NW: [62, 40], NE: [178, 40], SW: [62, 114], SE: [178, 114] };
 const QUAD_RECT: Record<string, [number, number]> = { NW: [0, 0], NE: [120, 0], SW: [0, 75], SE: [120, 75] };
 
@@ -175,7 +178,11 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           ) : <span className="h-ticket"><span className="h-ticket-main"><b>See what’s listed</b></span></span>}
         </Card>
 
-        <Card to="/map" n="03" title="Live map" desc="Break-ins, closures, outages and weather, each with its source." className="h-way-live">
+        <Card to="/map" n="03" title="Live safety map" desc="Crime and safety reports from neighbours, plus Calgary Police news releases, closures and outages. Each one shows its source." className="h-way-live">
+          <span className="h-way-kinds">
+            <small>The kinds of reports you’ll see</small>
+            <span>{REPORT_KINDS.map(k => <i key={k}>{k}</i>)}</span>
+          </span>
           <Radar report={report} />
           <span className="h-dispatch" aria-live="polite">
             {report ? (

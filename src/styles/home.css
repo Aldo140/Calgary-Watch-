@@ -120,6 +120,7 @@
 .cw-home2 .h-hero[data-tone='light'] .h-intents a { background: rgba(255, 255, 255, .13); color: #fff; border: 1px solid rgba(255, 255, 255, .22); }
 .cw-home2 .h-hero[data-tone='light'] .h-intents a:hover { background: rgba(255, 255, 255, .24); }
 
+.cw-home2 .h-cap-short { display: none; }
 .cw-home2 .h-sky-caption {
   position: absolute; right: max(24px, calc((100vw - 1320px) / 2 + 44px)); bottom: 132px;
   display: inline-flex; align-items: center; gap: 8px;
@@ -134,7 +135,7 @@
 .cw-home2 .h-tear-shade { fill: rgba(4, 10, 28, .22); }
 
 /* Scene motion — all off under prefers-reduced-motion (rule at the end). */
-.cw-home2 .h-train { animation: h-train 46s linear infinite; }
+.cw-home2 .h-train { animation: h-train 46s linear infinite; animation-delay: -12s; }
 @keyframes h-train { 0% { transform: translateX(-200px); } 55%, 100% { transform: translateX(1800px); } }
 .cw-home2 .h-cyclist { animation: h-ride 30s linear infinite; }
 @keyframes h-ride {
@@ -295,7 +296,14 @@
   .cw-home2 .h-hero { margin-top: -62px; min-height: 900px; padding: calc(62px + 28px) 0 120px; }
   .cw-home2 .h-hero h1 { font-size: clamp(46px, 14vw, 62px); }
   .cw-home2 .h-summary { margin: 16px 0 20px; font-size: 16px; }
-  .cw-home2 .h-sky-caption { right: auto; left: 16px; bottom: 60px; font-size: 10px; }
+  .cw-home2 .h-hero { min-height: max(620px, 100vh); min-height: max(620px, 100svh); padding-bottom: 0; }
+  .cw-home2 .h-dateline { margin-bottom: 16px; }
+  .cw-home2 .h-intents { flex-wrap: nowrap; overflow-x: auto; margin: 14px -16px 0; padding: 0 16px 4px; scrollbar-width: none; }
+  .cw-home2 .h-intents::-webkit-scrollbar { display: none; }
+  .cw-home2 .h-intents a { flex: none; padding: 9px 14px; font-size: 13px; }
+  .cw-home2 .h-sky-caption { position: relative; right: auto; bottom: auto; margin: 12px 16px 0; font-size: 10px; padding: 6px 10px; max-width: calc(100% - 32px); }
+  .cw-home2 .h-cap-long { display: none; }
+  .cw-home2 .h-cap-short { display: inline; }
   .cw-home2 .h-facts { grid-template-columns: minmax(0, 1fr); }
   .cw-home2 .h-fact { min-height: 0; }
   .cw-home2 .h-guides a { grid-template-columns: 40px minmax(0, 1fr) 18px; gap: 12px; }

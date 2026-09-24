@@ -46,7 +46,7 @@
 .cw-home2 .h-way > a:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--b-ink); }
 
 .cw-home2 .h-way-head { display: flex; align-items: center; gap: 10px; }
-.cw-home2 .h-way-head small { font: 600 12px/1 var(--h-mono); opacity: .7; }
+.cw-home2 .h-way-head small { flex: none; white-space: nowrap; font: 600 12px/1 var(--h-mono); opacity: .7; }
 .cw-home2 .h-way-head strong { font: 800 clamp(24px, 2.2vw, 30px)/1 var(--h-display); letter-spacing: -.03em; }
 .cw-home2 .h-way-go {
   margin-left: auto; flex: none; width: 40px; height: 40px; border-radius: 50%;
@@ -396,7 +396,8 @@
   .cw-home2 .h-way-head small::after { content: ' / 05'; opacity: .6; }
   .cw-home2 .h-way-live > a { display: flex; }
   .cw-home2 .h-way-live .h-radar { max-width: 176px; margin: auto; padding: 6px 0; }
-  .cw-home2 .h-way-live .h-dispatch { margin-top: 0; }
+  .cw-home2 .h-way-live .h-dispatch { margin-top: 0; align-self: stretch; }
+  .cw-home2 .h-way-head strong { font-size: 22px; min-width: 0; }
   .cw-home2 .h-mini-map { height: 132px; margin-top: auto; }
   .cw-home2 .h-envelope { margin-top: auto; }
   .cw-home2 .h-pricetag, .cw-home2 .h-ticket { margin-top: auto; }

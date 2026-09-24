@@ -6,10 +6,11 @@ export type SkyVariant = 'mobile' | 'tablet' | 'desktop';
 
 /** Extra sky above the city per layout, so the headline always sits in open sky
  * and the skyline sits below it (the SVG is anchored bottom-centre and sliced). */
-const VIEW: Record<SkyVariant, { y: number; moon: [number, number]; plane: number }> = {
-  desktop: { y: -250, moon: [1330, 150], plane: 10 },
-  tablet: { y: -700, moon: [1260, -140], plane: -560 },
-  mobile: { y: -900, moon: [1110, -640], plane: -770 },
+/** `size` enlarges the plane, train and cyclist where the scene is drawn small. */
+const VIEW: Record<SkyVariant, { y: number; moon: [number, number]; plane: number; size: { plane: number; train: number; bike: number } }> = {
+  desktop: { y: -250, moon: [1330, 150], plane: 10, size: { plane: 1, train: 1, bike: 1 } },
+  tablet: { y: -700, moon: [1260, -140], plane: -560, size: { plane: 1.6, train: 1.3, bike: 1.35 } },
+  mobile: { y: -900, moon: [1110, -640], plane: 262, size: { plane: 2.4, train: 1.7, bike: 2.2 } },
 };
 const W = 1600, BASE = 705, RIVER = 712, BANK = 795;
 
@@ -175,13 +176,13 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
         </g>
       ) : null}
       <g transform={`translate(0 ${view.plane})`}>
-        <g className="h-plane">
+        <g className="h-plane"><g transform={`scale(${view.size.plane})`}>
           {night < 0.5 ? <path d="M-230,1H-18" stroke="url(#hs-trail)" strokeWidth="2.5" /> : null}
           <path d="M-18,0C-12,-2.6 8,-2.6 16,-1.2C19,-.6 19,.6 16,1.2C8,2.6 -12,2.6 -18,0Z" fill={mix(p.city, '#ffffff', 0.75 - night * 0.55)} />
           <path d="M-2,0L-8,-9H-4L6,0L-4,9H-8Z" fill={mix(p.city, '#ffffff', 0.6 - night * 0.45)} />
           <path d="M-17,0L-20,-6H-17L-12,0Z" fill={mix(p.city, '#ffffff', 0.6 - night * 0.45)} />
           {night > 0.3 ? <><circle className="h-strobe" cx="-7" cy="-9" r="1.8" fill="#ff5a4e" /><circle className="h-strobe h-strobe-2" cx="-7" cy="9" r="1.8" fill="#fff" /></> : null}
-        </g>
+        </g></g>
       </g>
 
       <path d={ridge(FAR)} fill={p.far} />
@@ -242,7 +243,7 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
       <rect x="0" y={RIVER - 8} width={W} height="10" fill={mix(p.hills, p.ground, 0.5)} />
       <path d={`M0,${RIVER - 7}H${W}`} stroke={mix(p.city, p.horizon, 0.3)} strokeWidth="1.5" />
       <g transform={`translate(0 ${RIVER - 7})`}>
-        <g className="h-train">
+        <g className="h-train"><g transform={`scale(${view.size.train})`}>
           {[0, 1, 2].map(i => (
             <g key={i} transform={`translate(${i * 50} 0)`}>
               <rect x="0" y="-13" width="47" height="12" rx="3" fill={mix('#eef0f2', '#39425e', night * 0.8)} />
@@ -250,7 +251,7 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
               <rect x="5" y="-11" width="37" height="4" rx="1" fill={lit ? '#ffd27a' : mix(p.city, '#000000', 0.2)} opacity={lit ? 0.85 : 1} />
             </g>
           ))}
-        </g>
+        </g></g>
       </g>
       <rect x="0" y={RIVER} width={W} height={BANK - RIVER} fill="url(#hs-river)" />
       <g clipPath="url(#hs-river-clip)" opacity=".28">
@@ -271,11 +272,11 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
       <path d="M506,812Q640,750 734,716L792,716Q690,760 626,812Z" fill={mix('#0b1a2a', p.ground, 0.4)} opacity=".3" transform="translate(16 8)" />
       <path d="M510,808Q640,748 736,712L778,712Q684,756 618,808Z" fill={mix('#efe6d6', p.ground, night * 0.6)} />
       <path d="M510,808Q640,748 736,712L736,697Q640,728 510,768Z" fill="url(#hs-helix)" opacity=".5" />
-      <g className="h-cyclist" fill="none" stroke={mix(p.city, '#000000', 0.3)} strokeWidth="1.6" strokeLinecap="round">
+      <g className="h-cyclist" fill="none" stroke={mix(p.city, '#000000', 0.3)} strokeWidth="1.6" strokeLinecap="round"><g transform={`scale(${view.size.bike})`}>
         <circle cx="-5" cy="-3.5" r="3.3" /><circle cx="5" cy="-3.5" r="3.3" />
         <path d="M-5,-3.5L-1,-8L4,-8L5,-3.5M-1,-8L-3,-12M-3,-12L1,-17M1,-17L4,-10" />
         <circle cx="2" cy="-19.5" r="2.2" fill={mix(p.city, '#000000', 0.3)} stroke="none" />
-      </g>
+      </g></g>
       <path d="M618,808Q684,756 778,712L778,697Q690,736 618,768Z" fill="url(#hs-helix)" />
       <path d="M510,768Q564,748 618,768Q690,736 778,697Q757,690 736,697Q640,728 510,768Z" fill="url(#hs-helix)" />
       <g fill="none" stroke="#e2403a" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round">

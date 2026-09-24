@@ -137,16 +137,16 @@
 /* Scene motion — all off under prefers-reduced-motion (rule at the end). */
 .cw-home2 .h-train { animation: h-train 46s linear infinite; animation-delay: -12s; }
 @keyframes h-train { 0% { transform: translateX(-200px); } 55%, 100% { transform: translateX(1800px); } }
-.cw-home2 .h-cyclist { animation: h-ride 30s linear infinite; }
+.cw-home2 .h-cyclist { animation: h-ride 24s linear infinite; animation-delay: -5s; }
 @keyframes h-ride {
   0% { transform: translate(566px, 800px) scale(1.1); opacity: 0; } 4% { opacity: 1; }
-  44% { opacity: 1; } 48%, 100% { transform: translate(757px, 713px) scale(.4); opacity: 0; }
+  86% { opacity: 1; } 90%, 100% { transform: translate(757px, 713px) scale(.4); opacity: 0; }
 }
 .cw-home2 .h-geese { animation: h-geese 64s linear infinite; }
 @keyframes h-geese { 0% { transform: translateX(1760px); } 60%, 100% { transform: translateX(-160px); } }
 .cw-home2 .h-goose { transform-box: fill-box; transform-origin: center; animation: h-flap .55s ease-in-out infinite alternate; }
 @keyframes h-flap { to { transform: scaleY(.45); } }
-.cw-home2 .h-plane { animation: h-plane 90s linear infinite; animation-delay: -18s; }
+.cw-home2 .h-plane { animation: h-plane 90s linear infinite; animation-delay: -26s; }
 @keyframes h-plane { 0% { transform: translate(-260px, 30px); } 65%, 100% { transform: translate(1860px, -40px); } }
 .cw-home2 .h-strobe { animation: h-blink 1.2s steps(1) infinite; }
 .cw-home2 .h-strobe-2 { animation-delay: -.6s; }

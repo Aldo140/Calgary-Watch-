@@ -9,7 +9,8 @@ import type { BrandId, OpsPost, PostTemplate } from '../../../src/types/ops';
 import { BRANDS, ROOT, brandKit, type BrandKit } from '../lib/brand';
 import { claudeConfigured, extractBrief, writePost } from '../lib/claude';
 import { COLLECTIONS, uploadImage } from '../lib/firebase';
-import { igToken, publishImage } from '../lib/instagram';
+import { publishImage } from '../lib/instagram';
+import { currentToken } from './igTokens';
 import { checkDraft, happenings, selectCandidates, templateDraft, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { renderPost } from '../lib/render';
 import { calgaryDate, nextSlot } from '../lib/time';
@@ -172,7 +173,7 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
   for (const doc of due) {
     const p = doc.data() as OpsPost;
     const kit = brandKit(p.brand);
-    const token = igToken(p.brand);
+    const token = await currentToken(db, p.brand);
     const hold = async (error: string) => { await doc.ref.update({ error, updatedAt: now }); log(`held ${p.id}: ${error}`); };
     if (!token) { await hold(`No Instagram token for ${kit.name} yet (IG_TOKEN_${p.brand.toUpperCase()}).`); continue; }
     if (!kit.confirmed) { await hold(`${kit.name} brand kit is still provisional; confirm brand/${p.brand}.json first.`); continue; }

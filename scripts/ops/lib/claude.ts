@@ -12,7 +12,9 @@ const MODEL = 'claude-opus-5';
 let client: Anthropic | null = null;
 export const claudeConfigured = () => Boolean(process.env.ANTHROPIC_API_KEY);
 function anthropic(): Anthropic {
-  client ??= new Anthropic();
+  // Keys created outside a workspace must name one on every request.
+  const workspace = process.env.ANTHROPIC_WORKSPACE_ID;
+  client ??= new Anthropic(workspace ? { defaultHeaders: { 'anthropic-workspace-id': workspace } } : {});
   return client;
 }
 

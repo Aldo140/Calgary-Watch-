@@ -31,13 +31,14 @@ Code: `scripts/ops/` (jobs), `src/components/admin/OpsWorkspace.tsx` and `Partne
 
 ### Instagram
 
-Both accounts must be **Business** accounts, each linked to its own Facebook Page. Then:
+The Meta app "CalgaryWatch Ops" uses **Instagram API with Instagram business login**, so no Facebook Pages are needed. Each account must be a professional (Business or Creator) account.
 
-1. Create a Meta app (Business type) and add Instagram with Facebook Login.
-2. In the Graph API Explorer, generate a user token with `instagram_basic`, `instagram_content_publish`, `pages_show_list` and `pages_read_engagement`.
-3. Extend the token in the Access Token Debugger.
+1. In the app, open **App roles → Roles → Add people → Instagram Tester** and add each account.
+2. In the Instagram app, accept the invite under Settings → Website permissions → Apps and websites → Tester invites.
+3. In the app, go to **Instagram → API setup with Instagram business login → 1. Generate access tokens → Add account**. Log in as that account and copy the token (it starts with `IG`).
+4. Save the tokens as `IG_TOKEN_CALGARYWATCH` and `IG_TOKEN_CALGARYDAILY`.
 
-The daily health check shows how many days each token has left and warns 10 days before it expires.
+These tokens last 60 days, but the daily job renews them every day (`scripts/ops/jobs/igTokens.ts`), so they never run out while it runs. Renewed tokens are stored in `ops_secrets`, which no browser can read. Replacing a GitHub secret always takes priority over the stored copy. Facebook-login user tokens also still work.
 
 ### Outlook (sending as aldo@calgarywatch.ca)
 

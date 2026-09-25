@@ -6,6 +6,7 @@ import { BRANDS, brandKit } from '../lib/brand';
 import { claudeConfigured } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
 import { igAccount, igToken, tokenExpiry } from '../lib/instagram';
+import { currentToken, keepAlive } from './igTokens';
 import { outlookConfigured } from '../lib/outlook';
 import { happenings, type DiscoveryIndex } from '../lib/posts';
 
@@ -42,14 +43,18 @@ async function workflowCheck(): Promise<Item> {
 export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, now: number, log: Log): Promise<OpsHealth> {
   const items: Item[] = [];
   for (const brand of BRANDS) {
-    const kit = brandKit(brand), token = igToken(brand);
+    const kit = brandKit(brand);
     if (!kit.confirmed) items.push({ id: `kit-${brand}`, label: `${kit.name} brand kit`, ok: false, detail: kit.confirmNote ?? 'Provisional.' });
-    if (!token) { items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: false, detail: 'Not connected yet.' }); continue; }
+    if (!igToken(brand)) { items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: false, detail: 'Not connected yet.' }); continue; }
     try {
+      // Instagram-login tokens are renewed here every day, so they never run out.
+      const renewed = db ? await keepAlive(db, brand, now) : null;
+      const token = (await currentToken(db, brand))!;
       const account = await igAccount(token, kit.handle);
-      const exp = await tokenExpiry(token);
+      const exp = renewed ?? await tokenExpiry(token);
       const days = exp ? Math.floor((exp - now) / DAY) : null;
-      items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: days === null || days > 10, detail: `@${account.username} connected; ${days === null ? 'token does not expire.' : `token expires in ${days} days.`}` });
+      const detail = renewed ? 'token renews itself daily.' : days === null ? 'token does not expire.' : `token expires in ${days} days.`;
+      items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: days === null || days > 10, detail: `@${account.username} connected; ${detail}` });
     } catch (e) {
       items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: false, detail: e instanceof Error ? e.message : String(e) });
     }

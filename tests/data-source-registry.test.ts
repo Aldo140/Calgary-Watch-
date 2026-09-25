@@ -82,7 +82,7 @@ describe('source health contract', () => {
   it('deploys Firestore and Storage rules without the CLI service-usage preflight', () => {
     assert.match(backendWorkflow, /node scripts\/deploy-firestore-rules\.mjs/);
     assert.match(rulesDeploy, /releaseFirestoreRulesetFromSource\(firestoreSource\)/);
-    assert.match(rulesDeploy, /releaseStorageRulesetFromSource\(storageSource\)/);
+    assert.match(rulesDeploy, /releaseStorageRulesetFromSource\(storageSource, bucket\)/);
   });
 
   it('reports a broken news transport as an error instead of a healthy empty feed', () => {

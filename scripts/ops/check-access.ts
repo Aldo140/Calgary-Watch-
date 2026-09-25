@@ -4,6 +4,9 @@
 //
 //   IG_TOKEN_CALGARYWATCH=... IG_TOKEN_CALGARYDAILY=... ANTHROPIC_API_KEY=... npm run ops:check
 
+import { brandKit } from './lib/brand';
+import { igAccount, isInstagramLoginToken } from './lib/instagram';
+
 const GRAPH = 'https://graph.facebook.com/v25.0';
 
 type Result = { name: string; ok: boolean; detail: string };
@@ -24,6 +27,17 @@ async function getJson(url: string, init?: RequestInit): Promise<{ status: numbe
 async function checkInstagram(label: string, token: string | undefined): Promise<Result> {
   const name = `Instagram (${label})`;
   if (!token) return { name, ok: false, detail: 'token not set' };
+
+  // Instagram-login tokens ("IG…") belong to exactly one account; the handle must match the brand kit.
+  if (isInstagramLoginToken(token)) {
+    const handle = brandKit(label === 'CalgaryWatch' ? 'calgarywatch' : 'calgarydaily').handle;
+    try {
+      const account = await igAccount(token, handle);
+      return { name, ok: true, detail: `@${account.username} (Instagram login token; renewed daily by the ops job)` };
+    } catch (e) {
+      return { name, ok: false, detail: e instanceof Error ? e.message : String(e) };
+    }
+  }
 
   const debug = await getJson(`${GRAPH}/debug_token?input_token=${token}&access_token=${token}`);
   const data = debug.body?.data;
@@ -58,7 +72,7 @@ async function checkAnthropic(key: string | undefined): Promise<Result> {
   const name = 'Anthropic API';
   if (!key) return { name, ok: false, detail: 'ANTHROPIC_API_KEY not set' };
   const res = await getJson('https://api.anthropic.com/v1/models', {
-    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', ...(process.env.ANTHROPIC_WORKSPACE_ID ? { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID } : {}) },
   });
   if (res.status !== 200) {
     return { name, ok: false, detail: res.body?.error?.message ?? `HTTP ${res.status}` };

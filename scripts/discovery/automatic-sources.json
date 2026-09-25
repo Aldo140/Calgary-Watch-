@@ -30,7 +30,10 @@
         "bridgelandfm.ca",
         "calgaryfarmersmarket.ca",
         "www.crossroadsmarket.ca",
-        "www.farmersmakersmarket.ca"
+        "www.farmersmakersmarket.ca",
+        "calgarywintermarket.ca",
+        "marketcollective.ca",
+        "www.dalhousiecalgary.ca"
       ],
       "kind": "official",
       "provider": "recurring-market",
@@ -290,6 +293,138 @@
           "seasonStart": "2026-05-23",
           "seasonEnd": "2026-10-17",
           "occurrenceCount": 8
+        },
+        {
+          "id": "calgary-winter-market",
+          "title": "Calgary Winter Market",
+          "summary": "A ticketed, European-style outdoor holiday market at Eau Claire Plaza.",
+          "description": "Outdoor European-style winter market with more than 40 retail huts, a heated market tent, food and entertainment. Open Thursday to Sunday from November 19, then every day from December 15 to 24. Entry tickets are $10 in advance.",
+          "address": "101 Barclay Parade SW, Calgary, AB",
+          "venue": "Eau Claire Plaza",
+          "neighbourhood": "Eau Claire",
+          "organizer": "Calgary Winter Market",
+          "sourceUrl": "https://calgarywintermarket.ca/",
+          "categories": [
+            "market",
+            "holiday"
+          ],
+          "tags": [
+            "christmas market",
+            "outdoor",
+            "seasonal",
+            "ticketed"
+          ],
+          "amenities": [
+            "market huts",
+            "food vendors",
+            "entertainment"
+          ],
+          "familyFriendly": true,
+          "schedules": [
+            {
+              "dayOfWeek": 4,
+              "startTime": "11:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "11:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "11:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "11:00:00",
+              "endTime": "18:00:00"
+            }
+          ],
+          "seasonStart": "2026-11-19",
+          "seasonEnd": "2026-12-20",
+          "occurrenceCount": 20
+        },
+        {
+          "id": "holiday-market-collective",
+          "title": "Holiday Market Collective",
+          "summary": "Market Collective's two-weekend holiday market of local artists, makers and vintage sellers.",
+          "description": "Calgary's long-running artist and maker market holds its holiday edition over two weekends in Hall D at the BMO Centre, with artists, designers, vintage sellers and food vendors.",
+          "address": "20 Roundup Way SE, Calgary, AB",
+          "venue": "BMO Centre, Hall D",
+          "neighbourhood": "Victoria Park",
+          "organizer": "Market Collective",
+          "sourceUrl": "https://marketcollective.ca/faqs/",
+          "categories": [
+            "market",
+            "holiday"
+          ],
+          "tags": [
+            "makers market",
+            "christmas market",
+            "indoor",
+            "local artists"
+          ],
+          "amenities": [
+            "makers",
+            "vintage",
+            "food vendors"
+          ],
+          "familyFriendly": true,
+          "schedules": [
+            {
+              "dayOfWeek": 5,
+              "startTime": "16:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "10:00:00",
+              "endTime": "17:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "10:00:00",
+              "endTime": "17:00:00"
+            }
+          ],
+          "seasonStart": "2026-12-04",
+          "seasonEnd": "2026-12-13",
+          "occurrenceCount": 6
+        },
+        {
+          "id": "dalhousie-harvest-farmers-market",
+          "title": "Dalhousie Harvest Farmers' Market",
+          "summary": "A one-day indoor harvest market at the Dalhousie Community Association.",
+          "description": "Indoor harvest farmers' market with more than 28 vendors who make, bake or grow their products in Alberta. It is an Alberta Approved Farmers' Market.",
+          "address": "5432 Dalhart Rd NW, Calgary, AB",
+          "venue": "Dalhousie Community Association",
+          "neighbourhood": "Dalhousie",
+          "organizer": "Dalhousie Community Association",
+          "sourceUrl": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
+          "categories": [
+            "market",
+            "food"
+          ],
+          "tags": [
+            "farmers market",
+            "indoor",
+            "local vendors",
+            "seasonal"
+          ],
+          "amenities": [
+            "local produce",
+            "food vendors",
+            "makers"
+          ],
+          "familyFriendly": true,
+          "dayOfWeek": 6,
+          "startTime": "10:00:00",
+          "endTime": "15:00:00",
+          "seasonStart": "2026-10-24",
+          "seasonEnd": "2026-10-24",
+          "occurrenceCount": 1
         }
       ],
       "autoPublish": true

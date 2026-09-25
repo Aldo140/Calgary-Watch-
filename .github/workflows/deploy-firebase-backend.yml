@@ -59,6 +59,7 @@ jobs:
         if: ${{ inputs.target == 'rules' }}
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
         run: node scripts/deploy-firestore-rules.mjs
 
       - name: Deploy Firestore and Storage rules

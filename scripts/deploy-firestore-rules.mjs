@@ -32,8 +32,12 @@ const app = initializeApp({
   projectId,
 });
 
+// The Admin SDK needs the bucket named explicitly for Storage rules; without it
+// the Firestore release succeeds and the Storage release throws.
+const bucket = process.env.FIREBASE_STORAGE_BUCKET?.trim() || `${projectId}.firebasestorage.app`;
+
 const rules = getSecurityRules(app);
 const firestoreRuleset = await rules.releaseFirestoreRulesetFromSource(firestoreSource);
-const storageRuleset = await rules.releaseStorageRulesetFromSource(storageSource);
 console.log(`Published Firestore ruleset ${firestoreRuleset.name}.`);
-console.log(`Published Storage ruleset ${storageRuleset.name}.`);
+const storageRuleset = await rules.releaseStorageRulesetFromSource(storageSource, bucket);
+console.log(`Published Storage ruleset ${storageRuleset.name} for ${bucket}.`);

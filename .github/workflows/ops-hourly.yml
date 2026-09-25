@@ -10,7 +10,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # Rendered post images are committed to the ops-media branch (see scripts/ops/lib/firebase.ts).
+  contents: write
 
 # Two overlapping runs could publish the same post twice; never allow it.
 concurrency:
@@ -44,3 +45,4 @@ jobs:
           MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
           OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          GITHUB_TOKEN: ${{ github.token }}

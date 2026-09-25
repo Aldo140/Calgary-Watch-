@@ -13,7 +13,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # Rendered post images are committed to the ops-media branch (see scripts/ops/lib/firebase.ts).
+  contents: write
   actions: read
 
 concurrency:

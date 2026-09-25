@@ -28,10 +28,33 @@ export function opsDb(): Firestore {
 }
 
 /**
- * Upload a rendered post. Instagram fetches the image by URL, so it gets a
- * Firebase download token: readable by whoever has the link, not listable.
+ * Upload a rendered post; Instagram fetches the image by URL.
+ *
+ * In GitHub Actions the image goes to the repo's ops-media branch and is served
+ * from raw.githubusercontent.com. Firebase Storage is the fallback, but it needs
+ * a billing account on the project, which this one doesn't have (uploads fail
+ * with "billing account ... is disabled").
  */
 export async function uploadImage(path: string, png: Buffer): Promise<string> {
+  const repo = process.env.GITHUB_REPOSITORY, token = process.env.GITHUB_TOKEN;
+  if (repo && token) return uploadToGitHub(repo, token, path, png);
+  return uploadToStorage(path, png);
+}
+
+const MEDIA_BRANCH = 'ops-media';
+
+async function uploadToGitHub(repo: string, token: string, path: string, png: Buffer): Promise<string> {
+  const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+    method: 'PUT',
+    headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' },
+    body: JSON.stringify({ message: `ops: ${path}`, content: png.toString('base64'), branch: MEDIA_BRANCH }),
+  });
+  if (!res.ok) throw new Error(`Image upload to ${MEDIA_BRANCH} failed: HTTP ${res.status} ${(await res.text()).slice(0, 200)}`);
+  return `https://raw.githubusercontent.com/${repo}/${MEDIA_BRANCH}/${path}`;
+}
+
+/** A Firebase download token makes the file readable by whoever has the link, not listable. */
+async function uploadToStorage(path: string, png: Buffer): Promise<string> {
   const bucket = getStorage(app()).bucket();
   const token = randomUUID();
   await bucket.file(path).save(png, {

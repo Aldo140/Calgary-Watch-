@@ -171,6 +171,9 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       status: problems.length ? 'blocked' : 'ready', notes: [...warnings, ...problems].join(' '), updatedAt: now,
       history: push(event('drafted', `First email drafted to ${found.email} (address found at ${found.url}).`)),
     });
+    // Two listings can share one organization (e.g. two locations): pitch it once.
+    contactedBy.set(normalizeEmail(found.email), lead.id);
+    contactedBy.set(`@${emailDomain(found.email)}`, lead.id);
     log(`pitch ready: ${lead.businessName} → ${found.email}`);
   }
 

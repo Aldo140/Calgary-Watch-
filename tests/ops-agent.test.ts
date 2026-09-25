@@ -10,7 +10,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it } from 'node:test';
 
-import type { PartnerLead } from '../src/types/ops';
+import type { OpsPost, PartnerLead } from '../src/types/ops';
+import { autoPublishable } from '../scripts/ops/jobs/posts';
 import { brandKit, outreachConfig } from '../scripts/ops/lib/brand';
 import {
   checkPitch, consentBasisFor, extractEmails, hasNoSolicitationNotice, inSendWindow, isStopRequest, sendBlocker, signature,
@@ -95,6 +96,26 @@ describe('choosing posts', () => {
         }
       }
     }
+  });
+});
+
+describe('automatic posting', () => {
+  const post = (over: Partial<OpsPost>): OpsPost => ({
+    id: 'p', brand: 'calgarydaily', template: 'roundup', status: 'drafted', fingerprint: 'calgarydaily|today|2026-09-25',
+    entityIds: [], entityStarts: {}, sourceUrls: [], facts: '', caption: 'x', altText: 'x', link: '', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' },
+    imageUrl: 'https://x', imagePath: null, warnings: [], sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: null,
+    draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
+  });
+  it('lets CalgaryDaily listing posts go out on their own', () => {
+    assert.ok(autoPublishable(post({})));
+    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
+  });
+  it('keeps CalgaryWatch, briefs, paid posts and anything with a warning for a person', () => {
+    assert.ok(!autoPublishable(post({ brand: 'calgarywatch' })));
+    assert.ok(!autoPublishable(post({ template: 'update' })));
+    assert.ok(!autoPublishable(post({ template: 'partner', sponsored: true })));
+    assert.ok(!autoPublishable(post({ warnings: ['Sensitive story'] })));
+    assert.ok(!autoPublishable(post({ status: 'rejected' })));
   });
 });
 

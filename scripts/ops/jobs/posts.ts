@@ -197,3 +197,33 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
     }
   }
 }
+
+/**
+ * Posts that may go out without a person approving them: event, market and
+ * roundup posts built only from verified listings, with no warnings, for a
+ * brand whose kit turns that category on (the owner opted CalgaryDaily in on
+ * 2026-09-25). News briefs, sensitive stories and paid posts always wait.
+ */
+export function autoPublishable(p: OpsPost): boolean {
+  const kit = brandKit(p.brand);
+  if (!kit.confirmed || p.sponsored || p.status !== 'drafted' || (p.warnings ?? []).length) return false;
+  if (p.template === 'roundup') return kit.autoPublish.roundups;
+  if (p.template === 'event') return p.fingerprint.includes('|market|') ? kit.autoPublish.markets : kit.autoPublish.events;
+  return false;
+}
+
+export async function autoApprove(db: Firestore, now: number, log: Log): Promise<void> {
+  const drafted = await db.collection(COLLECTIONS.posts).where('status', '==', 'drafted').get();
+  for (const doc of drafted.docs) {
+    const p = doc.data() as OpsPost;
+    if (!autoPublishable(p)) continue;
+    const kit = brandKit(p.brand);
+    // A suggested slot that already passed moves to the next one, if the post is still useful then;
+    // otherwise it goes out shortly (e.g. a "today" roundup approved mid-morning).
+    const slot = p.suggestedFor && p.suggestedFor > now ? p.suggestedFor : nextSlot(now, kit.postingSlots);
+    const when = p.relevantUntil && slot > p.relevantUntil ? now + 5 * 60_000 : slot;
+    if (p.relevantUntil && when > p.relevantUntil) continue;
+    await doc.ref.update({ status: 'approved', scheduledFor: when, reviewedByEmail: 'auto (brand rules)', reviewedAt: now, updatedAt: now });
+    log(`auto-approved ${p.brand} "${p.imageText.headline}" for ${new Date(when).toISOString()}`);
+  }
+}

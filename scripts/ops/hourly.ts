@@ -2,7 +2,7 @@
 // the reviewer asked for, match replies from businesses, and send approved emails.
 
 import { hasFirebase, opsDb } from './lib/firebase';
-import { publishDue, redraftAndBriefs } from './jobs/posts';
+import { autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
 import { sendApproved, syncReplies } from './jobs/outreach';
 
 const log = (m: string) => console.log(`[ops:hourly] ${m}`);
@@ -17,6 +17,7 @@ async function step(name: string, run: () => Promise<unknown>) {
   try { await run(); } catch (e) { failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`); }
 }
 
+await step('auto-approve', () => autoApprove(db, now, log));
 await step('publish', () => publishDue(db, now, log));
 await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
 await step('replies', () => syncReplies(db, now, log));

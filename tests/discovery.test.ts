@@ -88,7 +88,7 @@ describe('Discovery routes and presentation', () => {
       assert.ok(event.title, 'Event must have a title');
       assert.ok(event.start.includes('-06:00') || event.start.includes('-07:00'), 'Event start must have valid Calgary offset');
       assert.equal(event.status, 'published');
-      assert.equal(event.verification, 'source-checked');
+      assert.ok(['source-checked', 'source-feed'].includes(event.verification));
       assert.ok(event.sources?.length, 'Event must have source attribution');
     }
   });

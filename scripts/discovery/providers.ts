@@ -273,7 +273,13 @@ export function icsDate(value: string, tzid?: string): { iso: string; allDay: bo
   if (!m) return null;
   const [, y, mo, d, h, mi, se, z] = m;
   if (!h) return { iso: `${y}-${mo}-${d}T00:00:00${calgaryOffset(`${y}-${mo}-${d}T00:00:00`)}`, allDay: true };
-  if (z) return { iso: `${y}-${mo}-${d}T${h}:${mi}:${se}Z`, allDay: false };
+  if (z) {
+    // Store in Calgary wall time, like every other listing.
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' })
+      .formatToParts(Date.parse(`${y}-${mo}-${d}T${h}:${mi}:${se}Z`)).map(p => [p.type, p.value]));
+    const local = `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
+    return { iso: `${local}${calgaryOffset(local)}`, allDay: false };
+  }
   if (tzid && !/edmonton|calgary|mountain/i.test(tzid)) return null;
   const local = `${y}-${mo}-${d}T${h}:${mi}:${se}`;
   return { iso: `${local}${calgaryOffset(local)}`, allDay: false };

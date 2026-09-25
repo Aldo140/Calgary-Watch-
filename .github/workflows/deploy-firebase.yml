@@ -3,6 +3,10 @@ name: Deploy Firebase Hosting
 on:
   push:
     branches: ["main"]
+  # The build pulls events and markets straight from organizer feeds, so a scheduled
+  # rebuild keeps listings current even if the ingest job is down.
+  schedule:
+    - cron: '41 11,23 * * *'
   workflow_dispatch:
 
 permissions:

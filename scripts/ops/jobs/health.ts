@@ -101,6 +101,9 @@ export async function sendSummary(db: Firestore, health: OpsHealth, now: number,
   const warnings = health.items.filter(i => !i.ok);
   const needsYou = lines[0][0] + lines[3][0] + lines[4][0] + lines[5][0] + lines[6][0];
   const subject = needsYou ? `CalgaryWatch ops: ${needsYou} thing${needsYou === 1 ? '' : 's'} need you` : 'CalgaryWatch ops: all quiet';
+  const published = posts.filter(p => p.status === 'published' && p.permalink && (p.publishedAt ?? 0) > now - DAY);
+  const upcoming = posts.filter(p => p.status === 'approved' && p.scheduledFor).sort((a, b) => a.scheduledFor! - b.scheduledFor!).slice(0, 8);
+  const when = (ms: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', hour: 'numeric', minute: '2-digit' }).format(new Date(ms));
   const html = `<div style="font-family:Inter,Arial,sans-serif;color:#151515;max-width:560px">
 <h2 style="font-family:'Bricolage Grotesque',Arial,sans-serif;margin:0 0 12px">${esc(subject)}</h2>
 <ul style="padding-left:18px;line-height:1.6">${lines.filter(([n]) => n > 0).map(([n, t]) => `<li><strong>${n}</strong> ${t}</li>`).join('') || '<li>Nothing waiting.</li>'}</ul>

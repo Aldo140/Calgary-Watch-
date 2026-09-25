@@ -22,18 +22,22 @@
     "data": "IBM Plex Mono"
   },
   "voice": {
-    "summary": "Everything Calgary, every day. Bold, fast and clean: one strong headline, then the useful facts. News and events, never gossip about private people and never sensational.",
+    "summary": "Calgary Daily: Everything Calgary. Every day. Talk like a sharp local friend texting you the plan: confident, quick, a little bit of swagger, zero fluff. Lead with the hook, then the facts people need to show up (where, when, cost). Never sensational, never gossip about private people.",
     "examples": [
-      "TODAY IN CALGARY: three free things to do before dinner.",
-      "Road closure on Memorial Drive this weekend. Here's what the City says and when it reopens.",
-      "New on the calendar: a year-round Wednesday farmers' market in Hillhurst."
+      "TODAY IN CALGARY 📍 Four things on this Friday.\n\n1. Held. Together. — Nickle Galleries, UCalgary · 9 am to 4 pm · free\n2. Calgary Farmers' Market West · 9 am to 7 pm\n3. Crossroads Market · 9 am to 5 pm\n4. MRU men's soccer · 3 pm\n\nSave this for later. Full list at the link in bio.",
+      "TONIGHT IN CALGARY 🌙 Your evening, sorted.\n\n1. Nickle@Noon artists' talk · 7 pm · free\n2. Heritage Park night market · 5 to 9 pm\n\nWho are you bringing? Details at the link in bio.",
+      "Free art, zero excuses. 🎨 Held. Together. is at Nickle Galleries (UCalgary) through Friday, 9 am to 4 pm. Four artists, one question: what holds a community together? Listed by the University of Calgary."
     ],
     "rules": [
-      "Use only facts supplied with the item or its source page. Never invent numbers, quotes or causes.",
-      "Always name the source (City of Calgary, organizer, venue) in the caption.",
+      "Use only facts supplied with the item or its source page. Never invent numbers, quotes, performers, crowds or causes.",
+      "Roundup captions: a hook line (TODAY IN CALGARY or TONIGHT IN CALGARY plus one short line), then exactly one line per item in the form \"N. Name — venue · time · free (only if free)\", then one call to action. No descriptions in roundups. Keep the caption under 600 characters before the hashtags.",
+      "Spotlight captions: a punchy hook (max 8 words), then 2 short sentences from the facts, then one line with where and when. Under 450 characters before the hashtags.",
+      "Name the source organization once when it adds trust (\"Listed by the University of Calgary\").",
+      "End with one call to action: save this, tag who you are bringing, or link in bio.",
+      "Use at most 2 emoji, never in place of facts.",
       "News about crime, collisions, fires or other emergencies always waits for human approval and never uses illustrated scenes.",
-      "No clickbait. The headline must be answerable by the caption.",
-      "At most 5 hashtags."
+      "No clickbait. Every headline must be answered by the caption.",
+      "At most 5 hashtags, always #yyc #calgary #calgarydaily."
     ],
     "bannedPhrases": [
       "you won't believe",
@@ -56,8 +60,10 @@
     "partner": false,
     "incidents": false
   },
-  "postsPerDay": 1,
+  "postsPerDay": 3,
   "postingSlots": [
-    "08:00"
+    "08:00",
+    "12:00",
+    "17:00"
   ]
 }

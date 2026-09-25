@@ -3,7 +3,7 @@
 
 import type { BrandId, PostImageText, PostTemplate } from '../../../src/types/ops';
 import type { BrandKit } from './brand';
-import { addDays, calgaryDate, calgaryWeekday, longDay, nextSlot, shortDay, timeRange } from './time';
+import { addDays, calgaryDate, calgaryMinutes, calgaryToEpoch, calgaryWeekday, longDay, nextSlot, shortDay, timeRange } from './time';
 
 export type Entity = Record<string, any> & { id: string; kind: string; title: string; slug: string };
 export type Occurrence = { id: string; marketId: string; start: string; end?: string; cancelled?: boolean };
@@ -115,17 +115,61 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
   const campaign = (s: string) => `${kit.id}_${s}`;
 
   if (kit.id === 'calgarydaily') {
-    const fp = `${kit.id}|today|${today}`;
-    const todays = all.filter(h => calgaryDate(h.start) === today && h.start > now);
-    if (!queued.has(fp) && todays.length >= 2) {
-      const items = diverse(todays, 4);
+    // The daily program: a morning "Today" roundup, a midday spotlight, and an
+    // evening "Tonight" roundup (or a second spotlight when the evening is quiet).
+    const slots = [...kit.postingSlots].sort();
+    const at = (i: number) => {
+      const t = calgaryToEpoch(today, slots[Math.min(i, slots.length - 1)]);
+      return t > now ? t : now + 10 * 60_000;
+    };
+    const until = (items: Happening[]) => Math.max(...items.map(i => i.end ?? i.start));
+    const used = new Set<string>();
+    const onToday = all.filter(h => calgaryDate(h.start) === today && (h.end ?? h.start) > now);
+    const isEvening = (h: Happening) => calgaryMinutes(h.start) >= 17 * 60;
+    // With enough evening plans for their own post, the morning roundup keeps to the daytime.
+    const eveningPost = !queued.has(`${kit.id}|tonight|${today}`) && onToday.filter(isEvening).length >= 2;
+    const morningPool = eveningPost ? onToday.filter(h => !isEvening(h)) : onToday;
+
+    const fpToday = `${kit.id}|today|${today}`;
+    if (!queued.has(fpToday) && morningPool.length >= 2) {
+      const items = diverse(morningPool, 4).sort((a, b) => a.start - b.start);
+      items.forEach(i => used.add(i.entity.id));
       out.push({
-        brand: kit.id, template: 'roundup', fingerprint: fp, items,
+        brand: kit.id, template: 'roundup', fingerprint: fpToday, items,
         title: `Today in Calgary — ${shortDay(now)}`, facts: factsFor(items),
         link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('today')}`,
-        relevantUntil: Math.max(...items.map(i => i.start)), suggestedFor: nextSlot(now, kit.postingSlots, slot++),
+        relevantUntil: until(items), suggestedFor: at(0),
       });
     }
+
+    const fpTonight = `${kit.id}|tonight|${today}`;
+    const evening = onToday.filter(h => isEvening(h) && !used.has(h.entity.id));
+    let tonight: Candidate | null = null;
+    if (!queued.has(fpTonight) && evening.length >= 2) {
+      const items = diverse(evening, 4).sort((a, b) => a.start - b.start);
+      items.forEach(i => used.add(i.entity.id));
+      tonight = {
+        brand: kit.id, template: 'roundup', fingerprint: fpTonight, items,
+        title: `Tonight in Calgary — ${shortDay(now)}`, facts: factsFor(items),
+        link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('tonight')}`,
+        relevantUntil: until(items), suggestedFor: at(2),
+      };
+    }
+
+    // Spotlights fill the remaining slots: one listing each, today or the next two days.
+    const fpFor = (h: Happening) => h.entity.kind === 'market'
+      ? `${kit.id}|market|${h.entity.id}|${calgaryDate(h.start).slice(0, 7)}`
+      : `${kit.id}|event|${normalize(h.entity.title)}`;
+    const spotlightSlots = tonight ? [1] : [1, 2];
+    const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
+    const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, kit.postsPerDay - out.length - (tonight ? 1 : 0))), used);
+    picks.forEach((h, i) => {
+      out.push({
+        brand: kit.id, template: 'event', fingerprint: fpFor(h), items: [h], title: h.entity.title, facts: factsFor([h]),
+        link: entityUrl(kit.site, h.entity, campaign('spotlight')), relevantUntil: h.end ?? h.start, suggestedFor: at(spotlightSlots[i]),
+      });
+    });
+    if (tonight) out.push(tonight);
     return out;
   }
 
@@ -211,6 +255,7 @@ export function checkDraft(d: Draft, kit: BrandKit, opts: { sponsored?: boolean 
   const problems: string[] = [];
   if (!d.caption.trim()) problems.push('Caption is empty.');
   if (d.caption.length > 2200) problems.push('Caption is longer than Instagram allows (2,200 characters).');
+  else if (d.caption.replace(/(\s#[\p{L}\p{N}_]+)+\s*$/u, '').length > 1000) problems.push('Caption is too long to read on a phone (over 1,000 characters before the hashtags).');
   const tags = d.caption.match(/#[\p{L}\p{N}_]+/gu) ?? [];
   if (tags.length > 5) problems.push(`Caption has ${tags.length} hashtags; the brand limit is 5.`);
   if (!d.altText.trim()) problems.push('Alt text is empty.');

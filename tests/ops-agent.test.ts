@@ -77,13 +77,23 @@ describe('choosing posts', () => {
     assert.ok(again.every(x => !c.some(y => y.fingerprint === x.fingerprint)));
   });
 
-  it('only drafts a CalgaryDaily "today" roundup when two or more things are on', () => {
+  it('gives CalgaryDaily a morning roundup, a midday spotlight and a tonight roundup', () => {
     const friday = calgaryToEpoch('2026-09-25', '06:30');
-    assert.equal(selectCandidates(index, cd, friday, new Set()).length, 0);
-    const busy = { ...index, entities: [...index.entities, event('e', '2026-09-25T12:00:00-06:00')] };
+    // One thing on today: no roundup, only spotlights.
+    const quiet = selectCandidates(index, cd, friday, new Set());
+    assert.ok(quiet.every(x => x.template === 'event'));
+    const busy = { ...index, entities: [...index.entities,
+      event('e', '2026-09-25T12:00:00-06:00'), event('h', '2026-09-25T10:00:00-06:00'), event('f', '2026-09-25T18:00:00-06:00'), event('g', '2026-09-25T19:30:00-06:00')] };
     const c = selectCandidates(busy, cd, friday, new Set());
-    assert.equal(c.length, 1);
-    assert.ok(c.every(x => x.items.every(i => calgaryDate(i.start) === '2026-09-25')));
+    assert.deepEqual(c.map(x => x.template), ['roundup', 'event', 'roundup']);
+    assert.match(c[0].title, /^Today/);
+    assert.match(c[2].title, /^Tonight/);
+    assert.deepEqual(c.map(x => new Date(x.suggestedFor).toISOString()), ['2026-09-25T14:00:00.000Z', '2026-09-25T18:00:00.000Z', '2026-09-25T23:00:00.000Z']);
+    // No listing appears in two of the day's posts.
+    const ids = c.flatMap(x => x.items.map(i => i.entity.id));
+    assert.equal(new Set(ids).size, ids.length);
+    // Running again the same day adds nothing new.
+    assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup').length, 0);
   });
 
   it('template drafts from the real published index always pass the brand checks', () => {

@@ -227,14 +227,15 @@ export function greetingFor(date: Date): string {
  * a rule reads as a printed page, which is what this is.
  */
 function Section({
-  eyebrow, title, children, order = 0, still = false,
+  eyebrow, title, children, order = 0, still = false, id,
 }: {
-  eyebrow: string; title: string; children: React.ReactNode; order?: number; still?: boolean;
+  eyebrow: string; title: string; children: React.ReactNode; order?: number; still?: boolean; id?: string;
 }) {
   const delay = still ? 0 : 0.2 + order * 0.11;
   return (
     <motion.section
-      className="relative pt-7 first:pt-1"
+      id={id}
+      className="relative scroll-mt-16 pt-8 first:pt-1"
       initial={still ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -370,6 +371,11 @@ export default function PersonalBriefing({
   onOpenArea, onOpenSettings, onSelectIncident, onOpenCamera, onOpenNearby,
 }: PersonalBriefingProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const jump = (id: string) => {
+    const box = scrollRef.current; const el = box?.querySelector<HTMLElement>(`#${id}`);
+    if (box && el) box.scrollTo({ top: el.offsetTop - 60, behavior: still ? 'auto' : 'smooth' });
+  };
   const issuedAtRef = useRef<number>(Date.now());
   if (!open) issuedAtRef.current = Date.now();
 
@@ -533,17 +539,28 @@ export default function PersonalBriefing({
       />
 
       <motion.div
-        className="relative flex h-full w-full max-w-[44rem] flex-col overflow-hidden shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)]"
+        ref={scrollRef}
+        className="br-sheet relative h-full w-full max-w-[64rem] overflow-y-auto overscroll-contain shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:rounded-[28px]"
         style={{ background: T.page }}
         initial={still ? false : { opacity: 0, y: 22, scale: 0.99 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
       >
+        <nav className="br-bar" aria-label="Report sections">
+          <span className="br-bar-title">Your report<span> · {areaLabel}</span></span>
+          <span className="br-bar-links">
+            {home && <button type="button" onClick={() => jump('br-near')}>Near you</button>}
+            {(areaStats || latestValue) && <button type="button" onClick={() => jump('br-community')}>Community</button>}
+            <button type="button" onClick={() => jump('br-you')}>You</button>
+          </span>
+          <button ref={closeRef} type="button" onClick={onClose} aria-label="Close" className="br-bar-close"><X size={17} /></button>
+        </nav>
+
         {/* ── Greeting ──────────────────────────────────────────────────────
             Their name and their street, in a sentence, the way a neighbour
             would open. */}
         <header
-          className="relative shrink-0 overflow-hidden px-5 pb-6 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 sm:pb-7 sm:pt-7"
+          className="br-head relative overflow-hidden px-5 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-6"
           style={{ background: `radial-gradient(120% 90% at 85% 20%, #0B2552 0%, ${T.deep} 55%, #030B1A 100%)` }}
         >
           {/* The city, inked into the masthead the way the feed rail does it.
@@ -567,13 +584,6 @@ export default function PersonalBriefing({
             </svg>
           </span>
 
-          <button
-            ref={closeRef} type="button" onClick={onClose} aria-label="Close"
-            className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 grid h-11 w-11 place-items-center rounded-full transition-opacity hover:opacity-80 sm:right-6 sm:top-6"
-            style={{ background: 'rgba(245,239,228,0.16)', color: T.page }}
-          >
-            <X size={17} />
-          </button>
 
           <motion.div
             initial={still ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -661,7 +671,11 @@ export default function PersonalBriefing({
         </header>
 
         {/* ── Page ──────────────────────────────────────────────────────────── */}
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-8 pt-6 sm:px-8">
+        <button type="button" className="br-cue" onClick={() => jump(home ? 'br-near' : 'br-community')}>
+          Scroll for your full report <span aria-hidden="true">↓</span>
+        </button>
+        <div className="br-body px-5 pb-8 pt-4 sm:px-8">
+          <div className="br-col">
           {home && (nearbySafety.length > 0 || nearbyTraffic.length > 0) && (
             <Section
               order={0} still={still} eyebrow="Closest street context"
@@ -743,6 +757,7 @@ export default function PersonalBriefing({
 
           {home && (
             <Section
+              id="br-near"
               order={0} still={still}
               eyebrow={ring.label}
               title={
@@ -861,6 +876,8 @@ export default function PersonalBriefing({
               reading taken at their door would be no more accurate while
               sending their coordinates to a third party. The closing note
               promises that does not happen, and this keeps that true. */}
+          </div>
+          <div className="br-col">
           {airQuality && (
             <Section eyebrow="In the air" title={airQuality.assessment.title} order={4}>
               <div
@@ -895,8 +912,9 @@ export default function PersonalBriefing({
 
           {(areaStats || latestValue) && (
             <Section
+              id="br-community"
               order={2} still={still} eyebrow={areaLabel}
-              title="Your community rank and signals"
+              title="Your community in numbers"
             >
               <img
                 src={publicAsset('images/illustration/process-community.webp')}
@@ -953,6 +971,7 @@ export default function PersonalBriefing({
           )}
 
           <Section
+            id="br-you"
             order={3} still={still} eyebrow="Your part in it"
             title={myReports.length === 0 ? 'Nothing from you yet' : `You have reported ${myReports.length} thing${myReports.length === 1 ? '' : 's'}`}
           >
@@ -984,6 +1003,7 @@ export default function PersonalBriefing({
             )}
           </Section>
 
+          </div>
           {address && !home && !isResolving && (
             <div className="mt-7 px-4 py-3.5" style={{ background: T.card, border: `1px solid ${T.line}` }}>
               <p className="text-[13px] leading-relaxed" style={{ color: T.soft }}>

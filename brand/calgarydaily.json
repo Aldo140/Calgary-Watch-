@@ -1,8 +1,8 @@
 {
   "id": "calgarydaily",
-  "name": "CalgaryDaily",
-  "confirmed": false,
-  "confirmNote": "Provisional kit. Replace the colours, handle and examples with CalgaryDaily's real ones before the first post goes out.",
+  "name": "Calgary Daily",
+  "confirmed": true,
+  "confirmNote": "Confirmed 2026-09-25 against instagram.com/calgarydaily (\"Calgary Daily | News & Events YYC\"). The feed is mostly reels with no fixed palette, so the bold black/yellow template is the house style for photo posts. Change colors here to restyle every future post.",
   "site": "https://calgarywatch.ca",
   "handle": "calgarydaily",
   "wordmark": "CALGARYDAILY",
@@ -22,7 +22,7 @@
     "data": "IBM Plex Mono"
   },
   "voice": {
-    "summary": "Bold, fast and clean. One strong headline, then the useful facts. Local news and things to do, never sensational.",
+    "summary": "Everything Calgary, every day. Bold, fast and clean: one strong headline, then the useful facts. News and events, never gossip about private people and never sensational.",
     "examples": [
       "TODAY IN CALGARY: three free things to do before dinner.",
       "Road closure on Memorial Drive this weekend. Here's what the City says and when it reopens.",
@@ -35,9 +35,19 @@
       "No clickbait. The headline must be answerable by the caption.",
       "At most 5 hashtags."
     ],
-    "bannedPhrases": ["you won't believe", "shocking", "viral", "guaranteed", "#1"]
+    "bannedPhrases": [
+      "you won't believe",
+      "shocking",
+      "viral",
+      "guaranteed",
+      "#1"
+    ]
   },
-  "hashtags": ["#yyc", "#calgary", "#calgarydaily"],
+  "hashtags": [
+    "#yyc",
+    "#calgary",
+    "#calgarydaily"
+  ],
   "linkInBio": "https://calgarywatch.ca/?utm_source=instagram&utm_medium=social&utm_campaign=calgarydaily_bio",
   "autoPublish": {
     "events": false,
@@ -47,5 +57,7 @@
     "incidents": false
   },
   "postsPerDay": 1,
-  "postingSlots": ["08:00"]
+  "postingSlots": [
+    "08:00"
+  ]
 }

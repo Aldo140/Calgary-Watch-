@@ -21,7 +21,7 @@ The bio is 124 characters (the limit is 150). It makes no claims about audience 
 
 ## CalgaryDaily (@calgarydaily)
 
-Before posting, confirm the brand kit: set real colours, handle and caption examples in `brand/calgarydaily.json`, then set `"confirmed": true`. Until then the hourly job holds CalgaryDaily posts, even approved ones.
+The brand kit was confirmed on 2026-09-25 against the live account ("Calgary Daily | News & Events YYC"). The feed is mostly reels with no fixed palette, so photo posts use the bold black-and-yellow template. To restyle every future post, change `colors` in `brand/calgarydaily.json`.
 
 | Field | Value |
 | --- | --- |

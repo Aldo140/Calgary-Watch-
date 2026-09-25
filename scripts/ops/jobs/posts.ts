@@ -64,6 +64,17 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
   const dryDir = db ? null : join(ROOT, 'brand', 'preview', 'dry-run');
   if (dryDir) await mkdir(dryDir, { recursive: true });
   const queued = new Set<string>();
+  // Which of today's posting slots already hold a post, per brand (so a second run never double-books).
+  const booked = new Map<string, Set<string>>();
+  const today = calgaryDate(now);
+  if (db) (await db.collection(COLLECTIONS.posts).where('status', 'in', ['drafted', 'approved', 'published']).select('brand', 'scheduledFor', 'suggestedFor', 'publishedAt', 'reviewedByEmail', 'draftedBy', 'fingerprint').get()).forEach(d => {
+    if (String(d.get('fingerprint') ?? '').includes('|draft|')) return; // hand-written posts don't use the program's slots
+    const at = d.get('scheduledFor') ?? d.get('suggestedFor') ?? d.get('publishedAt');
+    if (!at || calgaryDate(at) !== today) return;
+    const set = booked.get(d.get('brand')) ?? new Set<string>();
+    set.add(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(at)));
+    booked.set(d.get('brand'), set);
+  });
   const recent = new Map<string, Set<string>>();
   if (db) (await db.collection(COLLECTIONS.posts).select('fingerprint', 'brand', 'entityIds', 'createdAt').get()).forEach(d => {
     queued.add(d.get('fingerprint'));
@@ -82,7 +93,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
     if (db) waiting = (await db.collection(COLLECTIONS.posts).where('status', '==', 'drafted').select('brand').get()).docs.filter(d => d.get('brand') === brand).length;
     if (waiting >= kit.postsPerDay * 3) { log(`${brand}: ${waiting} drafts already waiting for review; not adding more.`); continue; }
 
-    for (const c of selectCandidates(index, kit, now, queued, recent.get(brand))) {
+    for (const c of selectCandidates(index, kit, now, queued, recent.get(brand), booked.get(brand))) {
       const id = postId(c.fingerprint);
       const { draft, warnings, by } = await writeDraft(c, kit, templateDraft(c, kit), '', log);
       const image = await renderAndStore(id, kit, c.template, draft, dryDir);
@@ -257,5 +268,28 @@ export async function autoApprove(db: Firestore, now: number, log: Log): Promise
     if (p.relevantUntil && when > p.relevantUntil) continue;
     await doc.ref.update({ status: 'approved', scheduledFor: when, reviewedByEmail: 'auto (brand rules)', reviewedAt: now, updatedAt: now });
     log(`auto-approved ${p.brand} "${p.imageText.headline}" for ${new Date(when).toISOString()}`);
+  }
+}
+
+/**
+ * One automatic post per slot. If two land on the same brand and time (for
+ * example from two drafting runs), the roundup wins, then the earlier draft;
+ * the other is skipped with a note. Hand-approved posts are never touched.
+ */
+export async function resolveDoubleBookings(db: Firestore, now: number, log: Log): Promise<void> {
+  const approved = (await db.collection(COLLECTIONS.posts).where('status', '==', 'approved').get()).docs
+    .filter(d => String(d.get('reviewedByEmail') ?? '').startsWith('auto') && d.get('scheduledFor'));
+  const bySlot = new Map<string, typeof approved>();
+  for (const d of approved) {
+    const key = `${d.get('brand')}|${d.get('scheduledFor')}`;
+    bySlot.set(key, [...(bySlot.get(key) ?? []), d]);
+  }
+  for (const group of bySlot.values()) {
+    if (group.length < 2) continue;
+    group.sort((a, b) => (a.get('template') === 'roundup' ? -1 : 0) - (b.get('template') === 'roundup' ? -1 : 0) || a.get('createdAt') - b.get('createdAt'));
+    for (const d of group.slice(1)) {
+      await d.ref.update({ status: 'rejected', note: 'Skipped automatically: another post already had this time slot.', updatedAt: now });
+      log(`skipped double-booked ${d.id} ("${d.get('imageText')?.headline}")`);
+    }
   }
 }

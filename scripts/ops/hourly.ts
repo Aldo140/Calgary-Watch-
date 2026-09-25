@@ -3,7 +3,7 @@
 
 import { hasFirebase, opsDb } from './lib/firebase';
 import { queueDrafts } from './jobs/drafts';
-import { autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
+import { resolveDoubleBookings, autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
 import { sendApproved, syncReplies } from './jobs/outreach';
 
 const log = (m: string) => console.log(`[ops:hourly] ${m}`);
@@ -20,6 +20,7 @@ async function step(name: string, run: () => Promise<unknown>) {
 
 await step('queue drafts', () => queueDrafts(db, now, log));
 await step('auto-approve', () => autoApprove(db, now, log));
+await step('one post per slot', () => resolveDoubleBookings(db, now, log));
 await step('publish', () => publishDue(db, now, log));
 await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
 await step('replies', () => syncReplies(db, now, log));

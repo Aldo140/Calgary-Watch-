@@ -107,7 +107,11 @@ function diverse(list: Happening[], n: number, taken = new Set<string>()): Happe
  * roundup drafted on Wednesdays and Thursdays. CalgaryDaily: a morning "today in
  * Calgary" roundup when at least two things are on.
  */
-export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: number, queued: Set<string>, recentlyPosted: Set<string> = new Set()): Candidate[] {
+/**
+ * `bookedSlots`: HH:mm slots today that already hold a post for this brand (drafted, approved or
+ * published). The day never gets more than postsPerDay automatic posts, and no slot gets two.
+ */
+export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: number, queued: Set<string>, recentlyPosted: Set<string> = new Set(), bookedSlots: Set<string> = new Set()): Candidate[] {
   const all = happenings(index);
   const today = calgaryDate(now);
   const out: Candidate[] = [];
@@ -132,7 +136,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
     const morningPool = eveningPost ? onToday.filter(h => !isEvening(h)) : onToday;
 
     const fpToday = `${kit.id}|today|${today}`;
-    if (!queued.has(fpToday) && morningPool.length >= 2) {
+    if (!queued.has(fpToday) && !bookedSlots.has(slots[0]) && morningPool.length >= 2) {
       const items = diverse(morningPool, 4).sort((a, b) => a.start - b.start);
       items.forEach(i => used.add(i.entity.id));
       out.push({
@@ -161,9 +165,12 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
     const fpFor = (h: Happening) => h.entity.kind === 'market'
       ? `${kit.id}|market|${h.entity.id}|${calgaryDate(h.start).slice(0, 7)}`
       : `${kit.id}|event|${normalize(h.entity.title)}`;
-    const spotlightSlots = tonight ? [1] : [1, 2];
+    const free = (i: number) => !bookedSlots.has(slots[Math.min(i, slots.length - 1)]);
+    if (tonight && !free(2)) tonight = null;
+    const spotlightSlots = (tonight ? [1] : [1, 2]).filter(free);
     const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
-    const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, kit.postsPerDay - out.length - (tonight ? 1 : 0))), used);
+    const budget = kit.postsPerDay - bookedSlots.size - out.length - (tonight ? 1 : 0);
+    const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used);
     picks.forEach((h, i) => {
       out.push({
         brand: kit.id, template: 'event', fingerprint: fpFor(h), items: [h], title: h.entity.title, facts: factsFor([h]),

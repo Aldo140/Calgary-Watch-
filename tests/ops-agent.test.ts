@@ -96,6 +96,11 @@ describe('choosing posts', () => {
     const spotlight = c[1].items[0].entity.id;
     const again = selectCandidates(busy, cd, friday, new Set(), new Set([spotlight]));
     assert.ok(again.filter(x => x.template === 'event').every(x => x.items[0].entity.id !== spotlight));
+    // A later run that finds today's slots booked adds nothing (the 2026-09-25 double-spotlight bug).
+    assert.equal(selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['08:00', '12:00', '17:00'])).length, 0);
+    const onlyNoonTaken = selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['12:00']));
+    assert.ok(onlyNoonTaken.every(x => new Date(x.suggestedFor).toISOString() !== '2026-09-25T18:00:00.000Z'));
+    assert.ok(onlyNoonTaken.length <= cd.postsPerDay - 1);
     // Running again the same day adds nothing new.
     assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup').length, 0);
   });

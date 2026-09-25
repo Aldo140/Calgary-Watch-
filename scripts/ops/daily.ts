@@ -10,7 +10,7 @@ import { ROOT } from './lib/brand';
 import { hasFirebase, opsDb } from './lib/firebase';
 import type { DiscoveryIndex } from './lib/posts';
 import { queueDrafts } from './jobs/drafts';
-import { autoApprove, draftPosts, monitorPosts, redraftAndBriefs } from './jobs/posts';
+import { resolveDoubleBookings, autoApprove, draftPosts, monitorPosts, redraftAndBriefs } from './jobs/posts';
 import { draftPitches, findLeads } from './jobs/outreach';
 import { checkHealth, sendSummary } from './jobs/health';
 
@@ -34,6 +34,7 @@ if (!db) {
   await step('draft posts', () => draftPosts(db, index, now, log));
   await step('queue drafts', () => queueDrafts(db, now, log));
   await step('auto-approve', () => autoApprove(db, now, log));
+  await step('one post per slot', () => resolveDoubleBookings(db, now, log));
   await step('find leads', () => findLeads(db, index, now, log));
   await step('draft pitches', () => draftPitches(db, index, now, log));
   let health = null as Awaited<ReturnType<typeof checkHealth>> | null;

@@ -16,7 +16,7 @@ import { brandKit, outreachConfig } from '../scripts/ops/lib/brand';
 import {
   checkPitch, consentBasisFor, extractEmails, hasNoSolicitationNotice, inSendWindow, isStopRequest, sendBlocker, signature,
 } from '../scripts/ops/lib/leads';
-import { checkDraft, happenings, selectCandidates, templateDraft, type DiscoveryIndex, type Entity } from '../scripts/ops/lib/posts';
+import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, type DiscoveryIndex, type Entity } from '../scripts/ops/lib/posts';
 import { calgaryDate, calgaryToEpoch, nextSlot, timeRange } from '../scripts/ops/lib/time';
 import { templatePitch } from '../scripts/ops/jobs/outreach';
 
@@ -242,5 +242,14 @@ describe('operations rules contract', () => {
   it('makes suppressions permanent and do-not-contact one-way', () => {
     assert.match(block('outreach_suppression'), /allow update, delete: if false;/);
     assert.match(block('partner_leads'), /!\(resource\.data\.doNotContact == true && request\.resource\.data\.doNotContact != true\)/);
+  });
+});
+
+describe('roundup headlines', () => {
+  it('keep the date only in the label', () => {
+    assert.equal(roundupHeadline('Tonight in Calgary — Fri, Sep 25'), 'Tonight in Calgary');
+    assert.equal(roundupHeadline('TODAY IN CALGARY: FRIDAY, SEPT 25'), 'TODAY IN CALGARY');
+    assert.equal(roundupHeadline('This weekend in Calgary'), 'This weekend in Calgary');
+    assert.equal(roundupHeadline('Farmers-market season'), 'Farmers-market season');
   });
 });

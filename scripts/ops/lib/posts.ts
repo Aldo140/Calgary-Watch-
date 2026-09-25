@@ -208,6 +208,9 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
 
 export interface Draft { caption: string; altText: string; imageText: PostImageText }
 
+/** "Today in Calgary: Friday, Sept 25" -> "Today in Calgary": the date is already in the roundup label. */
+export const roundupHeadline = (h: string) => h.replace(/\s*(?:[—–:]|\s-\s).*$/, '').trim() || h;
+
 /** "FRI, SEP 25" for a single day, "SEP 25 – 27" for a span. */
 export function roundupEyebrow(c: Pick<Candidate, 'items'>): string {
   const days = [...new Set(c.items.map(h => shortDay(h.start)))];

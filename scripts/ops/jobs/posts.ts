@@ -11,7 +11,7 @@ import { claudeConfigured, extractBrief, writePost } from '../lib/claude';
 import { COLLECTIONS, uploadImage } from '../lib/firebase';
 import { publishImage } from '../lib/instagram';
 import { currentToken } from './igTokens';
-import { checkDraft, happenings, selectCandidates, templateDraft, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
+import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { renderPost } from '../lib/render';
 import { calgaryDate, nextSlot } from '../lib/time';
 
@@ -30,7 +30,9 @@ async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'l
     const details = c.template === 'roundup' && w.itemLabels.length === base.imageText.details.length
       ? base.imageText.details.map((d, i) => `${d.split(' · ')[0]} · ${w.itemLabels[i].slice(0, 30)}`)
       : base.imageText.details;
-    const draft: Draft = { caption: w.caption, altText: w.altText, imageText: { ...base.imageText, headline: w.headline || base.imageText.headline, details } };
+    // Roundups keep the house headline (Today / Tonight / This weekend in Calgary); the date lives in the label.
+    const headline = c.template === 'roundup' ? base.imageText.headline : (w.headline || base.imageText.headline);
+    const draft: Draft = { caption: w.caption, altText: w.altText, imageText: { ...base.imageText, headline, details } };
     const problems = checkDraft(draft, kit, { sponsored: c.template === 'partner' });
     if (problems.length) {
       log(`  Claude draft failed checks (${problems.join(' ')}); using the template draft.`);
@@ -191,12 +193,21 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
     if (p.relevantUntil && p.relevantUntil < now) { await doc.ref.update({ status: 'expired', updatedAt: now }); continue; }
     if (p.publishingAt && now - p.publishingAt < 30 * 60_000) continue;
     if ((publishedToday.get(p.brand) ?? 0) >= kit.postsPerDay + 1) { await hold(`Daily limit reached (${kit.postsPerDay + 1}); will post next slot.`); await doc.ref.update({ scheduledFor: nextSlot(now, kit.postingSlots) }); continue; }
+    // A roundup headline that repeats the date already in its label gets trimmed and re-rendered before it goes out.
+    const trimmed = p.template === 'roundup' ? roundupHeadline(p.imageText.headline) : p.imageText.headline;
+    if (trimmed !== p.imageText.headline) {
+      p.imageText = { ...p.imageText, headline: trimmed };
+      const stored = await renderAndStore(p.id, kit, 'roundup', { caption: p.caption, altText: p.altText, imageText: p.imageText }, null);
+      if (stored.imageUrl) p.imageUrl = stored.imageUrl;
+      await doc.ref.update({ imageText: p.imageText, imageUrl: p.imageUrl });
+    }
+    const imageUrl = p.imageUrl;
     const problems = checkDraft({ caption: p.caption, altText: p.altText, imageText: p.imageText }, kit, { sponsored: p.sponsored });
     if (problems.length) { await hold(`Fails brand checks: ${problems.join(' ')}`); continue; }
 
     await doc.ref.update({ publishingAt: now });
     try {
-      const r = await publishImage(token, kit.handle, p.imageUrl, p.caption, p.altText);
+      const r = await publishImage(token, kit.handle, imageUrl, p.caption, p.altText);
       await doc.ref.update({ status: 'published', publishedAt: Date.now(), igMediaId: r.mediaId, permalink: r.permalink, error: null, publishingAt: null, updatedAt: Date.now() });
       publishedToday.set(p.brand, (publishedToday.get(p.brand) ?? 0) + 1);
       log(`published ${p.id} → ${r.permalink ?? r.mediaId}`);

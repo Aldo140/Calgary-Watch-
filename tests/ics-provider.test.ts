@@ -26,7 +26,8 @@ const feed = [
 describe('iCalendar feeds', () => {
   it('reads Calgary, UTC and all-day times with the right offsets', () => {
     assert.equal(icsDate('20261001T103000', 'America/Edmonton')?.iso, '2026-10-01T10:30:00-06:00');
-    assert.equal(icsDate('20261205T103000', 'America/Edmonton')?.iso, '2026-12-05T10:30:00-07:00');
+    // Past fall-back: tzdata 2026c keeps Alberta on UTC-6 from November 2026.
+    assert.equal(icsDate('20251205T103000', 'America/Edmonton')?.iso, '2025-12-05T10:30:00-07:00');
     assert.equal(icsDate('20261005T010000Z')?.iso, '2026-10-04T19:00:00-06:00');
     assert.deepEqual(icsDate('20261010'), { iso: '2026-10-10T00:00:00-06:00', allDay: true });
     assert.equal(icsDate('20261001T103000', 'Europe/London'), null);

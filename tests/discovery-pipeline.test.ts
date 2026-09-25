@@ -128,7 +128,8 @@ describe('Calgary time windows',()=>{
   });
   it('uses the correct DST offset and local midnight',()=>{
     assert.equal(new Date(calgaryInstant('2026-03-08',17)).toISOString(),'2026-03-08T23:00:00.000Z');
-    assert.equal(new Date(calgaryInstant('2026-11-01',17)).toISOString(),'2026-11-02T00:00:00.000Z');
+    // Past fall-back: tzdata 2026c keeps Alberta on UTC-6 from November 2026.
+    assert.equal(new Date(calgaryInstant('2025-11-02',17)).toISOString(),'2025-11-03T00:00:00.000Z');
     assert.ok(matchesTonight(event.start,event.end,new Date('2026-09-27T01:00:00Z')));
   });
   it('filters free and topic events independently',()=>{

@@ -4,7 +4,7 @@
 //
 //   IG_TOKEN_CALGARYWATCH=... IG_TOKEN_CALGARYDAILY=... ANTHROPIC_API_KEY=... npm run ops:check
 
-const GRAPH = 'https://graph.facebook.com/v21.0';
+const GRAPH = 'https://graph.facebook.com/v25.0';
 
 type Result = { name: string; ok: boolean; detail: string };
 

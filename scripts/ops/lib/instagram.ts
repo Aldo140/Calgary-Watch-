@@ -3,7 +3,7 @@
 
 import type { BrandId } from '../../../src/types/ops';
 
-const GRAPH = 'https://graph.facebook.com/v21.0';
+const GRAPH = 'https://graph.facebook.com/v25.0';
 
 export function igToken(brand: BrandId): string | undefined {
   return brand === 'calgarywatch' ? process.env.IG_TOKEN_CALGARYWATCH : process.env.IG_TOKEN_CALGARYDAILY;

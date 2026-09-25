@@ -107,7 +107,7 @@ function diverse(list: Happening[], n: number, taken = new Set<string>()): Happe
  * roundup drafted on Wednesdays and Thursdays. CalgaryDaily: a morning "today in
  * Calgary" roundup when at least two things are on.
  */
-export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: number, queued: Set<string>): Candidate[] {
+export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: number, queued: Set<string>, recentlyPosted: Set<string> = new Set()): Candidate[] {
   const all = happenings(index);
   const today = calgaryDate(now);
   const out: Candidate[] = [];
@@ -123,7 +123,8 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
       return t > now ? t : now + 10 * 60_000;
     };
     const until = (items: Happening[]) => Math.max(...items.map(i => i.end ?? i.start));
-    const used = new Set<string>();
+    // Spotlights never repeat a listing the account featured in the last couple of days.
+    const used = new Set<string>(recentlyPosted);
     const onToday = all.filter(h => calgaryDate(h.start) === today && (h.end ?? h.start) > now);
     const isEvening = (h: Happening) => calgaryMinutes(h.start) >= 17 * 60;
     // With enough evening plans for their own post, the morning roundup keeps to the daytime.

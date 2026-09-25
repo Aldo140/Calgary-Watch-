@@ -61,7 +61,15 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
   const dryDir = db ? null : join(ROOT, 'brand', 'preview', 'dry-run');
   if (dryDir) await mkdir(dryDir, { recursive: true });
   const queued = new Set<string>();
-  if (db) (await db.collection(COLLECTIONS.posts).select('fingerprint').get()).forEach(d => queued.add(d.get('fingerprint')));
+  const recent = new Map<string, Set<string>>();
+  if (db) (await db.collection(COLLECTIONS.posts).select('fingerprint', 'brand', 'entityIds', 'createdAt').get()).forEach(d => {
+    queued.add(d.get('fingerprint'));
+    if ((d.get('createdAt') ?? 0) > now - 2 * 86_400_000) {
+      const set = recent.get(d.get('brand')) ?? new Set<string>();
+      for (const id of d.get('entityIds') ?? []) set.add(id);
+      recent.set(d.get('brand'), set);
+    }
+  });
 
   let made = 0;
   for (const brand of BRANDS) {
@@ -71,7 +79,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
     if (db) waiting = (await db.collection(COLLECTIONS.posts).where('status', '==', 'drafted').select('brand').get()).docs.filter(d => d.get('brand') === brand).length;
     if (waiting >= kit.postsPerDay * 3) { log(`${brand}: ${waiting} drafts already waiting for review; not adding more.`); continue; }
 
-    for (const c of selectCandidates(index, kit, now, queued)) {
+    for (const c of selectCandidates(index, kit, now, queued, recent.get(brand))) {
       const id = postId(c.fingerprint);
       const { draft, warnings, by } = await writeDraft(c, kit, templateDraft(c, kit), '', log);
       const image = await renderAndStore(id, kit, c.template, draft, dryDir);

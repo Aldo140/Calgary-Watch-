@@ -92,6 +92,10 @@ describe('choosing posts', () => {
     // No listing appears in two of the day's posts.
     const ids = c.flatMap(x => x.items.map(i => i.entity.id));
     assert.equal(new Set(ids).size, ids.length);
+    // A spotlight never repeats something featured in the last couple of days.
+    const spotlight = c[1].items[0].entity.id;
+    const again = selectCandidates(busy, cd, friday, new Set(), new Set([spotlight]));
+    assert.ok(again.filter(x => x.template === 'event').every(x => x.items[0].entity.id !== spotlight));
     // Running again the same day adds nothing new.
     assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup').length, 0);
   });

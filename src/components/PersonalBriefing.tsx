@@ -20,6 +20,7 @@ import { publicAsset } from '@/src/lib/utils';
 import BriefingRadar, { bearingDegrees, type RadarPoint } from '@/src/components/BriefingRadar';
 import BriefingSparkline from '@/src/components/BriefingSparkline';
 import { curatePersonalStories } from '@/src/lib/reportCuration';
+import { CategoryDots, HomeOnCity, HourDial, RankStrip, SplitBar } from '@/src/components/briefing/ReportPieces';
 
 /**
  * What one neighbour's corner of Calgary looks like this week.
@@ -48,17 +49,17 @@ import { curatePersonalStories } from '@/src/lib/reportCuration';
  */
 
 const T = {
-  page: '#F5EFE4',
-  card: '#FFFCF6',
-  ink: '#2A2420',
-  soft: '#6E6357',
-  line: '#E4DACA',
-  edge: '#D6C9B4',
-  teal: '#2E8B7A',
-  deep: '#1F3D37',
-  deep2: '#2F5F52',
-  gold: '#B0793C',
-  clay: '#B0503A',
+  page: '#FAF8F3',
+  card: '#FFFFFF',
+  ink: '#151515',
+  soft: '#4A4F57',
+  line: 'rgba(21,21,21,0.12)',
+  edge: '#151515',
+  teal: '#00A8C6',
+  deep: '#06162F',
+  deep2: '#0D2447',
+  gold: '#1554D1',
+  clay: '#E2403A',
 } as const;
 
 /**
@@ -239,16 +240,13 @@ function Section({
       transition={{ delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="flex items-center gap-2.5">
-        <span className="h-[3px] w-[18px] shrink-0" style={{ background: T.gold }} aria-hidden="true" />
-        <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: T.gold }}>
-          {eyebrow}
-        </span>
+        <span className="br-eyebrow">{eyebrow}</span>
         {/* The rule carries the eyebrow across the column, the way the map's
             panels do it, so a section reads as a band rather than a paragraph. */}
         <span className="h-px flex-1" style={{ background: T.line }} aria-hidden="true" />
       </div>
       <h3
-        className="mt-2 font-display text-[1.3rem] font-extrabold leading-tight tracking-[-0.02em] sm:text-[1.5rem]"
+        className="mt-2 font-display text-[1.55rem] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[1.9rem]"
         style={{ color: T.ink }}
       >
         {title}
@@ -266,7 +264,7 @@ function Stat({
   const animated = useCountUp(count ?? 0, 900, !still && count !== undefined);
   const shown = value ?? (still ? (count ?? 0) : animated).toLocaleString();
   return (
-    <div className="px-3.5 py-3" style={{ background: T.card, border: `1px solid ${T.line}` }}>
+    <div className="br-card px-3.5 py-3">
       <p className="font-display text-[1.5rem] font-extrabold leading-none tabular-nums" style={{ color: tone }}>
         {shown}
       </p>
@@ -291,13 +289,12 @@ function ReportRow({
       <button
         type="button"
         onClick={onOpen}
-        className="flex w-full items-start gap-3 px-3.5 py-3 text-left transition-colors hover:opacity-90"
-        style={{ background: T.card, border: `1px solid ${T.line}` }}
+        className="br-card br-press flex w-full items-start gap-3 px-3.5 py-3 text-left"
       >
         {badge !== undefined ? (
           <span
             className="mt-[2px] shrink-0 rounded-lg px-2 py-1 font-mono text-[10px] font-bold tabular-nums"
-            style={{ background: 'rgba(46,139,122,0.12)', color: '#1F6154' }}
+            style={{ background: '#FFF5CC', color: T.ink, border: '1.5px solid #151515' }}
           >
             {badge}
           </span>
@@ -340,8 +337,8 @@ function FeaturedStory({
       <button
         type="button"
         onClick={onOpen}
-        className="w-full px-4 py-4 text-left transition-colors hover:bg-white/50 active:bg-white/70"
-        style={{ background: T.card, border: `1px solid ${T.edge}` }}
+        className="br-card br-press br-story w-full px-4 py-4 text-left"
+        style={{ ['--tone' as string]: STORY_TONE[incident.category] }}
       >
         <span className="flex items-center justify-between gap-3">
           <span className="text-[11px] font-extrabold" style={{ color: STORY_TONE[incident.category] }}>
@@ -547,7 +544,7 @@ export default function PersonalBriefing({
             would open. */}
         <header
           className="relative shrink-0 overflow-hidden px-5 pb-6 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 sm:pb-7 sm:pt-7"
-          style={{ background: `linear-gradient(155deg, ${T.deep} 0%, ${T.deep2} 100%)` }}
+          style={{ background: `radial-gradient(120% 90% at 85% 20%, #0B2552 0%, ${T.deep} 55%, #030B1A 100%)` }}
         >
           {/* The city, inked into the masthead the way the feed rail does it.
               The linocut is black ink, so on this dark ground it needs the
@@ -557,7 +554,7 @@ export default function PersonalBriefing({
             src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
             alt=""
             width={900} height={900} loading="lazy"
-            className="pointer-events-none absolute -right-10 -top-8 w-44 opacity-[0.13] sm:w-52"
+            className="pointer-events-none absolute -right-10 -top-8 hidden w-44 opacity-[0.13] sm:w-52"
             style={{ filter: 'invert(1)' }}
             aria-hidden="true"
           />
@@ -597,7 +594,7 @@ export default function PersonalBriefing({
                   {firstName.charAt(0).toUpperCase()}
                 </span>
               )}
-              <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: '#93C4B4' }}>
+              <p className="br-greet">
                 {greetingFor(new Date(issuedAt))}, {firstName}
               </p>
             </div>
@@ -606,42 +603,27 @@ export default function PersonalBriefing({
               className="mt-3.5 font-display font-extrabold leading-[1.06] tracking-[-0.03em] pr-10"
               style={{ color: '#FDFAF3', fontSize: 'clamp(1.75rem, 6.6vw, 2.5rem)' }}
             >
-              Here&rsquo;s your corner of Calgary
+              Here&rsquo;s your <span style={{ color: '#FFDF4F' }}>corner of Calgary.</span>
             </h2>
 
-            <p className="mt-3 flex items-start gap-1.5 text-[13px] font-medium leading-snug" style={{ color: '#C3D6CE' }}>
+            <p className="mt-3 flex items-start gap-1.5 text-[13px] font-medium leading-snug" style={{ color: 'rgba(255,255,255,.78)' }}>
               <Home size={13} className="mt-[2px] shrink-0" aria-hidden="true" />
               <span className="min-w-0">
                 Everything below is measured from{' '}
-                <span className="font-bold" style={{ color: '#FDFAF3' }}>{address || areaLabel}</span>
+                <span className="font-bold" style={{ color: '#FFFFFF' }}>{address || areaLabel}</span>
               </span>
             </p>
 
+            {home && <HomeOnCity home={home} points={selectedStories} />}
+
             {areaStats && band && (
-              <div
-                className="mt-4 px-3.5 py-3"
-                style={{ background: 'rgba(253,250,243,0.10)', border: '1px solid rgba(253,250,243,0.20)' }}
-              >
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-[11px] font-bold" style={{ color: '#C3D6CE' }}>Community report-volume rank</p>
-                    <p className="mt-0.5 text-[20px] font-extrabold tabular-nums" style={{ color: '#FDFAF3' }}>
-                      #{areaStats.rank} <span className="text-[12px] font-semibold" style={{ color: '#C3D6CE' }}>of {areaStats.count}</span>
-                    </p>
-                  </div>
-                  <span className="shrink-0 px-2 py-1 text-[11px] font-extrabold" style={{ background: band.color, color: '#FFFDF8' }}>
-                    {band.label}
-                  </span>
+              <div className="br-hrank">
+                <div className="br-hrank-top">
+                  <span>Calgary report-volume rank</span>
+                  <b style={{ background: band.color }}>{band.label}</b>
                 </div>
-                <div className="mt-2 h-1.5 overflow-hidden" style={{ background: 'rgba(253,250,243,0.16)' }} aria-hidden="true">
-                  <div
-                    className="h-full"
-                    style={{ width: `${Math.max(3, ((areaStats.count - areaStats.rank + 1) / areaStats.count) * 100)}%`, background: '#E8B871' }}
-                  />
-                </div>
-                <p className="mt-1.5 text-[10.5px] leading-snug" style={{ color: '#C3D6CE' }}>
-                  Based on reported volume, not a safety grade.
-                </p>
+                <RankStrip rank={areaStats.rank} count={areaStats.count} label={areaLabel} still={still} />
+                <p className="br-hrank-note">Based on how much gets reported, not a safety grade.</p>
               </div>
             )}
           </motion.div>
@@ -795,13 +777,17 @@ export default function PersonalBriefing({
                         onSelect={(incident) => { onSelectIncident(incident); onClose(); }}
                       />
                     </div>
+                    <div className="br-radar-side">
+                    <CategoryDots incidents={selectedStories.map(x => x.incident)} />
                     <p className="text-[13.5px] leading-relaxed" style={{ color: T.soft }}>
                       Your home is the middle. This edition selects useful local stories rather than filling
                       the page with routine road notices. North is up; the outer ring is{' '}
                       {ring.metres >= 1000 ? `${(ring.metres / 1000).toFixed(1)} km` : `${ring.metres} m`}{' '}
                       away. Tap one to read it.
                     </p>
+                    </div>
                   </div>
+                  <HourDial incidents={nearby.map(x => x.incident)} />
 
                   {stories.leads.length > 0 && (
                     <div className="mt-5">
@@ -848,13 +834,13 @@ export default function PersonalBriefing({
               <button
                 type="button"
                 onClick={() => { onOpenNearby(); onClose(); }}
-                className="mt-4 flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-transform active:scale-[0.99]"
-                style={{ background: T.ink, color: T.page }}
+                className="br-press mt-4 flex w-full items-center justify-between gap-3 rounded-[18px] border-2 border-[#151515] px-4 py-3.5 text-left shadow-[4px_4px_0_#00c2e0]"
+                style={{ background: T.deep, color: '#fff' }}
               >
                 <span className="flex min-w-0 items-center gap-3">
-                  <Compass size={18} className="shrink-0" style={{ color: '#E8B871' }} />
+                  <Compass size={18} className="shrink-0" style={{ color: '#FFDF4F' }} />
                   <span className="min-w-0">
-                    <span className="block text-[14px] font-black leading-tight">Look further out</span>
+                    <span className="block text-[15px] font-black leading-tight">Look further out</span>
                     <span className="block text-[11.5px] opacity-75">
                       Open the complete map, including live traffic, within {NEARBY_KM} km
                     </span>
@@ -921,41 +907,10 @@ export default function PersonalBriefing({
               />
               {areaStats && band && (
                 <>
-                  <div className="px-4 py-4" style={{ background: T.deep, color: T.page }}>
-                    <div className="flex items-end justify-between gap-4">
-                      <div>
-                        <p className="text-[11px] font-semibold" style={{ color: '#C3D6CE' }}>Calgary community ranking</p>
-                        <p className="mt-1 text-[26px] font-extrabold leading-none tabular-nums">
-                          #{areaStats.rank} <span className="text-[13px] font-semibold" style={{ color: '#C3D6CE' }}>of {areaStats.count}</span>
-                        </p>
-                      </div>
-                      <span className="px-2.5 py-1.5 text-[11px] font-extrabold" style={{ background: band.color, color: '#FFFDF8' }}>
-                        {band.label} volume
-                      </span>
-                    </div>
-                    <div className="mt-3 h-2 overflow-hidden" style={{ background: 'rgba(245,239,228,0.16)' }}>
-                      <div
-                        className="h-full"
-                        style={{ width: `${Math.max(3, ((areaStats.count - areaStats.rank + 1) / areaStats.count) * 100)}%`, background: '#E8B871' }}
-                      />
-                    </div>
-                    <p className="mt-2 text-[11px] leading-snug" style={{ color: '#C3D6CE' }}>
-                      Top {areaRankPercent}% by recorded crime and disorder volume in {areaStats.year}. This compares reporting volume—not danger or personal risk.
-                    </p>
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-2.5">
-                    <Stat count={areaStats.crime} still={still} label={`Criminal offences in ${areaStats.year}`} />
-                    <Stat count={areaStats.disorder} still={still} label={`Disorder calls in ${areaStats.year}`} />
-                  </div>
-                  <div className="mt-3 divide-y" style={{ borderColor: T.line }}>
-                    <p className="flex items-start justify-between gap-4 py-2.5 text-[12.5px] leading-snug" style={{ borderColor: T.line, color: T.soft }}>
-                      <span>Share recorded as criminal offences</span>
-                      <strong className="shrink-0 tabular-nums" style={{ color: T.ink }}>{areaCrimeShare}%</strong>
-                    </p>
-                    <p className="flex items-start justify-between gap-4 py-2.5 text-[12.5px] leading-snug" style={{ borderColor: T.line, color: T.soft }}>
-                      <span>Total recorded crime + disorder</span>
-                      <strong className="shrink-0 tabular-nums" style={{ color: T.ink }}>{areaReportTotal.toLocaleString()}</strong>
-                    </p>
+                  <div className="br-card br-split-card px-4 py-4">
+                    <p className="br-mini-h">What gets reported in {areaLabel} · {areaStats.year}</p>
+                    <SplitBar crime={areaStats.crime} disorder={areaStats.disorder} year={areaStats.year} />
+                    <p className="br-mini-note">{areaReportTotal.toLocaleString()} recorded in total in {areaStats.year}. Volume reflects reporting, not danger.</p>
                   </div>
                   {communitySignals.length > 0 && (
                     <div className="mt-4">
@@ -989,8 +944,8 @@ export default function PersonalBriefing({
               <button
                 type="button"
                 onClick={() => { onOpenArea(); onClose(); }}
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 text-[13px] font-bold transition-opacity hover:opacity-90"
-                style={{ background: 'transparent', border: `1.5px solid ${T.edge}`, color: T.ink }}
+                className="br-press mt-3 inline-flex items-center gap-2 rounded-full border-2 border-[#151515] bg-[#FFDF4F] px-5 py-3 text-[13.5px] font-extrabold shadow-[3px_3px_0_#151515]"
+                style={{ color: T.ink }}
               >
                 See everything about {areaLabel} <ArrowRight size={14} />
               </button>

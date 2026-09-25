@@ -5,8 +5,8 @@ export const COLOR: Record<string, string> = Object.fromEntries(INCIDENT_CATEGOR
 
 /** Calgary's box, projected flat: good enough to show where things cluster. */
 const BOX = { n: 51.215, s: 50.842, w: -114.315, e: -113.86 };
-const px = (lng: number) => ((lng - BOX.w) / (BOX.e - BOX.w)) * 400;
-const py = (lat: number) => ((BOX.n - lat) / (BOX.n - BOX.s)) * 440;
+export const px = (lng: number) => ((lng - BOX.w) / (BOX.e - BOX.w)) * 400;
+export const py = (lat: number) => ((BOX.n - lat) / (BOX.n - BOX.s)) * 440;
 
 const line = (pts: [number, number][]) => pts.map(([lat, lng], i) => `${i ? 'L' : 'M'}${px(lng).toFixed(1)},${py(lat).toFixed(1)}`).join('');
 const OUTLINE: [number, number][] = [[51.2, -114.26], [51.212, -114.15], [51.21, -114.05], [51.19, -113.92], [51.12, -113.87], [51.02, -113.88], [50.95, -113.9], [50.87, -113.94], [50.85, -114.05], [50.86, -114.16], [50.9, -114.23], [50.98, -114.28], [51.08, -114.3], [51.15, -114.29]];

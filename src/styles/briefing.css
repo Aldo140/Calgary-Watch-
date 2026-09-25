@@ -1,0 +1,76 @@
+/* Personal report, in the site brand. */
+.br-eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 700 11px/1 'IBM Plex Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: #1554d1; white-space: nowrap; }
+.br-eyebrow::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #ffdf4f; border: 1.5px solid #151515; }
+.br-card { background: #fff; border: 2px solid #151515 !important; border-radius: 18px; box-shadow: 4px 4px 0 #151515; }
+.br-press { transition: transform .12s, box-shadow .12s; }
+.br-press:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #151515; }
+.br-press:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #151515; }
+.br-story { border-left: 8px solid var(--tone) !important; }
+.br-greet { font: 700 12px/1 'IBM Plex Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #9fe9f5; }
+
+/* Header: their spot on the city */
+.br-city { position: absolute; top: 62px; right: 28px; width: 180px; height: 150px; border-radius: 22px; overflow: hidden; border: 1.5px solid rgba(255,255,255,.25); background: #0b1f3d; box-shadow: 0 20px 40px -20px rgba(0,0,0,.8); pointer-events: none; z-index: 0; }
+.br-city::after { content: 'Your spot in the city'; position: absolute; left: 10px; bottom: 9px; padding: 4px 9px; border-radius: 999px; background: #ffdf4f; color: #151515; font: 800 10.5px Inter, sans-serif; }
+.br-city-map, .br-city-home { position: absolute; inset: 0; width: 100%; height: 100%; }
+.br-city-map .cm-city-land { fill: rgba(13, 36, 71, .7); stroke: rgba(255,255,255,.3); }
+.br-ping { transform-box: fill-box; transform-origin: center; animation: br-ping 2.4s ease-out infinite; }
+@keyframes br-ping { 0% { transform: scale(.6); opacity: .8; } 100% { transform: scale(2.6); opacity: 0; } }
+
+/* Rank strip */
+.br-hrank { margin-top: 18px; padding: 14px 14px 12px; border-radius: 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); }
+.br-hrank-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 600 12px Inter, sans-serif; color: rgba(255,255,255,.75); }
+.br-hrank-top b { padding: 4px 10px; border-radius: 999px; color: #fff; font: 800 11px Inter, sans-serif; }
+.br-hrank-note { margin-top: 8px; font: 500 11px Inter, sans-serif; color: rgba(255,255,255,.6); }
+.br-rank { margin-top: 12px; }
+.br-rank-strip { position: relative; display: flex; gap: 1px; height: 30px; align-items: flex-end; }
+.br-rank-strip i { flex: 1; height: 100%; border-radius: 1px; background: #9fe9f5; }
+.br-rank-strip i.on { height: 130%; margin-top: -30%; box-shadow: 0 0 0 1.5px #06162f, 0 0 12px #ffdf4f; }
+.br-rank-pin { position: absolute; top: -30px; transform: translateX(-50%); }
+.br-rank-pin b { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #ffdf4f; color: #151515; font: 800 12px 'Bricolage Grotesque', Inter, sans-serif; border: 1.5px solid #151515; }
+.br-rank-ends { display: flex; justify-content: space-between; margin-top: 6px; font: 600 10px 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.br-rank-read { margin-top: 8px; font: 500 13px/1.45 Inter, sans-serif; color: rgba(255,255,255,.85); }
+.br-rank-read strong { color: #ffdf4f; }
+.br-hrank { padding-top: 40px; }
+
+/* Split bar */
+.br-mini-h { font: 700 11px 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #4a4f57; }
+.br-mini-note { margin-top: 10px; font: 400 12.5px/1.5 Inter, sans-serif; color: #4a4f57; }
+.br-split { margin-top: 10px; }
+.br-split-bar { display: flex; height: 18px; border-radius: 9px; overflow: hidden; border: 2px solid #151515; }
+.br-split-bar span + span { border-left: 2px solid #151515; }
+.br-split-key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font: 500 13px Inter, sans-serif; color: #151515; }
+.br-split-key span { display: inline-flex; align-items: center; gap: 6px; }
+.br-split-key i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #151515; }
+
+/* Radar side, category dots, hour dial */
+.br-radar-side { display: flex; flex-direction: column; gap: 12px; }
+.br-cats { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.br-cats li { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; border: 1.5px solid #151515; background: #fff; font: 600 12px Inter, sans-serif; }
+.br-cats i { width: 8px; height: 8px; border-radius: 50%; }
+.br-dial { display: flex; align-items: center; gap: 16px; margin-top: 16px; padding: 12px 16px 12px 12px; border-radius: 18px; background: #06162f; color: #fff; }
+.br-dial svg { width: 120px; height: 120px; flex: none; }
+.br-dial-t { font: 700 8px 'IBM Plex Mono', monospace; fill: rgba(255,255,255,.7); }
+.br-dial p { font: 500 14.5px/1.45 Inter, sans-serif; color: rgba(255,255,255,.85); }
+.br-dial strong { display: block; font: 800 34px/1 'Bricolage Grotesque', Inter, sans-serif; color: #ffdf4f; margin-bottom: 4px; }
+@media (max-width: 640px) {
+  .br-city { position: relative; top: auto; right: auto; width: 100%; height: 150px; margin: 14px 0 0; order: 5; }
+  .br-dial svg { width: 100px; height: 100px; }
+}
+@media (prefers-reduced-motion: reduce) { .br-ping { animation: none; } }
+
+@media (min-width: 641px) {
+  .br-greet, .br-hrank { position: relative; z-index: 1; }
+  header h2, header h2 + p { max-width: calc(100% - 220px); position: relative; z-index: 1; }
+}
+
+/* City map colours (shared with the Community page, which this screen doesn't load). */
+.br-city .cm-city-land { fill: #0d2447; stroke: rgba(255,255,255,.35); stroke-width: .6; }
+.br-city .cm-city-bow { fill: none; stroke: #00c2e0; stroke-width: 3; stroke-linecap: round; opacity: .85; }
+.br-city .cm-city-elbow { fill: none; stroke: #00c2e0; stroke-width: 2; stroke-linecap: round; opacity: .6; }
+.br-city .cm-city-ring { fill: none; stroke: rgba(255,223,79,.45); stroke-width: 1.5; }
+.br-city .cm-city-axis { fill: none; stroke: rgba(255,255,255,.2); stroke-width: .6; stroke-dasharray: 2 2; }
+.br-city .cm-city-lake { fill: #00c2e0; opacity: .5; }
+.br-city .cm-place circle { fill: rgba(255,255,255,.7); r: 1; }
+.br-city .cm-place text { font: 600 4px Inter, sans-serif; fill: rgba(255,255,255,.75); }
+.br-city .cm-pin circle { r: 2.2; }
+.br-city .cm-pin circle:first-child { r: 4; }

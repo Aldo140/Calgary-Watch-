@@ -1,4 +1,5 @@
 import '../styles/map-brand.css';
+import '../styles/briefing.css';
 import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Map, { MapRef } from '@/src/components/Map';

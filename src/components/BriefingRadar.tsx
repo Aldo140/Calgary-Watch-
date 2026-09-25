@@ -52,7 +52,7 @@ export function plotPoint(
   return { x: centre + r * Math.sin(rad), y: centre - r * Math.cos(rad) };
 }
 
-const T = { deep: '#1F3D37', deep2: '#2F5F52', gold: '#B0793C', glow: '#E8B871', page: '#FDFAF3' };
+const T = { deep: '#06162F', deep2: '#0D2447', gold: '#FFDF4F', glow: '#00C2E0', page: '#FFFFFF' };
 
 export default function BriefingRadar({
   points, radiusM, radiusLabel, size = 200, still = false, onSelect,

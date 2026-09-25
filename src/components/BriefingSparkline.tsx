@@ -13,7 +13,7 @@ import type { PropertyYearEntry } from '@/src/hooks/usePropertyAssessments';
  * the top of the box.
  */
 
-const T = { ink: '#2A2420', inkSoft: '#6E6357', line: '#E4DACA', panel: '#FFFCF6', bow: '#2E8B7A', critical: '#B0503A' };
+const T = { ink: '#151515', inkSoft: '#4A4F57', line: '#151515', panel: '#FFFFFF', bow: '#1554D1', critical: '#E2403A' };
 
 export function buildPath(values: number[], width: number, height: number, pad = 4): string {
   if (values.length < 2) return '';

@@ -1,0 +1,37 @@
+{
+  "sender": {
+    "name": "Aldo Ortiz",
+    "title": "Founder, CalgaryWatch",
+    "mailbox": "aldo@calgarywatch.ca",
+    "site": "https://calgarywatch.ca"
+  },
+  "paidOfferEnabled": false,
+  "paidOfferNote": "Leave false until the Local Partner price and deliverables are final and /partners explains how Featured partner placements work. While false, pitches offer only the free source-checked listing and a conversation.",
+  "offer": [
+    "A free source-checked listing on CalgaryWatch that links back to the organization's official page.",
+    "A direct line for schedule corrections, cancellations and approved photos.",
+    "Inclusion in relevant CalgaryWatch posts when the dates fit, always free and never ranked by payment."
+  ],
+  "paidOffer": [
+    "Invitation-only Featured partner placement for six months, one business per category.",
+    "Always labelled 'Featured partner' and kept separate from CalgaryWatch picks."
+  ],
+  "limits": {
+    "sendsPerDay": 10,
+    "sendWindowLocal": ["09:00", "16:30"],
+    "sendDays": [1, 2, 3, 4],
+    "followUpAfterDays": 7,
+    "maxFollowUps": 1
+  },
+  "unsubscribeLine": "If you'd rather not hear from CalgaryWatch again, reply \"stop\" and I won't email you again.",
+  "noSolicitationPatterns": [
+    "no solicitation",
+    "no solicitations",
+    "do not solicit",
+    "no unsolicited",
+    "unsolicited (commercial )?(e-?mail|messages?) (are|is) not",
+    "not accept unsolicited",
+    "no marketing emails",
+    "no sales (calls|emails|inquiries)"
+  ]
+}

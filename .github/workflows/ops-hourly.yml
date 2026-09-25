@@ -1,0 +1,45 @@
+name: Operations Hourly
+
+# scripts/ops/hourly.ts: publishes Instagram posts that were approved in /admin
+# and are due, drafts briefs and redrafts the reviewer asked for, matches
+# business replies (opt-outs are honoured immediately), and sends partner
+# emails that were approved, only inside the weekday send window.
+on:
+  schedule:
+    - cron: '25 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Two overlapping runs could publish the same post twice; never allow it.
+concurrency:
+  group: ops-hourly
+  cancel-in-progress: false
+
+jobs:
+  hourly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Publish, draft briefs, sync replies, send approved email
+        run: npm run ops:hourly
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          IG_TOKEN_CALGARYWATCH: ${{ secrets.IG_TOKEN_CALGARYWATCH }}
+          IG_TOKEN_CALGARYDAILY: ${{ secrets.IG_TOKEN_CALGARYDAILY }}
+          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}

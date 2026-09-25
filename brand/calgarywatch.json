@@ -1,0 +1,51 @@
+{
+  "id": "calgarywatch",
+  "name": "CalgaryWatch",
+  "confirmed": true,
+  "site": "https://calgarywatch.ca",
+  "handle": "calgarywatch",
+  "wordmark": "CALGARYWATCH",
+  "colors": {
+    "background": "#FAF8F3",
+    "surface": "#FFFFFF",
+    "ink": "#151515",
+    "muted": "#565A61",
+    "line": "#D8D9D7",
+    "brand": "#1554D1",
+    "live": "#06162F",
+    "onLive": "#FAF8F3"
+  },
+  "fonts": {
+    "display": "Bricolage Grotesque",
+    "body": "Inter",
+    "data": "IBM Plex Mono"
+  },
+  "voice": {
+    "summary": "Calm, useful and specific. Say what is happening, where, when and what it costs, then point to the page. Second person is fine. Plain Canadian English.",
+    "examples": [
+      "Hillhurst Sunnyside Farmers' Market is on this Wednesday, 3 to 7 pm at 1320 5 Ave NW. Year-round, run by the community association. Dates and vendors on calgarywatch.ca/markets.",
+      "Free this weekend: Held. Together. at Nickle Galleries, UCalgary. Open 9 to 4 through Friday. Details and the organizer's page at the link in bio.",
+      "Five things on this weekend in Calgary, all with dates checked against the organizer's own page."
+    ],
+    "rules": [
+      "Use only facts supplied with the listing. Never invent prices, times, performers, crowds or quotes.",
+      "Name the source organization when it adds trust (for example 'listed by University of Calgary').",
+      "No superlatives about businesses ('best', 'top', '#1') unless the line is labelled as a CalgaryWatch pick and was never paid for.",
+      "Never write incident, crime or emergency posts as lifestyle or entertainment content.",
+      "Paid placements always say 'Featured partner' in the image and the first line of the caption.",
+      "At most 5 hashtags. Prefer #yyc #calgary plus 1 to 3 specific tags."
+    ],
+    "bannedPhrases": ["best in calgary", "#1", "guaranteed", "you won't believe", "breaking", "must-see", "viral"]
+  },
+  "hashtags": ["#yyc", "#calgary"],
+  "linkInBio": "https://calgarywatch.ca/events?utm_source=instagram&utm_medium=social&utm_campaign=bio",
+  "autoPublish": {
+    "events": false,
+    "markets": false,
+    "roundups": false,
+    "partner": false,
+    "incidents": false
+  },
+  "postsPerDay": 2,
+  "postingSlots": ["11:30", "18:30"]
+}

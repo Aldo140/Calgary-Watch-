@@ -1,0 +1,90 @@
+name: Operations Maintenance
+
+# Nightly: type-check, run the test suite and audit production dependencies.
+# If anything fails, Claude Code investigates and opens a pull request with a
+# fix and the test output. It never pushes to main; merging is a human decision,
+# and deploy-firebase.yml only ships what is merged.
+#
+# 09:40 UTC = 03:40 MDT / 02:40 MST.
+on:
+  schedule:
+    - cron: '40 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-maintenance
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      report: ${{ steps.report.outputs.report }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Type-check, test, audit
+        id: run
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          { echo "## npm run lint"; npm run lint 2>&1 | tail -60; } > report.txt || echo "LINT_FAILED" >> report.txt
+          { echo "## npm test"; npm test 2>&1 | grep -E "not ok|# (pass|fail)|Error|expected|actual" | head -80; } >> report.txt || true
+          npm test > /dev/null 2>&1 || echo "TESTS_FAILED" >> report.txt
+          { echo "## npm audit (production, high+)"; npm audit --omit=dev --audit-level=high 2>&1 | tail -40; } >> report.txt || echo "AUDIT_FAILED" >> report.txt
+          if grep -q "_FAILED" report.txt; then exit 1; fi
+      - name: Keep the report
+        id: report
+        if: steps.run.outcome == 'failure'
+        run: |
+          {
+            echo 'report<<EOF'
+            head -c 12000 report.txt
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+      - name: Fail the check
+        if: steps.run.outcome == 'failure'
+        run: exit 1
+
+  fix:
+    needs: check
+    if: failure() && needs.check.outputs.report != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: '--allowedTools "Read,Edit,Write,Glob,Grep,Bash(npm run lint),Bash(npm test),Bash(npm audit:*),Bash(npm install:*),Bash(git:*),Bash(gh pr create:*),Bash(gh pr list:*)"'
+          prompt: |
+            The nightly maintenance check for this repository failed. Report:
+
+            ${{ needs.check.outputs.report }}
+
+            Find the root cause and fix it with the smallest correct change. Read docs/design-system.md before touching any UI.
+            Run `npm run lint` and `npm test` until both pass. For dependency audit failures, prefer a patch or minor upgrade; do not use `npm audit fix --force`.
+            Then create a branch named ops/nightly-fix-${{ github.run_id }}, commit, push, and open a pull request against main with `gh pr create`, titled "Nightly maintenance: <one-line summary>".
+            The PR body must say what failed, the cause, what changed, and paste the final lint and test summary.
+            If an open PR whose title starts with "Nightly maintenance" already exists (check with `gh pr list`), stop without opening another.
+            Never push to main. Never change firestore.rules, workflows, secrets or brand/*.json.

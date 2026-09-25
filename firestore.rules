@@ -583,6 +583,79 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── Operations agent (scripts/ops/*, GitHub Actions via the Admin SDK) ──
+    // The jobs draft, publish and send; admins only review. A browser can never
+    // mark a post published, send mail, or lift a do-not-contact.
+    match /ops_queue/{postId} {
+      allow read: if isAdmin();
+      // A CalgaryDaily/CalgaryWatch brief: "draft a post from this page".
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly(['id', 'brand', 'status', 'requestUrl', 'note', 'fingerprint', 'template', 'createdAt', 'updatedAt', 'reviewedByEmail']) &&
+        request.resource.data.id == postId &&
+        request.resource.data.status == 'requested' &&
+        request.resource.data.brand in ['calgarywatch', 'calgarydaily'] &&
+        request.resource.data.template == 'update' &&
+        request.resource.data.requestUrl is string &&
+        request.resource.data.requestUrl.matches('^https://.{4,2000}$') &&
+        request.resource.data.note is string && request.resource.data.note.size() <= 1000 &&
+        request.resource.data.fingerprint is string && request.resource.data.fingerprint.size() <= 300;
+      allow update: if isAdmin() && (
+        (
+          resource.data.status in ['drafted', 'approved', 'redraft', 'failed', 'expired', 'rejected'] &&
+          request.resource.data.diff(resource.data).changedKeys().hasOnly([
+            'status', 'caption', 'altText', 'scheduledFor', 'note', 'reviewedByEmail', 'reviewedAt', 'updatedAt', 'error', 'attempts'
+          ]) &&
+          request.resource.data.status in ['drafted', 'approved', 'redraft', 'rejected'] &&
+          (request.resource.data.status != 'approved' || request.resource.data.scheduledFor is number) &&
+          request.resource.data.caption is string && request.resource.data.caption.size() <= 2200 &&
+          request.resource.data.altText is string && request.resource.data.altText.size() <= 1000
+        ) || (
+          // The reviewer fixed a published post on Instagram by hand.
+          resource.data.status == 'needs-correction' &&
+          request.resource.data.status == 'published' &&
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'correction', 'reviewedByEmail', 'reviewedAt', 'updatedAt'])
+        )
+      );
+      allow delete: if false;
+    }
+
+    match /partner_leads/{leadId} {
+      allow read: if isAdmin();
+      // Manual leads start as "new" and go through the same research and review.
+      allow create: if isAdmin() &&
+        request.resource.data.id == leadId &&
+        request.resource.data.status == 'new' &&
+        request.resource.data.doNotContact == false &&
+        request.resource.data.businessName is string && request.resource.data.businessName.size() <= 200;
+      allow update: if isAdmin() &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'status', 'draftSubject', 'draftBody', 'notes', 'contactName', 'contactRole', 'contactEmail',
+          'emailSourceUrl', 'emailFoundAt', 'consentBasis', 'website', 'doNotContact', 'lastReply',
+          'reviewedByEmail', 'updatedAt', 'history'
+        ]) &&
+        request.resource.data.status in ['new', 'ready', 'approved', 'follow-up-ready', 'replied', 'interested', 'claimed', 'partner', 'not-interested', 'no-response', 'do-not-contact'] &&
+        // Only a reviewed draft can be approved, and never for a suppressed lead.
+        (request.resource.data.status != 'approved' || (resource.data.status in ['ready', 'follow-up-ready', 'approved'] && request.resource.data.doNotContact == false)) &&
+        !(resource.data.doNotContact == true && request.resource.data.doNotContact != true) &&
+        request.resource.data.draftBody is string && request.resource.data.draftBody.size() <= 6000;
+      allow delete: if false;
+    }
+
+    // Permanent opt-out list, honoured by every future send.
+    match /outreach_suppression/{entryId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasOnly(['email', 'domain', 'reason', 'leadId', 'at', 'byEmail']) &&
+        (request.resource.data.email is string || request.resource.data.domain is string) &&
+        request.resource.data.at is number;
+      allow update, delete: if false;
+    }
+
+    match /ops_health/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     // Discovery is published through a verified static snapshot. Raw inventory,
     // review records and source payloads are never readable by public clients.
     match /{collection}/{id} {

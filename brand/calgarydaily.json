@@ -1,0 +1,51 @@
+{
+  "id": "calgarydaily",
+  "name": "CalgaryDaily",
+  "confirmed": false,
+  "confirmNote": "Provisional kit. Replace the colours, handle and examples with CalgaryDaily's real ones before the first post goes out.",
+  "site": "https://calgarywatch.ca",
+  "handle": "calgarydaily",
+  "wordmark": "CALGARYDAILY",
+  "colors": {
+    "background": "#111111",
+    "surface": "#1C1C1C",
+    "ink": "#FFFFFF",
+    "muted": "#B8B8B8",
+    "line": "#333333",
+    "brand": "#FFD23F",
+    "live": "#111111",
+    "onLive": "#FFFFFF"
+  },
+  "fonts": {
+    "display": "Bricolage Grotesque",
+    "body": "Inter",
+    "data": "IBM Plex Mono"
+  },
+  "voice": {
+    "summary": "Bold, fast and clean. One strong headline, then the useful facts. Local news and things to do, never sensational.",
+    "examples": [
+      "TODAY IN CALGARY: three free things to do before dinner.",
+      "Road closure on Memorial Drive this weekend. Here's what the City says and when it reopens.",
+      "New on the calendar: a year-round Wednesday farmers' market in Hillhurst."
+    ],
+    "rules": [
+      "Use only facts supplied with the item or its source page. Never invent numbers, quotes or causes.",
+      "Always name the source (City of Calgary, organizer, venue) in the caption.",
+      "News about crime, collisions, fires or other emergencies always waits for human approval and never uses illustrated scenes.",
+      "No clickbait. The headline must be answerable by the caption.",
+      "At most 5 hashtags."
+    ],
+    "bannedPhrases": ["you won't believe", "shocking", "viral", "guaranteed", "#1"]
+  },
+  "hashtags": ["#yyc", "#calgary", "#calgarydaily"],
+  "linkInBio": "https://calgarywatch.ca/?utm_source=instagram&utm_medium=social&utm_campaign=calgarydaily_bio",
+  "autoPublish": {
+    "events": false,
+    "markets": false,
+    "roundups": false,
+    "partner": false,
+    "incidents": false
+  },
+  "postsPerDay": 1,
+  "postingSlots": ["08:00"]
+}

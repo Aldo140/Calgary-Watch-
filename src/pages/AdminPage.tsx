@@ -1,4 +1,6 @@
 import { DiscoveryContent } from '../components/admin/DiscoveryContent';
+import { OpsWorkspace } from '../components/admin/OpsWorkspace';
+import { PartnersWorkspace } from '../components/admin/PartnersWorkspace';
 /**
  * Calgary Watch — admin console.
  *
@@ -20,7 +22,7 @@ import {
   BarChart, Bar,
 } from 'recharts';
 import {
-  ExternalLink, FileText, Globe, LayoutDashboard, Loader2, Lock,
+  Bot, ExternalLink, FileText, Globe, LayoutDashboard, Loader2, Lock,
   MailPlus, Map as MapIcon, RefreshCw, Save, Trash2, Users, Zap,
 } from 'lucide-react';
 
@@ -39,7 +41,7 @@ import { INCIDENT_CATEGORIES } from '@/src/constants';
 import { summarizeDataSourceHealth } from '@/src/config/dataSources';
 import { cn } from '@/src/lib/utils';
 
-type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city' | 'content' | 'demand' | 'partners';
+type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city' | 'content' | 'demand' | 'partners' | 'ops';
 
 const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
 
@@ -106,6 +108,7 @@ export default function AdminPage() {
     return [
       { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined },
       { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus },
+      { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot },
       { id: 'content', label: 'Discovery content', short: 'Content', icon: FileText },
       { id: 'demand', label: 'Search demand', short: 'Demand', icon: Globe },
       { id: 'partners', label: 'Local partners', short: 'Partners', icon: Users },
@@ -118,6 +121,7 @@ export default function AdminPage() {
   }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds]);
 
   const titles: Record<Section, { title: string; subtitle: string }> = {
+    ops: { title: 'Operations', subtitle: 'Instagram posts for CalgaryWatch and CalgaryDaily, drafted by the agent and approved here' },
     content: { title: 'Discovery content', subtitle: 'Events, recurring markets, businesses, guides and neighbourhoods' },
     demand: { title: 'Search demand', subtitle: 'Understand what Calgary is looking for' },
     partners: { title: 'Local partners', subtitle: 'Claims and commercial relationships, separate from editorial selections' },
@@ -180,7 +184,9 @@ export default function AdminPage() {
       {section === 'visitors' && <VisitorsSection d={d} />}
       {section === 'city' && <CitySection d={d} />}
       {section === 'content' && <DiscoveryContent />}
-      {(['demand', 'partners'] as Section[]).includes(section) && <Panel title={titles[section].title}><p style={{ color: T.muted, padding: 20 }}>This workspace is being prepared. {section === 'content' ? 'Source verification and publishing controls will arrive with the first Events and Markets inventory.' : section === 'demand' ? 'No search queries are being collected yet. Future aggregate records will exclude identity and location data.' : 'Claim review and outreach tracking are not enabled yet. Paid placement will be labelled and will not confer editorial selection.'}</p></Panel>}
+      {section === 'ops' && <OpsWorkspace />}
+      {section === 'partners' && <PartnersWorkspace />}
+      {section === 'demand' && <Panel title={titles[section].title}><p style={{ color: T.muted, padding: 20 }}>This workspace is being prepared. No search queries are being collected yet. Future aggregate records will exclude identity and location data.</p></Panel>}
     </AdminShell>
   );
 }

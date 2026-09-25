@@ -198,6 +198,12 @@ describe('operations rules contract', () => {
     for (const k of ['conversationId', 'lastContactAt', 'replyIds', 'followUps']) assert.ok(!l.includes(`'${k}'`), k);
     assert.ok(!l.includes("'contacted'"));
   });
+  it('uses only regex repeat counts the rules engine accepts (RE2 caps them at 1000)', () => {
+    // A {4,2000} in ops_queue once made the whole ruleset fail to compile on deploy.
+    for (const m of rules.matchAll(/\{(\d+)(?:,(\d*))?\}/g)) {
+      assert.ok(Number(m[1]) <= 1000 && (!m[2] || Number(m[2]) <= 1000), `regex repeat ${m[0]} exceeds 1000`);
+    }
+  });
   it('makes suppressions permanent and do-not-contact one-way', () => {
     assert.match(block('outreach_suppression'), /allow update, delete: if false;/);
     assert.match(block('partner_leads'), /!\(resource\.data\.doNotContact == true && request\.resource\.data\.doNotContact != true\)/);

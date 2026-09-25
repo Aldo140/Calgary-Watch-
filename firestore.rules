@@ -596,7 +596,8 @@ service cloud.firestore {
         request.resource.data.brand in ['calgarywatch', 'calgarydaily'] &&
         request.resource.data.template == 'update' &&
         request.resource.data.requestUrl is string &&
-        request.resource.data.requestUrl.matches('^https://.{4,2000}$') &&
+        request.resource.data.requestUrl.matches('^https://.+') &&
+        request.resource.data.requestUrl.size() <= 2000 &&
         request.resource.data.note is string && request.resource.data.note.size() <= 1000 &&
         request.resource.data.fingerprint is string && request.resource.data.fingerprint.size() <= 300;
       allow update: if isAdmin() && (

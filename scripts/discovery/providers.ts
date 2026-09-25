@@ -1,5 +1,5 @@
 import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
-export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market'; markets?: RecurringMarketDefinition[] }
+export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
 /** Explicit JSON contract; adapters translate provider-specific APIs into this shape. */
@@ -235,6 +235,112 @@ export class RecurringMarketProvider implements InventoryProvider {
     }).filter(record => (record.input as MarketSubmissionInput).occurrences.length > 0);
     const skipped = markets.length - records.length;
     console.log(`[Recurring markets] ${markets.length} configured, ${records.length} with upcoming dates${skipped ? `, ${skipped} out of season` : ''}.`);
+    return records;
+  }
+}
+
+/* ── iCalendar feeds from official venue and organizer calendars ─────────────────── */
+
+export interface IcsSourceOptions {
+  organizer: string;
+  /** The organizer's public events page, used when an event has no URL on an approved host. */
+  fallbackUrl: string;
+  categories?: string[];
+  defaultAddress?: string;
+  neighbourhood?: string;
+  pricing?: 'free' | 'paid' | 'unknown';
+  /** Only list events starting within this many days (default 60). */
+  windowDays?: number;
+}
+
+interface IcsEvent { uid?: string; summary?: string; description?: string; location?: string; url?: string; status?: string; start?: string; end?: string; allDay?: boolean }
+
+const unescapeIcs = (v: string) => v.replace(/\\n/gi, '\n').replace(/\\([,;\\])/g, '$1');
+const stripHtml = (v: string) => v.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+
+/** "20261003T190000Z", "20261003T190000" (Calgary or floating) or "20261003" → ISO with offset. */
+export function icsDate(value: string, tzid?: string): { iso: string; allDay: boolean } | null {
+  const m = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?$/.exec(value.trim());
+  if (!m) return null;
+  const [, y, mo, d, h, mi, se, z] = m;
+  if (!h) return { iso: `${y}-${mo}-${d}T00:00:00${calgaryOffset(`${y}-${mo}-${d}T00:00:00`)}`, allDay: true };
+  if (z) return { iso: `${y}-${mo}-${d}T${h}:${mi}:${se}Z`, allDay: false };
+  if (tzid && !/edmonton|calgary|mountain/i.test(tzid)) return null;
+  const local = `${y}-${mo}-${d}T${h}:${mi}:${se}`;
+  return { iso: `${local}${calgaryOffset(local)}`, allDay: false };
+}
+
+export function parseIcs(text: string): IcsEvent[] {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\n[ \t]/g, '').split('\n');
+  const events: IcsEvent[] = [];
+  let cur: IcsEvent | null = null;
+  for (const line of lines) {
+    if (line === 'BEGIN:VEVENT') { cur = {}; continue; }
+    if (line === 'END:VEVENT') { if (cur) events.push(cur); cur = null; continue; }
+    if (!cur) continue;
+    const colon = line.indexOf(':'); if (colon < 0) continue;
+    const head = line.slice(0, colon); const value = line.slice(colon + 1);
+    const [name, ...params] = head.split(';');
+    const tzid = params.find(p => p.toUpperCase().startsWith('TZID='))?.slice(5);
+    switch (name.toUpperCase()) {
+      case 'UID': cur.uid = value.trim(); break;
+      case 'SUMMARY': cur.summary = unescapeIcs(value); break;
+      case 'DESCRIPTION': cur.description = unescapeIcs(value); break;
+      case 'LOCATION': cur.location = unescapeIcs(value); break;
+      case 'URL': cur.url = value.trim(); break;
+      case 'STATUS': cur.status = value.trim().toUpperCase(); break;
+      case 'DTSTART': { const d = icsDate(value, tzid); if (d) { cur.start = d.iso; cur.allDay = d.allDay; } break; }
+      case 'DTEND': { const d = icsDate(value, tzid); if (d) cur.end = d.iso; break; }
+    }
+  }
+  return events;
+}
+
+export function mapIcsEvents(events: IcsEvent[], source: SourceConfig, now = Date.now()): SourceRecord[] {
+  const o = source.ics!;
+  const horizon = now + (o.windowDays ?? 60) * 86400000;
+  const onHost = (u?: string) => { try { return !!u && u.startsWith('https://') && source.hosts.includes(new URL(u).hostname) ? u : undefined; } catch { return undefined; } };
+  const seen = new Set<string>();
+  return events.flatMap(e => {
+    const title = stripHtml(e.summary ?? '').slice(0, 200);
+    if (!title || !e.start) return [];
+    const startMs = Date.parse(e.start);
+    const end = e.end && Date.parse(e.end) > startMs ? e.end : new Date(startMs + (e.allDay ? 86400000 : 2 * 3600000)).toISOString();
+    if (Date.parse(end) < now || startMs > horizon) return [];
+    const address = stripHtml(e.location ?? '').slice(0, 480) || o.defaultAddress;
+    if (!address) return [];
+    const body = stripHtml(e.description ?? '');
+    const firstSentence = body.split(/(?<=[.!?])\s/)[0] ?? '';
+    const id = `${(e.uid || title).slice(0, 120)}@${e.start}`;
+    if (seen.has(id)) return [];
+    seen.add(id);
+    const input = {
+      kind: 'event' as const, title,
+      summary: (firstSentence.length > 20 && firstSentence.length < 240 ? firstSentence : `${title}, listed by ${o.organizer}.`).slice(0, 480),
+      description: (body || `${title}. Check ${o.organizer} for current details.`).slice(0, 4900),
+      address, organizer: o.organizer, sourceUrl: onHost(e.url) ?? o.fallbackUrl,
+      categories: o.categories ?? [], tags: [], start: e.start, end,
+      ...(e.end ? {} : { endTimeEstimated: true }),
+      pricing: o.pricing ?? 'unknown',
+      ...(o.neighbourhood ? { neighbourhood: o.neighbourhood } : {}),
+    } as InventorySubmissionInput;
+    return [{ id: id.replace(/[^\w@.:+-]/g, '_').slice(0, 190), input, cancelled: e.status === 'CANCELLED' }];
+  }).slice(0, 300);
+}
+
+export class IcsFeedProvider implements InventoryProvider {
+  constructor(public source: SourceConfig) {}
+  async fetch(): Promise<SourceRecord[]> {
+    const url = this.source.feedUrl;
+    if (!this.source.approved || !url || !url.startsWith('https://') || !this.source.hosts.includes(new URL(url).hostname) || !this.source.ics) throw Error('Unapproved or incomplete iCalendar source');
+    const response = await fetch(url, { signal: AbortSignal.timeout(20_000), headers: { Accept: 'text/calendar, */*', 'User-Agent': 'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
+    if (!response.ok) throw Error(`Calendar returned HTTP ${response.status}`);
+    if (!this.source.hosts.includes(new URL(response.url).hostname)) throw Error('Calendar redirected to an unapproved host');
+    const body = await response.text();
+    if (body.length > 5_000_000) throw Error('Calendar exceeds size limit');
+    if (!body.includes('BEGIN:VCALENDAR')) throw Error('Response is not an iCalendar feed');
+    const records = mapIcsEvents(parseIcs(body), this.source);
+    console.log(`[${this.source.name}] ${records.length} upcoming event(s) from the calendar.`);
     return records;
   }
 }

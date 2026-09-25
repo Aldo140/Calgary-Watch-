@@ -107,6 +107,8 @@ export async function sendSummary(db: Firestore, health: OpsHealth, now: number,
   const html = `<div style="font-family:Inter,Arial,sans-serif;color:#151515;max-width:560px">
 <h2 style="font-family:'Bricolage Grotesque',Arial,sans-serif;margin:0 0 12px">${esc(subject)}</h2>
 <ul style="padding-left:18px;line-height:1.6">${lines.filter(([n]) => n > 0).map(([n, t]) => `<li><strong>${n}</strong> ${t}</li>`).join('') || '<li>Nothing waiting.</li>'}</ul>
+${published.length ? `<h3 style="margin:18px 0 6px">Posted in the last 24 hours</h3><ul style="padding-left:18px;line-height:1.6">${published.map(p => `<li><a href="${esc(p.permalink ?? '')}" style="color:#1554D1">${esc(p.imageText.headline)}</a> · ${p.brand === 'calgarydaily' ? '@calgarydaily' : '@calgarywatch'}</li>`).join('')}</ul>` : ''}
+${upcoming.length ? `<h3 style="margin:18px 0 6px">Scheduled next</h3><ul style="padding-left:18px;line-height:1.6">${upcoming.map(p => `<li>${esc(when(p.scheduledFor!))} · ${esc(p.imageText.headline)}${p.reviewedByEmail?.startsWith('auto') ? ' (automatic)' : ''}</li>`).join('')}</ul>` : ''}
 ${warnings.length ? `<h3 style="margin:18px 0 6px">Health</h3><ul style="padding-left:18px;line-height:1.6">${warnings.map(w => `<li><strong>${esc(w.label)}:</strong> ${esc(w.detail)}</li>`).join('')}</ul>` : ''}
 <p><a href="https://calgarywatch.ca/admin" style="color:#1554D1">Open the admin Operations page</a></p></div>`;
   const res = await fetch('https://api.resend.com/emails', {

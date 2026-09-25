@@ -163,8 +163,10 @@ export async function monitorPosts(db: Firestore, index: DiscoveryIndex, now: nu
 }
 
 export async function publishDue(db: Firestore, now: number, log: Log): Promise<void> {
+  // A manual run can publish approved posts before their slot (OPS_PUBLISH_NOW, ops-hourly.yml input).
+  const force = process.env.OPS_PUBLISH_NOW === '1';
   // Single-field queries only, filtered here: the queue is small and this needs no composite indexes.
-  const due = (await db.collection(COLLECTIONS.posts).where('status', '==', 'approved').get()).docs.filter(d => (d.get('scheduledFor') ?? Infinity) <= now);
+  const due = (await db.collection(COLLECTIONS.posts).where('status', '==', 'approved').get()).docs.filter(d => force || (d.get('scheduledFor') ?? Infinity) <= now);
   const publishedToday = new Map<BrandId, number>();
   const today = calgaryDate(now);
   const recent = await db.collection(COLLECTIONS.posts).where('publishedAt', '>=', now - 36 * 3_600_000).get();

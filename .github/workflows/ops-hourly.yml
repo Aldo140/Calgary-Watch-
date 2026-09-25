@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '25 * * * *'
   workflow_dispatch:
+    inputs:
+      publish_now:
+        description: 'Publish approved posts now instead of waiting for their time slot'
+        type: boolean
+        default: false
 
 permissions:
   # Rendered post images are committed to the ops-media branch (see scripts/ops/lib/firebase.ts).
@@ -45,4 +50,5 @@ jobs:
           MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
           OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          OPS_PUBLISH_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_now && '1' || '' }}
           GITHUB_TOKEN: ${{ github.token }}

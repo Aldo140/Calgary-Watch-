@@ -24,13 +24,20 @@ async function graph(path: string, token: string, init?: { method?: 'GET' | 'POS
 
 const accounts = new Map<string, { id: string; username: string }>();
 
-/** The Instagram professional account behind a token, found through its Facebook Page. */
-export async function igAccount(token: string): Promise<{ id: string; username: string }> {
-  if (accounts.has(token)) return accounts.get(token)!;
-  const pages = await graph('me/accounts', token, { params: { fields: 'instagram_business_account{id,username}' } });
-  const ig = (pages.data ?? []).map((p: any) => p.instagram_business_account).find(Boolean);
-  if (!ig) throw new Error('Instagram: no Facebook Page with a linked Instagram professional account for this token.');
-  accounts.set(token, ig);
+/**
+ * The Instagram professional account with this handle, found through the token's
+ * Facebook Pages. One login often manages both brands' Pages, so the account is
+ * matched by handle: a CalgaryWatch post can never land on CalgaryDaily.
+ */
+export async function igAccount(token: string, handle: string): Promise<{ id: string; username: string }> {
+  const key = `${token}|${handle}`;
+  if (accounts.has(key)) return accounts.get(key)!;
+  const pages = await graph('me/accounts', token, { params: { fields: 'instagram_business_account{id,username}', limit: '100' } });
+  const all = (pages.data ?? []).map((p: any) => p.instagram_business_account).filter(Boolean) as { id: string; username: string }[];
+  if (!all.length) throw new Error('Instagram: no Facebook Page with a linked Instagram professional account for this token.');
+  const ig = all.find(a => a.username.toLowerCase() === handle.toLowerCase());
+  if (!ig) throw new Error(`Instagram: this token reaches ${all.map(a => '@' + a.username).join(', ')}, not @${handle}. Fix "handle" in brand/*.json or link @${handle} to a Page this login manages.`);
+  accounts.set(key, ig);
   return ig;
 }
 
@@ -42,8 +49,8 @@ export async function tokenExpiry(token: string): Promise<number | null> {
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-export async function publishImage(token: string, imageUrl: string, caption: string, altText: string): Promise<{ mediaId: string; permalink: string | null }> {
-  const { id: igId } = await igAccount(token);
+export async function publishImage(token: string, handle: string, imageUrl: string, caption: string, altText: string): Promise<{ mediaId: string; permalink: string | null }> {
+  const { id: igId } = await igAccount(token, handle);
   let container: any;
   try {
     container = await graph(`${igId}/media`, token, { method: 'POST', params: { image_url: imageUrl, caption, alt_text: altText } });
@@ -64,8 +71,8 @@ export async function publishImage(token: string, imageUrl: string, caption: str
 }
 
 /** Posts published in the last 24 hours, for Instagram's per-account daily cap. */
-export async function publishingUsage(token: string): Promise<{ used: number; limit: number }> {
-  const { id } = await igAccount(token);
+export async function publishingUsage(token: string, handle: string): Promise<{ used: number; limit: number }> {
+  const { id } = await igAccount(token, handle);
   const r = await graph(`${id}/content_publishing_limit`, token, { params: { fields: 'quota_usage,config' } });
   const row = r.data?.[0] ?? {};
   return { used: row.quota_usage ?? 0, limit: row.config?.quota_total ?? 50 };

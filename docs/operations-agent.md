@@ -44,7 +44,7 @@ The daily health check shows how many days each token has left and warns 10 days
 1. In Entra admin center, go to App registrations → New registration ("CalgaryWatch Ops").
 2. Under API permissions, add Microsoft Graph **Application** permissions **Mail.Send** and **Mail.ReadWrite**, then grant admin consent.
 3. Create a client secret under Certificates & secrets. Copy the tenant ID, client ID and secret into the secrets above.
-4. **Limit the app to one mailbox.** Otherwise it can reach every mailbox in the tenant. In Exchange Online PowerShell:
+4. **Limit the app to one mailbox.** Otherwise it can reach every mailbox in the tenant. Run `powershell -ExecutionPolicy Bypass -File scriptsopsestrict-outlook-app.ps1 -AppId <client id>`, which does the following:
    ```powershell
    New-DistributionGroup -Name "CW Ops Mailboxes" -Type Security -Members aldo@calgarywatch.ca
    New-ApplicationAccessPolicy -AppId <client id> -PolicyScopeGroupId "CW Ops Mailboxes" -AccessRight RestrictAccess -Description "Ops agent: aldo@ only"

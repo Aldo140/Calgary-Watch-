@@ -185,7 +185,7 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
 
     await doc.ref.update({ publishingAt: now });
     try {
-      const r = await publishImage(token, p.imageUrl, p.caption, p.altText);
+      const r = await publishImage(token, kit.handle, p.imageUrl, p.caption, p.altText);
       await doc.ref.update({ status: 'published', publishedAt: Date.now(), igMediaId: r.mediaId, permalink: r.permalink, error: null, publishingAt: null, updatedAt: Date.now() });
       publishedToday.set(p.brand, (publishedToday.get(p.brand) ?? 0) + 1);
       log(`published ${p.id} → ${r.permalink ?? r.mediaId}`);

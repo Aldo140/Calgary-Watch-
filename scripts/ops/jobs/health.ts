@@ -5,7 +5,7 @@ import type { OpsHealth, OpsPost, PartnerLead } from '../../../src/types/ops';
 import { BRANDS, brandKit } from '../lib/brand';
 import { claudeConfigured } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
-import { igToken, tokenExpiry } from '../lib/instagram';
+import { igAccount, igToken, tokenExpiry } from '../lib/instagram';
 import { outlookConfigured } from '../lib/outlook';
 import { happenings, type DiscoveryIndex } from '../lib/posts';
 
@@ -46,9 +46,10 @@ export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, n
     if (!kit.confirmed) items.push({ id: `kit-${brand}`, label: `${kit.name} brand kit`, ok: false, detail: kit.confirmNote ?? 'Provisional.' });
     if (!token) { items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: false, detail: 'Not connected yet.' }); continue; }
     try {
+      const account = await igAccount(token, kit.handle);
       const exp = await tokenExpiry(token);
       const days = exp ? Math.floor((exp - now) / DAY) : null;
-      items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: days === null || days > 10, detail: days === null ? 'Connected; token does not expire.' : `Connected; token expires in ${days} days.` });
+      items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: days === null || days > 10, detail: `@${account.username} connected; ${days === null ? 'token does not expire.' : `token expires in ${days} days.`}` });
     } catch (e) {
       items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: false, detail: e instanceof Error ? e.message : String(e) });
     }

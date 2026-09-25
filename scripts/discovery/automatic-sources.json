@@ -429,5 +429,98 @@
       ],
       "autoPublish": true
     }
+  },
+  {
+    "source": {
+      "id": "ucalgary-arts",
+      "name": "University of Calgary arts & culture events",
+      "approved": true,
+      "autoPublish": true,
+      "kind": "official",
+      "provider": "ics",
+      "feedUrl": "https://events.ucalgary.ca/live/ical/events/category/Arts%20and%20Culture",
+      "hosts": [
+        "events.ucalgary.ca"
+      ],
+      "ics": {
+        "organizer": "University of Calgary",
+        "fallbackUrl": "https://events.ucalgary.ca/",
+        "categories": [
+          "arts"
+        ],
+        "neighbourhood": "University Heights",
+        "windowDays": 60,
+        "excludeTitles": [
+          "private event",
+          "alumni all-access",
+          "colloquium",
+          "seminar",
+          "thesis",
+          "defence",
+          "defense",
+          "lecture series",
+          "workshop for",
+          "info session"
+        ],
+        "skipOnline": true
+      }
+    }
+  },
+  {
+    "source": {
+      "id": "mru-public",
+      "name": "Mount Royal University public events",
+      "approved": true,
+      "autoPublish": true,
+      "kind": "official",
+      "provider": "ics",
+      "feedUrl": "https://events.mtroyal.ca/live/ical/events",
+      "hosts": [
+        "events.mtroyal.ca"
+      ],
+      "ics": {
+        "organizer": "Mount Royal University",
+        "fallbackUrl": "https://events.mtroyal.ca/",
+        "categories": [
+          "arts"
+        ],
+        "neighbourhood": "Lincoln Park",
+        "windowDays": 60,
+        "includeCategories": [
+          "Live performance",
+          "Cougars athletics"
+        ],
+        "excludeTitles": [
+          "private event"
+        ],
+        "skipOnline": true
+      }
+    }
+  },
+  {
+    "source": {
+      "id": "heritage-park",
+      "name": "Heritage Park events",
+      "approved": true,
+      "autoPublish": true,
+      "kind": "official",
+      "provider": "tribe",
+      "feedUrl": "https://www.heritagepark.ca/wp-json/tribe/events/v1/events?per_page=50",
+      "hosts": [
+        "www.heritagepark.ca",
+        "heritagepark.ca"
+      ],
+      "ics": {
+        "organizer": "Heritage Park Historical Village",
+        "fallbackUrl": "https://www.heritagepark.ca/events/",
+        "categories": [
+          "family"
+        ],
+        "neighbourhood": "Heritage Park",
+        "windowDays": 60,
+        "fixedAddress": "1900 Heritage Dr SW, Calgary, AB",
+        "fixedVenue": "Heritage Park"
+      }
+    }
   }
 ]

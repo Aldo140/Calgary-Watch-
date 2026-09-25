@@ -1,5 +1,5 @@
 import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
-export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
+export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
 /** Explicit JSON contract; adapters translate provider-specific APIs into this shape. */
@@ -251,9 +251,18 @@ export interface IcsSourceOptions {
   pricing?: 'free' | 'paid' | 'unknown';
   /** Only list events starting within this many days (default 60). */
   windowDays?: number;
+  /** Keep only events with at least one of these CATEGORIES (case-insensitive). */
+  includeCategories?: string[];
+  /** Drop events whose title matches any of these (case-insensitive substrings), e.g. "private event". */
+  excludeTitles?: string[];
+  /** Use this address for every event, for venues whose feed leaves LOCATION empty. */
+  fixedAddress?: string;
+  fixedVenue?: string;
+  /** Drop events whose location looks online-only. */
+  skipOnline?: boolean;
 }
 
-interface IcsEvent { uid?: string; summary?: string; description?: string; location?: string; url?: string; status?: string; start?: string; end?: string; allDay?: boolean }
+interface IcsEvent { uid?: string; summary?: string; description?: string; location?: string; url?: string; status?: string; start?: string; end?: string; allDay?: boolean; categories?: string[]; cost?: string; image?: string; online?: boolean }
 
 const unescapeIcs = (v: string) => v.replace(/\\n/gi, '\n').replace(/\\([,;\\])/g, '$1');
 const stripHtml = (v: string) => v.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
@@ -291,6 +300,10 @@ export function parseIcs(text: string): IcsEvent[] {
       case 'STATUS': cur.status = value.trim().toUpperCase(); break;
       case 'DTSTART': { const d = icsDate(value, tzid); if (d) { cur.start = d.iso; cur.allDay = d.allDay; } break; }
       case 'DTEND': { const d = icsDate(value, tzid); if (d) cur.end = d.iso; break; }
+      case 'CATEGORIES': cur.categories = [...(cur.categories ?? []), ...unescapeIcs(value).split(',').map(c => c.trim()).filter(Boolean)]; break;
+      case 'X-LIVEWHALE-COST': cur.cost = unescapeIcs(value).trim(); break;
+      case 'X-LIVEWHALE-IMAGE': cur.image = value.trim(); break;
+      case 'X-LIVEWHALE-IS-ONLINE': cur.online = /^(1|true|yes)$/i.test(value.trim()); break;
     }
   }
   return events;
@@ -307,8 +320,19 @@ export function mapIcsEvents(events: IcsEvent[], source: SourceConfig, now = Dat
     const startMs = Date.parse(e.start);
     const end = e.end && Date.parse(e.end) > startMs ? e.end : new Date(startMs + (e.allDay ? 86400000 : 2 * 3600000)).toISOString();
     if (Date.parse(end) < now || startMs > horizon) return [];
-    const address = stripHtml(e.location ?? '').slice(0, 480) || o.defaultAddress;
+    if (o.includeCategories?.length && !e.categories?.some(c => o.includeCategories!.some(k => k.toLowerCase() === c.toLowerCase()))) return [];
+    if (o.excludeTitles?.some(t => title.toLowerCase().includes(t.toLowerCase()))) return [];
+    const location = stripHtml(e.location ?? '');
+    if (o.skipOnline && (e.online || /\b(zoom|online|virtual|teams|webinar)\b/i.test(location))) return [];
+    const address = (o.fixedAddress ?? location).slice(0, 480) || o.defaultAddress;
     if (!address) return [];
+    const venue = o.fixedVenue ?? (o.fixedAddress ? undefined : location.split(',')[0].trim().slice(0, 280) || undefined);
+    const cost = e.cost?.toLowerCase() ?? '';
+    const pricing = /\bfree\b|no charge|\$0\b/.test(cost) ? 'free' : /\$\s?\d/.test(cost) ? 'paid' : (o.pricing ?? 'unknown');
+    // LiveWhale sends an 80px thumbnail; its image URL takes the size in the path.
+    const img = e.image && e.image.startsWith('https://') && source.hosts.includes(new URL(e.image).hostname)
+      ? e.image.replace(/\/width\/\d+\//, '/width/1200/').replace(/\/height\/\d+\//, '/height/675/')
+      : undefined;
     const body = stripHtml(e.description ?? '');
     const firstSentence = body.split(/(?<=[.!?])\s/)[0] ?? '';
     const id = `${(e.uid || title).slice(0, 120)}@${e.start}`;
@@ -319,9 +343,11 @@ export function mapIcsEvents(events: IcsEvent[], source: SourceConfig, now = Dat
       summary: (firstSentence.length > 20 && firstSentence.length < 240 ? firstSentence : `${title}, listed by ${o.organizer}.`).slice(0, 480),
       description: (body || `${title}. Check ${o.organizer} for current details.`).slice(0, 4900),
       address, organizer: o.organizer, sourceUrl: onHost(e.url) ?? o.fallbackUrl,
-      categories: o.categories ?? [], tags: [], start: e.start, end,
+      categories: /athletic|sport|soccer|hockey|basketball|volleyball/i.test(`${e.categories?.join(' ')} ${title}`) ? ['sports'] : (o.categories ?? []), tags: [], start: e.start, end,
       ...(e.end ? {} : { endTimeEstimated: true }),
-      pricing: o.pricing ?? 'unknown',
+      pricing,
+      ...(venue ? { venue } : {}),
+      ...(img ? { image: { src: img, alt: `Image for ${title}`, credit: `Image via ${o.organizer}` } } : {}),
       ...(o.neighbourhood ? { neighbourhood: o.neighbourhood } : {}),
     } as InventorySubmissionInput;
     return [{ id: id.replace(/[^\w@.:+-]/g, '_').slice(0, 190), input, cancelled: e.status === 'CANCELLED' }];
@@ -341,6 +367,52 @@ export class IcsFeedProvider implements InventoryProvider {
     if (!body.includes('BEGIN:VCALENDAR')) throw Error('Response is not an iCalendar feed');
     const records = mapIcsEvents(parseIcs(body), this.source);
     console.log(`[${this.source.name}] ${records.length} upcoming event(s) from the calendar.`);
+    return records;
+  }
+}
+
+/* ── WordPress "The Events Calendar" REST feeds (/wp-json/tribe/events/v1/events) ── */
+
+interface TribeEvent { id?: number; title?: string; description?: string; excerpt?: string; url?: string; start_date?: string; end_date?: string; all_day?: boolean; cost?: string; image?: { url?: string } | false; venue?: { venue?: string; address?: string; city?: string } | unknown[]; categories?: Array<{ name?: string }> }
+
+export function mapTribeEvents(events: TribeEvent[], source: SourceConfig, now = Date.now()): SourceRecord[] {
+  const toIcs = (v?: string) => (v ? v.replace(/[-:]/g, '').replace(' ', 'T') : undefined);
+  const ics: IcsEvent[] = events.map(e => {
+    const venue = e.venue && !Array.isArray(e.venue) ? (e.venue as { venue?: string; address?: string; city?: string }) : undefined;
+    const img = e.image && typeof e.image === 'object' ? e.image.url : undefined;
+    return {
+      uid: e.id ? `tribe-${e.id}` : undefined,
+      summary: e.title,
+      description: e.description || e.excerpt,
+      location: venue ? [venue.venue, venue.address, venue.city].filter(Boolean).join(', ') : undefined,
+      url: e.url,
+      start: e.start_date ? icsDate(e.all_day ? toIcs(e.start_date)!.slice(0, 8) : toIcs(e.start_date)!, 'America/Edmonton')?.iso : undefined,
+      end: e.end_date ? icsDate(toIcs(e.end_date)!, 'America/Edmonton')?.iso : undefined,
+      allDay: !!e.all_day,
+      categories: e.categories?.map(c => c.name ?? '').filter(Boolean),
+      cost: e.cost,
+      image: img,
+    };
+  });
+  return mapIcsEvents(ics, source, now);
+}
+
+export class TribeEventsProvider implements InventoryProvider {
+  constructor(public source: SourceConfig) {}
+  async fetch(): Promise<SourceRecord[]> {
+    const url = this.source.feedUrl;
+    if (!this.source.approved || !url || !url.startsWith('https://') || !this.source.hosts.includes(new URL(url).hostname) || !this.source.ics) throw Error('Unapproved or incomplete events source');
+    const events: TribeEvent[] = [];
+    let next: string | undefined = url;
+    for (let page = 0; next && page < 6; page++) {
+      const response = await fetch(next, { signal: AbortSignal.timeout(20_000), headers: { Accept: 'application/json', 'User-Agent': 'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
+      if (!response.ok) throw Error(`Events API returned HTTP ${response.status}`);
+      const body = await response.json() as { events?: TribeEvent[]; next_rest_url?: string };
+      events.push(...(body.events ?? []));
+      next = body.next_rest_url && this.source.hosts.includes(new URL(body.next_rest_url).hostname) ? body.next_rest_url : undefined;
+    }
+    const records = mapTribeEvents(events, this.source);
+    console.log(`[${this.source.name}] ${records.length} upcoming event(s).`);
     return records;
   }
 }

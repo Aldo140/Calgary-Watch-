@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { inventoryDatabase } from './firebase';
-import { JsonFeedProvider, EditorialFileProvider, TicketmasterProvider, RecurringMarketProvider, IcsFeedProvider, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
+import { JsonFeedProvider, EditorialFileProvider, TicketmasterProvider, RecurringMarketProvider, IcsFeedProvider, TribeEventsProvider, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
 import store from '../../functions/discovery-store.cjs';
 import domain from '../../functions/discovery-domain.cjs';
 
@@ -24,6 +24,7 @@ function providerFor(batch: { source: SourceConfig; records?: SourceRecord[] }):
     case 'ticketmaster': return new TicketmasterProvider(batch.source);
     case 'recurring-market': return new RecurringMarketProvider(batch.source);
     case 'ics': return new IcsFeedProvider(batch.source);
+    case 'tribe': return new TribeEventsProvider(batch.source);
     default: return new JsonFeedProvider(batch.source);
   }
 }

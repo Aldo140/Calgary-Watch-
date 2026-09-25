@@ -2,6 +2,7 @@
 // the reviewer asked for, match replies from businesses, and send approved emails.
 
 import { hasFirebase, opsDb } from './lib/firebase';
+import { queueDrafts } from './jobs/drafts';
 import { autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
 import { sendApproved, syncReplies } from './jobs/outreach';
 
@@ -17,6 +18,7 @@ async function step(name: string, run: () => Promise<unknown>) {
   try { await run(); } catch (e) { failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`); }
 }
 
+await step('queue drafts', () => queueDrafts(db, now, log));
 await step('auto-approve', () => autoApprove(db, now, log));
 await step('publish', () => publishDue(db, now, log));
 await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));

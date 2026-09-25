@@ -1,0 +1,164 @@
+{
+  "brand": "calgarydaily",
+  "drafted": "2026-09-25",
+  "posts": [
+    {
+      "id": "referendum-explainer",
+      "kind": "news",
+      "title": "Alberta votes Oct. 19: what's on the ballot",
+      "suggestedAt": "2026-09-25T12:30",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "NEWS",
+          "headline": "Alberta votes Oct. 19. Here's what's on the ballot.",
+          "details": [
+            "Oct 19|Voting day (a Monday)",
+            "10|Questions on the ballot",
+            "Advisory|The government isn't bound by the result"
+          ],
+          "footer": "Sources: Alberta referendum question · Abacus Data · LiveWire Calgary"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "THE QUESTION",
+          "headline": "Word for word:",
+          "details": [
+            "“Should Alberta remain a province of Canada or should the Government of Alberta commence the legal process required under the Canadian Constitution to hold a binding provincial referendum on whether or not Alberta should separate from Canada?”"
+          ],
+          "footer": "2026 Alberta referendum question||2 / 5"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "THE POLL",
+          "headline": "Where Albertans are",
+          "details": [
+            "64%|Remain in Canada",
+            "24%|Hold a separation referendum"
+          ],
+          "footer": "Abacus Data, Sept. 4–7, 2026||3 / 5"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "CALGARY",
+          "headline": "14–1",
+          "details": [
+            "Council voted Sept. 22 to call Calgary “a vital part of Alberta and Canada.”",
+            "Only Ward 12 Coun. Mike Jamieson voted no. The vote is symbolic: it doesn't change the ballot."
+          ],
+          "footer": "LiveWire Calgary · CTV News, Sept. 22, 2026||4 / 5"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "WHAT A WIN DOES",
+          "headline": "Nothing separates on Oct. 19.",
+          "details": [
+            "If the second option wins, the province is asked to start the legal process toward a later, binding referendum on separating.",
+            "Voting day is Monday, Oct. 19. Save this."
+          ],
+          "footer": "2026 Alberta referendum question||5 / 5"
+        }
+      ],
+      "caption": "ALBERTA VOTES OCT. 19 🗳️ Swipe for what's actually on the ballot.\n\nThe separation question is one of 10 on the ballot. Picking the second option doesn't separate Alberta. It asks the province to start the legal process toward a later, binding vote. And the result doesn't bind the government either way.\n\nLatest poll (Abacus Data, Sept. 4–7): 64% remain, 24% hold a separation referendum.\n\nCalgary's council went on record Sept. 22, voting 14–1 to call Calgary \"a vital part of Alberta and Canada.\"\n\nSave this for Oct. 19.\n\nSources: Government of Alberta referendum question, Abacus Data, LiveWire Calgary, CTV News.\n\n#yyc #calgary #calgarydaily #albertareferendum #abpoli",
+      "altText": "Five slides explaining the Oct. 19 Alberta referendum: the date and that it is non-binding, the exact separation question, an Abacus Data poll showing 64% remain and 24% for a separation referendum, Calgary council's 14–1 unity vote, and what a win for the second option would do.",
+      "sources": [
+        {
+          "name": "2026 Alberta independence referendum (question, date, Abacus poll)",
+          "url": "https://en.wikipedia.org/wiki/2026_Alberta_independence_referendum"
+        },
+        {
+          "name": "LiveWire Calgary: council unity motion, Sept. 22",
+          "url": "https://livewirecalgary.com/2026/09/22/motion-declaring-calgary-a-vital-part-of-a-united-canada-approved-by-city-council/"
+        },
+        {
+          "name": "CTV News: council's symbolic vote",
+          "url": "https://www.ctvnews.ca/calgary/article/calgary-city-council-makes-symbolic-vote-in-support-of-remaining-in-canada/"
+        }
+      ],
+      "relevantUntil": "2026-10-19T20:00"
+    },
+    {
+      "id": "rent-falling",
+      "kind": "news",
+      "title": "Calgary rents are down from a year ago",
+      "suggestedAt": "2026-09-26T12:00",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "NEWS · RENT",
+          "headline": "Calgary rents are down from a year ago",
+          "details": [
+            "$1,590|Median 1-bedroom, down 10% in a year",
+            "$1,890|Median 2-bedroom, down 11%",
+            "$1,800|Calgary median vs $1,900 nationally"
+          ],
+          "footer": "Source: Zumper Calgary rent report, September 2026"
+        }
+      ],
+      "caption": "RENT IS FALLING IN CALGARY 📉\n\nMedian 1-bed: $1,590 (down 10% from last year)\nMedian 2-bed: $1,890 (down 11%)\nCalgary overall: $1,800 a month, about $100 under the national median.\n\nOur take: if your lease is up soon, this is a year to negotiate. Bring these numbers.\n\nSource: Zumper Calgary rent report, Sept. 2026.\n\n#yyc #calgary #calgarydaily #yycrent #calgaryrentals",
+      "altText": "Calgary rents are down from a year ago: median 1-bedroom $1,590, down 10%; median 2-bedroom $1,890, down 11%; Calgary median $1,800 versus $1,900 nationally. Source: Zumper, September 2026.",
+      "sources": [
+        {
+          "name": "Zumper Calgary rent research, Sept. 25, 2026",
+          "url": "https://www.zumper.com/rent-research/calgary-ab"
+        }
+      ]
+    },
+    {
+      "id": "suburb-bill",
+      "kind": "take",
+      "title": "Our take: show us the bill for new suburbs",
+      "suggestedAt": "2026-09-26T17:00",
+      "slides": [
+        {
+          "template": "take",
+          "eyebrow": "OUR TAKE",
+          "headline": "Every new suburb should come with its bill printed on it.",
+          "details": [
+            "9,600|Homes planned in Providence (SW)",
+            "$582.7M|City infrastructure to build it",
+            "$28M|Property tax a year, once fully built"
+          ],
+          "footer": "Opinion. Figures: The Sprawl, March 21, 2026"
+        }
+      ],
+      "caption": "OUR TAKE 🧾 Calgary keeps weighing new communities on its edge. We think every one should come with the bill up front.\n\nTake Providence in the southwest: about 9,600 homes, $582.7 million in city-built infrastructure over several budgets, and about $28 million a year in property tax once it's fully built. More applications were headed to council this year.\n\nMaybe that's a good deal. But Calgarians should see the math before it's approved, not after.\n\nWorth it? Tell us in the comments.\n\nThis post is opinion. Figures: The Sprawl, March 21, 2026.\n\n#yyc #calgary #calgarydaily #yycplanning #yyccouncil",
+      "altText": "Opinion: every new suburb should come with its bill printed on it. Providence in southwest Calgary: 9,600 homes planned, $582.7 million in city infrastructure, $28 million a year in property tax once fully built. Figures from The Sprawl, March 2026.",
+      "sources": [
+        {
+          "name": "The Sprawl: suburban developers face new scrutiny, March 21, 2026",
+          "url": "https://www.sprawlcalgary.com/calgary-suburban-developers-face-scrutiny-growth-infrastructure"
+        }
+      ]
+    },
+    {
+      "id": "night-light",
+      "kind": "event",
+      "title": "Night Light: free light festival tonight",
+      "suggestedAt": "2026-09-25T15:00",
+      "slides": [
+        {
+          "template": "event",
+          "eyebrow": "FREE · TONIGHT",
+          "headline": "Night Light lights up Victoria Park",
+          "details": [
+            "6 to 11 pm, Fri & Sat",
+            "5 venues · 40+ artists",
+            "Free, no tickets"
+          ],
+          "footer": "nightlightvicpark.ca"
+        }
+      ],
+      "caption": "FREE TONIGHT ✨ Night Light turns Victoria Park into a light-art festival.\n\nFri and Sat, 6 to 11 pm. More than 40 artists across 5 spots: Central Memorial Park, The District at Beltline, The Princeton, BLVD Beltline Bark and Pixel Park. Free, all ages, no tickets.\n\nTag who you're bringing.\n\nSource: nightlightvicpark.ca\n\n#yyc #calgary #calgarydaily #yycevents #nightlightyyc",
+      "altText": "Night Light lights up Victoria Park: 6 to 11 pm Friday and Saturday, 5 venues, more than 40 artists, free with no tickets.",
+      "sources": [
+        {
+          "name": "Night Light (official site)",
+          "url": "https://www.nightlightvicpark.ca/"
+        }
+      ],
+      "approved": true,
+      "relevantUntil": "2026-09-26T22:00"
+    }
+  ]
+}

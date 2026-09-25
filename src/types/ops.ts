@@ -15,7 +15,7 @@ export type PostStatus =
   | 'expired'          // the date passed before it was approved or published
   | 'failed';          // publishing failed; see error
 
-export type PostTemplate = 'event' | 'roundup' | 'update' | 'partner';
+export type PostTemplate = 'event' | 'roundup' | 'update' | 'partner' | 'news' | 'take' | 'slide';
 
 export interface PostImageText {
   eyebrow: string;
@@ -42,6 +42,8 @@ export interface OpsPost {
   link: string;
   imageText: PostImageText;
   imageUrl: string | null;
+  /** Carousel posts: every slide in order (the first is also imageUrl). */
+  imageUrls?: string[] | null;
   imagePath: string | null;
   warnings: string[];
   sponsored: boolean;

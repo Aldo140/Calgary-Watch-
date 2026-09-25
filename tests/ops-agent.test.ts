@@ -5,7 +5,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it } from 'node:test';
@@ -251,5 +251,24 @@ describe('roundup headlines', () => {
     assert.equal(roundupHeadline('TODAY IN CALGARY: FRIDAY, SEPT 25'), 'TODAY IN CALGARY');
     assert.equal(roundupHeadline('This weekend in Calgary'), 'This weekend in Calgary');
     assert.equal(roundupHeadline('Farmers-market season'), 'Farmers-market season');
+  });
+});
+
+describe('hand-written drafts', () => {
+  const dir = join(root, 'brand', 'drafts');
+  const files = readdirSync(dir).filter(f => f.endsWith('.json'));
+  it('every draft passes the brand checks and names its sources', () => {
+    for (const f of files) {
+      const data = JSON.parse(readFileSync(join(dir, f), 'utf8'));
+      const kit = brandKit(data.brand);
+      for (const p of data.posts) {
+        assert.deepEqual(checkDraft({ caption: p.caption, altText: p.altText, imageText: p.slides[0] }, kit), [], `${f}/${p.id}`);
+        assert.ok(p.slides.length === 1 || (p.slides.length >= 2 && p.slides.length <= 10), `${f}/${p.id}: carousel size`);
+        if (p.kind !== 'event') assert.ok(p.sources.length > 0 && p.sources.every((s: any) => /^https:\/\//.test(s.url)), `${f}/${p.id}: sources`);
+        if (p.kind === 'take') assert.match(p.caption, /opinion/i, `${f}/${p.id}: opinion must be labelled`);
+        // News and opinion only go out with a named person's approval recorded next to it.
+        if (p.kind !== 'event' && p.approved) assert.ok(typeof p.approvedBy === 'string' && p.approvedBy.length > 3, `${f}/${p.id}: approvedBy is required`);
+      }
+    }
   });
 });

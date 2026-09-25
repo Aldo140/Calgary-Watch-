@@ -75,6 +75,32 @@ export async function refreshInstagramToken(token: string): Promise<{ token: str
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+async function waitUntilReady(containerId: string, token: string): Promise<void> {
+  for (let i = 0; i < 20; i++) {
+    const s = await graph(containerId, token, { params: { fields: 'status_code' } });
+    if (s.status_code === 'FINISHED') return;
+    if (s.status_code === 'ERROR' || s.status_code === 'EXPIRED') throw new Error(`Instagram: media container ${s.status_code}`);
+    await sleep(3000);
+  }
+}
+
+/** A swipeable post: one container per slide, then a carousel container, then publish. */
+export async function publishCarousel(token: string, handle: string, imageUrls: string[], caption: string): Promise<{ mediaId: string; permalink: string | null }> {
+  if (imageUrls.length < 2 || imageUrls.length > 10) throw new Error('Instagram: a carousel needs 2 to 10 images.');
+  const { id: igId } = await igAccount(token, handle);
+  const children: string[] = [];
+  for (const url of imageUrls) {
+    const child = await graph(`${igId}/media`, token, { method: 'POST', params: { image_url: url, is_carousel_item: 'true' } });
+    await waitUntilReady(child.id, token);
+    children.push(child.id);
+  }
+  const parent = await graph(`${igId}/media`, token, { method: 'POST', params: { media_type: 'CAROUSEL', children: children.join(','), caption } });
+  await waitUntilReady(parent.id, token);
+  const published = await graph(`${igId}/media_publish`, token, { method: 'POST', params: { creation_id: parent.id } });
+  const media = await graph(published.id, token, { params: { fields: 'permalink' } }).catch(() => ({}));
+  return { mediaId: published.id, permalink: media.permalink ?? null };
+}
+
 export async function publishImage(token: string, handle: string, imageUrl: string, caption: string, altText: string): Promise<{ mediaId: string; permalink: string | null }> {
   const { id: igId } = await igAccount(token, handle);
   let container: any;

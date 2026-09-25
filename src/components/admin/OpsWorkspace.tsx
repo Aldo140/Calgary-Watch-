@@ -58,6 +58,18 @@ function PostCard({ post }: { post: OpsPost }) {
         {post.imageUrl
           ? <a href={post.imageUrl} target="_blank" rel="noreferrer"><img src={post.imageUrl} alt={post.altText} className="w-full rounded-lg border" style={{ borderColor: T.line, aspectRatio: '4 / 5', objectFit: 'cover' }} /></a>
           : <div className="w-full rounded-lg grid place-items-center" style={{ aspectRatio: '4 / 5', background: T.surface, color: T.muted }}><ImageIcon size={22} /></div>}
+        {(post.imageUrls?.length ?? 0) > 1 && (
+          <div className="mt-2">
+            <p className="text-[0.68rem] font-semibold mb-1" style={{ color: T.muted }}>Carousel · {post.imageUrls!.length} slides</p>
+            <div className="grid grid-cols-5 gap-1">
+              {post.imageUrls!.map((u, i) => (
+                <a key={u} href={u} target="_blank" rel="noreferrer" title={`Slide ${i + 1}`}>
+                  <img src={u} alt={`Slide ${i + 1}`} className="w-full rounded border" style={{ borderColor: T.line, aspectRatio: '4 / 5', objectFit: 'cover' }} />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
         {post.permalink && <a href={post.permalink} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold" style={{ color: T.signal }}>View on Instagram <ExternalLink size={12} /></a>}
       </div>
 

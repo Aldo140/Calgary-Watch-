@@ -132,7 +132,110 @@ function Profile({ kit }: { kit: BrandKit }) {
   );
 }
 
+// ── News, opinion and explainer formats ─────────────────────────────────────
+// News is dark with the source printed on the image; opinion is yellow and says
+// OUR TAKE at the top, so the two can never be confused in the grid.
+// Stats are written in `details` as "VALUE|what it means".
+
+function Masthead({ kit, ink, tag, tagBg, tagInk }: { kit: BrandKit; ink: string; tag: string; tagBg: string; tagInk: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '56px 72px 0' }}>
+      <Wordmark kit={kit} color={ink} />
+      <div style={{ display: 'flex', fontFamily: 'Mono', fontWeight: 500, fontSize: 26, letterSpacing: 3, color: tagInk, background: tagBg, padding: '8px 18px' }}>{tag}</div>
+    </div>
+  );
+}
+
+function SourceBar({ text, bg, ink, right }: { text: string; bg: string; ink: string; right?: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 24, padding: '30px 72px', background: bg, color: ink }}>
+      <div style={{ display: 'flex', fontFamily: 'Inter', fontWeight: 600, fontSize: 24, lineHeight: 1.3, flex: 1 }}>{text}</div>
+      {right && <div style={{ display: 'flex', fontFamily: 'Mono', fontWeight: 500, fontSize: 26 }}>{right}</div>}
+    </div>
+  );
+}
+
+function Stats({ lines, value, label, rule }: { lines: string[]; value: string; label: string; rule: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 44 }}>
+      {lines.map((line, i) => {
+        const [v, l] = line.split('|');
+        return (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 28, borderTop: `3px solid ${rule}`, padding: '20px 0' }}>
+            <div style={{ display: 'flex', width: 330, flexShrink: 0, fontFamily: 'Bricolage', fontWeight: 800, fontSize: v.length > 7 ? 58 : 76, letterSpacing: -2, color: value }}>{v}</div>
+            <div style={{ display: 'flex', flex: 1, fontFamily: 'Inter', fontWeight: 600, fontSize: 34, lineHeight: 1.2, color: label }}>{l ?? ''}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function NewsPost({ kit, text }: { kit: BrandKit; text: PostImageText }) {
+  const c = kit.colors;
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: c.live, color: c.onLive }}>
+      <Masthead kit={kit} ink={c.onLive} tag={text.eyebrow} tagBg={c.brand} tagInk={c.live} />
+      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', padding: '0 72px' }}>
+        <div style={{ display: 'flex', fontFamily: 'Bricolage', fontWeight: 800, fontSize: text.headline.length > 48 ? 78 : 94, lineHeight: 1.0, letterSpacing: -2, color: c.onLive }}>
+          {text.headline.toUpperCase()}
+        </div>
+        <Stats lines={text.details} value={c.brand} label={c.onLive} rule="#FFFFFF26" />
+      </div>
+      <SourceBar text={text.footer} bg={c.brand} ink={c.live} />
+    </div>
+  );
+}
+
+function TakePost({ kit, text }: { kit: BrandKit; text: PostImageText }) {
+  const c = kit.colors;
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: c.brand, color: c.live }}>
+      <Masthead kit={{ ...kit, colors: { ...c, brand: c.live } }} ink={c.live} tag={text.eyebrow} tagBg={c.live} tagInk={c.brand} />
+      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', padding: '0 72px' }}>
+        <div style={{ display: 'flex', fontFamily: 'Bricolage', fontWeight: 800, fontSize: text.headline.length > 60 ? 76 : 90, lineHeight: 1.02, letterSpacing: -2, color: c.live }}>
+          {text.headline}
+        </div>
+        <Stats lines={text.details} value={c.live} label={c.live} rule={`${c.live}33`} />
+      </div>
+      <SourceBar text={text.footer} bg={c.live} ink={c.brand} />
+    </div>
+  );
+}
+
+function SlidePost({ kit, text }: { kit: BrandKit; text: PostImageText }) {
+  const c = kit.colors;
+  const [source, counter] = text.footer.split('||');
+  const hasStats = text.details.some(d => d.includes('|'));
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: c.live, color: c.onLive }}>
+      <Masthead kit={kit} ink={c.onLive} tag={text.eyebrow} tagBg={c.brand} tagInk={c.live} />
+      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', padding: '0 72px' }}>
+        <div style={{ display: 'flex', fontFamily: 'Bricolage', fontWeight: 800, fontSize: text.headline.length <= 6 ? 280 : text.headline.length > 30 ? 84 : 120, lineHeight: 1.0, letterSpacing: -2, color: c.brand }}>
+          {text.headline}
+        </div>
+        {hasStats
+          ? <Stats lines={text.details} value={c.brand} label={c.onLive} rule="#FFFFFF26" />
+          : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 40 }}>
+              {text.details.map((p, i) => (
+                <div key={i} style={{ display: 'flex', fontFamily: 'Inter', fontWeight: i === 0 ? 600 : 400, fontSize: p.length > 150 ? 36 : 42, lineHeight: 1.3, color: c.onLive }}>{p}</div>
+              ))}
+            </div>
+          )}
+      </div>
+      <SourceBar text={source} bg={c.brand} ink={c.live} right={counter} />
+    </div>
+  );
+}
+
 export const renderPost = (kit: BrandKit, template: PostTemplate, text: PostImageText) =>
-  toPng(<Post kit={kit} template={template} text={text} />, POST_SIZE);
+  toPng(
+    template === 'news' ? <NewsPost kit={kit} text={text} />
+      : template === 'take' ? <TakePost kit={kit} text={text} />
+      : template === 'slide' ? <SlidePost kit={kit} text={text} />
+      : <Post kit={kit} template={template} text={text} />,
+    POST_SIZE,
+  );
 
 export const renderProfile = (kit: BrandKit) => toPng(<Profile kit={kit} />, PROFILE_SIZE);

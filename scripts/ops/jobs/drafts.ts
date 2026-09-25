@@ -8,9 +8,10 @@ import { join } from 'node:path';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { BrandId, OpsPost, PostImageText, PostTemplate } from '../../../src/types/ops';
 import { ROOT, brandKit } from '../lib/brand';
-import { COLLECTIONS, uploadImage } from '../lib/firebase';
+import { COLLECTIONS, uploadImage, uploadVideo } from '../lib/firebase';
+import { makeReel } from '../lib/reel';
 import { checkDraft } from '../lib/posts';
-import { renderPost } from '../lib/render';
+import { renderPost, renderReelBackdrop } from '../lib/render';
 import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
 import { calgaryToEpoch } from '../lib/time';
 
@@ -27,6 +28,10 @@ interface DraftFile {
     approved?: boolean;
     /** Who approved a news or opinion post, and where ("Aldo, in chat, 2026-09-25"). */
     approvedBy?: string;
+    /** 'reel' turns the slides into a 9:16 video Reel; default is an image or carousel post. */
+    format?: 'post' | 'reel';
+    /** Pull a queued draft back before it publishes. */
+    withdrawn?: boolean;
     slides: Array<PostImageText & { template: PostTemplate }>;
     caption: string;
     altText: string;
@@ -49,6 +54,14 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
       const scheduledFor = Math.max(toEpoch(d.suggestedAt), now + 5 * 60_000);
       const relevantUntil = d.relevantUntil ? toEpoch(d.relevantUntil) : null;
 
+      if (existing.exists && d.withdrawn) {
+        if (['drafted', 'approved'].includes(existing.get('status'))) {
+          await ref.update({ status: 'rejected', note: `Withdrawn in brand/drafts/${file}`, updatedAt: now });
+          log(`withdrawn: ${d.title}`);
+        }
+        continue;
+      }
+      if (d.withdrawn) continue;
       if (existing.exists) {
         // Approving in the file later schedules a draft that is still waiting.
         if (d.approved && existing.get('status') === 'drafted') {
@@ -64,6 +77,13 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
       for (const slide of d.slides) {
         imageUrls.push(await uploadImage(`ops/drafts/${id}-${++i}-${now}.png`, await renderPost(kit, slide.template, slide)));
       }
+      let videoUrl: string | null = null;
+      if (d.format === 'reel') {
+        const pngs = await Promise.all(d.slides.map(sl => renderPost(kit, sl.template, sl)));
+        const mp4 = await makeReel(pngs, { backdrop: await renderReelBackdrop() });
+        videoUrl = await uploadVideo(`ops/reels/${id}-${now}.mp4`, mp4);
+        log(`rendered reel ${id}: ${Math.round(mp4.length / 1024)} KB`);
+      }
       const first = d.slides[0];
       const warnings = [
         ...(d.kind === 'event' ? [] : [`${d.kind === 'take' ? 'Opinion' : 'News'} post drafted by Claude from the sources listed. Check the facts before approving.`]),
@@ -74,7 +94,7 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
         fingerprint: `${data.brand}|draft|${file}|${d.id}`, entityIds: [], entityStarts: {},
         sourceUrls: d.sources.map(s => s.url), facts: d.sources.map(s => `${s.name}: ${s.url}`).join('\n'),
         caption: d.caption, altText: d.altText, link: kit.linkInBio, imageText: first,
-        imageUrl: imageUrls[0], imageUrls: imageUrls.length > 1 ? imageUrls : null, imagePath: null,
+        imageUrl: imageUrls[0], imageUrls: !videoUrl && imageUrls.length > 1 ? imageUrls : null, videoUrl, imagePath: null,
         designVersion: DAILY_DESIGN_VERSION, warnings, sponsored: false, relevantUntil, suggestedFor: scheduledFor,
         scheduledFor: d.approved ? scheduledFor : null, draftedBy: 'claude', createdAt: now, updatedAt: now,
         reviewedByEmail: d.approved ? (d.approvedBy ?? `brand/drafts/${file}`) : null,

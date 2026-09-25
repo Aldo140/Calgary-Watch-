@@ -1,0 +1,106 @@
+{
+  "brand": "calgarydaily",
+  "drafted": "2026-09-25",
+  "posts": [
+    {
+      "id": "weekend-reel",
+      "kind": "event",
+      "format": "reel",
+      "title": "Reel: this weekend in Calgary (Sept 26–27)",
+      "suggestedAt": "2026-09-25T13:30",
+      "relevantUntil": "2026-09-27T19:00",
+      "approved": true,
+      "approvedBy": "Aldo, in chat, 2026-09-25 (\"post reels\")",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "THIS WEEKEND",
+          "headline": "5 plans for your Calgary weekend",
+          "details": [
+            "Sat Sep 26 – Sun Sep 27",
+            "Save this ↓"
+          ],
+          "footer": "Dates checked with each organizer",
+          "photo": {
+            "file": "brand/photos/skyline-stopa-1.jpg",
+            "credit": "Photo: Colby Stopa · CC BY 2.0",
+            "focus": "50% 30%"
+          }
+        },
+        {
+          "template": "event",
+          "eyebrow": "SAT · FREE",
+          "headline": "Night Light in Victoria Park",
+          "details": [
+            "6 to 11 pm",
+            "40+ light artists, 5 spots",
+            "Free, no tickets"
+          ],
+          "footer": "nightlightvicpark.ca"
+        },
+        {
+          "template": "event",
+          "eyebrow": "SAT · LIVE",
+          "headline": "Maria Bamford at Bella Concert Hall",
+          "details": [
+            "5 pm and 8 pm shows",
+            "Mount Royal University"
+          ],
+          "footer": "Listed by Mount Royal University"
+        },
+        {
+          "template": "event",
+          "eyebrow": "SAT & SUN · NIGHT",
+          "headline": "Outdoor escape room at Heritage Park",
+          "details": [
+            "Where Dark Things Dwell",
+            "Sat 7:30 pm · Sun 7 pm"
+          ],
+          "footer": "Listed by Heritage Park"
+        },
+        {
+          "template": "event",
+          "eyebrow": "SUN · BOOKS",
+          "headline": "Wordfest presents R. F. Kuang",
+          "details": [
+            "1 pm",
+            "Bella Concert Hall"
+          ],
+          "footer": "Listed by Mount Royal University"
+        },
+        {
+          "template": "event",
+          "eyebrow": "SUN · SKATE",
+          "headline": "Olympic Oval's 39th birthday skate",
+          "details": [
+            "3 to 8 pm",
+            "Olympic Oval, UCalgary"
+          ],
+          "footer": "Listed by the University of Calgary"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "FOLLOW",
+          "headline": "Your Calgary plan, every morning.",
+          "details": [
+            "Today, tonight and this weekend: checked with the organizers, posted daily.",
+            "@calgarydaily"
+          ],
+          "footer": "Everything Calgary. Every day.||"
+        }
+      ],
+      "caption": "5 PLANS FOR YOUR CALGARY WEEKEND 🔥\n\n1. Night Light — Victoria Park · Sat 6 to 11 pm · free\n2. Maria Bamford — Bella Concert Hall · Sat 5 and 8 pm\n3. Where Dark Things Dwell escape room — Heritage Park · Sat 7:30 pm, Sun 7 pm\n4. Wordfest presents R. F. Kuang — Bella Concert Hall · Sun 1 pm\n5. Olympic Oval 39th birthday skate — Sun 3 to 8 pm\n\nTag who you're bringing. Full list at the link in bio.\n\nDates checked with each organizer. Photo: Colby Stopa, CC BY 2.0.\n\n#yyc #calgary #calgarydaily #yycevents #thingstodoincalgary",
+      "altText": "A Reel listing five Calgary weekend plans for Sept 26 and 27: Night Light in Victoria Park, Maria Bamford at Bella Concert Hall, the Heritage Park outdoor escape room, Wordfest with R. F. Kuang, and the Olympic Oval birthday skate.",
+      "sources": [
+        {
+          "name": "Night Light (official)",
+          "url": "https://www.nightlightvicpark.ca/"
+        },
+        {
+          "name": "CalgaryWatch events (organizer feeds: Mount Royal University, Heritage Park, University of Calgary)",
+          "url": "https://calgarywatch.ca/events"
+        }
+      ]
+    }
+  ]
+}

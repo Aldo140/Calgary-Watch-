@@ -46,6 +46,8 @@ export interface OpsPost {
   imageUrl: string | null;
   /** Carousel posts: every slide in order (the first is also imageUrl). */
   imageUrls?: string[] | null;
+  /** Reels: the rendered 9:16 video (imageUrl is its cover). */
+  videoUrl?: string | null;
   /** Brand design the images were rendered with; older ones are re-rendered before publishing. */
   designVersion?: number;
   imagePath: string | null;

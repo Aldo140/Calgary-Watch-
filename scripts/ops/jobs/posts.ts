@@ -9,7 +9,7 @@ import type { BrandId, OpsPost, PostTemplate } from '../../../src/types/ops';
 import { BRANDS, ROOT, brandKit, type BrandKit } from '../lib/brand';
 import { claudeConfigured, extractBrief, writePost } from '../lib/claude';
 import { COLLECTIONS, uploadImage } from '../lib/firebase';
-import { publishCarousel, publishImage } from '../lib/instagram';
+import { publishCarousel, publishImage, publishReel } from '../lib/instagram';
 import { currentToken } from './igTokens';
 import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { renderPost } from '../lib/render';
@@ -215,7 +215,7 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
       await doc.ref.update({ imageText: p.imageText, imageUrl: p.imageUrl });
     }
     // Single-image CalgaryDaily posts drafted in an older look go out in the current one.
-    if (p.brand === 'calgarydaily' && (p.designVersion ?? 1) < DAILY_DESIGN_VERSION && !(p.imageUrls?.length)) {
+    if (p.brand === 'calgarydaily' && (p.designVersion ?? 1) < DAILY_DESIGN_VERSION && !(p.imageUrls?.length) && !p.videoUrl) {
       const stored = await renderAndStore(p.id, kit, p.template, { caption: p.caption, altText: p.altText, imageText: p.imageText }, null);
       if (stored.imageUrl) p.imageUrl = stored.imageUrl;
       await doc.ref.update({ imageUrl: p.imageUrl, designVersion: DAILY_DESIGN_VERSION });
@@ -227,9 +227,11 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
 
     await doc.ref.update({ publishingAt: now });
     try {
-      const r = (p.imageUrls?.length ?? 0) > 1
-        ? await publishCarousel(token, kit.handle, p.imageUrls!, p.caption)
-        : await publishImage(token, kit.handle, imageUrl, p.caption, p.altText);
+      const r = p.videoUrl
+        ? await publishReel(token, kit.handle, p.videoUrl, p.imageUrl, p.caption)
+        : (p.imageUrls?.length ?? 0) > 1
+          ? await publishCarousel(token, kit.handle, p.imageUrls!, p.caption)
+          : await publishImage(token, kit.handle, imageUrl, p.caption, p.altText);
       await doc.ref.update({ status: 'published', publishedAt: Date.now(), igMediaId: r.mediaId, permalink: r.permalink, error: null, publishingAt: null, updatedAt: Date.now() });
       publishedToday.set(p.brand, (publishedToday.get(p.brand) ?? 0) + 1);
       log(`published ${p.id} → ${r.permalink ?? r.mediaId}`);

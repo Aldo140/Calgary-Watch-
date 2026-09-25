@@ -84,6 +84,24 @@ async function waitUntilReady(containerId: string, token: string): Promise<void>
   }
 }
 
+/** A Reel: Instagram downloads and processes the video, which can take a few minutes. */
+export async function publishReel(token: string, handle: string, videoUrl: string, coverUrl: string | null, caption: string): Promise<{ mediaId: string; permalink: string | null }> {
+  const { id: igId } = await igAccount(token, handle);
+  const params: Record<string, string> = { media_type: 'REELS', video_url: videoUrl, caption, share_to_feed: 'true' };
+  if (coverUrl) params.cover_url = coverUrl;
+  const container = await graph(`${igId}/media`, token, { method: 'POST', params });
+  for (let i = 0; i < 60; i++) {
+    const s = await graph(container.id, token, { params: { fields: 'status_code,status' } });
+    if (s.status_code === 'FINISHED') break;
+    if (s.status_code === 'ERROR' || s.status_code === 'EXPIRED') throw new Error(`Instagram: reel ${s.status_code} (${s.status ?? 'no detail'})`);
+    if (i === 59) throw new Error('Instagram: reel still processing after 5 minutes; will retry next run.');
+    await sleep(5000);
+  }
+  const published = await graph(`${igId}/media_publish`, token, { method: 'POST', params: { creation_id: container.id } });
+  const media = await graph(published.id, token, { params: { fields: 'permalink' } }).catch(() => ({}));
+  return { mediaId: published.id, permalink: media.permalink ?? null };
+}
+
 /** A swipeable post: one container per slide, then a carousel container, then publish. */
 export async function publishCarousel(token: string, handle: string, imageUrls: string[], caption: string): Promise<{ mediaId: string; permalink: string | null }> {
   if (imageUrls.length < 2 || imageUrls.length > 10) throw new Error('Instagram: a carousel needs 2 to 10 images.');

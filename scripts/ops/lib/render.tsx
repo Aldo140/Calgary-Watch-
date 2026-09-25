@@ -8,7 +8,7 @@ import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import type { PostImageText, PostTemplate } from '../../../src/types/ops';
 import { ROOT, type BrandKit } from './brand';
-import { DailyPost, DailyProfile } from './renderDaily';
+import { DailyPost, DailyProfile, DailyReelBackdrop } from './renderDaily';
 
 export const POST_SIZE = { width: 1080, height: 1350 } as const;
 export const PROFILE_SIZE = { width: 1080, height: 1080 } as const;
@@ -241,3 +241,6 @@ export const renderPost = (kit: BrandKit, template: PostTemplate, text: PostImag
   );
 
 export const renderProfile = (kit: BrandKit) => toPng(kit.id === 'calgarydaily' ? <DailyProfile /> : <Profile kit={kit} />, PROFILE_SIZE);
+
+export const REEL_SIZE = { width: 1080, height: 1920 } as const;
+export const renderReelBackdrop = () => toPng(<DailyReelBackdrop />, REEL_SIZE);

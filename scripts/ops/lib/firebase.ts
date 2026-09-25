@@ -43,6 +43,18 @@ export async function uploadImage(path: string, png: Buffer): Promise<string> {
 
 const MEDIA_BRANCH = 'ops-media';
 
+/**
+ * Upload a rendered Reel to the ops-media branch. Instagram fetches videos by URL and needs a
+ * video content type, so it is served through jsDelivr's GitHub mirror (files up to 20 MB).
+ */
+export async function uploadVideo(path: string, mp4: Buffer): Promise<string> {
+  const repo = process.env.GITHUB_REPOSITORY, token = process.env.GITHUB_TOKEN;
+  if (!repo || !token) throw new Error('Reels need GITHUB_REPOSITORY and GITHUB_TOKEN (they run in GitHub Actions).');
+  if (mp4.length > 19 * 1024 * 1024) throw new Error(`Reel is ${Math.round(mp4.length / 1048576)} MB; the host limit is 20 MB.`);
+  await uploadToGitHub(repo, token, path, mp4);
+  return `https://cdn.jsdelivr.net/gh/${repo}@${MEDIA_BRANCH}/${path}`;
+}
+
 async function uploadToGitHub(repo: string, token: string, path: string, png: Buffer): Promise<string> {
   const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
     method: 'PUT',

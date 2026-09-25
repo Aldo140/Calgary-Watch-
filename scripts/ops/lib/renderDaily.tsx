@@ -249,3 +249,13 @@ export function DailyProfile() {
     </div>
   );
 }
+
+/** 9:16 backdrop for Reels: the gradient and skyline; the slides sit on top. */
+export function DailyReelBackdrop() {
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundImage: DAILY_GRADIENT, position: 'relative' }}>
+      <img src={skyline('#FFFFFF', 0.16)} width={1080} height={420} style={{ position: 'absolute', left: 0, bottom: 0 }} />
+      <div style={{ display: 'flex', marginTop: 150, fontFamily: 'Inter', fontWeight: 800, fontSize: 34, letterSpacing: 3, color: DAILY.white }}>EVERYTHING CALGARY. EVERY DAY.</div>
+    </div>
+  );
+}

@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ArrowUpRight, Search } from 'lucide-react';
 import '../../styles/discovery.css';
 import '../../styles/site-nav.css';
+import { MenuArt, type MenuArtKind } from './MenuArt';
 
 export function Wordmark() {
   return (
@@ -98,37 +99,34 @@ export function SiteHeader() {
       </div>
 
       <div id="cw-nav-sheet" ref={sheet} className="cw-nav-sheet" hidden={!open} role="dialog" aria-modal="true" aria-label="Menu">
-        <div className="cw-wrap cw-nav-sheet-inner">
+        <div className="cw-wrap cw-nav-sheet-inner cw-menu">
           <nav aria-label="Sections">
-            <ol className="cw-nav-sheet-links">
+            <ul className="cw-menu-grid">
               {SECTIONS.map((s, i) => (
-                <li key={s.to} style={{ ['--i' as string]: i }}>
+                <li key={s.to} className={`cw-menu-tile cw-menu-${s.to.slice(1)}`} style={{ ['--i' as string]: i }}>
                   <NavLink to={s.to}>
-                    <span className="cw-nav-sheet-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                    <MenuArt kind={s.to.slice(1) as MenuArtKind} />
                     <strong>{s.label}</strong>
                     <small>{s.note}</small>
                   </NavLink>
                 </li>
               ))}
-            </ol>
+              <li className="cw-menu-tile cw-menu-community" style={{ ['--i' as string]: SECTIONS.length }}>
+                <Link to="/community">
+                  <MenuArt kind="community" />
+                  <span>
+                    <span className="cw-menu-live"><span className="cw-nav-pulse" aria-hidden="true" /> Live</span>
+                    <strong>Community Watch</strong>
+                    <small>Crime and safety reports from your neighbours, on one map.</small>
+                  </span>
+                  <ArrowUpRight size={20} aria-hidden="true" />
+                </Link>
+              </li>
+            </ul>
           </nav>
-          <div className="cw-nav-sheet-cards">
-            <Link to="/map" className="cw-nav-card cw-nav-card-live">
-              <span className="cw-nav-card-tag"><span className="cw-nav-pulse" aria-hidden="true" /> CalgaryWatch Live</span>
-              <strong>Live map</strong>
-              <small>Reports, traffic, weather, outages and river levels, with sources.</small>
-              <ArrowUpRight size={20} aria-hidden="true" />
-            </Link>
-            <Link to="/community" className="cw-nav-card">
-              <span className="cw-nav-card-tag">Around your block</span>
-              <strong>Community Watch</strong>
-              <small>Neighbourhood reports and how verification works.</small>
-              <ArrowUpRight size={20} aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="cw-nav-sheet-foot">
-            <Link to="/map?settings=alerts" className="cw-nav-cta cw-nav-cta-block">Get the Monday email</Link>
-            <p><Link to="/about">About</Link><Link to="/coverage">Coverage</Link><Link to="/privacy">Privacy</Link></p>
+          <div className="cw-menu-foot">
+            <Link to="/map?settings=alerts" className="cw-menu-mail"><MenuArt kind="mail" /><span><strong>Get the Monday email</strong><small>What was reported near home. Free.</small></span></Link>
+            <p><Link to="/map">Open the live map</Link><Link to="/about">About</Link><Link to="/coverage">Sources</Link><Link to="/privacy">Privacy</Link></p>
           </div>
         </div>
       </div>

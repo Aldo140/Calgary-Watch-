@@ -156,3 +156,53 @@
 @media (prefers-reduced-motion: reduce) {
   .cw-nav, .cw-nav *, .cw-nav-sheet, .cw-nav-sheet * { animation: none !important; transition: none !important; }
 }
+
+/* ── Phone menu: board-style tiles, matching the homepage ─────────── */
+.cw-menu { --ink: #151515; gap: 18px; padding-top: 14px; padding-bottom: 28px; }
+.cw-menu-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cw-menu-tile { animation: cw-menu-in .45s cubic-bezier(.2, 1.2, .4, 1) both; animation-delay: calc(var(--i) * 50ms + 40ms); }
+@keyframes cw-menu-in { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+.cw-site .cw-menu-tile > a {
+  position: relative; height: 100%; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px 14px;
+  border: 2px solid var(--ink); border-radius: 20px; background: var(--t, #fff); color: var(--ink); text-decoration: none;
+  box-shadow: 4px 4px 0 var(--ink); transition: transform .12s, box-shadow .12s;
+}
+.cw-site .cw-menu-tile > a:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.cw-site .cw-menu-tile > a[aria-current='page'] { outline: 3px solid var(--ink); outline-offset: 2px; }
+.cw-menu-art { width: 64px; height: 52px; margin: -2px 0 4px -4px; overflow: visible; }
+.cw-menu-tile strong { font: 800 20px/1.05 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -.025em; }
+.cw-menu-tile small { font: 500 12.5px/1.3 Inter, sans-serif; color: #3d4148; }
+.cw-menu-events { --t: #bdf1f9; }
+.cw-menu-markets { --t: #ffdf4f; }
+.cw-menu-neighbourhoods { --t: #fff; }
+.cw-menu-guides { --t: #dfe7ff; }
+.cw-menu-local { --t: #ffd8c2; }
+/* Community Watch: the wide navy tile */
+.cw-menu-community { grid-column: 1 / -1; }
+.cw-site .cw-menu-community > a { flex-direction: row; align-items: center; gap: 12px; padding: 14px; background: #06162f; color: #fff; box-shadow: 4px 4px 0 #00c2e0; border-color: #06162f; }
+.cw-menu-community .cw-menu-art { width: 76px; height: 64px; flex: none; margin: 0; }
+.cw-menu-community > a > span { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.cw-menu-community small { color: rgba(255, 255, 255, .75); }
+.cw-menu-community strong { font-size: 22px; }
+.cw-menu-community svg:last-child { flex: none; color: #ffdf4f; }
+.cw-menu-live { display: inline-flex; align-items: center; gap: 6px; font: 700 10.5px/1 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: .08em; color: #ffb3ad; }
+.cw-menu-sweep { transform-origin: 40px 32px; animation: cw-menu-spin 4s linear infinite; }
+@keyframes cw-menu-spin { to { transform: rotate(360deg); } }
+/* Foot: the Monday email and quiet links */
+.cw-menu-foot { display: grid; gap: 14px; animation: cw-menu-in .45s cubic-bezier(.2, 1.2, .4, 1) .38s both; }
+.cw-site .cw-menu-mail { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 18px; border: 2px dashed var(--ink); background: #fff; color: var(--ink); text-decoration: none; }
+.cw-menu-mail .cw-menu-art { width: 58px; height: 46px; margin: 0; flex: none; }
+.cw-menu-mail span { display: flex; flex-direction: column; gap: 2px; }
+.cw-menu-mail strong { font: 800 17px/1.1 'Bricolage Grotesque', Inter, sans-serif; }
+.cw-menu-mail small { font: 500 12.5px Inter, sans-serif; color: #4a4f57; }
+.cw-menu-foot p { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0; }
+.cw-site .cw-menu-foot p a { font: 600 14px Inter, sans-serif; color: #4a4f57; text-decoration: none; }
+.cw-site .cw-menu-foot p a:first-child { color: #1554d1; }
+@media (min-width: 700px) { .cw-menu-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .cw-menu-tile, .cw-menu-foot, .cw-menu-sweep { animation: none !important; } }
+.cw-menu-local { grid-column: 1 / -1; }
+.cw-site .cw-menu-local > a { display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; }
+.cw-menu-local .cw-menu-art { grid-row: 1 / span 2; margin: 0; }
+.cw-menu-local strong { align-self: end; }
+.cw-menu-local small { align-self: start; }
+@media (min-width: 700px) { .cw-menu-local { grid-column: auto; } .cw-site .cw-menu-local > a { display: flex; } .cw-menu-local .cw-menu-art { margin: -2px 0 4px -4px; } }

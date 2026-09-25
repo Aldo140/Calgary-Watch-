@@ -11,6 +11,7 @@ import { ROOT, brandKit } from '../lib/brand';
 import { COLLECTIONS, uploadImage } from '../lib/firebase';
 import { checkDraft } from '../lib/posts';
 import { renderPost } from '../lib/render';
+import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
 import { calgaryToEpoch } from '../lib/time';
 
 type Log = (m: string) => void;
@@ -74,7 +75,7 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
         sourceUrls: d.sources.map(s => s.url), facts: d.sources.map(s => `${s.name}: ${s.url}`).join('\n'),
         caption: d.caption, altText: d.altText, link: kit.linkInBio, imageText: first,
         imageUrl: imageUrls[0], imageUrls: imageUrls.length > 1 ? imageUrls : null, imagePath: null,
-        warnings, sponsored: false, relevantUntil, suggestedFor: scheduledFor,
+        designVersion: DAILY_DESIGN_VERSION, warnings, sponsored: false, relevantUntil, suggestedFor: scheduledFor,
         scheduledFor: d.approved ? scheduledFor : null, draftedBy: 'claude', createdAt: now, updatedAt: now,
         reviewedByEmail: d.approved ? (d.approvedBy ?? `brand/drafts/${file}`) : null,
       };

@@ -22,6 +22,8 @@ export interface PostImageText {
   headline: string;
   details: string[];
   footer: string;
+  /** Photo posts: an openly licensed image in brand/photos/ and its credit, printed on the image. */
+  photo?: { file: string; credit: string; focus?: string } | null;
 }
 
 export interface OpsPost {
@@ -44,6 +46,8 @@ export interface OpsPost {
   imageUrl: string | null;
   /** Carousel posts: every slide in order (the first is also imageUrl). */
   imageUrls?: string[] | null;
+  /** Brand design the images were rendered with; older ones are re-rendered before publishing. */
+  designVersion?: number;
   imagePath: string | null;
   warnings: string[];
   sponsored: boolean;

@@ -1,6 +1,6 @@
 // Brand templates rendered to PNG without a browser (satori → SVG → resvg → PNG).
-// Text is always the checked draft text; there is no photography and no
-// generated scenery, so nothing here can be mistaken for a photo of a real place.
+// Text is always the checked draft text. Photos appear only on photo posts:
+// openly licensed, listed in brand/photos/CREDITS.md, credited on the image.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -8,6 +8,7 @@ import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import type { PostImageText, PostTemplate } from '../../../src/types/ops';
 import { ROOT, type BrandKit } from './brand';
+import { DailyPost, DailyProfile } from './renderDaily';
 
 export const POST_SIZE = { width: 1080, height: 1350 } as const;
 export const PROFILE_SIZE = { width: 1080, height: 1080 } as const;
@@ -231,11 +232,12 @@ function SlidePost({ kit, text }: { kit: BrandKit; text: PostImageText }) {
 
 export const renderPost = (kit: BrandKit, template: PostTemplate, text: PostImageText) =>
   toPng(
-    template === 'news' ? <NewsPost kit={kit} text={text} />
+    kit.id === 'calgarydaily' ? <DailyPost template={template} text={text} />
+    : template === 'news' ? <NewsPost kit={kit} text={text} />
       : template === 'take' ? <TakePost kit={kit} text={text} />
       : template === 'slide' ? <SlidePost kit={kit} text={text} />
       : <Post kit={kit} template={template} text={text} />,
     POST_SIZE,
   );
 
-export const renderProfile = (kit: BrandKit) => toPng(<Profile kit={kit} />, PROFILE_SIZE);
+export const renderProfile = (kit: BrandKit) => toPng(kit.id === 'calgarydaily' ? <DailyProfile /> : <Profile kit={kit} />, PROFILE_SIZE);

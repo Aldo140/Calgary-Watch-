@@ -13,6 +13,7 @@ import { publishCarousel, publishImage } from '../lib/instagram';
 import { currentToken } from './igTokens';
 import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { renderPost } from '../lib/render';
+import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
 import { calgaryDate, nextSlot } from '../lib/time';
 
 type Log = (m: string) => void;
@@ -93,6 +94,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
         ...image, warnings: kit.confirmed ? warnings : [`${kit.name} brand kit is provisional: ${kit.confirmNote ?? ''}`, ...warnings],
         sponsored: false, relevantUntil: c.relevantUntil, suggestedFor: c.suggestedFor, scheduledFor: null,
         draftedBy: by, createdAt: now, updatedAt: now,
+        ...(brand === 'calgarydaily' ? { designVersion: DAILY_DESIGN_VERSION } : {}),
       };
       if (db) await db.collection(COLLECTIONS.posts).doc(id).create(post).catch(e => log(`  skipped ${id}: ${e.message}`));
       else await writeFile(join(dryDir!, `${id}.json`), JSON.stringify(post, null, 2));
@@ -192,7 +194,7 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
     if (!p.imageUrl) { await hold('No image.'); continue; }
     if (p.relevantUntil && p.relevantUntil < now) { await doc.ref.update({ status: 'expired', updatedAt: now }); continue; }
     if (p.publishingAt && now - p.publishingAt < 30 * 60_000) continue;
-    if ((publishedToday.get(p.brand) ?? 0) >= kit.postsPerDay + 2) { await hold(`Daily limit reached (${kit.postsPerDay + 2}); will post next slot.`); await doc.ref.update({ scheduledFor: nextSlot(now, kit.postingSlots) }); continue; }
+    if ((publishedToday.get(p.brand) ?? 0) >= kit.postsPerDay + 3) { await hold(`Daily limit reached (${kit.postsPerDay + 3}); will post next slot.`); await doc.ref.update({ scheduledFor: nextSlot(now, kit.postingSlots) }); continue; }
     // A roundup headline that repeats the date already in its label gets trimmed and re-rendered before it goes out.
     const trimmed = p.template === 'roundup' ? roundupHeadline(p.imageText.headline) : p.imageText.headline;
     if (trimmed !== p.imageText.headline) {
@@ -200,6 +202,13 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
       const stored = await renderAndStore(p.id, kit, 'roundup', { caption: p.caption, altText: p.altText, imageText: p.imageText }, null);
       if (stored.imageUrl) p.imageUrl = stored.imageUrl;
       await doc.ref.update({ imageText: p.imageText, imageUrl: p.imageUrl });
+    }
+    // Single-image CalgaryDaily posts drafted in an older look go out in the current one.
+    if (p.brand === 'calgarydaily' && (p.designVersion ?? 1) < DAILY_DESIGN_VERSION && !(p.imageUrls?.length)) {
+      const stored = await renderAndStore(p.id, kit, p.template, { caption: p.caption, altText: p.altText, imageText: p.imageText }, null);
+      if (stored.imageUrl) p.imageUrl = stored.imageUrl;
+      await doc.ref.update({ imageUrl: p.imageUrl, designVersion: DAILY_DESIGN_VERSION });
+      log(`re-rendered ${p.id} in the current design`);
     }
     const imageUrl = p.imageUrl;
     const problems = checkDraft({ caption: p.caption, altText: p.altText, imageText: p.imageText }, kit, { sponsored: p.sponsored });

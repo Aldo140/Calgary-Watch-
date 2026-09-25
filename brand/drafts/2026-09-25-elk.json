@@ -1,0 +1,53 @@
+{
+  "brand": "calgarydaily",
+  "drafted": "2026-09-25",
+  "posts": [
+    {
+      "id": "elk-rut",
+      "kind": "news",
+      "title": "Elk rut season: how not to get charged",
+      "suggestedAt": "2026-09-25T11:00",
+      "relevantUntil": "2026-10-31T20:00",
+      "approved": true,
+      "approvedBy": "Aldo, in chat, 2026-09-25 (\"make another post\")",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "WILDLIFE",
+          "headline": "It's elk rut season. Give them room.",
+          "details": ["30 metres. About 3 bus lengths.", "Swipe before your Banff drive →"],
+          "footer": "Source: Parks Canada",
+          "photo": { "file": "brand/photos/elk-banff.jpg", "credit": "Photo: Jakub Fryš · CC BY-SA 4.0", "focus": "60% 55%" }
+        },
+        {
+          "template": "slide",
+          "eyebrow": "TOO CLOSE?",
+          "headline": "Ears back = back off.",
+          "details": ["If an elk gets alert or nervous, grinds its teeth or puts its ears back, you're too close.", "Never get between a bull and the females. Not on foot, not in your car."],
+          "footer": "Parks Canada, Banff elk safety||2 / 4"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "IF ONE CHARGES",
+          "headline": "Do not play dead.",
+          "details": ["Make yourself big: raise your arms, a jacket or an umbrella. Keep eye contact. Never turn your back or run.", "Get a tree or a big rock between you and the elk, then back slowly away."],
+          "footer": "Parks Canada elk rut advisory||3 / 4"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "SAVE THIS",
+          "headline": "Leash the dog.",
+          "details": ["Elk see an off-leash dog as a wolf or coyote.", "Report any elk incident to Banff Dispatch: 403-762-1470."],
+          "footer": "Parks Canada elk rut advisory||4 / 4"
+        }
+      ],
+      "caption": "ELK RUT SEASON 🦌 The bulls are fired up, and Parks Canada wants you to give them room.\n\n• Stay at least 30 metres back. That's about 3 bus lengths.\n• Ears back or teeth grinding? You're too close. Back off.\n• Never get between a bull and the females, and don't park there either.\n• If one charges: make yourself big, keep eye contact, don't run. Do not play dead.\n• Keep your dog on a leash.\n\nIncidents in Banff: Banff Dispatch 403-762-1470.\n\nSend this to whoever's driving to the mountains this weekend.\n\nSource: Parks Canada (Banff elk safety and elk rut advisory). Photo: Jakub Fryš, CC BY-SA 4.0, via Wikimedia Commons.\n\n#yyc #calgary #calgarydaily #banff #albertawildlife",
+      "altText": "Four slides on elk rut safety from Parks Canada: three elk grazing in snowy Banff meadow with the headline It's elk rut season, give them room, 30 metres; signs you're too close; what to do if an elk charges, including do not play dead; keep dogs leashed and report incidents to Banff Dispatch at 403-762-1470.",
+      "sources": [
+        { "name": "Parks Canada: Elk safety, Banff National Park", "url": "https://parks.canada.ca/pn-np/ab/banff/securite-safety/faunesecurite-wildlifesafety/wapiti-elk" },
+        { "name": "Parks Canada: Elk rut season advisory", "url": "https://parks.canada.ca/pn-np/ab/banff/bulletins/753cc04c-50e8-4ba8-a480-978c1fccc038" },
+        { "name": "Photo: Banff - elks.jpg by Jakub Fryš (CC BY-SA 4.0)", "url": "https://commons.wikimedia.org/wiki/File:Banff_-_elks.jpg" }
+      ]
+    }
+  ]
+}

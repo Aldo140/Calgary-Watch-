@@ -6,7 +6,7 @@
       "id": "referendum-explainer",
       "kind": "news",
       "title": "Alberta votes Oct. 19: what's on the ballot",
-      "suggestedAt": "2026-09-25T12:30",
+      "suggestedAt": "2026-09-25T10:00",
       "slides": [
         {
           "template": "news",
@@ -75,13 +75,15 @@
           "url": "https://www.ctvnews.ca/calgary/article/calgary-city-council-makes-symbolic-vote-in-support-of-remaining-in-canada/"
         }
       ],
-      "relevantUntil": "2026-10-19T20:00"
+      "relevantUntil": "2026-10-19T20:00",
+      "approved": true,
+      "approvedBy": "Aldo, in chat, 2026-09-25 (\"post them\")"
     },
     {
       "id": "rent-falling",
       "kind": "news",
       "title": "Calgary rents are down from a year ago",
-      "suggestedAt": "2026-09-26T12:00",
+      "suggestedAt": "2026-09-26T10:00",
       "slides": [
         {
           "template": "news",
@@ -102,13 +104,15 @@
           "name": "Zumper Calgary rent research, Sept. 25, 2026",
           "url": "https://www.zumper.com/rent-research/calgary-ab"
         }
-      ]
+      ],
+      "approved": true,
+      "approvedBy": "Aldo, in chat, 2026-09-25 (\"post them\")"
     },
     {
       "id": "suburb-bill",
       "kind": "take",
       "title": "Our take: show us the bill for new suburbs",
-      "suggestedAt": "2026-09-26T17:00",
+      "suggestedAt": "2026-09-27T14:00",
       "slides": [
         {
           "template": "take",
@@ -129,7 +133,9 @@
           "name": "The Sprawl: suburban developers face new scrutiny, March 21, 2026",
           "url": "https://www.sprawlcalgary.com/calgary-suburban-developers-face-scrutiny-growth-infrastructure"
         }
-      ]
+      ],
+      "approved": true,
+      "approvedBy": "Aldo, in chat, 2026-09-25 (\"post them\")"
     },
     {
       "id": "night-light",

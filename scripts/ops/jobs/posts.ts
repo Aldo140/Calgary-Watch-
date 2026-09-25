@@ -192,7 +192,7 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
     if (!p.imageUrl) { await hold('No image.'); continue; }
     if (p.relevantUntil && p.relevantUntil < now) { await doc.ref.update({ status: 'expired', updatedAt: now }); continue; }
     if (p.publishingAt && now - p.publishingAt < 30 * 60_000) continue;
-    if ((publishedToday.get(p.brand) ?? 0) >= kit.postsPerDay + 1) { await hold(`Daily limit reached (${kit.postsPerDay + 1}); will post next slot.`); await doc.ref.update({ scheduledFor: nextSlot(now, kit.postingSlots) }); continue; }
+    if ((publishedToday.get(p.brand) ?? 0) >= kit.postsPerDay + 2) { await hold(`Daily limit reached (${kit.postsPerDay + 2}); will post next slot.`); await doc.ref.update({ scheduledFor: nextSlot(now, kit.postingSlots) }); continue; }
     // A roundup headline that repeats the date already in its label gets trimmed and re-rendered before it goes out.
     const trimmed = p.template === 'roundup' ? roundupHeadline(p.imageText.headline) : p.imageText.headline;
     if (trimmed !== p.imageText.headline) {

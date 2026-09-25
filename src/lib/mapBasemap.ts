@@ -27,22 +27,22 @@ export function createCalgaryWatchPositronStyle(style: StyleSpecification): Styl
 
       switch (next.id) {
         case 'background':
-          if (paint) paint['background-color'] = '#F3F5F2';
+          if (paint) paint['background-color'] = '#F7F4EC';
           break;
         case 'park':
-          if (paint) paint['fill-color'] = '#DDE9DD';
+          if (paint) paint['fill-color'] = '#D9EBD6';
           break;
         case 'landcover_wood':
-          if (paint) paint['fill-color'] = '#D4E2D5';
+          if (paint) paint['fill-color'] = '#CFE4CD';
           break;
         case 'landuse_residential':
-          if (paint) paint['fill-color'] = '#EDEFEA';
+          if (paint) paint['fill-color'] = '#F0ECE2';
           break;
         case 'water':
-          if (paint) paint['fill-color'] = '#C8DDE8';
+          if (paint) paint['fill-color'] = '#B9E4EF';
           break;
         case 'waterway':
-          if (paint) paint['line-color'] = '#B7D1DF';
+          if (paint) paint['line-color'] = '#8FD3E4';
           break;
         case 'building':
           if (paint) {

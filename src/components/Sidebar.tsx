@@ -177,11 +177,11 @@ export default function Sidebar({
         />
 
         <div className="relative flex items-center justify-between gap-3">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#AFC5DF]">
-            51.05°N · 114.07°W
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#7FDCC6]">
-            <span className="size-1.5 bg-[#7FDCC6]" aria-hidden="true" />
+          <a href="/" className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#AFC5DF] hover:text-white">
+            ← calgarywatch.ca
+          </a>
+          <span className="flex items-center gap-1.5 rounded-full border border-[rgba(255,90,78,.5)] bg-[rgba(255,90,78,.14)] px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-[#ffb3ad]">
+            <span className="size-1.5 rounded-full bg-[#ff5a4e]" aria-hidden="true" />
             Live · {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
@@ -189,11 +189,11 @@ export default function Sidebar({
         <div className="relative mt-4 flex items-center gap-3.5">
           <DesktopMapBrandMark tone="dark" />
           <div className="min-w-0">
-            <p className="font-display text-[25px] font-black leading-none tracking-[-0.03em] text-[#F2EFE8]">
-              Calgary Watch
+            <p className="font-display text-[24px] font-black leading-none tracking-[-0.03em] text-[#F2EFE8]">
+              Community Watch
             </p>
-            <p className="mt-2 font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#AFC5DF]">
-              Community incident map
+            <p className="mt-1.5 text-[12.5px] font-medium text-[#AFC5DF]">
+              Calgary’s live safety map · <a href="/community" className="font-semibold text-[#ffdf4f] hover:underline">How it works</a>
             </p>
           </div>
         </div>

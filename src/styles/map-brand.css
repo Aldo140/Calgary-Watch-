@@ -1,0 +1,13 @@
+/* CalgaryWatch brand layer for the live map. Scoped to .cw-map so nothing else moves. */
+.cw-map { --ink: #151515; --navy: #06162f; --yellow: #ffdf4f; }
+/* Floating controls: rounded, with the site's ink outline and offset shadow. */
+.cw-map [class*="border-[1.5px]"][class*="bg-[rgba(255,253,248"],
+.cw-map [class*="border-[1.5px]"][class*="bg-[#FFFDF8]"] { border-radius: 14px; }
+.cw-map button[class*="border-[1.5px]"] { border-radius: 999px; }
+.cw-map .leaflet-control-zoom { border: 2px solid var(--ink) !important; border-radius: 14px !important; overflow: hidden; box-shadow: 3px 3px 0 var(--ink) !important; }
+.cw-map .leaflet-control-zoom a { width: 38px !important; height: 38px !important; line-height: 36px !important; color: var(--ink) !important; }
+/* Monospace labels: keep the data feel, drop the shouting. */
+.cw-map [class*="font-mono"][class*="uppercase"][class*="tracking-[0.18em]"],
+.cw-map [class*="font-mono"][class*="uppercase"][class*="tracking-[0.16em]"] { letter-spacing: 0.08em !important; }
+/* Popups and tooltips pick up the brand radius. */
+.cw-map .leaflet-popup-content-wrapper, .cw-map .custom-map-tooltip { border-radius: 14px !important; }

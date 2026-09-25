@@ -1,3 +1,4 @@
+import '../styles/map-brand.css';
 import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Map, { MapRef } from '@/src/components/Map';
@@ -2352,7 +2353,7 @@ export default function MapPage() {
   }, [user, updateAlertPrefs]);
 
   return (
-    <div className="map-shell relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
+    <div className="map-shell cw-map relative flex h-dvh w-full overflow-hidden bg-[#E8F3FC] font-sans text-[#0B1F33]">
       <h1 className="sr-only">Calgary crime map with recent reports near you</h1>
       <AnimatePresence>
         {isLoading && (
@@ -4033,8 +4034,8 @@ export default function MapPage() {
             data-tour="report"
             /* Button's `primary` variant sets --tw-shadow-color (blue-500/20), which
                would tint this offset away to nothing. Pin the colour on the element. */
-            style={{ ['--tw-shadow-color' as string]: '#4A90D9' } as React.CSSProperties}
-            className="group flex h-12 w-auto items-center justify-center gap-2 rounded-none bg-[#0B1F33] px-4 text-[#FFFDF8] shadow-[4px_4px_0_#4A90D9] transition-[background-color,transform,box-shadow] hover:bg-[#1C2B3A] active:translate-x-1 active:translate-y-1 active:shadow-none md:h-14 md:px-5 lg:h-13 lg:px-5"
+            style={{ ['--tw-shadow-color' as string]: '#151515' } as React.CSSProperties}
+            className="group flex h-12 w-auto items-center justify-center gap-2 rounded-full border-2 border-[#151515] bg-[#ffdf4f] px-5 text-[#151515] shadow-[4px_4px_0_#151515] transition-[background-color,transform,box-shadow] hover:bg-white active:translate-x-1 active:translate-y-1 active:shadow-none md:h-14 md:px-6 lg:h-13 lg:px-6"
             onClick={() => {
               // Debounce: prevent rapid clicks
               const now = Date.now();
@@ -4052,10 +4053,10 @@ export default function MapPage() {
               }
             }}
           >
-            <Plus size={21} className="shrink-0 text-[#FFFDF8]" />
-            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#F2EFE8] sm:text-[12px]">Report<span className="hidden lg:inline"> an incident</span></span>
+            <Plus size={21} className="shrink-0 text-[#151515]" />
+            <span className="text-[14px] font-extrabold text-[#151515] sm:text-[15px]">Post<span className="hidden lg:inline"> a report</span></span>
             <div className="absolute right-full mr-4 px-3 py-1.5 bg-[#06162F] text-[#F2EFE8] font-mono text-[10px] font-bold uppercase tracking-[0.14em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border-[1.5px] border-[#06162F] shadow-[0_4px_8px_rgba(11,31,51,0.20)] hidden md:block lg:hidden">
-              Report Incident
+              Post a report
             </div>
           </Button>
         </div>
@@ -4097,14 +4098,14 @@ export default function MapPage() {
               )} />
             </div>
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
-              {mapIncidents.length} Map Markers
+              {mapIncidents.length} on the map
             </span>
           </div>
 
           <div className="flex items-center gap-2 border-[1.5px] border-[#0B1F33] bg-[rgba(255,253,248,0.96)] px-3 py-2 shadow-[0_4px_8px_rgba(11,31,51,0.14)] backdrop-blur-lg">
             <ShieldAlert size={12} className="text-[#8A5710]" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#40566B]">
-              Verify before action.
+              Check the source before you act
             </span>
           </div>
         </div>

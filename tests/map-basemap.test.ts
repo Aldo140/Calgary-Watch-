@@ -29,9 +29,9 @@ test('customizes Positron for incident contrast and local orientation', () => {
   const result = createCalgaryWatchPositronStyle(fixture);
   const layer = (id: string) => result.layers.find((candidate) => candidate.id === id)! as any;
 
-  assert.equal(layer('background').paint['background-color'], '#F3F5F2');
-  assert.equal(layer('water').paint['fill-color'], '#C8DDE8');
-  assert.equal(layer('park').paint['fill-color'], '#DDE9DD');
+  assert.equal(layer('background').paint['background-color'], '#F7F4EC');
+  assert.equal(layer('water').paint['fill-color'], '#B9E4EF');
+  assert.equal(layer('park').paint['fill-color'], '#D9EBD6');
   assert.deepEqual(layer('label_other').layout['text-size'], ['interpolate', ['linear'], ['zoom'], 9, 10, 12, 12, 15, 13]);
   assert.equal(result.layers.some(({ id }) => id === 'poi-restaurant'), false);
   assert.match((result.sources.openmaptiles as any).attribution, /OpenStreetMap/);

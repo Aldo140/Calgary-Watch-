@@ -31,11 +31,12 @@ describe('Recurring market provider', () => {
   });
 
   it('crosses the daylight-saving boundary with the correct offset', async () => {
-    const provider = new RecurringMarketProvider(source([{ ...yearRound, occurrenceCount: 8 }]), new Date('2026-09-21T12:00:00Z'));
+    // Uses the 2025 fall-back (Nov 2): newer tzdata has no America/Edmonton transition after it.
+    const provider = new RecurringMarketProvider(source([{ ...yearRound, occurrenceCount: 8 }]), new Date('2025-09-21T12:00:00Z'));
     const records = await provider.fetch();
     if (records[0].input.kind !== 'market') throw Error('expected market');
-    const beforeDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-10-28'));
-    const afterDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-11-04'));
+    const beforeDst = records[0].input.occurrences.find(o => o.start.startsWith('2025-10-29'));
+    const afterDst = records[0].input.occurrences.find(o => o.start.startsWith('2025-11-05'));
     assert.equal(beforeDst?.start.endsWith('-06:00'), true);
     assert.equal(afterDst?.start.endsWith('-07:00'), true);
   });

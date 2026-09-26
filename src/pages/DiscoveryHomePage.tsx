@@ -7,6 +7,7 @@ import { WhatsHere } from '../components/home/WhatsHere';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { QuadrantMap } from '../components/home/QuadrantMap';
 import { SlowerPlans, MondayDigest } from '../components/home/SlowerPlans';
+import { CalgaryDailyStrip } from '../components/home/CalgaryDailyStrip';
 import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
 import { weekAgenda } from '../lib/discoveryCalendar';
 import { discoveryRepository } from '../data/discovery';
@@ -46,6 +47,7 @@ export default function DiscoveryHomePage() {
         <div className="cw-wrap h-body">
           <QuadrantMap entities={entities} />
           <SlowerPlans entities={entities} />
+          <CalgaryDailyStrip />
           <MondayDigest />
         </div>
       </div>

@@ -8,6 +8,8 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '.
 export interface BrandKit {
   id: BrandId;
   name: string;
+  /** false = the agent never drafts or publishes for this account (templates and previews still work). */
+  enabled?: boolean;
   confirmed: boolean;
   confirmNote?: string;
   site: string;
@@ -25,6 +27,8 @@ export interface BrandKit {
 export interface OutreachConfig {
   sender: { name: string; title: string; mailbox: string; site: string };
   paidOfferEnabled: boolean;
+  /** true = drafts that pass every rule are approved automatically and sent in the next window. */
+  autoSend?: boolean;
   offer: string[];
   paidOffer: string[];
   limits: {
@@ -46,4 +50,6 @@ function load<T>(file: string): T {
 
 export const brandKit = (id: BrandId): BrandKit => load<BrandKit>(`${id}.json`);
 export const outreachConfig = (): OutreachConfig => load<OutreachConfig>('outreach.json');
-export const BRANDS: BrandId[] = ['calgarywatch', 'calgarydaily'];
+export const ALL_BRANDS: BrandId[] = ['calgarywatch', 'calgarydaily'];
+/** Accounts the agent posts for. CalgaryWatch has no Instagram of its own; @calgarydaily is its sister account. */
+export const BRANDS: BrandId[] = ALL_BRANDS.filter(b => brandKit(b).enabled !== false);

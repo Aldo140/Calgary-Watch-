@@ -1,0 +1,20 @@
+/* /partners: how CalgaryWatch works with businesses. */
+.pt-page .pt-eyebrow {
+  font: 600 12px/1.2 'IBM Plex Mono', ui-monospace, monospace;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--cw-muted); margin: 0 0 12px;
+}
+.pt-page .cw-lead a,
+.pt-page .pt-card a { color: var(--cw-brand, #1554d1); text-decoration: underline; text-underline-offset: 3px; }
+.pt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 1040px; }
+.pt-card { background: #fff; border: 1.5px solid var(--cw-text, #151515); border-radius: 24px; padding: clamp(20px, 3vw, 28px); }
+.pt-card-soft { background: #fff5cc; }
+.pt-card h2 { font: 800 clamp(22px, 2.4vw, 28px)/1.1 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -.02em; margin: 0 0 12px; }
+.pt-card p,
+.pt-card li { font: 400 16px/1.55 Inter, sans-serif; color: var(--cw-text, #151515); }
+.pt-card p + p { margin-top: 12px; }
+.pt-card ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; list-style: disc; }
+.pt-note { font-size: 14px !important; color: var(--cw-muted) !important; }
+.pt-contact { margin-top: 36px; font: 400 17px/1.5 Inter, sans-serif; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pt-more { margin-top: 12px; font-size: 14px; color: var(--cw-muted); }
+.pt-more a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) { .pt-grid { grid-template-columns: minmax(0, 1fr); } }

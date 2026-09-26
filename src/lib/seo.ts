@@ -128,6 +128,15 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
+  '/partners': {
+    title: 'How CalgaryWatch Works With Local Businesses | Calgary Watch',
+    description:
+      'Free, source-checked listings for Calgary businesses, picks that are never sold, how Featured partner placements will be labelled, and why we may have emailed you.',
+    index: true,
+    pageType: 'WebPage',
+    dateModified: SEO_REFRESH_MOD,
+    image: DEFAULT_IMAGE,
+  },
   '/unsubscribe': {
     title: 'Email Preferences | Calgary Watch',
     description: 'Update Calgary Watch email preferences securely.',
@@ -172,6 +181,10 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
   '/privacy': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
     { name: 'Privacy Policy', item: `${PRODUCTION_ORIGIN}/privacy` },
+  ],
+  '/partners': [
+    { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
+    { name: 'For local businesses', item: `${PRODUCTION_ORIGIN}/partners` },
   ],
 };
 

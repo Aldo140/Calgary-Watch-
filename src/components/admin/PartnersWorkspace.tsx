@@ -1,8 +1,9 @@
 /**
  * Local partners: the outreach pipeline. Leads enter only through a real listing
  * on the site; the daily job researches the business's own published address and
- * drafts; a person approves every message here before the hourly job sends it
- * from aldo@calgarywatch.ca. Opt-outs are permanent.
+ * drafts. With autoSend on (brand/outreach.json) drafts that pass every rule are
+ * queued automatically and can be cancelled here; otherwise a person approves each
+ * message. The hourly job sends from aldo@calgarywatch.ca. Opt-outs are permanent.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -100,6 +101,17 @@ function LeadCard({ lead }: { lead: PartnerLead }) {
         </>
       )}
 
+      {lead.status === 'approved' && (
+        <div className="space-y-2 rounded-lg border p-3" style={{ borderColor: T.line }}>
+          <p className="text-xs font-semibold" style={{ color: T.ink }}>Queued: {lead.draftSubject}</p>
+          <pre className="whitespace-pre-wrap text-sm leading-relaxed max-h-60 overflow-auto" style={{ color: T.muted, fontFamily: 'Inter, system-ui, sans-serif' }}>{lead.draftBody}</pre>
+          <div className="flex flex-wrap items-center gap-2">
+            <AdminButton variant="outline" tone="critical" disabled={busy} onClick={() => update({ status: lead.conversationId ? 'follow-up-ready' : 'ready', history: note('Send cancelled; waiting for a person') })}>Cancel send</AdminButton>
+            <span className="text-xs" style={{ color: T.muted }}>Goes out in the next send window. Cancelling moves it back to Approve emails, where only a person can send it.</span>
+          </div>
+        </div>
+      )}
+
       {replyPending && lead.lastReply && (
         <div className="space-y-2 rounded-lg border p-3" style={{ borderColor: T.line }}>
           <p className="text-xs" style={{ color: T.muted }}><Mail size={12} className="inline mr-1" />{lead.lastReply.from} · <Chip tone={lead.lastReply.classification === 'interested' ? 'ok' : 'neutral'}>{lead.lastReply.classification}</Chip></p>
@@ -187,7 +199,7 @@ export function PartnersWorkspace() {
 
   return (
     <div className="space-y-4">
-      <Panel title="Partner outreach" subtitle="Every email is approved here first. Businesses come from real listings; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>
+      <Panel title="Partner outreach" subtitle="Emails that pass every rule are sent automatically (cancel any under In progress). Businesses come from real listings; replies wait for you; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>
         <div className="px-4 pt-3">
           <FilterRow>{(Object.keys(VIEWS) as View[]).map(v => <FilterChip key={v} active={view === v} onClick={() => setView(v)} count={counts[v]}>{VIEWS[v].label}</FilterChip>)}</FilterRow>
         </div>

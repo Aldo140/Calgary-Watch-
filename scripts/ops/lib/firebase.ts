@@ -43,6 +43,12 @@ export async function uploadImage(path: string, png: Buffer): Promise<string> {
 
 const MEDIA_BRANCH = 'ops-media';
 
+/** raw.githubusercontent.com is not a CDN; jsDelivr serves the same ops-media file cached. */
+export function cdnUrl(url: string): string {
+  const m = url.match(/^https:\/\/raw\.githubusercontent\.com\/([^/]+\/[^/]+)\/ops-media\/(.+)$/);
+  return m ? `https://cdn.jsdelivr.net/gh/${m[1]}@ops-media/${m[2]}` : url;
+}
+
 /**
  * Upload a rendered Reel to the ops-media branch. Instagram fetches videos by URL and needs a
  * video content type, so it is served through jsDelivr's GitHub mirror (files up to 20 MB).

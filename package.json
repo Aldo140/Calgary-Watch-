@@ -25,6 +25,7 @@
     "ops:daily": "tsx scripts/ops/daily.ts",
     "ops:hourly": "tsx scripts/ops/hourly.ts",
     "ops:import-leads": "tsx scripts/ops/import-leads.ts",
+    "ops:feed": "tsx scripts/ops/export-feed.ts",
     "digest:preview": "tsx scripts/digest/preview.ts",
     "digest:publish-previews": "tsx scripts/digest/publishPreviews.ts",
     "digest:art": "tsx scripts/prepare-email-art.ts",

@@ -5,8 +5,11 @@ name: Operations Hourly
 # business replies (opt-outs are honoured immediately), and sends partner
 # emails that were approved, only inside the weekday send window.
 on:
+  # Four times an hour, off the busy :00. GitHub drops or delays many scheduled runs
+  # (on 2026-09-25 only ~4 of 24 hourly runs fired); every run catches up on what is
+  # due, so more chances means posts go out close to their slot. Public repo: no cost.
   schedule:
-    - cron: '25 * * * *'
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
     inputs:
       publish_now:

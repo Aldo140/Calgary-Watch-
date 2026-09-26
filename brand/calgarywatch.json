@@ -1,6 +1,8 @@
 {
   "id": "calgarywatch",
   "name": "CalgaryWatch",
+  "enabled": false,
+  "disabledNote": "2026-09-26: no separate CalgaryWatch Instagram. Social runs through @calgarydaily, CalgaryWatch's sister account, which links back here. Kept for the brand templates and previews.",
   "confirmed": true,
   "site": "https://calgarywatch.ca",
   "handle": "calgarywatch",
@@ -35,9 +37,20 @@
       "Paid placements always say 'Featured partner' in the image and the first line of the caption.",
       "At most 5 hashtags. Prefer #yyc #calgary plus 1 to 3 specific tags."
     ],
-    "bannedPhrases": ["best in calgary", "#1", "guaranteed", "you won't believe", "breaking", "must-see", "viral"]
+    "bannedPhrases": [
+      "best in calgary",
+      "#1",
+      "guaranteed",
+      "you won't believe",
+      "breaking",
+      "must-see",
+      "viral"
+    ]
   },
-  "hashtags": ["#yyc", "#calgary"],
+  "hashtags": [
+    "#yyc",
+    "#calgary"
+  ],
   "linkInBio": "https://calgarywatch.ca/events?utm_source=instagram&utm_medium=social&utm_campaign=bio",
   "autoPublish": {
     "events": false,
@@ -47,5 +60,8 @@
     "incidents": false
   },
   "postsPerDay": 2,
-  "postingSlots": ["11:30", "18:30"]
+  "postingSlots": [
+    "11:30",
+    "18:30"
+  ]
 }

@@ -1,5 +1,7 @@
-// Partner outreach jobs. Nothing is ever sent without a reviewer approving the
-// exact message in the admin Partners workspace; "stop" replies are honoured
+// Partner outreach jobs. With autoSend on (brand/outreach.json) first emails and
+// the one follow-up are approved automatically once every CASL check passes;
+// otherwise a reviewer approves each message in the admin Partners workspace.
+// Replies to businesses always wait for a person. "Stop" replies are honoured
 // automatically and permanently through the suppression list.
 
 import { createHash } from 'node:crypto';
@@ -21,6 +23,9 @@ const DAY = 86_400_000;
 const cfg = outreachConfig();
 const event = (type: LeadEvent['type'], summary: string): LeadEvent => ({ at: Date.now(), type, summary });
 const push = (e: LeadEvent) => FieldValue.arrayUnion(e);
+// With autoSend on (brand/outreach.json), a draft that passes every rule is approved here;
+// it can still be cancelled in the admin until the next send window.
+const autoApproved = () => event('status', 'Approved automatically (outreach rules); sends in the next window.');
 export const suppressionId = (email: string) => createHash('sha256').update(normalizeEmail(email)).digest('hex').slice(0, 32);
 
 function mailingAddress(): string {
@@ -103,6 +108,17 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
     return other && other !== id ? other : null;
   };
 
+  // Drafts written before autoSend was switched on go out the same way, if they still pass.
+  // A lead a person has touched in the admin (edited, or cancelled a send) waits for that person.
+  if (cfg.autoSend) {
+    for (const doc of (await db.collection(COLLECTIONS.leads).where('status', 'in', ['ready', 'follow-up-ready']).get()).docs) {
+      const lead = doc.data() as PartnerLead;
+      if (lead.reviewedByEmail || checkPitch(lead.draftBody, cfg, address).length || sendBlocker(lead, sup.emails, sup.domains)) continue;
+      await doc.ref.update({ status: 'approved', updatedAt: now, history: push(autoApproved()) });
+      log(`queued to send: ${lead.businessName}`);
+    }
+  }
+
   const fresh = (await db.collection(COLLECTIONS.leads).where('status', '==', 'new').limit(10).get()).docs;
   for (const doc of fresh) {
     const lead = doc.data() as PartnerLead;
@@ -165,16 +181,20 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       } catch (e) { warnings.push(`Template draft; Claude failed: ${e instanceof Error ? e.message : e}`); }
     }
     const problems = checkPitch(pitch.body, cfg, address);
+    const status = problems.length ? 'blocked' : cfg.autoSend ? 'approved' : 'ready';
     await doc.ref.update({
       contactEmail: found.email, emailSourceUrl: found.url, emailFoundAt: now, consentBasis: consentBasisFor(found.url),
       reasonRelevant: pitch.reasonRelevant, draftSubject: pitch.subject, draftBody: pitch.body,
-      status: problems.length ? 'blocked' : 'ready', notes: [...warnings, ...problems].join(' '), updatedAt: now,
-      history: push(event('drafted', `First email drafted to ${found.email} (address found at ${found.url}).`)),
+      status, notes: [...warnings, ...problems].join(' '), updatedAt: now,
+      history: FieldValue.arrayUnion(
+        event('drafted', `First email drafted to ${found.email} (address found at ${found.url}).`),
+        ...(status === 'approved' ? [autoApproved()] : []),
+      ),
     });
     // Two listings can share one organization (e.g. two locations): pitch it once.
     contactedBy.set(normalizeEmail(found.email), lead.id);
     contactedBy.set(`@${emailDomain(found.email)}`, lead.id);
-    log(`pitch ready: ${lead.businessName} → ${found.email}`);
+    log(`pitch ${status === 'approved' ? 'queued to send' : status}: ${lead.businessName} → ${found.email}`);
   }
 
   // Follow-ups: one, after the configured wait, only if they never answered.
@@ -193,8 +213,13 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
         if (!checkPitch(w.body, cfg, address).length) body = w.body;
       } catch { /* keep the template follow-up */ }
     }
-    await doc.ref.update({ status: 'follow-up-ready', draftSubject: `Re: ${lead.draftSubject.replace(/^Re:\s*/i, '')}`, draftBody: body, updatedAt: now, history: push(event('drafted', 'Follow-up drafted.')) });
-    log(`follow-up ready: ${lead.businessName}`);
+    const ok = !checkPitch(body, cfg, address).length;
+    const status = ok && cfg.autoSend ? 'approved' : 'follow-up-ready';
+    await doc.ref.update({
+      status, draftSubject: `Re: ${lead.draftSubject.replace(/^Re:\s*/i, '')}`, draftBody: body, updatedAt: now,
+      history: FieldValue.arrayUnion(event('drafted', 'Follow-up drafted.'), ...(status === 'approved' ? [autoApproved()] : [])),
+    });
+    log(`follow-up ${status === 'approved' ? 'queued to send' : 'ready'}: ${lead.businessName}`);
   }
 }
 

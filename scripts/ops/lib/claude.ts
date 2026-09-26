@@ -38,7 +38,7 @@ async function structured<T extends z.ZodType>(system: string, user: string, sch
 const PostSchema = z.object({
   caption: z.string().describe('Instagram caption. First line is the hook. Ends with the hashtags.'),
   altText: z.string().describe('Plain description of the image text for screen readers, under 250 characters.'),
-  headline: z.string().describe('Headline printed on the image, under 48 characters.'),
+  headline: z.string().describe('Roundups: the plain opening line printed under the headline, sentence case, under 60 characters, no date, no exclamation mark (e.g. "A few things on tonight."). Other posts: headline printed on the image, sentence case, under 48 characters.'),
   itemLabels: z.array(z.string()).describe('Roundups only: a short name (max 28 characters) for each item, in the given order. Empty for single posts.'),
 });
 export type PostWriting = z.infer<typeof PostSchema>;
@@ -51,6 +51,7 @@ export async function writePost(kit: BrandKit, input: { kind: string; title: str
     `Never use these phrases: ${kit.voice.bannedPhrases.join(', ')}.`,
     `Examples of the voice:\n${kit.voice.examples.map(e => `> ${e}`).join('\n')}`,
     'Use only the facts in the user message. If a detail is not there, leave it out. Do not guess times, prices or who is performing.',
+    'Write like a person who lives in Calgary, not a brand: plain words, sentence case, no hype, no exclamation marks. Use the name people would say ("Maria Bamford", not "Outback Presents Maria Bamford").',
     'Say "link in bio" rather than pasting URLs; Instagram captions do not make links clickable.',
     `End the caption with at most 5 hashtags, always including ${kit.hashtags.join(' ')}.`,
   ].join('\n\n');

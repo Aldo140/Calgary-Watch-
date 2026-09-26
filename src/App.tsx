@@ -23,6 +23,7 @@ const AdminUserListPage = lazy(() => import('@/src/pages/admin/AdminUserListPage
 const AdminIncidentListPage = lazy(() => import('@/src/pages/admin/AdminIncidentListPage'));
 const CoveragePage = lazy(() => import('@/src/pages/CoveragePage'));
 const PrivacyPage  = lazy(() => import('@/src/pages/PrivacyPage'));
+const PartnersPage = lazy(() => import('@/src/pages/PartnersPage'));
 const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
 const UnsubscribePage = lazy(() => import('@/src/pages/UnsubscribePage'));
@@ -167,6 +168,7 @@ export default function App() {
           <Route path="/admin/incidents" element={<AdminIncidentListPage />} />
           <Route path="/coverage" element={<CoveragePage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/partners" element={<PartnersPage />} />
           {/* Reached from a link in the weekly digest, always signed out. */}
           <Route path="/unsubscribe" element={<UnsubscribePage />} />
           <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />

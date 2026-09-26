@@ -12,11 +12,13 @@ import { describe, it } from 'node:test';
 
 import type { OpsPost, PartnerLead } from '../src/types/ops';
 import { autoPublishable } from '../scripts/ops/jobs/posts';
-import { brandKit, outreachConfig } from '../scripts/ops/lib/brand';
+import { BRANDS, brandKit, outreachConfig } from '../scripts/ops/lib/brand';
+import { cdnUrl } from '../scripts/ops/lib/firebase';
+import { bestCaptions, computePerformance } from '../scripts/ops/jobs/insights';
 import {
   checkPitch, consentBasisFor, extractEmails, hasNoSolicitationNotice, inSendWindow, isStopRequest, sendBlocker, signature,
 } from '../scripts/ops/lib/leads';
-import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, type DiscoveryIndex, type Entity } from '../scripts/ops/lib/posts';
+import { checkDraft, cleanPlace, cleanTitle, happenings, mergeShowings, roundupHeadline, selectCandidates, templateDraft, weekendReelSlides, whenLabel, type DiscoveryIndex, type Entity } from '../scripts/ops/lib/posts';
 import { calgaryDate, calgaryToEpoch, nextSlot, timeRange } from '../scripts/ops/lib/time';
 import { templatePitch } from '../scripts/ops/jobs/outreach';
 
@@ -79,9 +81,9 @@ describe('choosing posts', () => {
 
   it('gives CalgaryDaily a morning roundup, a midday spotlight and a tonight roundup', () => {
     const friday = calgaryToEpoch('2026-09-25', '06:30');
-    // One thing on today: no roundup, only spotlights.
+    // One thing on today: no Today/Tonight roundup; on a Friday the weekend Reel takes the midday slot.
     const quiet = selectCandidates(index, cd, friday, new Set());
-    assert.ok(quiet.every(x => x.template === 'event'));
+    assert.ok(quiet.every(x => x.template === 'event' || x.format === 'reel'));
     const busy = { ...index, entities: [...index.entities,
       event('e', '2026-09-25T12:00:00-06:00'), event('h', '2026-09-25T10:00:00-06:00'), event('f', '2026-09-25T18:00:00-06:00'), event('g', '2026-09-25T19:30:00-06:00')] };
     const c = selectCandidates(busy, cd, friday, new Set());
@@ -102,7 +104,7 @@ describe('choosing posts', () => {
     assert.ok(onlyNoonTaken.every(x => new Date(x.suggestedFor).toISOString() !== '2026-09-25T18:00:00.000Z'));
     assert.ok(onlyNoonTaken.length <= cd.postsPerDay - 1);
     // Running again the same day adds nothing new.
-    assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup').length, 0);
+    assert.equal(selectCandidates(busy, cd, friday, new Set(c.map(x => x.fingerprint))).filter(x => x.template === 'roundup' && !x.format).length, 0);
   });
 
   it('template drafts from the real published index always pass the brand checks', () => {
@@ -267,7 +269,9 @@ describe('hand-written drafts', () => {
       const data = JSON.parse(readFileSync(join(dir, f), 'utf8'));
       const kit = brandKit(data.brand);
       for (const p of data.posts) {
-        assert.deepEqual(checkDraft({ caption: p.caption, altText: p.altText, imageText: p.slides[0] }, kit), [], `${f}/${p.id}`);
+        // Drafts that already went out stay as published; the voice rules (2026-09-26) apply from then on.
+        const past = p.suggestedAt < '2026-09-26';
+        if (!past) assert.deepEqual(checkDraft({ caption: p.caption, altText: p.altText, imageText: p.slides[0] }, kit), [], `${f}/${p.id}`);
         assert.ok(p.slides.length === 1 || (p.slides.length >= 2 && p.slides.length <= 10), `${f}/${p.id}: carousel size`);
         if (p.kind !== 'event') assert.ok(p.sources.length > 0 && p.sources.every((s: any) => /^https:\/\//.test(s.url)), `${f}/${p.id}: sources`);
         if (p.kind === 'take') assert.match(p.caption, /opinion/i, `${f}/${p.id}: opinion must be labelled`);
@@ -275,5 +279,118 @@ describe('hand-written drafts', () => {
         if (p.kind !== 'event' && p.approved) assert.ok(typeof p.approvedBy === 'string' && p.approvedBy.length > 3, `${f}/${p.id}: approvedBy is required`);
       }
     }
+  });
+});
+
+describe('one Instagram account', () => {
+  it('posts only for CalgaryDaily; CalgaryWatch has no account of its own', () => {
+    assert.deepEqual(BRANDS, ['calgarydaily']);
+    assert.equal(cw.enabled, false);
+  });
+  it('points CalgaryDaily readers to CalgaryWatch', () => {
+    const c = selectCandidates({ entities: [event('a', '2026-09-26T11:00:00-06:00')], occurrences: [] }, cd, calgaryToEpoch('2026-09-26', '06:30'), new Set());
+    assert.match(templateDraft(c[0], cd).caption, /CalgaryWatch/);
+  });
+  it('serves post images to the site through the CDN', () => {
+    assert.equal(cdnUrl('https://raw.githubusercontent.com/o/r/ops-media/ops/posts/p.png'), 'https://cdn.jsdelivr.net/gh/o/r@ops-media/ops/posts/p.png');
+    assert.equal(cdnUrl('https://example.org/a.png'), 'https://example.org/a.png');
+  });
+});
+
+describe('weekend Reel', () => {
+  const index: DiscoveryIndex = {
+    entities: [
+      event('fri', '2026-09-25T19:00:00-06:00'), event('sat1', '2026-09-26T11:00:00-06:00'),
+      event('sat2', '2026-09-26T20:00:00-06:00'), event('sun', '2026-09-27T14:00:00-06:00'),
+      event('friday-lunch', '2026-09-25T12:00:00-06:00'),
+    ],
+    occurrences: [],
+  };
+  const friday = calgaryToEpoch('2026-09-25', '06:30');
+  it('takes the Friday midday slot, once, from weekend plans only', () => {
+    const c = selectCandidates(index, cd, friday, new Set());
+    const reels = c.filter(x => x.format === 'reel');
+    assert.equal(reels.length, 1);
+    assert.equal(new Date(reels[0].suggestedFor).toISOString(), '2026-09-25T18:00:00.000Z');
+    assert.ok(!reels[0].items.some(i => i.entity.id === 'friday-lunch'), 'Friday daytime is not "the weekend"');
+    assert.ok(autoPublishable({ ...reels[0], id: 'r', status: 'drafted', entityIds: [], entityStarts: {}, sourceUrls: [], caption: 'x', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' }, imageUrl: 'x', imagePath: null, warnings: [], sponsored: false, scheduledFor: null, draftedBy: 'template', createdAt: 0, updatedAt: 0 } as OpsPost));
+    assert.equal(selectCandidates(index, cd, friday, new Set(reels.map(r => r.fingerprint))).filter(x => x.format === 'reel').length, 0);
+    assert.equal(c.length <= cd.postsPerDay, true);
+  });
+  it('is not made on other days', () => {
+    assert.equal(selectCandidates(index, cd, calgaryToEpoch('2026-09-24', '06:30'), new Set()).filter(x => x.format === 'reel').length, 0);
+  });
+  it('has a cover, one slide per plan and a follow card, all within the brand checks', () => {
+    const [reel] = selectCandidates(index, cd, friday, new Set()).filter(x => x.format === 'reel');
+    const slides = weekendReelSlides(reel);
+    assert.equal(slides.length, reel.items.length + 2);
+    for (const s of slides) assert.deepEqual(checkDraft({ caption: 'x #yyc', altText: 'x', imageText: s }, cd), []);
+  });
+});
+
+describe('performance', () => {
+  const now = calgaryToEpoch('2026-10-10', '09:00');
+  const pub = (id: string, over: Partial<OpsPost>): OpsPost => ({
+    id, brand: 'calgarydaily', template: 'event', status: 'published', fingerprint: `calgarydaily|event|${id}`, entityIds: [], entityStarts: {}, sourceUrls: [], facts: '',
+    caption: `caption ${id}`, altText: 'x', link: '', imageText: { eyebrow: '', headline: id, details: [], footer: '' }, imageUrl: 'x', imagePath: null, warnings: [],
+    sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: now - 2 * 86_400_000, publishedAt: now - 2 * 86_400_000 + 20 * 60_000, permalink: `https://instagram.com/p/${id}`,
+    reviewedByEmail: 'auto (brand rules)', draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
+  });
+  const ins = (reach: number, saves = 0) => ({ reach, views: null, likes: 0, comments: 0, saves, shares: 0, fetchedAt: now });
+  const posts = [
+    pub('reel', { videoUrl: 'v', fingerprint: 'calgarydaily|weekend-reel|2026-10-09', insights: ins(900, 12) }),
+    pub('img1', { insights: ins(150, 1) }),
+    pub('img2', { insights: ins(110, 5) }),
+    pub('news', { fingerprint: 'calgarydaily|draft|x|y', template: 'news', insights: ins(2000, 40) }),
+    pub('old', { publishedAt: now - 60 * 86_400_000, insights: ins(5000) }),
+  ];
+  it('ranks formats by reach and reports how late automatic posts went out', () => {
+    const p = computePerformance(posts, { '2026-10-10': 4400 }, now);
+    assert.deepEqual(p.byFormat.map(r => [r.key, r.avgReach]), [['reel', 900], ['image', 753]]); // news counts as an image
+    assert.equal(p.top[0].headline, 'news');
+    assert.ok(!p.top.some(t => t.headline === 'old'), 'only the last 30 days count');
+    assert.equal(p.avgDelayMinutes, 20);
+  });
+  it('learns only from listing posts, best saves and shares first', () => {
+    assert.deepEqual(bestCaptions(posts, 'calgarydaily', now), ['caption reel', 'caption img2']);
+  });
+});
+
+describe('sounding like a person', () => {
+  it('uses the name people say', () => {
+    assert.equal(cleanTitle('Outback Presents Maria Bamford'), 'Maria Bamford');
+    assert.equal(cleanTitle('Where Dark Things Dwell (Saturdays)- Outdoor Escape Room'), 'Where Dark Things Dwell');
+    assert.equal(cleanTitle('Exhibition - Held. Together.'), 'Held. Together.');
+    assert.equal(cleanTitle('TOUR – Introduction to Textiles'), 'Introduction to Textiles');
+    assert.equal(cleanTitle('Taking it to the Streets: Stories of Resilience, Connection, and Living Well with Dementia'), 'Taking it to the Streets');
+    assert.equal(cleanTitle("Women's Soccer — Regina Cougars vs. Mount Royal Cougars"), "Women's Soccer — Regina Cougars vs. Mount Royal Cougars");
+    assert.equal(cleanPlace('PF 1239 (Professional Faculties Building)'), 'Professional Faculties Building');
+    assert.equal(cleanPlace('White Buffalo Lodge (EDT 314)'), 'White Buffalo Lodge');
+  });
+  it('never shows a made-up one-hour end time, and merges two showings', () => {
+    const at = (t: string) => Date.parse(`2026-09-26T${t}:00-06:00`);
+    assert.equal(whenLabel({ start: at('20:00'), end: at('21:00') }, true), '8 pm');
+    assert.equal(whenLabel({ start: at('19:30'), end: at('23:55') }, true), 'from 7:30 pm');
+    assert.equal(whenLabel({ start: at('12:00'), end: null }, false), 'noon');
+    const shows = mergeShowings(happenings({ entities: [
+      event('m1', '2026-09-26T17:00:00-06:00', { title: 'Outback Presents Maria Bamford' }),
+      event('m2', '2026-09-26T20:00:00-06:00', { title: 'Outback Presents Maria Bamford' }),
+    ], occurrences: [] }));
+    assert.equal(shows.length, 1);
+    assert.equal(shows[0].times.length, 2);
+  });
+  it('writes roundups in sentence case with no hype', () => {
+    const index: DiscoveryIndex = { entities: [
+      event('a', '2026-09-26T10:00:00-06:00', { title: 'Exhibition - Held. Together.' }), event('b', '2026-09-26T11:00:00-06:00'),
+      event('c', '2026-09-26T19:00:00-06:00'), event('d', '2026-09-26T20:00:00-06:00'),
+    ], occurrences: [] };
+    for (const c of selectCandidates(index, cd, calgaryToEpoch('2026-09-26', '06:30'), new Set())) {
+      const d = templateDraft(c, cd);
+      assert.deepEqual(checkDraft(d, cd), []);
+      assert.ok(!/[A-Z]{5,}/.test(d.caption.split('\n')[0]), `no shouting: ${d.caption.split('\n')[0]}`);
+      assert.ok(!/!/.test(d.caption), 'no exclamation marks');
+    }
+    assert.ok(checkDraft({ caption: 'An epic night #yyc', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' } }, cd).length > 0);
+    assert.deepEqual(checkDraft({ caption: 'At the Epicentre #yyc', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' } }, cd), []);
   });
 });

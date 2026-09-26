@@ -248,6 +248,11 @@ export function buildStaticRouteBody(pathname: string): string {
       copy: 'Every source behind the CalgaryWatch map: neighbour reports, Calgary Police news releases, City of Calgary 311, traffic and water main breaks, Environment Canada and Alberta Emergency Alerts, ENMAX outages and river levels, with how often each updates. Built for Calgary.',
       links: [['/map', 'View the Calgary-area incident map'], [AIRDRIE_GUIDE_PATH, 'Read the Airdrie crime map guide'], [GUIDE_PATH, 'Read the neighbourhood watch guide']],
     },
+    '/partners': {
+      heading: 'How CalgaryWatch works with businesses.',
+      copy: 'CalgaryWatch lists Calgary events, markets and local places for free, checked against each business’s own page, and @calgarydaily, our sister Instagram account, posts from the same listings. Our picks are never sold. Featured partner placements, when they open, will always be labelled. We email a listed business only at an address it publishes itself, and a reply of “stop” is permanent.',
+      links: [['/local', 'Local places'], ['/events', 'Events'], ['/markets', 'Markets'], ['/about', 'About CalgaryWatch']],
+    },
     '/privacy': {
       heading: 'Calgary Watch privacy policy',
       copy: 'Read what Calgary Watch collects, why each piece of information is needed, how long it is retained, and how to make a privacy request. Public incident reports do not expose a reporter email address.',

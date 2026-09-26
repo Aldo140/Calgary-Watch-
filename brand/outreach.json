@@ -7,6 +7,8 @@
   },
   "paidOfferEnabled": false,
   "paidOfferNote": "Leave false until the Local Partner price and deliverables are final and /partners explains how Featured partner placements work. While false, pitches offer only the free source-checked listing and a conversation.",
+  "autoSend": true,
+  "autoSendNote": "Owner decision 2026-09-26 (Aldo, in chat): first emails and the one follow-up send without per-message approval. Every CASL rule still applies before a message can be approved: the address is published on the business's own site, no no-solicitation notice, not suppressed or contacted before, sender ID + mailing address + opt-out in the body, daily cap and send window. Replies from businesses still wait for a person. Set false to go back to approving each email.",
   "offer": [
     "A free source-checked listing on CalgaryWatch that links back to the organization's official page.",
     "A direct line for schedule corrections, cancellations and approved photos.",
@@ -18,8 +20,16 @@
   ],
   "limits": {
     "sendsPerDay": 10,
-    "sendWindowLocal": ["09:00", "16:30"],
-    "sendDays": [1, 2, 3, 4],
+    "sendWindowLocal": [
+      "09:00",
+      "16:30"
+    ],
+    "sendDays": [
+      1,
+      2,
+      3,
+      4
+    ],
     "followUpAfterDays": 7,
     "maxFollowUps": 1
   },

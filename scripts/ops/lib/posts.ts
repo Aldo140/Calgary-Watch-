@@ -3,7 +3,7 @@
 
 import type { BrandId, PostImageText, PostTemplate } from '../../../src/types/ops';
 import type { BrandKit } from './brand';
-import { addDays, calgaryDate, calgaryMinutes, calgaryToEpoch, calgaryWeekday, longDay, nextSlot, shortDay, timeRange } from './time';
+import { addDays, calgaryDate, calgaryMinutes, calgaryToEpoch, calgaryWeekday, clock, longDay, nextSlot, shortDay, timeRange } from './time';
 
 export type Entity = Record<string, any> & { id: string; kind: string; title: string; slug: string };
 export type Occurrence = { id: string; marketId: string; start: string; end?: string; cancelled?: boolean };
@@ -28,6 +28,8 @@ export interface Candidate {
   link: string;
   relevantUntil: number;
   suggestedFor: number;
+  /** 'reel' = the items become a vertical video (weekendReelSlides), not one image. */
+  format?: 'reel';
 }
 
 const DAY = 86_400_000;
@@ -80,9 +82,92 @@ export function factsFor(items: Happening[]): string {
   }).join('\n\n');
 }
 
+const ENTITIES: Record<string, string> = { amp: '&', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“' };
+const decode = (s: string) => s
+  .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+  .replace(/&([a-z]+);/gi, (m, n) => ENTITIES[n.toLowerCase()] ?? m)
+  .replace(/�/g, ' ');
+
+/**
+ * The name a person would say: "Outback Presents Maria Bamford" → "Maria Bamford",
+ * "Where Dark Things Dwell (Saturdays)- Outdoor Escape Room" → "Where Dark Things Dwell",
+ * "Exhibition - Held. Together." → "Held. Together."
+ */
+export function cleanTitle(title: string): string {
+  let t = decode(title).replace(/\s*\((?:mon|tues|wednes|thurs|fri|satur|sun)days?\)/gi, '').replace(/\s+/g, ' ').trim();
+  t = t.replace(/^(?:[\w&.'’-]+\s){1,4}presents?:?\s+/i, '');
+  t = t.replace(/^(?:exhibition|event|workshop|talk|lecture|concert|performance|tour)\s*[-–—:]\s*/i, '');
+  t = t.replace(/^[A-Z]{3,}\s*[-–—:]\s*/, ''); // "TOUR – Introduction to Textiles"
+  const [head, ...tail] = t.split(/\s*[-–—]\s*(?=[A-Z])/);
+  // Drop a trailing descriptor ("- Outdoor Escape Room") only when the name stands on its own.
+  // A matchup keeps both teams ("Women's Soccer — Regina Cougars vs. Mount Royal Cougars").
+  if (tail.length && head.length >= 8 && !/\bvs\.?(\s|$)/i.test(t)) t = head;
+  // "Taking it to the Streets: Stories of Resilience, Connection, and…" → "Taking it to the Streets".
+  const [main] = t.split(/:\s+/);
+  if (t.length > 40 && main.length >= 8 && main.length < t.length) t = main;
+  return t.trim();
+}
+
+/** Shorten at a word boundary, so a line never ends mid-word. */
+export const tidyWords = (s: string, n: number) => {
+  if (s.length <= n) return s;
+  const cut = s.slice(0, n - 1);
+  const at = cut.lastIndexOf(' ');
+  return `${(at > n / 2 ? cut.slice(0, at) : cut).replace(/[\s—–:,.-]+$/, '')}…`;
+};
+
+/**
+ * When to show up, as a person would say it. Feeds often fill in a one-hour end
+ * when they don't know it, so roundups give the start ("7:30 pm"); a spotlight
+ * shows a range only when the end looks real.
+ */
+export function whenLabel(h: Pick<Happening, 'start' | 'end'>, withRange: boolean): string {
+  const noon = (s: string) => s.replace(/^12 pm$/, 'noon');
+  if (!withRange || !h.end || h.end - h.start === 3_600_000) return noon(clock(h.start));
+  if (calgaryMinutes(h.end) >= 23 * 60 + 30) return `from ${clock(h.start)}`;
+  return timeRange(h.start, h.end);
+}
+
+/** One plain sentence from the organizer's description, or nothing when there isn't a clean one. */
+export function blurbFor(e: Entity): string | null {
+  for (const raw of [e.description, e.summary]) {
+    if (!raw) continue;
+    const text = decode(String(raw)).replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]/gu, '').replace(/\s+/g, ' ').trim();
+    const first = text.match(/^(.{30,240}?[.!?])(\s|$)/)?.[1] ?? (text.length >= 60 ? tidyWords(text, 150) : null);
+    if (!first) continue;
+    if (/listed by|\b20\d\d\b|\b[ap]\.m\.|admission|\$\d|click|register|tickets? (are|on)/i.test(first)) continue;
+    // "Join us for a free public exhibition featuring…" → "A free public exhibition featuring…"
+    const plain = first.replace(/^join us (for|at|in) /i, '').replace(/^./, c => c.toUpperCase());
+    if (plain.length < 30) continue;
+    return plain.length <= 240 ? plain : tidyWords(plain, 200);
+  }
+  return null;
+}
+
+/** Same show twice in a day (5 pm and 8 pm) is one line with both times. */
+export function mergeShowings(items: Happening[]): Array<{ name: string; first: Happening; times: Happening[] }> {
+  const out: Array<{ name: string; first: Happening; times: Happening[] }> = [];
+  for (const h of items) {
+    const name = cleanTitle(h.entity.title);
+    const same = out.find(o => normalize(o.name) === normalize(name) && calgaryDate(o.first.start) === calgaryDate(h.start));
+    if (same) same.times.push(h); else out.push({ name, first: h, times: [h] });
+  }
+  return out;
+}
+
+const joinTimes = (times: Happening[]) => {
+  // Markets are about opening hours; shows are about when to arrive.
+  const labels = times.map(t => whenLabel(t, t.entity.kind === 'market'));
+  if (labels.length === 1) return labels[0];
+  // "5 pm and 8 pm" → "5 and 8 pm" when they share am/pm.
+  const same = labels.every(l => l.slice(-2) === labels[0].slice(-2) && !l.startsWith('from'));
+  return same ? `${labels.map(l => l.slice(0, -3)).join(' and ')} ${labels[0].slice(-2)}` : labels.join(' and ');
+};
+
 /** Spread picks across organizers and categories so a day isn't five UCalgary lectures. */
-function diverse(list: Happening[], n: number, taken = new Set<string>()): Happening[] {
-  const picked: Happening[] = [];
+function diverse(list: Happening[], n: number, taken = new Set<string>(), siblings = false): Happening[] {
+  const picked: Happening[] = [], extra: Happening[] = [];
+  const sameShow = (a: Happening, b: Happening) => calgaryDate(a.start) === calgaryDate(b.start) && normalize(cleanTitle(a.entity.title)) === normalize(cleanTitle(b.entity.title));
   const orgs = new Set<string>(), cats = new Set<string>();
   const score = (h: Happening) =>
     (h.entity.pricing === 'free' ? 2 : 0) + (h.entity.neighbourhood ? 1 : 0) + (h.entity.address ? 1 : 0) +
@@ -93,11 +178,13 @@ function diverse(list: Happening[], n: number, taken = new Set<string>()): Happe
     pool.sort((a, b) => score(b) - score(a) || a.start - b.start);
     const h = pool.shift()!;
     if (picked.some(p => p.entity.id === h.entity.id)) continue;
+    // A second showing of the same thing never takes a slot of its own; roundups list it on the same line.
+    if (picked.some(p => sameShow(p, h))) { if (siblings) extra.push(h); continue; }
     picked.push(h);
     orgs.add(normalize(h.entity.organizer ?? h.sourceName));
     if (h.entity.categories?.[0]) cats.add(h.entity.categories[0]);
   }
-  return picked;
+  return [...picked, ...extra];
 }
 
 /**
@@ -137,7 +224,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
 
     const fpToday = `${kit.id}|today|${today}`;
     if (!queued.has(fpToday) && !bookedSlots.has(slots[0]) && morningPool.length >= 2) {
-      const items = diverse(morningPool, 4).sort((a, b) => a.start - b.start);
+      const items = diverse(morningPool, 4, undefined, true).sort((a, b) => a.start - b.start);
       items.forEach(i => used.add(i.entity.id));
       out.push({
         brand: kit.id, template: 'roundup', fingerprint: fpToday, items,
@@ -151,7 +238,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
     const evening = onToday.filter(h => isEvening(h) && !used.has(h.entity.id));
     let tonight: Candidate | null = null;
     if (!queued.has(fpTonight) && evening.length >= 2) {
-      const items = diverse(evening, 4).sort((a, b) => a.start - b.start);
+      const items = diverse(evening, 4, undefined, true).sort((a, b) => a.start - b.start);
       items.forEach(i => used.add(i.entity.id));
       tonight = {
         brand: kit.id, template: 'roundup', fingerprint: fpTonight, items,
@@ -161,13 +248,40 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
       };
     }
 
+    const free = (i: number) => !bookedSlots.has(slots[Math.min(i, slots.length - 1)]);
+    if (tonight && !free(2)) tonight = null;
+
+    // Fridays: the midday slot is a "this weekend" Reel. Reels reach far more people
+    // on this account than image posts (median 243 vs 150 views, 2026-09-25).
+    let reel: Candidate | null = null;
+    const fpReel = `${kit.id}|weekend-reel|${today}`;
+    if (calgaryWeekday(now) === 5 && free(1) && !queued.has(fpReel)) {
+      const weekendDays = [today, addDays(today, 1), addDays(today, 2)];
+      const weekend = all.filter(h => weekendDays.includes(calgaryDate(h.start)) && (h.end ?? h.start) > now && (calgaryDate(h.start) !== today || isEvening(h)) && !used.has(h.entity.id));
+      if (weekend.length >= 3) {
+        // One of each thing: two games of the same series read as a repeat ("Women's Soccer — …" twice).
+        const series = (h: Happening) => normalize(h.entity.title.replace(/\([^)]*\)/g, ' ').split(/\s*[—–-]\s|\svs\.?\s/i)[0]);
+        const bySeries = new Map<string, Happening>();
+        for (const h of diverse(weekend, 8)) if (!bySeries.has(series(h))) bySeries.set(series(h), h);
+        const items = [...bySeries.values()].slice(0, 5).sort((a, b) => a.start - b.start);
+        if (items.length >= 3) {
+          items.forEach(i => used.add(i.entity.id));
+          reel = {
+            brand: kit.id, template: 'roundup', format: 'reel', fingerprint: fpReel, items,
+            title: `This weekend in Calgary — ${shortDay(now)}`, facts: factsFor(items),
+            link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('weekend_reel')}`,
+            relevantUntil: Math.max(...items.map(i => i.end ?? i.start)), suggestedFor: at(1),
+          };
+          out.push(reel);
+        }
+      }
+    }
+
     // Spotlights fill the remaining slots: one listing each, today or the next two days.
     const fpFor = (h: Happening) => h.entity.kind === 'market'
       ? `${kit.id}|market|${h.entity.id}|${calgaryDate(h.start).slice(0, 7)}`
       : `${kit.id}|event|${normalize(h.entity.title)}`;
-    const free = (i: number) => !bookedSlots.has(slots[Math.min(i, slots.length - 1)]);
-    if (tonight && !free(2)) tonight = null;
-    const spotlightSlots = (tonight ? [1] : [1, 2]).filter(free);
+    const spotlightSlots = (tonight ? [1] : [1, 2]).filter(i => free(i) && !(reel && i === 1));
     const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
     const budget = kit.postsPerDay - bookedSlots.size - out.length - (tonight ? 1 : 0);
     const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used);
@@ -230,33 +344,97 @@ export function roundupEyebrow(c: Pick<Candidate, 'items'>): string {
 
 const tidy = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).trimEnd()}…`);
 
-/** A deterministic draft used when no model is configured or the model's draft fails checks. */
+const WEEKDAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long' });
+const dayName = (ms: number) => WEEKDAY.format(new Date(ms));
+/** "Today", "Tomorrow" or "Sunday", relative to when the post goes out. */
+function relativeDay(ms: number, postedAt: number): string {
+  if (calgaryDate(ms) === calgaryDate(postedAt)) return 'Today';
+  if (calgaryDate(ms) === addDays(calgaryDate(postedAt), 1)) return 'Tomorrow';
+  return dayName(ms);
+}
+
+// Plain opening lines, the way a person would start a text. Picked by date so a week doesn't repeat.
+const TODAY_HOOKS = ["Here's what's on today.", 'A few good reasons to get out today.', "Today's shortlist, if you need one.", 'Some ideas for today.', 'On today, in case you need a plan.'];
+const TONIGHT_HOOKS = ["Tonight's shortlist.", "If you're looking for something to do tonight.", 'A few things on tonight.', 'Plans for tonight, if you need them.', "What's on tonight."];
+const pick = (list: string[], ms: number) => list[Number(calgaryDate(ms).replace(/-/g, '')) % list.length];
+
+/** "PF 1239 (Professional Faculties Building)" → "Professional Faculties Building"; "White Buffalo Lodge (EDT 314)" → "White Buffalo Lodge". */
+export function cleanPlace(v: string): string {
+  const m = v.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+  if (!m) return v.trim();
+  const score = (x: string) => (x.match(/[a-z]/gi)?.length ?? 0) - 4 * (x.match(/\d/g)?.length ?? 0);
+  return (score(m[2]) > score(m[1]) ? m[2] : m[1]).trim();
+}
+const place = (e: Entity) => cleanPlace(e.venue ?? e.neighbourhood ?? '');
+const isFree = (e: Entity) => e.pricing === 'free';
+
+/** A weekend Reel: a cover, one slide per plan (facts from the listing only), and a follow card. */
+export function weekendReelSlides(c: Pick<Candidate, 'items'>): Array<PostImageText & { template: PostTemplate }> {
+  const shows = mergeShowings(c.items);
+  return [
+    { template: 'roundup', eyebrow: roundupEyebrow(c), headline: 'This weekend', blurb: `${shows.length} plans worth saving.`, details: [], footer: 'Dates checked with each organizer' },
+    ...shows.map(s => ({
+      template: 'event' as const,
+      eyebrow: `${dayName(s.first.start)}${isFree(s.first.entity) ? ' · Free' : ''}`,
+      headline: tidyWords(s.name, 56),
+      blurb: null,
+      details: [joinTimes(s.times), place(s.first.entity)].filter(Boolean).map(x => tidyWords(x, 44)),
+      footer: tidyWords(`Listed by ${s.first.entity.organizer ?? s.first.sourceName}`, 48),
+    })),
+    { template: 'slide', eyebrow: 'FOLLOW', headline: 'Your Calgary plan, every morning.', details: ['Today, tonight and this weekend, checked with the organizers.', '@calgarydaily'], footer: 'Full list on calgarywatch.ca||' },
+  ];
+}
+
+/**
+ * The draft used when no model is configured, or the model's draft fails the checks. It should
+ * read like a person who lives here wrote it: sentence case, specific, no hype.
+ */
 export function templateDraft(c: Candidate, kit: BrandKit): Draft {
   const tags = kit.hashtags.join(' ');
+  const postedAt = c.suggestedFor;
   if (c.template === 'roundup') {
-    const lines = c.items.map(h => `• ${h.entity.title} — ${shortDay(h.start)}, ${timeRange(h.start, h.end)}${h.entity.venue ? ` at ${h.entity.venue}` : ''}`);
+    const tonight = c.fingerprint.includes('|tonight|');
+    const weekend = c.fingerprint.includes('weekend');
+    const shows = mergeShowings(c.items);
+    const hook = weekend ? 'Some plans for the weekend.' : pick(tonight ? TONIGHT_HOOKS : TODAY_HOOKS, postedAt);
+    const headline = weekend ? 'This weekend' : tonight ? 'Tonight in Calgary' : `${dayName(postedAt)} in Calgary`;
+    const lines = shows.map(s => {
+      const e = s.first.entity;
+      return `${s.name}${place(e) && place(e) !== s.name ? `, ${place(e)}` : ''} · ${weekend ? `${dayName(s.first.start).slice(0, 3)} ` : ''}${joinTimes(s.times)}${isFree(e) ? ' · free' : ''}`;
+    });
     return {
-      caption: `${c.title}.\n\n${lines.join('\n')}\n\nDates are checked against each organizer's own page. Details at the link in bio.\n\n${tags}`,
-      altText: `${c.title}: ${c.items.map(h => h.entity.title).join('; ')}.`,
+      caption: `${hook}\n\n${lines.join('\n')}\n\nFull list on CalgaryWatch, link in bio.\n\n${tags}`,
+      altText: `${headline}: ${shows.map(s => s.name).join('; ')}.`,
       imageText: {
         eyebrow: roundupEyebrow(c),
-        headline: c.title.replace(/ — .*/, ''),
-        details: c.items.slice(0, 5).map(h => `${shortDay(h.start).split(',')[0]} ${timeRange(h.start, h.end)} · ${tidy(h.entity.title, 30)}`),
-        footer: kit.site.replace(/^https?:\/\//, '') + '/events',
+        headline,
+        blurb: hook,
+        details: shows.slice(0, 5).map(s => {
+          const e = s.first.entity;
+          const meta = [`${weekend ? `${dayName(s.first.start).slice(0, 3)} ` : ''}${joinTimes(s.times)}`, place(e) !== s.name ? place(e) : '', isFree(e) ? 'free' : ''].filter(Boolean).join(' · ');
+          return `${tidyWords(s.name, 38)}|${tidyWords(meta, 52)}`;
+        }),
+        footer: 'Full list on calgarywatch.ca',
       },
     };
   }
   const h = c.items[0], e = h.entity;
-  const where = [e.venue, e.neighbourhood].filter(Boolean).join(', ');
-  const price = e.pricing === 'free' ? 'Free. ' : '';
+  const name = cleanTitle(e.title);
+  const blurb = blurbFor(e);
+  const when = whenLabel(h, true);
+  const day = relativeDay(h.start, postedAt);
+  const where = [e.venue && cleanPlace(e.venue), e.neighbourhood].filter(Boolean).join(', ');
+  const dayPhrase = day === 'Today' ? 'Today' : day === 'Tomorrow' ? 'Tomorrow' : `${dayName(h.start)}, ${shortDay(h.start).split(', ')[1]}`;
   return {
-    caption: `${e.title}\n${longDay(h.start)}, ${timeRange(h.start, h.end)}${where ? ` · ${where}` : ''}\n\n${price}${e.summary ?? ''}\n\nListed by ${e.organizer ?? h.sourceName}. Details and the official page at the link in bio.\n\n${tags}`,
-    altText: `${e.title}, ${longDay(h.start)} at ${timeRange(h.start, h.end)}${where ? `, ${where}` : ''}.`,
+    caption: `${name}\n${dayPhrase}, ${when}${where ? ` at ${where}` : ''}.${blurb ? `\n\n${blurb}` : ''}${isFree(e) && !/\bfree\b/i.test(blurb ?? '') ? `${blurb ? ' ' : '\n\n'}Free.` : ''}\n\nListed by ${e.organizer ?? h.sourceName}. Details on CalgaryWatch, link in bio.\n\n${tags}`,
+    altText: `${name}, ${longDay(h.start)} at ${timeRange(h.start, h.end)}${where ? `, ${where}` : ''}.`,
     imageText: {
-      eyebrow: `${e.kind === 'market' ? 'MARKET' : (e.categories?.[0] ?? 'event').toUpperCase()} · ${shortDay(h.start).toUpperCase()}`,
-      headline: tidy(e.title, 60),
-      details: [timeRange(h.start, h.end), e.venue ?? e.address ?? '', e.pricing === 'free' ? 'Free' : ''].filter(Boolean).map(s => tidy(s, 44)),
-      footer: `${kit.site.replace(/^https?:\/\//, '')}${PATHS[e.kind] ?? ''}`,
+      eyebrow: `${day}${isFree(e) ? ' · Free' : e.kind === 'market' ? ' · Market' : ''}`,
+      headline: tidyWords(name, 60),
+      blurb: blurb ? tidyWords(blurb, 150) : null,
+      // The venue alone when venue + neighbourhood won't fit on one line.
+      details: [`${shortDay(h.start)} · ${when}`, where.length <= 44 ? where : (e.venue ? tidyWords(cleanPlace(e.venue), 44) : tidyWords(e.address ?? '', 44))].filter(Boolean),
+      footer: tidy(`Listed by ${e.organizer ?? h.sourceName}`, 52),
     },
   };
 }
@@ -272,8 +450,12 @@ export function checkDraft(d: Draft, kit: BrandKit, opts: { sponsored?: boolean 
   if (!d.altText.trim()) problems.push('Alt text is empty.');
   if (d.imageText.headline.length > 64) problems.push('Image headline is too long to stay legible (64 characters max).');
   if (d.imageText.details.length > 5) problems.push('Image has more than 5 detail lines.');
-  const lower = `${d.caption} ${d.imageText.headline}`.toLowerCase();
-  for (const p of kit.voice.bannedPhrases) if (lower.includes(p.toLowerCase())) problems.push(`Uses a banned phrase: "${p}".`);
+  const lower = `${d.caption} ${d.imageText.headline} ${d.imageText.blurb ?? ''}`.toLowerCase();
+  for (const p of kit.voice.bannedPhrases) {
+    // Whole words only, so "epic" doesn't catch "Epicentre".
+    const esc = p.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (new RegExp(/^\w/.test(p) ? `(^|[^\\w])${esc}($|[^\\w])` : esc, 'u').test(lower)) problems.push(`Uses a banned phrase: "${p}".`);
+  }
   if (opts.sponsored && !/featured partner/i.test(d.caption.split('\n')[0] ?? '')) problems.push('Sponsored post must say "Featured partner" in the first line.');
   if (opts.sponsored && !/featured partner/i.test(d.imageText.eyebrow)) problems.push('Sponsored image must carry the "Featured partner" label.');
   return problems;

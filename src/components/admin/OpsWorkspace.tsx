@@ -1,8 +1,9 @@
 /**
- * Operations: the Instagram post queue for CalgaryWatch and CalgaryDaily, plus
- * the agent's health. The GitHub Actions jobs in scripts/ops/ draft, render and
- * publish; this screen is where a person approves, edits, reschedules or rejects.
- * Nothing is published unless it is approved here.
+ * Operations: the @calgarydaily post queue (CalgaryWatch's sister account; there
+ * is no separate CalgaryWatch Instagram), how the account is doing, and the
+ * agent's health. The GitHub Actions jobs in scripts/ops/ draft, render and
+ * publish. Listing posts that pass the brand rules publish automatically; news,
+ * opinion and anything with a warning wait for a person here.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -11,7 +12,7 @@ import { AlertTriangle, CheckCircle2, ExternalLink, Image as ImageIcon, Link2, R
 
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
-import type { BrandId, OpsHealth, OpsPost, PostStatus } from '@/src/types/ops';
+import type { BrandId, OpsHealth, OpsPerformance, OpsPost, PerformanceRow, PostStatus } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, display, inputClass, inputStyle, mono, type Tone } from './ui';
 
 type View = 'review' | 'scheduled' | 'published' | 'corrections' | 'other';
@@ -161,7 +162,7 @@ function BriefForm() {
       <div className="grid gap-3 md:grid-cols-[160px_1fr_1fr_auto] items-end">
         <Field label="Account">
           <select value={brand} onChange={e => setBrand(e.target.value as BrandId)} className={inputClass} style={inputStyle}>
-            <option value="calgarydaily">CalgaryDaily</option><option value="calgarywatch">CalgaryWatch</option>
+            <option value="calgarydaily">CalgaryDaily</option>
           </select>
         </Field>
         <Field label="Source URL (https)"><input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://newsroom.calgary.ca/…" className={inputClass} style={inputStyle} /></Field>
@@ -192,11 +193,62 @@ export function OpsHealthPanel() {
   );
 }
 
+function PerfTable({ title, rows }: { title: string; rows: PerformanceRow[] }) {
+  if (!rows.length) return null;
+  return (
+    <div>
+      <h4 className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: T.muted, fontFamily: mono }}>{title}</h4>
+      <table className="w-full text-sm">
+        <thead><tr style={{ color: T.muted }}><th className="text-left font-medium py-1">Kind</th><th className="text-right font-medium">Posts</th><th className="text-right font-medium">Avg reach</th><th className="text-right font-medium">Saves + shares</th></tr></thead>
+        <tbody>{rows.map((r, i) => (
+          <tr key={r.key} className="border-t" style={{ borderColor: T.line }}>
+            <td className="py-1" style={{ color: T.ink, fontWeight: i === 0 && rows.length > 1 ? 700 : 400 }}>{r.label}</td>
+            <td className="text-right" style={{ fontFamily: mono }}>{r.posts}</td>
+            <td className="text-right" style={{ fontFamily: mono }}>{r.avgReach}</td>
+            <td className="text-right" style={{ fontFamily: mono }}>{r.avgSavesShares}</td>
+          </tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
+
+/** What's working: written by the daily run from Instagram's own numbers (scripts/ops/jobs/insights.ts). */
+export function PerformancePanel() {
+  const [perf, setPerf] = useState<OpsPerformance | null>(null);
+  useEffect(() => db ? onSnapshot(doc(db, 'ops_health', 'performance'), s => setPerf(s.exists() ? s.data() as OpsPerformance : null), () => setPerf(null)) : undefined, []);
+  const days = perf ? Object.keys(perf.followers).sort() : [];
+  const latest = days.at(-1);
+  const weekAgo = days.filter(d => latest && d <= new Date(Date.parse(latest) - 7 * 86_400_000).toISOString().slice(0, 10)).at(-1);
+  const change = perf && latest && weekAgo ? perf.followers[latest] - perf.followers[weekAgo] : 0;
+  return (
+    <Panel title="How @calgarydaily is doing" subtitle={perf ? `Last 30 days · updated ${when(perf.updatedAt)}` : 'Written by the daily run from Instagram insights'}>
+      {!perf ? <p className="text-sm" style={{ color: T.muted }}>No numbers yet. They appear after the next daily run.</p> : (
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            {latest && <span><strong style={{ color: T.ink, fontFamily: mono }}>{perf.followers[latest].toLocaleString('en-CA')}</strong> <span style={{ color: T.muted }}>followers{weekAgo ? ` (${change >= 0 ? '+' : ''}${change} this week)` : ''}</span></span>}
+            {perf.avgDelayMinutes !== null && <span style={{ color: perf.avgDelayMinutes > 30 ? T.attention : T.muted }}>Automatic posts went out {perf.avgDelayMinutes} min after their slot on average</span>}
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <PerfTable title="Format" rows={perf.byFormat} />
+            <PerfTable title="Post type" rows={perf.byKind} />
+            <PerfTable title="Time of day" rows={perf.bySlot} />
+          </div>
+          {perf.top.length > 0 && (
+            <ol className="text-sm space-y-1 list-decimal pl-5">
+              {perf.top.map(t => <li key={t.permalink}><a href={t.permalink} target="_blank" rel="noreferrer" style={{ color: T.signal }}>{t.headline}</a> <span style={{ color: T.muted }}>· {t.format} · {t.reach} reached · {t.savesShares} saves and shares</span></li>)}
+            </ol>
+          )}
+        </div>
+      )}
+    </Panel>
+  );
+}
+
 export function OpsWorkspace() {
   const [posts, setPosts] = useState<OpsPost[] | null>(null);
   const [error, setError] = useState('');
   const [view, setView] = useState<View>('review');
-  const [brand, setBrand] = useState<BrandId | 'all'>('all');
 
   useEffect(() => {
     if (!db) return;
@@ -207,20 +259,18 @@ export function OpsWorkspace() {
 
   const counts = useMemo(() => Object.fromEntries((Object.keys(VIEWS) as View[]).map(v => [v, (posts ?? []).filter(p => VIEWS[v].statuses.includes(p.status)).length])), [posts]);
   const shown = (posts ?? [])
-    .filter(p => VIEWS[view].statuses.includes(p.status) && (brand === 'all' || p.brand === brand))
+    .filter(p => VIEWS[view].statuses.includes(p.status))
     .sort((a, b) => view === 'scheduled' ? (a.scheduledFor ?? 0) - (b.scheduledFor ?? 0) : view === 'review' ? (a.suggestedFor ?? 0) - (b.suggestedFor ?? 0) : b.updatedAt - a.updatedAt);
 
   return (
     <div className="space-y-4">
       <OpsHealthPanel />
+      <PerformancePanel />
       <BriefForm />
-      <Panel title="Instagram queue" subtitle="Drafted each morning from verified listings. Nothing posts until you approve it." padded={false}>
+      <Panel title="Instagram queue · @calgarydaily" subtitle="Drafted each morning from verified listings. Listing posts that pass the brand rules are scheduled automatically; everything else waits for you." padded={false}>
         <div className="px-4 pt-3 space-y-2">
           <FilterRow>
             {(Object.keys(VIEWS) as View[]).map(v => <FilterChip key={v} active={view === v} onClick={() => setView(v)} count={counts[v]}>{VIEWS[v].label}</FilterChip>)}
-          </FilterRow>
-          <FilterRow>
-            {(['all', 'calgarywatch', 'calgarydaily'] as const).map(b => <FilterChip key={b} active={brand === b} onClick={() => setBrand(b)}>{b === 'all' ? 'Both accounts' : BRAND_LABEL[b]}</FilterChip>)}
           </FilterRow>
         </div>
         {error ? <p role="alert" className="p-4 text-sm" style={{ color: T.critical }}>{error}</p>

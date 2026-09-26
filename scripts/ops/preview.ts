@@ -7,7 +7,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
-import { BRANDS, ROOT, brandKit } from './lib/brand';
+import { ALL_BRANDS as BRANDS, ROOT, brandKit } from './lib/brand';
 import { selectCandidates, templateDraft, type DiscoveryIndex } from './lib/posts';
 import { renderPost, renderProfile } from './lib/render';
 import { addDays, calgaryDate, calgaryToEpoch } from './lib/time';

@@ -8,11 +8,13 @@ import type { Firestore } from 'firebase-admin/firestore';
 import type { BrandId, OpsPost, PostTemplate } from '../../../src/types/ops';
 import { BRANDS, ROOT, brandKit, type BrandKit } from '../lib/brand';
 import { claudeConfigured, extractBrief, writePost } from '../lib/claude';
-import { COLLECTIONS, uploadImage } from '../lib/firebase';
+import { COLLECTIONS, uploadImage, uploadVideo } from '../lib/firebase';
 import { publishCarousel, publishImage, publishReel } from '../lib/instagram';
 import { currentToken } from './igTokens';
-import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
-import { renderPost } from '../lib/render';
+import { bestCaptions } from './insights';
+import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, weekendReelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
+import { makeReel } from '../lib/reel';
+import { renderPost, renderReelBackdrop } from '../lib/render';
 import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
 import { calgaryDate, nextSlot } from '../lib/time';
 
@@ -20,20 +22,20 @@ type Log = (m: string) => void;
 const postId = (fingerprint: string) => `post-${createHash('sha256').update(fingerprint).digest('hex').slice(0, 20)}`;
 
 /** Claude's draft checked against the brand; the template draft when there is no key or it fails. */
-async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items'] }, kit: BrandKit, base: Draft, note: string, log: Log): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
+async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items']; format?: Candidate['format'] }, kit: BrandKit, base: Draft, note: string, log: Log): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
   if (!claudeConfigured()) return { draft: base, warnings: checkDraft(base, kit), by: 'template' };
   try {
     const w = await writePost(kit, {
-      kind: c.template === 'roundup' ? 'roundup of several listings' : c.template === 'update' ? 'news or city update' : 'single listing',
+      kind: c.format === 'reel' ? 'weekend roundup Reel (open with one plain line about the weekend; then one line per plan with its day)' : c.template === 'roundup' ? 'roundup of several listings' : c.template === 'update' ? 'news or city update' : 'single listing',
       title: c.title + (note ? `\nReviewer's note for this redraft: ${note}` : ''),
       facts: c.facts, link: c.link, sponsored: c.template === 'partner',
     });
-    const details = c.template === 'roundup' && w.itemLabels.length === base.imageText.details.length
-      ? base.imageText.details.map((d, i) => `${d.split(' · ')[0]} · ${w.itemLabels[i].slice(0, 30)}`)
-      : base.imageText.details;
-    // Roundups keep the house headline (Today / Tonight / This weekend in Calgary); the date lives in the label.
-    const headline = c.template === 'roundup' ? base.imageText.headline : (w.headline || base.imageText.headline);
-    const draft: Draft = { caption: w.caption, altText: w.altText, imageText: { ...base.imageText, headline, details } };
+    // The image keeps the plain facts (clean names, times, places) from the template. Listing posts
+    // keep the event's own name as the headline; on a roundup Claude's opening line becomes the blurb.
+    const listing = c.template === 'roundup' || c.template === 'event';
+    const headline = listing ? base.imageText.headline : (w.headline || base.imageText.headline);
+    const blurb = c.template === 'roundup' && w.headline && w.headline.length <= 60 ? w.headline : base.imageText.blurb;
+    const draft: Draft = { caption: w.caption, altText: w.altText, imageText: { ...base.imageText, headline, blurb } };
     const problems = checkDraft(draft, kit, { sponsored: c.template === 'partner' });
     if (problems.length) {
       log(`  Claude draft failed checks (${problems.join(' ')}); using the template draft.`);
@@ -85,9 +87,14 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
     }
   });
 
+  // The account's best-performing captions join the voice examples, so the writer leans toward what works.
+  const published = db ? (await db.collection(COLLECTIONS.posts).where('status', '==', 'published').get()).docs.map(d => d.data() as OpsPost) : [];
+
   let made = 0;
   for (const brand of BRANDS) {
     const kit = brandKit(brand);
+    const best = bestCaptions(published, brand, now);
+    const writerKit: BrandKit = best.length ? { ...kit, voice: { ...kit.voice, examples: [...kit.voice.examples, ...best] } } : kit;
     // Leave room for posts already waiting: don't pile up more drafts than a day's worth.
     let waiting = 0;
     if (db) waiting = (await db.collection(COLLECTIONS.posts).where('status', '==', 'drafted').select('brand').get()).docs.filter(d => d.get('brand') === brand).length;
@@ -95,14 +102,39 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
 
     for (const c of selectCandidates(index, kit, now, queued, recent.get(brand), booked.get(brand))) {
       const id = postId(c.fingerprint);
-      const { draft, warnings, by } = await writeDraft(c, kit, templateDraft(c, kit), '', log);
-      const image = await renderAndStore(id, kit, c.template, draft, dryDir);
+      const { draft, warnings, by } = await writeDraft(c, writerKit, templateDraft(c, kit), '', log);
+      let image: { imageUrl: string | null; imagePath: string | null };
+      let videoUrl: string | null = null;
+      if (c.format === 'reel') {
+        // The cover doubles as the post image (and the site's thumbnail).
+        const slides = weekendReelSlides(c);
+        const pngs = await Promise.all(slides.map(sl => renderPost(kit, sl.template, sl)));
+        let mp4: Buffer;
+        try { mp4 = await makeReel(pngs, { backdrop: await renderReelBackdrop() }); } catch (e) {
+          log(`  reel skipped (${e instanceof Error ? e.message : e})`);
+          continue;
+        }
+        if (dryDir) {
+          await writeFile(join(dryDir, `${id}.mp4`), mp4);
+          await writeFile(join(dryDir, `${id}.png`), pngs[0]);
+          image = { imageUrl: null, imagePath: join(dryDir, `${id}.png`) };
+        } else {
+          const path = `ops/reels/${id}-${Date.now()}`;
+          videoUrl = await uploadVideo(`${path}.mp4`, mp4);
+          image = { imageUrl: await uploadImage(`${path}.png`, pngs[0]), imagePath: `${path}.png` };
+        }
+        draft.imageText = slides[0];
+        log(`  rendered reel: ${slides.length} slides, ${Math.round(mp4.length / 1024)} KB`);
+      } else {
+        image = await renderAndStore(id, kit, c.template, draft, dryDir);
+      }
       const post: OpsPost = {
         id, brand, template: c.template, status: 'drafted', fingerprint: c.fingerprint,
         entityIds: c.items.map(i => i.entity.id), entityStarts: entityStarts(c),
         sourceUrls: [...new Set(c.items.map(i => i.sourceUrl))], facts: c.facts,
         caption: draft.caption, altText: draft.altText, link: c.link, imageText: draft.imageText,
-        ...image, warnings: kit.confirmed ? warnings : [`${kit.name} brand kit is provisional: ${kit.confirmNote ?? ''}`, ...warnings],
+        ...image, ...(videoUrl ? { videoUrl } : {}),
+        warnings: kit.confirmed ? warnings : [`${kit.name} brand kit is provisional: ${kit.confirmNote ?? ''}`, ...warnings],
         sponsored: false, relevantUntil: c.relevantUntil, suggestedFor: c.suggestedFor, scheduledFor: null,
         draftedBy: by, createdAt: now, updatedAt: now,
         ...(brand === 'calgarydaily' ? { designVersion: DAILY_DESIGN_VERSION } : {}),
@@ -164,6 +196,19 @@ export async function redraftAndBriefs(db: Firestore, now: number, log: Log): Pr
 export async function monitorPosts(db: Firestore, index: DiscoveryIndex, now: number, log: Log): Promise<void> {
   const stale = await db.collection(COLLECTIONS.posts).where('status', 'in', ['drafted', 'approved', 'redraft']).get();
   for (const d of stale.docs) {
+    if (!BRANDS.includes(d.get('brand'))) {
+      await d.ref.update({ status: 'rejected', note: `${brandKit(d.get('brand')).name} no longer posts on its own account.`, updatedAt: now });
+      log(`retired ${d.id} (account switched off)`);
+      continue;
+    }
+    // Automatic listing posts written in an older look and voice are cleared, so the drafting step
+    // (which runs next) writes them again. Hand-written and hand-approved posts are left alone.
+    const auto = !String(d.get('fingerprint') ?? '').includes('|draft|') && !d.get('videoUrl') && (d.get('status') === 'drafted' || String(d.get('reviewedByEmail') ?? '').startsWith('auto'));
+    if (auto && d.get('brand') === 'calgarydaily' && (d.get('designVersion') ?? 1) < DAILY_DESIGN_VERSION) {
+      await d.ref.delete();
+      log(`cleared ${d.id} to redraft in the current voice and design`);
+      continue;
+    }
     const until = d.get('relevantUntil');
     if (until && until < now) { await d.ref.update({ status: 'expired', updatedAt: now }); log(`expired ${d.id}`); }
   }

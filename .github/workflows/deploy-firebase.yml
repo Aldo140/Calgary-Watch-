@@ -41,6 +41,13 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
         run: npm run discovery:export
 
+      - name: Export the latest @calgarydaily posts (homepage strip)
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        run: npm run ops:feed
+
       - name: Build Site
         env:
           VITE_BASE_PATH: /

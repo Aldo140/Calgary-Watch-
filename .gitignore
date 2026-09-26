@@ -24,3 +24,6 @@ dist-preview/
 functions/assets/
 .vercel
 brand/preview/
+
+# Outreach logs with contact addresses: never published (the repo is public).
+.ops-private/

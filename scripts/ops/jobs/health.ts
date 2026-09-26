@@ -1,7 +1,7 @@
 // Daily health check and the morning summary email to the founder.
 
 import type { Firestore } from 'firebase-admin/firestore';
-import type { OpsHealth, OpsPost, PartnerLead } from '../../../src/types/ops';
+import type { OpsHealth, OpsPerformance, OpsPost, PartnerLead } from '../../../src/types/ops';
 import { BRANDS, brandKit } from '../lib/brand';
 import { claudeConfigured } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
@@ -9,6 +9,7 @@ import { igAccount, igToken, tokenExpiry } from '../lib/instagram';
 import { currentToken, keepAlive } from './igTokens';
 import { outlookConfigured } from '../lib/outlook';
 import { happenings, type DiscoveryIndex } from '../lib/posts';
+import { calgaryDate, calgaryMinutes } from '../lib/time';
 
 type Log = (m: string) => void;
 type Item = OpsHealth['items'][number];
@@ -60,7 +61,7 @@ export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, n
     }
   }
   items.push({ id: 'claude', label: 'Drafting (Claude)', ok: claudeConfigured(), detail: claudeConfigured() ? 'Connected.' : 'No ANTHROPIC_API_KEY; drafts use fixed templates.' });
-  items.push({ id: 'outlook', label: 'Outreach mailbox', ok: outlookConfigured(), detail: outlookConfigured() ? 'Connected.' : 'Microsoft Graph app not configured; approved emails wait.' });
+  items.push({ id: 'outlook', label: 'Outreach mailbox', ok: outlookConfigured(), detail: outlookConfigured() ? 'Connected.' : 'Microsoft Graph app not configured (MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET); queued emails wait.' });
 
   const upcoming = happenings(index).filter(h => h.start > now && h.start < now + 7 * DAY).length;
   items.push({ id: 'inventory', label: 'Listings next 7 days', ok: upcoming >= 5, detail: `${upcoming} dated events and market days.` });
@@ -81,9 +82,29 @@ export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, n
 
 const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
 
+/** Followers, what's working, and whether posts go out on time. */
+function performanceHtml(p: OpsPerformance, now: number): string {
+  const days = Object.keys(p.followers).sort();
+  const today = days.at(-1), weekAgo = days.filter(d => d <= calgaryDate(now - 7 * DAY)).at(-1);
+  const lines: string[] = [];
+  if (today) {
+    const change = weekAgo ? p.followers[today] - p.followers[weekAgo] : null;
+    lines.push(`<li><strong>${p.followers[today].toLocaleString('en-CA')}</strong> followers${change !== null ? ` (${change >= 0 ? '+' : ''}${change} this week)` : ''}</li>`);
+  }
+  const [bestFormat] = p.byFormat;
+  if (bestFormat && p.byFormat.length > 1) lines.push(`<li>${esc(bestFormat.label)} reach the most people: ${bestFormat.avgReach} on average over ${bestFormat.posts} posts.</li>`);
+  if (p.top[0]) lines.push(`<li>Best post this month: <a href="${esc(p.top[0].permalink)}" style="color:#1554D1">${esc(p.top[0].headline)}</a> (${p.top[0].reach} reached, ${p.top[0].savesShares} saves and shares)</li>`);
+  if (p.avgDelayMinutes !== null) lines.push(`<li>Automatic posts went out ${p.avgDelayMinutes} minutes after their slot on average this week.</li>`);
+  return lines.length ? `<h3 style="margin:18px 0 6px">How @calgarydaily is doing</h3><ul style="padding-left:18px;line-height:1.6">${lines.join('')}</ul>` : '';
+}
+
 export async function sendSummary(db: Firestore, health: OpsHealth, now: number, log: Log): Promise<void> {
   const to = process.env.OPS_SUMMARY_TO, key = process.env.RESEND_API_KEY;
   if (!to || !key) { log('No OPS_SUMMARY_TO or RESEND_API_KEY; summary not emailed.'); return; }
+  // The daily job runs several times a morning; the email goes out once, after 6 am.
+  const sentRef = db.collection(COLLECTIONS.health).doc('summary');
+  if (calgaryMinutes(now) < 6 * 60) { log('Before 6 am; the summary waits for a later run.'); return; }
+  if ((await sentRef.get()).get('sentFor') === calgaryDate(now)) { log('Summary already sent today.'); return; }
   const posts = (await db.collection(COLLECTIONS.posts).where('updatedAt', '>=', now - 14 * DAY).get()).docs.map(d => d.data() as OpsPost);
   const leads = (await db.collection(COLLECTIONS.leads).where('updatedAt', '>=', now - 30 * DAY).get()).docs.map(d => d.data() as PartnerLead);
   const count = <T,>(xs: T[], f: (x: T) => boolean) => xs.filter(f).length;
@@ -97,8 +118,11 @@ export async function sendSummary(db: Firestore, health: OpsHealth, now: number,
     [count(leads, l => l.status === 'ready' || l.status === 'follow-up-ready'), 'partner emails drafted for approval'],
     [count(leads, l => (l.status === 'replied' || l.status === 'interested') && !l.lastReply?.approved), 'business replies need you'],
     [count(leads, l => l.status === 'contacted' && (l.lastContactAt ?? 0) > now - DAY), 'partner emails sent in the last 24 hours'],
+    [count(leads, l => l.status === 'approved'), 'partner emails queued for the next send window'],
   ] as const;
   const warnings = health.items.filter(i => !i.ok);
+  const perf = (await db.collection(COLLECTIONS.health).doc('performance').get()).data() as OpsPerformance | undefined;
+  const perfHtml = perf ? performanceHtml(perf, now) : '';
   const needsYou = lines[0][0] + lines[3][0] + lines[4][0] + lines[5][0] + lines[6][0];
   const subject = needsYou ? `CalgaryWatch ops: ${needsYou} thing${needsYou === 1 ? '' : 's'} need you` : 'CalgaryWatch ops: all quiet';
   const published = posts.filter(p => p.status === 'published' && p.permalink && (p.publishedAt ?? 0) > now - DAY);
@@ -110,11 +134,13 @@ export async function sendSummary(db: Firestore, health: OpsHealth, now: number,
 ${published.length ? `<h3 style="margin:18px 0 6px">Posted in the last 24 hours</h3><ul style="padding-left:18px;line-height:1.6">${published.map(p => `<li><a href="${esc(p.permalink ?? '')}" style="color:#1554D1">${esc(p.imageText.headline)}</a> · ${p.brand === 'calgarydaily' ? '@calgarydaily' : '@calgarywatch'}</li>`).join('')}</ul>` : ''}
 ${upcoming.length ? `<h3 style="margin:18px 0 6px">Scheduled next</h3><ul style="padding-left:18px;line-height:1.6">${upcoming.map(p => `<li>${esc(when(p.scheduledFor!))} · ${esc(p.imageText.headline)}${p.reviewedByEmail?.startsWith('auto') ? ' (automatic)' : ''}</li>`).join('')}</ul>` : ''}
 ${warnings.length ? `<h3 style="margin:18px 0 6px">Health</h3><ul style="padding-left:18px;line-height:1.6">${warnings.map(w => `<li><strong>${esc(w.label)}:</strong> ${esc(w.detail)}</li>`).join('')}</ul>` : ''}
+${perfHtml}
 <p><a href="https://calgarywatch.ca/admin" style="color:#1554D1">Open the admin Operations page</a></p></div>`;
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
     body: JSON.stringify({ from: process.env.OPS_SUMMARY_FROM || 'CalgaryWatch Ops <digest@calgarywatch.ca>', to: [to], subject, html }),
   });
+  if (res.ok) await sentRef.set({ sentFor: calgaryDate(now), at: now });
   log(res.ok ? `summary emailed to ${to}` : `summary failed: HTTP ${res.status} ${await res.text()}`);
 }

@@ -75,6 +75,29 @@ export async function refreshInstagramToken(token: string): Promise<{ token: str
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+/** Followers and post count for the account behind this token. */
+export async function accountStats(token: string, handle: string): Promise<{ followers: number; mediaCount: number }> {
+  const { id } = await igAccount(token, handle);
+  const a = await graph(isInstagramLoginToken(token) ? 'me' : id, token, { params: { fields: 'followers_count,media_count' } });
+  return { followers: Number(a.followers_count ?? 0), mediaCount: Number(a.media_count ?? 0) };
+}
+
+/**
+ * Lifetime numbers for one post (needs the instagram_business_manage_insights
+ * permission on the token). Not every metric exists for every media type, so a
+ * rejected set falls back to the ones every post has.
+ */
+export async function mediaInsights(token: string, mediaId: string): Promise<Record<string, number>> {
+  const read = async (metrics: string[]) => {
+    const r = await graph(`${mediaId}/insights`, token, { params: { metric: metrics.join(',') } });
+    return Object.fromEntries((r.data ?? []).map((m: any) => [m.name, Number(m.values?.[0]?.value ?? m.total_value?.value ?? 0)]));
+  };
+  try { return await read(['reach', 'views', 'likes', 'comments', 'saved', 'shares']); } catch (e: any) {
+    if (e.code !== 100) throw e;
+    return read(['reach', 'likes', 'comments', 'saved']);
+  }
+}
+
 async function waitUntilReady(containerId: string, token: string): Promise<void> {
   for (let i = 0; i < 20; i++) {
     const s = await graph(containerId, token, { params: { fields: 'status_code' } });

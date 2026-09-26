@@ -71,6 +71,7 @@ export function signature(cfg: OutreachConfig, mailingAddress: string): string {
     cfg.sender.mailbox,
     cfg.sender.site,
     mailingAddress,
+    `How we work with businesses: ${cfg.sender.site.replace(/\/$/, '')}/partners`,
     '',
     cfg.unsubscribeLine,
   ].join('\n');

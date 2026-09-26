@@ -10,7 +10,7 @@ import type { PostImageText, PostTemplate } from '../../../src/types/ops';
 import { ROOT } from './brand';
 
 /** Bump when the look changes: queued posts in an older design are re-rendered before they publish. */
-export const DAILY_DESIGN_VERSION = 2;
+export const DAILY_DESIGN_VERSION = 3;
 
 export const DAILY = {
   orange: '#FE7F26',
@@ -226,13 +226,110 @@ function PhotoCard({ text }: { text: PostImageText }) {
   );
 }
 
+// ── Listing posts (design v3): "a local's notes", not a flyer ─────────────────
+// Warm paper by day, deep night blue for tonight. Sentence case, the event's own
+// name, one plain line of context, and the brand's sunset as an accent: a thin
+// band, the sun setting behind the skyline, the logo. The grid gets variety
+// instead of a wall of identical red.
+
+type Tone = { bg: string; ink: string; muted: string; rule: string; accent: string };
+const PAPER: Tone = { bg: '#FFF7EE', ink: '#1A1F4D', muted: '#5B5F7A', rule: '#1A1F4D1A', accent: DAILY.pillRed };
+const NIGHT: Tone = { bg: '#141A45', ink: '#FFFFFF', muted: '#C9CBE6', rule: '#FFFFFF24', accent: DAILY.orange };
+
+/** The sun going down behind the skyline, bottom right. */
+function sunset(): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="620" height="620" viewBox="0 0 620 620"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${DAILY.orange}"/><stop offset="0.5" stop-color="${DAILY.red}"/><stop offset="1" stop-color="${DAILY.magenta}"/></linearGradient></defs><circle cx="310" cy="310" r="300" fill="url(#s)"/></svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+}
+
+function NotesFrame({ tone, night, eyebrow, footer, center = false, children }: { tone: Tone; night: boolean; eyebrow: string; footer: string; center?: boolean; children: React.ReactNode }) {
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: tone.bg, ...(night ? { backgroundImage: `linear-gradient(170deg, ${tone.bg} 0%, #22165A 70%, #3A1560 100%)` } : {}), position: 'relative' }}>
+      <img src={sunset()} width={400} height={400} style={{ position: 'absolute', right: 70, bottom: -110 }} />
+      <img src={skyline(night ? '#0B0F2E' : tone.ink, night ? 0.95 : 0.92)} width={1080} height={420} style={{ position: 'absolute', left: 0, bottom: -60 }} />
+      <div style={{ display: 'flex', position: 'absolute', left: 0, top: 0, width: 1080, height: 14, backgroundImage: DAILY_GRADIENT }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '56px 72px 0' }}>
+        <img src={logo()} width={92} height={92} style={{ borderRadius: 92 }} />
+        <div style={{ display: 'flex', fontFamily: 'Inter', fontWeight: 600, fontSize: 30, color: tone.accent }}>{eyebrow}</div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: center ? 'center' : 'flex-start', padding: center ? '0 72px 260px' : '64px 72px 0' }}>{children}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 72px 48px' }}>
+        <div style={{ display: 'flex', fontFamily: 'Inter', fontWeight: 600, fontSize: 25, color: '#FFFFFF', backgroundColor: night ? '#FFFFFF1F' : tone.ink, padding: '10px 20px', borderRadius: 999 }}>{footer}</div>
+        <div style={{ display: 'flex', fontFamily: 'Inter', fontWeight: 800, fontSize: 27, color: '#FFFFFF' }}>@calgarydaily</div>
+      </div>
+    </div>
+  );
+}
+
+const notesHeadlineSize = (t: string) => (t.length <= 14 ? 124 : t.length <= 24 ? 104 : t.length <= 40 ? 86 : 72);
+
+function NotesHeadline({ text, tone }: { text: string; tone: Tone }) {
+  return <div style={{ display: 'flex', fontFamily: 'Bricolage', fontWeight: 800, fontSize: notesHeadlineSize(text), lineHeight: 1.02, letterSpacing: -2.5, color: tone.ink }}>{text}</div>;
+}
+
+function Blurb({ text, tone, size = 38 }: { text?: string | null; tone: Tone; size?: number }) {
+  return text ? <div style={{ display: 'flex', marginTop: 22, fontFamily: 'Inter', fontWeight: 400, fontSize: size, lineHeight: 1.32, color: tone.muted, maxWidth: 900 }}>{text}</div> : null;
+}
+
+/** "Name|meta" lines; older queued posts use "time · name". */
+function splitLine(line: string): [string, string] {
+  if (line.includes('|')) { const [a, b] = line.split('|'); return [a, b ?? '']; }
+  const [when, ...rest] = line.split(' · ');
+  return rest.length ? [rest.join(' · '), when] : [line, ''];
+}
+
+/** "SAT, SEP 26" → "Sat, Sep 26": the notes look keeps dates in sentence case too. */
+function titleCaseDate(s: string): string {
+  return s.toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase());
+}
+
+function NotesRoundup({ text }: { text: PostImageText }) {
+  const night = /^tonight/i.test(text.headline);
+  const tone = night ? NIGHT : PAPER;
+  const lines = text.details.map(splitLine);
+  return (
+    <NotesFrame tone={tone} night={night} eyebrow={titleCaseDate(text.eyebrow)} footer={text.footer || 'Full list on calgarywatch.ca'} center={!lines.length}>
+      <NotesHeadline text={text.headline} tone={tone} />
+      <Blurb text={text.blurb} tone={tone} />
+      <div style={{ display: 'flex', flexDirection: 'column', marginTop: lines.length ? 44 : 0 }}>
+        {lines.map(([name, meta], i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 26, padding: '20px 0', borderTop: `2px solid ${tone.rule}` }}>
+            <div style={{ display: 'flex', width: 52, flexShrink: 0, fontFamily: 'Bricolage', fontWeight: 800, fontSize: 48, lineHeight: 1, color: tone.accent }}>{String(i + 1)}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <div style={{ display: 'flex', fontFamily: 'Inter', fontWeight: 800, fontSize: lines.length > 4 ? 34 : 38, lineHeight: 1.15, color: tone.ink }}>{name}</div>
+              {meta ? <div style={{ display: 'flex', marginTop: 6, fontFamily: 'Inter', fontWeight: 400, fontSize: 28, color: tone.muted }}>{meta}</div> : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </NotesFrame>
+  );
+}
+
+function NotesSpotlight({ text }: { text: PostImageText }) {
+  const tone = PAPER;
+  return (
+    <NotesFrame tone={tone} night={false} eyebrow={text.footer} footer="Details on calgarywatch.ca" center>
+      <div style={{ display: 'flex', alignSelf: 'flex-start', fontFamily: 'Inter', fontWeight: 800, fontSize: 28, color: '#FFFFFF', backgroundImage: DAILY_GRADIENT, padding: '10px 22px', borderRadius: 999, marginBottom: 30 }}>{text.eyebrow}</div>
+      <NotesHeadline text={text.headline} tone={tone} />
+      <Blurb text={text.blurb} tone={tone} size={36} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 40 }}>
+        {text.details.map((d, i) => (
+          <div key={i} style={{ display: 'flex', fontFamily: 'Inter', fontWeight: i === 0 ? 800 : 600, fontSize: i === 0 ? 38 : 34, color: tone.ink }}>{d}</div>
+        ))}
+      </div>
+    </NotesFrame>
+  );
+}
+
 export function DailyPost({ template, text }: { template: PostTemplate; text: PostImageText }) {
   if (text.photo) return <PhotoCard text={text} />;
   switch (template) {
-    case 'roundup': return <RoundupCard text={text} />;
+    case 'roundup': return <NotesRoundup text={text} />;
     case 'news': return <NewsCard text={text} />;
     case 'slide': return <SlideCard text={text} />;
     case 'take': return <TakeCard text={text} />;
+    case 'event': return <NotesSpotlight text={text} />;
     default: return <EventCard text={text} />;
   }
 }

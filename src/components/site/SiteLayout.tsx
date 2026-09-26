@@ -4,6 +4,7 @@ import { ArrowUpRight, Search } from 'lucide-react';
 import '../../styles/discovery.css';
 import '../../styles/site-nav.css';
 import { MenuArt, type MenuArtKind } from './MenuArt';
+import { CALGARYDAILY } from '../../config/social';
 
 export function Wordmark() {
   return (
@@ -126,12 +127,12 @@ export function SiteHeader() {
           </nav>
           <div className="cw-menu-foot">
             <Link to="/map?settings=alerts" className="cw-menu-mail"><MenuArt kind="mail" /><span><strong>Get the Monday email</strong><small>What was reported near home. Free.</small></span></Link>
-            <p><Link to="/map">Open the live map</Link><Link to="/about">About</Link><Link to="/coverage">Sources</Link><Link to="/privacy">Privacy</Link></p>
+            <p><Link to="/map">Open the live map</Link><Link to="/about">About</Link><Link to="/coverage">Sources</Link><Link to="/privacy">Privacy</Link><a href={CALGARYDAILY.url} target="_blank" rel="noopener" title="CalgaryDaily, our sister account on Instagram">Instagram @calgarydaily</a></p>
           </div>
         </div>
       </div>
     </header>
   );
 }
-export function SiteFooter() { return <footer className="cw-footer"><div className="cw-wrap"><div className="cw-footer-top"><div><Wordmark /><p>A little closer to your city.</p></div><a className="cw-text-link" href="mailto:aldo@calgarywatch.ca">Say hello <ArrowUpRight size={18} /></a></div><div className="cw-footer-bottom"><p>© {new Date().getFullYear()} CalgaryWatch · Free for residents.</p><nav aria-label="Footer"><NavLink to="/community" title="CalgaryWatch community">Community</NavLink><Link to="/about">About</Link><Link to="/coverage">Live coverage</Link><Link to="/privacy">Privacy</Link><Link to="/map?settings=alerts">Email preferences</Link></nav></div></div></footer>; }
+export function SiteFooter() { return <footer className="cw-footer"><div className="cw-wrap"><div className="cw-footer-top"><div><Wordmark /><p>A little closer to your city.</p></div><a className="cw-text-link" href="mailto:aldo@calgarywatch.ca">Say hello <ArrowUpRight size={18} /></a></div><div className="cw-footer-bottom"><p>© {new Date().getFullYear()} CalgaryWatch · Free for residents.</p><nav aria-label="Footer"><NavLink to="/community" title="CalgaryWatch community">Community</NavLink><Link to="/about">About</Link><Link to="/coverage">Live coverage</Link><Link to="/partners">For businesses</Link><Link to="/privacy">Privacy</Link><Link to="/map?settings=alerts">Email preferences</Link><a href={CALGARYDAILY.url} target="_blank" rel="noopener" title="CalgaryDaily, our sister account on Instagram">Instagram @calgarydaily</a></nav></div></div></footer>; }
 export function SiteLayout({ children }: { children: ReactNode }) { return <div className="cw-site"><a className="cw-skip" href="#cw-main">Skip to content</a><SiteHeader /><main id="cw-main">{children}</main><SiteFooter /></div>; }

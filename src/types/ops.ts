@@ -22,6 +22,8 @@ export interface PostImageText {
   headline: string;
   details: string[];
   footer: string;
+  /** A plain line under the headline: the hook on roundups, one sentence from the organizer on spotlights. */
+  blurb?: string | null;
   /** Photo posts: an openly licensed image in brand/photos/ and its credit, printed on the image. */
   photo?: { file: string; credit: string; focus?: string } | null;
 }
@@ -73,6 +75,33 @@ export interface OpsPost {
   attempts?: number;
   /** Set while a publish is in flight so an overlapping run can't post twice. */
   publishingAt?: number | null;
+  /** Instagram numbers for a published post, refreshed daily for three weeks (scripts/ops/jobs/insights.ts). */
+  insights?: PostInsights | null;
+}
+
+export interface PostInsights {
+  reach: number;
+  views: number | null;
+  likes: number;
+  comments: number;
+  saves: number;
+  shares: number;
+  fetchedAt: number;
+}
+
+/** One row of the performance table: posts of one kind and how they did on average. */
+export interface PerformanceRow { key: string; label: string; posts: number; avgReach: number; avgSavesShares: number }
+
+/** ops_health/performance: what's working on @calgarydaily, from the last 30 days of posts. */
+export interface OpsPerformance {
+  updatedAt: number;
+  followers: Record<string, number>;
+  byFormat: PerformanceRow[];
+  bySlot: PerformanceRow[];
+  byKind: PerformanceRow[];
+  top: Array<{ headline: string; permalink: string; reach: number; savesShares: number; format: string }>;
+  /** Average minutes between a post's slot and when it actually went out, last 7 days. */
+  avgDelayMinutes: number | null;
 }
 
 export type LeadStatus =

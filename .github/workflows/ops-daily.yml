@@ -1,15 +1,15 @@
 name: Operations Daily
 
-# Morning run of the operations agent (scripts/ops/daily.ts): drafts Instagram
-# posts for CalgaryWatch and CalgaryDaily from verified listings, flags posts
-# whose listing changed, researches and drafts partner emails, checks health,
-# and emails a summary. It never publishes or sends: that waits for approval
-# in /admin and happens in Operations Hourly.
-#
-# 13:05 UTC = 07:05 MDT / 06:05 MST.
+# Morning run of the operations agent (scripts/ops/daily.ts): drafts @calgarydaily
+# posts from verified listings, flags posts whose listing changed, researches and
+# drafts partner emails (queued automatically when autoSend is on), checks health
+# and emails a summary. Publishing and sending happen in Operations Hourly.
 on:
   schedule:
-    - cron: '5 13 * * *'
+    # Several chances a day (03:05, 06:05, 07:05, 08:05 Calgary summer time) because GitHub
+    # skips or delays scheduled runs. Every step is safe to repeat; the summary email goes
+    # out once a day, from the first run after 6 am.
+    - cron: '5 9,12,13,14 * * *'
   workflow_dispatch:
 
 permissions:

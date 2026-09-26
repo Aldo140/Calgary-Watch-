@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Bell, Camera, Check, Clock, EyeOff, Flag, Mail, MapPin, Phone, Plus, ShieldCheck, Timer, UserRound } from 'lucide-react';
+import { ArrowUpRight, Bell, Camera, Check, Clock, EyeOff, Flag, Mail, MapPin, Phone, Plus, Search, ShieldCheck, Timer, UserRound } from 'lucide-react';
 import { INCIDENT_CATEGORIES } from '../../constants';
 import { COMMUNITY_FAQS } from '../../content/communityWatch';
 import { timeAgo, type ExampleReport } from '../../lib/homeClaims';
@@ -83,16 +83,44 @@ function NowBoard({ pulse }: { pulse: LivePulse }) {
   );
 }
 
+function CommunityPhone({ pulse }: { pulse: LivePulse }) {
+  const now = pulse.reports.checkedAt ?? Date.now();
+  return (
+    <div className="cv-phone-stage" role="group" aria-label="CalgaryWatch live map preview">
+      <div className="cv-phone">
+        <span className="cv-phone-button cv-phone-button-a" /><span className="cv-phone-button cv-phone-button-b" />
+        <div className="cv-phone-screen">
+          <div className="cv-phone-status"><span>{clock.format(now)}</span><span className="cv-phone-island" /><span>▮▮▮</span></div>
+          <div className="cv-phone-appbar">
+            <b><i />CalgaryWatch</b>
+            <span><Search size={13} /> Search a neighbourhood</span>
+          </div>
+          <div className="cv-phone-map"><CityMap pins={pulse.reports.recent ?? []} className="cv-phone-city" labels={false} quads={false} /><span className="cv-phone-you" /></div>
+          <NowBoard pulse={pulse} />
+          <div className="cv-phone-tabs"><span className="on"><MapPin size={16} />Map</span><span className="cv-phone-add"><Plus size={20} /></span><span><Bell size={16} />Alerts</span></div>
+        </div>
+        <span className="cv-phone-glare" />
+      </div>
+      <span className="cv-phone-note">A live look at Calgary</span>
+    </div>
+  );
+}
+
 export function CommunityHero({ pulse, views }: { pulse: LivePulse; views: string }) {
   return (
     <section className="cv-hero" aria-labelledby="cm-title">
       <div className="cv-hero-map" aria-hidden="true">
         <CityMap pins={pulse.reports.recent ?? []} className="cv-bgmap" labels={false} quads={false} />
+        <span className="cv-map-stamp">CALGARY · 51°02′N 114°04′W</span>
       </div>
       <div className="cw-wrap cv-hero-grid">
         <div className="cv-hero-copy">
           <p className="cv-kicker"><span className="cv-pulse" aria-hidden="true" />Community Watch · Live</p>
-          <h1 id="cm-title">Calgary crime watch, <mark>from your neighbours.</mark></h1>
+          <h1 id="cm-title" aria-label="Calgary crime watch, from your neighbours.">
+            <span className="cv-title-city">CALGARY</span>
+            <span className="cv-title-watch"><mark>CRIME</mark> WATCH</span>
+            <span className="cv-title-neighbours">FROM YOUR NEIGHBOURS.</span>
+          </h1>
           <p className="cv-lead">Crime and safety reports from people who live here, next to Calgary Police news, City of Calgary traffic and 311, weather alerts and power outages. One map, and every pin shows where it came from and when.</p>
           <div className="cv-ctas">
             <Link className="cv-btn cv-btn-yellow" to="/map">Open the live map <ArrowUpRight size={18} /></Link>
@@ -104,7 +132,11 @@ export function CommunityHero({ pulse, views }: { pulse: LivePulse; views: strin
             <li><b>Anonymous</b> posting</li>
           </ul>
         </div>
-        <NowBoard pulse={pulse} />
+        <div className="cv-hero-visual">
+          <CommunityPhone pulse={pulse} />
+          <div className="cv-orbit-note cv-orbit-note-a"><i />Neighbour reports<span>From people nearby</span></div>
+          <div className="cv-orbit-note cv-orbit-note-b"><i />Official updates<span>City · Police · Weather</span></div>
+        </div>
       </div>
       <Tear bottom />
     </section>
@@ -129,7 +161,9 @@ export function Sources({ pulse }: { pulse: LivePulse }) {
     <section className="cv-sec cv-sources" aria-labelledby="cv-sources-title">
       <div className="cw-wrap">
         <div className="cv-head cv-head-split">
+          <div><p className="cv-section-label">01 / A clearer picture</p>
           <h2 id="cv-sources-title">Five sources, <mark>one map.</mark></h2>
+          </div>
           <p>What each one covers and how often it updates. Official sources are pinned automatically; neighbours add the rest.</p>
         </div>
         <div className="cv-board">
@@ -165,34 +199,46 @@ export function Steps() {
     <section className="cv-sec cv-steps" aria-labelledby="cv-steps-title">
       <div className="cw-wrap">
         <div className="cv-head">
+          <p className="cv-section-label">02 / How it works</p>
           <h2 id="cv-steps-title">From your phone to the map <mark>in about a minute.</mark></h2>
         </div>
         <ol className="cv-step-list">
           <li className="cv-step">
             <span className="cv-num">1</span>
             <h3>Post what you saw</h3>
-            <div className="cv-step-art" aria-hidden="true">
-              <div className="cv-mini-chips"><i className="on">Crime</i><i>Traffic</i><i>Weather</i></div>
-              <div className="cv-mini-field"><small>Headline</small>Smoke coming from a building</div>
-              <div className="cv-mini-row"><span><Camera size={14} /> Photo</span><span><EyeOff size={14} /> Anonymous</span></div>
+            <div className="cv-flow-phone cv-flow-phone-one" aria-hidden="true">
+              <div className="cv-flow-screen"><div className="cv-flow-status"><span>9:41</span><i /></div><b className="cv-flow-brand">CalgaryWatch <small>NEW REPORT</small></b>
+                <span className="cv-flow-caption">What did you see?</span><div className="cv-mini-chips"><i className="on">Crime</i><i>Traffic</i></div>
+                <div className="cv-mini-field"><small>Headline</small>Smoke from a building</div>
+                <div className="cv-flow-place"><MapPin size={13} /> Inglewood <span>PIN PLACED</span></div>
+                <div className="cv-mini-row"><span><Camera size={14} /> Add photo</span><span><EyeOff size={14} /> Anonymous</span></div>
+                <div className="cv-flow-submit">Post report <ArrowUpRight size={13} /></div>
+              </div>
             </div>
             <p>A headline, the neighbourhood, an optional photo and a pin. You sign in, so every report comes from a real account, but your name can stay hidden.</p>
           </li>
           <li className="cv-step">
             <span className="cv-num">2</span>
             <h3>It's pinned where it happened</h3>
-            <div className="cv-step-art cv-step-map" aria-hidden="true">
-              <CityMap pins={[]} className="cv-mini-city" labels={false} quads={false} viewBox="130 150 170 110" />
-              <span className="cv-drop"><MapPin size={30} fill="#ef4444" stroke="#fff" /></span>
+            <div className="cv-flow-phone cv-flow-phone-two" aria-hidden="true">
+              <div className="cv-flow-screen"><div className="cv-flow-status"><span>9:41</span><i /></div><b className="cv-flow-brand">CalgaryWatch <small>LIVE MAP</small></b>
+                <div className="cv-flow-map"><CityMap pins={[]} className="cv-mini-city" labels={false} quads={false} viewBox="130 150 170 110" /><span className="cv-drop"><MapPin size={29} fill="#ef4444" stroke="#fff" /></span><i className="cv-map-ping" /></div>
+                <div className="cv-flow-mapcard"><b>Smoke from a building</b><span><MapPin size={12} /> Inglewood · just now</span><em><i /> Neighbour report</em></div>
+                <div className="cv-flow-notify"><Bell size={13} /> Pinned for nearby neighbours</div>
+              </div>
             </div>
             <p>Everyone sees it on the map right away, and people who live nearby get it in the next Monday email.</p>
           </li>
           <li className="cv-step">
             <span className="cv-num">3</span>
             <h3>Neighbours back it up</h3>
-            <div className="cv-step-art" aria-hidden="true">
-              <div className="cv-mini-chips"><i className="on"><Check size={12} /> I saw this too</i><i>Still happening</i></div>
-              <div className="cv-mini-backed"><ShieldCheck size={15} /> Backed by 4 neighbours</div>
+            <div className="cv-flow-phone cv-flow-phone-three" aria-hidden="true">
+              <div className="cv-flow-screen"><div className="cv-flow-status"><span>9:42</span><i /></div><b className="cv-flow-brand">CalgaryWatch <small>NEAR YOU</small></b>
+                <div className="cv-flow-mapcard"><em><i /> Neighbour report · Inglewood</em><b>Smoke from a building</b><span>Posted just now</span></div>
+                <span className="cv-flow-caption">Have an update?</span><div className="cv-flow-vote cv-flow-vote-on"><Check size={13} /> I saw this too <b>4</b></div>
+                <div className="cv-flow-vote">Still happening <b>2</b></div><div className="cv-flow-vote">Seems resolved <b>0</b></div>
+                <div className="cv-flow-trust"><ShieldCheck size={14} /> Neighbours add context</div>
+              </div>
             </div>
             <p>People nearby tap once: "I saw this too", "Still happening" or "Seems resolved". The report shows the count.</p>
           </li>
@@ -218,6 +264,7 @@ export function ReadingReports() {
       <div className="cw-wrap">
         <div className="cv-trust-grid">
           <div>
+            <p className="cv-section-label">03 / Read the signals</p>
             <h2 id="cv-trust-title">How much to trust a report, <mark>at a glance.</mark></h2>
             <p className="cv-sub">Neighbour reports aren't checked by police. Four things on every report tell you how much weight to give it.</p>
             <ol className="cv-trust-list">

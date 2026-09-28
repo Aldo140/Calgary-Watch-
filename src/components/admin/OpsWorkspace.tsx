@@ -55,7 +55,7 @@ function PostCard({ post }: { post: OpsPost }) {
 
   return (
     <article className="grid gap-4 md:grid-cols-[260px_1fr] p-4 border-b last:border-b-0" style={{ borderColor: T.line }}>
-      <div>
+      <div className="w-full max-w-[240px] mx-auto md:mx-0 md:max-w-none">
         {post.imageUrl
           ? <a href={post.imageUrl} target="_blank" rel="noreferrer"><img src={post.imageUrl} alt={post.altText} className="w-full rounded-lg border" style={{ borderColor: T.line, aspectRatio: '4 / 5', objectFit: 'cover' }} /></a>
           : <div className="w-full rounded-lg grid place-items-center" style={{ aspectRatio: '4 / 5', background: T.surface, color: T.muted }}><ImageIcon size={22} /></div>}

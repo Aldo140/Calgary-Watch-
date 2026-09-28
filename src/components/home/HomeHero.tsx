@@ -13,6 +13,7 @@ const INTENTS: Array<{ label: string; to: string; live?: boolean }> = [
   { label: 'Tonight', to: '/events/today?time=tonight' },
   { label: 'Community Watch', to: '/community', live: true },
   { label: 'This weekend', to: '/events/this-weekend' },
+  { label: 'Date night', to: '/date-night' },
   { label: 'Markets', to: '/markets' },
   { label: 'Neighbourhoods', to: '/neighbourhoods' },
 ];

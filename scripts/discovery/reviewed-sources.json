@@ -120,5 +120,362 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "theatre-calgary",
+      "name": "Theatre Calgary",
+      "approved": true,
+      "hosts": [
+        "www.theatrecalgary.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "little-shop-of-horrors-2026",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "musical",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Theatre Calgary",
+          "pricing": "paid",
+          "title": "Little Shop of Horrors",
+          "summary": "Theatre Calgary’s season-opening musical: a timid shop assistant, a plant with a taste for blood, and a very dark comedy.",
+          "description": "Theatre Calgary describes it as a “darkly comic tale about ambition, love, and the price of getting what you wish for.” Directed and choreographed by Tracey Flye. Evenings at 7:30 pm, matinees at 2 pm; opening night is Friday, Oct. 2. Runs 2 hours 5 minutes with an intermission. Check the Theatre Calgary box office for dates and prices.",
+          "address": "220 9 Ave SE, Calgary, AB",
+          "venue": "Max Bell Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.theatrecalgary.com/shows/2026-2027-little-shop-of-horrors",
+          "start": "2026-09-29T19:30:00-06:00",
+          "end": "2026-10-25T16:05:00-06:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "wordfest",
+      "name": "Wordfest",
+      "approved": true,
+      "hosts": [
+        "wordfest.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "imaginairium-2026-opening-night",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "books",
+            "festival",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "organizer": "Wordfest",
+          "pricing": "paid",
+          "title": "Wordfest Opening Night Showcase with Cassie Campbell-Pascall & Clara Hughes",
+          "summary": "The opening night of Wordfest’s Imaginairium festival, starring two of Canada’s best-known Olympians.",
+          "description": "Opening night of the 31st Imaginairium festival (Oct. 13–18): 41 shows featuring 60 authors across downtown. This showcase stars Cassie Campbell-Pascall and Clara Hughes. Tickets and festival passes through Wordfest.",
+          "address": "800 3 St SE, Calgary, AB",
+          "venue": "Central Library",
+          "neighbourhood": "East Village",
+          "sourceUrl": "https://wordfest.com/festival/imaginairium/schedule/",
+          "start": "2026-10-13T19:30:00-06:00",
+          "end": "2026-10-13T21:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "imaginairium-2026-literary-death-match",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "books",
+            "comedy",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Wordfest",
+          "pricing": "paid",
+          "title": "Literary Death Match",
+          "summary": "Writers read, judges riff, and a winner is crowned: Wordfest’s competitive night out at the DJD Dance Centre.",
+          "description": "Part of Wordfest’s Imaginairium festival (Oct. 13–18). Tickets through Wordfest.",
+          "address": "111 12 Ave SE, Calgary, AB",
+          "venue": "DJD Dance Centre",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://wordfest.com/festival/imaginairium/schedule/",
+          "start": "2026-10-16T19:30:00-06:00",
+          "end": "2026-10-16T21:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "imaginairium-2026-bonnie-garmus",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "books",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "organizer": "Wordfest",
+          "pricing": "paid",
+          "title": "An Evening with Bonnie Garmus",
+          "summary": "The closing-night show of Wordfest’s Imaginairium festival, at Bella Concert Hall.",
+          "description": "The last show of the 31st Imaginairium festival. Tickets through Wordfest.",
+          "address": "4825 Mount Royal Gate SW, Calgary, AB",
+          "venue": "Bella Concert Hall, Taylor Centre for the Performing Arts",
+          "neighbourhood": "Lincoln Park",
+          "sourceUrl": "https://wordfest.com/festival/imaginairium/schedule/",
+          "start": "2026-10-18T19:30:00-06:00",
+          "end": "2026-10-18T21:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scotiabank-saddledome",
+      "name": "Scotiabank Saddledome",
+      "approved": true,
+      "hosts": [
+        "scotiabanksaddledome.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "sidhu-moose-wala-2026-10-19",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "concert",
+            "arena"
+          ],
+          "categories": [
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Sidhu Moose Wala: Signed To God World Tour 2026",
+          "summary": "The Signed To God World Tour comes to the Saddledome.",
+          "description": "Arena concert at the Scotiabank Saddledome, 8 pm. Tickets through the Saddledome.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-19T20:00:00-06:00",
+          "end": "2026-10-19T23:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "smashing-pumpkins-2026-11-03",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "concert",
+            "arena",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Smashing Pumpkins: The Rats In A Cage Tour",
+          "summary": "The Smashing Pumpkins play the Saddledome in its farewell season.",
+          "description": "Arena concert at the Scotiabank Saddledome, 8 pm. The tour promises two sets. Tickets through the Saddledome.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-11-03T20:00:00-07:00",
+          "end": "2026-11-03T23:00:00-07:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "alberta-ballet",
+      "name": "Alberta Ballet",
+      "approved": true,
+      "hosts": [
+        "www.albertaballet.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "nutcracker-calgary-2026",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "ballet",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "family",
+            "holiday",
+            "indoor"
+          ],
+          "organizer": "Alberta Ballet",
+          "pricing": "paid",
+          "title": "Alberta Ballet: The Nutcracker",
+          "summary": "Alberta Ballet’s Nutcracker, with the Calgary Philharmonic playing Tchaikovsky live.",
+          "description": "Choreography by artistic director Francesco Ventriglia, costumes by Gianluca Falaschi and sets by Italo Grassi, with the Calgary Philharmonic Orchestra playing the score live. Calgary shows Dec. 11–24: evenings at 6 or 7 pm and 1 pm matinees (Dec. 24 is a matinee only). Tickets through Ticketmaster.",
+          "address": "1415 14 Ave NW, Calgary, AB",
+          "venue": "Southern Alberta Jubilee Auditorium",
+          "neighbourhood": "Banff Trail",
+          "sourceUrl": "https://www.albertaballet.com/shows/the-nutcracker",
+          "start": "2026-12-11T19:00:00-07:00",
+          "end": "2026-12-24T15:30:00-07:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "spruce-meadows",
+      "name": "Spruce Meadows",
+      "approved": true,
+      "hosts": [
+        "www.sprucemeadows.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "international-christmas-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Spruce Meadows International Christmas Market",
+          "summary": "Four weekends of Christmas shopping at Spruce Meadows, and new for 2026, an 18+ evening every Friday.",
+          "description": "Nov. 13–15, 20–22, 27–29 and Dec. 4–6. Fridays 12 to 5 pm for all ages, then 6 to 9 pm is 18+ only (new for 2026). Saturdays 10 am to 7 pm, Sundays 10 am to 6 pm. Admission 0 for adults, 2 for children 3 to 12 and seniors 65+, free under 2, plus GST. General parking is included in the ticket.",
+          "address": "18011 Spruce Meadows Way SW, Calgary, AB",
+          "venue": "Spruce Meadows",
+          "organizer": "Spruce Meadows",
+          "sourceUrl": "https://www.sprucemeadows.com/icm-faq/",
+          "categories": [
+            "markets",
+            "holiday",
+            "shopping",
+            "family"
+          ],
+          "tags": [
+            "christmas market",
+            "date night"
+          ],
+          "amenities": [
+            "parking"
+          ],
+          "parking": "General parking is included in the ticket price. Accessible parking in Lots 7 and 8.",
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "icm-2026-11-13",
+              "start": "2026-11-13T12:00:00-07:00",
+              "end": "2026-11-13T21:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-14",
+              "start": "2026-11-14T10:00:00-07:00",
+              "end": "2026-11-14T19:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-15",
+              "start": "2026-11-15T10:00:00-07:00",
+              "end": "2026-11-15T18:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-20",
+              "start": "2026-11-20T12:00:00-07:00",
+              "end": "2026-11-20T21:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-21",
+              "start": "2026-11-21T10:00:00-07:00",
+              "end": "2026-11-21T19:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-22",
+              "start": "2026-11-22T10:00:00-07:00",
+              "end": "2026-11-22T18:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-27",
+              "start": "2026-11-27T12:00:00-07:00",
+              "end": "2026-11-27T21:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-28",
+              "start": "2026-11-28T10:00:00-07:00",
+              "end": "2026-11-28T19:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-11-29",
+              "start": "2026-11-29T10:00:00-07:00",
+              "end": "2026-11-29T18:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-12-04",
+              "start": "2026-12-04T12:00:00-07:00",
+              "end": "2026-12-04T21:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-12-05",
+              "start": "2026-12-05T10:00:00-07:00",
+              "end": "2026-12-05T19:00:00-07:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "icm-2026-12-06",
+              "start": "2026-12-06T10:00:00-07:00",
+              "end": "2026-12-06T18:00:00-07:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
   }
 ]

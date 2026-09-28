@@ -128,6 +128,15 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
+  '/date-night': {
+    title: 'Date Night in Calgary: Shows, Festivals & Ideas for Two | CalgaryWatch',
+    description:
+      'Date night ideas in Calgary, checked with the organizers: theatre, concerts, festival nights and a Christmas market evening, plus what’s on this week and free ideas. Picks are never paid for.',
+    index: true,
+    pageType: 'WebPage',
+    dateModified: '2026-09-28',
+    image: DEFAULT_IMAGE,
+  },
   '/partners': {
     title: 'How CalgaryWatch Works With Local Businesses | Calgary Watch',
     description:

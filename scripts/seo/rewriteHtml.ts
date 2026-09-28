@@ -233,6 +233,11 @@ export function buildStaticRouteBody(pathname: string): string {
       copy: 'CalgaryWatch is Calgary’s crime watch: a live Calgary crime map and public safety map, plus events, markets and local places. Community Watch puts crime and safety reports from neighbours next to Calgary Police news releases, City data, weather and outages. The week planner lists real events and markets by day.',
       links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/neighbourhoods', 'Neighbourhoods']],
     },
+    '/date-night': {
+      heading: 'Date night in Calgary.',
+      copy: 'Date night ideas in Calgary, from the organizers’ own listings: Theatre Calgary’s Little Shop of Horrors, Wordfest’s Literary Death Match, the 18+ Friday evenings at the Spruce Meadows International Christmas Market, Alberta Ballet’s Nutcracker with the Calgary Philharmonic, and concerts at the Saddledome. Plus arts and nights out on this week and free ideas like the Bow River walk, Inglewood and Kensington. Picks are CalgaryWatch’s own and never paid for.',
+      links: [['/events', 'Events this week'], ['/events/this-weekend', 'This weekend in Calgary'], ['/neighbourhoods', 'Neighbourhoods'], ['/partners', 'How we pick']],
+    },
     '/map': {
       heading: 'Calgary crime map with recent reports near you',
       copy: 'Explore recent community observations and attributed public-source reports across Calgary and nearby communities. Crime, traffic, weather, infrastructure and emergency markers each include a report time and source. Calgary Watch supports local awareness; it is not a police scanner, dispatch feed or officer tracker.',

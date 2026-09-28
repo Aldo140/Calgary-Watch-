@@ -5,7 +5,8 @@ import type { AgendaDay, AgendaItem } from '../../lib/discoveryCalendar';
 import type { DiscoveryEntity, Neighbourhood } from '../../types/discovery';
 import type { LivePulse } from '../../hooks/useLivePulse';
 import { entityPath } from '../../lib/discovery';
-import { timeAgo, weekendDays } from '../../lib/homeClaims';
+import { timeAgo, weekendDays, type ExampleReport } from '../../lib/homeClaims';
+import { CityMap } from '../community/CityMap';
 
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayShort = fmt({ weekday: 'short' });
@@ -21,18 +22,40 @@ function firstOf(days: AgendaDay[], kind: AgendaItem['kind']) {
   return undefined;
 }
 
-/** Projects a real coordinate onto the radar: centred on Centre St downtown, rim ≈ 22 km. */
-const DOWNTOWN = { lat: 51.0447, lng: -114.0631 };
-function radarPoint(lat: number, lng: number) {
-  const x = (lng - DOWNTOWN.lng) * 70.04 / 22 * 84;
-  const y = -(lat - DOWNTOWN.lat) * 110.9 / 22 * 84;
-  const r = Math.hypot(x, y);
-  const k = r > 84 ? 84 / r : 1;
-  return { x: 100 + x * k, y: 100 + y * k };
-}
+/** Where pins come from; same names and colours as the /community sources board. */
+const WATCH_SOURCES = [
+  { name: 'Neighbours', color: '#ef4444' },
+  { name: 'Calgary Police', color: '#1554d1' },
+  { name: 'City of Calgary', color: '#00c2e0' },
+  { name: 'Weather alerts', color: '#8b5cf6' },
+  { name: 'Power & rivers', color: '#f59e0b' },
+];
 
-/** Kinds of report, not current ones; the real latest report is shown below them. */
-const REPORT_KINDS = ['Bike stolen', 'Car break-in', 'Suspicious person on the CTrain', 'Police news release', 'Road closure', 'Power outage'];
+/**
+ * What Community Watch is, in one picture: the city with its real pins from the
+ * last 24 hours, the five sources, and one report card with a photo. The card is
+ * the illustrated example from /community and says so; nothing here is invented.
+ */
+function WatchScene({ pins, count, compact = false }: { pins: ExampleReport[]; count: string | null; compact?: boolean }) {
+  return (
+    <span className={`h-watch${compact ? ' h-watch-compact' : ''}`} aria-hidden="true">
+      <CityMap pins={pins} className="h-watch-map" labels={false} quads={false} />
+      <span className="h-watch-live"><span className="h-pulse" />{count ?? 'Live map'}</span>
+      <span className="h-watch-legend">
+        {WATCH_SOURCES.map(s => <i key={s.name} style={{ ['--c' as string]: s.color }}>{s.name}</i>)}
+      </span>
+      <span className="h-watch-photo">
+        <span className="h-watch-img">
+          <img src="/images/community-examples/vehicle-breakin-example-560.webp" alt="" width="560" height="420" loading="lazy" decoding="async" />
+          <em>Example</em>
+        </span>
+        <b>Car break-in, glass on the street</b>
+        <small><i />Neighbour report · with photo</small>
+      </span>
+      <svg className="h-watch-pin" viewBox="0 0 40 52"><path d="M20,50C11,38 3,29 3,19A17,17 0 1 1 37,19C37,29 29,38 20,50Z" /><circle cx="20" cy="19" r="6.5" /></svg>
+    </span>
+  );
+}
 
 const QUAD_PIN: Record<string, [number, number]> = { NW: [62, 40], NE: [178, 40], SW: [62, 114], SE: [178, 114] };
 const QUAD_RECT: Record<string, [number, number]> = { NW: [0, 0], NE: [120, 0], SW: [0, 75], SE: [120, 75] };
@@ -50,36 +73,6 @@ function Card({ to, n, title, desc, className, children }: { to: string; n: stri
         {children}
       </Link>
     </li>
-  );
-}
-
-function Radar({ report }: { report?: { lat?: number; lng?: number } | null }) {
-  const blip = report && report.lat !== undefined && report.lng !== undefined ? radarPoint(report.lat, report.lng) : null;
-  return (
-    <svg className="h-radar" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="h-sweep" gradientUnits="userSpaceOnUse" x1="100" y1="12" x2="162" y2="38">
-          <stop offset="0" stopColor="#00c2e0" stopOpacity="0" />
-          <stop offset="1" stopColor="#00c2e0" stopOpacity=".5" />
-        </linearGradient>
-      </defs>
-      <circle cx="100" cy="100" r="88" className="h-radar-face" />
-      <circle cx="100" cy="100" r="60" /><circle cx="100" cy="100" r="32" />
-      <path d="M100,12V188M12,100H188" />
-      <path className="h-radar-bow" d="M14,86 C40,80 62,104 92,98 S130,90 146,108 S170,150 186,160" />
-      <text x="20" y="30">NW</text><text x="164" y="30">NE</text><text x="20" y="182">SW</text><text x="166" y="182">SE</text>
-      <g className="h-radar-sweep">
-        <path d="M100,100 L100,12 A88,88 0 0 1 162.2,37.8 Z" fill="url(#h-sweep)" />
-        <line x1="100" y1="100" x2="162.2" y2="37.8" />
-      </g>
-      <circle cx="100" cy="100" r="3" className="h-radar-core" />
-      {blip ? (
-        <g transform={`translate(${blip.x.toFixed(1)} ${blip.y.toFixed(1)})`}>
-          <circle r="5" className="h-radar-ping" />
-          <circle r="4.5" className="h-radar-blip" />
-        </g>
-      ) : null}
-    </svg>
   );
 }
 
@@ -184,6 +177,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
   const hoods = entities.filter((e): e is Neighbourhood => e.kind === 'neighbourhood');
   const hood = hoods.length ? hoods[new Date().getDate() % hoods.length] : undefined;
   const { example: report, status, total, capped, checkedAt } = pulse.reports;
+  const liveCount = status === 'ready' && total ? `${total}${capped ? '+' : ''} report${total === 1 ? '' : 's'} · 24 h` : null;
 
   return (
     <section className="h-ways" aria-labelledby="h-ways-title">
@@ -222,12 +216,8 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           ) : <span className="h-ticket"><span className="h-ticket-main"><b>See what’s listed</b></span></span>}
         </Card>
 
-        <Card to="/community" n="03" title="Community Watch" desc="A live crime and safety map for Calgary: reports from your neighbours, plus Calgary Police news releases, closures and outages, each with its source." className="h-way-live">
-          <span className="h-way-kinds">
-            <small>The kinds of reports you’ll see</small>
-            <span>{REPORT_KINDS.map(k => <i key={k}>{k}</i>)}</span>
-          </span>
-          <Radar report={report} />
+        <Card to="/community" n="03" title="Community Watch" desc="The free Calgary crime map. See the break-ins, stolen bikes, closures and outages near you, posted by neighbours and pulled from Calgary Police and the City, with the source on every pin." className="h-way-live">
+          <WatchScene pins={pulse.reports.recent ?? []} count={liveCount} />
           <span className="h-dispatch" aria-live="polite">
             {report ? (
               <>
@@ -268,10 +258,13 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           art={<MiniTicket day={event ? dayShort.format(new Date(event.start)) : undefined} num={event ? dayNum.format(new Date(event.start)) : undefined} />}>
           {event ? <><b>{event.title}</b><em>{clock.format(new Date(event.start))}{placeOf(event) ? ` · ${placeOf(event)}` : ''}</em></> : <b>See what’s listed</b>}
         </Strip>
-        <Strip to="/community" n="03" name="Community Watch" what="· crime & safety map" className="h-strip-live" art={<Radar report={report} />}>
+        <Strip to="/community" n="03" name="Community Watch" what="· live crime & safety map" className="h-strip-live" art={<WatchScene pins={pulse.reports.recent ?? []} count={liveCount} compact />}>
+          <b>Know what’s happening on your street.</b>
+          <span className="h-strip-say">Break-ins, stolen bikes, closures and outages near you, from neighbours, Calgary Police and the City. Free, and every pin shows its source.</span>
           {report
-            ? <><b>{report.title}</b><em><span className="h-pulse" aria-hidden="true" /> {timeAgo(report.timestamp, checkedAt ?? report.timestamp)}{report.neighborhood && !report.title.includes(report.neighborhood) ? ` · ${report.neighborhood}` : ''}</em></>
-            : <><b>Break-ins, stolen bikes, closures, outages</b><em>{status === 'ready' ? (total ? `${total}${capped ? '+' : ''} reports in the last 24 hours` : 'Quiet for the last 24 hours') : 'Each report shows its source'}</em></>}
+            ? <em><span className="h-pulse" aria-hidden="true" /> Latest: {report.title} · {timeAgo(report.timestamp, checkedAt ?? report.timestamp)}</em>
+            : null}
+          <span className="h-strip-cta">Open Community Watch <ArrowUpRight size={15} /></span>
         </Strip>
         <Strip to={hood ? entityPath(hood) : '/neighbourhoods'} n="04" name="Neighbourhoods" what="· guides by quadrant" className="h-strip-hood" art={<QuadrantMap quadrant={hood?.quadrant} />}>
           <b>{hood ? hood.title : 'Explore by quadrant'}</b>

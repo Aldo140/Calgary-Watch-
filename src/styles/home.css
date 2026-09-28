@@ -344,3 +344,12 @@
 @media (prefers-reduced-motion: reduce) {
   .cw-home2 *, .cw-home2 *::before, .cw-home2 *::after { animation: none !important; transition: none !important; }
 }
+
+/* Community Watch stands out in the hero's quick links: ink pill, live dot. */
+.cw-home2 .h-intents a.h-intent-live,
+.cw-home2 .h-hero[data-tone='light'] .h-intents a.h-intent-live { background: var(--h-navy, #06162f); color: #fff; border: 1px solid rgba(255, 255, 255, .28); }
+.cw-home2 .h-intents a.h-intent-live:hover,
+.cw-home2 .h-hero[data-tone='light'] .h-intents a.h-intent-live:hover { background: #0d2447; }
+.cw-home2 .h-intent-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--h-live-red, #ff5a4e); box-shadow: 0 0 0 0 rgba(255, 90, 78, .6); animation: h-intent-pulse 2s infinite; }
+@keyframes h-intent-pulse { 70% { box-shadow: 0 0 0 7px rgba(255, 90, 78, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 90, 78, 0); } }
+@media (prefers-reduced-motion: reduce) { .cw-home2 .h-intent-dot { animation: none; } }

@@ -9,8 +9,9 @@ import { isWeekend, summarize } from '../../lib/homeClaims';
 import { CalgarySky, type SkyVariant } from './CalgarySky';
 import { SkyGlyph } from './WeekPlanner';
 
-const INTENTS = [
+const INTENTS: Array<{ label: string; to: string; live?: boolean }> = [
   { label: 'Tonight', to: '/events/today?time=tonight' },
+  { label: 'Community Watch', to: '/community', live: true },
   { label: 'This weekend', to: '/events/this-weekend' },
   { label: 'Markets', to: '/markets' },
   { label: 'Neighbourhoods', to: '/neighbourhoods' },
@@ -111,7 +112,7 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
         </p>
         <GlobalSearch />
         <nav className="h-intents" aria-label="Jump to">
-          {INTENTS.map(i => <Link key={i.label} to={i.to}>{i.label}</Link>)}
+          {INTENTS.map(i => <Link key={i.label} to={i.to} className={i.live ? 'h-intent-live' : undefined}>{i.live ? <span className="h-intent-dot" aria-hidden="true" /> : null}{i.label}</Link>)}
         </nav>
       </div>
       <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">

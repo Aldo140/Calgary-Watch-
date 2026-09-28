@@ -156,7 +156,7 @@ for (const route of ['/events/today', '/events/this-weekend', '/markets/this-wee
 
 /** Breadcrumb entries per route for JSON-LD. */
 export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]> = {
-  '/community': [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Original Calgary Watch homepage', item: `${PRODUCTION_ORIGIN}/community` }],
+  '/community': [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Calgary Crime Watch', item: `${PRODUCTION_ORIGIN}/community` }],
   '/': [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }],
   '/map': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },

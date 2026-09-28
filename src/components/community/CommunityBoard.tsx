@@ -194,12 +194,82 @@ export function Sources({ pulse }: { pulse: LivePulse }) {
 
 /* ── How a report gets on the map ─────────────────────────────────── */
 
+const USE_CASES = [
+  {
+    type: 'THEFT · EXAMPLE',
+    title: 'A bike went missing',
+    body: 'A photo of the bike, its colour, and where and when it was last seen gives neighbours something useful to look for.',
+    detail: 'Photo + last-seen area',
+    image: '/images/community-examples/stolen-bike-example.jpg',
+    alt: 'Illustration of a bicycle at a rack with a cut lock, with the Calgary skyline and mountains behind it.',
+    tone: 'bike',
+  },
+  {
+    type: 'PROPERTY · EXAMPLE',
+    title: 'A car break-in',
+    body: 'Show the damage and share the block and time. Neighbours can stay aware and add a useful update if they saw something.',
+    detail: 'Damage + time + block',
+    image: '/images/community-examples/vehicle-breakin-example.jpg',
+    alt: 'Illustration of a car with a broken side window on a Calgary street.',
+    tone: 'breakin',
+  },
+  {
+    type: 'MISSING VEHICLE · EXAMPLE',
+    title: 'A truck to keep an eye out for',
+    body: 'Attach a reference photo, then add its colour, type, and the community and time it was last seen.',
+    detail: 'Reference photo + details',
+    image: '/images/community-examples/stolen-truck-reference.jpg',
+    alt: 'Illustration of a blue pickup truck on a snowy Calgary residential street.',
+    tone: 'truck',
+  },
+];
+
+export function ExampleReports() {
+  return (
+    <section className="cv-sec cv-examples" aria-labelledby="cv-examples-title">
+      <div className="cw-wrap">
+        <div className="cv-head cv-head-split cv-examples-head">
+          <div>
+            <p className="cv-section-label">02 / Show what neighbours should look for</p>
+            <h2 id="cv-examples-title">A useful report is <mark>easy to picture.</mark></h2>
+          </div>
+          <p>A clear photo and a few local details can help your neighbours recognize what you saw.</p>
+        </div>
+        <div className="cv-example-grid" role="region" aria-label="Illustrated example reports" tabIndex={0}>
+          {USE_CASES.map((item, index) => (
+            <article className={`cv-example-card cv-example-${item.tone}`} key={item.tone}>
+              <figure className="cv-example-image">
+                <img src={item.image} alt={item.alt} loading="lazy" decoding="async" />
+                <span className="cv-example-stamp">EXAMPLE · NOT LIVE</span>
+                <span className="cv-example-photo"><Camera size={14} /> Photo attached</span>
+                <span className="cv-example-index">0{index + 1}</span>
+              </figure>
+              <div className="cv-example-copy">
+                <p className="cv-example-type">{item.type}</p>
+                <h3>{item.title}</h3>
+                <p className="cv-example-body">{item.body}</p>
+                <div className="cv-example-detail"><MapPin size={14} /><span>{item.detail}</span><ArrowUpRight size={15} /></div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="cv-example-hint">Swipe to see all three examples <span aria-hidden="true">→</span></p>
+        <div className="cv-example-note">
+          <span><Camera size={17} /> One photo can make the details click.</span>
+          <p>These are illustrations, not current Calgary reports. On CalgaryWatch, add your own photo, community and last-seen time to help people understand your report.</p>
+          <Link to="/map?report=true">See how to post a report <ArrowUpRight size={17} /></Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function Steps() {
   return (
     <section className="cv-sec cv-steps" aria-labelledby="cv-steps-title">
       <div className="cw-wrap">
         <div className="cv-head">
-          <p className="cv-section-label">02 / How it works</p>
+          <p className="cv-section-label">03 / How it works</p>
           <h2 id="cv-steps-title">From your phone to the map <mark>in about a minute.</mark></h2>
         </div>
         <ol className="cv-step-list">
@@ -264,7 +334,7 @@ export function ReadingReports() {
       <div className="cw-wrap">
         <div className="cv-trust-grid">
           <div>
-            <p className="cv-section-label">03 / Read the signals</p>
+            <p className="cv-section-label">04 / Read the signals</p>
             <h2 id="cv-trust-title">How much to trust a report, <mark>at a glance.</mark></h2>
             <p className="cv-sub">Neighbour reports aren't checked by police. Four things on every report tell you how much weight to give it.</p>
             <ol className="cv-trust-list">

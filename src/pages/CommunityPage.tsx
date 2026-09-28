@@ -1,6 +1,6 @@
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useLivePulse } from '../hooks/useLivePulse';
-import { Closing, CommunityHero, MondayEmail, Questions, ReadingReports, Sources, Steps } from '../components/community/CommunityBoard';
+import { Closing, CommunityHero, ExampleReports, MondayEmail, Questions, ReadingReports, Sources, Steps } from '../components/community/CommunityBoard';
 import '../styles/community.css';
 import '../styles/community-page.css';
 
@@ -14,6 +14,7 @@ export default function CommunityPage() {
       <div className="cv">
         <CommunityHero pulse={pulse} views={VIEWS} />
         <Sources pulse={pulse} />
+        <ExampleReports />
         <Steps />
         <ReadingReports />
         <MondayEmail />

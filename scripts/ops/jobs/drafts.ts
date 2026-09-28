@@ -21,7 +21,9 @@ interface DraftFile {
   brand: BrandId;
   posts: Array<{
     id: string;
-    kind: 'news' | 'take' | 'event';
+    kind: 'news' | 'take' | 'event' | 'repost';
+    /** Someone else's video, shared only with their permission (see repostProblems). */
+    repost?: RepostInfo;
     title: string;
     suggestedAt: string;          // Calgary wall clock, "YYYY-MM-DDTHH:mm"
     relevantUntil?: string;       // Calgary wall clock; defaults to none
@@ -40,6 +42,46 @@ interface DraftFile {
 }
 
 const toEpoch = (local: string) => calgaryToEpoch(local.slice(0, 10), local.slice(11, 16));
+
+export interface RepostInfo {
+  /** The creator's Instagram handle, without the @. */
+  handle: string;
+  /** Their original post. */
+  originalUrl: string;
+  /** The file they sent, or a copy made after they said yes, under brand/reposts/. */
+  video: string;
+  permission: {
+    /** Who said yes: the handle or the person's name. */
+    grantedBy: string;
+    /** Where they said it: "Instagram DM", "email". */
+    how: string;
+    /** YYYY-MM-DD. */
+    date: string;
+    /** Their words, quoted, so anyone reviewing can see what was agreed. */
+    quote: string;
+  };
+}
+
+/**
+ * A repost goes out only with the creator's recorded permission and their credit
+ * in the caption. Credit alone is not permission: without a yes, it isn't queued.
+ */
+export function repostProblems(d: { kind: string; caption: string; approved?: boolean; approvedBy?: string; repost?: RepostInfo }): string[] {
+  if (d.kind !== 'repost') return [];
+  const r = d.repost;
+  if (!r) return ['Repost has no creator details.'];
+  const problems: string[] = [];
+  if (!/^[A-Za-z0-9._]{1,30}$/.test(r.handle ?? '')) problems.push('Creator handle is missing or not a valid Instagram handle.');
+  if (!/^https:\/\/(www\.)?instagram\.com\//.test(r.originalUrl ?? '')) problems.push('Original post URL must be an instagram.com link.');
+  if (!/^brand\/reposts\/[\w.-]+\.mp4$/.test(r.video ?? '')) problems.push('Video must be an .mp4 under brand/reposts/.');
+  const p = r.permission;
+  if (!p || !p.grantedBy?.trim() || !p.how?.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(p.date ?? '') || (p.quote ?? '').trim().length < 3) {
+    problems.push('Permission is not recorded (who, how, date and their words are all required).');
+  }
+  if (r.handle && !d.caption.includes(`@${r.handle}`)) problems.push(`Caption must credit @${r.handle}.`);
+  if (!/with permission/i.test(d.caption)) problems.push('Caption must say it is shared with permission.');
+  return problems;
+}
 
 export async function queueDrafts(db: Firestore, now: number, log: Log): Promise<void> {
   const dir = join(ROOT, 'brand', 'drafts');
@@ -71,6 +113,8 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
         continue;
       }
       if (relevantUntil && relevantUntil < now) continue;
+      const blocked = repostProblems(d);
+      if (blocked.length) { log(`not queued: ${d.title}: ${blocked.join(' ')}`); continue; }
 
       const imageUrls: string[] = [];
       let i = 0;
@@ -78,7 +122,11 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
         imageUrls.push(await uploadImage(`ops/drafts/${id}-${++i}-${now}.png`, await renderPost(kit, slide.template, slide)));
       }
       let videoUrl: string | null = null;
-      if (d.format === 'reel') {
+      if (d.kind === 'repost' && d.repost) {
+        // The creator's own video, as sent; the first slide is only the cover.
+        videoUrl = await uploadVideo(`ops/reposts/${id}-${now}.mp4`, await readFile(join(ROOT, d.repost.video)));
+        log(`uploaded repost video from @${d.repost.handle}`);
+      } else if (d.format === 'reel') {
         const pngs = await Promise.all(d.slides.map(sl => renderPost(kit, sl.template, sl)));
         const mp4 = await makeReel(pngs, { backdrop: await renderReelBackdrop() });
         videoUrl = await uploadVideo(`ops/reels/${id}-${now}.mp4`, mp4);
@@ -86,7 +134,7 @@ export async function queueDrafts(db: Firestore, now: number, log: Log): Promise
       }
       const first = d.slides[0];
       const warnings = [
-        ...(d.kind === 'event' ? [] : [`${d.kind === 'take' ? 'Opinion' : 'News'} post drafted by Claude from the sources listed. Check the facts before approving.`]),
+        ...(d.kind === 'event' ? [] : d.kind === 'repost' && d.repost ? [`Repost of @${d.repost.handle}'s video. Permission: ${d.repost.permission.how}, ${d.repost.permission.date}: "${d.repost.permission.quote}"`] : [`${d.kind === 'take' ? 'Opinion' : 'News'} post drafted by Claude from the sources listed. Check the facts before approving.`]),
         ...checkDraft({ caption: d.caption, altText: d.altText, imageText: first }, kit),
       ];
       const post: OpsPost = {

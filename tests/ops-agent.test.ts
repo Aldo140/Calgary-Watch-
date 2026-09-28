@@ -395,3 +395,26 @@ describe('sounding like a person', () => {
     assert.deepEqual(checkDraft({ caption: 'At the Epicentre #yyc', altText: 'x', imageText: { eyebrow: '', headline: 'h', details: [], footer: '' } }, cd), []);
   });
 });
+
+describe('date night', () => {
+  it('on Thursdays, the 3 pm slot is a date-night roundup of Friday and Saturday evenings, no kids’ events', () => {
+    const cd = brandKit('calgarydaily');
+    const thursday = calgaryToEpoch('2026-10-15', '06:30');
+    const ev = (id: string, iso: string, categories: string[]) => event(id, iso, { categories, pricing: 'paid', venue: `Venue ${id}` });
+    const index = { entities: [
+      ev('a', '2026-10-16T19:30:00-06:00', ['arts']), ev('b', '2026-10-17T20:00:00-06:00', ['nightlife']),
+      ev('k', '2026-10-17T18:00:00-06:00', ['family', 'arts']), ev('m', '2026-10-16T10:00:00-06:00', ['arts']),
+    ], occurrences: [] } as unknown as DiscoveryIndex;
+    const c = selectCandidates(index, cd, thursday, new Set());
+    const date = c.find(x => x.fingerprint.includes('|date-night-weekend|'));
+    assert.ok(date, 'a date-night post');
+    assert.deepEqual(date!.items.map(i => i.entity.id).sort(), ['a', 'b']);
+    assert.equal(new Date(date!.suggestedFor).toISOString(), '2026-10-15T21:00:00.000Z');
+    assert.match(date!.link, /\/date-night\?/);
+    const draft = templateDraft(date!, cd);
+    assert.deepEqual(checkDraft(draft, cd), []);
+    assert.equal(draft.imageText.headline, 'Date night this weekend');
+    // Other days of the week get no date-night post.
+    assert.ok(!selectCandidates(index, cd, calgaryToEpoch('2026-10-14', '06:30'), new Set()).some(x => x.fingerprint.includes('date-night')));
+  });
+});

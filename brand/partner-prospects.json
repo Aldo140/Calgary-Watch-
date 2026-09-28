@@ -1,0 +1,167 @@
+{
+  "note": "Calgary arts, music and festival organizations to invite to a free CalgaryWatch listing (added 2026-09-28 at the owner's request to expand outreach). Each becomes a lead; the daily job only emails an address published on the organization's own site, with every CASL check in brand/outreach.json. Websites checked live 2026-09-28.",
+  "prospects": [
+    {
+      "name": "Vertigo Theatre",
+      "website": "https://www.vertigotheatre.com/",
+      "category": "arts",
+      "why": "Mystery and thriller theatre in the Werklund Centre; a natural fit for date-night picks."
+    },
+    {
+      "name": "Alberta Theatre Projects",
+      "website": "https://albertatheatreprojects.com/",
+      "category": "arts",
+      "why": "New Canadian plays downtown; fits our theatre listings and date-night page."
+    },
+    {
+      "name": "Lunchbox Theatre",
+      "website": "https://www.lunchboxtheatre.com/",
+      "category": "arts",
+      "why": "Lunch-hour and evening theatre downtown; fits weekday listings."
+    },
+    {
+      "name": "Loose Moose Theatre",
+      "website": "https://www.loosemoose.com/",
+      "category": "nightlife",
+      "why": "Improv comedy; fits date-night and weekend roundups."
+    },
+    {
+      "name": "Decidedly Jazz Danceworks",
+      "website": "https://www.decidedlyjazz.com/",
+      "category": "arts",
+      "why": "Dance company and the DJD Dance Centre venue; already hosts Wordfest shows we list."
+    },
+    {
+      "name": "Calgary Opera",
+      "website": "https://www.calgaryopera.com/",
+      "category": "arts",
+      "why": "Opera season at the Jubilee; fits dress-up date-night picks."
+    },
+    {
+      "name": "Calgary Philharmonic Orchestra",
+      "website": "https://calgaryphil.com/",
+      "category": "arts",
+      "why": "Concert season; already appears in our Nutcracker listing."
+    },
+    {
+      "name": "Studio Bell, National Music Centre",
+      "website": "https://www.studiobell.ca/",
+      "category": "arts",
+      "why": "Concerts and exhibits in East Village."
+    },
+    {
+      "name": "Contemporary Calgary",
+      "website": "https://www.contemporarycalgary.com/",
+      "category": "arts",
+      "why": "Gallery and a Calgary International Film Festival venue."
+    },
+    {
+      "name": "Esker Foundation",
+      "website": "https://www.eskerfoundation.com/",
+      "category": "arts",
+      "why": "Free contemporary art gallery in Inglewood."
+    },
+    {
+      "name": "Glenbow",
+      "website": "https://www.glenbow.org/",
+      "category": "arts",
+      "why": "Art museum downtown; exhibitions fit our listings."
+    },
+    {
+      "name": "TELUS Spark Science Centre",
+      "website": "https://www.sparkscience.ca/",
+      "category": "family",
+      "why": "Science centre with adults-only evenings and Beakerhead."
+    },
+    {
+      "name": "Calgary Folk Music Festival",
+      "website": "https://www.calgaryfolkfest.com/",
+      "category": "nightlife",
+      "why": "Festival Hall concerts in Inglewood year-round."
+    },
+    {
+      "name": "Calgary International Film Festival",
+      "website": "https://www.ciffcalgary.ca/",
+      "category": "arts",
+      "why": "Annual film festival, Sept. 24 to Oct. 4 this year."
+    },
+    {
+      "name": "Calgary Fringe Festival",
+      "website": "https://www.calgaryfringe.ca/",
+      "category": "arts",
+      "why": "Summer theatre festival in Inglewood."
+    },
+    {
+      "name": "Sled Island",
+      "website": "https://www.sledisland.com/",
+      "category": "nightlife",
+      "why": "Music and arts festival in June."
+    },
+    {
+      "name": "GlobalFest",
+      "website": "https://www.globalfest.ca/",
+      "category": "family",
+      "why": "Fireworks festival in August."
+    },
+    {
+      "name": "Chinook Blast",
+      "website": "https://www.chinookblast.ca/",
+      "category": "family",
+      "why": "Downtown winter festival in February."
+    },
+    {
+      "name": "King Eddy",
+      "website": "https://kingeddy.ca/",
+      "category": "nightlife",
+      "why": "Live blues venue at Studio Bell."
+    },
+    {
+      "name": "The Palomino",
+      "website": "https://thepalomino.ca/",
+      "category": "nightlife",
+      "why": "Live music venue downtown."
+    },
+    {
+      "name": "Ironwood Stage & Grill",
+      "website": "https://ironwoodstage.ca/",
+      "category": "nightlife",
+      "why": "Live music in Inglewood."
+    },
+    {
+      "name": "Lougheed House",
+      "website": "https://www.lougheedhouse.com/",
+      "category": "arts",
+      "why": "Historic house and events in the Beltline."
+    },
+    {
+      "name": "Wilder Institute Calgary Zoo",
+      "website": "https://www.calgaryzoo.com/",
+      "category": "family",
+      "why": "Seasonal events like ZOOLIGHTS."
+    },
+    {
+      "name": "cSPACE King Edward",
+      "website": "https://cspace.ca/",
+      "category": "arts",
+      "why": "Arts hub in Marda Loop; already hosts a market we list."
+    },
+    {
+      "name": "Calgary Folk Club",
+      "website": "https://www.calgaryfolkclub.com/",
+      "category": "nightlife",
+      "why": "Concert series."
+    },
+    {
+      "name": "Sage Theatre",
+      "website": "https://sagetheatre.com/",
+      "category": "arts",
+      "why": "Contemporary theatre company."
+    },
+    {
+      "name": "Calgary Stampede",
+      "website": "https://www.calgarystampede.com/",
+      "category": "family",
+      "why": "Year-round events at Stampede Park as well as the July Stampede."
+    }
+  ]
+}

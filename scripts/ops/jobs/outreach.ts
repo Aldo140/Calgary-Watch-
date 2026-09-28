@@ -5,13 +5,15 @@
 // automatically and permanently through the suppression list.
 
 import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { FieldValue, type Firestore } from 'firebase-admin/firestore';
 import type { LeadEvent, PartnerLead, ReplyClass } from '../../../src/types/ops';
-import { outreachConfig } from '../lib/brand';
+import { ROOT, outreachConfig } from '../lib/brand';
 import { claudeConfigured, classifyReply, writePitch } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
 import {
-  LEAD_KINDS, checkPitch, consentBasisFor, emailDomain, extractEmails, hasNoSolicitationNotice, hostOf,
+  LEAD_KINDS, organizerLeads, prospectLeads, type Prospect, checkPitch, consentBasisFor, emailDomain, extractEmails, hasNoSolicitationNotice, hostOf,
   inSendWindow, isStopRequest, leadIdFor, normalizeEmail, sendBlocker, signature, websiteFor,
 } from '../lib/leads';
 import { inboxSince, outlookConfigured, replyInThread, sendNew } from '../lib/outlook';
@@ -36,7 +38,7 @@ function mailingAddress(): string {
 
 function factsFor(e: Entity): string {
   return [
-    `Listing: ${e.title} (${e.kind}) — https://calgarywatch.ca/${e.kind === 'market' ? 'markets' : 'local'}/${e.slug}`,
+    `Listing: ${e.title} (${e.kind}) — https://calgarywatch.ca/${e.kind === 'market' ? 'markets' : e.kind === 'event' ? 'events' : 'local'}/${e.slug}`,
     e.summary && `Summary: ${e.summary}`,
     e.address && `Address: ${e.address}`,
     e.neighbourhood && `Neighbourhood: ${e.neighbourhood}`,
@@ -46,6 +48,14 @@ function factsFor(e: Entity): string {
 }
 
 export function templatePitch(lead: PartnerLead, facts: string, sig: string): { subject: string; body: string; reasonRelevant: string } {
+  if (!facts.startsWith('Listing: ')) {
+    // An organization we haven't listed yet (brand/partner-prospects.json): an invitation, not a "we listed you".
+    return {
+      subject: `Listing ${lead.businessName}'s events on CalgaryWatch`,
+      body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses, with a sister Instagram account, @calgarydaily. I'd like to list ${lead.businessName}'s public events, built from the details on your own website and linking straight back to you.\n\nIs there a calendar page or feed you'd like us to use, and someone I should send questions to?\n\nThe listing is free and always will be.\n\n${sig}`,
+      reasonRelevant: `The message is about listing ${lead.businessName}'s public events on CalgaryWatch.`,
+    };
+  }
   const listing = facts.split('\n')[0].replace(/^Listing: /, '');
   return {
     subject: `CalgaryWatch has listed ${lead.businessName}`,
@@ -87,6 +97,38 @@ export async function findLeads(db: Firestore, index: DiscoveryIndex, now: numbe
     };
     await db.collection(COLLECTIONS.leads).doc(lead.id).create(lead).catch(() => undefined);
     log(`lead found: ${lead.businessName}`);
+  }
+  // Event organizers and venues, once each.
+  for (const o of organizerLeads(index.entities, now)) {
+    if (existing.has(o.id)) continue;
+    const lead: PartnerLead = {
+      id: o.id, entityId: o.entity.id, entityKind: 'organizer', businessName: o.name,
+      category: o.entity.categories?.[0] ?? 'events', neighbourhood: o.entity.neighbourhood ?? '', website: o.website,
+      contactName: null, contactRole: null, contactEmail: null, emailSourceUrl: null, emailFoundAt: null,
+      consentBasis: null, noSolicitationNotice: false, reasonRelevant: '', status: 'new', draftSubject: '', draftBody: '',
+      followUps: 0, lastContactAt: null, nextFollowUpAt: null, conversationId: null, lastReply: null,
+      doNotContact: false, notes: '', history: [event('found', `Organizer of "${o.entity.title}", listed on CalgaryWatch.`)],
+      createdAt: now, updatedAt: now,
+    };
+    await db.collection(COLLECTIONS.leads).doc(lead.id).create(lead).catch(() => undefined);
+    log(`organizer lead found: ${lead.businessName}`);
+  }
+  // Hand-picked Calgary arts, music and festival organizations (brand/partner-prospects.json).
+  const all = (await db.collection(COLLECTIONS.leads).select('website').get()).docs;
+  const taken = new Set(all.map(d => hostOf(String(d.get('website') ?? ''))).filter(Boolean));
+  const file = JSON.parse(await readFile(join(ROOT, 'brand', 'partner-prospects.json'), 'utf8').catch(() => '{"prospects":[]}')) as { prospects: Prospect[] };
+  for (const p of prospectLeads(file.prospects, taken)) {
+    if (existing.has(p.id)) continue;
+    const lead: PartnerLead = {
+      id: p.id, entityId: null, entityKind: 'prospect', businessName: p.name, category: p.category, neighbourhood: '', website: p.website,
+      contactName: null, contactRole: null, contactEmail: null, emailSourceUrl: null, emailFoundAt: null,
+      consentBasis: null, noSolicitationNotice: false, reasonRelevant: p.why, status: 'new', draftSubject: '', draftBody: '',
+      followUps: 0, lastContactAt: null, nextFollowUpAt: null, conversationId: null, lastReply: null,
+      doNotContact: false, notes: '', history: [event('found', 'Added from brand/partner-prospects.json.')],
+      createdAt: now, updatedAt: now,
+    };
+    await db.collection(COLLECTIONS.leads).doc(lead.id).create(lead).catch(() => undefined);
+    log(`prospect lead added: ${lead.businessName}`);
   }
 }
 

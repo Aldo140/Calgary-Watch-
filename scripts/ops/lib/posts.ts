@@ -280,12 +280,34 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
       }
     }
 
+    // Thursdays: the 3 pm slot is date night for the weekend, Friday and Saturday evenings
+    // (arts and nights out, nothing aimed at kids). Links to /date-night.
+    let dateNight: Candidate | null = null;
+    const DATE_SLOT = slots.indexOf('15:00');
+    const fpDate = `${kit.id}|date-night-weekend|${today}`;
+    if (calgaryWeekday(now) === 4 && DATE_SLOT > 0 && DATE_SLOT !== TONIGHT && free(DATE_SLOT) && !queued.has(fpDate)) {
+      const nights = [addDays(today, 1), addDays(today, 2)];
+      const grownUp = (h: Happening) => (h.entity.categories ?? [] as string[]).some((c: string) => ['arts', 'nightlife', 'music', 'food'].includes(c)) && !(h.entity.categories ?? [] as string[]).includes('family');
+      const pool = all.filter(h => nights.includes(calgaryDate(h.start)) && isEvening(h) && grownUp(h) && !used.has(h.entity.id));
+      if (pool.length >= 2) {
+        const items = diverse(pool, 4, undefined, true).sort((a, b) => a.start - b.start);
+        items.forEach(i => used.add(i.entity.id));
+        dateNight = {
+          brand: kit.id, template: 'roundup', fingerprint: fpDate, items,
+          title: `Date night this weekend — ${shortDay(now)}`, facts: factsFor(items),
+          link: `${kit.site}/date-night?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('date_night')}`,
+          relevantUntil: until(items), suggestedFor: at(DATE_SLOT),
+        };
+        out.push(dateNight);
+      }
+    }
+
     // Spotlights fill the remaining slots: one listing each, today or the next two days.
     const fpFor = (h: Happening) => h.entity.kind === 'market'
       ? `${kit.id}|market|${h.entity.id}|${calgaryDate(h.start).slice(0, 7)}`
       : `${kit.id}|event|${normalize(h.entity.title)}`;
     // Every other slot (midday, afternoon, late evening) takes a spotlight; slot 0 is the Today roundup.
-    const spotlightSlots = slots.map((_, i) => i).filter(i => i !== 0 && !(tonight && i === TONIGHT) && free(i) && !(reel && i === 1));
+    const spotlightSlots = slots.map((_, i) => i).filter(i => i !== 0 && !(tonight && i === TONIGHT) && free(i) && !(reel && i === 1) && !(dateNight && i === DATE_SLOT));
     const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
     const budget = kit.postsPerDay - bookedSlots.size - out.length - (tonight ? 1 : 0);
     const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used);
@@ -359,6 +381,7 @@ function relativeDay(ms: number, postedAt: number): string {
 
 // Plain opening lines, the way a person would start a text. Picked by date so a week doesn't repeat.
 const TODAY_HOOKS = ["Here's what's on today.", 'A few good reasons to get out today.', "Today's shortlist, if you need one.", 'Some ideas for today.', 'On today, in case you need a plan.'];
+const DATE_NIGHT_HOOKS = ['A few date night ideas for the weekend.', 'Date night ideas for Friday or Saturday.', 'Plans for two this weekend.', 'If it’s your turn to plan date night.'];
 const TONIGHT_HOOKS = ["Tonight's shortlist.", "If you're looking for something to do tonight.", 'A few things on tonight.', 'Plans for tonight, if you need them.', "What's on tonight."];
 const pick = (list: string[], ms: number) => list[Number(calgaryDate(ms).replace(/-/g, '')) % list.length];
 
@@ -402,8 +425,9 @@ export function templateDraft(c: Candidate, kit: BrandKit): Draft {
     const tonight = c.fingerprint.includes('|tonight|');
     const weekend = c.fingerprint.includes('weekend');
     const shows = mergeShowings(c.items);
-    const hook = weekend ? 'Some plans for the weekend.' : pick(tonight ? TONIGHT_HOOKS : TODAY_HOOKS, postedAt);
-    const headline = weekend ? 'This weekend' : tonight ? 'Tonight in Calgary' : `${dayName(postedAt)} in Calgary`;
+    const dateNight = c.fingerprint.includes('|date-night-weekend|');
+    const hook = dateNight ? pick(DATE_NIGHT_HOOKS, postedAt) : weekend ? 'Some plans for the weekend.' : pick(tonight ? TONIGHT_HOOKS : TODAY_HOOKS, postedAt);
+    const headline = dateNight ? 'Date night this weekend' : weekend ? 'This weekend' : tonight ? 'Tonight in Calgary' : `${dayName(postedAt)} in Calgary`;
     const lines = shows.map(s => {
       const e = s.first.entity;
       return `${s.name}${place(e) && place(e) !== s.name ? `, ${place(e)}` : ''} · ${weekend ? `${dayName(s.first.start).slice(0, 3)} ` : ''}${joinTimes(s.times)}${isFree(e) ? ' · free' : ''}`;

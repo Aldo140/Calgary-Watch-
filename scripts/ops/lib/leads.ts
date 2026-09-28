@@ -6,9 +6,51 @@ import type { OutreachConfig } from './brand';
 import type { Entity } from './posts';
 import { calgaryMinutes, calgaryWeekday } from './time';
 
-/** Kinds of listing a business can enter the lead list through. Events are run by
- * institutions and venues whose listing is editorial, not a sales opportunity. */
+/** Kinds of listing a business can enter the lead list through, one lead per listing.
+ * Events come in once per organizer instead (see organizerLeads). */
 export const LEAD_KINDS = new Set(['business', 'market']);
+
+/** Ticket sellers and aggregators: their address is not the organizer's own. */
+const RESELLER = /(^|\.)(ticketmaster|ticketweb|eventbrite|showpass|universe|livenation|axs|visitcalgary|travelalberta)\./i;
+
+export interface Prospect { name: string; website: string; category: string; why: string }
+
+/**
+ * Hand-picked organizations (brand/partner-prospects.json) as leads, skipping any whose
+ * website is already covered by another lead, so nobody is researched twice.
+ */
+export function prospectLeads(prospects: Prospect[], takenHosts: Set<string>): Array<Prospect & { id: string }> {
+  const out: Array<Prospect & { id: string }> = [];
+  for (const p of prospects) {
+    const host = hostOf(p.website);
+    if (!host || takenHosts.has(host)) continue;
+    takenHosts.add(host);
+    out.push({ ...p, id: `lead-prospect-${host.replace(/[^a-z0-9]+/g, '-')}` });
+  }
+  return out;
+}
+
+/**
+ * Event organizers as partner leads, one per organizer (2026-09-28, owner asked to
+ * expand outreach to organizers and venues). The representative listing is the
+ * organizer's next event; the website is the organizer's own official source,
+ * never a ticketing site, so the CASL "published on their own site" check applies.
+ */
+export function organizerLeads(entities: Entity[], now: number): Array<{ id: string; name: string; website: string; entity: Entity }> {
+  const byOrg = new Map<string, { id: string; name: string; website: string; entity: Entity }>();
+  const upcoming = entities
+    .filter(e => e.kind === 'event' && e.status === 'published' && !e.fixture && Date.parse(e.end ?? e.start) > now)
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  for (const e of upcoming) {
+    const name = String(e.organizer ?? e.sources?.[0]?.name ?? '').trim();
+    const website = websiteFor(e);
+    if (!name || !website || RESELLER.test(hostOf(website) + '.')) continue;
+    const key = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (!key || byOrg.has(key)) continue;
+    byOrg.set(key, { id: `lead-org-${key}`.slice(0, 120), name, website, entity: e });
+  }
+  return [...byOrg.values()];
+}
 
 export const normalizeEmail = (e: string) => e.trim().toLowerCase();
 export const emailDomain = (e: string) => normalizeEmail(e).split('@')[1] ?? '';

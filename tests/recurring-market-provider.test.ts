@@ -31,13 +31,14 @@ describe('Recurring market provider', () => {
   });
 
   it('crosses the daylight-saving boundary with the correct offset', async () => {
-    const provider = new RecurringMarketProvider(source([{ ...yearRound, occurrenceCount: 8 }]), new Date('2026-09-21T12:00:00Z'));
+    // Alberta's last spring-forward was 2026-03-08; it stays on UTC-6 year-round after that (tzdata 2026c).
+    const provider = new RecurringMarketProvider(source([{ ...yearRound, occurrenceCount: 8 }]), new Date('2026-02-16T12:00:00Z'));
     const records = await provider.fetch();
     if (records[0].input.kind !== 'market') throw Error('expected market');
-    const beforeDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-10-28'));
-    const afterDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-11-04'));
-    assert.equal(beforeDst?.start.endsWith('-06:00'), true);
-    assert.equal(afterDst?.start.endsWith('-07:00'), true);
+    const beforeDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-03-04'));
+    const afterDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-03-11'));
+    assert.equal(beforeDst?.start.endsWith('-07:00'), true);
+    assert.equal(afterDst?.start.endsWith('-06:00'), true);
   });
 
   it('supports one market opening on several weekdays without duplicating the listing', async () => {

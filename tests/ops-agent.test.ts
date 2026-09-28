@@ -18,7 +18,7 @@ import { bestCaptions, computePerformance } from '../scripts/ops/jobs/insights';
 import {
   checkPitch, consentBasisFor, extractEmails, hasNoSolicitationNotice, inSendWindow, isStopRequest, sendBlocker, signature,
 } from '../scripts/ops/lib/leads';
-import { checkDraft, cleanPlace, cleanTitle, happenings, mergeShowings, roundupHeadline, selectCandidates, templateDraft, weekendReelSlides, whenLabel, type DiscoveryIndex, type Entity } from '../scripts/ops/lib/posts';
+import { checkDraft, cleanPlace, cleanTitle, happenings, mergeShowings, roundupHeadline, selectCandidates, templateDraft, reelSlides, whenLabel, type DiscoveryIndex, type Entity } from '../scripts/ops/lib/posts';
 import { calgaryDate, calgaryToEpoch, nextSlot, timeRange } from '../scripts/ops/lib/time';
 import { templatePitch } from '../scripts/ops/jobs/outreach';
 
@@ -79,7 +79,7 @@ describe('choosing posts', () => {
     assert.ok(again.every(x => !c.some(y => y.fingerprint === x.fingerprint)));
   });
 
-  it('gives CalgaryDaily a morning roundup, a midday spotlight and a tonight roundup', () => {
+  it('gives CalgaryDaily a morning roundup, spotlights in the other slots and a Tonight Reel', () => {
     const friday = calgaryToEpoch('2026-09-25', '06:30');
     // One thing on today: no Today/Tonight roundup; on a Friday the weekend Reel takes the midday slot.
     const quiet = selectCandidates(index, cd, friday, new Set());
@@ -87,10 +87,11 @@ describe('choosing posts', () => {
     const busy = { ...index, entities: [...index.entities,
       event('e', '2026-09-25T12:00:00-06:00'), event('h', '2026-09-25T10:00:00-06:00'), event('f', '2026-09-25T18:00:00-06:00'), event('g', '2026-09-25T19:30:00-06:00')] };
     const c = selectCandidates(busy, cd, friday, new Set());
-    assert.deepEqual(c.map(x => x.template), ['roundup', 'event', 'roundup']);
+    assert.deepEqual(c.map(x => x.template), ['roundup', 'event', 'event', 'roundup']);
     assert.match(c[0].title, /^Today/);
-    assert.match(c[2].title, /^Tonight/);
-    assert.deepEqual(c.map(x => new Date(x.suggestedFor).toISOString()), ['2026-09-25T14:00:00.000Z', '2026-09-25T18:00:00.000Z', '2026-09-25T23:00:00.000Z']);
+    assert.match(c[3].title, /^Tonight/);
+    assert.equal(c[3].format, 'reel');
+    assert.deepEqual(c.map(x => new Date(x.suggestedFor).toISOString()), ['2026-09-25T14:00:00.000Z', '2026-09-25T18:00:00.000Z', '2026-09-25T21:00:00.000Z', '2026-09-25T23:00:00.000Z']);
     // No listing appears in two of the day's posts.
     const ids = c.flatMap(x => x.items.map(i => i.entity.id));
     assert.equal(new Set(ids).size, ids.length);
@@ -99,7 +100,7 @@ describe('choosing posts', () => {
     const again = selectCandidates(busy, cd, friday, new Set(), new Set([spotlight]));
     assert.ok(again.filter(x => x.template === 'event').every(x => x.items[0].entity.id !== spotlight));
     // A later run that finds today's slots booked adds nothing (the 2026-09-25 double-spotlight bug).
-    assert.equal(selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['08:00', '12:00', '17:00'])).length, 0);
+    assert.equal(selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['08:00', '12:00', '15:00', '17:00', '20:00'])).length, 0);
     const onlyNoonTaken = selectCandidates(busy, cd, friday, new Set(), new Set(), new Set(['12:00']));
     assert.ok(onlyNoonTaken.every(x => new Date(x.suggestedFor).toISOString() !== '2026-09-25T18:00:00.000Z'));
     assert.ok(onlyNoonTaken.length <= cd.postsPerDay - 1);
@@ -322,7 +323,7 @@ describe('weekend Reel', () => {
   });
   it('has a cover, one slide per plan and a follow card, all within the brand checks', () => {
     const [reel] = selectCandidates(index, cd, friday, new Set()).filter(x => x.format === 'reel');
-    const slides = weekendReelSlides(reel);
+    const slides = reelSlides(reel);
     assert.equal(slides.length, reel.items.length + 2);
     for (const s of slides) assert.deepEqual(checkDraft({ caption: 'x #yyc', altText: 'x', imageText: s }, cd), []);
   });

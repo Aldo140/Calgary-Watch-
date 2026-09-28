@@ -12,7 +12,7 @@ import { COLLECTIONS, uploadImage, uploadVideo } from '../lib/firebase';
 import { publishCarousel, publishImage, publishReel } from '../lib/instagram';
 import { currentToken } from './igTokens';
 import { bestCaptions } from './insights';
-import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, weekendReelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
+import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, reelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { makeReel } from '../lib/reel';
 import { renderPost, renderReelBackdrop } from '../lib/render';
 import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
@@ -26,7 +26,7 @@ async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'l
   if (!claudeConfigured()) return { draft: base, warnings: checkDraft(base, kit), by: 'template' };
   try {
     const w = await writePost(kit, {
-      kind: c.format === 'reel' ? 'weekend roundup Reel (open with one plain line about the weekend; then one line per plan with its day)' : c.template === 'roundup' ? 'roundup of several listings' : c.template === 'update' ? 'news or city update' : 'single listing',
+      kind: c.format === 'reel' ? (c.title.startsWith('Tonight') ? 'Tonight roundup Reel (open with one plain line about tonight; then one line per plan with its time)' : 'weekend roundup Reel (open with one plain line about the weekend; then one line per plan with its day)') : c.template === 'roundup' ? 'roundup of several listings' : c.template === 'update' ? 'news or city update' : 'single listing',
       title: c.title + (note ? `\nReviewer's note for this redraft: ${note}` : ''),
       facts: c.facts, link: c.link, sponsored: c.template === 'partner',
     });
@@ -105,15 +105,18 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
       const { draft, warnings, by } = await writeDraft(c, writerKit, templateDraft(c, kit), '', log);
       let image: { imageUrl: string | null; imagePath: string | null };
       let videoUrl: string | null = null;
+      // The cover doubles as the post image (and the site's thumbnail).
+      const slides = c.format === 'reel' ? reelSlides(c) : [];
+      const pngs = await Promise.all(slides.map(sl => renderPost(kit, sl.template, sl)));
+      let mp4: Buffer | null = null;
       if (c.format === 'reel') {
-        // The cover doubles as the post image (and the site's thumbnail).
-        const slides = weekendReelSlides(c);
-        const pngs = await Promise.all(slides.map(sl => renderPost(kit, sl.template, sl)));
-        let mp4: Buffer;
         try { mp4 = await makeReel(pngs, { backdrop: await renderReelBackdrop() }); } catch (e) {
-          log(`  reel skipped (${e instanceof Error ? e.message : e})`);
-          continue;
+          // A weekend Reel has no image version; Tonight falls back to its usual roundup image.
+          log(`  reel failed (${e instanceof Error ? e.message : e})${c.fingerprint.includes('|tonight|') ? '; posting Tonight as an image' : '; skipped'}`);
+          if (!c.fingerprint.includes('|tonight|')) continue;
         }
+      }
+      if (mp4) {
         if (dryDir) {
           await writeFile(join(dryDir, `${id}.mp4`), mp4);
           await writeFile(join(dryDir, `${id}.png`), pngs[0]);

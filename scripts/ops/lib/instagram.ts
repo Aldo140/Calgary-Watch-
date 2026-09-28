@@ -82,6 +82,32 @@ export async function accountStats(token: string, handle: string): Promise<{ fol
   return { followers: Number(a.followers_count ?? 0), mediaCount: Number(a.media_count ?? 0) };
 }
 
+export interface AccountMedia {
+  id: string; caption: string; mediaType: string; productType: string | null;
+  permalink: string; timestamp: number; likes: number; comments: number;
+}
+
+/** Every post on the account, newest first, including ones posted by hand before the agent. */
+export async function listAllMedia(token: string, handle: string, max = 1000): Promise<AccountMedia[]> {
+  const { id } = await igAccount(token, handle);
+  const out: AccountMedia[] = [];
+  let after: string | undefined;
+  while (out.length < max) {
+    const r = await graph(`${isInstagramLoginToken(token) ? 'me' : id}/media`, token, {
+      params: { fields: 'id,caption,media_type,media_product_type,permalink,timestamp,like_count,comments_count', limit: '100', ...(after ? { after } : {}) },
+    });
+    for (const m of r.data ?? []) {
+      out.push({
+        id: m.id, caption: m.caption ?? '', mediaType: m.media_type ?? '', productType: m.media_product_type ?? null,
+        permalink: m.permalink ?? '', timestamp: Date.parse(m.timestamp), likes: Number(m.like_count ?? 0), comments: Number(m.comments_count ?? 0),
+      });
+    }
+    after = r.paging?.next ? r.paging?.cursors?.after : undefined;
+    if (!after) break;
+  }
+  return out;
+}
+
 /**
  * Lifetime numbers for one post (needs the instagram_business_manage_insights
  * permission on the token). Not every metric exists for every media type, so a

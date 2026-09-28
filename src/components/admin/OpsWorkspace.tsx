@@ -12,7 +12,7 @@ import { AlertTriangle, CheckCircle2, ExternalLink, Image as ImageIcon, Link2, R
 
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
-import type { BrandId, OpsHealth, OpsPerformance, OpsPost, PerformanceRow, PostStatus } from '@/src/types/ops';
+import type { AccountHistory, BrandId, HistoryGroup, HistoryRow, OpsHealth, OpsPerformance, OpsPost, PerformanceRow, PostStatus } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, display, inputClass, inputStyle, mono, type Tone } from './ui';
 
 type View = 'review' | 'scheduled' | 'published' | 'corrections' | 'other';
@@ -245,6 +245,56 @@ export function PerformancePanel() {
   );
 }
 
+function HistoryTable({ title, rows }: { title: string; rows: HistoryGroup[] }) {
+  if (!rows.length) return null;
+  return (
+    <div>
+      <h4 className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: T.muted, fontFamily: mono }}>{title}</h4>
+      <table className="w-full text-sm">
+        <thead><tr style={{ color: T.muted }}><th className="text-left font-medium py-1">Group</th><th className="text-right font-medium">Posts</th><th className="text-right font-medium">Median views</th><th className="text-right font-medium">Best</th></tr></thead>
+        <tbody>{rows.map((r, i) => (
+          <tr key={r.key} className="border-t" style={{ borderColor: T.line }}>
+            <td className="py-1" style={{ color: T.ink, fontWeight: i === 0 && rows.length > 1 ? 700 : 400 }}>{r.label}</td>
+            <td className="text-right" style={{ fontFamily: mono }}>{r.posts}</td>
+            <td className="text-right" style={{ fontFamily: mono }}>{r.medianViews.toLocaleString('en-CA')}</td>
+            <td className="text-right" style={{ fontFamily: mono }}>{r.best.toLocaleString('en-CA')}</td>
+          </tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
+
+/** Every post the account has ever made, ranked (scripts/ops/jobs/accountHistory.ts). */
+export function AccountHistoryPanel() {
+  const [h, setH] = useState<AccountHistory | null>(null);
+  useEffect(() => db ? onSnapshot(doc(db, 'ops_health', 'account_history'), s => setH(s.exists() ? s.data() as AccountHistory : null), () => setH(null)) : undefined, []);
+  const views = (r: HistoryRow) => r.views ?? r.reach ?? null;
+  return (
+    <Panel title="All-time @calgarydaily posts" subtitle={h ? `${h.totalPosts} posts, numbers for ${h.measuredPosts} · updated ${when(h.updatedAt)}` : 'Every post on the account, ranked by views'}>
+      {!h ? <p className="text-sm" style={{ color: T.muted }}>No history yet. It fills in over the next few daily runs.</p> : (
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <HistoryTable title="Format" rows={h.byFormat} />
+            <HistoryTable title="Topic" rows={h.byTopic} />
+            <HistoryTable title="Original or repost" rows={h.byOrigin} />
+            <HistoryTable title="Time posted" rows={h.byHour} />
+            <HistoryTable title="Day" rows={h.byWeekday} />
+          </div>
+          <ol className="text-sm space-y-1 list-decimal pl-5">
+            {h.top.map(r => (
+              <li key={r.id}>
+                <a href={r.permalink} target="_blank" rel="noreferrer" style={{ color: T.signal }}>{r.caption.replace(/\s+/g, ' ').slice(0, 80) || '(no caption)'}</a>
+                <span style={{ color: T.muted }}> · {r.format} · {r.topicLabel}{r.repost ? ' · repost' : ''} · {views(r)?.toLocaleString('en-CA') ?? '?'} views · {r.likes} likes · {r.comments} comments{r.shares !== null ? ` · ${r.shares} shares` : ''}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
 export function OpsWorkspace() {
   const [posts, setPosts] = useState<OpsPost[] | null>(null);
   const [error, setError] = useState('');
@@ -266,6 +316,7 @@ export function OpsWorkspace() {
     <div className="space-y-4">
       <OpsHealthPanel />
       <PerformancePanel />
+      <AccountHistoryPanel />
       <BriefForm />
       <Panel title="Instagram queue · @calgarydaily" subtitle="Drafted each morning from verified listings. Listing posts that pass the brand rules are scheduled automatically; everything else waits for you." padded={false}>
         <div className="px-4 pt-3 space-y-2">

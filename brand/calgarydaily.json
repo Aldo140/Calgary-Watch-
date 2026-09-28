@@ -81,10 +81,12 @@
     "partner": false,
     "incidents": false
   },
-  "postsPerDay": 3,
+  "postsPerDay": 5,
   "postingSlots": [
     "08:00",
     "12:00",
-    "17:00"
+    "15:00",
+    "17:00",
+    "20:00"
   ]
 }

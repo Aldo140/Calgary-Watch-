@@ -14,6 +14,7 @@ import { resolveDoubleBookings, autoApprove, draftPosts, monitorPosts, redraftAn
 import { draftPitches, findLeads } from './jobs/outreach';
 import { checkHealth, sendSummary } from './jobs/health';
 import { collectInsights } from './jobs/insights';
+import { collectAccountHistory } from './jobs/accountHistory';
 
 const log = (m: string) => console.log(`[ops:daily] ${m}`);
 const index = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
@@ -32,6 +33,7 @@ if (!db) {
 } else {
   await step('monitor posts', () => monitorPosts(db, index, now, log));
   await step('insights', () => collectInsights(db, now, log));
+  await step('account history', () => collectAccountHistory(db, now, log));
   await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
   await step('draft posts', () => draftPosts(db, index, now, log));
   await step('queue drafts', () => queueDrafts(db, now, log));

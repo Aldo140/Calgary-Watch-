@@ -104,6 +104,23 @@ export interface OpsPerformance {
   avgDelayMinutes: number | null;
 }
 
+/** One post from the account's whole history (ops_health/account_history). */
+export interface HistoryRow {
+  id: string; permalink: string; caption: string; timestamp: number;
+  format: string; topic: string; topicLabel: string; repost: boolean; weekday: string; hour: string;
+  likes: number; comments: number;
+  views: number | null; reach: number | null; saves: number | null; shares: number | null; fetchedAt: number | null;
+}
+export interface HistoryGroup { key: string; label: string; posts: number; medianViews: number; medianEngagement: number; best: number }
+
+/** ops_health/account_history: every post @calgarydaily has made, ranked, and what the winners share. */
+export interface AccountHistory {
+  updatedAt: number; followers: number | null; totalPosts: number; measuredPosts: number;
+  top: HistoryRow[];
+  byFormat: HistoryGroup[]; byTopic: HistoryGroup[]; byOrigin: HistoryGroup[]; byWeekday: HistoryGroup[]; byHour: HistoryGroup[];
+  rows: HistoryRow[];
+}
+
 export type LeadStatus =
   | 'new'            // found, not yet researched
   | 'no-email'       // no published address found; needs a contact form or manual research

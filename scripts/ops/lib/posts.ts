@@ -28,7 +28,7 @@ export interface Candidate {
   link: string;
   relevantUntil: number;
   suggestedFor: number;
-  /** 'reel' = the items become a vertical video (weekendReelSlides), not one image. */
+  /** 'reel' = the items become a vertical video (reelSlides), not one image. */
   format?: 'reel';
 }
 
@@ -206,9 +206,12 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
   const campaign = (s: string) => `${kit.id}_${s}`;
 
   if (kit.id === 'calgarydaily') {
-    // The daily program: a morning "Today" roundup, a midday spotlight, and an
-    // evening "Tonight" roundup (or a second spotlight when the evening is quiet).
+    // The daily program: a morning "Today" roundup, an evening "Tonight" Reel (or a
+    // spotlight when the evening is quiet), and spotlights in every other slot.
     const slots = [...kit.postingSlots].sort();
+    // Tonight takes the first slot from 4 pm on; the Friday weekend Reel takes slot 1 (midday).
+    const firstEvening = slots.findIndex(s => s >= '16:00');
+    const TONIGHT = firstEvening >= 0 ? firstEvening : slots.length - 1;
     const at = (i: number) => {
       const t = calgaryToEpoch(today, slots[Math.min(i, slots.length - 1)]);
       return t > now ? t : now + 10 * 60_000;
@@ -244,12 +247,12 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
         brand: kit.id, template: 'roundup', fingerprint: fpTonight, items,
         title: `Tonight in Calgary — ${shortDay(now)}`, facts: factsFor(items),
         link: `${kit.site}/events?utm_source=instagram&utm_medium=social&utm_campaign=${campaign('tonight')}`,
-        relevantUntil: until(items), suggestedFor: at(2),
+        relevantUntil: until(items), suggestedFor: at(TONIGHT), format: 'reel',
       };
     }
 
     const free = (i: number) => !bookedSlots.has(slots[Math.min(i, slots.length - 1)]);
-    if (tonight && !free(2)) tonight = null;
+    if (tonight && !free(TONIGHT)) tonight = null;
 
     // Fridays: the midday slot is a "this weekend" Reel. Reels reach far more people
     // on this account than image posts (median 243 vs 150 views, 2026-09-25).
@@ -281,7 +284,8 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
     const fpFor = (h: Happening) => h.entity.kind === 'market'
       ? `${kit.id}|market|${h.entity.id}|${calgaryDate(h.start).slice(0, 7)}`
       : `${kit.id}|event|${normalize(h.entity.title)}`;
-    const spotlightSlots = (tonight ? [1] : [1, 2]).filter(i => free(i) && !(reel && i === 1));
+    // Every other slot (midday, afternoon, late evening) takes a spotlight; slot 0 is the Today roundup.
+    const spotlightSlots = slots.map((_, i) => i).filter(i => i !== 0 && !(tonight && i === TONIGHT) && free(i) && !(reel && i === 1));
     const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
     const budget = kit.postsPerDay - bookedSlots.size - out.length - (tonight ? 1 : 0);
     const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used);
@@ -369,16 +373,18 @@ const place = (e: Entity) => cleanPlace(e.venue ?? e.neighbourhood ?? '');
 const isFree = (e: Entity) => e.pricing === 'free';
 
 /** A weekend Reel: a cover, one slide per plan (facts from the listing only), and a follow card. */
-export function weekendReelSlides(c: Pick<Candidate, 'items'>): Array<PostImageText & { template: PostTemplate }> {
+/** Reel slides: a cover, one slide per plan, and a follow card. Weekend Reels label each plan's day; Tonight labels its time. */
+export function reelSlides(c: Pick<Candidate, 'items' | 'fingerprint'>): Array<PostImageText & { template: PostTemplate }> {
   const shows = mergeShowings(c.items);
+  const tonight = c.fingerprint.includes('|tonight|');
   return [
-    { template: 'roundup', eyebrow: roundupEyebrow(c), headline: 'This weekend', blurb: `${shows.length} plans worth saving.`, details: [], footer: 'Dates checked with each organizer' },
+    { template: 'roundup', eyebrow: roundupEyebrow(c), headline: tonight ? 'Tonight in Calgary' : 'This weekend', blurb: tonight ? `${shows.length} things on tonight.` : `${shows.length} plans worth saving.`, details: [], footer: 'Times checked with each organizer' },
     ...shows.map(s => ({
       template: 'event' as const,
-      eyebrow: `${dayName(s.first.start)}${isFree(s.first.entity) ? ' · Free' : ''}`,
+      eyebrow: `${tonight ? joinTimes(s.times) : dayName(s.first.start)}${isFree(s.first.entity) ? ' · Free' : ''}`,
       headline: tidyWords(s.name, 56),
       blurb: null,
-      details: [joinTimes(s.times), place(s.first.entity)].filter(Boolean).map(x => tidyWords(x, 44)),
+      details: (tonight ? [place(s.first.entity)] : [joinTimes(s.times), place(s.first.entity)]).filter(Boolean).map(x => tidyWords(x, 44)),
       footer: tidyWords(`Listed by ${s.first.entity.organizer ?? s.first.sourceName}`, 48),
     })),
     { template: 'slide', eyebrow: 'FOLLOW', headline: 'Your Calgary plan, every morning.', details: ['Today, tonight and this weekend, checked with the organizers.', '@calgarydaily'], footer: 'Full list on calgarywatch.ca||' },

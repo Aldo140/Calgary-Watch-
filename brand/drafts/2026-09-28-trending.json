@@ -1,0 +1,121 @@
+{
+  "brand": "calgarydaily",
+  "drafted": "2026-09-28",
+  "note": "Researched 2026-09-28 from trending Calgary stories. Every fact below was read on the source page listed. Waiting for approval in /admin; none are approved in this file.",
+  "posts": [
+    {
+      "id": "tinku-pole",
+      "kind": "news",
+      "title": "Tinku the cat is down from the power pole",
+      "suggestedAt": "2026-09-28T19:00",
+      "relevantUntil": "2026-09-30T21:00",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "GOOD NEWS",
+          "headline": "Tinku is down from the power pole.",
+          "details": ["Stuck up a utility pole in northeast Calgary from Friday.", "Rescued Saturday after a day-long effort."],
+          "footer": "Source: CTV News Calgary"
+        }
+      ],
+      "caption": "Tinku is down.\n\nThe cat got stuck up a utility pole in northeast Calgary on Friday, and was rescued on Saturday after a day-long effort.\n\nSource: CTV News Calgary.\n\n#yyc #calgary #calgarydaily",
+      "altText": "Text slide: Tinku is down from the power pole. Stuck up a utility pole in northeast Calgary from Friday, rescued Saturday after a day-long effort. Source: CTV News Calgary.",
+      "sources": [
+        { "name": "CTV News Calgary: Cat stuck on Calgary power pole rescued after day-long effort (Sept. 25–26, 2026)", "url": "https://www.ctvnews.ca/calgary/article/very-scared-calgary-family-seeking-help-recovering-cat-from-utility-pole/" }
+      ]
+    },
+    {
+      "id": "sunnyside-barrier",
+      "kind": "news",
+      "title": "Sunnyside flood barrier is finished",
+      "suggestedAt": "2026-09-29T10:00",
+      "relevantUntil": "2026-10-06T20:00",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "YOUR CITY",
+          "headline": "Sunnyside's flood barrier is finished.",
+          "details": ["2.4 km along the Bow, built for a one-in-100-year flood.", "13 years after the 2013 flood."],
+          "footer": "Source: City of Calgary, Calgary Herald"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "THE DETAILS",
+          "headline": "$73 million, 200 new trees.",
+          "details": ["It has been working since May and protects Sunnyside and Hillhurst.", "Some pathway and road closures stay until landscaping wraps up at the end of October."],
+          "footer": "City of Calgary, Calgary Herald||2 / 2"
+        }
+      ],
+      "caption": "Sunnyside's flood barrier is officially finished, 13 years after the 2013 flood.\n\nIt runs 2.4 km along the Bow, is built for a one-in-100-year flood, and has been protecting Sunnyside and Hillhurst since May. The project cost $73 million and added about 200 trees. A few pathway and road closures stay until the landscaping is done at the end of October.\n\nSources: City of Calgary, Calgary Herald.\n\n#yyc #calgary #calgarydaily #sunnyside #bowriver",
+      "altText": "Two slides. First: Sunnyside's flood barrier is finished, 2.4 km along the Bow River, built for a one-in-100-year flood, 13 years after the 2013 flood. Second: $73 million and 200 new trees; working since May, protects Sunnyside and Hillhurst; some closures until landscaping ends in late October.",
+      "sources": [
+        { "name": "Calgary Herald via Yahoo News: City unveils Sunnyside flood barrier (Sept. 26, 2026)", "url": "https://ca.news.yahoo.com/city-unveils-sunnyside-flood-barrier-225250274.html" },
+        { "name": "City of Calgary newsroom: Sunnyside Flood Barrier complete", "url": "https://newsroom.calgary.ca/from-rendering-to-reality-sunnyside-flood-barrier-complete-strengthening-calgarys-flood-resilience/" },
+        { "name": "CTV News Calgary: Sunnyside flood barrier completed after two years of construction", "url": "https://www.ctvnews.ca/calgary/article/sunnyside-flood-barrier-completed-after-two-years-of-construction/" }
+      ]
+    },
+    {
+      "id": "flames-dome-opener",
+      "kind": "news",
+      "title": "Last home opener at the Saddledome",
+      "suggestedAt": "2026-09-30T19:00",
+      "relevantUntil": "2026-10-01T19:00",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "FLAMES",
+          "headline": "The last home opener at the 'Dome.",
+          "details": ["Thursday, Oct. 1: Flames vs. Seattle Kraken.", "The Saddledome opened in 1983. This is its farewell season."],
+          "footer": "Source: Calgary Flames"
+        }
+      ],
+      "caption": "Thursday is the last home opener the Saddledome will ever host.\n\nThe Flames start the 2026–27 regular season at home against the Seattle Kraken on Oct. 1. The 'Dome opened in 1983, and this is its farewell season before the team moves to Scotia Place.\n\nFirst game you saw there?\n\nSource: Calgary Flames.\n\n#yyc #calgary #calgarydaily #flames #saddledome",
+      "altText": "Text slide: The last home opener at the Dome. Thursday, October 1, Flames versus Seattle Kraken. The Saddledome opened in 1983 and this is its farewell season. Source: Calgary Flames.",
+      "sources": [
+        { "name": "Calgary Flames: 2026-27 single game tickets on sale for Saddledome farewell season", "url": "https://www.nhl.com/flames/news/single-game-tickets-on-sale-for-saddledome-farewell-season" }
+      ]
+    },
+    {
+      "id": "referendum-questions",
+      "kind": "news",
+      "title": "What's on the Oct. 19 referendum ballot",
+      "suggestedAt": "2026-10-01T10:00",
+      "relevantUntil": "2026-10-19T20:00",
+      "slides": [
+        {
+          "template": "news",
+          "eyebrow": "OCT. 19 VOTE",
+          "headline": "10 questions on your referendum ballot.",
+          "details": ["Here's what each one asks, in plain words.", "Swipe →"],
+          "footer": "Source: Global News"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "QUESTIONS 1–4",
+          "headline": "Immigration and services",
+          "details": ["1. More provincial control of immigration, to under 1% of the population (about 50,000 a year).", "2. Provincial programs only for citizens, permanent residents and Alberta-approved immigrants.", "3. A 12-month wait for non-permanent residents before social supports.", "4. Health and education fees for non-permanent residents."],
+          "footer": "Global News, Sept. 27, 2026||2 / 4"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "QUESTIONS 5–9",
+          "headline": "Voting, courts and Ottawa",
+          "details": ["5. Proof of citizenship to vote.", "6. Provinces, not Ottawa, pick provincial court judges.", "7. Pursue abolishing the Senate.", "8. Opt out of federal programs and keep the funding.", "9. Provincial law wins over federal law in shared areas."],
+          "footer": "Global News, Sept. 27, 2026||3 / 4"
+        },
+        {
+          "template": "slide",
+          "eyebrow": "QUESTION 10",
+          "headline": "Stay, or hold a separation vote",
+          "details": ["Whether Alberta stays a province of Canada or moves to a binding referendum on separating.", "Voting day is Monday, Oct. 19."],
+          "footer": "Global News, Sept. 27, 2026||4 / 4"
+        }
+      ],
+      "caption": "There are 10 questions on the Oct. 19 referendum ballot, and most of the attention is on the last one. Here's what all of them ask, in plain words.\n\nSave it for before you vote.\n\nSource: Global News.\n\n#yyc #calgary #calgarydaily #alberta #abpoli",
+      "altText": "Four slides summarizing the 10 questions on Alberta's October 19, 2026 referendum: immigration and access to services (1 to 4), voting ID, court appointments, the Senate, federal programs and provincial law (5 to 9), and whether Alberta stays a province or holds a binding separation referendum (10). Source: Global News.",
+      "sources": [
+        { "name": "Global News: Albertans to vote on 10 questions in October referendum. Here's what they ask (Sept. 27, 2026)", "url": "https://globalnews.ca/news/12075177/alberta-referendum-questions/" }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { DiscoveryEntity, Event as EventEntity, Market, MarketOccurrence } from '../../types/discovery';
-import { entityPath } from '../../lib/discovery';
+import { entityPath, startClock } from '../../lib/discovery';
 import { EventArt, MarketArt } from './ListingArt';
 
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
@@ -51,12 +51,12 @@ export function EventCard({ entity, now }: { entity: EventEntity; now: Date }) {
           <span className="cw-lb-stub" aria-hidden="true">
             <small>{weekdayShort.format(at(entity.start))}</small>
             <b>{dayNum.format(at(entity.start))}</b>
-            <small>{clock.format(at(entity.start))}</small>
+            <small>{startClock(entity.start, clock)}</small>
           </span>
           {cost ? <span className="cw-lb-price">{cost}</span> : null}
         </span>
         <span className="cw-lb-body">
-          <small className="cw-lb-when">{relativeDay(entity.start, now)} · {monthDay.format(at(entity.start))} · {clock.format(at(entity.start))}</small>
+          <small className="cw-lb-when">{relativeDay(entity.start, now)} · {monthDay.format(at(entity.start))} · {startClock(entity.start, clock)}</small>
           <strong>{entity.title}</strong>
           {place ? <span className="cw-lb-place">{place}{entity.neighbourhood && entity.venue ? ` · ${entity.neighbourhood}` : ''}</span> : null}
           {entity.image?.credit ? <em className="cw-lb-credit">{entity.image.credit}</em> : null}

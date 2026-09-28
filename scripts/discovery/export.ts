@@ -42,6 +42,17 @@ for (const [id, e] of byId) {
   const key = `${e.kind}|${norm(e.title)}|${e.kind === 'event' ? e.start : ''}`;
   if (seen.has(key)) byId.delete(id); else seen.add(key);
 }
+// Tourism Calgary relists many organizers' events under slightly different titles. The
+// organizer's own listing wins: drop a Tourism Calgary copy whose title contains, or is
+// contained in, another source's title for the same kind of thing on the same day (any
+// day for markets, which carry their dates separately).
+const others = [...byId.values()].filter(e => e.sourceId !== 'visit-calgary');
+for (const [id, e] of byId) {
+  if (e.sourceId !== 'visit-calgary') continue;
+  const t = norm(e.title), day = String(e.start ?? '').slice(0, 10);
+  if (t.length < 8) continue;
+  if (others.some(o => { const u = norm(o.title); return u.length >= 8 && (u.includes(t) || t.includes(u)) && (o.kind === 'market' || String(o.start ?? '').slice(0, 10) === day); })) byId.delete(id);
+}
 const occById = new Map<string, Entity>(feed.occurrences.map(o => [o.id, o]));
 for (const o of stored.occurrences) if (!occById.has(o.id)) occById.set(o.id, o);
 

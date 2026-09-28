@@ -2,6 +2,7 @@ import { useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Moon, Sun, Umbrella } from 'lucide-react';
 import type { AgendaDay, AgendaItem } from '../../lib/discoveryCalendar';
+import { startClock } from '../../lib/discovery';
 import type { DailyForecast } from '../../hooks/useCalgaryWeather';
 import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
 import { isWeekend } from '../../lib/homeClaims';
@@ -21,7 +22,7 @@ const clock = fmt({ hour: 'numeric', minute: '2-digit' });
 
 function timeLabel(item: AgendaItem, date: string) {
   const startsToday = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(item.start)) === date;
-  return startsToday ? clock.format(new Date(item.start)) : 'Continues';
+  return startsToday ? startClock(item.start, clock) : 'Continues';
 }
 
 /** "9:00 a.m." → ["9:00", "a.m."]; "Continues" stays whole. */

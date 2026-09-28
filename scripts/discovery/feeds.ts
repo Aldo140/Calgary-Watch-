@@ -1,6 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { EditorialFileProvider, IcsFeedProvider, RecurringMarketProvider, TicketmasterProvider, TribeEventsProvider, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
 import domain from '../../functions/discovery-domain.cjs';
+import { VisitCalgaryProvider } from './visitCalgary';
+import { SquarespaceEventsProvider } from './squarespace';
 
 type Entity = Record<string, unknown> & { id: string; kind: string };
 
@@ -23,6 +25,8 @@ export async function collectSources(log: (m: string) => void = console.log) {
       const provider: InventoryProvider = records ? new EditorialFileProvider(source, records)
         : source.provider === 'ics' ? new IcsFeedProvider(source)
         : source.provider === 'tribe' ? new TribeEventsProvider(source)
+        : source.provider === 'visitcalgary' ? new VisitCalgaryProvider(source)
+        : source.provider === 'squarespace' ? new SquarespaceEventsProvider(source)
         : source.provider === 'recurring-market' ? new RecurringMarketProvider(source)
         : new TicketmasterProvider(source);
       try {

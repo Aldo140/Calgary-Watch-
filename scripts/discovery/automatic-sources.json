@@ -521,5 +521,46 @@
         "fixedVenue": "Heritage Park"
       }
     }
+  },
+  {
+    "source": {
+      "id": "visit-calgary",
+      "name": "Tourism Calgary events calendar",
+      "approved": true,
+      "hosts": [
+        "www.visitcalgary.com"
+      ],
+      "kind": "editorial",
+      "provider": "visitcalgary",
+      "autoPublish": true
+    }
+  },
+  {
+    "source": {
+      "id": "the-confluence",
+      "name": "The Confluence Historic Site & Parkland",
+      "approved": true,
+      "hosts": [
+        "www.theconfluence.ca"
+      ],
+      "kind": "official",
+      "provider": "squarespace",
+      "feedUrl": "https://www.theconfluence.ca/events",
+      "autoPublish": true
+    }
+  },
+  {
+    "source": {
+      "id": "contemporary-calgary",
+      "name": "Contemporary Calgary",
+      "approved": true,
+      "hosts": [
+        "www.contemporarycalgary.com"
+      ],
+      "kind": "official",
+      "provider": "squarespace",
+      "feedUrl": "https://www.contemporarycalgary.com/whats-on",
+      "autoPublish": true
+    }
   }
 ]

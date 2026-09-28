@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 import type { AgendaDay, AgendaItem } from '../../lib/discoveryCalendar';
 import type { DiscoveryEntity, Neighbourhood } from '../../types/discovery';
 import type { LivePulse } from '../../hooks/useLivePulse';
-import { entityPath } from '../../lib/discovery';
+import { entityPath, startClock } from '../../lib/discovery';
 import { timeAgo, weekendDays, type ExampleReport } from '../../lib/homeClaims';
 import { CityMap } from '../community/CityMap';
 
@@ -205,7 +205,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
               <span className="h-ticket-stub">
                 <small>{dayShort.format(new Date(event.start))}</small>
                 <b>{dayNum.format(new Date(event.start))}</b>
-                <small>{clock.format(new Date(event.start))}</small>
+                <small>{startClock(event.start, clock)}</small>
               </span>
               <span className="h-ticket-main">
                 <small>Next on the calendar</small>
@@ -256,7 +256,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
         </Strip>
         <Strip to={event ? event.to : '/events'} n="02" name="Events" what="· shows, talks, workshops" className="h-strip-event"
           art={<MiniTicket day={event ? dayShort.format(new Date(event.start)) : undefined} num={event ? dayNum.format(new Date(event.start)) : undefined} />}>
-          {event ? <><b>{event.title}</b><em>{clock.format(new Date(event.start))}{placeOf(event) ? ` · ${placeOf(event)}` : ''}</em></> : <b>See what’s listed</b>}
+          {event ? <><b>{event.title}</b><em>{startClock(event.start, clock)}{placeOf(event) ? ` · ${placeOf(event)}` : ''}</em></> : <b>See what’s listed</b>}
         </Strip>
         <Strip to="/community" n="03" name="Community Watch" what="· live crime & safety map" className="h-strip-live" art={<WatchScene pins={pulse.reports.recent ?? []} count={liveCount} compact />}>
           <b>Know what’s happening on your street.</b>

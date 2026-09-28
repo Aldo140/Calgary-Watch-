@@ -1,5 +1,5 @@
 import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
-export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
+export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe' | 'visitcalgary' | 'squarespace'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
 /** Explicit JSON contract; adapters translate provider-specific APIs into this shape. */

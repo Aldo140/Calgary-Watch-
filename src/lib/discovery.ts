@@ -53,3 +53,9 @@ export function createDiscoveryRepository(entities: DiscoveryEntity[], occurrenc
   const visible = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e)));
   return { list: () => visible, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
 }
+
+const calgaryHm = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+/** Start time for display: "All day" when a listing starts at midnight (a date-only event). */
+export function startClock(iso: string, clock: Intl.DateTimeFormat): string {
+  return calgaryHm.format(new Date(iso)) === '00:00' ? 'All day' : clock.format(new Date(iso));
+}

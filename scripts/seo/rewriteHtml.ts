@@ -233,6 +233,26 @@ export function buildStaticRouteBody(pathname: string): string {
       copy: 'CalgaryWatch is Calgary’s crime watch: a live Calgary crime map and public safety map, plus events, markets and local places. Community Watch puts crime and safety reports from neighbours next to Calgary Police news releases, City data, weather and outages. The week planner lists real events and markets by day.',
       links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/neighbourhoods', 'Neighbourhoods']],
     },
+    '/events': {
+      heading: 'Events in Calgary this week.',
+      copy: 'What’s on in Calgary, from the organizers’ own listings: theatre, concerts, talks, exhibitions, festivals and family events from Theatre Calgary, Wordfest, Alberta Ballet, the Scotiabank Saddledome, Heritage Park, the University of Calgary, Mount Royal University and more. Every listing links back to the organizer and is checked again every day, so cancelled and past events drop off.',
+      links: [['/events/today', 'Today in Calgary'], ['/events/this-weekend', 'This weekend in Calgary'], ['/date-night', 'Date night ideas'], ['/markets', 'Markets']],
+    },
+    '/markets': {
+      heading: 'Calgary farmers’ markets and makers’ markets.',
+      copy: 'Calgary’s farmers’ and makers’ markets with their next real dates and hours: Calgary Farmers’ Market South and West, Crossroads Market, Hillhurst Sunnyside, Bridgeland-Riverside, Farmers & Makers at cSPACE, Dalhousie, the Calgary Winter Market, Market Collective and the Spruce Meadows International Christmas Market. Dates come from each market’s own site.',
+      links: [['/markets/this-weekend', 'Markets this weekend'], ['/guides', 'Calgary guides'], ['/events', 'Events']],
+    },
+    '/guides': {
+      heading: 'Calgary guides.',
+      copy: 'Local guides to Calgary: a day along the Bow River from Harvie Passage to the Peace Bridge, Calgary’s farmers’ markets and artisan food halls, and the historic laneways and craft coffee of Inglewood and Ramsay. Each guide links to the places and official sources it’s built from.',
+      links: [['/neighbourhoods', 'Neighbourhood guides'], ['/markets', 'Markets'], ['/date-night', 'Date night ideas']],
+    },
+    '/neighbourhoods': {
+      heading: 'Calgary neighbourhood guides.',
+      copy: 'Guides to Calgary neighbourhoods and what’s on in them: Inglewood, Kensington, the Beltline, Bridgeland-Riverside, Marda Loop, Bowness and Ramsay, quadrant by quadrant. Each one draws on its community association or business improvement area.',
+      links: [['/events', 'Events'], ['/guides', 'Calgary guides'], ['/community', 'Calgary crime watch']],
+    },
     '/date-night': {
       heading: 'Date night in Calgary.',
       copy: 'Date night ideas in Calgary, from the organizers’ own listings: Theatre Calgary’s Little Shop of Horrors, Wordfest’s Literary Death Match, the 18+ Friday evenings at the Spruce Meadows International Christmas Market, Alberta Ballet’s Nutcracker with the Calgary Philharmonic, and concerts at the Saddledome. Plus arts and nights out on this week and free ideas like the Bow River walk, Inglewood and Kensington. Picks are CalgaryWatch’s own and never paid for.',

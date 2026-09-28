@@ -57,8 +57,10 @@ describe('Discovery search and calendar', () => {
   });
 });
 describe('Discovery routes and presentation', () => {
-  it('noindexes unfinished collections, search and unknown entity pages', () => {
-    for (const path of [...DISCOVERY_SECTIONS.map(s => s.path), '/search', '/events/missing', '/local/food']) assert.equal(getSeoConfig(path).index, false);
+  it('indexes the hubs with real content; keeps /local, search, derived and unknown pages out', () => {
+    for (const path of ['/events', '/markets', '/guides', '/neighbourhoods']) assert.equal(getSeoConfig(path).index, true, path);
+    for (const path of ['/local', '/search', '/events/missing', '/events/today', '/events/this-weekend', '/local/food']) assert.equal(getSeoConfig(path).index, false, path);
+    assert.ok(!/being prepared/.test(getSeoConfig('/events').description));
     assert.equal(getSeoConfig('/map').index, true);
     assert.equal(getSeoConfig('/calgary-neighbourhood-watch').index, true);
     const hosting = JSON.parse(readFileSync('firebase.json', 'utf8')).hosting;
@@ -76,7 +78,7 @@ describe('Discovery routes and presentation', () => {
   });
   it('prerenders noindex and removes the homepage preload from other routes', () => {
     const shell = '<html><head><link rel="preload" as="image" href="/hero.webp"></head><body><div id="root"></div></body></html>';
-    const html = renderRouteHtml(shell, '/events', 'https://calgarywatch.ca');
+    const html = renderRouteHtml(shell, '/local', 'https://calgarywatch.ca');
     assert.match(html, /noindex, nofollow/); assert.ok(!html.includes('rel="preload"'));
   });
   it('loads verified real events in generated inventory and validates their fields', () => {

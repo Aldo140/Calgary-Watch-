@@ -158,9 +158,18 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
 for (const section of DISCOVERY_SECTIONS) {
   ROUTE_SEO[section.path] = { title: `${section.label} in Calgary | CalgaryWatch`, description: `Explore Calgary ${section.label.toLowerCase()}. Our first verified collection is being prepared.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
 }
+// The hubs with real, source-checked content are indexed (owner decision 2026-09-28). /local stays
+// out until it has more than a handful of places; single listings follow discoveryIndexingEnabled.
+const HUBS: Record<string, { title: string; description: string }> = {
+  '/events': { title: 'Events in Calgary This Week | CalgaryWatch', description: 'What’s on in Calgary: theatre, concerts, talks, festivals and family events, each checked against the organizer’s own listing. Updated every day.' },
+  '/markets': { title: 'Calgary Farmers’ Markets & Makers’ Markets | CalgaryWatch', description: 'Calgary farmers’ and makers’ markets with their next real dates and hours, from Crossroads and Calgary Farmers’ Market to seasonal Christmas markets.' },
+  '/guides': { title: 'Calgary Guides: Walks, Markets & Neighbourhoods | CalgaryWatch', description: 'Local guides to Calgary: the Bow River walk, farmers’ markets and food halls, and Inglewood’s historic laneways.' },
+  '/neighbourhoods': { title: 'Calgary Neighbourhood Guides | CalgaryWatch', description: 'Guides to Calgary neighbourhoods like Inglewood, Kensington, the Beltline, Bridgeland and Marda Loop: what’s there and what’s on.' },
+};
+for (const [path, hub] of Object.entries(HUBS)) ROUTE_SEO[path] = { ...ROUTE_SEO[path], ...hub, index: true };
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Find events, markets, local places, guides and neighbourhoods.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
-  ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
+  ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], index: false, title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
 }
 
 /** Breadcrumb entries per route for JSON-LD. */

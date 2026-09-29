@@ -37,7 +37,8 @@ describe('Recurring market provider', () => {
     const beforeDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-10-28'));
     const afterDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-11-04'));
     assert.equal(beforeDst?.start.endsWith('-06:00'), true);
-    assert.equal(afterDst?.start.endsWith('-07:00'), true);
+    // tzdata 2026c: Alberta stays on UTC-6 year-round from 2026-11-01, so no fall-back.
+    assert.equal(afterDst?.start.endsWith('-06:00'), true);
   });
 
   it('supports one market opening on several weekdays without duplicating the listing', async () => {

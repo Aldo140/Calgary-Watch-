@@ -30,14 +30,14 @@ describe('Recurring market provider', () => {
     assert.doesNotThrow(() => domain.validateSubmission(records[0].input));
   });
 
-  it('crosses the daylight-saving boundary with the correct offset', async () => {
+  it('keeps UTC-6 past 2026-11-01, when Alberta stopped changing clocks (tzdata 2026c)', async () => {
     const provider = new RecurringMarketProvider(source([{ ...yearRound, occurrenceCount: 8 }]), new Date('2026-09-21T12:00:00Z'));
     const records = await provider.fetch();
     if (records[0].input.kind !== 'market') throw Error('expected market');
-    const beforeDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-10-28'));
-    const afterDst = records[0].input.occurrences.find(o => o.start.startsWith('2026-11-04'));
-    assert.equal(beforeDst?.start.endsWith('-06:00'), true);
-    assert.equal(afterDst?.start.endsWith('-07:00'), true);
+    const before = records[0].input.occurrences.find(o => o.start.startsWith('2026-10-28'));
+    const after = records[0].input.occurrences.find(o => o.start.startsWith('2026-11-04'));
+    assert.equal(before?.start.endsWith('-06:00'), true);
+    assert.equal(after?.start.endsWith('-06:00'), true);
   });
 
   it('supports one market opening on several weekdays without duplicating the listing', async () => {

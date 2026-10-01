@@ -38,7 +38,8 @@ function event(id: string, start: string, extra: Partial<Entity> = {}): Entity {
 describe('Calgary time', () => {
   it('converts wall-clock times across daylight saving', () => {
     assert.equal(new Date(calgaryToEpoch('2026-07-01', '12:00')).toISOString(), '2026-07-01T18:00:00.000Z');
-    assert.equal(new Date(calgaryToEpoch('2026-12-01', '12:00')).toISOString(), '2026-12-01T19:00:00.000Z');
+    // tzdata 2026c: Alberta stays on UTC-6 year-round after the March 2026 change.
+    assert.equal(new Date(calgaryToEpoch('2026-12-01', '12:00')).toISOString(), '2026-12-01T18:00:00.000Z');
   });
   it('schedules the next slot after now, rolling to tomorrow', () => {
     const at = calgaryToEpoch('2026-09-24', '19:00');

@@ -85,6 +85,10 @@ describe('Publication and SEO',()=>{
     assert.equal((buildPageJsonLd(path,'https://calgarywatch.ca',repository) as any).mainEntity.name,e.title);
     assert.equal(getSeoConfig('/events/not-published',repository).index,false);
   });
+  it('keeps local business pages noindex while events are indexed',()=>{
+    const e={...published(),kind:'business',slug:'a-shop',name:'A shop',images:[],socials:{},services:[],claimed:false,partner:false,editorialSelection:false} as unknown as DiscoveryEntity;
+    assert.equal(getSeoConfig('/local/a-shop',createDiscoveryRepository([e])).index,false);
+  });
   it('excludes stale, unreviewed, archived and fixture inventory',()=>{
     const valid=published();
     const entities=[valid,{...valid,id:'pending',status:'pending'},{...valid,id:'old',verifiedAt:'2020-01-01T00:00:00Z'},{...valid,id:'fixture',developmentOnly:true},{...valid,id:'archived',status:'archived'}];

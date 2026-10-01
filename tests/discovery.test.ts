@@ -64,7 +64,10 @@ describe('Discovery routes and presentation', () => {
     assert.equal(getSeoConfig('/map').index, true);
     assert.equal(getSeoConfig('/calgary-neighbourhood-watch').index, true);
     const hosting = JSON.parse(readFileSync('firebase.json', 'utf8')).hosting;
-    for (const section of DISCOVERY_SECTIONS) assert.ok(hosting.headers.some((rule: { source: string; headers: { key: string; value: string }[] }) => rule.source === `${section.path}/**` && rule.headers.some(h => h.key === 'X-Robots-Tag' && h.value.includes('noindex'))));
+    const noindexHeader = (source: string) => hosting.headers.some((rule: { source: string; headers: { key: string; value: string }[] }) => rule.source === source && rule.headers.some(h => h.key === 'X-Robots-Tag' && h.value.includes('noindex')));
+    for (const section of DISCOVERY_SECTIONS) assert.equal(noindexHeader(`${section.path}/**`), section.path === '/local', section.path);
+    // Only the admin app falls back to index.html; every other unknown URL gets a real 404.
+    assert.deepEqual(hosting.rewrites.map((r: { source: string }) => r.source), ['/admin', '/admin/**']);
   });
   it('keeps new routes lazy and retains every existing route', () => {
     const app = readFileSync('src/App.tsx', 'utf8');

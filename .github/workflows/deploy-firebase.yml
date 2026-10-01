@@ -107,6 +107,12 @@ jobs:
               "urlList": [
                 "https://calgarywatch.ca/",
                 "https://calgarywatch.ca/map",
+                "https://calgarywatch.ca/community",
+                "https://calgarywatch.ca/events",
+                "https://calgarywatch.ca/markets",
+                "https://calgarywatch.ca/guides",
+                "https://calgarywatch.ca/neighbourhoods",
+                "https://calgarywatch.ca/date-night",
                 "https://calgarywatch.ca/about",
                 "https://calgarywatch.ca/coverage",
                 "https://calgarywatch.ca/calgary-neighbourhood-watch",

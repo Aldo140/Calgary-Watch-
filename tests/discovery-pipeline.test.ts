@@ -81,7 +81,7 @@ describe('Publication and SEO',()=>{
   it('uses the same approved repository for entity metadata and JSON-LD',()=>{
     const e=published();const repository=createDiscoveryRepository([e]);const path=`/events/${e.slug}`;
     assert.equal(getSeoConfig(path,repository).title,`${e.title} | CalgaryWatch`);
-    assert.equal(getSeoConfig(path,repository).index,false); // launch gate remains closed
+    assert.equal(getSeoConfig(path,repository).index,true); // single listings indexed since 2026-10-01
     assert.equal((buildPageJsonLd(path,'https://calgarywatch.ca',repository) as any).mainEntity.name,e.title);
     assert.equal(getSeoConfig('/events/not-published',repository).index,false);
   });

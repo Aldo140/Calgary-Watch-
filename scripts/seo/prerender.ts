@@ -1,4 +1,4 @@
-import { discoveryIndexingEnabled } from '../../src/lib/discoveryPublication';
+import { discoveryIndexingEnabled, sitemapInventory } from '../../src/lib/discoveryPublication';
 /**
  * Calgary Watch — post-build SEO prerender
  *
@@ -28,7 +28,7 @@ import { PRERENDER_OUTPUT_ROUTES, PRERENDER_ROUTES, PRODUCTION_ORIGIN } from '..
 import { discoveryRepository } from '../../src/data/discovery.js';
 import { entityPath } from '../../src/lib/discovery.js';
 import { buildSitemap } from '../../src/lib/discoverySeo.js';
-import { outputPathForRoute, renderRouteHtml } from './rewriteHtml.js';
+import { outputPathForRoute, renderNotFoundHtml, renderRouteHtml } from './rewriteHtml.js';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const DIST = join(REPO_ROOT, 'dist');
@@ -56,9 +56,10 @@ async function run(): Promise<void> {
     console.log(`[prerender] ${route} → ${outPath.replace(REPO_ROOT + '/', '')}`);
   }
 
-  console.log(`[prerender] Wrote ${written} page(s).`);
+  await writeFile(join(DIST, '404.html'), renderNotFoundHtml(shell), 'utf8');
+  console.log(`[prerender] Wrote ${written} page(s) and 404.html.`);
   // Verified discovery inventory will be passed here by the publishing adapter.
-  await writeFile(join(DIST, 'sitemap.xml'), buildSitemap(PRERENDER_ROUTES, discoveryIndexingEnabled ? discoveryRepository.list() : [], PRODUCTION_ORIGIN), 'utf8');
+  await writeFile(join(DIST, 'sitemap.xml'), buildSitemap(PRERENDER_ROUTES, discoveryIndexingEnabled ? discoveryRepository.list().filter(e => sitemapInventory(e)) : [], PRODUCTION_ORIGIN), 'utf8');
 }
 
 run().catch((error) => {

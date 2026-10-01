@@ -28,6 +28,16 @@ import {
   AIRDRIE_GUIDE_UPDATED,
   AIRDRIE_MAP_COMPARISON,
 } from '../../src/content/airdrieCrimeMapGuide.js';
+import { COMMUNITY_FAQS } from '../../src/content/communityWatch.js';
+import {
+  COVERAGE_BROWSER_SOURCES,
+  COVERAGE_FAQS,
+  COVERAGE_SERVER_SOURCES,
+  coverageSourceLink,
+  type CoverageSource,
+} from '../../src/content/coverage.js';
+import { weekAgenda } from '../../src/lib/discoveryCalendar.js';
+import type { DiscoveryEntity } from '../../src/types/discovery';
 
 /**
  * Where a route's static HTML is written, relative to dist/.
@@ -121,12 +131,83 @@ function staticLink(href: string, label: string): string {
   return `<a href="${escapeAttr(href)}">${escapeText(label)}</a>`;
 }
 
+function faqList(faqs: readonly { question: string; answer: string }[]): string {
+  return faqs.map((faq) => `<details><summary>${escapeText(faq.question)}</summary><p>${escapeText(faq.answer)}</p></details>`).join('');
+}
+
+function sourceTable(items: readonly CoverageSource[]): string {
+  const rows = items.map((source) => {
+    const href = coverageSourceLink(source);
+    return `<tr><td>${href ? staticLink(href, source.name) : escapeText(source.name)}</td><td>${escapeText(source.covers)}</td><td>${escapeText(source.often)}</td></tr>`;
+  }).join('');
+  return `<table><thead><tr><th>Source</th><th>What it covers</th><th>How often</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+const calgaryDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' });
+const calgaryDateTime = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const dayLabel = (date: string) => calgaryDay.format(new Date(`${date}T12:00:00Z`));
+
+/** The homepage week planner, as plain lists: the same days and listings the page shows. */
+function weekPlannerHtml(now: Date): string {
+  const days = weekAgenda(discoveryRepository.list(), discoveryRepository.occurrences(), 7, now).filter((day) => day.items.length);
+  if (!days.length) return '';
+  const lists = days.map((day) => {
+    const items = day.items.slice(0, 15).map((item) => `<li>${staticLink(item.to, item.title)}${item.place ? ` · ${escapeText(item.place)}` : ''}</li>`).join('');
+    return `<h3>${escapeText(dayLabel(day.date))}</h3><ul>${items}</ul>`;
+  }).join('');
+  return `<section><h2>This week in Calgary</h2>${lists}</section>`;
+}
+
+/** A hub's listings, linked, with the line each card shows. */
+function hubListingsHtml(kind: DiscoveryEntity['kind'], label: string, now: Date): string {
+  const occurrences = discoveryRepository.occurrences();
+  const nextMarketDate = (id: string) => occurrences.filter((o) => o.marketId === id && !o.cancelled && Date.parse(o.end) > now.getTime()).map((o) => o.start).sort()[0];
+  const entities = discoveryRepository.list()
+    .filter((e) => e.kind === kind && !(e.kind === 'event' && Date.parse(e.end) < now.getTime()))
+    .sort((a, b) => (a.kind === 'event' && b.kind === 'event' ? Date.parse(a.start) - Date.parse(b.start) : a.title.localeCompare(b.title)));
+  if (!entities.length) return '';
+  const items = entities.map((e) => {
+    const when = e.kind === 'event' ? e.start : e.kind === 'market' ? nextMarketDate(e.id) : undefined;
+    const meta = [when ? calgaryDateTime.format(new Date(when)) : '', 'venue' in e && e.venue ? e.venue : e.neighbourhood ?? ''].filter(Boolean).join(' · ');
+    return `<li>${staticLink(entityPath(e), e.title)}${meta ? ` — ${escapeText(meta)}` : ''}<br />${escapeText(e.summary)}</li>`;
+  }).join('');
+  return `<section><h2>${escapeText(label)} in Calgary</h2><ul>${items}</ul></section>`;
+}
+
+/** Extra sections for routes whose page shows more than a heading and a paragraph. */
+function routeSections(pathname: string, now: Date): string {
+  const hub = DISCOVERY_SECTIONS.find((section) => section.path === pathname);
+  if (hub) return hubListingsHtml(hub.kind, hub.label, now);
+  switch (pathname) {
+    case '/':
+      return weekPlannerHtml(now);
+    case '/community':
+      return `<section><h2>Questions people ask</h2>${faqList(COMMUNITY_FAQS)}</section>`;
+    case '/coverage':
+      return `<section><h2>Official feeds collected by our server</h2>${sourceTable(COVERAGE_SERVER_SOURCES)}</section>
+        <section><h2>Layers loaded when you open the map</h2>${sourceTable(COVERAGE_BROWSER_SOURCES)}</section>
+        <section><h2>Questions about coverage</h2>${faqList(COVERAGE_FAQS.map((f) => ({ question: f.q, answer: f.a })))}</section>`;
+    case '/map': {
+      const seen = new Set<string>();
+      const layers = [...COVERAGE_SERVER_SOURCES, ...COVERAGE_BROWSER_SOURCES].filter((source) => !seen.has(source.name) && seen.add(source.name));
+      return `<section><h2>What’s on the Calgary crime map</h2><ul>${layers.map((source) => `<li><strong>${escapeText(source.name)}</strong>: ${escapeText(source.covers)}</li>`).join('')}</ul>
+        <p>Neighbour reports are posted by signed-in Calgarians and show up right away. Neighbours can mark a report as seen, still happening or resolved, and it comes off the map after 5 days.</p>
+        <p>Call 911 for an emergency or a crime in progress. For Calgary police matters that are not in progress, call 403-266-1234.</p></section>`;
+    }
+    case '/about':
+      return `<section><h2>What Calgary Watch does</h2><ul><li>Community-powered incident reporting</li><li>Real-time map updates and context</li><li>Verified data from official sources</li><li>Privacy-first, anonymous reporting option</li></ul>
+        <p>Calgary Police, the City of Calgary, Environment Canada, ENMAX and Alberta Emergency Alerts each publish a real piece of what is happening in the city. Calgary Watch puts them in one view next to what neighbours report, with the source and time on every pin.</p></section>`;
+    default:
+      return '';
+  }
+}
+
 /**
  * Meaningful first-response HTML for crawlers and browsers before React boots.
  * The copy mirrors content that is visible in the corresponding React page;
  * it is not crawler-only content or a separate keyword variant.
  */
-export function buildStaticRouteBody(pathname: string): string {
+export function buildStaticRouteBody(pathname: string, now = new Date()): string {
   if (pathname === AIRDRIE_GUIDE_PATH) {
     const comparisons = AIRDRIE_MAP_COMPARISON.map((row) => `
       <tr>
@@ -287,7 +368,7 @@ export function buildStaticRouteBody(pathname: string): string {
   const summary = summaries[pathname];
   if (!summary) return '';
   const links = summary.links.map(([href, label]) => staticLink(href, label)).join(' · ');
-  return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>${escapeText(summary.heading)}</h1><p>${escapeText(summary.copy)}</p><p>${links}</p></article></main>`;
+  return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>${escapeText(summary.heading)}</h1><p>${escapeText(summary.copy)}</p><p>${links}</p>${routeSections(pathname, now)}</article></main>`;
 }
 
 /** Place route content inside the React mount point for the first response. */
@@ -297,7 +378,7 @@ export function upsertStaticRouteBody(html: string, pathname: string): string {
   const dated = (start: string, end: string) => `${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(start))} to ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(end))} (Calgary time)`;
   const sourceLinks = entity?.sources.map(s=>staticLink(s.url,s.name)).join(' · ');
   const dates = entity?.kind === 'event' ? `<p>${escapeText(dated(entity.start,entity.end))}${entity.cancelled ? ' — Cancelled' : ''}</p>` : entity?.kind === 'market' ? `<ul>${discoveryRepository.occurrences().filter(o=>o.marketId===entity.id).map(o=>`<li>${escapeText(dated(o.start,o.end))}${o.cancelled?' — Cancelled':''}</li>`).join('')}</ul>` : '';
-  const body = entity ? `<main><article><h1>${escapeText(entity.title)}</h1><p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname);
+  const body = entity ? `<main><article><h1>${escapeText(entity.title)}</h1><p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section && !buildStaticRouteBody(pathname) ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname);
   if (!body) return html;
   return html.replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, `<div id="root">${body}</div>`);
 }
@@ -349,4 +430,27 @@ export function renderRouteHtml(shell: string, pathname: string, origin: string)
   html = upsertStaticRouteBody(html, pathname);
 
   return html;
+}
+
+/**
+ * dist/404.html. Firebase Hosting serves it with a real 404 status for any URL that has no
+ * prerendered file, so a mistyped link or an expired listing is not a soft 404 that copies
+ * the homepage. The app still boots on it and renders NotFoundPage.
+ */
+export function renderNotFoundHtml(shell: string): string {
+  let html = shell.replace(/<link[^>]*rel="preload"[^>]*as="image"[^>]*>/g, '');
+  html = upsertTitle(html, 'Page not found | CalgaryWatch');
+  html = upsertMeta(html, 'name', 'description', 'This page could not be found on CalgaryWatch.');
+  html = upsertMeta(html, 'name', 'robots', ROBOTS_NOINDEX);
+  for (const [attr, key] of [['property', 'og:title'], ['name', 'twitter:title']] as const) html = upsertMeta(html, attr, key, 'Page not found | CalgaryWatch');
+  for (const [attr, key] of [['property', 'og:description'], ['name', 'twitter:description']] as const) html = upsertMeta(html, attr, key, 'This page could not be found on CalgaryWatch.');
+  html = html
+    .replace(/\s*<meta[^>]*property=["']og:url["'][^>]*>/gi, '')
+    .replace(/\s*<link[^>]*rel=["']canonical["'][^>]*>/gi, '')
+    .replace(/\s*<link[^>]*rel=["']alternate["'][^>]*hreflang=[^>]*>/gi, '')
+    .replace(/\s*<script[^>]*data-ld=["']page-schema["'][^>]*>[\s\S]*?<\/script>/i, '');
+  const links = [['/', 'Home'], ['/community', 'Community Watch'], ['/map', 'Live safety map'], ['/events', 'Events']]
+    .map(([href, label]) => staticLink(href, label)).join(' · ');
+  const body = `<main><h1>Page not found.</h1><p>The link may be old or mistyped. Here’s where most people head next.</p><p>${links}</p></main>`;
+  return html.replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, `<div id="root">${body}</div>`);
 }

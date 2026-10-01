@@ -16,6 +16,7 @@
   "hosting": {
     "public": "dist",
     "cleanUrls": true,
+    "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -23,7 +24,11 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/admin",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/**",
         "destination": "/index.html"
       }
     ],
@@ -110,24 +115,6 @@
         ]
       },
       {
-        "source": "/events/**",
-        "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, follow"
-          }
-        ]
-      },
-      {
-        "source": "/markets/**",
-        "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, follow"
-          }
-        ]
-      },
-      {
         "source": "/local",
         "headers": [
           {
@@ -138,24 +125,6 @@
       },
       {
         "source": "/local/**",
-        "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, follow"
-          }
-        ]
-      },
-      {
-        "source": "/guides/**",
-        "headers": [
-          {
-            "key": "X-Robots-Tag",
-            "value": "noindex, follow"
-          }
-        ]
-      },
-      {
-        "source": "/neighbourhoods/**",
         "headers": [
           {
             "key": "X-Robots-Tag",

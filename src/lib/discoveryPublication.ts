@@ -9,4 +9,11 @@ export function publishedInventory(entity: DiscoveryEntity, now=new Date()): boo
 }
 
 // Enable only together with reviewed Hosting header changes and a verified export.
-export const discoveryIndexingEnabled = false;
+// Turned on 2026-10-01 with the /events, /markets, /guides and /neighbourhoods header rules removed.
+export const discoveryIndexingEnabled = true;
+/** Kinds whose single pages Google may index. Local businesses stay out, like the /local hub. */
+export const INDEXED_DISCOVERY_KINDS: ReadonlySet<DiscoveryEntity['kind']> = new Set(['event', 'market', 'guide', 'neighbourhood']);
+/** Indexed and worth listing in the sitemap: an indexed kind, and not an event that has already ended. */
+export function sitemapInventory(entity: DiscoveryEntity, now = new Date()): boolean {
+  return INDEXED_DISCOVERY_KINDS.has(entity.kind) && !(entity.kind === 'event' && Date.parse(entity.end) < now.getTime());
+}

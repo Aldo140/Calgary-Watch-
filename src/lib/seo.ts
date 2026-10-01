@@ -1,4 +1,4 @@
-import { discoveryIndexingEnabled } from './discoveryPublication';
+import { INDEXED_DISCOVERY_KINDS, discoveryIndexingEnabled } from './discoveryPublication';
 import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
 import { COMMUNITY_FAQS, COMMUNITY_PATH } from '@/src/content/communityWatch';
 import { DISCOVERY_SECTIONS, type DiscoveryRepository } from './discovery';
@@ -221,7 +221,7 @@ export function getSeoConfig(pathname: string, repository: DiscoveryRepository =
   const [section, slug] = pathname.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;
-  if (entity) return { title: `${entity.title} | CalgaryWatch`, description: entity.summary, index: discoveryIndexingEnabled && indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
+  if (entity) return { title: `${entity.title} | CalgaryWatch`, description: entity.summary, index: discoveryIndexingEnabled && INDEXED_DISCOVERY_KINDS.has(entity.kind) && indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
   return ROUTE_SEO[pathname] ?? { title: 'Listing unavailable | CalgaryWatch', description: 'This listing has not been published or could not be found.', index: false, pageType: 'WebPage' };
 }
 

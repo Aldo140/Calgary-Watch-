@@ -13,6 +13,7 @@ import {
   escapeJsonLd,
   buildStaticRouteBody,
   outputPathForRoute,
+  renderNotFoundHtml,
   upsertMeta,
 } from '../scripts/seo/rewriteHtml.js';
 import { PRERENDER_OUTPUT_ROUTES, PRERENDER_ROUTES, PRODUCTION_ORIGIN, ROUTE_SEO } from '../src/lib/seo.js';
@@ -192,5 +193,30 @@ describe('escaping', () => {
   it('appends a meta tag when none exists', () => {
     const html = upsertMeta('<head></head>', 'name', 'brand-new', 'value');
     assert.match(html, /<meta name="brand-new" content="value" \/>/);
+  });
+});
+
+describe('404 page and fuller first-response HTML', () => {
+  it('renders a noindex 404 page without a canonical that points at the homepage', () => {
+    const html = renderNotFoundHtml(renderRouteHtml(SHELL, '/', PRODUCTION_ORIGIN));
+    assert.ok(html.includes('<meta name="robots" content="noindex, nofollow" />'));
+    assert.ok(html.includes('<h1>Page not found.</h1>'));
+    assert.ok(!/rel="canonical"/.test(html));
+    assert.ok(!/data-ld="page-schema"/.test(html));
+    assert.ok(!html.includes('<h1>What’s happening in Calgary.</h1>'));
+    assert.ok(!/og:description" content="What’s happening/.test(html));
+  });
+
+  it('gives /community its FAQ and /coverage every source', () => {
+    assert.match(buildStaticRouteBody('/community'), /Why are there sirens or police near me right now\?/);
+    const coverage = buildStaticRouteBody('/coverage');
+    assert.match(coverage, /Calgary Police news releases/);
+    assert.match(coverage, /ENMAX power outages/);
+    assert.match(coverage, /Does an empty area mean nothing happened there\?/);
+    assert.match(buildStaticRouteBody('/map'), /What’s on the Calgary crime map/);
+  });
+
+  it('keeps the hub summary when a hub has no listings', () => {
+    assert.match(buildStaticRouteBody('/markets'), /Calgary farmers’ markets and makers’ markets\./);
   });
 });

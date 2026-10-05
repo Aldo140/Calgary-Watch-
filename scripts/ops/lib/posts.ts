@@ -129,7 +129,7 @@ export function whenLabel(h: Pick<Happening, 'start' | 'end'>, withRange: boolea
 }
 
 /** One plain sentence from the organizer's description, or nothing when there isn't a clean one. */
-export function blurbFor(e: Entity): string | null {
+export function blurbFor(e: Entity, bannedPhrases: string[] = []): string | null {
   for (const raw of [e.description, e.summary]) {
     if (!raw) continue;
     const text = decode(String(raw)).replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]/gu, '').replace(/\s+/g, ' ').trim();
@@ -139,6 +139,8 @@ export function blurbFor(e: Entity): string | null {
     // "Join us for a free public exhibition featuring…" → "A free public exhibition featuring…"
     const plain = first.replace(/^join us (for|at|in) /i, '').replace(/^./, c => c.toUpperCase());
     if (plain.length < 30) continue;
+    // Organizer copy ("Don't miss…") doesn't get to speak in the brand's voice.
+    if (bannedIn(plain.toLowerCase(), bannedPhrases).length) continue;
     return plain.length <= 240 ? plain : tidyWords(plain, 200);
   }
   return null;
@@ -450,7 +452,7 @@ export function templateDraft(c: Candidate, kit: BrandKit): Draft {
   }
   const h = c.items[0], e = h.entity;
   const name = cleanTitle(e.title);
-  const blurb = blurbFor(e);
+  const blurb = blurbFor(e, kit.voice.bannedPhrases);
   const when = whenLabel(h, true);
   const day = relativeDay(h.start, postedAt);
   const where = [e.venue && cleanPlace(e.venue), e.neighbourhood].filter(Boolean).join(', ');
@@ -469,6 +471,14 @@ export function templateDraft(c: Candidate, kit: BrandKit): Draft {
   };
 }
 
+/** Banned phrases found in already-lowercased text. Whole words only, so "epic" doesn't catch "Epicentre". */
+function bannedIn(lower: string, phrases: string[]): string[] {
+  return phrases.filter(p => {
+    const esc = p.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(/^\w/.test(p) ? `(^|[^\\w])${esc}($|[^\\w])` : esc, 'u').test(lower);
+  });
+}
+
 /** Brand and platform checks. Returns problems; an empty list means the draft can be reviewed as-is. */
 export function checkDraft(d: Draft, kit: BrandKit, opts: { sponsored?: boolean } = {}): string[] {
   const problems: string[] = [];
@@ -481,11 +491,7 @@ export function checkDraft(d: Draft, kit: BrandKit, opts: { sponsored?: boolean 
   if (d.imageText.headline.length > 64) problems.push('Image headline is too long to stay legible (64 characters max).');
   if (d.imageText.details.length > 5) problems.push('Image has more than 5 detail lines.');
   const lower = `${d.caption} ${d.imageText.headline} ${d.imageText.blurb ?? ''}`.toLowerCase();
-  for (const p of kit.voice.bannedPhrases) {
-    // Whole words only, so "epic" doesn't catch "Epicentre".
-    const esc = p.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    if (new RegExp(/^\w/.test(p) ? `(^|[^\\w])${esc}($|[^\\w])` : esc, 'u').test(lower)) problems.push(`Uses a banned phrase: "${p}".`);
-  }
+  for (const p of bannedIn(lower, kit.voice.bannedPhrases)) problems.push(`Uses a banned phrase: "${p}".`);
   if (opts.sponsored && !/featured partner/i.test(d.caption.split('\n')[0] ?? '')) problems.push('Sponsored post must say "Featured partner" in the first line.');
   if (opts.sponsored && !/featured partner/i.test(d.imageText.eyebrow)) problems.push('Sponsored image must carry the "Featured partner" label.');
   return problems;

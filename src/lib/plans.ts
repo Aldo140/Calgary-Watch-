@@ -153,3 +153,14 @@ export async function readMyReportCount(uid: string): Promise<number | undefined
     return undefined;
   }
 }
+
+/** Events or markets the reader has suggested, for the Event scout badge. */
+export async function readMySubmissionCount(uid: string): Promise<number | undefined> {
+  if (!db) return undefined;
+  try {
+    const snap = await getDocs(query(collection(db, 'entity_submissions'), where('submittedBy', '==', uid), limit(5)));
+    return snap.size;
+  } catch {
+    return undefined;
+  }
+}

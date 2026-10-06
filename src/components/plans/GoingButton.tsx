@@ -3,6 +3,7 @@ import { Check, Ticket } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
 import { auth } from '../../firebase';
 import { readGoingCount, setGoing, useMyGoing } from '../../lib/plans';
+import { celebrateBadge } from './BadgeToast';
 import '../../styles/plans.css';
 
 /**
@@ -31,7 +32,11 @@ export function GoingButton({ eventId, start, past = false, compact = false }: {
     if (!user) return;
     setBusy(true); setError('');
     try {
+      const before = mine.ids.size;
       await setGoing(user.uid, eventId, start, next);
+      // Reward the plan the moment it's made: first RSVP, then the fifth.
+      if (next && before === 0) celebrateBadge('first-plans');
+      else if (next && before === 4) celebrateBadge('regular');
       setCount((c) => Math.max(0, (c ?? 0) + (next ? 1 : -1)));
     } catch {
       setError('That didn’t save. Try again in a moment.');

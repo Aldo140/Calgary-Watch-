@@ -9,8 +9,6 @@
  * places to add next.
  */
 
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../firebase';
 
 export const SEARCH_DEMAND = 'search_demand';
 const SEEN_KEY = 'cw_searched';
@@ -24,14 +22,18 @@ export function demandQuery(q: string): string | null {
 
 export function recordSearch(q: string, results: number): void {
   const term = demandQuery(q);
-  if (!term || !db) return;
+  if (!term) return;
   try {
     const seen = new Set<string>(JSON.parse(sessionStorage.getItem(SEEN_KEY) ?? '[]'));
     if (seen.has(term)) return;
     seen.add(term);
     sessionStorage.setItem(SEEN_KEY, JSON.stringify([...seen].slice(-50)));
   } catch { /* private mode: still record once per page view */ }
-  void addDoc(collection(db, SEARCH_DEMAND), { q: term, results: Math.min(Math.max(0, Math.round(results)), 999), ts: Date.now() }).catch(() => {});
+  // Firebase loads lazily so this module (and its pure helpers) import anywhere, tests included.
+  void Promise.all([import('firebase/firestore'), import('../firebase')]).then(([{ addDoc, collection }, { db }]) => {
+    if (!db) return;
+    return addDoc(collection(db, SEARCH_DEMAND), { q: term, results: Math.min(Math.max(0, Math.round(results)), 999), ts: Date.now() });
+  }).catch(() => {});
 }
 
 export interface DemandRow { q: string; searches: number; lastResults: number; lastAt: number }

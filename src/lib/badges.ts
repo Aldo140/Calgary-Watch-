@@ -12,7 +12,7 @@
 
 export type BadgeId =
   | 'founding' | 'neighbour' | 'tuned-in' | 'on-the-list' | 'monday-reader'
-  | 'first-plans' | 'regular' | 'all-rounder' | 'eyes-on-the-street';
+  | 'first-plans' | 'regular' | 'all-rounder' | 'eyes-on-the-street' | 'scout';
 
 export type BadgeTone = 'navy' | 'blue' | 'cyan' | 'sun' | 'coral' | 'green';
 
@@ -37,6 +37,7 @@ export const BADGES: readonly BadgeDefinition[] = [
   { id: 'first-plans', label: 'First plans', earned: 'Said “I’m going” to a Calgary event.', hint: 'Tap “I’m going” on any event.', tone: 'coral' },
   { id: 'regular', label: 'Regular', earned: 'Made plans for five Calgary events.', hint: 'Say “I’m going” to five events.', tone: 'sun', target: 5 },
   { id: 'all-rounder', label: 'All-rounder', earned: 'Made plans across three different kinds of events.', hint: 'Go to three different kinds of things.', tone: 'cyan', target: 3 },
+  { id: 'scout', label: 'Event scout', earned: 'Shared a Calgary event or market for the calendar.', hint: 'Add an event or market you know about.', tone: 'green' },
   { id: 'eyes-on-the-street', label: 'Eyes on the street', earned: 'Shared a report neighbours could see on the live map.', hint: 'Post a report on the live map.', tone: 'navy' },
 ];
 
@@ -52,6 +53,8 @@ export interface BadgeInput {
   goingInterestCount: number;
   /** Public reports the reader authored; undefined while unknown. */
   reportCount?: number;
+  /** Events or markets the reader suggested. */
+  submissionCount?: number;
 }
 
 export interface BadgeState extends BadgeDefinition {
@@ -74,6 +77,7 @@ export function computeBadges(input: BadgeInput): BadgeState[] {
     regular: input.goingCount,
     'all-rounder': input.goingInterestCount,
     'eyes-on-the-street': (input.reportCount ?? 0) >= 1,
+    scout: (input.submissionCount ?? 0) >= 1,
   };
   return BADGES.map((def) => {
     const value = has[def.id];

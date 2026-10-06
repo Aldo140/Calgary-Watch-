@@ -14,6 +14,9 @@ import { computeBadges, FOUNDING_CUTOFF, orderBadges } from '../src/lib/badges.t
 import { eventsConsentRefusal, eventsSubject, eventsUnsubscribeUrl } from '../src/lib/eventsDigest.ts';
 import { emailConsentPatch, readPlansProfile } from '../src/lib/plansProfile.ts';
 import { renderEventsHtml, renderEventsText } from '../scripts/digest/render.ts';
+import { googleCalendarUrl, icsFile } from '../src/lib/calendarFile.ts';
+import { filterInventory, matchesText } from '../src/lib/discoveryCalendar.ts';
+import { demandQuery, summarizeDemand } from '../src/lib/searchDemand.ts';
 
 const NOW = new Date('2026-10-08T15:00:00Z'); // Thursday 9:00 MDT
 
@@ -203,5 +206,33 @@ describe('one form, two email lists', () => {
   it('does not invent an opt-out for a list that was never on', () => {
     const p = emailConsentPatch(null, { weekly: false, events: false }, 500);
     assert.ok(!('digestUnsubscribedAt' in p) && !('eventsDigestUnsubscribedAt' in p));
+  });
+});
+
+describe('finding and adding events', () => {
+  it('builds a valid, escaped calendar file and Google link', () => {
+    const f = icsFile({ id: 'x', title: 'Jazz, live; late', start: '2026-10-10T02:00:00Z', end: '2026-10-10T04:00:00Z', location: 'Studio Bell', url: 'https://calgarywatch.ca/events/x' }, new Date('2026-10-01T00:00:00Z'));
+    assert.match(f, /DTSTART:20261010T020000Z/);
+    assert.match(f, /SUMMARY:Jazz\\, live\; late/);
+    assert.match(f, /\r\nEND:VCALENDAR\r\n$/);
+    assert.match(googleCalendarUrl({ id: 'x', title: 'Jazz', start: '2026-10-10T02:00:00Z', end: '2026-10-10T04:00:00Z', url: 'u' }), /dates=20261010T020000Z%2F20261010T040000Z/);
+  });
+  it('the Music chip finds the symphony even without a music tag', () => {
+    assert.deepEqual(filterInventory([symphony, kids], [], undefined, 'music', NOW).map((e) => e.id), ['sym']);
+    assert.deepEqual(filterInventory([symphony, kids], [], undefined, 'family', NOW).map((e) => e.id), ['kids']);
+  });
+  it('search within a listing matches every word', () => {
+    assert.ok(matchesText(symphony, 'mahler phil'));
+    assert.ok(!matchesText(symphony, 'mahler jazz'));
+  });
+  it('search demand never stores contact-like text, and groups terms', () => {
+    assert.equal(demandQuery('  Jazz   Night '), 'jazz night');
+    assert.equal(demandQuery('me@x.ca'), null);
+    assert.equal(demandQuery('call 4035551234'), null);
+    assert.deepEqual(summarizeDemand([{ q: 'jazz', results: 0, ts: 1 }, { q: 'jazz', results: 2, ts: 2 }, { q: 'yoga', results: 0, ts: 3 }]).map((r) => [r.q, r.searches, r.lastResults]), [['jazz', 2, 2], ['yoga', 1, 0]]);
+  });
+  it('sharing a listing earns Event scout', () => {
+    const base = { hasHomeArea: false, interestCount: 0, eventsDigestOptIn: false, weeklyDigestOptIn: false, goingCount: 0, goingInterestCount: 0 };
+    assert.equal(computeBadges({ ...base, submissionCount: 1 }).find((b) => b.id === 'scout')!.unlocked, true);
   });
 });

@@ -10,7 +10,7 @@ import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { computeBadges, orderBadges } from '../lib/badges';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
 import { buildEventPicks, EVENT_INTERESTS, interestsFor, pickDistance, pickWhen, type EventInterestId, type PickItem } from '../lib/eventPicks';
-import { homeAreaOf, readMyReportCount, savePlans, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
+import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
 import { resolveHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
 import '../styles/plans.css';
@@ -77,6 +77,7 @@ export default function PlansPage() {
   const [error, setError] = useState('');
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [reportCount, setReportCount] = useState<number | undefined>(undefined);
+  const [submissionCount, setSubmissionCount] = useState<number | undefined>(undefined);
   const pendingSave = useRef(false);
   const hydratedFor = useRef<string | null>(null);
 
@@ -104,6 +105,7 @@ export default function PlansPage() {
     if (!user) { setReportCount(undefined); return; }
     let live = true;
     void readMyReportCount(user.uid).then((n) => { if (live) setReportCount(n); });
+    void readMySubmissionCount(user.uid).then((n) => { if (live) setSubmissionCount(n); });
     return () => { live = false; };
   }, [user]);
 
@@ -134,6 +136,7 @@ export default function PlansPage() {
     goingCount: mine.ids.size,
     goingInterestCount: goingKinds,
     reportCount,
+    submissionCount,
   }));
   const unlocked = badges.filter((b) => b.unlocked).length;
 

@@ -1,4 +1,4 @@
-import { CalendarHeart, Eye, Home, Layers, Mail, Newspaper, Repeat, Sparkles, Ticket, type LucideIcon } from 'lucide-react';
+import { CalendarHeart, Compass, Eye, Home, Layers, Mail, Newspaper, Repeat, Sparkles, Ticket, type LucideIcon } from 'lucide-react';
 import type { BadgeId, BadgeState } from '../../lib/badges';
 
 const ICONS: Record<BadgeId, LucideIcon> = {
@@ -11,6 +11,7 @@ const ICONS: Record<BadgeId, LucideIcon> = {
   regular: Repeat,
   'all-rounder': Layers,
   'eyes-on-the-street': Eye,
+  scout: Compass,
 };
 
 /** A postage-stamp edge, in keeping with the site's torn-paper collage. Deterministic. */

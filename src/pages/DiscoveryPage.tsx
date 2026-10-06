@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { filterInventory } from '../lib/discoveryCalendar';
+import { filterInventory, matchesText } from '../lib/discoveryCalendar';
 import { recordSearch } from '../lib/searchDemand';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -12,6 +12,8 @@ import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
 import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
+
+const EVENT_FILTERS: Array<[string, string]> = [['free', 'Free'], ['family', 'Family'], ['music', 'Music'], ['arts', 'Arts & theatre'], ['food', 'Food & drink'], ['sports', 'Sports'], ['outdoor', 'Outdoors'], ['talks', 'Talks'], ['indoor', 'Indoor']];
 
 export default function DiscoveryPage() {
   const { pathname } = useLocation(); const [params] = useSearchParams();
@@ -27,6 +29,9 @@ export default function DiscoveryPage() {
   const isTonight = period === 'today' && params.get('time') === 'tonight';
   let items = all.filter(e => e.kind === section?.kind && (!category || e.categories.includes(category)) && (!quadrant || (e.kind === 'neighbourhood' && e.quadrant === quadrant)));
   items = filterInventory(items, discoveryRepository.occurrences(), isTonight ? 'tonight' : period, params.get('filter') || undefined);
+  // Search within a listing page (/events?q=jazz), on top of the date and interest filters.
+  const within = (root === 'events' || root === 'markets') ? normalizeSearch(params.get('q') ?? '') : '';
+  if (within) items = items.filter(e => matchesText(e, within));
   // Search defaults to current/upcoming inventory, same as the listing pages — an ended
   // or cancelled event/market shouldn't surface as a live suggestion. Its detail URL
   // still resolves normally above (`entity`/`missing` don't go through this filter).
@@ -52,21 +57,23 @@ export default function DiscoveryPage() {
         { to: '/events/today?time=tonight', label: 'Tonight', current: isTonight },
       ] : []),
     ];
-    const interestLinks = root === 'events' ? ['free', 'family', 'music', 'food', 'arts', 'outdoor', 'indoor'].map(f => ({
-      to: `${pathname}?${new URLSearchParams({ ...(isTonight ? { time: 'tonight' } : {}), filter: f })}`,
-      label: f[0].toUpperCase() + f.slice(1), current: params.get('filter') === f,
-    })) : undefined;
+    const interestLinks = root === 'events' ? EVENT_FILTERS.map(([f, label]) => {
+      const current = params.get('filter') === f;
+      const next = new URLSearchParams({ ...(isTonight ? { time: 'tonight' } : {}), ...(within ? { q: within } : {}), ...(current ? {} : { filter: f }) });
+      // Tapping the active chip clears it, so a filter is never a dead end.
+      return { to: `${pathname}${next.size ? `?${next}` : ''}`, label, current };
+    }) : undefined;
     return <SiteLayout><div className="cw-wrap cw-page">
-      <ListingBoard root={root} title={title} items={items} occurrences={discoveryRepository.occurrences()} filters={filterLinks} interests={interestLinks}
+      <ListingBoard root={root} title={title} items={items} query={within} occurrences={discoveryRepository.occurrences()} filters={filterLinks} interests={interestLinks}
         emptyCta={<EmptyInventory type={section?.label.toLowerCase() || 'discoveries'} kind={section?.kind} />} />
     </div></SiteLayout>;
   }
   return <SiteLayout><div className="cw-wrap cw-page">
     <nav className="cw-breadcrumb" aria-label="Breadcrumb"><Link to="/">Home</Link> / {section && <Link to={section.path}>{section.label}</Link>}{slug && <> / {entity?.title || slug}</>}</nav>
-    {entity ? <EntityDetail entity={entity} occurrences={discoveryRepository.occurrences()} related={all.filter(e => relatedIds.includes(e.id))} /> : <><header className="cw-page-heading"><p className="cw-eyebrow">CalgaryWatch discovery</p><h1>{title}</h1><p className="cw-lead">{missing ? 'The listing may have moved or hasn’t been published.' : 'Good plans begin with a little local knowledge.'}</p></header>
+    {entity ? <EntityDetail entity={entity} occurrences={discoveryRepository.occurrences()} related={all.filter(e => relatedIds.includes(e.id))} all={all} /> : <><header className="cw-page-heading"><p className="cw-eyebrow">CalgaryWatch discovery</p><h1>{title}</h1><p className="cw-lead">{missing ? 'The listing may have moved or hasn’t been published.' : 'Good plans begin with a little local knowledge.'}</p></header>
       {missing ? <Link className="cw-button" to={section?.path || '/'}>Explore {section?.label || 'Calgary'} ↗</Link> : search ? <><GlobalSearch initial={q} />{q && <p className="cw-result-count" role="status">{Object.values(groups).flat().length} results for “{q}”</p>}{Object.entries(groups).map(([kind, entities]) => <section className="cw-section" key={kind}><h2>{DISCOVERY_SECTIONS.find(s => s.kind === kind)?.label}</h2><div className="cw-card-grid">{entities.map(e => <DiscoveryCard entity={e} key={e.id} />)}</div></section>)}{q && !Object.keys(groups).length && <p>Try another term, browse a neighbourhood, or suggest a place we should add.</p>}<aside className="cw-search-live"><h2>Looking for what’s happening right now?</h2><p>Weather, traffic, outages and community reports have their own place.</p><Link to="/map">Open CalgaryWatch Live ↗</Link></aside></> : <>
       <nav className="cw-intents" aria-label="Filter listings"><Link to={`/${root}`} aria-current={!slug && !quadrant ? 'page' : undefined}>All {section?.label.toLowerCase()}</Link>{(root === 'events' || root === 'markets') && <><Link to={`/${root}/this-weekend`}>This weekend</Link>{root === 'events' && <><Link to="/events/today">Today</Link><Link to="/events/today?time=tonight">Tonight</Link></>}</>}{root === 'local' && LOCAL_CATEGORIES.map(c => <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{c[0].toUpperCase() + c.slice(1)}</Link>)}{root === 'neighbourhoods' && QUADRANTS.map(quad => <Link key={quad} to={`/neighbourhoods?quadrant=${quad}`} aria-current={quadrant === quad ? 'page' : undefined}>{quad}</Link>)}</nav>
-      {root === 'events' && <nav className="cw-intents" aria-label="Event interests">{['free','family','music','food','arts','outdoor','indoor'].map(f => <Link key={f} aria-current={params.get('filter') === f ? 'page' : undefined} to={`${pathname}?${new URLSearchParams({ ...(isTonight ? {time:'tonight'} : {}), filter:f })}`}>{f[0].toUpperCase()+f.slice(1)}</Link>)}</nav>}
+      {root === 'events' && <nav className="cw-intents" aria-label="Event interests">{EVENT_FILTERS.map(([f]) => f).map(f => <Link key={f} aria-current={params.get('filter') === f ? 'page' : undefined} to={`${pathname}?${new URLSearchParams({ ...(isTonight ? {time:'tonight'} : {}), filter:f })}`}>{f[0].toUpperCase()+f.slice(1)}</Link>)}</nav>}
       {items.some(e => e.developmentOnly) && <p className="cw-preview-note">Illustrative design previews. These are not confirmed listings.</p>}
       {items.length ? <div className="cw-card-grid">{items.map(e => <DiscoveryCard entity={e} key={e.id} />)}</div> : <EmptyInventory type={section?.label.toLowerCase() || 'discoveries'} kind={section?.kind} />}
       </>}

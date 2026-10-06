@@ -27,7 +27,29 @@ export type NavItem = {
   tone?: Tone;
   /** Navigates instead of switching the in-page section. */
   href?: string;
+  /** Rail heading this item sits under (Today, Audience, Content, City). */
+  group?: string;
 };
+
+const calgaryNow = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+/** "Tue, Oct 6 · 9:41 a.m. Calgary", refreshed each minute. */
+function useCalgaryClock(): string {
+  const [now, setNow] = React.useState(() => Date.now());
+  React.useEffect(() => { const t = window.setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(t); }, []);
+  return calgaryNow.format(now).replace(/,\s(\d)/, ' · $1');
+}
+
+/** Items in order, with a heading inserted wherever the group changes. */
+function grouped(items: NavItem[]): Array<{ group?: string; items: NavItem[] }> {
+  const out: Array<{ group?: string; items: NavItem[] }> = [];
+  for (const item of items) {
+    const last = out[out.length - 1];
+    if (last && last.group === item.group) last.items.push(item);
+    else out.push({ group: item.group, items: [item] });
+  }
+  return out;
+}
 
 export function AdminShell({
   items,
@@ -49,6 +71,7 @@ export function AdminShell({
   onSignOut?: () => void;
 }) {
   const navigate = useNavigate();
+  const clock = useCalgaryClock();
   const [moreOpen, setMoreOpen] = React.useState(false);
   // A phone fits four tabs and a "More" button. Eleven tabs in one row left each
   // about 35px wide with colliding labels. Every section stays one tap away in the
@@ -77,12 +100,15 @@ export function AdminShell({
       >
         <div className="px-4 pt-5 pb-4">
           <Link
-            to="/map"
+            to="/"
             className="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold mb-4 transition-colors hover:text-white"
             style={{ color: T.railText }}
           >
-            <ArrowLeft size={13} /> Back to map
+            <ArrowLeft size={13} /> Back to the site
           </Link>
+          <div className="flex items-center gap-2.5">
+            <img src="/images/brand/calgarywatch-city-spark-v2.webp" width="34" height="34" alt="" className="rounded-full" style={{ boxShadow: '0 0 0 2px rgba(255,255,255,0.12)' }} />
+            <div>
           <p
             className="text-[0.6rem] font-semibold uppercase tracking-[0.18em]"
             style={{ color: T.railText }}
@@ -96,10 +122,19 @@ export function AdminShell({
           <p className="text-[1.1rem] font-bold" style={{ fontFamily: display, color: '#FFFFFF' }}>
             Admin console
           </p>
+            </div>
+          </div>
+          <p className="mt-3 text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.railText }}>{clock} · Calgary</p>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2.5 pb-4 space-y-0.5">
-          {items.map((item) => {
+        <nav className="flex-1 overflow-y-auto px-2.5 pb-4">
+          {grouped(items).map((section) => (
+          <div key={section.group ?? section.items[0].id} className="mb-3">
+          {section.group && (
+            <p className="px-3 pt-2 pb-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.2em]" style={{ color: 'rgba(154,164,178,0.7)' }}>{section.group}</p>
+          )}
+          <div className="space-y-0.5">
+          {section.items.map((item) => {
             const active = item.id === activeId;
             const Icon = item.icon;
             return (
@@ -111,9 +146,10 @@ export function AdminShell({
                   'w-full flex items-center gap-2.5 h-10 px-3 rounded-lg text-[0.82rem] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
                 )}
                 style={{
-                  background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
+                  background: active ? 'linear-gradient(90deg, rgba(44,111,181,0.28), rgba(255,255,255,0.06))' : 'transparent',
                   color: active ? '#fff' : T.railText,
                   outlineColor: T.signal,
+                  boxShadow: active ? `inset 3px 0 0 ${T.signal}` : undefined,
                 }}
               >
                 <Icon size={16} className="shrink-0" />
@@ -133,6 +169,9 @@ export function AdminShell({
               </button>
             );
           })}
+          </div>
+          </div>
+          ))}
         </nav>
 
         {onSignOut && (
@@ -156,10 +195,10 @@ export function AdminShell({
         >
           <div className="px-4 lg:px-7 py-3 flex items-center gap-3">
             <Link
-              to="/map"
+              to="/"
               className="lg:hidden shrink-0 h-9 w-9 grid place-items-center rounded-lg border"
               style={{ borderColor: T.line, color: T.muted, background: T.card }}
-              aria-label="Back to map"
+              aria-label="Back to the site"
             >
               <ArrowLeft size={16} />
             </Link>
@@ -175,6 +214,7 @@ export function AdminShell({
                   {subtitle}
                 </p>
               )}
+              <p className="lg:hidden text-[0.62rem] tabular-nums mt-0.5" style={{ fontFamily: mono, color: T.muted }}>{clock} · Calgary</p>
             </div>
             {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}
           </div>
@@ -278,8 +318,11 @@ export function AdminShell({
                 <X size={18} />
               </button>
             </div>
+            {grouped(items).map((section) => (
+            <div key={section.group ?? section.items[0].id} className="mb-2">
+            {section.group && <p className="px-2 pt-1 pb-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.2em]" style={{ color: T.railText }}>{section.group}</p>}
             <div className="grid grid-cols-2 gap-1.5">
-              {items.map((item) => {
+              {section.items.map((item) => {
                 const active = item.id === activeId;
                 const Icon = item.icon;
                 return (
@@ -301,9 +344,11 @@ export function AdminShell({
                 );
               })}
             </div>
+            </div>
+            ))}
             <div className="mt-3 pt-3 border-t flex gap-2" style={{ borderColor: T.railLine }}>
-              <Link to="/map" className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-xl text-[0.82rem] font-semibold" style={{ color: T.railText, background: 'rgba(255,255,255,0.04)' }}>
-                <ArrowLeft size={15} /> Back to map
+              <Link to="/" className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-xl text-[0.82rem] font-semibold" style={{ color: T.railText, background: 'rgba(255,255,255,0.04)' }}>
+                <ArrowLeft size={15} /> Back to the site
               </Link>
               {onSignOut && (
                 <button onClick={() => { setMoreOpen(false); onSignOut(); }} className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-xl text-[0.82rem] font-semibold" style={{ color: T.railText, background: 'rgba(255,255,255,0.04)' }}>
@@ -319,4 +364,4 @@ export function AdminShell({
 }
 
 /** The four sections most used from a phone; everything else lives under More. */
-const PRIMARY_TABS = ['desk', 'ops', 'partners', 'reports'];
+const PRIMARY_TABS = ['desk', 'members', 'reports', 'content'];

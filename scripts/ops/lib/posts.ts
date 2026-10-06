@@ -4,6 +4,7 @@
 import type { BrandId, PostImageText, PostTemplate } from '../../../src/types/ops';
 import type { BrandKit } from './brand';
 import { addDays, calgaryDate, calgaryMinutes, calgaryToEpoch, calgaryWeekday, clock, longDay, nextSlot, shortDay, timeRange } from './time';
+import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
 
 export type Entity = Record<string, any> & { id: string; kind: string; title: string; slug: string };
 export type Occurrence = { id: string; marketId: string; start: string; end?: string; cancelled?: boolean };
@@ -370,7 +371,7 @@ export function roundupEyebrow(c: Pick<Candidate, 'items'>): string {
 
 const tidy = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).trimEnd()}…`);
 
-const WEEKDAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long' });
+const WEEKDAY = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long' });
 const dayName = (ms: number) => WEEKDAY.format(new Date(ms));
 /** "Today", "Tomorrow" or "Sunday", relative to when the post goes out. */
 function relativeDay(ms: number, postedAt: number): string {
@@ -418,6 +419,23 @@ export function reelSlides(c: Pick<Candidate, 'items' | 'fingerprint'>): Array<P
  * The draft used when no model is configured, or the model's draft fails the checks. It should
  * read like a person who lives here wrote it: sentence case, specific, no hype.
  */
+/** Whole words only, so "epic" doesn't catch "Epicentre". */
+function usesPhrase(text: string, phrase: string): boolean {
+  const esc = phrase.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(/^\w/.test(phrase) ? `(^|[^\\w])${esc}($|[^\\w])` : esc, 'u').test(text.toLowerCase().replace(/[’‘]/g, "'"));
+}
+
+/**
+ * Organizer copy is quoted, not written by us, and some of it says exactly
+ * what our voice rules forbid ("Don't miss…"). Drop those sentences rather
+ * than let an automatic draft fail its own brand check and stall in review.
+ */
+function withoutBannedSentences(text: string | null | undefined, kit: BrandKit): string | null {
+  if (!text) return null;
+  const kept = text.split(/(?<=[.!?])\s+/).filter(sentence => !kit.voice.bannedPhrases.some(p => usesPhrase(sentence, p)));
+  return kept.join(' ').trim() || null;
+}
+
 export function templateDraft(c: Candidate, kit: BrandKit): Draft {
   const tags = kit.hashtags.join(' ');
   const postedAt = c.suggestedFor;
@@ -450,7 +468,7 @@ export function templateDraft(c: Candidate, kit: BrandKit): Draft {
   }
   const h = c.items[0], e = h.entity;
   const name = cleanTitle(e.title);
-  const blurb = blurbFor(e);
+  const blurb = withoutBannedSentences(blurbFor(e), kit);
   const when = whenLabel(h, true);
   const day = relativeDay(h.start, postedAt);
   const where = [e.venue && cleanPlace(e.venue), e.neighbourhood].filter(Boolean).join(', ');
@@ -482,9 +500,7 @@ export function checkDraft(d: Draft, kit: BrandKit, opts: { sponsored?: boolean 
   if (d.imageText.details.length > 5) problems.push('Image has more than 5 detail lines.');
   const lower = `${d.caption} ${d.imageText.headline} ${d.imageText.blurb ?? ''}`.toLowerCase();
   for (const p of kit.voice.bannedPhrases) {
-    // Whole words only, so "epic" doesn't catch "Epicentre".
-    const esc = p.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    if (new RegExp(/^\w/.test(p) ? `(^|[^\\w])${esc}($|[^\\w])` : esc, 'u').test(lower)) problems.push(`Uses a banned phrase: "${p}".`);
+    if (usesPhrase(lower, p)) problems.push(`Uses a banned phrase: "${p}".`);
   }
   if (opts.sponsored && !/featured partner/i.test(d.caption.split('\n')[0] ?? '')) problems.push('Sponsored post must say "Featured partner" in the first line.');
   if (opts.sponsored && !/featured partner/i.test(d.imageText.eyebrow)) problems.push('Sponsored image must carry the "Featured partner" label.');

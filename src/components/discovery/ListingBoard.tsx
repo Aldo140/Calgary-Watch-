@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Plus, Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import type { DiscoveryEntity, Event as EventEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath, startClock } from '../../lib/discovery';
 import { EventArt, MarketArt } from './ListingArt';
+import '../../styles/plans.css';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
+const fmt = (opts: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayKey = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
 const weekdayShort = fmt({ weekday: 'short' });
 const weekdayLong = fmt({ weekday: 'long' });
@@ -112,13 +116,14 @@ function Filters({ links }: { links: { to: string; label: string; current: boole
 }
 
 /** Events and Markets listing pages: counts from the published inventory, never estimates. */
-export function ListingBoard({ root, title, items, occurrences, filters, interests, emptyCta }: {
+export function ListingBoard({ root, title, items, occurrences, filters, interests, emptyCta, query = '' }: {
   root: 'events' | 'markets';
   title: string;
   items: DiscoveryEntity[];
   occurrences: readonly MarketOccurrence[];
   filters: { to: string; label: string; current: boolean }[];
   interests?: { to: string; label: string; current: boolean }[];
+  query?: string;
   emptyCta: ReactNode;
 }) {
   const now = new Date();
@@ -148,11 +153,25 @@ export function ListingBoard({ root, title, items, occurrences, filters, interes
         <p className="cw-lb-kicker"><span className="cw-lb-pulse" aria-hidden="true" />CalgaryWatch {root === 'events' ? 'Events' : 'Markets'}</p>
         <h1>{lead}{rest.length ? <> <span>in {rest.join(' in ')}.</span></> : '.'}</h1>
         <p className="cw-lb-count">{count}. Every listing links to its organizer or ticket seller.</p>
+        <div className="cw-lb-tools">
+          <ListingSearch root={root} query={query} />
+          {root === 'events' ? <Link to="/submit?type=event" className="cw-lb-add"><Plus size={16} aria-hidden="true" /> Add an event</Link> : <Link to="/submit?type=market" className="cw-lb-add"><Plus size={16} aria-hidden="true" /> Add a market</Link>}
+        </div>
+        <Link to="/plans" className="cw-lb-plans">
+          <span className="cw-lb-plans-new">For you</span>
+          <span><strong>Picks that fit you.</strong> Choose what you’re into, say “I’m going”, get Thursday picks near home.</span>
+          <ArrowUpRight size={17} aria-hidden="true" />
+        </Link>
       </header>
       <Filters links={filters} />
       {interests ? <Filters links={interests} /> : null}
 
-      {!items.length ? <div className="cw-lb-empty">{emptyCta}</div> : root === 'events' ? (
+      {!items.length ? <div className="cw-lb-empty">{query ? (
+        <div className="cw-lb-nomatch">
+          <p><strong>Nothing listed matches “{query}” yet.</strong> We only list what we’ve checked with the organizer.</p>
+          <p>Know of one? <Link to={`/submit?type=${root === 'markets' ? 'market' : 'event'}`}>Add it</Link> and it earns you the Event scout badge once it’s in.</p>
+        </div>
+      ) : emptyCta}</div> : root === 'events' ? (
         groups.map(g => (
           <section className="cw-lb-day" key={g.key} aria-labelledby={`d-${g.key}`}>
             <h2 id={`d-${g.key}`}><span>{g.label}</span> {g.date}<small>{g.items.length} {g.items.length === 1 ? 'event' : 'events'}</small></h2>
@@ -174,5 +193,26 @@ export function ListingBoard({ root, title, items, occurrences, filters, interes
         </>
       )}
     </div>
+  );
+}
+
+/** Search inside the current listing: keeps the date and interest filters, updates ?q=. */
+function ListingSearch({ root, query }: { root: string; query: string }) {
+  const [value, setValue] = useState(query);
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+  useEffect(() => setValue(query), [query]);
+  const go = (q: string) => {
+    const params = new URLSearchParams(search);
+    if (q.trim()) params.set('q', q.trim()); else params.delete('q');
+    navigate(`${pathname}${params.size ? `?${params}` : ''}`, { replace: true });
+  };
+  return (
+    <form className="cw-lb-search" role="search" onSubmit={e => { e.preventDefault(); go(value); }}>
+      <Search size={17} aria-hidden="true" />
+      <label className="cw-sr" htmlFor="cw-lb-q">Search {root}</label>
+      <input id="cw-lb-q" type="search" value={value} onChange={e => setValue(e.target.value)} placeholder={root === 'events' ? 'Search events: jazz, Flames, kids…' : 'Search markets'} enterKeyHint="search" />
+      {value ? <button type="button" aria-label="Clear search" onClick={() => { setValue(''); go(''); }}><X size={16} /></button> : null}
+    </form>
   );
 }

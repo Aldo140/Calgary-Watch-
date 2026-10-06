@@ -234,7 +234,7 @@ export default function NeighbourhoodWatchGuidePage() {
                 <strong>A free Monday email for your area</strong>
                 <p>Reports within a 15-minute walk of home first, then 3 km and 10 km when it’s quiet. Opt in only.</p>
               </div>
-              <Link className="cm-btn cm-btn-primary" to="/map?settings=alerts"><Bell size={18} aria-hidden="true" /> Get the Monday email</Link>
+              <Link className="cm-btn cm-btn-primary" to="/plans?email=monday#emails"><Bell size={18} aria-hidden="true" /> Get the Monday email</Link>
             </div>
           </section>
 

@@ -175,7 +175,9 @@ async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
       digestWelcomeSentAt: typeof d.digestWelcomeSentAt === 'number' ? d.digestWelcomeSentAt : null,
       // Kept out of DigestRecipient so it cannot reach a template by accident.
       _address: typeof d.address === 'string' ? d.address : '',
-    } as DigestRecipient & { _address: string };
+      // Already on the Thursday list? Then the Monday email doesn't offer it.
+      _eventsOn: d.eventsDigestOptIn === true,
+    } as DigestRecipient & { _address: string; _eventsOn: boolean };
   });
 }
 
@@ -419,6 +421,7 @@ async function run(): Promise<void> {
         unsubscribeUrl: unsubUrl,
         branding,
         contribution: isFirstEmail ? undefined : contribution,
+        offerThursday: !(profile as DigestRecipient & { _eventsOn?: boolean })._eventsOn,
       };
 
       const email = {

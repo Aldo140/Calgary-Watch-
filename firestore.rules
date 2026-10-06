@@ -368,6 +368,24 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Anonymous search demand (src/lib/searchDemand.ts): the words, how many
+    // listings matched, and when. Nothing that identifies the searcher, and
+    // nothing shaped like contact details; admins read it to see what Calgary
+    // looks for that isn't listed yet.
+    match /search_demand/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['q', 'results', 'ts']) &&
+                    request.resource.data.q is string &&
+                    request.resource.data.q.size() >= 2 &&
+                    request.resource.data.q.size() <= 80 &&
+                    !request.resource.data.q.matches('.*(@|https?:|[0-9]{6,}).*') &&
+                    request.resource.data.results is int &&
+                    request.resource.data.results >= 0 &&
+                    request.resource.data.results <= 999 &&
+                    request.resource.data.ts is number;
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
       // Every field is bounded and type-checked. `referrer` holds a bare
@@ -445,6 +463,13 @@ service cloud.firestore {
     // mailed, which is exactly the list an attacker would want.
     match /digest_sends/{sendId} {
       allow read, write: if false;
+    }
+
+    // Thursday picks send ledger (scripts/digest/events.ts, Admin SDK).
+    // Admins read it for the run summary; nobody writes from a browser.
+    match /events_digest_sends/{sendId} {
+      allow read: if isAdmin();
+      allow write: if false;
     }
 
     // Resend inbound mail is synchronized by GitHub Actions through the Admin
@@ -583,6 +608,83 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Unsubscribe requests for the Thursday events email. Same shape and the
+    // same per-account token as digest_unsubscribes; a separate collection so
+    // leaving one list never touches the other, and so neither request can
+    // overwrite a pending one for the other list. Honoured by
+    // scripts/digest/events.ts before it selects anybody to mail.
+    match /events_digest_unsubscribes/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if
+        request.resource.data.keys().hasOnly(['uid', 'token', 'requestedAt', 'processedAt', 'source']) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.token is string &&
+        request.resource.data.token.size() == 32 &&
+        request.resource.data.requestedAt is number &&
+        request.resource.data.processedAt == null &&
+        exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.get('digestUnsubToken', '') == request.resource.data.token;
+      allow delete: if false;
+    }
+
+    // ── "I'm going" ─────────────────────────────────────────────────────────
+    // An RSVP is private to its owner; the public sees only a per-listing
+    // count. The browser writes both in one batch, and each rule checks the
+    // other half with getAfter()/existsAfter(), so the count can only move by
+    // exactly one, and only in step with the caller's own RSVP appearing or
+    // disappearing. No Cloud Function is needed to keep it honest.
+    function rsvpPath(eventId) {
+      return /databases/$(database)/documents/event_rsvps/$(request.auth.uid + '_' + eventId);
+    }
+    function rsvpCountPath(eventId) {
+      return /databases/$(database)/documents/event_rsvp_counts/$(eventId);
+    }
+
+    match /event_rsvps/{rsvpId} {
+      allow read: if isAdmin() ||
+                  (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['uid', 'eventId', 'start', 'createdAt']) &&
+                    request.resource.data.uid == request.auth.uid &&
+                    request.resource.data.eventId is string &&
+                    request.resource.data.eventId.size() > 0 &&
+                    request.resource.data.eventId.size() <= 120 &&
+                    rsvpId == request.auth.uid + '_' + request.resource.data.eventId &&
+                    request.resource.data.start is string &&
+                    request.resource.data.start.size() <= 40 &&
+                    request.resource.data.createdAt is number &&
+                    ((exists(rsvpCountPath(request.resource.data.eventId)) &&
+                      getAfter(rsvpCountPath(request.resource.data.eventId)).data.count ==
+                        get(rsvpCountPath(request.resource.data.eventId)).data.count + 1) ||
+                     (!exists(rsvpCountPath(request.resource.data.eventId)) &&
+                      getAfter(rsvpCountPath(request.resource.data.eventId)).data.count == 1));
+      allow delete: if isAuthenticated() &&
+                    resource.data.uid == request.auth.uid &&
+                    exists(rsvpCountPath(resource.data.eventId)) &&
+                    getAfter(rsvpCountPath(resource.data.eventId)).data.count ==
+                      get(rsvpCountPath(resource.data.eventId)).data.count - 1;
+      allow update: if false;
+    }
+
+    match /event_rsvp_counts/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['count', 'updatedAt']) &&
+                    request.resource.data.count == 1 &&
+                    request.resource.data.updatedAt is number &&
+                    !exists(rsvpPath(eventId)) &&
+                    existsAfter(rsvpPath(eventId));
+      allow update: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['count', 'updatedAt']) &&
+                    request.resource.data.updatedAt is number &&
+                    ((request.resource.data.count == resource.data.count + 1 &&
+                      !exists(rsvpPath(eventId)) && existsAfter(rsvpPath(eventId))) ||
+                     (request.resource.data.count == resource.data.count - 1 &&
+                      request.resource.data.count >= 0 &&
+                      exists(rsvpPath(eventId)) && !existsAfter(rsvpPath(eventId))));
+      allow delete: if false;
+    }
+
     // ── Operations agent (scripts/ops/*, GitHub Actions via the Admin SDK) ──
     // The jobs draft, publish and send; admins only review. A browser can never
     // mark a post published, send mail, or lift a do-not-contact.
@@ -665,7 +767,46 @@ service cloud.firestore {
     }
     match /entity_submissions/{id} {
       allow read: if isAdmin() || (isAuthenticated() && resource.data.submittedBy == request.auth.uid);
-      allow write: if false; // Callable validates strict DTOs and enforces per-user quotas.
+      // Direct path for when the submitDiscovery callable is not deployed. The
+      // id is uid_YYYY-MM-DD_slot with slot 1-5 and no updates, so one account
+      // gets five suggestions a Calgary day. Content is validated again, in
+      // full, by the same domain code when an admin approves it.
+      allow create: if isAuthenticated() &&
+                    request.auth.token.email_verified == true &&
+                    hasOnlyAllowedFields(['id', 'input', 'submittedBy', 'status', 'createdAt', 'via']) &&
+                    request.resource.data.id == id &&
+                    id.matches('^' + request.auth.uid + '_[0-9]{4}-[0-9]{2}-[0-9]{2}_[1-5]$') &&
+                    request.resource.data.submittedBy == request.auth.uid &&
+                    request.resource.data.status == 'pending' &&
+                    request.resource.data.via == 'direct' &&
+                    request.resource.data.createdAt is string &&
+                    request.resource.data.input is map &&
+                    request.resource.data.input.kind in ['event', 'market'] &&
+                    request.resource.data.input.title is string &&
+                    request.resource.data.input.title.size() >= 3 &&
+                    request.resource.data.input.title.size() <= 160 &&
+                    request.resource.data.input.sourceUrl is string &&
+                    request.resource.data.input.sourceUrl.size() <= 2000 &&
+                    request.resource.data.input.sourceUrl.matches('^https://.*');
+      // Admin review marks without the callable; the discovery job publishes.
+      allow update: if isAdmin() &&
+                    request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'reviewedBy', 'reviewedAt', 'entityId']);
+      allow delete: if false;
+    }
+
+    // Admin actions queued for the discovery job when the manageDiscovery
+    // callable is not deployed (scripts/discovery/actions.ts applies them with
+    // the callable's own validation, then stamps the outcome).
+    match /discovery_actions/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() &&
+                    hasOnlyAllowedFields(['id', 'action', 'adminUid', 'adminEmail', 'status', 'createdAt']) &&
+                    request.resource.data.id == id &&
+                    request.resource.data.adminUid == request.auth.uid &&
+                    request.resource.data.status == 'pending' &&
+                    request.resource.data.action is map &&
+                    request.resource.data.createdAt is number;
+      allow update, delete: if false;
     }
     match /{path=**} {
       allow read, write: if false;

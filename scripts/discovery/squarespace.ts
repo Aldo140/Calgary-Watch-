@@ -5,6 +5,7 @@
  */
 import type { InventorySubmissionInput } from '../../src/types/discovery';
 import type { InventoryProvider, SourceConfig, SourceRecord } from './providers';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 
 export interface SquarespaceEvent {
   id: string; title?: string; excerpt?: string; body?: string; fullUrl?: string; startDate?: number; endDate?: number;
@@ -15,7 +16,7 @@ export interface SquarespaceEvent {
 const strip = (v: string) => v.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
 const iso = (ms: number) => {
   const d = new Date(ms);
-  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'longOffset' }).formatToParts(d).map(p => [p.type, p.value]));
+  const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'longOffset' }).formatToParts(d).map(p => [p.type, p.value]));
   const off = String(parts.timeZoneName).replace('GMT', '') || '+00:00';
   return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:00${off}`;
 };

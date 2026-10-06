@@ -9,6 +9,7 @@
 
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { exitForQuota, isQuotaExhausted } from '../lib/quota.js';
 
 const RESEND_API = 'https://api.resend.com';
 const REPLIES = 'digest_replies';
@@ -286,6 +287,7 @@ async function run(): Promise<void> {
 }
 
 run().catch((error) => {
+  if (isQuotaExhausted(error)) exitForQuota('Sync email replies');
   console.error('[replies] fatal:', error);
   process.exit(1);
 });

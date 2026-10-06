@@ -344,8 +344,11 @@ describe('discovery collections lockdown', () => {
     }
   });
 
-  it('entity_submissions cannot be written directly by a client either', () => {
-    assert.match(submissionsBlock, /allow write: if false/);
+  it('entity_submissions: a client may only file its own pending suggestion, never edit or delete one', () => {
+    assert.match(submissionsBlock, /request\.resource\.data\.submittedBy == request\.auth\.uid/);
+    assert.match(submissionsBlock, /id\.matches\('\^' \+ request\.auth\.uid/);
+    assert.match(submissionsBlock, /allow update: if isAdmin\(\)/);
+    assert.match(submissionsBlock, /allow delete: if false/);
   });
 
   it('entity_submissions reads are limited to the admin or the original submitter', () => {
@@ -396,8 +399,10 @@ describe('discovery moderation actions parity', () => {
   it('the admin UI only offers moderation actions the server accepts', () => {
     const serverActions = /!\['publish','draft','archive','cancel'\]\.includes\(action\)/.exec(discoveryStoreSource);
     assert.ok(serverActions, 'could not find the server action allowlist');
-    const clientActions = [...discoveryAdminSource.matchAll(/\{publish:'[^']+',draft:'[^']+',archive:'[^']+',cancel:'[^']+'\}/g)];
-    assert.ok(clientActions.length > 0, 'could not find the admin UI action labels');
+    const labels = /const ACTION_LABEL = \{([^}]+)\}/.exec(discoveryAdminSource);
+    assert.ok(labels, 'could not find the admin UI action labels');
+    const clientActions = [...labels[1].matchAll(/(\w+):/g)].map((m) => m[1]);
+    assert.deepEqual(clientActions.sort(), ['archive', 'cancel', 'draft', 'publish']);
   });
 
   it('a moderator cannot publish over an unacknowledged duplicate warning', () => {

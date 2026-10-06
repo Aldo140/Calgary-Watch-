@@ -6,6 +6,7 @@ import { startClock } from '../../lib/discovery';
 import type { DailyForecast } from '../../hooks/useCalgaryWeather';
 import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
 import { isWeekend } from '../../lib/homeClaims';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const ICONS: Record<SkyIcon, typeof Sun> = { sun: Sun, moon: Moon, partly: CloudSun, cloud: Cloud, fog: CloudFog, drizzle: CloudDrizzle, rain: CloudRain, snow: CloudSnow, storm: CloudLightning };
 export function SkyGlyph({ icon, size = 16 }: { icon: SkyIcon; size?: number }) {
@@ -13,7 +14,7 @@ export function SkyGlyph({ icon, size = 16 }: { icon: SkyIcon; size?: number }) 
   return <Icon size={size} aria-hidden="true" />;
 }
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
+const fmt = (opts: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const noon = (date: string) => new Date(`${date}T18:00:00Z`); // midday in Calgary year-round
 const weekday = fmt({ weekday: 'short' });
 const longWeekday = fmt({ weekday: 'long' });

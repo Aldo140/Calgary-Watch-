@@ -7,8 +7,9 @@ import { entityPath } from '../lib/discovery';
 import { eveningsThisWeek, resolvePicks, type ResolvedPick } from '../lib/dateNight';
 import { DATE_FREE_IDEAS } from '../content/dateNight';
 import '../styles/date-night.css';
+import { calgaryDateTimeFormat } from '../lib/calgaryTz';
 
-const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...o });
+const fmt = (o: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...o });
 const dow = fmt({ weekday: 'short' });
 const dnum = fmt({ day: 'numeric' });
 const mon = fmt({ month: 'short' });

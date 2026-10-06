@@ -40,6 +40,7 @@ export function AttentionQueue({
   onHide,
   restoringId,
   deletingId,
+  tasks,
 }: {
   flagged: Incident[];
   pendingReview: Incident[];
@@ -50,8 +51,16 @@ export function AttentionQueue({
   onHide: (id: string) => void;
   restoringId: string | null;
   deletingId: string | null;
+  /** Work that lives in another section (event suggestions, moderation jobs). */
+  tasks?: Array<{ id: string; tone: Tone; kind: string; title: string; detail?: string; ts?: number; open: () => void }>;
 }) {
   const items: QueueItem[] = [];
+  for (const t of tasks ?? []) {
+    items.push({
+      id: `task-${t.id}`, rank: t.tone === 'critical' ? 1 : 4, tone: t.tone, icon: t.tone === 'critical' ? AlertOctagon : Eye, kind: t.kind, title: t.title, detail: t.detail, ts: t.ts,
+      actions: <AdminButton size="sm" variant="outline" tone="signal" onClick={t.open}>Open</AdminButton>,
+    });
+  }
 
   // 1. Flagged content — hidden from the public map, waiting on a decision.
   for (const incident of flagged) {

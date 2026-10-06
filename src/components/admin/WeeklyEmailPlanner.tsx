@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { ThursdayPicksPanel } from './ThursdayPicksPanel';
 import {
   collection, doc, getDoc, onSnapshot, query, runTransaction, where, writeBatch,
 } from 'firebase/firestore';
@@ -35,6 +36,7 @@ import {
 } from './ui';
 import { configuredDigestAudienceForecast, DigestAudienceForecast } from './DigestAudienceForecast';
 import { DigestReplyInbox } from './DigestReplyInbox';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const MAX_BODY = 2400;
 const MIN_BODY = 20;
@@ -55,7 +57,7 @@ const AUDIENCE_ICONS = {
 type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
 type MessageTone = 'neutral' | 'ok' | 'attention' | 'critical';
 type TestStatus = 'pending' | 'sending' | 'retrying' | 'sent' | 'partial' | 'failed';
-type PlannerView = 'overview' | 'replies' | 'preview' | 'compose' | 'audience' | 'templates';
+type PlannerView = 'overview' | 'replies' | 'preview' | 'compose' | 'audience' | 'templates' | 'thursday';
 type SubscriberPreview = 'weekly-local' | 'weekly-city' | 'welcome' | 'alert';
 
 type TestRequest = {
@@ -100,7 +102,7 @@ const signature = (
 
 function formatTime(value: number | undefined): string {
   if (!value) return '';
-  return new Intl.DateTimeFormat('en-CA', {
+  return calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
   }).format(new Date(value));
 }
@@ -781,6 +783,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
     { id: 'preview', label: 'Email preview', description: 'What readers receive', icon: Eye },
     ...(showComposerNavigation ? [{ id: 'compose' as const, label: 'Opening note', description: dirty ? 'Draft needs approval' : 'Optional contribution', icon: PenLine }] : []),
     { id: 'audience', label: 'Recipients', description: 'Who gets which email', icon: Users },
+    { id: 'thursday', label: 'Thursday picks', description: 'Both lists, every case', icon: Eye },
     { id: 'templates', label: 'Delivery rules', description: 'How routing works', icon: FileText },
   ];
 
@@ -823,6 +826,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
       {plannerView === 'preview' && <ProductionEmailViewer plan={nextPlan} />}
 
       {plannerView === 'replies' && <DigestReplyInbox />}
+      {plannerView === 'thursday' && <ThursdayPicksPanel mondayProfiles={profiles} />}
 
       {plannerView === 'overview' && (
         <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="email-overview-title">

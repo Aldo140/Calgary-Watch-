@@ -17,6 +17,7 @@ import { makeReel } from '../lib/reel';
 import { renderPost, renderReelBackdrop } from '../lib/render';
 import { DAILY_DESIGN_VERSION } from '../lib/renderDaily';
 import { calgaryDate, nextSlot } from '../lib/time';
+import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
 
 type Log = (m: string) => void;
 const postId = (fingerprint: string) => `post-${createHash('sha256').update(fingerprint).digest('hex').slice(0, 20)}`;
@@ -74,7 +75,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
     const at = d.get('scheduledFor') ?? d.get('suggestedFor') ?? d.get('publishedAt');
     if (!at || calgaryDate(at) !== today) return;
     const set = booked.get(d.get('brand')) ?? new Set<string>();
-    set.add(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(at)));
+    set.add(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(at)));
     booked.set(d.get('brand'), set);
   });
   const recent = new Map<string, Set<string>>();

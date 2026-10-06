@@ -1,11 +1,13 @@
+import { interestsFor, type EventInterestId } from './eventPicks';
 import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
 import { calgaryDate, entityPath, matchesPeriod } from './discovery';
+import { calgaryDateTimeFormat } from './calgaryTz';
 /** Convert a wall clock time using the zone's actual offset (including DST). */
 export function calgaryInstant(day: string, hour: number): number {
   const wall = Date.parse(`${day}T00:00:00Z`) + hour * 3600000;
   let instant = wall;
   for (let i = 0; i < 3; i++) {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone:'America/Edmonton', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' }).formatToParts(instant).map(p=>[p.type,p.value]));
+    const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone:'America/Edmonton', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' }).formatToParts(instant).map(p=>[p.type,p.value]));
     const localAsUtc = Date.parse(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}Z`);
     instant += wall-localAsUtc;
   }
@@ -32,8 +34,26 @@ export function filterInventory(entities: readonly DiscoveryEntity[], occurrence
     } else if(e.kind==='market') {
       if(!upcomingOccurrences(occurrences,e.id,now).some(o=>!o.cancelled && (!period || matchesPeriod(o.start,o.end,period,now)))) return false;
     }
-    return !filter || [...e.categories,...e.tags].some(c=>c.toLowerCase().replace(/s$/,'')===filter.replace(/s$/,''));
+    if(!filter) return true;
+    // Interest filters use the same matcher as /plans and the Thursday email,
+    // so "Music" finds the symphony even when a feed only tagged it "arts".
+    const interest=INTEREST_FILTERS[filter];
+    if(interest && interestsFor(e).includes(interest)) return true;
+    return [...e.categories,...e.tags].some(c=>c.toLowerCase().replace(/s$/,'')===filter.replace(/s$/,''));
   });
+}
+
+/** URL filter words to interest ids (eventPicks.ts). */
+const INTEREST_FILTERS: Record<string, EventInterestId> = {
+  free:'free', family:'family', music:'music', arts:'arts', art:'arts', food:'food', sports:'sports',
+  outdoor:'outdoors', outdoors:'outdoors', markets:'markets', talks:'learning', learning:'learning', community:'community',
+};
+
+/** Listings whose title, summary, venue, neighbourhood or tags contain every word of `q`. */
+export function matchesText(e: DiscoveryEntity, q: string): boolean {
+  const words=q.toLocaleLowerCase('en-CA').split(/\s+/).filter(Boolean);
+  const hay=[e.title,e.summary,e.neighbourhood,'venue' in e?e.venue:'',...e.categories,...e.tags].join(' ').toLocaleLowerCase('en-CA');
+  return words.every(w=>hay.includes(w));
 }
 
 export interface DayItem { date: string; title: string; to: string; venue?: string }

@@ -20,6 +20,7 @@
     "backfill:visibility": "tsx scripts/backfill-visibility.ts",
     "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
     "digest:weekly": "tsx scripts/digest/weekly.ts",
+    "digest:events": "tsx scripts/digest/events.ts",
     "ops:check": "tsx scripts/ops/check-access.ts",
     "ops:preview": "tsx scripts/ops/preview.ts",
     "ops:daily": "tsx scripts/ops/daily.ts",
@@ -33,6 +34,7 @@
     "send:alerts": "tsx scripts/alerts/send.ts",
     "discovery:ingest": "tsx scripts/discovery/ingest.ts",
     "discovery:export": "tsx scripts/discovery/export.ts",
+    "discovery:actions": "tsx scripts/discovery/actions.ts",
     "discovery:preview": "tsx scripts/discovery/preview.ts"
   },
   "dependencies": {
@@ -81,5 +83,8 @@
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.13.6"
   }
 }

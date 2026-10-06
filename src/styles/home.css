@@ -353,3 +353,9 @@
 .cw-home2 .h-intent-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--h-live-red, #ff5a4e); box-shadow: 0 0 0 0 rgba(255, 90, 78, .6); animation: h-intent-pulse 2s infinite; }
 @keyframes h-intent-pulse { 70% { box-shadow: 0 0 0 7px rgba(255, 90, 78, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 90, 78, 0); } }
 @media (prefers-reduced-motion: reduce) { .cw-home2 .h-intent-dot { animation: none; } }
+.cw-home2 .h-digest-list { display: grid; gap: 10px; margin: 18px 0 8px; }
+.cw-home2 .h-digest-list li { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: baseline; font: 400 16px/1.5 Inter, sans-serif; }
+.cw-home2 .h-digest-list b { justify-self: start; padding: 4px 9px; border-radius: 999px; background: var(--h-navy); color: #fff; font: 600 11px/1.2 var(--h-mono); letter-spacing: .08em; text-transform: uppercase; }
+.cw-home2 .h-digest-list li + li b { background: var(--h-sun); color: var(--h-navy); }
+.cw-home2 .h-digest p.h-digest-fine { margin: 6px 0 22px; font: 400 13px/1.4 var(--h-mono); color: var(--h-muted); }
+@media (max-width: 560px) { .cw-home2 .h-digest-list li { grid-template-columns: 1fr; gap: 6px; } }

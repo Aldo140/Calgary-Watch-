@@ -5,6 +5,7 @@ import { hasFirebase, opsDb } from './lib/firebase';
 import { queueDrafts } from './jobs/drafts';
 import { resolveDoubleBookings, autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
 import { sendApproved, syncReplies } from './jobs/outreach';
+import { exitForQuota, isQuotaExhausted } from '../lib/quota';
 
 const log = (m: string) => console.log(`[ops:hourly] ${m}`);
 if (!hasFirebase()) {
@@ -14,8 +15,14 @@ if (!hasFirebase()) {
 const db = opsDb();
 const now = Date.now();
 let failed = false;
+let quota = false;
 async function step(name: string, run: () => Promise<unknown>) {
-  try { await run(); } catch (e) { failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`); }
+  // Once the quota is gone every later step would fail the same way.
+  if (quota) return;
+  try { await run(); } catch (e) {
+    if (isQuotaExhausted(e)) { quota = true; log(`${name}: Firestore quota exhausted; stopping this run.`); return; }
+    failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`);
+  }
 }
 
 await step('queue drafts', () => queueDrafts(db, now, log));
@@ -26,3 +33,4 @@ await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
 await step('replies', () => syncReplies(db, now, log));
 await step('send', () => sendApproved(db, now, log));
 if (failed) process.exitCode = 1;
+else if (quota) exitForQuota('Operations hourly');

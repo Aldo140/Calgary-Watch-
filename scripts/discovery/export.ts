@@ -20,10 +20,17 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     const { inventoryDatabase } = await import('./firebase');
     const db = inventoryDatabase();
-    stored = await db.runTransaction(async tx => {
+    // Firestore retries an exhausted quota for as long as it is allowed to, which
+    // used to hold the whole deploy until the job timed out. Cap it: past this,
+    // build from the feeds, exactly as when Firestore is unreachable.
+    const read = db.runTransaction(async tx => {
       const [events, markets, occ] = await Promise.all(['events', 'markets', 'market_occurrences'].map(c => tx.get(db.collection(c))));
       return { entities: [...events.docs, ...markets.docs].map(d => d.data() as Entity), occurrences: occ.docs.map(d => d.data() as Entity) };
     });
+    stored = await Promise.race([
+      read,
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out after 90s (quota exhausted?)')), 90_000).unref()),
+    ]);
     log(`Firestore: ${stored.entities.length} events and markets`);
   } catch (e) { log(`Firestore unavailable, building from feeds only: ${e instanceof Error ? e.message : String(e)}`); }
 } else log('No Firestore credentials; building from feeds only.');

@@ -38,6 +38,7 @@ import {
 } from '../../src/content/coverage.js';
 import { weekAgenda } from '../../src/lib/discoveryCalendar.js';
 import type { DiscoveryEntity } from '../../src/types/discovery';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 
 /**
  * Where a route's static HTML is written, relative to dist/.
@@ -144,7 +145,7 @@ function sourceTable(items: readonly CoverageSource[]): string {
 }
 
 const calgaryDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' });
-const calgaryDateTime = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const calgaryDateTime = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const dayLabel = (date: string) => calgaryDay.format(new Date(`${date}T12:00:00Z`));
 
 /** The homepage week planner, as plain lists: the same days and listings the page shows. */
@@ -375,7 +376,7 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
 export function upsertStaticRouteBody(html: string, pathname: string): string {
   const entity = discoveryRepository.list().find(e => entityPath(e) === pathname);
   const section = DISCOVERY_SECTIONS.find(s => pathname === s.path);
-  const dated = (start: string, end: string) => `${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(start))} to ${new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(end))} (Calgary time)`;
+  const dated = (start: string, end: string) => `${calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(start))} to ${calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(end))} (Calgary time)`;
   const sourceLinks = entity?.sources.map(s=>staticLink(s.url,s.name)).join(' · ');
   const dates = entity?.kind === 'event' ? `<p>${escapeText(dated(entity.start,entity.end))}${entity.cancelled ? ' — Cancelled' : ''}</p>` : entity?.kind === 'market' ? `<ul>${discoveryRepository.occurrences().filter(o=>o.marketId===entity.id).map(o=>`<li>${escapeText(dated(o.start,o.end))}${o.cancelled?' — Cancelled':''}</li>`).join('')}</ul>` : '';
   const body = entity ? `<main><article><h1>${escapeText(entity.title)}</h1><p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section && !buildStaticRouteBody(pathname) ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname);

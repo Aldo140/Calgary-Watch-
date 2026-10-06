@@ -7,8 +7,9 @@ import type { LivePulse } from '../../hooks/useLivePulse';
 import { entityPath, startClock } from '../../lib/discovery';
 import { timeAgo, weekendDays, type ExampleReport } from '../../lib/homeClaims';
 import { CityMap } from '../community/CityMap';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
+const fmt = (opts: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayShort = fmt({ weekday: 'short' });
 const dayNum = fmt({ day: 'numeric' });
 const clock = fmt({ hour: 'numeric', minute: '2-digit' });
@@ -240,7 +241,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           </span>
         </Card>
 
-        <Card to="/map?settings=alerts" n="05" title="Monday digest" desc="What was reported near home, in your inbox every Monday." className="h-way-mail">
+        <Card to="/plans?email=monday#emails" n="05" title="Monday digest" desc="What was reported near home, in your inbox every Monday." className="h-way-mail">
           <Envelope />
           <span className="h-way-pick">
             <small>Your rings</small>
@@ -270,7 +271,7 @@ export function WhatsHere({ days, entities, pulse }: { days: AgendaDay[]; entiti
           <b>{hood ? hood.title : 'Explore by quadrant'}</b>
           <em>{hood ? `Today’s pick · ${hood.quadrant}` : 'NW · NE · SW · SE'}</em>
         </Strip>
-        <Strip to="/map?settings=alerts" n="05" name="Monday digest" what="· your area’s week" className="h-strip-mail" art={<Envelope />}>
+        <Strip to="/plans?email=monday#emails" n="05" name="Monday digest" what="· your area’s week" className="h-strip-mail" art={<Envelope />}>
           <b>What was reported near home</b>
           <em>15-min walk · 3 km · 10 km</em>
         </Strip>

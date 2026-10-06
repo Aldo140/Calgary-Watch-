@@ -60,16 +60,20 @@ export function SlowerPlans({ entities }: { entities: readonly DiscoveryEntity[]
   );
 }
 
-/** Describes the email that is actually sent (scripts/digest, Mondays), nothing more. */
+/** Describes the two emails that are actually sent (scripts/digest: weekly.ts Mondays, events.ts Thursdays), nothing more. */
 export function MondayDigest() {
   return (
     <section className="h-digest" aria-labelledby="h-digest-title">
       <img src="/images/illustration/calgarywatch-brief-v1.webp" alt="" loading="lazy" width="1280" height="853" />
       <div>
-        <p className="h-eyebrow">The Monday email</p>
-        <h2 id="h-digest-title">What happened near home this week.</h2>
-        <p>Each Monday morning, a short recap of public reports within a 15-minute walk, 3 km and 10 km of the place you choose. It’s free, and you can unsubscribe in one click.</p>
-        <Link className="h-btn" to="/map?settings=alerts">Set up your email <ArrowUpRight size={18} /></Link>
+        <p className="h-eyebrow">Two free emails</p>
+        <h2 id="h-digest-title">Monday for your block. Thursday for your weekend.</h2>
+        <ul className="h-digest-list">
+          <li><b>Monday</b> What was reported within a 15-minute walk, 3 km and 10 km of home.</li>
+          <li><b>Thursday</b> Up to eight events that fit what you’re into, nearest first.</li>
+        </ul>
+        <p className="h-digest-fine">Pick one or both. One-click unsubscribe on each.</p>
+        <Link className="h-btn" to="/plans#emails">Choose your emails <ArrowUpRight size={18} /></Link>
       </div>
     </section>
   );

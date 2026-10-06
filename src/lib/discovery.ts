@@ -1,5 +1,6 @@
 import { publishedInventory } from './discoveryPublication';
 import type { DiscoveryEntity, EntityKind, MarketOccurrence } from '../types/discovery';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 export const DISCOVERY_SECTIONS = [
   { path: '/markets', label: 'Markets', kind: 'market' },
@@ -23,7 +24,7 @@ export function searchEntities(entities: DiscoveryEntity[], query: string): Part
     .reduce<Partial<Record<EntityKind, DiscoveryEntity[]>>>((groups, e) => { (groups[e.kind] ??= []).push(e); return groups; }, {});
 }
 export function calgaryDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+  return calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
 }
 /** Calendar arithmetic deliberately uses Calgary dates, never the browser timezone. */
 export function matchesPeriod(start: string, end: string, period: string, now = new Date()): boolean {
@@ -54,8 +55,8 @@ export function createDiscoveryRepository(entities: DiscoveryEntity[], occurrenc
   return { list: () => visible, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
 }
 
-const calgaryHm = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const calgaryHm = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 /** Start time for display: "All day" when a listing starts at midnight (a date-only event). */
-export function startClock(iso: string, clock: Intl.DateTimeFormat): string {
+export function startClock(iso: string, clock: Pick<Intl.DateTimeFormat, 'format'>): string {
   return calgaryHm.format(new Date(iso)) === '00:00' ? 'All day' : clock.format(new Date(iso));
 }

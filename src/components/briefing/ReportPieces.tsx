@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import type { Incident } from '@/src/types';
 import { categoryColor } from '@/src/lib/tokens';
 import { CityMap, px, py } from '@/src/components/community/CityMap';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 /**
  * Visual pieces for the personal report, in the site brand: navy, yellow, cyan and
@@ -88,7 +89,7 @@ export function HourDial({ incidents }: { incidents: Incident[] }) {
   if (incidents.length < 4) return null;
   const hours = new Array(24).fill(0) as number[];
   for (const i of incidents) {
-    const h = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', hourCycle: 'h23' }).format(i.timestamp));
+    const h = Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', hourCycle: 'h23' }).format(i.timestamp));
     if (Number.isFinite(h)) hours[h % 24] += 1;
   }
   const max = Math.max(...hours);

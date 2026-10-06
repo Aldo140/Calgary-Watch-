@@ -2917,6 +2917,13 @@ export default function MapPage() {
                               and community updates for your area. Optional, and you can turn it off any time.
                             </span>
                           </label>
+                          <a
+                            href="/plans#emails"
+                            className="block px-4 py-3 text-[13px] font-semibold underline underline-offset-2"
+                            style={{ color: '#1C2B3A', background: '#FFF5CC', border: '1.5px solid #E7D27A' }}
+                          >
+                            Also want Thursday weekend picks, your plans and badges? Manage everything in Your CalgaryWatch →
+                          </a>
 
                           {/* Category preference — only meaningful once the digest
                               is on. Empty selection means every category, so the

@@ -9,6 +9,7 @@ import {
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
 import { AdminButton, Chip, Panel, StatusDot, T, display, inputClass, inputStyle, mono } from './ui';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 type ReplyStatus = 'unread' | 'open' | 'handled' | 'archived';
 
@@ -48,7 +49,7 @@ const statusCopy: Record<ReplyStatus, string> = {
 };
 
 function dateTime(value: number): string {
-  return new Intl.DateTimeFormat('en-CA', {
+  return calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', month: 'short', day: 'numeric',
     hour: 'numeric', minute: '2-digit',
   }).format(new Date(value));

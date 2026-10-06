@@ -20,6 +20,7 @@
  */
 
 import type { DigestSummary } from '../../src/lib/digest.js';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 
@@ -36,7 +37,7 @@ export function spellCap(n: number): string {
 
 /** The job lands at 09:00 Calgary, but a resend at any hour should still fit. */
 export function greeting(at: number): string {
-  const hour = Number(new Intl.DateTimeFormat('en-CA', {
+  const hour = Number(calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', hour: 'numeric', hour12: false,
   }).format(new Date(at)));
   if (hour < 12) return 'Morning';

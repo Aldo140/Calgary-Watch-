@@ -16,7 +16,14 @@ if (!hasFirebase()) {
 } else {
   try {
     const kit = brandKit('calgarydaily');
-    const docs = (await opsDb().collection(COLLECTIONS.posts).where('status', '==', 'published').get()).docs
+    // Only this brand's posts (two equality filters need no composite index),
+    // and never hold the deploy hostage to an exhausted quota.
+    const query = opsDb().collection(COLLECTIONS.posts).where('status', '==', 'published').where('brand', '==', 'calgarydaily').get();
+    const snapshot = await Promise.race([
+      query,
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out after 60s (quota exhausted?)')), 60_000).unref()),
+    ]);
+    const docs = snapshot.docs
       .map(d => d.data() as OpsPost)
       .filter(p => p.brand === 'calgarydaily' && p.permalink && p.imageUrl && !p.sponsored)
       .sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0))

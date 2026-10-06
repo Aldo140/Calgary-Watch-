@@ -7,8 +7,9 @@ import { AIR_BAND_LABEL, classifyPm25 } from '../../lib/airQuality';
 import { INCIDENT_CATEGORIES } from '../../constants';
 import { SkyGlyph } from './WeekPlanner';
 import { TEAR } from './HomeHero';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
-const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const clock = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
 /**
  * The Live product's layer on the homepage: dark and dense on purpose, per the

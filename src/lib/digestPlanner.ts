@@ -10,6 +10,8 @@ import {
   type DigestRecipient,
   type DigestScope,
 } from './digest';
+import { CALGARY_TZ } from './calgaryTz';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 export const DIGEST_CONTRIBUTION_STYLES = ['neighbour-note', 'news-brief', 'personal-story'] as const;
 export type DigestContributionStyle = typeof DIGEST_CONTRIBUTION_STYLES[number];
@@ -37,7 +39,7 @@ export const DIGEST_TEMPLATE_PURPOSES = [
     label: 'Weekly brief',
     timing: 'Every later Monday',
     purpose: 'Personalized local summary. This planner controls its optional opening note.',
-    schedule: 'Runs every Monday at 15:00 UTC — 09:00 MDT or 08:00 MST. The edition week is calculated in America/Edmonton so daylight-saving time cannot move it into the wrong week.',
+    schedule: 'Runs every Monday at 15:00 UTC, which is 09:00 in Calgary now that Alberta stays on UTC-6 all year. The edition week is calculated in Calgary time, never from the cron clock.',
     trigger: 'Used for an eligible opted-in recipient whose welcome was already delivered. A published planner note is inserted first only when its selected audience matches that recipient’s local or city-wide summary.',
     recipients: 'Every eligible opted-in subscriber whose welcome was already delivered. The live Recipients view applies the current deployment safety settings and 50-delivery ceiling.',
     protection: 'One send-ledger record per recipient and Calgary week prevents duplicates. Manual workflow runs are dry by default and transmit nothing unless an operator deliberately changes the controls.',
@@ -329,7 +331,7 @@ export function nextDigestRunAt(when: Date | number = Date.now()): number {
 }
 
 function localCalendarParts(when: Date | number, timeZone: string) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
+  const parts = calgaryDateTimeFormat('en-CA', {
     timeZone,
     year: 'numeric',
     month: '2-digit',
@@ -343,7 +345,7 @@ function localCalendarParts(when: Date | number, timeZone: string) {
 export function upcomingDigestWeeks(
   when: Date | number = Date.now(),
   count = 8,
-  timeZone = 'America/Edmonton',
+  timeZone = CALGARY_TZ,
 ): DigestWeekOption[] {
   const local = localCalendarParts(when, timeZone);
   const localDate = new Date(Date.UTC(local.year, local.month - 1, local.day, 18));
@@ -353,9 +355,9 @@ export function upcomingDigestWeeks(
   return Array.from({ length: Math.max(1, count) }, (_, index) => {
     const weekStart = firstMonday + index * WEEK_MS;
     const weekEnd = weekStart + 6 * 24 * 60 * 60 * 1000;
-    const from = new Intl.DateTimeFormat('en-CA', { timeZone, month: 'short', day: 'numeric' })
+    const from = calgaryDateTimeFormat('en-CA', { timeZone, month: 'short', day: 'numeric' })
       .format(new Date(weekStart));
-    const to = new Intl.DateTimeFormat('en-CA', { timeZone, month: 'short', day: 'numeric', year: 'numeric' })
+    const to = calgaryDateTimeFormat('en-CA', { timeZone, month: 'short', day: 'numeric', year: 'numeric' })
       .format(new Date(weekEnd));
     return {
       weekKey: digestWeekKey(weekStart, timeZone),

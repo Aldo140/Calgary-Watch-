@@ -6,6 +6,7 @@ import { timeAgo, type ExampleReport } from '../../lib/homeClaims';
 import type { LivePulse } from '../../hooks/useLivePulse';
 import { TEAR } from '../home/HomeHero';
 import { COLOR, CityMap } from './CityMap';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 /**
  * Community Watch, in the homepage's board language: cream paper, ink outlines,
@@ -14,7 +15,7 @@ import { COLOR, CityMap } from './CityMap';
  * that isn't real is labelled as an example.
  */
 
-const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const clock = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 const label = (c: string) => INCIDENT_CATEGORIES.find(x => x.value === c)?.label ?? c;
 
 const EXAMPLES: ExampleReport[] = [
@@ -378,7 +379,7 @@ export function MondayEmail() {
             <li><i className="r2" /><b>3 km</b><span>your part of town</span></li>
             <li><i className="r3" /><b>10 km</b><span>the wider city</span></li>
           </ul>
-          <Link className="cv-btn cv-btn-yellow" to="/map?settings=alerts"><Bell size={18} /> Get the Monday email</Link>
+          <Link className="cv-btn cv-btn-yellow" to="/plans?email=monday#emails"><Bell size={18} /> Get the Monday email</Link>
           <p className="cv-small">Free, opt in only, and one click to unsubscribe.</p>
         </div>
         <div className="cv-email" aria-hidden="true">

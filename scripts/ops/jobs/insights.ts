@@ -10,6 +10,7 @@ import { COLLECTIONS } from '../lib/firebase';
 import { accountStats, mediaInsights } from '../lib/instagram';
 import { calgaryDate } from '../lib/time';
 import { currentToken } from './igTokens';
+import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
 
 type Log = (m: string) => void;
 const DAY = 86_400_000;
@@ -24,7 +25,7 @@ const kindOf = (p: OpsPost) => {
   if (fp.includes('|draft|')) return [p.template, p.template === 'take' ? 'Our take' : p.template === 'news' ? 'News' : 'Hand-written'];
   return ['spotlight', 'Spotlight'];
 };
-const hourOf = (ms: number) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', hourCycle: 'h23' }).format(new Date(ms)));
+const hourOf = (ms: number) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', hourCycle: 'h23' }).format(new Date(ms)));
 
 function rows(posts: OpsPost[], keyOf: (p: OpsPost) => [string, string]): PerformanceRow[] {
   const groups = new Map<string, { label: string; list: PostInsights[] }>();

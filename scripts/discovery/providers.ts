@@ -1,4 +1,5 @@
 import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe' | 'visitcalgary' | 'squarespace'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
@@ -35,7 +36,7 @@ export function calgaryOffset(local: string): string {
   if (!Number.isFinite(wall)) throw Error(`Invalid Ticketmaster local date: ${local}`);
   let instant = wall;
   for (let i = 0; i < 3; i++) {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(instant).map(part => [part.type, part.value]));
+    const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(instant).map(part => [part.type, part.value]));
     const localAsUtc = Date.parse(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}Z`);
     instant += wall - localAsUtc;
   }
@@ -195,7 +196,7 @@ function nextOccurrenceSlots(market: RecurringMarketDefinition, now: Date) {
   const schedules = recurringSchedules(market);
   const cursor = new Date(now.getTime());
   for (let i = 0; i < 400 && slots.length < count; i++) {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }).formatToParts(cursor).map(part => [part.type, part.value]));
+    const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }).formatToParts(cursor).map(part => [part.type, part.value]));
     const dateStr = `${parts.year}-${parts.month}-${parts.day}`;
     if ((!market.seasonStart || dateStr >= market.seasonStart) && (!market.seasonEnd || dateStr <= market.seasonEnd)) {
       for (const schedule of schedules) {
@@ -275,7 +276,7 @@ export function icsDate(value: string, tzid?: string): { iso: string; allDay: bo
   if (!h) return { iso: `${y}-${mo}-${d}T00:00:00${calgaryOffset(`${y}-${mo}-${d}T00:00:00`)}`, allDay: true };
   if (z) {
     // Store in Calgary wall time, like every other listing.
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' })
+    const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' })
       .formatToParts(Date.parse(`${y}-${mo}-${d}T${h}:${mi}:${se}Z`)).map(p => [p.type, p.value]));
     const local = `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
     return { iso: `${local}${calgaryOffset(local)}`, allDay: false };

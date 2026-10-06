@@ -1,5 +1,6 @@
 import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
 import { DATE_PICKS, type DatePick } from '../content/dateNight';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 export interface ResolvedPick extends DatePick {
   entity: DiscoveryEntity;
@@ -11,7 +12,7 @@ export interface ResolvedPick extends DatePick {
 }
 
 const DAY = 86_400_000;
-const hourIn = (iso: string) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', hourCycle: 'h23' }).format(new Date(iso)));
+const hourIn = (iso: string) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', hourCycle: 'h23' }).format(new Date(iso)));
 
 /** Our picks that are still ahead, soonest first. A pick whose listing expired simply drops off. */
 export function resolvePicks(entities: readonly DiscoveryEntity[], occurrences: readonly MarketOccurrence[], now: number, picks: DatePick[] = DATE_PICKS): ResolvedPick[] {

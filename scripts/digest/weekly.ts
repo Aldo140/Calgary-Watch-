@@ -422,6 +422,7 @@ async function run(): Promise<void> {
         branding,
         contribution: isFirstEmail ? undefined : contribution,
         offerThursday: !(profile as DigestRecipient & { _eventsOn?: boolean })._eventsOn,
+        categories: isFirstEmail ? undefined : profile.digestCategories,
       };
 
       const email = {

@@ -28,10 +28,13 @@ import { execFileSync } from 'node:child_process';
  * gold rule and a cream illustration is how a letterhead starts looking
  * assembled rather than drawn.
  */
-const INK = '(244, 238, 227)';
+const INK = '(242, 239, 232)';
 
 /**
- * The plate baked in behind every mark: spruce black, #0E1A17.
+ * The plate baked in behind every mark: CalgaryWatch Live navy, #06162F —
+ * the same ground the site uses for everything live (the map, the homepage
+ * Live band, the Community Watch card). It was spruce black, #0E1A17, until
+ * the emails were brought onto the site's brand.
  *
  * This must equal C.page in scripts/digest/render.ts exactly. A plate that is
  * merely close to the page is worse than one that is obviously different —
@@ -51,7 +54,7 @@ const INK = '(244, 238, 227)';
  * an image's own pixels are the one thing none of them touch. There is no
  * state in which a mark disappears.
  */
-const PLATE = '(14, 26, 23)';
+const PLATE = '(6, 22, 47)';
 
 /**
  * Two kinds of mark, and the difference is what the artwork already carries.
@@ -89,7 +92,7 @@ const TARGETS: Mark[] = [
   // Primary brand mark used in the public-site navigation and every email
   // masthead. The shield remains a secondary illustration rather than being
   // asked to stand in for the product logo.
-  { src: 'public/images/brand/calgary-watch-plane-mark.webp', out: 'public/images/email/logo.png', width: 176, mode: 'medallion', square: true },
+  { src: 'public/images/brand/calgarywatch-city-spark-v2.webp', out: 'public/images/email/logo.png', width: 176, mode: 'medallion', square: true },
   { src: 'public/images/illustration/calgary-watch-shield.webp', out: 'public/images/email/shield.png', width: 152, mode: 'linework' },
   { src: 'public/images/illustration/calgary-skyline-rule.webp', out: 'public/images/email/skyline.png', width: 960, mode: 'linework' },
   // The welcome email explains how the map is fed; these three carry that.

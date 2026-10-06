@@ -624,7 +624,7 @@ describe('rendering', () => {
         assert.match(img, /alt=""/, `${label}: letterhead art is decorative`);
         assert.match(img, /width="\d+"/, `${label}: images need explicit width`);
       }
-      assert.ok(html.includes('CALGARY&nbsp;WATCH'), `${label} needs a live-text wordmark`);
+      assert.match(html, /CALGARY<span[^>]*>WATCH<\/span>/, `${label} needs a live-text wordmark`);
       assert.ok(html.includes('src="cid:cw-logo"'), `${label} needs the primary Calgary Watch logo`);
       assert.ok(!/<script/i.test(html), `${label} must have no script`);
       assert.ok(!/<link\s/i.test(html), `${label} must have no external stylesheet`);
@@ -733,7 +733,7 @@ describe('the first email', () => {
 
   it('is signed by the team, not by one person', () => {
     const html = renderWelcomeHtml(shared);
-    assert.ok(html.includes('The Calgary Watch team'));
+    assert.ok(html.includes('Your neighbours at CalgaryWatch'));
     // A single name promises one pair of hands answering every reply.
     assert.ok(!/—\s*Aldo/.test(html), 'must not be signed with an individual name');
   });

@@ -194,3 +194,25 @@ export async function setEmailOptIn(
     profileUpdatedAt: now,
   }, { merge: true });
 }
+
+export interface PendingOptOuts { monday: number | null; thursday: number | null }
+
+/**
+ * Unsubscribe requests filed from an email link that the sender hasn't
+ * processed yet. /plans shows that list as off straight away (and saving
+ * applies it), so nobody sees a box ticked for an email they just left.
+ */
+export function usePendingOptOuts(uid: string | undefined): PendingOptOuts {
+  const [state, setState] = useState<PendingOptOuts>({ monday: null, thursday: null });
+  useEffect(() => {
+    if (!uid || !db) { setState({ monday: null, thursday: null }); return; }
+    const database = db;
+    const read = (c: string) => getDoc(doc(database, c, uid))
+      .then((s) => { const d = s.data(); return d && d.processedAt == null && typeof d.requestedAt === 'number' ? d.requestedAt as number : null; })
+      .catch(() => null);
+    let live = true;
+    void Promise.all([read('digest_unsubscribes'), read('events_digest_unsubscribes')]).then(([monday, thursday]) => { if (live) setState({ monday, thursday }); });
+    return () => { live = false; };
+  }, [uid]);
+  return state;
+}

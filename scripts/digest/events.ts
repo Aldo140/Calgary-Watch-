@@ -231,7 +231,8 @@ async function run() {
       const token = await ensureUnsubToken(db, profile);
       const unsubscribeUrl = eventsUnsubscribeUrl(origin, profile.uid, token);
       const shared = {
-        picks, fallback, interests: profile.eventInterests, area, displayName: profile.displayName, unsubscribeUrl, branding, at: now.getTime(),
+        // "home" when only a street address resolved: distances work, no prompt to add an area.
+        picks, fallback, interests: profile.eventInterests, area: area || (home ? 'home' : ''), displayName: profile.displayName, unsubscribeUrl, branding, at: now.getTime(),
         first: !profile.eventsWelcomeSentAt,
         offerMonday: !profile._mondayOn,
       };

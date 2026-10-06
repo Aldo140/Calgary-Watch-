@@ -24,9 +24,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ArrowLeft, Check, MailX, TriangleAlert } from 'lucide-react';
-import { db } from '@/src/firebase';
+import { auth, db } from '@/src/firebase';
+import { emailConsentPatch, readPlansProfile } from '@/src/lib/plansProfile';
 import { isValidUnsubToken } from '@/src/lib/digest';
 
 const T = {
@@ -53,6 +54,7 @@ export default function UnsubscribePage() {
   // rather than after a round trip that will certainly be rejected.
   const linkLooksValid = uid.length > 0 && uid.length <= 128 && isValidUnsubToken(token);
   const [stage, setStage] = useState<Stage>(linkLooksValid ? 'confirm' : 'invalid');
+  const [immediate, setImmediate] = useState(false);
 
   useEffect(() => {
     document.title = 'Unsubscribe · Calgary Watch';
@@ -71,6 +73,18 @@ export default function UnsubscribePage() {
         processedAt: null,
         source: 'email-link',
       });
+      // Signed in as this same account? Then turn it off on the profile now too,
+      // instead of waiting for the next run to process the request.
+      if (auth?.currentUser?.uid === uid) {
+        try {
+          const profile = readPlansProfile((await getDoc(doc(db, 'users', uid))).data());
+          await setDoc(doc(db, 'users', uid), emailConsentPatch(profile, {
+            weekly: events ? profile.weeklyDigestOptIn === true : false,
+            events: events ? false : profile.eventsDigestOptIn,
+          }, Date.now(), 'email-link'), { merge: true });
+          setImmediate(true);
+        } catch { /* the queued request still stops the next email */ }
+      }
       setStage('done');
     } catch (error) {
       // A permission error here means the token did not match the account.
@@ -132,9 +146,9 @@ export default function UnsubscribePage() {
                 Done — you are unsubscribed.
               </h1>
               <p className="mt-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-                Your request is recorded. It is applied when the {events ? 'picks email' : 'digest'} next runs, so in
-                the rare case that a message is already in flight you may see one more.
-                Nothing after that.
+                {immediate
+                  ? `It’s off now. You won’t get another ${events ? 'Thursday picks email' : 'Monday email'}, and everything else on your account stays as it is.`
+                  : `Your request is recorded. It is applied when the ${events ? 'picks email' : 'digest'} next runs, so in the rare case that a message is already in flight you may see one more. Nothing after that.`}
               </p>
               <Link
                 to={events ? '/plans' : '/map'}

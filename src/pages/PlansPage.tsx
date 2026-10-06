@@ -11,8 +11,8 @@ import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { computeBadges, orderBadges } from '../lib/badges';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
 import { buildEventPicks, normalizeInterests, EVENT_INTERESTS, interestsFor, pickDistance, pickWhen, type EventInterestId, type PickItem } from '../lib/eventPicks';
-import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
-import { resolveHomeLocation } from '../hooks/useHomeLocation';
+import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
+import { resolveHomeLocation, useHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
 import '../styles/plans.css';
 
@@ -46,7 +46,7 @@ async function communityForAddress(address: string): Promise<string> {
 
 const EMPTY: PlansDraft = { interests: [], neighborhood: '', address: '', inferredNeighborhood: '', consent: false, eventsDigestOptIn: false, weeklyDigestOptIn: false };
 
-function draftFrom(profile: PlansProfile | null): PlansDraft {
+function draftFrom(profile: PlansProfile | null, pending: PendingOptOuts = { monday: null, thursday: null }): PlansDraft {
   if (!profile) return EMPTY;
   return {
     interests: profile.eventInterests,
@@ -54,8 +54,9 @@ function draftFrom(profile: PlansProfile | null): PlansDraft {
     address: profile.address ?? '',
     inferredNeighborhood: profile.inferredNeighborhood ?? '',
     consent: Boolean(profile.piiConsentAt),
-    eventsDigestOptIn: profile.eventsDigestOptIn,
-    weeklyDigestOptIn: profile.weeklyDigestOptIn === true,
+    // An email-link opt-out the sender hasn't processed yet already counts as off.
+    eventsDigestOptIn: profile.eventsDigestOptIn && !pending.thursday,
+    weeklyDigestOptIn: profile.weeklyDigestOptIn === true && !pending.monday,
   };
 }
 
@@ -70,6 +71,9 @@ export default function PlansPage() {
   const [params] = useSearchParams();
   const profile = usePlansProfile(user?.uid);
   const mine = useMyGoing(user?.uid);
+  const pending = usePendingOptOuts(user?.uid);
+  // A street address resolves to a point, so picks rank by distance even without a neighbourhood name.
+  const { home: addressPoint } = useHomeLocation(profile?.address, Boolean(profile?.address));
   const communities = useCommunityNames();
   // A first-time visitor starts with the email(s) the link they followed was about, visibly ticked.
   const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params), interests: normalizeInterests((params.get('interests') ?? '').split(',')) }));
@@ -90,7 +94,7 @@ export default function PlansPage() {
     if (!user || !profile || hydratedFor.current === user.uid) return;
     hydratedFor.current = user.uid;
     setDraft((local) => {
-      const stored = draftFrom(profile);
+      const stored = draftFrom(profile, pending);
       const fresh = !profile.piiConsentAt && !profile.eventInterests.length;
       // Keep what they chose before signing in; a brand-new account also keeps the ticked emails.
       return {
@@ -101,6 +105,12 @@ export default function PlansPage() {
       };
     });
   }, [user, profile]);
+
+  // Pending opt-outs load after the profile; untick those boxes when they arrive (unless editing has begun).
+  useEffect(() => {
+    if (!pending.monday && !pending.thursday) return;
+    setDraft((d) => ({ ...d, ...(pending.monday ? { weeklyDigestOptIn: false } : {}), ...(pending.thursday ? { eventsDigestOptIn: false } : {}) }));
+  }, [pending.monday, pending.thursday]);
 
   useEffect(() => {
     if (!user) { setReportCount(undefined); return; }
@@ -118,8 +128,8 @@ export default function PlansPage() {
   const occurrences = discoveryRepository.occurrences();
   const interests = (showForm ? draft.interests : profile?.eventInterests) ?? [];
   const picks = useMemo(
-    () => buildEventPicks({ entities, occurrences, interests, homeArea: area || draft.neighborhood || draft.inferredNeighborhood, goingIds: mine.ids, days: 10, limit: 8 }),
-    [entities, occurrences, interests, area, draft.neighborhood, draft.inferredNeighborhood, mine.ids],
+    () => buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area || draft.neighborhood || draft.inferredNeighborhood, goingIds: mine.ids, days: 10, limit: 8 }),
+    [entities, occurrences, interests, addressPoint, area, draft.neighborhood, draft.inferredNeighborhood, mine.ids],
   );
 
   const goingKinds = useMemo(() => {
@@ -247,6 +257,9 @@ export default function PlansPage() {
                 <fieldset className="pl-step" id="emails">
                   <legend><span className="pl-num">02</span> Your emails</legend>
                   <p className="pl-help">Two short emails, both free, each with its own one-click unsubscribe.</p>
+                  {pending.monday || pending.thursday ? (
+                    <p className="pl-hint" role="status">You unsubscribed from the {[pending.monday ? 'Monday' : '', pending.thursday ? 'Thursday' : ''].filter(Boolean).join(' and ')} email by link, so it’s unticked. Tick it again and save if you change your mind.</p>
+                  ) : null}
                   <div className="pl-mails">
                     <label className="pl-mail" data-on={draft.weeklyDigestOptIn}>
                       <input type="checkbox" checked={draft.weeklyDigestOptIn} onChange={(e) => setDraft((d) => ({ ...d, weeklyDigestOptIn: e.target.checked }))} />
@@ -284,7 +297,7 @@ export default function PlansPage() {
                   <button type="submit" className="pl-btn" disabled={saving || (isAuthReady && !isFirebaseConfigured)}>
                     {saving ? 'Saving…' : user ? (hasPlans ? 'Save changes' : 'Save and finish') : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
-                  {editing ? <button type="button" className="pl-textbtn" onClick={() => { setEditing(false); setDraft(draftFrom(profile)); setError(''); }}>Cancel</button> : null}
+                  {editing ? <button type="button" className="pl-textbtn" onClick={() => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); }}>Cancel</button> : null}
                   {!user ? <p className="pl-fine">Google sign-in keeps your settings yours. Everything you picked above is kept through sign-in.</p> : null}
                 </div>
               </form>
@@ -293,7 +306,7 @@ export default function PlansPage() {
             <section className="pl-picks" aria-labelledby="pl-picks-title">
               <div className="pl-sec-head">
                 <h2 id="pl-picks-title">{interests.length ? 'Picked for you' : 'On in Calgary'}<span> · next 10 days</span></h2>
-                {!showForm ? <button type="button" className="pl-textbtn" onClick={() => { setDraft(draftFrom(profile)); setEditing(true); }}><Pencil size={14} aria-hidden="true" /> Edit area, emails & interests</button> : null}
+                {!showForm ? <button type="button" className="pl-textbtn" onClick={() => { setDraft(draftFrom(profile, pending)); setEditing(true); }}><Pencil size={14} aria-hidden="true" /> Edit area, emails & interests</button> : null}
               </div>
               {picks.picks.length ? (
                 <ol className="pl-list">{picks.picks.map((p) => <PickRow key={p.key} item={p} signedIn={!!user} />)}</ol>

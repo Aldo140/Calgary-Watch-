@@ -21,7 +21,8 @@
     "Always labelled 'Featured partner' and kept separate from CalgaryWatch picks."
   ],
   "limits": {
-    "sendsPerDay": 10,
+    "sendsPerDay": 50,
+    "sendsPerRun": 2,
     "sendWindowLocal": [
       "09:00",
       "16:30"

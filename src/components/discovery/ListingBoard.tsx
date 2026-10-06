@@ -5,8 +5,9 @@ import type { DiscoveryEntity, Event as EventEntity, Market, MarketOccurrence } 
 import { entityPath, startClock } from '../../lib/discovery';
 import { EventArt, MarketArt } from './ListingArt';
 import '../../styles/plans.css';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
+const fmt = (opts: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayKey = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
 const weekdayShort = fmt({ weekday: 'short' });
 const weekdayLong = fmt({ weekday: 'long' });

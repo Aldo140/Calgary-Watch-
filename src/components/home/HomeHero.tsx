@@ -8,6 +8,7 @@ import { moonPhase, skyPalette, sunPosition } from '../../lib/sky';
 import { isWeekend, summarize } from '../../lib/homeClaims';
 import { CalgarySky, type SkyVariant } from './CalgarySky';
 import { SkyGlyph } from './WeekPlanner';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const INTENTS: Array<{ label: string; to: string; live?: boolean }> = [
   { label: 'Tonight', to: '/events/today?time=tonight' },
@@ -18,9 +19,9 @@ const INTENTS: Array<{ label: string; to: string; live?: boolean }> = [
   { label: 'Neighbourhoods', to: '/neighbourhoods' },
 ];
 
-const dateline = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
-const shortDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
-const clock = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
+const dateline = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
+const shortDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
+const clock = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 
 /** A torn paper edge (the site's collage language) where the page meets the scene.
  * Deterministic, so it never shifts between renders. */

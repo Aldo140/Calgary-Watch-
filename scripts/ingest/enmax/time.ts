@@ -7,10 +7,11 @@
  * resolve the America/Edmonton offset that applies at that moment and emit a
  * fully-qualified ISO string instead.
  */
+import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
 
 export const CALGARY_TIME_ZONE = 'America/Edmonton';
 
-const OFFSET_FORMATTER = new Intl.DateTimeFormat('en-US', {
+const OFFSET_FORMATTER = calgaryDateTimeFormat('en-US', {
   timeZone: CALGARY_TIME_ZONE,
   hour12: false,
   year: 'numeric',

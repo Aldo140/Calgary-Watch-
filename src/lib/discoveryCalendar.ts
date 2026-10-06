@@ -1,11 +1,12 @@
 import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
 import { calgaryDate, entityPath, matchesPeriod } from './discovery';
+import { calgaryDateTimeFormat } from './calgaryTz';
 /** Convert a wall clock time using the zone's actual offset (including DST). */
 export function calgaryInstant(day: string, hour: number): number {
   const wall = Date.parse(`${day}T00:00:00Z`) + hour * 3600000;
   let instant = wall;
   for (let i = 0; i < 3; i++) {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone:'America/Edmonton', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' }).formatToParts(instant).map(p=>[p.type,p.value]));
+    const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone:'America/Edmonton', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' }).formatToParts(instant).map(p=>[p.type,p.value]));
     const localAsUtc = Date.parse(`${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}Z`);
     instant += wall-localAsUtc;
   }

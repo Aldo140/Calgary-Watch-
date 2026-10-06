@@ -15,15 +15,21 @@ import { draftPitches, findLeads } from './jobs/outreach';
 import { checkHealth, sendSummary } from './jobs/health';
 import { collectInsights } from './jobs/insights';
 import { collectAccountHistory } from './jobs/accountHistory';
+import { exitForQuota, isQuotaExhausted } from '../lib/quota';
 
 const log = (m: string) => console.log(`[ops:daily] ${m}`);
 const index = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
 const now = Date.now();
 const db = hasFirebase() ? opsDb() : null;
 let failed = false;
+let quota = false;
 
 async function step(name: string, run: () => Promise<unknown>) {
-  try { await run(); } catch (e) { failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`); }
+  if (quota) return;
+  try { await run(); } catch (e) {
+    if (isQuotaExhausted(e)) { quota = true; log(`${name}: Firestore quota exhausted; stopping this run.`); return; }
+    failed = true; log(`${name} failed: ${e instanceof Error ? e.stack ?? e.message : e}`);
+  }
 }
 
 if (!db) {
@@ -46,3 +52,4 @@ if (!db) {
   if (health) await step('summary', () => sendSummary(db, health!, now, log));
 }
 if (failed) process.exitCode = 1;
+else if (quota) exitForQuota('Operations daily');

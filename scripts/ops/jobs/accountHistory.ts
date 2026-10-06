@@ -13,6 +13,7 @@ import { brandKit } from '../lib/brand';
 import { COLLECTIONS } from '../lib/firebase';
 import { listAllMedia, mediaInsights, type AccountMedia } from '../lib/instagram';
 import { currentToken } from './igTokens';
+import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
 
 type Log = (m: string) => void;
 const DAY = 86_400_000;
@@ -43,7 +44,7 @@ export const isRepost = (caption: string) => CREDIT.test(caption);
 const formatOf = (m: Pick<AccountMedia, 'mediaType' | 'productType'>) =>
   m.productType === 'REELS' || m.mediaType === 'VIDEO' ? 'Reels' : m.mediaType === 'CAROUSEL_ALBUM' ? 'Carousels' : 'Single images';
 const calgary = (ms: number, part: 'weekday' | 'hour') =>
-  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...(part === 'weekday' ? { weekday: 'long' } : { hour: '2-digit', hourCycle: 'h23' }) }).format(new Date(ms));
+  calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...(part === 'weekday' ? { weekday: 'long' } : { hour: '2-digit', hourCycle: 'h23' }) }).format(new Date(ms));
 
 /** Views where Instagram reports them (every format since 2025), else reach, else likes. */
 export const reachOf = (r: HistoryRow) => r.views ?? r.reach ?? r.likes * 10;

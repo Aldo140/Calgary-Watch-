@@ -7,8 +7,9 @@ import type { LivePulse } from '../../hooks/useLivePulse';
 import { entityPath, startClock } from '../../lib/discovery';
 import { timeAgo, weekendDays, type ExampleReport } from '../../lib/homeClaims';
 import { CityMap } from '../community/CityMap';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
+const fmt = (opts: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayShort = fmt({ weekday: 'short' });
 const dayNum = fmt({ day: 'numeric' });
 const clock = fmt({ hour: 'numeric', minute: '2-digit' });

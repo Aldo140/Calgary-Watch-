@@ -9,6 +9,7 @@
 
 import type { Incident } from '@/src/types';
 import type { OutageGroup, PowerOutage } from '@/src/types/powerOutage';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 export const CALGARY_TIME_ZONE = 'America/Edmonton';
 
@@ -76,13 +77,13 @@ export function classifyOutage(outage: PowerOutage, now: number = Date.now()): O
   return 'active_unplanned';
 }
 
-const DATE_TIME_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+const DATE_TIME_FORMATTER = calgaryDateTimeFormat('en-CA', {
   timeZone: CALGARY_TIME_ZONE,
   dateStyle: 'medium',
   timeStyle: 'short',
 });
 
-const TIME_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+const TIME_FORMATTER = calgaryDateTimeFormat('en-CA', {
   timeZone: CALGARY_TIME_ZONE,
   timeStyle: 'short',
 });

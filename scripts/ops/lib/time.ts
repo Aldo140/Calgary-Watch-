@@ -1,11 +1,12 @@
 // Calgary wall-clock helpers. GitHub runners are UTC; every date a person reads
 // or a schedule is set against is America/Edmonton.
+import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
 
 export const TZ = 'America/Edmonton';
 
 function parts(epoch: number): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const p of new Intl.DateTimeFormat('en-CA', {
+  for (const p of calgaryDateTimeFormat('en-CA', {
     timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', weekday: 'short',
   }).formatToParts(new Date(epoch))) out[p.type] = p.value;
@@ -65,9 +66,9 @@ export function nextSlot(now: number, slots: string[], skip = 0): number {
   return found[skip] ?? now + 60 * 60_000;
 }
 
-const dayFmt = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' });
-const longDayFmt = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric' });
-const timeFmt = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, hour: 'numeric', minute: '2-digit', hour12: true });
+const dayFmt = calgaryDateTimeFormat('en-CA', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' });
+const longDayFmt = calgaryDateTimeFormat('en-CA', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric' });
+const timeFmt = calgaryDateTimeFormat('en-CA', { timeZone: TZ, hour: 'numeric', minute: '2-digit', hour12: true });
 
 /** "Sat, Sep 27" */
 export function shortDay(epoch: number): string {

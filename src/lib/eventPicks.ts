@@ -17,6 +17,7 @@
 import type { DiscoveryEntity, Event, Market, MarketOccurrence } from '../types/discovery';
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { entityPath } from './discovery';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 export type EventInterestId =
   | 'music' | 'arts' | 'family' | 'food' | 'sports'
@@ -253,10 +254,10 @@ export function buildEventPicks(options: PickOptions): EventPicks {
 /** "Thu Oct 9 · 7:30 p.m." in Calgary time; "All day" for a date-only listing. */
 export function pickWhen(iso: string): string {
   const d = new Date(iso);
-  const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' }).format(d);
-  const hm = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d);
+  const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' }).format(d);
+  const hm = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d);
   if (hm === '00:00') return `${day} · All day`;
-  const time = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' }).format(d);
+  const time = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' }).format(d);
   return `${day} · ${time}`;
 }
 

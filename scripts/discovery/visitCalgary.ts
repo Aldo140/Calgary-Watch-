@@ -9,6 +9,7 @@
  */
 import type { InventorySubmissionInput } from '../../src/types/discovery';
 import { calgaryOffset, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 
 export interface VisitCalgaryHit {
   slug: string; permalink: string; searchable_taxonomies?: string;
@@ -50,7 +51,7 @@ const CATEGORY: Array<[RegExp, string]> = [
 ];
 
 const addDays = (day: string, n: number) => new Date(Date.parse(`${day}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
-const calgaryDay = (ms: number) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
+const calgaryDay = (ms: number) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
 const local = (day: string, hhmm: string) => { const l = `${day}T${hhmm}:00`; return `${l}${calgaryOffset(l)}`; };
 
 /**

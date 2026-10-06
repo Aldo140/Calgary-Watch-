@@ -26,6 +26,9 @@ import { fetchCalgary311Crime } from './sources/calgary-311.js';
 import { fetchCalgaryPoliceNews } from './sources/calgary-police-news.js';
 import type { NormalizedIncident } from './types.js';
 import { DATA_SOURCE_BY_ID, type DataSourceId } from '../../src/config/dataSources.js';
+import { exitForQuota, isQuotaExhausted } from '../lib/quota.js';
+import { buildPulseSnapshot, PULSE_DOC, PULSE_SAMPLE } from '../../src/lib/livePulseSnapshot.js';
+import type { Incident } from '../../src/types/index.js';
 
 // ---------------------------------------------------------------------------
 // Firebase Admin init
@@ -255,6 +258,7 @@ async function run(): Promise<void> {
 
   if (allIncidents.length === 0) {
     console.log('[ingest] No incidents to process. Done.');
+    await writePulseSnapshot(db);
     return;
   }
 
@@ -274,9 +278,28 @@ async function run(): Promise<void> {
     `[ingest] Done — upserted ${allIncidents.length - skipped} incident(s), ` +
       `skipped ${skipped} suppressed.`,
   );
+  await writePulseSnapshot(db);
+}
+
+/**
+ * The homepage's live summary, so a page view costs one read instead of 60.
+ * Best effort: a failure here never fails the ingest, the page falls back.
+ */
+async function writePulseSnapshot(db: Firestore): Promise<void> {
+  try {
+    const snap = await db.collection('incidents').where('visibility', '==', 'public')
+      .orderBy('timestamp', 'desc').limit(PULSE_SAMPLE).get();
+    const incidents = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Incident);
+    const pulse = buildPulseSnapshot(incidents, Date.now());
+    await db.collection(PULSE_DOC.collection).doc(PULSE_DOC.id).set(pulse);
+    console.log(`[ingest] Pulse snapshot: ${pulse.total} report(s) in the last 24h.`);
+  } catch (error) {
+    console.warn('[ingest] Pulse snapshot skipped:', error instanceof Error ? error.message : error);
+  }
 }
 
 run().catch((err) => {
+  if (isQuotaExhausted(err)) exitForQuota('Ingest');
   console.error('[ingest] Fatal error:', err);
   process.exit(1);
 });

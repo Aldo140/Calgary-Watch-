@@ -24,6 +24,7 @@ import {
 import { cn } from '@/src/lib/utils';
 import { consentRefusal, consentTimestamp, digestDeliveryKind, type DigestRecipient } from '@/src/lib/digest';
 import { adminIncidentTimestamp } from '@/src/lib/adminIncidentPolicy';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 type UserProfile = {
   uid: string;
@@ -587,7 +588,7 @@ function UserEditor({
 function fullDate(value: unknown): string {
   const timestamp = coerceTimestamp(value);
   if (!timestamp) return '—';
-  return new Intl.DateTimeFormat('en-CA', {
+  return calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', year: 'numeric', month: 'short', day: 'numeric',
     hour: 'numeric', minute: '2-digit',
   }).format(new Date(timestamp));

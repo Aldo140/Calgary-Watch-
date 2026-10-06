@@ -66,6 +66,7 @@ import {
   listHeading,
   WELCOME,
 } from './copy.js';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 
 /**
  * The product's tokens, not a palette invented for email.
@@ -203,7 +204,7 @@ function firstName(displayName: string | undefined): string {
 }
 
 function fmt(timestamp: number, opts: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts })
+  return calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts })
     .format(new Date(timestamp));
 }
 

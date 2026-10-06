@@ -4,8 +4,9 @@ import type { Business, DiscoveryEntity, Market, MarketOccurrence, Neighbourhood
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
 import { LOCAL_NOTES, type LocalNote } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
-const when = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const when = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
 const QUADRANT_BOX: Record<string, [number, number]> = { NW: [0, 0], NE: [1, 0], SW: [0, 1], SE: [1, 1] };
 

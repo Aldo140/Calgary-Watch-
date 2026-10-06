@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import type { InventorySubmissionInput } from '../../types/discovery';
 import { calgaryInstant } from '../../lib/discoveryCalendar';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const local = (iso: string) => {
-  const parts=Object.fromEntries(new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Edmonton',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)).map(p=>[p.type,p.value]));
+  const parts=Object.fromEntries(calgaryDateTimeFormat('sv-SE',{timeZone:'America/Edmonton',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)).map(p=>[p.type,p.value]));
   return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
 };
 const instant = (value: string) => { const [day,time]=value.split('T'); const [h,m]=time.split(':').map(Number); return new Date(calgaryInstant(day,h+m/60)).toISOString(); };

@@ -12,6 +12,7 @@
  */
 
 import type { Incident, IncidentCategory } from '@/src/types';
+import { calgaryDateTimeFormat } from './calgaryTz';
 
 /** Seven days, in ms. The digest's whole horizon. */
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -211,7 +212,7 @@ export function isPlausibleEmail(value: string): boolean {
  */
 export function digestWeekKey(when: Date | number, timeZone = 'America/Edmonton'): string {
   const date = typeof when === 'number' ? new Date(when) : when;
-  const parts = new Intl.DateTimeFormat('en-CA', {
+  const parts = calgaryDateTimeFormat('en-CA', {
     timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
   }).formatToParts(date);
   const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);

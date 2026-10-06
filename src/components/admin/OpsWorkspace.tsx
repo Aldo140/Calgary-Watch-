@@ -14,6 +14,7 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
 import type { AccountHistory, BrandId, HistoryGroup, HistoryRow, OpsHealth, OpsPerformance, OpsPost, PerformanceRow, PostStatus } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, display, inputClass, inputStyle, mono, type Tone } from './ui';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 type View = 'review' | 'scheduled' | 'published' | 'corrections' | 'other';
 const VIEWS: Record<View, { label: string; statuses: PostStatus[] }> = {
@@ -28,7 +29,7 @@ const STATUS_TONE: Partial<Record<PostStatus, Tone>> = {
 };
 const BRAND_LABEL: Record<BrandId, string> = { calgarywatch: 'CalgaryWatch', calgarydaily: 'CalgaryDaily' };
 
-const when = (ms: number | null | undefined) => ms ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(ms)) : '—';
+const when = (ms: number | null | undefined) => ms ? calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(ms)) : '—';
 /** datetime-local works in the browser's zone; admins are in Calgary, and the label says so. */
 const toLocalInput = (ms: number) => { const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
 

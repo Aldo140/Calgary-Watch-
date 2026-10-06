@@ -35,6 +35,7 @@ import {
 } from './ui';
 import { configuredDigestAudienceForecast, DigestAudienceForecast } from './DigestAudienceForecast';
 import { DigestReplyInbox } from './DigestReplyInbox';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const MAX_BODY = 2400;
 const MIN_BODY = 20;
@@ -100,7 +101,7 @@ const signature = (
 
 function formatTime(value: number | undefined): string {
   if (!value) return '';
-  return new Intl.DateTimeFormat('en-CA', {
+  return calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
   }).format(new Date(value));
 }

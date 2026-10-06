@@ -12,6 +12,7 @@ import {
 } from '@/src/lib/digestPlanner';
 import type { ConsentRefusal, DigestRecipient } from '@/src/lib/digest';
 import { Chip, Figure, StatusDot, T, display, mono } from './ui';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 type AudienceFilter = 'all' | 'scheduled' | 'welcome' | 'weekly' | 'held' | 'attention';
 
@@ -43,7 +44,7 @@ const statusCopy: Record<DigestAudienceStatus, { label: string; tone: 'ok' | 'at
 
 function formatDate(value: number | null): string {
   if (!value) return '—';
-  return new Intl.DateTimeFormat('en-CA', {
+  return calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', month: 'short', day: 'numeric', year: 'numeric',
   }).format(new Date(value));
 }
@@ -91,7 +92,7 @@ export function DigestAudienceForecast({ profiles, loading, error }: {
   const [search, setSearch] = useState('');
   const forecast = useMemo(() => configuredDigestAudienceForecast(profiles), [profiles]);
   const nextRun = useMemo(() => nextDigestRunAt(), []);
-  const nextRunLabel = useMemo(() => new Intl.DateTimeFormat('en-CA', {
+  const nextRunLabel = useMemo(() => calgaryDateTimeFormat('en-CA', {
     timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric', year: 'numeric',
   }).format(new Date(nextRun)), [nextRun]);
   const scheduled = forecast.rows.filter((row) => row.status === 'scheduled');

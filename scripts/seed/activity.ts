@@ -10,6 +10,8 @@
 import { pathToFileURL } from 'node:url';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { FieldValue, getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { exitForQuota, isQuotaExhausted } from '../lib/quota.js';
 
 type WindowName = 'morning' | 'afternoon' | 'evening';
 
@@ -306,7 +308,7 @@ export function selectDuePost(
 }
 
 export function calgaryClock(now = new Date()): { date: string; month: number; minute: number } {
-  const parts = new Intl.DateTimeFormat('en-CA', {
+  const parts = calgaryDateTimeFormat('en-CA', {
     timeZone: CALGARY_TIME_ZONE,
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
@@ -403,6 +405,7 @@ const executedDirectly = process.argv[1] !== undefined &&
 
 if (executedDirectly) {
   run().catch((error) => {
+    if (isQuotaExhausted(error)) exitForQuota('Community pulse');
     console.error('[pulse] Error:', error);
     process.exit(1);
   });

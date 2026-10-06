@@ -48,6 +48,13 @@ export function eventsUnsubscribeUrl(origin: string, uid: string, token: string)
   return url.toString();
 }
 
+/** For the combined Monday email: one link that stops both lists. */
+export function allUnsubscribeUrl(origin: string, uid: string, token: string): string {
+  const url = new URL(eventsUnsubscribeUrl(origin, uid, token));
+  url.searchParams.set('list', 'all');
+  return url.toString();
+}
+
 /**
  * What this reader's Thursday email is, this week.
  *   picks       – things matching their interests (the normal case)

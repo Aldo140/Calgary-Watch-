@@ -46,8 +46,10 @@ export default function UnsubscribePage() {
   const [params] = useSearchParams();
   const uid = (params.get('uid') ?? '').trim();
   const token = (params.get('t') ?? '').trim();
-  // `list=events` comes from the Thursday picks email; anything else is the
-  // Monday digest, which predates the parameter.
+  // `list=events` comes from the Thursday picks email, `list=all` from the
+  // combined "your week" email (both lists); anything else is the Monday
+  // digest, which predates the parameter.
+  const all = params.get('list') === 'all';
   const events = params.get('list') === 'events';
 
   // Shape is checked here so an obviously malformed link says so immediately
@@ -64,7 +66,9 @@ export default function UnsubscribePage() {
     if (!db || !linkLooksValid) { setStage('invalid'); return; }
     setStage('working');
     try {
-      await setDoc(doc(db, events ? 'events_digest_unsubscribes' : 'digest_unsubscribes', uid), {
+      const database = db;
+      const lists = all ? ['digest_unsubscribes', 'events_digest_unsubscribes'] : [events ? 'events_digest_unsubscribes' : 'digest_unsubscribes'];
+      await Promise.all(lists.map((list) => setDoc(doc(database, list, uid), {
         uid,
         token,
         requestedAt: Date.now(),
@@ -72,7 +76,7 @@ export default function UnsubscribePage() {
         // and null rather than absent — Firestore cannot match a missing field.
         processedAt: null,
         source: 'email-link',
-      });
+      })));
       // Signed in as this same account? Then turn it off on the profile now too,
       // instead of waiting for the next run to process the request.
       if (auth?.currentUser?.uid === uid) {
@@ -80,7 +84,7 @@ export default function UnsubscribePage() {
           const profile = readPlansProfile((await getDoc(doc(db, 'users', uid))).data());
           await setDoc(doc(db, 'users', uid), emailConsentPatch(profile, {
             weekly: events ? profile.weeklyDigestOptIn === true : false,
-            events: events ? false : profile.eventsDigestOptIn,
+            events: events || all ? false : profile.eventsDigestOptIn,
           }, Date.now(), 'email-link'), { merge: true });
           setImmediate(true);
         } catch { /* the queued request still stops the next email */ }
@@ -91,7 +95,7 @@ export default function UnsubscribePage() {
       const code = (error as { code?: string })?.code ?? '';
       setStage(code.includes('permission-denied') ? 'invalid' : 'error');
     }
-  }, [uid, token, linkLooksValid, events]);
+  }, [uid, token, linkLooksValid, events, all]);
 
   return (
     <div className="min-h-screen" style={{ background: T.paper }}>
@@ -112,10 +116,12 @@ export default function UnsubscribePage() {
                 className="mt-4 font-display text-[1.7rem] font-extrabold leading-tight tracking-[-0.02em]"
                 style={{ color: T.ink }}
               >
-                {events ? 'Stop the Thursday picks email?' : 'Stop the weekly digest?'}
+                {all ? 'Stop both weekly emails?' : events ? 'Stop the Thursday picks email?' : 'Stop the weekly digest?'}
               </h1>
               <p className="mt-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-                {events
+                {all
+                  ? 'You will stop getting the Monday safety reports and your event picks. Your account, saved area, interests, plans and badges stay as they are, and you can turn either back on from Your CalgaryWatch whenever you like.'
+                  : events
                   ? 'You will stop receiving Thursday event picks. Your interests, your plans and your badges stay on your account, the Monday neighbourhood email is not affected, and you can turn picks back on from your plans page whenever you like.'
                   : 'You will stop receiving the Monday email about your neighbourhood. Your account, your saved location and any reports you have filed are untouched, and you can turn the digest back on from settings whenever you like.'}
               </p>
@@ -128,6 +134,11 @@ export default function UnsubscribePage() {
               >
                 {stage === 'working' ? 'Unsubscribing…' : 'Yes, unsubscribe me'}
               </button>
+              {all ? (
+                <p className="mt-4 text-[13px]" style={{ color: T.inkSoft }}>
+                  Only want to stop one of them? <Link to="/plans#emails" className="font-bold underline" style={{ color: T.ink }}>Choose on Your CalgaryWatch</Link>
+                </p>
+              ) : null}
             </>
           ) : null}
 
@@ -147,8 +158,8 @@ export default function UnsubscribePage() {
               </h1>
               <p className="mt-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
                 {immediate
-                  ? `It’s off now. You won’t get another ${events ? 'Thursday picks email' : 'Monday email'}, and everything else on your account stays as it is.`
-                  : `Your request is recorded. It is applied when the ${events ? 'picks email' : 'digest'} next runs, so in the rare case that a message is already in flight you may see one more. Nothing after that.`}
+                  ? `It’s off now. You won’t get another ${all ? 'weekly email from us' : events ? 'Thursday picks email' : 'Monday email'}, and everything else on your account stays as it is.`
+                  : `Your request is recorded. It is applied when the ${all ? 'emails' : events ? 'picks email' : 'digest'} next run${all ? '' : 's'}, so in the rare case that a message is already in flight you may see one more. Nothing after that.`}
               </p>
               <Link
                 to={events ? '/plans' : '/map'}

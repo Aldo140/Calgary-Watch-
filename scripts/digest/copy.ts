@@ -19,7 +19,7 @@
  *     They asked for it.
  */
 
-import type { DigestSummary } from '../../src/lib/digest.js';
+import { displayAreaName, type DigestSummary } from '../../src/lib/digest.js';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 
 const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
@@ -219,3 +219,71 @@ export function categoriesNote(labels: string[]): string | null {
   const list = labels.length === 1 ? labels[0] : `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
   return `Showing ${list.toLowerCase()} only, as you chose.`;
 }
+
+// ── The combined "your week" email ─────────────────────────────────────────
+//
+// For readers on both lists: one Monday email with two chapters, what happened
+// near home and what's worth leaving the house for, instead of a Monday and a
+// Thursday email that half-overlap.
+
+export interface CombinedFacts {
+  summary: DigestSummary;
+  /** Titles of things they said they're going to this week, soonest first. */
+  going: string[];
+  /** How many picks (or "what else is on" items in fallback) are listed. */
+  listed: number;
+  fallback: boolean;
+}
+
+function areaOf(summary: DigestSummary): string {
+  if (summary.scope === 'city') return '';
+  const area = summary.areaName && summary.areaName !== 'your area' ? displayAreaName(summary.areaName) : '';
+  return area;
+}
+
+/** Subject: both halves, the most personal thing first. */
+export function combinedSubject(f: CombinedFacts): string {
+  const area = areaOf(f.summary);
+  const head = area ? `Your week in ${area}` : f.summary.scope === 'city' ? 'Your Calgary week' : 'Your week';
+  const n = f.summary.total;
+  const crime = f.summary.quiet ? 'all quiet' : `${n} ${n === 1 ? 'report' : 'reports'}${f.summary.scope === 'city' ? '' : ' nearby'}`;
+  if (f.going.length) {
+    return f.summary.quiet
+      ? `${head}: all quiet, and you’re going to ${f.going[0]}`
+      : `${head}: you’re going to ${f.going[0]}, plus ${crime}`;
+  }
+  const events = f.listed
+    ? `${f.listed} ${f.fallback ? (f.listed === 1 ? 'thing' : 'things') + ' on' : f.listed === 1 ? 'pick for you' : 'picks for you'}`
+    : 'your plans';
+  return `${head}: ${crime}, ${f.summary.quiet ? 'and ' : ''}${events}`;
+}
+
+/** The yellow second line of the greeting. */
+export function combinedSubline(f: CombinedFacts): string {
+  const area = areaOf(f.summary);
+  const possessive = (name: string) => (/s$/i.test(name) ? `${name}’` : `${name}’s`);
+  if (f.summary.quiet && f.listed) return 'Quiet streets. Plenty on.';
+  return area ? `Here’s ${possessive(area)} whole week.` : 'Here’s your whole week.';
+}
+
+/** One line under the greeting that explains the shape of the email. */
+export function combinedLead(f: CombinedFacts): string {
+  const n = f.summary.total;
+  const crime = f.summary.quiet
+    ? 'A quiet week near home'
+    : `${spell(n).replace(/^./, (c) => c.toUpperCase())} ${n === 1 ? 'thing was' : 'things were'} reported near home`;
+  const more = f.listed ? `${spell(f.listed)} ${f.listed === 1 ? 'thing is' : 'things are'}` : '';
+  if (f.going.length) {
+    const extra = f.listed ? `${spell(f.listed)} more ${f.listed === 1 ? 'thing is' : 'things are'} worth a look` : '';
+    return `${crime}. You’ve got plans this week${extra ? `, and ${extra}` : ''}. Both halves of your week, in one email.`;
+  }
+  const events = more ? `${more} worth leaving the house for` : 'your plans are below';
+  return `${crime}, and ${events}. Both halves of your week, in one email.`;
+}
+
+/** Shown once, the first time somebody's two emails become one. */
+export const COMBINED_HELLO = 'New: because you get both, your event picks now come inside this Monday email. One email a week instead of two. Nothing else changes.';
+export const COMBINED_FALLBACK = 'Nothing we’ve checked with an organizer matches your interests this week, so here’s what else is on.';
+export const COMBINED_GOING_ONLY = 'No new picks matched this week, but here’s what you said you’re going to.';
+export const COMBINED_REASON = 'You’re getting this because you turned on both the Monday brief and event picks on CalgaryWatch, '
+  + 'so they arrive together. It’s built from your saved area, your interests and public reports on the map, nothing else.';

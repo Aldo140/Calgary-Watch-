@@ -65,6 +65,13 @@ import {
   CTA_LABEL_QUIET,
   greeting,
   categoriesNote,
+  combinedLead,
+  combinedSubject,
+  combinedSubline,
+  COMBINED_FALLBACK,
+  COMBINED_GOING_ONLY,
+  COMBINED_HELLO,
+  COMBINED_REASON,
   mondaySubline,
   leadParagraph,
   listHeading,
@@ -942,6 +949,11 @@ function shell(options: {
     }
     .cw-count > tbody > tr > td + td { padding-top: 13px !important; }
     .cw-step { padding: 0 0 18px 0 !important; }
+    .cw-tile { padding: 0 3px !important; }
+    .cw-tile-in { padding: 11px 9px 12px !important; }
+    .cw-tile-n { font-size: 28px !important; }
+    .cw-tile-l { font-size: 9px !important; letter-spacing: .4px !important; }
+    .cw-tile-s { font-size: 10.5px !important; }
     .cw-step img { margin-bottom: 6px !important; }
   }
 
@@ -1367,7 +1379,7 @@ function eventSection(title: string, items: PickItem[], origin: string): string 
   </td></tr>`;
 }
 
-function plansButton(origin: string): string {
+function plansButton(origin: string, reminderDay = 'Thursday'): string {
   return `
   <tr><td style="padding:24px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -1379,7 +1391,7 @@ function plansButton(origin: string): string {
       </td></tr>
     </table>
     <div class="cw-soft" style="font:400 12.5px/1.5 ${BODY};color:${C.soft};padding-top:13px;">
-      Tap “I’m going” on any event to get a reminder here next Thursday.
+      Tap “I’m going” on any event to get a reminder here next ${reminderDay}.
       <a href="${escapeHtml(origin)}/plans" style="color:${C.bow};text-decoration:none;font-weight:700;">Change your interests&nbsp;→</a>
     </div>
   </td></tr>`;
@@ -1514,6 +1526,242 @@ export function renderEventsText(options: EventsEmailOptions): string {
     branding.supportEmail,
     '',
     `Unsubscribe: ${options.unsubscribeUrl}`,
+    `Privacy: ${branding.origin}/privacy`,
+  );
+  return lines.join('\n');
+}
+
+// ── The combined "your week" email ──────────────────────────────────────────
+//
+// For readers on both lists. One Monday letter in two chapters: what happened
+// near home, then what's worth leaving the house for. It opens with the week
+// at a glance, three numbers, so the whole email is legible before a single
+// headline is read. The Thursday run skips anybody this email reached.
+
+export interface CombinedEmailOptions {
+  summary: DigestSummary;
+  picks: EventPicks;
+  fallback?: EventPicks | null;
+  interests: readonly EventInterestId[];
+  /** Neighbourhood for event ranking copy; "home" for address-only readers. */
+  area: string;
+  displayName?: string;
+  branding: DigestBranding;
+  contribution?: DigestContribution;
+  categories?: readonly IncidentCategory[];
+  /** First combined email: explain once that two emails became one. */
+  firstCombined?: boolean;
+  /** Stops both lists; this is the message's List-Unsubscribe too. */
+  unsubscribeAllUrl: string;
+  unsubscribeMondayUrl: string;
+  unsubscribeEventsUrl: string;
+}
+
+export function combinedEmailContent(options: CombinedEmailOptions) {
+  const ev = eventsEmailContent({
+    picks: options.picks, fallback: options.fallback, interests: options.interests, area: options.area,
+    unsubscribeUrl: options.unsubscribeEventsUrl, branding: options.branding, at: options.summary.until,
+  });
+  const facts = {
+    summary: options.summary,
+    going: options.picks.going.map((g) => g.title),
+    listed: ev.list.length,
+    fallback: ev.mode === 'fallback',
+  };
+  const eventsLead = ev.mode === 'fallback' ? COMBINED_FALLBACK : ev.mode === 'going-only' ? COMBINED_GOING_ONLY : ev.lead;
+  return {
+    ...ev,
+    eventsLead,
+    subject: combinedSubject(facts),
+    subline: combinedSubline(facts),
+    lead: combinedLead(facts),
+  };
+}
+
+/** Three numbers across the top: reported, picked, going. Stacks on a phone. */
+function glance(options: CombinedEmailOptions, listed: number, fallback: boolean): string {
+  const { summary, picks } = options;
+  const delta = summary.widenedToCity || (summary.previousTotal === 0 && summary.total === 0) ? ''
+    : summary.delta === 0 ? 'Same as last week'
+      : `${summary.delta > 0 ? '+' : '&minus;'}${Math.abs(summary.delta)} vs last week`;
+  const next = picks.going[0];
+  const tiles = [
+    {
+      accent: summary.quiet ? C.bow : TONE.crime,
+      n: summary.total,
+      label: summary.scope === 'city' ? 'Reported in Calgary' : 'Reported nearby',
+      sub: summary.quiet ? 'A quiet week' : delta || 'Last seven days',
+    },
+    {
+      accent: C.gold,
+      n: listed,
+      label: fallback ? 'On this week' : 'Picks for you',
+      sub: 'Next seven days',
+    },
+    {
+      accent: C.bow,
+      n: picks.going.length,
+      label: 'You’re going',
+      sub: next ? `Next: ${escapeHtml(pickWhen(next.start).split(' · ')[0])}` : 'Tap “I’m going” to add',
+    },
+  ];
+  const cells = tiles.map((t, i) => `
+      <td width="33%" class="cw-tile" style="width:33.33%;vertical-align:top;padding:0 ${i === 2 ? 0 : 5}px 0 ${i === 0 ? 0 : 5}px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+               class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+          <tr><td style="height:3px;background:${t.accent};font-size:0;line-height:0;border-radius:3px 3px 0 0;">&nbsp;</td></tr>
+          <tr><td class="cw-tile-in" style="padding:13px 14px 14px;">
+            <div class="cw-ink cw-tile-n" style="font:800 34px/1 ${DISPLAY};color:${t.n ? C.ink : C.soft};letter-spacing:-1px;">${t.n}</div>
+            <div class="cw-tile-l" style="font:700 10.5px/1.3 ${MONO};color:${t.accent};letter-spacing:.8px;text-transform:uppercase;padding-top:9px;">${t.label}</div>
+            <div class="cw-soft cw-tile-s" style="font:400 11.5px/1.4 ${BODY};color:${C.soft};padding-top:4px;">${t.sub}</div>
+          </td></tr>
+        </table>
+      </td>`).join('');
+  return `
+  <tr><td style="padding:24px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-glance">
+      <tr>${cells}</tr>
+    </table>
+  </td></tr>`;
+}
+
+/** A chapter opener: numbered disc, title, and a mono line saying what it covers. */
+function chapter(n: number, title: string, meta: string): string {
+  return `
+  <tr><td style="padding:40px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      <tr>
+        <td width="46" style="width:46px;vertical-align:middle;">
+          <div style="width:34px;height:34px;border-radius:50%;background:${C.gold};text-align:center;
+                      font:700 13px/34px ${MONO};color:${C.buttonInk};">0${n}</div>
+        </td>
+        <td style="vertical-align:middle;">
+          <div class="cw-ink" style="font:800 23px/1.1 ${DISPLAY};color:${C.ink};letter-spacing:-0.4px;">${escapeHtml(title)}</div>
+          <div class="cw-soft" style="font:500 11px/1 ${MONO};color:${C.soft};letter-spacing:.8px;text-transform:uppercase;padding-top:7px;">${escapeHtml(meta)}</div>
+        </td>
+      </tr>
+    </table>
+    <div class="cw-hair" style="height:1px;background:${C.line};font-size:0;line-height:0;margin-top:16px;">&nbsp;</div>
+  </td></tr>`;
+}
+
+function combinedFooter(options: CombinedEmailOptions): string {
+  const { branding } = options;
+  const link = (href: string, label: string, strong = false) =>
+    `<a href="${escapeHtml(href)}" style="color:${C.bow};${strong ? 'font-weight:700;text-decoration:underline;' : 'text-decoration:none;'}">${label}</a>`;
+  const dot = `<span style="color:${C.soft};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`;
+  return `
+  <tr><td style="padding:16px 36px 30px;">
+    ${p(`${escapeHtml(COMBINED_REASON)} Change what you get any time on ${link(`${branding.origin}/plans`, 'Your CalgaryWatch')}.`, { top: 4, color: C.soft, size: 12 })}
+    ${p(`<strong style="color:${C.body};">${escapeHtml(branding.senderName)}</strong><br>`
+      + `${escapeHtml(branding.mailingAddress)}<br>`
+      + link(`mailto:${branding.supportEmail}`, escapeHtml(branding.supportEmail)), { top: 15, color: C.soft, size: 12 })}
+    ${p(link(options.unsubscribeAllUrl, 'Unsubscribe from both', true)
+      + dot + link(options.unsubscribeMondayUrl, 'Only stop safety reports')
+      + dot + link(options.unsubscribeEventsUrl, 'Only stop event picks')
+      + dot + link(`${branding.origin}/privacy`, 'Privacy'), { top: 15, color: C.soft, size: 12 })}
+  </td></tr>`;
+}
+
+export function renderCombinedHtml(options: CombinedEmailOptions): string {
+  const { summary, picks, branding } = options;
+  assertBrandingComplete(branding);
+  const { origin } = branding;
+  const c = combinedEmailContent(options);
+  const contribution = contributionAppliesToScope(options.contribution, summary.scope) ? options.contribution : undefined;
+  const where = summary.scope === 'city' ? 'Across Calgary' : displayAreaName(summary.areaName);
+  return shell({
+    title: c.subject,
+    preheader: contribution?.preheader?.trim() || c.lead,
+    inner: `
+    ${masthead(dateRange(summary), 'Your week')}
+    ${contributionBlock(contribution)}
+    <tr><td style="padding:26px 36px 0;">
+      ${salutation(firstName(options.displayName), summary.until, c.subline)}
+      ${p(escapeHtml(c.lead), { top: 14 })}
+      ${options.firstCombined ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-left:3px solid ${C.gold};border-radius:3px;margin-top:16px;"><tr><td style="padding:13px 16px;"><div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">${escapeHtml(COMBINED_HELLO)}</div></td></tr></table>` : ''}
+    </td></tr>
+    ${glance(options, c.list.length, c.mode === 'fallback')}
+
+    ${chapter(1, 'Near home', `Last 7 days · ${where}`)}
+    <tr><td style="padding:16px 36px 0;">
+      ${p(escapeHtml(leadParagraph(summary)), { top: 0 })}
+      ${categoryLine(options.categories, origin)}
+      ${locationPromptBlock(summary)}
+    </td></tr>
+    ${weekBand(summary)}
+    ${topAreasBlock(summary)}
+    ${reportList(summary, origin)}
+    ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+
+    ${chapter(2, 'Out & about', 'Next 7 days · Picked for you')}
+    <tr><td style="padding:16px 36px 0;">
+      ${p(escapeHtml(c.eventsLead), { top: 0 })}
+    </td></tr>
+    ${eventSection('You’re going', picks.going, origin)}
+    ${eventSection(c.listTitle, c.list, origin)}
+    ${c.mode === 'fallback' ? `<tr><td style="padding:0 36px;">${p(`<a href="${escapeHtml(origin)}/events" style="color:${C.bow};font-weight:700;text-decoration:none;">Everything on in Calgary&nbsp;→</a>`, { top: 6 })}</td></tr>` : ''}
+    ${plansButton(origin, 'Monday')}
+
+    ${skylineRule()}
+    ${combinedFooter(options)}`,
+  });
+}
+
+export function renderCombinedText(options: CombinedEmailOptions): string {
+  const { summary, picks, branding } = options;
+  assertBrandingComplete(branding);
+  const c = combinedEmailContent(options);
+  const delta = deltaSentence(summary);
+  const rail = (item: ScoredIncident) => (item.distanceM !== null ? formatDigestDistance(item.distanceM) : dayShort(item.incident.timestamp)).padEnd(9);
+  const event = (i: PickItem) => [
+    `${pickWhen(i.start)}  ${i.title}`,
+    `   ${[i.venue || i.neighbourhood, pickDistance(i.distanceM), i.free ? 'Free' : null].filter(Boolean).join(' · ')}`,
+    `   ${branding.origin}${i.path}`,
+    '',
+  ];
+  const lines = [
+    'CALGARYWATCH — YOUR WEEK',
+    dateRange(summary),
+    '',
+    `${greeting(summary.until)}, ${firstName(options.displayName)}.`,
+    c.subline,
+    '',
+    wrap(c.lead),
+    '',
+    ...(options.firstCombined ? [wrap(COMBINED_HELLO), ''] : []),
+    `${summary.total} reported ${summary.scope === 'city' ? 'in Calgary' : 'nearby'}  ·  ${c.list.length} ${c.mode === 'fallback' ? 'on this week' : 'picks for you'}  ·  ${picks.going.length} going`,
+    '',
+    '01  NEAR HOME',
+    '--------------------------------------------------------------',
+    wrap(leadParagraph(summary)),
+  ];
+  if (delta && !summary.quiet) lines.push(delta);
+  const topics = categoriesNote((options.categories ?? []).map((cat) => DIGEST_CATEGORY_LABEL[cat]).filter(Boolean));
+  if (topics) lines.push(topics);
+  lines.push('');
+  if (summary.highlights.length) {
+    lines.push(listHeading(summary).toUpperCase(), '');
+    for (const item of summary.highlights) lines.push(`${rail(item)}${item.incident.title}`, `${' '.repeat(9)}${itemSubtitle(item)}`, '');
+  }
+  lines.push(`See it on the map: ${branding.origin}/map`, '', '02  OUT & ABOUT', '--------------------------------------------------------------', wrap(c.eventsLead), '');
+  if (picks.going.length) lines.push('YOU’RE GOING', '', ...picks.going.flatMap(event));
+  if (c.list.length) lines.push(c.listTitle.toUpperCase(), '', ...c.list.flatMap(event));
+  if (c.mode === 'fallback') lines.push(`Everything on in Calgary: ${branding.origin}/events`, '');
+  lines.push(
+    `See all your plans: ${branding.origin}/plans`,
+    '',
+    '--------------------------------------------------------------',
+    wrap(COMBINED_REASON),
+    `Change what you get: ${branding.origin}/plans`,
+    '',
+    branding.senderName,
+    branding.mailingAddress,
+    branding.supportEmail,
+    '',
+    `Unsubscribe from both: ${options.unsubscribeAllUrl}`,
+    `Only stop safety reports: ${options.unsubscribeMondayUrl}`,
+    `Only stop event picks: ${options.unsubscribeEventsUrl}`,
     `Privacy: ${branding.origin}/privacy`,
   );
   return lines.join('\n');

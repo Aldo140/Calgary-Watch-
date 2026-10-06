@@ -17,7 +17,9 @@ const CASES = [
   { file: 'thursday-going-only.html', label: 'Reminder only', who: 'Nothing new, but going to something', note: 'Just the reminder.' },
   { file: 'thursday-no-area.html', label: 'No home area', who: 'Picks without a neighbourhood', note: 'No distances, and a one-line prompt to add their area.' },
   { file: 'digest.html', label: 'Monday, Monday-only', who: 'Monday reader not on Thursday', note: 'The Monday brief with one Thursday offer at the bottom.' },
-  { file: 'digest-both.html', label: 'Monday, both lists', who: 'Reader on both lists', note: 'The Monday brief with no offers.' },
+  { file: 'combined-first.html', label: 'Both lists: your week', who: 'Reader on both lists', note: 'One Monday email: week at a glance, 01 Near home, 02 Out & about. Thursday skips them that week. First one explains the merge.' },
+  { file: 'combined-quiet-fallback.html', label: 'Both, quiet + no match', who: 'Quiet week, interests with no listings', note: '“Quiet streets. Plenty on.” then what else is on.' },
+  { file: 'combined-going-only.html', label: 'Both, reminder only', who: 'No new picks, but going to something', note: 'Safety chapter plus the reminder.' },
 ] as const;
 
 /**
@@ -87,7 +89,7 @@ export function ThursdayPicksPanel({ mondayProfiles }: { mondayProfiles: UserPro
       <Panel title="Who gets which email" subtitle="Every account falls into exactly one of these. Each email offers the other list only to people not on it.">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: T.line }}>
           {[
-            { label: 'Both emails', value: thursday ? m.both : undefined, note: 'Monday + Thursday, no offers', tone: 'ok' as const },
+            { label: 'Both emails', value: thursday ? m.both : undefined, note: 'One combined Monday email', tone: 'ok' as const },
             { label: 'Monday only', value: thursday ? m.mondayOnly : undefined, note: 'Sees the Thursday offer', tone: 'signal' as const },
             { label: 'Thursday only', value: thursday ? m.thursdayOnly : undefined, note: 'Sees the Monday offer', tone: 'signal' as const },
             { label: 'Neither', value: m.neither, note: 'Account, no email', tone: 'neutral' as const },

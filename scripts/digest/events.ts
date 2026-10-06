@@ -22,23 +22,17 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import { randomBytes } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
-import { digestWeekKey, isValidUnsubToken } from '../../src/lib/digest.js';
-import { buildEventPicks, normalizeInterests, neighbourhoodPoint, type Point } from '../../src/lib/eventPicks.js';
-import { eventsConsentRefusal, eventsEmailMode, eventsSendId, eventsUnsubscribeUrl, type EventsDigestRecipient } from '../../src/lib/eventsDigest.js';
-import { createDiscoveryRepository } from '../../src/lib/discovery.js';
-import { resolveHomeLocation } from '../../src/hooks/useHomeLocation.js';
-import type { DiscoveryEntity, MarketOccurrence } from '../../src/types/discovery.js';
+import { digestSendId, digestWeekKey, isValidUnsubToken } from '../../src/lib/digest.js';
+import { normalizeInterests, type Point } from '../../src/lib/eventPicks.js';
+import { eventsConsentRefusal, eventsSendId, eventsUnsubscribeUrl, type EventsDigestRecipient } from '../../src/lib/eventsDigest.js';
+import { loadInventory, processEventsUnsubscribes, readerPicks } from './eventsShared.js';
 import { assertBrandingComplete, eventsEmailContent, renderEventsHtml, renderEventsText, type DigestBranding } from './render.js';
 import { letterheadImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
 
 const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
 const SENDS = 'events_digest_sends';
-const UNSUBS = 'events_digest_unsubscribes';
-const RSVPS = 'event_rsvps';
 /** Thursday to the Sunday after next: this weekend and the next one's Friday. */
 const WINDOW_DAYS = 10;
 const MAX_PICKS = 8;
@@ -48,46 +42,6 @@ function initFirebase(): Firestore {
   if (!json) throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set.');
   if (!getApps().length) initializeApp({ credential: cert(JSON.parse(json)) });
   return getFirestore();
-}
-
-/** The same published inventory the site was built with. */
-function loadInventory() {
-  const file = join(process.cwd(), 'src/generated/discovery-index.json');
-  const raw = JSON.parse(readFileSync(file, 'utf8')) as { generatedAt?: string; entities: DiscoveryEntity[]; occurrences: MarketOccurrence[] };
-  const repo = createDiscoveryRepository(raw.entities, raw.occurrences, false);
-  return { entities: repo.list(), occurrences: repo.occurrences(), generatedAt: raw.generatedAt };
-}
-
-/** Opt-outs filed from an email link. Stamped, never deleted (CASL burden of proof). */
-async function processUnsubscribes(db: Firestore): Promise<number> {
-  const pending = await db.collection(UNSUBS).where('processedAt', '==', null).get();
-  let honoured = 0;
-  for (const request of pending.docs) {
-    const uid = request.id;
-    try {
-      const requestedAt = typeof request.data().requestedAt === 'number' ? request.data().requestedAt as number : 0;
-      const profileRef = db.collection('users').doc(uid);
-      const profile = (await profileRef.get()).data() ?? {};
-      const consentAt = profile.eventsDigestOptIn === true && typeof profile.eventsDigestOptInAt === 'number' ? profile.eventsDigestOptInAt as number : 0;
-      if (consentAt > requestedAt) {
-        await request.ref.set({ processedAt: Date.now(), outcome: 'superseded-by-new-consent' }, { merge: true });
-        continue;
-      }
-      await profileRef.set({
-        eventsDigestOptIn: false,
-        eventsDigestOptInAt: null,
-        eventsDigestUnsubscribedAt: Date.now(),
-        eventsDigestUnsubscribeSource: 'email-link',
-      }, { merge: true });
-      await request.ref.set({ processedAt: Date.now(), outcome: 'unsubscribed' }, { merge: true });
-      honoured += 1;
-      console.log(`[events] unsubscribed ${uid}`);
-    } catch (error) {
-      console.error(`[events] FAILED to honour unsubscribe for ${uid}:`, error);
-      process.exitCode = 1;
-    }
-  }
-  return honoured;
 }
 
 type Loaded = EventsDigestRecipient & { _address: string; _mondayOn: boolean };
@@ -154,7 +108,7 @@ async function run() {
   console.log(`[events] inventory ${inventory.generatedAt ?? 'unknown'}: ${inventory.entities.length} published listings`);
 
   const db = initFirebase();
-  const honoured = await processUnsubscribes(db);
+  const honoured = await processEventsUnsubscribes(db, 'events');
   if (honoured) console.log(`[events] honoured ${honoured} unsubscribe(s)`);
 
   const recipients = (await loadRecipients(db))
@@ -181,6 +135,17 @@ async function run() {
   let sent = 0; let skipped = 0; let failed = 0;
 
   for (const profile of planned) {
+    // On both lists? Monday's combined email already carried this week's
+    // picks. One email covering both beats two that overlap. A redirected
+    // test still sends, so the Thursday format can always be proofed.
+    if (profile._mondayOn && !sender.testRecipient) {
+      const monday = (await db.collection('digest_sends').doc(digestSendId(profile.uid, weekKey)).get()).data();
+      if (monday?.status === 'sent' && monday.kind === 'combined') {
+        console.log(`[events] skip ${profile.uid}: picks went out in Monday's combined email`);
+        skipped += 1;
+        continue;
+      }
+    }
     const claimKey = sender.testRecipient ? `${weekKey}_test_${process.env.GITHUB_RUN_ID ?? randomBytes(4).toString('hex')}` : weekKey;
     const claim = db.collection(SENDS).doc(eventsSendId(profile.uid, claimKey));
     try {
@@ -192,34 +157,11 @@ async function run() {
     }
 
     try {
-      const area = (profile.neighborhood || profile.inferredNeighborhood || '').trim();
-      let home: Point | null = null;
-      const address = profile._address.trim();
-      if (address) {
-        if (!geocode.has(address)) geocode.set(address, await resolveHomeLocation(address));
-        home = geocode.get(address) ?? null;
-      }
-      home ??= neighbourhoodPoint(area);
-
-      const rsvps = await db.collection(RSVPS).where('uid', '==', profile.uid).get();
-      const goingIds = new Set(rsvps.docs.map((d) => String(d.data().eventId)));
-
-      const picks = buildEventPicks({
-        entities: inventory.entities,
-        occurrences: inventory.occurrences,
-        interests: profile.eventInterests,
-        home,
-        homeArea: area,
-        goingIds,
-        now,
-        days: WINDOW_DAYS,
-        limit: MAX_PICKS,
+      const { picks, fallback, mode, area } = await readerPicks({
+        db, inventory, uid: profile.uid, interests: profile.eventInterests,
+        neighbourhood: profile.neighborhood || profile.inferredNeighborhood || '', address: profile._address,
+        now, days: WINDOW_DAYS, limit: MAX_PICKS, geocode,
       });
-      // Nothing matched their interests: a short "what else is on" instead of an empty email.
-      const fallback = picks.picks.length ? null : buildEventPicks({
-        entities: inventory.entities, occurrences: inventory.occurrences, interests: [], home, homeArea: area, goingIds, now, days: WINDOW_DAYS, limit: 5,
-      });
-      const mode = eventsEmailMode(picks, fallback);
       if (mode === 'skip') {
         // No email is better than an empty one. Release the week so a re-run can try again.
         await claim.delete().catch(() => {});
@@ -231,8 +173,7 @@ async function run() {
       const token = await ensureUnsubToken(db, profile);
       const unsubscribeUrl = eventsUnsubscribeUrl(origin, profile.uid, token);
       const shared = {
-        // "home" when only a street address resolved: distances work, no prompt to add an area.
-        picks, fallback, interests: profile.eventInterests, area: area || (home ? 'home' : ''), displayName: profile.displayName, unsubscribeUrl, branding, at: now.getTime(),
+        picks, fallback, interests: profile.eventInterests, area, displayName: profile.displayName, unsubscribeUrl, branding, at: now.getTime(),
         first: !profile.eventsWelcomeSentAt,
         offerMonday: !profile._mondayOn,
       };

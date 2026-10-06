@@ -60,7 +60,10 @@ import {
 import { buildDigestAudienceForecast, normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import { aggregateFeedback, type IncidentFeedback } from '../../src/lib/feedback.js';
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
-import { assertBrandingComplete, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
+import { assertBrandingComplete, combinedEmailContent, renderCombinedHtml, renderCombinedText, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
+import { normalizeInterests, type EventInterestId, type Point } from '../../src/lib/eventPicks.js';
+import { allUnsubscribeUrl, eventsConsentRefusal, eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
+import { loadInventory, processEventsUnsubscribes, readerPicks, type Inventory } from './eventsShared.js';
 import { WELCOME } from './copy.js';
 import { letterheadImages, welcomeImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
@@ -144,7 +147,20 @@ async function processUnsubscribes(db: Firestore): Promise<number> {
 
 // ── Recipients ──────────────────────────────────────────────────────────────
 
-async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
+type Loaded = DigestRecipient & {
+  _address: string;
+  _eventsOn: boolean;
+  _eventsConsentOk: boolean;
+  _interests: EventInterestId[];
+  _combinedIntroSentAt: number | null;
+  _eventsWelcomeSentAt: number | null;
+};
+
+/** Event picks inside the combined email cover Monday to Sunday. */
+const COMBINED_DAYS = 7;
+const COMBINED_PICKS = 5;
+
+async function loadRecipients(db: Firestore): Promise<Loaded[]> {
   const onlyUid = process.env.DIGEST_ONLY_UID?.trim();
   const onlyEmail = process.env.DIGEST_ONLY_EMAIL?.trim().toLowerCase();
   if (onlyUid && onlyEmail) throw new Error('Set DIGEST_ONLY_UID or DIGEST_ONLY_EMAIL, not both.');
@@ -175,9 +191,20 @@ async function loadRecipients(db: Firestore): Promise<DigestRecipient[]> {
       digestWelcomeSentAt: typeof d.digestWelcomeSentAt === 'number' ? d.digestWelcomeSentAt : null,
       // Kept out of DigestRecipient so it cannot reach a template by accident.
       _address: typeof d.address === 'string' ? d.address : '',
-      // Already on the Thursday list? Then the Monday email doesn't offer it.
+      // Already on the Thursday list? Then the Monday email doesn't offer it,
+      // and (with valid consent) it becomes the combined "your week" email.
       _eventsOn: d.eventsDigestOptIn === true,
-    } as DigestRecipient & { _address: string; _eventsOn: boolean };
+      _eventsConsentOk: eventsConsentRefusal({
+        uid: doc.id,
+        email: typeof d.email === 'string' ? d.email : undefined,
+        eventsDigestOptIn: d.eventsDigestOptIn === true,
+        eventsDigestOptInAt: typeof d.eventsDigestOptInAt === 'number' ? d.eventsDigestOptInAt : null,
+        eventInterests: [],
+      }) === null,
+      _interests: normalizeInterests(d.eventInterests),
+      _combinedIntroSentAt: typeof d.combinedIntroSentAt === 'number' ? d.combinedIntroSentAt : null,
+      _eventsWelcomeSentAt: typeof d.eventsWelcomeSentAt === 'number' ? d.eventsWelcomeSentAt : null,
+    } as Loaded;
   });
 }
 
@@ -306,6 +333,10 @@ async function run(): Promise<void> {
 
   const honoured = await processUnsubscribes(db);
   if (honoured > 0) console.log(`[digest] honoured ${honoured} unsubscribe(s)`);
+  // Event-picks opt-outs too: the combined email carries picks, so somebody
+  // who left that list since Thursday must not see them today.
+  const honouredEvents = await processEventsUnsubscribes(db, 'digest');
+  if (honouredEvents > 0) console.log(`[digest] honoured ${honouredEvents} event-picks unsubscribe(s)`);
 
   const loadedRecipients = await loadRecipients(db);
   console.log(`[digest] ${loadedRecipients.length} profile(s) flagged for the digest`);
@@ -326,7 +357,7 @@ async function run(): Promise<void> {
   const recipients = forecast.rows
     .filter((row) => row.status === 'scheduled')
     .map((row) => byUid.get(row.uid))
-    .filter((profile): profile is DigestRecipient => !!profile);
+    .filter((profile): profile is Loaded => !!profile);
   const held = forecast.rows.length - recipients.length;
   console.log(`[digest] frozen plan — ${recipients.length} delivery attempt(s), ${held} held, cap ${forecast.limit}`);
   if (recipients.length === 0) return;
@@ -340,6 +371,18 @@ async function run(): Promise<void> {
 
   // Addresses repeat across a household; resolve each one once per run.
   const geocodeCache = new Map<string, HomeLocation | null>();
+
+  // The event inventory, only if somebody on this run gets the combined email.
+  let inventory: Inventory | null = null;
+  if (recipients.some((r) => r._eventsOn && r._eventsConsentOk)) {
+    try {
+      inventory = loadInventory();
+      console.log(`[digest] event inventory ${inventory.generatedAt ?? 'unknown'}: ${inventory.entities.length} listings`);
+    } catch (error) {
+      // No inventory means no picks: everybody gets the plain Monday brief.
+      console.error('[digest] could not load the event inventory; sending Monday briefs only:', error);
+    }
+  }
 
   let sent = 0;
   let skipped = 0;
@@ -394,7 +437,7 @@ async function run(): Promise<void> {
     }
 
     try {
-      const address = ((profile as DigestRecipient & { _address?: string })._address ?? '').trim();
+      const address = profile._address.trim();
       let home: HomeLocation | null = null;
       if (address) {
         if (!geocodeCache.has(address)) {
@@ -413,6 +456,84 @@ async function run(): Promise<void> {
       // counting ledger rows, because the flag survives a ledger cleanup and
       // costs no extra read.
       const isFirstEmail = digestDeliveryKind(profile) === 'welcome';
+
+      // On both lists (and past the welcome)? Then this is the combined
+      // "your week" email: both halves in one, and Thursday skips them.
+      // Nothing on at all this week falls back to the plain Monday brief.
+      const events = !isFirstEmail && inventory && profile._eventsOn && profile._eventsConsentOk
+        ? await readerPicks({
+          db, inventory, uid: profile.uid, interests: profile._interests,
+          neighbourhood: profile.neighborhood || profile.inferredNeighborhood || '', address: profile._address,
+          now: new Date(now), days: COMBINED_DAYS, limit: COMBINED_PICKS, fallbackLimit: 4,
+          geocode: geocodeCache as Map<string, Point | null>,
+        }).catch((error) => {
+          console.error(`[digest] picks failed for ${profile.uid}; sending the Monday brief:`, error);
+          return null;
+        })
+        : null;
+
+      if (events && events.mode !== 'skip') {
+        const combined = {
+          summary,
+          picks: events.picks,
+          fallback: events.fallback,
+          interests: profile._interests,
+          area: events.area,
+          displayName: profile.displayName,
+          branding,
+          contribution,
+          categories: profile.digestCategories,
+          firstCombined: profile._combinedIntroSentAt == null,
+          unsubscribeAllUrl: allUnsubscribeUrl(origin, profile.uid, token),
+          unsubscribeMondayUrl: unsubUrl,
+          unsubscribeEventsUrl: eventsUnsubscribeUrl(origin, profile.uid, token),
+        };
+        const content = combinedEmailContent(combined);
+        const result = await sendDigestEmail({
+          to: profile.email!.trim(),
+          subject: content.subject,
+          html: renderCombinedHtml(combined),
+          text: renderCombinedText(combined),
+          unsubscribeUrl: combined.unsubscribeAllUrl,
+          replyTo: tokenizedReplyAddress(sender.inboundAddress, replyToken) ?? sender.replyTo,
+          inline: letterheadImages(),
+        }, sender);
+        const stats = `${summary.total} report(s) ${summary.ringLabel}, ${content.mode} picks: ${content.list.length} listed, ${events.picks.going.length} going`;
+        if (result.skipped) {
+          await claim.delete().catch(() => {});
+          skipped += 1;
+          console.log(`[digest] ${result.blocked ? 'blocked' : 'dry run'} ${profile.uid} — combined, ${stats}; claim released`);
+        } else if (result.ok && sender.testRecipient) {
+          sent += 1;
+          await db.collection(REPLY_ROUTES).doc(replyToken).set({
+            uid: profile.uid, weekKey, kind: 'combined', subject: content.subject, test: true,
+            createdAt: Date.now(), expiresAt: Date.now() + 180 * 24 * 60 * 60 * 1000,
+          });
+          await claim.delete().catch(() => {});
+          console.log(`[digest] test delivered for ${profile.uid} → ${sender.testRecipient} — combined, ${stats}; claim released`);
+        } else if (result.ok) {
+          sent += 1;
+          await claim.set({
+            status: 'sent', sentAt: Date.now(), providerId: result.id ?? null, subject: content.subject,
+            kind: 'combined', reportCount: summary.total, ring: summary.ringLabel,
+            eventsMode: content.mode, picks: content.list.length, going: events.picks.going.length,
+          }, { merge: true });
+          // Thursday reads `kind: 'combined'` on this row and skips them this week.
+          const stamp = Date.now();
+          await db.collection('users').doc(profile.uid).set({
+            ...(profile._combinedIntroSentAt == null ? { combinedIntroSentAt: stamp } : {}),
+            ...(profile._eventsWelcomeSentAt == null ? { eventsWelcomeSentAt: stamp } : {}),
+          }, { merge: true });
+          console.log(`[digest] sent ${profile.uid} — combined, ${stats}`);
+        } else {
+          failed += 1;
+          await claim.delete().catch(() => {});
+          console.error(`[digest] FAILED ${profile.uid}: ${result.error}`);
+        }
+        await sleep(sender.throttleMs);
+        continue;
+      }
+
       const render = isFirstEmail ? renderWelcomeHtml : renderDigestHtml;
       const renderText = isFirstEmail ? renderWelcomeText : renderDigestText;
       const shared = {
@@ -421,7 +542,7 @@ async function run(): Promise<void> {
         unsubscribeUrl: unsubUrl,
         branding,
         contribution: isFirstEmail ? undefined : contribution,
-        offerThursday: !(profile as DigestRecipient & { _eventsOn?: boolean })._eventsOn,
+        offerThursday: !profile._eventsOn,
         categories: isFirstEmail ? undefined : profile.digestCategories,
       };
 

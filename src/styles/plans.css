@@ -321,3 +321,15 @@
   .cw-submit-steps { grid-template-columns: minmax(0, 1fr); }
   .cw-submit-done { flex-direction: column; }
 }
+
+/* One-tap Thursday offer on event pages, and the after-save next steps. */
+.cw-nudge { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 16px; padding: 14px 16px; border-radius: 18px; background: var(--pl-sun-soft); border: 1.5px solid #ecd98a; }
+.cw-nudge > svg { flex: none; color: var(--cw-live); }
+.cw-nudge p { flex: 1 1 240px; margin: 0; font-size: 14.5px; line-height: 1.45; }
+.cw-site .cw-nudge button, .cw-site .cw-nudge > a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--cw-live); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; }
+.cw-site .cw-nudge p a { color: var(--cw-brand); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.cw-nudge[data-done='true'] { background: #e3f4ef; border-color: #a9d9c8; }
+.pl-next { display: grid; gap: 10px; margin-top: 18px; max-width: 720px; }
+.pl-next-item { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 16px; border-radius: 18px; background: #fff; border: 1.5px solid var(--cw-border); }
+.pl-next-item p { flex: 1 1 240px; margin: 0; font-size: 14.5px; line-height: 1.45; }
+.cw-site .pl-next-item button, .cw-site .pl-next-item a.pl-next-go { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--cw-text); background: var(--cw-bg); color: var(--cw-text); font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; }

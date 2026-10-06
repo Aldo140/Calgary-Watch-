@@ -1,16 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowUpRight, Check, MapPin, Pencil } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { BadgeMark } from '../components/plans/BadgeMark';
 import { GoingButton } from '../components/plans/GoingButton';
+import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { computeBadges, orderBadges } from '../lib/badges';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
-import { buildEventPicks, EVENT_INTERESTS, interestsFor, pickDistance, pickWhen, type EventInterestId, type PickItem } from '../lib/eventPicks';
-import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
+import { buildEventPicks, normalizeInterests, EVENT_INTERESTS, interestsFor, pickDistance, pickWhen, type EventInterestId, type PickItem } from '../lib/eventPicks';
+import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
 import { resolveHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
 import '../styles/plans.css';
@@ -71,7 +72,7 @@ export default function PlansPage() {
   const mine = useMyGoing(user?.uid);
   const communities = useCommunityNames();
   // A first-time visitor starts with the email(s) the link they followed was about, visibly ticked.
-  const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params) }));
+  const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params), interests: normalizeInterests((params.get('interests') ?? '').split(',')) }));
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -195,6 +196,7 @@ export default function PlansPage() {
             </ul>
           ) : null}
           {savedAt ? <p className="pl-saved" role="status"><Check size={16} aria-hidden="true" /> Saved. {savedSummary(profile)}</p> : null}
+          {user && profile && hasPlans && !showForm ? <NextSteps profile={profile} goingCount={mine.ids.size} onAdd={async (which) => { await setEmailOptIn(user, profile, which === 'monday' ? { weekly: true } : { events: true }); setSavedAt(Date.now()); celebrateBadge(which === 'monday' ? 'monday-reader' : 'on-the-list'); }} /> : null}
         </header>
 
         <div className="cw-wrap pl-grid">
@@ -348,6 +350,23 @@ export default function PlansPage() {
       </div>
     </SiteLayout>
   );
+}
+
+/**
+ * After setup, the one or two things most worth doing next, in order: the
+ * email they don't have yet (one tap), then making a first plan. Nothing
+ * shows once both are done.
+ */
+function NextSteps({ profile, goingCount, onAdd }: { profile: PlansProfile; goingCount: number; onAdd: (which: 'monday' | 'thursday') => Promise<void> }) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const items: React.ReactNode[] = [];
+  const add = (which: 'monday' | 'thursday', text: React.ReactNode, label: string) => items.push(
+    <div className="pl-next-item" key={which}><p>{text}</p><button type="button" disabled={busy === which} onClick={async () => { setBusy(which); try { await onAdd(which); } finally { setBusy(null); } }}>{busy === which ? 'Adding…' : label}</button></div>,
+  );
+  if (!profile.weeklyDigestOptIn && (profile.neighborhood || profile.inferredNeighborhood)) add('monday', <><strong>Add the Monday email?</strong> What happened near {profile.neighborhood || profile.inferredNeighborhood} this week, from police news, 311 and neighbours.</>, 'Add Monday');
+  if (!profile.eventsDigestOptIn && profile.eventInterests.length) add('thursday', <><strong>Add Thursday picks?</strong> Weekend plans for what you’re into, near home first.</>, 'Add Thursday');
+  if (!goingCount) items.push(<div className="pl-next-item" key="going"><p><strong>Make your first plan.</strong> Tap “I’m going” on anything below to earn your first badge and get a reminder.</p><a className="pl-next-go" href="#pl-picks-title">See picks</a></div>);
+  return items.length ? <div className="pl-next" aria-label="Next steps">{items.slice(0, 2)}</div> : null;
 }
 
 function savedSummary(profile: PlansProfile | null): string {

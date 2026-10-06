@@ -18,7 +18,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { collection, doc, getDoc, getDocs, increment, limit, onSnapshot, query, setDoc, where, writeBatch } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
 import { db } from '../firebase';
-import type { EventInterestId } from './eventPicks';
+import { normalizeInterests, type EventInterestId } from './eventPicks';
 import { emailConsentPatch, readPlansProfile, type PlansProfile } from './plansProfile';
 
 export { homeAreaOf, readPlansProfile, type PlansProfile } from './plansProfile';
@@ -163,4 +163,34 @@ export async function readMySubmissionCount(uid: string): Promise<number | undef
   } catch {
     return undefined;
   }
+}
+
+/**
+ * One-click opt-in from wherever the offer appears (an event page, the
+ * after-save card). Only the named list changes; the other keeps its current
+ * state and consent date. Interests the reader came in with are added to,
+ * never replaced.
+ */
+export async function setEmailOptIn(
+  user: User,
+  existing: PlansProfile | null,
+  change: { weekly?: boolean; events?: boolean; addInterests?: EventInterestId[] },
+): Promise<void> {
+  if (!db) throw new Error('Sign-in is unavailable right now.');
+  const now = Date.now();
+  const interests = change.addInterests?.length
+    ? normalizeInterests([...(existing?.eventInterests ?? []), ...change.addInterests])
+    : undefined;
+  await setDoc(doc(db, 'users', user.uid), {
+    uid: user.uid,
+    displayName: user.displayName || existing?.displayName || 'Calgary User',
+    email: user.email || existing?.email || '',
+    photoURL: user.photoURL || existing?.photoURL || '',
+    ...emailConsentPatch(existing, {
+      weekly: change.weekly ?? existing?.weeklyDigestOptIn === true,
+      events: change.events ?? existing?.eventsDigestOptIn === true,
+    }, now),
+    ...(interests ? { eventInterests: interests } : {}),
+    profileUpdatedAt: now,
+  }, { merge: true });
 }

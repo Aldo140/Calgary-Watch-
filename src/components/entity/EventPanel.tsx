@@ -7,6 +7,7 @@ import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { interestLabel, interestsFor, pickWhen, type EventInterestId } from '../../lib/eventPicks';
 import { entityPath } from '../../lib/discovery';
 import { GoingButton } from '../plans/GoingButton';
+import { ThursdayNudge } from '../plans/ThursdayNudge';
 import '../../styles/plans.css';
 
 const day = calgaryDateTimeFormat('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -74,6 +75,7 @@ export function EventPanel({ entity, all, part = 'both' }: { entity: Event; all:
             </div>
           </div>
         )}
+        {!past && !entity.cancelled && !entity.developmentOnly ? <ThursdayNudge interests={interests} /> : null}
         {interests.length ? <p className="cw-evp-tags">{interests.map((i) => <Link key={i} to={`/events?filter=${i === 'outdoors' ? 'outdoor' : i === 'learning' ? 'talks' : i}`}>{interestLabel(i)}</Link>)}</p> : null}
       </section> : null}
 

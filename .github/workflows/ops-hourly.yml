@@ -53,6 +53,7 @@ jobs:
           MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
           MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
           MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
           OPS_PUBLISH_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_now && '1' || '' }}

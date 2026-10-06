@@ -17,6 +17,7 @@ import {
   inSendWindow, isStopRequest, leadIdFor, normalizeEmail, sendBlocker, signature, websiteFor,
 } from '../lib/leads';
 import { inboxSince, outlookConfigured, replyInThread, sendNew } from '../lib/outlook';
+import { resendConfigured, sendViaResend } from '../lib/resend';
 import type { DiscoveryIndex, Entity } from '../lib/posts';
 import { calgaryDate } from '../lib/time';
 
@@ -265,16 +266,28 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   }
 }
 
+// How long the inbox may go unread before sending stops: opt-outs must be seen before we write again.
+const INBOX_STALE_AFTER = 6 * 60 * 60_000;
+
 /** Send approved first emails and follow-ups (within the send window), and approved replies (any time). */
 export async function sendApproved(db: Firestore, now: number, log: Log): Promise<void> {
   if (!outlookConfigured()) { log('Outlook is not connected (MS_TENANT_ID / MS_CLIENT_ID / MS_CLIENT_SECRET); nothing sent.'); return; }
+  const viaResend = cfg.transport === 'resend';
+  if (viaResend) {
+    if (!resendConfigured()) { log('transport is "resend" but RESEND_API_KEY is missing; nothing sent.'); return; }
+    // Replies arrive in Outlook either way; never send while that inbox isn't being read.
+    const checked = (await db.collection(COLLECTIONS.health).doc('outreach_inbox').get()).get('lastCheckedAt') as number | undefined;
+    if (!checked || now - checked > INBOX_STALE_AFTER) { log('Outlook inbox has not synced in 6 hours; nothing sent until replies and opt-outs are being read.'); return; }
+  }
+  const send = (to: string, subject: string, text: string) => viaResend ? sendViaResend(cfg.sender, to, subject, text) : sendNew(to, subject, text);
   const sup = await loadSuppression(db);
 
   // Replies the reviewer approved.
   for (const doc of (await db.collection(COLLECTIONS.leads).where('lastReply.approved', '==', true).get()).docs) {
     const lead = doc.data() as PartnerLead;
     if (!lead.lastReply || lead.lastReply.sent || !lead.conversationId || lead.doNotContact) continue;
-    await replyInThread(lead.conversationId, lead.lastReply.suggestedBody);
+    if (viaResend) await send(lead.lastReply.from, lead.lastReply.suggestedSubject || `Re: ${lead.lastReply.subject}`, lead.lastReply.suggestedBody);
+    else await replyInThread(lead.conversationId, lead.lastReply.suggestedBody);
     await doc.ref.update({ 'lastReply.sent': true, lastContactAt: now, updatedAt: now, history: push(event('reply-sent', 'Approved reply sent.')) });
     log(`reply sent: ${lead.businessName}`);
   }
@@ -292,7 +305,7 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
     try {
       // A follow-up goes out as its own "Re:" message; the first conversation id is kept for matching replies.
       const isFollowUp = Boolean(lead.conversationId);
-      const sent = await sendNew(lead.contactEmail!, lead.draftSubject, lead.draftBody);
+      const sent = await send(lead.contactEmail!, lead.draftSubject, lead.draftBody);
       if (isFollowUp) sent.conversationId = lead.conversationId!;
       await doc.ref.update({
         status: 'contacted', conversationId: sent.conversationId, lastContactAt: now,

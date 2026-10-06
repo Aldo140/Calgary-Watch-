@@ -26,9 +26,11 @@
  * one place is the entire value of the message, and burying it under a greeting
  * would be pretending otherwise.
  *
- * Type is three roles: Georgia for display, a monospace stack for data and
- * eyebrows, Arial for body. Web fonts are not used — Gmail and Outlook drop
- * them, and a fallback that only appears for some readers is not a typeface.
+ * Type follows the site's three roles — Bricolage Grotesque for display, IBM
+ * Plex Mono for data and eyebrows, Inter for body — named first in each stack
+ * for readers who have them installed, falling back to heavy Helvetica/Arial.
+ * No web font is fetched: an external stylesheet would tell a third party
+ * when somebody opened their email, and the tests forbid it.
  *
  * Every message is rendered twice, HTML and text. The text part is not a
  * courtesy: a message with no text/plain alternative scores worse with spam
@@ -62,6 +64,8 @@ import {
   locationPrompt,
   CTA_LABEL_QUIET,
   greeting,
+  categoriesNote,
+  mondaySubline,
   leadParagraph,
   listHeading,
   WELCOME,
@@ -75,7 +79,7 @@ import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
  * here rather than on sandstone, and the darker value fails contrast there.
  */
 /**
- * Set on spruce black, and the artwork is set on the same spruce black.
+ * Set on Live navy, and the artwork is plated on the same navy.
  *
  * The marks carry a baked plate, because CSS behind an image cannot survive a
  * client that repaints backgrounds. That solved the vanishing, but introduced
@@ -91,36 +95,38 @@ import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
  * derived from a luminance curve; cut-out sources removed that constraint, so
  * the direction reverses. The plate moves to the page.
  *
- * PAGE here and PLATE in scripts/prepare-email-art.ts are both #0E1A17,
+ * PAGE here and PLATE in scripts/prepare-email-art.ts are both #06162F,
  * exactly. Not near, not tuned — the same constant, so the seam cannot exist.
  * If one changes, the other must change with it, and a test asserts they still
  * agree.
  *
- * Everything else follows from that: cream marks, sandstone type. Every value
+ * The page is CalgaryWatch Live navy, the ground the site uses for everything
+ * live, with the site's sun yellow for the one action and its cyan for links,
+ * so an email reads as the same product as the page it links to. Every value
  * is checked against the surface it lands on by `npm run digest:contrast`.
  */
 const C = {
-  /** Spruce black. Must equal PLATE in scripts/prepare-email-art.ts. */
-  page: '#0E1A17',
+  /** CalgaryWatch Live navy. Must equal PLATE in scripts/prepare-email-art.ts. */
+  page: '#06162F',
   /** Cards, lifted just enough to read as a surface. */
-  card: '#17251F',
-  /** The distance rail, one step further up. */
-  rail: '#1E312A',
-  line: '#2C443B',
-  edge: '#3A5A4E',
-  /** Headings and anything that must not be missed. */
-  ink: '#F4EEE3',
-  /** Running text. Warm, so a dark page does not read as a terminal. */
-  body: '#DCD3C4',
+  card: '#0E2242',
+  /** The distance/date rail, one step further up. */
+  rail: '#15305A',
+  line: '#22406C',
+  edge: '#2E5287',
+  /** Headings and anything that must not be missed: the site's paper white. */
+  ink: '#F2EFE8',
+  /** Running text: the site's on-navy body colour. */
+  body: '#C9D6E4',
   /** Secondary text. */
-  soft: '#A6B8AE',
-  /** Bow River teal, lifted for the dark ground. */
-  bow: '#5CC3AA',
-  /** Sandstone gold, lifted for the dark ground. */
-  gold: '#E0AC63',
-  /** The one solid button. */
-  button: '#F4EEE3',
-  buttonInk: '#0E1A17',
+  soft: '#9DB2C9',
+  /** Links: the site's cyan, as used on navy. */
+  bow: '#87DCE8',
+  /** Eyebrows and rules: the site's sun yellow. */
+  gold: '#FFDF4F',
+  /** The one solid button: sun yellow with navy ink, as on the site. */
+  button: '#FFDF4F',
+  buttonInk: '#06162F',
 } as const;
 
 /**
@@ -139,14 +145,14 @@ const C = {
 const TONE: Record<IncidentCategory, string> = {
   emergency: '#D2705C',
   crime: '#D2705C',
-  traffic: '#E0AC63',
-  infrastructure: '#5CC3AA',
-  weather: '#A6B8AE',
+  traffic: '#FFC94D',
+  infrastructure: '#4FD1C5',
+  weather: '#A9B9CC',
 };
 
-const DISPLAY = "Georgia,'Iowan Old Style','Times New Roman',Times,serif";
-const MONO = "'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
-const BODY = "-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif";
+const DISPLAY = "'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif";
+const MONO = "'IBM Plex Mono','SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
+const BODY = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif";
 
 export interface DigestBranding {
   /**
@@ -260,9 +266,9 @@ const SHELL_W = 560;
  * turning the whole identity into an empty rectangle when a client blocks
  * images. It is embedded with the message, never fetched from a hosted URL.
  */
-function masthead(dateLine: string): string {
+function masthead(dateLine: string, kicker = 'Monday brief'): string {
   return `
-  <tr><td style="padding:32px 36px 0;">
+  <tr><td style="padding:30px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
         <td width="44" style="width:44px;padding-right:12px;vertical-align:middle;">
@@ -270,19 +276,24 @@ function masthead(dateLine: string): string {
                wordmark beside it is live text, so a reader with images off
                still gets a masthead rather than an empty box. -->
           <img src="cid:${CID.logo}" width="44" height="44" alt=""
-               style="display:block;width:44px;height:44px;border:0;">
+               style="display:block;width:44px;height:44px;border:0;border-radius:50%;">
         </td>
         <td style="vertical-align:middle;">
-          <div class="cw-ink" style="font:700 13px/1 ${BODY};color:${C.ink};letter-spacing:2.6px;">
-            CALGARY&nbsp;WATCH
+          <div class="cw-ink" style="font:800 16px/1 ${DISPLAY};color:${C.ink};letter-spacing:-0.2px;">
+            CALGARY<span style="font-weight:600;">WATCH</span><span style="color:${C.bow};">&nbsp;&#8226;</span>
           </div>
-          <div style="font:400 11px/1 ${BODY};color:${C.soft};padding-top:6px;">
+          <div class="cw-soft" style="font:500 11px/1 ${MONO};color:${C.soft};padding-top:7px;letter-spacing:0.4px;">
             ${escapeHtml(dateLine)}
           </div>
         </td>
+        <td align="right" style="vertical-align:middle;">
+          <span style="display:inline-block;padding:6px 10px;border-radius:999px;background:${C.gold};color:${C.buttonInk};font:600 10.5px/1 ${MONO};letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">
+            ${escapeHtml(kicker)}
+          </span>
+        </td>
       </tr>
     </table>
-    <div style="height:2px;background:${C.gold};font-size:0;line-height:0;margin-top:13px;">&nbsp;</div>
+    <div style="height:2px;background:${C.gold};font-size:0;line-height:0;margin-top:16px;">&nbsp;</div>
   </td></tr>`;
 }
 
@@ -317,10 +328,16 @@ function p(text: string, opts: { top?: number; color?: string; size?: number } =
 }
 
 /** The greeting, in the display face — the one place the serif goes large. */
-function salutation(name: string, at: number): string {
-  return `<div class="cw-ink" style="font:700 27px/1.25 ${DISPLAY};color:${C.ink};">
+function categoryLine(categories: readonly IncidentCategory[] | undefined, origin: string): string {
+  const note = categoriesNote((categories ?? []).map((c) => DIGEST_CATEGORY_LABEL[c]).filter(Boolean));
+  return note ? p(`${escapeHtml(note)} <a href="${escapeHtml(origin)}/map?settings=alerts" style="color:${C.bow};text-decoration:none;font-weight:700;">Change topics&nbsp;→</a>`, { top: 8, color: C.soft, size: 13 }) : '';
+}
+
+function salutation(name: string, at: number, subline?: string): string {
+  return `<div class="cw-ink" style="font:800 30px/1.12 ${DISPLAY};color:${C.ink};letter-spacing:-0.6px;">
     ${escapeHtml(greeting(at))}, ${escapeHtml(name)}.
-  </div>`;
+  </div>${subline ? `
+  <div style="font:800 30px/1.12 ${DISPLAY};color:${C.gold};letter-spacing:-0.6px;">${escapeHtml(subline)}</div>` : ''}`;
 }
 
 /**
@@ -562,7 +579,7 @@ function contributionBlock(contribution: DigestContribution | undefined): string
         <div class="cw-ink" style="font:700 23px/1.3 ${DISPLAY};color:${C.ink};max-width:430px;">
           ${escapeHtml(title)}
         </div>
-        ${content}${extras || '<div class="cw-soft" style="font:600 12.5px/1.5 '+BODY+';color:'+C.soft+';padding-top:15px;">From the Calgary Watch team</div>'}
+        ${content}${extras || '<div class="cw-soft" style="font:600 12.5px/1.5 '+BODY+';color:'+C.soft+';padding-top:15px;">From your neighbours at CalgaryWatch</div>'}
       </div>
       <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
     </td></tr>`;
@@ -763,15 +780,15 @@ function footer(unsubscribeUrl: string, branding: DigestBranding, adminPreview =
   if (adminPreview) {
     return `
     <tr><td style="padding:16px 36px 30px;">
-      ${p(`Internal preview for Calgary Watch administrators. This test was generated from the email planner and was not sent to subscribers.`, { top: 4, color: C.soft, size: 12 })}
+      ${p(`Internal preview for CalgaryWatch administrators. This test was generated from the email planner and was not sent to subscribers.`, { top: 4, color: C.soft, size: 12 })}
       ${p(`<a href="${escapeHtml(branding.origin)}/admin" style="color:${C.bow};font-weight:700;text-decoration:underline;">Open the email planner</a>`, { top: 13, color: C.soft, size: 12 })}
     </td></tr>`;
   }
   return `
   <tr><td style="padding:16px 36px 30px;">
-    ${p(reason ? escapeHtml(reason) : `You're getting this because you turned on the weekly digest in your Calgary Watch `
-      + `settings. It's built from your saved location and public reports on the map, `
-      + `nothing else.`, { top: 4, color: C.soft, size: 12 })}
+    ${p(reason ? escapeHtml(reason) : `You're getting this because you turned on the Monday brief on CalgaryWatch. `
+      + `It's built from your saved area and public reports on the map, nothing else. `
+      + `Change what you get any time on <a href="${escapeHtml(branding.origin)}/plans" style="color:${C.bow};text-decoration:none;">Your CalgaryWatch</a>.`, { top: 4, color: C.soft, size: 12 })}
     ${p(`<strong style="color:${C.body};">${escapeHtml(branding.senderName)}</strong><br>`
       + `${escapeHtml(branding.mailingAddress)}<br>`
       + `<a href="mailto:${escapeHtml(branding.supportEmail)}" `
@@ -903,7 +920,7 @@ function shell(options: {
     }
     .cw-rail {
       border-right: 0 !important;
-      border-bottom: 1px solid #2C443B !important;
+      border-bottom: 1px solid #22406C !important;
       text-align: left !important;
       padding: 8px 14px !important;
     }
@@ -937,13 +954,13 @@ function shell(options: {
    * still meets the artwork at its own edge.
    */
   @media (prefers-color-scheme: light) {
-    .cw-page, .cw-shell { background: #0E1A17 !important; }
-    .cw-card { background: #17251F !important; border-color: #2C443B !important; }
-    .cw-rail { background: #1E312A !important; border-color: #2C443B !important; }
-    .cw-ink, .cw-ink a { color: #F4EEE3 !important; }
-    .cw-soft { color: #A6B8AE !important; }
-    .cw-body { color: #DCD3C4 !important; }
-    .cw-hair { background: #2C443B !important; }
+    .cw-page, .cw-shell { background: #06162F !important; }
+    .cw-card { background: #0E2242 !important; border-color: #22406C !important; }
+    .cw-rail { background: #15305A !important; border-color: #22406C !important; }
+    .cw-ink, .cw-ink a { color: #F2EFE8 !important; }
+    .cw-soft { color: #9DB2C9 !important; }
+    .cw-body { color: #C9D6E4 !important; }
+    .cw-hair { background: #22406C !important; }
   }
 </style>
 </head>
@@ -974,6 +991,8 @@ export function renderDigestHtml(options: {
   adminPreview?: boolean;
   /** Not on the Thursday list: offer it once at the bottom. */
   offerThursday?: boolean;
+  /** Topics the reader limited their Monday email to; empty = everything. */
+  categories?: readonly IncidentCategory[];
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -990,8 +1009,9 @@ export function renderDigestHtml(options: {
     ${masthead(dateRange(summary))}
     ${contributionBlock(contribution)}
     <tr><td style="padding:26px 36px 0;">
-      ${salutation(name, summary.until)}
-      ${p(escapeHtml(leadParagraph(summary)), { top: 13 })}
+      ${salutation(name, summary.until, mondaySubline(summary))}
+      ${p(escapeHtml(leadParagraph(summary)), { top: 14 })}
+      ${categoryLine(options.categories, origin)}
       ${locationPromptBlock(summary)}
     </td></tr>
     ${weekBand(summary)}
@@ -1093,6 +1113,8 @@ export function renderDigestText(options: {
   adminPreview?: boolean;
   /** Not on the Thursday list: offer it once at the bottom. */
   offerThursday?: boolean;
+  /** Topics the reader limited their Monday email to; empty = everything. */
+  categories?: readonly IncidentCategory[];
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -1126,7 +1148,9 @@ export function renderDigestText(options: {
     );
   }
 
-  lines.push(`Morning, ${name}.`, '');
+  lines.push(`${greeting(summary.until)}, ${name}.`, mondaySubline(summary), '');
+  const topics = categoriesNote((options.categories ?? []).map((c) => DIGEST_CATEGORY_LABEL[c]).filter(Boolean));
+  if (topics) lines.push(topics, '');
 
   if (summary.quiet) {
     lines.push(
@@ -1172,7 +1196,7 @@ export function renderDigestText(options: {
       `See it on the map: ${branding.origin}/map`,
       '',
       '--------------------------------------------------------------',
-      'Internal preview for Calgary Watch administrators.',
+      'Internal preview for CalgaryWatch administrators.',
       'This test was not sent to subscribers.',
       `Open the email planner: ${branding.origin}/admin`,
     );
@@ -1185,9 +1209,9 @@ export function renderDigestText(options: {
     '',
     ...(options.offerThursday ? crossPromoText(branding.origin, 'thursday') : []),
     '--------------------------------------------------------------',
-    'You are getting this because you turned on the weekly digest in',
-    'your Calgary Watch settings. It is built only from your saved',
-    'location and public reports on the map.',
+    'You are getting this because you turned on the Monday brief on',
+    'CalgaryWatch. It is built only from your saved area and public',
+    `reports on the map. Change what you get: ${branding.origin}/plans`,
     '',
     branding.senderName,
     branding.mailingAddress,
@@ -1268,8 +1292,8 @@ export function renderWelcomeText(options: {
     '',
     ...(options.offerThursday ? crossPromoText(branding.origin, 'thursday') : []),
     '--------------------------------------------------------------',
-    "You're getting this because you turned on the weekly digest in",
-    'your Calgary Watch settings.',
+    "You're getting this because you turned on the Monday brief on",
+    `CalgaryWatch. Change what you get: ${branding.origin}/plans`,
     '',
     branding.senderName,
     branding.mailingAddress,
@@ -1295,7 +1319,7 @@ function wrap(text: string, width = 62): string {
 
 // ── Thursday events email ───────────────────────────────────────────────────
 //
-// The same letter as the Monday digest: same masthead, same spruce page, same
+// The same letter as the Monday digest: same masthead, same navy page, same
 // CASL footer. Only the middle differs, and the footer says which list this is
 // so nobody confuses the two when deciding what to keep.
 
@@ -1406,6 +1430,11 @@ export interface EventsEmailOptions {
   offerMonday?: boolean;
 }
 
+/** "Here's what's on near Beltline." in the brand yellow under the greeting. */
+function thursdaySubline(area: string): string {
+  return area && area !== 'home' ? `Here’s what’s on near ${displayAreaName(area)}.` : 'Here’s what’s on this week.';
+}
+
 const FIRST_HELLO = 'Welcome to Thursday picks. Each week, up to eight things for the next ten days, chosen from the interests you picked and every listing we’ve checked with its organizer. Tap “I’m going” on anything and it comes back here as a reminder.';
 const FALLBACK_LINE = 'Nothing we’ve checked with an organizer matches your interests in the next ten days. Rather than send nothing, here’s what else is on.';
 const GOING_ONLY_LINE = 'No new picks matched this week, but here’s your reminder.';
@@ -1433,9 +1462,9 @@ export function renderEventsHtml(options: EventsEmailOptions): string {
     title: c.subject,
     preheader: options.first ? 'Your first Thursday picks, chosen from what you’re into.' : c.lead,
     inner: `
-    ${masthead(`Thursday picks · ${dateLabel(at)}`)}
+    ${masthead(dateLabel(at), 'Thursday picks')}
     <tr><td style="padding:26px 36px 0;">
-      ${salutation(firstName(options.displayName), at)}
+      ${salutation(firstName(options.displayName), at, thursdaySubline(options.area))}
       ${options.first ? p(escapeHtml(FIRST_HELLO), { top: 13 }) : ''}
       ${p(escapeHtml(c.lead), { top: options.first ? 10 : 13 })}
       ${!options.area ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-left:3px solid ${C.bow};border-radius:3px;margin-top:16px;"><tr><td style="padding:14px 16px;"><div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">${escapeHtml(NO_AREA_LINE)} <a href="${escapeHtml(origin)}/plans" style="color:${C.bow};font-weight:700;text-decoration:none;">Add it&nbsp;→</a></div></td></tr></table>` : ''}

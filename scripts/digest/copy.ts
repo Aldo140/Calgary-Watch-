@@ -150,17 +150,17 @@ export const CTA_LABEL_QUIET = 'Have a look at the map';
  * not inviting one.
  */
 export const WELCOME = {
-  subject: 'Quick hello from Calgary Watch',
+  subject: 'Welcome to your Monday brief from CalgaryWatch',
   /**
    * Why this landed in their inbox, said in the first line rather than buried
    * in the footer. Somebody who does not remember signing up reaches for the
    * spam button long before they reach the small print, and a spam complaint
    * costs the whole list — so the reason goes where it will actually be read.
    */
-  reason: `You're getting this because you enabled the weekly digest on Calgary Watch.`,
+  reason: `You're getting this because you asked for the Monday brief on CalgaryWatch.`,
   paragraphs: [
     `Quick hello, since this is the first one.`,
-    `Calgary Watch is a map of what's actually going on around your block — break-ins, `
+    `CalgaryWatch is a map of what's actually going on around your block — break-ins, `
       + `road closures, water main breaks, the things you'd want a heads-up about. Some of it `
       + `comes from neighbours who report it. Some comes straight from Calgary Police, 311 and `
       + `511 Alberta. It all lands in one place instead of five.`,
@@ -194,8 +194,28 @@ export const WELCOME = {
    * Watch team" still reads as people rather than a system, and stays true
    * whoever ends up answering.
    */
-  signOff: 'The Calgary Watch team',
+  signOff: 'Your neighbours at CalgaryWatch',
   signOffRole: 'calgarywatch.ca',
   /** Introduces the digest below it, so the format explains itself once. */
   sampleIntro: `Here's this week's, so you can see what you're in for.`,
 } as const;
+
+/**
+ * The second line of the greeting, in brand yellow: whose week this is.
+ * Possessive area names read as the reader's own place ("Beltline's week"),
+ * which is the whole promise of the Monday email.
+ */
+export function mondaySubline(summary: DigestSummary): string {
+  const area = summary.areaName && summary.areaName !== 'your area' ? summary.areaName : '';
+  const possessive = (name: string) => (/s$/i.test(name) ? `${name}’` : `${name}’s`);
+  if (summary.scope === 'city') return summary.widenedToCity ? 'Here’s the city’s week.' : 'Here’s Calgary’s week.';
+  if (summary.quiet) return area ? `A quiet one in ${area}.` : 'A quiet one near you.';
+  return area ? `Here’s ${possessive(area)} week.` : 'Here’s your week.';
+}
+
+/** For readers who narrowed the Monday email to some topics. */
+export function categoriesNote(labels: string[]): string | null {
+  if (!labels.length) return null;
+  const list = labels.length === 1 ? labels[0] : `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
+  return `Showing ${list.toLowerCase()} only, as you chose.`;
+}

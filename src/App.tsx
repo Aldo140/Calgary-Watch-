@@ -28,6 +28,7 @@ const DateNightPage = lazy(() => import('@/src/pages/DateNightPage'));
 const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
 const UnsubscribePage = lazy(() => import('@/src/pages/UnsubscribePage'));
+const PlansPage = lazy(() => import('@/src/pages/PlansPage'));
 
 /**
  * Handles redirects from the 404.html hack.
@@ -171,6 +172,8 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/partners" element={<PartnersPage />} />
           <Route path="/date-night" element={<DateNightPage />} />
+          {/* Event interests, "I'm going", badges and the Thursday picks email. */}
+          <Route path="/plans" element={<PlansPage />} />
           {/* Reached from a link in the weekly digest, always signed out. */}
           <Route path="/unsubscribe" element={<UnsubscribePage />} />
           <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />

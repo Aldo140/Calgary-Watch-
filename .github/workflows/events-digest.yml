@@ -1,0 +1,77 @@
+name: Thursday Event Picks
+
+# Thursdays, once, in time to plan the weekend. Cron is UTC: this lands at
+# 08:00 in MDT and 07:00 in MST. The ledger week is computed in
+# America/Edmonton by digestWeekKey(), so the drift never double-sends.
+on:
+  schedule:
+    - cron: '0 14 * * 4'
+  # Manual runs default to a dry run, same as the Monday digest.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Render and log only — transmit nothing'
+        type: boolean
+        default: true
+      test_email:
+        description: 'Redirect every message to this address (needs only_uid or only_email)'
+        type: string
+        default: ''
+      only_uid:
+        description: 'Restrict the run to a single account uid'
+        type: string
+        default: ''
+      only_email:
+        description: 'Restrict the run to one reader email'
+        type: string
+        default: ''
+
+concurrency:
+  group: 'events-digest'
+  cancel-in-progress: false
+
+jobs:
+  picks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The same published inventory the site builds from, so the email can
+      # never recommend a listing the site would not show.
+      - name: Export verified discovery inventory
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        run: npm run discovery:export
+
+      - name: Send Thursday picks
+        run: npx tsx scripts/digest/events.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_SENDER_NAME: ${{ vars.DIGEST_SENDER_NAME }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          DIGEST_SUPPORT_EMAIL: ${{ vars.DIGEST_SUPPORT_EMAIL }}
+          DIGEST_REPLY_TO: ${{ vars.DIGEST_REPLY_TO }}
+          DIGEST_FROM: ${{ vars.DIGEST_FROM }}
+          DIGEST_ORIGIN: ${{ vars.DIGEST_ORIGIN }}
+          DIGEST_LIMIT: ${{ vars.DIGEST_LIMIT }}
+          # SAFETY: while set, these are the only addresses that can be mailed.
+          DIGEST_ALLOWLIST: ${{ vars.DIGEST_ALLOWLIST }}
+          DIGEST_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+          DIGEST_TEST_EMAIL: ${{ inputs.test_email }}
+          DIGEST_ONLY_UID: ${{ inputs.only_uid }}
+          DIGEST_ONLY_EMAIL: ${{ inputs.only_email }}

@@ -53,6 +53,8 @@ import {
   type DigestContribution,
 } from '../../src/lib/digestPlanner.js';
 import type { IncidentCategory } from '../../src/types/index.js';
+import { eventsIntro, eventsSubject } from '../../src/lib/eventsDigest.js';
+import { interestLabel, pickDistance, pickWhen, type EventInterestId, type EventPicks, type PickItem } from '../../src/lib/eventPicks.js';
 import { CID } from './art.js';
 import {
   areasHeading,
@@ -756,7 +758,7 @@ function cta(origin: string, label: string): string {
  * link somebody cannot see is what makes them press the spam button instead,
  * and that costs far more than the unsubscribe would have.
  */
-function footer(unsubscribeUrl: string, branding: DigestBranding, adminPreview = false): string {
+function footer(unsubscribeUrl: string, branding: DigestBranding, adminPreview = false, reason?: string): string {
   if (adminPreview) {
     return `
     <tr><td style="padding:16px 36px 30px;">
@@ -766,7 +768,7 @@ function footer(unsubscribeUrl: string, branding: DigestBranding, adminPreview =
   }
   return `
   <tr><td style="padding:16px 36px 30px;">
-    ${p(`You're getting this because you turned on the weekly digest in your Calgary Watch `
+    ${p(reason ? escapeHtml(reason) : `You're getting this because you turned on the weekly digest in your Calgary Watch `
       + `settings. It's built from your saved location and public reports on the map, `
       + `nothing else.`, { top: 4, color: C.soft, size: 12 })}
     ${p(`<strong style="color:${C.body};">${escapeHtml(branding.senderName)}</strong><br>`
@@ -1276,4 +1278,146 @@ function wrap(text: string, width = 62): string {
   }
   if (line) out.push(line);
   return out.join('\n');
+}
+
+// ── Thursday events email ───────────────────────────────────────────────────
+//
+// The same letter as the Monday digest: same masthead, same spruce page, same
+// CASL footer. Only the middle differs, and the footer says which list this is
+// so nobody confuses the two when deciding what to keep.
+
+const EVENTS_REASON = "You're getting this because you asked for Thursday event picks on your "
+  + 'CalgaryWatch plans page. They are chosen from your interests and saved area, nothing else. '
+  + 'The Monday neighbourhood email is a separate list.';
+
+function eventRow(item: PickItem, origin: string): string {
+  const sub = [item.venue || item.neighbourhood, pickDistance(item.distanceM), item.free ? 'Free' : null]
+    .filter(Boolean).join(' · ');
+  const tags = item.matched.filter((m) => m !== 'free').slice(0, 3).map((m) => interestLabel(m)).join(' · ');
+  return `
+  <tr><td style="padding-bottom:9px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card cw-stack" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+      <tr>
+        <td width="3" class="cw-edge" style="width:3px;background:${C.gold};font-size:0;line-height:0;">&nbsp;</td>
+        <td width="96" class="cw-rail" style="width:96px;background:${C.rail};border-right:1px solid ${C.line};
+                   padding:14px 8px;text-align:center;vertical-align:middle;">
+          <span class="cw-ink" style="font:700 11px/1.35 ${MONO};color:${C.ink};">
+            ${pickWhen(item.start).split(' · ').map(escapeHtml).join('<br>')}
+          </span>
+        </td>
+        <td style="padding:13px 16px;">
+          <a href="${escapeHtml(origin)}${escapeHtml(item.path)}"
+             style="font:700 15px/1.42 ${DISPLAY};color:${C.ink};text-decoration:none;">
+            ${escapeHtml(item.title)}
+          </a>
+          ${sub ? `<div class="cw-soft" style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">${escapeHtml(sub)}</div>` : ''}
+          ${tags ? `<div style="font:700 10.5px/1.4 ${BODY};color:${C.bow};letter-spacing:.6px;text-transform:uppercase;padding-top:6px;">${escapeHtml(tags)}</div>` : ''}
+        </td>
+      </tr>
+    </table>
+  </td></tr>`;
+}
+
+function eventSection(title: string, items: PickItem[], origin: string): string {
+  if (!items.length) return '';
+  return `
+  <tr><td style="padding:30px 36px 0;">
+    ${heading(title)}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      ${items.map((i) => eventRow(i, origin)).join('')}
+    </table>
+  </td></tr>`;
+}
+
+function plansButton(origin: string): string {
+  return `
+  <tr><td style="padding:24px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+      <tr><td style="background:${C.button};border-radius:3px;">
+        <a href="${escapeHtml(origin)}/plans"
+           style="display:inline-block;padding:14px 26px;font:700 14px/1 ${BODY};color:${C.buttonInk};text-decoration:none;">
+          See all your plans&nbsp;→
+        </a>
+      </td></tr>
+    </table>
+    <div class="cw-soft" style="font:400 12.5px/1.5 ${BODY};color:${C.soft};padding-top:13px;">
+      Tap “I’m going” on any event to get a reminder here next Thursday.
+      <a href="${escapeHtml(origin)}/plans" style="color:${C.bow};text-decoration:none;font-weight:700;">Change your interests&nbsp;→</a>
+    </div>
+  </td></tr>`;
+}
+
+export interface EventsEmailOptions {
+  picks: EventPicks;
+  interests: readonly EventInterestId[];
+  area: string;
+  displayName?: string;
+  unsubscribeUrl: string;
+  branding: DigestBranding;
+  at: number;
+}
+
+export function renderEventsHtml(options: EventsEmailOptions): string {
+  const { picks, branding, at } = options;
+  assertBrandingComplete(branding);
+  const { origin } = branding;
+  const intro = eventsIntro(options.interests, options.area);
+  const quiet = !picks.picks.length && !picks.going.length;
+  return shell({
+    title: eventsSubject(picks, options.interests),
+    preheader: quiet ? 'A quiet week for your picks. Here’s where to look instead.' : intro,
+    inner: `
+    ${masthead(`Thursday picks · ${dateLabel(at)}`)}
+    <tr><td style="padding:26px 36px 0;">
+      ${salutation(firstName(options.displayName), at)}
+      ${p(escapeHtml(quiet
+        ? 'Nothing we’ve checked with an organizer matches your picks in the next ten days. Rather than pad this out, here’s the full list in case something else catches your eye.'
+        : intro), { top: 13 })}
+    </td></tr>
+    ${eventSection('You’re going', picks.going, origin)}
+    ${eventSection('Picked for you', picks.picks, origin)}
+    ${quiet ? `<tr><td style="padding:0 36px;">${p(`<a href="${escapeHtml(origin)}/events" style="color:${C.bow};font-weight:700;text-decoration:none;">Everything on in Calgary&nbsp;→</a>`, { top: 18 })}</td></tr>` : ''}
+    ${plansButton(origin)}
+    ${skylineRule()}
+    ${footer(options.unsubscribeUrl, branding, false, EVENTS_REASON)}`,
+  });
+}
+
+export function renderEventsText(options: EventsEmailOptions): string {
+  const { picks, branding, at } = options;
+  assertBrandingComplete(branding);
+  const line = (i: PickItem) => [
+    `${pickWhen(i.start)}  ${i.title}`,
+    `   ${[i.venue || i.neighbourhood, pickDistance(i.distanceM), i.free ? 'Free' : null].filter(Boolean).join(' · ')}`,
+    `   ${branding.origin}${i.path}`,
+    '',
+  ];
+  const lines = [
+    'CALGARY WATCH',
+    `Thursday picks · ${dateLabel(at)}`,
+    '',
+    `${greeting(at)}, ${firstName(options.displayName)}.`,
+    '',
+    wrap(picks.picks.length || picks.going.length
+      ? eventsIntro(options.interests, options.area)
+      : 'Nothing we’ve checked with an organizer matches your picks in the next ten days. Everything on in Calgary: ' + `${branding.origin}/events`),
+    '',
+  ];
+  if (picks.going.length) lines.push('YOU’RE GOING', '', ...picks.going.flatMap(line));
+  if (picks.picks.length) lines.push('PICKED FOR YOU', '', ...picks.picks.flatMap(line));
+  lines.push(
+    `See all your plans: ${branding.origin}/plans`,
+    '',
+    '--------------------------------------------------------------',
+    wrap(EVENTS_REASON),
+    '',
+    branding.senderName,
+    branding.mailingAddress,
+    branding.supportEmail,
+    '',
+    `Unsubscribe: ${options.unsubscribeUrl}`,
+    `Privacy: ${branding.origin}/privacy`,
+  );
+  return lines.join('\n');
 }

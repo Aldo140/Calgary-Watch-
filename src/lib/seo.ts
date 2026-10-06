@@ -146,6 +146,12 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
+  '/plans': {
+    title: 'Your Calgary plans | CalgaryWatch',
+    description: 'Pick what you’re into, say “I’m going” to Calgary events, collect badges and get Thursday event picks near home.',
+    index: false,
+    pageType: 'WebPage',
+  },
   '/unsubscribe': {
     title: 'Email Preferences | Calgary Watch',
     description: 'Update Calgary Watch email preferences securely.',
@@ -215,7 +221,7 @@ export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
  * Public utility pages also need correct first-response robots/canonical tags.
  * They are rendered as static files but deliberately excluded from the sitemap.
  */
-export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
+export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', '/plans', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
 
 export function getSeoConfig(pathname: string, repository: DiscoveryRepository = discoveryRepository): SeoConfig {
   const [section, slug] = pathname.split('/').filter(Boolean);

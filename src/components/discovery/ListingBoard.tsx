@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { DiscoveryEntity, Event as EventEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath, startClock } from '../../lib/discovery';
 import { EventArt, MarketArt } from './ListingArt';
+import '../../styles/plans.css';
 
 const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayKey = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -148,6 +149,11 @@ export function ListingBoard({ root, title, items, occurrences, filters, interes
         <p className="cw-lb-kicker"><span className="cw-lb-pulse" aria-hidden="true" />CalgaryWatch {root === 'events' ? 'Events' : 'Markets'}</p>
         <h1>{lead}{rest.length ? <> <span>in {rest.join(' in ')}.</span></> : '.'}</h1>
         <p className="cw-lb-count">{count}. Every listing links to its organizer or ticket seller.</p>
+        <Link to="/plans" className="cw-lb-plans">
+          <span className="cw-lb-plans-new">New</span>
+          <span><strong>Plans that fit you.</strong> Pick what you’re into, say “I’m going”, get Thursday picks near home.</span>
+          <ArrowUpRight size={17} aria-hidden="true" />
+        </Link>
       </header>
       <Filters links={filters} />
       {interests ? <Filters links={interests} /> : null}

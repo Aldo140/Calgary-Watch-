@@ -583,6 +583,83 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Unsubscribe requests for the Thursday events email. Same shape and the
+    // same per-account token as digest_unsubscribes; a separate collection so
+    // leaving one list never touches the other, and so neither request can
+    // overwrite a pending one for the other list. Honoured by
+    // scripts/digest/events.ts before it selects anybody to mail.
+    match /events_digest_unsubscribes/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if
+        request.resource.data.keys().hasOnly(['uid', 'token', 'requestedAt', 'processedAt', 'source']) &&
+        request.resource.data.uid == userId &&
+        request.resource.data.token is string &&
+        request.resource.data.token.size() == 32 &&
+        request.resource.data.requestedAt is number &&
+        request.resource.data.processedAt == null &&
+        exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.get('digestUnsubToken', '') == request.resource.data.token;
+      allow delete: if false;
+    }
+
+    // ── "I'm going" ─────────────────────────────────────────────────────────
+    // An RSVP is private to its owner; the public sees only a per-listing
+    // count. The browser writes both in one batch, and each rule checks the
+    // other half with getAfter()/existsAfter(), so the count can only move by
+    // exactly one, and only in step with the caller's own RSVP appearing or
+    // disappearing. No Cloud Function is needed to keep it honest.
+    function rsvpPath(eventId) {
+      return /databases/$(database)/documents/event_rsvps/$(request.auth.uid + '_' + eventId);
+    }
+    function rsvpCountPath(eventId) {
+      return /databases/$(database)/documents/event_rsvp_counts/$(eventId);
+    }
+
+    match /event_rsvps/{rsvpId} {
+      allow read: if isAdmin() ||
+                  (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['uid', 'eventId', 'start', 'createdAt']) &&
+                    request.resource.data.uid == request.auth.uid &&
+                    request.resource.data.eventId is string &&
+                    request.resource.data.eventId.size() > 0 &&
+                    request.resource.data.eventId.size() <= 120 &&
+                    rsvpId == request.auth.uid + '_' + request.resource.data.eventId &&
+                    request.resource.data.start is string &&
+                    request.resource.data.start.size() <= 40 &&
+                    request.resource.data.createdAt is number &&
+                    ((exists(rsvpCountPath(request.resource.data.eventId)) &&
+                      getAfter(rsvpCountPath(request.resource.data.eventId)).data.count ==
+                        get(rsvpCountPath(request.resource.data.eventId)).data.count + 1) ||
+                     (!exists(rsvpCountPath(request.resource.data.eventId)) &&
+                      getAfter(rsvpCountPath(request.resource.data.eventId)).data.count == 1));
+      allow delete: if isAuthenticated() &&
+                    resource.data.uid == request.auth.uid &&
+                    exists(rsvpCountPath(resource.data.eventId)) &&
+                    getAfter(rsvpCountPath(resource.data.eventId)).data.count ==
+                      get(rsvpCountPath(resource.data.eventId)).data.count - 1;
+      allow update: if false;
+    }
+
+    match /event_rsvp_counts/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['count', 'updatedAt']) &&
+                    request.resource.data.count == 1 &&
+                    request.resource.data.updatedAt is number &&
+                    !exists(rsvpPath(eventId)) &&
+                    existsAfter(rsvpPath(eventId));
+      allow update: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['count', 'updatedAt']) &&
+                    request.resource.data.updatedAt is number &&
+                    ((request.resource.data.count == resource.data.count + 1 &&
+                      !exists(rsvpPath(eventId)) && existsAfter(rsvpPath(eventId))) ||
+                     (request.resource.data.count == resource.data.count - 1 &&
+                      request.resource.data.count >= 0 &&
+                      exists(rsvpPath(eventId)) && !existsAfter(rsvpPath(eventId))));
+      allow delete: if false;
+    }
+
     // ── Operations agent (scripts/ops/*, GitHub Actions via the Admin SDK) ──
     // The jobs draft, publish and send; admins only review. A browser can never
     // mark a post published, send mail, or lift a do-not-contact.

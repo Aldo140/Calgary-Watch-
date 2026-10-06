@@ -20,6 +20,7 @@
     "backfill:visibility": "tsx scripts/backfill-visibility.ts",
     "repair:timestamps": "tsx scripts/repair-future-timestamps.ts",
     "digest:weekly": "tsx scripts/digest/weekly.ts",
+    "digest:events": "tsx scripts/digest/events.ts",
     "ops:check": "tsx scripts/ops/check-access.ts",
     "ops:preview": "tsx scripts/ops/preview.ts",
     "ops:daily": "tsx scripts/ops/daily.ts",

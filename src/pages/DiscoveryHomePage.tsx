@@ -6,6 +6,7 @@ import { LiveNow } from '../components/home/LiveNow';
 import { WhatsHere } from '../components/home/WhatsHere';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { QuadrantMap } from '../components/home/QuadrantMap';
+import { WatchPromo } from '../components/home/WatchPromo';
 import { SlowerPlans, MondayDigest } from '../components/home/SlowerPlans';
 import { CalgaryDailyStrip } from '../components/home/CalgaryDailyStrip';
 import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
@@ -51,6 +52,7 @@ export default function DiscoveryHomePage() {
           <MondayDigest />
         </div>
       </div>
+      <WatchPromo pulse={pulse} />
     </SiteLayout>
   );
 }

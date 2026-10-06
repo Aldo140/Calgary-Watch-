@@ -11,6 +11,7 @@
  * returns you to the same scroll position.
  */
 
+import { adminFeedback, adminIncidents } from '@/src/lib/adminStore';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { collection, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
@@ -110,31 +111,16 @@ export default function AdminIncidentListPage() {
     // Read the collection itself: orderBy(timestamp) silently excludes legacy
     // documents that do not contain that field, which made old submissions
     // disappear from the purported all-time archive.
-    const unsubIncidents = onSnapshot(
-      collection(db, 'incidents'),
-      (snapshot) => {
-        setIncidents(
-          snapshot.docs
-            .map((row) => {
-              const data = row.data();
-              return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
-            }),
-        );
-        setLoadError('');
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Could not load report history:', error);
-        setLoadError('The all-time report archive could not be loaded. Check the deployed admin read rules.');
-        setLoading(false);
-      },
-    );
+    // Shared with /admin: read once per tab, plus a live window on the newest.
+    const unsubIncidents = adminIncidents.subscribe(db, ({ rows, loading, error }) => {
+      setIncidents(rows);
+      setLoadError(error ? 'The all-time report archive could not be loaded. Check the deployed admin read rules.' : '');
+      if (!loading) setLoading(false);
+    });
     const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
       setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
     });
-    const unsubFeedback = onSnapshot(collection(db, 'incident_feedback'), (snapshot) => {
-      setFeedback(snapshot.docs.map((row) => row.data() as IncidentFeedback));
-    }, () => setFeedback([]));
+    const unsubFeedback = adminFeedback.subscribe(db, ({ rows }) => setFeedback(rows as unknown as IncidentFeedback[]));
     return () => { unsubIncidents(); unsubUsers(); unsubFeedback(); };
   }, []);
 
@@ -250,6 +236,7 @@ export default function AdminIncidentListPage() {
         ...draft,
         report_count: Number(draft.report_count || 0),
       });
+      adminIncidents.patch(incident.id, { ...draft, report_count: Number(draft.report_count || 0) } as Partial<Incident>);
       setDrafts((prev) => {
         const next = { ...prev };
         delete next[incident.id];
@@ -276,6 +263,7 @@ export default function AdminIncidentListPage() {
         deleted: true,
         deletedAt: Date.now(),
       });
+      adminIncidents.patch(incident.id, { visibility: 'deleted', deleted: true } as Partial<Incident>);
       setSelectedId(null);
     } finally {
       setSavingId(null);
@@ -289,6 +277,7 @@ export default function AdminIncidentListPage() {
     }
     if (!db || !window.confirm(`Delete "${incident.title}" permanently? This cannot be undone.`)) return;
     await deleteDoc(doc(db, 'incidents', incident.id));
+    adminIncidents.patch(incident.id, null);
     setSelectedId(null);
   };
 

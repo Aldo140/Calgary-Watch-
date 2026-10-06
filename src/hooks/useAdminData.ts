@@ -11,6 +11,7 @@
  * here and return it, so every screen agrees on what it means.
  */
 
+import { adminIncidents } from '@/src/lib/adminStore';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   addDoc, collection, deleteDoc, doc, getDocs,
@@ -233,6 +234,7 @@ export function useAdminData() {
         flagged_by: [],
         flag_count: 0,
       });
+      adminIncidents.patch(incidentId, { visibility: 'public', flagged: false, flagged_at: undefined, flagged_by: [], flag_count: 0 } as Partial<Incident>);
       await writeAuditLog('incident_update', 'incidents', incidentId, { visibility: 'public' });
     } catch (err) {
       // Surfaced rather than swallowed: this used to fail silently, which made
@@ -276,6 +278,7 @@ export function useAdminData() {
       }
 
       await deleteDoc(doc(db, 'incidents', incidentId));
+      adminIncidents.patch(incidentId, null);
       await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { permanent: true });
 
       // The photo is removed after the record it belonged to is gone. A
@@ -302,23 +305,13 @@ export function useAdminData() {
   useEffect(() => {
     if (!isAuthReady || !user || !isAdmin || !db) return;
 
-    const unsubIncidents = onSnapshot(
-      collection(db, 'incidents'),
-      (snapshot) => {
-        // Admin is the permanent record. Hidden resident submissions stay here
-        // for all-time review even though public map queries cannot see them.
-        // Reading the collection directly also includes legacy rows without a
-        // timestamp field; orderBy(timestamp) silently excludes those rows.
-        const rows = snapshot.docs
-          .map((row) => {
-            const data = row.data();
-            return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
-          })
-          .sort((a, b) => b.timestamp - a.timestamp);
-        setIncidents(rows);
-        setLoadingData(false);
-      }
-    );
+    // Admin is the permanent record: the full archive (including legacy rows
+    // without a timestamp) is read once per tab and shared with /admin/incidents,
+    // with a live window on the newest reports. See src/lib/adminStore.ts.
+    const unsubIncidents = adminIncidents.subscribe(db, ({ rows, loading }) => {
+      setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp));
+      if (!loading) setLoadingData(false);
+    });
 
     const unsubStats = onSnapshot(collection(db, 'community_stats'), (snapshot) => {
       const rows = snapshot.docs
@@ -349,14 +342,14 @@ export function useAdminData() {
       },
     );
 
-    // Page views — real-time listener for chart/breakdown data (last 2000 docs)
-    const unsubPageViews = onSnapshot(
-      query(collection(db, 'page_views'), orderBy('timestamp', 'desc'), limit(200)),
-      (snapshot) => {
-        setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc));
-      },
-      () => {}
-    );
+    // Page views: the newest 200, re-read every five minutes. A live listener
+    // here billed one read for every page any visitor opened while admin was up.
+    const loadPageViews = () => getDocs(query(collection(db!, 'page_views'), orderBy('timestamp', 'desc'), limit(200)))
+      .then((snapshot) => setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc)))
+      .catch(() => {});
+    void loadPageViews();
+    const pageViewTimer = window.setInterval(loadPageViews, 5 * 60 * 1000);
+    const unsubPageViews = () => clearInterval(pageViewTimer);
 
     // True total count — not capped by the snapshot limit
     const fetchTotalCount = async () => {
@@ -882,6 +875,7 @@ export function useAdminData() {
         deletedAt: Date.now(),
         deletedBy: user.uid,
       });
+      adminIncidents.patch(incidentId, { visibility: 'deleted', deleted: true } as Partial<Incident>);
       await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { visibility: 'deleted' });
     } catch (err) {
       console.error('Failed to soft-delete incident:', err);
@@ -893,6 +887,7 @@ export function useAdminData() {
     if (!user || !db) return;
     try {
       await updateDoc(doc(db, 'incidents', incidentId), { verified_status: 'unverified' });
+      adminIncidents.patch(incidentId, { verified_status: 'unverified' });
       await writeAuditLog('incident_update', 'incidents', incidentId, { verified_status: 'unverified' });
     } catch (err) { console.error('Failed to approve incident:', err); }
   };

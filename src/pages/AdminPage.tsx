@@ -1,3 +1,5 @@
+import { adminIncidents } from '../lib/adminStore';
+import { db } from '../firebase';
 import { DiscoveryContent } from '../components/admin/DiscoveryContent';
 import { DemandWorkspace } from '../components/admin/DemandWorkspace';
 import { MembersWorkspace } from '../components/admin/MembersWorkspace';
@@ -179,10 +181,14 @@ export default function AdminPage() {
       subtitle={titles[section].subtitle}
       onSignOut={logout}
       actions={
-        <Chip tone={d.loadingData ? 'attention' : 'ok'}>
-          <StatusDot tone={d.loadingData ? 'attention' : 'ok'} pulse={d.loadingData} />
-          {d.loadingData ? 'Syncing' : 'Live'}
-        </Chip>
+        <>
+          <Chip tone={d.loadingData ? 'attention' : 'ok'}>
+            <StatusDot tone={d.loadingData ? 'attention' : 'ok'} pulse={d.loadingData} />
+            {d.loadingData ? 'Syncing' : 'Live'}
+          </Chip>
+          {/* The archive is read once per tab; this re-reads it on demand. */}
+          <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton>
+        </>
       }
     >
       {section === 'desk' && <DeskSection d={d} />}

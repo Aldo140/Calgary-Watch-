@@ -202,7 +202,7 @@ export function StatTile({
       style={{ background: T.card, borderColor: T.line, outlineColor: T.signal }}
     >
       <span
-        className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] truncate"
+        className="text-[0.65rem] font-semibold uppercase tracking-[0.08em] leading-snug line-clamp-2"
         style={{ color: T.muted }}
       >
         {label}

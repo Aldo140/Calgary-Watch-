@@ -1,4 +1,6 @@
 import { DiscoveryContent } from '../components/admin/DiscoveryContent';
+import { DemandWorkspace } from '../components/admin/DemandWorkspace';
+import { MembersWorkspace } from '../components/admin/MembersWorkspace';
 import { OpsWorkspace } from '../components/admin/OpsWorkspace';
 import { PartnersWorkspace } from '../components/admin/PartnersWorkspace';
 /**
@@ -23,7 +25,7 @@ import {
 } from 'recharts';
 import {
   Bot, ExternalLink, FileText, Globe, LayoutDashboard, Loader2, Lock,
-  MailPlus, Map as MapIcon, RefreshCw, Save, Trash2, Users, Zap,
+  CalendarDays, HeartHandshake, MailPlus, Map as MapIcon, RefreshCw, Save, Search, Store, Trash2, Users, Zap,
 } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -41,7 +43,7 @@ import { INCIDENT_CATEGORIES } from '@/src/constants';
 import { summarizeDataSourceHealth } from '@/src/config/dataSources';
 import { cn } from '@/src/lib/utils';
 
-type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city' | 'content' | 'demand' | 'partners' | 'ops';
+type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city' | 'content' | 'demand' | 'partners' | 'ops' | 'members';
 
 const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
 
@@ -106,24 +108,26 @@ export default function AdminPage() {
     const needsAttention =
       d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds;
     return [
-      { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined },
-      { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus },
-      { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot },
-      { id: 'content', label: 'Discovery content', short: 'Content', icon: FileText },
-      { id: 'demand', label: 'Search demand', short: 'Demand', icon: Globe },
-      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Users },
-      { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText },
-      { id: 'people', label: 'People', short: 'People', icon: Users },
-      { id: 'feeds', label: 'Data feeds', short: 'Feeds', icon: Zap, count: failingFeeds, tone: 'critical' },
-      { id: 'visitors', label: 'Visitors', short: 'Visitors', icon: Globe },
-      { id: 'city', label: 'City stats', short: 'City', icon: MapIcon },
+      { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined, group: 'Today' },
+      { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText, group: 'Today' },
+      { id: 'feeds', label: 'Data feeds', short: 'Feeds', icon: Zap, count: failingFeeds, tone: 'critical', group: 'Today' },
+      { id: 'members', label: 'Members & plans', short: 'Members', icon: HeartHandshake, group: 'Audience' },
+      { id: 'people', label: 'People', short: 'People', icon: Users, group: 'Audience' },
+      { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus, group: 'Audience' },
+      { id: 'visitors', label: 'Visitors', short: 'Visitors', icon: Globe, group: 'Audience' },
+      { id: 'demand', label: 'Search demand', short: 'Demand', icon: Search, group: 'Audience' },
+      { id: 'content', label: 'Events & markets', short: 'Events', icon: CalendarDays, group: 'Content' },
+      { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot, group: 'Content' },
+      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Store, group: 'Content' },
+      { id: 'city', label: 'City stats', short: 'City', icon: MapIcon, group: 'City' },
     ];
   }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds]);
 
   const titles: Record<Section, { title: string; subtitle: string }> = {
     ops: { title: 'Operations', subtitle: 'Instagram posts for CalgaryWatch and CalgaryDaily, drafted by the agent and approved here' },
-    content: { title: 'Discovery content', subtitle: 'Events, recurring markets, businesses, guides and neighbourhoods' },
-    demand: { title: 'Search demand', subtitle: 'Understand what Calgary is looking for' },
+    content: { title: 'Events & markets', subtitle: 'Resident suggestions, listings to verify, and what is published' },
+    members: { title: 'Members & plans', subtitle: 'Sign-ups, both emails, interests and what people are planning to go to' },
+    demand: { title: 'Search demand', subtitle: 'What Calgary searches for, and what it couldn’t find' },
     partners: { title: 'Local partners', subtitle: 'Claims and commercial relationships, separate from editorial selections' },
     desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
     planner: { title: 'Email planner', subtitle: 'Prepare Monday’s edition, review recipients and understand every delivery route' },
@@ -142,7 +146,12 @@ export default function AdminPage() {
     );
   }
 
-  if (!isFirebaseConfigured || !d.user || !d.isAdmin) {
+  // Dev server only, with no Firebase configured: `?preview` renders the
+  // console with empty data so its layout can be reviewed. import.meta.env.DEV
+  // is statically false in production builds, so this cannot ship.
+  const preview = Boolean(import.meta.env?.DEV) && !isFirebaseConfigured && typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('preview');
+
+  if (!preview && (!isFirebaseConfigured || !d.user || !d.isAdmin)) {
     return (
       <div className="min-h-screen grid place-items-center p-6" style={{ background: T.surface }}>
         <div className="max-w-sm w-full rounded-2xl border p-6 text-center" style={{ background: T.card, borderColor: T.line }}>
@@ -186,7 +195,8 @@ export default function AdminPage() {
       {section === 'content' && <DiscoveryContent />}
       {section === 'ops' && <OpsWorkspace />}
       {section === 'partners' && <PartnersWorkspace />}
-      {section === 'demand' && <Panel title={titles[section].title}><p style={{ color: T.muted, padding: 20 }}>This workspace is being prepared. No search queries are being collected yet. Future aggregate records will exclude identity and location data.</p></Panel>}
+      {section === 'demand' && <DemandWorkspace />}
+      {section === 'members' && <MembersWorkspace d={d} onOpen={(id) => setSection(id as Section)} />}
     </AdminShell>
   );
 }

@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { filterInventory } from '../lib/discoveryCalendar';
+import { recordSearch } from '../lib/searchDemand';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { GlobalSearch } from '../components/site/GlobalSearch';
@@ -29,6 +31,13 @@ export default function DiscoveryPage() {
   // or cancelled event/market shouldn't surface as a live suggestion. Its detail URL
   // still resolves normally above (`entity`/`missing` don't go through this filter).
   const groups = searchEntities(filterInventory(all, discoveryRepository.occurrences()), q);
+  const resultCount = Object.values(groups).flat().length;
+  // Record what people look for (anonymously), after they stop typing.
+  useEffect(() => {
+    if (!search || !q) return;
+    const t = window.setTimeout(() => recordSearch(q, resultCount), 1200);
+    return () => clearTimeout(t);
+  }, [search, q, resultCount]);
   const title = missing ? 'This page isn’t here yet.' : search ? 'Find your next Calgary thing.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
   const relatedIds = entity?.kind === 'guide' ? entity.entries.map(e => e.entityId) : entity?.kind === 'neighbourhood' ? entity.entityIds : [];
   if (root === 'local' && !entity && !missing) {

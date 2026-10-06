@@ -368,6 +368,24 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Anonymous search demand (src/lib/searchDemand.ts): the words, how many
+    // listings matched, and when. Nothing that identifies the searcher, and
+    // nothing shaped like contact details; admins read it to see what Calgary
+    // looks for that isn't listed yet.
+    match /search_demand/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['q', 'results', 'ts']) &&
+                    request.resource.data.q is string &&
+                    request.resource.data.q.size() >= 2 &&
+                    request.resource.data.q.size() <= 80 &&
+                    !request.resource.data.q.matches('.*(@|https?:|[0-9]{6,}).*') &&
+                    request.resource.data.results is int &&
+                    request.resource.data.results >= 0 &&
+                    request.resource.data.results <= 999 &&
+                    request.resource.data.ts is number;
+      allow read, delete: if isAdmin();
+      allow update: if false;
+    }
+
     // Anonymous page view analytics – write-only from any visitor, no PII stored.
     match /page_views/{viewId} {
       // Every field is bounded and type-checked. `referrer` holds a bare

@@ -1,3 +1,4 @@
+import { adminIncidents, adminUsers } from '@/src/lib/adminStore';
 /**
  * User directory.
  *
@@ -9,7 +10,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { collection, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, limit, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import {
   ArrowLeft, FileText, Loader2, Lock, Mail, MailCheck, MailX, Save, Search, Trash2, Users, X,
 } from 'lucide-react';
@@ -172,26 +173,18 @@ export default function AdminUserListPage() {
 
   useEffect(() => {
     if (!db) { setLoading(false); return; }
-    const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
-      setUsers(snapshot.docs.map((row) => row.data() as UserProfile));
-      setLoading(false);
+    // Every account (the directory has to find anyone), read once per tab and
+    // shared across admin pages; reports come from the shared archive.
+    const unsubUsers = adminUsers.subscribe(db, ({ rows, loading }) => {
+      setUsers(rows as unknown as UserProfile[]);
+      if (!loading) setLoading(false);
     });
-    const unsubDigest = onSnapshot(query(collection(db, 'digest_unsubscribes'), limit(200)), (snapshot) => {
-      setUnsubscribes(snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as DigestUnsubscribeRequest)));
-    });
-    const unsubIncidents = onSnapshot(
-      collection(db, 'incidents'),
-      (snapshot) => {
-        setIncidents(
-          snapshot.docs
-            .map((row) => {
-              const data = row.data();
-              return { id: row.id, ...data, timestamp: adminIncidentTimestamp(data) } as Incident;
-            })
-            .sort((a, b) => b.timestamp - a.timestamp),
-        );
-      },
-    );
+    let live = true;
+    void getDocs(collection(db, 'digest_unsubscribes')).then((snapshot) => {
+      if (live) setUnsubscribes(snapshot.docs.map((row) => ({ uid: row.id, ...row.data() } as DigestUnsubscribeRequest)));
+    }).catch(() => {});
+    const unsubDigest = () => { live = false; };
+    const unsubIncidents = adminIncidents.subscribe(db, ({ rows }) => setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp)));
     return () => { unsubUsers(); unsubDigest(); unsubIncidents(); };
   }, []);
 
@@ -274,6 +267,7 @@ export default function AdminUserListPage() {
       await updateDoc(doc(db, 'users', profile.uid), {
         notes: draftNotes[profile.uid] ?? profile.notes ?? '',
       });
+      adminUsers.patch(profile.uid, { notes: draftNotes[profile.uid] ?? profile.notes ?? '' });
     } finally {
       setSavingUid(null);
     }
@@ -284,6 +278,7 @@ export default function AdminUserListPage() {
     setSavingUid(profile.uid);
     try {
       await updateDoc(doc(db, 'users', profile.uid), getProfileDraft(profile));
+      adminUsers.patch(profile.uid, getProfileDraft(profile) as Record<string, unknown>);
       setDraftProfiles((prev) => {
         const next = { ...prev };
         delete next[profile.uid];

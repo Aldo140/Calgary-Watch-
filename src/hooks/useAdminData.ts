@@ -144,6 +144,7 @@ export function useAdminData() {
   const { user, isAuthReady, isAdmin } = useAuth();
 
   const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [accountCount, setAccountCount] = useState<number | null>(null);
   const [communityStats, setCommunityStats] = useState<(CommunityStats & { id: string })[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [usersLoaded, setUsersLoaded] = useState(false);
@@ -320,7 +321,8 @@ export function useAdminData() {
       setCommunityStats(rows);
     });
 
-    const unsubUsers = onSnapshot(query(collection(db, 'users'), limit(200)), (snapshot) => {
+    // Newest 200 for lists and charts; the total comes from a server count below.
+    const unsubUsers = onSnapshot(query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(200)), (snapshot) => {
       setUsers(snapshot.docs.map((row) => ({ ...row.data(), uid: row.id } as UserProfile)));
       setUsersLoaded(true);
     });
@@ -361,6 +363,7 @@ export function useAdminData() {
       }
     };
     fetchTotalCount();
+    getCountFromServer(collection(db!, 'users')).then((s) => setAccountCount(s.data().count)).catch(() => setAccountCount(null));
     const countInterval = 0;
 
     const unsubFlagged = onSnapshot(
@@ -479,7 +482,7 @@ export function useAdminData() {
   const emergencyIncidents = realIncidents.filter((i) => i.category === 'emergency').length;
   const unresolvedIncidents = realIncidents.filter((i) => i.verified_status !== 'community_confirmed').length;
   const todayIncidents     = realIncidents.filter((i) => Date.now() - i.timestamp < 86_400_000).length;
-  const totalUsers         = users.length;
+  const totalUsers         = accountCount ?? users.length;
   const adminUsers         = users.filter((u) => u.role === 'admin').length;
   const viewOnlyUsers      = totalUsers - adminUsers;
   const uniqueReporterEmails = new Set(

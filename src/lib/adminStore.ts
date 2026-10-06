@@ -88,3 +88,8 @@ export type FeedbackRow = { id: string; incidentId?: string; uid?: string; kind?
 export const adminFeedback = createStore<FeedbackRow>(
   async (db) => (await getDocs(collection(db, 'incident_feedback'))).docs.map((d) => ({ id: d.id, ...d.data() })),
 );
+
+/** Every account, for the People directory's search. Read once per tab. */
+export const adminUsers = createStore<{ id: string; uid: string } & Record<string, unknown>>(
+  async (db) => (await getDocs(collection(db, 'users'))).docs.map((d) => ({ ...d.data(), id: d.id, uid: d.id })),
+);

@@ -53,7 +53,7 @@ import {
   type DigestContribution,
 } from '../../src/lib/digestPlanner.js';
 import type { IncidentCategory } from '../../src/types/index.js';
-import { eventsIntro, eventsSubject } from '../../src/lib/eventsDigest.js';
+import { eventsEmailMode, eventsIntro, eventsSubject } from '../../src/lib/eventsDigest.js';
 import { interestLabel, pickDistance, pickWhen, type EventInterestId, type EventPicks, type PickItem } from '../../src/lib/eventPicks.js';
 import { CID } from './art.js';
 import {
@@ -972,6 +972,8 @@ export function renderDigestHtml(options: {
   branding: DigestBranding;
   contribution?: DigestContribution;
   adminPreview?: boolean;
+  /** Not on the Thursday list: offer it once at the bottom. */
+  offerThursday?: boolean;
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -996,6 +998,7 @@ export function renderDigestHtml(options: {
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+    ${options.offerThursday ? crossPromoHtml(origin, 'thursday') : ''}
     ${skylineRule()}
     ${footer(unsubscribeUrl, branding, options.adminPreview)}`,
   });
@@ -1015,6 +1018,8 @@ export function renderWelcomeHtml(options: {
   displayName?: string;
   unsubscribeUrl: string;
   branding: DigestBranding;
+  /** Not on the Thursday list: offer it once at the bottom. */
+  offerThursday?: boolean;
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -1071,6 +1076,7 @@ export function renderWelcomeHtml(options: {
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
+    ${options.offerThursday ? crossPromoHtml(origin, 'thursday') : ''}
     ${skylineRule()}
     ${footer(unsubscribeUrl, branding)}`,
   });
@@ -1085,6 +1091,8 @@ export function renderDigestText(options: {
   branding: DigestBranding;
   contribution?: DigestContribution;
   adminPreview?: boolean;
+  /** Not on the Thursday list: offer it once at the bottom. */
+  offerThursday?: boolean;
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -1175,6 +1183,7 @@ export function renderDigestText(options: {
     '',
     `See it on the map: ${branding.origin}/map`,
     '',
+    ...(options.offerThursday ? crossPromoText(branding.origin, 'thursday') : []),
     '--------------------------------------------------------------',
     'You are getting this because you turned on the weekly digest in',
     'your Calgary Watch settings. It is built only from your saved',
@@ -1203,6 +1212,8 @@ export function renderWelcomeText(options: {
   displayName?: string;
   unsubscribeUrl: string;
   branding: DigestBranding;
+  /** Not on the Thursday list: offer it once at the bottom. */
+  offerThursday?: boolean;
 }): string {
   const { summary, unsubscribeUrl, branding } = options;
   assertBrandingComplete(branding);
@@ -1255,6 +1266,7 @@ export function renderWelcomeText(options: {
     '',
     `${CTA_LABEL}: ${branding.origin}/map`,
     '',
+    ...(options.offerThursday ? crossPromoText(branding.origin, 'thursday') : []),
     '--------------------------------------------------------------',
     "You're getting this because you turned on the weekly digest in",
     'your Calgary Watch settings.',
@@ -1349,37 +1361,90 @@ function plansButton(origin: string): string {
   </td></tr>`;
 }
 
+/**
+ * The other list, offered once at the bottom — only to someone who isn't on
+ * it. It links to the sign-up page with that email pre-ticked; nothing is
+ * switched on from the email itself.
+ */
+export function crossPromoHtml(origin: string, offer: 'monday' | 'thursday'): string {
+  const copy = offer === 'monday'
+    ? { day: 'Monday', title: 'What happened near home this week', body: 'A short recap of public safety reports within a walk, 3 km and 10 km of home.', cta: 'Add the Monday email' }
+    : { day: 'Thursday', title: 'Weekend picks for what you’re into', body: 'Up to eight events for the next ten days, near home first.', cta: 'Add Thursday picks' };
+  return `
+  <tr><td style="padding:24px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
+      <tr><td style="padding:16px 18px;">
+        <div style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.6px;text-transform:uppercase;">Also free · ${copy.day}</div>
+        <div class="cw-ink" style="font:700 16px/1.35 ${DISPLAY};color:${C.ink};padding-top:7px;">${escapeHtml(copy.title)}</div>
+        <div class="cw-body" style="font:400 13px/1.5 ${BODY};color:${C.body};padding-top:4px;">${escapeHtml(copy.body)}</div>
+        <a href="${escapeHtml(origin)}/plans?email=${offer}#emails" style="display:inline-block;margin-top:10px;font:700 13px/1 ${BODY};color:${C.bow};text-decoration:none;">${copy.cta}&nbsp;→</a>
+      </td></tr>
+    </table>
+  </td></tr>`;
+}
+
+export function crossPromoText(origin: string, offer: 'monday' | 'thursday'): string[] {
+  return offer === 'monday'
+    ? ['ALSO FREE: THE MONDAY EMAIL', 'What happened near home this week.', `${origin}/plans?email=monday`, '']
+    : ['ALSO FREE: THURSDAY PICKS', 'Weekend picks for what you’re into, near home first.', `${origin}/plans?email=thursday`, ''];
+}
+
 export interface EventsEmailOptions {
   picks: EventPicks;
+  /** "What else is on" when nothing matched; used only in fallback mode. */
+  fallback?: EventPicks | null;
   interests: readonly EventInterestId[];
   area: string;
   displayName?: string;
   unsubscribeUrl: string;
   branding: DigestBranding;
   at: number;
+  /** This reader's first Thursday email: opens with a short hello. */
+  first?: boolean;
+  /** Not on the Monday list: offer it once at the bottom. */
+  offerMonday?: boolean;
+}
+
+const FIRST_HELLO = 'Welcome to Thursday picks. Each week, up to eight things for the next ten days, chosen from the interests you picked and every listing we’ve checked with its organizer. Tap “I’m going” on anything and it comes back here as a reminder.';
+const FALLBACK_LINE = 'Nothing we’ve checked with an organizer matches your interests in the next ten days. Rather than send nothing, here’s what else is on.';
+const GOING_ONLY_LINE = 'No new picks matched this week, but here’s your reminder.';
+const NO_AREA_LINE = 'Tell us your neighbourhood and picks near home come first.';
+
+export function eventsEmailContent(options: EventsEmailOptions) {
+  const mode = eventsEmailMode(options.picks, options.fallback ?? null);
+  const list = mode === 'fallback' ? options.fallback!.picks : options.picks.picks;
+  const lead = mode === 'fallback' ? FALLBACK_LINE : mode === 'going-only' ? GOING_ONLY_LINE : eventsIntro(options.interests, options.area);
+  return {
+    mode,
+    list,
+    lead,
+    listTitle: mode === 'fallback' ? 'Also on in Calgary' : 'Picked for you',
+    subject: eventsSubject(options.picks, options.interests, { mode, first: options.first, fallbackCount: options.fallback?.picks.length }),
+  };
 }
 
 export function renderEventsHtml(options: EventsEmailOptions): string {
   const { picks, branding, at } = options;
   assertBrandingComplete(branding);
   const { origin } = branding;
-  const intro = eventsIntro(options.interests, options.area);
-  const quiet = !picks.picks.length && !picks.going.length;
+  const c = eventsEmailContent(options);
   return shell({
-    title: eventsSubject(picks, options.interests),
-    preheader: quiet ? 'A quiet week for your picks. Here’s where to look instead.' : intro,
+    title: c.subject,
+    preheader: options.first ? 'Your first Thursday picks, chosen from what you’re into.' : c.lead,
     inner: `
     ${masthead(`Thursday picks · ${dateLabel(at)}`)}
     <tr><td style="padding:26px 36px 0;">
       ${salutation(firstName(options.displayName), at)}
-      ${p(escapeHtml(quiet
-        ? 'Nothing we’ve checked with an organizer matches your picks in the next ten days. Rather than pad this out, here’s the full list in case something else catches your eye.'
-        : intro), { top: 13 })}
+      ${options.first ? p(escapeHtml(FIRST_HELLO), { top: 13 }) : ''}
+      ${p(escapeHtml(c.lead), { top: options.first ? 10 : 13 })}
+      ${!options.area ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-left:3px solid ${C.bow};border-radius:3px;margin-top:16px;"><tr><td style="padding:14px 16px;"><div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">${escapeHtml(NO_AREA_LINE)} <a href="${escapeHtml(origin)}/plans" style="color:${C.bow};font-weight:700;text-decoration:none;">Add it&nbsp;→</a></div></td></tr></table>` : ''}
     </td></tr>
     ${eventSection('You’re going', picks.going, origin)}
-    ${eventSection('Picked for you', picks.picks, origin)}
-    ${quiet ? `<tr><td style="padding:0 36px;">${p(`<a href="${escapeHtml(origin)}/events" style="color:${C.bow};font-weight:700;text-decoration:none;">Everything on in Calgary&nbsp;→</a>`, { top: 18 })}</td></tr>` : ''}
+    ${eventSection(c.listTitle, c.list, origin)}
+    ${c.mode === 'fallback' ? `<tr><td style="padding:0 36px;">${p(`<a href="${escapeHtml(origin)}/events" style="color:${C.bow};font-weight:700;text-decoration:none;">Everything on in Calgary&nbsp;→</a>`, { top: 6 })}</td></tr>` : ''}
     ${plansButton(origin)}
+    ${options.offerMonday ? crossPromoHtml(origin, 'monday') : ''}
     ${skylineRule()}
     ${footer(options.unsubscribeUrl, branding, false, EVENTS_REASON)}`,
   });
@@ -1388,6 +1453,7 @@ export function renderEventsHtml(options: EventsEmailOptions): string {
 export function renderEventsText(options: EventsEmailOptions): string {
   const { picks, branding, at } = options;
   assertBrandingComplete(branding);
+  const c = eventsEmailContent(options);
   const line = (i: PickItem) => [
     `${pickWhen(i.start)}  ${i.title}`,
     `   ${[i.venue || i.neighbourhood, pickDistance(i.distanceM), i.free ? 'Free' : null].filter(Boolean).join(' · ')}`,
@@ -1400,16 +1466,17 @@ export function renderEventsText(options: EventsEmailOptions): string {
     '',
     `${greeting(at)}, ${firstName(options.displayName)}.`,
     '',
-    wrap(picks.picks.length || picks.going.length
-      ? eventsIntro(options.interests, options.area)
-      : 'Nothing we’ve checked with an organizer matches your picks in the next ten days. Everything on in Calgary: ' + `${branding.origin}/events`),
+    ...(options.first ? [wrap(FIRST_HELLO), ''] : []),
+    wrap(c.lead),
     '',
+    ...(!options.area ? [wrap(`${NO_AREA_LINE} ${branding.origin}/plans`), ''] : []),
   ];
   if (picks.going.length) lines.push('YOU’RE GOING', '', ...picks.going.flatMap(line));
-  if (picks.picks.length) lines.push('PICKED FOR YOU', '', ...picks.picks.flatMap(line));
+  if (c.list.length) lines.push(c.listTitle.toUpperCase(), '', ...c.list.flatMap(line));
+  if (c.mode === 'fallback') lines.push(`Everything on in Calgary: ${branding.origin}/events`, '');
+  lines.push(`See all your plans: ${branding.origin}/plans`, '');
+  if (options.offerMonday) lines.push(...crossPromoText(branding.origin, 'monday'));
   lines.push(
-    `See all your plans: ${branding.origin}/plans`,
-    '',
     '--------------------------------------------------------------',
     wrap(EVENTS_REASON),
     '',

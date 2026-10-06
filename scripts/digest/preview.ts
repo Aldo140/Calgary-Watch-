@@ -15,7 +15,10 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
-import { renderDigestHtml, renderDigestText, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { renderDigestHtml, renderDigestText, renderEventsHtml, renderEventsText, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { buildEventPicks } from '../../src/lib/eventPicks.js';
+import { eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
+import type { Event } from '../../src/types/discovery.js';
 import { renderAlertEmail } from '../alerts/render.js';
 import { DIGEST_CONTRIBUTION_STYLES, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import type { Incident } from '../../src/types/index.js';
@@ -91,7 +94,9 @@ const BRANDING: DigestBranding = {
 
 const summary = buildDigestSummary({ incidents: SAMPLE, profile: PROFILE, home: HOME, now: NOW });
 const unsub = unsubscribeUrl(BRANDING.origin, PROFILE.uid, 'a'.repeat(32));
-const shared = { summary, displayName: PROFILE.displayName, unsubscribeUrl: unsub, branding: BRANDING };
+// The Monday sample is a Monday-only reader, so it carries the Thursday offer;
+// digest-both.html is the same reader who also gets Thursday picks.
+const shared = { summary, displayName: PROFILE.displayName, unsubscribeUrl: unsub, branding: BRANDING, offerThursday: true };
 
 /**
  * Swap the cid: references for data URIs.
@@ -130,6 +135,7 @@ mkdirSync(OUTPUT_DIR, { recursive: true });
 writeFileSync(`${OUTPUT_DIR}/digest.html`, browserPreview(renderDigestHtml(shared)));
 writeFileSync(`${OUTPUT_DIR}/digest.txt`, renderDigestText(shared));
 writeFileSync(`${OUTPUT_DIR}/welcome.html`, browserPreview(renderWelcomeHtml(shared)));
+writeFileSync(`${OUTPUT_DIR}/digest-both.html`, browserPreview(renderDigestHtml({ ...shared, offerThursday: false })));
 
 // Instant-alert email — the between-digest urgent nudge. A believable mix: an
 // emergency (which always alerts) plus two nearby neighbour reports.
@@ -186,5 +192,39 @@ writeFileSync(`${OUTPUT_DIR}/city.html`, browserPreview(renderDigestHtml({
 console.log(`City variant: scope=${citySummary.scope}, ${citySummary.total} reports, `
   + `top areas ${citySummary.topAreas.map((a) => `${a.name} ${a.count}`).join(', ')}`);
 
-console.log(`Wrote digest, welcome and all three planner-format previews to ${OUTPUT_DIR}/`);
+// ── Thursday picks: one preview per case the sender can produce ─────────────
+// Fixed fixture events around a Thursday 08:00 send, so every case renders the
+// same way on every build (the real send uses the published inventory).
+const THURSDAY = Date.UTC(2026, 7, 20, 14, 0, 0);
+const at = (days: number, hour: number) => new Date(THURSDAY + days * 86_400_000 + (hour - 8) * HOUR).toISOString();
+const ev = (id: string, title: string, start: string, extra: Partial<Event> = {}): Event => ({
+  kind: 'event', id, slug: id, title, summary: '', description: '', categories: [], tags: [],
+  sources: [{ name: 'Organizer', url: 'https://example.org', kind: 'official' }], status: 'published', verification: 'source-feed', updatedAt: '2026-08-18',
+  start, end: new Date(Date.parse(start) + 2 * HOUR).toISOString(), timezone: 'America/Edmonton', pricing: 'paid', organizer: 'Organizer', address: 'Calgary', ...extra,
+});
+const EVENTS: Event[] = [
+  ev('jazz', 'Late-night jazz at the Ironwood', at(1, 21), { venue: 'Ironwood Stage & Grill', neighbourhood: 'Inglewood' }),
+  ev('phil', 'Calgary Phil plays Beethoven 7', at(2, 19), { venue: 'Jack Singer Concert Hall', neighbourhood: 'Downtown' }),
+  ev('market', 'Bridgeland night market', at(1, 17), { venue: 'Murdoch Park', neighbourhood: 'Bridgeland', categories: ['food'], pricing: 'free' }),
+  ev('kids', 'Saturday storytime and crafts', at(2, 10), { venue: 'Central Library', neighbourhood: 'Downtown', categories: ['family'], pricing: 'free' }),
+  ev('flames', 'Flames vs. Oilers', at(3, 19), { venue: 'Scotiabank Saddledome', neighbourhood: 'Beltline', categories: ['sports'] }),
+  ev('talk', 'Author talk: the Bow River, upstream', at(5, 19), { venue: 'Memorial Park Library', neighbourhood: 'Beltline' }),
+  ev('play', 'Theatre Calgary: opening night', at(6, 19), { venue: 'Max Bell Theatre', neighbourhood: 'Downtown', categories: ['arts'] }),
+];
+const eventsBase = { displayName: PROFILE.displayName, unsubscribeUrl: eventsUnsubscribeUrl('https://calgarywatch.ca', PROFILE.uid, 'a'.repeat(32)), branding: BRANDING, at: THURSDAY };
+const picksFor = (interests: Parameters<typeof buildEventPicks>[0]['interests'], going: string[] = [], homeArea = 'Beltline') =>
+  buildEventPicks({ entities: EVENTS, occurrences: [], interests, homeArea, goingIds: new Set(going), now: new Date(THURSDAY), days: 10, limit: 8 });
+const THURSDAY_CASES: Array<[string, Parameters<typeof renderEventsHtml>[0]]> = [
+  ['thursday-first', { ...eventsBase, picks: picksFor(['music', 'arts']), interests: ['music', 'arts'], area: 'Beltline', first: true, offerMonday: true }],
+  ['thursday', { ...eventsBase, picks: picksFor(['music', 'sports', 'family'], ['flames']), interests: ['music', 'sports', 'family'], area: 'Beltline' }],
+  ['thursday-fallback', { ...eventsBase, picks: picksFor(['outdoors']), fallback: picksFor([]), interests: ['outdoors'], area: 'Beltline', offerMonday: true }],
+  ['thursday-going-only', { ...eventsBase, picks: { ...picksFor(['outdoors'], ['phil']), picks: [] }, fallback: { going: [], picks: [], considered: 0 }, interests: ['outdoors'], area: 'Beltline' }],
+  ['thursday-no-area', { ...eventsBase, picks: picksFor(['food', 'family'], [], ''), interests: ['food', 'family'], area: '', offerMonday: true }],
+];
+for (const [name, options] of THURSDAY_CASES) {
+  writeFileSync(`${OUTPUT_DIR}/${name}.html`, browserPreview(renderEventsHtml(options)));
+  writeFileSync(`${OUTPUT_DIR}/${name}.txt`, renderEventsText(options));
+}
+
+console.log(`Wrote digest, welcome, all three planner-format previews and ${THURSDAY_CASES.length} Thursday cases to ${OUTPUT_DIR}/`);
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

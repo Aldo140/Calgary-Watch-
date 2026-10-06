@@ -48,12 +48,34 @@ export function eventsUnsubscribeUrl(origin: string, uid: string, token: string)
   return url.toString();
 }
 
+/**
+ * What this reader's Thursday email is, this week.
+ *   picks       – things matching their interests (the normal case)
+ *   fallback    – nothing matched, so a short "what else is on" list instead
+ *                 of an empty email; says so plainly
+ *   going-only  – nothing new, but reminders for what they said they're going to
+ *   skip        – nothing at all: no email is better than an empty one
+ */
+export type EventsEmailMode = 'picks' | 'fallback' | 'going-only' | 'skip';
+
+export function eventsEmailMode(picks: EventPicks, fallback: EventPicks | null): EventsEmailMode {
+  if (picks.picks.length) return 'picks';
+  if (fallback?.picks.length) return 'fallback';
+  if (picks.going.length) return 'going-only';
+  return 'skip';
+}
+
 /** Subject line: the reader's first real pick, never a manufactured superlative. */
-export function eventsSubject(picks: EventPicks, interests: readonly EventInterestId[]): string {
-  if (picks.going.length) return `You’re going to ${picks.going[0].title}, plus ${picks.picks.length} more picks`;
+export function eventsSubject(picks: EventPicks, interests: readonly EventInterestId[], opts: { mode?: EventsEmailMode; first?: boolean; fallbackCount?: number } = {}): string {
+  const mode = opts.mode ?? eventsEmailMode(picks, null);
+  if (opts.first && mode === 'picks') return `Your first Thursday picks: ${picks.picks.length} things to do in Calgary`;
+  if (picks.going.length && mode !== 'fallback') return picks.picks.length
+    ? `You’re going to ${picks.going[0].title}, plus ${picks.picks.length} more pick${picks.picks.length === 1 ? '' : 's'}`
+    : `Reminder: you’re going to ${picks.going[0].title}`;
+  if (mode === 'fallback') return `Nothing matched your picks this week, but ${opts.fallbackCount ?? 'a few'} things are on`;
   if (!picks.picks.length) return 'A quiet week for your picks in Calgary';
   const lead = interests.length ? `${interestLabel(interests[0])} and more` : 'What’s on';
-  return `${lead}: ${picks.picks.length} Calgary picks for this week`;
+  return `${lead}: ${picks.picks.length} Calgary pick${picks.picks.length === 1 ? '' : 's'} for this week`;
 }
 
 /** Sentence for the top of the email explaining why these were chosen. */

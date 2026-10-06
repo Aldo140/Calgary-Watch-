@@ -11,9 +11,10 @@ import { describe, it } from 'node:test';
 import type { Event, Market, MarketOccurrence } from '../src/types/discovery.ts';
 import { buildEventPicks, interestsFor, neighbourhoodPoint, normalizeInterests, pickWhen } from '../src/lib/eventPicks.ts';
 import { computeBadges, FOUNDING_CUTOFF, orderBadges } from '../src/lib/badges.ts';
-import { eventsConsentRefusal, eventsSubject, eventsUnsubscribeUrl } from '../src/lib/eventsDigest.ts';
+import { eventsConsentRefusal, eventsEmailMode, eventsSubject, eventsUnsubscribeUrl } from '../src/lib/eventsDigest.ts';
 import { emailConsentPatch, readPlansProfile } from '../src/lib/plansProfile.ts';
-import { renderEventsHtml, renderEventsText } from '../scripts/digest/render.ts';
+import { renderDigestText, renderEventsHtml, renderEventsText } from '../scripts/digest/render.ts';
+import { buildDigestSummary } from '../src/lib/digest.ts';
 import { googleCalendarUrl, icsFile } from '../src/lib/calendarFile.ts';
 import { filterInventory, matchesText } from '../src/lib/discoveryCalendar.ts';
 import { demandQuery, summarizeDemand } from '../src/lib/searchDemand.ts';
@@ -234,5 +235,44 @@ describe('finding and adding events', () => {
   it('sharing a listing earns Event scout', () => {
     const base = { hasHomeArea: false, interestCount: 0, eventsDigestOptIn: false, weeklyDigestOptIn: false, goingCount: 0, goingInterestCount: 0 };
     assert.equal(computeBadges({ ...base, submissionCount: 1 }).find((b) => b.id === 'scout')!.unlocked, true);
+  });
+});
+
+describe('every Thursday case', () => {
+  const branding = { mailingAddress: '123 Main St, Calgary AB', senderName: 'CalgaryWatch', supportEmail: 'hi@calgarywatch.ca', origin: 'https://calgarywatch.ca' };
+  const base = { interests: ['outdoors'] as ('outdoors')[], area: 'Beltline', unsubscribeUrl: 'u', branding, at: NOW.getTime() };
+  const none = { going: [], picks: [], considered: 0 };
+  it('picks, fallback, going-only, skip', () => {
+    const matched = buildEventPicks({ entities, occurrences, interests: ['music'], now: NOW });
+    const unmatched = buildEventPicks({ entities, occurrences, interests: ['outdoors'], now: NOW });
+    const everything = buildEventPicks({ entities, occurrences, interests: [], now: NOW });
+    assert.equal(eventsEmailMode(matched, null), 'picks');
+    assert.equal(eventsEmailMode(unmatched, everything), 'fallback');
+    assert.equal(eventsEmailMode({ ...none, going: matched.picks }, none), 'going-only');
+    assert.equal(eventsEmailMode(none, none), 'skip');
+  });
+  it('fallback says so plainly and lists what else is on', () => {
+    const unmatched = buildEventPicks({ entities, occurrences, interests: ['outdoors'], now: NOW });
+    const text = renderEventsText({ ...base, picks: unmatched, fallback: buildEventPicks({ entities, occurrences, interests: [], now: NOW }) });
+    assert.match(text, /Nothing we’ve checked with an organizer matches your interests/);
+    assert.match(text, /ALSO ON IN CALGARY/);
+  });
+  it('first email says hello; later ones do not', () => {
+    const picks = buildEventPicks({ entities, occurrences, interests: ['music'], now: NOW });
+    assert.match(renderEventsText({ ...base, interests: ['music'], picks, first: true }), /Welcome to Thursday picks/);
+    assert.doesNotMatch(renderEventsText({ ...base, interests: ['music'], picks }), /Welcome to Thursday picks/);
+    assert.match(eventsSubject(picks, ['music'], { mode: 'picks', first: true }), /^Your first Thursday picks/);
+  });
+  it('no home area asks for one', () => {
+    const picks = buildEventPicks({ entities, occurrences, interests: ['music'], now: NOW });
+    assert.match(renderEventsHtml({ ...base, interests: ['music'], area: '', picks }), /Tell us your neighbourhood/);
+  });
+  it('each email offers the other list only to people not on it', () => {
+    const picks = buildEventPicks({ entities, occurrences, interests: ['music'], now: NOW });
+    assert.match(renderEventsText({ ...base, interests: ['music'], picks, offerMonday: true }), /plans\?email=monday/);
+    assert.doesNotMatch(renderEventsText({ ...base, interests: ['music'], picks, offerMonday: false }), /email=monday/);
+    const summary = buildDigestSummary({ incidents: [], profile: { uid: 'u', weeklyDigestOptIn: true }, home: null, now: NOW.getTime() });
+    assert.match(renderDigestText({ summary, unsubscribeUrl: 'u', branding, offerThursday: true }), /plans\?email=thursday/);
+    assert.doesNotMatch(renderDigestText({ summary, unsubscribeUrl: 'u', branding }), /email=thursday/);
   });
 });

@@ -27,11 +27,11 @@ import { join } from 'node:path';
 
 import { digestWeekKey, isValidUnsubToken } from '../../src/lib/digest.js';
 import { buildEventPicks, normalizeInterests, neighbourhoodPoint, type Point } from '../../src/lib/eventPicks.js';
-import { eventsConsentRefusal, eventsSendId, eventsSubject, eventsUnsubscribeUrl, type EventsDigestRecipient } from '../../src/lib/eventsDigest.js';
+import { eventsConsentRefusal, eventsEmailMode, eventsSendId, eventsUnsubscribeUrl, type EventsDigestRecipient } from '../../src/lib/eventsDigest.js';
 import { createDiscoveryRepository } from '../../src/lib/discovery.js';
 import { resolveHomeLocation } from '../../src/hooks/useHomeLocation.js';
 import type { DiscoveryEntity, MarketOccurrence } from '../../src/types/discovery.js';
-import { assertBrandingComplete, renderEventsHtml, renderEventsText, type DigestBranding } from './render.js';
+import { assertBrandingComplete, eventsEmailContent, renderEventsHtml, renderEventsText, type DigestBranding } from './render.js';
 import { letterheadImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
 
@@ -90,7 +90,7 @@ async function processUnsubscribes(db: Firestore): Promise<number> {
   return honoured;
 }
 
-type Loaded = EventsDigestRecipient & { _address: string };
+type Loaded = EventsDigestRecipient & { _address: string; _mondayOn: boolean };
 
 async function loadRecipients(db: Firestore): Promise<Loaded[]> {
   const onlyUid = process.env.DIGEST_ONLY_UID?.trim();
@@ -115,6 +115,7 @@ async function loadRecipients(db: Firestore): Promise<Loaded[]> {
       eventsWelcomeSentAt: typeof d.eventsWelcomeSentAt === 'number' ? d.eventsWelcomeSentAt : null,
       // Kept off the recipient type so it can't reach a template.
       _address: typeof d.address === 'string' ? d.address : '',
+      _mondayOn: d.weeklyDigestOptIn === true,
     };
   });
 }
@@ -214,17 +215,36 @@ async function run() {
         days: WINDOW_DAYS,
         limit: MAX_PICKS,
       });
+      // Nothing matched their interests: a short "what else is on" instead of an empty email.
+      const fallback = picks.picks.length ? null : buildEventPicks({
+        entities: inventory.entities, occurrences: inventory.occurrences, interests: [], home, homeArea: area, goingIds, now, days: WINDOW_DAYS, limit: 5,
+      });
+      const mode = eventsEmailMode(picks, fallback);
+      if (mode === 'skip') {
+        // No email is better than an empty one. Release the week so a re-run can try again.
+        await claim.delete().catch(() => {});
+        skipped += 1;
+        console.log(`[events] skip ${profile.uid}: nothing on in the next ${WINDOW_DAYS} days`);
+        continue;
+      }
 
       const token = await ensureUnsubToken(db, profile);
       const unsubscribeUrl = eventsUnsubscribeUrl(origin, profile.uid, token);
-      const shared = { picks, interests: profile.eventInterests, area, displayName: profile.displayName, unsubscribeUrl, branding, at: now.getTime() };
+      const shared = {
+        picks, fallback, interests: profile.eventInterests, area, displayName: profile.displayName, unsubscribeUrl, branding, at: now.getTime(),
+        first: !profile.eventsWelcomeSentAt,
+        offerMonday: !profile._mondayOn,
+      };
+      const content = eventsEmailContent(shared);
       const email = {
         to: profile.email!.trim(),
-        subject: eventsSubject(picks, profile.eventInterests),
+        subject: content.subject,
         html: renderEventsHtml(shared),
         text: renderEventsText(shared),
         unsubscribeUrl,
-        replyTo: sender.replyTo,
+        // Replies go to a person, not the Monday reply-routing inbox (whose
+        // per-send tokens only exist for the Monday ledger).
+        replyTo: process.env.DIGEST_REPLY_TO?.trim() || process.env.DIGEST_SUPPORT_EMAIL?.trim() || undefined,
         inline: letterheadImages(),
       };
 
@@ -233,12 +253,12 @@ async function run() {
         // Nothing reached the real reader: release the week so Thursday's real run isn't spent.
         await claim.delete().catch(() => {});
         if (result.skipped) skipped += 1; else sent += 1;
-        console.log(`[events] ${result.blocked ? 'blocked' : result.skipped ? 'dry run' : 'test sent'} ${profile.uid} — ${picks.going.length} going, ${picks.picks.length} picks; claim released`);
+        console.log(`[events] ${result.blocked ? 'blocked' : result.skipped ? 'dry run' : 'test sent'} ${profile.uid} — ${mode}${shared.first ? ' (first)' : ''}, ${picks.going.length} going, ${content.list.length} listed; claim released`);
       } else if (result.ok) {
         sent += 1;
-        await claim.set({ status: 'sent', sentAt: Date.now(), providerId: result.id ?? null, subject: email.subject, picks: picks.picks.length, going: picks.going.length }, { merge: true });
+        await claim.set({ status: 'sent', sentAt: Date.now(), providerId: result.id ?? null, subject: email.subject, mode, first: shared.first, picks: content.list.length, going: picks.going.length }, { merge: true });
         if (!profile.eventsWelcomeSentAt) await db.collection('users').doc(profile.uid).set({ eventsWelcomeSentAt: Date.now() }, { merge: true });
-        console.log(`[events] sent ${profile.uid} — ${picks.going.length} going, ${picks.picks.length} picks`);
+        console.log(`[events] sent ${profile.uid} — ${mode}${shared.first ? ' (first)' : ''}, ${picks.going.length} going, ${content.list.length} listed`);
       } else {
         failed += 1;
         await claim.delete().catch(() => {});

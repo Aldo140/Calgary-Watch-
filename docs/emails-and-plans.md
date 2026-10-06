@@ -73,6 +73,11 @@ so "Music" finds the symphony even when a feed only tagged it "arts".
   next run for that list honours it before choosing recipients. If they opt
   back in after filing it, the newer consent wins.
 - Re-subscribing records a fresh consent date.
+- Unsubscribed by link but the run hasn't happened yet: `/plans` already
+  shows that email unticked, with a note. If the person clicking the link is
+  signed in as that account, it is switched off on the profile immediately.
+- Street address but no neighbourhood name: picks still rank by distance
+  (the address resolves to a point), and no "add your area" prompt is shown.
 
 ## "I'm going" and badges
 
@@ -109,6 +114,25 @@ it hourly with the same validation, then republishes the site.
   queued-change history.
 - **Search demand**: anonymous searches, and what people looked for but
   didn't find.
+
+## Admin and the read quota
+
+Firestore's free plan allows 50,000 reads a day, and every scheduled job
+shares it with the site. Admin is built to stay small:
+- The report archive and the account directory are read **once per browser
+  tab** and shared between /admin, /admin/incidents and /admin/users. A live
+  window on the newest 150 reports keeps the desk current; moderation edits
+  update the screen without a re-read; **Refresh** re-reads on demand.
+- Totals (accounts, subscribers, pending suggestions, opt-outs) are
+  server-side counts: one read per thousand documents.
+- Page views are re-read every five minutes, not streamed per visit.
+- Every admin query uses single-field filters, so no composite index has to
+  be deployed (the rules-only backend release doesn't create indexes).
+
+**What appears on the Watch desk:** flagged reports, unreviewed reports,
+failing feeds, resident event suggestions, moderation the hourly job couldn't
+apply, and moderation queued for over two hours (the job may not be running).
+Each has an action or an Open button; Events & markets carries the same count.
 
 ## Data model (Firestore)
 

@@ -344,8 +344,11 @@ describe('discovery collections lockdown', () => {
     }
   });
 
-  it('entity_submissions cannot be written directly by a client either', () => {
-    assert.match(submissionsBlock, /allow write: if false/);
+  it('entity_submissions: a client may only file its own pending suggestion, never edit or delete one', () => {
+    assert.match(submissionsBlock, /request\.resource\.data\.submittedBy == request\.auth\.uid/);
+    assert.match(submissionsBlock, /id\.matches\('\^' \+ request\.auth\.uid/);
+    assert.match(submissionsBlock, /allow update: if isAdmin\(\)/);
+    assert.match(submissionsBlock, /allow delete: if false/);
   });
 
   it('entity_submissions reads are limited to the admin or the original submitter', () => {

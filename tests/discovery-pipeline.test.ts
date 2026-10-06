@@ -115,7 +115,10 @@ describe('Publication and SEO',()=>{
   });
   it('protects submissions and raw inventory with callable-only writes',()=>{
     const rules=readFileSync('firestore.rules','utf8');
-    assert.match(rules,/match \/entity_submissions\/\{id\}[^}]*allow write: if false/s);
+    // Direct suggestions (when the callable isn't deployed) are pending-only, one of five daily slots, never deletable.
+    const subs=rules.slice(rules.indexOf('match /entity_submissions/{id}'),rules.indexOf('match /discovery_actions/'));
+    assert.match(subs,/request\.resource\.data\.status == 'pending'/);assert.match(subs,/_\[1-5\]\$/);assert.match(subs,/allow update: if isAdmin\(\)/);assert.match(subs,/allow delete: if false/);
+    const queue=readFileSync('scripts/discovery/actions.ts','utf8');assert.match(queue,/store\.ingestRecord/);assert.match(queue,/ALLOWED_ADMIN_EMAILS/);
     assert.match(rules,/'discovery_source_records', 'discovery_audit'\] && isAdmin\(\)/);
     const callable=readFileSync('functions/discovery.cjs','utf8');
     assert.match(callable,/validateSubmission\(request.data\)/);assert.match(callable,/await assertAdmin\(db,request.auth\)/);

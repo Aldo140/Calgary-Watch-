@@ -39,10 +39,32 @@ so nobody is asked twice.
 
 | Person wants | What they tick | Mondays | Thursdays | Offers they see |
 |---|---|---|---|---|
-| Crime/safety and events | both | Monday brief | Thursday picks | none |
+| Crime/safety and events | both | **Your week** (combined) | — (picks already sent Monday) | none |
 | Crime/safety only | Monday | Monday brief | — | Thursday offer at the bottom of each Monday email; "Add Thursday" on `/plans`; one-tap Thursday offer on event pages |
 | Events only | Thursday | — | Thursday picks | Monday offer at the bottom of each Thursday email; "Add Monday" on `/plans` |
 | Neither (account, plans, badges) | neither | — | — | both offers on `/plans`; Thursday offer on event pages |
+
+**Both lists: the combined "your week" email.** From their second Monday
+on, somebody on both lists gets one email instead of two: the week at a
+glance (reported nearby, picks for you, you're going), then chapter 01 *Near
+home* (the full Monday brief) and chapter 02 *Out & about* (reminders, then
+up to five picks for the next seven days). The ledger row is
+`digest_sends/{uid}_{week}` with `kind: 'combined'`; Thursday reads it and
+skips them that week. If no events are on at all, or the inventory can't
+load, they get the plain Monday brief and Thursday runs as usual. The first
+combined email explains the merge once (`combinedIntroSentAt`). The footer
+offers "Unsubscribe from both" (`/unsubscribe?list=all`, also the
+List-Unsubscribe header), "Only stop safety reports" and "Only stop event
+picks". Monday honours pending event-picks opt-outs before it selects
+anybody. Their very first Monday is still the welcome letter.
+
+| Combined case | Subject | Glance + chapter 02 |
+|---|---|---|
+| Going to something | "Your week in Beltline: you're going to X, plus 4 reports nearby" | Reminders, then picks |
+| Picks matched | "Your week in Beltline: 4 reports nearby, 5 picks for you" | Picks |
+| Quiet week | "Your week in Beltline: all quiet, and 5 picks for you" | Subline "Quiet streets. Plenty on." |
+| Nothing matched interests | "…, 4 things on" | Says so, then what else is on |
+| No area saved | "Your Calgary week: …" | City-wide brief with the add-your-area prompt |
 
 **Monday cases** (unchanged behaviour, now reachable from `/plans`)
 - First Monday: the welcome letter. Later: the weekly brief.
@@ -138,7 +160,7 @@ Each has an action or an Open button; Events & markets carries the same count.
 
 | Collection | Written by | Read by | Holds |
 |---|---|---|---|
-| `users/{uid}` | owner (`/plans`, map settings); senders (welcome stamps, tokens, unsubscribes) | owner, admin | identity, `neighborhood` / `address` / `inferredNeighborhood`, `piiConsentAt`, both lists' opt-in fields, `eventInterests`, `digestUnsubToken`, `digestWelcomeSentAt`, `eventsWelcomeSentAt` |
+| `users/{uid}` | owner (`/plans`, map settings); senders (welcome stamps, tokens, unsubscribes) | owner, admin | identity, `neighborhood` / `address` / `inferredNeighborhood`, `piiConsentAt`, both lists' opt-in fields, `eventInterests`, `digestUnsubToken`, `digestWelcomeSentAt`, `eventsWelcomeSentAt`, `combinedIntroSentAt` |
 | `digest_sends`, `events_digest_sends` | senders (Admin SDK) | admin (Thursday) | one row per person per week |
 | `digest_unsubscribes`, `events_digest_unsubscribes` | anyone with the link's token | owner, admin | opt-out requests; stamped, never deleted |
 | `event_rsvps` | owner | owner, admin | `uid`, `eventId`, `start`, `createdAt` |

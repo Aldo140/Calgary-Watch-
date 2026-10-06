@@ -10,7 +10,9 @@
 import {
   buildDigestSummary, unsubscribeUrl, type DigestRecipient,
 } from '../../src/lib/digest.js';
-import { renderDigestHtml, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { renderCombinedHtml, renderDigestHtml, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { buildEventPicks } from '../../src/lib/eventPicks.js';
+import type { Event } from '../../src/types/discovery.js';
 import { auditContrast } from './contrast.js';
 import { validateImages } from './images.js';
 import { letterheadImages, welcomeImages } from './art.js';
@@ -83,8 +85,23 @@ for (const testCase of CASES) {
     unsubscribeUrl: unsubscribeUrl(BRANDING.origin, testCase.profile.uid, 'a'.repeat(32)),
     branding: BRANDING,
   };
+  // The combined email for a reader on both lists: one going, two picks.
+  const ev = (id: string, title: string, days: number): Event => ({
+    kind: 'event', id, slug: id, title, summary: '', description: '', categories: [], tags: [],
+    sources: [{ name: 'Organizer', url: 'https://example.org', kind: 'official' }], status: 'published', verification: 'source-feed', updatedAt: '2026-08-01',
+    start: new Date(NOW + days * 86_400_000).toISOString(), end: new Date(NOW + days * 86_400_000 + 7_200_000).toISOString(),
+    timezone: 'America/Edmonton', pricing: 'free', organizer: 'Org', address: 'Calgary', venue: 'Central Library', neighbourhood: 'Downtown',
+  } as Event);
+  const picks = buildEventPicks({
+    entities: [ev('a', 'Storytime', 1), ev('b', 'Jazz night', 2), ev('c', 'Night market', 3)], occurrences: [],
+    interests: [], goingIds: new Set(['a']), homeArea: 'Beltline', now: new Date(NOW), days: 7, limit: 5,
+  });
+  const combined = renderCombinedHtml({
+    summary, picks, interests: [], area: 'Beltline', displayName: 'Aldo', branding: BRANDING, firstCombined: true,
+    unsubscribeAllUrl: shared.unsubscribeUrl, unsubscribeMondayUrl: shared.unsubscribeUrl, unsubscribeEventsUrl: shared.unsubscribeUrl,
+  });
   for (const [kind, html] of [
-    ['digest', renderDigestHtml(shared)], ['welcome', renderWelcomeHtml(shared)],
+    ['digest', renderDigestHtml(shared)], ['welcome', renderWelcomeHtml(shared)], ['combined', combined],
   ] as const) {
     const findings = auditContrast(html);
     checked += findings.length;

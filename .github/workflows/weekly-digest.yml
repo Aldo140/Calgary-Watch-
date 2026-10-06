@@ -53,6 +53,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Readers on both lists get event picks inside this email, from the
+      # same published inventory the site builds from. If the export fails the
+      # committed copy is used, and the brief still goes out either way.
+      - name: Export verified discovery inventory
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        run: npm run discovery:export
+
       - name: Send weekly digest
         run: npx tsx scripts/digest/weekly.ts
         env:

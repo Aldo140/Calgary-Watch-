@@ -235,7 +235,7 @@ export function DigestReplyInbox() {
                     <div className="flex flex-wrap items-center gap-2">
                       <Chip tone={selected.status === 'handled' ? 'ok' : selected.status === 'unread' ? 'attention' : 'neutral'}>{statusCopy[selected.status]}</Chip>
                       {selected.automated && <Chip tone="attention">Automatic response</Chip>}
-                      {selected.deliveryKind && <Chip>{selected.deliveryKind === 'welcome' ? 'Welcome letter' : 'Weekly brief'}</Chip>}
+                      {selected.deliveryKind && <Chip>{selected.deliveryKind === 'welcome' ? 'Welcome letter' : selected.deliveryKind === 'combined' ? 'Your week (both)' : 'Weekly brief'}</Chip>}
                       {selected.weekKey && <span className="text-[0.68rem]" style={{ color: T.muted, fontFamily: mono }}>{selected.weekKey}</span>}
                     </div>
                     <h3 className="mt-3 text-lg font-bold leading-snug" style={{ color: T.ink, fontFamily: display }}>{selected.subject}</h3>

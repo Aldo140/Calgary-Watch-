@@ -276,3 +276,77 @@ describe('every Thursday case', () => {
     assert.doesNotMatch(renderDigestText({ summary, unsubscribeUrl: 'u', branding }), /email=thursday/);
   });
 });
+
+describe('combined "your week" email (both lists)', async () => {
+  const { renderCombinedHtml, renderCombinedText, combinedEmailContent } = await import('../scripts/digest/render.ts');
+  const { combinedSubject } = await import('../scripts/digest/copy.ts');
+  const { allUnsubscribeUrl } = await import('../src/lib/eventsDigest.ts');
+  const branding = { mailingAddress: '123 Main St, Calgary AB', senderName: 'CalgaryWatch', supportEmail: 'hi@calgarywatch.ca', origin: 'https://calgarywatch.ca' };
+  const home = { lat: 51.0447, lng: -114.0719 };
+  const profile = { uid: 'u1', email: 'a@b.co', displayName: 'Sam Lee', neighborhood: 'Beltline', weeklyDigestOptIn: true, weeklyDigestOptInAt: 1 };
+  const busy = buildDigestSummary({
+    incidents: [{ id: 'i1', title: 'Bike stolen', description: '', category: 'crime', neighborhood: 'Beltline', lat: home.lat, lng: home.lng, timestamp: NOW.getTime() - 3600_000, name: 'A neighbour', verified_status: 'unverified', report_count: 1, visibility: 'public', data_source: 'community' } as never],
+    profile, home, now: NOW.getTime(),
+  });
+  const quiet = buildDigestSummary({ incidents: [], profile, home, now: NOW.getTime() });
+  const picks = buildEventPicks({ entities, occurrences, interests: ['music', 'sports'], goingIds: new Set(['flames']), homeArea: 'Beltline', now: NOW, days: 7, limit: 5 });
+  const base = {
+    summary: busy, picks, interests: ['music', 'sports'] as ('music' | 'sports')[], area: 'Beltline', displayName: 'Sam Lee', branding,
+    unsubscribeAllUrl: allUnsubscribeUrl(branding.origin, 'u1', 'a'.repeat(32)),
+    unsubscribeMondayUrl: 'https://calgarywatch.ca/unsubscribe?uid=u1&t=x',
+    unsubscribeEventsUrl: eventsUnsubscribeUrl(branding.origin, 'u1', 'a'.repeat(32)),
+  };
+
+  it('carries both chapters, the glance tiles and all three unsubscribe choices', () => {
+    const html = renderCombinedHtml(base);
+    const text = renderCombinedText(base);
+    for (const body of [html, text]) {
+      assert.match(body, /Bike stolen/);
+      assert.match(body, /Flames vs\. Oilers/);
+      assert.match(body, /list=all/);
+      assert.match(body, /list=events/);
+      assert.match(body, /123 Main St/);
+    }
+    assert.match(html, /Near home/);
+    assert.match(html, /Out &amp; about/);
+    assert.match(html, /Unsubscribe from both/);
+    assert.match(html, /Only stop safety reports/);
+    assert.match(html, /Only stop event picks/);
+    assert.match(html, /reminder here next Monday/);
+  });
+
+  it('leads the subject with the plan the reader made', () => {
+    assert.match(combinedEmailContent(base).subject, /^Your week in Beltline: you’re going to Flames vs\. Oilers, plus 1 report nearby$/);
+  });
+
+  it('says so plainly on a quiet week, and in fallback mode', () => {
+    const fallback = buildEventPicks({ entities, occurrences, interests: [], homeArea: 'Beltline', now: NOW, days: 7, limit: 4 });
+    assert.equal(combinedSubject({ summary: quiet, going: [], listed: 3, fallback: true }), 'Your week in Beltline: all quiet, and 3 things on');
+    const c = combinedEmailContent({ ...base, summary: quiet, picks: { going: [], picks: [], considered: 0 }, fallback });
+    assert.equal(c.mode, 'fallback');
+    assert.equal(c.subline, 'Quiet streets. Plenty on.');
+    assert.match(c.eventsLead, /what else is on/);
+  });
+
+  it('explains the merge once, only when asked to', () => {
+    assert.match(renderCombinedHtml({ ...base, firstCombined: true }), /One email a week instead of two/);
+    assert.doesNotMatch(renderCombinedHtml(base), /One email a week instead of two/);
+  });
+
+  it('escapes listing titles', () => {
+    const evil = event({ id: 'x', title: '<script>alert(1)</script> gig', start: '2026-10-10T02:00:00Z' });
+    const p2 = buildEventPicks({ entities: [evil], occurrences: [], interests: [], now: NOW });
+    assert.doesNotMatch(renderCombinedHtml({ ...base, picks: p2 }), /<script>/);
+  });
+
+  it('wires the senders: Monday sends it, Thursday skips readers it reached', () => {
+    const monday = readFileSync(new URL('../scripts/digest/weekly.ts', import.meta.url), 'utf8');
+    const thursday = readFileSync(new URL('../scripts/digest/events.ts', import.meta.url), 'utf8');
+    assert.match(monday, /kind: 'combined'/);
+    assert.match(monday, /processEventsUnsubscribes/);
+    assert.match(monday, /unsubscribeUrl: combined\.unsubscribeAllUrl/);
+    assert.match(thursday, /monday\.kind === 'combined'/);
+    const page = readFileSync(new URL('../src/pages/UnsubscribePage.tsx', import.meta.url), 'utf8');
+    assert.match(page, /get\('list'\) === 'all'/);
+  });
+});

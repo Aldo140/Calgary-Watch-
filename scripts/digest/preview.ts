@@ -15,9 +15,9 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
-import { renderDigestHtml, renderDigestText, renderEventsHtml, renderEventsText, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { renderCombinedHtml, renderCombinedText, renderDigestHtml, renderDigestText, renderEventsHtml, renderEventsText, renderWelcomeHtml, type DigestBranding } from './render.js';
 import { buildEventPicks } from '../../src/lib/eventPicks.js';
-import { eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
+import { allUnsubscribeUrl, eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
 import type { Event } from '../../src/types/discovery.js';
 import { renderAlertEmail } from '../alerts/render.js';
 import { DIGEST_CONTRIBUTION_STYLES, type DigestContribution } from '../../src/lib/digestPlanner.js';
@@ -226,5 +226,26 @@ for (const [name, options] of THURSDAY_CASES) {
   writeFileSync(`${OUTPUT_DIR}/${name}.txt`, renderEventsText(options));
 }
 
-console.log(`Wrote digest, welcome, all three planner-format previews and ${THURSDAY_CASES.length} Thursday cases to ${OUTPUT_DIR}/`);
+// ── Combined "your week": readers on both lists, one per case ──────────────
+const mondayPicks = (interests: Parameters<typeof buildEventPicks>[0]['interests'], going: string[] = []) =>
+  buildEventPicks({ entities: EVENTS, occurrences: [], interests, homeArea: 'Beltline', goingIds: new Set(going), now: new Date(NOW), days: 7, limit: 5 });
+const quietSummary = buildDigestSummary({ incidents: [], profile: PROFILE, home: HOME, now: NOW });
+const combinedBase = {
+  summary, displayName: PROFILE.displayName, branding: BRANDING, area: 'Beltline',
+  unsubscribeAllUrl: allUnsubscribeUrl(BRANDING.origin, PROFILE.uid, 'a'.repeat(32)),
+  unsubscribeMondayUrl: unsub,
+  unsubscribeEventsUrl: eventsUnsubscribeUrl(BRANDING.origin, PROFILE.uid, 'a'.repeat(32)),
+};
+const COMBINED_CASES: Array<[string, Parameters<typeof renderCombinedHtml>[0]]> = [
+  ['combined-first', { ...combinedBase, picks: mondayPicks(['music', 'sports'], ['jazz']), interests: ['music', 'sports'], firstCombined: true }],
+  ['combined', { ...combinedBase, picks: mondayPicks(['music', 'family', 'food']), interests: ['music', 'family', 'food'] }],
+  ['combined-quiet-fallback', { ...combinedBase, summary: quietSummary, picks: mondayPicks(['outdoors']), fallback: mondayPicks([]), interests: ['outdoors'] }],
+  ['combined-going-only', { ...combinedBase, picks: { ...mondayPicks(['outdoors'], ['phil']), picks: [] }, fallback: { going: [], picks: [], considered: 0 }, interests: ['outdoors'], categories: ['crime', 'traffic'] }],
+];
+for (const [name, options] of COMBINED_CASES) {
+  writeFileSync(`${OUTPUT_DIR}/${name}.html`, browserPreview(renderCombinedHtml(options)));
+  writeFileSync(`${OUTPUT_DIR}/${name}.txt`, renderCombinedText(options));
+}
+
+console.log(`Wrote digest, welcome, all three planner-format previews ${THURSDAY_CASES.length} Thursday and ${COMBINED_CASES.length} combined cases to ${OUTPUT_DIR}/`);
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

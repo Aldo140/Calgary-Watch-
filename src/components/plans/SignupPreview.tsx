@@ -1,4 +1,6 @@
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { BADGES, type BadgeId } from '../../lib/badges';
+import { Tilt } from './Motion';
 import { interestLabel, type EventInterestId, type PickItem } from '../../lib/eventPicks';
 import { emailPlan, partOfDay } from '../../lib/memberHome';
 import { BadgeMark } from './BadgeMark';
@@ -17,10 +19,16 @@ export function SignupPreview({ name, area, interests, weekly, events, picks, un
   const possessive = /s$/i.test(place) ? `${place}’` : `${place}’s`;
   const subline = plan.kind === 'thursday' ? `Here’s what’s on near ${place}.` : plan.kind === 'monday' ? `Here’s ${possessive} week.` : `Here’s ${possessive} whole week.`;
   const kicker = plan.kind === 'combined' ? 'Your week' : plan.kind === 'thursday' ? 'Thursday picks' : 'Monday brief';
+  const reduce = useReducedMotion();
+  const swap = { initial: reduce ? false : { opacity: 0, y: 8, filter: 'blur(4px)' }, animate: { opacity: 1, y: 0, filter: 'blur(0px)' }, exit: { opacity: 0, y: -8, filter: 'blur(4px)' }, transition: { duration: 0.28 } } as const;
   return (
     <div className="pl-preview">
-      <p className="pl-kicker">Live preview · your first email</p>
-      <div className="pl-mock" data-kind={plan.kind} aria-hidden="true">
+      <p className="pl-kicker"><span className="pl-live-dot" aria-hidden="true" /> Live preview · your first email</p>
+      <div className="pl-stack">
+      <span className="pl-sheet pl-sheet-a" aria-hidden="true" />
+      <span className="pl-sheet pl-sheet-b" aria-hidden="true" />
+      <Tilt className="pl-tilt">
+      <motion.div className="pl-mock" data-kind={plan.kind} aria-hidden="true" layout={!reduce} transition={{ type: 'spring', stiffness: 260, damping: 28 }}>
         {plan.kind === 'none' ? (
           <div className="pl-mock-off">
             <strong>No email ticked</strong>
@@ -30,11 +38,11 @@ export function SignupPreview({ name, area, interests, weekly, events, picks, un
           <>
             <div className="pl-mock-top">
               <span className="pl-mock-logo">CALGARY<b>WATCH</b><i>•</i></span>
-              <span className="pl-mock-pill">{kicker}</span>
+              <AnimatePresence mode="wait" initial={false}><motion.span key={kicker} className="pl-mock-pill" {...swap}>{kicker}</motion.span></AnimatePresence>
             </div>
             <div className="pl-mock-rule" />
             <p className="pl-mock-hi">{partOfDay(now)}, {name || 'neighbour'}.</p>
-            <p className="pl-mock-sub">{subline}</p>
+            <AnimatePresence mode="wait" initial={false}><motion.p key={subline} className="pl-mock-sub" {...swap}>{subline}</motion.p></AnimatePresence>
             {plan.kind === 'combined' ? (
               <div className="pl-mock-tiles">
                 <span data-tone="coral"><b>4</b>Reported nearby</span>
@@ -61,16 +69,30 @@ export function SignupPreview({ name, area, interests, weekly, events, picks, un
             ) : null}
           </>
         )}
+      </motion.div>
+      </Tilt>
       </div>
       {plan.kind !== 'none' ? <p className="pl-preview-when"><strong>{plan.cadence}</strong> · {plan.inside}</p> : null}
       {unlocks.length ? (
         <div className="pl-unlocks">
           <p className="pl-kicker">You’ll unlock when you save</p>
           <ul>
-            {unlocks.map((id) => {
-              const b = BADGES.find((x) => x.id === id)!;
-              return <li key={id}><BadgeMark badge={{ ...b, unlocked: true }} size={44} /><span>{b.label}</span></li>;
-            })}
+            <AnimatePresence initial={false}>
+              {unlocks.map((id) => {
+                const b = BADGES.find((x) => x.id === id)!;
+                return (
+                  <motion.li
+                    key={id} layout={!reduce}
+                    initial={reduce ? false : { opacity: 0, scale: 0.4, rotate: -25 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    exit={{ opacity: 0, scale: 0.6 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 16 }}
+                  >
+                    <BadgeMark badge={{ ...b, unlocked: true }} size={44} /><span>{b.label}</span>
+                  </motion.li>
+                );
+              })}
+            </AnimatePresence>
           </ul>
         </div>
       ) : null}

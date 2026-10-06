@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { animate, AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { CountUp, EASE_OUT } from './Motion';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Check, Mail, MapPin, Radio } from 'lucide-react';
 import { BADGES, type BadgeState } from '../../lib/badges';
@@ -17,19 +19,25 @@ export function Glance({ near, nearReady, picks, going, badges, total }: {
   near: number; nearReady: boolean; picks: number; going: PickItem[]; badges: number; total: number;
 }) {
   const tiles = [
-    { tone: near ? 'coral' : 'green', n: nearReady ? near : '…', label: 'Near home', sub: nearReady ? (near ? 'Reported in the last 24 h' : 'All quiet, last 24 h') : 'Checking the map', href: '/map' },
+    { tone: near ? 'coral' : 'green', n: nearReady ? near : null, label: 'Near home', sub: nearReady ? (near ? 'Reported in the last 24 h' : 'All quiet, last 24 h') : 'Checking the map', href: '/map' },
     { tone: 'sun', n: picks, label: 'Picks for you', sub: 'Next 10 days', href: '#pl-picks-title' },
     { tone: 'cyan', n: going.length, label: 'You’re going', sub: going[0] ? `Next: ${pickWhen(going[0].start).split(' · ')[0]}` : 'Tap “I’m going”', href: going.length ? '#pl-going-title' : '#pl-picks-title' },
-    { tone: 'navy', n: `${badges}/${total}`, label: 'Badges', sub: badges === total ? 'Every one. Nice.' : `${total - badges} left to earn`, href: '#pl-badges-title' },
+    { tone: 'navy', n: badges, of: total, label: 'Badges', sub: badges === total ? 'Every one. Nice.' : `${total - badges} left to earn`, href: '#pl-badges-title' },
   ];
+  const reduce = useReducedMotion();
   return (
     <div className="pl-glance" role="list">
-      {tiles.map((t) => (
-        <a key={t.label} href={t.href} className="pl-tile" data-tone={t.tone} role="listitem">
-          <span className="pl-tile-n">{t.n}</span>
+      {tiles.map((t, i) => (
+        <motion.a
+          key={t.label} href={t.href} className="pl-tile" data-tone={t.tone} role="listitem"
+          initial={reduce ? false : { opacity: 0, y: 34, rotate: i % 2 ? 1.5 : -1.5 }}
+          animate={{ opacity: 1, y: 0, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 170, damping: 19, delay: 0.3 + i * 0.07 }}
+        >
+          <span className="pl-tile-n">{t.n === null ? '…' : <CountUp value={t.n as number} />}{'of' in t ? <small>/{t.of}</small> : null}</span>
           <span className="pl-tile-l">{t.label}</span>
           <span className="pl-tile-s">{t.sub}</span>
-        </a>
+        </motion.a>
       ))}
     </div>
   );
@@ -39,25 +47,43 @@ export function Glance({ near, nearReady, picks, going, badges, total }: {
 export function SetupCard({ steps, onAct, busy }: { steps: SetupStep[]; onAct: (id: SetupStepId) => void; busy: SetupStepId | null }) {
   const pct = setupPercent(steps);
   const [open, setOpen] = useState(pct < 100);
+  const reduce = useReducedMotion();
+  const [ring, setRing] = useState(reduce ? pct : 0);
+  useEffect(() => {
+    if (reduce) { setRing(pct); return; }
+    const c = animate(0, pct, { duration: 1.1, ease: EASE_OUT, delay: 0.35, onUpdate: setRing });
+    return () => c.stop();
+    // Re-run only when the real number changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pct]);
   const done = steps.filter((s) => s.done).length;
   const next = steps.find((s) => !s.done);
   const action: Record<SetupStepId, string> = { home: 'Add', monday: 'Turn on', events: 'Turn on', interests: 'Choose', plan: 'See picks', share: 'Add one' };
   return (
     <section className="pl-setup" aria-labelledby="pl-setup-title" data-complete={pct === 100}>
       <button type="button" className="pl-setup-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-        <span className="pl-ring" style={{ ['--pct' as string]: `${pct}%` }} aria-hidden="true"><span>{pct}%</span></span>
+        <span className="pl-ring" style={{ ['--pct' as string]: `${ring}%` }} aria-hidden="true"><span>{Math.round(ring)}%</span></span>
         <span className="pl-setup-text">
           <span id="pl-setup-title" className="pl-setup-title">{pct === 100 ? 'All set up. Nice.' : `Your CalgaryWatch is ${pct}% set up`}</span>
           <span className="pl-setup-sub">{pct === 100 ? 'Every step done and every setup badge earned.' : next ? <>Next: <strong>{next.label.toLowerCase()}</strong>, {done} of {steps.length} done</> : null}</span>
         </span>
         <span className="pl-setup-toggle">{open ? 'Hide' : 'Show'}</span>
       </button>
+      <AnimatePresence initial={false}>
       {open ? (
-        <ol className="pl-steps">
-          {steps.map((s) => {
+        <motion.ol
+          className="pl-steps" key="steps"
+          initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.35, ease: EASE_OUT }}
+        >
+          {steps.map((s, i) => {
             const badge = BADGES.find((b) => b.id === s.badge)!;
             return (
-              <li key={s.id} data-done={s.done} data-next={s === next}>
+              <motion.li
+                key={s.id} data-done={s.done} data-next={s === next}
+                initial={reduce ? false : { opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.45, ease: EASE_OUT, delay: 0.45 + i * 0.05 }}
+              >
                 <span className="pl-step-tick" aria-hidden="true">{s.done ? <Check size={14} strokeWidth={3} /> : null}</span>
                 <span className="pl-step-text">
                   <strong>{s.label}</strong>
@@ -69,11 +95,12 @@ export function SetupCard({ steps, onAct, busy }: { steps: SetupStep[]; onAct: (
                     {busy === s.id ? 'Adding…' : action[s.id]}
                   </button>
                 ) : <span className="pl-step-done">Done</span>}
-              </li>
+              </motion.li>
             );
           })}
-        </ol>
+        </motion.ol>
       ) : null}
+      </AnimatePresence>
     </section>
   );
 }
@@ -159,8 +186,8 @@ export function BadgesCard({ badges, signedIn }: { badges: BadgeState[]; signedI
         </div>
       ) : null}
       <ul className="pl-badges">
-        {badges.map((b) => (
-          <li key={b.id} data-locked={!b.unlocked || !signedIn}>
+        {badges.map((b, i) => (
+          <li key={b.id} data-locked={!b.unlocked || !signedIn} style={{ ['--i' as string]: i }}>
             <BadgeMark badge={{ ...b, unlocked: b.unlocked && signedIn }} size={56} />
             <strong>{b.label}</strong>
             <small>{b.unlocked && signedIn ? b.earned : b.hint}{b.target && signedIn && !b.unlocked ? ` ${b.progress}/${b.target}` : ''}</small>
@@ -178,11 +205,11 @@ export function GoingTimeline({ going }: { going: PickItem[] }) {
     <section className="pl-going" aria-labelledby="pl-going-title">
       <div className="pl-sec-head"><h2 id="pl-going-title">You’re going<span> · {going.length} plan{going.length === 1 ? '' : 's'}</span></h2></div>
       <ol className="pl-timeline">
-        {going.map((g) => {
+        {going.map((g, i) => {
           const d = new Date(g.start);
           const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...o }).format(d);
           return (
-            <li key={g.key}>
+            <li key={g.key} style={{ ['--i' as string]: i }}>
               <Link to={g.path}>
                 <span className="pl-tl-date"><small>{fmt({ weekday: 'short' })}</small><strong>{fmt({ day: 'numeric' })}</strong><small>{fmt({ month: 'short' })}</small></span>
                 <span className="pl-tl-body">

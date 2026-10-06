@@ -7,6 +7,8 @@ import { useAuth } from '../components/FirebaseProvider';
 import { BadgeMark } from '../components/plans/BadgeMark';
 import { BadgesCard, EmailsCard, Glance, GoingTimeline, NearHomeCard, SetupCard } from '../components/plans/MemberHome';
 import { SignupPreview } from '../components/plans/SignupPreview';
+import { PlansSkyHero } from '../components/plans/PlansSkyHero';
+import { Reveal } from '../components/plans/Motion';
 import { GoingButton } from '../components/plans/GoingButton';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
@@ -295,18 +297,21 @@ export default function PlansPage() {
       <div className="cw-plans" data-view={dashboard && !showForm ? 'home' : 'setup'}>
         {dashboard && !editing ? (
           <header className="cw-wrap pl-head pl-head-member">
-            <p className="pl-eyebrow">Your CalgaryWatch{area ? <> · <MapPin size={12} aria-hidden="true" /> {area}</> : null}</p>
-            <h1>{partOfDay(now)}{first ? `, ${first}` : ''}.<br /><em>Here’s your {area || 'Calgary'}.</em></h1>
-            {joined ? (
-              <div className="pl-joined" role="status">
-                <Sparkles size={20} aria-hidden="true" />
-                <div>
-                  <strong>You’re in.</strong> {savedSummary(profile)}
-                  <ul>{joined.map((id) => { const b = BADGES.find((x) => x.id === id)!; return <li key={id}><BadgeMark badge={{ ...b, unlocked: true }} size={30} /> {b.label}</li>; })}</ul>
+            <PlansSkyHero
+              greeting={`${partOfDay(now)}${first ? `, ${first}` : ''}.|Here’s your ${area || 'Calgary'}.`}
+              area={area}
+              after={joined ? (
+                <div className="pl-joined" role="status">
+                  <Sparkles size={20} aria-hidden="true" />
+                  <div>
+                    <strong>You’re in.</strong> {savedSummary(profile)}
+                    <ul>{joined.map((id, i) => { const b = BADGES.find((x) => x.id === id)!; return <li key={id} style={{ animationDelay: `${0.25 + i * 0.12}s` }}><BadgeMark badge={{ ...b, unlocked: true }} size={30} /> {b.label}</li>; })}</ul>
+                  </div>
                 </div>
-              </div>
-            ) : savedAt ? <p className="pl-saved" role="status"><Check size={16} aria-hidden="true" /> Saved. {savedSummary(profile)}</p> : null}
-            <Glance near={near.length} nearReady={nearReady} picks={picks.picks.length} going={picks.going} badges={unlocked} total={badges.length} />
+              ) : savedAt ? <p className="pl-saved" role="status"><Check size={16} aria-hidden="true" /> Saved. {savedSummary(profile)}</p> : null}
+            >
+              <Glance near={near.length} nearReady={nearReady} picks={picks.picks.length} going={picks.going} badges={unlocked} total={badges.length} />
+            </PlansSkyHero>
           </header>
         ) : (
           <header className="cw-wrap pl-head">
@@ -432,7 +437,7 @@ export default function PlansPage() {
 
                 {error ? <p className="pl-error" role="alert">{error}</p> : null}
                 <div className="pl-actions">
-                  <button type="submit" className="pl-btn" disabled={saving || (!demo && isAuthReady && !isFirebaseConfigured)}>
+                  <button type="submit" className="pl-btn" data-ready={progress.every(Boolean)} disabled={saving || (!demo && isAuthReady && !isFirebaseConfigured)}>
                     {saving ? 'Saving…' : user ? (hasPlans ? 'Save changes' : 'Save and start my week') : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
                   {editing ? <button type="button" className="pl-textbtn" onClick={() => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); }}>Cancel</button> : null}
@@ -441,7 +446,7 @@ export default function PlansPage() {
               </form>
             ) : null}
 
-            {dashboard && !showForm ? <GoingTimeline going={picks.going} /> : null}
+            {dashboard && !showForm ? <Reveal><GoingTimeline going={picks.going} /></Reveal> : null}
 
             <section className="pl-picks" aria-labelledby="pl-picks-title">
               <div className="pl-sec-head">
@@ -449,7 +454,7 @@ export default function PlansPage() {
                 {!showForm ? <button type="button" className="pl-textbtn" onClick={() => openEditor()}><Pencil size={14} aria-hidden="true" /> Edit interests</button> : null}
               </div>
               {picks.picks.length ? (
-                <ol className="pl-list">{picks.picks.map((p) => <PickRow key={p.key} item={p} signedIn={!!user} />)}</ol>
+                <ol className="pl-list">{picks.picks.map((p, i) => <PickRow key={p.key} item={p} signedIn={!!user} index={i} />)}</ol>
               ) : (
                 <p className="pl-empty">{interests.length ? 'Nothing listed yet that matches. We only list events we’ve checked with the organizer, so some weeks are quieter. Try adding an interest.' : 'Pick a few interests above to see what fits.'}</p>
               )}
@@ -503,11 +508,11 @@ function savedSummary(profile: PlansProfile | null): string {
   return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1]}.`;
 }
 
-function PickRow({ item, signedIn }: { item: PickItem; signedIn: boolean }) {
+function PickRow({ item, signedIn, index = 0 }: { item: PickItem; signedIn: boolean; index?: number }) {
   const distance = pickDistance(item.distanceM);
   const labels = EVENT_INTERESTS.filter((i) => item.matched.includes(i.id)).map((i) => i.label);
   return (
-    <li className="pl-row">
+    <li className="pl-row" style={{ ['--i' as string]: index }}>
       <time dateTime={item.start}>{pickWhen(item.start)}</time>
       <div>
         <Link to={item.path} className="pl-row-title">{item.title}</Link>

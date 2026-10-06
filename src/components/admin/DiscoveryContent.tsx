@@ -3,7 +3,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import type { DiscoveryEntity, EntitySubmission, InventorySubmissionInput } from '../../types/discovery';
 import { InventoryForm } from '../discovery/InventoryForm';
-import { discoveryCall } from '../../lib/discoveryApi';
+import { manageDiscovery } from '../../lib/discoveryApi';
 import '../../styles/discovery.css';
 
 type RecordRow=DiscoveryEntity & {revision:number;duplicateIds?:string[]};
@@ -16,7 +16,7 @@ export function DiscoveryContent() {
   const [ack,setAck]=useState(false);
   async function load() { if(!db)return;const data=await Promise.all(['events','markets','entity_submissions','discovery_sources','discovery_source_records'].map(c=>getDocs(collection(db!,c))));setRecords([...data[0].docs,...data[1].docs].map(d=>d.data() as RecordRow));setSubmissions(data[2].docs.map(d=>d.data() as EntitySubmission));setSources(data[3].docs.map(d=>d.data() as Source));setRaw(data[4].docs.map(d=>d.data() as Raw)); }
   useEffect(()=>{void load().catch(e=>setError(e.message));},[]);
-  async function run(data:unknown) { setBusy(true);setError('');setMessage('');try{await discoveryCall('manageDiscovery',data);await load();setMessage('Saved. Published changes appear on the public site after the next verified export and Hosting release.');}catch(e){setError(e instanceof Error?e.message:'Save failed');throw e;}finally{setBusy(false);} }
+  async function run(data:unknown) { setBusy(true);setError('');setMessage('');try{const r=await manageDiscovery(data as Record<string,unknown>);await load();setMessage(r.queued?'Queued. The moderation job applies it within the hour and then republishes the site.':'Saved. Published changes appear on the public site after the next verified export and Hosting release.');}catch(e){setError(e instanceof Error?e.message:'Save failed');throw e;}finally{setBusy(false);} }
   const act=(data:unknown)=>void run(data).catch(()=>{});
   return <section className="cw-content-workspace"><h2>Events & Markets</h2><p>Review official sources and confirmed dates before publishing. Verification expires after 14 days. Source changes return a listing to review.</p>
     <div className="cw-content-actions"><button disabled={busy} onClick={()=>void load().catch(e=>setError(e.message))}>Refresh</button><button onClick={()=>setEditor({sourceId:sources.find(s=>s.approved)?.id||'',recordId:crypto.randomUUID()})}>Add listing</button><label>Type<select value={kind} onChange={e=>setKind(e.target.value)}><option value="all">All</option><option value="event">Events</option><option value="market">Markets</option></select></label><label>Status<select value={filter} onChange={e=>setFilter(e.target.value)}>{['pending','draft','published','archived'].map(s=><option key={s}>{s}</option>)}</select></label></div>

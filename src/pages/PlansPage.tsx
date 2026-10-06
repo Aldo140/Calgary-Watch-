@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowUpRight, Check, MapPin, Pencil } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
@@ -43,7 +43,7 @@ async function communityForAddress(address: string): Promise<string> {
   return name ? titleCase(name) : '';
 }
 
-const EMPTY: PlansDraft = { interests: [], neighborhood: '', address: '', inferredNeighborhood: '', consent: false, eventsDigestOptIn: true };
+const EMPTY: PlansDraft = { interests: [], neighborhood: '', address: '', inferredNeighborhood: '', consent: false, eventsDigestOptIn: false, weeklyDigestOptIn: false };
 
 function draftFrom(profile: PlansProfile | null): PlansDraft {
   if (!profile) return EMPTY;
@@ -53,18 +53,25 @@ function draftFrom(profile: PlansProfile | null): PlansDraft {
     address: profile.address ?? '',
     inferredNeighborhood: profile.inferredNeighborhood ?? '',
     consent: Boolean(profile.piiConsentAt),
-    // A first visit defaults the box on, visibly, beside what it sends; the
-    // reader can untick it before saving. A returning reader sees their choice.
-    eventsDigestOptIn: profile.eventInterests.length || profile.eventsDigestOptInAt ? profile.eventsDigestOptIn : true,
+    eventsDigestOptIn: profile.eventsDigestOptIn,
+    weeklyDigestOptIn: profile.weeklyDigestOptIn === true,
   };
+}
+
+/** Which email a link asked for: `?email=monday`, `?email=thursday`, or both by default. */
+function requestedEmails(params: URLSearchParams): Pick<PlansDraft, 'weeklyDigestOptIn' | 'eventsDigestOptIn'> {
+  const want = params.get('email');
+  return { weeklyDigestOptIn: want !== 'thursday', eventsDigestOptIn: want !== 'monday' };
 }
 
 export default function PlansPage() {
   const { user, signIn, isAuthReady, isFirebaseConfigured } = useAuth();
+  const [params] = useSearchParams();
   const profile = usePlansProfile(user?.uid);
   const mine = useMyGoing(user?.uid);
   const communities = useCommunityNames();
-  const [draft, setDraft] = useState<PlansDraft>(EMPTY);
+  // A first-time visitor starts with the email(s) the link they followed was about, visibly ticked.
+  const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params) }));
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -73,7 +80,7 @@ export default function PlansPage() {
   const pendingSave = useRef(false);
   const hydratedFor = useRef<string | null>(null);
 
-  useEffect(() => { document.title = 'Your Calgary plans | CalgaryWatch'; }, []);
+  useEffect(() => { document.title = 'Your CalgaryWatch | Emails, plans & badges'; }, []);
 
   // Hydrate the form from the profile once per account, keeping anything the
   // reader picked before signing in.
@@ -82,7 +89,14 @@ export default function PlansPage() {
     hydratedFor.current = user.uid;
     setDraft((local) => {
       const stored = draftFrom(profile);
-      return local.interests.length ? { ...stored, interests: local.interests } : stored;
+      const fresh = !profile.piiConsentAt && !profile.eventInterests.length;
+      // Keep what they chose before signing in; a brand-new account also keeps the ticked emails.
+      return {
+        ...stored,
+        ...(local.interests.length ? { interests: local.interests } : {}),
+        ...(fresh ? { weeklyDigestOptIn: local.weeklyDigestOptIn, eventsDigestOptIn: local.eventsDigestOptIn } : {}),
+        ...(local.neighborhood || local.address ? { neighborhood: local.neighborhood, address: local.address, inferredNeighborhood: local.inferredNeighborhood, consent: local.consent || stored.consent } : {}),
+      };
     });
   }, [user, profile]);
 
@@ -93,7 +107,8 @@ export default function PlansPage() {
     return () => { live = false; };
   }, [user]);
 
-  const hasPlans = Boolean(profile && profile.eventInterests.length);
+  // Set up = has a home area on file (the one thing every email needs).
+  const hasPlans = Boolean(profile && (profile.piiConsentAt || profile.eventInterests.length));
   const showForm = !user || !profile || !hasPlans || editing;
   const area = profile ? homeAreaOf(profile) : '';
   const entities = discoveryRepository.list();
@@ -124,12 +139,15 @@ export default function PlansPage() {
 
   const hasArea = Boolean(draft.neighborhood.trim() || draft.address.trim());
   const needsConsent = hasArea && !profile?.piiConsentAt;
-  const canSave = draft.interests.length > 0 && hasArea && (!needsConsent || draft.consent);
+  const problem = !hasArea ? 'Add your neighbourhood or address, so everything starts near home.'
+    : needsConsent && !draft.consent ? 'Tick the box so we can store your area.'
+    : draft.eventsDigestOptIn && !draft.interests.length ? 'Pick at least one interest for your Thursday picks, or untick that email.'
+    : '';
 
   const save = async () => {
     const current = auth?.currentUser;
     if (!current) { pendingSave.current = true; await signIn(); if (!auth?.currentUser) pendingSave.current = false; return; }
-    if (!canSave) { setError(!draft.interests.length ? 'Pick at least one thing you’re into.' : !hasArea ? 'Add your neighbourhood or address so picks can start near home.' : 'Tick the box so we can store your area.'); return; }
+    if (problem) { setError(problem); return; }
     setSaving(true); setError('');
     try {
       let inferred = draft.inferredNeighborhood;
@@ -162,10 +180,18 @@ export default function PlansPage() {
     <SiteLayout>
       <div className="cw-plans">
         <header className="cw-wrap pl-head">
-          <p className="pl-eyebrow">Your Calgary plans</p>
-          <h1>Plans that fit <em>you.</em></h1>
-          <p className="pl-lead">Tell us what you’re into and where home is. We’ll pick from every event and market we’ve checked against the organizer, give things near home a head start, and send the best of it on Thursday mornings, in time for the weekend.</p>
-          {savedAt ? <p className="pl-saved" role="status"><Check size={16} aria-hidden="true" /> Saved. {profile?.eventsDigestOptIn ? 'Your first picks email arrives Thursday morning.' : 'The Thursday email is off; your picks stay here.'}</p> : null}
+          <p className="pl-eyebrow">{user && hasPlans ? `Welcome back${user.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}` : 'Your CalgaryWatch · free for Calgarians'}</p>
+          <h1>Calgary, <em>your way.</em></h1>
+          <p className="pl-lead">One place for everything we send you: what happened near home on Mondays, weekend picks for what you’re into on Thursdays, the events you’re going to, and the badges you pick up along the way.</p>
+          {!user ? (
+            <ul className="pl-perks" aria-label="What you get">
+              <li><Check size={15} aria-hidden="true" /> Monday recap of what happened near home</li>
+              <li><Check size={15} aria-hidden="true" /> Thursday picks for what you’re into</li>
+              <li><Check size={15} aria-hidden="true" /> “I’m going” on any event</li>
+              <li><Check size={15} aria-hidden="true" /> Badges as you go</li>
+            </ul>
+          ) : null}
+          {savedAt ? <p className="pl-saved" role="status"><Check size={16} aria-hidden="true" /> Saved. {savedSummary(profile)}</p> : null}
         </header>
 
         <div className="cw-wrap pl-grid">
@@ -173,24 +199,8 @@ export default function PlansPage() {
             {showForm ? (
               <form className="pl-form" onSubmit={(e) => { e.preventDefault(); void save(); }} noValidate>
                 <fieldset className="pl-step">
-                  <legend><span className="pl-num">01</span> What are you into?</legend>
-                  <p className="pl-help">Pick as many as you like. You can change them any time.</p>
-                  <div className="pl-chips">
-                    {EVENT_INTERESTS.map((i) => {
-                      const on = draft.interests.includes(i.id);
-                      return (
-                        <button key={i.id} type="button" className="pl-chip" aria-pressed={on} onClick={() => toggleInterest(i.id)}>
-                          <span className="pl-chip-tick" aria-hidden="true">{on ? <Check size={14} strokeWidth={3} /> : null}</span>
-                          <span><strong>{i.label}</strong><small>{i.note}</small></span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-
-                <fieldset className="pl-step">
-                  <legend><span className="pl-num">02</span> Where’s home?</legend>
-                  <p className="pl-help">A neighbourhood is enough. It’s the same setting the live map’s Monday email uses, so you only set it once.</p>
+                  <legend><span className="pl-num">01</span> Where’s home?</legend>
+                  <p className="pl-help">A neighbourhood is enough. Both emails and your picks start from here, and the live map uses it too, so you set it once.</p>
                   {!draft.address ? (
                     <label className="pl-field">
                       <span>Neighbourhood</span>
@@ -199,6 +209,7 @@ export default function PlansPage() {
                         onChange={(e) => setDraft((d) => ({ ...d, neighborhood: e.target.value, inferredNeighborhood: '' }))}
                         placeholder="Start typing, e.g. Bridgeland"
                         autoComplete="off"
+                        enterKeyHint="next"
                         aria-describedby="pl-hood-hint"
                       />
                     </label>
@@ -223,26 +234,53 @@ export default function PlansPage() {
                   {needsConsent ? (
                     <label className="pl-check">
                       <input type="checkbox" checked={draft.consent} onChange={(e) => setDraft((d) => ({ ...d, consent: e.target.checked }))} />
-                      <span><strong>Store my area.</strong> CalgaryWatch keeps it on your account to choose picks and run your emails. An address is turned into a point only while picks are made and never shown to anyone. <Link to="/privacy">What we keep</Link></span>
+                      <span><strong>Store my area.</strong> CalgaryWatch keeps it on your account to run your emails and picks. An address is turned into a point only while an email is made and never shown to anyone. <Link to="/privacy">What we keep</Link></span>
                     </label>
                   ) : null}
                 </fieldset>
 
+                <fieldset className="pl-step" id="emails">
+                  <legend><span className="pl-num">02</span> Your emails</legend>
+                  <p className="pl-help">Two short emails, both free, each with its own one-click unsubscribe.</p>
+                  <div className="pl-mails">
+                    <label className="pl-mail" data-on={draft.weeklyDigestOptIn}>
+                      <input type="checkbox" checked={draft.weeklyDigestOptIn} onChange={(e) => setDraft((d) => ({ ...d, weeklyDigestOptIn: e.target.checked }))} />
+                      <span className="pl-mail-day">Monday</span>
+                      <strong>Your neighbourhood’s week</strong>
+                      <small>Public safety reports within a 15-minute walk, 3 km and 10 km of home: police news, 311, outages and what neighbours posted.</small>
+                    </label>
+                    <label className="pl-mail" data-on={draft.eventsDigestOptIn}>
+                      <input type="checkbox" checked={draft.eventsDigestOptIn} onChange={(e) => setDraft((d) => ({ ...d, eventsDigestOptIn: e.target.checked }))} />
+                      <span className="pl-mail-day">Thursday</span>
+                      <strong>Your weekend picks</strong>
+                      <small>Up to eight events for the next ten days that match your interests, near home first, plus reminders for what you’re going to.</small>
+                    </label>
+                  </div>
+                </fieldset>
+
                 <fieldset className="pl-step">
-                  <legend><span className="pl-num">03</span> The Thursday picks email</legend>
-                  <label className="pl-check pl-check-mail">
-                    <input type="checkbox" checked={draft.eventsDigestOptIn} onChange={(e) => setDraft((d) => ({ ...d, eventsDigestOptIn: e.target.checked }))} />
-                    <span><strong>Email me my picks every Thursday.</strong> Up to eight things for the next ten days that match what you chose, starting near home, plus a reminder for anything you said you’re going to. Free, separate from the Monday safety email, and one click to stop.</span>
-                  </label>
+                  <legend><span className="pl-num">03</span> What are you into?</legend>
+                  <p className="pl-help">{draft.eventsDigestOptIn ? 'Your Thursday picks come from these. Pick as many as you like.' : 'Optional. These shape the picks on this page and in the Thursday email.'}</p>
+                  <div className="pl-chips">
+                    {EVENT_INTERESTS.map((i) => {
+                      const on = draft.interests.includes(i.id);
+                      return (
+                        <button key={i.id} type="button" className="pl-chip" aria-pressed={on} onClick={() => toggleInterest(i.id)}>
+                          <span className="pl-chip-tick" aria-hidden="true">{on ? <Check size={14} strokeWidth={3} /> : null}</span>
+                          <span><strong>{i.label}</strong><small>{i.note}</small></span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </fieldset>
 
                 {error ? <p className="pl-error" role="alert">{error}</p> : null}
                 <div className="pl-actions">
                   <button type="submit" className="pl-btn" disabled={saving || (isAuthReady && !isFirebaseConfigured)}>
-                    {saving ? 'Saving…' : user ? (hasPlans ? 'Save changes' : 'Save my plans') : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
+                    {saving ? 'Saving…' : user ? (hasPlans ? 'Save changes' : 'Save and finish') : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
-                  {editing ? <button type="button" className="pl-textbtn" onClick={() => { setEditing(false); setDraft(draftFrom(profile)); }}>Cancel</button> : null}
-                  {!user ? <p className="pl-fine">We use Google sign-in so nobody else can change your settings. Your picks above are kept through sign-in.</p> : null}
+                  {editing ? <button type="button" className="pl-textbtn" onClick={() => { setEditing(false); setDraft(draftFrom(profile)); setError(''); }}>Cancel</button> : null}
+                  {!user ? <p className="pl-fine">Google sign-in keeps your settings yours. Everything you picked above is kept through sign-in.</p> : null}
                 </div>
               </form>
             ) : null}
@@ -250,7 +288,7 @@ export default function PlansPage() {
             <section className="pl-picks" aria-labelledby="pl-picks-title">
               <div className="pl-sec-head">
                 <h2 id="pl-picks-title">{interests.length ? 'Picked for you' : 'On in Calgary'}<span> · next 10 days</span></h2>
-                {!showForm ? <button type="button" className="pl-textbtn" onClick={() => { setDraft(draftFrom(profile)); setEditing(true); }}><Pencil size={14} aria-hidden="true" /> Edit interests & email</button> : null}
+                {!showForm ? <button type="button" className="pl-textbtn" onClick={() => { setDraft(draftFrom(profile)); setEditing(true); }}><Pencil size={14} aria-hidden="true" /> Edit area, emails & interests</button> : null}
               </div>
               {picks.picks.length ? (
                 <ol className="pl-list">{picks.picks.map((p) => <PickRow key={p.key} item={p} signedIn={!!user} />)}</ol>
@@ -277,17 +315,7 @@ export default function PlansPage() {
                   <div><dt>Thursday</dt><dd className="pl-stat-word">{profile?.eventsDigestOptIn ? 'On' : 'Off'}</dd></div>
                 </dl>
               </div>
-            ) : (
-              <div className="pl-card pl-card-pitch">
-                <p className="pl-eyebrow">Free for Calgarians</p>
-                <ul>
-                  <li><Check size={16} aria-hidden="true" /> Picks for what you’re into, near home</li>
-                  <li><Check size={16} aria-hidden="true" /> “I’m going” on any event, saved to your plans</li>
-                  <li><Check size={16} aria-hidden="true" /> A short Thursday email for the weekend</li>
-                  <li><Check size={16} aria-hidden="true" /> Little badges as you go</li>
-                </ul>
-              </div>
-            )}
+            ) : null}
 
             {picks.going.length ? (
               <section className="pl-card" aria-labelledby="pl-going-title">
@@ -311,12 +339,17 @@ export default function PlansPage() {
               </ul>
             </section>
 
-            <p className="pl-fine pl-side-foot">Looking for safety alerts near home? That’s the <Link to="/map?settings=alerts">Monday email on the live map</Link>.</p>
+            <p className="pl-fine pl-side-foot">Instant alerts and quiet hours live in the <Link to="/map?settings=alerts">live map’s settings</Link>.</p>
           </aside>
         </div>
       </div>
     </SiteLayout>
   );
+}
+
+function savedSummary(profile: PlansProfile | null): string {
+  const on = [profile?.weeklyDigestOptIn ? 'Monday' : '', profile?.eventsDigestOptIn ? 'Thursday' : ''].filter(Boolean);
+  return on.length ? `You’ll get the ${on.join(' and ')} email${on.length > 1 ? 's' : ''}, starting with the next one.` : 'No emails for now; your picks and plans stay here.';
 }
 
 function PickRow({ item, signedIn }: { item: PickItem; signedIn: boolean }) {

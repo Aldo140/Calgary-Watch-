@@ -19,7 +19,7 @@ import { collection, doc, getDoc, getDocs, increment, limit, onSnapshot, query, 
 import type { User } from 'firebase/auth';
 import { db } from '../firebase';
 import type { EventInterestId } from './eventPicks';
-import { readPlansProfile, type PlansProfile } from './plansProfile';
+import { emailConsentPatch, readPlansProfile, type PlansProfile } from './plansProfile';
 
 export { homeAreaOf, readPlansProfile, type PlansProfile } from './plansProfile';
 
@@ -47,19 +47,20 @@ export interface PlansDraft {
   inferredNeighborhood: string;
   consent: boolean;
   eventsDigestOptIn: boolean;
+  weeklyDigestOptIn: boolean;
 }
 
 /**
- * Save interests, area and the email choice in one merge. Identity fields are
- * repeated because the users rule validates the whole resulting document, and
- * a first sign-in can race the background profile sync.
+ * Save area, interests and both email choices in one merge. Identity fields
+ * are repeated because the users rule validates the whole resulting document,
+ * and a first sign-in can race the background profile sync. Setting the
+ * onboarding stamp means the live map never asks the same questions again.
  */
 export async function savePlans(user: User, existing: PlansProfile | null, draft: PlansDraft): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
   const neighborhood = draft.neighborhood.trim().slice(0, 80);
   const address = draft.address.trim().slice(0, 160);
   const now = Date.now();
-  const wasOn = existing?.eventsDigestOptIn === true;
   await setDoc(doc(db, 'users', user.uid), {
     uid: user.uid,
     displayName: user.displayName || existing?.displayName || 'Calgary User',
@@ -70,15 +71,9 @@ export async function savePlans(user: User, existing: PlansProfile | null, draft
     inferredNeighborhood: draft.inferredNeighborhood.trim().slice(0, 80),
     locationPreferenceType: address ? 'address' : 'neighborhood',
     piiConsentAt: existing?.piiConsentAt || now,
+    onboardingCompletedAt: existing?.onboardingCompletedAt || now,
     eventInterests: draft.interests,
-    eventsDigestOptIn: draft.eventsDigestOptIn,
-    // Consent date is kept from the first opt-in, cleared on opt-out — the same
-    // shape the Monday email uses, so the CASL record reads the same way.
-    eventsDigestOptInAt: draft.eventsDigestOptIn ? (wasOn && existing?.eventsDigestOptInAt) || now : null,
-    // An earlier opt-out stays on record until the reader opts back in.
-    ...(draft.eventsDigestOptIn
-      ? { eventsDigestUnsubscribedAt: null, eventsDigestUnsubscribeSource: null }
-      : wasOn ? { eventsDigestUnsubscribedAt: now, eventsDigestUnsubscribeSource: 'plans-page' } : {}),
+    ...emailConsentPatch(existing, { weekly: draft.weeklyDigestOptIn, events: draft.eventsDigestOptIn }, now),
     plansUpdatedAt: now,
     profileUpdatedAt: now,
   }, { merge: true });

@@ -379,7 +379,7 @@ export function MondayEmail() {
             <li><i className="r2" /><b>3 km</b><span>your part of town</span></li>
             <li><i className="r3" /><b>10 km</b><span>the wider city</span></li>
           </ul>
-          <Link className="cv-btn cv-btn-yellow" to="/map?settings=alerts"><Bell size={18} /> Get the Monday email</Link>
+          <Link className="cv-btn cv-btn-yellow" to="/plans?email=monday#emails"><Bell size={18} /> Get the Monday email</Link>
           <p className="cv-small">Free, opt in only, and one click to unsubscribe.</p>
         </div>
         <div className="cv-email" aria-hidden="true">

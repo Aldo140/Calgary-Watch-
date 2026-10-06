@@ -12,7 +12,7 @@ import type { Event, Market, MarketOccurrence } from '../src/types/discovery.ts'
 import { buildEventPicks, interestsFor, neighbourhoodPoint, normalizeInterests, pickWhen } from '../src/lib/eventPicks.ts';
 import { computeBadges, FOUNDING_CUTOFF, orderBadges } from '../src/lib/badges.ts';
 import { eventsConsentRefusal, eventsSubject, eventsUnsubscribeUrl } from '../src/lib/eventsDigest.ts';
-import { readPlansProfile } from '../src/lib/plansProfile.ts';
+import { emailConsentPatch, readPlansProfile } from '../src/lib/plansProfile.ts';
 import { renderEventsHtml, renderEventsText } from '../scripts/digest/render.ts';
 
 const NOW = new Date('2026-10-08T15:00:00Z'); // Thursday 9:00 MDT
@@ -182,5 +182,26 @@ describe('rules contract', () => {
     assert.match(block, /allow delete: if false/);
     const page = readFileSync(new URL('../src/pages/UnsubscribePage.tsx', import.meta.url), 'utf8');
     assert.match(page, /events_digest_unsubscribes/);
+  });
+});
+
+describe('one form, two email lists', () => {
+  it('keeps the first consent date while a list stays on', () => {
+    const p = emailConsentPatch({ weeklyDigestOptIn: true, weeklyDigestOptInAt: 100, eventsDigestOptIn: false, eventsDigestOptInAt: null }, { weekly: true, events: true }, 500);
+    assert.equal(p.weeklyDigestOptInAt, 100);
+    assert.equal(p.eventsDigestOptInAt, 500);
+    assert.equal(p.eventsDigestUnsubscribedAt, null);
+  });
+  it('records an opt-out with its source, per list, and leaves the other alone', () => {
+    const p = emailConsentPatch({ weeklyDigestOptIn: true, weeklyDigestOptInAt: 100, eventsDigestOptIn: true, eventsDigestOptInAt: 200 }, { weekly: false, events: true }, 500);
+    assert.equal(p.weeklyDigestOptIn, false);
+    assert.equal(p.weeklyDigestOptInAt, null);
+    assert.equal(p.digestUnsubscribedAt, 500);
+    assert.equal(p.digestUnsubscribeSource, 'plans-page');
+    assert.equal(p.eventsDigestOptInAt, 200);
+  });
+  it('does not invent an opt-out for a list that was never on', () => {
+    const p = emailConsentPatch(null, { weekly: false, events: false }, 500);
+    assert.ok(!('digestUnsubscribedAt' in p) && !('eventsDigestUnsubscribedAt' in p));
   });
 });

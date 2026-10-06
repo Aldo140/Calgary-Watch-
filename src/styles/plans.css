@@ -209,3 +209,25 @@
 .cw-lb-plans-new { flex: none; padding: 4px 8px; border-radius: 999px; background: var(--cw-live); color: #fff; font: 700 10.5px/1 var(--pl-mono); letter-spacing: .08em; text-transform: uppercase; }
 .cw-lb-plans svg { flex: none; }
 @media (max-width: 640px) { .cw-site .cw-lb-plans { border-radius: 18px; align-items: flex-start; } }
+
+/* Step 02: the two emails as cards you tick. */
+.pl-mails { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+.pl-mail {
+  position: relative; display: grid; gap: 6px; align-content: start;
+  padding: 18px 18px 18px 52px; border-radius: 20px; cursor: pointer;
+  border: 1.5px solid var(--cw-border); background: var(--cw-bg);
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.pl-mail:hover { border-color: var(--cw-text); }
+.pl-mail[data-on='true'] { border-color: var(--cw-text); background: #fff; box-shadow: inset 0 0 0 1px var(--cw-text), 0 10px 24px -18px rgba(6, 22, 47, .5); }
+.pl-mail input { position: absolute; top: 20px; left: 18px; width: 22px; height: 22px; margin: 0; accent-color: var(--cw-live); }
+.pl-mail-day { justify-self: start; padding: 4px 9px; border-radius: 999px; background: var(--cw-live); color: #fff; font: 600 11px/1 var(--pl-mono); letter-spacing: .08em; text-transform: uppercase; }
+.pl-mail:nth-child(2) .pl-mail-day { background: var(--pl-sun); color: var(--cw-live); }
+.pl-mail strong { font: 800 19px/1.15 var(--pl-display); letter-spacing: -.02em; }
+.pl-mail small { font-size: 13.5px; line-height: 1.5; color: var(--cw-muted); }
+@media (max-width: 640px) { .pl-mails { grid-template-columns: minmax(0, 1fr); } }
+.pl-head h1 { max-width: 16ch; }
+.pl-head .pl-lead { margin-top: 22px; }
+.pl-perks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.pl-perks li { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--pl-sun-soft); border: 1px solid #ecd98a; font-size: 13.5px; font-weight: 600; }
+@media (max-width: 640px) { .pl-perks li { font-size: 12.5px; padding: 6px 10px; } }

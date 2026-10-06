@@ -84,7 +84,7 @@ export function SiteHeader() {
         <div className="cw-nav-actions">
           <Link to="/search" className="cw-nav-icon" aria-label="Search CalgaryWatch"><Search size={19} /></Link>
           <Link to="/map" className="cw-nav-live"><span className="cw-nav-pulse" aria-hidden="true" /><span>Live<span className="cw-nav-live-long"> map</span></span></Link>
-          <Link to="/map?settings=alerts" className="cw-nav-cta">Subscribe</Link>
+          <Link to="/plans" className="cw-nav-cta">Sign up</Link>
           <button
             ref={burger}
             type="button"
@@ -126,8 +126,7 @@ export function SiteHeader() {
             </ul>
           </nav>
           <div className="cw-menu-foot">
-            <Link to="/map?settings=alerts" className="cw-menu-mail"><MenuArt kind="mail" /><span><strong>Get the Monday email</strong><small>What was reported near home. Free.</small></span></Link>
-            <Link to="/plans" className="cw-menu-mail cw-menu-plans"><MenuArt kind="events" /><span><strong>Your Calgary plans</strong><small>Picks for what you’re into, every Thursday.</small></span></Link>
+            <Link to="/plans" className="cw-menu-mail"><MenuArt kind="mail" /><span><strong>Your CalgaryWatch</strong><small>Monday safety recap, Thursday picks, your plans and badges. Free.</small></span></Link>
             <p><Link to="/map">Open the live map</Link><Link to="/about">About</Link><Link to="/coverage">Sources</Link><Link to="/privacy">Privacy</Link><a href={CALGARYDAILY.url} target="_blank" rel="noopener" title="CalgaryDaily, our sister account on Instagram">Instagram @calgarydaily</a></p>
           </div>
         </div>
@@ -135,5 +134,5 @@ export function SiteHeader() {
     </header>
   );
 }
-export function SiteFooter() { return <footer className="cw-footer"><div className="cw-wrap"><div className="cw-footer-top"><div><Wordmark /><p>A little closer to your city.</p></div><a className="cw-text-link" href="mailto:aldo@calgarywatch.ca">Say hello <ArrowUpRight size={18} /></a></div><div className="cw-footer-bottom"><p>© {new Date().getFullYear()} CalgaryWatch · Free for residents · <a className="cw-footer-credit" href="https://arctoslaunchpad.com/calgary-web-design" target="_blank" rel="noopener">Managed by Arctos Launchpad</a></p><nav aria-label="Footer"><NavLink to="/community" title="CalgaryWatch community">Community</NavLink><Link to="/about">About</Link><Link to="/coverage">Live coverage</Link><Link to="/plans">Your plans</Link><Link to="/partners">For businesses</Link><Link to="/privacy">Privacy</Link><Link to="/map?settings=alerts">Email preferences</Link><a href={CALGARYDAILY.url} target="_blank" rel="noopener" title="CalgaryDaily, our sister account on Instagram">Instagram @calgarydaily</a></nav></div></div></footer>; }
+export function SiteFooter() { return <footer className="cw-footer"><div className="cw-wrap"><div className="cw-footer-top"><div><Wordmark /><p>A little closer to your city.</p></div><a className="cw-text-link" href="mailto:aldo@calgarywatch.ca">Say hello <ArrowUpRight size={18} /></a></div><div className="cw-footer-bottom"><p>© {new Date().getFullYear()} CalgaryWatch · Free for residents · <a className="cw-footer-credit" href="https://arctoslaunchpad.com/calgary-web-design" target="_blank" rel="noopener">Managed by Arctos Launchpad</a></p><nav aria-label="Footer"><NavLink to="/community" title="CalgaryWatch community">Community</NavLink><Link to="/about">About</Link><Link to="/coverage">Live coverage</Link><Link to="/plans">Your plans</Link><Link to="/partners">For businesses</Link><Link to="/privacy">Privacy</Link><Link to="/plans">Email preferences</Link><a href={CALGARYDAILY.url} target="_blank" rel="noopener" title="CalgaryDaily, our sister account on Instagram">Instagram @calgarydaily</a></nav></div></div></footer>; }
 export function SiteLayout({ children }: { children: ReactNode }) { return <div className="cw-site"><a className="cw-skip" href="#cw-main">Skip to content</a><SiteHeader /><main id="cw-main">{children}</main><SiteFooter /></div>; }

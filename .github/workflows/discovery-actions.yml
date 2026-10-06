@@ -1,0 +1,42 @@
+name: Apply Discovery Moderation
+
+# Applies admin event/market decisions queued in discovery_actions when the
+# manageDiscovery Cloud Function isn't deployed (scripts/discovery/actions.ts),
+# then republishes the site only if something changed. Cheap when idle: one
+# query for pending actions.
+on:
+  schedule:
+    - cron: '27 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: discovery-actions
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Apply queued moderation
+        id: apply
+        run: npm run discovery:actions
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+      - name: Republish the site
+        if: steps.apply.outputs.applied != '' && steps.apply.outputs.applied != '0'
+        run: gh workflow run deploy-firebase.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

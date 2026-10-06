@@ -24,6 +24,7 @@ import {
 import { cn } from '@/src/lib/utils';
 import { consentRefusal, consentTimestamp, digestDeliveryKind, type DigestRecipient } from '@/src/lib/digest';
 import { adminIncidentTimestamp } from '@/src/lib/adminIncidentPolicy';
+import { interestLabel, normalizeInterests } from '@/src/lib/eventPicks';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 type UserProfile = {
@@ -45,6 +46,12 @@ type UserProfile = {
   digestUnsubscribeSource?: string | null;
   neighborhood?: string;
   inferredNeighborhood?: string;
+  eventsDigestOptIn?: boolean;
+  eventsDigestOptInAt?: number | null;
+  eventsWelcomeSentAt?: number | null;
+  eventsDigestUnsubscribedAt?: number | null;
+  eventsDigestUnsubscribeSource?: string | null;
+  eventInterests?: string[];
 };
 
 type DigestUnsubscribeRequest = {
@@ -415,6 +422,7 @@ export default function AdminUserListPage() {
                               </p>
                               {profile.role === 'admin' && <Chip tone="signal">admin</Chip>}
                               <Chip tone={statusTone(profile.digestStatus)}>{digestStatusCopy[profile.digestStatus]}</Chip>
+                              {profile.eventsDigestOptIn ? <Chip tone="ok">Thursday picks</Chip> : null}
                             </span>
                             <p className="text-xs truncate" style={{ color: T.muted }}>{profile.email}</p>
                           </span>
@@ -531,6 +539,7 @@ function UserEditor({
       </Panel>
 
       <DigestSubscriptionPanel profile={profile} />
+      <ThursdaySubscriptionPanel profile={profile} />
 
       <Panel
         title="Admin notes"
@@ -615,8 +624,8 @@ function DigestSubscriptionPanel({ profile }: {
 
   return (
     <Panel
-      title="Weekly email"
-      subtitle="Consent and delivery history"
+      title="Monday email"
+      subtitle="Neighbourhood recap · consent and delivery history"
       action={<Chip tone={statusTone(profile.digestStatus)}>{digestStatusCopy[profile.digestStatus]}</Chip>}
     >
       <div className="flex items-start gap-3">
@@ -630,7 +639,32 @@ function DigestSubscriptionPanel({ profile }: {
         <InfoRow label="Welcome delivered" value={fullDate(profile.digestWelcomeSentAt)} />
         {request && <InfoRow label={profile.weeklyDigestOptIn ? 'Last opt-out request' : 'Opt-out requested'} value={fullDate(request.requestedAt)} />}
         {optedOutAt && <InfoRow label="Unsubscribed" value={fullDate(optedOutAt)} />}
-        {source && <InfoRow label="Source" value={source === 'email-link' ? 'Email unsubscribe link' : source === 'account-settings' ? 'Account settings' : source} />}
+        {source && <InfoRow label="Source" value={source === 'email-link' ? 'Email unsubscribe link' : source === 'account-settings' ? 'Account settings' : source === 'plans-page' ? 'Your CalgaryWatch page' : source} />}
+      </div>
+    </Panel>
+  );
+}
+
+/** The Thursday picks list, read from the same profile. Separate consent, separate opt-out. */
+function ThursdaySubscriptionPanel({ profile }: { profile: UserProfile }) {
+  const on = profile.eventsDigestOptIn === true;
+  const consented = typeof profile.eventsDigestOptInAt === 'number' && profile.eventsDigestOptInAt > 0;
+  const status = on ? (consented ? (profile.eventsWelcomeSentAt ? 'Receiving' : 'First email next') : 'Needs attention') : profile.eventsDigestUnsubscribedAt ? 'Unsubscribed' : 'Not subscribed';
+  const tone = on ? (consented ? 'ok' : 'attention') : 'neutral';
+  const interests = normalizeInterests(profile.eventInterests);
+  const explanation = !on
+    ? (profile.eventsDigestUnsubscribedAt ? 'Left the Thursday list. Their interests and plans stay on the account.' : 'Has not asked for Thursday picks.')
+    : !consented ? 'Marked as subscribed but no opt-in date is recorded, so the sender will not mail them.'
+    : profile.eventsWelcomeSentAt ? 'Gets Thursday picks for their interests, near home first.' : 'Subscribed. Their next Thursday email opens with the welcome.';
+  return (
+    <Panel title="Thursday picks" subtitle="Events for their interests · consent and delivery" action={<Chip tone={tone}>{status}</Chip>}>
+      <p className="text-xs leading-relaxed" style={{ color: T.muted }}>{explanation}</p>
+      <div className="mt-3 space-y-1.5 border-t pt-3 text-xs" style={{ borderColor: T.line }}>
+        <InfoRow label="Consent recorded" value={fullDate(profile.eventsDigestOptInAt ?? undefined)} />
+        <InfoRow label="First email delivered" value={fullDate(profile.eventsWelcomeSentAt ?? undefined)} />
+        <InfoRow label="Interests" value={interests.length ? interests.map(interestLabel).join(', ') : '—'} />
+        {profile.eventsDigestUnsubscribedAt ? <InfoRow label="Unsubscribed" value={fullDate(profile.eventsDigestUnsubscribedAt)} /> : null}
+        {profile.eventsDigestUnsubscribeSource ? <InfoRow label="Source" value={profile.eventsDigestUnsubscribeSource === 'email-link' ? 'Email unsubscribe link' : profile.eventsDigestUnsubscribeSource === 'plans-page' ? 'Your CalgaryWatch page' : profile.eventsDigestUnsubscribeSource} /> : null}
       </div>
     </Panel>
   );

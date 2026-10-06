@@ -465,6 +465,13 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Thursday picks send ledger (scripts/digest/events.ts, Admin SDK).
+    // Admins read it for the run summary; nobody writes from a browser.
+    match /events_digest_sends/{sendId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
     // Resend inbound mail is synchronized by GitHub Actions through the Admin
     // SDK. Message contents and subscriber identity never leave the approved
     // admin surface. Admins may only change workflow fields, not forge mail.

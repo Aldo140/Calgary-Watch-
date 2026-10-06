@@ -295,10 +295,11 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   if (!inSendWindow(now, cfg)) { log('Outside the outreach send window; first emails wait.'); return; }
   const sentToday = (await db.collection(COLLECTIONS.leads).where('lastContactAt', '>=', now - DAY).get()).docs
     .filter(d => calgaryDate(d.get('lastContactAt')) === calgaryDate(now)).length;
-  let budget = cfg.limits.sendsPerDay - sentToday;
+  // The job runs every 15 minutes; a per-run cap spreads the day's sends across the window.
+  let budget = Math.min(cfg.limits.sendsPerDay - sentToday, cfg.limits.sendsPerRun ?? Infinity);
   const approved = (await db.collection(COLLECTIONS.leads).where('status', '==', 'approved').get()).docs;
   for (const doc of approved) {
-    if (budget <= 0) { log('Daily send limit reached.'); break; }
+    if (budget <= 0) { log('Send limit for this run or today reached.'); break; }
     const lead = doc.data() as PartnerLead;
     const blocker = sendBlocker(lead, sup.emails, sup.domains);
     if (blocker) { await doc.ref.update({ status: 'blocked', notes: blocker, updatedAt: now, history: push(event('status', `Not sent: ${blocker}`)) }); log(`not sent to ${lead.businessName}: ${blocker}`); continue; }

@@ -35,6 +35,8 @@ export interface OutreachConfig {
   paidOffer: string[];
   limits: {
     sendsPerDay: number;
+    /** Optional cap per job run, so a day's sends spread across the window instead of one burst. */
+    sendsPerRun?: number;
     sendWindowLocal: [string, string];
     sendDays: number[];
     followUpAfterDays: number;

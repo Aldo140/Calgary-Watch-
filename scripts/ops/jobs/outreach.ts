@@ -295,7 +295,8 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   if (!inSendWindow(now, cfg)) { log('Outside the outreach send window; first emails wait.'); return; }
   const sentToday = (await db.collection(COLLECTIONS.leads).where('lastContactAt', '>=', now - DAY).get()).docs
     .filter(d => calgaryDate(d.get('lastContactAt')) === calgaryDate(now)).length;
-  // The job runs every 15 minutes; a per-run cap spreads the day's sends across the window.
+  // GitHub runs the "every 15 minutes" schedule only a few times a day in practice, so the
+  // per-run cap is sized for that: it still spreads the day's sends over several runs.
   let budget = Math.min(cfg.limits.sendsPerDay - sentToday, cfg.limits.sendsPerRun ?? Infinity);
   const approved = (await db.collection(COLLECTIONS.leads).where('status', '==', 'approved').get()).docs;
   for (const doc of approved) {

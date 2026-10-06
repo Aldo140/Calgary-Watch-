@@ -22,7 +22,7 @@
   ],
   "limits": {
     "sendsPerDay": 50,
-    "sendsPerRun": 2,
+    "sendsPerRun": 10,
     "sendWindowLocal": [
       "09:00",
       "16:30"

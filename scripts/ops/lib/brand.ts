@@ -29,6 +29,8 @@ export interface OutreachConfig {
   paidOfferEnabled: boolean;
   /** true = drafts that pass every rule are approved automatically and sent in the next window. */
   autoSend?: boolean;
+  /** "resend" sends through Resend (Reply-To the Outlook mailbox); default "outlook" sends through Microsoft Graph. */
+  transport?: 'outlook' | 'resend';
   offer: string[];
   paidOffer: string[];
   limits: {

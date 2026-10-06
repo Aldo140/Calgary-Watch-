@@ -18,8 +18,9 @@
     "Invitation-only Featured partner placement for six months, one business per category.",
     "Always labelled 'Featured partner' and kept separate from CalgaryWatch picks."
   ],
+  "limitsNote": "sendsPerDay is 0 while Microsoft blocks outbound mail from the tenant (550 5.7.708, confirmed again 2026-10-06). Graph accepts the message and Exchange bounces it later, which the job cannot see, so every queued lead would be marked contacted and lost. Set back to 10 once a test email from aldo@calgarywatch.ca is delivered.",
   "limits": {
-    "sendsPerDay": 10,
+    "sendsPerDay": 0,
     "sendWindowLocal": [
       "09:00",
       "16:30"

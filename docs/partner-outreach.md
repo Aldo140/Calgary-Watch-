@@ -4,7 +4,7 @@ This list starts with organizations whose recurring schedules are already repres
 
 | Organization | Contact | Why it fits | Listing source | Status |
 | --- | --- | --- | --- | --- |
-| Calgary Farmers' Market | info@calgaryfarmersmarket.ca | Two year-round markets, more than 100 local vendors, strong family and food discovery fit | https://calgaryfarmersmarket.ca/faqs/ | Draft prepared |
+| Calgary Farmers' Market | info@calgaryfarmersmarket.ca | Two year-round markets, more than 100 local vendors, strong family and food discovery fit | https://calgaryfarmersmarket.ca/ | Replied 2026-10-07: link switched to homepage at their request |
 | Crossroads Market | info@crossroadsmarket.ca | Year-round Friday-to-Sunday schedule and a large mix of local food and independent vendors | https://www.crossroadsmarket.ca/ | Draft prepared |
 | Farmers & Makers Market / Calgary Earth Market Society | farmersmakersmarket@gmail.com | Nonprofit weekly market with a direct community and local-business mission | https://www.farmersmakersmarket.ca/ | Draft prepared |
 | Hillhurst Sunnyside Farmers' Market | Official contact form | Year-round community-association market and inner-city neighbourhood anchor | https://farmersmarket.hsca.ca/ | Research contact |

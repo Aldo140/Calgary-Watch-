@@ -62,7 +62,8 @@ export function rank(entries: ScoutEntry[]): ScoutEntry[] {
 }
 
 // "📸 @someone", "🎥: @someone", "via @someone", "credit @someone", "video by @someone", "w/ @someone".
-const CREDITED = /(?:📸|🎥|📹|🎬|via|credit(?:s)?|cred|video by|filmed by|shot by|photo by|w\/)\s*:?\s*@([a-z0-9._]{2,30})/gi;
+// Emoji often carry an invisible variation selector (U+FE0F), so it's allowed after each one.
+const CREDITED = /(?:(?:📸|📷|🎥|📹|🎬|🎞)\uFE0F?|\bvia|\bcredits?|\bcred|\b(?:video|filmed|shot|photo|footage|clip) by|\bw\/)\s*[:\-–]?\s*@([a-z0-9._]{2,30})/giu;
 
 /** Handles that watched accounts credit for their content: creators we may want on the Bench. */
 export function creditedHandles(captions: string[], exclude: Iterable<string>): string[] {

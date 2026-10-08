@@ -18,7 +18,44 @@ function anthropic(): Anthropic {
   return client;
 }
 
-async function structured<T extends z.ZodType>(system: string, user: string, schema: T): Promise<z.infer<T>> {
+// Spend metering. Anthropic has no balance API, so every call's usage is
+// priced here and written to ops_usage/{day} at the end of each run
+// (flushUsage), which is what the HQ dashboard's Money tab reads.
+// USD per million tokens: [input, output]. Cache reads cost a tenth of input,
+// cache writes 1.25x.
+const PRICES: Record<string, [number, number]> = {
+  'claude-fable-5-1': [10, 50], 'claude-fable-5': [10, 50],
+  'claude-opus-5-5': [4, 20], 'claude-opus-5': [5, 25], 'claude-opus-4-8': [5, 25],
+  'claude-sonnet-5-5': [2, 10], 'claude-sonnet-5': [2, 10], 'claude-haiku-5-5': [0.1, 0.5],
+};
+export interface UsageTally { calls: number; inputTokens: number; outputTokens: number; cacheReadTokens: number; cacheWriteTokens: number; usd: number }
+const usage = new Map<string, UsageTally>();
+
+export function priceUsage(model: string, u: { input_tokens?: number | null; output_tokens?: number | null; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null }): number {
+  const [inp, out] = PRICES[model] ?? PRICES[MODEL];
+  const read = u.cache_read_input_tokens ?? 0, write = u.cache_creation_input_tokens ?? 0;
+  return ((u.input_tokens ?? 0) * inp + (u.output_tokens ?? 0) * out + read * inp * 0.1 + write * inp * 1.25) / 1_000_000;
+}
+
+function record(task: string, model: string, u: Parameters<typeof priceUsage>[1]) {
+  const t = usage.get(task) ?? { calls: 0, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0, usd: 0 };
+  t.calls += 1;
+  t.inputTokens += u.input_tokens ?? 0;
+  t.outputTokens += u.output_tokens ?? 0;
+  t.cacheReadTokens += u.cache_read_input_tokens ?? 0;
+  t.cacheWriteTokens += u.cache_creation_input_tokens ?? 0;
+  t.usd += priceUsage(model, u);
+  usage.set(task, t);
+}
+
+/** This run's Claude usage by task, emptied once read. */
+export function takeUsage(): Map<string, UsageTally> {
+  const out = new Map(usage);
+  usage.clear();
+  return out;
+}
+
+async function structured<T extends z.ZodType>(system: string, user: string, schema: T, task = 'other'): Promise<z.infer<T>> {
   const response = await anthropic().beta.messages.parse({
     model: MODEL,
     max_tokens: 4000,
@@ -28,6 +65,7 @@ async function structured<T extends z.ZodType>(system: string, user: string, sch
     system,
     messages: [{ role: 'user', content: user }],
   });
+  record(task, response.model ?? MODEL, response.usage ?? {});
   if (response.stop_reason === 'refusal') throw new Error('Claude declined to draft this item.');
   if (response.stop_reason === 'max_tokens') throw new Error('Draft was cut off (max_tokens).');
   const parsed = response.parsed_output;
@@ -60,7 +98,7 @@ export async function writePost(kit: BrandKit, input: { kind: string; title: str
     `Working title: ${input.title}`,
     `Facts:\n${input.facts}`,
   ].join('\n\n');
-  return structured(system, user, PostSchema);
+  return structured(system, user, PostSchema, 'posts');
 }
 
 const BriefSchema = z.object({
@@ -77,6 +115,7 @@ export async function extractBrief(pageText: string, url: string, note: string) 
     'You extract facts from a Calgary news or public-information page for a local Instagram account. Report only what the page states. Mark sensitive stories.',
     `Source URL: ${url}\nEditor's note: ${note || '(none)'}\n\nPage text:\n${pageText.slice(0, 40_000)}`,
     BriefSchema,
+    'briefs',
   );
 }
 
@@ -99,7 +138,7 @@ export async function writePitch(cfg: OutreachConfig, lead: { businessName: stri
   const user = lead.followUp
     ? `Write a brief, polite follow-up (under 80 words) to an unanswered email.\nBusiness: ${lead.businessName}\nPrevious email:\n${lead.previous ?? ''}`
     : `Business: ${lead.businessName}\nCategory: ${lead.category}\nNeighbourhood: ${lead.neighbourhood}\nWhat CalgaryWatch already lists about them:\n${lead.facts}`;
-  return structured(system, user, PitchSchema);
+  return structured(system, user, PitchSchema, 'outreach');
 }
 
 const ReplySchema = z.object({
@@ -120,5 +159,6 @@ export async function classifyReply(cfg: OutreachConfig, input: { businessName: 
     ].filter(Boolean).join('\n\n'),
     `Business: ${input.businessName}\n\nOur email:\n${input.ourEmail}\n\nTheir reply:\n${input.theirReply.slice(0, 8000)}`,
     ReplySchema,
+    'replies',
   );
 }

@@ -17,6 +17,7 @@ import { collectInsights } from './jobs/insights';
 import { collectAccountHistory } from './jobs/accountHistory';
 import { runScout } from './jobs/scout';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
+import { flushUsage } from './jobs/usage';
 
 const log = (m: string) => console.log(`[ops:daily] ${m}`);
 const index = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
@@ -53,5 +54,6 @@ if (!db) {
   await step('health', async () => { health = await checkHealth(db, index, now, log); });
   if (health) await step('summary', () => sendSummary(db, health!, now, log));
 }
+await flushUsage(db, now, 'daily', log).catch(e => log(`usage not recorded: ${e instanceof Error ? e.message : e}`));
 if (failed) process.exitCode = 1;
 else if (quota) exitForQuota('Operations daily');

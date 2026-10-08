@@ -20,6 +20,8 @@ on:
 permissions:
   # Rendered post images are committed to the ops-media branch (see scripts/ops/lib/firebase.ts).
   contents: write
+  # Keyless sign-in to arctos-hq for the HQ snapshot.
+  id-token: write
 
 # Two overlapping runs could publish the same post twice; never allow it.
 concurrency:
@@ -58,3 +60,26 @@ jobs:
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
           OPS_PUBLISH_NOW: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_now && '1' || '' }}
           GITHUB_TOKEN: ${{ github.token }}
+
+      # The HQ dashboard (arctoslaunchpad.com/hq) reads a summary of everything above.
+      # Keyless: GitHub's OIDC token is exchanged for a short-lived arctos-hq token.
+      - name: Sign in to arctos-hq
+        id: hq
+        if: always()
+        continue-on-error: true
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Publish the HQ snapshot
+        if: always()
+        continue-on-error: true
+        run: npm run ops:hq
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}

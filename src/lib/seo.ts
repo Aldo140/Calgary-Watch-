@@ -178,7 +178,7 @@ for (const section of DISCOVERY_SECTIONS) {
 const HUBS: Record<string, { title: string; description: string }> = {
   '/events': { title: 'Events in Calgary This Week | CalgaryWatch', description: 'What’s on in Calgary: theatre, concerts, talks, festivals and family events, each checked against the organizer’s own listing. Updated every day.' },
   '/markets': { title: 'Calgary Farmers’ Markets & Makers’ Markets | CalgaryWatch', description: 'Calgary farmers’ and makers’ markets with their next real dates and hours, from Crossroads and Calgary Farmers’ Market to seasonal Christmas markets.' },
-  '/guides': { title: 'Calgary Guides: Walks, Markets & Neighbourhoods | CalgaryWatch', description: 'Local guides to Calgary: the Bow River walk, farmers’ markets and food halls, and Inglewood’s historic laneways.' },
+  '/guides': { title: 'Calgary Guides: Walks, Markets & Neighbourhoods | CalgaryWatch', description: 'Self-guided days out in Calgary: the Bow River walk, a free day downtown, the city’s farmers’ markets, and Inglewood and Ramsay on foot.' },
   '/neighbourhoods': { title: 'Calgary Neighbourhood Guides | CalgaryWatch', description: 'Guides to Calgary neighbourhoods like Inglewood, Kensington, the Beltline, Bridgeland and Marda Loop: what’s there and what’s on.' },
 };
 for (const [path, hub] of Object.entries(HUBS)) ROUTE_SEO[path] = { ...ROUTE_SEO[path], ...hub, index: true };

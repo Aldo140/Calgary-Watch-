@@ -87,7 +87,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="cw-nav-actions">
-          <Link to="/search" className="cw-nav-icon" aria-label="Search CalgaryWatch"><Search size={19} /></Link>
+          <Link to="/search" className="cw-nav-icon cw-nav-search" aria-label="Search CalgaryWatch"><Search size={19} /></Link>
           <Link to="/map" className="cw-nav-live"><span className="cw-nav-pulse" aria-hidden="true" /><span>Live<span className="cw-nav-live-long"> map</span></span></Link>
           <AccountMenu />
           <button
@@ -106,6 +106,7 @@ export function SiteHeader() {
 
       <div id="cw-nav-sheet" ref={sheet} className="cw-nav-sheet" hidden={!open} role="dialog" aria-modal="true" aria-label="Menu">
         <div className="cw-wrap cw-nav-sheet-inner cw-menu">
+          <Link to="/search" className="cw-menu-search"><Search size={19} aria-hidden="true" /><span>Search events, markets, places…</span></Link>
           <nav aria-label="Sections">
             <ul className="cw-menu-grid">
               {SECTIONS.map((s, i) => (

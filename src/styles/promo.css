@@ -93,6 +93,7 @@
   font: 700 15px/1 Inter, sans-serif; text-decoration: none;
   transition: transform .15s, background .15s;
 }
+.cw-promo-btn-short { display: none; }
 .cw-promo-btn:hover { background: #fff; transform: translateY(-1px); }
 .cw-promo .cw-promo-link {
   display: inline-flex; align-items: center; min-height: 44px;
@@ -119,27 +120,25 @@
   font: 700 10.5px/1 var(--p-mono); letter-spacing: .08em; text-transform: uppercase;
 }
 
-/* Phones: a bottom sheet with a grab-bar look, the long source list trimmed. */
+/* Phones: a slim card that leaves the page readable. The homepage's own
+   Community Watch feature carries the detail, so only the pitch and the
+   button stay. */
 @media (max-width: 640px) {
   .cw-promo {
     left: 10px; right: 10px; bottom: max(10px, env(safe-area-inset-bottom));
-    width: auto; border-radius: 24px;
-    max-height: min(78dvh, 640px);
+    width: auto; border-radius: 20px; max-height: none; overflow: visible;
+    border-width: 2px; box-shadow: 4px 4px 0 var(--p-sun), 4px 4px 0 2px var(--p-ink), 0 20px 40px -16px rgba(6, 22, 47, .6);
   }
-  .cw-promo::before {
-    content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-    width: 40px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .22);
-  }
-  .cw-promo-body { padding: 24px 20px 18px; }
-  .cw-promo h2 { font-size: 27px; }
-  .cw-promo-lead { font-size: 14.5px; }
-  .cw-promo-more { display: none; }
+  .cw-promo-close { top: 6px; right: 6px; width: 40px; height: 40px; }
+  .cw-promo-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 12px 12px 16px; }
+  .cw-promo-eyebrow { grid-column: 1 / -1; padding-right: 36px; font-size: 10px; }
+  .cw-promo h2 { font-size: 18px; line-height: 1.1; }
   .cw-promo h2 em { display: inline; }
-  .cw-promo-sources { margin-top: 12px; }
-  .cw-promo-sources li:nth-child(n + 5) { display: none; }
-  .cw-promo-actions { margin-top: 14px; }
-  .cw-promo-btn { flex: 1 1 auto; justify-content: center; }
-  .cw-promo-plans { padding: 13px 16px 15px 20px; border-radius: 0 0 22px 22px; }
+  .cw-promo-lead, .cw-promo-sources, .cw-promo-stat, .cw-promo .cw-promo-link, .cw-promo-plans { display: none; }
+  .cw-promo-actions { margin: 0; }
+  .cw-promo-btn { height: 42px; padding: 0 14px; font-size: 14px; }
+  .cw-promo-btn-long { display: none; }
+  .cw-promo-btn-short { display: inline; }
 }
 
 @media (prefers-reduced-motion: reduce) {

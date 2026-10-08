@@ -113,3 +113,14 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+
+      # HQ's reply check: decides which Gmail replies need Aldo before they reach
+      # the HQ board (scripts/ops/lib/replyCheck.ts). Sends nothing.
+      - name: Check Gmail replies for HQ
+        if: always() && steps.moved.outputs.moved == 'false'
+        continue-on-error: true
+        run: npm run ops:reply-check
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}

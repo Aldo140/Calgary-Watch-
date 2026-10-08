@@ -85,6 +85,8 @@ export async function accountStats(token: string, handle: string): Promise<{ fol
 export interface AccountMedia {
   id: string; caption: string; mediaType: string; productType: string | null;
   permalink: string; timestamp: number; likes: number; comments: number;
+  /** Business Discovery only: the image (or a Reel's cover). Instagram CDN links expire after a few days. */
+  mediaUrl?: string | null;
 }
 
 /** Every post on the account, newest first, including ones posted by hand before the agent. */
@@ -128,7 +130,7 @@ export async function businessDiscovery(token: string, igUserId: string, usernam
   };
   const base = 'id,caption,media_type,permalink,timestamp,like_count,comments_count';
   let bd: any;
-  try { bd = await read(`${base},media_product_type`); } catch (e: any) {
+  try { bd = await read(`${base},media_product_type,media_url,thumbnail_url`); } catch (e: any) {
     if (e.code !== 100) throw e;
     bd = await read(base);
   }
@@ -139,6 +141,7 @@ export async function businessDiscovery(token: string, igUserId: string, usernam
     media: (bd.media?.data ?? []).map((m: any) => ({
       id: m.id, caption: m.caption ?? '', mediaType: m.media_type ?? '', productType: m.media_product_type ?? null,
       permalink: m.permalink ?? '', timestamp: Date.parse(m.timestamp), likes: Number(m.like_count ?? 0), comments: Number(m.comments_count ?? 0),
+      mediaUrl: m.thumbnail_url ?? m.media_url ?? null,
     })),
   };
 }

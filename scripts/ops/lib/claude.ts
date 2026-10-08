@@ -162,3 +162,32 @@ export async function classifyReply(cfg: OutreachConfig, input: { businessName: 
     'replies',
   );
 }
+
+const InspirationSchema = z.object({
+  patterns: z.array(z.object({
+    title: z.string().describe('The pattern in a few words, e.g. "Weather as a shared moment".'),
+    why: z.string().describe('One or two sentences: what these posts do that works, based only on the captions, formats and numbers given.'),
+    examples: z.array(z.string()).describe('Permalinks of the posts that show it, from the list given.'),
+  })).describe('3 to 5 patterns across the outperforming posts.'),
+  ideas: z.array(z.object({
+    title: z.string().describe('A concrete post idea for @calgarydaily.'),
+    format: z.enum(['Reel', 'Carousel', 'Single image', 'Story']),
+    hook: z.string().describe('The first line or on-screen text, in the CalgaryDaily voice.'),
+    why: z.string().describe('Which pattern it borrows and why it suits CalgaryDaily.'),
+  })).describe('3 to 5 original ideas inspired by the patterns. Never copy another account\'s post; repost only with credit and permission.'),
+});
+export type InspirationAnalysis = z.infer<typeof InspirationSchema>;
+
+/** What's working on other Calgary accounts, and what CalgaryDaily could make from it. */
+export async function analyzeInspiration(posts: Array<{ handle: string; permalink: string; caption: string; reel: boolean; engagement: number; lift: number }>): Promise<InspirationAnalysis> {
+  return structured(
+    [
+      'You are the content strategist for @calgarydaily, a Calgary news and events Instagram account (4,300 followers) whose own credited Reels get a median of about 2,500 views while its static event cards get about 40.',
+      'You are given the posts from other Calgary accounts that did best against their own usual in the last 30 days. Find what they have in common and turn it into original ideas for CalgaryDaily.',
+      'Base every claim on the captions, formats and numbers given. Do not guess what is in a video. Ideas must be original or a credited repost with permission, never a copy.',
+    ].join('\n\n'),
+    posts.map((p, i) => `${i + 1}. @${p.handle} · ${p.reel ? 'Reel' : 'Post'} · ${p.engagement} likes+comments · ${p.lift}x its usual · ${p.permalink}\n${p.caption}`).join('\n\n'),
+    InspirationSchema,
+    'inspiration',
+  );
+}

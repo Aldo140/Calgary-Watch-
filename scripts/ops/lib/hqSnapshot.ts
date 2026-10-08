@@ -9,7 +9,7 @@
 import type { AccountHistory, HistoryGroup, OpsHealth, OpsPerformance, OpsPost, PartnerLead } from '../../../src/types/ops';
 import type { ScoutEntry } from './scout';
 
-export const SNAPSHOT_VERSION = 1;
+export const SNAPSHOT_VERSION = 2;
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -37,6 +37,86 @@ export interface Pipeline {
   interested30: number;
 }
 
+/** A CalgaryDaily/CalgaryWatch post as HQ shows it: the image, the words and where it stands. */
+export interface HqPost {
+  id: string;
+  brand: Business;
+  status: string;
+  template: string;
+  format: 'image' | 'carousel' | 'reel';
+  headline: string;
+  caption: string;
+  altText: string;
+  imageUrl: string | null;
+  imageUrls: string[];
+  videoUrl: string | null;
+  warnings: string[];
+  facts: string;
+  note: string;
+  suggestedFor: number | null;
+  scheduledFor: number | null;
+  publishedAt: number | null;
+  permalink: string | null;
+  error: string | null;
+  insights: { reach: number; views: number | null; likes: number; comments: number; saves: number; shares: number } | null;
+  updatedAt: number;
+}
+
+export interface InboxReply {
+  leadId: string;
+  business: Business;
+  businessName: string;
+  from: string;
+  subject: string;
+  text: string;
+  classification: string;
+  suggestedSubject: string;
+  suggestedBody: string;
+  approved: boolean;
+  at: number;
+}
+
+export interface InboxPitch {
+  leadId: string;
+  business: Business;
+  businessName: string;
+  contactEmail: string | null;
+  category: string;
+  neighbourhood: string;
+  reasonRelevant: string;
+  subject: string;
+  body: string;
+  followUp: boolean;
+  at: number;
+}
+
+export interface LeadRow {
+  id: string;
+  businessName: string;
+  category: string;
+  neighbourhood: string;
+  website: string | null;
+  contactEmail: string | null;
+  status: string;
+  followUps: number;
+  lastContactAt: number | null;
+  nextFollowUpAt: number | null;
+  replyClass: string | null;
+  replyAt: number | null;
+  createdAt: number;
+}
+
+export interface PipelineDetail {
+  leads: LeadRow[];
+  sendsByDay: Array<{ date: string; sent: number; replies: number }>;
+  byCategory: Array<{ category: string; total: number; contacted: number; replied: number; interested: number }>;
+  followUpsDue: number;
+  replyRate: number | null;
+  medianHoursToReply: number | null;
+}
+
+export interface ActivityItem { at: number; business: Business; type: string; text: string }
+
 export interface QueueCounts { waiting: number; scheduled: number; published7d: number; failed7d: number }
 
 export interface SpendDay { date: string; usd: number; calls: number; byTask: Record<string, number> }
@@ -59,7 +139,17 @@ export interface HqSnapshot {
     avgDelayMinutes: number | null;
     queue: QueueCounts;
   } | null;
+  posts: HqPost[];
+  inbox: { replies: InboxReply[]; pitches: InboxPitch[]; at: number };
+  activity: ActivityItem[];
   pipelines: Pipeline[];
+  pipelineDetail: { calgarywatch: PipelineDetail | null };
+  instagram: {
+    accounts: Array<import('./scout').OwnAccount & { trend: Array<{ date: string; followers: number }> }>;
+    inspiration: import('./scout').Outperformer[];
+    analysis: (import('./claude').InspirationAnalysis & { at: number }) | null;
+    updatedAt: number | null;
+  };
   pipelinesAt: number;
   spend: { days: SpendDay[]; monthToDate: number; last7: number; last30: number };
   bottlenecks: Bottleneck[];
@@ -178,5 +268,125 @@ export function calgaryDailySummary(history: AccountHistory | null, performance:
     top: (history?.top ?? []).slice(0, 10).map(r => ({ permalink: r.permalink, caption: r.caption.replace(/\s+/g, ' ').slice(0, 140), views: r.views, likes: r.likes, format: r.format, repost: r.repost, at: r.timestamp })),
     avgDelayMinutes: performance?.avgDelayMinutes ?? null,
     queue,
+  };
+}
+
+const OPEN_POSTS = ['drafted', 'approved', 'failed', 'needs-correction', 'redraft', 'requested'];
+
+export function hqPosts(posts: OpsPost[], now: number): HqPost[] {
+  const recent = (p: OpsPost) => p.status === 'published' && (p.publishedAt ?? 0) >= now - 14 * DAY;
+  return posts
+    .filter(p => OPEN_POSTS.includes(p.status) || recent(p))
+    .map(p => ({
+      id: p.id,
+      brand: p.brand,
+      status: p.status,
+      template: p.template,
+      format: p.videoUrl ? 'reel' as const : (p.imageUrls?.length ?? 0) > 1 ? 'carousel' as const : 'image' as const,
+      headline: p.imageText?.headline || p.caption.split('\n')[0].slice(0, 80) || 'Untitled post',
+      caption: p.caption,
+      altText: p.altText,
+      imageUrl: p.imageUrl,
+      imageUrls: p.imageUrls ?? (p.imageUrl ? [p.imageUrl] : []),
+      videoUrl: p.videoUrl ?? null,
+      warnings: p.warnings ?? [],
+      facts: (p.facts ?? '').slice(0, 1500),
+      note: p.note ?? '',
+      suggestedFor: p.suggestedFor ?? null,
+      scheduledFor: p.scheduledFor ?? null,
+      publishedAt: p.publishedAt ?? null,
+      permalink: p.permalink ?? null,
+      error: p.error ?? null,
+      insights: p.insights ? { reach: p.insights.reach, views: p.insights.views, likes: p.insights.likes, comments: p.insights.comments, saves: p.insights.saves, shares: p.insights.shares } : null,
+      updatedAt: p.updatedAt ?? 0,
+    }))
+    .sort((a, b) => (b.publishedAt ?? b.scheduledFor ?? b.suggestedFor ?? b.updatedAt) - (a.publishedAt ?? a.scheduledFor ?? a.suggestedFor ?? a.updatedAt))
+    .slice(0, 60);
+}
+
+export function inbox(leads: PartnerLead[], now: number): HqSnapshot['inbox'] {
+  const replies: InboxReply[] = [];
+  const pitches: InboxPitch[] = [];
+  for (const l of leads) {
+    const r = l.lastReply;
+    if (r && !r.sent && r.classification !== 'stop' && r.classification !== 'auto-reply') {
+      replies.push({
+        leadId: l.id, business: 'calgarywatch', businessName: l.businessName, from: r.from, subject: r.subject,
+        text: r.text.slice(0, 4000), classification: r.classification, suggestedSubject: r.suggestedSubject,
+        suggestedBody: r.suggestedBody, approved: r.approved, at: r.at,
+      });
+    }
+    if ((l.status === 'ready' || l.status === 'follow-up-ready') && !l.doNotContact) {
+      pitches.push({
+        leadId: l.id, business: 'calgarywatch', businessName: l.businessName, contactEmail: l.contactEmail, category: l.category,
+        neighbourhood: l.neighbourhood, reasonRelevant: l.reasonRelevant, subject: l.draftSubject, body: l.draftBody,
+        followUp: l.status === 'follow-up-ready', at: l.updatedAt,
+      });
+    }
+  }
+  return { replies: replies.sort((a, b) => a.at - b.at), pitches: pitches.sort((a, b) => a.at - b.at), at: now };
+}
+
+const ACTIVITY_TYPES: Record<string, string> = { found: 'Lead found', drafted: 'Pitch drafted', approved: 'Approved', sent: 'Email sent', reply: 'Reply received', 'reply-sent': 'Reply sent', status: 'Updated', imported: 'Imported', note: 'Note' };
+
+/** What the agents (and you) did lately, newest first. */
+export function activity(leads: PartnerLead[], posts: OpsPost[], now: number, hours = 72): ActivityItem[] {
+  const since = now - hours * 3_600_000;
+  const out: ActivityItem[] = [];
+  for (const l of leads) {
+    for (const e of l.history ?? []) {
+      if (e.at >= since) out.push({ at: e.at, business: 'calgarywatch', type: ACTIVITY_TYPES[e.type] ?? e.type, text: `${l.businessName}: ${e.summary}`.slice(0, 200) });
+    }
+  }
+  for (const p of posts) {
+    if (p.status === 'published' && (p.publishedAt ?? 0) >= since) out.push({ at: p.publishedAt!, business: p.brand, type: 'Posted', text: p.imageText?.headline || p.caption.split('\n')[0].slice(0, 120) });
+    if (p.status === 'failed' && (p.updatedAt ?? 0) >= since) out.push({ at: p.updatedAt, business: p.brand, type: 'Post failed', text: `${p.imageText?.headline ?? ''}: ${p.error ?? ''}`.slice(0, 200) });
+  }
+  return out.sort((a, b) => b.at - a.at).slice(0, 80);
+}
+
+const CONTACTED = ['contacted', 'follow-up-ready', 'no-response', 'replied', 'interested', 'not-interested', 'claimed', 'partner'];
+const REPLIED = ['replied', 'interested', 'not-interested', 'claimed', 'partner'];
+
+/** Everything about CalgaryWatch partner outreach that fits on one screen. */
+export function pipelineDetail(leads: PartnerLead[], now: number, dateOf: (t: number) => string): PipelineDetail {
+  const rows: LeadRow[] = leads.map(l => ({
+    id: l.id, businessName: l.businessName, category: l.category || 'Other', neighbourhood: l.neighbourhood, website: l.website,
+    contactEmail: l.contactEmail, status: l.status, followUps: l.followUps, lastContactAt: l.lastContactAt, nextFollowUpAt: l.nextFollowUpAt,
+    replyClass: l.lastReply?.classification ?? null, replyAt: l.lastReply?.at ?? null, createdAt: l.createdAt,
+  })).sort((a, b) => (b.replyAt ?? b.lastContactAt ?? b.createdAt) - (a.replyAt ?? a.lastContactAt ?? a.createdAt));
+
+  const days = new Map<string, { sent: number; replies: number }>();
+  for (let i = 29; i >= 0; i--) days.set(dateOf(now - i * DAY), { sent: 0, replies: 0 });
+  const hoursToReply: number[] = [];
+  for (const l of leads) {
+    const firstSent = (l.history ?? []).filter(e => e.type === 'sent').map(e => e.at).sort((a, b) => a - b)[0];
+    for (const e of l.history ?? []) {
+      const d = days.get(dateOf(e.at));
+      if (d && e.type === 'sent') d.sent++;
+      if (d && e.type === 'reply') d.replies++;
+    }
+    if (firstSent && l.lastReply?.at && l.lastReply.at > firstSent) hoursToReply.push((l.lastReply.at - firstSent) / 3_600_000);
+  }
+
+  const cats = new Map<string, { total: number; contacted: number; replied: number; interested: number }>();
+  for (const l of leads) {
+    const c = cats.get(l.category || 'Other') ?? { total: 0, contacted: 0, replied: 0, interested: 0 };
+    c.total++;
+    if (CONTACTED.includes(l.status)) c.contacted++;
+    if (REPLIED.includes(l.status)) c.replied++;
+    if (['interested', 'claimed', 'partner'].includes(l.status)) c.interested++;
+    cats.set(l.category || 'Other', c);
+  }
+  const contacted = leads.filter(l => CONTACTED.includes(l.status)).length;
+  const replied = leads.filter(l => REPLIED.includes(l.status)).length;
+  const sortedHours = hoursToReply.sort((a, b) => a - b);
+  return {
+    leads: rows.slice(0, 400),
+    sendsByDay: [...days.entries()].map(([date, v]) => ({ date, ...v })),
+    byCategory: [...cats.entries()].map(([category, v]) => ({ category, ...v })).sort((a, b) => b.total - a.total).slice(0, 16),
+    followUpsDue: leads.filter(l => l.status === 'follow-up-ready' || (l.nextFollowUpAt !== null && l.nextFollowUpAt <= now && l.status === 'contacted')).length,
+    replyRate: contacted ? Math.round((replied / contacted) * 1000) / 10 : null,
+    medianHoursToReply: sortedHours.length ? Math.round(sortedHours[Math.floor(sortedHours.length / 2)]) : null,
   };
 }

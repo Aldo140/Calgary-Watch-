@@ -45,6 +45,27 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
 
+      # HQ (arctoslaunchpad.com/hq): keyless sign-in to arctos-hq. GitHub's OIDC
+      # token is exchanged for a short-lived Google token; no key is stored.
+      - name: Sign in to arctos-hq
+        id: hq
+        continue-on-error: true
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: false
+          export_environment_variables: false
+      # Approvals, rejections and replies made in HQ, applied before the run publishes and sends.
+      - name: Apply HQ actions
+        continue-on-error: true
+        run: npm run ops:hq-commands
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       - name: Draft, research, check health, send summary
         run: npm run ops:daily
         env:
@@ -70,19 +91,7 @@ jobs:
           OPS_SUMMARY_FROM: ${{ vars.OPS_SUMMARY_FROM }}
           GITHUB_TOKEN: ${{ github.token }}
 
-      # The HQ dashboard (arctoslaunchpad.com/hq) reads a summary of everything above.
-      # Keyless: GitHub's OIDC token is exchanged for a short-lived arctos-hq token.
-      - name: Sign in to arctos-hq
-        id: hq
-        if: always()
-        continue-on-error: true
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
-          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
-          token_format: access_token
-          create_credentials_file: false
-          export_environment_variables: false
+      # The HQ dashboard reads a summary of everything above.
       - name: Publish the HQ snapshot
         if: always()
         continue-on-error: true

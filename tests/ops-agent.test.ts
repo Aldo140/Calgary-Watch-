@@ -130,9 +130,12 @@ describe('automatic posting', () => {
     imageUrl: 'https://x', imagePath: null, warnings: [], sponsored: false, relevantUntil: null, suggestedFor: null, scheduledFor: null,
     draftedBy: 'claude', createdAt: 0, updatedAt: 0, ...over,
   });
-  it('lets CalgaryDaily listing posts go out on their own', () => {
+  it('lets CalgaryDaily roundups go out on their own', () => {
     assert.ok(autoPublishable(post({})));
-    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
+  });
+  it('holds single event and market posts for a person (they drew a median of 45 views)', () => {
+    assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
+    assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x' })));
   });
   it('keeps CalgaryWatch, briefs, paid posts and anything with a warning for a person', () => {
     assert.ok(!autoPublishable(post({ brand: 'calgarywatch' })));

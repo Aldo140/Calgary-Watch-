@@ -75,8 +75,8 @@
   ],
   "linkInBio": "https://calgarywatch.ca/?utm_source=instagram&utm_medium=social&utm_campaign=calgarydaily_bio",
   "autoPublish": {
-    "events": true,
-    "markets": true,
+    "events": false,
+    "markets": false,
     "roundups": true,
     "partner": false,
     "incidents": false

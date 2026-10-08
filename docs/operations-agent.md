@@ -2,7 +2,8 @@
 
 It runs every day without a laptop open. It posts to **@calgarydaily**, CalgaryWatch's sister Instagram account. There is no separate CalgaryWatch Instagram. It also runs partner outreach from aldo@calgarywatch.ca and keeps an eye on the site.
 
-- **Listing posts** (Today and Tonight roundups, spotlights, the Friday weekend Reel) publish on their own when they pass the brand rules.
+- **Roundups** (Today and Tonight, Thursday date night, the Friday weekend Reel) publish on their own when they pass the brand rules.
+- **Single event and market spotlights** wait for you in /admin (since 2026-10-08). The account history showed them drawing a median of 45 views against 2,520 for credited Reels, so they no longer go out unattended. Turn them back on with `autoPublish.events` / `autoPublish.markets` in `brand/calgarydaily.json`.
 - **News, opinion, anything with a warning, and paid posts** wait for you in /admin.
 - **Partner emails** are sent automatically once every CASL check passes (`autoSend` in `brand/outreach.json`). You can cancel any queued email in /admin before its send window.
 - **Replies from businesses** always wait for you. Opt-outs take effect at once and are permanent.

@@ -2,6 +2,7 @@ import { interestsFor, type EventInterestId } from './eventPicks';
 import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
 import { calgaryDate, entityPath, matchesPeriod } from './discovery';
 import { calgaryDateTimeFormat } from './calgaryTz';
+import { interestScore, isCampusOnly } from './eventRank';
 /** Convert a wall clock time using the zone's actual offset (including DST). */
 export function calgaryInstant(day: string, hour: number): number {
   const wall = Date.parse(`${day}T00:00:00Z`) + hour * 3600000;
@@ -89,6 +90,8 @@ export interface AgendaItem {
   free: boolean;
   indoor: boolean;
   outdoor: boolean;
+  /** How likely it is to be worth going to (eventRank.ts); the day list sorts by it. */
+  score: number;
 }
 export interface AgendaDay { date: string; items: AgendaItem[] }
 
@@ -101,7 +104,9 @@ export function addCalgaryDays(day: string, offset: number): string {
 
 /** Every one of the next `days` Calgary dates — empty days included, so a quiet
  * Tuesday reads as quiet rather than disappearing — with the events and market
- * occurrences that overlap it. A multi-day event appears on each day it runs. */
+ * occurrences that overlap it. A multi-day event appears on each day it runs.
+ * Each day leads with what people are most likely to go to (a Flames game before a
+ * campus talk), drops campus-only listings, and shows a title once per day. */
 export function weekAgenda(entities: readonly DiscoveryEntity[], occurrences: readonly MarketOccurrence[], days = 7, now = new Date()): AgendaDay[] {
   const today = calgaryDate(now);
   const week: AgendaDay[] = Array.from({ length: days }, (_, i) => ({ date: addCalgaryDays(today, i), items: [] }));
@@ -110,21 +115,30 @@ export function weekAgenda(entities: readonly DiscoveryEntity[], occurrences: re
     if (!(Date.parse(end) > now.getTime())) return;
     const from = calgaryDate(new Date(start)), to = calgaryDate(new Date(end));
     const tags = [...e.categories, ...e.tags].map(t => t.toLowerCase());
+    const base = interestScore(e, start);
     for (const day of week) {
       if (day.date < from || day.date > to) continue;
+      // Something that began on an earlier day is a carry-over, not today's news.
+      const score = day.date === from ? base : base - 1;
       day.items.push({
         key, kind, title: e.title, to: entityPath(e), place: place(e), start, end,
         free: e.kind === 'event' && e.pricing === 'free',
         indoor: tags.includes('indoor'), outdoor: tags.includes('outdoor') || tags.includes('outdoors'),
+        score,
       });
     }
   };
   for (const e of entities) {
-    if (e.kind === 'event' && !e.cancelled) add(e, 'event', e.id, e.start, e.end);
+    if (e.kind === 'event' && !e.cancelled && !isCampusOnly(e)) add(e, 'event', e.id, e.start, e.end);
     if (e.kind === 'market') {
       for (const o of occurrences) if (o.marketId === e.id && !o.cancelled) add(e, 'market', `${e.id}:${o.start}`, o.start, o.end);
     }
   }
-  for (const day of week) day.items.sort((a, b) => Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
+  const titleKey = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  for (const day of week) {
+    day.items.sort((a, b) => b.score - a.score || Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
+    const seen = new Set<string>();
+    day.items = day.items.filter(i => { const k = titleKey(i.title); if (seen.has(k)) return false; seen.add(k); return true; });
+  }
   return week;
 }

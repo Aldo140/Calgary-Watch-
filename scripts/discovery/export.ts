@@ -1,6 +1,7 @@
 import { mkdir, rename, writeFile } from 'node:fs/promises';
 import domain from '../../functions/discovery-domain.cjs';
 import { collectSources, editorialEntities } from './feeds';
+import { isCampusOnly } from '../../src/lib/eventRank';
 
 /**
  * Builds src/generated/discovery-index.json for the site, from three inputs:
@@ -60,6 +61,11 @@ for (const [id, e] of byId) {
   if (t.length < 8) continue;
   if (others.some(o => { const u = norm(o.title); return u.length >= 8 && (u.includes(t) || t.includes(u)) && (o.kind === 'market' || String(o.start ?? '').slice(0, 10) === day); })) byId.delete(id);
 }
+// University calendars also publish things meant only for their own students and staff
+// (study-break crafts in a numbered room, info sessions). They aren't city events.
+let campus = 0;
+for (const [id, e] of byId) if (e.kind === 'event' && isCampusOnly(e as never)) { byId.delete(id); campus++; }
+if (campus) log(`Left out ${campus} campus-only listings`);
 const occById = new Map<string, Entity>(feed.occurrences.map(o => [o.id, o]));
 for (const o of stored.occurrences) if (!occById.has(o.id)) occById.set(o.id, o);
 

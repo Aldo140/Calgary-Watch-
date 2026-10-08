@@ -223,3 +223,17 @@
   .cw-home2 .h-blade-quad i { animation: none; opacity: 0; }
   .cw-home2 .h-blade-quad i:first-child { opacity: 1; }
 }
+
+/* Phones: the week planner runs well over a screen tall, so a side shadow
+   reads as a black bar down the right edge while you scroll. Keep the
+   offset under the card only. */
+@media (max-width: 640px) {
+  .cw-home2 .h-week { box-shadow: 0 6px 0 var(--b-ink); }
+}
+
+/* Older Safari (before 16) has no overflow: clip, so the torn-edge art that
+   bleeds past the screen widened the page and showed a strip on the right. */
+@supports not (overflow: clip) {
+  .cw-home2 { overflow-x: hidden; }
+  .cw-site > main { overflow-x: hidden; }
+}

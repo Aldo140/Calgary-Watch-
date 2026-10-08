@@ -33,11 +33,12 @@ export function useAdminWorkload(enabled: boolean): AdminWorkload {
       queue(),
       count(query(collection(database, 'listing_claims'), where('status', '==', 'pending'))),
       count(query(collection(database, 'listing_updates'), where('status', '==', 'pending'))),
-    ]).then(([suggestions, rows, claims, updates]) => {
+      count(query(collection(database, 'market_service_requests'), where('status', '==', 'new'))),
+    ]).then(([suggestions, rows, claims, updates, service]) => {
       const now = Date.now();
       setW({
         suggestions,
-        claims: claims + updates,
+        claims: claims + updates + service,
         failedActions: rows.filter((r) => r.status === 'failed' && (r.createdAt ?? 0) > now - 7 * 86_400_000).length,
         stuckActions: rows.filter((r) => r.status === 'pending' && (r.createdAt ?? now) < now - 2 * 3_600_000).length,
       });

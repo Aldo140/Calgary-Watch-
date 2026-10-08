@@ -12,6 +12,7 @@ import { auth } from '../firebase';
 import { EASE_OUT } from '../components/plans/Motion';
 import '../styles/plans.css';
 import '../styles/claim.css';
+import '../styles/hq.css';
 
 const PERKS = [
   { icon: CalendarClock, title: 'Dates and hours', body: 'New run dates, holiday hours, a show that moved.' },
@@ -101,7 +102,15 @@ export default function ClaimListingPage() {
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
             {claim?.status === 'approved' ? (
-              <Manage claim={claim} />
+              <>
+                {entity.kind === 'market' ? (
+                  <Link to={`/organizer/${encodeURIComponent(entity.id)}`} className="hq-open">
+                    <span><strong>Open Market HQ</strong><small>Vendors, weekly lineups, applications and vendor emails.</small></span>
+                    <ArrowUpRight size={20} aria-hidden="true" />
+                  </Link>
+                ) : null}
+                <Manage claim={claim} />
+              </>
             ) : claim?.status === 'pending' ? (
               <motion.section className="cl-status" data-state="pending" {...rise(4)}>
                 <Clock size={22} aria-hidden="true" />

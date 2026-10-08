@@ -15,6 +15,9 @@ const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
 const ClaimListingPage = lazy(() => import('@/src/pages/ClaimListingPage'));
+const MarketHQPage = lazy(() => import('@/src/pages/MarketHQPage'));
+const VendorApplyPage = lazy(() => import('@/src/pages/VendorApplyPage'));
+const ForMarketsPage = lazy(() => import('@/src/pages/ForMarketsPage'));
 const DiscoveryPage = lazy(() => import('@/src/pages/DiscoveryPage'));
 const MapPage     = lazy(() => import('@/src/pages/MapPage'));
 const NotFoundPage = lazy(() => import('@/src/pages/NotFoundPage'));
@@ -153,6 +156,9 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/submit" element={<SubmitDiscoveryPage />} />
           <Route path="/claim/:id" element={<ClaimListingPage />} />
+          <Route path="/organizer/:id" element={<MarketHQPage />} />
+          <Route path="/apply/:id" element={<VendorApplyPage />} />
+          <Route path="/for-markets" element={<ForMarketsPage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/events" element={<DiscoveryPage />} />
           <Route path="/events/:slug" element={<DiscoveryPage />} />

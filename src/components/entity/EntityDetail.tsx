@@ -6,6 +6,7 @@ import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { DiscoveryCard } from '../discovery/DiscoveryCards';
 import { EventPanel } from './EventPanel';
 import { ClaimCta, VerifiedMark } from './ClaimCta';
+import { MarketLineup } from './MarketLineup';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const checkedOn = (v: string) => { const t = Date.parse(v); return Number.isFinite(t) ? calgaryDateTimeFormat('en-CA', { month: 'long', day: 'numeric', year: 'numeric' }).format(t) : v; };
@@ -26,7 +27,7 @@ export function EntityDetail({ entity, related, occurrences = [], all = [] }: { 
     <p>{entity.description}</p>
     {'address' in entity && entity.kind !== 'event' && <p><strong>Location:</strong> {entity.address}</p>}
     {entity.kind === 'event' && <EventPanel entity={entity} all={all} part="more" />}
-    {entity.kind === 'market' && <><h2>Plan your visit</h2><p>{entity.amenities.join(' · ')}</p><p><strong>Next:</strong> {next ? `${format(next.start)} to ${format(next.end)} (Calgary time)` : 'No upcoming dates confirmed.'}</p><h2>Upcoming dates</h2><ul>{dates.map(o => <li key={o.id}>{format(o.start)} to {format(o.end)} {o.cancelled ? 'Cancelled' : ''} - <a href={o.source.url}>Source</a></li>)}</ul>{entity.parking && <p><strong>Parking:</strong> {entity.parking}</p>}{entity.transit && <p><strong>Transit:</strong> {entity.transit}</p>}{entity.petFriendly !== undefined && <p>{entity.petFriendly ? 'Pet friendly' : 'Pets not permitted'}</p>}{entity.familyFriendly && <p>Family friendly</p>}</>}
+    {entity.kind === 'market' && <><h2>Plan your visit</h2><p>{entity.amenities.join(' · ')}</p><p><strong>Next:</strong> {next ? `${format(next.start)} to ${format(next.end)} (Calgary time)` : 'No upcoming dates confirmed.'}</p><h2>Upcoming dates</h2><ul>{dates.map(o => <li key={o.id}>{format(o.start)} to {format(o.end)} {o.cancelled ? 'Cancelled' : ''} - <a href={o.source.url}>Source</a></li>)}</ul>{entity.parking && <p><strong>Parking:</strong> {entity.parking}</p>}{entity.transit && <p><strong>Transit:</strong> {entity.transit}</p>}{entity.petFriendly !== undefined && <p>{entity.petFriendly ? 'Pet friendly' : 'Pets not permitted'}</p>}{entity.familyFriendly && <p>Family friendly</p>}<MarketLineup marketId={entity.id} /></>}
     {entity.kind === 'guide' && <><h2>About this guide</h2><p>{entity.introduction}</p><h2>How we choose</h2><p>{entity.methodology}</p>{entity.sponsorshipDisclosure && <p>Sponsored: {entity.sponsorshipDisclosure}</p>}</>}
     <SourceBadge entity={entity} />
     {related.length > 0 && <section><h2>In this guide & nearby</h2><div className="cw-card-grid">{related.map(e => <DiscoveryCard key={e.id} entity={e} />)}</div></section>}

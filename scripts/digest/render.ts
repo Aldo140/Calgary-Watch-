@@ -1362,6 +1362,8 @@ function eventRow(item: PickItem, origin: string): string {
           </a>
           ${sub ? `<div class="cw-soft" style="font:400 12px/1.45 ${BODY};color:${C.soft};padding-top:6px;">${escapeHtml(sub)}</div>` : ''}
           ${tags ? `<div style="font:700 10.5px/1.4 ${BODY};color:${C.bow};letter-spacing:.6px;text-transform:uppercase;padding-top:6px;">${escapeHtml(tags)}</div>` : ''}
+          ${item.lineup?.summary ? `<div class="cw-body" style="font:400 12.5px/1.45 ${BODY};color:${C.body};padding-top:6px;">${escapeHtml(item.lineup.summary)}</div>` : ''}
+          ${item.lineup?.note ? `<div style="font:italic 400 12.5px/1.45 ${BODY};color:${C.bow};padding-top:4px;">“${escapeHtml(item.lineup.note.slice(0, 180))}”</div>` : ''}
         </td>
       </tr>
     </table>
@@ -1498,6 +1500,8 @@ export function renderEventsText(options: EventsEmailOptions): string {
   const line = (i: PickItem) => [
     `${pickWhen(i.start)}  ${i.title}`,
     `   ${[i.venue || i.neighbourhood, pickDistance(i.distanceM), i.free ? 'Free' : null].filter(Boolean).join(' · ')}`,
+    ...(i.lineup?.summary ? [`   ${i.lineup.summary}`] : []),
+    ...(i.lineup?.note ? [`   "${i.lineup.note.slice(0, 180)}"`] : []),
     `   ${branding.origin}${i.path}`,
     '',
   ];
@@ -1717,6 +1721,8 @@ export function renderCombinedText(options: CombinedEmailOptions): string {
   const event = (i: PickItem) => [
     `${pickWhen(i.start)}  ${i.title}`,
     `   ${[i.venue || i.neighbourhood, pickDistance(i.distanceM), i.free ? 'Free' : null].filter(Boolean).join(' · ')}`,
+    ...(i.lineup?.summary ? [`   ${i.lineup.summary}`] : []),
+    ...(i.lineup?.note ? [`   "${i.lineup.note.slice(0, 180)}"`] : []),
     `   ${branding.origin}${i.path}`,
     '',
   ];

@@ -31,6 +31,7 @@ const PartnersPage = lazy(() => import('@/src/pages/PartnersPage'));
 const DateNightPage = lazy(() => import('@/src/pages/DateNightPage'));
 const NeighbourhoodWatchGuidePage = lazy(() => import('@/src/pages/NeighbourhoodWatchGuidePage'));
 const AirdrieCrimeMapPage = lazy(() => import('@/src/pages/AirdrieCrimeMapPage'));
+const CheckYourCommunityPage = lazy(() => import('@/src/pages/CheckYourCommunityPage'));
 const UnsubscribePage = lazy(() => import('@/src/pages/UnsubscribePage'));
 const PlansPage = lazy(() => import('@/src/pages/PlansPage'));
 
@@ -186,6 +187,7 @@ export default function App() {
           <Route path="/unsubscribe" element={<UnsubscribePage />} />
           <Route path="/calgary-neighbourhood-watch" element={<NeighbourhoodWatchGuidePage />} />
           <Route path="/airdrie-crime-map" element={<AirdrieCrimeMapPage />} />
+          <Route path="/check-your-community" element={<CheckYourCommunityPage />} />
           {/* Redirect unknown paths to landing page */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

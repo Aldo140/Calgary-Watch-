@@ -345,6 +345,11 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
       copy: 'Explore recent community observations and attributed public-source reports across Calgary and nearby communities. Crime, traffic, weather, infrastructure and emergency markers each include a report time and source. Calgary Watch supports local awareness; it is not a police scanner, dispatch feed or officer tracker.',
       links: [[GUIDE_PATH, 'Understand Calgary crime maps and current activity'], [AIRDRIE_GUIDE_PATH, 'Compare Airdrie crime-map sources'], ['/about', 'How Calgary Watch verifies report sources']],
     },
+    '/check-your-community': {
+      heading: 'Where does your community rank?',
+      copy: 'Type your Calgary community and guess where it lands for City of Calgary 311 reports this year, then see the answer, how it changed over the last full year, and how it compares with the communities either side. Rankings are totals, not per resident, so busy areas like downtown and around the airport rank higher. These are 311 requests, not police crime statistics, and CalgaryWatch is not affiliated with the City or Calgary Police.',
+      links: [['/map', 'See it on the live map'], ['/coverage', 'Where the data comes from']],
+    },
     '/about': {
       heading: 'How Calgary Watch works',
       copy: 'Calgary Watch combines community reports with selected, attributed public-source information to support local awareness. It is independent from Calgary Police Service and is not a substitute for 911.',

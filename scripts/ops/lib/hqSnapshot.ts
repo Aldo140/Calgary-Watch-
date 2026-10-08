@@ -9,7 +9,7 @@
 import type { AccountHistory, HistoryGroup, OpsHealth, OpsPerformance, OpsPost, PartnerLead } from '../../../src/types/ops';
 import type { ScoutEntry } from './scout';
 
-export const SNAPSHOT_VERSION = 1;
+export const SNAPSHOT_VERSION = 2;
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
 
@@ -37,6 +37,61 @@ export interface Pipeline {
   interested30: number;
 }
 
+/** A CalgaryDaily/CalgaryWatch post as HQ shows it: the image, the words and where it stands. */
+export interface HqPost {
+  id: string;
+  brand: Business;
+  status: string;
+  template: string;
+  format: 'image' | 'carousel' | 'reel';
+  headline: string;
+  caption: string;
+  altText: string;
+  imageUrl: string | null;
+  imageUrls: string[];
+  videoUrl: string | null;
+  warnings: string[];
+  facts: string;
+  note: string;
+  suggestedFor: number | null;
+  scheduledFor: number | null;
+  publishedAt: number | null;
+  permalink: string | null;
+  error: string | null;
+  insights: { reach: number; views: number | null; likes: number; comments: number; saves: number; shares: number } | null;
+  updatedAt: number;
+}
+
+export interface InboxReply {
+  leadId: string;
+  business: Business;
+  businessName: string;
+  from: string;
+  subject: string;
+  text: string;
+  classification: string;
+  suggestedSubject: string;
+  suggestedBody: string;
+  approved: boolean;
+  at: number;
+}
+
+export interface InboxPitch {
+  leadId: string;
+  business: Business;
+  businessName: string;
+  contactEmail: string | null;
+  category: string;
+  neighbourhood: string;
+  reasonRelevant: string;
+  subject: string;
+  body: string;
+  followUp: boolean;
+  at: number;
+}
+
+export interface ActivityItem { at: number; business: Business; type: string; text: string }
+
 export interface QueueCounts { waiting: number; scheduled: number; published7d: number; failed7d: number }
 
 export interface SpendDay { date: string; usd: number; calls: number; byTask: Record<string, number> }
@@ -59,6 +114,9 @@ export interface HqSnapshot {
     avgDelayMinutes: number | null;
     queue: QueueCounts;
   } | null;
+  posts: HqPost[];
+  inbox: { replies: InboxReply[]; pitches: InboxPitch[]; at: number };
+  activity: ActivityItem[];
   pipelines: Pipeline[];
   pipelinesAt: number;
   spend: { days: SpendDay[]; monthToDate: number; last7: number; last30: number };
@@ -179,4 +237,78 @@ export function calgaryDailySummary(history: AccountHistory | null, performance:
     avgDelayMinutes: performance?.avgDelayMinutes ?? null,
     queue,
   };
+}
+
+const OPEN_POSTS = ['drafted', 'approved', 'failed', 'needs-correction', 'redraft', 'requested'];
+
+export function hqPosts(posts: OpsPost[], now: number): HqPost[] {
+  const recent = (p: OpsPost) => p.status === 'published' && (p.publishedAt ?? 0) >= now - 14 * DAY;
+  return posts
+    .filter(p => OPEN_POSTS.includes(p.status) || recent(p))
+    .map(p => ({
+      id: p.id,
+      brand: p.brand,
+      status: p.status,
+      template: p.template,
+      format: p.videoUrl ? 'reel' as const : (p.imageUrls?.length ?? 0) > 1 ? 'carousel' as const : 'image' as const,
+      headline: p.imageText?.headline || p.caption.split('\n')[0].slice(0, 80) || 'Untitled post',
+      caption: p.caption,
+      altText: p.altText,
+      imageUrl: p.imageUrl,
+      imageUrls: p.imageUrls ?? (p.imageUrl ? [p.imageUrl] : []),
+      videoUrl: p.videoUrl ?? null,
+      warnings: p.warnings ?? [],
+      facts: (p.facts ?? '').slice(0, 1500),
+      note: p.note ?? '',
+      suggestedFor: p.suggestedFor ?? null,
+      scheduledFor: p.scheduledFor ?? null,
+      publishedAt: p.publishedAt ?? null,
+      permalink: p.permalink ?? null,
+      error: p.error ?? null,
+      insights: p.insights ? { reach: p.insights.reach, views: p.insights.views, likes: p.insights.likes, comments: p.insights.comments, saves: p.insights.saves, shares: p.insights.shares } : null,
+      updatedAt: p.updatedAt ?? 0,
+    }))
+    .sort((a, b) => (b.publishedAt ?? b.scheduledFor ?? b.suggestedFor ?? b.updatedAt) - (a.publishedAt ?? a.scheduledFor ?? a.suggestedFor ?? a.updatedAt))
+    .slice(0, 60);
+}
+
+export function inbox(leads: PartnerLead[], now: number): HqSnapshot['inbox'] {
+  const replies: InboxReply[] = [];
+  const pitches: InboxPitch[] = [];
+  for (const l of leads) {
+    const r = l.lastReply;
+    if (r && !r.sent && r.classification !== 'stop' && r.classification !== 'auto-reply') {
+      replies.push({
+        leadId: l.id, business: 'calgarywatch', businessName: l.businessName, from: r.from, subject: r.subject,
+        text: r.text.slice(0, 4000), classification: r.classification, suggestedSubject: r.suggestedSubject,
+        suggestedBody: r.suggestedBody, approved: r.approved, at: r.at,
+      });
+    }
+    if ((l.status === 'ready' || l.status === 'follow-up-ready') && !l.doNotContact) {
+      pitches.push({
+        leadId: l.id, business: 'calgarywatch', businessName: l.businessName, contactEmail: l.contactEmail, category: l.category,
+        neighbourhood: l.neighbourhood, reasonRelevant: l.reasonRelevant, subject: l.draftSubject, body: l.draftBody,
+        followUp: l.status === 'follow-up-ready', at: l.updatedAt,
+      });
+    }
+  }
+  return { replies: replies.sort((a, b) => a.at - b.at), pitches: pitches.sort((a, b) => a.at - b.at), at: now };
+}
+
+const ACTIVITY_TYPES: Record<string, string> = { found: 'Lead found', drafted: 'Pitch drafted', approved: 'Approved', sent: 'Email sent', reply: 'Reply received', 'reply-sent': 'Reply sent', status: 'Updated', imported: 'Imported', note: 'Note' };
+
+/** What the agents (and you) did lately, newest first. */
+export function activity(leads: PartnerLead[], posts: OpsPost[], now: number, hours = 72): ActivityItem[] {
+  const since = now - hours * 3_600_000;
+  const out: ActivityItem[] = [];
+  for (const l of leads) {
+    for (const e of l.history ?? []) {
+      if (e.at >= since) out.push({ at: e.at, business: 'calgarywatch', type: ACTIVITY_TYPES[e.type] ?? e.type, text: `${l.businessName}: ${e.summary}`.slice(0, 200) });
+    }
+  }
+  for (const p of posts) {
+    if (p.status === 'published' && (p.publishedAt ?? 0) >= since) out.push({ at: p.publishedAt!, business: p.brand, type: 'Posted', text: p.imageText?.headline || p.caption.split('\n')[0].slice(0, 120) });
+    if (p.status === 'failed' && (p.updatedAt ?? 0) >= since) out.push({ at: p.updatedAt, business: p.brand, type: 'Post failed', text: `${p.imageText?.headline ?? ''}: ${p.error ?? ''}`.slice(0, 200) });
+  }
+  return out.sort((a, b) => b.at - a.at).slice(0, 80);
 }

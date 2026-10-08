@@ -28,6 +28,7 @@
     "ops:import-leads": "tsx scripts/ops/import-leads.ts",
     "ops:feed": "tsx scripts/ops/export-feed.ts",
     "ops:hq": "tsx scripts/ops/hq-snapshot.ts",
+    "ops:hq-commands": "tsx scripts/ops/hq-commands.ts",
     "digest:preview": "tsx scripts/digest/preview.ts",
     "digest:publish-previews": "tsx scripts/digest/publishPreviews.ts",
     "digest:art": "tsx scripts/prepare-email-art.ts",

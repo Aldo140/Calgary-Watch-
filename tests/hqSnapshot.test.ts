@@ -79,3 +79,69 @@ describe('bottlenecks', () => {
     assert.deepEqual(by, { you: 'bad', late: 'warn', inbox: 'bad', failed: 'ok', workflows: 'bad' });
   });
 });
+
+import { activity, hqPosts, inbox } from '../scripts/ops/lib/hqSnapshot';
+import { applyLeadCommand, applyPostCommand, type HqCommand } from '../scripts/ops/lib/hqCommands';
+
+const cmd = (over: Partial<HqCommand>): HqCommand => ({ id: 'c1', type: 'approve-post', targetId: 'p1', payload: {}, by: 'aldo@calgarywatch.ca', at: now, ...over });
+
+describe('HQ actions', () => {
+  it('approves a drafted post for its suggested slot, with an edited caption', () => {
+    const r = applyPostCommand(cmd({ payload: { caption: ' New caption ' } }), post({ status: 'drafted', suggestedFor: now + 2 * HOUR }), now);
+    assert.ok(r.ok);
+    assert.equal(r.update.status, 'approved');
+    assert.equal(r.update.scheduledFor, now + 2 * HOUR);
+    assert.equal(r.update.caption, 'New caption');
+    assert.equal(r.update.reviewedByEmail, 'aldo@calgarywatch.ca (HQ)');
+  });
+  it('never schedules in the past, and refuses posts that already went out', () => {
+    const late = applyPostCommand(cmd({}), post({ status: 'drafted', suggestedFor: now - HOUR }), now);
+    assert.ok(late.ok && late.update.scheduledFor === now);
+    assert.equal(applyPostCommand(cmd({}), post({ status: 'published' }), now).ok, false);
+    assert.equal(applyPostCommand(cmd({}), null, now).ok, false);
+  });
+  it('rejects, redrafts with a note, and unschedules', () => {
+    const rej = applyPostCommand(cmd({ type: 'reject-post' }), post({ status: 'drafted' }), now);
+    assert.ok(rej.ok && rej.update.status === 'rejected');
+    const red = applyPostCommand(cmd({ type: 'redraft-post', payload: { note: 'lead with the free entry' } }), post({ status: 'drafted' }), now);
+    assert.ok(red.ok && red.update.status === 'redraft' && red.update.note === 'lead with the free entry');
+    assert.equal(applyPostCommand(cmd({ type: 'unschedule-post' }), post({ status: 'drafted' }), now).ok, false);
+  });
+  it('approves an edited pitch only while it is waiting, and never for a do-not-contact lead', () => {
+    const ok = applyLeadCommand(cmd({ type: 'approve-pitch', payload: { subject: 'Hi', body: 'Body' } }), lead({ status: 'ready', contactEmail: 'a@b.ca' }), now);
+    assert.ok(ok.ok && ok.update.status === 'approved' && ok.update.draftBody === 'Body');
+    assert.equal(applyLeadCommand(cmd({ type: 'approve-pitch' }), lead({ status: 'contacted' }), now).ok, false);
+    assert.equal(applyLeadCommand(cmd({ type: 'approve-pitch' }), lead({ status: 'ready', doNotContact: true }), now).ok, false);
+  });
+  it('approves or closes a reply through nested fields', () => {
+    const reply = { at: now, from: 'x', subject: '', text: 'Tell me more', classification: 'interested' as const, suggestedSubject: '', suggestedBody: 'Draft', approved: false, sent: false };
+    const a = applyLeadCommand(cmd({ type: 'approve-reply', payload: { body: 'Edited' } }), lead({ lastReply: reply }), now);
+    assert.ok(a.ok && a.update['lastReply.approved'] === true && a.update['lastReply.suggestedBody'] === 'Edited');
+    const h = applyLeadCommand(cmd({ type: 'handled-reply' }), lead({ lastReply: reply }), now);
+    assert.ok(h.ok && h.update['lastReply.sent'] === true);
+    assert.equal(applyLeadCommand(cmd({ type: 'approve-reply' }), lead({ lastReply: { ...reply, sent: true } }), now).ok, false);
+  });
+});
+
+describe('snapshot v2', () => {
+  it('keeps open posts and the last 14 days of published ones, newest first', () => {
+    const ps = hqPosts([
+      post({ id: 'old', status: 'published', publishedAt: now - 20 * 24 * HOUR }),
+      post({ id: 'pub', status: 'published', publishedAt: now - HOUR }),
+      post({ id: 'draft', status: 'drafted', suggestedFor: now + HOUR }),
+      post({ id: 'rej', status: 'rejected' }),
+    ], now);
+    assert.deepEqual(ps.map(p => p.id), ['draft', 'pub']);
+    assert.equal(ps[0].format, 'image');
+  });
+  it('puts waiting replies and pitches in the inbox, never opt-outs', () => {
+    const r = (classification: 'interested' | 'stop') => ({ at: now, from: 'x', subject: '', text: '', classification, suggestedSubject: '', suggestedBody: '', approved: false, sent: false });
+    const box = inbox([lead({ id: 'a', lastReply: r('interested') }), lead({ id: 'b', lastReply: r('stop') }), lead({ id: 'c', status: 'follow-up-ready' })], now);
+    assert.deepEqual(box.replies.map(x => x.leadId), ['a']);
+    assert.deepEqual(box.pitches.map(x => [x.leadId, x.followUp]), [['c', true]]);
+  });
+  it('lists recent sends, replies and posts newest first', () => {
+    const a = activity([lead({ businessName: 'Biz', history: [{ at: now - HOUR, type: 'sent', summary: 'Pitch sent' }, { at: now - 100 * HOUR, type: 'sent', summary: 'old' }] })], [post({ status: 'published', publishedAt: now - 2 * HOUR })], now);
+    assert.deepEqual(a.map(x => x.type), ['Email sent', 'Posted']);
+  });
+});

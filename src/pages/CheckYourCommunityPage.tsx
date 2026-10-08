@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Gamepad2, Play, Sparkles } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useCrimeStats } from '../hooks/useCrimeStats';
@@ -120,6 +120,37 @@ function Boards({ rankings, shapes, onOpen }: { rankings: CommunityRank[]; shape
         <Tracklist key={title} title={title} items={items} shapes={shapes} value={value} onOpen={onOpen} />
       ))}
     </div>
+  );
+}
+
+const SERVICES = [
+  { to: '/map', title: 'Live map', note: 'Incidents, traffic, weather and outages across Calgary as they happen.', tone: 'green' },
+  { to: '/plans', title: 'Your CalgaryWatch', note: 'Safety near home on Mondays, picks for the weekend on Thursdays. Free.', tone: 'lilac' },
+  { to: '/events', title: 'Events', note: 'What’s on, day by day, with a link to every organizer.', tone: 'hot' },
+  { to: '/markets', title: 'Markets', note: 'Farmers’ and makers’ markets, this weekend and beyond.', tone: 'sun' },
+  { to: '/neighbourhoods', title: 'Neighbourhoods', note: 'The city quadrant by quadrant, and where yours ranks.', tone: 'blue' },
+  { to: '/guides', title: 'Guides', note: 'Self-guided days out, from the river to the foothills.', tone: 'warm' },
+] as const;
+
+/** Who we are and what else we make, closing the page. */
+function MoreFromUs() {
+  return (
+    <section className="cyc-more" aria-labelledby="cyc-more-title">
+      <p className="cyc-eyebrow">Made in Calgary</p>
+      <h2 id="cyc-more-title">More from CalgaryWatch</h2>
+      <p className="cyc-more-lead">We're a free, independent guide to the city: what's happening near home, what's on this weekend, and the places worth knowing. Free for residents, built right here. <Link to="/about">About us</Link></p>
+      <ul className="cyc-more-row">
+        {SERVICES.map((s) => (
+          <li key={s.to}>
+            <Link to={s.to} className={`cyc-more-tile is-${s.tone}`}>
+              <b>{s.title}</b>
+              <span>{s.note}</span>
+              <i aria-hidden="true"><ArrowRight size={18} /></i>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -311,6 +342,7 @@ function Desktop({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading
         </section>
 
         {selected && phase === 'reveal' && <Boards rankings={rankings} shapes={shapes} onOpen={(r) => open(r)} />}
+        <MoreFromUs />
         <FinePrint />
       </main>
     </div>
@@ -372,7 +404,7 @@ function Mobile({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading:
         <Headline />
         <p className="cyc-m-lead">{rankings.length ? `${rankings.length} communities` : 'Every community'}, ranked by how often their people called the City. Guess where yours lands, then get the card.</p>
         <div ref={pickerRef}>
-          <CommunityPicker rankings={rankings} onPick={open} placeholder={isLoading && !rankings.length ? 'Loading…' : 'Find your community'} hint="Wrap it" className="is-mob" />
+          <CommunityPicker rankings={rankings} onPick={open} placeholder={isLoading && !rankings.length ? 'Loading…' : 'Your community'} hint="Wrap it" className="is-mob" />
         </div>
         <button type="button" className="cyc-m-game" onClick={() => { setGameStart(undefined); setGameOpen(true); }} disabled={!rankings.length}>
           <span className="cyc-play-btn" aria-hidden="true"><Play size={20} fill="currentColor" /></span>
@@ -389,6 +421,7 @@ function Mobile({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading:
         <Teasers rankings={rankings} onOpen={open} />
         <Shelf rankings={rankings} shapes={shapes} onOpen={open} limit={10} title="Or pick a cover" />
         {seen && <Boards rankings={rankings} shapes={shapes} onOpen={open} />}
+        <MoreFromUs />
         <FinePrint />
       </div>
 

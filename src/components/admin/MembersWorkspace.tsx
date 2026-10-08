@@ -8,6 +8,7 @@ import { EVENT_INTERESTS, normalizeInterests, pickWhen } from '../../lib/eventPi
 import { entityPath } from '../../lib/discovery';
 import { Chip, EmptyState, Figure, Panel, StatGrid, StatTile, T, TimeAgo, mono } from './ui';
 import type { AdminData } from '../../hooks/useAdminData';
+import { MembersDirectory } from './MembersDirectory';
 
 type Counts = { accounts?: number; monday?: number; thursday?: number; withArea?: number; suggestions?: number };
 
@@ -65,7 +66,6 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
   }, [d.users]);
 
   const entities = discoveryRepository.list();
-  const recent = [...d.users].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)).slice(0, 8);
   // Every tile has a fallback from data admin already holds, so none stays blank.
   const allUsersLoaded = d.usersLoaded && d.users.length >= d.totalUsers;
   const shown = {
@@ -86,8 +86,10 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
         <StatTile label="Event suggestions waiting" value={shown.suggestions} tone={shown.suggestions ? 'attention' : 'neutral'} hint="Review in Events & markets" onClick={() => onOpen('content')} />
       </StatGrid>
 
+      <MembersDirectory />
+
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-        <Panel title="What Thursday readers are into" subtitle="Interests chosen by people who get the picks email">
+        <Panel title="What event-picks readers are into" subtitle="Interests chosen by people who get event picks">
           {thursday === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
             : !thursday.length ? <EmptyState icon={<CalendarHeart size={20} />} title="No Thursday readers yet" body="Interests appear here as people sign up on Your CalgaryWatch." />
             : (
@@ -129,37 +131,13 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
         </Panel>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="Where members live" subtitle={`Home areas across the ${d.users.length} most recent accounts`}>
-          {areas.length ? (
-            <ul className="p-4 flex flex-wrap gap-2">
-              {areas.map(([a, n]) => <li key={a}><Chip tone="neutral"><MapPin size={11} /> {a} <b style={{ fontFamily: mono }}>{n}</b></Chip></li>)}
-            </ul>
-          ) : <EmptyState icon={<MapPin size={20} />} title="No home areas yet" />}
-        </Panel>
-        <Panel title="Newest members" subtitle="And which emails they chose">
-          {recent.length ? (
-            <ul className="divide-y" style={{ borderColor: T.line }}>
-              {recent.map((u) => {
-                const raw = u as typeof u & { eventsDigestOptIn?: boolean };
-                return (
-                  <li key={u.uid} className="flex items-center gap-3 px-4 py-2.5">
-                    <span className="h-8 w-8 shrink-0 grid place-items-center rounded-full text-xs font-bold" style={{ background: '#EEF3FA', color: T.signal }}>{(u.displayName || '?').slice(0, 1)}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold truncate" style={{ color: T.ink }}>{u.displayName || 'Unnamed'}</p>
-                      <p className="text-[0.7rem]" style={{ color: T.muted }}><TimeAgo ts={u.createdAt} />{(u.neighborhood || u.inferredNeighborhood) ? ` · ${u.neighborhood || u.inferredNeighborhood}` : ''}</p>
-                    </div>
-                    <span className="flex gap-1">
-                      {u.weeklyDigestOptIn ? <Chip tone="signal"><Mail size={11} /> Mon</Chip> : null}
-                      {raw.eventsDigestOptIn ? <Chip tone="ok"><Mail size={11} /> Thu</Chip> : null}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : <EmptyState icon={<Users size={20} />} title="No members yet" />}
-        </Panel>
-      </div>
+      <Panel title="Where members live" subtitle={`Home areas across the ${d.users.length} most recent accounts`}>
+        {areas.length ? (
+          <ul className="p-4 flex flex-wrap gap-2">
+            {areas.map(([a, n]) => <li key={a}><Chip tone="neutral"><MapPin size={11} /> {a} <b style={{ fontFamily: mono }}>{n}</b></Chip></li>)}
+          </ul>
+        ) : <EmptyState icon={<MapPin size={20} />} title="No home areas yet" />}
+      </Panel>
     </div>
   );
 }

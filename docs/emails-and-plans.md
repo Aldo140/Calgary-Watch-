@@ -137,6 +137,15 @@ it hourly with the same validation, then republishes the site.
 - **Search demand**: anonymous searches, and what people looked for but
   didn't find.
 
+**Members & plans → All members** lists every account, newest first, and works on a phone:
+- Search by name, email or neighbourhood.
+- Filter by Your week (both), safety only, event picks only, no email, no home area, or new this week.
+- Tap a row for their emails and interests, plus three buttons: **Their dashboard** opens `/plans?as=<uid>`, the member's own page exactly as they see it, read-only and admin-only; **Full profile** opens the People directory; **Email** opens your mail app.
+
+**On the site**
+- Signed in, the header's "Sign up" becomes an account menu with: Your dashboard, Your plans, Emails and area (`/plans?edit=1#emails`), Your listings (organizers), Live map, Admin (admins only) and Sign out.
+- The homepage has a strip on the hero's edge. Signed in, it shows your picks count, your next plan, your email and setup %, with "Open your dashboard". Signed out, it shows the sign-up.
+
 ## Admin and the read quota
 
 Firestore's free plan allows 50,000 reads a day, and every scheduled job

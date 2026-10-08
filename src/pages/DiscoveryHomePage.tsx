@@ -7,6 +7,7 @@ import { WhatsHere } from '../components/home/WhatsHere';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { QuadrantMap } from '../components/home/QuadrantMap';
 import { WatchPromo } from '../components/home/WatchPromo';
+import { HomeYours } from '../components/home/HomeYours';
 import { SlowerPlans, MondayDigest } from '../components/home/SlowerPlans';
 import { CalgaryDailyStrip } from '../components/home/CalgaryDailyStrip';
 import { useCalgaryWeather } from '../hooks/useCalgaryWeather';
@@ -38,6 +39,7 @@ export default function DiscoveryHomePage() {
     <SiteLayout>
       <div className="cw-home2">
         <HomeHero days={days} weather={weather} onPickDay={pickDay} />
+        <div className="cw-wrap h-yours-wrap"><HomeYours /></div>
         <div className="cw-wrap h-ways-wrap">
           <WhatsHere days={days} entities={entities} pulse={pulse} />
         </div>

@@ -46,8 +46,8 @@ Partner replies kept asking for the same things, so organizers now get a self-se
 
 | Reply (Oct 2026) | What they asked for | Where it lands now |
 | --- | --- | --- |
-| Vertigo Theatre | "a direct line to update our listings", happy to "fill out a form and add production photos" | Claim the listing, then send dates and photos from the claim page |
-| Alberta Ballet | Venue is the Jubilee Auditorium, not "in Banff Trail" | A claimed organizer files a location change |
+| Vertigo Theatre | "a direct line to update our listings", happy to "fill out a form and add production photos" | The 2026–27 season (6 productions) was added from vertigotheatre.com/2026-27; they can claim the listings and send dates and photos from the claim page |
+| Alberta Ballet | Venue is the Jubilee Auditorium, not "in Banff Trail" | Fixed: shows the Southern Alberta Jubilee Auditorium, with no neighbourhood (times also corrected to UTC−6) |
 | Dalhousie Community Association | Replace our image | Photo change from the claim page |
 | Calgary Farmers' Market | Link to the homepage; we also have a West location | Link change and an extra location |
 | Farmers & Makers Market | STOP | Suppressed automatically; never contacted again |

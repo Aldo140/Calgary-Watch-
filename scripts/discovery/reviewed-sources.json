@@ -319,6 +319,314 @@
           "end": "2026-11-03T23:00:00-07:00",
           "endTimeEstimated": true
         }
+      },
+      {
+        "id": "flames-2026-10-08",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Colorado Avalanche",
+          "summary": "The Flames host the Colorado Avalanche in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 7:00 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-08T19:00:00-06:00",
+          "end": "2026-10-08T22:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "flames-2026-10-10",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Anaheim Ducks",
+          "summary": "The Flames host the Anaheim Ducks in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 8:00 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-10T20:00:00-06:00",
+          "end": "2026-10-10T23:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "flames-2026-10-18",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Carolina Hurricanes",
+          "summary": "The Flames host the Carolina Hurricanes in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 6:00 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-18T18:00:00-06:00",
+          "end": "2026-10-18T21:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "flames-2026-10-22",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Minnesota Wild",
+          "summary": "The Flames host the Minnesota Wild in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 7:00 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-22T19:00:00-06:00",
+          "end": "2026-10-22T22:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "flames-2026-10-24",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Detroit Red Wings",
+          "summary": "The Flames host the Detroit Red Wings in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 8:00 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-24T20:00:00-06:00",
+          "end": "2026-10-24T23:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "flames-2026-10-26",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Toronto Maple Leafs",
+          "summary": "The Flames host the Toronto Maple Leafs in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 6:30 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-26T18:30:00-06:00",
+          "end": "2026-10-26T21:30:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "flames-2026-10-30",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "nhl",
+            "flames",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Flames vs. Seattle Kraken",
+          "summary": "The Flames host the Seattle Kraken in the Saddledome's final NHL season.",
+          "description": "NHL regular-season game at the Scotiabank Saddledome. Puck drop 6:00 pm as listed by ticket sellers; confirm the time and tickets with the Flames before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-30T18:00:00-06:00",
+          "end": "2026-10-30T21:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "wranglers-2026-10-09",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "ahl",
+            "wranglers",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Wranglers vs. Bakersfield Condors",
+          "summary": "The Flames' AHL affiliate hosts the Bakersfield Condors at the Saddledome.",
+          "description": "AHL regular-season game at the Scotiabank Saddledome, 7:00 pm. Confirm the time and tickets with the Wranglers before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-09T19:00:00-06:00",
+          "end": "2026-10-09T21:30:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "wranglers-2026-10-11",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "ahl",
+            "wranglers",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Wranglers vs. Bakersfield Condors",
+          "summary": "The Flames' AHL affiliate hosts the Bakersfield Condors at the Saddledome.",
+          "description": "AHL regular-season game at the Scotiabank Saddledome, 1:00 pm. Confirm the time and tickets with the Wranglers before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-11T13:00:00-06:00",
+          "end": "2026-10-11T15:30:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "wranglers-2026-10-29",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "ahl",
+            "wranglers",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Wranglers vs. Laval Rocket",
+          "summary": "The Flames' AHL affiliate hosts the Laval Rocket at the Saddledome.",
+          "description": "AHL regular-season game at the Scotiabank Saddledome, 7:00 pm. Confirm the time and tickets with the Wranglers before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-29T19:00:00-06:00",
+          "end": "2026-10-29T21:30:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "wranglers-2026-10-31",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "ahl",
+            "wranglers",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Wranglers vs. Laval Rocket",
+          "summary": "The Flames' AHL affiliate hosts the Laval Rocket at the Saddledome.",
+          "description": "AHL regular-season game at the Scotiabank Saddledome, 12:00 pm. Confirm the time and tickets with the Wranglers before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-31T12:00:00-06:00",
+          "end": "2026-10-31T14:30:00-06:00",
+          "endTimeEstimated": true
+        }
       }
     ]
   },
@@ -657,6 +965,385 @@
           "start": "2027-05-15T19:30:00-06:00",
           "end": "2027-06-13T16:00:00-06:00",
           "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "screamfest",
+      "name": "ScreamFest Calgary",
+      "approved": true,
+      "hosts": [
+        "screamfest.ca",
+        "www.screamfest.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "screamfest-2026-10-09",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-09T19:00:00-06:00",
+          "end": "2026-10-10T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-10",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-10T19:00:00-06:00",
+          "end": "2026-10-11T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-16",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-16T19:00:00-06:00",
+          "end": "2026-10-17T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-17",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-17T19:00:00-06:00",
+          "end": "2026-10-18T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-22",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-22T19:00:00-06:00",
+          "end": "2026-10-23T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-23",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-23T19:00:00-06:00",
+          "end": "2026-10-24T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-24",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-24T19:00:00-06:00",
+          "end": "2026-10-25T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-25",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-25T19:00:00-06:00",
+          "end": "2026-10-26T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-29",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-29T19:00:00-06:00",
+          "end": "2026-10-30T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-30",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-30T19:00:00-06:00",
+          "end": "2026-10-31T00:00:00-06:00"
+        }
+      },
+      {
+        "id": "screamfest-2026-10-31",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "haunted house",
+            "date night"
+          ],
+          "categories": [
+            "nightlife",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "ScreamFest",
+          "pricing": "paid",
+          "title": "ScreamFest at Stampede Park",
+          "summary": "Calgary's big Halloween night out: haunted houses, rides and scare zones at GMC Stadium.",
+          "description": "ScreamFest takes over GMC Stadium at Stampede Park from 7 pm to midnight on select October nights, with haunted houses, scare zones and midway rides. Much of it is outdoors, so dress for the weather. Tickets are sold online; one night is 18+ only, so check the official site for that date and current prices. Parking is on Stampede Park and the Erlton/Stampede CTrain station is next door.",
+          "address": "2200 Stampede Trail SE, Calgary, AB",
+          "venue": "GMC Stadium, Stampede Park",
+          "neighbourhood": "Beltline",
+          "sourceUrl": "https://screamfest.ca/",
+          "start": "2026-10-31T19:00:00-06:00",
+          "end": "2026-11-01T00:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-zoo",
+      "name": "Wilder Institute/Calgary Zoo",
+      "approved": true,
+      "hosts": [
+        "www.calgaryzoo.com",
+        "calgaryzoo.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "zooboo-2026-10-31",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "kids",
+            "costumes"
+          ],
+          "categories": [
+            "family",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "Wilder Institute/Calgary Zoo",
+          "pricing": "paid",
+          "title": "ZooBOO at the Calgary Zoo",
+          "summary": "The zoo's Halloween weekend: come in costume for treats and trick-or-treat stations around the paths.",
+          "description": "ZooBOO is the Wilder Institute/Calgary Zoo's Halloween celebration, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
+          "address": "210 St. George's Drive NE, Calgary, AB",
+          "venue": "Wilder Institute/Calgary Zoo",
+          "neighbourhood": "Bridgeland",
+          "sourceUrl": "https://www.calgaryzoo.com/",
+          "start": "2026-10-31T09:00:00-06:00",
+          "end": "2026-10-31T17:30:00-06:00"
+        }
+      },
+      {
+        "id": "zooboo-2026-11-01",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "halloween",
+            "kids",
+            "costumes"
+          ],
+          "categories": [
+            "family",
+            "holiday",
+            "outdoor"
+          ],
+          "organizer": "Wilder Institute/Calgary Zoo",
+          "pricing": "paid",
+          "title": "ZooBOO at the Calgary Zoo",
+          "summary": "The zoo's Halloween weekend: come in costume for treats and trick-or-treat stations around the paths.",
+          "description": "ZooBOO is the Wilder Institute/Calgary Zoo's Halloween celebration, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
+          "address": "210 St. George's Drive NE, Calgary, AB",
+          "venue": "Wilder Institute/Calgary Zoo",
+          "neighbourhood": "Bridgeland",
+          "sourceUrl": "https://www.calgaryzoo.com/",
+          "start": "2026-11-01T09:00:00-06:00",
+          "end": "2026-11-01T17:30:00-06:00"
         }
       }
     ]

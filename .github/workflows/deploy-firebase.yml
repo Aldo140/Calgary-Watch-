@@ -71,6 +71,11 @@ jobs:
           VITE_DIGEST_PROOF_ENABLED: ${{ vars.DIGEST_PROOF_ENABLED }}
         run: npm run build
 
+      # The ops agents (ArctosLaunchpad) draft posts and find leads from these
+      # listings; they read this copy instead of needing this repository's code.
+      - name: Publish the listings index for the ops agents
+        run: cp src/generated/discovery-index.json dist/discovery-index.json
+
       # Publish the UI before backend provisioning. This keeps ordinary site
       # releases available even when a Google Cloud IAM or Secret Manager
       # change needs attention.

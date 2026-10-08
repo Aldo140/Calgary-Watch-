@@ -231,8 +231,208 @@
         @keyframes cw-shell-in { from { opacity: 0 } to { opacity: 1 } }
       }
     </style>
+    <!--
+      Opening splash (#cw-splash, markup at the top of the body).
+
+      Inline for the same reason as the shell styles above: it has to be on
+      screen at first paint, before the CSS bundle or any font arrives. It
+      covers the prerendered text while the app boots, then wipes away once
+      the first route has rendered (window.__cwSplashDone, called from
+      App.tsx). Everything is SVG and CSS so it costs no extra requests.
+    -->
+    <style>
+      html.cw-splashing, html.cw-splashing body { overflow: hidden; }
+      #cw-splash {
+        --s-navy: #06162F; --s-cyan: #2EC4F1; --s-blue: #1554D1; --s-sun: #FFD23F;
+        --s-coral: #FF6A4D; --s-cream: #FAF8F3; --s-muted: #8FA7C7;
+        position: fixed; inset: 0; z-index: 2147483000;
+        display: grid; place-items: center; overflow: hidden;
+        color: var(--s-cream); background: var(--s-navy);
+        font-family: "Bricolage Grotesque", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+        clip-path: inset(0 0 0 0);
+        transition: clip-path 760ms cubic-bezier(.76,0,.24,1);
+      }
+      /* Map-dot texture and two slow light pools: big Alberta sky, not a black box. */
+      #cw-splash::before, #cw-splash::after { content: ""; position: absolute; pointer-events: none; }
+      #cw-splash::before {
+        inset: 0;
+        background:
+          radial-gradient(circle at 1px 1px, rgba(143,167,199,.16) 1px, transparent 1.4px) 0 0 / 22px 22px;
+        -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
+        mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
+      }
+      #cw-splash::after {
+        inset: -30%;
+        background:
+          radial-gradient(closest-side at 30% 70%, rgba(46,196,241,.22), transparent),
+          radial-gradient(closest-side at 72% 28%, rgba(255,106,77,.16), transparent),
+          radial-gradient(closest-side at 55% 55%, rgba(255,210,63,.10), transparent 70%);
+        animation: cws-drift 9s ease-in-out infinite alternate;
+      }
+      .cws-stage {
+        position: relative; z-index: 2;
+        display: flex; flex-direction: column; align-items: center; text-align: center;
+        gap: clamp(14px, 2.4vh, 22px); padding: 0 16px;
+        transform: translateY(-4vh);
+        transition: transform 760ms cubic-bezier(.76,0,.24,1), opacity 500ms ease;
+      }
+      .cws-mark { width: clamp(132px, 36vw, 200px); height: auto; overflow: visible; filter: drop-shadow(0 18px 40px rgba(0,0,0,.45)); }
+      .cws-word {
+        margin: 0; display: flex; align-items: baseline; justify-content: center;
+        font-size: clamp(38px, 11.5vw, 84px); line-height: .9; letter-spacing: -.055em;
+        font-weight: 900; white-space: nowrap;
+      }
+      .cws-word span { display: inline-block; opacity: 0; transform: translateY(.55em) rotate(4deg); animation: cws-letter 620ms cubic-bezier(.2,.9,.25,1.15) both; }
+      .cws-word .cws-light { font-weight: 500; }
+      .cws-word .cws-dot { color: var(--s-cyan); }
+      .cws-tag {
+        margin: 0; display: flex; align-items: center; gap: .55em;
+        font: 500 clamp(11px, 3.1vw, 13px)/1 "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--s-muted);
+        opacity: 0; animation: cws-fade 500ms 820ms ease both;
+      }
+      .cws-live { width: 8px; height: 8px; border-radius: 50%; background: var(--s-coral); box-shadow: 0 0 0 0 rgba(255,106,77,.6); animation: cws-ping 1.6s ease-out infinite; flex: none; }
+      .cws-roll { position: relative; display: inline-block; vertical-align: middle; height: 1.25em; overflow: hidden; text-align: left; color: var(--s-cream); }
+      .cws-roll i { display: block; height: 1.25em; line-height: 1.25em; font-style: normal; animation: cws-roll 4.8s 900ms cubic-bezier(.7,0,.2,1) infinite; }
+      /* Corner furniture, desktop only. */
+      .cws-corner {
+        position: absolute; z-index: 2; margin: 0;
+        font: 500 11px/1.5 "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+        letter-spacing: .14em; text-transform: uppercase; color: rgba(143,167,199,.75);
+        opacity: 0; animation: cws-fade 600ms 500ms ease both;
+      }
+      .cws-tl { top: 28px; left: 32px; } .cws-tr { top: 28px; right: 32px; text-align: right; }
+      .cws-corner b { color: var(--s-cream); font-weight: 600; }
+      @media (max-width: 720px) { .cws-tr, .cws-sub { display: none; } .cws-tl { top: max(18px, env(safe-area-inset-top)); left: 0; right: 0; text-align: center; } }
+      /* Skyline across the bottom: Saddledome, Calgary Tower, the Bow. */
+      .cws-city { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(120px, 22vh, 210px); }
+      .cws-city .cws-rockies { fill: none; stroke: rgba(143,167,199,.22); stroke-width: 1.5; stroke-dasharray: 2600; stroke-dashoffset: 2600; animation: cws-draw 1.8s 100ms ease-out forwards; }
+      .cws-city .cws-towers { fill: rgba(4,14,33,.94); stroke: rgba(46,196,241,.55); stroke-width: 2; stroke-linejoin: round; stroke-dasharray: 3600; stroke-dashoffset: 3600; animation: cws-draw 1.6s ease-out forwards; }
+      .cws-city circle { fill: var(--s-sun); opacity: 0; animation: cws-light 2.6s ease-in-out infinite; }
+      .cws-bar { position: absolute; z-index: 3; left: 0; bottom: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--s-blue), var(--s-cyan) 60%, var(--s-sun)); animation: cws-load 2.8s cubic-bezier(.1,.7,.2,1) forwards; }
+      /* The mark assembles itself: wave, sun, peaks, skyline, tower, sparkles. */
+      .cws-mark * { transform-box: fill-box; }
+      .cws-wave { fill: none; stroke-linecap: round; stroke-dasharray: 400; stroke-dashoffset: 400; animation: cws-draw 900ms cubic-bezier(.65,0,.25,1) forwards; }
+      .cws-wave-hi { animation-delay: 120ms; }
+      .cws-sun { transform-origin: 50% 50%; animation: cws-sun 800ms 180ms cubic-bezier(.2,.9,.3,1.2) both; }
+      .cws-rays { transform-origin: 50% 100%; animation: cws-rays 500ms 650ms ease-out both; }
+      .cws-peaks { transform-origin: 50% 100%; animation: cws-rise 600ms 260ms cubic-bezier(.2,.9,.3,1) both; }
+      .cws-bld { transform-origin: 50% 100%; animation: cws-rise 520ms cubic-bezier(.2,.9,.3,1.1) both; }
+      .cws-tower { transform-origin: 50% 100%; animation: cws-rise 700ms 620ms cubic-bezier(.2,.9,.3,1.15) both; }
+      .cws-spark { transform-origin: 50% 50%; animation: cws-pop 520ms cubic-bezier(.2,1.4,.4,1) both, cws-twinkle 2.2s 1.2s ease-in-out infinite; }
+      /* Leaving: the panel wipes up and the stage lifts with it. */
+      #cw-splash.is-leaving { clip-path: inset(0 0 100% 0); pointer-events: none; }
+      #cw-splash.is-leaving .cws-stage { transform: translateY(-14vh) scale(.94); opacity: 0; }
+      #cw-splash.is-leaving .cws-bar { animation: none; transform: scaleX(1); transition: transform 240ms ease; }
+      @keyframes cws-draw { to { stroke-dashoffset: 0; } }
+      @keyframes cws-letter { to { opacity: 1; transform: none; } }
+      @keyframes cws-fade { to { opacity: 1; } }
+      @keyframes cws-sun { from { opacity: 0; transform: translateY(70%) scale(.6); } to { opacity: 1; transform: none; } }
+      @keyframes cws-rays { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+      @keyframes cws-rise { from { opacity: 0; transform: scaleY(0); } to { opacity: 1; transform: none; } }
+      @keyframes cws-pop { from { opacity: 0; transform: scale(0) rotate(-90deg); } to { opacity: 1; transform: none; } }
+      @keyframes cws-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(.72) rotate(18deg); } }
+      @keyframes cws-ping { 0% { box-shadow: 0 0 0 0 rgba(255,106,77,.6); } 100% { box-shadow: 0 0 0 10px rgba(255,106,77,0); } }
+      @keyframes cws-roll { 0%, 18% { transform: translateY(0); } 25%, 43% { transform: translateY(-100%); } 50%, 68% { transform: translateY(-200%); } 75%, 93% { transform: translateY(-300%); } 100% { transform: translateY(-400%); } }
+      @keyframes cws-light { 0%, 100% { opacity: 0; } 30%, 70% { opacity: .9; } }
+      @keyframes cws-load { 0% { transform: scaleX(0); } 100% { transform: scaleX(.86); } }
+      @keyframes cws-drift { from { transform: translate3d(-3%, 2%, 0) rotate(0deg); } to { transform: translate3d(3%, -2%, 0) rotate(8deg); } }
+      /* A reload in the same visit skips the build-up and goes straight to the finished mark. */
+      #cw-splash.is-quick *, #cw-splash.is-quick::after { animation-duration: 1ms !important; animation-delay: 0s !important; }
+      #cw-splash.is-quick .cws-roll i, #cw-splash.is-quick .cws-city circle, #cw-splash.is-quick .cws-live { animation: none !important; }
+      #cw-splash.is-quick .cws-city circle { opacity: .7; }
+      @media (prefers-reduced-motion: reduce) {
+        #cw-splash *, #cw-splash::after { animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+        #cw-splash .cws-roll i { animation: none !important; }
+        #cw-splash { transition: opacity 300ms ease; }
+        #cw-splash.is-leaving { clip-path: inset(0 0 0 0); opacity: 0; }
+        #cw-splash.is-leaving .cws-stage { transform: translateY(-4vh); }
+      }
+    </style>
+    <noscript><style>#cw-splash { display: none !important; } html, body { overflow: auto !important; }</style></noscript>
   </head>
   <body>
+    <div id="cw-splash" role="status" aria-live="polite" aria-label="Loading CalgaryWatch">
+      <p class="cws-corner cws-tl"><b>CalgaryWatch</b> · YYC<span class="cws-sub"><br />51.0447° N · 114.0719° W</span></p>
+      <p class="cws-corner cws-tr">Calgary time <b id="cws-clock">&nbsp;</b><br />Events · Markets · Live map</p>
+      <div class="cws-stage" aria-hidden="true">
+        <svg class="cws-mark" viewBox="0 0 200 200" width="200" height="200">
+          <defs><clipPath id="cws-disc"><circle cx="100" cy="100" r="64" /></clipPath></defs>
+          <circle cx="100" cy="100" r="65.5" fill="#FAF8F3" stroke="#030B1C" stroke-width="3" />
+          <g clip-path="url(#cws-disc)">
+            <g class="cws-rays" stroke="#FFD23F" stroke-width="4" stroke-linecap="round">
+              <path d="M92 68V58M107 72l4-7M77 72l-4-7M118 83l7-4M66 83l-7-4" />
+            </g>
+            <circle class="cws-sun" cx="92" cy="98" r="24" fill="#FFD23F" stroke="#030B1C" stroke-width="2.5" />
+            <g class="cws-peaks">
+              <path d="M34 142 70 104 82 114 98 92 134 142Z" fill="#4A8FE0" stroke="#030B1C" stroke-width="2.5" stroke-linejoin="round" />
+              <path d="M98 92 90 103 96 101 100 106 106 102Z" fill="#FAF8F3" />
+            </g>
+            <g fill="#0A1F44">
+              <rect class="cws-bld" style="animation-delay:340ms" x="56" y="112" width="13" height="32" />
+              <rect class="cws-bld" style="animation-delay:400ms" x="71" y="102" width="11" height="42" />
+              <rect class="cws-bld" style="animation-delay:460ms" x="84" y="116" width="14" height="28" />
+              <rect class="cws-bld" style="animation-delay:520ms" x="136" y="106" width="12" height="38" />
+              <rect class="cws-bld" style="animation-delay:580ms" x="150" y="120" width="11" height="24" />
+            </g>
+            <g class="cws-tower">
+              <rect x="121" y="50" width="2.5" height="16" fill="#0A1F44" />
+              <rect x="119" y="74" width="6.5" height="70" fill="#0A1F44" />
+              <rect x="111.5" y="64" width="21.5" height="11" rx="3.5" fill="#FF6A4D" stroke="#0A1F44" stroke-width="2.5" />
+              <rect x="113" y="75" width="18.5" height="3.5" rx="1.5" fill="#0A1F44" />
+            </g>
+            <path class="cws-peaks" style="animation-delay:500ms" d="M30 150Q100 124 172 150V172H30Z" fill="#2EC4F1" stroke="#030B1C" stroke-width="2.5" />
+          </g>
+          <path class="cws-wave" d="M151 49A72 72 0 1 0 159 141" stroke="#030B1C" stroke-width="33" />
+          <path class="cws-wave" d="M151 49A72 72 0 1 0 159 141" stroke="#2EC4F1" stroke-width="24" />
+          <path class="cws-wave cws-wave-hi" d="M155 45A78 78 0 1 0 164 145" stroke="#B8EEFF" stroke-width="4" opacity=".85" />
+          <path class="cws-spark" style="animation-delay:880ms" d="M172 45Q174.3 55.7 185 58 174.3 60.3 172 71 169.7 60.3 159 58 169.7 55.7 172 45Z" fill="#FF6A4D" stroke="#030B1C" stroke-width="2" stroke-linejoin="round" />
+          <path class="cws-spark" style="animation-delay:1000ms" d="M184 82Q185.6 90.4 194 92 185.6 93.6 184 102 182.4 93.6 174 92 182.4 90.4 184 82Z" fill="#FFD23F" stroke="#030B1C" stroke-width="2" stroke-linejoin="round" />
+        </svg>
+        <p class="cws-word"><span style="animation-delay:300ms">C</span><span style="animation-delay:340ms">a</span><span style="animation-delay:380ms">l</span><span style="animation-delay:420ms">g</span><span style="animation-delay:460ms">a</span><span style="animation-delay:500ms">r</span><span style="animation-delay:540ms">y</span><span class="cws-light" style="animation-delay:600ms">W</span><span class="cws-light" style="animation-delay:640ms">a</span><span class="cws-light" style="animation-delay:680ms">t</span><span class="cws-light" style="animation-delay:720ms">c</span><span class="cws-light" style="animation-delay:760ms">h</span><span class="cws-dot" style="animation-delay:860ms">.</span></p>
+        <p class="cws-tag"><span class="cws-live"></span>What’s happening <span class="cws-roll"><i>tonight</i><i>this weekend</i><i>near you</i><i>in Calgary</i><i>tonight</i></span></p>
+      </div>
+      <svg class="cws-city" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <path class="cws-rockies" d="M0 150 60 128 110 140 170 104 215 122 280 92 330 116 390 98 440 120 500 86 560 112 610 80 670 108 730 90 790 118 850 96 910 124 970 100 1030 128 1090 108 1150 132 1200 120" />
+        <path class="cws-towers" d="M0 200V178H70V170H120V182H160V160Q250 184 300 160V184H340V150H372V164H400V128H426V140H474V96H464V82H477V56V82H492V96H482V170H500V110H524V84H548V100H566V64H590V92H604V70C616 44 660 38 664 60V112H690V78H712V56H730V96H752V118H780V104H806V134H840V150H880V162H930V146H960V170H1020V160H1060V178H1120V172H1200V200Z" />
+        <circle cx="536" cy="112" r="2.4" style="animation-delay:1.2s" /><circle cx="578" cy="88" r="2.4" style="animation-delay:1.6s" />
+        <circle cx="700" cy="100" r="2.4" style="animation-delay:1.9s" /><circle cx="720" cy="76" r="2.4" style="animation-delay:1.4s" />
+        <circle cx="642" cy="70" r="2.4" style="animation-delay:2.2s" /><circle cx="412" cy="150" r="2.4" style="animation-delay:1.7s" />
+        <circle cx="764" cy="132" r="2.4" style="animation-delay:2.4s" /><circle cx="555" cy="140" r="2.4" style="animation-delay:2s" />
+        <circle cx="484" cy="89" r="2.4" fill="#FF6A4D" style="animation-delay:1.1s" />
+      </svg>
+      <span class="cws-bar"></span>
+    </div>
+    <script>
+      // Splash lifecycle. App.tsx calls window.__cwSplashDone() once the first
+      // route has rendered; the timeout is a backstop so a failed boot still
+      // reveals the prerendered page underneath.
+      (function () {
+        var el = document.getElementById('cw-splash');
+        if (!el) return;
+        var root = document.documentElement;
+        var start = Date.now();
+        var seen = false;
+        try { seen = sessionStorage.getItem('cw-splash') === '1'; sessionStorage.setItem('cw-splash', '1'); } catch (e) {}
+        if (seen) el.className = 'is-quick';
+        root.classList.add('cw-splashing');
+        // First visit plays the whole build-up; a reload in the same visit just bows out.
+        var minShow = seen ? 200 : 1250;
+        var clock = document.getElementById('cws-clock');
+        try { clock.textContent = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' }).format(new Date()); } catch (e) {}
+        var done = false;
+        window.__cwSplashDone = function () {
+          if (done) return;
+          done = true;
+          setTimeout(function () {
+            el.classList.add('is-leaving');
+            root.classList.remove('cw-splashing');
+            setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
+          }, Math.max(0, minShow - (Date.now() - start)));
+        };
+        setTimeout(window.__cwSplashDone, 10000);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

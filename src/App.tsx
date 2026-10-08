@@ -8,6 +8,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import SeoManager from '@/src/components/SeoManager';
 import { db } from '@/src/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import './styles/page-loader.css';
 
 // Lazy-load every page so the initial bundle stays minimal and module-eval
 // failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
@@ -135,15 +136,29 @@ function PageTracker() {
   return null;
 }
 
+/**
+ * Shown when a later navigation waits on a page chunk. The first load is
+ * covered by the splash in index.html instead, so this stays small: the
+ * CalgaryWatch "C" drawing itself on the page's own cream background.
+ */
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-[#f5efe3] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 rounded-full border-2 border-[#4A90D9] border-t-transparent animate-spin" />
-        <p className="text-sm text-slate-500 font-medium">Loading…</p>
-      </div>
+    <div className="cw-page-loader" role="status" aria-label="Loading">
+      <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true">
+        <path className="cw-page-loader-track" d="M36 11A17 17 0 1 0 38 34" />
+        <path className="cw-page-loader-wave" d="M36 11A17 17 0 1 0 38 34" />
+        <circle className="cw-page-loader-sun" cx="23" cy="24" r="5" />
+      </svg>
     </div>
   );
+}
+
+/** Lifts the index.html splash once the first route has actually rendered. */
+function SplashDone() {
+  useEffect(() => {
+    (window as Window & { __cwSplashDone?: () => void }).__cwSplashDone?.();
+  }, []);
+  return null;
 }
 
 export default function App() {
@@ -153,6 +168,7 @@ export default function App() {
       <PageTracker />
       <SeoManager />
       <Suspense fallback={<PageLoader />}>
+        <SplashDone />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/submit" element={<SubmitDiscoveryPage />} />

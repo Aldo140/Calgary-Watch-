@@ -14,6 +14,7 @@ import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
 import type { LeadStatus, PartnerLead } from '@/src/types/ops';
 import { ClaimsPanel } from './ClaimsPanel';
+import { MarketHQPanel } from './MarketHQPanel';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, inputClass, inputStyle, mono, type Tone } from './ui';
 
 type View = 'approve' | 'replies' | 'pipeline' | 'research' | 'closed';
@@ -201,6 +202,7 @@ export function PartnersWorkspace() {
   return (
     <div className="space-y-4">
       <ClaimsPanel leads={leads} />
+      <MarketHQPanel />
       <Panel title="Partner outreach" subtitle="Emails that pass every rule are sent automatically (cancel any under In progress). Businesses come from real listings; replies wait for you; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>
         <div className="px-4 pt-3">
           <FilterRow>{(Object.keys(VIEWS) as View[]).map(v => <FilterChip key={v} active={view === v} onClick={() => setView(v)} count={counts[v]}>{VIEWS[v].label}</FilterChip>)}</FilterRow>

@@ -43,6 +43,7 @@ export default function PartnersPage() {
             <h2>Claim your listing</h2>
             <p>Sign in with Google, tell us who you are, and once we've confirmed it the listing is yours to keep right: dates and hours, photos, addresses and extra locations, and the link we send people to. Claimed listings show <strong>Managed by the organizer</strong>. It's free, and it doesn't buy placement.</p>
             <p className="pt-note">Open your listing on CalgaryWatch and use “Claim this listing” at the bottom.</p>
+            <p>Run a market? Claiming it opens <Link to="/for-markets">Market HQ</Link>: your vendor roster, applications, weekly lineups and vendor emails, run by you or by us.</p>
           </section>
 
           <section className="pt-card pt-card-soft">

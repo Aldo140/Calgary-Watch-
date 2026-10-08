@@ -138,6 +138,8 @@ export interface PickItem {
   matched: EventInterestId[];
   /** Straight-line metres from the reader's home area, when both ends are known. */
   distanceM: number | null;
+  /** Markets only: the organizer's published lineup for this date (Market HQ). */
+  lineup?: { summary: string; note: string };
 }
 
 export interface EventPicks {

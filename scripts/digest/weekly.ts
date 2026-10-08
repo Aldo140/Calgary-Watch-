@@ -63,7 +63,7 @@ import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeL
 import { assertBrandingComplete, combinedEmailContent, renderCombinedHtml, renderCombinedText, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { normalizeInterests, type EventInterestId, type Point } from '../../src/lib/eventPicks.js';
 import { allUnsubscribeUrl, eventsConsentRefusal, eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
-import { loadInventory, processEventsUnsubscribes, readerPicks, type Inventory } from './eventsShared.js';
+import { loadInventory, processEventsUnsubscribes, readerPicks, withLineups, type Inventory } from './eventsShared.js';
 import { WELCOME } from './copy.js';
 import { letterheadImages, welcomeImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
@@ -376,7 +376,7 @@ async function run(): Promise<void> {
   let inventory: Inventory | null = null;
   if (recipients.some((r) => r._eventsOn && r._eventsConsentOk)) {
     try {
-      inventory = loadInventory();
+      inventory = await withLineups(db, loadInventory());
       console.log(`[digest] event inventory ${inventory.generatedAt ?? 'unknown'}: ${inventory.entities.length} listings`);
     } catch (error) {
       // No inventory means no picks: everybody gets the plain Monday brief.

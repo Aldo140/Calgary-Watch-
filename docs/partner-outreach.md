@@ -74,3 +74,32 @@ Data:
 - `verified_listings/{entityId}`: public read, admin write.
 
 The rules are tested in `tests/claims.test.ts` and against the emulator.
+
+## Market HQ (`/organizer/:marketId`)
+
+Vendor management for market organizers, offered two ways with the same tools:
+
+- **Run it yourself (free).** The market's verified organizer, meaning an approved listing claim, runs it.
+- **We run it for you.** Admin can do everything an organizer can. Organizers ask from Market HQ → Plan & sharing, and requests land under **Local partners → Market HQ**, where they also count toward the desk badge.
+
+What's in it:
+
+| Tab | What it does | Public? |
+| --- | --- | --- |
+| Lineup | Pick a market date, tick who's coming, add a "this week at the market" note, publish | Yes, once published: on the listing ("Who's at the market…") and in event picks and the weekly emails ("14 vendors, including…") |
+| Vendors | Roster (name, category, description, links) plus private contact name, email and phone; active and opted-out toggles | Roster yes; contacts never |
+| Applications | Public form at `/apply/:marketId` (Google sign-in). Approve adds the vendor and their contact in one write | No |
+| Messages | Templates (load-in, weather, cancellation, thank you) to all active vendors or one date's lineup. Sent hourly by `scripts/markets/send-vendor-messages.ts`, one email per vendor, from "<Market> via CalgaryWatch", Reply-To the organizer, CASL footer, opted-out vendors skipped | No |
+| Plan & sharing | Self-serve vs managed; copyable application and listing links | n/a |
+
+The landing page for organizers is `/for-markets`. Claimed markets get an "Open Market HQ" card on their claim page.
+
+Data:
+- `market_vendors/{marketId}__{slug}`: public.
+- `market_vendor_contacts/{same}`: organizer and admin only.
+- `market_lineups/{occurrenceId}`: public when `published`.
+- `vendor_applications/{auto}`: applicant, organizer and admin.
+- `vendor_messages/{auto}`: queued by the organizer, sent by the job.
+- `market_service_requests/{uid}_{marketId}`.
+
+The rules have 27 emulator cases and contract tests in `tests/markets.test.ts`. Payments, stall maps and document storage are deliberately not built yet; payments need a server, which the current Firebase plan doesn't include.

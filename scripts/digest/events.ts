@@ -26,7 +26,7 @@ import { randomBytes } from 'node:crypto';
 import { digestSendId, digestWeekKey, isValidUnsubToken } from '../../src/lib/digest.js';
 import { normalizeInterests, type Point } from '../../src/lib/eventPicks.js';
 import { eventsConsentRefusal, eventsSendId, eventsUnsubscribeUrl, type EventsDigestRecipient } from '../../src/lib/eventsDigest.js';
-import { loadInventory, processEventsUnsubscribes, readerPicks } from './eventsShared.js';
+import { loadInventory, processEventsUnsubscribes, readerPicks, withLineups } from './eventsShared.js';
 import { assertBrandingComplete, eventsEmailContent, renderEventsHtml, renderEventsText, type DigestBranding } from './render.js';
 import { letterheadImages } from './art.js';
 import { loadSenderConfig, sendDigestEmail, sleep } from './send.js';
@@ -104,10 +104,12 @@ async function run() {
     ? `[events] ALLOWLIST ACTIVE — only ${sender.allowlist.join(', ')} can be mailed`
     : '[events] NO ALLOWLIST — every opted-in reader is in scope');
 
-  const inventory = loadInventory();
+  let inventory = loadInventory();
   console.log(`[events] inventory ${inventory.generatedAt ?? 'unknown'}: ${inventory.entities.length} published listings`);
 
   const db = initFirebase();
+  inventory = await withLineups(db, inventory);
+  if (inventory.lineups?.size) console.log(`[events] ${inventory.lineups.size} published market lineup(s)`);
   const honoured = await processEventsUnsubscribes(db, 'events');
   if (honoured) console.log(`[events] honoured ${honoured} unsubscribe(s)`);
 

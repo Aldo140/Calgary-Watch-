@@ -35,6 +35,15 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+      # Vendor emails queued in Market HQ. Cheap when idle: one query.
+      - name: Send queued vendor messages
+        run: npx tsx scripts/markets/send-vendor-messages.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
+          DIGEST_FROM: ${{ vars.DIGEST_FROM }}
       - name: Republish the site
         if: steps.apply.outputs.applied != '' && steps.apply.outputs.applied != '0'
         run: gh workflow run deploy-firebase.yml --ref main

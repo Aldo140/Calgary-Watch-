@@ -815,6 +815,109 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Market HQ ────────────────────────────────────────────────────────
+    // A market's verified organizer (approved listing claim) or admin, who
+    // runs it for markets on the managed service. Roster and published
+    // lineups are public; vendor contacts, applications and messages are not.
+    function isOrganizerOf(marketId) {
+      return isAuthenticated() && marketId is string &&
+             exists(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + marketId)) &&
+             get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + marketId)).data.status == 'approved';
+    }
+    function runsMarket(marketId) {
+      return isAdmin() || isOrganizerOf(marketId);
+    }
+
+    match /market_vendors/{id} {
+      allow read: if true;
+      allow create, update: if runsMarket(request.resource.data.marketId) &&
+                    hasOnlyAllowedFields(['marketId', 'slug', 'name', 'category', 'description', 'website', 'instagram', 'active', 'createdAt', 'updatedAt']) &&
+                    id == request.resource.data.marketId + '__' + request.resource.data.slug &&
+                    request.resource.data.name is string && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 120 &&
+                    request.resource.data.category is string && request.resource.data.category.size() <= 60 &&
+                    request.resource.data.description is string && request.resource.data.description.size() <= 600 &&
+                    request.resource.data.website is string && request.resource.data.website.size() <= 300 &&
+                    request.resource.data.instagram is string && request.resource.data.instagram.size() <= 80 &&
+                    request.resource.data.active is bool &&
+                    (resource == null || resource.data.marketId == request.resource.data.marketId);
+      allow delete: if runsMarket(resource.data.marketId);
+    }
+
+    match /market_vendor_contacts/{id} {
+      allow read: if runsMarket(resource.data.marketId);
+      allow create, update: if runsMarket(request.resource.data.marketId) &&
+                    hasOnlyAllowedFields(['marketId', 'vendorSlug', 'contactName', 'email', 'phone', 'optedOut', 'updatedAt']) &&
+                    id == request.resource.data.marketId + '__' + request.resource.data.vendorSlug &&
+                    request.resource.data.email is string && request.resource.data.email.size() <= 160 &&
+                    request.resource.data.contactName is string && request.resource.data.contactName.size() <= 80 &&
+                    request.resource.data.phone is string && request.resource.data.phone.size() <= 40 &&
+                    request.resource.data.optedOut is bool &&
+                    (resource == null || resource.data.marketId == request.resource.data.marketId);
+      allow delete: if runsMarket(resource.data.marketId);
+    }
+
+    match /market_lineups/{occurrenceId} {
+      allow read: if resource.data.published == true || runsMarket(resource.data.marketId);
+      allow create, update: if runsMarket(request.resource.data.marketId) &&
+                    hasOnlyAllowedFields(['marketId', 'occurrenceId', 'start', 'vendorSlugs', 'note', 'published', 'updatedAt']) &&
+                    request.resource.data.occurrenceId == occurrenceId &&
+                    request.resource.data.vendorSlugs is list && request.resource.data.vendorSlugs.size() <= 300 &&
+                    request.resource.data.note is string && request.resource.data.note.size() <= 1200 &&
+                    request.resource.data.published is bool &&
+                    (resource == null || resource.data.marketId == request.resource.data.marketId);
+      allow delete: if runsMarket(resource.data.marketId);
+    }
+
+    match /vendor_applications/{id} {
+      allow read: if isAuthenticated() && (resource.data.uid == request.auth.uid || runsMarket(resource.data.marketId));
+      allow create: if isAuthenticated() &&
+                    request.auth.token.email_verified == true &&
+                    hasOnlyAllowedFields(['uid', 'marketId', 'marketTitle', 'businessName', 'category', 'description', 'website', 'instagram', 'contactName', 'email', 'phone', 'availability', 'status', 'createdAt']) &&
+                    request.resource.data.uid == request.auth.uid &&
+                    request.resource.data.marketId is string && request.resource.data.marketId.size() <= 120 &&
+                    request.resource.data.businessName is string && request.resource.data.businessName.size() >= 2 && request.resource.data.businessName.size() <= 120 &&
+                    request.resource.data.description is string && request.resource.data.description.size() <= 1200 &&
+                    request.resource.data.availability is string && request.resource.data.availability.size() <= 600 &&
+                    request.resource.data.email is string && request.resource.data.email.size() <= 160 &&
+                    request.resource.data.status == 'pending' &&
+                    request.resource.data.createdAt is number;
+      allow update: if runsMarket(resource.data.marketId) &&
+                    request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'reviewedAt', 'reviewedBy']) &&
+                    request.resource.data.status in ['pending', 'approved', 'declined'];
+      allow delete: if false;
+    }
+
+    // Queued by the organizer; scripts/markets/send-vendor-messages.ts sends
+    // them with the Admin SDK and records the outcome.
+    match /vendor_messages/{id} {
+      allow read: if runsMarket(resource.data.marketId);
+      allow create: if runsMarket(request.resource.data.marketId) &&
+                    hasOnlyAllowedFields(['marketId', 'marketTitle', 'audience', 'occurrenceId', 'subject', 'body', 'replyTo', 'status', 'createdBy', 'createdAt']) &&
+                    request.resource.data.createdBy == request.auth.uid &&
+                    request.resource.data.status == 'queued' &&
+                    request.resource.data.audience in ['all', 'date'] &&
+                    request.resource.data.subject is string && request.resource.data.subject.size() >= 2 && request.resource.data.subject.size() <= 140 &&
+                    request.resource.data.body is string && request.resource.data.body.size() >= 2 && request.resource.data.body.size() <= 5000 &&
+                    request.resource.data.replyTo is string && request.resource.data.replyTo.size() <= 160 &&
+                    request.resource.data.createdAt is number;
+      allow update, delete: if false;
+    }
+
+    // "Have CalgaryWatch run it": a request for the managed service.
+    match /market_service_requests/{id} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated() &&
+                    hasOnlyAllowedFields(['uid', 'marketId', 'marketTitle', 'plan', 'note', 'contact', 'status', 'createdAt']) &&
+                    request.resource.data.uid == request.auth.uid &&
+                    id == request.auth.uid + '_' + request.resource.data.marketId &&
+                    request.resource.data.plan in ['managed', 'self'] &&
+                    request.resource.data.note is string && request.resource.data.note.size() <= 1200 &&
+                    request.resource.data.status == 'new' &&
+                    request.resource.data.createdAt is number;
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
     // Discovery is published through a verified static snapshot. Raw inventory,
     // review records and source payloads are never readable by public clients.
     match /{collection}/{id} {

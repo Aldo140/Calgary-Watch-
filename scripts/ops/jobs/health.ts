@@ -7,6 +7,7 @@ import { claudeConfigured } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
 import { igAccount, igToken, tokenExpiry } from '../lib/instagram';
 import { currentToken, keepAlive } from './igTokens';
+import { scoutConfigured } from './scout';
 import { outlookConfigured } from '../lib/outlook';
 import { happenings, type DiscoveryIndex } from '../lib/posts';
 import { calgaryDate, calgaryMinutes } from '../lib/time';
@@ -60,6 +61,19 @@ export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, n
     } catch (e) {
       items.push({ id: `ig-${brand}`, label: `Instagram ${kit.name}`, ok: false, detail: e instanceof Error ? e.message : String(e) });
     }
+  }
+  if (scoutConfigured()) {
+    // A Page token never expires, but Meta stops returning data ~90 days after
+    // the person last approved the app. Re-approving is one click in the Graph API Explorer.
+    try {
+      const at = await tokenExpiry(process.env.IG_DISCOVERY_TOKEN!);
+      const days = at ? Math.floor((at - now) / DAY) : null;
+      items.push({ id: 'scout', label: 'Instagram Scout', ok: days === null || days > 14, detail: days === null ? 'Reading other Calgary accounts.' : days > 14 ? `Reading other Calgary accounts; data access renews in ${days} days.` : `Data access ends in ${days} days: open the Graph API Explorer, pick CalgaryDaily Scout and click Generate Access Token once.` });
+    } catch (e) {
+      items.push({ id: 'scout', label: 'Instagram Scout', ok: false, detail: e instanceof Error ? e.message : String(e) });
+    }
+  } else {
+    items.push({ id: 'scout', label: 'Instagram Scout', ok: false, detail: 'Not connected: add IG_DISCOVERY_TOKEN and IG_USER_ID to the repository secrets.' });
   }
   items.push({ id: 'claude', label: 'Drafting (Claude)', ok: claudeConfigured(), detail: claudeConfigured() ? 'Connected.' : 'No ANTHROPIC_API_KEY; drafts use fixed templates.' });
   items.push({ id: 'outlook', label: 'Outreach mailbox', ok: outlookConfigured(), detail: outlookConfigured() ? 'Connected.' : 'Microsoft Graph app not configured (MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET); queued emails wait.' });

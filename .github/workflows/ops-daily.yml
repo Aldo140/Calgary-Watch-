@@ -54,6 +54,9 @@ jobs:
           ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
           IG_TOKEN_CALGARYWATCH: ${{ secrets.IG_TOKEN_CALGARYWATCH }}
           IG_TOKEN_CALGARYDAILY: ${{ secrets.IG_TOKEN_CALGARYDAILY }}
+          # The Scout reads other Calgary accounts (Business Discovery, Facebook-login Page token).
+          IG_DISCOVERY_TOKEN: ${{ secrets.IG_DISCOVERY_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
           MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
           MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
           MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}

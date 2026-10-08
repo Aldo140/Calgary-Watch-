@@ -108,6 +108,41 @@ export async function listAllMedia(token: string, handle: string, max = 1000): P
   return out;
 }
 
+export interface DiscoveredAccount {
+  username: string; followers: number; mediaCount: number; media: AccountMedia[];
+}
+
+/**
+ * Another Business or Creator account's public profile and recent posts,
+ * through Business Discovery. Needs a Facebook-login token (graph.facebook.com)
+ * and our own Instagram user id; Instagram-login tokens can't do this. Personal
+ * accounts and unknown handles throw (code 110).
+ */
+export async function businessDiscovery(token: string, igUserId: string, username: string, mediaLimit = 12): Promise<DiscoveredAccount> {
+  const read = async (mediaFields: string) => {
+    const r = await graph(igUserId, token, {
+      root: FB,
+      params: { fields: `business_discovery.username(${username}){username,followers_count,media_count,media.limit(${mediaLimit}){${mediaFields}}}` },
+    });
+    return r.business_discovery ?? {};
+  };
+  const base = 'id,caption,media_type,permalink,timestamp,like_count,comments_count';
+  let bd: any;
+  try { bd = await read(`${base},media_product_type`); } catch (e: any) {
+    if (e.code !== 100) throw e;
+    bd = await read(base);
+  }
+  return {
+    username: bd.username ?? username,
+    followers: Number(bd.followers_count ?? 0),
+    mediaCount: Number(bd.media_count ?? 0),
+    media: (bd.media?.data ?? []).map((m: any) => ({
+      id: m.id, caption: m.caption ?? '', mediaType: m.media_type ?? '', productType: m.media_product_type ?? null,
+      permalink: m.permalink ?? '', timestamp: Date.parse(m.timestamp), likes: Number(m.like_count ?? 0), comments: Number(m.comments_count ?? 0),
+    })),
+  };
+}
+
 /**
  * Lifetime numbers for one post (needs the instagram_business_manage_insights
  * permission on the token). Not every metric exists for every media type, so a

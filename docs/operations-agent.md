@@ -2,7 +2,8 @@
 
 It runs every day without a laptop open. It posts to **@calgarydaily**, CalgaryWatch's sister Instagram account. There is no separate CalgaryWatch Instagram. It also runs partner outreach from aldo@calgarywatch.ca and keeps an eye on the site.
 
-- **Listing posts** (Today and Tonight roundups, spotlights, the Friday weekend Reel) publish on their own when they pass the brand rules.
+- **Roundups** (Today and Tonight, Thursday date night, the Friday weekend Reel) publish on their own when they pass the brand rules.
+- **Single event and market spotlights** wait for you in /admin (since 2026-10-08). The account history showed them drawing a median of 45 views against 2,520 for credited Reels, so they no longer go out unattended. Turn them back on with `autoPublish.events` / `autoPublish.markets` in `brand/calgarydaily.json`.
 - **News, opinion, anything with a warning, and paid posts** wait for you in /admin.
 - **Partner emails** are sent automatically once every CASL check passes (`autoSend` in `brand/outreach.json`). You can cancel any queued email in /admin before its send window.
 - **Replies from businesses** always wait for you. Opt-outs take effect at once and are permanent.
@@ -38,6 +39,7 @@ Insights need the `instagram_business_manage_insights` permission on the token. 
    - `IG_TOKEN_CALGARYDAILY`: set.
    - `MS_TENANT_ID`, `MS_CLIENT_ID`, `MS_CLIENT_SECRET`: the Outlook sending app. See "Outlook" below.
    - `IG_TOKEN_CALGARYWATCH` is no longer needed.
+   - `IG_DISCOVERY_TOKEN` and `IG_USER_ID`: the Scout (see below). The token is a Facebook-login **Page** token for CalgaryDaily from the CalgaryDaily Scout app (permissions `pages_show_list`, `pages_read_engagement`, `instagram_basic`, `instagram_manage_insights`), and `IG_USER_ID` is `17841439690285949`.
 2. **Repository variables** (same page, Variables tab):
    - `OPS_SUMMARY_TO` = `aldo@calgarywatch.ca` (set).
    - `DIGEST_MAILING_ADDRESS`: set. CASL requires a real mailing address in every commercial email.
@@ -75,6 +77,12 @@ This needs aldo@calgarywatch.ca to be a real Microsoft 365 / Exchange Online mai
 ### External trigger (only if posts are still late)
 
 At cron-job.org (free), create a job that runs every 15 minutes: `POST https://api.github.com/repos/Aldo140/Calgary-Watch-/actions/workflows/ops-hourly.yml/dispatches`, with body `{"ref":"main"}`, header `Accept: application/vnd.github+json`, and `Authorization: Bearer <token>`. The token should be a fine-grained personal access token limited to this repository, with **Actions: read and write** permission only.
+
+## The Scout
+
+Once a day `scripts/ops/jobs/scout.ts` reads the Calgary accounts in `brand/scout.json` through Instagram's Business Discovery: followers, posts in the last 30 days, days since the last post, median likes plus comments, share of Reels, and the best recent post. Active accounts (posted in the last 14 days) rank first. Creators the watched accounts credit ("📸 @someone") become candidates and are checked a few per run, which is how the Creator Bench list grows. Results go to `ops_health/scout` and the Actions log. It is read only: it never posts, follows or messages anyone.
+
+Only Business and Creator accounts can be read; personal or misspelled handles are listed as unreadable and skipped. The Page token never expires, but Meta stops returning data about 90 days after the app was last approved. The health check warns two weeks ahead; renewing is one click on **Generate Access Token** in the Graph API Explorer with the CalgaryDaily Scout app selected.
 
 ## Rules the agent follows
 

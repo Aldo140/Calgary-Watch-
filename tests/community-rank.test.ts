@@ -14,6 +14,7 @@ import {
   displayName,
   findBySlug,
   guessVerdict,
+  ladder,
   movers,
   neighbours,
   searchCommunities,
@@ -112,5 +113,18 @@ describe('helpers', () => {
     assert.equal(guessVerdict(44, 41), 'So close: 3 spots off.');
     assert.equal(guessVerdict(200, 41), "159 spots off. It's busier than you thought.");
     assert.equal(guessVerdict(10, 41), "31 spots off. It's quieter than you thought.");
+  });
+});
+
+describe('ladder', () => {
+  const r = buildRankings(stats, yearly);
+
+  it('centres on the community when there is room', () => {
+    assert.deepEqual(ladder(r, 'bowness', 1).map((x) => x.key), ['beltline', 'bowness', 'mckenzie towne']);
+  });
+
+  it('slides instead of shrinking at either end', () => {
+    assert.deepEqual(ladder(r, 'beltline', 1).map((x) => x.key), ['beltline', 'bowness', 'mckenzie towne']);
+    assert.deepEqual(ladder(r, 'erin woods', 1).map((x) => x.key), ['bowness', 'mckenzie towne', 'erin woods']);
   });
 });

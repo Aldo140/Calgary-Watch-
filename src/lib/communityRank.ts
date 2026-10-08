@@ -155,3 +155,16 @@ export function guessVerdict(guess: number, actual: number): string {
 export function shareText(r: CommunityRank): string {
   return `${r.name} is #${r.rank} of ${r.count} Calgary communities for 311 reports this year. Where does yours land?`;
 }
+
+/** Up to `span` communities either side, for the rank ladder. */
+export function ladder(rankings: CommunityRank[], key: string, span = 2): CommunityRank[] {
+  const i = rankings.findIndex((r) => r.key === key);
+  if (i === -1) return [];
+  const start = Math.max(0, Math.min(i - span, rankings.length - (span * 2 + 1)));
+  return rankings.slice(start, start + span * 2 + 1);
+}
+
+/** Bar height from 0 to 1. Square root so quiet communities still show up next to downtown. */
+export function barHeight(total: number, max: number): number {
+  return max > 0 ? Math.sqrt(total / max) : 0;
+}

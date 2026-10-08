@@ -8,6 +8,8 @@ import {
   type CommunityRank,
 } from '../../lib/communityRank';
 import { BAND_COLOUR, fmt, ShareActions, useCountTo, useScrollLock } from './shared';
+import { Cover } from './Cover';
+import { BAND_DUOTONE } from '../../lib/coverArt';
 
 /**
  * Phones: your community, wrapped. A full-screen story you tap through, one
@@ -21,9 +23,11 @@ function RevealNumber({ rank, from }: { rank: number; from: number }) {
   return <>#{n}</>;
 }
 
-export function Wrapped({ r, rankings, onClose, onPlay, onAnother }: {
+export function Wrapped({ r, rankings, shape, shapes, onClose, onPlay, onAnother }: {
   r: CommunityRank;
   rankings: CommunityRank[];
+  shape?: string;
+  shapes: Map<string, string>;
   onClose: () => void;
   onPlay: () => void;
   onAnother: () => void;
@@ -60,7 +64,7 @@ export function Wrapped({ r, rankings, onClose, onPlay, onAnother }: {
   };
 
   return (
-    <div className={`cyc-wr is-${id}`} style={{ '--band': band } as React.CSSProperties} role="dialog" aria-modal="true" aria-label={`${r.name}, wrapped`} onClick={onTap}>
+    <div className={`cyc-wr is-${id} ${r.change && r.change.pct > 0 ? 'is-busier' : ''}`} style={{ '--band': band, '--from': BAND_DUOTONE[r.band].from, '--to': BAND_DUOTONE[r.band].to } as React.CSSProperties} role="dialog" aria-modal="true" aria-label={`${r.name}, wrapped`} onClick={onTap}>
       <div className="cyc-wr-progress" aria-hidden="true">
         {slides.map((s, n) => <span key={s} className={n < i ? 'is-done' : n === i ? 'is-now' : ''} />)}
       </div>
@@ -72,9 +76,10 @@ export function Wrapped({ r, rankings, onClose, onPlay, onAnother }: {
       <div className="cyc-wr-slide" key={id}>
         {id === 'cover' && (
           <>
-            <p className="cyc-wr-kicker">{r.year} so far</p>
+            <Cover r={r} shape={shape} label="?" className="cyc-wr-art" />
+            <p className="cyc-wr-kicker">Your {r.year} so far</p>
             <h2 className="cyc-wr-mega">{r.name.split(/[\s/-]+/).map((w, n) => <span key={n} style={{ animationDelay: `${n * 120}ms` }}>{w}</span>)}</h2>
-            <p className="cyc-wr-sub">Your community, wrapped. {r.count} Calgary communities. One of them is yours.</p>
+            <p className="cyc-wr-sub">{r.count} Calgary communities, ranked by 311 calls. Let's see where yours lands.</p>
             <p className="cyc-wr-hint">Tap to start →</p>
           </>
         )}
@@ -152,7 +157,7 @@ export function Wrapped({ r, rankings, onClose, onPlay, onAnother }: {
             <ol className="cyc-wr-ladder">
               {rungs.map((x, n) => (
                 <li key={x.key} className={x.key === r.key ? 'is-you' : ''} style={{ animationDelay: `${n * 90}ms` }}>
-                  <b>#{x.rank}</b><span>{x.name}</span><small>{fmt(x.total)}</small>
+                  <b>{x.rank}</b><Cover r={x} shape={shapes.get(x.key)} label="" className="is-mini" /><span>{x.name}</span><small>{fmt(x.total)}</small>
                 </li>
               ))}
             </ol>
@@ -161,13 +166,9 @@ export function Wrapped({ r, rankings, onClose, onPlay, onAnother }: {
 
         {id === 'share' && (
           <>
-            <div className="cyc-wr-card">
-              <span>Calgary · 311 · {r.year}</span>
-              <b>{r.name}</b>
-              <strong>#{r.rank}</strong>
-              <em>of {r.count} · {r.band}</em>
-            </div>
-            <ShareActions r={r} rankings={rankings} />
+            <p className="cyc-wr-kicker">Your card</p>
+            <Cover r={r} shape={shape} showRank className="cyc-wr-card" label={`Calgary · 311 · ${r.year}`} />
+            <ShareActions r={r} rankings={rankings} shape={shape} />
             <div className="cyc-wr-more">
               <button type="button" onClick={onPlay}><Gamepad2 size={18} aria-hidden="true" /> Play Higher or Lower</button>
               <button type="button" onClick={onAnother}><RotateCcw size={18} aria-hidden="true" /> Wrap another community</button>

@@ -11,10 +11,11 @@ import { BAND_COLOUR, fmt, pageLink, readBest, useCountTo, writeBest } from './s
 
 type Phase = 'ask' | 'show' | 'over';
 
-function Side({ r, reveal, from, role, children }: { r: CommunityRank; reveal: boolean; from: number; role: 'known' | 'unknown'; children?: React.ReactNode }) {
+function Side({ r, shape, reveal, from, role, children }: { r: CommunityRank; shape?: string; reveal: boolean; from: number; role: 'known' | 'unknown'; children?: React.ReactNode }) {
   const shown = useCountTo(reveal ? r.total : from, from, 900);
   return (
     <div className={`cyc-hl-side is-${role}`} style={{ '--band': BAND_COLOUR[r.band] } as React.CSSProperties}>
+      {shape && <svg className="cyc-hl-shape" viewBox="0 0 100 100" aria-hidden="true"><path d={shape} /></svg>}
       <div className="cyc-hl-name">{r.name}</div>
       {role === 'known' || reveal ? (
         <div className="cyc-hl-count"><b>{fmt(shown)}</b><span>311 requests this year</span></div>
@@ -26,7 +27,7 @@ function Side({ r, reveal, from, role, children }: { r: CommunityRank; reveal: b
   );
 }
 
-export function HigherLower({ rankings, start, layout, onClose }: { rankings: CommunityRank[]; start?: CommunityRank; layout: 'side' | 'stack'; onClose?: () => void }) {
+export function HigherLower({ rankings, shapes, start, layout, onClose }: { rankings: CommunityRank[]; shapes?: Map<string, string>; start?: CommunityRank; layout: 'side' | 'stack'; onClose?: () => void }) {
   const pool = useMemo(() => rankings.filter((r) => r.total >= 20), [rankings]);
   const seen = useRef(new Set<string>());
   const first = () => start ?? pool[Math.floor(Math.random() * pool.length)];
@@ -97,9 +98,9 @@ export function HigherLower({ rankings, start, layout, onClose }: { rankings: Co
         {onClose && <button type="button" className="cyc-hl-close" onClick={onClose} aria-label="Close the game"><X size={22} /></button>}
       </div>
       <div className="cyc-hl-arena">
-        <Side key={`k-${known.key}`} r={known} reveal from={known.total} role="known" />
+        <Side key={`k-${known.key}`} r={known} shape={shapes?.get(known.key)} reveal from={known.total} role="known" />
         <div className="cyc-hl-vs" aria-hidden="true">{phase === 'show' ? (lastRight ? <Check size={36} strokeWidth={3.5} /> : <X size={36} strokeWidth={3.5} />) : 'VS'}</div>
-        <Side key={`n-${next.key}`} r={next} reveal={phase !== 'ask'} from={0} role="unknown">
+        <Side key={`n-${next.key}`} r={next} shape={shapes?.get(next.key)} reveal={phase !== 'ask'} from={0} role="unknown">
           {phase === 'ask' && (
             <div className="cyc-hl-choices">
               <p><b>More</b> or <b>fewer</b> 311 requests than {known.name}?</p>

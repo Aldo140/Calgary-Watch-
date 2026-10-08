@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Check, Download, Link2, MapPin, Share2 } from 'lucide-react';
 import { searchCommunities, shareText, type CommunityRank } from '../../lib/communityRank';
 import { drawShareCard } from '../../lib/shareCard';
+import { BAND_DUOTONE } from '../../lib/coverArt';
 
 export const PATH = '/check-your-community';
 export const fmt = (n: number) => n.toLocaleString('en-CA');
@@ -11,12 +12,19 @@ export function pageLink(r?: CommunityRank, extra = ''): string {
   return `${window.location.origin}${PATH}${r ? `?c=${r.slug}` : ''}${extra}`;
 }
 
+/** Each band's lead colour, from its cover duotone. */
 export const BAND_COLOUR: Record<CommunityRank['band'], string> = {
-  Hot: '#ff4d6d',
-  High: '#ff9b3d',
-  Elevated: '#46c6e0',
-  Calm: '#3b6fd8',
+  Hot: BAND_DUOTONE.Hot.from,
+  High: BAND_DUOTONE.High.from,
+  Elevated: BAND_DUOTONE.Elevated.from,
+  Calm: BAND_DUOTONE.Calm.to,
 };
+
+/** Stable pseudo-shuffle so the cover shelf isn't alphabetical or ranked. */
+export function shuffled<T extends { key: string }>(items: T[]): T[] {
+  const h = (s: string) => { let n = 2166136261; for (let i = 0; i < s.length; i++) n = Math.imul(n ^ s.charCodeAt(i), 16777619); return n >>> 0; };
+  return [...items].sort((a, b) => h(a.key) - h(b.key));
+}
 
 export function useMedia(query: string): boolean {
   const get = () => typeof window !== 'undefined' && !!window.matchMedia?.(query).matches;
@@ -118,7 +126,7 @@ export function CommunityPicker({ rankings, onPick, placeholder, autoFocus, clas
   );
 }
 
-export function ShareActions({ r, rankings, compact }: { r: CommunityRank; rankings: CommunityRank[]; compact?: boolean }) {
+export function ShareActions({ r, rankings, shape, compact }: { r: CommunityRank; rankings: CommunityRank[]; shape?: string; compact?: boolean }) {
   const [state, setState] = useState<'' | 'copied' | 'saving' | 'saved'>('');
   const flash = (s: typeof state) => { setState(s); setTimeout(() => setState(''), 2200); };
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
@@ -134,7 +142,7 @@ export function ShareActions({ r, rankings, compact }: { r: CommunityRank; ranki
 
   const saveCard = async () => {
     setState('saving');
-    const blob = await drawShareCard(r, rankings);
+    const blob = await drawShareCard(r, rankings, shape);
     if (!blob) { setState(''); return; }
     const file = new File([blob], `${r.slug}-calgary-rank.png`, { type: 'image/png' });
     if (canShare && navigator.canShare?.({ files: [file] })) {

@@ -675,3 +675,7 @@
   .pl-sky[data-tone='light']::before { background: linear-gradient(180deg, rgba(4, 10, 28, .55), rgba(4, 10, 28, .15) 70%, transparent); }
   .pl-sill { margin-top: -64px; }
 }
+.pl-adminview { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 16px 0 0; padding: 10px 14px; border-radius: 14px; background: var(--cw-live); color: #dfe7f0; font-size: 14px; }
+.pl-adminview svg { color: var(--pl-sun); }
+.pl-adminview strong { color: #fff; }
+.cw-site .pl-adminview a { margin-left: auto; color: var(--pl-sun); font-weight: 700; }

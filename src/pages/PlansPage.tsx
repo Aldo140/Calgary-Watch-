@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUpRight, Check, Lock, MapPin, Pencil, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Check, Lock, MapPin, Pencil, Shield, Sparkles } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
@@ -98,14 +98,21 @@ export default function PlansPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const demo = useDemo(params);
-  const user = demo?.user ?? auth0.user;
+  // Admin can open any member's dashboard read-only: /plans?as=<uid>.
+  const asUid = auth0.isAdmin ? (params.get('as') || '').trim() || null : null;
   const { signIn, isAuthReady, isFirebaseConfigured } = auth0;
-  const liveProfile = usePlansProfile(demo ? undefined : user?.uid);
+  const subjectUid = demo ? undefined : asUid ?? auth0.user?.uid;
+  const liveProfile = usePlansProfile(subjectUid);
   const profile = demo?.profile ?? liveProfile;
-  const liveGoing = useMyGoing(demo ? undefined : user?.uid);
+  const viewed = useMemo(() => (asUid && liveProfile
+    ? ({ uid: asUid, displayName: liveProfile.displayName ?? '', email: liveProfile.email ?? '', photoURL: liveProfile.photoURL ?? '' } as unknown as User)
+    : null), [asUid, liveProfile]);
+  const user = demo?.user ?? (asUid ? viewed : auth0.user);
+  const readOnly = Boolean(demo || asUid);
+  const liveGoing = useMyGoing(subjectUid);
   const mine = demo ? { uid: 'demo', ids: demo.goingIds, ready: true } : liveGoing;
-  const pending = usePendingOptOuts(demo ? undefined : user?.uid);
-  const myClaims = useMyClaims(demo ? undefined : user?.uid);
+  const pending = usePendingOptOuts(subjectUid);
+  const myClaims = useMyClaims(subjectUid);
   // A street address resolves to a point, so picks rank by distance even without a neighbourhood name.
   const { home: addressPoint } = useHomeLocation(profile?.address, Boolean(profile?.address));
   const communities = useCommunityNames();
@@ -125,6 +132,17 @@ export default function PlansPage() {
   const now = Date.now();
 
   useEffect(() => { document.title = 'Your CalgaryWatch | Emails, plans & badges'; }, []);
+
+  // Deep links from the account menu: ?edit=1 opens the editor, #id scrolls there once it exists.
+  const deepLinked = useRef(false);
+  useEffect(() => {
+    if (deepLinked.current || !profile) return;
+    deepLinked.current = true;
+    if (params.get('edit') === '1' && !readOnly) { setDraft(draftFrom(profile, pending)); setEditing(true); }
+    const id = window.location.hash.slice(1);
+    if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   // Hydrate the form from the profile once per account, keeping anything the
   // reader picked before signing in.
@@ -152,6 +170,7 @@ export default function PlansPage() {
 
   useEffect(() => {
     if (!user || demo) { setReportCount(undefined); return; }
+    // (In admin view, `user` is the member being viewed, so these are their counts.)
     let live = true;
     void readMyReportCount(user.uid).then((n) => { if (live) setReportCount(n); });
     void readMySubmissionCount(user.uid).then((n) => { if (live) setSubmissionCount(n); });
@@ -240,6 +259,7 @@ export default function PlansPage() {
     if (!user || !profile) return;
     // Event picks need something to pick from: ask for interests first.
     if (which === 'thursday' && !profile.eventInterests.length) { openEditor('interests'); setDraft((d) => ({ ...d, eventsDigestOptIn: true })); return; }
+    if (asUid) return;
     if (demo) { celebrateBadge(which === 'monday' ? 'monday-reader' : 'on-the-list'); return; }
     await setEmailOptIn(user, profile, which === 'monday' ? { weekly: true } : { events: true });
     setSavedAt(Date.now());
@@ -256,6 +276,7 @@ export default function PlansPage() {
   };
 
   const save = async () => {
+    if (asUid) { setError('Admin view is read-only. Members change their own settings.'); return; }
     const current = demo ? demo.user : auth?.currentUser;
     if (!current) { pendingSave.current = true; await signIn(); if (!auth?.currentUser) pendingSave.current = false; return; }
     if (problem) { setError(problem); return; }
@@ -297,6 +318,9 @@ export default function PlansPage() {
   return (
     <SiteLayout>
       <div className="cw-plans" data-view={dashboard && !showForm ? 'home' : 'setup'}>
+        {asUid ? (
+          <div className="cw-wrap"><p className="pl-adminview" role="status"><Shield size={15} aria-hidden="true" /> <span><strong>Admin view.</strong> You’re seeing {profile?.displayName || 'this member'}’s dashboard as they see it. Read-only.</span> <Link to="/admin">Back to admin</Link></p></div>
+        ) : null}
         {dashboard && !editing ? (
           <header className="cw-wrap pl-head pl-head-member">
             <PlansSkyHero

@@ -6,6 +6,8 @@ import '../../styles/site-nav.css';
 import { MenuArt, type MenuArtKind } from './MenuArt';
 import { CALGARYDAILY } from '../../config/social';
 import { BadgeToaster } from '../plans/BadgeToast';
+import { AccountMenu } from './AccountMenu';
+import { useAuth } from '../FirebaseProvider';
 
 export function Wordmark() {
   return (
@@ -44,6 +46,7 @@ export function SiteHeader() {
   const { pathname } = useLocation();
   const burger = useRef<HTMLButtonElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     setOpen(false);
@@ -85,7 +88,7 @@ export function SiteHeader() {
         <div className="cw-nav-actions">
           <Link to="/search" className="cw-nav-icon" aria-label="Search CalgaryWatch"><Search size={19} /></Link>
           <Link to="/map" className="cw-nav-live"><span className="cw-nav-pulse" aria-hidden="true" /><span>Live<span className="cw-nav-live-long"> map</span></span></Link>
-          <Link to="/plans" className="cw-nav-cta">Sign up</Link>
+          <AccountMenu />
           <button
             ref={burger}
             type="button"
@@ -127,7 +130,7 @@ export function SiteHeader() {
             </ul>
           </nav>
           <div className="cw-menu-foot">
-            <Link to="/plans" className="cw-menu-mail"><MenuArt kind="mail" /><span><strong>Your CalgaryWatch</strong><small>Monday safety recap, Thursday picks, your plans and badges. Free.</small></span></Link>
+            <Link to="/plans" className="cw-menu-mail"><MenuArt kind="mail" /><span><strong>{user ? `Your dashboard${user.displayName ? `, ${user.displayName.split(' ')[0]}` : ''}` : 'Sign up for Your CalgaryWatch'}</strong><small>{user ? 'Your picks, plans, emails and badges.' : 'Safety near home on Mondays, event picks, your plans and badges. Free.'}</small></span></Link>
             <p><Link to="/map">Open the live map</Link><Link to="/about">About</Link><Link to="/coverage">Sources</Link><Link to="/privacy">Privacy</Link><a href={CALGARYDAILY.url} target="_blank" rel="noopener" title="CalgaryDaily, our sister account on Instagram">Instagram @calgarydaily</a></p>
           </div>
         </div>

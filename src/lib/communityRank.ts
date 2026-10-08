@@ -168,3 +168,42 @@ export function ladder(rankings: CommunityRank[], key: string, span = 2): Commun
 export function barHeight(total: number, max: number): number {
   return max > 0 ? Math.sqrt(total / max) : 0;
 }
+
+/** The rank a community would have with `total` reports, against everyone else. */
+export function rankForTotal(rankings: CommunityRank[], total: number, excludeKey?: string): number {
+  return rankings.filter((r) => r.key !== excludeKey && r.total > total).length + 1;
+}
+
+/**
+ * Average minutes between 311 requests so far this year, for "one every
+ * 1h 44m" lines. `now` is passed in so the result is testable.
+ */
+export function minutesBetweenReports(total: number, year: number, now: Date): number | null {
+  if (total <= 0) return null;
+  const start = new Date(year, 0, 1).getTime();
+  const end = Math.min(now.getTime(), new Date(year + 1, 0, 1).getTime());
+  const minutes = (end - start) / 60000;
+  return minutes > 0 ? minutes / total : null;
+}
+
+export function formatInterval(minutes: number): string {
+  if (minutes < 1) return `${Math.max(1, Math.round(minutes * 60))} seconds`;
+  if (minutes < 60) return `${Math.round(minutes)} minute${Math.round(minutes) === 1 ? '' : 's'}`;
+  const h = Math.floor(minutes / 60);
+  const m = Math.round(minutes - h * 60);
+  if (h >= 24) {
+    const d = Math.round(h / 24);
+    return `${d} day${d === 1 ? '' : 's'}`;
+  }
+  return m ? `${h}h ${m}m` : `${h} hour${h === 1 ? '' : 's'}`;
+}
+
+/**
+ * Next community for Higher or Lower: never the current one, never a tie
+ * (a tie has no right answer), and not one seen recently.
+ */
+export function pickChallenger(rankings: CommunityRank[], current: CommunityRank, seen: Set<string>, rand: () => number = Math.random): CommunityRank | undefined {
+  const pool = rankings.filter((r) => r.key !== current.key && r.total !== current.total && !seen.has(r.key));
+  const from = pool.length ? pool : rankings.filter((r) => r.key !== current.key && r.total !== current.total);
+  return from[Math.floor(rand() * from.length)];
+}

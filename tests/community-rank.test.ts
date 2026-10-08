@@ -13,6 +13,10 @@ import {
   buildRankings,
   displayName,
   findBySlug,
+  formatInterval,
+  minutesBetweenReports,
+  pickChallenger,
+  rankForTotal,
   guessVerdict,
   ladder,
   movers,
@@ -20,6 +24,7 @@ import {
   searchCommunities,
   teasers,
 } from '../src/lib/communityRank.js';
+import { depthOrder, projectGround, simplifyRing, toLocalKm, wallLight } from '../src/lib/isoCity.js';
 
 const entry = (crime: number, disorder: number, year = 2026): CrimeStatEntry => ({
   crime, violent: Math.floor(crime / 2), property: crime - Math.floor(crime / 2), disorder, year, dataSource: '311',
@@ -126,5 +131,59 @@ describe('ladder', () => {
   it('slides instead of shrinking at either end', () => {
     assert.deepEqual(ladder(r, 'beltline', 1).map((x) => x.key), ['beltline', 'bowness', 'mckenzie towne']);
     assert.deepEqual(ladder(r, 'erin woods', 1).map((x) => x.key), ['bowness', 'mckenzie towne', 'erin woods']);
+  });
+});
+
+describe('game and story helpers', () => {
+  const r = buildRankings(stats, yearly);
+
+  it('ranks a guessed total against everyone else', () => {
+    assert.equal(rankForTotal(r, 5000, 'bowness'), 1);
+    assert.equal(rankForTotal(r, 400, 'bowness'), 2);
+    assert.equal(rankForTotal(r, 1, 'bowness'), 4);
+  });
+
+  it('turns a yearly total into a cadence', () => {
+    const minutes = minutesBetweenReports(24, 2026, new Date(2026, 0, 2));
+    assert.equal(minutes, 60);
+    assert.equal(minutesBetweenReports(0, 2026, new Date(2026, 5, 1)), null);
+    assert.equal(formatInterval(0.5), '30 seconds');
+    assert.equal(formatInterval(45), '45 minutes');
+    assert.equal(formatInterval(104), '1h 44m');
+    assert.equal(formatInterval(60 * 50), '2 days');
+  });
+
+  it('never deals a tie or the same community', () => {
+    const bowness = r.find((x) => x.key === 'bowness')!;
+    for (let i = 0; i < 20; i++) {
+      const next = pickChallenger(r, bowness, new Set(), () => i / 20)!;
+      assert.notEqual(next.key, 'bowness');
+      assert.notEqual(next.total, bowness.total);
+    }
+  });
+});
+
+describe('isoCity', () => {
+  it('drops the closing vertex and thins long rings', () => {
+    const ring: [number, number][] = Array.from({ length: 101 }, (_, i) => [i, i] as [number, number]);
+    ring.push([0, 0]);
+    assert.equal(simplifyRing(ring, 10).length, 10);
+    assert.deepEqual(simplifyRing([[0, 0], [1, 0], [1, 1], [0, 0]]), [[0, 0], [1, 0], [1, 1]]);
+  });
+
+  it('puts northern blocks further back than southern ones', () => {
+    const blocks = toLocalKm([
+      { key: 'north', ring: [[-114.07, 51.15], [-114.06, 51.15], [-114.06, 51.16]] },
+      { key: 'south', ring: [[-114.07, 50.9], [-114.06, 50.9], [-114.06, 50.91]] },
+    ]);
+    assert.deepEqual(depthOrder(blocks).map((b) => b.key), ['north', 'south']);
+    assert.ok(projectGround(blocks[0].centroid)[1] < projectGround(blocks[1].centroid)[1]);
+  });
+
+  it('shades walls between dark and lit', () => {
+    for (const [a, b] of [[[0, 0], [1, 0]], [[0, 0], [0, 1]], [[1, 0], [0, 0]]] as [[number, number], [number, number]][]) {
+      const l = wallLight(a, b);
+      assert.ok(l >= 0.4 && l <= 1);
+    }
   });
 });

@@ -24,7 +24,7 @@ import {
   searchCommunities,
   teasers,
 } from '../src/lib/communityRank.js';
-import { depthOrder, projectGround, simplifyRing, toLocalKm, wallLight } from '../src/lib/isoCity.js';
+import { BAND_DUOTONE, ringToPath, simplifyRing } from '../src/lib/coverArt.js';
 
 const entry = (crime: number, disorder: number, year = 2026): CrimeStatEntry => ({
   crime, violent: Math.floor(crime / 2), property: crime - Math.floor(crime / 2), disorder, year, dataSource: '311',
@@ -163,7 +163,7 @@ describe('game and story helpers', () => {
   });
 });
 
-describe('isoCity', () => {
+describe('coverArt', () => {
   it('drops the closing vertex and thins long rings', () => {
     const ring: [number, number][] = Array.from({ length: 101 }, (_, i) => [i, i] as [number, number]);
     ring.push([0, 0]);
@@ -171,19 +171,18 @@ describe('isoCity', () => {
     assert.deepEqual(simplifyRing([[0, 0], [1, 0], [1, 1], [0, 0]]), [[0, 0], [1, 0], [1, 1]]);
   });
 
-  it('puts northern blocks further back than southern ones', () => {
-    const blocks = toLocalKm([
-      { key: 'north', ring: [[-114.07, 51.15], [-114.06, 51.15], [-114.06, 51.16]] },
-      { key: 'south', ring: [[-114.07, 50.9], [-114.06, 50.9], [-114.06, 50.91]] },
-    ]);
-    assert.deepEqual(depthOrder(blocks).map((b) => b.key), ['north', 'south']);
-    assert.ok(projectGround(blocks[0].centroid)[1] < projectGround(blocks[1].centroid)[1]);
+  it('fits a boundary inside the cover with north up', () => {
+    // A tall triangle: the northern tip should be near the top of the box.
+    const path = ringToPath([[-114.07, 51.0], [-114.05, 51.0], [-114.06, 51.04]], 100, 10);
+    const nums = path.match(/-?\d+(\.\d+)?/g)!.map(Number);
+    for (const n of nums) assert.ok(n >= 9.9 && n <= 90.1, `${n} outside the padded box`);
+    const ys = [nums[1], nums[3], nums[5]];
+    assert.equal(Math.min(...ys), ys[2]);
+    assert.ok(path.startsWith('M') && path.endsWith('Z'));
+    assert.equal(ringToPath([[0, 0], [1, 1]]), '');
   });
 
-  it('shades walls between dark and lit', () => {
-    for (const [a, b] of [[[0, 0], [1, 0]], [[0, 0], [0, 1]], [[1, 0], [0, 0]]] as [[number, number], [number, number]][]) {
-      const l = wallLight(a, b);
-      assert.ok(l >= 0.4 && l <= 1);
-    }
+  it('has a duotone for every band', () => {
+    for (const band of ['Hot', 'High', 'Elevated', 'Calm'] as const) assert.match(BAND_DUOTONE[band].from, /^#[0-9a-f]{6}$/);
   });
 });

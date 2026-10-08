@@ -10,8 +10,8 @@
 
 import type { AccountHistory, OpsHealth, OpsPerformance, OpsPost, PartnerLead } from '../../src/types/ops';
 import { COLLECTIONS, hasFirebase, opsDb } from './lib/firebase';
-import { activity, bottlenecks, calgaryDailySummary, calgaryWatchPipeline, hqPosts, inbox, notConnected, spendSummary, todayItems, SNAPSHOT_VERSION, type HqSnapshot, type SpendDay } from './lib/hqSnapshot';
-import type { ScoutEntry } from './lib/scout';
+import { activity, bottlenecks, pipelineDetail, calgaryDailySummary, calgaryWatchPipeline, hqPosts, inbox, notConnected, spendSummary, todayItems, SNAPSHOT_VERSION, type HqSnapshot, type SpendDay } from './lib/hqSnapshot';
+import type { Outperformer, OwnAccount, ScoutEntry } from './lib/scout';
 import { calgaryDate } from './lib/time';
 import { USAGE_COLLECTION } from './jobs/usage';
 
@@ -39,7 +39,7 @@ async function previous(): Promise<HqSnapshot | null> {
 const health = (await db.collection(COLLECTIONS.health).doc('latest').get()).data() as OpsHealth | undefined ?? null;
 const performance = (await db.collection(COLLECTIONS.health).doc('performance').get()).data() as OpsPerformance | undefined ?? null;
 const history = (await db.collection(COLLECTIONS.health).doc('account_history').get()).data() as AccountHistory | undefined ?? null;
-const scoutDoc = (await db.collection(COLLECTIONS.health).doc('scout').get()).data() as { updatedAt: number; accounts: ScoutEntry[]; unreadable: string[]; candidates: Record<string, { status: string }> } | undefined;
+const scoutDoc = (await db.collection(COLLECTIONS.health).doc('scout').get()).data() as { updatedAt: number; accounts: ScoutEntry[]; unreadable: string[]; candidates: Record<string, { status: string }>; own?: OwnAccount[]; ownHistory?: Record<string, Record<string, number>>; inspiration?: Outperformer[]; analysis?: HqSnapshot['instagram']['analysis'] } | undefined;
 const inboxCheckedAt = ((await db.collection(COLLECTIONS.health).doc('outreach_inbox').get()).get('lastCheckedAt') as number | undefined) ?? null;
 
 const open = (await db.collection(COLLECTIONS.posts).where('status', 'in', ['drafted', 'needs-correction', 'failed', 'approved', 'redraft', 'requested']).get()).docs.map(d => ({ id: d.id, ...d.data() }) as OpsPost);
@@ -54,14 +54,16 @@ const waitingLeads = [...new Map([...pitchLeads, ...replyLeads].map(l => [l.id, 
 const prev = await previous().catch(e => { log(String(e)); return null; });
 let leads: PartnerLead[] | null = null;
 let pipelines = prev?.pipelines ?? [];
+let detail = prev?.pipelineDetail?.calgarywatch ?? null;
 let pipelinesAt = prev?.pipelinesAt ?? 0;
-if (!prev || now - pipelinesAt > PIPELINE_TTL) {
+if (!prev || (prev.version ?? 1) < SNAPSHOT_VERSION || now - pipelinesAt > PIPELINE_TTL) {
   leads = (await db.collection(COLLECTIONS.leads).get()).docs.map(d => ({ id: d.id, ...d.data() }) as PartnerLead);
   pipelines = [
     calgaryWatchPipeline(leads, now),
     notConnected('vowmotion', 'Vow Motion planners', 'Connects when the agent can read mrotiz14@gmail.com (Gmail sign-in, next step).'),
     notConnected('arctos', 'Arctos Launchpad', 'Connects when the agent can read mrotiz14@gmail.com (Gmail sign-in, next step).'),
   ];
+  detail = pipelineDetail(leads, now, calgaryDate);
   pipelinesAt = now;
 }
 // Replies and pitches waiting on you need fresh lead data; between lead reads, keep the previous ones.
@@ -99,6 +101,16 @@ const snapshot: HqSnapshot = {
   inbox: inbox(waitingLeads, now),
   activity: [...postActivity, ...leadActivity].sort((a, b) => b.at - a.at).slice(0, 80),
   pipelines,
+  pipelineDetail: { calgarywatch: detail },
+  instagram: {
+    accounts: (scoutDoc?.own ?? []).map(a => ({
+      ...a,
+      trend: Object.entries(scoutDoc?.ownHistory?.[a.handle] ?? {}).sort(([x], [y]) => x.localeCompare(y)).map(([date, followers]) => ({ date, followers })),
+    })),
+    inspiration: scoutDoc?.inspiration ?? [],
+    analysis: scoutDoc?.analysis ?? null,
+    updatedAt: scoutDoc?.updatedAt ?? null,
+  },
   pipelinesAt,
   spend: spendSummary(days, calgaryDate(now)),
   bottlenecks: bottlenecks({ today, performance, inboxCheckedAt, health, failed7d, now }),

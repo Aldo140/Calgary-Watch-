@@ -145,3 +145,42 @@ describe('snapshot v2', () => {
     assert.deepEqual(a.map(x => x.type), ['Email sent', 'Posted']);
   });
 });
+
+import { pipelineDetail } from '../scripts/ops/lib/hqSnapshot';
+import { outperformers, ownSummary } from '../scripts/ops/lib/scout';
+
+describe('Instagram and inspiration', () => {
+  const media = (daysAgo: number, likes: number, extra = {}) => ({ id: String(daysAgo), caption: `post ${daysAgo}`, mediaType: 'VIDEO', productType: 'REELS', permalink: `p${daysAgo}`, timestamp: now - daysAgo * 24 * HOUR, likes, comments: 0, mediaUrl: `img${daysAgo}`, ...extra });
+  it('ranks posts by lift over their own account, so a small account can win', () => {
+    const big = { username: 'Big', followers: 100000, mediaCount: 3, media: [media(1, 1000), media(2, 900), media(3, 1100)] };
+    const small = { username: 'small', followers: 900, mediaCount: 3, media: [media(1, 400), media(2, 40), media(3, 50)] };
+    const out = outperformers([big, small], now);
+    assert.equal(out[0].handle, 'small');
+    assert.equal(out[0].lift, 8);
+    assert.ok(!out.some(o => o.handle === 'big'));
+  });
+  it('summarizes an own account with its recent posts and images', () => {
+    const o = ownSummary({ username: 'arctoslaunchpad', followers: 120, mediaCount: 2, media: [media(1, 10), media(40, 4, { productType: 'FEED', mediaType: 'IMAGE' })] }, 'arctos', now);
+    assert.equal(o.business, 'arctos');
+    assert.equal(o.posts30, 1);
+    assert.equal(o.recent[0].mediaUrl, 'img1');
+    assert.equal(o.recent[1].reel, false);
+  });
+});
+
+describe('pipeline detail', () => {
+  it('counts sends and replies per day, reply rate and categories', () => {
+    const dateOf = (t: number) => new Date(t).toISOString().slice(0, 10);
+    const d = pipelineDetail([
+      lead({ id: 'a', category: 'Market', status: 'interested', history: [{ at: now - 30 * HOUR, type: 'sent', summary: '' }, { at: now - 6 * HOUR, type: 'reply', summary: '' }], lastReply: { at: now - 6 * HOUR, from: '', subject: '', text: '', classification: 'interested', suggestedSubject: '', suggestedBody: '', approved: false, sent: false } }),
+      lead({ id: 'b', category: 'Market', status: 'contacted', history: [{ at: now - 30 * HOUR, type: 'sent', summary: '' }] }),
+      lead({ id: 'c', category: 'Theatre', status: 'ready' }),
+    ], now, dateOf);
+    assert.equal(d.replyRate, 50);
+    assert.equal(d.medianHoursToReply, 24);
+    assert.equal(d.sendsByDay.length, 30);
+    assert.equal(d.sendsByDay.reduce((n, x) => n + x.sent, 0), 2);
+    assert.deepEqual(d.byCategory[0], { category: 'Market', total: 2, contacted: 2, replied: 1, interested: 1 });
+    assert.equal(d.leads[0].id, 'a');
+  });
+});

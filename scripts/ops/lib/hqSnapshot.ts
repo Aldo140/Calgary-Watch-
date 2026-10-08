@@ -90,6 +90,31 @@ export interface InboxPitch {
   at: number;
 }
 
+export interface LeadRow {
+  id: string;
+  businessName: string;
+  category: string;
+  neighbourhood: string;
+  website: string | null;
+  contactEmail: string | null;
+  status: string;
+  followUps: number;
+  lastContactAt: number | null;
+  nextFollowUpAt: number | null;
+  replyClass: string | null;
+  replyAt: number | null;
+  createdAt: number;
+}
+
+export interface PipelineDetail {
+  leads: LeadRow[];
+  sendsByDay: Array<{ date: string; sent: number; replies: number }>;
+  byCategory: Array<{ category: string; total: number; contacted: number; replied: number; interested: number }>;
+  followUpsDue: number;
+  replyRate: number | null;
+  medianHoursToReply: number | null;
+}
+
 export interface ActivityItem { at: number; business: Business; type: string; text: string }
 
 export interface QueueCounts { waiting: number; scheduled: number; published7d: number; failed7d: number }
@@ -118,6 +143,13 @@ export interface HqSnapshot {
   inbox: { replies: InboxReply[]; pitches: InboxPitch[]; at: number };
   activity: ActivityItem[];
   pipelines: Pipeline[];
+  pipelineDetail: { calgarywatch: PipelineDetail | null };
+  instagram: {
+    accounts: Array<import('./scout').OwnAccount & { trend: Array<{ date: string; followers: number }> }>;
+    inspiration: import('./scout').Outperformer[];
+    analysis: (import('./claude').InspirationAnalysis & { at: number }) | null;
+    updatedAt: number | null;
+  };
   pipelinesAt: number;
   spend: { days: SpendDay[]; monthToDate: number; last7: number; last30: number };
   bottlenecks: Bottleneck[];
@@ -311,4 +343,50 @@ export function activity(leads: PartnerLead[], posts: OpsPost[], now: number, ho
     if (p.status === 'failed' && (p.updatedAt ?? 0) >= since) out.push({ at: p.updatedAt, business: p.brand, type: 'Post failed', text: `${p.imageText?.headline ?? ''}: ${p.error ?? ''}`.slice(0, 200) });
   }
   return out.sort((a, b) => b.at - a.at).slice(0, 80);
+}
+
+const CONTACTED = ['contacted', 'follow-up-ready', 'no-response', 'replied', 'interested', 'not-interested', 'claimed', 'partner'];
+const REPLIED = ['replied', 'interested', 'not-interested', 'claimed', 'partner'];
+
+/** Everything about CalgaryWatch partner outreach that fits on one screen. */
+export function pipelineDetail(leads: PartnerLead[], now: number, dateOf: (t: number) => string): PipelineDetail {
+  const rows: LeadRow[] = leads.map(l => ({
+    id: l.id, businessName: l.businessName, category: l.category || 'Other', neighbourhood: l.neighbourhood, website: l.website,
+    contactEmail: l.contactEmail, status: l.status, followUps: l.followUps, lastContactAt: l.lastContactAt, nextFollowUpAt: l.nextFollowUpAt,
+    replyClass: l.lastReply?.classification ?? null, replyAt: l.lastReply?.at ?? null, createdAt: l.createdAt,
+  })).sort((a, b) => (b.replyAt ?? b.lastContactAt ?? b.createdAt) - (a.replyAt ?? a.lastContactAt ?? a.createdAt));
+
+  const days = new Map<string, { sent: number; replies: number }>();
+  for (let i = 29; i >= 0; i--) days.set(dateOf(now - i * DAY), { sent: 0, replies: 0 });
+  const hoursToReply: number[] = [];
+  for (const l of leads) {
+    const firstSent = (l.history ?? []).filter(e => e.type === 'sent').map(e => e.at).sort((a, b) => a - b)[0];
+    for (const e of l.history ?? []) {
+      const d = days.get(dateOf(e.at));
+      if (d && e.type === 'sent') d.sent++;
+      if (d && e.type === 'reply') d.replies++;
+    }
+    if (firstSent && l.lastReply?.at && l.lastReply.at > firstSent) hoursToReply.push((l.lastReply.at - firstSent) / 3_600_000);
+  }
+
+  const cats = new Map<string, { total: number; contacted: number; replied: number; interested: number }>();
+  for (const l of leads) {
+    const c = cats.get(l.category || 'Other') ?? { total: 0, contacted: 0, replied: 0, interested: 0 };
+    c.total++;
+    if (CONTACTED.includes(l.status)) c.contacted++;
+    if (REPLIED.includes(l.status)) c.replied++;
+    if (['interested', 'claimed', 'partner'].includes(l.status)) c.interested++;
+    cats.set(l.category || 'Other', c);
+  }
+  const contacted = leads.filter(l => CONTACTED.includes(l.status)).length;
+  const replied = leads.filter(l => REPLIED.includes(l.status)).length;
+  const sortedHours = hoursToReply.sort((a, b) => a - b);
+  return {
+    leads: rows.slice(0, 400),
+    sendsByDay: [...days.entries()].map(([date, v]) => ({ date, ...v })),
+    byCategory: [...cats.entries()].map(([category, v]) => ({ category, ...v })).sort((a, b) => b.total - a.total).slice(0, 16),
+    followUpsDue: leads.filter(l => l.status === 'follow-up-ready' || (l.nextFollowUpAt !== null && l.nextFollowUpAt <= now && l.status === 'contacted')).length,
+    replyRate: contacted ? Math.round((replied / contacted) * 1000) / 10 : null,
+    medianHoursToReply: sortedHours.length ? Math.round(sortedHours[Math.floor(sortedHours.length / 2)]) : null,
+  };
 }

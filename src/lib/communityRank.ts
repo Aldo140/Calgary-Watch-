@@ -31,6 +31,14 @@ export interface CommunityRank {
 
 export type RankBand = 'Hot' | 'High' | 'Elevated' | 'Calm';
 
+/** What readers see for each band: a plain position, not a judgement. */
+export const BAND_LABEL: Record<RankBand, string> = {
+  Hot: 'Top 10%',
+  High: 'Top 25%',
+  Elevated: 'Top half',
+  Calm: 'Bottom half',
+};
+
 /** Below this, a year-over-year percentage is mostly noise. */
 export const MIN_CHANGE_BASE = 100;
 
@@ -148,12 +156,12 @@ export function guessVerdict(guess: number, actual: number): string {
   const spots = `${off} spot${off === 1 ? '' : 's'}`;
   if (off <= 5) return `So close: ${spots} off.`;
   return guess > actual
-    ? `${spots} off. It's busier than you thought.`
-    : `${spots} off. It's quieter than you thought.`;
+    ? `${spots} off. More reports than you guessed.`
+    : `${spots} off. Fewer reports than you guessed.`;
 }
 
 export function shareText(r: CommunityRank): string {
-  return `${r.name} is #${r.rank} of ${r.count} Calgary communities for 311 reports this year. Where does yours land?`;
+  return `${r.name} is #${r.rank} of ${r.count} Calgary communities for reports to the City this year. Know your community: where does yours land?`;
 }
 
 /** Up to `span` communities either side, for the rank ladder. */

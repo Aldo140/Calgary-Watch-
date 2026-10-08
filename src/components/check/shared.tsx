@@ -103,7 +103,7 @@ export function CommunityPicker({ rankings, onPick, placeholder, autoFocus, clas
           const name = findCommunityAt(coords.latitude, coords.longitude, await fetchCommunityBoundaries());
           const r = name ? rankings.find((x) => x.key === name) : undefined;
           if (r) onPick(r);
-          else setLocNote(name ? `No 311 data for ${name} yet. Try a community nearby.` : 'You look to be outside Calgary. Type a community instead.');
+          else setLocNote(name ? `No reports on file for ${name} yet. Try a community nearby.` : 'You look to be outside Calgary. Type a community instead.');
         } catch {
           setLocNote('Couldn\'t look up your community. Type it instead.');
         } finally {

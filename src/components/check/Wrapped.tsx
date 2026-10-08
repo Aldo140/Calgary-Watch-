@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Gamepad2, RotateCcw, X } from 'lucide-react';
 import {
+  BAND_LABEL,
   formatInterval,
   guessVerdict,
   ladder,
@@ -79,7 +80,7 @@ export function Wrapped({ r, rankings, shape, shapes, onClose, onPlay, onAnother
             <Cover r={r} shape={shape} label="?" className="cyc-wr-art" />
             <p className="cyc-wr-kicker">Your {r.year} so far</p>
             <h2 className="cyc-wr-mega">{r.name.split(/[\s/-]+/).map((w, n) => <span key={n} style={{ animationDelay: `${n * 120}ms` }}>{w}</span>)}</h2>
-            <p className="cyc-wr-sub">{r.count} Calgary communities, ranked by 311 calls. Let's see where yours lands.</p>
+            <p className="cyc-wr-sub">{r.count} Calgary communities, ranked by what neighbours reported to the City. Let's see where yours lands.</p>
             <p className="cyc-wr-hint">Tap to start →</p>
           </>
         )}
@@ -87,7 +88,7 @@ export function Wrapped({ r, rankings, shape, shapes, onClose, onPlay, onAnother
         {id === 'guess' && (
           <>
             <p className="cyc-wr-kicker">Your call</p>
-            <h2 className="cyc-wr-q">Out of {r.count}, where does {r.name} rank for 311 requests?</h2>
+            <h2 className="cyc-wr-q">Out of {r.count}, where does {r.name} rank for reports to the City?</h2>
             <p className="cyc-wr-guess" aria-hidden="true">#{guess}</p>
             <div className="cyc-wr-scale">
               <input
@@ -112,26 +113,26 @@ export function Wrapped({ r, rankings, shape, shapes, onClose, onPlay, onAnother
             <p className="cyc-wr-kicker">{r.name} is</p>
             <p className="cyc-wr-rank"><RevealNumber rank={r.rank} from={locked ?? r.count} /></p>
             <p className="cyc-wr-of">of {r.count} Calgary communities</p>
-            <p className="cyc-wr-verdict">{locked === null ? `${r.band}.` : `You said #${locked}. ${guessVerdict(locked, r.rank)}`}</p>
+            <p className="cyc-wr-verdict">{locked === null ? `In the ${BAND_LABEL[r.band].toLowerCase()} for reports.` : `You said #${locked}. ${guessVerdict(locked, r.rank)}`}</p>
           </>
         )}
 
         {id === 'cadence' && minutes && (
           <>
-            <p className="cyc-wr-kicker">Someone in {r.name} contacted 311</p>
+            <p className="cyc-wr-kicker">Neighbours in {r.name} flagged something</p>
             <p className="cyc-wr-big">every<br /><b>{formatInterval(minutes)}</b></p>
-            <p className="cyc-wr-sub">{fmt(r.total)} requests since January 1, day and night.</p>
+            <p className="cyc-wr-sub">{fmt(r.total)} reports since January 1, from potholes to safety concerns.</p>
           </>
         )}
 
         {id === 'mix' && (
           <>
-            <p className="cyc-wr-kicker">What it was about</p>
+            <p className="cyc-wr-kicker">What neighbours reported</p>
             <div className="cyc-wr-mix">
               {[
-                ['Safety and disorder', r.safety, 'red'],
-                ['Property damage and theft', r.property, 'yellow'],
-                ['Everything else', r.other, 'blue'],
+                ['Safety concerns', r.safety, 'red'],
+                ['Property and vandalism', r.property, 'yellow'],
+                ['Streets, parks and everything else', r.other, 'blue'],
               ].map(([label, v, tone], n) => (
                 <div key={label as string} className={`cyc-wr-mix-${tone}`} style={{ flexGrow: Math.max(0.12, (v as number) / mixTotal), animationDelay: `${n * 140}ms` }}>
                   <b>{Math.round(((v as number) / mixTotal) * 100)}%</b>
@@ -147,13 +148,13 @@ export function Wrapped({ r, rankings, shape, shapes, onClose, onPlay, onAnother
             <p className="cyc-wr-kicker">{r.change.fromYear} → {r.change.toYear}</p>
             <p className={`cyc-wr-arrow ${r.change.pct <= 0 ? 'is-down' : 'is-up'}`} aria-hidden="true">{r.change.pct <= 0 ? '↓' : '↑'}</p>
             <p className="cyc-wr-big"><b>{r.change.pct > 0 ? '+' : ''}{r.change.pct}%</b></p>
-            <p className="cyc-wr-sub">{r.change.pct < 0 ? `${r.name} got quieter: ${fmt(r.change.from)} requests down to ${fmt(r.change.to)}.` : r.change.pct > 0 ? `${r.name} got busier: ${fmt(r.change.from)} requests up to ${fmt(r.change.to)}.` : 'Exactly level.'}</p>
+            <p className="cyc-wr-sub">{r.change.pct < 0 ? `Fewer reports in ${r.name}: ${fmt(r.change.from)} down to ${fmt(r.change.to)}.` : r.change.pct > 0 ? `More reports in ${r.name}: ${fmt(r.change.from)} up to ${fmt(r.change.to)}. Worth keeping an eye on together.` : 'Exactly level.'}</p>
           </>
         )}
 
         {id === 'ladder' && (
           <>
-            <p className="cyc-wr-kicker">Your rivals</p>
+            <p className="cyc-wr-kicker">Around you in the ranking</p>
             <ol className="cyc-wr-ladder">
               {rungs.map((x, n) => (
                 <li key={x.key} className={x.key === r.key ? 'is-you' : ''} style={{ animationDelay: `${n * 90}ms` }}>
@@ -167,7 +168,7 @@ export function Wrapped({ r, rankings, shape, shapes, onClose, onPlay, onAnother
         {id === 'share' && (
           <>
             <p className="cyc-wr-kicker">Your card</p>
-            <Cover r={r} shape={shape} showRank className="cyc-wr-card" label={`Calgary · 311 · ${r.year}`} />
+            <Cover r={r} shape={shape} showRank className="cyc-wr-card" label={`Calgary · ${r.year}`} />
             <ShareActions r={r} rankings={rankings} shape={shape} />
             <div className="cyc-wr-more">
               <button type="button" onClick={onPlay}><Gamepad2 size={18} aria-hidden="true" /> Play Higher or Lower</button>

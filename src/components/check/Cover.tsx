@@ -62,7 +62,7 @@ export function Cover({ r, shape, showRank = false, label, className = '' }: {
           <path d={shape || FALLBACK} fill={tone.ink} />
         </g>
       </svg>
-      <span className="cyc-cover-label">{label ?? `311 · ${r.year}`}</span>
+      <span className="cyc-cover-label">{label ?? `Calgary · ${r.year}`}</span>
       {showRank && <b className="cyc-cover-rank">#{r.rank}</b>}
       <span className="cyc-cover-name">{r.name}</span>
     </div>

@@ -28,7 +28,19 @@ export interface Business extends EntityBase, Location {
   claimed: boolean; partner: boolean; editorialSelection: boolean; offer?: string; sponsorshipDisclosure?: string;
 }
 export interface GuideEntry { entityId: string; note: string; comparison?: Record<string, string> }
-export interface Guide extends EntityBase { kind: 'guide'; introduction: string; methodology: string; entries: GuideEntry[]; relatedGuideIds: string[]; sponsorshipDisclosure?: string }
+/** One stop on a guide's route. `entityId` links a listing we already carry (a market, a local place). */
+export interface GuideStop { name: string; area: string; note: string; tip?: string; mapQuery: string; entityId?: string; detour?: boolean }
+/** The at-a-glance strip on a guide: how long, how far, what it costs, when to go. */
+export interface GuideFacts { time: string; distance: string; cost: string; season: string }
+/** A guide's typographic cover: a two-colour wash, ink colour and one of the drawn motifs. */
+export interface GuideCover { from: string; to: string; ink: string; motif: 'river' | 'market' | 'brick' | 'free' | 'skyline'; label: string }
+export interface Guide extends EntityBase {
+  kind: 'guide'; introduction: string; methodology: string; entries: GuideEntry[]; relatedGuideIds: string[]; sponsorshipDisclosure?: string;
+  /** Editorial route. Older guides without stops fall back to introduction + methodology. */
+  stops?: GuideStop[]; facts?: GuideFacts; tips?: string[]; cover?: GuideCover;
+  /** True when the stops form a walkable route in order, so a single "walk it" link makes sense. */
+  route?: boolean;
+}
 export interface Neighbourhood extends EntityBase { kind: 'neighbourhood'; quadrant: string; entityIds: string[] }
 export interface VendorAppearance { vendorId: string; marketOccurrenceId: string; source: EntitySource }
 export interface ClaimRequest { id: string; entityId: string; requesterUid: string; status: 'pending' | 'approved' | 'rejected'; createdAt: string }

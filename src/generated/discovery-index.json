@@ -268,51 +268,154 @@
       "entityIds": []
     },
     {
-      "id": "guide-bow-river-trail",
       "kind": "guide",
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-08T12:00:00.000Z",
+      "updatedAt": "2026-10-08T12:00:00.000Z",
+      "entries": [
+        {
+          "entityId": "biz-higher-ground-kensington",
+          "note": "Coffee in Kensington, a five-minute walk from the Peace Bridge."
+        },
+        {
+          "entityId": "hood-kensington-nw",
+          "note": "Where the walk ends up."
+        }
+      ],
+      "relatedGuideIds": [
+        "guide-farmers-markets",
+        "guide-historic-laneways",
+        "guide-calgary-for-free"
+      ],
+      "id": "guide-bow-river-trail",
       "slug": "a-day-along-the-bow-river",
-      "title": "A Day Along the Bow River",
-      "summary": "From Harvie Passage to the Peace Bridge: 12 km of world-class riverfront paths, public art, and island parklets.",
-      "description": "The Bow River is the spine of Calgary life. This curated itinerary guides you along paved shared paths from the whitewater rapids at Harvie Passage through St. Patrick’s Island, past Prince’s Island Park, and beneath Santiago Calatrava’s Peace Bridge.",
+      "title": "A Day Along the Bow",
+      "summary": "Inglewood to the Peace Bridge on the river pathway: whitewater, an island park, the Central Library and a free skyline view to finish.",
+      "description": "A flat, paved, free walk west along the Bow River pathway, from the rapids at Harvie Passage to the Peace Bridge, with the confluence, St. Patrick’s Island, the Central Library and Prince’s Island Park on the way. Finish with the climb to the Crescent Heights lookout for the view most postcards use.",
       "categories": [
         "guides",
         "outdoors",
         "walking",
-        "scenic"
+        "free"
       ],
       "tags": [
         "bow river",
         "peace bridge",
         "st patricks island",
-        "harvie passage"
+        "harvie passage",
+        "princes island park",
+        "riverwalk"
       ],
       "sources": [
         {
-          "name": "Calgary Parks & Pathway Guide",
+          "name": "City of Calgary: pathways and bikeways",
           "url": "https://www.calgary.ca/parks/pathways.html",
-          "kind": "editorial"
+          "kind": "official"
+        },
+        {
+          "name": "City of Calgary: Peace Bridge",
+          "url": "https://www.calgary.ca/parks/peace-bridge.html",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary Public Library: Central Library",
+          "url": "https://calgarylibrary.ca/central-library/",
+          "kind": "official"
         }
       ],
       "image": {
-        "src": "/images/hero/calgarywatch-city-guide-v1.webp",
-        "alt": "Peace Bridge and Bow River trail skyline view"
+        "src": "/images/photo/calgary4.webp",
+        "alt": "The Peace Bridge over the Bow River"
       },
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-09-22T16:44:40.770Z",
-      "updatedAt": "2026-09-22T16:44:40.770Z",
-      "introduction": "Calgary boasts the largest paved urban pathway network in North America. This route showcases the city at its most natural and connected.",
-      "methodology": "Ground-truthed by CalgaryWatch editors with accessibility notes, bike parking locations, and seasonal riverflow telemetry.",
-      "entries": [],
-      "relatedGuideIds": []
+      "introduction": "The Bow is the reason Calgary is where it is, and the pathway along it is the best free thing in the city. This route walks it east to west, so the downtown skyline grows in front of you all afternoon.",
+      "methodology": "Walked and timed by CalgaryWatch. Every stop is on or within a few minutes of the paved river pathway, free to visit, and has washrooms or a café close by. Nobody paid to be on this list.",
+      "route": true,
+      "facts": {
+        "time": "3 to 4 hours",
+        "distance": "About 7 km, flat and paved",
+        "cost": "Free",
+        "season": "Year round. Main pathways are plowed in winter."
+      },
+      "cover": {
+        "from": "#0b3d91",
+        "to": "#00c2e0",
+        "ink": "#ffffff",
+        "motif": "river",
+        "label": "Walk"
+      },
+      "stops": [
+        {
+          "name": "Pearce Estate Park and Harvie Passage",
+          "area": "Inglewood",
+          "mapQuery": "Pearce Estate Park, Calgary, AB",
+          "note": "Start where the river is loudest. Harvie Passage replaced the old Calgary weir, long nicknamed the drowning machine, with rapids that paddlers and rafters can run and a channel that lets fish through.",
+          "tip": "Watch from the bank. The rapids are for experienced paddlers only."
+        },
+        {
+          "name": "Fort Calgary and the confluence",
+          "area": "East Village",
+          "mapQuery": "Fort Calgary, 750 9 Ave SE, Calgary, AB",
+          "note": "The Elbow meets the Bow here, and in 1875 the North-West Mounted Police built the fort the city grew out of. The grounds and the river edge are free to wander."
+        },
+        {
+          "name": "St. Patrick’s Island",
+          "area": "East Village",
+          "mapQuery": "St. Patrick’s Island Park, Calgary, AB",
+          "note": "A whole island park a bridge away from downtown, with a pebble beach, a sledding hill and Bloom, a tall sculpture built from retired city streetlights.",
+          "tip": "Cross on the George C. King Bridge, the one shaped like a skipping stone."
+        },
+        {
+          "name": "Central Library",
+          "area": "East Village",
+          "mapQuery": "Calgary Central Library, 800 3 St SE, Calgary, AB",
+          "note": "Five minutes off the river and worth the detour. The wooden arch of the entrance frames the CTrain running underneath, and it is free, warm and has the best public washrooms downtown.",
+          "detour": true
+        },
+        {
+          "name": "Prince’s Island Park",
+          "area": "Eau Claire",
+          "mapQuery": "Prince’s Island Park, Calgary, AB",
+          "note": "Downtown’s back garden: lawns, lagoons and the River Café in the middle. In July it fills up for the Calgary Folk Music Festival.",
+          "tip": "The lagoon side is the quiet side."
+        },
+        {
+          "name": "Peace Bridge",
+          "area": "Eau Claire to Sunnyside",
+          "mapQuery": "Peace Bridge, Calgary, AB",
+          "note": "Santiago Calatrava’s red helix, open since 2012 and only for people on foot or on bikes. Cross it slowly; everyone stops for a photo halfway."
+        },
+        {
+          "name": "Crescent Heights lookout",
+          "area": "Crescent Heights",
+          "mapQuery": "Crescent Road NW lookout, Calgary, AB",
+          "note": "Climb the McHugh Bluff stairs from Sunnyside to Crescent Road for the classic view back over the river and the whole skyline. Best at sunset.",
+          "tip": "Sunnyside CTrain station is a short walk back down when you are done."
+        }
+      ],
+      "tips": [
+        "Bikes and scooters share the pathway. Keep right and say “on your left” when you pass.",
+        "In June the river runs high and fast. Stay off the banks and out of the water.",
+        "Going one way? Sunnyside station on the Red Line gets you home from the finish."
+      ]
     },
     {
-      "id": "guide-farmers-markets",
       "kind": "guide",
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-08T12:00:00.000Z",
+      "updatedAt": "2026-10-08T12:00:00.000Z",
+      "entries": [],
+      "relatedGuideIds": [
+        "guide-bow-river-trail",
+        "guide-historic-laneways",
+        "guide-calgary-for-free"
+      ],
+      "id": "guide-farmers-markets",
       "slug": "calgary-farmers-markets-guide",
-      "title": "Calgary Farmers’ Markets & Artisan Food Halls",
-      "summary": "Where to find Alberta sourdough, organic foothills produce, local apiaries, and slow-morning market breakfasts.",
-      "description": "From century-old Crossroads Market to modern community popups at Hillhurst Sunnyside, Bridgeland, and cSPACE Marda Loop, this guide maps Calgary’s best local food hubs.",
+      "title": "Calgary’s Farmers’ Markets, Big and Small",
+      "summary": "The two big indoor halls for any week of the year, the old-school weekend market, and the community markets worth planning a Saturday around.",
+      "description": "Calgary’s markets come in three sizes: the year-round indoor halls, Crossroads with its flea-market corner, and the neighbourhood markets run by community associations. This guide covers each one, what it is good for, and links to the next confirmed date we have for it.",
       "categories": [
         "guides",
         "food",
@@ -323,35 +426,142 @@
         "farmers market",
         "local food",
         "alberta growers",
-        "bakeries"
+        "bakeries",
+        "makers"
       ],
       "sources": [
         {
-          "name": "CalgaryWatch Editorial Selection",
-          "url": "https://calgarywatch.ca/markets",
+          "name": "CalgaryWatch editors",
+          "url": "https://calgarywatch.ca/guides",
           "kind": "editorial"
+        },
+        {
+          "name": "Calgary Farmers’ Market",
+          "url": "https://www.calgaryfarmersmarket.ca/",
+          "kind": "official"
+        },
+        {
+          "name": "Crossroads Market",
+          "url": "https://crossroadsmarket.ca/",
+          "kind": "official"
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-market-v1.webp",
-        "alt": "Calgary farmers market fresh produce and artisan food stalls"
+        "src": "/images/photo/calgary5.webp",
+        "alt": "Friends making plans together in the city"
       },
-      "status": "published",
-      "verification": "source-checked",
-      "verifiedAt": "2026-09-22T16:44:40.770Z",
-      "updatedAt": "2026-09-22T16:44:40.770Z",
-      "introduction": "Every quadrant of Calgary has its own weekend market ritual. Here is where the city comes to taste what our province grows.",
-      "methodology": "Curated and verified with published market coordinators, seasonal calendars, and transit accessibility notes.",
-      "entries": [],
-      "relatedGuideIds": []
+      "introduction": "Every part of the city has its own market ritual. The big halls will feed you any week of the year; the small community markets are where you meet the grower and end up chatting for ten minutes.",
+      "methodology": "Every market here is one CalgaryWatch already tracks, with dates checked against the organizer. Each stop links to its listing, so the next date you see is the one we last confirmed, not a guess. Nobody paid to be on this list.",
+      "route": false,
+      "facts": {
+        "time": "A morning",
+        "distance": "All four quadrants",
+        "cost": "Free to browse",
+        "season": "Halls year round. Community markets mostly June to October."
+      },
+      "cover": {
+        "from": "#ff6437",
+        "to": "#ffc864",
+        "ink": "#1a0f00",
+        "motif": "market",
+        "label": "Eat"
+      },
+      "stops": [
+        {
+          "name": "Calgary Farmers’ Market South",
+          "area": "South, off Blackfoot Trail",
+          "mapQuery": "Calgary Farmers’ Market South, 510 77 Ave SE, Calgary, AB",
+          "entityId": "2a55ade6e02d4308cc4f09f59f02",
+          "note": "The big one. A huge indoor hall of butchers, bakers, produce stalls and lunch counters, open Thursday to Sunday all year.",
+          "tip": "Go before 11 on Saturdays, or go Thursday and have it to yourself."
+        },
+        {
+          "name": "Calgary Farmers’ Market West",
+          "area": "Near Canada Olympic Park",
+          "mapQuery": "Calgary Farmers’ Market West, 25 Greenbriar Dr NW, Calgary, AB",
+          "entityId": "f100f20bace6917b47385f90a0d2",
+          "note": "The same idea in a newer, brighter building on the west side. Easy stop on the way out to the mountains."
+        },
+        {
+          "name": "Crossroads Market",
+          "area": "Southeast",
+          "mapQuery": "Crossroads Market, 1235 26 Ave SE, Calgary, AB",
+          "entityId": "3e483396c1c2ea35ca05c3f284e3",
+          "note": "Old-school and a bit chaotic, in the best way. Produce and food stalls on one side, antiques and flea-market finds on the other.",
+          "tip": "Bring cash for the flea-market side."
+        },
+        {
+          "name": "Hillhurst Sunnyside Farmers’ Market",
+          "area": "Hillhurst",
+          "mapQuery": "Hillhurst Sunnyside Community Association, 1320 5 Ave NW, Calgary, AB",
+          "entityId": "d6d4476cb83f44b8639ea3ecfd7c",
+          "note": "A summer community market run by the neighbourhood, a short walk from Kensington. Small, friendly and very local."
+        },
+        {
+          "name": "Bridgeland-Riverside Farmers’ Market",
+          "area": "Bridgeland",
+          "mapQuery": "Bridgeland-Riverside Community Association, 917 Centre Ave NE, Calgary, AB",
+          "entityId": "f9e4cdd719a09b4128a1865e055e",
+          "note": "A community-hall market on the hill above the river. Pair it with a walk down to the Bow."
+        },
+        {
+          "name": "Farmers & Makers Market at cSPACE",
+          "area": "Marda Loop",
+          "mapQuery": "cSPACE King Edward, 1721 29 Ave SW, Calgary, AB",
+          "entityId": "ec8af09816f955c314652ffe376b",
+          "note": "Growers and makers inside a restored sandstone school that is now an arts hub. Come for the market, stay for the building."
+        },
+        {
+          "name": "Dalhousie Harvest Farmers’ Market",
+          "area": "Dalhousie",
+          "mapQuery": "5432 Dalhart Rd NW, Calgary, AB",
+          "entityId": "b3bbb09ef98f18fa6f66383e98f1",
+          "note": "A northwest community market with growers you will not find downtown."
+        },
+        {
+          "name": "Calgary Winter Market",
+          "area": "Downtown",
+          "mapQuery": "101 Barclay Parade SW, Calgary, AB",
+          "entityId": "ef9a9e8453e7dfa21099a0dab63c",
+          "note": "When the summer markets pack up, this one keeps a downtown market going through the cold months."
+        }
+      ],
+      "tips": [
+        "Bakeries sell out first. If bread is the point, go early.",
+        "Bring a tote and some cash. Smaller stalls at community markets do not always take cards.",
+        "Seasonal markets mostly run June to October. The two big halls carry you through winter."
+      ]
     },
     {
-      "id": "guide-historic-laneways",
       "kind": "guide",
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-08T12:00:00.000Z",
+      "updatedAt": "2026-10-08T12:00:00.000Z",
+      "entries": [
+        {
+          "entityId": "biz-rosso-inglewood",
+          "note": "Coffee stop on 9 Avenue."
+        },
+        {
+          "entityId": "hood-inglewood-se",
+          "note": "The neighbourhood."
+        },
+        {
+          "entityId": "hood-ramsay-se",
+          "note": "Next door, with the view."
+        }
+      ],
+      "relatedGuideIds": [
+        "guide-bow-river-trail",
+        "guide-farmers-markets",
+        "guide-calgary-for-free"
+      ],
+      "id": "guide-historic-laneways",
       "slug": "historic-laneways-and-craft-coffee",
-      "title": "Historic Laneways & Craft Coffee of Inglewood and Ramsay",
-      "summary": "Discover red-brick carriage houses, roasteries, and independent record stores across Calgary’s oldest postal codes.",
-      "description": "A relaxed walking loop connecting 9th Avenue SE in Inglewood to the sandstone ridge of Ramsay. Enjoy specialty single-origin espresso, hidden courtyard bakeries, and century-old architectural character.",
+      "title": "Inglewood & Ramsay on Foot",
+      "summary": "Calgary’s oldest main street, a record store that has outlasted everything, a bird sanctuary, a warehouse brewery and the best free view of downtown.",
+      "description": "A day on foot in Inglewood and Ramsay, east of downtown. Start at the fort the city grew from, work along 9 Avenue SE for records and coffee, slip out to the bird sanctuary, and finish on Scotsman’s Hill at sunset with live blues after.",
       "categories": [
         "guides",
         "heritage",
@@ -359,31 +569,232 @@
         "walkable"
       ],
       "tags": [
-        "coffee",
         "inglewood",
         "ramsay",
-        "brick laneways",
-        "walking"
+        "9 avenue se",
+        "coffee",
+        "records",
+        "scotsmans hill",
+        "bird sanctuary"
       ],
       "sources": [
         {
-          "name": "Calgary Heritage Authority & Local Historians",
-          "url": "https://www.calgary.ca/heritage.html",
+          "name": "CalgaryWatch editors",
+          "url": "https://calgarywatch.ca/guides",
           "kind": "editorial"
+        },
+        {
+          "name": "City of Calgary: Inglewood Bird Sanctuary",
+          "url": "https://www.calgary.ca/parks/inglewood-bird-sanctuary.html",
+          "kind": "official"
+        },
+        {
+          "name": "Fort Calgary",
+          "url": "https://www.fortcalgary.com/",
+          "kind": "official"
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-        "alt": "Calgary historic brick laneway and cozy patio café"
+        "src": "/images/photo/calgary2.webp",
+        "alt": "The Calgary Tower above downtown at golden hour"
       },
+      "introduction": "Inglewood calls itself Calgary’s oldest neighbourhood, and 9 Avenue SE still looks the part: low brick storefronts, independent shops and almost no chains. Ramsay sits on the hill next door and has the view.",
+      "methodology": "Walked by CalgaryWatch. Every stop is independent, local, and open to anyone; the brewery and the bar are 18+ in the evening. Independent places change hours often, so check before you go. Nobody paid to be on this list.",
+      "route": true,
+      "facts": {
+        "time": "A full day",
+        "distance": "About 6 km with the sanctuary",
+        "cost": "Free to walk",
+        "season": "Best spring to fall. The sanctuary is open year round."
+      },
+      "cover": {
+        "from": "#7a1f12",
+        "to": "#ff4632",
+        "ink": "#fff5ea",
+        "motif": "brick",
+        "label": "Wander"
+      },
+      "stops": [
+        {
+          "name": "Fort Calgary",
+          "area": "Where Inglewood meets downtown",
+          "mapQuery": "Fort Calgary, 750 9 Ave SE, Calgary, AB",
+          "note": "Where it started: the 1875 police fort at the confluence. Walk the grounds and the river edge, then head east on 9 Avenue."
+        },
+        {
+          "name": "Recordland",
+          "area": "9 Avenue SE",
+          "mapQuery": "Recordland, 1208 9 Ave SE, Calgary, AB",
+          "note": "Floor-to-ceiling crates of vinyl that have been here for decades. Bring time, not a plan."
+        },
+        {
+          "name": "Rosso Coffee Roasters",
+          "area": "9 Avenue SE",
+          "mapQuery": "Rosso Coffee Roasters, 1402 9 Ave SE, Calgary, AB",
+          "entityId": "biz-rosso-inglewood",
+          "note": "A Calgary roaster on the main street. Take it to go and keep walking."
+        },
+        {
+          "name": "Inglewood Bird Sanctuary",
+          "area": "East Inglewood",
+          "mapQuery": "Inglewood Bird Sanctuary, 2425 9 Ave SE, Calgary, AB",
+          "detour": true,
+          "note": "A quiet, flat loop through riverside forest where hundreds of bird species have been spotted. Free, and the calmest hour you will spend in the city.",
+          "tip": "No dogs or bikes inside. Mornings are best for birds."
+        },
+        {
+          "name": "Cold Garden Beverage Company",
+          "area": "Inglewood",
+          "mapQuery": "Cold Garden Beverage Company, 1100 11 St SE, Calgary, AB",
+          "note": "A big, cheerful warehouse taproom. Grab a table, a pint and a second wind."
+        },
+        {
+          "name": "Scotsman’s Hill",
+          "area": "Ramsay",
+          "mapQuery": "Scotsman’s Hill, Salisbury St SE, Calgary, AB",
+          "note": "The best free view of downtown, with the Stampede grounds right below you. Come for sunset; during Stampede week people bring chairs for the fireworks."
+        },
+        {
+          "name": "The Blues Can",
+          "area": "9 Avenue SE",
+          "mapQuery": "The Blues Can, 1429 9 Ave SE, Calgary, AB",
+          "note": "Finish where Inglewood has finished its nights for years: a small room with live blues on stage.",
+          "tip": "18+. Check the lineup and any cover charge before you go."
+        }
+      ],
+      "tips": [
+        "Parking on 9 Avenue fills up on weekends. The 1 bus and the walk from downtown are easier.",
+        "Most shops open around 10 or 11; plan the sanctuary for the morning.",
+        "Scotsman’s Hill is a residential street. Keep it quiet for the neighbours."
+      ]
+    },
+    {
+      "kind": "guide",
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-09-22T16:44:40.770Z",
-      "updatedAt": "2026-09-22T16:44:40.770Z",
-      "introduction": "Calgary’s historical character is best experienced on foot, where sandstone foundation blocks meet contemporary craft coffee.",
-      "methodology": "Vetted with Calgary heritage building registries and verified independently by local contributors.",
+      "verifiedAt": "2026-10-08T12:00:00.000Z",
+      "updatedAt": "2026-10-08T12:00:00.000Z",
       "entries": [],
-      "relatedGuideIds": []
+      "relatedGuideIds": [
+        "guide-bow-river-trail",
+        "guide-farmers-markets",
+        "guide-historic-laneways"
+      ],
+      "id": "guide-calgary-for-free",
+      "slug": "free-things-to-do-in-calgary",
+      "title": "Calgary for $0",
+      "summary": "A whole downtown day that costs nothing, built to work in January: a glass garden, 16 km of skywalks, the city’s best library and a skyline view at the end.",
+      "description": "A free day in downtown Calgary that works in any weather. Go indoors through the +15 skywalks and Devonian Gardens, out along Stephen Avenue and through Chinatown, and finish on the river and up at the Crescent Heights lookout.",
+      "categories": [
+        "guides",
+        "free",
+        "indoor",
+        "walking",
+        "family"
+      ],
+      "tags": [
+        "free things to do",
+        "winter",
+        "indoor",
+        "devonian gardens",
+        "plus 15",
+        "central library",
+        "stephen avenue",
+        "chinatown"
+      ],
+      "sources": [
+        {
+          "name": "City of Calgary: Devonian Gardens",
+          "url": "https://www.calgary.ca/parks/devonian-gardens.html",
+          "kind": "official"
+        },
+        {
+          "name": "City of Calgary: +15 skywalk",
+          "url": "https://www.calgary.ca/planning/projects/plus-15.html",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary Public Library",
+          "url": "https://calgarylibrary.ca/",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary Transit fares",
+          "url": "https://www.calgarytransit.com/fares-passes.html",
+          "kind": "official"
+        }
+      ],
+      "image": {
+        "src": "/images/photo/calgary1.webp",
+        "alt": "Downtown Calgary skyline"
+      },
+      "introduction": "Calgary is expensive enough. This is a full day downtown without paying for a ticket, a museum or parking, and most of it is indoors, so it works at minus twenty as well as in July.",
+      "methodology": "Picked by CalgaryWatch. Every stop is free to enter, open to the public and reachable on foot or by CTrain. We list what something costs only when it is truly zero. Nobody paid to be on this list.",
+      "route": true,
+      "facts": {
+        "time": "A full day",
+        "distance": "About 5 km, mostly indoors",
+        "cost": "$0",
+        "season": "Any weather. Built for winter."
+      },
+      "cover": {
+        "from": "#1ed760",
+        "to": "#0b6b3a",
+        "ink": "#04140a",
+        "motif": "free",
+        "label": "Free"
+      },
+      "stops": [
+        {
+          "name": "Central Library",
+          "area": "East Village",
+          "mapQuery": "Calgary Central Library, 800 3 St SE, Calgary, AB",
+          "note": "Start somewhere warm and beautiful. Wander all the floors, find a window seat, and if you live here, get a library card: it is free.",
+          "tip": "The kids’ floor is one of the best free play spaces in the city."
+        },
+        {
+          "name": "Stephen Avenue Walk",
+          "area": "Downtown",
+          "mapQuery": "Stephen Avenue Walk, 8 Ave SW, Calgary, AB",
+          "note": "Calgary’s pedestrian main street, lined with sandstone buildings from the early 1900s. Walk it west and look up."
+        },
+        {
+          "name": "Devonian Gardens",
+          "area": "CORE Shopping Centre, 4th floor",
+          "mapQuery": "Devonian Gardens, 317 7 Ave SW, Calgary, AB",
+          "note": "A free indoor garden under a glass roof, with thousands of plants, a koi pond and a living wall. The warmest green space in the city in February."
+        },
+        {
+          "name": "The +15 skywalks",
+          "area": "Downtown",
+          "mapQuery": "Plus 15 skywalk, downtown Calgary, AB",
+          "note": "About 16 km of enclosed bridges, one floor up, linking a big part of downtown. Follow the +15 signs and cross the core without stepping outside.",
+          "tip": "Some bridges close in the evening and on weekends. Weekdays are best."
+        },
+        {
+          "name": "Chinatown and Sien Lok Park",
+          "area": "Chinatown",
+          "mapQuery": "Sien Lok Park, Calgary, AB",
+          "note": "Walk Centre Street into Chinatown, then down to Sien Lok Park on the river. Budget a few dollars if a bakery gets you; that part is optional."
+        },
+        {
+          "name": "Prince’s Island Park and the Peace Bridge",
+          "area": "Eau Claire",
+          "mapQuery": "Prince’s Island Park, Calgary, AB",
+          "note": "Back outside for the river: loop the island, then cross Santiago Calatrava’s red Peace Bridge to Sunnyside."
+        },
+        {
+          "name": "Crescent Heights lookout",
+          "area": "Crescent Heights",
+          "mapQuery": "Crescent Road NW lookout, Calgary, AB",
+          "note": "End with the climb up the McHugh Bluff stairs to Crescent Road for the whole skyline at sunset. Still free."
+        }
+      ],
+      "tips": [
+        "CTrain rides in the downtown free fare zone along 7 Avenue cost nothing. Check Calgary Transit for the current zone.",
+        "Kids 12 and under ride Calgary Transit free.",
+        "Bring a water bottle. The library and the gardens have fountains."
+      ]
     },
     {
       "id": "biz-rosso-inglewood",

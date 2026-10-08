@@ -8,9 +8,11 @@ import { DiscoveryCard, EmptyInventory } from '../components/discovery/Discovery
 import { EntityDetail } from '../components/entity/EntityDetail';
 import { ListingBoard } from '../components/discovery/ListingBoard';
 import { LocalBoard } from '../components/discovery/LocalBoard';
+import { GuideDetail, GuidesBoard } from '../components/guides/Guides';
 import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
+import type { Guide } from '../types/discovery';
 import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
 
 // The 311 rank game, loaded only on the Neighbourhoods pages.
@@ -48,6 +50,11 @@ export default function DiscoveryPage() {
   }, [search, q, resultCount]);
   const title = missing ? 'This page isn’t here yet.' : search ? 'Find your next Calgary thing.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
   const relatedIds = entity?.kind === 'guide' ? entity.entries.map(e => e.entityId) : entity?.kind === 'neighbourhood' ? entity.entityIds : [];
+  if (root === 'guides' && !missing) {
+    return <SiteLayout>{entity?.kind === 'guide'
+      ? <GuideDetail guide={entity} all={all} occurrences={discoveryRepository.occurrences()} />
+      : <GuidesBoard guides={items.filter((e): e is Guide => e.kind === 'guide')} />}</SiteLayout>;
+  }
   if (root === 'local' && !entity && !missing) {
     return <SiteLayout><div className="cw-wrap cw-page"><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></div></SiteLayout>;
   }

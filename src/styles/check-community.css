@@ -439,3 +439,35 @@
 .cyc .cyc-m-copy { padding-top: 40svh; }
 .cyc .cyc-m-hero .cyc-headline { font-size: clamp(48px, 15vw, 72px); }
 @media (max-height: 700px) { .cyc .cyc-m-copy { padding-top: 34svh; } }
+
+/* "Near me": find the community from the browser's location */
+.cyc .cyc-picker .cyc-input { padding-right: 128px; }
+.cyc .cyc-locate { position: absolute; z-index: 1; right: 6px; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; gap: 6px; height: calc(100% - 12px); max-height: 44px; padding: 0 14px; border-radius: 999px; background: var(--green); color: #000; font: 800 14px Inter, sans-serif; transition: transform .12s, background .12s; }
+.cyc .cyc-locate:hover:not(:disabled) { background: var(--green-2); transform: translateY(-50%) scale(1.04); }
+.cyc .cyc-locate:disabled { opacity: .75; cursor: progress; }
+.cyc .cyc-spin { animation: cyc-spin 1s linear infinite; }
+@keyframes cyc-spin { to { transform: rotate(360deg); } }
+.cyc .cyc-locate-note { position: absolute; left: 18px; right: 18px; top: calc(100% + 8px); font: 600 13px/1.35 Inter, sans-serif; color: #ffc864; }
+@media (max-width: 380px) { .cyc .cyc-locate span { display: none; } .cyc .cyc-picker .cyc-input { padding-right: 60px; } }
+
+/* ═══ More from CalgaryWatch ═══════════════════════════════════════════════ */
+.cyc .cyc-more { margin-top: 64px; }
+.cyc .cyc-more h2 { margin-top: 6px; font: 800 clamp(30px, 3.4vw, 44px)/1 var(--display); letter-spacing: -.04em; }
+.cyc .cyc-more-lead { max-width: 640px; margin-top: 12px; font: 500 16px/1.55 Inter, sans-serif; color: var(--sub); }
+.cyc .cyc-more-lead a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.cyc .cyc-more-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.cyc .cyc-more-tile { position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 170px; padding: 22px 22px 56px; overflow: hidden; border-radius: 10px; color: #000; transition: transform .15s; }
+.cyc .cyc-more-tile:hover { transform: translateY(-3px); }
+.cyc .cyc-more-tile::before { content: ''; position: absolute; right: -40px; bottom: -60px; width: 160px; height: 160px; border-radius: 50%; background: rgba(0, 0, 0, .12); }
+.cyc .cyc-more-tile b { position: relative; font: 800 26px/1 var(--display); letter-spacing: -.03em; }
+.cyc .cyc-more-tile span { position: relative; font: 600 14px/1.4 Inter, sans-serif; opacity: .8; }
+.cyc .cyc-more-tile i { position: absolute; left: 22px; bottom: 18px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #000; color: #fff; }
+.cyc .cyc-more-tile.is-green { background: var(--green); }
+.cyc .cyc-more-tile.is-lilac { background: var(--lilac); }
+.cyc .cyc-more-tile.is-hot { background: var(--hot); color: #fff; }
+.cyc .cyc-more-tile.is-sun { background: var(--sun); }
+.cyc .cyc-more-tile.is-blue { background: var(--blue); }
+.cyc .cyc-more-tile.is-warm { background: var(--warm); color: #fff; }
+.cyc.cyc-mob .cyc-more { margin-top: 48px; }
+.cyc.cyc-mob .cyc-more-row { display: flex; margin: 20px -16px 0; padding: 0 16px 6px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: 16px; scrollbar-width: none; }
+.cyc.cyc-mob .cyc-more-row li { flex: 0 0 72%; scroll-snap-align: start; }

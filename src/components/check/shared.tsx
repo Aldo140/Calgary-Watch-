@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Check, Download, Link2, MapPin, Share2 } from 'lucide-react';
+import { ArrowRight, Check, Download, Link2, LoaderCircle, LocateFixed, MapPin, Share2 } from 'lucide-react';
+import { fetchCommunityBoundaries, findCommunityAt } from '../../lib/communityLookup';
 import { searchCommunities, shareText, type CommunityRank } from '../../lib/communityRank';
 import { drawShareCard } from '../../lib/shareCard';
 import { BAND_DUOTONE } from '../../lib/coverArt';
@@ -88,6 +89,34 @@ export function CommunityPicker({ rankings, onPick, placeholder, autoFocus, clas
   const matches = useMemo(() => searchCommunities(rankings, query), [rankings, query]);
   const [listId] = useState(() => `cyc-list-${Math.random().toString(36).slice(2, 8)}`);
   const pick = (r: CommunityRank) => { setQuery(''); onPick(r); };
+  const [locating, setLocating] = useState(false);
+  const [locNote, setLocNote] = useState('');
+
+  // One tap: browser location → the community boundary it falls in → that community's ranking.
+  const locate = () => {
+    if (!navigator.geolocation) { setLocNote('Your browser can\'t share location. Type your community instead.'); return; }
+    setLocating(true);
+    setLocNote('');
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const name = findCommunityAt(coords.latitude, coords.longitude, await fetchCommunityBoundaries());
+          const r = name ? rankings.find((x) => x.key === name) : undefined;
+          if (r) onPick(r);
+          else setLocNote(name ? `No 311 data for ${name} yet. Try a community nearby.` : 'You look to be outside Calgary. Type a community instead.');
+        } catch {
+          setLocNote('Couldn\'t look up your community. Type it instead.');
+        } finally {
+          setLocating(false);
+        }
+      },
+      (err) => {
+        setLocating(false);
+        setLocNote(err.code === err.PERMISSION_DENIED ? 'Location is blocked. Allow it in your browser, or type your community.' : 'Couldn\'t get your location. Type your community instead.');
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+    );
+  };
 
   return (
     <div className={`cyc-picker ${className}`}>
@@ -110,6 +139,11 @@ export function CommunityPicker({ rankings, onPick, placeholder, autoFocus, clas
           if (e.key === 'Enter' && matches[active]) { e.preventDefault(); pick(matches[active]); }
         }}
       />
+      <button type="button" className="cyc-locate" onClick={locate} disabled={locating || rankings.length === 0} aria-label="Use my location">
+        {locating ? <LoaderCircle size={16} className="cyc-spin" aria-hidden="true" /> : <LocateFixed size={16} aria-hidden="true" />}
+        <span>{locating ? 'Finding…' : 'Near me'}</span>
+      </button>
+      {locNote && <p className="cyc-locate-note" role="status">{locNote}</p>}
       {matches.length > 0 && (
         <ul className="cyc-matches" id={listId} role="listbox">
           {matches.map((r, i) => (

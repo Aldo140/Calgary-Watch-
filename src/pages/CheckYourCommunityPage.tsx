@@ -319,12 +319,30 @@ function Desktop({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading
 
 // ── Mobile ───────────────────────────────────────────────────────────────────
 
-function Fan({ rankings, shapes }: { rankings: CommunityRank[]; shapes: Shapes }) {
-  const three = useMemo(() => shuffled(rankings).slice(4, 7), [rankings]);
-  if (three.length < 3) return <div className="cyc-fan" aria-hidden="true" />;
+const WALL_TONES = Object.values(BAND_DUOTONE);
+
+/** Three rows of covers drifting in opposite directions: the phone opener. Placeholder tiles while data loads. */
+function CoverWall({ rankings, shapes }: { rankings: CommunityRank[]; shapes: Shapes }) {
+  const rows = useMemo(() => {
+    const list = shuffled(rankings).slice(0, 30);
+    return [0, 1, 2].map((i) => list.filter((_, n) => n % 3 === i));
+  }, [rankings]);
   return (
-    <div className="cyc-fan" aria-hidden="true">
-      {three.map((r, i) => <Cover key={r.key} r={r} shape={shapes.get(r.key)} label="?" className={`is-${i}`} />)}
+    <div className="cyc-wall" aria-hidden="true">
+      {rows.map((row, i) => (
+        <div key={i} className={`cyc-wall-row is-${i}`}>
+          {[0, 1].map((copy) => (
+            <div key={copy} className="cyc-wall-track">
+              {row.length
+                ? row.map((r) => <Cover key={r.key} r={r} shape={shapes.get(r.key)} label="?" />)
+                : Array.from({ length: 8 }, (_, n) => {
+                    const t = WALL_TONES[(n + i) % WALL_TONES.length];
+                    return <div key={n} className="cyc-cover is-blank" style={{ background: `linear-gradient(135deg, ${t.from}, ${t.to})` }} />;
+                  })}
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
@@ -348,10 +366,11 @@ function Mobile({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading:
   return (
     <div className="cyc cyc-mob">
       <section className="cyc-m-hero" aria-labelledby="cyc-title">
-        <Fan rankings={rankings} shapes={shapes} />
+        <CoverWall rankings={rankings} shapes={shapes} />
+        <div className="cyc-m-copy">
         <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> Calgary 311 · {rankings[0]?.year ?? 'this year'}</p>
         <Headline />
-        <p className="cyc-m-lead">{rankings.length || 'Every'} communities, ranked by how often their people called the City. Guess where yours lands, then get the card.</p>
+        <p className="cyc-m-lead">{rankings.length ? `${rankings.length} communities` : 'Every community'}, ranked by how often their people called the City. Guess where yours lands, then get the card.</p>
         <div ref={pickerRef}>
           <CommunityPicker rankings={rankings} onPick={open} placeholder={isLoading && !rankings.length ? 'Loading…' : 'Find your community'} hint="Wrap it" className="is-mob" />
         </div>
@@ -360,6 +379,7 @@ function Mobile({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading:
           <span><b>Higher or Lower</b><small>Which community called 311 more?</small></span>
           <ArrowRight size={20} aria-hidden="true" />
         </button>
+        </div>
       </section>
 
       <div className="cyc-m-lower">

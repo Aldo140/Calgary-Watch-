@@ -14,6 +14,7 @@ import { collection, addDoc } from 'firebase/firestore';
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
+const ClaimListingPage = lazy(() => import('@/src/pages/ClaimListingPage'));
 const DiscoveryPage = lazy(() => import('@/src/pages/DiscoveryPage'));
 const MapPage     = lazy(() => import('@/src/pages/MapPage'));
 const NotFoundPage = lazy(() => import('@/src/pages/NotFoundPage'));
@@ -151,6 +152,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/submit" element={<SubmitDiscoveryPage />} />
+          <Route path="/claim/:id" element={<ClaimListingPage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/events" element={<DiscoveryPage />} />
           <Route path="/events/:slug" element={<DiscoveryPage />} />

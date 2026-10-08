@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import type { DiscoveryEntity, MarketOccurrence } from '../../types/discovery';
 import { DiscoveryCard } from '../discovery/DiscoveryCards';
 import { EventPanel } from './EventPanel';
+import { ClaimCta, VerifiedMark } from './ClaimCta';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const checkedOn = (v: string) => { const t = Date.parse(v); return Number.isFinite(t) ? calgaryDateTimeFormat('en-CA', { month: 'long', day: 'numeric', year: 'numeric' }).format(t) : v; };
@@ -13,7 +14,7 @@ export function EntityDetail({ entity, related, occurrences = [], all = [] }: { 
   const dates = entity.kind === 'market' ? upcomingOccurrences(occurrences, entity.id) : [];
   const next = dates.find(o => !o.cancelled);
   const format = (value: string) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle: 'full', timeStyle: 'short' }).format(new Date(value));
-  return <article className="cw-detail"><p className="cw-eyebrow">{entity.kind}{entity.developmentOnly ? ' · Illustrative preview' : ''}</p><h1>{entity.title}</h1><p className="cw-lead">{entity.summary}</p>
+  return <article className="cw-detail"><p className="cw-eyebrow">{entity.kind}{entity.developmentOnly ? ' · Illustrative preview' : ''}</p><h1>{entity.title}</h1>{['event', 'market', 'business'].includes(entity.kind) ? <VerifiedMark entityId={entity.id} /> : null}<p className="cw-lead">{entity.summary}</p>
     {entity.kind === 'event' && <EventPanel entity={entity} all={all} part="plan" />}
     {entity.kind === 'business'
       ? <><figure className="cw-detail-image-wrap cw-detail-art"><ShopArt id={entity.id} title={entity.title} tags={entity.tags} categories={entity.categories} /></figure>
@@ -29,6 +30,6 @@ export function EntityDetail({ entity, related, occurrences = [], all = [] }: { 
     {entity.kind === 'guide' && <><h2>About this guide</h2><p>{entity.introduction}</p><h2>How we choose</h2><p>{entity.methodology}</p>{entity.sponsorshipDisclosure && <p>Sponsored: {entity.sponsorshipDisclosure}</p>}</>}
     <SourceBadge entity={entity} />
     {related.length > 0 && <section><h2>In this guide & nearby</h2><div className="cw-card-grid">{related.map(e => <DiscoveryCard key={e.id} entity={e} />)}</div></section>}
-    <p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction or claim: ${entity.title}`)}`}>Suggest a correction{entity.kind === 'business' ? ' or request to claim this listing' : ''}</a></p><Link to="/">Back to discovery</Link>
+    {['event', 'market', 'business'].includes(entity.kind) ? <ClaimCta entityId={entity.id} title={entity.title} kind={entity.kind} /> : <p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${entity.title}`)}`}>Suggest a correction</a></p>}<Link to="/">Back to discovery</Link>
   </article>;
 }

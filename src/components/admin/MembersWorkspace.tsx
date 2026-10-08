@@ -27,13 +27,18 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
     if (!db) { setThursday([]); setPlanned([]); return; }
     const database = db;
     const users = collection(database, 'users');
-    const count = (q: Parameters<typeof getCountFromServer>[0]) => getCountFromServer(q).then((s) => s.data().count).catch(() => undefined);
+    // Server-side counts are cheapest, but a browser or rules hiccup must not
+    // leave the tiles blank: a failed count falls back to the data below.
+    const count = (q: Parameters<typeof getCountFromServer>[0]) => getCountFromServer(q).then((s) => s.data().count).catch((e) => { console.warn('[members] count failed, using loaded data', e); return undefined; });
     void Promise.all([
       count(users),
       count(query(users, where('weeklyDigestOptIn', '==', true))),
       count(query(users, where('eventsDigestOptIn', '==', true))),
       count(query(users, where('piiConsentAt', '>', 0))),
-      count(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'))),
+      // A capped read stands in for the pending-suggestions count when it fails.
+      getCountFromServer(query(collection(database, 'entity_submissions'), where('status', '==', 'pending')))
+        .then((s) => s.data().count)
+        .catch(() => getDocs(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'), limit(100))).then((s) => s.size).catch(() => undefined)),
     ]).then(([accounts, monday, thursday, withArea, suggestions]) => setCounts({ accounts, monday, thursday, withArea, suggestions }));
     getDocs(query(users, where('eventsDigestOptIn', '==', true), limit(500)))
       .then((s) => setThursday(s.docs.map((x) => x.data())))
@@ -61,15 +66,24 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
 
   const entities = discoveryRepository.list();
   const recent = [...d.users].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)).slice(0, 8);
-  const pct = (n?: number) => (n !== undefined && counts.accounts ? Math.round((n / counts.accounts) * 100) : undefined);
+  // Every tile has a fallback from data admin already holds, so none stays blank.
+  const allUsersLoaded = d.usersLoaded && d.users.length >= d.totalUsers;
+  const shown = {
+    accounts: counts.accounts ?? (d.usersLoaded ? d.totalUsers : undefined),
+    monday: counts.monday ?? (d.digestSubscribersLoaded ? d.digestSubscribers.length : undefined),
+    thursday: counts.thursday ?? thursday?.length,
+    withArea: counts.withArea ?? (allUsersLoaded ? d.users.filter((u) => (u.neighborhood || u.inferredNeighborhood || '').trim()).length : undefined),
+    suggestions: counts.suggestions,
+  };
+  const pct = (n?: number) => (n !== undefined && shown.accounts ? Math.round((n / shown.accounts) * 100) : undefined);
 
   return (
     <div className="space-y-4">
       <StatGrid>
-        <StatTile label="Accounts" value={counts.accounts} hint={counts.withArea !== undefined ? `${counts.withArea} with a home area (${pct(counts.withArea)}%)` : undefined} />
-        <StatTile label="Monday email" value={counts.monday} tone="signal" hint={pct(counts.monday) !== undefined ? `${pct(counts.monday)}% of accounts` : undefined} onClick={() => onOpen('planner')} />
-        <StatTile label="Thursday picks" value={counts.thursday} tone="signal" hint={pct(counts.thursday) !== undefined ? `${pct(counts.thursday)}% of accounts` : undefined} />
-        <StatTile label="Event suggestions waiting" value={counts.suggestions} tone={counts.suggestions ? 'attention' : 'neutral'} hint="Review in Events & markets" onClick={() => onOpen('content')} />
+        <StatTile label="Accounts" value={shown.accounts} hint={shown.withArea !== undefined ? `${shown.withArea} with a home area (${pct(shown.withArea)}%)` : undefined} />
+        <StatTile label="Monday email" value={shown.monday} tone="signal" hint={pct(shown.monday) !== undefined ? `${pct(shown.monday)}% of accounts` : undefined} onClick={() => onOpen('planner')} />
+        <StatTile label="Event picks" value={shown.thursday} tone="signal" hint={pct(shown.thursday) !== undefined ? `${pct(shown.thursday)}% of accounts` : undefined} />
+        <StatTile label="Event suggestions waiting" value={shown.suggestions} tone={shown.suggestions ? 'attention' : 'neutral'} hint="Review in Events & markets" onClick={() => onOpen('content')} />
       </StatGrid>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">

@@ -226,3 +226,25 @@ export function GoingTimeline({ going }: { going: PickItem[] }) {
     </section>
   );
 }
+
+/** Listings this reader has claimed as an organizer, with where each claim stands. */
+export function ListingsCard({ claims }: { claims: Array<{ entityId: string; entityTitle: string; status: string }> }) {
+  if (!claims.length) return null;
+  const label = (s: string) => (s === 'approved' ? 'You manage it' : s === 'rejected' ? 'Not confirmed' : 'Being confirmed');
+  return (
+    <section className="pl-card" aria-labelledby="pl-listings-title">
+      <p className="pl-kicker">For organizers</p>
+      <h2 id="pl-listings-title" className="pl-side-title">Your listings</h2>
+      <ul className="pl-near-list">
+        {claims.map((c) => (
+          <li key={c.entityId}>
+            <Link to={`/claim/${encodeURIComponent(c.entityId)}`}>
+              <span className="pl-near-dot" data-cat={c.status === 'approved' ? 'infrastructure' : 'traffic'} aria-hidden="true" />
+              <span><strong>{c.entityTitle}</strong><small>{label(c.status)}{c.status === 'approved' ? ' · send a change' : ''}</small></span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}

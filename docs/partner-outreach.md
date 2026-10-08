@@ -39,3 +39,38 @@ Founder, CalgaryWatch
 aldo@calgarywatch.ca  
 https://calgarywatch.ca
 
+
+## Claimed listings
+
+Partner replies kept asking for the same things, so organizers now get a self-serve route:
+
+| Reply (Oct 2026) | What they asked for | Where it lands now |
+| --- | --- | --- |
+| Vertigo Theatre | "a direct line to update our listings", happy to "fill out a form and add production photos" | Claim the listing, then send dates and photos from the claim page |
+| Alberta Ballet | Venue is the Jubilee Auditorium, not "in Banff Trail" | A claimed organizer files a location change |
+| Dalhousie Community Association | Replace our image | Photo change from the claim page |
+| Calgary Farmers' Market | Link to the homepage; we also have a West location | Link change and an extra location |
+| Farmers & Makers Market | STOP | Suppressed automatically; never contacted again |
+
+**How it works**
+
+1. Every event, market and business listing ends with "Is this yours? Claim this listing" (`/claim/:entityId`).
+2. The organizer registers with Google, then gives their name, role, work email, an optional phone number and anything to fix straight away.
+3. Admin sees the claim under **Local partners → Claimed listings**, with evidence recomputed from the listing's own site:
+   - A Google account at the organization's domain is the strongest evidence.
+   - A matching work email needs a one-click "Confirm by email" first.
+   - A personal or other-domain address needs checking through the organization's published contact details.
+4. On approval:
+   - The listing shows **Managed by the organizer** (`verified_listings/{entityId}`).
+   - The partner lead moves to `claimed`, so outreach stops.
+   - The claim page becomes the organizer's direct line, with change types for dates and hours, location, link, photo, description, cancelled and other.
+5. Changes queue in the same admin panel. Make the edit in Events & markets, then mark it applied. The organizer sees the status on their claim page.
+
+Every outreach email, follow-up and drafted reply to a listed organization now ends with the claim link, placed just above the signature (`withClaimLink` in `scripts/ops/jobs/outreach.ts`).
+
+Data:
+- `listing_claims/{uid}_{entityId}`: written by the claimant, decided by admin.
+- `listing_updates/{auto}`: can only be filed under an approved claim.
+- `verified_listings/{entityId}`: public read, admin write.
+
+The rules are tested in `tests/claims.test.ts` and against the emulator.

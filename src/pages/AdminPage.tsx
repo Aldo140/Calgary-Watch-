@@ -111,7 +111,7 @@ export default function AdminPage() {
   const navItems: NavItem[] = useMemo(() => {
     const contentWork = work.suggestions + work.failedActions + work.stuckActions;
     const needsAttention =
-      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds + contentWork;
+      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds + contentWork + work.claims;
     return [
       { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined, group: 'Today' },
       { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText, group: 'Today' },
@@ -123,7 +123,7 @@ export default function AdminPage() {
       { id: 'demand', label: 'Search demand', short: 'Demand', icon: Search, group: 'Audience' },
       { id: 'content', label: 'Events & markets', short: 'Events', icon: CalendarDays, group: 'Content', count: contentWork, tone: work.failedActions || work.stuckActions ? 'critical' : 'attention' },
       { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot, group: 'Content' },
-      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Store, group: 'Content' },
+      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Store, group: 'Content', count: work.claims, tone: 'attention' },
       { id: 'city', label: 'City stats', short: 'City', icon: MapIcon, group: 'City' },
     ];
   }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds, work]);
@@ -194,7 +194,7 @@ export default function AdminPage() {
         </>
       }
     >
-      {section === 'desk' && <DeskSection d={d} tasks={deskTasks(work, () => setSection('content'))} />}
+      {section === 'desk' && <DeskSection d={d} tasks={deskTasks(work, () => setSection('content'), () => setSection('partners'))} />}
       {section === 'planner' && <WeeklyEmailPlanner profiles={d.digestSubscribers} profilesLoading={!d.digestSubscribersLoaded} profilesError={d.digestSubscribersError} />}
       {section === 'reports' && <ReportsSection d={d} />}
       {section === 'people' && <PeopleSection d={d} />}
@@ -215,10 +215,11 @@ type D = ReturnType<typeof useAdminData>;
 // ── Watch desk ────────────────────────────────────────────────────────────────
 
 /** Content work for the desk queue, worded as what to do. */
-function deskTasks(work: AdminWorkload, openContent: () => void) {
+function deskTasks(work: AdminWorkload, openContent: () => void, openPartners?: () => void) {
   const tasks: Array<{ id: string; tone: 'attention' | 'critical'; kind: string; title: string; detail?: string; open: () => void }> = [];
   if (work.stuckActions) tasks.push({ id: 'stuck', tone: 'critical', kind: 'Moderation job', title: `${work.stuckActions} event change${work.stuckActions > 1 ? 's' : ''} queued over 2 hours`, detail: 'The hourly “Apply Discovery Moderation” workflow may not be running', open: openContent });
   if (work.failedActions) tasks.push({ id: 'failed', tone: 'critical', kind: 'Moderation failed', title: `${work.failedActions} event change${work.failedActions > 1 ? 's' : ''} couldn’t be applied`, detail: 'See the reason under Recent queued changes', open: openContent });
+  if (work.claims && openPartners) tasks.push({ id: 'claims', tone: 'attention', kind: 'Organizers', title: `${work.claims} listing claim${work.claims > 1 ? 's' : ''} or change${work.claims > 1 ? 's' : ''} waiting`, detail: 'Confirm who they are, or apply what they sent', open: openPartners });
   if (work.suggestions) tasks.push({ id: 'suggestions', tone: 'attention', kind: 'Suggestions', title: `${work.suggestions} event suggestion${work.suggestions > 1 ? 's' : ''} from residents`, detail: 'Check the source, then approve or reject', open: openContent });
   return tasks;
 }

@@ -1,0 +1,68 @@
+/* /claim/:id — built on the /plans form language (pl-*), with its own head and side. */
+.cl-page { padding-bottom: 72px; }
+.cl-head { padding-top: clamp(36px, 6vw, 72px); padding-bottom: clamp(20px, 3vw, 32px); }
+.cl-title { margin: 12px 0 0; font: 800 clamp(40px, 6.2vw, 80px)/.94 var(--pl-display); letter-spacing: -.045em; max-width: 18ch; }
+.cl-title em { font-style: normal; background: linear-gradient(transparent 62%, var(--pl-sun) 62%, var(--pl-sun) 92%, transparent 92%); padding: 0 .06em; }
+.cl-lead { margin: 18px 0 0; max-width: 44em; font-size: clamp(16px, 1.6vw, 18px); line-height: 1.6; color: #34373c; }
+.cl-steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.cl-steps li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 8px; border-radius: 999px; background: #fff; border: 1.5px solid var(--cw-border); font-weight: 600; font-size: 14px; transition: border-color .3s, background .3s; }
+.cl-steps li > span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--cw-live); color: #fff; font: 600 12px/1 var(--pl-mono); }
+.cl-steps li[data-done='true'] { border-color: #a9d9c8; background: #f1faf6; }
+.cl-steps li[data-done='true'] > span { background: var(--pl-green); }
+
+.cl-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.cl-side { display: grid; gap: 16px; position: sticky; top: 96px; }
+.cl-listing { padding: 22px; border-radius: 28px; background: var(--cw-live); color: #fff; border: 1.5px solid var(--cw-text); box-shadow: 10px 10px 0 var(--pl-sun); }
+.cl-listing .pl-kicker { color: var(--pl-sun); }
+.cl-listing h2 { margin: 8px 0 0; font: 800 26px/1.1 var(--pl-display); letter-spacing: -.02em; }
+.cl-listing p { margin: 8px 0 0; color: #c9d6e4; font-size: 14.5px; line-height: 1.5; }
+.cl-listing .cl-listing-src { font: 500 12px/1.4 var(--pl-mono); color: #9db2c9; }
+.cw-site .cl-listing-go { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; color: #87dce8; font-weight: 700; font-size: 14px; text-decoration: none; }
+.cl-perks { display: grid; gap: 2px; margin: 0; padding: 8px; list-style: none; border-radius: 24px; background: #fff; border: 1.5px solid var(--cw-text); }
+.cl-perks li { display: flex; gap: 12px; padding: 12px; border-radius: 16px; transition: background .2s; }
+.cl-perks li:hover { background: var(--pl-sun-soft); }
+.cl-perks svg { flex: none; margin-top: 2px; color: var(--cw-brand); }
+.cl-perks strong { display: block; font-size: 15px; line-height: 1.3; }
+.cl-perks span { font-size: 13.5px; line-height: 1.45; color: var(--cw-muted); }
+
+.cl-roles { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.cw-site .cl-role { min-height: 44px; padding: 10px 14px; align-items: center; }
+.cw-site .cl-role strong { font-size: 14px; }
+.cw-site .cl-textarea { width: 100%; padding: 12px 16px; border-radius: 14px; border: 1.5px solid var(--cw-border); background: #fff; color: var(--cw-text); font: 400 16px/1.5 Inter, sans-serif; resize: vertical; }
+.cw-site .cl-textarea:focus { outline: none; border-color: var(--cw-brand); box-shadow: 0 0 0 3px rgba(21, 84, 209, .18); }
+.cl-match { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 13.5px; color: var(--cw-muted); }
+.cl-match[data-ok='true'] { color: #145a4c; font-weight: 600; }
+
+.cl-status { display: flex; gap: 14px; padding: 22px; border-radius: 28px; border: 1.5px solid var(--cw-text); background: #fff; box-shadow: 10px 10px 0 var(--cw-live); }
+.cl-status[data-state='pending'] { background: var(--pl-sun-soft); }
+.cl-status > svg { flex: none; margin-top: 4px; }
+.cl-status h2 { margin: 0; font: 800 24px/1.15 var(--pl-display); letter-spacing: -.02em; }
+.cl-status p { margin: 8px 0 0; line-height: 1.55; }
+.cl-owner { display: flex; gap: 10px; align-items: flex-start; padding: 16px clamp(20px, 3vw, 32px); background: var(--cw-live); color: #dfe7f0; font-size: 14.5px; line-height: 1.5; }
+.cl-owner svg { flex: none; color: var(--pl-sun); margin-top: 2px; }
+.cl-owner strong { color: #fff; }
+.cl-history { padding: 18px clamp(20px, 3vw, 32px) 24px; border-top: 1px solid var(--pl-line); }
+.cl-history h3 { margin: 0 0 10px; font: 800 18px/1.2 var(--pl-display); }
+.cl-history ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cl-history li { display: grid; grid-template-columns: 160px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--pl-line); font-size: 14px; }
+.cl-history li span { color: var(--cw-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl-history em { font: 600 11px/1 var(--pl-mono); font-style: normal; text-transform: uppercase; letter-spacing: .06em; color: #8a6d00; }
+.cl-history li[data-status='applied'] em { color: var(--pl-green); }
+
+/* On the listing itself: the claim invitation, and the verified mark */
+.cl-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 28px 0 8px; padding: 16px 18px; border-radius: 22px; border: 1.5px solid var(--cw-text); background: var(--pl-sun-soft, #fff5cc); }
+.cl-cta p { flex: 1 1 260px; margin: 0; font-size: 15px; line-height: 1.45; }
+.cw-site .cl-cta a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 18px; border-radius: 999px; background: var(--cw-live); color: #fff; font-weight: 700; font-size: 14px; text-decoration: none; box-shadow: 3px 3px 0 var(--cw-text); transition: transform .2s; }
+.cw-site .cl-cta a:hover { transform: translate(-2px, -2px); }
+.cl-verified { display: inline-flex; align-items: center; gap: 6px; margin: 10px 0 0; padding: 6px 12px 6px 8px; border-radius: 999px; background: #e3f4ef; color: #145a4c; font: 600 13px/1 Inter, sans-serif; border: 1px solid #a9d9c8; }
+
+@media (max-width: 980px) {
+  .cl-grid { grid-template-columns: minmax(0, 1fr); }
+  .cl-side { position: static; }
+}
+@media (max-width: 640px) {
+  .cl-history li { grid-template-columns: minmax(0, 1fr) auto; }
+  .cl-history li span { grid-column: 1 / -1; white-space: normal; }
+  .cl-listing, .cl-status { box-shadow: 6px 6px 0 var(--cw-live); }
+}
+.cl-form .pl-step legend + .pl-field { margin-top: 22px; }

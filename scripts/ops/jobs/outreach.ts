@@ -65,6 +65,19 @@ export function templatePitch(lead: PartnerLead, facts: string, sig: string): { 
   };
 }
 
+/**
+ * Every listed organization gets the self-serve route: a claim link, placed
+ * just above the signature. Partner replies kept asking for "a direct line to
+ * update our listings" and "a form for dates and production photos"; this is
+ * that, with a verified sender attached.
+ */
+export function withClaimLink(body: string, lead: Pick<PartnerLead, 'entityId'>, sig: string): string {
+  if (!lead.entityId || body.includes('/claim/')) return body;
+  const line = `Prefer to keep it up to date yourself? You can claim the listing for free and send changes directly: https://calgarywatch.ca/claim/${encodeURIComponent(lead.entityId)}`;
+  const at = body.lastIndexOf(sig);
+  return at > 0 ? `${body.slice(0, at)}${line}\n\n${body.slice(at)}` : `${body}\n\n${line}`;
+}
+
 async function fetchText(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, { headers: { 'user-agent': 'CalgaryWatchBot/1.0 (+https://calgarywatch.ca)' }, signal: AbortSignal.timeout(15_000), redirect: 'follow' });
@@ -223,6 +236,7 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
         if (problems.length) warnings.push(`Claude's draft was replaced by the template: ${problems.join(' ')}`); else pitch = w;
       } catch (e) { warnings.push(`Template draft; Claude failed: ${e instanceof Error ? e.message : e}`); }
     }
+    pitch = { ...pitch, body: withClaimLink(pitch.body, lead, sig) };
     const problems = checkPitch(pitch.body, cfg, address);
     const status = problems.length ? 'blocked' : cfg.autoSend ? 'approved' : 'ready';
     await doc.ref.update({
@@ -256,6 +270,7 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
         if (!checkPitch(w.body, cfg, address).length) body = w.body;
       } catch { /* keep the template follow-up */ }
     }
+    body = withClaimLink(body, lead, sig);
     const ok = !checkPitch(body, cfg, address).length;
     const status = ok && cfg.autoSend ? 'approved' : 'follow-up-ready';
     await doc.ref.update({
@@ -351,6 +366,9 @@ export async function syncReplies(db: Firestore, now: number, log: Log): Promise
       } catch (e) { log(`classify failed for ${lead.businessName}: ${e instanceof Error ? e.message : e}`); }
     }
     classification ??= 'other';
+    // Every human reply gets the self-serve route, so "send us the direct line"
+    // and "can I send a photo" are answered with the claim page itself.
+    if (suggested.suggestedBody) suggested = { ...suggested, suggestedBody: withClaimLink(suggested.suggestedBody, lead, sig) };
 
     if (classification === 'stop') {
       await db.collection(COLLECTIONS.suppression).doc(suppressionId(m.from)).set({ email: m.from, reason: 'Asked to stop', leadId: lead.id, at: now });

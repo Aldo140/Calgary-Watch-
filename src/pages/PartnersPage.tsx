@@ -39,6 +39,12 @@ export default function PartnersPage() {
             <p>When we call something "our pick", that's our own opinion, written from the listing and its official source. We don't sell picks, rankings or "best in Calgary" claims, and we don't write about visits we didn't make.</p>
           </section>
 
+          <section className="pt-card">
+            <h2>Claim your listing</h2>
+            <p>Sign in with Google, tell us who you are, and once we've confirmed it the listing is yours to keep right: dates and hours, photos, addresses and extra locations, and the link we send people to. Claimed listings show <strong>Managed by the organizer</strong>. It's free, and it doesn't buy placement.</p>
+            <p className="pt-note">Open your listing on CalgaryWatch and use “Claim this listing” at the bottom.</p>
+          </section>
+
           <section className="pt-card pt-card-soft">
             <h2>Featured partners</h2>
             <p>Later we'll offer a paid, invitation-only placement, one business per category. It will always be labelled <strong>Featured partner</strong>, on the site and on the first line of any Instagram post, and kept apart from our picks. It will never appear next to crime or safety reports.</p>

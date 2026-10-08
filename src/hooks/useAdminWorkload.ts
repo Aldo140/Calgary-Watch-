@@ -6,6 +6,8 @@ export interface AdminWorkload {
   suggestions: number;
   failedActions: number;
   stuckActions: number;
+  /** Listing claims to confirm plus organizer changes to apply. */
+  claims: number;
 }
 
 /**
@@ -15,7 +17,7 @@ export interface AdminWorkload {
  * moderation queued long enough that the job itself probably isn't running.
  */
 export function useAdminWorkload(enabled: boolean): AdminWorkload {
-  const [w, setW] = useState<AdminWorkload>({ suggestions: 0, failedActions: 0, stuckActions: 0 });
+  const [w, setW] = useState<AdminWorkload>({ suggestions: 0, failedActions: 0, stuckActions: 0, claims: 0 });
   useEffect(() => {
     if (!enabled || !db) return;
     const database = db;
@@ -29,10 +31,13 @@ export function useAdminWorkload(enabled: boolean): AdminWorkload {
     const load = () => void Promise.all([
       count(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'))),
       queue(),
-    ]).then(([suggestions, rows]) => {
+      count(query(collection(database, 'listing_claims'), where('status', '==', 'pending'))),
+      count(query(collection(database, 'listing_updates'), where('status', '==', 'pending'))),
+    ]).then(([suggestions, rows, claims, updates]) => {
       const now = Date.now();
       setW({
         suggestions,
+        claims: claims + updates,
         failedActions: rows.filter((r) => r.status === 'failed' && (r.createdAt ?? 0) > now - 7 * 86_400_000).length,
         stuckActions: rows.filter((r) => r.status === 'pending' && (r.createdAt ?? now) < now - 2 * 3_600_000).length,
       });

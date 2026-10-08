@@ -5,7 +5,8 @@ import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { BadgeMark } from '../components/plans/BadgeMark';
-import { BadgesCard, EmailsCard, Glance, GoingTimeline, NearHomeCard, SetupCard } from '../components/plans/MemberHome';
+import { BadgesCard, EmailsCard, Glance, GoingTimeline, ListingsCard, NearHomeCard, SetupCard } from '../components/plans/MemberHome';
+import { useMyClaims } from '../lib/claimsApi';
 import { SignupPreview } from '../components/plans/SignupPreview';
 import { PlansSkyHero } from '../components/plans/PlansSkyHero';
 import { Reveal } from '../components/plans/Motion';
@@ -104,6 +105,7 @@ export default function PlansPage() {
   const liveGoing = useMyGoing(demo ? undefined : user?.uid);
   const mine = demo ? { uid: 'demo', ids: demo.goingIds, ready: true } : liveGoing;
   const pending = usePendingOptOuts(demo ? undefined : user?.uid);
+  const myClaims = useMyClaims(demo ? undefined : user?.uid);
   // A street address resolves to a point, so picks rank by distance even without a neighbourhood name.
   const { home: addressPoint } = useHomeLocation(profile?.address, Boolean(profile?.address));
   const communities = useCommunityNames();
@@ -486,6 +488,7 @@ export default function PlansPage() {
                   </div>
                   <p className="pl-me-line">{setupPercent(steps) === 100 ? 'Fully set up' : `${setupPercent(steps)}% set up`} · {unlocked} badge{unlocked === 1 ? '' : 's'}</p>
                 </div>
+                <ListingsCard claims={myClaims ?? []} />
                 <div className="pl-wide-only pl-side-cards">
                   <EmailsCard plan={plan} area={area} busy={busy === 'monday' || busy === 'events'} onEdit={() => openEditor()} onAdd={(w) => void actOnStep(w === 'monday' ? 'monday' : 'events')} />
                   <NearHomeCard reports={near} ready={nearReady} area={area} now={now} />

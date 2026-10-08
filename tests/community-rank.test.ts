@@ -186,3 +186,18 @@ describe('coverArt', () => {
     for (const band of ['Hot', 'High', 'Elevated', 'Calm'] as const) assert.match(BAND_DUOTONE[band].from, /^#[0-9a-f]{6}$/);
   });
 });
+
+describe('rankNudge', () => {
+  it('shows only to signed-in readers who have not opened the game, away from its own pages', async () => {
+    const { shouldShowRankNudge, opensGame } = await import('../src/lib/rankNudge.js');
+    assert.equal(shouldShowRankNudge({ signedIn: true, pathname: '/events', done: false }), true);
+    assert.equal(shouldShowRankNudge({ signedIn: false, pathname: '/events', done: false }), false);
+    assert.equal(shouldShowRankNudge({ signedIn: true, pathname: '/events', done: true }), false);
+    assert.equal(shouldShowRankNudge({ signedIn: true, pathname: '/neighbourhoods', done: false }), false);
+    assert.equal(shouldShowRankNudge({ signedIn: true, pathname: '/neighbourhoods/inglewood', done: false }), false);
+    assert.equal(shouldShowRankNudge({ signedIn: true, pathname: '/check-your-community', done: false }), false);
+    assert.equal(shouldShowRankNudge({ signedIn: true, pathname: '/neighbourhoods-guide', done: false }), true);
+    assert.equal(opensGame('/check-your-community'), true);
+    assert.equal(opensGame('/events'), false);
+  });
+});

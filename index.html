@@ -236,184 +236,186 @@
 
       Inline for the same reason as the shell styles above: it has to be on
       screen at first paint, before the CSS bundle or any font arrives. It
-      covers the prerendered text while the app boots, then wipes away once
-      the first route has rendered (window.__cwSplashDone, called from
-      App.tsx). Everything is SVG and CSS so it costs no extra requests.
+      covers the prerendered text while the app boots, then leaves once the
+      first route has rendered (window.__cwSplashDone, called from App.tsx).
+
+      Every animation here moves only transform and opacity, on HTML-level
+      layers, so the compositor runs them. That keeps them smooth while the
+      main thread is busy parsing the app bundle, which is exactly when the
+      splash is on screen. (SVG internals and stroke-dashoffset repaint on the
+      main thread and stutter, so the mark is built from stacked SVG layers.)
     -->
     <style>
       html.cw-splashing, html.cw-splashing body { overflow: hidden; }
       #cw-splash {
         --s-navy: #06162F; --s-cyan: #2EC4F1; --s-blue: #1554D1; --s-sun: #FFD23F;
         --s-coral: #FF6A4D; --s-cream: #FAF8F3; --s-muted: #8FA7C7;
+        --s-out: cubic-bezier(.16,1,.3,1);
         position: fixed; inset: 0; z-index: 2147483000;
         display: grid; place-items: center; overflow: hidden;
-        color: var(--s-cream); background: var(--s-navy);
+        color: var(--s-cream);
         font-family: "Bricolage Grotesque", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-        clip-path: inset(0 0 0 0);
-        transition: clip-path 760ms cubic-bezier(.76,0,.24,1);
+        will-change: transform;
+        transition: transform 820ms cubic-bezier(.76,0,.24,1);
       }
-      /* Map-dot texture and two slow light pools: big Alberta sky, not a black box. */
-      #cw-splash::before, #cw-splash::after { content: ""; position: absolute; pointer-events: none; }
-      #cw-splash::before {
+      #cw-splash .cws-l, .cws-bg::after, .cws-word span, .cws-roll-in, .cws-city, .cws-bar, .cws-live::after { will-change: transform, opacity; }
+      .cws-bg { position: absolute; inset: 0; background: var(--s-navy); transition: opacity 480ms ease 120ms; }
+      .cws-bg::before, .cws-bg::after { content: ""; position: absolute; pointer-events: none; }
+      /* Map-dot texture and slow light pools: big Alberta sky, not a black box. */
+      .cws-bg::before {
         inset: 0;
-        background:
-          radial-gradient(circle at 1px 1px, rgba(143,167,199,.16) 1px, transparent 1.4px) 0 0 / 22px 22px;
+        background: radial-gradient(circle at 1px 1px, rgba(143,167,199,.16) 1px, transparent 1.4px) 0 0 / 22px 22px;
         -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
         mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%);
       }
-      #cw-splash::after {
+      .cws-bg::after {
         inset: -30%;
         background:
           radial-gradient(closest-side at 30% 70%, rgba(46,196,241,.22), transparent),
           radial-gradient(closest-side at 72% 28%, rgba(255,106,77,.16), transparent),
           radial-gradient(closest-side at 55% 55%, rgba(255,210,63,.10), transparent 70%);
-        animation: cws-drift 9s ease-in-out infinite alternate;
+        animation: cws-drift 10s ease-in-out infinite alternate;
       }
       .cws-stage {
         position: relative; z-index: 2;
         display: flex; flex-direction: column; align-items: center; text-align: center;
         gap: clamp(14px, 2.4vh, 22px); padding: 0 16px;
         transform: translateY(-4vh);
-        transition: transform 760ms cubic-bezier(.76,0,.24,1), opacity 500ms ease;
+        transition: transform 820ms cubic-bezier(.76,0,.24,1), opacity 420ms ease;
       }
-      .cws-mark { width: clamp(156px, 46vw, 208px); height: auto; overflow: visible; filter: drop-shadow(0 18px 40px rgba(0,0,0,.45)); }
+      /* The mark: stacked layers that assemble — disc, sun, skyline, then the C sweeps round. */
+      .cws-mark { position: relative; width: clamp(156px, 46vw, 208px); aspect-ratio: 1; transition: transform 760ms cubic-bezier(.65,0,.15,1), opacity 220ms ease; }
+      .cws-l { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+      .cws-disc { animation: cws-pop-in 620ms var(--s-out) backwards; }
+      .cws-win { inset: 18%; width: auto; height: auto; border-radius: 50%; overflow: hidden; -webkit-mask-image: -webkit-radial-gradient(white, black); animation: cws-pop-in 620ms var(--s-out) backwards; }
+      .cws-win svg { position: absolute; left: -28.125%; top: -28.125%; width: 156.25%; height: 156.25%; display: block; }
+      .cws-sun { animation: cws-sunrise 1100ms 160ms var(--s-out) backwards; }
+      .cws-peaks { animation: cws-rise 900ms 260ms var(--s-out) backwards; }
+      .cws-scene { animation: cws-rise 900ms 380ms var(--s-out) backwards; }
+      .cws-front { animation: cws-rise 900ms 480ms var(--s-out) backwards; }
+      .cws-wave { transform-origin: 50% 50%; animation: cws-sweep 1100ms 60ms var(--s-out) backwards; filter: drop-shadow(0 16px 30px rgba(0,0,0,.4)); }
+      .cws-spark { transform-origin: 50% 50%; animation: cws-spark 700ms var(--s-out) backwards, cws-twinkle 2.6s 1.4s ease-in-out infinite; }
       .cws-word {
         margin: 0; display: flex; align-items: baseline; justify-content: center;
         font-size: clamp(38px, 11.5vw, 84px); line-height: .9; letter-spacing: -.045em;
-        font-weight: 900; white-space: nowrap;
+        font-weight: 900; white-space: nowrap; transition: opacity 260ms ease;
       }
-      .cws-word span { display: inline-block; opacity: 0; transform: translateY(.55em) rotate(4deg); animation: cws-letter 620ms cubic-bezier(.2,.9,.25,1.15) both; }
+      .cws-word span { display: inline-block; animation: cws-letter 900ms var(--s-out) backwards; }
       .cws-word .cws-light { font-weight: 500; }
       .cws-word .cws-dot { color: var(--s-cyan); }
       .cws-tag {
         margin: 0; display: flex; align-items: center; gap: .55em;
         font: 500 clamp(11px, 3.1vw, 13px)/1 "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
         letter-spacing: .14em; text-transform: uppercase; color: var(--s-muted);
-        opacity: 0; animation: cws-fade 500ms 820ms ease both;
+        animation: cws-fade-up 700ms 760ms var(--s-out) backwards; transition: opacity 260ms ease;
       }
-      .cws-live { width: 8px; height: 8px; border-radius: 50%; background: var(--s-coral); box-shadow: 0 0 0 0 rgba(255,106,77,.6); animation: cws-ping 1.6s ease-out infinite; flex: none; }
+      .cws-live { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--s-coral); flex: none; }
+      .cws-live::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--s-coral); animation: cws-ping 1.8s ease-out infinite; }
       .cws-roll { position: relative; display: inline-block; vertical-align: middle; height: 1.25em; overflow: hidden; text-align: left; color: var(--s-cream); }
-      .cws-roll i { display: block; height: 1.25em; line-height: 1.25em; font-style: normal; animation: cws-roll 4.8s 900ms cubic-bezier(.7,0,.2,1) infinite; }
-      /* Corner furniture, desktop only. */
+      .cws-roll-in { display: block; animation: cws-roll 6s 1000ms cubic-bezier(.83,0,.17,1) infinite; }
+      .cws-roll i { display: block; height: 1.25em; line-height: 1.25em; font-style: normal; }
+      /* Corner furniture. */
       .cws-corner {
         position: absolute; z-index: 2; margin: 0;
         font: 500 11px/1.5 "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
         letter-spacing: .14em; text-transform: uppercase; color: rgba(143,167,199,.75);
-        opacity: 0; animation: cws-fade 600ms 500ms ease both;
+        animation: cws-fade 800ms 400ms ease backwards; transition: opacity 260ms ease;
       }
       .cws-tl { top: 28px; left: 32px; } .cws-tr { top: 28px; right: 32px; text-align: right; }
       .cws-corner b { color: var(--s-cream); font-weight: 600; }
       @media (max-width: 720px) { .cws-tl, .cws-sub { display: none; } .cws-tr { top: max(20px, env(safe-area-inset-top)); left: 0; right: 0; text-align: center; } .cws-stage { transform: translateY(-2vh); } }
-      /* Skyline across the bottom: Saddledome, Calgary Tower, the Bow. */
-      .cws-city { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(120px, 22vh, 210px); }
-      .cws-city .cws-rockies { fill: none; stroke: rgba(143,167,199,.22); stroke-width: 1.5; stroke-dasharray: 2600; stroke-dashoffset: 2600; animation: cws-draw 1.8s 100ms ease-out forwards; }
-      .cws-city .cws-towers { fill: rgba(4,14,33,.94); stroke: rgba(46,196,241,.55); stroke-width: 2; stroke-linejoin: round; stroke-dasharray: 3600; stroke-dashoffset: 3600; animation: cws-draw 1.6s ease-out forwards; }
-      .cws-city .cws-river { fill: none; stroke: rgba(46,196,241,.35); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1400; stroke-dashoffset: 1400; animation: cws-draw 1.6s 500ms ease-out forwards; }
-      .cws-city circle { fill: var(--s-sun); opacity: 0; animation: cws-light 2.6s ease-in-out infinite; }
-      .cws-bar { position: absolute; z-index: 3; left: 0; bottom: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--s-blue), var(--s-cyan) 60%, var(--s-sun)); animation: cws-load 2.8s cubic-bezier(.1,.7,.2,1) forwards; }
-      /* The mark assembles itself: wave, sun, peaks, skyline, tower, sparkles. */
-      .cws-mark * { transform-box: fill-box; }
-      .cws-wave { fill: none; stroke-linecap: round; stroke-dasharray: 400; stroke-dashoffset: 400; animation: cws-draw 900ms cubic-bezier(.65,0,.25,1) forwards; }
-      .cws-wave-hi { animation-delay: 120ms; }
-      .cws-sun { transform-origin: 50% 50%; animation: cws-sun 800ms 180ms cubic-bezier(.2,.9,.3,1.2) both; }
-      .cws-rays { transform-origin: 50% 100%; animation: cws-rays 500ms 650ms ease-out both; }
-      .cws-peaks { transform-origin: 50% 100%; animation: cws-rise 600ms 260ms cubic-bezier(.2,.9,.3,1) both; }
-      .cws-bld { transform-origin: 50% 100%; animation: cws-rise 520ms cubic-bezier(.2,.9,.3,1.1) both; }
-      .cws-tower { transform-origin: 50% 100%; animation: cws-rise 700ms 620ms cubic-bezier(.2,.9,.3,1.15) both; }
-      .cws-spark { transform-origin: 50% 50%; animation: cws-pop 520ms cubic-bezier(.2,1.4,.4,1) both, cws-twinkle 2.2s 1.2s ease-in-out infinite; }
-      /* Leaving: the panel wipes up and the stage lifts with it. */
-      #cw-splash.is-leaving { clip-path: inset(0 0 100% 0); pointer-events: none; }
-      #cw-splash.is-leaving .cws-stage { transform: translateY(-14vh) scale(.94); opacity: 0; }
-      #cw-splash.is-leaving .cws-bar { animation: none; transform: scaleX(1); transition: transform 240ms ease; }
+      /* Skyline across the bottom: Saddledome, Calgary Tower, the Bow, the river. */
+      .cws-city { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: clamp(120px, 22vh, 210px); animation: cws-city 1400ms 120ms var(--s-out) backwards; transition: opacity 300ms ease; }
+      .cws-city svg { width: 100%; height: 100%; display: block; }
+      .cws-rockies { fill: none; stroke: rgba(143,167,199,.22); stroke-width: 1.5; }
+      .cws-towers { fill: rgba(4,14,33,.94); stroke: rgba(46,196,241,.55); stroke-width: 2; stroke-linejoin: round; }
+      .cws-river { fill: none; stroke: rgba(46,196,241,.35); stroke-width: 2; stroke-linecap: round; }
+      .cws-city circle { fill: var(--s-sun); opacity: .85; }
+      .cws-bar { position: absolute; z-index: 3; left: 0; bottom: 0; height: 3px; width: 100%; transform-origin: 0 50%; transform: scaleX(.86); background: linear-gradient(90deg, var(--s-blue), var(--s-cyan) 60%, var(--s-sun)); animation: cws-load 2.8s cubic-bezier(.1,.7,.2,1) backwards; transition: opacity 300ms ease; }
+      /* Leaving: the whole sheet lifts away, its content easing out ahead of it. */
+      #cw-splash.is-leaving { transform: translateY(-100%); pointer-events: none; }
+      #cw-splash.is-leaving .cws-stage { transform: translateY(-10vh) scale(.96); opacity: 0; }
       /* Leaving for the homepage: the mark flies into the hero's logo while the rest fades. */
-      #cw-splash.is-flying { clip-path: none; background: transparent; transition: background 520ms ease 180ms; pointer-events: none; }
-      #cw-splash.is-flying::before, #cw-splash.is-flying::after, #cw-splash.is-flying .cws-corner,
-      #cw-splash.is-flying .cws-city, #cw-splash.is-flying .cws-bar, #cw-splash.is-flying .cws-word, #cw-splash.is-flying .cws-tag {
-        /* filter, not opacity: several of these hold opacity through their entrance animation. */
-        filter: opacity(0); transition: filter 260ms ease;
-      }
-      #cw-splash.is-flying .cws-word { transform: translateY(12px); transition: filter 240ms ease, transform 300ms ease; }
-      #cw-splash.is-flying .cws-mark { transition: transform 720ms cubic-bezier(.7,0,.2,1), filter 720ms ease; filter: none; }
-      @keyframes cws-draw { to { stroke-dashoffset: 0; } }
-      @keyframes cws-letter { to { opacity: 1; transform: none; } }
-      @keyframes cws-fade { to { opacity: 1; } }
-      @keyframes cws-sun { from { opacity: 0; transform: translateY(70%) scale(.6); } to { opacity: 1; transform: none; } }
-      @keyframes cws-rays { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
-      @keyframes cws-rise { from { opacity: 0; transform: scaleY(0); } to { opacity: 1; transform: none; } }
-      @keyframes cws-pop { from { opacity: 0; transform: scale(0) rotate(-90deg); } to { opacity: 1; transform: none; } }
-      @keyframes cws-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(.72) rotate(18deg); } }
-      @keyframes cws-ping { 0% { box-shadow: 0 0 0 0 rgba(255,106,77,.6); } 100% { box-shadow: 0 0 0 10px rgba(255,106,77,0); } }
-      @keyframes cws-roll { 0%, 18% { transform: translateY(0); } 25%, 43% { transform: translateY(-100%); } 50%, 68% { transform: translateY(-200%); } 75%, 93% { transform: translateY(-300%); } 100% { transform: translateY(-400%); } }
-      @keyframes cws-light { 0%, 100% { opacity: 0; } 30%, 70% { opacity: .9; } }
-      @keyframes cws-load { 0% { transform: scaleX(0); } 100% { transform: scaleX(.86); } }
+      #cw-splash.is-flying { pointer-events: none; }
+      #cw-splash.is-flying .cws-bg, #cw-splash.is-flying .cws-corner, #cw-splash.is-flying .cws-word,
+      #cw-splash.is-flying .cws-tag, #cw-splash.is-flying .cws-city, #cw-splash.is-flying .cws-bar { opacity: 0; }
+      #cw-splash.is-flying .cws-wave { filter: none; }
+      @keyframes cws-pop-in { from { opacity: 0; transform: scale(.55); } }
+      @keyframes cws-sweep { from { opacity: 0; transform: rotate(-150deg) scale(.6); } }
+      @keyframes cws-sunrise { from { opacity: 0; transform: translateY(26%) scale(.7); } }
+      @keyframes cws-rise { from { opacity: 0; transform: translateY(34%); } }
+      @keyframes cws-spark { from { opacity: 0; transform: scale(0) rotate(-120deg); } }
+      @keyframes cws-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(.75) rotate(20deg); } }
+      @keyframes cws-letter { from { opacity: 0; transform: translateY(.6em); } }
+      @keyframes cws-fade-up { from { opacity: 0; transform: translateY(8px); } }
+      @keyframes cws-fade { from { opacity: 0; } }
+      @keyframes cws-ping { from { opacity: .7; transform: scale(1); } to { opacity: 0; transform: scale(2.8); } }
+      @keyframes cws-roll { 0%, 17% { transform: translateY(0); } 25%, 42% { transform: translateY(-20%); } 50%, 67% { transform: translateY(-40%); } 75%, 92% { transform: translateY(-60%); } 100% { transform: translateY(-80%); } }
+      @keyframes cws-city { from { opacity: 0; transform: translateY(40%); } }
+      @keyframes cws-load { from { transform: scaleX(0); } }
       @keyframes cws-drift { from { transform: translate3d(-3%, 2%, 0) rotate(0deg); } to { transform: translate3d(3%, -2%, 0) rotate(8deg); } }
       /* A reload in the same visit skips the build-up and goes straight to the finished mark. */
-      #cw-splash.is-quick *, #cw-splash.is-quick::after { animation-duration: 1ms !important; animation-delay: 0s !important; }
-      #cw-splash.is-quick .cws-roll i, #cw-splash.is-quick .cws-city circle, #cw-splash.is-quick .cws-live { animation: none !important; }
-      #cw-splash.is-quick .cws-city circle { opacity: .7; }
+      #cw-splash.is-quick *, #cw-splash.is-quick *::after { animation-duration: 1ms !important; animation-delay: 0s !important; }
+      #cw-splash.is-quick .cws-roll-in, #cw-splash.is-quick .cws-spark, #cw-splash.is-quick .cws-live::after { animation: none !important; }
       @media (prefers-reduced-motion: reduce) {
-        #cw-splash *, #cw-splash::after { animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
-        #cw-splash .cws-roll i { animation: none !important; }
+        #cw-splash *, #cw-splash *::before, #cw-splash *::after { animation: none !important; }
         #cw-splash { transition: opacity 300ms ease; }
-        #cw-splash.is-leaving { clip-path: inset(0 0 0 0); opacity: 0; }
-        #cw-splash.is-leaving .cws-stage { transform: translateY(-4vh); }
+        #cw-splash.is-leaving { transform: none; opacity: 0; }
+        #cw-splash.is-leaving .cws-stage { transform: translateY(-4vh); opacity: 1; }
       }
     </style>
     <noscript><style>#cw-splash { display: none !important; } html, body { overflow: auto !important; }</style></noscript>
   </head>
   <body>
     <div id="cw-splash" role="status" aria-live="polite" aria-label="Loading CalgaryWatch">
+      <div class="cws-bg"></div>
       <p class="cws-corner cws-tl"><b>CalgaryWatch</b> · YYC<span class="cws-sub"><br />51.0447° N · 114.0719° W</span></p>
       <p class="cws-corner cws-tr">Calgary · <b id="cws-clock">&nbsp;</b><span class="cws-sub"><br />Events · Markets · Live map</span></p>
       <div class="cws-stage" aria-hidden="true">
-        <svg class="cws-mark" viewBox="0 0 200 200" width="200" height="200">
-          <defs><clipPath id="cws-disc"><circle cx="100" cy="100" r="64" /></clipPath></defs>
-          <circle cx="100" cy="100" r="65.5" fill="#FAF8F3" stroke="#030B1C" stroke-width="3" />
-          <g clip-path="url(#cws-disc)">
-            <g class="cws-rays" stroke="#FFD23F" stroke-width="4" stroke-linecap="round">
-              <path d="M92 68V58M107 72l4-7M77 72l-4-7M118 83l7-4M66 83l-7-4" />
-            </g>
-            <circle class="cws-sun" cx="92" cy="98" r="24" fill="#FFD23F" stroke="#030B1C" stroke-width="2.5" />
-            <g class="cws-peaks">
+        <div class="cws-mark">
+          <svg class="cws-l cws-disc" viewBox="0 0 200 200"><circle cx="100" cy="100" r="65.5" fill="#FAF8F3" stroke="#030B1C" stroke-width="3" /></svg>
+          <div class="cws-l cws-win">
+            <svg class="cws-l cws-sun" viewBox="0 0 200 200">
+              <path d="M92 68V58M107 72l4-7M77 72l-4-7M118 83l7-4M66 83l-7-4" stroke="#FFD23F" stroke-width="4" stroke-linecap="round" />
+              <circle cx="92" cy="98" r="24" fill="#FFD23F" stroke="#030B1C" stroke-width="2.5" />
+            </svg>
+            <svg class="cws-l cws-peaks" viewBox="0 0 200 200">
               <path d="M34 142 70 104 82 114 98 92 134 142Z" fill="#4A8FE0" stroke="#030B1C" stroke-width="2.5" stroke-linejoin="round" />
               <path d="M98 92 90 103 96 101 100 106 106 102Z" fill="#FAF8F3" />
-            </g>
-            <g fill="#0A1F44">
-              <rect class="cws-bld" style="animation-delay:340ms" x="56" y="112" width="13" height="32" />
-              <rect class="cws-bld" style="animation-delay:400ms" x="71" y="102" width="11" height="42" />
-              <rect class="cws-bld" style="animation-delay:460ms" x="84" y="116" width="14" height="28" />
-              <rect class="cws-bld" style="animation-delay:520ms" x="136" y="106" width="12" height="38" />
-              <rect class="cws-bld" style="animation-delay:580ms" x="150" y="120" width="11" height="24" />
-            </g>
-            <g class="cws-tower">
-              <rect x="121" y="50" width="2.5" height="16" fill="#0A1F44" />
-              <rect x="119" y="74" width="6.5" height="70" fill="#0A1F44" />
+            </svg>
+            <svg class="cws-l cws-scene" viewBox="0 0 200 200">
+              <g fill="#0A1F44">
+                <rect x="56" y="112" width="13" height="32" /><rect x="71" y="102" width="11" height="42" /><rect x="84" y="116" width="14" height="28" />
+                <rect x="136" y="106" width="12" height="38" /><rect x="150" y="120" width="11" height="24" />
+                <rect x="121" y="50" width="2.5" height="16" /><rect x="119" y="74" width="6.5" height="70" />
+              </g>
               <rect x="111.5" y="64" width="21.5" height="11" rx="3.5" fill="#FF6A4D" stroke="#0A1F44" stroke-width="2.5" />
               <rect x="113" y="75" width="18.5" height="3.5" rx="1.5" fill="#0A1F44" />
-            </g>
-            <path class="cws-peaks" style="animation-delay:500ms" d="M30 150Q100 124 172 150V172H30Z" fill="#2EC4F1" stroke="#030B1C" stroke-width="2.5" />
-          </g>
-          <path class="cws-wave" d="M151 49A72 72 0 1 0 159 141" stroke="#030B1C" stroke-width="33" />
-          <path class="cws-wave" d="M151 49A72 72 0 1 0 159 141" stroke="#2EC4F1" stroke-width="24" />
-          <path class="cws-wave cws-wave-hi" d="M155 45A78 78 0 1 0 164 145" stroke="#B8EEFF" stroke-width="4" opacity=".85" />
-          <path class="cws-spark" style="animation-delay:880ms" d="M172 45Q174.3 55.7 185 58 174.3 60.3 172 71 169.7 60.3 159 58 169.7 55.7 172 45Z" fill="#FF6A4D" stroke="#030B1C" stroke-width="2" stroke-linejoin="round" />
-          <path class="cws-spark" style="animation-delay:1000ms" d="M184 82Q185.6 90.4 194 92 185.6 93.6 184 102 182.4 93.6 174 92 182.4 90.4 184 82Z" fill="#FFD23F" stroke="#030B1C" stroke-width="2" stroke-linejoin="round" />
-        </svg>
-        <p class="cws-word"><span style="animation-delay:300ms">C</span><span style="animation-delay:340ms">a</span><span style="animation-delay:380ms">l</span><span style="animation-delay:420ms">g</span><span style="animation-delay:460ms">a</span><span style="animation-delay:500ms">r</span><span style="animation-delay:540ms">y</span><span class="cws-light" style="animation-delay:600ms">W</span><span class="cws-light" style="animation-delay:640ms">a</span><span class="cws-light" style="animation-delay:680ms">t</span><span class="cws-light" style="animation-delay:720ms">c</span><span class="cws-light" style="animation-delay:760ms">h</span><span class="cws-dot" style="animation-delay:860ms">.</span></p>
-        <p class="cws-tag"><span class="cws-live"></span>What’s happening <span class="cws-roll"><i>tonight</i><i>this weekend</i><i>near you</i><i>in Calgary</i><i>tonight</i></span></p>
+            </svg>
+            <svg class="cws-l cws-front" viewBox="0 0 200 200"><path d="M30 150Q100 124 172 150V172H30Z" fill="#2EC4F1" stroke="#030B1C" stroke-width="2.5" /></svg>
+          </div>
+          <svg class="cws-l cws-wave" viewBox="0 0 200 200" fill="none" stroke-linecap="round">
+            <path d="M151 49A72 72 0 1 0 159 141" stroke="#030B1C" stroke-width="33" />
+            <path d="M151 49A72 72 0 1 0 159 141" stroke="#2EC4F1" stroke-width="24" />
+            <path d="M155 45A78 78 0 1 0 164 145" stroke="#B8EEFF" stroke-width="4" opacity=".85" />
+          </svg>
+          <svg class="cws-l cws-spark" style="animation-delay:820ms,1.5s;transform-origin:86% 29%" viewBox="0 0 200 200"><path d="M172 45Q174.3 55.7 185 58 174.3 60.3 172 71 169.7 60.3 159 58 169.7 55.7 172 45Z" fill="#FF6A4D" stroke="#030B1C" stroke-width="2" stroke-linejoin="round" /></svg>
+          <svg class="cws-l cws-spark" style="animation-delay:940ms,1.9s;transform-origin:92% 46%" viewBox="0 0 200 200"><path d="M184 82Q185.6 90.4 194 92 185.6 93.6 184 102 182.4 93.6 174 92 182.4 90.4 184 82Z" fill="#FFD23F" stroke="#030B1C" stroke-width="2" stroke-linejoin="round" /></svg>
+        </div>
+        <p class="cws-word"><span style="animation-delay:340ms">C</span><span style="animation-delay:375ms">a</span><span style="animation-delay:410ms">l</span><span style="animation-delay:445ms">g</span><span style="animation-delay:480ms">a</span><span style="animation-delay:515ms">r</span><span style="animation-delay:550ms">y</span><span class="cws-light" style="animation-delay:600ms">W</span><span class="cws-light" style="animation-delay:635ms">a</span><span class="cws-light" style="animation-delay:670ms">t</span><span class="cws-light" style="animation-delay:705ms">c</span><span class="cws-light" style="animation-delay:740ms">h</span><span class="cws-dot" style="animation-delay:820ms">.</span></p>
+        <p class="cws-tag"><span class="cws-live"></span>What’s happening <span class="cws-roll"><span class="cws-roll-in"><i>tonight</i><i>this weekend</i><i>near you</i><i>in Calgary</i><i>tonight</i></span></span></p>
       </div>
-      <svg class="cws-city" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-        <path class="cws-rockies" d="M0 150 60 128 110 140 170 104 215 122 280 92 330 116 390 98 440 120 500 86 560 112 610 80 670 108 730 90 790 118 850 96 910 124 970 100 1030 128 1090 108 1150 132 1200 120" />
-        <path class="cws-towers" d="M0 200V178H70V170H120V182H160V160Q250 184 300 160V184H340V150H372V164H400V128H426V140H474V96H464V82H477V56V82H492V96H482V170H500V110H524V84H548V100H566V64H590V92H604V112C606 80 620 44 664 40C650 60 648 90 652 112H690V78H712V56H730V96H752V118H780V104H806V134H840V150H880V162H930V146H960V170H1020V160H1060V178H1120V172H1200V200Z" />
-        <path class="cws-river" d="M0 192C80 184 140 198 220 190S380 182 460 190 620 198 700 189 860 182 940 191 1100 197 1200 188" />
-        <circle cx="536" cy="112" r="2.4" style="animation-delay:1.2s" /><circle cx="578" cy="88" r="2.4" style="animation-delay:1.6s" />
-        <circle cx="700" cy="100" r="2.4" style="animation-delay:1.9s" /><circle cx="720" cy="76" r="2.4" style="animation-delay:1.4s" />
-        <circle cx="642" cy="70" r="2.4" style="animation-delay:2.2s" /><circle cx="412" cy="150" r="2.4" style="animation-delay:1.7s" />
-        <circle cx="764" cy="132" r="2.4" style="animation-delay:2.4s" /><circle cx="555" cy="140" r="2.4" style="animation-delay:2s" />
-        <circle cx="484" cy="89" r="2.4" fill="#FF6A4D" style="animation-delay:1.1s" />
-        <circle cx="650" cy="96" r="2.4" style="animation-delay:2.6s" /><circle cx="742" cy="108" r="2.4" style="animation-delay:1.3s" />
-        <circle cx="358" cy="172" r="2.4" style="animation-delay:2.1s" /><circle cx="822" cy="150" r="2.4" style="animation-delay:1.8s" />
-      </svg>
+      <div class="cws-city" aria-hidden="true">
+        <svg viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax slice">
+          <path class="cws-rockies" d="M0 150 60 128 110 140 170 104 215 122 280 92 330 116 390 98 440 120 500 86 560 112 610 80 670 108 730 90 790 118 850 96 910 124 970 100 1030 128 1090 108 1150 132 1200 120" />
+          <path class="cws-towers" d="M0 200V178H70V170H120V182H160V160Q250 184 300 160V184H340V150H372V164H400V128H426V140H474V96H464V82H477V56V82H492V96H482V170H500V110H524V84H548V100H566V64H590V92H604V112C606 80 620 44 664 40C650 60 648 90 652 112H690V78H712V56H730V96H752V118H780V104H806V134H840V150H880V162H930V146H960V170H1020V160H1060V178H1120V172H1200V200Z" />
+          <path class="cws-river" d="M0 192C80 184 140 198 220 190S380 182 460 190 620 198 700 189 860 182 940 191 1100 197 1200 188" />
+          <circle cx="536" cy="112" r="2.4" /><circle cx="578" cy="88" r="2.4" /><circle cx="700" cy="100" r="2.4" /><circle cx="720" cy="76" r="2.4" />
+          <circle cx="642" cy="70" r="2.4" /><circle cx="412" cy="150" r="2.4" /><circle cx="764" cy="132" r="2.4" /><circle cx="555" cy="140" r="2.4" />
+          <circle cx="484" cy="89" r="2.4" style="fill:#FF6A4D" /><circle cx="650" cy="96" r="2.4" /><circle cx="742" cy="108" r="2.4" />
+          <circle cx="358" cy="172" r="2.4" /><circle cx="822" cy="150" r="2.4" />
+        </svg>
+      </div>
       <span class="cws-bar"></span>
     </div>
     <script>
@@ -430,44 +432,48 @@
         if (seen) el.className = 'is-quick';
         root.classList.add('cw-splashing');
         // First visit plays the whole build-up; a reload in the same visit just bows out.
-        var minShow = seen ? 200 : 1250;
+        var minShow = seen ? 200 : 1300;
         var clock = document.getElementById('cws-clock');
         try { clock.textContent = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date()); } catch (e) {}
         var done = false;
         function remove(after) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, after); }
-        // On the homepage the mark lands on the hero's logo; elsewhere the panel wipes up.
+        // Two frames so the starting styles are committed before a transition begins.
+        function nextFrame(fn) { requestAnimationFrame(function () { requestAnimationFrame(fn); }); }
+        // On the homepage the mark lands on the hero's logo; elsewhere the sheet lifts away.
         function fly() {
           var mark = el.querySelector('.cws-mark');
           var target = document.querySelector('.h-hero-mark');
           if (!mark || !target || !target.offsetWidth || matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
           var t = target.getBoundingClientRect(), m = mark.getBoundingClientRect();
           if (t.bottom < 0 || t.top > innerHeight) return false;
-          // The SVG's C fills ~88% of its box, the sticker's ~78%; sizes come from layout, not the hero's own scale-in.
+          // The C fills ~88% of the splash mark and ~78% of the sticker; sizes come from
+          // layout (offsetWidth), not the hero's own scale-in.
           var scale = (target.offsetWidth * 0.78) / (m.width * 0.885);
           var dx = t.left + t.width / 2 - (m.left + m.width / 2);
           var dy = t.top + t.height / 2 - (m.top + m.height / 2);
           target.style.animation = 'none';
           target.style.opacity = '0';
-          el.classList.add('is-flying');
           root.classList.remove('cw-splashing');
-          requestAnimationFrame(function () { mark.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')'; });
+          el.classList.add('is-flying');
+          mark.style.transform = 'translate3d(' + dx + 'px,' + dy + 'px,0) scale(' + scale + ')';
           setTimeout(function () {
-            target.style.transition = 'opacity 220ms ease';
+            target.style.transition = 'opacity 240ms ease';
             target.style.opacity = '1';
-            mark.style.transition = 'opacity 220ms ease';
             mark.style.opacity = '0';
-            remove(260);
-          }, 720);
+            remove(280);
+          }, 760);
           return true;
         }
         window.__cwSplashDone = function () {
           if (done) return;
           done = true;
           setTimeout(function () {
-            if (fly()) return;
-            el.classList.add('is-leaving');
-            root.classList.remove('cw-splashing');
-            remove(900);
+            nextFrame(function () {
+              if (fly()) return;
+              el.classList.add('is-leaving');
+              root.classList.remove('cw-splashing');
+              remove(900);
+            });
           }, Math.max(0, minShow - (Date.now() - start)));
         };
         setTimeout(window.__cwSplashDone, 10000);

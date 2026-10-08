@@ -33,7 +33,8 @@
         "www.farmersmakersmarket.ca",
         "calgarywintermarket.ca",
         "marketcollective.ca",
-        "www.dalhousiecalgary.ca"
+        "www.dalhousiecalgary.ca",
+        "www.avenuecalgary.com"
       ],
       "kind": "official",
       "provider": "recurring-market",
@@ -425,6 +426,55 @@
           "seasonStart": "2026-10-24",
           "seasonEnd": "2026-10-24",
           "occurrenceCount": 1
+        },
+        {
+          "id": "fresh-and-local-market",
+          "title": "Fresh & Local Market + Kitchens",
+          "summary": "A year-round indoor market and food hall in Avenida Village: about 40 local vendors and kitchens from 20-plus countries.",
+          "description": "Fresh & Local Market + Kitchens in Avenida Village is a year-round indoor market and food hall with about 40 local vendors: farm-store produce and meat, bakeries, and kitchens cooking dishes from more than 20 countries. Live music on Thursday to Saturday evenings. Open Thursday to Saturday 11 am to 8 pm and Sunday 11 am to 5 pm; confirm holiday hours with the market.",
+          "address": "12445 Lake Fraser Drive SE, Calgary, AB",
+          "venue": "Avenida Village",
+          "organizer": "Fresh & Local Market + Kitchens",
+          "sourceUrl": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+          "categories": [
+            "market",
+            "food"
+          ],
+          "tags": [
+            "food hall",
+            "local vendors",
+            "year-round",
+            "live music"
+          ],
+          "amenities": [
+            "food hall",
+            "free parking",
+            "live music"
+          ],
+          "familyFriendly": true,
+          "schedules": [
+            {
+              "dayOfWeek": 4,
+              "startTime": "11:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "11:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "11:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "11:00:00",
+              "endTime": "17:00:00"
+            }
+          ],
+          "occurrenceCount": 12
         }
       ],
       "autoPublish": true

@@ -118,7 +118,7 @@ export interface DiscoveredAccount {
  * and our own Instagram user id; Instagram-login tokens can't do this. Personal
  * accounts and unknown handles throw (code 110).
  */
-export async function businessDiscovery(token: string, igUserId: string, username: string, mediaLimit = 12): Promise<DiscoveredAccount> {
+export async function businessDiscovery(token: string, igUserId: string, username: string, mediaLimit = 30): Promise<DiscoveredAccount> {
   const read = async (mediaFields: string) => {
     const r = await graph(igUserId, token, {
       root: FB,

@@ -50,8 +50,10 @@ describe('creator discovery', () => {
       'Deerfoot at 5pm 🎥: @RoadWatcher',
       'via @roadwatcher',
       'Credit @urbacalgary',
+      'Sunset over the Bow 📸\uFE0F @Bow.Light',
+      'Footage by: @clipper_yyc',
       'Just a caption mentioning @someone without credit',
     ], ['urbacalgary']);
-    assert.deepEqual(found, ['roadwatcher', 'skyguy.yyc']);
+    assert.deepEqual(found, ['roadwatcher', 'bow.light', 'clipper_yyc', 'skyguy.yyc']);
   });
 });

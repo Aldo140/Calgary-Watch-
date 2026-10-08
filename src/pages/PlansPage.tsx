@@ -1,26 +1,20 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUpRight, Check, MapPin, Pencil, Shield, Sparkles } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
-import { BadgeMark } from '../components/plans/BadgeMark';
-import { BadgesCard, EmailsCard, Glance, GoingTimeline, ListingsCard, NearHomeCard, SetupCard } from '../components/plans/MemberHome';
 import { useMyClaims } from '../lib/claimsApi';
-import { SignupPreview } from '../components/plans/SignupPreview';
-import { SignupForm, SignupHero } from '../components/plans/SignupFlow';
-import { PlansSkyHero } from '../components/plans/PlansSkyHero';
+import { SignupForm, SignupHero, SignupSummary } from '../components/plans/SignupFlow';
 import { MemberDashboard } from '../components/plans/Dashboard';
-import { Reveal } from '../components/plans/Motion';
-import { GoingButton } from '../components/plans/GoingButton';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
-import { BADGES, computeBadges, orderBadges, type BadgeId } from '../lib/badges';
-import { emailPlan, nearHome, partOfDay, setupPercent, setupSteps, type SetupStepId } from '../lib/memberHome';
+import { computeBadges, orderBadges, type BadgeId } from '../lib/badges';
+import { emailPlan, nearHome, setupSteps, type SetupStepId } from '../lib/memberHome';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
-import { buildEventPicks, normalizeInterests, neighbourhoodPoint, EVENT_INTERESTS, interestsFor, pickDistance, pickWhen, type EventInterestId, type PickItem } from '../lib/eventPicks';
+import { buildEventPicks, normalizeInterests, neighbourhoodPoint, interestsFor, type EventInterestId } from '../lib/eventPicks';
 import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
 import { resolveHomeLocation, useHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
@@ -122,6 +116,7 @@ export default function PlansPage() {
   // A first-time visitor starts with the email(s) the link they followed was about, visibly ticked.
   const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params), interests: normalizeInterests((params.get('interests') ?? '').split(',')) }));
   const [editing, setEditing] = useState(false);
+  const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -143,6 +138,7 @@ export default function PlansPage() {
     deepLinked.current = true;
     if (params.get('edit') === '1' && !readOnly) { setDraft(draftFrom(profile, pending)); setEditing(true); }
     const id = window.location.hash.slice(1);
+    if (id === 'emails') setStep(1); else if (id === 'pl-step-interests') setStep(2);
     if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
@@ -212,7 +208,6 @@ export default function PlansPage() {
     submissionCount,
   };
   const badges = orderBadges(computeBadges(badgeInput));
-  const unlocked = badges.filter((b) => b.unlocked).length;
 
   // What saving this form would newly earn: the reward, shown before the ask.
   const unlocks = useMemo(() => {
@@ -252,10 +247,8 @@ export default function PlansPage() {
   const openEditor = (focus?: 'interests' | 'home') => {
     setDraft(draftFrom(profile, pending));
     setEditing(true);
-    requestAnimationFrame(() => {
-      const target = focus === 'interests' ? document.getElementById('pl-step-interests') : formRef.current;
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    setStep(focus === 'interests' ? 2 : 0);
+    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
 
   const addEmail = async (which: 'monday' | 'thursday') => {
@@ -294,6 +287,7 @@ export default function PlansPage() {
       setSavedAt(Date.now());
       if (firstTime && unlocks.length) { setJoined(unlocks); celebrateBadge(unlocks[0]); }
       setEditing(false);
+      setStep(0);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError('Your plans didn’t save. Check your connection and try again.');
@@ -308,11 +302,6 @@ export default function PlansPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, profile]);
 
-  const startForm = () => {
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    window.setTimeout(() => document.getElementById('su-hood')?.focus({ preventScroll: true }), 450);
-  };
-
   const toggleInterest = (id: EventInterestId) => setDraft((d) => ({ ...d, interests: d.interests.includes(id) ? d.interests.filter((i) => i !== id) : [...d.interests, id] }));
 
   const q = draft.neighborhood.trim().toLowerCase();
@@ -320,7 +309,6 @@ export default function PlansPage() {
     ? communities.filter((c) => c.toLowerCase().includes(q)).sort((a, b) => Number(!a.toLowerCase().startsWith(q)) - Number(!b.toLowerCase().startsWith(q))).slice(0, 6)
     : [];
   const first = (user?.displayName || '').split(' ')[0];
-  const tunedLeft = Math.max(0, 3 - draft.interests.length);
 
   if (dashboard && !showForm && user) {
     const images = new Map(entities.map((e) => [e.id, e.image?.src]));
@@ -340,123 +328,35 @@ export default function PlansPage() {
 
   return (
     <SiteLayout>
-      <div className="cw-plans" data-view={dashboard && !showForm ? 'home' : 'setup'}>
+      <div className="cw-plans" data-view="setup">
         {asUid ? (
           <div className="cw-wrap"><p className="pl-adminview" role="status"><Shield size={15} aria-hidden="true" /> <span><strong>Admin view.</strong> You’re seeing {profile?.displayName || 'this member'}’s dashboard as they see it. Read-only.</span> <Link to="/admin">Back to admin</Link></p></div>
         ) : null}
-        {dashboard && !editing ? (
-          <header className="cw-wrap pl-head pl-head-member">
-            <PlansSkyHero
-              greeting={`${partOfDay(now)}${first ? `, ${first}` : ''}.|Here’s your ${area || 'Calgary'}.`}
-              area={area}
-              after={joined ? (
-                <div className="pl-joined" role="status">
-                  <Sparkles size={20} aria-hidden="true" />
-                  <div>
-                    <strong>You’re in.</strong> {savedSummary(profile)}
-                    <ul>{joined.map((id, i) => { const b = BADGES.find((x) => x.id === id)!; return <li key={id} style={{ animationDelay: `${0.25 + i * 0.12}s` }}><BadgeMark badge={{ ...b, unlocked: true }} size={30} /> {b.label}</li>; })}</ul>
-                  </div>
-                </div>
-              ) : savedAt ? <p className="pl-saved" role="status"><Check size={16} aria-hidden="true" /> Saved. {savedSummary(profile)}</p> : null}
-            >
-              <Glance near={near.length} nearReady={nearReady} picks={picks.picks.length} going={picks.going} badges={unlocked} total={badges.length} />
-            </PlansSkyHero>
-          </header>
-        ) : (
-          <SignupHero
-            editing={Boolean(user && hasPlans)}
-            signedIn={Boolean(user)}
-            area={draftArea}
-            onStart={startForm}
-            onSignIn={() => void signIn()}
+        <div className="cw-wrap su-layout">
+          <SignupHero editing={Boolean(user && hasPlans)} signedIn={Boolean(user)} onSignIn={() => void signIn()} />
+            <SignupForm
+              formRef={formRef}
+              step={step}
+              setStep={setStep}
+              draft={draft}
+              setDraft={setDraft}
+              progress={progress}
+              suggestions={suggestions}
+              communityCount={communities.length}
+              needsConsent={needsConsent}
+              pending={pending}
+              error={error}
+              setError={setError}
+              saving={saving}
+              disabled={!demo && isAuthReady && !isFirebaseConfigured}
+              signedIn={Boolean(user)}
+              hasPlans={hasPlans}
+              editing={editing}
+              onCancel={() => { setEditing(false); setStep(0); setDraft(draftFrom(profile, pending)); setError(''); }}
+              onSubmit={() => void save()}
+            onToggleInterest={toggleInterest}
           />
-        )}
-
-        <div className="cw-wrap pl-grid">
-          <div className="pl-main">
-            {dashboard && !showForm ? <SetupCard steps={steps} busy={busy} onAct={(id) => void actOnStep(id)} /> : null}
-            {dashboard && !showForm ? (
-              // On a phone the side column comes last, so the two cards people check most come up here instead.
-              <div className="pl-narrow-only pl-narrow-cards">
-                <EmailsCard plan={plan} area={area} busy={busy === 'monday' || busy === 'events'} onEdit={() => openEditor()} onAdd={(w) => void actOnStep(w === 'monday' ? 'monday' : 'events')} />
-                <NearHomeCard reports={near} ready={nearReady} area={area} now={now} />
-              </div>
-            ) : null}
-
-            {showForm ? (
-              <SignupForm
-                formRef={formRef}
-                draft={draft}
-                setDraft={setDraft}
-                progress={progress}
-                draftArea={draftArea}
-                suggestions={suggestions}
-                communityCount={communities.length}
-                needsConsent={needsConsent}
-                pending={pending}
-                tunedLeft={tunedLeft}
-                error={error}
-                saving={saving}
-                disabled={!demo && isAuthReady && !isFirebaseConfigured}
-                signedIn={Boolean(user)}
-                hasPlans={hasPlans}
-                editing={editing}
-                onCancel={() => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); }}
-                onSubmit={() => void save()}
-                onToggleInterest={toggleInterest}
-              />
-            ) : null}
-
-            {dashboard && !showForm ? <Reveal><GoingTimeline going={picks.going} /></Reveal> : null}
-
-            <section className="pl-picks" aria-labelledby="pl-picks-title">
-              <div className="pl-sec-head">
-                <h2 id="pl-picks-title">{interests.length ? 'Picked for you' : 'On in Calgary'}<span> · next 10 days</span></h2>
-                {!showForm ? <button type="button" className="pl-textbtn" onClick={() => openEditor()}><Pencil size={14} aria-hidden="true" /> Edit interests</button> : null}
-              </div>
-              {picks.picks.length ? (
-                <ol className="pl-list">{picks.picks.map((p, i) => <PickRow key={p.key} item={p} signedIn={!!user} index={i} />)}</ol>
-              ) : (
-                <p className="pl-empty">{interests.length ? 'Nothing listed yet that matches. We only list events we’ve checked with the organizer, so some weeks are quieter. Try adding an interest.' : 'Pick a few interests above to see what fits.'}</p>
-              )}
-              <p className="pl-fine">{picks.considered} upcoming events and market dates considered. <Link to="/events">Browse everything</Link> · <Link to="/submit">Add one we’re missing</Link></p>
-            </section>
-          </div>
-
-          <aside className="pl-side" aria-label={dashboard && !showForm ? 'Your profile' : 'Preview'}>
-            {showForm ? (
-              <SignupPreview
-                name={first}
-                area={draftArea}
-                interests={draft.interests}
-                weekly={draft.weeklyDigestOptIn}
-                events={draft.eventsDigestOptIn}
-                picks={picks.picks}
-                unlocks={unlocks}
-                now={now}
-              />
-            ) : (
-              <>
-                <div className="pl-card pl-mecard">
-                  <div className="pl-me">
-                    {user?.photoURL ? <img src={user.photoURL} alt="" width="52" height="52" referrerPolicy="no-referrer" /> : <span className="pl-avatar" aria-hidden="true">{(user?.displayName || 'C').slice(0, 1)}</span>}
-                    <div>
-                      <strong>{user?.displayName || 'Calgary neighbour'}</strong>
-                      <span>{area ? <><MapPin size={13} aria-hidden="true" /> {area}</> : 'No home area yet'}</span>
-                    </div>
-                  </div>
-                  <p className="pl-me-line">{setupPercent(steps) === 100 ? 'Fully set up' : `${setupPercent(steps)}% set up`} · {unlocked} badge{unlocked === 1 ? '' : 's'}</p>
-                </div>
-                <ListingsCard claims={myClaims ?? []} />
-                <div className="pl-wide-only pl-side-cards">
-                  <EmailsCard plan={plan} area={area} busy={busy === 'monday' || busy === 'events'} onEdit={() => openEditor()} onAdd={(w) => void actOnStep(w === 'monday' ? 'monday' : 'events')} />
-                  <NearHomeCard reports={near} ready={nearReady} area={area} now={now} />
-                </div>
-              </>
-            )}
-            <BadgesCard badges={badges} signedIn={!!user && !showForm} />
-            <p className="pl-fine pl-side-foot">Instant alerts and quiet hours live in the <Link to="/map?settings=alerts">live map’s settings</Link>.</p>
-          </aside>
+          <SignupSummary draft={draft} area={draftArea} progress={progress} />
         </div>
       </div>
     </SiteLayout>
@@ -468,20 +368,4 @@ function savedSummary(profile: PlansProfile | null): string {
   if (plan.kind === 'none' || !plan.next) return 'No emails for now; your picks and plans stay here.';
   const when = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(plan.next);
   return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1]}.`;
-}
-
-function PickRow({ item, signedIn, index = 0 }: { item: PickItem; signedIn: boolean; index?: number }) {
-  const distance = pickDistance(item.distanceM);
-  const labels = EVENT_INTERESTS.filter((i) => item.matched.includes(i.id)).map((i) => i.label);
-  return (
-    <li className="pl-row" style={{ ['--i' as string]: index }}>
-      <time dateTime={item.start}>{pickWhen(item.start)}</time>
-      <div>
-        <Link to={item.path} className="pl-row-title">{item.title}</Link>
-        <p>{[item.venue || item.neighbourhood, distance, item.free ? 'Free' : null].filter(Boolean).join(' · ')}</p>
-        {labels.length ? <p className="pl-row-tags">{labels.map((l) => <span key={l}>{l}</span>)}</p> : null}
-      </div>
-      {item.kind === 'event' && signedIn ? <GoingButton eventId={item.entityId} start={item.start} compact /> : <Link to={item.path} className="pl-row-go" aria-label={`Open ${item.title}`}><ArrowUpRight size={18} /></Link>}
-    </li>
-  );
 }

@@ -101,6 +101,15 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
     dateModified: SEO_REFRESH_MOD,
     image: DEFAULT_IMAGE,
   },
+  '/check-your-community': {
+    title: 'Where Does Your Calgary Community Rank? | CalgaryWatch',
+    description:
+      'Type your Calgary community, guess where it ranks for 311 reports, then see the answer, the trend and how it stacks up against your neighbours.',
+    index: true,
+    pageType: 'WebPage',
+    dateModified: '2026-10-08',
+    image: DEFAULT_IMAGE,
+  },
   '/admin': {
     title: 'Admin Portal | Calgary Watch',
     description: 'Administrative dashboard for Calgary Watch operations and moderation.',
@@ -201,6 +210,10 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
   '/airdrie-crime-map': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
     { name: 'Airdrie Crime Map Guide', item: `${PRODUCTION_ORIGIN}/airdrie-crime-map` },
+  ],
+  '/check-your-community': [
+    { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },
+    { name: 'Check Your Community', item: `${PRODUCTION_ORIGIN}/check-your-community` },
   ],
   '/privacy': [
     { name: 'Home', item: `${PRODUCTION_ORIGIN}/` },

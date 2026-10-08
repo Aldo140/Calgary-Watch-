@@ -6,6 +6,7 @@ import { queueDrafts } from './jobs/drafts';
 import { resolveDoubleBookings, autoApprove, publishDue, redraftAndBriefs } from './jobs/posts';
 import { sendApproved, syncReplies } from './jobs/outreach';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
+import { flushUsage } from './jobs/usage';
 
 const log = (m: string) => console.log(`[ops:hourly] ${m}`);
 if (!hasFirebase()) {
@@ -32,5 +33,6 @@ await step('publish', () => publishDue(db, now, log));
 await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
 await step('replies', () => syncReplies(db, now, log));
 await step('send', () => sendApproved(db, now, log));
+await flushUsage(db, now, 'hourly', log).catch(e => log(`usage not recorded: ${e instanceof Error ? e.message : e}`));
 if (failed) process.exitCode = 1;
 else if (quota) exitForQuota('Operations hourly');

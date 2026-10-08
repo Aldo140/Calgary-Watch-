@@ -1,0 +1,22 @@
+/* Route-change loader (App.tsx PageLoader). The first load uses #cw-splash in index.html. */
+.cw-page-loader {
+  min-height: 100vh; min-height: 100dvh;
+  display: grid; place-items: center;
+  background: var(--cw-bg, #faf8f3);
+  animation: cw-page-loader-in 200ms 150ms ease both;
+}
+.cw-page-loader svg { overflow: visible; }
+.cw-page-loader path { fill: none; stroke-linecap: round; }
+.cw-page-loader-track { stroke: rgba(6, 22, 47, .1); stroke-width: 7; }
+.cw-page-loader-wave {
+  stroke: #2ec4f1; stroke-width: 7;
+  stroke-dasharray: 88 200; stroke-dashoffset: 88;
+  animation: cw-page-loader-draw 1.1s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+.cw-page-loader-sun { fill: #ffd23f; stroke: #06162f; stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: cw-page-loader-pulse 1.1s ease-in-out infinite; }
+@keyframes cw-page-loader-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cw-page-loader-draw { 0% { stroke-dashoffset: 88; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -88; } }
+@keyframes cw-page-loader-pulse { 0%, 100% { transform: scale(.8); } 50% { transform: scale(1.1); } }
+@media (prefers-reduced-motion: reduce) {
+  .cw-page-loader-wave, .cw-page-loader-sun { animation: none; stroke-dashoffset: 0; }
+}

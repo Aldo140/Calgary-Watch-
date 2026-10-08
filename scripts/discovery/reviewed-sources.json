@@ -352,12 +352,11 @@
           "title": "Alberta Ballet: The Nutcracker",
           "summary": "Alberta Ballet’s Nutcracker, with the Calgary Philharmonic playing Tchaikovsky live.",
           "description": "Choreography by artistic director Francesco Ventriglia, costumes by Gianluca Falaschi and sets by Italo Grassi, with the Calgary Philharmonic Orchestra playing the score live. Calgary shows Dec. 11–24: evenings at 6 or 7 pm and 1 pm matinees (Dec. 24 is a matinee only). Tickets through Ticketmaster.",
-          "address": "1415 14 Ave NW, Calgary, AB",
+          "address": "Southern Alberta Jubilee Auditorium, 1415 14 Ave NW, Calgary, AB",
           "venue": "Southern Alberta Jubilee Auditorium",
-          "neighbourhood": "Banff Trail",
           "sourceUrl": "https://www.albertaballet.com/shows/the-nutcracker",
-          "start": "2026-12-11T19:00:00-07:00",
-          "end": "2026-12-24T15:30:00-07:00",
+          "start": "2026-12-11T19:00:00-06:00",
+          "end": "2026-12-24T15:30:00-06:00",
           "endTimeEstimated": true
         }
       }
@@ -474,6 +473,190 @@
               "cancelled": false
             }
           ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "vertigo-theatre",
+      "name": "Vertigo Theatre",
+      "approved": true,
+      "hosts": [
+        "www.vertigotheatre.com",
+        "purchase.vertigotheatre.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "the-lodger-2026",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "mystery",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Vertigo Theatre",
+          "pricing": "paid",
+          "title": "Vertigo Theatre: The Lodger",
+          "summary": "A world-premiere thriller opening Vertigo Theatre’s 50th-anniversary season.",
+          "description": "World premiere. Runs Sept. 26 to Oct. 25, 2026. Vertigo Theatre’s 2026–27 season is its 50th. Tickets and exact showtimes on Vertigo’s season page.",
+          "address": "161, 115 9 Ave SE, Calgary, AB",
+          "venue": "Vertigo Theatre, Calgary Tower Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.vertigotheatre.com/2026-27",
+          "start": "2026-09-26T19:30:00-06:00",
+          "end": "2026-10-25T16:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "sherlock-holmes-hunt-for-moriarty-2026",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "mystery",
+            "holiday",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Vertigo Theatre",
+          "pricing": "paid",
+          "title": "Sherlock Holmes: The Hunt for Moriarty",
+          "summary": "Vertigo’s holiday-season Sherlock Holmes mystery.",
+          "description": "Runs Nov. 14 to Dec. 19, 2026. Vertigo Theatre’s 2026–27 season is its 50th. Tickets and exact showtimes on Vertigo’s season page.",
+          "address": "161, 115 9 Ave SE, Calgary, AB",
+          "venue": "Vertigo Theatre, Calgary Tower Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.vertigotheatre.com/2026-27",
+          "start": "2026-11-14T19:30:00-06:00",
+          "end": "2026-12-19T22:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "the-veil-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "mystery",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Vertigo Theatre",
+          "pricing": "paid",
+          "title": "Vertigo Theatre: The Veil",
+          "summary": "A thriller by Keith Barker and Thomas Morgan Jones.",
+          "description": "By Keith Barker and Thomas Morgan Jones. Runs Jan. 16 to Feb. 14, 2027. Vertigo Theatre’s 2026–27 season is its 50th. Tickets and exact showtimes on Vertigo’s season page.",
+          "address": "161, 115 9 Ave SE, Calgary, AB",
+          "venue": "Vertigo Theatre, Calgary Tower Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.vertigotheatre.com/2026-27",
+          "start": "2027-01-16T19:30:00-06:00",
+          "end": "2027-02-14T16:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "last-candle-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "mystery",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Vertigo Theatre",
+          "pricing": "paid",
+          "title": "Vertigo Theatre: Last Candle",
+          "summary": "A special presentation in The Studio at Vertigo Theatre.",
+          "description": "Special presentation in The Studio. Runs Feb. 26 to March 7, 2027. Vertigo Theatre’s 2026–27 season is its 50th. Tickets and exact showtimes on Vertigo’s season page.",
+          "address": "161, 115 9 Ave SE, Calgary, AB",
+          "venue": "The Studio, Vertigo Theatre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.vertigotheatre.com/2026-27",
+          "start": "2027-02-26T19:30:00-06:00",
+          "end": "2027-03-07T16:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "the-39-steps-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "comedy",
+            "mystery",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Vertigo Theatre",
+          "pricing": "paid",
+          "title": "Vertigo Theatre: The 39 Steps",
+          "summary": "Hitchcock’s spy caper played for laughs, with a tiny cast and a lot of quick changes.",
+          "description": "Runs March 13 to April 17, 2027. Vertigo Theatre’s 2026–27 season is its 50th. Tickets and exact showtimes on Vertigo’s season page.",
+          "address": "161, 115 9 Ave SE, Calgary, AB",
+          "venue": "Vertigo Theatre, Calgary Tower Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.vertigotheatre.com/2026-27",
+          "start": "2027-03-13T19:30:00-06:00",
+          "end": "2027-04-17T22:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "the-midnight-torch-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "mystery",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "nightlife",
+            "indoor"
+          ],
+          "organizer": "Vertigo Theatre",
+          "pricing": "paid",
+          "title": "The Midnight Torch: A Detective Murdoch Mystery",
+          "summary": "A Detective Murdoch Mystery on stage at Vertigo Theatre.",
+          "description": "Runs May 15 to June 13, 2027. Vertigo Theatre’s 2026–27 season is its 50th. Tickets and exact showtimes on Vertigo’s season page.",
+          "address": "161, 115 9 Ave SE, Calgary, AB",
+          "venue": "Vertigo Theatre, Calgary Tower Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.vertigotheatre.com/2026-27",
+          "start": "2027-05-15T19:30:00-06:00",
+          "end": "2027-06-13T16:00:00-06:00",
+          "endTimeEstimated": true
         }
       }
     ]

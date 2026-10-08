@@ -9,7 +9,7 @@ import { calgaryDateTimeFormat } from './calgaryTz';
  */
 
 /** Places people plan a night around. */
-const MARQUEE_VENUE = /saddledome|scotia place|stampede park|bmo centre|gmc stadium|big four|nutrien western|mcmahon|jubilee|jack singer|werklund|arts commons|grey eagle|studio bell|national music centre|calgary zoo|wilder institute|telus spark|heritage park|spruce meadows|olympic plaza|shaw millennium|prince'?s island|winsport|canada olympic park|calaway|max bell|theatre calgary|stephen avenue|east village|the confluence|contemporary calgary|glenbow|central library|bella concert hall|vertigo|chinook centre|eau claire/i;
+const MARQUEE_VENUE = /saddledome|scotia place|stampede park|bmo centre|gmc stadium|big four|nutrien western|mcmahon|jubilee|jack singer|werklund|arts commons|grey eagle|studio bell|national music centre|calgary zoo|wilder institute|telus spark|heritage park|spruce meadows|olympic plaza|shaw millennium|prince'?s island|winsport|canada olympic park|calaway|max bell|theatre calgary|stephen avenue|east village|the confluence|contemporary calgary|glenbow|central library|bella concert hall|vertigo|chinook centre|eau claire|calgary farmers' market|crossroads market/i;
 
 /** Pro and major-junior teams that fill an arena. */
 const BIG_LEAGUE = /\b(flames|stampeders|grey cup)\b/i;
@@ -55,7 +55,7 @@ export function interestScore(e: Rankable, start?: string): number {
   else if (e.sourceId === 'visit-calgary') s += 1;
   if (e.verification === 'source-checked') s += 2; // hand-reviewed by an editor
   if (e.image) s += 1;
-  if (e.kind === 'market') s += 2;
+  if (e.kind === 'market') s += /farmers'? market|crossroads|christmas|holiday|winter market/i.test(e.title) ? 3 : 2;
   s += Math.min(5, (e.scores?.featured ?? 0) + (e.scores?.editorial ?? 0));
   if (start) { const h = hour(start); if (h >= 17 && h <= 21) s += 1; }
   if (SMALL_FORMAT.test(e.title)) s -= 4;

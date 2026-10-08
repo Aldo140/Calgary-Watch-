@@ -627,6 +627,90 @@
           "end": "2026-10-31T14:30:00-06:00",
           "endTimeEstimated": true
         }
+      },
+      {
+        "id": "hitmen-2026-10-12",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "whl",
+            "hitmen",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Hitmen vs. Victoria Royals",
+          "summary": "WHL hockey: the Hitmen host the Victoria Royals at the Saddledome.",
+          "description": "WHL regular-season game at the Scotiabank Saddledome, 1:00 pm. Confirm the time and tickets with the Hitmen before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-12T13:00:00-06:00",
+          "end": "2026-10-12T15:30:00-06:00",
+          "neighbourhood": "Beltline",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "hitmen-2026-10-16",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "whl",
+            "hitmen",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Hitmen vs. Lethbridge Hurricanes",
+          "summary": "WHL hockey: the Hitmen host the Lethbridge Hurricanes at the Saddledome.",
+          "description": "WHL regular-season game at the Scotiabank Saddledome, 7:00 pm. Confirm the time and tickets with the Hitmen before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-16T19:00:00-06:00",
+          "end": "2026-10-16T21:30:00-06:00",
+          "neighbourhood": "Beltline",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "hitmen-2026-10-17",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "hockey",
+            "whl",
+            "hitmen",
+            "arena"
+          ],
+          "categories": [
+            "sports",
+            "indoor"
+          ],
+          "organizer": "Scotiabank Saddledome",
+          "pricing": "paid",
+          "title": "Calgary Hitmen vs. Red Deer Rebels",
+          "summary": "WHL hockey: the Hitmen host the Red Deer Rebels at the Saddledome.",
+          "description": "WHL regular-season game at the Scotiabank Saddledome, 1:00 pm. Confirm the time and tickets with the Hitmen before you go.",
+          "address": "555 Saddledome Rise SE, Calgary, AB",
+          "venue": "Scotiabank Saddledome",
+          "sourceUrl": "https://scotiabanksaddledome.com/events/",
+          "start": "2026-10-17T13:00:00-06:00",
+          "end": "2026-10-17T15:30:00-06:00",
+          "neighbourhood": "Beltline",
+          "endTimeEstimated": true
+        }
       }
     ]
   },
@@ -1344,6 +1428,239 @@
           "sourceUrl": "https://www.calgaryzoo.com/",
           "start": "2026-11-01T09:00:00-06:00",
           "end": "2026-11-01T17:30:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-opera",
+      "name": "Calgary Opera",
+      "approved": true,
+      "hosts": [
+        "www.calgaryopera.com",
+        "calgaryopera.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "tosca-2026-10-16",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "opera",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "organizer": "Calgary Opera",
+          "pricing": "paid",
+          "title": "Calgary Opera: Tosca",
+          "summary": "Puccini's thriller of love, politics and betrayal, with the Calgary Philharmonic in the pit.",
+          "description": "Calgary Opera opens its 2026/27 season with Puccini's Tosca at the Southern Alberta Jubilee Auditorium, sung in Italian with English surtitles, about 2 hours 25 minutes with one intermission. Youth 18 and under get half-price seats. Bridge work on 14 Avenue NW limits driving access, so check the Jubilee's directions before you go.",
+          "address": "1415 14 Avenue NW, Calgary, AB",
+          "venue": "Southern Alberta Jubilee Auditorium",
+          "sourceUrl": "https://www.calgaryopera.com/",
+          "start": "2026-10-16T19:30:00-06:00",
+          "end": "2026-10-16T22:00:00-06:00"
+        }
+      },
+      {
+        "id": "tosca-2026-10-18",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "opera",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "organizer": "Calgary Opera",
+          "pricing": "paid",
+          "title": "Calgary Opera: Tosca",
+          "summary": "Puccini's thriller of love, politics and betrayal, with the Calgary Philharmonic in the pit.",
+          "description": "Calgary Opera opens its 2026/27 season with Puccini's Tosca at the Southern Alberta Jubilee Auditorium, sung in Italian with English surtitles, about 2 hours 25 minutes with one intermission. Youth 18 and under get half-price seats. Bridge work on 14 Avenue NW limits driving access, so check the Jubilee's directions before you go.",
+          "address": "1415 14 Avenue NW, Calgary, AB",
+          "venue": "Southern Alberta Jubilee Auditorium",
+          "sourceUrl": "https://www.calgaryopera.com/",
+          "start": "2026-10-18T14:00:00-06:00",
+          "end": "2026-10-18T16:30:00-06:00"
+        }
+      },
+      {
+        "id": "tosca-2026-10-24",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "opera",
+            "date night"
+          ],
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "organizer": "Calgary Opera",
+          "pricing": "paid",
+          "title": "Calgary Opera: Tosca",
+          "summary": "Puccini's thriller of love, politics and betrayal, with the Calgary Philharmonic in the pit.",
+          "description": "Calgary Opera opens its 2026/27 season with Puccini's Tosca at the Southern Alberta Jubilee Auditorium, sung in Italian with English surtitles, about 2 hours 25 minutes with one intermission. Youth 18 and under get half-price seats. Bridge work on 14 Avenue NW limits driving access, so check the Jubilee's directions before you go.",
+          "address": "1415 14 Avenue NW, Calgary, AB",
+          "venue": "Southern Alberta Jubilee Auditorium",
+          "sourceUrl": "https://www.calgaryopera.com/",
+          "start": "2026-10-24T19:30:00-06:00",
+          "end": "2026-10-24T22:00:00-06:00"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-phil",
+      "name": "Calgary Philharmonic Orchestra",
+      "approved": true,
+      "hosts": [
+        "calgaryphil.com",
+        "www.calgaryphil.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "moana-2026-10-09",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "orchestra",
+            "film",
+            "kids"
+          ],
+          "categories": [
+            "music",
+            "family",
+            "indoor"
+          ],
+          "organizer": "Calgary Philharmonic Orchestra",
+          "pricing": "paid",
+          "title": "Disney's Moana Live-to-Film Concert",
+          "summary": "The Calgary Phil plays the whole Moana score live while the film runs on the big screen.",
+          "description": "The Calgary Philharmonic Orchestra performs Disney's Moana live to the full film at the Jack Singer Concert Hall. All ages. Tickets from about $35 including fees through the Calgary Phil.",
+          "address": "225 8 Avenue SE, Calgary, AB",
+          "venue": "Jack Singer Concert Hall, Werklund Centre",
+          "sourceUrl": "https://calgaryphil.com/",
+          "start": "2026-10-09T19:30:00-06:00",
+          "end": "2026-10-09T21:45:00-06:00",
+          "neighbourhood": "Downtown",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "moana-2026-10-10",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "orchestra",
+            "film",
+            "kids"
+          ],
+          "categories": [
+            "music",
+            "family",
+            "indoor"
+          ],
+          "organizer": "Calgary Philharmonic Orchestra",
+          "pricing": "paid",
+          "title": "Disney's Moana Live-to-Film Concert",
+          "summary": "The Calgary Phil plays the whole Moana score live while the film runs on the big screen.",
+          "description": "The Calgary Philharmonic Orchestra performs Disney's Moana live to the full film at the Jack Singer Concert Hall. All ages. Tickets from about $35 including fees through the Calgary Phil.",
+          "address": "225 8 Avenue SE, Calgary, AB",
+          "venue": "Jack Singer Concert Hall, Werklund Centre",
+          "sourceUrl": "https://calgaryphil.com/",
+          "start": "2026-10-10T14:30:00-06:00",
+          "end": "2026-10-10T16:45:00-06:00",
+          "neighbourhood": "Downtown",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "grey-eagle",
+      "name": "Grey Eagle Resort & Casino",
+      "approved": true,
+      "hosts": [
+        "www.greyeagleresortandcasino.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "beach-boys-2026-10-19",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "concert",
+            "date night"
+          ],
+          "categories": [
+            "music",
+            "indoor"
+          ],
+          "organizer": "Grey Eagle Resort & Casino",
+          "pricing": "paid",
+          "title": "The Beach Boys",
+          "summary": "The Beach Boys play the Grey Eagle Event Centre.",
+          "description": "Rescheduled from August 24; tickets for the original date are honoured. Doors 6:30 pm, show 8 pm. Tickets $69.50 to $99.50 plus tax and fees through Grey Eagle.",
+          "address": "3777 Grey Eagle Drive, Calgary, AB",
+          "venue": "Grey Eagle Event Centre",
+          "sourceUrl": "https://www.greyeagleresortandcasino.ca/events/2026-oct/the-beach-boys",
+          "start": "2026-10-19T20:00:00-06:00",
+          "end": "2026-10-19T22:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "inglewood-bia",
+      "name": "Inglewood Business Improvement Area",
+      "approved": true,
+      "hosts": [
+        "www.inglewoodyyc.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "mercantile-on-9th-2026-11-28",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "holiday market",
+            "local makers"
+          ],
+          "categories": [
+            "market",
+            "shopping",
+            "holiday"
+          ],
+          "organizer": "Inglewood BIA",
+          "pricing": "free",
+          "title": "Mercantile on 9th",
+          "summary": "Inglewood's holiday street market: local makers and sustainable gifts along 9 Avenue SE.",
+          "description": "A one-day sustainable holiday market along 9 Avenue SE in Inglewood, 11 am to 6 pm, run by the Inglewood Business Improvement Area.",
+          "address": "9 Avenue SE, Calgary, AB",
+          "venue": "9 Avenue SE, Inglewood",
+          "sourceUrl": "https://www.inglewoodyyc.ca/",
+          "start": "2026-11-28T11:00:00-07:00",
+          "end": "2026-11-28T18:00:00-07:00",
+          "neighbourhood": "Inglewood"
         }
       }
     ]

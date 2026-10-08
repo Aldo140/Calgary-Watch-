@@ -9,9 +9,29 @@ import { brandKit } from './lib/brand';
 import { COLLECTIONS, cdnUrl, hasFirebase, opsDb } from './lib/firebase';
 
 const OUT = 'src/generated/calgarydaily-feed.json';
+// The agents now run from ArctosLaunchpad and publish the feed to its ops-media branch.
+const ARCTOS_FEED = 'https://raw.githubusercontent.com/Aldo140/ArctosLaunchpad/ops-media/feed/calgarydaily.json';
 const log = (m: string) => console.log(`[ops:feed] ${m}`);
 
-if (!hasFirebase()) {
+async function fromArctos(): Promise<boolean> {
+  try {
+    const res = await fetch(ARCTOS_FEED, { signal: AbortSignal.timeout(20_000) });
+    if (!res.ok) return false;
+    const feed = (await res.json()) as { posts?: unknown[] };
+    if (!Array.isArray(feed.posts)) return false;
+    await mkdir('src/generated', { recursive: true });
+    await writeFile(`${OUT}.tmp`, JSON.stringify(feed, null, 2) + '\n');
+    await rename(`${OUT}.tmp`, OUT);
+    log(`Wrote ${feed.posts.length} posts from the Arctos agents.`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+if (await fromArctos()) {
+  // Done: the queue no longer lives in this project's database.
+} else if (!hasFirebase()) {
   log('No Firebase credentials; keeping the committed feed.');
 } else {
   try {

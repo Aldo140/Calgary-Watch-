@@ -15,7 +15,9 @@ import { draftPitches, findLeads } from './jobs/outreach';
 import { checkHealth, sendSummary } from './jobs/health';
 import { collectInsights } from './jobs/insights';
 import { collectAccountHistory } from './jobs/accountHistory';
+import { runScout } from './jobs/scout';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
+import { flushUsage } from './jobs/usage';
 
 const log = (m: string) => console.log(`[ops:daily] ${m}`);
 const index = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
@@ -40,6 +42,7 @@ if (!db) {
   await step('monitor posts', () => monitorPosts(db, index, now, log));
   await step('insights', () => collectInsights(db, now, log));
   await step('account history', () => collectAccountHistory(db, now, log));
+  await step('scout', () => runScout(db, now, log));
   await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
   await step('draft posts', () => draftPosts(db, index, now, log));
   await step('queue drafts', () => queueDrafts(db, now, log));
@@ -51,5 +54,6 @@ if (!db) {
   await step('health', async () => { health = await checkHealth(db, index, now, log); });
   if (health) await step('summary', () => sendSummary(db, health!, now, log));
 }
+await flushUsage(db, now, 'daily', log).catch(e => log(`usage not recorded: ${e instanceof Error ? e.message : e}`));
 if (failed) process.exitCode = 1;
 else if (quota) exitForQuota('Operations daily');

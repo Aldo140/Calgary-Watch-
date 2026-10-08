@@ -15,6 +15,8 @@ on:
 permissions:
   # Rendered post images are committed to the ops-media branch (see scripts/ops/lib/firebase.ts).
   contents: write
+  # Keyless sign-in to arctos-hq for the HQ snapshot.
+  id-token: write
   actions: read
 
 concurrency:
@@ -43,7 +45,49 @@ jobs:
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
 
+      # HQ (arctoslaunchpad.com/hq): keyless sign-in to arctos-hq. GitHub's OIDC
+      # token is exchanged for a short-lived Google token; no key is stored.
+      - name: Sign in to arctos-hq
+        id: hq
+        continue-on-error: true
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: false
+          export_environment_variables: false
+      # The agents moved to ArctosLaunchpad (docs/OPS.md there). Once its first
+      # run has started the handoff, this workflow does nothing. Anything but a
+      # clear "not moved yet" stands down too, so the two can never both publish.
+      - name: Stand down if the agents moved to Arctos
+        id: moved
+        env:
+          TOKEN: ${{ steps.hq.outputs.access_token }}
+        run: |
+          code=000
+          if [ -n "$TOKEN" ]; then
+            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $TOKEN" \
+              'https://firestore.googleapis.com/v1/projects/arctos-hq/databases/(default)/documents/ops_meta/handoff')
+          fi
+          if [ "$code" = 404 ]; then
+            echo "moved=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "moved=true" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Ops moved to Arctos::The agents run from Aldo140/ArctosLaunchpad now (handoff check: HTTP $code)."
+          fi
+      # Approvals, rejections and replies made in HQ, applied before the run publishes and sends.
+      - name: Apply HQ actions
+        if: steps.moved.outputs.moved == 'false'
+        continue-on-error: true
+        run: npm run ops:hq-commands
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       - name: Draft, research, check health, send summary
+        if: steps.moved.outputs.moved == 'false'
         run: npm run ops:daily
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -54,6 +98,9 @@ jobs:
           ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
           IG_TOKEN_CALGARYWATCH: ${{ secrets.IG_TOKEN_CALGARYWATCH }}
           IG_TOKEN_CALGARYDAILY: ${{ secrets.IG_TOKEN_CALGARYDAILY }}
+          # The Scout reads other Calgary accounts (Business Discovery, Facebook-login Page token).
+          IG_DISCOVERY_TOKEN: ${{ secrets.IG_DISCOVERY_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
           MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
           MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
           MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
@@ -64,3 +111,14 @@ jobs:
           OPS_SUMMARY_TO: ${{ vars.OPS_SUMMARY_TO }}
           OPS_SUMMARY_FROM: ${{ vars.OPS_SUMMARY_FROM }}
           GITHUB_TOKEN: ${{ github.token }}
+
+      # The HQ dashboard reads a summary of everything above.
+      - name: Publish the HQ snapshot
+        if: always() && steps.moved.outputs.moved == 'false'
+        continue-on-error: true
+        run: npm run ops:hq
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}

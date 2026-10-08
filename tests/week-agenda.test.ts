@@ -52,13 +52,21 @@ describe('weekAgenda', () => {
     assert.equal(week[1].items[0].kind, 'market');
   });
 
-  it('sorts a day by start time and carries indoor/free hints', () => {
-    const evening = withDates('2026-09-26T19:00:00-06:00', '2026-09-26T21:00:00-06:00', { pricing: 'free', categories: ['indoor'] } as Partial<DiscoveryEntity>);
-    const morning = withDates('2026-09-26T09:00:00-06:00', '2026-09-26T11:00:00-06:00');
-    const [first, second] = weekAgenda([evening, morning], [], 7, now)[3].items;
-    assert.equal(first.start, morning.kind === 'event' ? morning.start : '');
-    assert.equal(second.free, true);
-    assert.equal(second.indoor, true);
+  it('leads each day with the likeliest outing, then by start time, and carries indoor/free hints', () => {
+    const talk = withDates('2026-09-26T09:00:00-06:00', '2026-09-26T11:00:00-06:00', { title: 'Speaker Series: Soil Health' } as Partial<DiscoveryEntity>);
+    const morning = withDates('2026-09-26T10:00:00-06:00', '2026-09-26T12:00:00-06:00', { title: 'Morning walk', categories: [], tags: [], image: undefined, venue: 'Somewhere' } as Partial<DiscoveryEntity>);
+    const game = withDates('2026-09-26T19:00:00-06:00', '2026-09-26T22:00:00-06:00', { title: 'Calgary Flames vs. Edmonton Oilers', venue: 'Scotiabank Saddledome', pricing: 'free', categories: ['indoor'] } as Partial<DiscoveryEntity>);
+    const titles = weekAgenda([talk, morning, game], [], 7, now)[3].items;
+    assert.deepEqual(titles.map(i => i.title), ['Calgary Flames vs. Edmonton Oilers', 'Morning walk', 'Speaker Series: Soil Health']);
+    assert.equal(titles[0].free, true);
+    assert.equal(titles[0].indoor, true);
+  });
+
+  it('shows a title once per day and hides campus-only listings', () => {
+    const tour = (start: string) => withDates(start, start.replace('T19', 'T21'), { title: 'Fall Ghost Tours' } as Partial<DiscoveryEntity>);
+    const unwind = withDates('2026-09-26T12:00:00-06:00', '2026-09-26T13:00:00-06:00', { title: 'Unwind - Pouch Decorating', venue: 'Life Design Hub (MSC 171)', sourceId: 'ucalgary-arts' } as Partial<DiscoveryEntity>);
+    const day = weekAgenda([tour('2026-09-26T19:00:00-06:00'), tour('2026-09-26T19:30:00-06:00'), unwind], [], 7, now)[3].items;
+    assert.deepEqual(day.map(i => i.title), ['Fall Ghost Tours']);
   });
 
   it('adds Calgary days across the November DST change', () => {
@@ -67,7 +75,7 @@ describe('weekAgenda', () => {
 });
 
 describe('homepage claims', () => {
-  const item = (title: string, to = `/x/${title}`) => ({ key: title, kind: 'event' as const, title, to, start: '', end: '', free: false, indoor: false, outdoor: false });
+  const item = (title: string, to = `/x/${title}`) => ({ key: title, kind: 'event' as const, title, to, start: '', end: '', free: false, indoor: false, outdoor: false, score: 0 });
 
   it('counts a listing once for the weekend even when it runs on two days', () => {
     const week = weekAgenda([], [], 7, now); // Wed..Tue; Fri 25 – Sun 27

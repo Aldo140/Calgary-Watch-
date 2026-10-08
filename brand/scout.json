@@ -1,0 +1,100 @@
+{
+  "note": "Calgary Instagram accounts the Scout reads every day through Business Discovery. Only Business and Creator accounts can be read; a handle that turns out to be personal or wrong is reported in the log and skipped. Creators the watched accounts credit are found and checked automatically (candidates), so this list only needs the starting points. 'own' lists our own accounts, shown on the HQ Instagram tab.",
+  "maxCandidatesPerRun": 15,
+  "watch": [
+    {
+      "handle": "urbacalgary",
+      "kind": "creator"
+    },
+    {
+      "handle": "albertahub",
+      "kind": "creator"
+    },
+    {
+      "handle": "konnectyyc",
+      "kind": "creator"
+    },
+    {
+      "handle": "megiipierson",
+      "kind": "creator"
+    },
+    {
+      "handle": "calgaryevents",
+      "kind": "creator"
+    },
+    {
+      "handle": "dailyhivecalgary",
+      "kind": "media"
+    },
+    {
+      "handle": "narcitycalgary",
+      "kind": "media"
+    },
+    {
+      "handle": "avenuecalgary",
+      "kind": "media"
+    },
+    {
+      "handle": "cbccalgary",
+      "kind": "media"
+    },
+    {
+      "handle": "calgaryherald",
+      "kind": "media"
+    },
+    {
+      "handle": "citynewscalgary",
+      "kind": "media"
+    },
+    {
+      "handle": "livewirecalgary",
+      "kind": "media"
+    },
+    {
+      "handle": "tourismcalgary",
+      "kind": "tourism"
+    },
+    {
+      "handle": "cityofcalgary",
+      "kind": "civic"
+    },
+    {
+      "handle": "calgaryzoo",
+      "kind": "venue"
+    },
+    {
+      "handle": "heritageparkyyc",
+      "kind": "venue"
+    },
+    {
+      "handle": "studiobellnmc",
+      "kind": "venue"
+    },
+    {
+      "handle": "calgarystampede",
+      "kind": "venue"
+    },
+    {
+      "handle": "calgaryfarmersmarket",
+      "kind": "venue"
+    }
+  ],
+  "own": [
+    {
+      "handle": "calgarydaily",
+      "business": "calgarydaily"
+    },
+    {
+      "handle": "calgarywatch",
+      "business": "calgarywatch"
+    },
+    {
+      "handle": "vowmotion",
+      "business": "vowmotion"
+    },
+    {
+      "handle": "arctoslaunchpad",
+      "business": "arctos"
+    }
+  ]
+}

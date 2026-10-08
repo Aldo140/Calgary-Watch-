@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUpRight, Check, Lock, MapPin, Pencil, Shield, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Check, MapPin, Pencil, Shield, Sparkles } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
@@ -8,6 +8,7 @@ import { BadgeMark } from '../components/plans/BadgeMark';
 import { BadgesCard, EmailsCard, Glance, GoingTimeline, ListingsCard, NearHomeCard, SetupCard } from '../components/plans/MemberHome';
 import { useMyClaims } from '../lib/claimsApi';
 import { SignupPreview } from '../components/plans/SignupPreview';
+import { SignupForm, SignupHero } from '../components/plans/SignupFlow';
 import { PlansSkyHero } from '../components/plans/PlansSkyHero';
 import { Reveal } from '../components/plans/Motion';
 import { GoingButton } from '../components/plans/GoingButton';
@@ -23,6 +24,7 @@ import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEma
 import { resolveHomeLocation, useHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
 import '../styles/plans.css';
+import '../styles/signup.css';
 
 const titleCase = (s: string) => s.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase()).replace(/\b(Nw|Ne|Sw|Se)\b/g, (q) => q.toUpperCase());
 
@@ -305,6 +307,11 @@ export default function PlansPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, profile]);
 
+  const startForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.setTimeout(() => document.getElementById('su-hood')?.focus({ preventScroll: true }), 450);
+  };
+
   const toggleInterest = (id: EventInterestId) => setDraft((d) => ({ ...d, interests: d.interests.includes(id) ? d.interests.filter((i) => i !== id) : [...d.interests, id] }));
 
   const q = draft.neighborhood.trim().toLowerCase();
@@ -312,7 +319,6 @@ export default function PlansPage() {
     ? communities.filter((c) => c.toLowerCase().includes(q)).sort((a, b) => Number(!a.toLowerCase().startsWith(q)) - Number(!b.toLowerCase().startsWith(q))).slice(0, 6)
     : [];
   const first = (user?.displayName || '').split(' ')[0];
-  const both = draft.weeklyDigestOptIn && draft.eventsDigestOptIn;
   const tunedLeft = Math.max(0, 3 - draft.interests.length);
 
   return (
@@ -340,19 +346,13 @@ export default function PlansPage() {
             </PlansSkyHero>
           </header>
         ) : (
-          <header className="cw-wrap pl-head">
-            <p className="pl-eyebrow">{user && hasPlans ? 'Edit your CalgaryWatch' : 'Your CalgaryWatch · free for Calgarians'}</p>
-            <h1>Calgary, <em>your way.</em></h1>
-            <p className="pl-lead">Tell us where home is and what you’re into. We’ll send what happened nearby and what’s worth leaving the house for, and keep your plans in one place.</p>
-            {!user ? (
-              <ul className="pl-perks" aria-label="What you get">
-                <li><Check size={15} aria-hidden="true" /> Safety near home, every Monday</li>
-                <li><Check size={15} aria-hidden="true" /> Event picks for what you’re into</li>
-                <li><Check size={15} aria-hidden="true" /> “I’m going” reminders</li>
-                <li><Check size={15} aria-hidden="true" /> Badges as you go</li>
-              </ul>
-            ) : null}
-          </header>
+          <SignupHero
+            editing={Boolean(user && hasPlans)}
+            signedIn={Boolean(user)}
+            area={draftArea}
+            onStart={startForm}
+            onSignIn={() => void signIn()}
+          />
         )}
 
         <div className="cw-wrap pl-grid">
@@ -367,109 +367,27 @@ export default function PlansPage() {
             ) : null}
 
             {showForm ? (
-              <form ref={formRef} className="pl-form" onSubmit={(e) => { e.preventDefault(); void save(); }} noValidate>
-                <div className="pl-progress" aria-label={`${progress.filter(Boolean).length} of 3 steps done`}>
-                  <div className="pl-progress-bar">{progress.map((done, i) => <span key={i} data-done={done} />)}</div>
-                  <p>
-                    <strong>{progress.every(Boolean) ? 'Ready to save' : `Step ${Math.min(3, progress.filter(Boolean).length + 1)} of 3`}</strong>
-                    <span>{[draftArea || (draft.address ? 'Street address' : ''), both ? 'Your week (one email)' : draft.weeklyDigestOptIn ? 'Monday brief' : draft.eventsDigestOptIn ? 'Thursday picks' : '', draft.interests.length ? `${draft.interests.length} interest${draft.interests.length === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ') || 'About a minute'}</span>
-                  </p>
-                </div>
-
-                <fieldset className="pl-step" data-done={progress[0]}>
-                  <legend><span className="pl-num">{progress[0] ? <Check size={16} strokeWidth={3} /> : '01'}</span> Where’s home?</legend>
-                  <p className="pl-help">A neighbourhood is enough. Your email, your picks and the live map all start from here, so you set it once.</p>
-                  {!draft.address ? (
-                    <label className="pl-field">
-                      <span>Neighbourhood</span>
-                      <input
-                        value={draft.neighborhood}
-                        onChange={(e) => setDraft((d) => ({ ...d, neighborhood: e.target.value, inferredNeighborhood: '' }))}
-                        placeholder="Start typing, e.g. Bridgeland"
-                        autoComplete="off"
-                        enterKeyHint="next"
-                        aria-describedby="pl-hood-hint"
-                      />
-                    </label>
-                  ) : null}
-                  {suggestions.length ? (
-                    <div className="pl-suggest" aria-label="Matching neighbourhoods">
-                      {suggestions.map((s) => <button key={s} type="button" onClick={() => setDraft((d) => ({ ...d, neighborhood: s, inferredNeighborhood: '', address: '' }))}><MapPin size={14} aria-hidden="true" /> {s}</button>)}
-                    </div>
-                  ) : <p id="pl-hood-hint" className="pl-hint">{communities.length > 100 ? `All ${communities.length} official Calgary communities are searchable.` : 'Calgary communities only.'}</p>}
-                  {!draft.neighborhood ? (
-                    <label className="pl-field">
-                      <span>Or a street address <small>(optional, more precise)</small></span>
-                      <input
-                        value={draft.address}
-                        onChange={(e) => setDraft((d) => ({ ...d, address: e.target.value, inferredNeighborhood: '' }))}
-                        placeholder="e.g. 201 8 Av SW"
-                        autoComplete="street-address"
-                      />
-                    </label>
-                  ) : <button type="button" className="pl-textbtn" onClick={() => setDraft((d) => ({ ...d, neighborhood: '', inferredNeighborhood: '' }))}>Use a street address instead</button>}
-                  {draft.address ? <button type="button" className="pl-textbtn" onClick={() => setDraft((d) => ({ ...d, address: '', inferredNeighborhood: '' }))}>Use a neighbourhood instead</button> : null}
-                  {needsConsent ? (
-                    <label className="pl-check">
-                      <input type="checkbox" checked={draft.consent} onChange={(e) => setDraft((d) => ({ ...d, consent: e.target.checked }))} />
-                      <span><strong>Store my area.</strong> CalgaryWatch keeps it on your account to run your email and picks. An address is turned into a point only while an email is made and never shown to anyone. <Link to="/privacy">What we keep</Link></span>
-                    </label>
-                  ) : null}
-                </fieldset>
-
-                <fieldset className="pl-step" id="emails" data-done={progress[1]}>
-                  <legend><span className="pl-num">{progress[1] ? <Check size={16} strokeWidth={3} /> : '02'}</span> What should we send?</legend>
-                  <p className="pl-help">Free, short, and one click to stop. Tick both and they arrive together as one Monday email.</p>
-                  {pending.monday || pending.thursday ? (
-                    <p className="pl-hint" role="status">You unsubscribed from the {[pending.monday ? 'safety' : '', pending.thursday ? 'event picks' : ''].filter(Boolean).join(' and ')} email by link, so it’s unticked. Tick it again and save if you change your mind.</p>
-                  ) : null}
-                  <div className="pl-mails">
-                    <label className="pl-mail" data-on={draft.weeklyDigestOptIn}>
-                      <input type="checkbox" checked={draft.weeklyDigestOptIn} onChange={(e) => setDraft((d) => ({ ...d, weeklyDigestOptIn: e.target.checked }))} />
-                      <span className="pl-mail-day">Safety · Mondays</span>
-                      <strong>What happened near home</strong>
-                      <small>Reports within a walk, 3 km and 10 km: police news, 311, outages and what neighbours posted.</small>
-                    </label>
-                    <label className="pl-mail" data-on={draft.eventsDigestOptIn}>
-                      <input type="checkbox" checked={draft.eventsDigestOptIn} onChange={(e) => setDraft((d) => ({ ...d, eventsDigestOptIn: e.target.checked }))} />
-                      <span className="pl-mail-day">Event picks · {draft.weeklyDigestOptIn ? 'with Monday' : 'Thursdays'}</span>
-                      <strong>Things to do, picked for you</strong>
-                      <small>Up to eight events that match your interests, near home first, plus reminders for what you’re going to.</small>
-                    </label>
-                  </div>
-                  {both ? <p className="pl-together"><Sparkles size={15} aria-hidden="true" /> <span><strong>One email, not two.</strong> Both arrive together every Monday as <em>Your week</em>: safety near home first, then your picks.</span></p> : null}
-                </fieldset>
-
-                <fieldset className="pl-step" id="pl-step-interests" data-done={progress[2]}>
-                  <legend><span className="pl-num">{progress[2] ? <Check size={16} strokeWidth={3} /> : '03'}</span> What are you into?</legend>
-                  <p className="pl-help">{draft.eventsDigestOptIn ? 'Your event picks come from these. Pick as many as you like.' : 'Optional. These shape the picks on this page.'}</p>
-                  <div className="pl-chips">
-                    {EVENT_INTERESTS.map((i) => {
-                      const on = draft.interests.includes(i.id);
-                      return (
-                        <button key={i.id} type="button" className="pl-chip" aria-pressed={on} onClick={() => toggleInterest(i.id)}>
-                          <span className="pl-chip-tick" aria-hidden="true">{on ? <Check size={14} strokeWidth={3} /> : null}</span>
-                          <span><strong>{i.label}</strong><small>{i.note}</small></span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <p className="pl-goal" data-done={tunedLeft === 0} role="status">
-                    {tunedLeft === 0
-                      ? <><Check size={14} strokeWidth={3} aria-hidden="true" /> {draft.interests.length} picked. <strong>Tuned in</strong> badge unlocked.</>
-                      : <>{draft.interests.length ? `${draft.interests.length} picked. ` : ''}Pick {tunedLeft} more for the <strong>Tuned in</strong> badge.</>}
-                  </p>
-                </fieldset>
-
-                {error ? <p className="pl-error" role="alert">{error}</p> : null}
-                <div className="pl-actions">
-                  <button type="submit" className="pl-btn" data-ready={progress.every(Boolean)} disabled={saving || (!demo && isAuthReady && !isFirebaseConfigured)}>
-                    {saving ? 'Saving…' : user ? (hasPlans ? 'Save changes' : 'Save and start my week') : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
-                  </button>
-                  {editing ? <button type="button" className="pl-textbtn" onClick={() => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); }}>Cancel</button> : null}
-                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> Free. One click to stop any email. Your address is never shown to anyone.{!user ? ' What you picked is kept through sign-in.' : ''}</p>
-                </div>
-              </form>
+              <SignupForm
+                formRef={formRef}
+                draft={draft}
+                setDraft={setDraft}
+                progress={progress}
+                draftArea={draftArea}
+                suggestions={suggestions}
+                communityCount={communities.length}
+                needsConsent={needsConsent}
+                pending={pending}
+                tunedLeft={tunedLeft}
+                error={error}
+                saving={saving}
+                disabled={!demo && isAuthReady && !isFirebaseConfigured}
+                signedIn={Boolean(user)}
+                hasPlans={hasPlans}
+                editing={editing}
+                onCancel={() => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); }}
+                onSubmit={() => void save()}
+                onToggleInterest={toggleInterest}
+              />
             ) : null}
 
             {dashboard && !showForm ? <Reveal><GoingTimeline going={picks.going} /></Reveal> : null}

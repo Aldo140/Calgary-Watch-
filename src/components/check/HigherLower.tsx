@@ -18,7 +18,7 @@ function Side({ r, shape, reveal, from, role, children }: { r: CommunityRank; sh
       {shape && <svg className="cyc-hl-shape" viewBox="0 0 100 100" aria-hidden="true"><path d={shape} /></svg>}
       <div className="cyc-hl-name">{r.name}</div>
       {role === 'known' || reveal ? (
-        <div className="cyc-hl-count"><b>{fmt(shown)}</b><span>311 requests this year</span></div>
+        <div className="cyc-hl-count"><b>{fmt(shown)}</b><span>reports this year</span></div>
       ) : (
         <div className="cyc-hl-count is-hidden"><b>?</b></div>
       )}
@@ -82,7 +82,7 @@ export function HigherLower({ rankings, shapes, start, layout, onClose }: { rank
   };
 
   const shareScore = async () => {
-    const text = `I got a streak of ${streak} on Calgary Higher or Lower. Which community had more 311 calls? Beat me:`;
+    const text = `I got a streak of ${streak} on Calgary Higher or Lower. Which community reported more to the City? Beat me:`;
     const url = pageLink(undefined, '?play=1');
     if (typeof navigator.share === 'function') {
       try { await navigator.share({ text, url }); return; } catch { /* dismissed */ }
@@ -103,7 +103,7 @@ export function HigherLower({ rankings, shapes, start, layout, onClose }: { rank
         <Side key={`n-${next.key}`} r={next} shape={shapes?.get(next.key)} reveal={phase !== 'ask'} from={0} role="unknown">
           {phase === 'ask' && (
             <div className="cyc-hl-choices">
-              <p><b>More</b> or <b>fewer</b> 311 requests than {known.name}?</p>
+              <p><b>More</b> or <b>fewer</b> reports than {known.name}?</p>
               <button type="button" className="cyc-hl-btn is-up" onClick={() => answer(true)}><ArrowUp size={20} aria-hidden="true" /> Higher</button>
               <button type="button" className="cyc-hl-btn is-down" onClick={() => answer(false)}><ArrowDown size={20} aria-hidden="true" /> Lower</button>
             </div>

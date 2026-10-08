@@ -1,4 +1,4 @@
-import type { CommunityRank } from './communityRank';
+import { BAND_LABEL, type CommunityRank } from './communityRank';
 import { BAND_DUOTONE } from './coverArt';
 
 /**
@@ -74,7 +74,7 @@ export async function drawShareCard(r: CommunityRank, rankings: CommunityRank[],
   ctx.restore();
   ctx.fillStyle = tone.ink;
   ctx.font = '600 30px "IBM Plex Mono", monospace';
-  ctx.fillText(`CALGARY · 311 · ${r.year}`, cx + 44, cy + 72);
+  ctx.fillText(`CALGARY · ${r.year}`, cx + 44, cy + 72);
   ctx.font = '800 54px "Bricolage Grotesque", Inter, sans-serif';
   ctx.fillText(r.name, cx + 44, cy + 136, cs * 0.42);
   ctx.font = '800 300px "Bricolage Grotesque", Inter, sans-serif';
@@ -88,7 +88,7 @@ export async function drawShareCard(r: CommunityRank, rankings: CommunityRank[],
   ctx.fillStyle = '#b3b3b3';
   ctx.font = '600 38px Inter, sans-serif';
   const trend = r.change && r.change.pct !== 0 ? ` · ${r.change.pct > 0 ? '+' : ''}${r.change.pct}% vs ${r.change.fromYear}` : '';
-  ctx.fillText(`#${r.rank} of ${r.count} Calgary communities · ${r.band}${trend}`, 140, 1090, W - 280);
+  ctx.fillText(`#${r.rank} of ${r.count} Calgary communities · ${BAND_LABEL[r.band]}${trend}`, 140, 1090, W - 280);
 
   // A progress bar: where it sits from #1 to last
   const bx = 140, bw = W - 280, by = 1150;
@@ -115,7 +115,7 @@ export async function drawShareCard(r: CommunityRank, rankings: CommunityRank[],
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffffff';
   ctx.font = '800 38px "Bricolage Grotesque", Inter, sans-serif';
-  ctx.fillText('Where does yours rank?', 140, 1262);
+  ctx.fillText('Know your community. Where’s yours?', 140, 1262);
   ctx.fillStyle = '#1ed760';
   ctx.font = '700 28px Inter, sans-serif';
   ctx.fillText('calgarywatch.ca/check-your-community', 140, 1306);

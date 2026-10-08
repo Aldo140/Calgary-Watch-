@@ -116,8 +116,8 @@ describe('helpers', () => {
   it('says which way a guess was off', () => {
     assert.equal(guessVerdict(41, 41), 'Exactly right.');
     assert.equal(guessVerdict(44, 41), 'So close: 3 spots off.');
-    assert.equal(guessVerdict(200, 41), "159 spots off. It's busier than you thought.");
-    assert.equal(guessVerdict(10, 41), "31 spots off. It's quieter than you thought.");
+    assert.equal(guessVerdict(200, 41), '159 spots off. More reports than you guessed.');
+    assert.equal(guessVerdict(10, 41), '31 spots off. Fewer reports than you guessed.');
   });
 });
 

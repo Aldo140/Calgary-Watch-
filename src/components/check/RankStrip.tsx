@@ -25,9 +25,9 @@ export default function RankStrip({ focus }: { focus?: string }) {
   return (
     <section className="cyc cyc-strip" aria-labelledby="cyc-strip-title">
       <div className="cyc-strip-text">
-        <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> 311 rankings · {rankings[0].year}</p>
+        <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> Community awareness · {rankings[0].year}</p>
         <h2 id="cyc-strip-title">{mine ? <>Where does <span>{mine.name}</span> rank?</> : <>How does your neighbourhood <span>rank?</span></>}</h2>
-        <p className="cyc-strip-lead">{rankings.length} Calgary communities, ranked by how often their people called 311 this year. Guess yours, then see the truth.</p>
+        <p className="cyc-strip-lead">{rankings.length} Calgary communities, ranked by what neighbours reported to the City this year. Guess yours, then see how it compares.</p>
         <CommunityPicker rankings={rankings} onPick={(r) => go(r.slug)} placeholder="Find your community" hint="Guess it" className="is-strip" />
         <Link to={`${PATH}?play=1`} className="cyc-strip-play">
           <span className="cyc-play-btn" aria-hidden="true"><Play size={18} fill="currentColor" /></span>

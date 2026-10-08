@@ -30,7 +30,7 @@ export function RankNudge() {
       <div className="cw-rnudge-body">
         <p className="cw-rnudge-eyebrow"><span /> New for you{first ? `, ${first}` : ''}</p>
         <p className="cw-rnudge-title">How does your neighbourhood rank?</p>
-        <p className="cw-rnudge-text">Every Calgary community, ranked by 311 calls. Guess yours first.</p>
+        <p className="cw-rnudge-text">See what neighbours reported to the City this year, and where yours lands. Guess first.</p>
         <Link to="/check-your-community" className="cw-rnudge-go" onClick={finish}>
           <span aria-hidden="true"><Play size={14} fill="currentColor" /></span> Check yours
         </Link>

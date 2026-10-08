@@ -11,6 +11,7 @@ import {
   ladder,
   minutesBetweenReports,
   movers,
+  BAND_LABEL,
   teasers,
   type CommunityRank,
 } from '../lib/communityRank';
@@ -48,9 +49,9 @@ function Teasers({ rankings, onOpen }: { rankings: CommunityRank[]; onOpen: (r: 
   if (!rankings.length) return null;
   return (
     <ul className="cyc-teasers" aria-label="Sealed surprises">
-      <Teaser tone="hot" label="#1 in Calgary" r={t.top} detail={(r) => `${fmt(r.total)} requests`} onOpen={onOpen} />
-      <Teaser tone="cool" label="Biggest drop" r={t.biggestDrop} detail={(r) => `${r.change!.pct}% last year`} onOpen={onOpen} />
-      <Teaser tone="warm" label="Biggest jump" r={t.biggestJump} detail={(r) => `+${r.change!.pct}% last year`} onOpen={onOpen} />
+      <Teaser tone="hot" label="Most reports in Calgary" r={t.top} detail={(r) => `${fmt(r.total)} reports`} onOpen={onOpen} />
+      <Teaser tone="cool" label="Most improved" r={t.biggestDrop} detail={(r) => `${r.change!.pct}% last year`} onOpen={onOpen} />
+      <Teaser tone="warm" label="Biggest rise" r={t.biggestJump} detail={(r) => `+${r.change!.pct}% last year`} onOpen={onOpen} />
     </ul>
   );
 }
@@ -97,7 +98,7 @@ function Tracklist({ title, items, shapes, value, you, onOpen, max }: {
             <button type="button" onClick={() => onOpen(r)} disabled={r.key === you}>
               <i>{r.rank}</i>
               <Cover r={r} shape={shapes.get(r.key)} label="" className="is-mini" />
-              <span><b>{r.name}</b><small>{r.key === you ? 'You' : r.band}</small></span>
+              <span><b>{r.name}</b><small>{r.key === you ? 'You' : BAND_LABEL[r.band]}</small></span>
               <em><span style={{ width: `${Math.max(4, (r.total / top) * 100)}%` }} /></em>
               <strong>{value(r)}</strong>
             </button>
@@ -110,9 +111,9 @@ function Tracklist({ title, items, shapes, value, you, onOpen, max }: {
 
 function Boards({ rankings, shapes, onOpen }: { rankings: CommunityRank[]; shapes: Shapes; onOpen: (r: CommunityRank) => void }) {
   const lists: [string, CommunityRank[], (r: CommunityRank) => string][] = [
-    ['Top 10 · most 311 requests', rankings.slice(0, 10), (r) => fmt(r.total)],
-    ['Biggest drops', movers(rankings, 'down'), (r) => `${r.change!.pct}%`],
-    ['Biggest jumps', movers(rankings, 'up'), (r) => `+${r.change!.pct}%`],
+    ['Most reported this year', rankings.slice(0, 10), (r) => fmt(r.total)],
+    ['Most improved', movers(rankings, 'down'), (r) => `${r.change!.pct}%`],
+    ['Biggest rises', movers(rankings, 'up'), (r) => `+${r.change!.pct}%`],
   ];
   return (
     <div className="cyc-boards">
@@ -159,7 +160,8 @@ function FinePrint() {
     <section className="cyc-fine" aria-labelledby="cyc-fine-title">
       <h2 id="cyc-fine-title">The fine print</h2>
       <ul>
-        <li><b>Source.</b> City of Calgary Open Data: 311 service requests by community, refreshed daily. These are requests residents made, not police crime statistics.</li>
+        <li><b>Reports aren't a score.</b> A high rank usually means a busy area and neighbours who notice things and speak up. Use it to know your community and look out for it, not to judge anyone's.</li>
+        <li><b>Source.</b> City of Calgary Open Data: 311 service requests by community, refreshed daily. Reports range from potholes and graffiti to noise and safety concerns. These are requests residents made, not police crime statistics.</li>
         <li><b>Totals, not per resident.</b> Big, busy communities rank higher partly because more people live, work and pass through them. Downtown, the airport and areas around hospitals and LRT stations collect a lot of requests for that reason.</li>
         <li><b>Trends</b> compare the last two full years and skip communities under 100 requests a year, where small numbers swing wildly.</li>
         <li><b>Not official.</b> CalgaryWatch isn't affiliated with the City of Calgary or Calgary Police. In an emergency, call 911.</li>
@@ -169,7 +171,7 @@ function FinePrint() {
 }
 
 function Headline({ id = 'cyc-title' }: { id?: string }) {
-  return <h1 id={id} className="cyc-headline">Calgary,<br />built from its<br /><span>311 calls.</span></h1>;
+  return <h1 id={id} className="cyc-headline">Know your<br />community.<br /><span>Look out for&nbsp;it.</span></h1>;
 }
 
 /** Four covers tiled like a playlist mosaic. */
@@ -190,7 +192,7 @@ function DeskGuess({ r, guess, setGuess, onLock, onSkip }: { r: CommunityRank; g
     <section className="cyc-guess" aria-labelledby="cyc-guess-title">
       <p className="cyc-eyebrow">Round 1 · Your call</p>
       <h2 id="cyc-guess-title">Where does {r.name} rank?</h2>
-      <p className="cyc-guess-sub">Out of {r.count} communities. #1 had the most 311 requests this year.</p>
+      <p className="cyc-guess-sub">Out of {r.count} communities. #1 had the most reports to the City this year.</p>
       <p className="cyc-guess-num" aria-hidden="true">#{guess}</p>
       <div className="cyc-scrub" style={{ '--p': `${pct}%` } as React.CSSProperties}>
         <input type="range" min={1} max={r.count} value={guess} onChange={(e) => setGuess(Number(e.target.value))} aria-label={`Your guess, 1 to ${r.count}`} aria-valuetext={`#${guess}`} />
@@ -210,9 +212,9 @@ function DeskReveal({ r, rankings, shapes, guess, onOpen, onPlay }: { r: Communi
   const minutes = minutesBetweenReports(r.total, r.year, new Date());
   const mixTotal = Math.max(1, r.safety + r.property + r.other);
   const mix = [
-    ['Safety and disorder', r.safety, 'hot'],
-    ['Property damage and theft', r.property, 'warm'],
-    ['Everything else', r.other, 'cool'],
+    ['Safety concerns', r.safety, 'hot'],
+    ['Property and vandalism', r.property, 'warm'],
+    ['Streets, parks and everything else', r.other, 'cool'],
   ] as const;
   const rungs = ladder(rankings, r.key, 3);
   return (
@@ -221,18 +223,18 @@ function DeskReveal({ r, rankings, shapes, guess, onOpen, onPlay }: { r: Communi
         <article className="cyc-tile is-rank">
           <p className="cyc-eyebrow">{guess === null ? 'The answer' : `You said #${guess}`}</p>
           <p className="cyc-tile-rank" aria-label={`Rank ${r.rank} of ${r.count}`}><span aria-hidden="true">#{shown}</span></p>
-          <p className="cyc-tile-of">of {r.count} Calgary communities · <b>{r.band}</b></p>
-          <p className="cyc-tile-verdict">{guess === null ? `${fmt(r.total)} requests so far this year.` : guessVerdict(guess, r.rank)}</p>
+          <p className="cyc-tile-of">of {r.count} Calgary communities · <b>{BAND_LABEL[r.band]}</b></p>
+          <p className="cyc-tile-verdict">{guess === null ? `${fmt(r.total)} reports to the City so far this year.` : guessVerdict(guess, r.rank)}</p>
         </article>
         {minutes && (
           <article className="cyc-tile is-every">
-            <p className="cyc-eyebrow">Someone here contacted 311</p>
+            <p className="cyc-eyebrow">Neighbours here flagged something to the City</p>
             <p className="cyc-tile-big">every <b>{formatInterval(minutes)}</b></p>
-            <p className="cyc-tile-foot">{fmt(r.total)} requests since January 1, day and night.</p>
+            <p className="cyc-tile-foot">{fmt(r.total)} reports since January 1, from potholes to safety concerns.</p>
           </article>
         )}
         <article className="cyc-tile is-mix">
-          <p className="cyc-eyebrow">What it was about</p>
+          <p className="cyc-eyebrow">What neighbours reported</p>
           <ul>
             {mix.map(([label, v, tone]) => (
               <li key={label} className={`is-${tone}`}>
@@ -247,14 +249,14 @@ function DeskReveal({ r, rankings, shapes, guess, onOpen, onPlay }: { r: Communi
           {r.change ? (
             <>
               <p className="cyc-tile-big">{r.change.pct <= 0 ? <ArrowDownRight size={56} aria-hidden="true" /> : <ArrowUpRight size={56} aria-hidden="true" />}<b>{r.change.pct > 0 ? '+' : ''}{r.change.pct}%</b></p>
-              <p className="cyc-tile-foot">{r.change.pct < 0 ? 'Quieter' : r.change.pct > 0 ? 'Busier' : 'Level'}: {fmt(r.change.from)} → {fmt(r.change.to)} requests.</p>
+              <p className="cyc-tile-foot">{r.change.pct < 0 ? 'Fewer reports' : r.change.pct > 0 ? 'More reports' : 'Level'}: {fmt(r.change.from)} → {fmt(r.change.to)}.</p>
             </>
-          ) : <p className="cyc-tile-foot">Too few requests to call a trend.</p>}
+          ) : <p className="cyc-tile-foot">Too few reports to call a trend.</p>}
         </article>
       </div>
 
       <div className="cyc-reveal-row">
-        <Tracklist title="Your rivals" items={rungs} shapes={shapes} you={r.key} value={(x) => fmt(x.total)} onOpen={onOpen} max={rankings[0]?.total} />
+        <Tracklist title="Around you in the ranking" items={rungs} shapes={shapes} you={r.key} value={(x) => fmt(x.total)} onOpen={onOpen} max={rankings[0]?.total} />
         <aside className="cyc-sharebox">
           <Cover r={r} shape={shapes.get(r.key)} showRank className="is-share" />
           <ShareActions r={r} rankings={rankings} shape={shapes.get(r.key)} />
@@ -303,16 +305,16 @@ function Desktop({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading
               <button type="button" className="cyc-back" onClick={close}><ArrowLeft size={16} aria-hidden="true" /> All communities</button>
               <p className="cyc-head-type">Community</p>
               <h1 id="cyc-title" className="cyc-head-name">{selected.name}</h1>
-              <p className="cyc-head-meta"><b>CalgaryWatch</b> · 311 requests · {selected.year} · {phase === 'reveal' ? `#${selected.rank} of ${selected.count}` : `? of ${selected.count}`}</p>
+              <p className="cyc-head-meta"><b>CalgaryWatch</b> · Reports to the City · {selected.year} · {phase === 'reveal' ? `#${selected.rank} of ${selected.count}` : `? of ${selected.count}`}</p>
             </div>
           </div>
         ) : (
           <div className="cyc-head-inner">
             <Mosaic rankings={rankings} shapes={shapes} />
             <div className="cyc-head-text">
-              <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> Public ranking · live from City of Calgary 311 data</p>
+              <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> Community awareness · from City of Calgary open data</p>
               <Headline />
-              <p className="cyc-head-meta"><b>CalgaryWatch</b> · {rankings.length || '…'} communities · {totalRequests ? `${fmt(totalRequests)} requests` : 'loading'} in {rankings[0]?.year ?? 'this year'}</p>
+              <p className="cyc-head-meta"><b>CalgaryWatch</b> · {rankings.length || '…'} communities · {totalRequests ? `${fmt(totalRequests)} reports` : 'loading'} in {rankings[0]?.year ?? 'this year'}</p>
             </div>
           </div>
         )}
@@ -336,7 +338,7 @@ function Desktop({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading
 
         <section ref={gameRef} className="cyc-game" aria-labelledby="cyc-game-title">
           <div className="cyc-shelf-head">
-            <h2 id="cyc-game-title">Which community called 311 more?</h2>
+            <h2 id="cyc-game-title">Which community reported more?</h2>
           </div>
           {rankings.length > 0 && <HigherLower key={gameKey} rankings={rankings} shapes={shapes} start={gameStart} layout="side" />}
         </section>
@@ -400,15 +402,15 @@ function Mobile({ rankings, isLoading }: { rankings: CommunityRank[]; isLoading:
       <section className="cyc-m-hero" aria-labelledby="cyc-title">
         <CoverWall rankings={rankings} shapes={shapes} />
         <div className="cyc-m-copy">
-        <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> Calgary 311 · {rankings[0]?.year ?? 'this year'}</p>
+        <p className="cyc-head-type"><span className="cyc-live" aria-hidden="true" /> Community awareness · {rankings[0]?.year ?? 'this year'}</p>
         <Headline />
-        <p className="cyc-m-lead">{rankings.length ? `${rankings.length} communities` : 'Every community'}, ranked by how often their people called the City. Guess where yours lands, then get the card.</p>
+        <p className="cyc-m-lead">{rankings.length ? `${rankings.length} communities` : 'Every community'}, ranked by what neighbours reported to the City this year, from potholes to safety concerns. Guess where yours lands, then share it with your block.</p>
         <div ref={pickerRef}>
           <CommunityPicker rankings={rankings} onPick={open} placeholder={isLoading && !rankings.length ? 'Loading…' : 'Your community'} hint="Wrap it" className="is-mob" />
         </div>
         <button type="button" className="cyc-m-game" onClick={() => { setGameStart(undefined); setGameOpen(true); }} disabled={!rankings.length}>
           <span className="cyc-play-btn" aria-hidden="true"><Play size={20} fill="currentColor" /></span>
-          <span><b>Higher or Lower</b><small>Which community called 311 more?</small></span>
+          <span><b>Higher or Lower</b><small>Which community reported more?</small></span>
           <ArrowRight size={20} aria-hidden="true" />
         </button>
         </div>

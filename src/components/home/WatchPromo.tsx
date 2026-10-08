@@ -95,7 +95,7 @@ export function WatchPromo({ pulse }: { pulse: LivePulse }) {
 
         <div className="cw-promo-actions">
           <Link to="/community" className="cw-promo-btn" onClick={() => rememberFor(QUIET_AFTER_USE)}>
-            See Community Watch <ArrowUpRight size={18} aria-hidden="true" />
+            <span className="cw-promo-btn-long">See Community Watch</span><span className="cw-promo-btn-short">Take a look</span> <ArrowUpRight size={18} aria-hidden="true" />
           </Link>
           <Link to="/map" className="cw-promo-link" onClick={() => rememberFor(QUIET_AFTER_USE)}>Open the live map</Link>
         </div>

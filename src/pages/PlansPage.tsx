@@ -10,6 +10,7 @@ import { useMyClaims } from '../lib/claimsApi';
 import { SignupPreview } from '../components/plans/SignupPreview';
 import { SignupForm, SignupHero } from '../components/plans/SignupFlow';
 import { PlansSkyHero } from '../components/plans/PlansSkyHero';
+import { MemberDashboard } from '../components/plans/Dashboard';
 import { Reveal } from '../components/plans/Motion';
 import { GoingButton } from '../components/plans/GoingButton';
 import { celebrateBadge } from '../components/plans/BadgeToast';
@@ -320,6 +321,22 @@ export default function PlansPage() {
     : [];
   const first = (user?.displayName || '').split(' ')[0];
   const tunedLeft = Math.max(0, 3 - draft.interests.length);
+
+  if (dashboard && !showForm && user) {
+    const images = new Map(entities.map((e) => [e.id, e.image?.src]));
+    return (
+      <SiteLayout>
+        <MemberDashboard
+          user={user} first={first} area={area} now={now}
+          picks={picks.picks} going={picks.going} considered={picks.considered} imageFor={(id) => images.get(id)}
+          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={myClaims ?? []}
+          busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
+          adminView={asUid ? profile?.displayName ?? '' : null}
+          notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}
+        />
+      </SiteLayout>
+    );
+  }
 
   return (
     <SiteLayout>

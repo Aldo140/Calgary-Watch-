@@ -134,7 +134,9 @@ export function weekAgenda(entities: readonly DiscoveryEntity[], occurrences: re
       for (const o of occurrences) if (o.marketId === e.id && !o.cancelled) add(e, 'market', `${e.id}:${o.start}`, o.start, o.end);
     }
   }
-  const titleKey = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  // Ticketmaster lists one game as "Calgary Hitmen v Red Deer Rebels - Sunday Funday" and
+  // "Calgary Hitmen vs. Red Deer Rebels presented by …"; both are the same outing.
+  const titleKey = (t: string) => t.toLowerCase().replace(/\s+(presented by|-|–|—)\s.*$/, '').replace(/\bv\b\.?/g, 'vs').replace(/[^a-z0-9]+/g, ' ').trim();
   for (const day of week) {
     day.items.sort((a, b) => b.score - a.score || Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
     const seen = new Set<string>();

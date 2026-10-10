@@ -1,28 +1,31 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Check, Clock, Footprints, MapPin, Navigation, Share2, Sun, Wallet } from 'lucide-react';
+import { ArrowUpRight, Check, List, MapPin, Navigation, Share2 } from 'lucide-react';
 import type { DiscoveryEntity, Guide, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { upcomingOccurrences } from '../../lib/discoveryCalendar';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
-import { GuideCover } from './GuideCover';
+import { BRAND_MARK, GuideCover } from './GuideCover';
 import { featuredGuide, mapSearchUrl, routeUrl } from '../../lib/guides';
 import '../../styles/guides.css';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const updated = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric', year: 'numeric' });
 
-function Facts({ guide, compact }: { guide: Guide; compact?: boolean }) {
+const coverVars = (g: Guide) => g.cover ? { ['--from' as string]: g.cover.from, ['--to' as string]: g.cover.to } : undefined;
+
+/** The playlist-style byline: who made it, then the numbers that matter. */
+function Byline({ guide }: { guide: Guide }) {
   const f = guide.facts;
-  if (!f) return null;
-  if (compact) return <p className="gd-mini-facts">{f.time} · {f.cost}</p>;
-  const rows: [typeof Clock, string, string][] = [[Clock, 'Time', f.time], [Footprints, 'Distance', f.distance], [Wallet, 'Cost', f.cost], [Sun, 'When', f.season]];
+  const stops = guide.stops?.length;
   return (
-    <dl className="gd-facts">
-      {rows.map(([Icon, label, value]) => (
-        <div key={label}><dt><Icon size={14} aria-hidden="true" />{label}</dt><dd>{value}</dd></div>
-      ))}
-    </dl>
+    <p className="gd-byline">
+      <img src={BRAND_MARK} alt="" width="24" height="24" />
+      <b>CalgaryWatch</b>
+      {stops ? <span>{stops} stops</span> : null}
+      {f && <span>{f.time}</span>}
+      {f && <span>{f.cost}</span>}
+    </p>
   );
 }
 
@@ -37,8 +40,8 @@ function ShareButton({ title }: { title: string }) {
     } catch { /* dismissed */ }
   };
   return (
-    <button type="button" className="gd-ghost" onClick={share}>
-      {copied ? <Check size={18} aria-hidden="true" /> : <Share2 size={18} aria-hidden="true" />}{copied ? 'Link copied' : 'Send to a friend'}
+    <button type="button" className="gd-icon-btn" onClick={share} aria-label={copied ? 'Link copied' : 'Send to a friend'} title="Send to a friend">
+      {copied ? <Check size={22} aria-hidden="true" /> : <Share2 size={22} aria-hidden="true" />}
     </button>
   );
 }
@@ -48,9 +51,9 @@ function StopLink({ entity, occurrences }: { entity?: DiscoveryEntity; occurrenc
   if (!entity) return null;
   if (entity.kind === 'market') {
     const next = upcomingOccurrences(occurrences, entity.id).find(o => !o.cancelled);
-    return <Link className="gd-stop-link" to={entityPath(entity)}>{next ? <>Next: <b>{day.format(new Date(next.start))}</b></> : 'See dates'} <ArrowUpRight size={14} aria-hidden="true" /></Link>;
+    return <Link className="gd-stop-link" to={entityPath(entity)}>{next ? <>Next: <b>{day.format(new Date(next.start))}</b></> : 'See dates'}</Link>;
   }
-  return <Link className="gd-stop-link" to={entityPath(entity)}>On CalgaryWatch <ArrowUpRight size={14} aria-hidden="true" /></Link>;
+  return <Link className="gd-stop-link" to={entityPath(entity)}>On CalgaryWatch</Link>;
 }
 
 function GuideCard({ guide, number }: { guide: Guide; number: number }) {
@@ -59,13 +62,26 @@ function GuideCard({ guide, number }: { guide: Guide; number: number }) {
       <Link className="gd-card" to={entityPath(guide)}>
         <span className="gd-card-art">
           <GuideCover guide={guide} number={number} />
-          <span className="gd-card-play" aria-hidden="true"><ArrowUpRight size={20} /></span>
+          <span className="gd-card-play" aria-hidden="true"><ArrowUpRight size={22} strokeWidth={2.5} /></span>
         </span>
         <strong>{guide.title}</strong>
-        <span className="gd-card-sum">{guide.summary}</span>
-        <Facts guide={guide} compact />
+        <span className="gd-card-sum">{guide.facts ? `${guide.facts.time} · ${guide.facts.cost}` : guide.summary}</span>
       </Link>
     </li>
+  );
+}
+
+/** "Pitch a guide", drawn as a browse tile with the CalgaryWatch mark tipped into the corner. */
+function PitchTile() {
+  return (
+    <a className="gd-pitch" href="mailto:aldo@calgarywatch.ca?subject=A%20guide%20idea%20for%20CalgaryWatch">
+      <span className="gd-pitch-copy">
+        <strong>Know a day you’d send a friend on?</strong>
+        <span>Tell us the route. If we walk it and love it, it becomes a guide with your name on it.</span>
+        <em>Pitch a guide <ArrowUpRight size={16} aria-hidden="true" /></em>
+      </span>
+      <img src={BRAND_MARK} alt="" width="200" height="200" loading="lazy" />
+    </a>
   );
 }
 
@@ -77,22 +93,22 @@ export function GuidesBoard({ guides }: { guides: readonly Guide[] }) {
   return (
     <div className="gd gd-index">
       <header className="gd-index-hero">
-        <p className="gd-eyebrow"><span className="gd-dot" aria-hidden="true" />CalgaryWatch Guides</p>
-        <h1 className="gd-headline">One good day <span>at a time.</span></h1>
+        <p className="gd-eyebrow"><img src={BRAND_MARK} alt="" width="22" height="22" />CalgaryWatch Guides<span className="gd-dot" aria-hidden="true">•</span></p>
+        <h1 className="gd-headline">One good day<span>at a time.</span></h1>
         <p className="gd-lede">Self-guided days out, written by people who live here. {guides.length} guides, {stops} stops, no sign-up and no paid placements.</p>
       </header>
 
       {lead && (
-        <section className="gd-feature" aria-labelledby="gd-feature-title" style={lead.cover ? { ['--from' as string]: lead.cover.from, ['--to' as string]: lead.cover.to } : undefined}>
+        <Link className="gd-feature" to={entityPath(lead)} style={coverVars(lead)}>
           <GuideCover guide={lead} size="hero" number={guides.indexOf(lead) + 1} />
-          <div className="gd-feature-copy">
-            <p className="gd-eyebrow">New guide</p>
-            <h2 id="gd-feature-title">{lead.title}</h2>
-            <p className="gd-feature-sum">{lead.summary}</p>
-            <Facts guide={lead} />
-            <Link className="gd-play" to={entityPath(lead)}>Open the guide <ArrowUpRight size={18} aria-hidden="true" /></Link>
-          </div>
-        </section>
+          <span className="gd-feature-copy">
+            <span className="gd-tag">New guide</span>
+            <strong className="gd-feature-title">{lead.title}</strong>
+            <span className="gd-feature-sum">{lead.summary}</span>
+            <Byline guide={lead} />
+            <span className="gd-play-row"><span className="gd-play" aria-hidden="true"><ArrowUpRight size={26} strokeWidth={2.5} /></span>Open the guide</span>
+          </span>
+        </Link>
       )}
 
       {shelf.length > 0 && (
@@ -102,11 +118,7 @@ export function GuidesBoard({ guides }: { guides: readonly Guide[] }) {
         </section>
       )}
 
-      <aside className="gd-pitch">
-        <h2>Know a day you would send a friend on?</h2>
-        <p>Tell us the route. If we walk it and love it, it becomes a guide with your name on it.</p>
-        <a className="gd-ghost" href="mailto:aldo@calgarywatch.ca?subject=A%20guide%20idea%20for%20CalgaryWatch">Pitch a guide <ArrowUpRight size={18} aria-hidden="true" /></a>
-      </aside>
+      <section className="gd-shelf"><PitchTile /></section>
     </div>
   );
 }
@@ -119,65 +131,72 @@ export function GuideDetail({ guide, all, occurrences }: { guide: Guide; all: re
   const allGuides = all.filter((e): e is Guide => e.kind === 'guide');
   const more = guide.relatedGuideIds.map(id => byId.get(id)).filter((e): e is Guide => e?.kind === 'guide');
   const linked = guide.entries.map(en => byId.get(en.entityId)).filter((e): e is DiscoveryEntity => !!e && !stops.some(s => s.entityId === e.id));
-  const style = guide.cover ? { ['--from' as string]: guide.cover.from, ['--to' as string]: guide.cover.to } : undefined;
   const changed = Date.parse(guide.updatedAt);
+  const before = [
+    ...(guide.facts ? [`${guide.facts.distance}. ${guide.facts.season}`] : []),
+    ...(guide.tips ?? []),
+  ];
 
   return (
-    <article className="gd gd-detail" style={style}>
+    <article className="gd gd-detail" style={coverVars(guide)}>
       <header className="gd-hero">
-        <nav className="gd-crumbs" aria-label="Breadcrumb"><Link to="/">Home</Link><span aria-hidden="true">/</span><Link to="/guides">Guides</Link></nav>
+        <nav className="gd-crumbs" aria-label="Breadcrumb"><Link to="/guides">← All guides</Link></nav>
         <div className="gd-hero-row">
           <GuideCover guide={guide} size="hero" number={allGuides.indexOf(guide) + 1} />
           <div className="gd-hero-copy">
-            <p className="gd-eyebrow">Guide{stops.length ? ` · ${stops.length} stops` : ''}</p>
+            <p className="gd-tag">Guide</p>
             <h1 className="gd-title">{guide.title}</h1>
             <p className="gd-hero-sum">{guide.summary}</p>
-            <p className="gd-byline"><img src="/icon.svg" alt="" width="20" height="20" />CalgaryWatch{Number.isFinite(changed) ? ` · Updated ${updated.format(changed)}` : ''}</p>
+            <Byline guide={guide} />
           </div>
         </div>
-        <div className="gd-actions">
-          {walk && <a className="gd-play" href={walk} target="_blank" rel="noopener noreferrer"><Navigation size={18} aria-hidden="true" />Walk it in Maps</a>}
-          {!walk && stops.length > 0 && <a className="gd-play" href="#gd-stops"><MapPin size={18} aria-hidden="true" />See the stops</a>}
-          <ShareButton title={guide.title} />
-        </div>
-        <Facts guide={guide} />
       </header>
+
+      <div className="gd-bar">
+        {walk
+          ? <a className="gd-play-row" href={walk} target="_blank" rel="noopener noreferrer"><span className="gd-play"><Navigation size={24} fill="currentColor" aria-hidden="true" /></span>Walk the route</a>
+          : stops.length > 0 && <a className="gd-play-row" href="#gd-stops"><span className="gd-play"><List size={26} aria-hidden="true" /></span>See the list</a>}
+        <ShareButton title={guide.title} />
+      </div>
 
       <div className="gd-body">
         <p className="gd-intro">{guide.introduction}</p>
 
         {stops.length > 0 ? (
           <section aria-labelledby="gd-stops-title">
-            <div className="gd-stops-head" id="gd-stops">
-              <h2 id="gd-stops-title" className="gd-h2">{guide.route ? 'The route' : 'The list'}</h2>
-              <span>{guide.route ? 'In walking order' : 'Pick one, or make a weekend of it'}</span>
+            <h2 id="gd-stops-title" className="gd-sr">{guide.route ? 'The route' : 'The list'}</h2>
+            <div className="gd-track-head" id="gd-stops" aria-hidden="true">
+              <span>#</span><span>{guide.route ? 'Stop, in walking order' : 'Market'}</span><span>Map</span>
             </div>
             <ol className="gd-stops">
               {stops.map((s, i) => (
                 <li key={s.name} className={s.detour ? 'is-detour' : undefined}>
-                  <span className="gd-stop-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="gd-stop-num" aria-hidden="true">{i + 1}</span>
                   <div className="gd-stop-main">
                     <h3>{s.name}</h3>
-                    <p className="gd-stop-area"><MapPin size={13} aria-hidden="true" />{s.area}{s.detour ? <em>Detour</em> : null}</p>
+                    <p className="gd-stop-area">{s.detour ? <em>Detour</em> : null}{s.area}</p>
                     <p className="gd-stop-note">{s.note}</p>
-                    {s.tip && <p className="gd-stop-tip"><b>Tip</b>{s.tip}</p>}
-                    <div className="gd-stop-links">
-                      <a href={mapSearchUrl(s.mapQuery)} target="_blank" rel="noopener noreferrer">Map <ArrowUpRight size={14} aria-hidden="true" /></a>
-                      <StopLink entity={s.entityId ? byId.get(s.entityId) : undefined} occurrences={occurrences} />
-                    </div>
+                    {s.tip && <p className="gd-stop-tip"><b>Tip</b> {s.tip}</p>}
+                    <StopLink entity={s.entityId ? byId.get(s.entityId) : undefined} occurrences={occurrences} />
                   </div>
+                  <a className="gd-icon-btn is-small" href={mapSearchUrl(s.mapQuery)} target="_blank" rel="noopener noreferrer" aria-label={`${s.name} on the map`} title="Open in Maps">
+                    <MapPin size={18} aria-hidden="true" />
+                  </a>
                 </li>
               ))}
             </ol>
           </section>
         ) : null}
 
-        {guide.tips?.length ? (
-          <aside className="gd-tips" aria-labelledby="gd-tips-title">
-            <h2 id="gd-tips-title" className="gd-h2">Before you go</h2>
-            <ul>{guide.tips.map(t => <li key={t}>{t}</li>)}</ul>
+        {before.length > 0 && (
+          <aside className="gd-about" aria-labelledby="gd-about-title">
+            <img src={BRAND_MARK} alt="" width="72" height="72" loading="lazy" />
+            <div>
+              <h2 id="gd-about-title" className="gd-h2">Before you go</h2>
+              <ul>{before.map(t => <li key={t}>{t}</li>)}</ul>
+            </div>
           </aside>
-        ) : null}
+        )}
 
         {linked.length > 0 && (
           <section aria-labelledby="gd-linked-title">
@@ -186,23 +205,23 @@ export function GuideDetail({ guide, all, occurrences }: { guide: Guide; all: re
           </section>
         )}
 
-        <section className="gd-how" aria-labelledby="gd-how-title">
-          <h2 id="gd-how-title" className="gd-h2">How we picked</h2>
-          <p>{guide.methodology}</p>
-          {guide.sponsorshipDisclosure && <p>Sponsored: {guide.sponsorshipDisclosure}</p>}
-          {guide.sources.length > 0 && <p className="gd-sources">Sources: {guide.sources.map((s, i) => <span key={s.url}>{i > 0 && ' · '}<a href={s.url} target="_blank" rel="noopener noreferrer">{s.name}</a></span>)}</p>}
-          <p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${guide.title}`)}`}>Something changed? Tell us</a></p>
-        </section>
-
         {more.length > 0 && (
           <section aria-labelledby="gd-more-title">
-            <div className="gd-stops-head">
-              <h2 id="gd-more-title" className="gd-h2">More guides</h2>
-              <Link to="/guides">All guides <ArrowUpRight size={15} aria-hidden="true" /></Link>
+            <div className="gd-shelf-head">
+              <h2 id="gd-more-title" className="gd-h2">More from CalgaryWatch</h2>
+              <Link to="/guides">Show all</Link>
             </div>
             <ol className="gd-cards is-row">{more.map(g => <GuideCard key={g.id} guide={g} number={allGuides.indexOf(g) + 1} />)}</ol>
           </section>
         )}
+
+        <footer className="gd-small">
+          {Number.isFinite(changed) && <p>Updated {updated.format(changed)}</p>}
+          <p>{guide.methodology}</p>
+          {guide.sponsorshipDisclosure && <p>Sponsored: {guide.sponsorshipDisclosure}</p>}
+          {guide.sources.length > 0 && <p>Sources: {guide.sources.map((s, i) => <span key={s.url}>{i > 0 && ' · '}<a href={s.url} target="_blank" rel="noopener noreferrer">{s.name}</a></span>)}</p>}
+          <p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${guide.title}`)}`}>Something changed? Tell us</a></p>
+        </footer>
       </div>
     </article>
   );

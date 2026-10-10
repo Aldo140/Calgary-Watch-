@@ -59,10 +59,13 @@ function Motif({ motif }: { motif: Cover['motif'] }) {
   }
 }
 
+export const BRAND_MARK = '/images/brand/calgarywatch-city-spark-v2.webp';
+
 /**
  * A guide's cover: typographic, album-style, drawn rather than photographed, so a
- * guide never leans on a stock image. Sized by its container, so the same cover
- * works as a 44px thumbnail and a 320px hero.
+ * guide never leans on a stock image. Like an editorial playlist, every cover
+ * carries the CalgaryWatch mark in its corner. Sized by its container, so the
+ * same cover works as a thumbnail and a 300px hero.
  */
 export function GuideCover({ guide, size = 'card', number }: { guide: Guide; size?: 'hero' | 'card' | 'mini'; number?: number }) {
   const c = guide.cover ?? FALLBACK;
@@ -71,10 +74,9 @@ export function GuideCover({ guide, size = 'card', number }: { guide: Guide; siz
   return (
     <div className={`gd-cover is-${size} is-${c.motif}`} style={style} aria-hidden="true">
       <Motif motif={c.motif} />
-      <span className="gd-cover-label">{c.label}</span>
+      <span className="gd-cover-mark"><img src={BRAND_MARK} alt="" width="40" height="40" loading="lazy" />{c.label}</span>
       {big && <span className="gd-cover-big">{big}</span>}
       <span className="gd-cover-title">{guide.title}</span>
-      <span className="gd-cover-brand">CalgaryWatch Guides</span>
     </div>
   );
 }

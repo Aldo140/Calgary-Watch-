@@ -162,3 +162,23 @@ export function isStopRequest(text: string): boolean {
   return /^\W*(stop|unsubscribe)\b/.test(first) ||
     /\b(unsubscribe|remove me|remove us|take (me|us) off|do not (contact|email)|don't (contact|email)|stop (emailing|contacting|sending|messaging)|please stop|not interested,? (please )?(remove|stop))\b/.test(first);
 }
+
+export interface Bounce { recipients: string[]; reason: string }
+
+/**
+ * A delivery-failure notice ("Undeliverable: …") from Microsoft or a mail server.
+ * Mail sent from the Outlook mailbox by hand, or by an assistant through the
+ * Outlook connector, can fail this way (550 5.7.708 while Microsoft blocks the
+ * tenant); without this the business never gets the reply and nobody notices.
+ */
+export function parseBounce(m: { from: string; subject: string; text: string }): Bounce | null {
+  if (!/^(microsoftexchange[0-9a-f]*|postmaster|mailer-daemon)@/i.test(m.from)) return null;
+  if (!/^(undeliverable|undelivered|delivery (status notification|has failed)|mail delivery failed|returned mail)/i.test(m.subject.trim())) return null;
+  const head = m.text.split(/Original message headers:/i)[0];
+  const list = head.split(/Diagnostic information/i)[0];
+  const recipients = [...new Set((list.match(/[A-Z0-9._%+'-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? []).map(normalizeEmail))]
+    .filter(e => !/^(microsoftexchange|postmaster|mailer-daemon)/.test(e));
+  if (!recipients.length) return null;
+  const code = head.match(/\b5\.\d\.\d{1,3}\b[^'\]\n]*/)?.[0]?.trim();
+  return { recipients, reason: code ? code.replace(/\s*For more information.*$/i, '').slice(0, 160) : 'the receiving server refused it' };
+}

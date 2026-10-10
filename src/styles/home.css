@@ -269,7 +269,11 @@
   .cw-home2 .h-hero { margin-top: -62px; min-height: 900px; padding: calc(62px + 28px) 0 120px; }
   .cw-home2 .h-hero h1 { font-size: clamp(44px, 12.8vw, 62px); }
   .cw-home2 .h-summary { margin: 16px 0 20px; font-size: 16px; }
-  .cw-home2 .h-hero { min-height: max(620px, 100vh); min-height: max(620px, 100svh); padding-bottom: 0; }
+  /* iOS reduces the small viewport while Safari/Chrome bars are visible. At
+     the old 620px floor the bottom-anchored skyline rose behind search and
+     the intent chips. The extra height extends the scene below the controls,
+     keeping the tower visible in its own part of the sky. */
+  .cw-home2 .h-hero { min-height: max(780px, 100vh); min-height: max(780px, 100svh); padding-bottom: 0; }
   .cw-home2 .h-dateline { margin-bottom: 16px; }
   .cw-home2 .h-intents { flex-wrap: nowrap; overflow-x: auto; margin: 14px -16px 0; padding: 0 16px 4px; scrollbar-width: none; }
   .cw-home2 .h-intents::-webkit-scrollbar { display: none; }

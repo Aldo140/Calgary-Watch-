@@ -5,7 +5,7 @@ import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { useMyClaims } from '../lib/claimsApi';
-import { SignupForm, SignupHero, SignupSummary } from '../components/plans/SignupFlow';
+import { SignupForm, SignupSky } from '../components/plans/SignupFlow';
 import { MemberDashboard } from '../components/plans/Dashboard';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
@@ -328,13 +328,13 @@ export default function PlansPage() {
 
   return (
     <SiteLayout>
-      <div className="cw-plans" data-view="setup">
+      <div className="cw-plans cw-home2" data-view="setup">
         {asUid ? (
           <div className="cw-wrap"><p className="pl-adminview" role="status"><Shield size={15} aria-hidden="true" /> <span><strong>Admin view.</strong> You’re seeing {profile?.displayName || 'this member'}’s dashboard as they see it. Read-only.</span> <Link to="/admin">Back to admin</Link></p></div>
         ) : null}
-        <div className="cw-wrap su-layout">
-          <SignupHero editing={Boolean(user && hasPlans)} signedIn={Boolean(user)} onSignIn={() => void signIn()} />
-            <SignupForm
+        <SignupSky editing={Boolean(user && hasPlans)} signedIn={Boolean(user)} area={draftArea} onSignIn={() => void signIn()} />
+        <div className="cw-wrap su-sill">
+          <SignupForm
               formRef={formRef}
               step={step}
               setStep={setStep}
@@ -354,9 +354,9 @@ export default function PlansPage() {
               editing={editing}
               onCancel={() => { setEditing(false); setStep(0); setDraft(draftFrom(profile, pending)); setError(''); }}
               onSubmit={() => void save()}
-            onToggleInterest={toggleInterest}
-          />
-          <SignupSummary draft={draft} area={draftArea} progress={progress} />
+              area={draftArea}
+              onToggleInterest={toggleInterest}
+            />
         </div>
       </div>
     </SiteLayout>

@@ -30,6 +30,7 @@
     "ops:hq": "tsx scripts/ops/hq-snapshot.ts",
     "ops:hq-commands": "tsx scripts/ops/hq-commands.ts",
     "ops:reply-check": "tsx scripts/ops/reply-check.ts",
+    "ops:gmail-sync": "tsx scripts/ops/gmail-sync-ingest.ts",
     "digest:preview": "tsx scripts/digest/preview.ts",
     "digest:publish-previews": "tsx scripts/digest/publishPreviews.ts",
     "digest:art": "tsx scripts/prepare-email-art.ts",

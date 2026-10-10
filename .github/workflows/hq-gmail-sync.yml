@@ -1,0 +1,55 @@
+name: HQ Gmail sync
+
+# Started by the Gmail sync routine (a scheduled Claude session that reads
+# mrotiz14@gmail.com through the Gmail connector), in place of the Apps Script
+# in Aldo140/ArctosLaunchpad. The payload is sealed with
+# scripts/ops/gmail-sync.pub.pem and only opened here, with the private key in
+# arctos-hq; this repository is public, so mail never crosses it in the clear.
+# scripts/ops/gmail-sync-ingest.ts merges it into hq/gmail, then the reply
+# check reads any new replies. Payload "init" creates the key pair once.
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: 'Sealed Gmail sync from the routine (or "init")'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  # Keyless sign-in to arctos-hq.
+  id-token: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Sign in to arctos-hq
+        id: hq
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Merge into HQ
+        run: npm run ops:gmail-sync
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          PAYLOAD: ${{ inputs.payload }}
+      - name: Check Gmail replies for HQ
+        if: inputs.payload != 'init'
+        continue-on-error: true
+        run: npm run ops:reply-check
+        env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ vars.ANTHROPIC_WORKSPACE_ID }}

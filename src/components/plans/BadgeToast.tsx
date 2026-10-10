@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { BADGES, type BadgeId } from '../../lib/badges';
 import { BadgeMark } from './BadgeMark';
+import { claimPopup, releasePopup } from '../../lib/popupSlot';
 import '../../styles/plans.css';
 
 const EVENT = 'cw:badge';
@@ -22,13 +23,18 @@ export function BadgeToaster() {
   useEffect(() => {
     let t: number | undefined;
     const on = (e: Event) => {
+      // An earned badge answers something the person just did, so it always
+      // shows; anything else floating (the homepage promo) steps aside for it.
+      releasePopup('promo');
+      claimPopup('badge');
       setId((e as CustomEvent<BadgeId>).detail);
       clearTimeout(t);
       t = window.setTimeout(() => setId(null), 7000);
     };
     window.addEventListener(EVENT, on);
-    return () => { window.removeEventListener(EVENT, on); clearTimeout(t); };
+    return () => { window.removeEventListener(EVENT, on); clearTimeout(t); releasePopup('badge'); };
   }, []);
+  useEffect(() => { if (!id) releasePopup('badge'); }, [id]);
   const badge = BADGES.find((b) => b.id === id);
   return (
     <div className="cw-btoast-region" aria-live="polite">

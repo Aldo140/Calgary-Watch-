@@ -1,0 +1,46 @@
+/*
+ * Phones: the same homepage, said one thing at a time.
+ *
+ * People told us the phone homepage felt like a lot at once. Nothing here
+ * removes a section or changes the design; it gives each section more air,
+ * trims the lists to a first look (every one keeps its "All …" link), and
+ * takes the boxes off the small print so the cards read as one idea each.
+ */
+@media (max-width: 640px) {
+  /* Room between sections, so each one gets the screen to itself. */
+  .cw-home2 .h-ways-wrap { padding-top: 72px; }
+  .cw-home2 .h-ways-head { margin-bottom: 28px; }
+  .cw-home2 .h-ways-head p { margin-top: 6px; line-height: 1.6; }
+  .cw-home2 .h-strips { gap: 22px; }
+  .cw-home2 .h-week-wrap { margin-top: 80px; }
+  .cw-home2 .h-body { gap: 112px; padding-top: 96px; padding-bottom: 88px; }
+
+  /* Make Calgary yours: plain rows instead of three boxes inside a box. */
+  .cw-home2 .h-yours { padding: 26px 20px 22px; gap: 20px; }
+  .cw-home2 .h-yours-lead { margin-top: 10px; line-height: 1.6; }
+  .cw-home2 .h-yours-facts { gap: 14px; }
+  .cw-home2 .h-yours-facts li { padding: 0; background: none; border: 0; border-radius: 0; gap: 12px; }
+
+  /* The week: a calmer agenda with three to start (set in WeekPlanner). */
+  .cw-home2 .h-week { padding: 26px 16px; }
+  .cw-home2 .h-day-panel { margin-top: 36px; }
+  .cw-home2 .h-day-panel-head { margin-bottom: 16px; }
+  .cw-home2 .h-agenda-row { padding-top: 20px; padding-bottom: 20px; }
+  .cw-home2 .h-agenda-main strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cw-home2 .h-more { margin-top: 8px; }
+  .cw-home2 .h-day-panel-foot { margin-top: 28px; padding-top: 24px; }
+
+  /* Quadrants: short descriptions under each neighbourhood. */
+  .cw-home2 .h-quad-note { margin-bottom: 32px; }
+  .cw-home2 .h-quad-panel li a { padding: 16px 0; }
+  .cw-home2 .h-quad-panel li span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* For a slower day: two of each to start, one-glance summaries. */
+  .cw-home2 .h-slow-head { margin-bottom: 28px; }
+  .cw-home2 .h-slow-grid { gap: 56px; }
+  .cw-home2 .h-guides li:nth-child(n + 3), .cw-home2 .h-places li:nth-child(n + 3) { display: none; }
+  .cw-home2 .h-guides a { padding: 24px 0; }
+  .cw-home2 .h-guides a > span:not(.h-guide-num) > span,
+  .cw-home2 .h-places span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cw-home2 .h-places a { padding: 20px 0; gap: 6px; }
+}

@@ -15,6 +15,7 @@ import { weekAgenda } from '../lib/discoveryCalendar';
 import { discoveryRepository } from '../data/discovery';
 import '../styles/home.css';
 import '../styles/home-board.css';
+import '../styles/home-calm.css';
 
 /**
  * The homepage answers one question — what's happening in Calgary — in the

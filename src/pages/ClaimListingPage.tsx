@@ -16,7 +16,7 @@ import '../styles/hq.css';
 
 const PERKS = [
   { icon: CalendarClock, title: 'Dates and hours', body: 'New run dates, holiday hours, a show that moved.' },
-  { icon: ImagePlus, title: 'Your own photos', body: 'Swap our artwork for images you choose.' },
+  { icon: ImagePlus, title: 'Your own photos', body: 'Email the original files for the best quality.' },
   { icon: MapPinned, title: 'Addresses and locations', body: 'Fix a venue, or add a second branch.' },
   { icon: Link2, title: 'The link we send people to', body: 'Homepage, tickets or your season page.' },
 ];
@@ -201,7 +201,7 @@ function Manage({ claim }: { claim: { entityId: string; entityTitle: string } })
   const [history, setHistory] = useState<Array<{ field: UpdateField; details: string; status: string; createdAt: number }>>([]);
   useEffect(() => { if (user) void readMyUpdates(user.uid, claim.entityId).then(setHistory); }, [user, claim.entityId, sent]);
   const meta = UPDATE_FIELDS.find((f) => f.id === field)!;
-  const needsUrl = field === 'link' || field === 'photo';
+  const needsUrl = field === 'link';
   return (
     <section className="pl-form cl-form" aria-labelledby="cl-manage">
       <div className="cl-owner"><Sparkles size={18} aria-hidden="true" /> <span><strong>You manage this listing.</strong> Send a change and it reaches a person the same day.</span></div>
@@ -216,10 +216,10 @@ function Manage({ claim }: { claim: { entityId: string; entityTitle: string } })
           ))}
         </div>
         <label className="pl-field"><span>Details</span><textarea className="cl-textarea" rows={4} value={details} onChange={(e) => setDetails(e.target.value)} placeholder={meta.hint} /></label>
-        {needsUrl || field === 'dates' || field === 'other' ? (
+        {needsUrl || field === 'photo' || field === 'dates' || field === 'other' ? (
           <label className="pl-field"><span>{field === 'photo' ? 'Link to the image' : 'Link'} {needsUrl ? '' : <small>(optional)</small>}</span><input type="url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://" /></label>
         ) : null}
-        {field === 'photo' ? <p className="pl-hint">Use an image you own or have permission to share. We credit it as you ask.</p> : null}
+        {field === 'photo' ? <p className="pl-hint">For the best quality, email the original photo to <a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Photos for ${claim.entityTitle}`)}`}>aldo@calgarywatch.ca</a>. Include the listing name and only send images you own or have permission to share. We credit them as you ask.</p> : null}
       </fieldset>
       {error ? <p className="pl-error" role="alert">{error}</p> : null}
       <div className="pl-actions">

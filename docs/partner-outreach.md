@@ -66,6 +66,8 @@ Partner replies kept asking for the same things, so organizers now get a self-se
    - The claim page becomes the organizer's direct line, with change types for dates and hours, location, link, photo, description, cancelled and other.
 5. Changes queue in the same admin panel. Make the edit in Events & markets, then mark it applied. The organizer sees the status on their claim page.
 
+For photo changes, encourage organizers to email the original files to `aldo@calgarywatch.ca` with the listing name. The claim form can record the request and an optional image link, but email preserves the original quality and is the preferred route for future partner replies.
+
 Every outreach email, follow-up and drafted reply to a listed organization now ends with the claim link, placed just above the signature (`withClaimLink` in `scripts/ops/jobs/outreach.ts`).
 
 Data:

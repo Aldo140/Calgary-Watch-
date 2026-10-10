@@ -49,7 +49,7 @@ export const UPDATE_FIELDS: ReadonlyArray<{ id: UpdateField; label: string; hint
   { id: 'dates', label: 'Dates or hours', hint: 'New run dates, a schedule change, holiday hours.' },
   { id: 'location', label: 'Address or another location', hint: 'A corrected address, or a second branch.' },
   { id: 'link', label: 'The link we send people to', hint: 'Your homepage, tickets or a season page.' },
-  { id: 'photo', label: 'A photo you’d like us to use', hint: 'A link to an image you own or have the rights to.' },
+  { id: 'photo', label: 'A photo you’d like us to use', hint: 'Email the original photo when you can, or share a link to an image you have the rights to.' },
   { id: 'description', label: 'How it’s described', hint: 'Facts we got wrong or left out.' },
   { id: 'cancel', label: 'Cancelled or postponed', hint: 'We mark it right away so nobody shows up.' },
   { id: 'other', label: 'Something else', hint: 'Anything else that should change.' },

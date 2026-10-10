@@ -125,7 +125,7 @@ export function HomeYours() {
 }
 
 /** A hand-drawn underline: the one loose stroke on a card of hard edges. */
-function Scribble({ children }: { children: ReactNode }) {
+export function Scribble({ children }: { children: ReactNode }) {
   return (
     <em className="h-scribble">
       {children}
@@ -134,7 +134,7 @@ function Scribble({ children }: { children: ReactNode }) {
   );
 }
 
-function RadarArt() {
+export function RadarArt() {
   return (
     <svg className="h-deck-art" viewBox="0 0 80 64" aria-hidden="true" focusable="false">
       <circle cx="40" cy="34" r="27" fill="#0b2a55" stroke="#00c2e0" strokeWidth="2" />
@@ -148,7 +148,7 @@ function RadarArt() {
   );
 }
 
-function TicketArt() {
+export function TicketArt() {
   return (
     <svg className="h-deck-art" viewBox="0 0 80 64" aria-hidden="true" focusable="false">
       <g transform="rotate(-10 40 32)">
@@ -160,7 +160,7 @@ function TicketArt() {
   );
 }
 
-function BadgeArt() {
+export function BadgeArt() {
   return (
     <svg className="h-deck-art" viewBox="0 0 80 64" aria-hidden="true" focusable="false">
       <path d="M30,38L22,62L32,56L37,64L42,42Z" fill="#00c2e0" stroke="#151515" strokeWidth="2" strokeLinejoin="round" />

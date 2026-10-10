@@ -14,7 +14,7 @@ import { claudeConfigured, classifyReply, writePitch } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
 import {
   LEAD_KINDS, organizerLeads, prospectLeads, type Prospect, checkPitch, consentBasisFor, emailDomain, extractEmails, hasNoSolicitationNotice, hostOf,
-  inSendWindow, isStopRequest, leadIdFor, normalizeEmail, sendBlocker, signature, websiteFor,
+  inSendWindow, isStopRequest, leadIdFor, normalizeEmail, parseBounce, sendBlocker, signature, websiteFor, type Bounce,
 } from '../lib/leads';
 import { inboxSince, outlookConfigured, replyInThread, sendNew } from '../lib/outlook';
 import { resendConfigured, sendViaResend } from '../lib/resend';
@@ -297,14 +297,22 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   const send = (to: string, subject: string, text: string) => viaResend ? sendViaResend(cfg.sender, to, subject, text) : sendNew(to, subject, text);
   const sup = await loadSuppression(db);
 
-  // Replies the reviewer approved.
+  // Replies the reviewer approved. Resend addresses the reply to whoever wrote, so it
+  // needs no Outlook thread; one failed reply never stops the others or the first emails.
   for (const doc of (await db.collection(COLLECTIONS.leads).where('lastReply.approved', '==', true).get()).docs) {
     const lead = doc.data() as PartnerLead;
-    if (!lead.lastReply || lead.lastReply.sent || !lead.conversationId || lead.doNotContact) continue;
-    if (viaResend) await send(lead.lastReply.from, lead.lastReply.suggestedSubject || `Re: ${lead.lastReply.subject}`, lead.lastReply.suggestedBody);
-    else await replyInThread(lead.conversationId, lead.lastReply.suggestedBody);
-    await doc.ref.update({ 'lastReply.sent': true, lastContactAt: now, updatedAt: now, history: push(event('reply-sent', 'Approved reply sent.')) });
-    log(`reply sent: ${lead.businessName}`);
+    if (!lead.lastReply || lead.lastReply.sent || lead.doNotContact) continue;
+    if (!viaResend && !lead.conversationId) { log(`reply not sent to ${lead.businessName}: no Outlook thread to reply in`); continue; }
+    if (sup.emails.has(normalizeEmail(lead.lastReply.from))) continue;
+    try {
+      if (viaResend) await send(lead.lastReply.from, lead.lastReply.suggestedSubject || `Re: ${lead.lastReply.subject}`, lead.lastReply.suggestedBody);
+      else await replyInThread(lead.conversationId!, lead.lastReply.suggestedBody);
+      await doc.ref.update({ 'lastReply.sent': true, lastContactAt: now, updatedAt: now, history: push(event('reply-sent', `Approved reply sent to ${lead.lastReply.from}.`)) });
+      log(`reply sent: ${lead.businessName}`);
+    } catch (e) {
+      await doc.ref.update({ notes: `Reply failed: ${e instanceof Error ? e.message : e}`, updatedAt: now });
+      log(`reply failed for ${lead.businessName}: ${e instanceof Error ? e.message : e}`);
+    }
   }
 
   if (!inSendWindow(now, cfg)) { log('Outside the outreach send window; first emails wait.'); return; }
@@ -338,6 +346,27 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   }
 }
 
+/**
+ * A reply that bounced goes back to HQ's Replies list, unapproved, with the reason,
+ * so one tap sends it again through Resend. Each notice is handled once.
+ */
+async function recordBounce(b: Bounce, noticeId: string, byEmail: Map<string, FirebaseFirestore.QueryDocumentSnapshot>, now: number, log: Log): Promise<void> {
+  for (const to of b.recipients) {
+    const doc = byEmail.get(to);
+    if (!doc) continue;
+    const lead = doc.data() as PartnerLead;
+    if (lead.replyIds?.includes(noticeId)) continue;
+    const summary = `An email to ${to} did not go out (${b.reason}).`;
+    const update: Record<string, unknown> = {
+      notes: `${summary} Resend it from HQ; HQ sends through Resend, which Microsoft's block does not affect.`,
+      replyIds: FieldValue.arrayUnion(noticeId), updatedAt: now, history: push(event('status', summary)),
+    };
+    if (lead.lastReply?.sent) Object.assign(update, { 'lastReply.sent': false, 'lastReply.approved': false });
+    await doc.ref.update(update);
+    log(`bounce: ${lead.businessName} (${to}): ${b.reason}`);
+  }
+}
+
 /** Match inbox replies to leads, honour opt-outs immediately, and draft suggested responses. */
 export async function syncReplies(db: Firestore, now: number, log: Log): Promise<void> {
   if (!outlookConfigured()) return;
@@ -346,12 +375,16 @@ export async function syncReplies(db: Firestore, now: number, log: Log): Promise
   const leads = (await db.collection(COLLECTIONS.leads).where('conversationId', '!=', null).get()).docs;
   const byConversation = new Map(leads.map(d => [d.get('conversationId') as string, d]));
   const byEmail = new Map(leads.filter(d => d.get('contactEmail')).map(d => [normalizeEmail(d.get('contactEmail')), d]));
+  // A bounced reply was addressed to whoever wrote to us, who may not be the address we pitched.
+  const byRecipient = new Map([...leads.filter(d => d.get('lastReply.from')).map(d => [normalizeEmail(d.get('lastReply.from')), d] as const), ...byEmail]);
   const address = mailingAddress();
   const sig = signature(cfg, address);
   const own = normalizeEmail(cfg.sender.mailbox);
 
   for (const m of await inboxSince(since - 60 * 60_000)) {
     if (m.from === own) continue;
+    const bounce = parseBounce(m);
+    if (bounce) { await recordBounce(bounce, m.id, byRecipient, now, log); continue; }
     const doc = byConversation.get(m.conversationId) ?? byEmail.get(m.from);
     if (!doc) continue;
     const lead = doc.data() as PartnerLead;

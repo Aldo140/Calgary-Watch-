@@ -11,6 +11,8 @@ import { EntityDetail } from '../components/entity/EntityDetail';
 import { ListingBoard } from '../components/discovery/ListingBoard';
 import { LocalBoard } from '../components/discovery/LocalBoard';
 import { GuideDetail, GuidesBoard } from '../components/guides/Guides';
+import { MarketsBoard } from '../components/markets/MarketsBoard';
+import { MarketDetail } from '../components/markets/MarketDetail';
 import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
@@ -61,6 +63,11 @@ export default function DiscoveryPage() {
     return <SiteLayout>{entity?.kind === 'guide'
       ? <GuideDetail guide={entity} all={all} occurrences={discoveryRepository.occurrences()} />
       : <GuidesBoard guides={items.filter((e): e is Guide => e.kind === 'guide')} />}</SiteLayout>;
+  }
+  if (root === 'markets' && !missing) {
+    return <SiteLayout>{entity?.kind === 'market'
+      ? <MarketDetail market={entity} all={all} occurrences={discoveryRepository.occurrences()} />
+      : <MarketsBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} period={period} query={within} />}</SiteLayout>;
   }
   if (root === 'local' && !entity && !missing) {
     return <SiteLayout><div className="cw-wrap cw-page"><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></div></SiteLayout>;

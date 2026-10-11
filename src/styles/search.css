@@ -1,0 +1,226 @@
+/* Search answers: ready-made results for a neighbourhood, a street, or
+   "yesterday police". The homepage board language: ink outlines, hard shadows,
+   navy for live, yellow for the thing to tap. */
+
+.cw-answers {
+  display: grid;
+  gap: 22px;
+  margin: 28px 0 8px;
+}
+
+.cw-answer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  border: 2px solid #06162f;
+  background: #fff;
+  box-shadow: 6px 6px 0 #06162f;
+  overflow: hidden;
+}
+
+.cw-answer-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 30px 30px 28px;
+  background: #06162f;
+  color: #f2efe8;
+}
+
+.cw-answer-street .cw-answer-head { background: #ffdf4f; color: #06162f; }
+.cw-answer-city .cw-answer-head { background: #1554d1; color: #fff; }
+
+.cw-answer-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #87dce8;
+}
+
+.cw-answer-street .cw-answer-eyebrow { color: #06162f; opacity: .75; }
+.cw-answer-city .cw-answer-eyebrow { color: #d7f3f9; }
+
+.cw-answer h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin: 0;
+  font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+  line-height: .95;
+  letter-spacing: -.045em;
+}
+
+.cw-answer h2 span {
+  padding: 4px 10px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  line-height: 1;
+  opacity: .9;
+}
+
+.cw-answer-lead {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  opacity: .92;
+}
+
+.cw-answer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.cw-answer-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cw-answer-actions .cw-answer-primary {
+  padding: 0 18px;
+  border: 2px solid #06162f;
+  background: #ffdf4f;
+  color: #06162f;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 #06162f;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.cw-answer-actions .cw-answer-primary:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #06162f; }
+.cw-answer-hood .cw-answer-primary, .cw-answer-city .cw-answer-primary { border-color: #ffdf4f; box-shadow: none; }
+.cw-answer-street .cw-answer-primary { background: #06162f; color: #fff; }
+
+.cw-answer-help {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 13px;
+  opacity: .9;
+}
+
+.cw-answer-help svg { display: inline; margin-right: 6px; vertical-align: -2px; }
+.cw-answer-help a { color: inherit; font-weight: 800; white-space: nowrap; }
+
+/* Reports pane */
+
+.cw-answer-reports {
+  padding: 26px 28px;
+  min-width: 0;
+}
+
+.cw-answer-reports h3 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cw-muted, #565a61);
+}
+
+.cw-answer-reports ol { margin: 0; padding: 0; list-style: none; }
+.cw-answer-reports li + li { border-top: 1px solid #e6e4de; }
+
+.cw-answer-reports li a {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 11px 6px;
+  margin: 0 -6px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.cw-answer-reports li a:hover { background: #f4f1ea; }
+
+.cw-answer-reports li i {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4px #e6e4de;
+}
+
+.cw-answer-reports li span { display: grid; gap: 3px; min-width: 0; }
+.cw-answer-reports li b { font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+.cw-answer-reports li small { font-size: 12.5px; color: var(--cw-muted, #565a61); line-height: 1.4; }
+
+.cw-answer-empty, .cw-answer-note {
+  margin: 0 0 6px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #2b2e33;
+}
+
+.cw-answer-note { font-size: 13px; color: var(--cw-muted, #565a61); }
+
+.cw-answer-skeleton { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.cw-answer-skeleton li {
+  height: 42px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f1eee7 25%, #e7e3da 50%, #f1eee7 75%);
+  background-size: 200% 100%;
+  animation: cw-answer-shimmer 1.2s linear infinite;
+}
+
+@keyframes cw-answer-shimmer { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-answer-skeleton li { animation: none; }
+  .cw-answer-actions .cw-answer-primary { transition: none; }
+}
+
+/* Popular searches */
+
+.cw-starters { margin: 22px 0 8px; }
+.cw-starters p { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--cw-muted, #565a61); }
+.cw-starters ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cw-starters a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid #06162f;
+  border-radius: 999px;
+  background: #fff;
+  color: #06162f;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.cw-starters a:hover { background: #ffdf4f; }
+
+/* Phones: one column, the answer first, the list right under it. */
+@media (max-width: 760px) {
+  .cw-answers { gap: 18px; margin-top: 20px; }
+  .cw-answer { grid-template-columns: 1fr; box-shadow: 4px 4px 0 #06162f; }
+  .cw-answer-head { padding: 22px 20px 20px; gap: 10px; }
+  .cw-answer h2 { font-size: clamp(2rem, 10vw, 2.6rem); }
+  .cw-answer-lead { font-size: 14.5px; }
+  .cw-answer-actions { gap: 0 18px; }
+  .cw-answer-actions a { min-height: 40px; font-size: 13.5px; }
+  .cw-answer-actions .cw-answer-primary { flex: 1 0 100%; justify-content: center; min-height: 48px; margin-bottom: 4px; font-size: 15px; }
+  .cw-answer-reports { padding: 18px 20px 20px; }
+  .cw-starters a { min-height: 38px; font-size: 13.5px; }
+  .cw-search-heading h1 { font-size: clamp(2.2rem, 11vw, 3rem); }
+  .cw-search-heading .cw-lead { font-size: 16px; line-height: 1.5; }
+}

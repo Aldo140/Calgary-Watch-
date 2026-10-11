@@ -46,7 +46,7 @@ import { stripCityQualifier, withCityQualifier, buildAddressQuery, rankAddressMa
 import { curateTrafficReports } from '@/src/lib/reportCuration';
 import { categoryColor } from '@/src/lib/tokens';
 import PersonalBriefing from '@/src/components/PersonalBriefing';
-import { fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
+import { communityCentre, fetchCommunityBoundaries, findCommunityAt, normalizeCalgaryAddress } from '@/src/lib/communityLookup';
 import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 import { getDistance } from '@/src/lib/geo';
 import { classify311Service } from '@/src/lib/three11';
@@ -1559,6 +1559,24 @@ export default function MapPage() {
           mapRef.current?.flyTo(lat, lng, 15);
         });
       }
+      return;
+    }
+
+    // /map?area=seton — search links a neighbourhood straight to its patch of the map.
+    const area = searchParams.get('area');
+    if (area) {
+      coordDeepLinkHandledRef.current = true;
+      fetchCommunityBoundaries().then((boundaries) => {
+        const centre = communityCentre(area, boundaries);
+        if (!centre) return;
+        // The map may still be mounting on a cold load; give it a moment.
+        let tries = 0;
+        const go = () => {
+          if (mapRef.current) mapRef.current.flyTo(centre[0], centre[1], 14);
+          else if (++tries < 20) window.setTimeout(go, 250);
+        };
+        go();
+      });
     }
   }, [searchParams]);
 

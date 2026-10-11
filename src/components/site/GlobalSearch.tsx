@@ -44,7 +44,7 @@ export function GlobalSearch({ initial = '' }: { initial?: string }) {
         defaultValue={initial}
         key={initial}
         maxLength={120}
-        placeholder="What are you looking for? (Press / to search)"
+        placeholder="Neighbourhood, street, event…"
         type="search"
         autoComplete="off"
       />

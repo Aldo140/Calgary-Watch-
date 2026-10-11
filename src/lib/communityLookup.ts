@@ -171,3 +171,16 @@ export function fetchCommunityBoundaries(): Promise<CommunityBoundary[]> {
   }
   return boundariesPromise;
 }
+
+/**
+ * Where to point the map for a community named in a link (/map?area=seton).
+ * Matches the slug search builds from the name, so "bridgeland-riverside"
+ * finds "bridgeland/riverside". Returns the middle of its bounding box.
+ */
+export function communityCentre(slug: string, boundaries: CommunityBoundary[]): [number, number] | null {
+  const want = slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const b = boundaries.find((x) => x.name.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === want);
+  if (!b) return null;
+  const [minLng, minLat, maxLng, maxLat] = b.bbox;
+  return [(minLat + maxLat) / 2, (minLng + maxLng) / 2];
+}

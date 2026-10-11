@@ -16,6 +16,7 @@ import { discoveryRepository } from '../data/discovery';
 import '../styles/home.css';
 import '../styles/home-board.css';
 import '../styles/home-v3.css';
+import '../styles/home-calm.css';
 
 /**
  * Development only: `/?demo=live` fills the live pulse with sample pins so the

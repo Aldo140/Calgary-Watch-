@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Moon, Sun, Umbrella } from 'lucide-react';
 import type { AgendaDay, AgendaItem } from '../../lib/discoveryCalendar';
@@ -37,6 +37,21 @@ function wetDay(f?: DailyForecast) {
   return !!f && describeSky(f.code).wet && (f.precipChance ?? 0) >= 50;
 }
 
+const PHONE = '(max-width: 640px)';
+
+function usePhone(): boolean {
+  const [phone, setPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia?.(PHONE).matches === true);
+  useEffect(() => {
+    const mq = window.matchMedia?.(PHONE);
+    if (!mq) return;
+    const on = () => setPhone(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return phone;
+}
+
 export function WeekPlanner({ days, forecast, selected, onSelect }: {
   days: AgendaDay[];
   forecast: Record<string, DailyForecast>;
@@ -48,7 +63,9 @@ export function WeekPlanner({ days, forecast, selected, onSelect }: {
   const f = forecast[day.date];
   const wet = wetDay(f);
   const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? day.items : day.items.slice(0, 5);
+  // Phones get a shorter first look at the day; the rest is one tap away.
+  const limit = usePhone() ? 3 : 5;
+  const visible = showAll ? day.items : day.items.slice(0, limit);
 
   const onKey = (event: KeyboardEvent) => {
     const moves: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1, Home: -selected, End: days.length - 1 - selected };
@@ -179,8 +196,8 @@ export function WeekPlanner({ days, forecast, selected, onSelect }: {
           </div>
         )}
 
-        {day.items.length > 5 && !showAll ? (
-          <button className="h-more" type="button" onClick={() => setShowAll(true)}>Show {day.items.length - 5} more</button>
+        {day.items.length > limit && !showAll ? (
+          <button className="h-more" type="button" onClick={() => setShowAll(true)}>Show {day.items.length - limit} more</button>
         ) : null}
 
         <p className="h-day-panel-foot">

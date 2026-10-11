@@ -6,6 +6,7 @@
 import type { InventorySubmissionInput } from '../../src/types/discovery';
 import type { InventoryProvider, SourceConfig, SourceRecord } from './providers';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { cleanText } from '../../src/lib/cleanText.js';
 
 export interface SquarespaceEvent {
   id: string; title?: string; excerpt?: string; body?: string; fullUrl?: string; startDate?: number; endDate?: number;
@@ -13,7 +14,7 @@ export interface SquarespaceEvent {
   location?: { addressTitle?: string; addressLine1?: string; addressLine2?: string };
 }
 
-const strip = (v: string) => v.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+const strip = (v: string) => cleanText(v.replace(/<[^>]+>/g, ' '));
 const iso = (ms: number) => {
   const d = new Date(ms);
   const parts = Object.fromEntries(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'longOffset' }).formatToParts(d).map(p => [p.type, p.value]));

@@ -10,33 +10,34 @@
  * the system, which is the part a lawyer would otherwise have to reconstruct.
  */
 
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { SiteLayout } from '../components/site/SiteLayout';
+import { PageHero } from '../components/site/PageHero';
+import '../styles/privacy.css';
 
 const UPDATED = '28 August 2026';
 const CONTACT = 'aldo@calgarywatch.ca';
 
-const T = {
-  paper: '#F7F3EA',
-  panel: '#FFFDF8',
-  ink: '#1C2B3A',
-  inkSoft: '#5A6B7D',
-  line: '#D9D2C3',
-  bow: '#2E8B7A',
-};
+const TOC = [
+  ['account', 'If you create an account'],
+  ['reports', 'When you file a report'],
+  ['anonymous', 'What “anonymous” means'],
+  ['others', 'Reporting about other people'],
+  ['visitors', 'If you only look'],
+  ['traffic-flow', 'Traffic flow and cameras'],
+  ['third-parties', 'Who else is involved'],
+  ['rights', 'Your rights'],
+  ['security', 'How it is protected'],
+  ['children', 'Children'],
+  ['changes', 'Changes'],
+  ['contact', 'Contact'],
+] as const;
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-24">
-      <h2
-        className="font-display text-[1.35rem] font-extrabold tracking-[-0.02em] sm:text-[1.6rem]"
-        style={{ color: T.ink }}
-      >
-        {title}
-      </h2>
-      <div className="mt-3 space-y-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-        {children}
-      </div>
+    <section id={id} className="pv-section">
+      <h2>{title}</h2>
+      <div className="pv-body">{children}</div>
     </section>
   );
 }
@@ -49,28 +50,20 @@ function DataTable({
   rows: { what: string; why: string; kept: string }[];
 }) {
   return (
-    <div className="mt-4 overflow-x-auto rounded-2xl border" style={{ borderColor: T.line, background: T.panel }}>
-      <table className="w-full min-w-[34rem] border-collapse text-left text-[13.5px]">
+    <div className="pv-table">
+      <table>
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            {['What we store', 'Why', 'How long'].map((h) => (
-              <th
-                key={h}
-                className="border-b px-3.5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em]"
-                style={{ borderColor: T.line, color: T.inkSoft }}
-              >
-                {h}
-              </th>
-            ))}
+            {['What we store', 'Why', 'How long'].map((h) => <th key={h}>{h}</th>)}
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.what} className="border-b last:border-0" style={{ borderColor: T.line }}>
-              <td className="px-3.5 py-3 font-semibold align-top" style={{ color: T.ink }}>{r.what}</td>
-              <td className="px-3.5 py-3 align-top" style={{ color: T.inkSoft }}>{r.why}</td>
-              <td className="px-3.5 py-3 align-top" style={{ color: T.inkSoft }}>{r.kept}</td>
+            <tr key={r.what}>
+              <td data-label="What we store">{r.what}</td>
+              <td data-label="Why">{r.why}</td>
+              <td data-label="How long"><span>{r.kept}</span></td>
             </tr>
           ))}
         </tbody>
@@ -81,36 +74,28 @@ function DataTable({
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen" style={{ background: T.paper }}>
-      <header className="border-b" style={{ borderColor: T.line }}>
-        <div className="mx-auto flex max-w-[52rem] items-center gap-3 px-5 py-4 sm:px-8">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-[13px] font-bold transition-opacity hover:opacity-70"
-            style={{ color: T.inkSoft }}
-          >
-            <ArrowLeft size={15} /> Calgary Watch
-          </Link>
-        </div>
-      </header>
+    <SiteLayout>
+      <div className="bp pv">
+        <PageHero
+          id="pv-title"
+          kicker="Privacy"
+          title={<>What we collect, and <span>what we do with it.</span></>}
+          lead="CalgaryWatch is a free Calgary discovery and community awareness platform. We do not sell personal information, and we do not track you across other websites. Sponsored placements, when offered, are labelled and are independent of editorial selections. This page describes exactly what the service stores."
+          facts={<>
+            <li><b>Never</b> sold</li>
+            <li><b>No</b> cross-site tracking</li>
+            <li>Updated <b>{UPDATED}</b></li>
+          </>}
+        />
 
-      <main className="mx-auto max-w-[52rem] px-5 py-10 sm:px-8 sm:py-14">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em]" style={{ color: T.bow }}>
-          Privacy
-        </p>
-        <h1
-          className="mt-3 font-display font-extrabold tracking-[-0.03em] leading-[1.05]"
-          style={{ color: T.ink, fontSize: 'clamp(2rem, 5vw, 3rem)' }}
-        >
-          What we collect, and what we do with it.
-        </h1>
-        <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: T.inkSoft }}>
-          Calgary Watch is a free Calgary discovery and community awareness platform. We do not sell personal
-          information, and we do not track you across other websites. Sponsored placements, when offered, are labelled and are independent of editorial selections.
-          This page describes exactly what the service stores. Last updated {UPDATED}.
-        </p>
-
-        <div className="mt-12 space-y-12">
+        <div className="cw-wrap pv-layout">
+          <nav className="pv-toc" aria-label="On this page">
+            <p className="bp-eyebrow">On this page</p>
+            <ol>
+              {TOC.map(([id, label]) => <li key={id}><a href={`#${id}`}>{label}</a></li>)}
+            </ol>
+          </nav>
+          <div className="pv-sections">
           <Section id="account" title="If you create an account">
             <p>
               Signing in uses Google. We never see or store your Google password. Google returns
@@ -152,7 +137,7 @@ export default function PrivacyPage() {
           <Section id="anonymous" title='What "anonymous" actually means'>
             <p>
               Choosing to post anonymously hides your name from the public map and the public feed.
-              It does <strong style={{ color: T.ink }}>not</strong> hide you from us. Your account
+              It does <strong>not</strong> hide you from us. Your account
               identifier and email address are still recorded against the report, stored in an
               administrator-only area, and used if a report has to be investigated for abuse or is
               the subject of a legal request.
@@ -227,7 +212,7 @@ export default function PrivacyPage() {
               Some pages contact these sources for public information. They are not given anything
               about you beyond the ordinary network request your browser makes:
             </p>
-            <ul className="ml-5 list-disc space-y-1">
+            <ul className="pv-list">
               <li>City of Calgary and City of Edmonton Open Data — incidents, boundaries, assessments, traffic cameras</li>
               <li>Open-Meteo — current weather and air-quality conditions</li>
               <li>Alberta Rivers — public river-level readings</li>
@@ -253,7 +238,7 @@ export default function PrivacyPage() {
 
           <Section id="rights" title="Your rights">
             <p>You can ask us to:</p>
-            <ul className="ml-5 list-disc space-y-1">
+            <ul className="pv-list">
               <li>tell you what personal information we hold about you</li>
               <li>correct anything that is wrong</li>
               <li>delete your account and the personal information attached to it</li>
@@ -306,19 +291,19 @@ export default function PrivacyPage() {
             </p>
             <a
               href={`mailto:${CONTACT}`}
-              className="mt-2 inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[14px] font-bold transition-opacity hover:opacity-90"
-              style={{ background: T.ink, color: T.paper }}
+              className="bp-btn bp-btn-navy pv-mail"
             >
               <Mail size={15} /> {CONTACT}
             </a>
-            <p className="mt-4 text-[13.5px]">
+            <p className="pv-fine">
               If you are not satisfied with our response you can contact the Office of the
               Information and Privacy Commissioner of Alberta, or the Office of the Privacy
               Commissioner of Canada.
             </p>
           </Section>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </SiteLayout>
   );
 }

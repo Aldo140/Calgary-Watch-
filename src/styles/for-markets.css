@@ -1,0 +1,26 @@
+/* /for-markets: Market HQ for organizers. Builds on brand-page.css. */
+.fm-find {
+  justify-self: end; width: 100%; max-width: 460px; padding: 22px; border: 2px solid var(--ink); border-radius: 24px;
+  background: #fff; color: var(--ink); box-shadow: 7px 7px 0 var(--yellow); transform: rotate(-1.5deg);
+}
+.fm-find h2 { margin-top: 6px; font: 800 30px/1 var(--display); letter-spacing: -.035em; }
+.fm-search { display: flex; align-items: center; gap: 10px; height: 54px; margin-top: 16px; padding: 0 16px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; transition: box-shadow .15s; }
+.fm-search:focus-within { box-shadow: 4px 4px 0 var(--cyan); }
+.fm-search input { flex: 1; min-width: 0; border: 0; outline: none; background: none; font: 400 16px Inter, sans-serif; color: var(--ink); }
+.fm-found { display: grid; gap: 8px; margin-top: 14px !important; }
+.fm-found li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 14px; background: var(--card); }
+.fm-found strong { font: 800 16px/1.2 var(--display); }
+.fm-found span { display: flex; gap: 12px; font: 700 14px Inter, sans-serif; }
+.bp .fm-found a { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
+.bp .fm-found .fm-open { padding: 6px 10px; border: 2px solid var(--ink); border-radius: 999px; background: var(--yellow); color: var(--ink); text-decoration: none; }
+.fm-hint { margin-top: 12px !important; font: 400 14px/1.45 Inter, sans-serif; color: var(--muted); }
+.bp .fm-hint a { color: var(--blue); font-weight: 700; text-decoration: underline; }
+.fm-plans .bp-card h3 { font-size: clamp(24px, 2.4vw, 30px); }
+.fm-plans .bp-card-dark .bp-tag { background: var(--cyan); }
+.fm-plans .bp-card-dark ul li::before { background-color: var(--cyan); }
+.fm-promise { display: grid; gap: 8px; margin-top: 14px !important; }
+.fm-promise li { display: flex; align-items: center; gap: 10px; font: 600 17px/1.35 Inter, sans-serif; }
+.fm-promise svg { flex: none; width: 24px; height: 24px; padding: 3px; border: 2px solid var(--ink); border-radius: 50%; background: #fff; }
+@media (max-width: 1100px) { .fm .bp-cards { --cols: 2 !important; } }
+@media (max-width: 960px) { .fm-find { justify-self: start; } }
+@media (max-width: 640px) { .fm-find { transform: none; box-shadow: 5px 5px 0 var(--yellow); padding: 18px; } }

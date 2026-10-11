@@ -1,8 +1,8 @@
 /*
  * The member glance: three answer tiles (near home, next plan, next email)
  * in the homepage's deck language: 2px ink outlines, hard offset shadows,
- * navy / cyan / paper blocks. Dealt cards on wide screens, plain tappable
- * rows on phones, where a squeezed card would hide the answer.
+ * navy / cyan / paper blocks. Dealt cards on wide screens, a home-screen
+ * style widget stack on phones.
  */
 .gl-tiles {
   --gl-ink: #151515; --gl-navy: var(--cw-live, #06162f); --gl-cyan: #00c2e0; --gl-yellow: #ffdf4f;
@@ -52,24 +52,34 @@
   .gl-text small { font-size: 12.5px; }
 }
 
-/* Phones: rows. Art left, the answer in the middle, the action under it. */
+/*
+ * Phones: a widget stack, like a home screen. Near home is the wide widget
+ * (the first thing anyone wants to know); the next plan and the next email
+ * sit side by side as squares underneath.
+ */
 @media (max-width: 640px) {
-  .gl-tiles { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 0 4px 4px 0; }
+  .gl-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 3px 3px 0; }
   .gl-tile {
     --r: 0deg !important; --y: 0px !important;
-    display: grid; grid-template-columns: 58px minmax(0, 1fr); grid-template-areas: 'art text' 'art act'; column-gap: 12px; align-items: start;
-    min-height: 0; padding: 12px 14px 12px 10px; border-radius: 16px; box-shadow: 3px 3px 0 var(--gl-ink);
+    min-height: 0; padding: 12px 12px 11px; border-radius: 20px; box-shadow: 3px 3px 0 var(--gl-ink);
   }
-  .gl-art { grid-area: art; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 12px; background: rgba(255, 255, 255, .1); }
-  .gl-tile[data-tone='cyan'] .gl-art { background: rgba(255, 255, 255, .35); }
-  .gl-tile[data-tone='paper'] .gl-art { background: #fff5cc; }
-  .gl-art .h-deck-art { width: 50px; height: 40px; margin: 0; }
-  .gl-text { grid-area: text; margin: 0; padding: 0; gap: 2px; }
-  .gl-label { font-size: 10px; }
-  .gl-text strong { font-size: 18px; -webkit-line-clamp: 1; }
-  .gl-text small { font-size: 13px; }
-  .gl-act { grid-area: act; margin-top: 8px; padding-top: 0; border: 0; }
-  .cw-site .gl-tiles .gl-link, .cw-site .gl-tiles .gl-btn { font-size: 13.5px; }
+  .gl-tile:first-child {
+    grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) 84px; grid-template-areas: 'text art' 'act art';
+    column-gap: 10px; align-items: center; padding: 14px 12px 12px 16px;
+  }
+  .gl-tile:first-child .gl-art { grid-area: art; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; background: rgba(0, 194, 224, .12); }
+  .gl-tile:first-child .gl-art .h-deck-art { width: 74px; height: 60px; margin: 0; }
+  .gl-tile:first-child .gl-text { grid-area: text; margin: 0; padding: 0; }
+  .gl-tile:first-child .gl-text strong { font-size: 26px; -webkit-line-clamp: 1; }
+  .gl-tile:first-child .gl-act { grid-area: act; }
+  .gl-tile:not(:first-child) { min-height: 176px; }
+  .gl-art .h-deck-art { width: 52px; height: 42px; margin: 0 0 0 -4px; }
+  .gl-text { gap: 3px; padding-top: 8px; }
+  .gl-label { font-size: 9.5px; letter-spacing: .08em; }
+  .gl-text strong { font-size: 16.5px; }
+  .gl-text small { font-size: 12px; }
+  .gl-act { margin-top: 8px; padding-top: 8px; }
+  .cw-site .gl-tiles .gl-link, .cw-site .gl-tiles .gl-btn { font-size: 13px; }
 }
 
 @media (prefers-reduced-motion: reduce) { .gl-tile { transition: none; } }

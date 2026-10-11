@@ -315,7 +315,7 @@ export default function PlansPage() {
     return (
       <SiteLayout>
         <MemberDashboard
-          user={user} first={first} area={area} now={now}
+          user={user} first={first} area={area} now={now} memberSince={profile?.createdAt}
           picks={picks.picks} going={picks.going} considered={picks.considered} imageFor={(id) => images.get(id)}
           near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={myClaims ?? []}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}

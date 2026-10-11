@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import {
-  ArrowDown, ArrowUpRight, Bell, Check, Footprints, HeartHandshake, MapPin, Mic, Music, Palette,
+  ArrowDown, ArrowUpRight, Award, Bell, ListMusic, Sun, Ticket, Check, Footprints, HeartHandshake, MapPin, Mic, Music, Palette,
   Pencil, Radio, Settings2, ShoppingBasket, Shield, Sparkles, Trophy, Users, UtensilsCrossed, type LucideIcon,
 } from 'lucide-react';
 import type { User } from 'firebase/auth';
@@ -10,7 +10,6 @@ import { BadgeMark } from './BadgeMark';
 import { GoingButton } from './GoingButton';
 import { EASE_OUT } from './Motion';
 import { GlanceTiles, briefing, type GlanceProps } from './Glance';
-import { useShapes } from '../check/Cover';
 import { CalgarySky, type SkyVariant } from '../home/CalgarySky';
 import { TEAR } from '../home/HomeHero';
 import { Scribble } from '../home/HomeYours';
@@ -92,6 +91,8 @@ export interface DashboardProps {
   onEdit: (focus?: 'interests' | 'home') => void;
   /** Admin viewing someone else's dashboard. */
   adminView?: string | null;
+  /** Account creation, for the member card. */
+  memberSince?: number;
   /** Shown under the title right after saving: "You're in" or "Saved". */
   notice?: { joined: BadgeId[] | null; text: string } | null;
 }
@@ -136,7 +137,60 @@ function PhoneBody(p: DashboardProps) {
       <BadgeShelf badges={p.badges} />
       <ListingsCard claims={p.claims} />
       <Fine />
+      <PhoneDock hasPlans={p.going.length > 0} />
     </div>
+  );
+}
+
+/**
+ * Phones: an app-style dock pinned to the bottom, so Today, Plans, Picks and
+ * Badges are always one thumb-tap away on a long page. The current section
+ * lights up as you scroll.
+ */
+function PhoneDock({ hasPlans }: { hasPlans: boolean }) {
+  const items: Array<{ id: string; label: string; Icon: LucideIcon }> = [
+    { id: 'pd-today', label: 'Today', Icon: Sun },
+    ...(hasPlans ? [{ id: 'pd-next', label: 'Plans', Icon: Ticket }] : []),
+    { id: 'pd-picks', label: 'Picks', Icon: ListMusic },
+    { id: 'pd-badges', label: 'Badges', Icon: Award },
+  ];
+  const [active, setActive] = useState(items[0].id);
+  // Out of the way on the hero, where its own buttons do the job; in once you scroll.
+  const [shown, setShown] = useState(false);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const line = window.innerHeight * 0.4;
+        let current = items[0].id;
+        for (const it of items) {
+          const el = document.getElementById(it.id)?.closest('section') ?? document.getElementById(it.id);
+          if (el && el.getBoundingClientRect().top <= line) current = it.id;
+        }
+        setActive(current);
+        setShown(window.scrollY > window.innerHeight * 0.55);
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', onScroll); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPlans]);
+  const go = (id: string) => {
+    const el = document.getElementById(id)?.closest('section') ?? document.getElementById(id);
+    el?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  };
+  return (
+    <nav className="pd-dock" aria-label="Jump to" data-shown={shown}>
+      {items.map(({ id, label, Icon }) => (
+        <button key={id} type="button" data-on={active === id} aria-current={active === id ? 'true' : undefined} onClick={() => go(id)}>
+          <Icon size={19} strokeWidth={2.3} aria-hidden="true" />
+          <span>{label}</span>
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -170,6 +224,12 @@ function Sky(p: DashboardProps & { phone: boolean }) {
       <CalgarySky palette={palette} sun={sun} phase={moonPhase(new Date(now))} cloudCover={cloudCover} windKph={current?.windKph ?? 8} precip={precip} variant={variant} now={Math.floor(now / 300000)} />
       <div className="cw-wrap pd-sky-in">
         <motion.p className="pd-dateline" {...rise(0)}>
+          {p.phone ? (
+            <span className="pd-me">
+              <span className="pd-me-ava" aria-hidden="true">{p.user.photoURL ? <img src={p.user.photoURL} alt="" referrerPolicy="no-referrer" /> : (p.first || 'Y').slice(0, 1)}</span>
+              Member{p.area ? ` · ${p.area}` : ''}
+            </span>
+          ) : null}
           <span className="h-dateline-live"><span className="h-pulse" aria-hidden="true" />Live · {clock.format(new Date(now))}</span>
           {current && sky ? <span className="pd-chip pd-chip-ghost"><SkyGlyph icon={sky.icon} size={14} /> {Math.round(current.temp)}° {sky.label.toLowerCase()}</span> : null}
         </motion.p>
@@ -184,7 +244,7 @@ function Sky(p: DashboardProps & { phone: boolean }) {
           <Link to="/map" className="pd-ghost"><Radio size={16} aria-hidden="true" /> Live map</Link>
           <button type="button" className="pd-ghost" onClick={() => p.onEdit()}><Settings2 size={16} aria-hidden="true" /> {p.phone ? 'Settings' : 'Area, emails & interests'}</button>
         </motion.div>
-        <Cover area={p.area} />
+        {p.phone ? null : <MemberPass {...p} />}
       </div>
       <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
@@ -194,31 +254,35 @@ function Sky(p: DashboardProps & { phone: boolean }) {
   );
 }
 
-/** "Made for you": the reader's own community, drawn as a cover in the brand's colours. */
-function Cover({ area }: { area: string }) {
-  const shapes = useShapes();
-  const shape = shapes.get(area.toUpperCase());
+/** The reader's member card: who they are, where home is, what they've got going. */
+function MemberPass(p: DashboardProps) {
   const reduce = useReducedMotion();
+  const unlocked = p.badges.filter((b) => b.unlocked).length;
+  const name = p.user.displayName || p.first || 'You';
+  const stats: Array<[number, string, string]> = [[p.picks.length, 'Picks', '#pd-picks'], [p.going.length, 'Plans', p.going.length ? '#pd-next' : '#pd-picks'], [unlocked, 'Badges', '#pd-badges']];
   return (
-    <motion.div
-      className="pd-cover" aria-hidden="true"
-      initial={reduce ? false : { opacity: 0, scale: 0.86, rotate: -6 }} animate={{ opacity: 1, scale: 1, rotate: 4 }}
-      transition={{ type: 'spring', stiffness: 150, damping: 16, delay: 0.1 }}
+    <motion.aside
+      className="pd-pass" aria-label="Your member card"
+      initial={reduce ? false : { opacity: 0, y: 24, rotate: -4 }} animate={{ opacity: 1, y: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 150, damping: 16, delay: 0.12 }}
     >
-      <span className="pd-cover-art">
-        {shape ? (
-          <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-            <g transform="translate(14 12) scale(.72)">
-              <path d={shape} fill="#151515" transform="translate(4 4)" />
-              <path d={shape} fill="#00c2e0" stroke="#151515" strokeWidth="1.6" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-            </g>
-          </svg>
-        ) : <MapPin className="pd-cover-pin" strokeWidth={2.2} />}
-        <img className="pd-cover-mark" src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" width="40" height="40" />
+      <span className="pd-pass-top">
+        <img src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" width="34" height="34" />
+        <span>CalgaryWatch</span>
+        <b>Member</b>
       </span>
-      <span className="pd-cover-label">Made for you</span>
-      <span className="pd-cover-name">{area || 'Calgary'}</span>
-    </motion.div>
+      <span className="pd-pass-who">
+        <span className="pd-pass-ava" aria-hidden="true">{p.user.photoURL ? <img src={p.user.photoURL} alt="" referrerPolicy="no-referrer" /> : name.slice(0, 1)}</span>
+        <span>
+          <strong>{name}</strong>
+          <small><MapPin size={13} aria-hidden="true" /> {p.area || 'Calgary'}</small>
+        </span>
+      </span>
+      <span className="pd-pass-stats">
+        {stats.map(([n, label, href]) => <a key={label} href={href}><strong>{n}</strong><small>{label}</small></a>)}
+      </span>
+      <span className="pd-pass-foot">{p.memberSince ? `Since ${fmt(p.memberSince, { month: 'long', year: 'numeric' })}` : 'Free, for Calgary'}</span>
+    </motion.aside>
   );
 }
 
@@ -252,7 +316,7 @@ function TodayCard(p: DashboardProps) {
   const reduce = useReducedMotion();
   return (
     <motion.section
-      className="pd-today" aria-labelledby="pd-today-title"
+      id="pd-today" className="pd-today" aria-labelledby="pd-today-title"
       initial={reduce ? false : { opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 150, damping: 20, delay: 0.2 }}
     >
       <div className="pd-today-head">

@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { Search, SearchX } from 'lucide-react';
 import { db } from '../../firebase';
 import { SEARCH_DEMAND, summarizeDemand, type DemandRow } from '../../lib/searchDemand';
-import { AdminButton, Chip, EmptyState, Figure, Panel, StatGrid, StatTile, T, mono } from './ui';
+import { describeAnswer, parseSearchIntent } from '../../lib/searchIntent';
+import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, mono } from './ui';
 
 const WINDOWS = [7, 30, 90] as const;
 
@@ -45,7 +46,7 @@ export function DemandWorkspace() {
       <StatGrid>
         <StatTile label="Searches" value={rows ? total : null} hint={`Last ${days} days`} />
         <StatTile label="Distinct terms" value={rows ? terms.length : null} />
-        <StatTile label="Found nothing" value={rows ? misses.length : null} tone={misses.length ? 'attention' : 'neutral'} hint="Terms whose latest search had no results" />
+        <StatTile label="Found nothing" value={rows ? misses.length : null} tone={misses.length ? 'attention' : 'neutral'} hint={`Of ${terms.length} terms, the latest search had no results`} />
         <StatTile label="Hit rate" value={rows && total ? Math.round((1 - (rows.filter((r) => r.results === 0).length / total)) * 100) : null} unit="%" />
       </StatGrid>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -64,22 +65,38 @@ export function DemandWorkspace() {
   );
 }
 
+/**
+ * One row per term. The search count and the result count used to sit side by
+ * side as a bare number and "0 found", which read as one figure: a term
+ * searched once with nothing found looked like "10 found". Each number now
+ * carries its own word.
+ */
 function TermList({ rows, miss = false }: { rows: DemandRow[]; miss?: boolean }) {
   const max = Math.max(...rows.map((r) => r.searches), 1);
   return (
     <ol className="divide-y" style={{ borderColor: T.line }}>
-      {rows.map((r) => (
-        <li key={r.q} className="flex items-center gap-3 px-4 py-2.5">
-          <div className="min-w-0 flex-1">
-            <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
-            <div className="mt-1 h-1.5 rounded-full" style={{ background: `${miss ? T.attention : T.signal}1F` }}>
-              <div className="h-full rounded-full" style={{ width: `${(r.searches / max) * 100}%`, background: miss ? T.attention : T.signal }} />
+      {rows.map((r) => {
+        // Searches recorded before search understood neighbourhoods, streets and
+        // "yesterday police" stay at 0 found; say what the same words get today.
+        const now = r.lastResults === 0 ? describeAnswer(parseSearchIntent(r.q)) : null;
+        return (
+          <li key={r.q} className="flex items-center gap-3 px-4 py-2.5">
+            <div className="min-w-0 flex-1">
+              <Link to={`/search?q=${encodeURIComponent(r.q)}`} target="_blank" className="text-sm font-semibold hover:underline" style={{ color: T.ink }}>{r.q}</Link>
+              <div className="mt-1 h-1.5 rounded-full" style={{ background: `${miss ? T.attention : T.signal}1F` }}>
+                <div className="h-full rounded-full" style={{ width: `${(r.searches / max) * 100}%`, background: miss ? T.attention : T.signal }} />
+              </div>
+              {now ? <p className="mt-1 text-[0.68rem]" style={{ color: T.muted }}>Answered now: {now}</p> : null}
             </div>
-          </div>
-          <Figure value={r.searches} size="sm" />
-          <span className="w-16 text-right text-[0.68rem]" style={{ fontFamily: mono, color: T.muted }}>{miss ? <Chip tone="attention">0 found</Chip> : `${r.lastResults} found`}</span>
-        </li>
-      ))}
+            <span className="w-20 text-right text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{r.searches} {r.searches === 1 ? 'search' : 'searches'}</span>
+            <span className="w-20 text-right">
+              {r.lastResults === 0
+                ? <Chip tone={now ? 'ok' : 'attention'}>{now ? 'answered' : 'no results'}</Chip>
+                : <span className="text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{r.lastResults} {r.lastResults === 1 ? 'result' : 'results'}</span>}
+            </span>
+          </li>
+        );
+      })}
     </ol>
   );
 }

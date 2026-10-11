@@ -182,7 +182,7 @@ const HUBS: Record<string, { title: string; description: string }> = {
   '/neighbourhoods': { title: 'Calgary Neighbourhood Guides | CalgaryWatch', description: 'Guides to Calgary neighbourhoods like Inglewood, Kensington, the Beltline, Bridgeland and Marda Loop: what’s there and what’s on.' },
 };
 for (const [path, hub] of Object.entries(HUBS)) ROUTE_SEO[path] = { ...ROUTE_SEO[path], ...hub, index: true };
-ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Find events, markets, local places, guides and neighbourhoods.', index: false, pageType: 'CollectionPage' };
+ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
   ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], index: false, title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
 }

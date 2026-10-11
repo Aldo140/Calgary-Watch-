@@ -120,7 +120,7 @@ function DeskBody(p: DashboardProps) {
       </div>
       <aside className="pd-side" aria-label="More for you">
         <NearCard near={p.near} area={p.area} now={p.now} />
-        <BadgeShelf badges={p.badges} />
+        <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} />
         <ListingsCard claims={p.claims} />
         <Fine />
       </aside>
@@ -134,7 +134,7 @@ function PhoneBody(p: DashboardProps) {
       <UpNext going={p.going} />
       <NearCard near={p.near} area={p.area} now={p.now} />
       <Tracklist {...p} phone />
-      <BadgeShelf badges={p.badges} />
+      <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} phone />
       <ListingsCard claims={p.claims} />
       <Fine />
       <PhoneDock hasPlans={p.going.length > 0} />
@@ -487,8 +487,32 @@ function NearCard({ near, area, now }: { near: NearReport[]; area: string; now: 
   );
 }
 
-function BadgeShelf({ badges }: { badges: BadgeState[] }) {
-  const unlocked = badges.filter((b) => b.unlocked).length;
+/** How to earn each badge from here: a setup step, or a place on the site. */
+type EarnWay = { step: SetupStepId; label: string } | { to: string; label: string };
+const EARN: Partial<Record<BadgeId, EarnWay>> = {
+  neighbour: { step: 'home', label: 'Add home' },
+  'tuned-in': { step: 'interests', label: 'Choose' },
+  'on-the-list': { step: 'events', label: 'Turn on' },
+  'monday-reader': { step: 'monday', label: 'Turn on' },
+  'first-plans': { to: '#pd-picks', label: 'See picks' },
+  regular: { to: '#pd-picks', label: 'See picks' },
+  'all-rounder': { to: '#pd-picks', label: 'See picks' },
+  scout: { to: '/submit', label: 'Add one' },
+  'eyes-on-the-street': { to: '/map', label: 'Open map' },
+};
+
+/**
+ * Badges as a collection with gaps: what you've earned on the shelf, and
+ * every one still to get listed with exactly how to get it and one button.
+ * Closest first, so the next badge is always the obvious one.
+ */
+function BadgeShelf({ badges, busy, onAct, phone }: { badges: BadgeState[]; busy: SetupStepId | null; onAct: (id: SetupStepId) => void; phone?: boolean }) {
+  const [all, setAll] = useState(false);
+  const earned = badges.filter((b) => b.unlocked);
+  const near = (b: BadgeState) => (EARN[b.id] ? 0 : 2) - (b.target ? (b.progress ?? 0) / b.target : 0);
+  const locked = badges.filter((b) => !b.unlocked).sort((a, b) => near(a) - near(b));
+  const cap = phone ? 3 : 4;
+  const shown = all ? locked : locked.slice(0, cap);
   return (
     <section className="pd-card pd-badges" aria-labelledby="pd-badges">
       <div className="pd-card-head">
@@ -496,16 +520,54 @@ function BadgeShelf({ badges }: { badges: BadgeState[] }) {
           <p className="pd-kicker">For plans, not screen time</p>
           <h2 id="pd-badges">Badges</h2>
         </div>
-        <span className="pd-count">{unlocked}<small>/{badges.length}</small></span>
+        <span className="pd-count">{earned.length}<small>/{badges.length}</small></span>
       </div>
-      <ul className="pd-stickers">
-        {badges.map((b, i) => (
-          <li key={b.id} data-locked={!b.unlocked} style={{ '--tilt': `${((i * 37) % 13) - 6}deg` } as CSSProperties} title={b.unlocked ? b.earned : b.hint}>
-            <BadgeMark badge={b} size={54} />
-            <strong>{b.label}</strong>
-          </li>
-        ))}
-      </ul>
+      <ol className="pd-meter" aria-hidden="true">{badges.map((b) => <li key={b.id} data-on={b.unlocked} />)}</ol>
+      {earned.length ? (
+        <ul className="pd-stickers" aria-label="Earned">
+          {earned.map((b, i) => (
+            <li key={b.id} style={{ '--tilt': `${((i * 37) % 13) - 6}deg` } as CSSProperties} title={b.earned}>
+              <BadgeMark badge={b} size={54} />
+              <strong>{b.label}</strong>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="pd-earn-none">None yet. Your first one is a tap away.</p>}
+      {locked.length ? (
+        <>
+          <h3 className="pd-earn-title">{locked.length === 1 ? 'One left to earn' : `${locked.length} more to earn`}</h3>
+          <ul className="pd-earn">
+            {shown.map((b) => {
+              const way = EARN[b.id];
+              const pct = b.target ? Math.round(((b.progress ?? 0) / b.target) * 100) : 0;
+              return (
+                <li key={b.id}>
+                  <BadgeMark badge={b} size={44} />
+                  <span className="pd-earn-text">
+                    <strong>{b.label}</strong>
+                    <small>{b.hint}</small>
+                    {b.target ? (
+                      <span className="pd-earn-bar" role="img" aria-label={`${b.progress ?? 0} of ${b.target}`}>
+                        <span style={{ width: `${pct}%` }} /><em>{b.progress ?? 0}/{b.target}</em>
+                      </span>
+                    ) : null}
+                  </span>
+                  {way && 'step' in way ? (
+                    <button type="button" className="pd-earn-go" disabled={busy === way.step} onClick={() => onAct(way.step)}>{busy === way.step ? 'Adding…' : way.label}</button>
+                  ) : way ? (
+                    way.to.startsWith('#') ? <a className="pd-earn-go" href={way.to}>{way.label}</a> : <Link className="pd-earn-go" to={way.to}>{way.label}</Link>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+          {locked.length > cap ? (
+            <button type="button" className="pd-earn-more" aria-expanded={all} onClick={() => setAll(!all)}>
+              {all ? 'Show fewer' : `Show all ${locked.length}`} <ArrowDown size={15} aria-hidden="true" style={all ? { transform: 'rotate(180deg)' } : undefined} />
+            </button>
+          ) : null}
+        </>
+      ) : <p className="pd-earn-none">Every badge earned. Nice work, neighbour.</p>}
     </section>
   );
 }

@@ -9,10 +9,11 @@ import { EntityDetail } from '../components/entity/EntityDetail';
 import { ListingBoard } from '../components/discovery/ListingBoard';
 import { LocalBoard } from '../components/discovery/LocalBoard';
 import { GuideDetail, GuidesBoard } from '../components/guides/Guides';
+import { NeighbourhoodDetail, NeighbourhoodsBoard } from '../components/neighbourhoods/Neighbourhoods';
 import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
-import type { Guide } from '../types/discovery';
+import type { Guide, Neighbourhood } from '../types/discovery';
 import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
 
 // The 311 rank game, loaded only on the Neighbourhoods pages.
@@ -54,6 +55,11 @@ export default function DiscoveryPage() {
     return <SiteLayout>{entity?.kind === 'guide'
       ? <GuideDetail guide={entity} all={all} occurrences={discoveryRepository.occurrences()} />
       : <GuidesBoard guides={items.filter((e): e is Guide => e.kind === 'guide')} />}</SiteLayout>;
+  }
+  if (root === 'neighbourhoods' && !missing) {
+    return <SiteLayout>{entity?.kind === 'neighbourhood'
+      ? <NeighbourhoodDetail hood={entity} all={all} occurrences={discoveryRepository.occurrences()} />
+      : <NeighbourhoodsBoard hoods={items.filter((e): e is Neighbourhood => e.kind === 'neighbourhood')} all={all} occurrences={discoveryRepository.occurrences()} quadrant={quadrant} />}</SiteLayout>;
   }
   if (root === 'local' && !entity && !missing) {
     return <SiteLayout><div className="cw-wrap cw-page"><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></div></SiteLayout>;

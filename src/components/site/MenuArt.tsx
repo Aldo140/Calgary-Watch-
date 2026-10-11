@@ -2,7 +2,7 @@
 const INK = '#151515';
 const S = { stroke: INK, strokeWidth: 2.5, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
 
-export type MenuArtKind = 'events' | 'markets' | 'neighbourhoods' | 'guides' | 'local' | 'community' | 'mail';
+export type MenuArtKind = 'events' | 'markets' | 'date-night' | 'neighbourhoods' | 'guides' | 'local' | 'community' | 'mail';
 
 export function MenuArt({ kind }: { kind: MenuArtKind }) {
   return (
@@ -21,6 +21,16 @@ export function MenuArt({ kind }: { kind: MenuArtKind }) {
           {[0, 1, 2, 3, 4].map(i => <path key={i} d={`M${10 + i * 12},26a6,6 0 0 0 12,0Z`} fill={i % 2 ? '#fff' : '#1554d1'} {...S} />)}
           <rect x="10" y="12" width="60" height="14" fill="none" {...S} />
           <circle cx="28" cy="42" r="5" fill="#ff8a3d" {...S} /><circle cx="40" cy="42" r="5" fill="#3fbf6a" {...S} /><circle cx="52" cy="42" r="5" fill="#e2573d" {...S} />
+        </g>
+      ) : kind === 'date-night' ? (
+        <g>
+          <path d="M18,10H38L36,26A8,8 0 0 1 20,26Z" fill="#fff" {...S} transform="rotate(-12 28 30)" />
+          <path d="M20,22H36L35.4,26A7.4,7.4 0 0 1 20.6,26Z" fill="#e2403a" transform="rotate(-12 28 30)" />
+          <path d="M28,34V52M21,52H35" fill="none" {...S} transform="rotate(-12 28 30)" />
+          <path d="M42,10H62L60,26A8,8 0 0 1 44,26Z" fill="#fff" {...S} transform="rotate(12 52 30)" />
+          <path d="M44,22H60L59.4,26A7.4,7.4 0 0 1 44.6,26Z" fill="#e2403a" transform="rotate(12 52 30)" />
+          <path d="M52,34V52M45,52H59" fill="none" {...S} transform="rotate(12 52 30)" />
+          <path d="M40,12C38,8 32,9 34,14C35,16 40,19 40,19S45,16 46,14C48,9 42,8 40,12Z" fill="#ffdf4f" stroke={INK} strokeWidth="1.8" strokeLinejoin="round" />
         </g>
       ) : kind === 'neighbourhoods' ? (
         <g>

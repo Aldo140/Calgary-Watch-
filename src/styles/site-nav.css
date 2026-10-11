@@ -34,7 +34,7 @@
 
 .cw-nav-links { display: flex; align-items: center; gap: 4px; margin: 0 auto; }
 .cw-site .cw-nav-link {
-  position: relative; padding: 10px 13px; border-radius: 999px;
+  position: relative; padding: 10px 13px; border-radius: 999px; white-space: nowrap;
   font: 600 15px/1 Inter, sans-serif; color: inherit; opacity: .82;
   transition: opacity .15s, background .15s;
 }
@@ -125,7 +125,13 @@
 .cw-nav-sheet-foot p { display: flex; gap: 20px; margin: 0; font: 500 14px/1 Inter, sans-serif; color: var(--cw-muted, #565a61); }
 
 /* ── Breakpoints ──────────────────────────────────────────────────────── */
-@media (max-width: 1140px) {
+/* Seven sections only fit at full size from about 1360px; tighten them below that. */
+@media (max-width: 1360px) {
+  .cw-site .cw-nav-link { padding: 10px 9px; font-size: 14px; }
+  .cw-nav-link::after { left: 9px; right: 9px; }
+  .cw-nav-live-long { display: none; }
+}
+@media (max-width: 1200px) {
   .cw-nav-links, .cw-nav-actions > .cw-nav-cta { display: none; }
   .cw-nav-burger { display: block; }
   .cw-nav-actions { margin-left: auto; gap: 6px; }
@@ -174,6 +180,7 @@
 .cw-menu-tile small { font: 500 12.5px/1.3 Inter, sans-serif; color: #3d4148; }
 .cw-menu-events { --t: #bdf1f9; }
 .cw-menu-markets { --t: #ffdf4f; }
+.cw-menu-date-night { --t: #ffc9d6; }
 .cw-menu-neighbourhoods { --t: #fff; }
 .cw-menu-guides { --t: #dfe7ff; }
 .cw-menu-local { --t: #ffd8c2; }
@@ -200,13 +207,6 @@
 .cw-site .cw-menu-foot p a:first-child { color: #1554d1; }
 @media (min-width: 700px) { .cw-menu-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .cw-menu-tile, .cw-menu-foot, .cw-menu-sweep { animation: none !important; } }
-.cw-menu-local { grid-column: 1 / -1; }
-.cw-site .cw-menu-local > a { display: grid; grid-template-columns: 64px 1fr; grid-template-rows: auto auto; column-gap: 12px; align-items: center; }
-.cw-menu-local .cw-menu-art { grid-row: 1 / span 2; margin: 0; }
-.cw-menu-local strong { align-self: end; }
-.cw-menu-local small { align-self: start; }
-@media (min-width: 700px) { .cw-menu-local { grid-column: auto; } .cw-site .cw-menu-local > a { display: flex; } .cw-menu-local .cw-menu-art { margin: -2px 0 4px -4px; } }
-
 /* ── Account menu (signed in) ─────────────────────────────────────────── */
 .cw-acct { position: relative; }
 .cw-site .cw-acct-btn {

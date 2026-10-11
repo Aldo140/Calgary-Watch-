@@ -265,7 +265,7 @@ export default function PlansPage() {
   const actOnStep = async (id: SetupStepId) => {
     if (id === 'home') return openEditor('home');
     if (id === 'interests') return openEditor('interests');
-    if (id === 'plan') { document.getElementById('pl-picks-title')?.scrollIntoView({ behavior: 'smooth' }); return; }
+    if (id === 'plan') { document.getElementById('pd-picks')?.scrollIntoView({ behavior: 'smooth' }); return; }
     if (id === 'share') { navigate('/submit'); return; }
     setBusy(id);
     try { await addEmail(id === 'monday' ? 'monday' : 'thursday'); } finally { setBusy(null); }

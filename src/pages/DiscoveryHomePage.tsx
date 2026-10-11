@@ -57,7 +57,7 @@ export default function DiscoveryHomePage() {
     <SiteLayout>
       <div className="cw-home2">
         <HomeHero days={days} weather={weather} onPickDay={pickDay} />
-        <div className="cw-wrap h-yours-wrap"><HomeYours /></div>
+        <div className="cw-wrap h-yours-wrap"><HomeYours pulse={pulse} /></div>
         <div className="cw-wrap h-ways-wrap">
           <WhatsHere days={days} entities={entities} pulse={pulse} />
         </div>

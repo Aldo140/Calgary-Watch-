@@ -1,0 +1,75 @@
+/*
+ * The member glance: three answer tiles (near home, next plan, next email)
+ * in the homepage's deck language: 2px ink outlines, hard offset shadows,
+ * navy / cyan / paper blocks. Dealt cards on wide screens, plain tappable
+ * rows on phones, where a squeezed card would hide the answer.
+ */
+.gl-tiles {
+  --gl-ink: #151515; --gl-navy: var(--cw-live, #06162f); --gl-cyan: #00c2e0; --gl-yellow: #ffdf4f;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 6px 6px 10px 0; list-style: none;
+}
+.gl-tile {
+  --r: 0deg; --y: 0px;
+  position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 228px; padding: 16px 16px 14px;
+  border: 2px solid var(--gl-ink); border-radius: 20px; box-shadow: 5px 5px 0 var(--gl-ink);
+  transform: translateY(var(--y)) rotate(var(--r)); transition: transform .3s cubic-bezier(.2, 1.4, .4, 1);
+}
+.gl-tile:nth-child(1) { --r: -2.5deg; --y: 6px; }
+.gl-tile:nth-child(2) { --r: 1.5deg; --y: -6px; }
+.gl-tile:nth-child(3) { --r: -1deg; --y: 8px; }
+@media (hover: hover) { .gl-tile:hover { transform: translateY(calc(var(--y) - 6px)) rotate(0deg); } }
+.gl-tile[data-tone='navy'] { background: var(--gl-navy); color: #fff; }
+.gl-tile[data-tone='cyan'] { background: var(--gl-cyan); color: var(--gl-ink); }
+.gl-tile[data-tone='paper'] { background: #fff; color: var(--gl-ink); }
+.gl-art { display: block; flex: none; }
+.gl-art .h-deck-art { display: block; width: 72px; height: 56px; margin: 0 0 0 -4px; overflow: visible; }
+.gl-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; margin-top: auto; padding-top: 12px; }
+.gl-label { font: 700 10.5px/1.2 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: .09em; text-transform: uppercase; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gl-text strong {
+  font: 800 21px/1.06 'Bricolage Grotesque', Inter, sans-serif; letter-spacing: -.025em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.gl-text small {
+  font: 500 13px/1.35 Inter, sans-serif; opacity: .86;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.gl-act { display: flex; margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed currentColor; border-top-color: color-mix(in srgb, currentColor 35%, transparent); }
+.cw-site .gl-tiles .gl-link, .cw-site .gl-tiles .gl-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; cursor: pointer; color: inherit;
+  font: 800 14px/1.2 Inter, sans-serif; text-decoration: none;
+}
+.cw-site .gl-tiles .gl-link:hover, .cw-site .gl-tiles .gl-btn:hover { color: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.cw-site .gl-tiles .gl-btn:disabled { opacity: .6; cursor: progress; }
+.gl-tile[data-tone='navy'] .gl-link { color: var(--gl-yellow); }
+.gl-tile :focus-visible { outline: 3px solid var(--gl-yellow); outline-offset: 3px; border-radius: 4px; }
+.gl-tile[data-tone='paper'] :focus-visible, .gl-tile[data-tone='cyan'] :focus-visible { outline-color: #1554d1; }
+
+/* Narrow card (homepage right column at mid widths): tighter type. */
+@media (max-width: 1180px) and (min-width: 641px) {
+  .gl-tiles { gap: 12px; }
+  .gl-tile { min-height: 214px; padding: 14px 13px 12px; }
+  .gl-text strong { font-size: 18px; }
+  .gl-text small { font-size: 12.5px; }
+}
+
+/* Phones: rows. Art left, the answer in the middle, the action under it. */
+@media (max-width: 640px) {
+  .gl-tiles { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 0 4px 4px 0; }
+  .gl-tile {
+    --r: 0deg !important; --y: 0px !important;
+    display: grid; grid-template-columns: 58px minmax(0, 1fr); grid-template-areas: 'art text' 'art act'; column-gap: 12px; align-items: start;
+    min-height: 0; padding: 12px 14px 12px 10px; border-radius: 16px; box-shadow: 3px 3px 0 var(--gl-ink);
+  }
+  .gl-art { grid-area: art; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 12px; background: rgba(255, 255, 255, .1); }
+  .gl-tile[data-tone='cyan'] .gl-art { background: rgba(255, 255, 255, .35); }
+  .gl-tile[data-tone='paper'] .gl-art { background: #fff5cc; }
+  .gl-art .h-deck-art { width: 50px; height: 40px; margin: 0; }
+  .gl-text { grid-area: text; margin: 0; padding: 0; gap: 2px; }
+  .gl-label { font-size: 10px; }
+  .gl-text strong { font-size: 18px; -webkit-line-clamp: 1; }
+  .gl-text small { font-size: 13px; }
+  .gl-act { grid-area: act; margin-top: 8px; padding-top: 0; border: 0; }
+  .cw-site .gl-tiles .gl-link, .cw-site .gl-tiles .gl-btn { font-size: 13.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .gl-tile { transition: none; } }

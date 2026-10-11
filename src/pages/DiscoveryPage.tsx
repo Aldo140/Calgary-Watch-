@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo } from 'react';
-import { filterInventory, matchesText } from '../lib/discoveryCalendar';
+import { filterInventory, matchesText, matchesTonight } from '../lib/discoveryCalendar';
 import { recordSearch } from '../lib/searchDemand';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -9,6 +9,8 @@ import { answerCount, parseSearchIntent } from '../lib/searchIntent';
 import { DiscoveryCard, EmptyInventory } from '../components/discovery/DiscoveryCards';
 import { EntityDetail } from '../components/entity/EntityDetail';
 import { ListingBoard } from '../components/discovery/ListingBoard';
+import { EventsBoard } from '../components/discovery/EventsBoard';
+import { boardCount } from '../lib/eventsBoard';
 import { LocalBoard } from '../components/discovery/LocalBoard';
 import { GuideDetail, GuidesBoard } from '../components/guides/Guides';
 import { NeighbourhoodDetail, NeighbourhoodsBoard } from '../components/neighbourhoods/Neighbourhoods';
@@ -17,7 +19,7 @@ import { MarketDetail } from '../components/markets/MarketDetail';
 import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
-import type { Guide, Neighbourhood } from '../types/discovery';
+import type { Event as EventEntity, Guide, Neighbourhood } from '../types/discovery';
 import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
 
 // The 311 rank game, loaded only on the Neighbourhoods pages.
@@ -93,6 +95,20 @@ export default function DiscoveryPage() {
       // Tapping the active chip clears it, so a filter is never a dead end.
       return { to: `${pathname}${next.size ? `?${next}` : ''}`, label, current };
     }) : undefined;
+    if (root === 'events') {
+      const upcoming = filterInventory(all, discoveryRepository.occurrences()).filter((e): e is EventEntity => e.kind === 'event');
+      const now = new Date();
+      const counts: Record<string, number> = {
+        'This weekend': boardCount(upcoming.filter(e => matchesPeriod(e.start, e.end, 'this-weekend', now)), now),
+        Today: boardCount(upcoming.filter(e => matchesPeriod(e.start, e.end, 'today', now)), now),
+        Tonight: boardCount(upcoming.filter(e => matchesTonight(e.start, e.end, now)), now),
+      };
+      return <SiteLayout>
+        <EventsBoard title={title} items={items.filter((e): e is EventEntity => e.kind === 'event')} upcoming={upcoming} query={within}
+          period={isTonight ? 'tonight' : period} when={filterLinks.map(l => ({ ...l, count: counts[l.label] }))} interests={interestLinks ?? []}
+          emptyCta={<EmptyInventory type="events" kind="event" />} />
+      </SiteLayout>;
+    }
     return <SiteLayout><div className="cw-wrap cw-page">
       <ListingBoard root={root} title={title} items={items} query={within} occurrences={discoveryRepository.occurrences()} filters={filterLinks} interests={interestLinks}
         emptyCta={<EmptyInventory type={section?.label.toLowerCase() || 'discoveries'} kind={section?.kind} />} />

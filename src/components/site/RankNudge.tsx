@@ -1,9 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Play, X } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../FirebaseProvider';
+import { useCalmPopup } from '../../hooks/useCalmPopup';
 import { opensGame, readNudgeDone, shouldShowRankNudge, writeNudgeDone } from '../../lib/rankNudge';
-import '../../styles/rank-nudge.css';
+import { Notice } from './Notice';
+
+/** Three dealt cover tiles, each a guess, in the homepage's colours. */
+function Deck() {
+  return (
+    <svg viewBox="0 0 64 64">
+      <g stroke="#151515" strokeWidth="2">
+        <rect x="4" y="12" width="34" height="40" rx="6" fill="#00c2e0" transform="rotate(-10 21 32)" />
+        <rect x="26" y="12" width="34" height="40" rx="6" fill="#1554d1" transform="rotate(9 43 32)" />
+        <rect x="15" y="8" width="34" height="44" rx="6" fill="#06162f" />
+      </g>
+      <text x="32" y="40" textAnchor="middle" fill="#ffdf4f" style={{ font: '800 24px "Bricolage Grotesque", Inter, sans-serif' }}>?</text>
+    </svg>
+  );
+}
 
 /** A one-time card for signed-in readers announcing Check your community. */
 export function RankNudge() {
@@ -11,31 +25,30 @@ export function RankNudge() {
   const { pathname } = useLocation();
   const uid = user?.uid;
   const [done, setDone] = useState(() => (uid ? readNudgeDone(uid) : true));
-  const [ready, setReady] = useState(false);
 
   useEffect(() => { setDone(uid ? readNudgeDone(uid) : true); }, [uid]);
   useEffect(() => {
     if (uid && opensGame(pathname)) { writeNudgeDone(uid); setDone(true); }
   }, [uid, pathname]);
-  // A beat after the page settles, so it arrives rather than flashes.
-  useEffect(() => { const t = window.setTimeout(() => setReady(true), 1400); return () => clearTimeout(t); }, []);
 
-  if (!uid || !ready || !shouldShowRankNudge({ signedIn: true, pathname, done })) return null;
-  const finish = () => { writeNudgeDone(uid); setDone(true); };
+  const eligible = !!uid && shouldShowRankNudge({ signedIn: true, pathname, done });
+  const { open, leaving, close } = useCalmPopup('rank', eligible);
+  if (!uid || !open || !eligible) return null;
+
   const first = user?.displayName?.split(' ')[0];
 
   return (
-    <aside className="cw-rnudge" role="status" aria-label="New on CalgaryWatch">
-      <div className="cw-rnudge-art" aria-hidden="true"><i /><i /><i /></div>
-      <div className="cw-rnudge-body">
-        <p className="cw-rnudge-eyebrow"><span /> New for you{first ? `, ${first}` : ''}</p>
-        <p className="cw-rnudge-title">How does your neighbourhood rank?</p>
-        <p className="cw-rnudge-text">See what neighbours reported to the City this year, and where yours lands. Guess first.</p>
-        <Link to="/check-your-community" className="cw-rnudge-go" onClick={finish}>
-          <span aria-hidden="true"><Play size={14} fill="currentColor" /></span> Check yours
-        </Link>
-      </div>
-      <button type="button" className="cw-rnudge-close" onClick={finish} aria-label="Dismiss"><X size={18} /></button>
-    </aside>
+    <Notice
+      tone="sun"
+      labelId="cw-rnudge-title"
+      eyebrow={`New for you${first ? `, ${first}` : ''}`}
+      title={<>How does <em>your area</em> rank?</>}
+      text="See what neighbours reported to the City this year and where yours lands. Guess first."
+      points={['Takes a minute', 'Every community']}
+      art={<Deck />}
+      action={{ to: '/check-your-community', label: 'Check yours', onClick: () => { writeNudgeDone(uid); setDone(true); } }}
+      onClose={() => { writeNudgeDone(uid); close(); window.setTimeout(() => setDone(true), 230); }}
+      leaving={leaving}
+    />
   );
 }

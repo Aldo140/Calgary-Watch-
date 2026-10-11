@@ -10,6 +10,8 @@ export interface LocalNote {
   since?: string;
   /** Lowercase text that identifies a market held at this place, for a real next-date cross-link. */
   marketMatch?: string;
+  /** Lowercase neighbourhoods next door, so "on nearby" can reach a market a short walk away. */
+  nearby?: string[];
 }
 
 export const LOCAL_NOTES: Record<string, LocalNote> = {
@@ -18,12 +20,14 @@ export const LOCAL_NOTES: Record<string, LocalNote> = {
     note: 'Order a single-origin pour-over, add a sourdough pastry and take both out to the patio. It’s an easy stop on a ride along the Bow.',
     dontMiss: ['Single-origin pour-overs', 'Cold brew', 'Beans roasted in SE Calgary, to take home'],
     since: 'Roasting since 2007',
+    nearby: ['ramsay'],
   },
   'biz-higher-ground-kensington': {
     pick: 'Our pick for a late coffee in Kensington',
     note: 'Come after dark. It stays open late, there’s a fireplace, and the brick walls hang local art.',
     dontMiss: ['Organic, fair-trade coffee', 'Warm comfort meals', 'Outdoor seating on 10th Street'],
     since: 'A Kensington anchor for 20+ years',
+    nearby: ['hillhurst', 'sunnyside'],
   },
   'biz-cspace-marda-loop': {
     pick: 'Our pick for an afternoon of art in Marda Loop',
@@ -31,11 +35,13 @@ export const LOCAL_NOTES: Record<string, LocalNote> = {
     dontMiss: ['Galleries', 'Artist studios', 'Indoor-outdoor artisan fairs'],
     since: 'In a 1912 sandstone school',
     marketMatch: 'cspace',
+    nearby: ['south calgary'],
   },
   'biz-lukes-drug-mart-bridgeland': {
     pick: 'Our favourite corner of Bridgeland',
     note: 'Flip through the vinyl while your espresso’s pulled, then leave with a soft serve when it’s in season. It’s still a working pharmacy, too.',
     dontMiss: ['Curated vinyl', 'Espresso bar', 'Seasonal soft serve', 'Specialty groceries'],
     since: 'In Bridgeland since 1951',
+    nearby: ['bridgeland-riverside', 'riverside'],
   },
 };

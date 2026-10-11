@@ -10,6 +10,7 @@
 import type { InventorySubmissionInput } from '../../src/types/discovery';
 import { calgaryOffset, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { cleanText } from '../../src/lib/cleanText.js';
 
 export interface VisitCalgaryHit {
   slug: string; permalink: string; searchable_taxonomies?: string;
@@ -24,7 +25,7 @@ export interface VisitCalgaryPlace { street?: string; locality?: string; venue?:
 const ORIGIN = 'https://www.visitcalgary.com';
 const CALGARY_AREA = /^(calgary|airdrie|cochrane|chestermere|okotoks|tsuut['’]?ina( nation)?)$/i;
 const NOT_AN_EVENT = /\b(parking|upsell|upgrade|vip (package|experience|upgrade)|hospitality package|add-?on|voucher|gift card|season tickets?)\b/i;
-const strip = (v: string) => v.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+const strip = (v: string) => cleanText(v.replace(/<[^>]+>/g, ' '));
 const truthy = (v: unknown) => v === true || v === 'true';
 const clean = (v: unknown) => (typeof v === 'string' && v !== 'null' ? strip(v) : '');
 

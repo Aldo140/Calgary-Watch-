@@ -1,3 +1,4 @@
+import { cleanBlock, cleanText } from './cleanText';
 import { publishedInventory } from './discoveryPublication';
 import type { DiscoveryEntity, EntityKind, MarketOccurrence } from '../types/discovery';
 import { calgaryDateTimeFormat } from './calgaryTz';
@@ -50,8 +51,20 @@ export interface DiscoveryRepository {
   occurrences(): readonly MarketOccurrence[];
   find(kind: EntityKind, slug: string): DiscoveryEntity | undefined;
 }
+/** Feed text cleaned for display: decoded entities, no mojibake (cleanText.ts). */
+function cleanEntity<T extends DiscoveryEntity>(e: T): T {
+  const loc = e as T & { venue?: string; address?: string; organizer?: string };
+  return {
+    ...e, title: cleanText(e.title), summary: cleanText(e.summary), description: cleanBlock(e.description),
+    ...(e.neighbourhood ? { neighbourhood: cleanText(e.neighbourhood) } : {}),
+    ...(loc.venue ? { venue: cleanText(loc.venue) } : {}),
+    ...(loc.organizer ? { organizer: cleanText(loc.organizer) } : {}),
+    ...(loc.address ? { address: cleanText(loc.address) } : {}),
+  };
+}
+
 export function createDiscoveryRepository(entities: DiscoveryEntity[], occurrences: MarketOccurrence[] = [], development = false): DiscoveryRepository {
-  const visible = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e)));
+  const visible = entities.filter(e => validateEntity(e) && e.status === 'published' && (development || publishedInventory(e))).map(cleanEntity);
   return { list: () => visible, occurrences: () => occurrences.filter(o => visible.some(e => e.id === o.marketId)), find: (kind, slug) => visible.find(e => e.kind === kind && e.slug === slug) };
 }
 

@@ -20,9 +20,32 @@ export const titleKey = (t: string) => t.toLowerCase().replace(/\s+(presented by
 
 const DAY = 86400000;
 
+/** Two feeds' names for one show: "Live Nation Presents Buena Vista Orchestra" / "Buena Vista Orchestra". */
+const showKey = (t: string) => titleKey(t).replace(/^(.*\bpresents?\s+)/, '').replace(/^the\s+/, '').replace(/\s+(tour|live|in concert)$/, '');
+const venueKey = (v?: string) => (v ?? '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10);
+
+/** The same show listed by two sources (Ticketmaster and the venue's own calendar):
+ * same Calgary day, same venue, starts within two hours, and one name contains the
+ * other. Keeps the listing with a price or an image, else the earlier one. */
+export function dedupeShows(events: readonly EventEntity[]): EventEntity[] {
+  const kept: EventEntity[] = [];
+  const richness = (e: EventEntity) => (e.priceRange ? 2 : 0) + (e.pricing !== 'unknown' ? 1 : 0) + (e.image ? 1 : 0) + (e.neighbourhood ? 1 : 0);
+  for (const e of events) {
+    const k = showKey(e.title); const day = calgaryDate(new Date(e.start)); const v = venueKey(e.venue);
+    const twin = k.length >= 8 ? kept.findIndex(x => {
+      const xk = showKey(x.title);
+      return xk.length >= 8 && (xk.includes(k) || k.includes(xk)) && calgaryDate(new Date(x.start)) === day
+        && Math.abs(Date.parse(x.start) - Date.parse(e.start)) <= 2 * 3600000 && (!v || !venueKey(x.venue) || venueKey(x.venue) === v);
+    }) : -1;
+    if (twin < 0) kept.push(e);
+    else if (richness(e) > richness(kept[twin])) kept[twin] = e;
+  }
+  return kept;
+}
+
 export function buildEventsBoard(events: readonly EventEntity[], now = new Date()): EventsBoardModel {
   const today = calgaryDate(now);
-  const sorted = [...events].sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  const sorted = dedupeShows([...events].sort((a, b) => Date.parse(a.start) - Date.parse(b.start))).sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
   // Under way before today and still on: an exhibition, a theatre run, a multi-day fair.
   const runningAll = sorted.filter(e => calgaryDate(new Date(e.start)) < today && Date.parse(e.end) > now.getTime());
   const seenRun = new Set<string>();

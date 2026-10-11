@@ -1,5 +1,6 @@
 import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { cleanText } from '../../src/lib/cleanText.js';
 export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe' | 'visitcalgary' | 'squarespace'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
 export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
@@ -266,7 +267,7 @@ export interface IcsSourceOptions {
 interface IcsEvent { uid?: string; summary?: string; description?: string; location?: string; url?: string; status?: string; start?: string; end?: string; allDay?: boolean; categories?: string[]; cost?: string; image?: string; online?: boolean }
 
 const unescapeIcs = (v: string) => v.replace(/\\n/gi, '\n').replace(/\\([,;\\])/g, '$1');
-const stripHtml = (v: string) => v.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+const stripHtml = (v: string) => cleanText(v.replace(/<[^>]+>/g, ' '));
 
 /** "20261003T190000Z", "20261003T190000" (Calgary or floating) or "20261003" → ISO with offset. */
 export function icsDate(value: string, tzid?: string): { iso: string; allDay: boolean } | null {

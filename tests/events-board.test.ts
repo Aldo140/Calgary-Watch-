@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { boardCount, buildEventsBoard, daysLeft, initialDayCount } from '../src/lib/eventsBoard';
+import { boardCount, buildEventsBoard, daysLeft, dedupeShows, initialDayCount } from '../src/lib/eventsBoard';
+import { cleanBlock, cleanText } from '../src/lib/cleanText';
 import type { Event } from '../src/types/discovery';
 
 const now = new Date('2026-10-10T18:30:00-06:00');
@@ -57,5 +58,30 @@ describe('events board', () => {
     assert.equal(initialDayCount(days), 10);
     assert.equal(daysLeft('2026-10-10T23:00:00-06:00', now), 0);
     assert.equal(daysLeft('2026-10-25T22:00:00-06:00', now), 15);
+  });
+
+  it('shows one listing when two sources list the same show', () => {
+    const kept = dedupeShows([
+      ev('Buena Vista Orchestra', '2026-10-28T20:30:00-06:00', '2026-10-28T23:00:00-06:00', { venue: 'Bella Concert Hall - Mount Royal University', image: { src: 'https://x/y.jpg', alt: '' } }),
+      ev('Live Nation Presents Buena Vista Orchestra', '2026-10-28T20:30:00-06:00', '2026-10-28T23:00:00-06:00', { venue: 'Bella Concert Hall' }),
+      ev('The Smashing Pumpkins: The Rats In A Cage Tour', '2026-11-03T20:00:00-07:00', '2026-11-03T23:00:00-07:00', { venue: 'Scotiabank Saddledome' }),
+      ev('Smashing Pumpkins: The Rats In A Cage Tour', '2026-11-03T21:00:00-07:00', '2026-11-03T23:00:00-07:00', { venue: 'Scotiabank Saddledome', pricing: 'paid', neighbourhood: 'Beltline' }),
+      ev('Alberta Ballet in The Nutcracker', '2026-12-19T13:00:00-07:00', '2026-12-19T15:00:00-07:00', { venue: 'Jubilee' }),
+      ev('Alberta Ballet in The Nutcracker', '2026-12-19T18:00:00-07:00', '2026-12-19T20:00:00-07:00', { venue: 'Jubilee' }),
+    ]);
+    assert.deepEqual(kept.map(e => e.title), ['Buena Vista Orchestra', 'Smashing Pumpkins: The Rats In A Cage Tour', 'Alberta Ballet in The Nutcracker', 'Alberta Ballet in The Nutcracker']);
+  });
+});
+
+describe('feed text', () => {
+  it('decodes entities, including double-encoded ones, and drops mojibake', () => {
+    assert.equal(cleanText('Carnival of Curiosities &#8211; Adult Night'), 'Carnival of Curiosities – Adult Night');
+    assert.equal(cleanText('Ghouls&#8217; Night Out'), 'Ghouls’ Night Out');
+    assert.equal(cleanText('Tom &amp;amp; Jerry &amp;#8211; live'), 'Tom & Jerry – live');
+    assert.equal(cleanText('🎃👻 Frozen Frights — Halloween on Ice \uFFFD🦇'), '🎃👻 Frozen Frights — Halloween on Ice 🦇');
+    assert.equal(cleanText('Meet at theÂ Warehouse.'), 'Meet at the Warehouse.');
+    assert.equal(cleanText('Whethan \u00c2\u0080\u0093 Warehouse.wavs Tour'), 'Whethan – Warehouse.wavs Tour');
+    assert.equal(cleanText('CafÃ© Rouge'), 'Café Rouge');
+    assert.equal(cleanBlock('One.\n\nTwo&nbsp;&nbsp;words.'), 'One.\n\nTwo words.');
   });
 });

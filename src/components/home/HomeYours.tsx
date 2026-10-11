@@ -7,6 +7,7 @@ import { homeAreaOf, useMyGoing, usePlansProfile } from '../../lib/plans';
 import { buildEventPicks, pickWhen } from '../../lib/eventPicks';
 import { emailPlan, nearHome, partOfDay, setupPercent, setupSteps } from '../../lib/memberHome';
 import { neighbourhoodPoint } from '../../lib/eventPicks';
+import { computeBadges } from '../../lib/badges';
 import { discoveryRepository } from '../../data/discovery';
 import { GlanceLink, GlanceTiles, briefing } from '../plans/Glance';
 import type { LivePulse } from '../../hooks/useLivePulse';
@@ -60,6 +61,14 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
       hasHomeArea: Boolean(area), weekly: profile.weeklyDigestOptIn === true, events: profile.eventsDigestOptIn,
       interestCount: profile.eventInterests.length, goingCount: going.ids.size,
     }));
+    // Report and submission counts aren't loaded here, so those two badges
+    // are left out of the count rather than shown as missing.
+    const known = computeBadges({
+      createdAt: profile.createdAt ?? null, hasHomeArea: Boolean(area), interestCount: profile.eventInterests.length,
+      eventsDigestOptIn: profile.eventsDigestOptIn === true, weeklyDigestOptIn: profile.weeklyDigestOptIn === true,
+      goingCount: going.ids.size, goingInterestCount: 0,
+    }).filter((b) => b.id !== 'scout' && b.id !== 'eyes-on-the-street' && b.id !== 'all-rounder');
+    const nextBadge = known.find((b) => !b.unlocked && b.id !== 'founding');
     const first = (user.displayName || '').split(' ')[0];
     return (
       <motion.section className="h-yours" data-state="member" aria-labelledby="h-yours-title" {...enter}>
@@ -97,8 +106,10 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
           </li>
           <li className="h-deck h-deck-paper">
             <Ring pct={pct} />
-            <strong>{pct}% set up</strong>
-            <small>{pct === 100 ? 'Every badge in reach' : 'A step or two to go'}</small>
+            {nextBadge ? <span className="h-deck-k">Next badge</span> : null}
+            <strong>{nextBadge ? nextBadge.label : `${pct}% set up`}</strong>
+            <small>{nextBadge ? nextBadge.hint : 'Every badge in reach'}</small>
+            <Link to="/plans#pd-badges" className="h-deck-more">{nextBadge ? 'See how' : 'Badges'} <ArrowUpRight size={13} aria-hidden="true" /></Link>
           </li>
         </ul>
       </motion.section>

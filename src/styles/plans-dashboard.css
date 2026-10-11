@@ -233,6 +233,7 @@
 .pd-card { padding: 20px; border: 2px solid var(--b-ink); border-radius: 22px; background: #fff; box-shadow: 5px 5px 0 var(--b-ink); scroll-margin-top: 96px; }
 .cw-site .pd-card h2 { margin-top: 6px; font: 800 26px/1 var(--h-display); letter-spacing: -.03em; color: inherit; }
 .pd-card .pd-kicker { color: var(--h-muted); }
+.cw-site .pd-card h2[id] { scroll-margin-top: 120px; }
 .pd-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .pd-count { font: 800 34px/1 var(--h-display); letter-spacing: -.04em; color: var(--b-blue); }
 .pd-count small { font-size: .5em; color: var(--h-muted); }
@@ -261,6 +262,32 @@
 .pd-stickers li:hover { transform: rotate(0deg) scale(1.08); }
 .pd-stickers li[data-locked='true'] { opacity: .45; filter: grayscale(1); }
 .pd-stickers strong { font: 700 12px/1.2 Inter, sans-serif; }
+
+/* Badges still to earn: each with its how-to and one button. */
+.pd-meter { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: 14px !important; }
+.pd-meter li { height: 8px; border: 1.5px solid var(--b-ink); border-radius: 99px; background: #fff; }
+.pd-meter li[data-on='true'] { background: var(--b-yellow); }
+.pd-earn-none { margin-top: 14px; font: 500 13.5px/1.45 Inter, sans-serif; color: var(--h-muted); }
+.cw-site .pd .pd-earn-title { margin: 20px 0 0; padding-top: 14px; border-top: 2px dashed color-mix(in srgb, var(--b-ink) 22%, transparent); font: 700 11.5px/1.2 var(--h-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--b-ink); }
+.pd-earn { display: flex; flex-direction: column; gap: 8px; margin-top: 10px !important; }
+.pd-earn li { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 10px 10px 8px; border: 2px solid var(--b-ink); border-radius: 16px; background: var(--b-paper, #fbf8ef); }
+.pd-earn .cw-bdg[data-locked='true'] { opacity: 1; }
+.pd-earn-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pd-earn-text strong { font: 800 14.5px/1.2 Inter, sans-serif; }
+.pd-earn-text small { font: 500 12.5px/1.35 Inter, sans-serif; color: var(--h-muted); }
+.pd-earn-bar { position: relative; display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.pd-earn-bar::before { content: ''; flex: 1; height: 7px; border: 1.5px solid var(--b-ink); border-radius: 99px; background: #fff; }
+.pd-earn-bar > span { position: absolute; left: 0; top: 50%; height: 7px; max-width: calc(100% - 38px); transform: translateY(-50%); border-radius: 99px; background: var(--b-blue); }
+.pd-earn-bar em { font: 700 11px/1 var(--h-mono); font-style: normal; color: var(--b-ink); }
+.cw-site .pd .pd-earn-go {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 12px; border: 2px solid var(--b-ink); border-radius: 99px;
+  background: var(--b-yellow); color: var(--b-ink); box-shadow: 2px 2px 0 var(--b-ink); font: 800 13px/1 Inter, sans-serif; text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cw-site .pd .pd-earn-go:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--b-ink); color: var(--b-ink); }
+.cw-site .pd .pd-earn-go:disabled { opacity: .6; cursor: progress; }
+.cw-site .pd .pd-earn-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 0; border: 0; background: none; font: 800 14px/1.2 Inter, sans-serif; color: var(--b-blue); cursor: pointer; }
+.cw-site .pd .pd-earn-more:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 /* ── Tablet ──────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
@@ -331,6 +358,8 @@
   .pd-stickers::-webkit-scrollbar { display: none; }
   .pd-stickers li { flex: 0 0 78px; scroll-snap-align: start; }
   .pd-stickers strong { font-size: 11px; }
+  .pd-earn li { gap: 10px; padding: 10px 8px 10px 6px; }
+  .pd-earn-text strong { font-size: 14px; }
 
   /* The dock: an app-style tab bar pinned above the home indicator. */
   .cw-site .pd { padding-bottom: 110px; }

@@ -112,6 +112,13 @@
   .cw-home2 .h-deck-big { font-size: 52px; margin: 2px 0 0; }
 }
 
+/* The signed-in phone deck's badge card: the next one and how to get it. */
+.cw-home2 .h-deck-k { margin-top: 8px; font: 700 9.5px/1.1 var(--h-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--b-blue); }
+.cw-home2 .h-deck-k + strong { margin-top: 2px; }
+.cw-site .cw-home2 .h-deck-more { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 6px; font: 800 12px/1 Inter, sans-serif; color: var(--b-ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.cw-site .cw-home2 .h-deck-more::after { content: ''; position: absolute; inset: 0; }
+.cw-home2 .h-deck-paper { position: relative; }
+
 /* ── Community Watch radar ─────────────────────────────────────────────── */
 .cw-home2 .h-watch2 {
   position: relative; display: block; height: clamp(320px, 28vw, 380px); margin: 16px 0 18px; overflow: hidden;

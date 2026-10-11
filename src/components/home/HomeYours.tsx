@@ -4,14 +4,17 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, MapPin } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
 import { homeAreaOf, useMyGoing, usePlansProfile } from '../../lib/plans';
-import { buildEventPicks, pickWhen } from '../../lib/eventPicks';
-import { emailPlan, partOfDay, setupPercent, setupSteps } from '../../lib/memberHome';
+import { buildEventPicks } from '../../lib/eventPicks';
+import { emailPlan, nearHome, partOfDay } from '../../lib/memberHome';
+import { neighbourhoodPoint } from '../../lib/eventPicks';
 import { discoveryRepository } from '../../data/discovery';
+import { GlanceLink, GlanceTiles, briefing } from '../plans/Glance';
+import type { LivePulse } from '../../hooks/useLivePulse';
 
 /**
  * The homepage's door to Your CalgaryWatch, sitting on the hero's torn edge.
- * Signed in: a personal strip (your picks, your next plan, what arrives
- * Monday) with one tap into the dashboard. Signed out: why it's worth having,
+ * Signed in: the same three answers the dashboard opens with (near home,
+ * your next plan, your next email) with one tap into the dashboard. Signed out: why it's worth having,
  * and the sign-up. Either way the dashboard is one tap from the front page.
  */
 /** Development only: `/?demo=member` previews the signed-in strip without Firebase. */
@@ -23,7 +26,7 @@ function demoMember() {
   };
 }
 
-export function HomeYours() {
+export function HomeYours({ pulse }: { pulse?: LivePulse }) {
   const auth = useAuth();
   const demo = useMemo(demoMember, []);
   const user = demo?.user ?? auth.user;
@@ -48,12 +51,10 @@ export function HomeYours() {
   if (user && profile) {
     const area = homeAreaOf(profile);
     const plan = emailPlan(profile.weeklyDigestOptIn === true, profile.eventsDigestOptIn, now);
-    const pct = setupPercent(setupSteps({
-      hasHomeArea: Boolean(area), weekly: profile.weeklyDigestOptIn === true, events: profile.eventsDigestOptIn,
-      interestCount: profile.eventInterests.length, goingCount: going.ids.size,
-    }));
+    const reports = pulse?.reports;
+    const near = nearHome(reports?.recent ?? [], neighbourhoodPoint(area), area);
+    const nearReady = reports?.status === 'ready' || reports?.status === 'error';
     const next = picks?.going[0];
-    const count = picks?.picks.length ?? 0;
     const first = (user.displayName || '').split(' ')[0];
     return (
       <motion.section className="h-yours" data-state="member" aria-labelledby="h-yours-title" {...enter}>
@@ -64,28 +65,16 @@ export function HomeYours() {
             {area ? <span className="h-yours-tag"><MapPin size={12} aria-hidden="true" /> {area}</span> : null}
           </p>
           <h2 id="h-yours-title">{partOfDay(now)}{first ? <>, <Scribble>{first}.</Scribble></> : '.'}</h2>
-          <p className="h-yours-lead">{plan.kind === 'none' ? 'No email on yet. Turn one on and your week lands in your inbox.' : `${plan.name}: ${plan.cadence.replace(/\.$/, '')}.`}</p>
+          <p className="h-yours-lead">{briefing({ near, nearReady, area, picks: picks?.picks.length ?? 0, next })}</p>
           <div className="h-yours-actions">
             <Link to="/plans" className="h-yours-go">Open your dashboard <ArrowUpRight size={18} aria-hidden="true" /></Link>
           </div>
         </div>
-        <ul className="h-yours-deck">
-          <li className="h-deck h-deck-navy">
-            <span className="h-deck-big">{count}</span>
-            <strong>{count === 1 ? 'pick' : 'picks'} for you</strong>
-            <small>This week, near {area || 'you'}</small>
-          </li>
-          <li className="h-deck h-deck-cyan">
-            <TicketArt />
-            <strong>{next ? next.title : 'No plans yet'}</strong>
-            <small>{next ? pickWhen(next.start) : 'Tap “I’m going” on anything'}</small>
-          </li>
-          <li className="h-deck h-deck-paper">
-            <Ring pct={pct} />
-            <strong>{pct}% set up</strong>
-            <small>{pct === 100 ? 'Every badge in reach' : 'A step or two to go'}</small>
-          </li>
-        </ul>
+        <GlanceTiles
+          area={area} near={near} nearReady={nearReady} next={next} plan={plan} now={now}
+          nearHref="/map" picksHref="/plans#pd-picks"
+          emailAction={<GlanceLink to="/plans?edit=1#emails">{plan.next ? 'Change' : 'Turn one on'}</GlanceLink>}
+        />
       </motion.section>
     );
   }
@@ -168,17 +157,6 @@ export function BadgeArt() {
       <path className="h-deck-rosette" d="M40,4l5,5.5l7.3,-1.4l1.4,7.3l6.6,3.4l-3.4,6.6l3.4,6.6l-6.6,3.4l-1.4,7.3l-7.3,-1.4l-5,5.5l-5,-5.5l-7.3,1.4l-1.4,-7.3l-6.6,-3.4l3.4,-6.6l-3.4,-6.6l6.6,-3.4l1.4,-7.3l7.3,1.4z" fill="#ffdf4f" stroke="#151515" strokeWidth="2" strokeLinejoin="round" />
       <circle cx="40" cy="27" r="9" fill="#fff" stroke="#151515" strokeWidth="2" />
       <path d="M36,27l3,3l5,-6" fill="none" stroke="#151515" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function Ring({ pct }: { pct: number }) {
-  const r = 22, c = 2 * Math.PI * r;
-  return (
-    <svg className="h-deck-art" viewBox="0 0 80 64" aria-hidden="true" focusable="false">
-      <circle cx="40" cy="32" r={r} fill="none" stroke="#e4e1d8" strokeWidth="9" />
-      <circle cx="40" cy="32" r={r} fill="none" stroke="#1554d1" strokeWidth="9" strokeDasharray={`${(c * pct) / 100} ${c}`} transform="rotate(-90 40 32)" strokeLinecap="round" />
-      <circle cx="40" cy="32" r="9" fill="#ffdf4f" stroke="#151515" strokeWidth="2" />
     </svg>
   );
 }

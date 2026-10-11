@@ -265,7 +265,7 @@ export default function PlansPage() {
   const actOnStep = async (id: SetupStepId) => {
     if (id === 'home') return openEditor('home');
     if (id === 'interests') return openEditor('interests');
-    if (id === 'plan') { document.getElementById('pl-picks-title')?.scrollIntoView({ behavior: 'smooth' }); return; }
+    if (id === 'plan') { document.getElementById('pd-picks')?.scrollIntoView({ behavior: 'smooth' }); return; }
     if (id === 'share') { navigate('/submit'); return; }
     setBusy(id);
     try { await addEmail(id === 'monday' ? 'monday' : 'thursday'); } finally { setBusy(null); }
@@ -315,7 +315,7 @@ export default function PlansPage() {
     return (
       <SiteLayout>
         <MemberDashboard
-          user={user} first={first} area={area} now={now}
+          user={user} first={first} area={area} now={now} memberSince={profile?.createdAt}
           picks={picks.picks} going={picks.going} considered={picks.considered} imageFor={(id) => images.get(id)}
           near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={myClaims ?? []}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}

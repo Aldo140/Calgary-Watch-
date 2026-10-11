@@ -237,3 +237,7 @@
   .cw-home2 { overflow-x: hidden; }
   .cw-site > main { overflow-x: hidden; }
 }
+
+/* Signed in: the glance tiles need more room than the guest deck. */
+.cw-home2 .h-yours[data-state='member'] { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+@media (max-width: 960px) { .cw-home2 .h-yours[data-state='member'] { grid-template-columns: minmax(0, 1fr); } }

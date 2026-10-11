@@ -70,7 +70,7 @@ export function SignupSky({ editing, signedIn, area, onSignIn }: { editing: bool
 }
 
 /** An envelope in the homepage's deck style: ink outline, flat fills, one seal. */
-function EnvelopeArt() {
+export function EnvelopeArt() {
   return (
     <svg className="h-deck-art" viewBox="0 0 80 64" aria-hidden="true" focusable="false">
       <g transform="rotate(6 40 34)">

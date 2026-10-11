@@ -1,0 +1,87 @@
+name: HQ agent (email)
+
+# The email half of the HQ agent (see Aldo140/ArctosLaunchpad: lib/hq/agentJobs.ts,
+# docs/HQ.md). Aldo texts the HQ bot a question about his email; hq-agent-clock.yml
+# starts this run for the job within a minute. It runs here because this repository
+# holds the Outlook secrets for aldo@calgarywatch.ca.
+#
+# Claude Code reads mail with ArctosLaunchpad's ops/agent-mail.ts and nothing else:
+# no edits, no other commands, no web, and this job can't push anywhere. Code
+# changes are a different job, in ArctosLaunchpad, with no email access.
+#
+# Both repositories are public, and so are these logs: the question, the mail and
+# the answer never print here. Only the job id is an input.
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'hq_agent_jobs document id'
+        required: true
+
+permissions:
+  contents: read
+  # Keyless sign-in to arctos-hq, and proof of who's calling /api/hq/agent/notify.
+  id-token: write
+
+concurrency:
+  group: hq-agent-mail
+  cancel-in-progress: false
+
+env:
+  JOB: ${{ inputs.job }}
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+jobs:
+  mail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check the job id
+        run: '[[ "$JOB" =~ ^[A-Za-z0-9_-]{1,100}$ ]] || { echo "::error::Bad job id"; exit 1; }'
+      # The agent's tools live in ArctosLaunchpad (public, so no token is needed).
+      - uses: actions/checkout@v4
+        with:
+          repository: Aldo140/ArctosLaunchpad
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Pick up the job
+        run: |
+          kind=$(node ops/agent-jobs.ts claim "$JOB")
+          [ "$kind" = mail ] || { echo "::error::Not an email job"; exit 1; }
+          node ops/agent-jobs.ts task "$JOB" "$RUNNER_TEMP/task.txt"
+      - run: npm ci
+      - name: Sign in to arctos-hq
+        id: hq
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/872261504062/locations/global/workloadIdentityPools/github/providers/arctos-repos
+          service_account: firebase-adminsdk-fbsvc@arctos-hq.iam.gserviceaccount.com
+          token_format: access_token
+      - name: Look through the email (Claude Code)
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WORKSPACE: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
+          MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+          MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+          OUTREACH_MAILBOX: ${{ vars.OUTREACH_MAILBOX }}
+        run: |
+          [ -n "$WORKSPACE" ] && export ANTHROPIC_CUSTOM_HEADERS="anthropic-workspace-id: $WORKSPACE"
+          { cat ops/agent/mail-brief.md; echo; cat "$RUNNER_TEMP/task.txt"; } > "$RUNNER_TEMP/prompt.txt"
+          # The mail reader and nothing else. Output goes to a file, not the public log.
+          npx -y @anthropic-ai/claude-code@2.1.290 -p "$(cat "$RUNNER_TEMP/prompt.txt")" \
+            --model claude-opus-5-5 --max-turns 60 --output-format json \
+            --allowedTools "Bash(npx tsx ops/agent-mail.ts *)" \
+            --disallowedTools "Edit" "Write" "NotebookEdit" "WebFetch" "WebSearch" \
+            > "$RUNNER_TEMP/claude.json" 2> /dev/null || echo "Claude Code exited with $?"
+          jq -r '.result // empty' "$RUNNER_TEMP/claude.json" > "$RUNNER_TEMP/result.txt" 2>/dev/null || true
+          if [ -s "$RUNNER_TEMP/result.txt" ]; then echo "STATUS=answered" >> "$GITHUB_ENV"; else echo "STATUS=failed" >> "$GITHUB_ENV"; fi
+      - name: Report back
+        if: always()
+        run: bash ops/agent/report.sh

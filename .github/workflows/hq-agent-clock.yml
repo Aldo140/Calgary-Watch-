@@ -1,0 +1,50 @@
+name: HQ agent clock (email)
+
+# Starts hq-agent-mail.yml within a minute of Aldo texting the HQ bot a question
+# about his email (jobs in arctos-hq hq_agent_jobs; ArctosLaunchpad's
+# ops/agent-jobs.ts). GitHub runs schedules late or not at all, so one run stays
+# awake for just under six hours, checks every minute, then starts the next one.
+# The schedule only restarts the chain if it ever breaks. Public repository:
+# runner minutes are free.
+on:
+  schedule:
+    - cron: '53 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+
+concurrency:
+  group: hq-agent-clock
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Aldo140/ArctosLaunchpad
+          ref: main
+          sparse-checkout: ops/agent-jobs.ts
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Keep time
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          end=$((SECONDS + 5 * 3600 + 45 * 60))
+          while [ "$SECONDS" -lt "$end" ]; do
+            for job in $(node ops/agent-jobs.ts pending mail || true); do
+              gh workflow run hq-agent-mail.yml -f job="$job" && echo "$(date -u +%H:%M) started an HQ email job" || echo "::warning::couldn't start HQ email job $job"
+            done
+            sleep 60
+          done
+          gh workflow run hq-agent-clock.yml || echo "::warning::couldn't start the next clock"

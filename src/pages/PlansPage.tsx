@@ -14,7 +14,7 @@ import { computeBadges, orderBadges, type BadgeId } from '../lib/badges';
 import { emailPlan, nearHome, setupSteps, type SetupStepId } from '../lib/memberHome';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
-import { buildEventPicks, normalizeInterests, neighbourhoodPoint, interestsFor, type EventInterestId } from '../lib/eventPicks';
+import { buildEventPicks, buildPlanTimeline, normalizeInterests, neighbourhoodPoint, interestsFor, type EventInterestId } from '../lib/eventPicks';
 import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
 import { resolveHomeLocation, useHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
@@ -85,8 +85,13 @@ function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; 
       eventInterests: set ? ['music', 'food'] : [],
     };
     const now = Date.now();
-    const soon = discoveryRepository.list().filter((e) => e.kind === 'event' && Date.parse((e as { start: string }).start) > now).slice(0, mode === 'member' ? 2 : 0);
-    return { user, profile, goingIds: new Set(soon.map((e) => e.id)) };
+    const events = discoveryRepository.list().filter((e): e is Extract<typeof e, { kind: 'event' }> => e.kind === 'event');
+    const n = mode === 'member' ? 1 : 0;
+    const soon = events.filter((e) => Date.parse(e.start) > now).slice(0, 3 * n);
+    // A run that's on now and a few that already happened, so both halves of "Your plans" show.
+    const live = events.filter((e) => Date.parse(e.start) < now && Date.parse(e.end) > now).slice(0, n);
+    const past = events.filter((e) => Date.parse(e.end) < now).sort((a, b) => Date.parse(b.end) - Date.parse(a.end)).slice(0, 3 * n);
+    return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)) };
   }, [mode]);
 }
 
@@ -189,6 +194,7 @@ export default function PlansPage() {
     () => buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area || draftArea, goingIds: mine.ids, days: 10, limit: 8 }),
     [entities, occurrences, interests, addressPoint, area, draftArea, mine.ids],
   );
+  const timeline = useMemo(() => buildPlanTimeline({ entities, occurrences, goingIds: mine.ids }), [entities, occurrences, mine.ids]);
 
   const goingKinds = useMemo(() => {
     const kinds = new Set<EventInterestId>();
@@ -316,7 +322,7 @@ export default function PlansPage() {
       <SiteLayout>
         <MemberDashboard
           user={user} first={first} area={area} now={now} memberSince={profile?.createdAt}
-          picks={picks.picks} going={picks.going} considered={picks.considered} imageFor={(id) => images.get(id)}
+          picks={picks.picks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
           near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={myClaims ?? []}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
           adminView={asUid ? profile?.displayName ?? '' : null}

@@ -16,6 +16,9 @@ import { useCalgaryWeather } from '../../hooks/useCalgaryWeather';
 import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
 import { moonPhase, skyPalette, sunPosition } from '../../lib/sky';
 import { EventArt, eventArtKind } from './ListingArt';
+import { MenuArt } from '../site/MenuArt';
+import { discoveryRepository } from '../../data/discovery';
+import { resolvePicks } from '../../lib/dateNight';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/home-v3.css';
@@ -195,6 +198,8 @@ export function EventsBoard({ title, items, upcoming, when, interests, query, pe
           ) : emptyCta}</div>
         ) : null}
 
+        {!query ? <DateNight now={now} period={period} /> : null}
+
         {board.running.length ? <Running events={board.running} now={now} /> : null}
 
         {visible.map((d, i) => (
@@ -362,6 +367,34 @@ function Row({ entry, dupe }: { entry: DayEntry; dupe?: boolean }) {
         <span className="ev-go" aria-hidden="true"><ArrowUpRight size={16} /></span>
       </Link>
     </li>
+  );
+}
+
+/**
+ * Date night lives inside Events rather than in the menu: a card at the top of
+ * the listings with our next pick for two, so it's found where people are
+ * already looking for a night out.
+ */
+function DateNight({ now, period }: { now: Date; period?: EventsBoardProps['period'] }) {
+  const picks = useMemo(() => resolvePicks(discoveryRepository.list(), discoveryRepository.occurrences(), now.getTime()), [now]);
+  const next = picks[0];
+  const week = picks.filter(p => Date.parse(p.next) - now.getTime() < 7 * 86400000).length;
+  const kicker = period === 'tonight' ? 'Out for two tonight?' : period === 'this-weekend' ? 'Date this weekend?' : 'Planning a date?';
+  return (
+    <Link to="/date-night" className="ev-date">
+      <span className="ev-date-art" aria-hidden="true"><MenuArt kind="date-night" /></span>
+      <span className="ev-date-copy">
+        <span className="ev-date-kicker">{kicker}</span>
+        <strong>Date night picks</strong>
+        <span className="ev-date-sub">
+          {next ? <>Next up: <b>{next.entity.title}</b>{next.onNow ? ', on now' : `, ${fmt({ weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(next.next))}`}</> : 'Shows, dinners and free ideas for a night out for two.'}
+        </span>
+      </span>
+      <span className="ev-date-cta">
+        {week ? <small>{week} this week</small> : null}
+        <span>See our picks <ArrowUpRight size={16} aria-hidden="true" /></span>
+      </span>
+    </Link>
   );
 }
 

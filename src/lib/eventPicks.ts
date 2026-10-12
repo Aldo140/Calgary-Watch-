@@ -188,6 +188,27 @@ function datedItems(entities: readonly DiscoveryEntity[], occurrences: readonly 
   return out;
 }
 
+function toItem({ entity, key, start, end }: { entity: Event | Market; key: string; start: string; end: string }, wanted: ReadonlySet<EventInterestId>, home: Point | null): PickItem {
+  const interests = interestsFor(entity);
+  const where = neighbourhoodPoint(entity.neighbourhood);
+  return {
+    key,
+    entityId: entity.id,
+    kind: entity.kind,
+    title: entity.title,
+    summary: entity.summary,
+    path: entityPath(entity),
+    start,
+    end,
+    venue: entity.venue,
+    neighbourhood: entity.neighbourhood,
+    free: entity.kind === 'event' && entity.pricing === 'free',
+    interests,
+    matched: interests.filter((i) => wanted.has(i)),
+    distanceM: home && where ? Math.round(metresBetween(home, where)) : null,
+  };
+}
+
 export function buildEventPicks(options: PickOptions): EventPicks {
   const now = options.now ?? new Date();
   const from = now.getTime();
@@ -197,27 +218,7 @@ export function buildEventPicks(options: PickOptions): EventPicks {
   const goingIds = options.goingIds ?? new Set<string>();
   const home = options.home ?? neighbourhoodPoint(options.homeArea);
 
-  const items = datedItems(options.entities, options.occurrences, from, to).map(({ entity, key, start, end }) => {
-    const interests = interestsFor(entity);
-    const where = neighbourhoodPoint(entity.neighbourhood);
-    const item: PickItem = {
-      key,
-      entityId: entity.id,
-      kind: entity.kind,
-      title: entity.title,
-      summary: entity.summary,
-      path: entityPath(entity),
-      start,
-      end,
-      venue: entity.venue,
-      neighbourhood: entity.neighbourhood,
-      free: entity.kind === 'event' && entity.pricing === 'free',
-      interests,
-      matched: interests.filter((i) => wanted.has(i)),
-      distanceM: home && where ? Math.round(metresBetween(home, where)) : null,
-    };
-    return item;
-  });
+  const items = datedItems(options.entities, options.occurrences, from, to).map((d) => toItem(d, wanted, home));
 
   const bySoonest = (a: PickItem, b: PickItem) => Date.parse(a.start) - Date.parse(b.start);
   const going = items.filter((i) => goingIds.has(i.entityId)).sort(bySoonest);
@@ -267,4 +268,93 @@ export function pickDistance(metres: number | null): string | null {
   if (metres === null) return null;
   if (metres < 1000) return 'In your area';
   return `${(metres / 1000).toFixed(metres < 10_000 ? 1 : 0)} km from home`;
+}
+
+// ── The reader's own plans, either side of today ───────────────────────────
+
+export type PlanStatus = 'live' | 'upcoming' | 'past';
+
+export interface PlanEntry {
+  item: PickItem;
+  status: PlanStatus;
+  /** Calgary calendar days from today to the start (upcoming) or the end (past). */
+  days: number;
+  /** "Tonight", "Tomorrow", "In 4 days", "On now", "Yesterday", "2 weeks ago". */
+  when: string;
+}
+
+export interface PlanTimeline {
+  /** On now, then coming up, soonest first. */
+  ahead: PlanEntry[];
+  /** Already over, most recent first. */
+  past: PlanEntry[];
+}
+
+const DAY_MS = 86_400_000;
+const calgaryDay = (t: number) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t));
+const dayGap = (from: number, to: number) => Math.round((Date.parse(`${calgaryDay(to)}T12:00:00Z`) - Date.parse(`${calgaryDay(from)}T12:00:00Z`)) / DAY_MS);
+const calgaryHour = (t: number) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', hourCycle: 'h23' }).format(new Date(t)));
+
+/** How far away a plan is, in the words you'd use about it. */
+export function planWhen(status: PlanStatus, days: number, startMs: number): string {
+  if (status === 'live') return 'On now';
+  if (status === 'upcoming') {
+    if (days <= 0) return calgaryHour(startMs) >= 17 ? 'Tonight' : 'Today';
+    if (days === 1) return 'Tomorrow';
+    if (days < 7) return `In ${days} days`;
+    if (days < 14) return 'Next week';
+    return days < 60 ? `In ${Math.round(days / 7)} weeks` : `In ${Math.round(days / 30)} months`;
+  }
+  const ago = -days;
+  if (ago <= 0) return 'Earlier today';
+  if (ago === 1) return 'Yesterday';
+  if (ago < 7) return `${ago} days ago`;
+  if (ago < 14) return 'Last week';
+  return ago < 60 ? `${Math.round(ago / 7)} weeks ago` : `${Math.round(ago / 30)} months ago`;
+}
+
+/**
+ * Everything the reader said they're going to, split at today: what's on now
+ * or still ahead (no 10-day window, a plan in March is still a plan), and
+ * what has already happened in the last `pastDays`. A market counts by its
+ * next date while it has one, and by its last date once it doesn't.
+ */
+export function buildPlanTimeline(options: {
+  entities: readonly DiscoveryEntity[];
+  occurrences: readonly MarketOccurrence[];
+  goingIds: ReadonlySet<string>;
+  now?: Date;
+  pastDays?: number;
+}): PlanTimeline {
+  const now = (options.now ?? new Date()).getTime();
+  const since = now - (options.pastDays ?? 90) * DAY_MS;
+  const none = new Set<EventInterestId>();
+  const ahead: PlanEntry[] = [];
+  const past: PlanEntry[] = [];
+  for (const e of options.entities) {
+    if (!options.goingIds.has(e.id)) continue;
+    let dated: { entity: Event | Market; key: string; start: string; end: string } | null = null;
+    if (e.kind === 'event') {
+      if (!e.cancelled) dated = { entity: e, key: e.id, start: e.start, end: e.end };
+    } else if (e.kind === 'market') {
+      const own = options.occurrences.filter((o) => o.marketId === e.id && !o.cancelled).sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+      const o = own.find((x) => Date.parse(x.end) > now) ?? own[own.length - 1];
+      if (o) dated = { entity: e, key: o.id, start: o.start, end: o.end };
+    }
+    if (!dated) continue;
+    const start = Date.parse(dated.start); const end = Date.parse(dated.end);
+    const item = toItem(dated, none, null);
+    if (end <= now) {
+      if (end < since) continue;
+      const days = dayGap(now, end);
+      past.push({ item, status: 'past', days, when: planWhen('past', days, start) });
+    } else {
+      const status: PlanStatus = start <= now ? 'live' : 'upcoming';
+      const days = Math.max(0, dayGap(now, start));
+      ahead.push({ item, status, days, when: planWhen(status, days, start) });
+    }
+  }
+  ahead.sort((a, b) => (a.status === b.status ? 0 : a.status === 'live' ? -1 : 1) || Date.parse(a.item.start) - Date.parse(b.item.start));
+  past.sort((a, b) => Date.parse(b.item.end) - Date.parse(a.item.end));
+  return { ahead, past };
 }

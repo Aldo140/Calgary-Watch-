@@ -19,7 +19,7 @@ import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
 import { moonPhase, skyPalette, sunPosition } from '../../lib/sky';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { BADGES, type BadgeId, type BadgeState } from '../../lib/badges';
-import { EVENT_INTERESTS, pickDistance, pickWhen, type EventInterestId, type PickItem } from '../../lib/eventPicks';
+import { EVENT_INTERESTS, pickDistance, pickWhen, type EventInterestId, type PickItem, type PlanEntry, type PlanTimeline } from '../../lib/eventPicks';
 import { partOfDay, setupPercent, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
@@ -78,6 +78,8 @@ export interface DashboardProps {
   now: number;
   picks: PickItem[];
   going: PickItem[];
+  /** Every plan, on now and ahead, then already passed. */
+  timeline: PlanTimeline;
   considered: number;
   imageFor: (entityId: string) => string | undefined;
   near: NearReport[];
@@ -115,7 +117,7 @@ function DeskBody(p: DashboardProps) {
   return (
     <div className="cw-wrap pd-body">
       <div className="pd-main">
-        <UpNext going={p.going} />
+        <Plans {...p} />
         <Tracklist {...p} />
       </div>
       <aside className="pd-side" aria-label="More for you">
@@ -131,13 +133,13 @@ function DeskBody(p: DashboardProps) {
 function PhoneBody(p: DashboardProps) {
   return (
     <div className="cw-wrap pd-body">
-      <UpNext going={p.going} />
+      <Plans {...p} phone />
       <NearCard near={p.near} area={p.area} now={p.now} />
       <Tracklist {...p} phone />
       <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} phone />
       <ListingsCard claims={p.claims} />
       <Fine />
-      <PhoneDock hasPlans={p.going.length > 0} />
+      <PhoneDock hasPlans={p.timeline.ahead.length + p.timeline.past.length > 0} />
     </div>
   );
 }
@@ -259,7 +261,7 @@ function MemberPass(p: DashboardProps) {
   const reduce = useReducedMotion();
   const unlocked = p.badges.filter((b) => b.unlocked).length;
   const name = p.user.displayName || p.first || 'You';
-  const stats: Array<[number, string, string]> = [[p.picks.length, 'Picks', '#pd-picks'], [p.going.length, 'Plans', p.going.length ? '#pd-next' : '#pd-picks'], [unlocked, 'Badges', '#pd-badges']];
+  const stats: Array<[number, string, string]> = [[p.picks.length, 'Picks', '#pd-picks'], [p.timeline.ahead.length, 'Plans', p.timeline.ahead.length || p.timeline.past.length ? '#pd-next' : '#pd-picks'], [unlocked, 'Badges', '#pd-badges']];
   return (
     <motion.aside
       className="pd-pass" aria-label="Your member card"
@@ -367,32 +369,156 @@ function Ring({ pct }: { pct: number }) {
   );
 }
 
-/* ── Plans, as tickets ───────────────────────────────────────────────── */
+/* ── Plans: what's still ahead, a line for today, what already passed ─ */
 
-function UpNext({ going }: { going: PickItem[] }) {
-  if (!going.length) return null;
+const timeOf = (iso: string) => pickWhen(iso).split(' · ')[1] ?? '';
+const placeOf = (i: PickItem) => i.venue || i.neighbourhood || '';
+
+function Plans(p: DashboardProps & { phone?: boolean }) {
+  const { ahead, past } = p.timeline;
+  const [all, setAll] = useState(false);
+  if (!ahead.length && !past.length) return null;
+  const cap = p.phone ? 3 : 4;
+  const older = all ? past : past.slice(0, cap);
+  const more = past.length > cap ? (
+    <button type="button" className="pd-past-more" aria-expanded={all} onClick={() => setAll(!all)}>
+      {all ? 'Show fewer' : `Show all ${past.length} past plans`} <ArrowDown size={15} aria-hidden="true" style={all ? { transform: 'rotate(180deg)' } : undefined} />
+    </button>
+  ) : null;
+  const tally = (
+    <p className="pd-plan-tally" aria-label={`${ahead.length} coming up, ${past.length} already passed`}>
+      <span data-k="ahead"><b>{ahead.length}</b> coming up</span>
+      <span data-k="past"><b>{past.length}</b> passed</span>
+    </p>
+  );
   return (
-    <section className="pd-sec" aria-labelledby="pd-next">
-      <SecHead id="pd-next" kicker="You said you’re going" title={<>Your <mark>plans</mark></>} note={`${going.length} coming up · reminders come by email`} />
-      <ol className="pd-tickets">
-        {going.map((g) => (
-          <li key={g.key}>
-            <Link to={g.path} className="pd-ticket">
-              <span className="pd-ticket-stub">
-                <small>{fmt(g.start, { weekday: 'short' })}</small>
-                <strong>{fmt(g.start, { day: 'numeric' })}</strong>
-                <small>{fmt(g.start, { month: 'short' })}</small>
-              </span>
-              <span className="pd-ticket-body">
-                <strong>{g.title}</strong>
-                <small>{[pickWhen(g.start).split(' · ')[1], g.venue || g.neighbourhood].filter(Boolean).join(' · ')}</small>
-              </span>
-              <ArrowUpRight className="pd-ticket-go" size={18} aria-hidden="true" />
-            </Link>
-          </li>
-        ))}
-      </ol>
+    <section className="pd-sec pd-plans" aria-labelledby="pd-next">
+      <SecHead id="pd-next" kicker="You said you’re going" title={<>Your <mark>plans</mark></>} action={tally} />
+      {p.phone
+        ? <PlanRail ahead={ahead} past={older} now={p.now} more={more} />
+        : <PlanBoard ahead={ahead} past={older} now={p.now} more={more} imageFor={p.imageFor} />}
     </section>
+  );
+}
+
+/** "Today · Mon Oct 12": the line every plan is measured from. */
+function NowLine({ now, phone }: { now: number; phone?: boolean }) {
+  return (
+    <div className="pd-now" role="separator" aria-label={`Today, ${fmt(now, { weekday: 'long', month: 'long', day: 'numeric' })}`}>
+      <span className="pd-now-pill"><span className="h-pulse" aria-hidden="true" /> Today · {fmt(now, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+      {phone ? null : <span className="pd-now-hint"><b>↑</b> still to come <b>↓</b> already happened</span>}
+    </div>
+  );
+}
+
+function Countdown({ e }: { e: PlanEntry }) {
+  const big = e.status === 'upcoming' && e.days >= 2 && e.days < 100;
+  return (
+    <span className="pd-count-down" data-status={e.status}>
+      {e.status === 'live' ? <><span className="h-pulse" aria-hidden="true" /><strong>On now</strong><small>{e.item.end ? `until ${fmt(e.item.end, { month: 'short', day: 'numeric' })}` : ''}</small></>
+        : big ? <><strong>{e.days}</strong><small>days to go</small></>
+        : <><strong className="pd-count-word">{e.when}</strong><small>{timeOf(e.item.start)}</small></>}
+    </span>
+  );
+}
+
+/** Desktop: the next plan as a big ticket, the rest as a row of stubs, then a cut line and the ones you've been to. */
+function PlanBoard({ ahead, past, now, more, imageFor }: { ahead: PlanEntry[]; past: PlanEntry[]; now: number; more: ReactNode; imageFor: (id: string) => string | undefined }) {
+  const [next, ...rest] = ahead;
+  return (
+    <div className="pd-board">
+      {next ? (
+        <Link to={next.item.path} className="pd-hero-ticket" data-status={next.status}>
+          <span className="pd-hero-art"><Art item={next.item} src={imageFor(next.item.entityId)} /></span>
+          <span className="pd-hero-body">
+            <span className="pd-hero-tag">{next.status === 'live' ? 'Happening now' : 'Next up'}</span>
+            <strong>{next.item.title}</strong>
+            <small>{fmt(next.item.start, { weekday: 'long', month: 'long', day: 'numeric' })}{timeOf(next.item.start) && next.status !== 'live' ? ` · ${timeOf(next.item.start)}` : ''}</small>
+            {placeOf(next.item) ? <small><MapPin size={13} aria-hidden="true" /> {placeOf(next.item)}</small> : null}
+          </span>
+          <span className="pd-hero-stub"><Countdown e={next} /></span>
+        </Link>
+      ) : (
+        <a href="#pd-picks" className="pd-hero-empty">
+          <strong>Nothing coming up yet.</strong>
+          <span>Tap <b>I’m going</b> on any pick below and it lands here with a countdown.</span>
+          <ArrowDown size={18} aria-hidden="true" />
+        </a>
+      )}
+      {rest.length ? (
+        <ol className="pd-stubs" aria-label="Also coming up">
+          {rest.map((e) => (
+            <li key={e.item.key}>
+              <Link to={e.item.path} className="pd-stub" data-status={e.status}>
+                <span className="pd-stub-when">{e.when}</span>
+                <span className="pd-stub-date">
+                  <small>{fmt(e.item.start, { weekday: 'short' })}</small>
+                  <b>{fmt(e.item.start, { day: 'numeric' })}</b>
+                  <small>{fmt(e.item.start, { month: 'short' })}</small>
+                </span>
+                <strong>{e.item.title}</strong>
+                <small>{[e.status === 'live' ? null : timeOf(e.item.start), placeOf(e.item)].filter(Boolean).join(' · ')}</small>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      ) : null}
+      {past.length ? (
+        <>
+          <NowLine now={now} />
+          <ol className="pd-past" aria-label="Already passed">
+            {past.map((e, i) => (
+              <li key={e.item.key} style={{ '--tilt': `${(i % 2 ? 1 : -1) * (1 + (i % 3))}deg` } as CSSProperties}>
+                <Link to={e.item.path} className="pd-past-card">
+                  <span className="pd-past-art"><Art item={e.item} src={imageFor(e.item.entityId)} /></span>
+                  <span className="pd-past-body">
+                    <small>{e.when} · {fmt(e.item.start, { month: 'short', day: 'numeric' })}</small>
+                    <strong>{e.item.title}</strong>
+                  </span>
+                  <span className="pd-stamp" aria-hidden="true">Passed</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+          {more}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+/** Phones: one vertical timeline. Solid line and bright cards above today, a dashed grey line and faded cards below it. */
+function PlanRail({ ahead, past, now, more }: { ahead: PlanEntry[]; past: PlanEntry[]; now: number; more: ReactNode }) {
+  const node = (e: PlanEntry, i: number) => (
+    <li key={e.item.key} className="pd-rail-item" data-status={e.status} data-lead={e.status !== 'past' && i === 0 ? 'true' : undefined}>
+      <span className="pd-rail-date" aria-hidden="true">
+        {e.status === 'live' ? <><small>On</small><b>now</b></> : <><small>{fmt(e.item.start, { weekday: 'short' })}</small><b>{fmt(e.item.start, { day: 'numeric' })}</b><small>{fmt(e.item.start, { month: 'short' })}</small></>}
+      </span>
+      <Link to={e.item.path} className="pd-rail-card">
+        <span className="pd-rail-when">{e.status === 'past' ? <><Check size={12} aria-hidden="true" /> {e.when}</> : e.status === 'live' ? <><span className="h-pulse" aria-hidden="true" /> On now</> : e.when}</span>
+        <strong>{e.item.title}</strong>
+        <small>{[e.status === 'upcoming' ? timeOf(e.item.start) : e.status === 'live' ? `until ${fmt(e.item.end, { month: 'short', day: 'numeric' })}` : null, placeOf(e.item)].filter(Boolean).join(' · ')}</small>
+      </Link>
+    </li>
+  );
+  return (
+    <div className="pd-rail-wrap">
+      <ol className="pd-rail" aria-label="Coming up">
+        {ahead.length ? ahead.map(node) : (
+          <li className="pd-rail-item" data-status="empty">
+            <span className="pd-rail-date" aria-hidden="true"><small>Next</small><b>?</b></span>
+            <a href="#pd-picks" className="pd-rail-card"><strong>Nothing coming up yet</strong><small>Tap I’m going on a pick below.</small></a>
+          </li>
+        )}
+      </ol>
+      {past.length ? (
+        <>
+          <NowLine now={now} phone />
+          <ol className="pd-rail" data-part="past" aria-label="Already passed">{past.map(node)}</ol>
+          {more}
+        </>
+      ) : null}
+    </div>
   );
 }
 

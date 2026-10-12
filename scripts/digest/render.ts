@@ -1220,7 +1220,7 @@ function setupChecklist(summary: DigestSummary, origin: string, offerThursday: b
     { done: true, title: 'Every topic', body: `Crime, traffic, infrastructure and weather.${link('/map?settings=alerts', 'Narrow it')}` },
     offerThursday
       ? { done: false, title: 'Thursday picks', body: `Off. Weekend picks for what you’re into, near home first.${link('/plans?email=thursday#emails', 'Add them')}` }
-      : { done: true, title: 'Thursday picks', body: 'On. From next week both arrive together in one Monday email.' },
+      : { done: true, title: 'Thursday picks', body: 'On. This email is your hello for both, so nothing extra comes Thursday. From next Monday, one email carries your week and your picks.' },
   ];
   const cells = rows.map((r) => `
       <tr>

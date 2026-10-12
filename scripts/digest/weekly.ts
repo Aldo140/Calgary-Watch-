@@ -598,6 +598,11 @@ async function run(): Promise<void> {
           console.log(`[digest] test delivered for ${profile.uid} → ${sender.testRecipient}; claim released`);
           continue;
         }
+        // A new reader on both lists gets one hello, here on Monday: the
+        // welcome tells them Thursday picks are on, Thursday skips them this
+        // week (`coversEvents`), and their first Thursday email is not a
+        // second hello.
+        const welcomesBoth = isFirstEmail && profile._eventsOn && profile._eventsConsentOk;
         await claim.set({
           status: 'sent',
           sentAt: Date.now(),
@@ -606,10 +611,13 @@ async function run(): Promise<void> {
           kind: isFirstEmail ? 'welcome' : 'digest',
           reportCount: summary.total,
           ring: summary.ringLabel,
+          ...(welcomesBoth ? { coversEvents: true } : {}),
         }, { merge: true });
         if (isFirstEmail) {
-          await db.collection('users').doc(profile.uid)
-            .set({ digestWelcomeSentAt: Date.now() }, { merge: true });
+          await db.collection('users').doc(profile.uid).set({
+            digestWelcomeSentAt: Date.now(),
+            ...(welcomesBoth && profile._eventsWelcomeSentAt == null ? { eventsWelcomeSentAt: Date.now() } : {}),
+          }, { merge: true });
         }
         console.log(`[digest] sent ${profile.uid}${isFirstEmail ? ' (hello)' : ''}`
           + ` — ${summary.total} report(s) ${summary.ringLabel}`);

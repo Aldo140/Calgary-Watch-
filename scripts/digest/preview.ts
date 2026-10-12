@@ -172,7 +172,7 @@ const welcomeCity = buildDigestSummary({ incidents: SAMPLE, profile: noAreaProfi
 writeFileSync(`${OUTPUT_DIR}/welcome-city.html`, browserPreview(renderWelcomeHtml({ ...shared, summary: welcomeCity })));
 describe('welcome-city.html', 'welcome', 'Welcome, no area yet', 'First Monday, no neighbourhood saved', WELCOME.subject, 'Checklist flags the missing area with a one-tap fix; the sample covers all of Calgary.');
 writeFileSync(`${OUTPUT_DIR}/welcome-both.html`, browserPreview(renderWelcomeHtml({ ...shared, offerThursday: false })));
-describe('welcome-both.html', 'welcome', 'Welcome, both lists', 'First Monday, already on Thursday picks', WELCOME.subject, 'Checklist shows Thursday picks on and says both will arrive together from next week.');
+describe('welcome-both.html', 'welcome', 'Welcome, both lists', 'First Monday, already on Thursday picks', WELCOME.subject, 'Their one hello for both lists: the checklist shows Thursday picks on, Thursday skips them this week, and from next Monday they get the combined week.');
 
 // Instant-alert email — the between-digest urgent nudge. A believable mix: an
 // emergency (which always alerts) plus two nearby neighbour reports.

@@ -346,6 +346,12 @@ describe('combined "your week" email (both lists)', async () => {
     assert.match(monday, /processEventsUnsubscribes/);
     assert.match(monday, /unsubscribeUrl: combined\.unsubscribeAllUrl/);
     assert.match(thursday, /monday\.kind === 'combined'/);
+    // A new reader on both lists gets one hello, on Monday, not a second on Thursday.
+    assert.match(monday, /coversEvents: true/);
+    assert.match(monday, /welcomesBoth && profile\._eventsWelcomeSentAt == null \? \{ eventsWelcomeSentAt/);
+    assert.match(thursday, /monday\.coversEvents === true/);
+    const panel = readFileSync(new URL('../src/components/admin/ThursdayPicksPanel.tsx', import.meta.url), 'utf8');
+    assert.match(panel, /if \(mondayMailable\.has\(p\.uid\)\) \{ covered \+= 1; continue; \}/);
     const page = readFileSync(new URL('../src/pages/UnsubscribePage.tsx', import.meta.url), 'utf8');
     assert.match(page, /get\('list'\) === 'all'/);
   });

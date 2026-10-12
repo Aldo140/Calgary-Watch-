@@ -30,6 +30,7 @@ export function Wordmark() {
 const SECTIONS = [
   { to: '/events', label: 'Events', note: 'What’s on, day by day' },
   { to: '/markets', label: 'Markets', note: 'Farmers’ and makers’ markets' },
+  { to: '/date-night', label: 'Date night', note: 'Our picks for a night out for two' },
   { to: '/neighbourhoods', label: 'Neighbourhoods', note: 'The city, quadrant by quadrant' },
   { to: '/guides', label: 'Guides', note: 'Self-guided days out' },
   { to: '/local', label: 'Local', note: 'Independent places worth knowing' },

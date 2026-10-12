@@ -3,11 +3,12 @@ import { filterInventory, matchesText, matchesTonight } from '../lib/discoveryCa
 import { recordSearch } from '../lib/searchDemand';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
-import { GlobalSearch } from '../components/site/GlobalSearch';
-import { SearchAnswers } from '../components/site/SearchAnswers';
+import { SearchBoard } from '../components/site/SearchBoard';
+import { NotFoundHero } from './NotFoundPage';
 import { answerCount, parseSearchIntent } from '../lib/searchIntent';
 import { DiscoveryCard, EmptyInventory } from '../components/discovery/DiscoveryCards';
 import { EntityDetail } from '../components/entity/EntityDetail';
+import { EventDetail, PlaceDetail } from '../components/entity/ListingDetail';
 import { ListingBoard } from '../components/discovery/ListingBoard';
 import { EventsBoard } from '../components/discovery/EventsBoard';
 import { boardCount } from '../lib/eventsBoard';
@@ -114,41 +115,22 @@ export default function DiscoveryPage() {
         emptyCta={<EmptyInventory type={section?.label.toLowerCase() || 'discoveries'} kind={section?.kind} />} />
     </div></SiteLayout>;
   }
+  if (entity?.kind === 'event') return <SiteLayout><EventDetail event={entity} all={all} /></SiteLayout>;
+  if (entity?.kind === 'business') return <SiteLayout><PlaceDetail place={entity} all={all} /></SiteLayout>;
+  if (missing) {
+    return <SiteLayout><NotFoundHero code={`${section?.label ?? 'Listing'} · not found`} title={<>This listing has <span>moved on.</span></>} lead="It may have ended, moved, or not been published yet. Search for it, or see what’s on now." back={{ to: section?.path || '/', label: `See all ${section?.label.toLowerCase() || 'of Calgary'}` }} /></SiteLayout>;
+  }
+  if (search) {
+    return <SiteLayout><SearchBoard q={q} intent={intent} now={now} groups={groups} listingCount={listingCount} resultCount={resultCount} answers={answers} /></SiteLayout>;
+  }
   return <SiteLayout><div className="cw-wrap cw-page">
     <nav className="cw-breadcrumb" aria-label="Breadcrumb"><Link to="/">Home</Link> / {section && <Link to={section.path}>{section.label}</Link>}{slug && <> / {entity?.title || slug}</>}</nav>
-    {entity ? <><EntityDetail entity={entity} occurrences={discoveryRepository.occurrences()} related={all.filter(e => relatedIds.includes(e.id))} all={all} />{entity.kind === 'neighbourhood' && <Suspense fallback={null}><RankStrip focus={entity.title} /></Suspense>}</> : <><header className={`cw-page-heading${search ? ' cw-search-heading' : ''}`}><p className="cw-eyebrow">CalgaryWatch discovery</p><h1>{title}</h1><p className="cw-lead">{missing ? 'The listing may have moved or hasn’t been published.' : search ? 'Your neighbourhood, a street, what happened last night, or something to do this weekend.' : 'Good plans begin with a little local knowledge.'}</p></header>
-      {missing ? <Link className="cw-button" to={section?.path || '/'}>Explore {section?.label || 'Calgary'} ↗</Link> : search ? <><GlobalSearch initial={q} />
-        {!q && <SearchStarters />}
-        {q && <SearchAnswers intent={intent} now={now} />}
-        {q && listingCount > 0 && <p className="cw-result-count" role="status">{listingCount} {listingCount === 1 ? 'listing' : 'listings'} for “{q}”</p>}
-        {Object.entries(groups).map(([kind, entities]) => <section className="cw-section" key={kind}><h2>{DISCOVERY_SECTIONS.find(s => s.kind === kind)?.label}</h2><div className="cw-card-grid">{entities.map(e => <DiscoveryCard entity={e} key={e.id} />)}</div></section>)}
-        {q && !resultCount && <><p className="cw-result-count" role="status">Nothing matched “{q}” yet.</p><SearchStarters lead="Try one of these, or type a neighbourhood or street." /></>}
-        {!answers && <aside className="cw-search-live"><h2>Looking for what’s happening right now?</h2><p>Weather, traffic, outages and community reports have their own place.</p><Link to="/map">Open CalgaryWatch Live ↗</Link></aside>}</> : <>
+    {entity ? <><EntityDetail entity={entity} occurrences={discoveryRepository.occurrences()} related={all.filter(e => relatedIds.includes(e.id))} all={all} />{entity.kind === 'neighbourhood' && <Suspense fallback={null}><RankStrip focus={entity.title} /></Suspense>}</> : <><header className="cw-page-heading"><p className="cw-eyebrow">CalgaryWatch discovery</p><h1>{title}</h1><p className="cw-lead">Good plans begin with a little local knowledge.</p></header>
       <nav className="cw-intents" aria-label="Filter listings"><Link to={`/${root}`} aria-current={!slug && !quadrant ? 'page' : undefined}>All {section?.label.toLowerCase()}</Link>{(root === 'events' || root === 'markets') && <><Link to={`/${root}/this-weekend`}>This weekend</Link>{root === 'events' && <><Link to="/events/today">Today</Link><Link to="/events/today?time=tonight">Tonight</Link></>}</>}{root === 'local' && LOCAL_CATEGORIES.map(c => <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{c[0].toUpperCase() + c.slice(1)}</Link>)}{root === 'neighbourhoods' && QUADRANTS.map(quad => <Link key={quad} to={`/neighbourhoods?quadrant=${quad}`} aria-current={quadrant === quad ? 'page' : undefined}>{quad}</Link>)}</nav>
       {root === 'neighbourhoods' && <Suspense fallback={null}><RankStrip /></Suspense>}
       {root === 'events' && <nav className="cw-intents" aria-label="Event interests">{EVENT_FILTERS.map(([f]) => f).map(f => <Link key={f} aria-current={params.get('filter') === f ? 'page' : undefined} to={`${pathname}?${new URLSearchParams({ ...(isTonight ? {time:'tonight'} : {}), filter:f })}`}>{f[0].toUpperCase()+f.slice(1)}</Link>)}</nav>}
       {items.some(e => e.developmentOnly) && <p className="cw-preview-note">Illustrative design previews. These are not confirmed listings.</p>}
       {items.length ? <div className="cw-card-grid">{items.map(e => <DiscoveryCard entity={e} key={e.id} />)}</div> : <EmptyInventory type={section?.label.toLowerCase() || 'discoveries'} kind={section?.kind} />}
-      </>}
     </>}
   </div></SiteLayout>;
-}
-
-/** One-tap searches for what people most often come looking for. */
-const STARTERS: Array<[string, string]> = [
-  ['Police and safety tonight', '/search?q=police+tonight'],
-  ['What happened yesterday', '/search?q=yesterday'],
-  ['Crime reports this week', '/search?q=crime+this+week'],
-  ['Traffic and road closures', '/search?q=traffic+today'],
-  ['Power outages', '/search?q=power+outage'],
-  ['Things to do this weekend', '/events/this-weekend'],
-];
-
-function SearchStarters({ lead = 'Popular searches' }: { lead?: string }) {
-  return (
-    <nav className="cw-starters" aria-label="Popular searches">
-      <p>{lead}</p>
-      <ul>{STARTERS.map(([label, to]) => <li key={to}><Link to={to}>{label}</Link></li>)}</ul>
-    </nav>
-  );
 }

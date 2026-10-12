@@ -105,7 +105,7 @@ export const MARKET_TYPES: { id: string; label: string; test: (m: Market) => boo
   { id: 'pets', label: 'Dogs welcome', test: m => !!m.petFriendly },
 ];
 
-export function directionsUrl(market: Market) {
+export function directionsUrl(market: Pick<Market, 'venue' | 'address'>) {
   return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([market.venue, market.address].filter(Boolean).join(', '))}`;
 }
 
@@ -142,7 +142,7 @@ export function quadrantOf(market: Market): string | null {
 /** Communities CalgaryWatch has a neighbourhood page for, and their nearest neighbour where the market sits just outside one. */
 const HOOD_ALIASES: Record<string, string> = { hillhurst: 'kensington', sunnyside: 'kensington', 'victoria park': 'beltline', 'south calgary': 'marda loop' };
 
-export function neighbourhoodFor(market: Market, all: readonly DiscoveryEntity[]): { hood: Neighbourhood; nearby: boolean } | null {
+export function neighbourhoodFor(market: Pick<Market, 'title' | 'venue' | 'neighbourhood' | 'address'>, all: readonly DiscoveryEntity[]): { hood: Neighbourhood; nearby: boolean } | null {
   const hoods = all.filter((e): e is Neighbourhood => e.kind === 'neighbourhood');
   const own = (market.neighbourhood ?? '').toLowerCase();
   const haystack = [market.title, market.venue, market.neighbourhood, market.address].filter(Boolean).join(' ').toLowerCase();
@@ -156,7 +156,7 @@ export function neighbourhoodFor(market: Market, all: readonly DiscoveryEntity[]
 /** The community name the City's 311 data uses, as /check-your-community?c= expects it. */
 const COMMUNITY_ALIASES: Record<string, string> = { bridgeland: 'bridgeland/riverside', 'bridgeland-riverside': 'bridgeland/riverside' };
 
-export function communityFor(market: Market): { name: string; slug: string } | null {
+export function communityFor(market: Pick<Market, 'neighbourhood'>): { name: string; slug: string } | null {
   if (!market.neighbourhood) return null;
   const name = market.neighbourhood;
   const key = COMMUNITY_ALIASES[name.toLowerCase()] ?? name;

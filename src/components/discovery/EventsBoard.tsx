@@ -308,14 +308,20 @@ function Running({ events, now }: { events: EventEntity[]; now: Date }) {
 
 /* ── A day ──────────────────────────────────────────────────────────── */
 
+const PHONE_ROWS = 4;
+
 function Day({ day, today, heroPick }: { day: EventDay; today: string; heroPick?: string }) {
   // Desktop already shows this one as the ticket on the sky, so there it sits in the list
   // as a plain row; phones, which don't show the ticket, keep it as the lead.
   const dupe = !!day.lead && day.lead.event.id === heroPick;
   const rows = day.entries.filter(x => x !== day.lead || dupe);
   const name = dayName(day.date, today);
+  // Phones show the first few rows of a busy day and fold the rest away, so
+  // one big Saturday doesn't bury the rest of the week. Desktop shows them all.
+  const [all, setAll] = useState(false);
+  const extra = rows.filter(x => !(dupe && x === day.lead)).length - PHONE_ROWS;
   return (
-    <section className="ev-day" id={`ev-${day.date}`} data-day={day.date} aria-labelledby={`ev-h-${day.date}`}>
+    <section className={`ev-day${all ? ' is-all' : ''}`} id={`ev-${day.date}`} data-day={day.date} aria-labelledby={`ev-h-${day.date}`}>
       <h2 id={`ev-h-${day.date}`} className="ev-day-head">
         <span className={`ev-pill${day.date === today ? ' ev-pill-navy' : ''}`}>{name}</span>
         <span className="ev-day-date">{name === dWeekLong.format(noon(day.date)) ? dMonthDay.format(noon(day.date)) : `${dWeekShort.format(noon(day.date))}, ${dMonthDay.format(noon(day.date))}`}</span>
@@ -323,6 +329,7 @@ function Day({ day, today, heroPick }: { day: EventDay; today: string; heroPick?
       </h2>
       {day.lead ? <Lead entry={day.lead} dupe={dupe} /> : null}
       {rows.length ? <ul className="ev-rows">{rows.map(x => <Row key={x.key + x.event.id} entry={x} dupe={dupe && x === day.lead} />)}</ul> : null}
+      {extra > 0 && !all ? <button type="button" className="ev-day-all" onClick={() => setAll(true)}>Show {extra} more on {name === 'Today' || name === 'Tomorrow' ? name.toLowerCase() : name}</button> : null}
     </section>
   );
 }

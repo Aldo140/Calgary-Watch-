@@ -114,7 +114,7 @@ export default function DateNightPage() {
               <h1 id="dn-title">Date night in <mark>Calgary.</mark></h1>
               <p className="dn-lead">Real plans for two, from the organizers’ own listings: a show, a festival night, somewhere to dress up for. Every date and time is checked at the source. The picks are ours and never paid for.</p>
               <div className="dn-jump">
-                <a href="#dn-picks">Our picks</a>
+                {picks.length ? <a href="#dn-picks">Our picks</a> : null}
                 <a href="#dn-week">Evenings this week</a>
                 <a href="#dn-free">No tickets needed</a>
               </div>
@@ -123,18 +123,20 @@ export default function DateNightPage() {
           </div>
         </section>
 
-        <section className="cw-wrap dn-sec" id="dn-picks" aria-labelledby="dn-picks-title">
-          <div className="dn-head">
-            <h2 id="dn-picks-title">Our picks, <mark>soonest first.</mark></h2>
-            <p>Each one links to the full listing and the organizer’s tickets. When a date passes it comes off this page by itself.</p>
-          </div>
-          {picks.length ? <ol className="dn-picks">{picks.map(p => <PickCard key={p.entity.id} pick={p} />)}</ol>
-            : <p className="dn-empty">Our next picks are being checked. In the meantime, see <Link to="/events">everything on this week</Link>.</p>}
-        </section>
+        {/* No picks checked right now: lead with what's on rather than an empty shelf. */}
+        {picks.length ? (
+          <section className="cw-wrap dn-sec" id="dn-picks" aria-labelledby="dn-picks-title">
+            <div className="dn-head">
+              <h2 id="dn-picks-title">Our picks, <mark>soonest first.</mark></h2>
+              <p>Each one links to the full listing and the organizer’s tickets. When a date passes it comes off this page by itself.</p>
+            </div>
+            <ol className="dn-picks">{picks.map(p => <PickCard key={p.entity.id} pick={p} />)}</ol>
+          </section>
+        ) : null}
 
         <section className="cw-wrap dn-sec" id="dn-week" aria-labelledby="dn-week-title">
           <div className="dn-head">
-            <h2 id="dn-week-title">Also on, <mark>evenings this week.</mark></h2>
+            <h2 id="dn-week-title">{picks.length ? <>Also on, <mark>evenings this week.</mark></> : <>On this week, <mark>after dark.</mark></>}</h2>
             <p>Arts and nights out starting at 5 pm or later, straight from the listings. Not picks, just what’s on.</p>
           </div>
           {more.length ? (

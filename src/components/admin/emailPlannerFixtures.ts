@@ -40,6 +40,8 @@ export const SAMPLE_MONDAY: UserProfile[] = [
 export const SAMPLE_THURSDAY: Array<Record<string, unknown> & { uid: string }> = [
   // On both lists: the first twelve Monday readers.
   ...Array.from({ length: 12 }, (_, i) => ({ ...person(i), eventsDigestOptIn: true, eventsDigestOptInAt: NOW - 10 * DAY, eventInterests: ['music', 'food'] })),
+  // New this week and on both lists: their Monday welcome covers both.
+  ...[40, 41].map((i) => ({ ...person(i, { digestWelcomeSentAt: null, weeklyDigestOptInAt: NOW - i % 2 * DAY }), eventsDigestOptIn: true, eventsDigestOptInAt: NOW - DAY, eventInterests: ['markets'] })),
   // Thursday only.
   ...Array.from({ length: 9 }, (_, i) => ({ ...person(80 + i, { weeklyDigestOptIn: false }), eventsDigestOptIn: true, eventsDigestOptInAt: NOW - 5 * DAY, eventInterests: i % 3 ? ['family', 'outdoors'] : [] })),
   ...Array.from({ length: 3 }, (_, i) => ({ ...person(90 + i, { weeklyDigestOptIn: false, neighborhood: undefined }), eventsDigestOptIn: true, eventsDigestOptInAt: NOW - 3 * DAY, eventInterests: ['arts'] })),

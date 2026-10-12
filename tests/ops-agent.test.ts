@@ -169,6 +169,11 @@ describe('finding a business address', () => {
     assert.deepEqual(extractEmails('hello [at] market.ca', 'market.ca'), ['hello@market.ca']);
     assert.deepEqual(extractEmails('hello&#64;market.ca', 'market.ca'), ['hello@market.ca']);
   });
+  it('drops a phone number glued onto the front of an address', () => {
+    assert.deepEqual(extractEmails('Box office 403-264-7243info@sagetheatre.com', 'sagetheatre.com'), ['info@sagetheatre.com']);
+    assert.deepEqual(extractEmails('264-7243info@sagetheatre.com', 'sagetheatre.com'), ['info@sagetheatre.com']);
+    assert.deepEqual(extractEmails('team2024@market.ca', 'market.ca'), ['team2024@market.ca']);
+  });
   it('detects no-solicitation notices', () => {
     assert.ok(hasNoSolicitationNotice('Please note: we do not accept unsolicited offers.', cfg));
     assert.ok(hasNoSolicitationNotice('NO SOLICITATION', cfg));

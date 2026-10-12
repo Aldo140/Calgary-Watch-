@@ -227,11 +227,16 @@ describe('weekly email planner', () => {
   });
 
   it('publishes the real welcome renderer for the admin preview', () => {
-    const plannerSource = readFileSync('src/components/admin/WeeklyEmailPlanner.tsx', 'utf8');
+    const gallerySource = readFileSync('src/components/admin/EmailGallery.tsx', 'utf8');
+    const segmentsSource = readFileSync('src/lib/emailSegments.ts', 'utf8');
     const packageSource = readFileSync('package.json', 'utf8');
     const previewSource = readFileSync('scripts/digest/preview.ts', 'utf8');
-    assert.match(plannerSource, /email-previews\/welcome\.html/);
-    assert.match(plannerSource, /Actual production template/);
+    assert.match(gallerySource, /email-previews\//);
+    assert.match(gallerySource, /manifest\.json/);
+    assert.match(gallerySource, /Production template/);
+    assert.match(segmentsSource, /file: 'welcome\.html'/);
+    assert.match(previewSource, /manifest\.json/);
+    assert.match(previewSource, /describe\('welcome\.html'/);
     assert.match(packageSource, /digest:publish-previews/);
     assert.match(previewSource, /renderWelcomeHtml\(shared\)/);
     assert.match(previewSource, /noindex, nofollow/);

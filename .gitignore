@@ -27,3 +27,4 @@ brand/preview/
 
 # Outreach logs with contact addresses: never published (the repo is public).
 .ops-private/
+public/email-previews/

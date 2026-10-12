@@ -1,5 +1,9 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { ThursdayPicksPanel } from './ThursdayPicksPanel';
+import { ThursdayPicksPanel, useThursdayData } from './ThursdayPicksPanel';
+import { EmailGallery, useEmailManifest } from './EmailGallery';
+import { SAMPLE_MONDAY, SAMPLE_THURSDAY } from './emailPlannerFixtures';
+import { SEGMENTS, segmentReaders, type SegmentProfile } from '@/src/lib/emailSegments';
+import './email-planner.css';
 import {
   collection, doc, getDoc, onSnapshot, query, runTransaction, where, writeBatch,
 } from 'firebase/firestore';
@@ -57,8 +61,7 @@ const AUDIENCE_ICONS = {
 type SaveState = 'idle' | 'loading' | 'saving' | 'saved' | 'error' | 'conflict';
 type MessageTone = 'neutral' | 'ok' | 'attention' | 'critical';
 type TestStatus = 'pending' | 'sending' | 'retrying' | 'sent' | 'partial' | 'failed';
-type PlannerView = 'overview' | 'replies' | 'preview' | 'compose' | 'audience' | 'templates' | 'thursday';
-type SubscriberPreview = 'weekly-local' | 'weekly-city' | 'welcome' | 'alert';
+type PlannerView = 'overview' | 'emails' | 'readers' | 'compose' | 'replies' | 'rules';
 
 type TestRequest = {
   id: string;
@@ -127,20 +130,20 @@ function safeDraft(value: string | null, ownerUid: string): Draft | null {
 
 function PreviewInline({ tokens }: { tokens: DigestInlineToken[] }) {
   return <>{tokens.map((token, index) => {
-    if (token.type === 'strong') return <strong key={index} style={{ color: '#F4EEE3' }}>{token.text}</strong>;
-    if (token.type === 'link') return <span key={index} className="font-semibold underline" style={{ color: '#5CC3AA' }}>{token.text}</span>;
+    if (token.type === 'strong') return <strong key={index} style={{ color: '#F2EFE8' }}>{token.text}</strong>;
+    if (token.type === 'link') return <span key={index} className="font-semibold underline" style={{ color: '#87DCE8' }}>{token.text}</span>;
     return <span key={index} className="whitespace-pre-line">{token.text}</span>;
   })}</>;
 }
 
 function PreviewBody({ body }: { body: string }) {
   const blocks = parseDigestBody(body);
-  if (!blocks.length) return <p style={{ color: '#A6B8AE' }}>Your optional opening note will appear here.</p>;
-  return <div className="mt-2 space-y-2.5 text-[0.82rem] leading-relaxed" style={{ color: '#DCD3C4' }}>
+  if (!blocks.length) return <p style={{ color: '#9DB2C9' }}>Your optional opening note will appear here.</p>;
+  return <div className="mt-2 space-y-2.5 text-[0.82rem] leading-relaxed" style={{ color: '#C9D6E4' }}>
     {blocks.map((block, index) => {
-      if (block.type === 'heading') return <p key={index} className="pt-1 text-[0.92rem] font-bold" style={{ fontFamily: display, color: '#F4EEE3' }}><PreviewInline tokens={block.content} /></p>;
-      if (block.type === 'quote') return <blockquote key={index} className="border-s-2 ps-3 italic" style={{ borderColor: '#E0AC63' }}><PreviewInline tokens={block.content} /></blockquote>;
-      if (block.type === 'list') return <ul key={index} className="space-y-1 ps-4">{block.items.map((item, itemIndex) => <li key={itemIndex} className="list-disc marker:text-[#E0AC63]"><PreviewInline tokens={item} /></li>)}</ul>;
+      if (block.type === 'heading') return <p key={index} className="pt-1 text-[0.92rem] font-bold" style={{ fontFamily: display, color: '#F2EFE8' }}><PreviewInline tokens={block.content} /></p>;
+      if (block.type === 'quote') return <blockquote key={index} className="border-s-2 ps-3 italic" style={{ borderColor: '#FFDF4F' }}><PreviewInline tokens={block.content} /></blockquote>;
+      if (block.type === 'list') return <ul key={index} className="space-y-1 ps-4">{block.items.map((item, itemIndex) => <li key={itemIndex} className="list-disc marker:text-[#FFDF4F]"><PreviewInline tokens={item} /></li>)}</ul>;
       return <p key={index}><PreviewInline tokens={block.content} /></p>;
     })}
   </div>;
@@ -189,21 +192,21 @@ function OpeningPreview({
   const copy = CONTRIBUTION_STYLE_COPY[style];
   const content = (
     <>
-      <p className="text-lg font-bold leading-snug" style={{ fontFamily: display, color: '#F4EEE3' }}>
+      <p className="text-lg font-bold leading-snug" style={{ fontFamily: display, color: '#F2EFE8' }}>
         {headline.trim() || copy.label}
       </p>
       <PreviewBody body={body} />
-      {byline.trim() && <p className="mt-3 text-[0.72rem] font-semibold" style={{ color: '#A6B8AE' }}>{byline.trim()}</p>}
-      {ctaLabel.trim() && <span className="mt-4 inline-block rounded-sm px-3 py-2 text-[0.7rem] font-bold" style={{ background: '#F4EEE3', color: '#0E1A17' }}>{ctaLabel.trim()} →</span>}
+      {byline.trim() && <p className="mt-3 text-[0.72rem] font-semibold" style={{ color: '#9DB2C9' }}>{byline.trim()}</p>}
+      {ctaLabel.trim() && <span className="mt-4 inline-block rounded-sm px-3 py-2 text-[0.7rem] font-bold" style={{ background: '#F2EFE8', color: '#06162F' }}>{ctaLabel.trim()} →</span>}
     </>
   );
 
   if (style === 'news-brief') {
     return (
-      <div className="rounded-sm border p-4" style={{ background: '#17251F', borderColor: '#2C443B' }}>
+      <div className="rounded-sm border p-4" style={{ background: '#0E2242', borderColor: '#22406C' }}>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
-          <p className="text-[0.62rem]" style={{ color: '#A6B8AE', fontFamily: mono }}>{weekKey}</p>
+          <p className="text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#FFDF4F' }}>{copy.emailLabel}</p>
+          <p className="text-[0.62rem]" style={{ color: '#9DB2C9', fontFamily: mono }}>{weekKey}</p>
         </div>
         {content}
       </div>
@@ -212,17 +215,17 @@ function OpeningPreview({
 
   if (style === 'personal-story') {
     return (
-      <div className="border-y px-1 py-4" style={{ borderColor: '#3A5A4E' }}>
-        <p className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
+      <div className="border-y px-1 py-4" style={{ borderColor: '#2E5287' }}>
+        <p className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#FFDF4F' }}>{copy.emailLabel}</p>
         {content}
-        {!byline.trim() && <p className="mt-4 text-[0.72rem] font-semibold" style={{ color: '#A6B8AE' }}>From the Calgary Watch team</p>}
+        {!byline.trim() && <p className="mt-4 text-[0.72rem] font-semibold" style={{ color: '#9DB2C9' }}>From the Calgary Watch team</p>}
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border p-4" style={{ background: '#17251F', borderColor: '#2C443B' }}>
-      <p className="mb-2 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#E0AC63' }}>{copy.emailLabel}</p>
+    <div className="rounded-lg border p-4" style={{ background: '#0E2242', borderColor: '#22406C' }}>
+      <p className="mb-2 text-[0.62rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#FFDF4F' }}>{copy.emailLabel}</p>
       {content}
     </div>
   );
@@ -262,102 +265,17 @@ function PushNotificationPreview() {
   );
 }
 
-function ProductionEmailViewer({ plan }: { plan: DigestContribution | undefined }) {
-  const [route, setRoute] = useState<SubscriberPreview>('weekly-local');
-  const [html, setHtml] = useState('');
-  const [error, setError] = useState('');
-  const routeConfig: Record<SubscriberPreview, { label: string; detail: string; file: string }> = {
-    'weekly-local': { label: 'Weekly · local', detail: 'For readers with nearby results', file: 'digest.html' },
-    'weekly-city': { label: 'Weekly · city-wide', detail: 'For readers without a local result set', file: 'city.html' },
-    welcome: { label: 'Welcome letter', detail: 'Each subscriber’s first eligible send', file: 'welcome.html' },
-    alert: { label: 'Instant alert', detail: 'Between-digest urgent nearby reports', file: 'alert.html' },
-  };
-  const active = routeConfig[route];
+// Dev server with no Firebase (`/admin?preview`): sample readers, so the
+// segment cards and recipient lists can be reviewed. False in production.
+const DEV_SAMPLE = Boolean(import.meta.env?.DEV) && !db;
 
-  useEffect(() => {
-    let cancelled = false;
-    setHtml('');
-    setError('');
-    fetch(`${import.meta.env.BASE_URL}email-previews/${active.file}`, { cache: 'no-store' })
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.text();
-      })
-      .then((value) => { if (!cancelled) setHtml(value); })
-      .catch((reason) => {
-        console.error('Could not load production email preview:', reason);
-        if (!cancelled) setError('The production preview could not be loaded. No email or schedule was changed.');
-      });
-    return () => { cancelled = true; };
-  }, [active.file]);
-
-  const weekly = route === 'weekly-local' || route === 'weekly-city';
-  const previewFacts: Array<[string, string]> = route === 'alert'
-    ? [
-        ['Fixed for everyone', 'Branding and a short list of nearby reports'],
-        ['Personalized', 'Only the reports that matched this reader’s zones and categories'],
-        ['Delivery rule', 'Between digests when something worth interrupting for happens nearby, outside quiet hours'],
-      ]
-    : weekly
-      ? [
-          ['Fixed for everyone', 'Branding, layout, legal footer and report structure'],
-          ['Personalized Monday', 'Name, subject, location, latest reports and distances'],
-          ['Delivery rule', 'Only after that person’s welcome was delivered'],
-        ]
-      : [
-          ['Fixed for everyone', 'Branding, onboarding explanation and legal footer'],
-          ['Personalized Monday', 'Name, location and that week’s current sample briefing'],
-          ['Delivery rule', 'Only when no successful welcome is recorded'],
-        ];
-  return (
-    <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="production-email-title">
-      <header className="border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line }}>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 id="production-email-title" className="text-sm font-bold" style={{ color: T.ink }}>Subscriber email preview</h2>
-            <p className="mt-1 max-w-2xl text-xs leading-relaxed" style={{ color: T.muted }}>This is the production template—not an admin-proof approximation. The reports, greeting, subject, distances and unsubscribe link are rebuilt for each person when Monday’s job runs.</p>
-          </div>
-          <Chip tone="ok"><Eye size={11} /> Production template</Chip>
-        </div>
-        <div className="mt-4 grid gap-1 rounded-lg p-1 sm:grid-cols-3" style={{ background: T.surface }} aria-label="Choose recipient email route">
-          {(Object.keys(routeConfig) as SubscriberPreview[]).map((id) => {
-            const selectedRoute = route === id;
-            return <button key={id} type="button" aria-pressed={selectedRoute} onClick={() => setRoute(id)} className="rounded-md px-3 py-2 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: selectedRoute ? T.card : 'transparent', color: selectedRoute ? T.signal : T.ink, boxShadow: selectedRoute ? `0 1px 3px ${T.rail}14` : 'none', outlineColor: T.signal }}><span className="block text-xs font-bold">{routeConfig[id].label}</span><span className="mt-0.5 block text-[0.66rem]" style={{ color: T.muted }}>{routeConfig[id].detail}</span></button>;
-          })}
-        </div>
-      </header>
-
-      {weekly && plan && (
-        <div className="border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line, background: `${T.signal}05` }}>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div><p className="text-xs font-bold" style={{ color: T.ink }}>Approved opening for this Monday</p><p className="mt-0.5 text-[0.68rem]" style={{ color: T.muted }}>These exact words are inserted before the personalized report section for {CONTRIBUTION_AUDIENCE_COPY[plan.audience ?? 'everyone'].label.toLowerCase()}.</p></div>
-            <Chip tone="ok"><Check size={11} /> Revision {plan.revision ?? 1}</Chip>
-          </div>
-          <div className="mt-3 max-w-[34rem] rounded-lg p-4" style={{ background: '#0E1A17' }}><OpeningPreview style={plan.style} headline={plan.headline} body={plan.body} weekKey={plan.weekKey} byline={plan.byline ?? ''} ctaLabel={plan.ctaLabel ?? ''} /></div>
-        </div>
-      )}
-
-      <div className="grid border-b md:grid-cols-3" style={{ borderColor: T.line }}>
-        {previewFacts.map(([label, value]) =><div key={label} className="border-b px-4 py-3 last:border-b-0 md:border-b-0 md:border-e md:last:border-e-0" style={{ borderColor: T.line }}><p className="text-[0.66rem] font-bold" style={{ color: T.ink }}>{label}</p><p className="mt-1 text-[0.68rem] leading-relaxed" style={{ color: T.muted }}>{value}</p></div>)}
-      </div>
-
-      <div className="p-3 sm:p-5" style={{ background: T.surface }}>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-bold" style={{ color: T.ink }}>{active.label} · representative subscriber</p>
-          <a href={`${import.meta.env.BASE_URL}email-previews/${active.file}`} target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border bg-white px-2.5 text-[0.72rem] font-bold focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}><Eye size={13} /> Open full size</a>
-        </div>
-        {route === 'alert' && <PushNotificationPreview />}
-        <div className="mx-auto max-w-[42rem] overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }}>
-          {error ? <div className="flex min-h-64 flex-col items-center justify-center gap-2 p-6 text-center" role="alert"><AlertTriangle size={20} style={{ color: T.critical }} /><p className="max-w-md text-xs" style={{ color: T.muted }}>{error}</p></div> : html ? <iframe srcDoc={html} title={`${active.label} production email preview`} className="block h-[48rem] w-full bg-white" sandbox="" /> : <div className="h-[48rem] space-y-5 p-8 motion-safe:animate-pulse" aria-label="Loading production email preview"><div className="mx-auto h-12 w-52 rounded-lg" style={{ background: T.line }} /><div className="mx-auto h-40 max-w-lg rounded-xl" style={{ background: T.card }} /><div className="mx-auto h-56 max-w-lg rounded-xl" style={{ background: T.card }} /></div>}
-        </div>
-        <p className="mt-2 text-center text-[0.68rem]" style={{ color: T.muted }}>Representative data makes the layout reviewable before Monday. Recipient-specific values are produced only when the send job reads that person’s profile and the latest reports.</p>
-      </div>
-    </section>
-  );
-}
-
-export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }: { profiles: UserProfile[]; profilesLoading: boolean; profilesError: string }) {
+export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: liveLoading, profilesError }: { profiles: UserProfile[]; profilesLoading: boolean; profilesError: string }) {
   const { user } = useAuth();
+  const profiles = DEV_SAMPLE && !liveProfiles.length ? SAMPLE_MONDAY : liveProfiles;
+  const profilesLoading = DEV_SAMPLE ? false : liveLoading;
+  const thursdayData = useThursdayData(DEV_SAMPLE ? SAMPLE_THURSDAY : undefined);
+  const emailCases = useEmailManifest();
+  const [galleryFile, setGalleryFile] = useState('digest.html');
   const weeks = useMemo(() => upcomingDigestWeeks(Date.now(), 8), []);
   const [plannerView, setPlannerView] = useState<PlannerView>('overview');
   const [plans, setPlans] = useState<Record<string, DigestContribution>>({});
@@ -375,9 +293,6 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   const [previewWidth, setPreviewWidth] = useState<'desktop' | 'mobile'>('desktop');
   const [previewScope, setPreviewScope] = useState<'local' | 'citywide'>('local');
   const [activeTemplateId, setActiveTemplateId] = useState<(typeof DIGEST_TEMPLATE_PURPOSES)[number]['id']>('weekly');
-  const [showWelcomePreview, setShowWelcomePreview] = useState(false);
-  const [welcomePreviewHtml, setWelcomePreviewHtml] = useState('');
-  const [welcomePreviewError, setWelcomePreviewError] = useState('');
   const [saveState, setSaveState] = useState<SaveState>('loading');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState<MessageTone>('neutral');
@@ -409,21 +324,6 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   const latestTest = testRequests[0];
   const activeTemplate = DIGEST_TEMPLATE_PURPOSES.find((template) => template.id === activeTemplateId)
     ?? DIGEST_TEMPLATE_PURPOSES[1];
-  const welcomePreviewUrl = `${import.meta.env.BASE_URL}email-previews/welcome.html`;
-
-  async function openWelcomePreview() {
-    setShowWelcomePreview(true);
-    if (welcomePreviewHtml) return;
-    setWelcomePreviewError('');
-    try {
-      const response = await fetch(welcomePreviewUrl, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`Preview returned HTTP ${response.status}`);
-      setWelcomePreviewHtml(await response.text());
-    } catch (error) {
-      console.error('Could not load welcome letter preview:', error);
-      setWelcomePreviewError('The welcome letter preview could not be loaded. The email template itself was not changed.');
-    }
-  }
 
   useEffect(() => {
     if (!db) return;
@@ -776,15 +676,28 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
   const scheduledWeekly = scheduledAudience.filter((row) => row.kind === 'weekly').length;
   const heldAudience = audienceForecast.rows.filter((row) => row.status.startsWith('held-')).length;
   const attentionAudience = audienceForecast.rows.filter((row) => row.status === 'attention').length;
-  const showComposerNavigation = plannerView === 'compose' || dirty || !!loadedPlan;
-  const plannerViews: Array<{ id: PlannerView; label: string; description: string; icon: typeof LayoutDashboard }> = [
-    { id: 'overview', label: 'This Monday', description: 'Sent and pending', icon: LayoutDashboard },
-    { id: 'replies', label: 'Replies', description: 'Reader responses', icon: Inbox },
-    { id: 'preview', label: 'Email preview', description: 'What readers receive', icon: Eye },
-    ...(showComposerNavigation ? [{ id: 'compose' as const, label: 'Opening note', description: dirty ? 'Draft needs approval' : 'Optional contribution', icon: PenLine }] : []),
-    { id: 'audience', label: 'Recipients', description: 'Who gets which email', icon: Users },
-    { id: 'thursday', label: 'Thursday picks', description: 'Both lists, every case', icon: Eye },
-    { id: 'templates', label: 'Delivery rules', description: 'How routing works', icon: FileText },
+  const segments = useMemo(
+    () => segmentReaders(profiles as SegmentProfile[], (thursdayData.thursday ?? []) as SegmentProfile[]),
+    [profiles, thursdayData.thursday],
+  );
+  const mondaySegments = SEGMENTS.filter((seg) => seg.day === 'Monday');
+  const thursdaySegments = SEGMENTS.filter((seg) => seg.day === 'Thursday');
+  const mondayCount = mondaySegments.reduce((n, seg) => n + segments.counts[seg.id], 0);
+  const thursdayCount = thursdaySegments.reduce((n, seg) => n + segments.counts[seg.id], 0);
+  const activeVersions = SEGMENTS.filter((seg) => segments.counts[seg.id] > 0).length;
+  const thursdayDate = useMemo(() => {
+    const at = new Date();
+    at.setDate(at.getDate() + ((4 - at.getDay() + 7) % 7 || 7));
+    return calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' }).format(at);
+  }, []);
+  const mondayDate = nextWeek?.label.split('–')[0].trim() ?? 'Monday';
+  const plannerViews: Array<{ id: PlannerView; label: string; count?: number }> = [
+    { id: 'overview', label: 'This week' },
+    { id: 'emails', label: 'Every email', count: emailCases?.length || undefined },
+    { id: 'readers', label: 'Readers', count: segments.total || undefined },
+    { id: 'compose', label: dirty ? 'Opening note · draft' : 'Opening note' },
+    { id: 'replies', label: 'Replies' },
+    { id: 'rules', label: 'How it works' },
   ];
 
   async function openNextCompose() {
@@ -803,63 +716,122 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
     void loadWeek(nextWeek.weekKey);
   }
 
+  function openEmail(file: string) {
+    setGalleryFile(file);
+    setPlannerView('emails');
+  }
+
+  const mix = (list: typeof SEGMENTS[number][], total: number) => (
+    <div className="ep-send-mix" aria-hidden>
+      {list.map((seg) => segments.counts[seg.id] > 0 && (
+        <span key={seg.id} className={`tone-${seg.tone}`} style={{ width: `${(segments.counts[seg.id] / Math.max(1, total)) * 100}%` }} />
+      ))}
+    </div>
+  );
+
   return (
-    <div className="space-y-4">
-      <nav className="overflow-x-auto rounded-xl border bg-white p-1.5" style={{ borderColor: T.line }} aria-label="Email planner sections">
-        <div className="flex min-w-max gap-1">
-          {plannerViews.map((item) => {
-            const Icon = item.icon;
-            const active = plannerView === item.id;
+    <div className="ep">
+      <nav className="ep-tabs" aria-label="Email planner sections">
+        {plannerViews.map((item) => (
+          <button key={item.id} type="button" className="ep-tab" aria-current={plannerView === item.id ? 'page' : undefined} onClick={() => selectPlannerView(item.id)}>
+            {item.label}{item.count ? <b>{item.count}</b> : null}
+          </button>
+        ))}
+      </nav>
+
+      {plannerView === 'emails' && <EmailGallery cases={emailCases} selected={galleryFile} onSelect={setGalleryFile} aboveFrame={(file) => (file === 'alert.html' ? <PushNotificationPreview /> : null)} />}
+
+      {plannerView === 'replies' && <DigestReplyInbox />}
+
+      {plannerView === 'readers' && <div className="space-y-4">
+        <DigestAudienceForecast profiles={profiles} loading={profilesLoading} error={profilesError} />
+        <ThursdayPicksPanel mondayProfiles={profiles} data={thursdayData} />
+      </div>}
+
+      {plannerView === 'overview' && (<>
+        <section className="ep-hero" aria-labelledby="email-overview-title">
+          <p className="ep-kicker">Email planner · {nextWeek?.weekKey}</p>
+          <h2 id="email-overview-title">Every reader gets <span>their own</span> email</h2>
+          <p className="ep-hero-lead">
+            {profilesLoading ? 'Counting readers…' : profilesError ? 'The recipient forecast could not load. Open Readers to see the error before relying on these counts.'
+              : `${segments.total} readers across ${activeVersions} versions this week. Each one opens with its own cover, and every Monday leads with a CW pick angle computed from that reader’s own week, so nobody gets the same email twice.`}
+          </p>
+          <div className="ep-sends">
+            <div className="ep-send">
+              <div className="ep-send-top"><span className="ep-send-day"><i className="tone-blue" />Monday · {mondayDate}</span><span>09:00 Calgary</span></div>
+              <p className="ep-send-n">{profilesLoading ? '…' : mondayCount}<small>emails</small></p>
+              {mix(mondaySegments, mondayCount)}
+              <p className="ep-send-note">{segments.counts.welcome + segments.counts['welcome-city']} welcome letters · {segments.counts.both} combined weeks · {segments.counts['monday-home'] + segments.counts['monday-city']} Monday briefs</p>
+            </div>
+            <div className="ep-send">
+              <div className="ep-send-top"><span className="ep-send-day"><i className="tone-yellow" />Thursday · {thursdayDate}</span><span>08:00 Calgary</span></div>
+              <p className="ep-send-n">{thursdayData.thursday === null ? '…' : thursdayCount}<small>emails</small></p>
+              {mix(thursdaySegments, thursdayCount)}
+              <p className="ep-send-note">{segments.counts.both ? `${segments.counts.both} on both lists already get their picks inside Monday’s email.` : 'Readers on both lists get their picks inside Monday’s email.'}</p>
+            </div>
+          </div>
+          <div className="ep-hero-ctas">
+            <button type="button" className="ep-btn ep-btn-primary" onClick={() => setPlannerView('emails')}><Eye size={15} /> See every email</button>
+            <button type="button" className="ep-btn" onClick={() => void openNextCompose()}><PenLine size={15} /> {dirty ? 'Finish the opening note' : nextPlan ? 'Review the opening note' : 'Add an opening note'}</button>
+          </div>
+        </section>
+
+        <div className="ep-head">
+          <h3>Who gets <span>which</span> email</h3>
+          <p>Every subscriber falls into exactly one group, using the same rules as the senders. Tap a group to open the exact email it gets.</p>
+        </div>
+        <div className="ep-segments">
+          {SEGMENTS.map((seg) => {
+            const n = segments.counts[seg.id];
+            const share = segments.total ? Math.round((n / segments.total) * 100) : 0;
             return (
-              <button key={item.id} type="button" aria-current={active ? 'page' : undefined} onClick={() => selectPlannerView(item.id)} className="flex min-h-12 min-w-[9.5rem] flex-1 items-center gap-2.5 rounded-lg px-3 text-left transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ background: active ? T.rail : 'transparent', color: active ? '#fff' : T.ink, outlineColor: T.signal }}>
-                <Icon size={15} className="shrink-0" style={{ color: active ? '#fff' : T.muted }} />
-                <span className="min-w-0">
-                  <span className="block text-xs font-bold">{item.label}</span>
-                  <span className="block truncate text-[0.65rem]" style={{ color: active ? '#CBD1D9' : T.muted }}>{item.description}</span>
-                </span>
+              <button key={seg.id} type="button" className="ep-card ep-seg" onClick={() => openEmail(seg.file)} aria-label={`${seg.label}: ${n} readers. Open their email`}>
+                <div className={`ep-seg-cover tone-${seg.tone}`}><small>{seg.day}</small><strong>{profilesLoading ? '…' : n}</strong></div>
+                <div className="ep-seg-body">
+                  <h4>{seg.label}</h4>
+                  <p>{seg.who}</p>
+                  <p style={{ color: '#151515' }}>{seg.tailored}</p>
+                  <div className="ep-share" aria-hidden><i style={{ width: `${share}%` }} /></div>
+                </div>
+                <div className="ep-seg-foot">See their email →<span>{share}% of readers</span></div>
               </button>
             );
           })}
         </div>
-      </nav>
+        <div className="ep-modifiers">
+          <span className="ep-pill"><b>{segments.topicFiltered}</b> Monday readers chose some topics only</span>
+          <span className="ep-pill"><b>{segments.noInterests}</b> Thursday readers with no interests get a bit of everything</span>
+          <button type="button" className="ep-pill" style={{ cursor: 'pointer', borderColor: segments.blocked ? T.critical : undefined }} onClick={() => setPlannerView('readers')}><b>{segments.blocked}</b> opted in but can’t be mailed yet →</button>
+        </div>
 
-      {plannerView === 'preview' && <ProductionEmailViewer plan={nextPlan} />}
-
-      {plannerView === 'replies' && <DigestReplyInbox />}
-      {plannerView === 'thursday' && <ThursdayPicksPanel mondayProfiles={profiles} />}
-
-      {plannerView === 'overview' && (
-        <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="email-overview-title">
-          <header className="flex flex-wrap items-start justify-between gap-3 border-b px-4 py-4 sm:px-5" style={{ borderColor: T.line }}>
-            <div><h2 id="email-overview-title" className="text-base font-bold" style={{ color: T.ink }}>This Monday’s send</h2><p className="mt-0.5 text-xs" style={{ color: T.muted }}>{nextWeek?.label} · automatic run at 15:00 UTC (09:00 MDT / 08:00 MST)</p></div>
-            <div className="flex flex-wrap gap-2"><AdminButton tone="signal" onClick={() => setPlannerView('preview')}><Eye size={14} /> See the exact emails</AdminButton><AdminButton variant="outline" onClick={() => setPlannerView('audience')}><Users size={14} /> See recipients</AdminButton></div>
-          </header>
-
-          <div className="divide-y" style={{ borderColor: T.line }}>
-            <div className="grid gap-3 px-4 py-4 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-center sm:px-5">
-              <p className="text-xs font-bold" style={{ color: T.ink }}>Subscriber delivery</p>
-              <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: profilesError ? T.critical : profilesLoading ? T.attention : T.ok }}><StatusDot tone={profilesError ? 'critical' : profilesLoading ? 'attention' : 'ok'} pulse={profilesLoading} /> {profilesError ? 'Forecast unavailable' : profilesLoading ? 'Checking recipients' : 'Ready for Monday'}</p><p className="mt-1 text-[0.7rem] leading-relaxed" style={{ color: T.muted }}>{profilesLoading ? 'Loading recipient forecast…' : profilesError ? 'Open Recipients to review the connection error before relying on these counts.' : `${scheduledAudience.length} scheduled: ${scheduledWelcome} welcome ${scheduledWelcome === 1 ? 'letter' : 'letters'} and ${scheduledWeekly} weekly ${scheduledWeekly === 1 ? 'brief' : 'briefs'}.`}</p></div>
-              <span className="text-xs tabular-nums" style={{ color: heldAudience || attentionAudience ? T.attention : T.muted, fontFamily: mono }}>{heldAudience + attentionAudience} held</span>
-            </div>
-
-            <div className="grid gap-3 px-4 py-4 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-center sm:px-5">
-              <p className="text-xs font-bold" style={{ color: T.ink }}>Optional opening</p>
-              {dirty ? <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.attention }}><StatusDot tone="attention" /> Draft waiting for approval</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>Your draft is saved on this device. The last approved email remains unchanged until you publish.</p></div> : nextPlan ? <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.ok }}><StatusDot tone="ok" /> Approved and scheduled</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>“{nextPlan.headline || CONTRIBUTION_STYLE_COPY[nextPlan.style]?.label || 'Editorial note'}” · revision {nextPlan.revision ?? 1}</p></div> : <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.ink }}><StatusDot tone="neutral" /> Not requested</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>The standard weekly email sends normally. Nothing is pending.</p></div>}
-              {(dirty || nextPlan) && <AdminButton variant="ghost" size="sm" onClick={() => void openNextCompose()}>{dirty ? 'Finish approval' : 'Review'}</AdminButton>}
-            </div>
-
-            <div className="grid gap-3 px-4 py-4 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-center sm:px-5">
-              <p className="text-xs font-bold" style={{ color: T.ink }}>Admin proof</p>
-              {!PROOF_SERVICE_ENABLED ? <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.critical }}><StatusDot tone="critical" /> Billing upgrade required</p><p className="mt-1 text-[0.7rem] leading-relaxed" style={{ color: T.muted }}>Cloud Functions is enabled, but Firebase is still on the free Spark plan. Upgrade to Blaze, then deploy the proof function. Subscriber automation remains separate.</p></div> : nextPlan && selectedWeek === nextWeek?.weekKey ? <DeliveryStatus request={latestTest} /> : <div><p className="flex items-center gap-2 text-xs font-semibold" style={{ color: T.muted }}><StatusDot tone="neutral" /> {nextPlan ? 'Load the opening to check proof status' : 'Not required'}</p><p className="mt-1 text-[0.7rem]" style={{ color: T.muted }}>{nextPlan ? 'Proof history is attached to the approved edition.' : 'Proofs are sent only when an optional opening is published, updated or removed.'}</p></div>}
-              {!PROOF_SERVICE_ENABLED ? <a href="https://console.firebase.google.com/project/calgary-map-e70bb/usage/details" target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center justify-center rounded-lg border px-2.5 text-[0.72rem] font-bold focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}>Upgrade Firebase</a> : nextPlan && selectedWeek === nextWeek?.weekKey && <AdminButton variant="outline" size="sm" onClick={() => void resendTest()} disabled={dirty || hasRemoteChange || saveState === 'saving'}>{saveState === 'saving' ? <Loader2 size={13} className="motion-safe:animate-spin" /> : <Send size={13} />} Send test</AdminButton>}
-            </div>
+        <div className="ep-head">
+          <h3>Before <span>Monday</span></h3>
+          <p>{nextWeek?.label} · automatic run at 15:00 UTC (09:00 MDT / 08:00 MST)</p>
+        </div>
+        <section className="ep-card ep-ready" aria-label="Monday readiness">
+          <div className="ep-ready-row">
+            <span className="ep-ready-icon" style={{ background: profilesError ? '#ffe1de' : '#e7f6ec' }}><Users size={17} /></span>
+            <div><h4>{profilesError ? 'Forecast unavailable' : profilesLoading ? 'Checking recipients' : 'Recipients ready'}</h4><p>{profilesLoading ? 'Loading recipient forecast…' : profilesError ? 'Open Readers to review the connection error before relying on these counts.' : `${scheduledAudience.length} scheduled: ${scheduledWelcome} welcome ${scheduledWelcome === 1 ? 'letter' : 'letters'} and ${scheduledWeekly} weekly ${scheduledWeekly === 1 ? 'email' : 'emails'}. ${heldAudience + attentionAudience} held.`}</p></div>
+            <button type="button" className="ep-btn" onClick={() => setPlannerView('readers')}>Readers</button>
           </div>
-
-          {message && <div className="border-t px-4 py-3 sm:px-5" style={{ borderColor: T.line }}><p role="status" className="text-xs" style={{ color: toneColor[messageTone] }}>{message}</p></div>}
-
-          {!dirty && !nextPlan && <div className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 sm:px-5" style={{ borderColor: T.line, background: T.surface }}><p className="text-[0.7rem]" style={{ color: T.muted }}>Need to add context this week? Personal stories, newsroom notes and announcements are available only when requested.</p><AdminButton variant="ghost" size="sm" onClick={() => void openNextCompose()}><PenLine size={13} /> Add optional opening</AdminButton></div>}
+          <div className="ep-ready-row">
+            <span className="ep-ready-icon" style={{ background: dirty ? '#fff4d6' : nextPlan ? '#e7f6ec' : '#fff' }}><PenLine size={17} /></span>
+            <div>{dirty ? <><h4>Opening note waiting for approval</h4><p>Your draft is saved on this device. The last approved email stays unchanged until you publish.</p></> : nextPlan ? <><h4>Opening note approved</h4><p>“{nextPlan.headline || CONTRIBUTION_STYLE_COPY[nextPlan.style]?.label || 'Editorial note'}” · revision {nextPlan.revision ?? 1} · {CONTRIBUTION_AUDIENCE_COPY[nextPlan.audience ?? 'everyone'].label.toLowerCase()}</p></> : <><h4>No opening note</h4><p>Optional. Every reader still gets their own email; a note adds context above the greeting.</p></>}</div>
+            <button type="button" className="ep-btn" onClick={() => void openNextCompose()}>{dirty ? 'Finish' : nextPlan ? 'Review' : 'Add one'}</button>
+          </div>
+          <div className="ep-ready-row">
+            <span className="ep-ready-icon" style={{ background: !PROOF_SERVICE_ENABLED ? '#ffe1de' : '#fff' }}><ShieldCheck size={17} /></span>
+            <div>{!PROOF_SERVICE_ENABLED ? <><h4 style={{ color: T.critical }}>Admin proof needs Firebase Blaze</h4><p>Cloud Functions is enabled, but Firebase is still on the free Spark plan. Upgrade, then deploy the proof function. Subscriber sends are separate and unaffected.</p></> : nextPlan && selectedWeek === nextWeek?.weekKey ? <DeliveryStatus request={latestTest} /> : <><h4>Admin proof</h4><p>{nextPlan ? 'Proof history is attached to the approved edition.' : 'Proofs are sent only when an opening note is published, updated or removed.'}</p></>}</div>
+            {!PROOF_SERVICE_ENABLED ? <a className="ep-btn" href="https://console.firebase.google.com/project/calgary-map-e70bb/usage/details" target="_blank" rel="noreferrer">Upgrade</a> : nextPlan && selectedWeek === nextWeek?.weekKey ? <button type="button" className="ep-btn" onClick={() => void resendTest()} disabled={dirty || hasRemoteChange || saveState === 'saving'}>{saveState === 'saving' ? <Loader2 size={13} className="motion-safe:animate-spin" /> : <Send size={13} />} Send test</button> : <span />}
+          </div>
+          {message && <div className="ep-ready-row"><span /><p role="status" className="text-xs" style={{ color: toneColor[messageTone] }}>{message}</p><span /></div>}
         </section>
-      )}
+      </>)}
+
+      {plannerView === 'compose' && <div className="ep-head">
+        <h3>An <span>opening note</span>, when it matters</h3>
+        <p>Optional. Most weeks every reader’s own email says enough. Add a note for news, a change or a story, and it sits above the greeting for the readers you choose.</p>
+      </div>}
 
       {plannerView === 'compose' && <section className="rounded-xl border bg-white px-4 py-3" style={{ borderColor: T.line }} aria-label="Selected email edition">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
@@ -907,13 +879,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
         </details>
       </section>}
 
-      {plannerView === 'audience' && <DigestAudienceForecast
-        profiles={profiles}
-        loading={profilesLoading}
-        error={profilesError}
-      />}
-
-      {plannerView === 'templates' && <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="template-routing-title">
+      {plannerView === 'rules' && <section className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }} aria-labelledby="template-routing-title">
         <div className="border-b px-4 py-3" style={{ borderColor: T.line }}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="template-routing-title" className="text-sm font-bold" style={{ color: T.ink }}>Template routing</h2>
@@ -971,55 +937,11 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
               </div>
             ))}
           </dl>
-          {activeTemplate.id === 'welcome' && !showWelcomePreview && (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3" style={{ borderColor: T.line }}>
-              <p className="max-w-2xl text-[0.72rem] leading-relaxed" style={{ color: T.muted }}>See the complete production letter with its Calgary Watch logo, onboarding explanation, sample weekly brief and legal footer.</p>
-              <AdminButton variant="outline" size="sm" onClick={() => void openWelcomePreview()}><Eye size={14} /> Preview welcome letter</AdminButton>
-            </div>
-          )}
-        </div>
-        {showWelcomePreview && (
-          <div className="border-t p-4 sm:p-5" style={{ borderColor: T.line, background: T.surface }}>
-            <div className="mx-auto max-w-[42rem]">
-              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-bold" style={{ color: T.ink }}>Welcome letter preview</p>
-                    <Chip tone="ok">Actual production template</Chip>
-                  </div>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed" style={{ color: T.muted }}>Subject: “Quick hello from Calgary Watch” · Sample recipient: Vicky in Beltline</p>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <a href={welcomePreviewUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[0.72rem] font-bold transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: T.line, color: T.ink, outlineColor: T.signal }}><Eye size={13} /> Open full size</a>
-                  <AdminButton variant="ghost" size="sm" onClick={() => setShowWelcomePreview(false)} aria-label="Close welcome letter preview"><X size={14} /> Close</AdminButton>
-                </div>
-              </div>
-              <div className="overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }}>
-                {welcomePreviewError ? (
-                  <div className="flex min-h-64 flex-col items-center justify-center gap-3 p-6 text-center" role="alert">
-                    <AlertTriangle size={22} style={{ color: T.critical }} />
-                    <p className="max-w-md text-xs leading-relaxed" style={{ color: T.muted }}>{welcomePreviewError}</p>
-                    <AdminButton variant="outline" size="sm" onClick={() => { setWelcomePreviewHtml(''); void openWelcomePreview(); }}><RefreshCw size={13} /> Try again</AdminButton>
-                  </div>
-                ) : welcomePreviewHtml ? (
-                  <iframe
-                    srcDoc={welcomePreviewHtml}
-                    title="Calgary Watch welcome letter preview"
-                    className="block h-[46rem] w-full bg-white"
-                    sandbox=""
-                  />
-                ) : (
-                  <div className="h-[46rem] space-y-5 p-8 motion-safe:animate-pulse" aria-label="Loading welcome letter preview">
-                    <div className="mx-auto h-12 w-52 rounded-lg" style={{ background: T.line }} />
-                    <div className="mx-auto h-40 max-w-lg rounded-xl" style={{ background: T.surface }} />
-                    <div className="mx-auto h-56 max-w-lg rounded-xl" style={{ background: T.surface }} />
-                  </div>
-                )}
-              </div>
-              <p className="mt-2 text-center text-[0.68rem]" style={{ color: T.muted }}>Preview data is illustrative. Every real recipient receives their own location-aware sample and unsubscribe link.</p>
-            </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3" style={{ borderColor: T.line }}>
+            <p className="max-w-2xl text-[0.72rem] leading-relaxed" style={{ color: T.muted }}>Every version of this email, rendered from the production template with sample readers, is in Every email.</p>
+            <AdminButton variant="outline" size="sm" onClick={() => openEmail(activeTemplate.id === 'welcome' ? 'welcome.html' : 'digest.html')}><Eye size={14} /> Open {activeTemplate.id === 'welcome' ? 'the welcome letters' : 'the Monday emails'}</AdminButton>
           </div>
-        )}
+        </div>
       </section>}
 
       {plannerView === 'compose' && hasRemoteChange && (
@@ -1035,7 +957,7 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
         </div>
       )}
 
-      {plannerView === 'compose' && <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(350px,0.92fr)]">
+      {plannerView === 'compose' && <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(350px,0.92fr)] [&>*]:min-w-0">
         <Panel title="Weekly opening note" subtitle="Optional. It appears only in the recurring weekly brief, before the automated neighbourhood briefing." action={saveState === 'loading'
           ? <Chip tone="attention"><Loader2 size={11} className="motion-safe:animate-spin" /> Loading</Chip>
           : reusablePlan ? <AdminButton variant="ghost" size="sm" onClick={copyAnotherEdition} disabled={saveState === 'saving'}><Copy size={13} /> Reuse edition</AdminButton> : undefined}>
@@ -1166,24 +1088,27 @@ export function WeeklyEmailPlanner({ profiles, profilesLoading, profilesError }:
               <div className="flex min-w-0 gap-3 text-xs"><span className="shrink-0 font-bold" style={{ color: T.ink }}>Calgary Watch</span><p className="min-w-0 truncate" style={{ color: T.muted }}><strong style={{ color: T.ink }}>Your personalized weekly subject</strong> — {preheader.trim() || 'Automatic neighbourhood summary'}</p></div>
             </div>
             {previewMode === 'text' ? (
-              <pre className="max-h-[36rem] overflow-auto whitespace-pre-wrap p-5 text-xs leading-relaxed" style={{ background: '#0E1A17', color: '#DCD3C4', fontFamily: mono }}>{previewShowsOpening ? plainTextPreview : `OPENING NOTE NOT SHOWN\n\nThis ${previewScope} reader is outside the selected audience. Their normal personalized weekly brief continues unchanged.`}</pre>
-            ) : <div className="overflow-x-auto p-3 sm:p-5" style={{ background: '#0E1A17' }}>
-              <div className={`mx-auto transition-[max-width] duration-200 ${previewWidth === 'mobile' ? 'max-w-[20rem]' : 'max-w-[34rem]'}`} style={{ color: '#DCD3C4' }}>
-                <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: '#E0AC63' }}>
+              <pre className="max-h-[36rem] overflow-auto whitespace-pre-wrap p-5 text-xs leading-relaxed" style={{ background: '#06162F', color: '#C9D6E4', fontFamily: mono }}>{previewShowsOpening ? plainTextPreview : `OPENING NOTE NOT SHOWN\n\nThis ${previewScope} reader is outside the selected audience. Their normal personalized weekly brief continues unchanged.`}</pre>
+            ) : <div className="overflow-x-auto p-3 sm:p-5" style={{ background: '#06162F' }}>
+              <div className={`mx-auto transition-[max-width] duration-200 ${previewWidth === 'mobile' ? 'max-w-[20rem]' : 'max-w-[34rem]'}`} style={{ color: '#C9D6E4' }}>
+                <div className="flex items-center justify-between border-b-2 pb-3" style={{ borderColor: '#FFDF4F' }}>
                   <div className="flex items-center gap-2.5">
                     <img src="/images/email/logo.png" width="40" height="40" alt="" className="h-10 w-10 object-contain" />
-                    <div><p className="text-[0.68rem] font-bold tracking-[0.16em]" style={{ color: '#F4EEE3' }}>CALGARY WATCH</p><p className="mt-1 text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.label}</p></div>
+                    <div><p className="text-[0.68rem] font-bold tracking-[0.16em]" style={{ color: '#F2EFE8' }}>CALGARY WATCH</p><p className="mt-1 text-[0.65rem]" style={{ color: '#9DB2C9' }}>{selected?.label}</p></div>
                   </div>
-                  <span className="text-[0.65rem]" style={{ color: '#A6B8AE' }}>{selected?.weekKey}</span>
+                  <span className="text-[0.65rem]" style={{ color: '#9DB2C9' }}>{selected?.weekKey}</span>
                 </div>
                 <div className="py-5">
+                  <div className="mb-5 flex items-end justify-between gap-3 rounded-xl p-4" style={{ background: previewScope === 'local' ? '#1554D1' : '#15305A', color: '#fff' }}>
+                    <div><p className="text-[0.6rem] font-bold uppercase tracking-[0.14em]" style={{ color: '#FFDF4F', fontFamily: mono }}>Monday brief · {previewScope === 'local' ? 'their area' : 'Calgary'}</p><p className="mt-2 text-lg font-extrabold leading-tight" style={{ fontFamily: display }}>{previewScope === 'local' ? 'Their area’s week' : 'Calgary’s week'}</p></div>
+                    <p className="text-4xl font-extrabold leading-none" style={{ fontFamily: display }}>#</p>
+                  </div>
                   {previewShowsOpening
                     ? <OpeningPreview style={style} headline={headline} body={body} weekKey={selected?.weekKey ?? ''} byline={byline} ctaLabel={validCta ? ctaLabel : ''} />
-                    : <div className="rounded-md border px-4 py-3 text-[0.72rem] leading-relaxed" style={{ borderColor: '#3A5A4E', color: '#A6B8AE' }}>This reader is outside the selected opening-note audience. Their standard weekly brief begins here.</div>}
+                    : <div className="rounded-md border px-4 py-3 text-[0.72rem] leading-relaxed" style={{ borderColor: '#2E5287', color: '#9DB2C9' }}>This reader is outside the selected opening-note audience. Their standard weekly brief begins here.</div>}
                   <div className={previewShowsOpening ? 'pt-6' : 'pt-4'}>
-                    <p className="text-xl font-bold" style={{ fontFamily: display, color: '#F4EEE3' }}>Morning, neighbour.</p>
-                    <p className="mt-2 text-[0.78rem] leading-relaxed" style={{ color: '#A6B8AE' }}>The regular location-based summary, weekly comparison and report list continue below.</p>
-                    <div className="mt-4 rounded-md p-3" style={{ background: '#17251F', border: '1px solid #2C443B' }}><div className="flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-[0.12em]" style={{ color: '#E0AC63' }}><span>This week</span><span style={{ color: '#A6B8AE' }}>Your area</span></div></div>
+                    <p className="text-xl font-bold" style={{ fontFamily: display, color: '#F2EFE8' }}>Morning, neighbour.</p>
+                    <p className="mt-2 text-[0.78rem] leading-relaxed" style={{ color: '#9DB2C9' }}>Their own day-by-day strip, CW pick angle and report list continue below, built for each reader on Monday.</p>
                   </div>
                 </div>
               </div>

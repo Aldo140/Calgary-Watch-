@@ -10,34 +10,28 @@ import { Chip, EmptyState, Figure, Panel, StatGrid, StatTile, T, mono } from './
 
 type Raw = Record<string, unknown> & { uid: string };
 
-const CASES = [
-  { file: 'thursday-first.html', label: 'First email', who: 'Every reader’s first Thursday', note: 'Opens with a short hello, then their picks. Offers Monday if they don’t get it.' },
-  { file: 'thursday.html', label: 'Picks + reminders', who: 'A reader who said “I’m going”', note: 'Reminders first, then up to eight picks matched to their interests, nearest given a head start.' },
-  { file: 'thursday-fallback.html', label: 'Nothing matched', who: 'Interests with no listings this week', note: 'Says so plainly, then up to five things that are on. Never an empty email.' },
-  { file: 'thursday-going-only.html', label: 'Reminder only', who: 'Nothing new, but going to something', note: 'Just the reminder.' },
-  { file: 'thursday-no-area.html', label: 'No home area', who: 'Picks without a neighbourhood', note: 'No distances, and a one-line prompt to add their area.' },
-  { file: 'digest.html', label: 'Monday, Monday-only', who: 'Monday reader not on Thursday', note: 'The Monday brief with one Thursday offer at the bottom.' },
-  { file: 'combined-first.html', label: 'Both lists: your week', who: 'Reader on both lists', note: 'One Monday email: week at a glance, 01 Near home, 02 Out & about. Thursday skips them that week. First one explains the merge.' },
-  { file: 'combined-quiet-fallback.html', label: 'Both, quiet + no match', who: 'Quiet week, interests with no listings', note: '“Quiet streets. Plenty on.” then what else is on.' },
-  { file: 'combined-going-only.html', label: 'Both, reminder only', who: 'No new picks, but going to something', note: 'Safety chapter plus the reminder.' },
-] as const;
+export interface ThursdayData {
+  thursday: Raw[] | null;
+  accounts?: number;
+  pendingUnsubs?: number;
+  ledger: Array<{ status?: string; mode?: string; first?: boolean }> | null;
+  week: string;
+}
 
 /**
- * Thursday picks, from the admin side: who is on which list, who will
- * actually receive Thursday's email and why anyone won't, what this week's
- * run did, and the exact email for every case the sender can produce.
+ * The Thursday list, read once for the whole planner: the segment overview
+ * and the readers view both need it, and two components reading the same
+ * thousand profiles would double the cost for nothing.
  */
-export function ThursdayPicksPanel({ mondayProfiles }: { mondayProfiles: UserProfile[] }) {
+export function useThursdayData(fixture?: Raw[]): ThursdayData {
   const [thursday, setThursday] = useState<Raw[] | null>(null);
   const [accounts, setAccounts] = useState<number | undefined>();
   const [pendingUnsubs, setPendingUnsubs] = useState<number | undefined>();
   const [ledger, setLedger] = useState<Array<{ status?: string; mode?: string; first?: boolean }> | null>(null);
-  const [preview, setPreview] = useState<(typeof CASES)[number]['file']>('thursday-first.html');
-  const [html, setHtml] = useState('');
   const week = digestWeekKey(Date.now());
 
   useEffect(() => {
-    if (!db) { setThursday([]); setLedger([]); return; }
+    if (!db) { setThursday(fixture ?? []); setLedger([]); return; }
     const database = db;
     getDocs(query(collection(database, 'users'), where('eventsDigestOptIn', '==', true), limit(1000)))
       .then((s) => setThursday(s.docs.map((d) => ({ ...d.data(), uid: d.id }))))
@@ -47,17 +41,19 @@ export function ThursdayPicksPanel({ mondayProfiles }: { mondayProfiles: UserPro
     getDocs(query(collection(database, 'events_digest_sends'), where('weekKey', '==', week), limit(1000)))
       .then((s) => setLedger(s.docs.map((d) => d.data())))
       .catch(() => setLedger([]));
-  }, [week]);
+  }, [week, fixture]);
 
-  useEffect(() => {
-    let live = true;
-    setHtml('');
-    fetch(`${import.meta.env.BASE_URL}email-previews/${preview}`, { cache: 'no-store' })
-      .then((r) => (r.ok ? r.text() : Promise.reject()))
-      .then((t) => { if (live) setHtml(t); })
-      .catch(() => { if (live) setHtml(''); });
-    return () => { live = false; };
-  }, [preview]);
+  return { thursday, accounts, pendingUnsubs, ledger, week };
+}
+
+/**
+ * Thursday picks, from the admin side: who is on which list, who will
+ * actually receive Thursday's email and why anyone won't, and what this
+ * week's run did. Every Thursday email itself lives in the planner's
+ * "Every email" gallery.
+ */
+export function ThursdayPicksPanel({ mondayProfiles, data }: { mondayProfiles: UserProfile[]; data: ThursdayData }) {
+  const { thursday, accounts, pendingUnsubs, ledger, week } = data;
 
   const m = useMemo(() => {
     const mon = new Set(mondayProfiles.map((p) => p.uid));
@@ -82,7 +78,6 @@ export function ThursdayPicksPanel({ mondayProfiles }: { mondayProfiles: UserPro
 
   const sent = (ledger ?? []).filter((l) => l.status === 'sent');
   const byMode = sent.reduce<Record<string, number>>((acc, l) => { const k = l.mode ?? 'picks'; acc[k] = (acc[k] ?? 0) + 1; return acc; }, {});
-  const active = CASES.find((c) => c.file === preview)!;
 
   return (
     <div className="space-y-4">
@@ -134,26 +129,6 @@ export function ThursdayPicksPanel({ mondayProfiles }: { mondayProfiles: UserPro
         </Panel>
       </div>
 
-      <Panel title="Every email, every case" subtitle="The production template with sample data. Real sends use each reader’s interests, area and plans." padded={false}>
-        <div className="p-3 sm:p-4 flex gap-1.5 overflow-x-auto" style={{ background: T.surface }}>
-          {CASES.map((c) => (
-            <button key={c.file} type="button" aria-pressed={c.file === preview} onClick={() => setPreview(c.file)} className="shrink-0 rounded-lg border px-3 py-2 text-left" style={{ background: c.file === preview ? T.card : 'transparent', borderColor: c.file === preview ? T.signal : T.line, minWidth: '10rem' }}>
-              <span className="block text-xs font-bold" style={{ color: c.file === preview ? T.signal : T.ink }}>{c.label}</span>
-              <span className="block text-[0.66rem]" style={{ color: T.muted }}>{c.who}</span>
-            </button>
-          ))}
-        </div>
-        <div className="px-4 py-3 border-y text-xs flex flex-wrap items-center gap-2" style={{ borderColor: T.line, color: T.muted }}>
-          {active.file.startsWith('digest') ? <Chip tone="signal"><MapPin size={11} /> Monday</Chip> : <Chip tone="ok"><CalendarHeart size={11} /> Thursday</Chip>}
-          <span className="flex-1">{active.note}</span>
-          <a href={`${import.meta.env.BASE_URL}email-previews/${active.file}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-bold" style={{ color: T.ink }}><Eye size={13} /> Full size</a>
-        </div>
-        <div className="p-3 sm:p-5" style={{ background: T.surface }}>
-          <div className="mx-auto max-w-[42rem] overflow-hidden rounded-xl border bg-white" style={{ borderColor: T.line }}>
-            {html ? <iframe srcDoc={html} title={`${active.label} email preview`} className="block h-[46rem] w-full" sandbox="" /> : <p className="p-8 text-center text-sm" style={{ color: T.muted }}>Previews are built with the site. Run <code>npm run build</code> (or the deploy) to refresh them.</p>}
-          </div>
-        </div>
-      </Panel>
     </div>
   );
 }

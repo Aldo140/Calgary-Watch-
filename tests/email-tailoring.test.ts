@@ -85,9 +85,12 @@ describe('reader segments', () => {
       [thursday('both'), thursday('newboth'), thursday('thu'), thursday('thu-noarea', { neighborhood: undefined })],
     );
     assert.deepEqual(result.counts, {
-      welcome: 2, 'welcome-city': 0, both: 1, 'monday-home': 1, 'monday-city': 1, thursday: 1, 'thursday-no-area': 1,
+      welcome: 1, 'welcome-city': 0, 'welcome-both': 1, both: 1, 'monday-home': 1, 'monday-city': 1, thursday: 1, 'thursday-no-area': 1,
     });
     assert.equal(result.total, 7);
+    // Everyone on both lists is visible as such: the new one in their welcome, the rest combined.
+    assert.deepEqual(result.members['welcome-both'].map((p) => p.uid), ['newboth']);
+    assert.deepEqual(result.members.both.map((p) => p.uid), ['both']);
   });
 
   it('counts unmailable opt-ins separately instead of hiding them', () => {

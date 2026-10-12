@@ -273,6 +273,8 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
   const { user } = useAuth();
   const profiles = DEV_SAMPLE && !liveProfiles.length ? SAMPLE_MONDAY : liveProfiles;
   const profilesLoading = DEV_SAMPLE ? false : liveLoading;
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
+  const toggleGroup = (id: string) => setOpenGroups((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   const thursdayData = useThursdayData(DEV_SAMPLE ? SAMPLE_THURSDAY : undefined);
   const emailCases = useEmailManifest();
   const [galleryFile, setGalleryFile] = useState('digest.html');
@@ -684,6 +686,7 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
   const thursdaySegments = SEGMENTS.filter((seg) => seg.day === 'Thursday');
   const mondayCount = mondaySegments.reduce((n, seg) => n + segments.counts[seg.id], 0);
   const thursdayCount = thursdaySegments.reduce((n, seg) => n + segments.counts[seg.id], 0);
+  const bothLists = segments.counts.both + segments.counts['welcome-both'];
   const activeVersions = SEGMENTS.filter((seg) => segments.counts[seg.id] > 0).length;
   const thursdayDate = useMemo(() => {
     const at = new Date();
@@ -761,13 +764,13 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
               <div className="ep-send-top"><span className="ep-send-day"><i className="tone-blue" />Monday · {mondayDate}</span><span>09:00 Calgary</span></div>
               <p className="ep-send-n">{profilesLoading ? '…' : mondayCount}<small>emails</small></p>
               {mix(mondaySegments, mondayCount)}
-              <p className="ep-send-note">{segments.counts.welcome + segments.counts['welcome-city']} welcome letters · {segments.counts.both} combined weeks · {segments.counts['monday-home'] + segments.counts['monday-city']} Monday briefs</p>
+              <p className="ep-send-note">{segments.counts.welcome + segments.counts['welcome-city'] + segments.counts['welcome-both']} welcome letters · {segments.counts.both} combined weeks · {segments.counts['monday-home'] + segments.counts['monday-city']} Monday briefs</p>
             </div>
             <div className="ep-send">
               <div className="ep-send-top"><span className="ep-send-day"><i className="tone-yellow" />Thursday · {thursdayDate}</span><span>08:00 Calgary</span></div>
               <p className="ep-send-n">{thursdayData.thursday === null ? '…' : thursdayCount}<small>emails</small></p>
               {mix(thursdaySegments, thursdayCount)}
-              <p className="ep-send-note">{segments.counts.both ? `${segments.counts.both} on both lists already get their picks inside Monday’s email.` : 'Readers on both lists get their picks inside Monday’s email.'}</p>
+              <p className="ep-send-note">{bothLists ? `${bothLists} on both lists get one email on Monday instead${segments.counts['welcome-both'] ? ` (${segments.counts['welcome-both']} of them new, so their welcome covers both)` : ''}.` : 'Readers on both lists get one email on Monday instead.'}</p>
             </div>
           </div>
           <div className="ep-hero-ctas">
@@ -784,17 +787,33 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
           {SEGMENTS.map((seg) => {
             const n = segments.counts[seg.id];
             const share = segments.total ? Math.round((n / segments.total) * 100) : 0;
+            const people = segments.members[seg.id];
+            const open = openGroups.has(seg.id);
+            const shown = open ? people : people.slice(0, 4);
             return (
-              <button key={seg.id} type="button" className="ep-card ep-seg" onClick={() => openEmail(seg.file)} aria-label={`${seg.label}: ${n} readers. Open their email`}>
+              <article key={seg.id} className="ep-card ep-seg" aria-label={`${seg.label}: ${n} readers`}>
                 <div className={`ep-seg-cover tone-${seg.tone}`}><small>{seg.day}</small><strong>{profilesLoading ? '…' : n}</strong></div>
                 <div className="ep-seg-body">
                   <h4>{seg.label}</h4>
                   <p>{seg.who}</p>
                   <p style={{ color: '#151515' }}>{seg.tailored}</p>
                   <div className="ep-share" aria-hidden><i style={{ width: `${share}%` }} /></div>
+                  {people.length ? (
+                    <ul className="ep-seg-people" aria-label={`Readers in ${seg.label}`}>
+                      {shown.map((p) => (
+                        <li key={p.uid}>
+                          <b>{p.displayName?.trim() || p.email?.split('@')[0] || 'Unnamed reader'}</b>
+                          <span>{(p.neighborhood || p.inferredNeighborhood || '').trim() || 'No area'}</span>
+                        </li>
+                      ))}
+                      {people.length > 4 && (
+                        <li><button type="button" className="ep-seg-more" aria-expanded={open} onClick={() => toggleGroup(seg.id)}>{open ? 'Show fewer' : `+ ${people.length - 4} more`}</button></li>
+                      )}
+                    </ul>
+                  ) : <p className="ep-seg-none">Nobody this week</p>}
                 </div>
-                <div className="ep-seg-foot">See their email →<span>{share}% of readers</span></div>
-              </button>
+                <button type="button" className="ep-seg-foot" onClick={() => openEmail(seg.file)}>See their email →<span>{share}% of readers</span></button>
+              </article>
             );
           })}
         </div>

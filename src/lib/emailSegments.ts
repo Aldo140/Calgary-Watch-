@@ -17,7 +17,7 @@ import { eventsConsentRefusal } from './eventsDigest';
 import { normalizeInterests } from './eventPicks';
 
 export type SegmentId =
-  | 'welcome' | 'welcome-city' | 'both' | 'monday-home' | 'monday-city'
+  | 'welcome' | 'welcome-city' | 'welcome-both' | 'both' | 'monday-home' | 'monday-city'
   | 'thursday' | 'thursday-no-area';
 
 export interface SegmentDefinition {
@@ -36,6 +36,7 @@ export interface SegmentDefinition {
 export const SEGMENTS: readonly SegmentDefinition[] = [
   { id: 'welcome', label: 'New, with an area', who: 'First Monday, neighbourhood saved', file: 'welcome.html', tone: 'paper', day: 'Monday', tailored: 'A hello, their setup checklist, and a sample of their own area’s week.' },
   { id: 'welcome-city', label: 'New, no area yet', who: 'First Monday, nothing saved', file: 'welcome-city.html', tone: 'paper', day: 'Monday', tailored: 'Checklist flags the missing area with a one-tap fix.' },
+  { id: 'welcome-both', label: 'New, on both lists', who: 'First Monday, also on Thursday picks', file: 'welcome-both.html', tone: 'paper', day: 'Monday', tailored: 'One hello for both lists. No Thursday email this week; the combined week starts next Monday.' },
   { id: 'both', label: 'Both lists', who: 'Monday brief and Thursday picks', file: 'combined.html', tone: 'week', day: 'Monday', tailored: 'One “your week” email: their blocks, then the pick of the week.' },
   { id: 'monday-home', label: 'Monday, near home', who: 'Monday only, area saved', file: 'digest.html', tone: 'blue', day: 'Monday', tailored: 'Their count, day-by-day strip and CW pick angle, closest first.' },
   { id: 'monday-city', label: 'Monday, whole city', who: 'Monday only, no area', file: 'city.html', tone: 'city', day: 'Monday', tailored: 'Where reports landed across Calgary, and a “make it yours” ask.' },
@@ -52,6 +53,8 @@ export type SegmentProfile = DigestRecipient & {
 
 export interface SegmentCounts {
   counts: Record<SegmentId, number>;
+  /** The readers in each segment, in list order, for naming them. */
+  members: Record<SegmentId, SegmentProfile[]>;
   /** Mailable readers in any segment. */
   total: number;
   /** Monday readers who narrowed their topics: a modifier, not a segment. */
@@ -65,7 +68,8 @@ export interface SegmentCounts {
 const hasArea = (p: SegmentProfile) => Boolean((p.neighborhood || p.inferredNeighborhood || '').trim());
 
 export function segmentReaders(monday: SegmentProfile[], thursday: SegmentProfile[]): SegmentCounts {
-  const counts = Object.fromEntries(SEGMENTS.map((s) => [s.id, 0])) as Record<SegmentId, number>;
+  const members = Object.fromEntries(SEGMENTS.map((s) => [s.id, [] as SegmentProfile[]])) as Record<SegmentId, SegmentProfile[]>;
+  const put = (id: SegmentId, p: SegmentProfile) => { members[id].push(p); };
   let topicFiltered = 0;
   let noInterests = 0;
   let blocked = 0;
@@ -88,17 +92,19 @@ export function segmentReaders(monday: SegmentProfile[], thursday: SegmentProfil
     mondayUids.add(p.uid);
     if (p.digestCategories?.length) topicFiltered += 1;
     // The welcome always wins: the sender never folds a first email into the
-    // combined week, so a new both-lists reader is a welcome this Monday.
-    if (digestDeliveryKind(p) === 'welcome') counts[hasArea(p) ? 'welcome' : 'welcome-city'] += 1;
-    else if (thursdayOk.has(p.uid)) counts.both += 1;
-    else counts[hasArea(p) ? 'monday-home' : 'monday-city'] += 1;
+    // combined week, so a new both-lists reader gets the welcome as their one
+    // hello for both, and Thursday skips them that week.
+    if (digestDeliveryKind(p) === 'welcome') put(thursdayOk.has(p.uid) ? 'welcome-both' : hasArea(p) ? 'welcome' : 'welcome-city', p);
+    else if (thursdayOk.has(p.uid)) put('both', p);
+    else put(hasArea(p) ? 'monday-home' : 'monday-city', p);
   }
 
   for (const [uid, p] of thursdayOk) {
     if (mondayUids.has(uid)) continue;
-    counts[hasArea(p) ? 'thursday' : 'thursday-no-area'] += 1;
+    put(hasArea(p) ? 'thursday' : 'thursday-no-area', p);
   }
 
+  const counts = Object.fromEntries(SEGMENTS.map((s) => [s.id, members[s.id].length])) as Record<SegmentId, number>;
   const total = Object.values(counts).reduce((n, c) => n + c, 0);
-  return { counts, total, topicFiltered, noInterests, blocked };
+  return { counts, members, total, topicFiltered, noInterests, blocked };
 }

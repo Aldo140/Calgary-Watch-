@@ -17,6 +17,7 @@ import {
   inSendWindow, isStopRequest, leadIdFor, normalizeEmail, parseBounce, sendBlocker, signature, websiteFor, type Bounce,
 } from '../lib/leads';
 import { inboxSince, outlookConfigured, replyInThread, sendNew } from '../lib/outlook';
+import { reportOutreach } from '../lib/hqOutreach';
 import { resendConfigured, sendViaResend } from '../lib/resend';
 import type { DiscoveryIndex, Entity } from '../lib/posts';
 import { calgaryDate } from '../lib/time';
@@ -345,6 +346,11 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   // per-run cap is sized for that: it still spreads the day's sends over several runs.
   let budget = Math.min(cfg.limits.sendsPerDay - sentToday, cfg.limits.sendsPerRun ?? Infinity);
   const approved = (await db.collection(COLLECTIONS.leads).where('status', '==', 'approved').get()).docs;
+  // Text Aldo when a run has email to send, and again with how it went.
+  const planned = Math.max(0, Math.min(budget, approved.length));
+  const sentNames: string[] = [];
+  let failed: { business: string; error: string } | null = null;
+  if (planned) await reportOutreach({ event: 'start', planned }, log);
   for (const doc of approved) {
     if (budget <= 0) { log('Send limit for this run or today reached.'); break; }
     const lead = doc.data() as PartnerLead;
@@ -361,11 +367,16 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
         updatedAt: now, history: push(event('sent', `${isFollowUp ? 'Follow-up' : 'First email'} sent to ${lead.contactEmail}: "${lead.draftSubject}"`)),
       });
       budget--;
+      sentNames.push(lead.businessName);
       log(`sent: ${lead.businessName} (${lead.contactEmail})`);
     } catch (e) {
       await doc.ref.update({ notes: `Send failed: ${e instanceof Error ? e.message : e}`, updatedAt: now });
+      failed ??= { business: lead.businessName, error: String(e instanceof Error ? e.message : e).slice(0, 300) };
       log(`send failed for ${lead.businessName}: ${e instanceof Error ? e.message : e}`);
     }
+  }
+  if (planned) {
+    await reportOutreach({ event: 'done', sent: sentNames, failed, sentToday: sentToday + sentNames.length, cap: cfg.limits.sendsPerDay, left: Math.max(0, approved.length - sentNames.length) }, log);
   }
 }
 

@@ -59,8 +59,8 @@ function inlineFormatting(value) {
   let cursor = 0;
   for (const match of source.matchAll(pattern)) {
     output += escapeHtml(source.slice(cursor, match.index));
-    if (match[1]) output += `<strong style="font-weight:700;color:#F4EEE3;">${escapeHtml(match[1])}</strong>`;
-    else output += `<a href="${escapeHtml(match[3])}" style="color:#5CC3AA;font-weight:700;text-decoration:underline;">${escapeHtml(match[2])}</a>`;
+    if (match[1]) output += `<strong style="font-weight:700;color:#F2EFE8;">${escapeHtml(match[1])}</strong>`;
+    else output += `<a href="${escapeHtml(match[3])}" style="color:#87DCE8;font-weight:700;text-decoration:underline;">${escapeHtml(match[2])}</a>`;
     cursor = match.index + match[0].length;
   }
   return output + escapeHtml(source.slice(cursor)).replace(/\n/g, '<br>');
@@ -73,18 +73,18 @@ function formattedBody(value) {
   let list = [];
   const flushParagraph = () => {
     const text = paragraph.join('\n').trim();
-    if (text) blocks.push(`<p style="margin:12px 0 0;font:400 15px/1.62 Arial,sans-serif;color:#DCD3C4;">${inlineFormatting(text)}</p>`);
+    if (text) blocks.push(`<p style="margin:12px 0 0;font:400 15px/1.62 Arial,sans-serif;color:#C9D6E4;">${inlineFormatting(text)}</p>`);
     paragraph = [];
   };
   const flushList = () => {
-    if (list.length) blocks.push(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">${list.map((item) => `<tr><td width="18" style="width:18px;vertical-align:top;color:#E0AC63;font:700 15px/1.6 Arial,sans-serif;">•</td><td style="padding-bottom:5px;color:#DCD3C4;font:400 15px/1.6 Arial,sans-serif;">${inlineFormatting(item)}</td></tr>`).join('')}</table>`);
+    if (list.length) blocks.push(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">${list.map((item) => `<tr><td width="18" style="width:18px;vertical-align:top;color:#FFDF4F;font:700 15px/1.6 Arial,sans-serif;">•</td><td style="padding-bottom:5px;color:#C9D6E4;font:400 15px/1.6 Arial,sans-serif;">${inlineFormatting(item)}</td></tr>`).join('')}</table>`);
     list = [];
   };
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) { flushParagraph(); flushList(); }
-    else if (/^##\s+/.test(trimmed)) { flushParagraph(); flushList(); blocks.push(`<div style="padding-top:15px;color:#F4EEE3;font:700 17px/1.35 Georgia,serif;">${inlineFormatting(trimmed.replace(/^##\s+/, ''))}</div>`); }
-    else if (/^>\s?/.test(trimmed)) { flushParagraph(); flushList(); blocks.push(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:13px;"><tr><td width="3" style="width:3px;background:#E0AC63;font-size:0;">&nbsp;</td><td style="padding-left:13px;color:#DCD3C4;font:italic 400 15px/1.62 Georgia,serif;">${inlineFormatting(trimmed.replace(/^>\s?/, ''))}</td></tr></table>`); }
+    else if (/^##\s+/.test(trimmed)) { flushParagraph(); flushList(); blocks.push(`<div style="padding-top:15px;color:#F2EFE8;font:700 17px/1.35 'Bricolage Grotesque',Arial,sans-serif;">${inlineFormatting(trimmed.replace(/^##\s+/, ''))}</div>`); }
+    else if (/^>\s?/.test(trimmed)) { flushParagraph(); flushList(); blocks.push(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:13px;"><tr><td width="3" style="width:3px;background:#FFDF4F;font-size:0;">&nbsp;</td><td style="padding-left:13px;color:#C9D6E4;font:italic 400 15px/1.62 'Bricolage Grotesque',Arial,sans-serif;">${inlineFormatting(trimmed.replace(/^>\s?/, ''))}</td></tr></table>`); }
     else if (/^-\s+/.test(trimmed)) { flushParagraph(); list.push(trimmed.replace(/^-\s+/, '')); }
     else { flushList(); paragraph.push(trimmed); }
   }
@@ -121,67 +121,67 @@ function renderPreview(value) {
   const audienceLabel = AUDIENCE_LABELS[value.audience || 'everyone'];
   const title = cancelled ? `${value.planWeekKey} will use the standard brief` : value.headline.trim() || label;
   const paragraphs = formattedBody(value.body.trim());
-  const extras = `${value.byline?.trim() ? `<div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">${escapeHtml(value.byline.trim())}</div>` : ''}${value.ctaLabel?.trim() && validHttpsUrl(value.ctaUrl) ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:17px;"><tr><td style="background:#F4EEE3;border-radius:3px;"><a href="${escapeHtml(validHttpsUrl(value.ctaUrl))}" style="display:inline-block;padding:11px 17px;color:#0E1A17;font:700 13px/1 Arial,sans-serif;text-decoration:none;">${escapeHtml(value.ctaLabel.trim())} →</a></td></tr></table>` : ''}`;
+  const extras = `${value.byline?.trim() ? `<div style="font:600 12px/1.5 Arial,sans-serif;color:#9DB2C9;padding-top:15px;">${escapeHtml(value.byline.trim())}</div>` : ''}${value.ctaLabel?.trim() && validHttpsUrl(value.ctaUrl) ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:17px;"><tr><td style="background:#FFDF4F;border-radius:999px;"><a href="${escapeHtml(validHttpsUrl(value.ctaUrl))}" style="display:inline-block;padding:11px 17px;color:#06162F;font:700 13px/1 Arial,sans-serif;text-decoration:none;">${escapeHtml(value.ctaLabel.trim())} →</a></td></tr></table>` : ''}`;
 
   const opening = (() => {
     if (cancelled) {
-      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:6px;">
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E2242;border:1px solid #22406C;border-radius:6px;">
         <tr><td style="padding:20px;">
-          <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
-          <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
+          <div style="font:700 11px/1 Arial,sans-serif;color:#FFDF4F;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
+          <div style="font:700 22px/1.3 'Bricolage Grotesque',Arial,sans-serif;color:#F2EFE8;padding-top:11px;">${escapeHtml(title)}</div>
           ${paragraphs}${extras}
         </td></tr>
       </table>`;
     }
     if (value.style === 'news-brief') {
-      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:3px;">
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E2242;border:1px solid #22406C;border-radius:3px;">
         <tr><td style="padding:18px 20px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-            <td style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</td>
-            <td align="right" style="font:400 10px/1 monospace;color:#A6B8AE;">${escapeHtml(value.planWeekKey)}</td>
+            <td style="font:700 11px/1 Arial,sans-serif;color:#FFDF4F;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</td>
+            <td align="right" style="font:400 10px/1 monospace;color:#9DB2C9;">${escapeHtml(value.planWeekKey)}</td>
           </tr></table>
-          <div style="font:700 21px/1.3 Georgia,serif;color:#F4EEE3;padding-top:12px;">${escapeHtml(title)}</div>
+          <div style="font:700 21px/1.3 'Bricolage Grotesque',Arial,sans-serif;color:#F2EFE8;padding-top:12px;">${escapeHtml(title)}</div>
           ${paragraphs}${extras}
         </td></tr>
       </table>`;
     }
     if (value.style === 'personal-story') {
-      return `<div style="border-top:1px solid #3A5A4E;border-bottom:1px solid #3A5A4E;padding:19px 4px 20px;">
-        <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
-        <div style="font:700 23px/1.3 Georgia,serif;color:#F4EEE3;padding-top:12px;">${escapeHtml(title)}</div>
-        ${paragraphs}${extras || '<div style="font:600 12px/1.5 Arial,sans-serif;color:#A6B8AE;padding-top:15px;">From the Calgary Watch team</div>'}
+      return `<div style="border-top:1px solid #2E5287;border-bottom:1px solid #2E5287;padding:19px 4px 20px;">
+        <div style="font:700 11px/1 Arial,sans-serif;color:#FFDF4F;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
+        <div style="font:700 23px/1.3 'Bricolage Grotesque',Arial,sans-serif;color:#F2EFE8;padding-top:12px;">${escapeHtml(title)}</div>
+        ${paragraphs}${extras || '<div style="font:600 12px/1.5 Arial,sans-serif;color:#9DB2C9;padding-top:15px;">From the Calgary Watch team</div>'}
       </div>`;
     }
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#17251F;border:1px solid #2C443B;border-radius:6px;">
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E2242;border:1px solid #22406C;border-radius:6px;">
       <tr><td style="padding:20px;">
-        <div style="font:700 11px/1 Arial,sans-serif;color:#E0AC63;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
-        <div style="font:700 22px/1.3 Georgia,serif;color:#F4EEE3;padding-top:11px;">${escapeHtml(title)}</div>
+        <div style="font:700 11px/1 Arial,sans-serif;color:#FFDF4F;letter-spacing:1.7px;text-transform:uppercase;">${escapeHtml(label)}</div>
+        <div style="font:700 22px/1.3 'Bricolage Grotesque',Arial,sans-serif;color:#F2EFE8;padding-top:11px;">${escapeHtml(title)}</div>
         ${paragraphs}${extras}
       </td></tr>
     </table>`;
   })();
 
-  const html = `<!doctype html><html><body style="margin:0;background:#0E1A17;color:#DCD3C4;">
+  const html = `<!doctype html><html><body style="margin:0;background:#06162F;color:#C9D6E4;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(value.preheader?.trim() || `Admin proof for ${value.planWeekKey}`)}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E1A17;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#06162F;">
       <tr><td align="center" style="padding:28px 12px;">
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
-          <tr><td style="padding:0 24px 16px;border-bottom:2px solid #E0AC63;">
+          <tr><td style="padding:0 24px 16px;border-bottom:2px solid #FFDF4F;">
             <table role="presentation" cellpadding="0" cellspacing="0"><tr>
               <td width="44" style="width:44px;padding-right:12px;vertical-align:middle;"><img src="cid:${LOGO_CID}" width="44" height="44" alt="" style="display:block;width:44px;height:44px;border:0;"></td>
-              <td style="vertical-align:middle;"><div style="font:700 13px/1 Arial,sans-serif;color:#F4EEE3;letter-spacing:2.6px;">CALGARY WATCH</div>
-              <div style="font:400 11px/1 Arial,sans-serif;color:#A6B8AE;padding-top:7px;">Admin proof · ${escapeHtml(value.planWeekKey)}</div></td>
+              <td style="vertical-align:middle;"><div style="font:700 13px/1 Arial,sans-serif;color:#F2EFE8;letter-spacing:2.6px;">CALGARY WATCH</div>
+              <div style="font:400 11px/1 Arial,sans-serif;color:#9DB2C9;padding-top:7px;">Admin proof · ${escapeHtml(value.planWeekKey)}</div></td>
             </tr></table>
           </td></tr>
           <tr><td style="padding:22px 24px 0;">
-            <div style="font:700 11px/1 Arial,sans-serif;color:#A6B8AE;padding-bottom:10px;">Audience: ${escapeHtml(audienceLabel)}</div>
+            <div style="font:700 11px/1 Arial,sans-serif;color:#9DB2C9;padding-bottom:10px;">Audience: ${escapeHtml(audienceLabel)}</div>
             ${opening}
           </td></tr>
-          <tr><td style="padding:22px 24px 0;font:400 13px/1.55 Arial,sans-serif;color:#A6B8AE;">
+          <tr><td style="padding:22px 24px 0;font:400 13px/1.55 Arial,sans-serif;color:#9DB2C9;">
             ${cancelled
               ? 'This is an administrator-only confirmation. Subscribers will receive the standard weekly brief with no optional opening note.'
               : `This is an administrator-only test. The contribution will appear first for ${escapeHtml(audienceLabel.toLowerCase())}; subscriber-specific reports follow underneath.`}
-            <div style="padding-top:14px;"><a href="https://calgarywatch.ca/admin" style="color:#5CC3AA;font-weight:700;">Open the email planner →</a></div>
+            <div style="padding-top:14px;"><a href="https://calgarywatch.ca/admin" style="color:#87DCE8;font-weight:700;">Open the email planner →</a></div>
           </td></tr>
         </table>
       </td></tr>

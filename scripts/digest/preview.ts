@@ -14,8 +14,10 @@
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { buildDigestSummary, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
-import { renderCombinedHtml, renderCombinedText, renderDigestHtml, renderDigestText, renderEventsHtml, renderEventsText, renderWelcomeHtml, type DigestBranding } from './render.js';
+import { buildDigestSummary, digestSubject, unsubscribeUrl, type DigestRecipient } from '../../src/lib/digest.js';
+import { WELCOME } from './copy.js';
+import { digestAngles } from '../../src/lib/digestInsights.js';
+import { combinedEmailContent, eventsEmailContent, renderCombinedHtml, renderCombinedText, renderDigestHtml, renderDigestText, renderEventsHtml, renderEventsText, renderWelcomeHtml, type DigestBranding } from './render.js';
 import { buildEventPicks } from '../../src/lib/eventPicks.js';
 import { allUnsubscribeUrl, eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
 import type { Event } from '../../src/types/discovery.js';
@@ -132,10 +134,45 @@ function browserPreview(html: string): string {
 
 const OUTPUT_DIR = process.env.DIGEST_PREVIEW_DIR?.trim() || 'dist-preview';
 mkdirSync(OUTPUT_DIR, { recursive: true });
+
+/**
+ * What the admin email gallery lists: every file below, which reader gets it,
+ * its real subject line and what sets it apart. Written next to the previews so
+ * the gallery can never show a case the build did not render.
+ */
+type Family = 'monday' | 'welcome' | 'thursday' | 'combined' | 'alert' | 'opening';
+const manifest: Array<{ file: string; family: Family; label: string; who: string; subject: string; notes: string; angle?: string }> = [];
+const describe = (file: string, family: Family, label: string, who: string, subject: string, notes: string, angle?: string) =>
+  manifest.push({ file, family, label, who, subject, notes, ...(angle ? { angle } : {}) });
+const angleOf = (s: Parameters<typeof digestAngles>[0]) => digestAngles(s, 1)[0]?.headline;
 writeFileSync(`${OUTPUT_DIR}/digest.html`, browserPreview(renderDigestHtml(shared)));
 writeFileSync(`${OUTPUT_DIR}/digest.txt`, renderDigestText(shared));
 writeFileSync(`${OUTPUT_DIR}/welcome.html`, browserPreview(renderWelcomeHtml(shared)));
 writeFileSync(`${OUTPUT_DIR}/digest-both.html`, browserPreview(renderDigestHtml({ ...shared, offerThursday: false })));
+describe('digest.html', 'monday', 'Near home', 'Monday reader with a saved address', digestSubject(summary), 'Blue cover with the count, a day-by-day strip, the CW pick angle, then reports closest first. Offers Thursday picks at the bottom.', angleOf(summary));
+describe('welcome.html', 'welcome', 'Welcome, with an area', 'Anyone’s first Monday, area saved', WELCOME.subject, 'Paper cover, a short hello, a checklist of how their Mondays are set up, then a sample of this week.', angleOf(summary));
+
+// Somebody whose blocks had nothing this week: the cyan "quiet" cover.
+const quietSummary0 = buildDigestSummary({ incidents: SAMPLE.map((i) => ({ ...i, timestamp: i.timestamp - 7 * 24 * HOUR })), profile: PROFILE, home: HOME, now: NOW });
+writeFileSync(`${OUTPUT_DIR}/digest-quiet.html`, browserPreview(renderDigestHtml({ ...shared, summary: quietSummary0 })));
+describe('digest-quiet.html', 'monday', 'Quiet week', 'Monday reader whose area had nothing', digestSubject(quietSummary0), 'Cyan cover. Says plainly nothing was reported, compares with last week, and still lists recent context.', angleOf(quietSummary0));
+
+// A neighbourhood name but no street address: no distances, weekday rail.
+const communitySummary = buildDigestSummary({ incidents: SAMPLE, profile: PROFILE, home: null, now: NOW });
+writeFileSync(`${OUTPUT_DIR}/digest-community.html`, browserPreview(renderDigestHtml({ ...shared, summary: communitySummary })));
+describe('digest-community.html', 'monday', 'Neighbourhood only', 'Monday reader with a community but no address', digestSubject(communitySummary), 'Same cover and strip, but reports are matched by community name, so no distances are shown or invented.', angleOf(communitySummary));
+
+// Narrowed to some topics.
+writeFileSync(`${OUTPUT_DIR}/digest-topics.html`, browserPreview(renderDigestHtml({ ...shared, categories: ['crime'], summary: buildDigestSummary({ incidents: SAMPLE, profile: PROFILE, home: HOME, now: NOW, categories: ['crime'] }) })));
+describe('digest-topics.html', 'monday', 'Chosen topics', 'Monday reader who picked crime only', digestSubject(buildDigestSummary({ incidents: SAMPLE, profile: PROFILE, home: HOME, now: NOW, categories: ['crime'] })), 'Only the topics they chose, with a line saying so and a link to change it.');
+describe('digest-both.html', 'monday', 'Near home, Thursday on', 'Monday reader already on Thursday picks', digestSubject(summary), 'The plain brief with no Thursday offer (used when a both-lists reader has no events at all that week).');
+
+const noAreaProfile: DigestRecipient = { ...PROFILE, uid: 'no-area', neighborhood: undefined };
+const welcomeCity = buildDigestSummary({ incidents: SAMPLE, profile: noAreaProfile, home: null, now: NOW });
+writeFileSync(`${OUTPUT_DIR}/welcome-city.html`, browserPreview(renderWelcomeHtml({ ...shared, summary: welcomeCity })));
+describe('welcome-city.html', 'welcome', 'Welcome, no area yet', 'First Monday, no neighbourhood saved', WELCOME.subject, 'Checklist flags the missing area with a one-tap fix; the sample covers all of Calgary.');
+writeFileSync(`${OUTPUT_DIR}/welcome-both.html`, browserPreview(renderWelcomeHtml({ ...shared, offerThursday: false })));
+describe('welcome-both.html', 'welcome', 'Welcome, both lists', 'First Monday, already on Thursday picks', WELCOME.subject, 'Checklist shows Thursday picks on and says both will arrive together from next week.');
 
 // Instant-alert email — the between-digest urgent nudge. A believable mix: an
 // emergency (which always alerts) plus two nearby neighbour reports.
@@ -146,6 +183,7 @@ const ALERT_SAMPLE: Incident[] = [
 ];
 writeFileSync(`${OUTPUT_DIR}/alert.html`, browserPreview(renderAlertEmail(ALERT_SAMPLE, NOW, 'https://calgarywatch.ca').html));
 writeFileSync(`${OUTPUT_DIR}/alert.txt`, renderAlertEmail(ALERT_SAMPLE, NOW, 'https://calgarywatch.ca').text);
+describe('alert.html', 'alert', 'Instant alert', 'Alerts on, something close just happened', renderAlertEmail(ALERT_SAMPLE, NOW, 'https://calgarywatch.ca').subject, 'Red “Heads up” cover, each report with how long ago it was, one map button and a 911 reminder. Also sent as a push.');
 
 // Every planner format gets a browser-openable proof. This prevents a format
 // that is not currently selected in the admin UI from becoming the unreviewed
@@ -172,6 +210,7 @@ for (const style of DIGEST_CONTRIBUTION_STYLES) {
     status: 'published',
   };
   writeFileSync(`${OUTPUT_DIR}/planner-${style}.html`, browserPreview(renderDigestHtml({ ...shared, contribution })));
+  describe(`planner-${style}.html`, 'opening', ({ 'neighbour-note': 'Neighbour note', 'news-brief': 'News brief', 'personal-story': 'Personal story' } as Record<string, string>)[style] ?? style, 'Any week an admin adds an opening', digestSubject(summary), 'An optional opening note from the planner, set above the greeting in this format.');
 }
 
 // What somebody with no saved location receives: the city-wide variant, which
@@ -189,6 +228,7 @@ writeFileSync(`${OUTPUT_DIR}/city.html`, browserPreview(renderDigestHtml({
   summary: citySummary, displayName: PROFILE.displayName,
   unsubscribeUrl: unsub, branding: BRANDING,
 })));
+describe('city.html', 'monday', 'Whole city', 'Monday reader with no area saved', digestSubject(citySummary), 'Navy city cover, where reports landed by community, and a “Make it yours” card asking for their neighbourhood.', angleOf(citySummary));
 console.log(`City variant: scope=${citySummary.scope}, ${citySummary.total} reports, `
   + `top areas ${citySummary.topAreas.map((a) => `${a.name} ${a.count}`).join(', ')}`);
 
@@ -221,8 +261,17 @@ const THURSDAY_CASES: Array<[string, Parameters<typeof renderEventsHtml>[0]]> = 
   ['thursday-going-only', { ...eventsBase, picks: { ...picksFor(['outdoors'], ['phil']), picks: [] }, fallback: { going: [], picks: [], considered: 0 }, interests: ['outdoors'], area: 'Beltline' }],
   ['thursday-no-area', { ...eventsBase, picks: picksFor(['food', 'family'], [], ''), interests: ['food', 'family'], area: '', offerMonday: true }],
 ];
+const THURSDAY_META: Record<string, [string, string, string]> = {
+  'thursday-first': ['First Thursday', 'Every reader’s first Thursday', 'Yellow cover, a short hello, the CW pick of the week, then the rest. Offers Monday.'],
+  thursday: ['Picks + reminders', 'Reader who tapped “I’m going”', 'CW pick hero, a seven-day strip with free and nearby counts, their plans, then more picks.'],
+  'thursday-fallback': ['Nothing matched', 'Interests with no listings this week', '“Something different” cover: says so plainly, then what else is on. Never an empty email.'],
+  'thursday-going-only': ['Reminder only', 'Nothing new, but going to something', '“Don’t forget” cover with their plan set large.'],
+  'thursday-no-area': ['No home area', 'Picks without a neighbourhood', 'No distances, and a prompt to add their area.'],
+};
 for (const [name, options] of THURSDAY_CASES) {
   writeFileSync(`${OUTPUT_DIR}/${name}.html`, browserPreview(renderEventsHtml(options)));
+  const [label, who, notes] = THURSDAY_META[name];
+  describe(`${name}.html`, 'thursday', label, who, eventsEmailContent(options).subject, notes);
   writeFileSync(`${OUTPUT_DIR}/${name}.txt`, renderEventsText(options));
 }
 
@@ -242,10 +291,19 @@ const COMBINED_CASES: Array<[string, Parameters<typeof renderCombinedHtml>[0]]> 
   ['combined-quiet-fallback', { ...combinedBase, summary: quietSummary, picks: mondayPicks(['outdoors']), fallback: mondayPicks([]), interests: ['outdoors'] }],
   ['combined-going-only', { ...combinedBase, picks: { ...mondayPicks(['outdoors'], ['phil']), picks: [] }, fallback: { going: [], picks: [], considered: 0 }, interests: ['outdoors'], categories: ['crime', 'traffic'] }],
 ];
+const COMBINED_META: Record<string, [string, string, string]> = {
+  'combined-first': ['First combined', 'Reader on both lists, first time', 'Explains once that two emails became one, then 01 Near home and 02 Out & about.'],
+  combined: ['Your week', 'Reader on both lists', 'Week at a glance, the CW pick for their blocks, reports, then the pick of the week and more.'],
+  'combined-quiet-fallback': ['Quiet + nothing matched', 'Quiet week, interests with no listings', '“Quiet streets. Plenty on.”, then what else is on.'],
+  'combined-going-only': ['Reminder only', 'Both lists, no new picks but going to something', 'Safety chapter plus the reminder.'],
+};
 for (const [name, options] of COMBINED_CASES) {
   writeFileSync(`${OUTPUT_DIR}/${name}.html`, browserPreview(renderCombinedHtml(options)));
+  const [label, who, notes] = COMBINED_META[name];
+  describe(`${name}.html`, 'combined', label, who, combinedEmailContent(options).subject, notes, angleOf(options.summary));
   writeFileSync(`${OUTPUT_DIR}/${name}.txt`, renderCombinedText(options));
 }
 
-console.log(`Wrote digest, welcome, all three planner-format previews ${THURSDAY_CASES.length} Thursday and ${COMBINED_CASES.length} combined cases to ${OUTPUT_DIR}/`);
+writeFileSync(`${OUTPUT_DIR}/manifest.json`, JSON.stringify({ generatedFor: summary.weekKey, emails: manifest }, null, 2));
+console.log(`Wrote ${manifest.length} described previews, digest, welcome, all three planner-format previews ${THURSDAY_CASES.length} Thursday and ${COMBINED_CASES.length} combined cases to ${OUTPUT_DIR}/`);
 console.log(`Subject: ${summary.total} report(s) — ring "${summary.ringLabel}", vs ${summary.previousTotal} last week`);

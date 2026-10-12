@@ -112,7 +112,7 @@ const snapshot: HqSnapshot = {
     inspiration: scoutDoc?.inspiration ?? [],
     analysis: scoutDoc?.analysis ?? null,
     updatedAt: scoutDoc?.updatedAt ?? null,
-    coordinator: coordinatorDoc ? { at: coordinatorDoc.at, direction: coordinatorDoc.direction, plan: coordinatorDoc.plan, shootList: coordinatorDoc.shootList, outreach: coordinatorDoc.outreach } : null,
+    coordinator: coordinatorDoc?.plan ? { at: coordinatorDoc.at, direction: coordinatorDoc.direction, plan: coordinatorDoc.plan, shootList: coordinatorDoc.shootList, outreach: coordinatorDoc.outreach } : null,
   },
   pipelinesAt,
   spend: spendSummary(days, calgaryDate(now)),

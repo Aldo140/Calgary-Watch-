@@ -81,11 +81,12 @@ const PostSchema = z.object({
 });
 export type PostWriting = z.infer<typeof PostSchema>;
 
-export async function writePost(kit: BrandKit, input: { kind: string; title: string; facts: string; link: string; sponsored: boolean }, guidance: { playbook?: string | null; direction?: string | null } = {}): Promise<PostWriting> {
+export async function writePost(kit: BrandKit, input: { kind: string; title: string; facts: string; link: string; sponsored: boolean }, guidance: { playbook?: string | null; direction?: string | null; notes?: string | null } = {}): Promise<PostWriting> {
   const system = [
     `You write Instagram posts for ${kit.name} (@${kit.handle}), a Calgary account. Your job is to grow it: every post has to earn a stop, a save or a share from Calgarians, using only true facts.`,
     guidance.playbook ? `The account's playbook (the owner's rules; follow it):\n${guidance.playbook}` : '',
     guidance.direction ? `This week's direction from the content plan:\n${guidance.direction}` : '',
+    guidance.notes ? `Aldo's standing notes (he owns the account; follow them unless they'd break a fact or a rule above):\n${guidance.notes}` : '',
     `Voice: ${kit.voice.summary}`,
     `Rules:\n- ${kit.voice.rules.join('\n- ')}`,
     `Never use these phrases: ${kit.voice.bannedPhrases.join(', ')}.`,
@@ -222,14 +223,15 @@ const PlanSchema = z.object({
 export type ContentPlan = z.infer<typeof PlanSchema>;
 
 /** The coordinator: the week's plan, the writer's direction, clips to shoot and creators to ask, from the numbers and the playbook. */
-export async function planWeek(input: { playbook: string; numbers: string; inspiration: string; creators: string; listings: string; slots: string[]; today: string }): Promise<ContentPlan> {
+export async function planWeek(input: { playbook: string; notes: string | null; numbers: string; inspiration: string; creators: string; listings: string; slots: string[]; today: string }): Promise<ContentPlan> {
   return structured(
     [
       'You are the social media coordinator for @calgarydaily, a Calgary Instagram account with about 4,300 followers. Your goal is reach and follower growth: posts Calgarians stop on, save and share.',
       `The owner's playbook (follow it):\n${input.playbook}`,
+      input.notes ? `Aldo's latest notes from his phone (newest first; they win over the playbook where they differ):\n${input.notes}` : '',
       'Base every claim on the numbers, patterns and listings given. Never invent events, times, prices or creators. Ideas must be original, or a creator\'s clip shared only after they say yes (that is what the outreach DMs are for).',
       'The bot cannot comment on other accounts or send DMs itself; Aldo sends the outreach DMs by hand from the app.',
-    ].join('\n\n'),
+    ].filter(Boolean).join('\n\n'),
     [
       `Today: ${input.today}. Posting slots: ${input.slots.join(', ')}.`,
       `Our numbers:\n${input.numbers}`,

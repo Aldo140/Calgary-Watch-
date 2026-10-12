@@ -83,3 +83,26 @@ describe('listing photos', () => {
     assert.equal(slides[1].photo?.credit, 'Image via University of Calgary');
   });
 });
+
+describe('notes from Telegram (/ig)', async () => {
+  const { newBriefs, noteLink, notesChanged, notesForPrompt } = await import('../scripts/ops/lib/igNotes');
+  const n = (id: string, text: string, at = 0) => ({ id, text, at });
+  it('finds the link in a note', () => {
+    assert.equal(noteLink('post this https://www.cbc.ca/news/calgary/x.html.'), 'https://www.cbc.ca/news/calgary/x.html');
+    assert.equal(noteLink('more Flames'), null);
+  });
+  it('turns each new link into one brief', () => {
+    const notes = [n('a', 'post this https://cbc.ca/1'), n('b', 'more Flames')];
+    assert.deepEqual(newBriefs(notes, []).map(b => [b.id, b.url]), [['a', 'https://cbc.ca/1']]);
+    assert.deepEqual(newBriefs(notes, ['a']), []);
+  });
+  it('notices added, removed and edited notes, not reordering', () => {
+    assert.equal(notesChanged([n('a', 'x'), n('b', 'y')], [n('b', 'y'), n('a', 'x')]), false);
+    assert.equal(notesChanged([n('a', 'x')], [n('a', 'x2')]), true);
+    assert.equal(notesChanged([n('a', 'x')], []), true);
+  });
+  it('lists notes newest first', () => {
+    assert.equal(notesForPrompt([n('a', 'old', 1), n('b', 'new', 2)]), '- new\n- old');
+    assert.equal(notesForPrompt([]), null);
+  });
+});

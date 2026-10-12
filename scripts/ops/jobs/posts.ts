@@ -13,6 +13,7 @@ import { publishCarousel, publishImage, publishReel } from '../lib/instagram';
 import { currentToken } from './igTokens';
 import { bestCaptions } from './insights';
 import { featuredListings, type CoordinatorDoc } from './coordinator';
+import { IG_NOTES_DOC, notesForPrompt, type IgNote } from '../lib/igNotes';
 import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, reelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { makeReel } from '../lib/reel';
 import { renderPost, renderReelBackdrop } from '../lib/render';
@@ -24,14 +25,14 @@ type Log = (m: string) => void;
 const postId = (fingerprint: string) => `post-${createHash('sha256').update(fingerprint).digest('hex').slice(0, 20)}`;
 
 /** Claude's draft checked against the brand; the template draft when there is no key or it fails. */
-async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items']; format?: Candidate['format'] }, kit: BrandKit, base: Draft, note: string, log: Log, direction: string | null = null): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
+async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items']; format?: Candidate['format'] }, kit: BrandKit, base: Draft, note: string, log: Log, direction: string | null = null, notes: string | null = null): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
   if (!claudeConfigured()) return { draft: base, warnings: checkDraft(base, kit), by: 'template' };
   try {
     const w = await writePost(kit, {
       kind: c.format === 'reel' ? (c.title.startsWith('Tonight') ? 'Tonight roundup Reel (open with one plain line about tonight; then one line per plan with its time)' : 'weekend roundup Reel (open with one plain line about the weekend; then one line per plan with its day)') : c.template === 'roundup' ? 'roundup of several listings' : c.template === 'update' ? 'news or city update' : 'single listing',
       title: c.title + (note ? `\nReviewer's note for this redraft: ${note}` : ''),
       facts: c.facts, link: c.link, sponsored: c.template === 'partner',
-    }, { playbook: playbook(kit.id), direction });
+    }, { playbook: playbook(kit.id), direction, notes: kit.id === 'calgarydaily' ? notes : null });
     // The image keeps the plain facts (clean names, times, places) from the template. Listing posts
     // keep the event's own name as the headline; on a roundup Claude's opening line becomes the blurb.
     const listing = c.template === 'roundup' || c.template === 'event';
@@ -48,6 +49,12 @@ async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'l
     log(`  Claude unavailable (${e instanceof Error ? e.message : e}); using the template draft.`);
     return { draft: base, warnings: [`Drafted from the template because Claude failed: ${e instanceof Error ? e.message : e}`], by: 'template' };
   }
+}
+
+/** Aldo's notes from Telegram (/ig), as prompt lines. */
+async function aldosNotes(db: Firestore): Promise<string | null> {
+  const doc = (await db.collection(COLLECTIONS.health).doc(IG_NOTES_DOC).get()).data() as { notes?: IgNote[] } | undefined;
+  return notesForPrompt(doc?.notes ?? []);
 }
 
 async function renderAndStore(id: string, kit: BrandKit, template: PostTemplate, draft: Draft, dryDir: string | null): Promise<{ imageUrl: string | null; imagePath: string | null }> {
@@ -93,6 +100,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
   const published = db ? (await db.collection(COLLECTIONS.posts).where('status', '==', 'published').get()).docs.map(d => d.data() as OpsPost) : [];
   // The week's content plan: direction for the writer and the listings it wants featured.
   const plan = db ? ((await db.collection(COLLECTIONS.health).doc('coordinator').get()).data() as CoordinatorDoc | undefined) ?? null : null;
+  const notes = db ? await aldosNotes(db) : null;
 
   let made = 0;
   for (const brand of BRANDS) {
@@ -107,7 +115,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
     const direction = brand === 'calgarydaily' ? plan?.direction ?? null : null;
     for (const c of selectCandidates(index, kit, now, queued, recent.get(brand), booked.get(brand), brand === 'calgarydaily' ? featuredListings(plan) : undefined)) {
       const id = postId(c.fingerprint);
-      const { draft, warnings, by } = await writeDraft(c, writerKit, templateDraft(c, kit), '', log, direction);
+      const { draft, warnings, by } = await writeDraft(c, writerKit, templateDraft(c, kit), '', log, direction, notes);
       let image: { imageUrl: string | null; imagePath: string | null };
       let videoUrl: string | null = null;
       // The cover doubles as the post image (and the site's thumbnail).
@@ -160,6 +168,7 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
 /** Re-draft posts a reviewer sent back, and draft CalgaryDaily briefs from a source URL. */
 export async function redraftAndBriefs(db: Firestore, now: number, log: Log): Promise<void> {
   const snap = await db.collection(COLLECTIONS.posts).where('status', 'in', ['redraft', 'requested']).get();
+  const notes = snap.empty ? null : await aldosNotes(db);
   for (const doc of snap.docs) {
     const p = doc.data() as OpsPost;
     const kit = brandKit(p.brand);
@@ -185,7 +194,7 @@ export async function redraftAndBriefs(db: Firestore, now: number, log: Log): Pr
     const base: Draft = p.status === 'requested'
       ? { caption: `${title}\n\nSource: ${sourceUrls[0]}\n\n${kit.hashtags.join(' ')}`, altText: title, imageText: { eyebrow: `UPDATE · ${calgaryDate(now)}`, headline: title.slice(0, 60), details: [], footer: kit.site.replace(/^https?:\/\//, '') } }
       : { caption: p.caption, altText: p.altText, imageText: p.imageText };
-    const { draft, warnings: w, by } = await writeDraft({ template, title, facts, link: p.link || kit.linkInBio }, kit, base, p.status === 'redraft' ? (p.note ?? '') : '', log);
+    const { draft, warnings: w, by } = await writeDraft({ template, title, facts, link: p.link || kit.linkInBio }, kit, base, p.status === 'redraft' ? (p.note ?? '') : '', log, null, notes);
     if (p.status === 'requested' && by === 'claude') {
       // Briefs: the image carries the headline and the source, nothing Claude could embellish.
       draft.imageText.details = [`Source: ${new URL(sourceUrls[0]).hostname.replace(/^www\./, '')}`];

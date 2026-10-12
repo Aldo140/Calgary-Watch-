@@ -12,6 +12,7 @@ import type { AccountHistory, HistoryGroup, OpsPerformance } from '../../../src/
 import { brandKit, playbook } from '../lib/brand';
 import { claudeConfigured, planWeek, type ContentPlan } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
+import { IG_NOTES_DOC, notesForPrompt, type IgNote } from '../lib/igNotes';
 import { photoFor, cleanTitle, happenings, normalize, type DiscoveryIndex } from '../lib/posts';
 import type { Outperformer, ScoutEntry } from '../lib/scout';
 import { addDays, calgaryDate, calgaryToEpoch, clock, longDay } from '../lib/time';
@@ -81,7 +82,7 @@ export async function coordinate(db: Firestore, index: DiscoveryIndex, now: numb
   if (!claudeConfigured() || !book) { log('coordinator: needs ANTHROPIC_API_KEY and brand/calgarydaily-playbook.md; skipped.'); return prev ?? null; }
 
   const health = db.collection(COLLECTIONS.health);
-  const [perf, history, scout] = await Promise.all(['performance', 'account_history', 'scout'].map(id => health.doc(id).get().then(d => d.data() ?? null)));
+  const [perf, history, scout, notes] = await Promise.all(['performance', 'account_history', 'scout', IG_NOTES_DOC].map(id => health.doc(id).get().then(d => d.data() ?? null)));
   const s = scout as { accounts?: ScoutEntry[]; inspiration?: Outperformer[]; analysis?: { patterns?: Array<{ title: string; why: string }>; ideas?: Array<{ title: string; format: string; hook: string }> } } | null;
 
   const today = calgaryDate(now);
@@ -97,6 +98,7 @@ export async function coordinate(db: Firestore, index: DiscoveryIndex, now: numb
 
   const plan = await planWeek({
     playbook: book,
+    notes: notesForPrompt(((notes as { notes?: IgNote[] } | null)?.notes) ?? []),
     numbers: numbersBrief(history as AccountHistory | null, perf as OpsPerformance | null),
     inspiration: inspiration || '(nothing yet)',
     creators: creators.map(c => c.line).join('\n'),

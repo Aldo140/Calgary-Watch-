@@ -8,6 +8,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import type { OpsPost, PartnerLead } from '../../src/types/ops';
 import { COLLECTIONS, hasFirebase, opsDb } from './lib/firebase';
 import { applyLeadCommand, applyPostCommand, isPostCommand, type HqCommand, type HqCommandType } from './lib/hqCommands';
+import { IG_NOTES_DOC, newBriefs, notesChanged, type IgNote } from './lib/igNotes';
 
 const log = (m: string) => console.log(`[hq-commands] ${m}`);
 const BASE = 'https://firestore.googleapis.com/v1/projects/arctos-hq/databases/(default)/documents';
@@ -18,6 +19,43 @@ if (!hasFirebase()) { log('FIREBASE_SERVICE_ACCOUNT is required.'); process.exit
 const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
 type Fields = Record<string, { stringValue?: string; integerValue?: string }>;
+
+// Notes for the Instagram agent, sent from Telegram (/ig): copy them to the ops data, replan the
+// week when they change, and draft a brief from any new link.
+try {
+  const r = await fetch(`${BASE}:runQuery`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'hq_ig_notes' }], limit: 50 } }),
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const notes: IgNote[] = ((await r.json()) as Array<{ document?: { name: string; fields: Fields } }>).filter(x => x.document).map(x => ({
+    id: x.document!.name.split('/').pop()!,
+    text: x.document!.fields.text?.stringValue ?? '',
+    at: Number(x.document!.fields.at?.integerValue ?? 0),
+  })).filter(n => n.text);
+  const ops = opsDb();
+  const ref = ops.collection(COLLECTIONS.health).doc(IG_NOTES_DOC);
+  const prev = (await ref.get()).data() as { notes?: IgNote[]; briefed?: string[] } | undefined;
+  const briefs = newBriefs(notes, prev?.briefed ?? []);
+  const now = Date.now();
+  for (const b of briefs) {
+    const id = `brief-ig-${b.id}`.slice(0, 120);
+    await ops.collection(COLLECTIONS.posts).doc(id).set({
+      id, brand: 'calgarydaily', status: 'requested', template: 'update', requestUrl: b.url, note: b.text,
+      fingerprint: `calgarydaily|brief|${b.url}`.slice(0, 300), createdAt: now, updatedAt: now, reviewedByEmail: 'Aldo (Telegram /ig)',
+    }, { merge: true });
+    log(`instagram note: brief queued from ${b.url}`);
+  }
+  if (notesChanged(prev?.notes ?? [], notes) || briefs.length) {
+    await ref.set({ notes, briefed: [...new Set([...(prev?.briefed ?? []), ...briefs.map(b => b.id)])].slice(-200), updatedAt: now });
+    // A new instruction gets a new plan on the next daily run instead of waiting out the old one.
+    await ops.collection(COLLECTIONS.health).doc('coordinator').set({ at: 0 }, { merge: true });
+    log(`instagram notes: ${notes.length} now; the week will be replanned.`);
+  }
+} catch (e) {
+  log(`instagram notes not synced: ${e instanceof Error ? e.message : e}`);
+}
 
 const q = await fetch(`${BASE}:runQuery`, {
   method: 'POST',

@@ -90,10 +90,12 @@ export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
                       <strong>{h.title}</strong>
                       <span className="nb-card-sum">{h.summary}</span>
                       <span className="nb-vibes">{vibes(h).slice(0, 3).map(v => <em key={v}>{v}</em>)}</span>
+                      {/* Only what's there: a row of zeros reads as a dead neighbourhood. */}
                       <span className="nb-card-counts">
-                        <span title="Events in or near it"><CalendarDays size={15} aria-hidden="true" />{plural(c.events, 'event')}</span>
-                        <span title="Markets in or near it"><ShoppingBasket size={15} aria-hidden="true" />{plural(c.markets, 'market')}</span>
-                        <span title="Local places"><Coffee size={15} aria-hidden="true" />{plural(c.places, 'place')}</span>
+                        {c.events ? <span title="Events in or near it"><CalendarDays size={15} aria-hidden="true" />{plural(c.events, 'event')}</span> : null}
+                        {c.markets ? <span title="Markets in or near it"><ShoppingBasket size={15} aria-hidden="true" />{plural(c.markets, 'market')}</span> : null}
+                        {c.places ? <span title="Local places"><Coffee size={15} aria-hidden="true" />{plural(c.places, 'place')}</span> : null}
+                        {!c.events && !c.markets && !c.places ? <span>Walks, history and what’s nearby</span> : null}
                       </span>
                     </span>
                     <span className="nb-card-go" aria-hidden="true"><ArrowUpRight size={20} /></span>

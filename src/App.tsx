@@ -20,6 +20,7 @@ const MarketHQPage = lazy(() => import('@/src/pages/MarketHQPage'));
 const VendorApplyPage = lazy(() => import('@/src/pages/VendorApplyPage'));
 const ForMarketsPage = lazy(() => import('@/src/pages/ForMarketsPage'));
 const DiscoveryPage = lazy(() => import('@/src/pages/DiscoveryPage'));
+const SearchPage  = lazy(() => import('@/src/pages/SearchPage'));
 const MapPage     = lazy(() => import('@/src/pages/MapPage'));
 const NotFoundPage = lazy(() => import('@/src/pages/NotFoundPage'));
 const AboutPage   = lazy(() => import('@/src/pages/AboutPage'));
@@ -187,7 +188,7 @@ export default function App() {
           <Route path="/guides/:slug" element={<DiscoveryPage />} />
           <Route path="/neighbourhoods" element={<DiscoveryPage />} />
           <Route path="/neighbourhoods/:slug" element={<DiscoveryPage />} />
-          <Route path="/search" element={<DiscoveryPage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/admin" element={<AdminPage />} />

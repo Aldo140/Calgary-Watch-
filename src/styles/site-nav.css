@@ -306,3 +306,9 @@
 }
 @media (prefers-reduced-motion: reduce) { .cw-site .cw-menu-search { animation: none; } }
 .cw-site { overflow-x: clip; }
+
+/* Off the homepage: the current section wears the yellow marker, and the bar
+   gets an ink rule once you scroll, like the rest of the collage. */
+.cw-site:not([data-home]) .cw-nav-link[aria-current='page'] { background: #ffdf4f; color: #151515; box-shadow: inset 0 0 0 2px #151515; }
+.cw-site:not([data-home]) .cw-nav-link[aria-current='page']::after { display: none; }
+.cw-site:not([data-home]) .cw-nav[data-scrolled='true'] { border-bottom: 2px solid #151515; }

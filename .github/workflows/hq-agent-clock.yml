@@ -2,7 +2,10 @@ name: HQ agent clock (email)
 
 # Starts hq-agent-mail.yml within a minute of Aldo texting the HQ bot a question
 # about his email (jobs in arctos-hq hq_agent_jobs; ArctosLaunchpad's
-# ops/agent-jobs.ts), and Operations hourly at :07 and :37. GitHub fired the
+# ops/agent-jobs.ts), Operations hourly at :07 and :37, and Operations daily
+# once just after 07:20 UTC. Firestore's free daily quota resets at 07:00 UTC
+# (midnight Pacific) and other jobs used it up before the scheduled daily runs
+# fired (Oct 10 and 11, 2026: no posts drafted), so drafting goes first. GitHub fired the
 # four-an-hour ops schedule only every 3 to 6 hours (October 2026), so HQ
 # approvals, due posts and replies waited that long; ArctosLaunchpad's clock
 # can't start it there because the ops secrets live here. One run stays
@@ -45,11 +48,17 @@ jobs:
         run: |
           end=$((SECONDS + 5 * 3600 + 45 * 60))
           last_hourly=""
+          last_daily=""
           while [ "$SECONDS" -lt "$end" ]; do
             m=$((10#$(date -u +%M)))
             if [ $((m % 30)) -ge 7 ]; then
               key="$(date -u +%Y%m%d%H)-$((m / 30))"
               [ "$key" != "$last_hourly" ] && { gh workflow run ops-hourly.yml && echo "$(date -u +%H:%M) started Operations hourly" || echo "::warning::couldn't start Operations hourly"; last_hourly=$key; }
+            fi
+            day="$(date -u +%Y%m%d)"
+            if [ "$day" != "$last_daily" ] && [ "$((10#$(date -u +%H)))" -eq 7 ] && [ "$m" -ge 20 ]; then
+              gh workflow run ops-daily.yml && echo "$(date -u +%H:%M) started Operations daily" || echo "::warning::couldn't start Operations daily"
+              last_daily=$day
             fi
             for job in $(node ops/agent-jobs.ts pending mail || true); do
               gh workflow run hq-agent-mail.yml -f job="$job" && echo "$(date -u +%H:%M) started an HQ email job" || echo "::warning::couldn't start HQ email job $job"

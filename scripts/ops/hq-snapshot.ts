@@ -13,6 +13,7 @@ import { COLLECTIONS, hasFirebase, opsDb } from './lib/firebase';
 import { activity, bottlenecks, pipelineDetail, calgaryDailySummary, calgaryWatchPipeline, hqPosts, inbox, notConnected, spendSummary, todayItems, SNAPSHOT_VERSION, type HqSnapshot, type SpendDay } from './lib/hqSnapshot';
 import type { Outperformer, OwnAccount, ScoutEntry } from './lib/scout';
 import { calgaryDate } from './lib/time';
+import type { ContentPlan } from './lib/claude';
 import { USAGE_COLLECTION } from './jobs/usage';
 
 const log = (m: string) => console.log(`[hq-snapshot] ${m}`);
@@ -40,6 +41,7 @@ const health = (await db.collection(COLLECTIONS.health).doc('latest').get()).dat
 const performance = (await db.collection(COLLECTIONS.health).doc('performance').get()).data() as OpsPerformance | undefined ?? null;
 const history = (await db.collection(COLLECTIONS.health).doc('account_history').get()).data() as AccountHistory | undefined ?? null;
 const scoutDoc = (await db.collection(COLLECTIONS.health).doc('scout').get()).data() as { updatedAt: number; accounts: ScoutEntry[]; unreadable: string[]; candidates: Record<string, { status: string }>; own?: OwnAccount[]; ownHistory?: Record<string, Record<string, number>>; inspiration?: Outperformer[]; analysis?: HqSnapshot['instagram']['analysis'] } | undefined;
+const coordinatorDoc = (await db.collection(COLLECTIONS.health).doc('coordinator').get()).data() as (ContentPlan & { at: number }) | undefined;
 const inboxCheckedAt = ((await db.collection(COLLECTIONS.health).doc('outreach_inbox').get()).get('lastCheckedAt') as number | undefined) ?? null;
 
 const open = (await db.collection(COLLECTIONS.posts).where('status', 'in', ['drafted', 'needs-correction', 'failed', 'approved', 'redraft', 'requested']).get()).docs.map(d => ({ id: d.id, ...d.data() }) as OpsPost);
@@ -110,6 +112,7 @@ const snapshot: HqSnapshot = {
     inspiration: scoutDoc?.inspiration ?? [],
     analysis: scoutDoc?.analysis ?? null,
     updatedAt: scoutDoc?.updatedAt ?? null,
+    coordinator: coordinatorDoc ? { at: coordinatorDoc.at, direction: coordinatorDoc.direction, plan: coordinatorDoc.plan, shootList: coordinatorDoc.shootList, outreach: coordinatorDoc.outreach } : null,
   },
   pipelinesAt,
   spend: spendSummary(days, calgaryDate(now)),

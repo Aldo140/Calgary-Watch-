@@ -5,6 +5,7 @@ import type { BrandId, PostImageText, PostTemplate } from '../../../src/types/op
 import type { BrandKit } from './brand';
 import { addDays, calgaryDate, calgaryMinutes, calgaryToEpoch, calgaryWeekday, clock, longDay, nextSlot, shortDay, timeRange } from './time';
 import { calgaryDateTimeFormat } from '../../../src/lib/calgaryTz.js';
+import { listingPhoto } from './photos';
 
 export type Entity = Record<string, any> & { id: string; kind: string; title: string; slug: string };
 export type Occurrence = { id: string; marketId: string; start: string; end?: string; cancelled?: boolean };
@@ -145,6 +146,9 @@ export function blurbFor(e: Entity): string | null {
   return null;
 }
 
+/** The listing's own photo, when it has one. */
+export const photoFor = (h: Happening) => listingPhoto(h.entity, h.sourceName);
+
 /** Same show twice in a day (5 pm and 8 pm) is one line with both times. */
 export function mergeShowings(items: Happening[]): Array<{ name: string; first: Happening; times: Happening[] }> {
   const out: Array<{ name: string; first: Happening; times: Happening[] }> = [];
@@ -166,12 +170,16 @@ const joinTimes = (times: Happening[]) => {
 };
 
 /** Spread picks across organizers and categories so a day isn't five UCalgary lectures. */
-function diverse(list: Happening[], n: number, taken = new Set<string>(), siblings = false): Happening[] {
+function diverse(list: Happening[], n: number, taken = new Set<string>(), siblings = false, prefer: Set<string> = new Set()): Happening[] {
   const picked: Happening[] = [], extra: Happening[] = [];
   const sameShow = (a: Happening, b: Happening) => calgaryDate(a.start) === calgaryDate(b.start) && normalize(cleanTitle(a.entity.title)) === normalize(cleanTitle(b.entity.title));
   const orgs = new Set<string>(), cats = new Set<string>();
   const score = (h: Happening) =>
     (h.entity.pricing === 'free' ? 2 : 0) + (h.entity.neighbourhood ? 1 : 0) + (h.entity.address ? 1 : 0) +
+    // A real photo is what gets a post seen; listings with one go first.
+    (listingPhoto(h.entity, h.sourceName) ? 3 : 0) +
+    // Listings the week's content plan picked (jobs/coordinator.ts).
+    (prefer.has(normalize(cleanTitle(h.entity.title))) ? 4 : 0) +
     (h.entity.kind === 'market' ? 1 : 0) - (orgs.has(normalize(h.entity.organizer ?? h.sourceName)) ? 3 : 0) -
     (cats.has(h.entity.categories?.[0]) ? 1 : 0);
   const pool = list.filter(h => !taken.has(h.entity.id));
@@ -199,7 +207,7 @@ function diverse(list: Happening[], n: number, taken = new Set<string>(), siblin
  * `bookedSlots`: HH:mm slots today that already hold a post for this brand (drafted, approved or
  * published). The day never gets more than postsPerDay automatic posts, and no slot gets two.
  */
-export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: number, queued: Set<string>, recentlyPosted: Set<string> = new Set(), bookedSlots: Set<string> = new Set()): Candidate[] {
+export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: number, queued: Set<string>, recentlyPosted: Set<string> = new Set(), bookedSlots: Set<string> = new Set(), prefer: Set<string> = new Set()): Candidate[] {
   const all = happenings(index);
   const today = calgaryDate(now);
   const out: Candidate[] = [];
@@ -228,7 +236,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
 
     const fpToday = `${kit.id}|today|${today}`;
     if (!queued.has(fpToday) && !bookedSlots.has(slots[0]) && morningPool.length >= 2) {
-      const items = diverse(morningPool, 4, undefined, true).sort((a, b) => a.start - b.start);
+      const items = diverse(morningPool, 4, undefined, true, prefer).sort((a, b) => a.start - b.start);
       items.forEach(i => used.add(i.entity.id));
       out.push({
         brand: kit.id, template: 'roundup', fingerprint: fpToday, items,
@@ -242,7 +250,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
     const evening = onToday.filter(h => isEvening(h) && !used.has(h.entity.id));
     let tonight: Candidate | null = null;
     if (!queued.has(fpTonight) && evening.length >= 2) {
-      const items = diverse(evening, 4, undefined, true).sort((a, b) => a.start - b.start);
+      const items = diverse(evening, 4, undefined, true, prefer).sort((a, b) => a.start - b.start);
       items.forEach(i => used.add(i.entity.id));
       tonight = {
         brand: kit.id, template: 'roundup', fingerprint: fpTonight, items,
@@ -266,7 +274,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
         // One of each thing: two games of the same series read as a repeat ("Women's Soccer — …" twice).
         const series = (h: Happening) => normalize(h.entity.title.replace(/\([^)]*\)/g, ' ').split(/\s*[—–-]\s|\svs\.?\s/i)[0]);
         const bySeries = new Map<string, Happening>();
-        for (const h of diverse(weekend, 8)) if (!bySeries.has(series(h))) bySeries.set(series(h), h);
+        for (const h of diverse(weekend, 8, undefined, false, prefer)) if (!bySeries.has(series(h))) bySeries.set(series(h), h);
         const items = [...bySeries.values()].slice(0, 5).sort((a, b) => a.start - b.start);
         if (items.length >= 3) {
           items.forEach(i => used.add(i.entity.id));
@@ -291,7 +299,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
       const grownUp = (h: Happening) => (h.entity.categories ?? [] as string[]).some((c: string) => ['arts', 'nightlife', 'music', 'food'].includes(c)) && !(h.entity.categories ?? [] as string[]).includes('family');
       const pool = all.filter(h => nights.includes(calgaryDate(h.start)) && isEvening(h) && grownUp(h) && !used.has(h.entity.id));
       if (pool.length >= 2) {
-        const items = diverse(pool, 4, undefined, true).sort((a, b) => a.start - b.start);
+        const items = diverse(pool, 4, undefined, true, prefer).sort((a, b) => a.start - b.start);
         items.forEach(i => used.add(i.entity.id));
         dateNight = {
           brand: kit.id, template: 'roundup', fingerprint: fpDate, items,
@@ -311,7 +319,7 @@ export function selectCandidates(index: DiscoveryIndex, kit: BrandKit, now: numb
     const spotlightSlots = slots.map((_, i) => i).filter(i => i !== 0 && !(tonight && i === TONIGHT) && free(i) && !(reel && i === 1) && !(dateNight && i === DATE_SLOT));
     const pool = all.filter(h => (h.end ?? h.start) > now && h.start < calgaryToEpoch(addDays(today, 3), '00:00') && !queued.has(fpFor(h)));
     const budget = kit.postsPerDay - bookedSlots.size - out.length - (tonight ? 1 : 0);
-    const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used);
+    const picks = diverse(pool, Math.max(0, Math.min(spotlightSlots.length, budget)), used, false, prefer);
     picks.forEach((h, i) => {
       out.push({
         brand: kit.id, template: 'event', fingerprint: fpFor(h), items: [h], title: h.entity.title, facts: factsFor([h]),
@@ -410,6 +418,7 @@ export function reelSlides(c: Pick<Candidate, 'items' | 'fingerprint'>): Array<P
       blurb: null,
       details: (tonight ? [place(s.first.entity)] : [joinTimes(s.times), place(s.first.entity)]).filter(Boolean).map(x => tidyWords(x, 44)),
       footer: tidyWords(`Listed by ${s.first.entity.organizer ?? s.first.sourceName}`, 48),
+      photo: listingPhoto(s.first.entity, s.first.sourceName),
     })),
     { template: 'slide', eyebrow: 'FOLLOW', headline: 'Your Calgary plan, every morning.', details: ['Today, tonight and this weekend, checked with the organizers.', '@calgarydaily'], footer: 'Full list on calgarywatch.ca||' },
   ];
@@ -483,6 +492,7 @@ export function templateDraft(c: Candidate, kit: BrandKit): Draft {
       // The venue alone when venue + neighbourhood won't fit on one line.
       details: [`${shortDay(h.start)} · ${when}`, where.length <= 44 ? where : (e.venue ? tidyWords(cleanPlace(e.venue), 44) : tidyWords(e.address ?? '', 44))].filter(Boolean),
       footer: tidy(`Listed by ${e.organizer ?? h.sourceName}`, 52),
+      photo: listingPhoto(e, h.sourceName),
     },
   };
 }

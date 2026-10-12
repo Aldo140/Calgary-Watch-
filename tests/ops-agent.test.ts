@@ -133,9 +133,14 @@ describe('automatic posting', () => {
   it('lets CalgaryDaily roundups go out on their own', () => {
     assert.ok(autoPublishable(post({})));
   });
-  it('holds single event and market posts for a person (they drew a median of 45 views)', () => {
+  it('holds text-only event and market posts for a person (they drew a median of 45 views)', () => {
     assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x' })));
     assert.ok(!autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x' })));
+  });
+  it('lets event and market posts with the listing\'s own photo go out on their own', () => {
+    const imageText = { eyebrow: '', headline: 'h', details: [], footer: '', photo: { url: 'https://x/p.jpg', credit: 'Image via University of Calgary' } };
+    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|event|x', imageText })));
+    assert.ok(autoPublishable(post({ template: 'event', fingerprint: 'calgarydaily|market|x', imageText })));
   });
   it('keeps CalgaryWatch, briefs, paid posts and anything with a warning for a person', () => {
     assert.ok(!autoPublishable(post({ brand: 'calgarywatch' })));

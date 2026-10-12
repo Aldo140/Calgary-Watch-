@@ -1,0 +1,21 @@
+/* /submit: add an event or market. Hero from brand-page.css; the form keeps plans.css. */
+.sb { padding-bottom: 0; }
+.sb-steps { display: grid; gap: 14px; justify-self: end; width: 100%; max-width: 440px; counter-reset: none; }
+.sb-steps li {
+  position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; align-items: start; padding: 16px 16px 16px 18px;
+  border: 2px solid var(--ink); border-radius: 18px; background: #fff; color: var(--ink); box-shadow: 5px 5px 0 var(--cyan);
+}
+.sb-steps li:nth-child(1) { transform: rotate(-1.5deg); }
+.sb-steps li:nth-child(2) { transform: translateX(18px) rotate(1deg); background: var(--yellow); box-shadow: 5px 5px 0 rgba(0, 0, 0, .45); }
+.sb-steps li:nth-child(3) { transform: rotate(-.5deg); }
+.sb-steps b { position: absolute; top: -12px; left: -12px; width: 30px; height: 30px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--navy); color: #fff; font: 800 15px var(--display); }
+.sb-steps svg { margin-top: 2px; color: var(--blue); }
+.sb-steps span { display: flex; flex-direction: column; gap: 3px; font: 400 14.5px/1.45 Inter, sans-serif; color: #2e3238; }
+.sb-steps strong { font: 800 19px/1.15 var(--display); letter-spacing: -.02em; color: var(--ink); }
+.cw-submit { padding-top: clamp(24px, 3vw, 40px); }
+.cw-submit .pl-card { border: 2px solid #151515; box-shadow: 6px 6px 0 #151515; border-radius: 24px; }
+@media (max-width: 960px) { .sb-steps { justify-self: start; } }
+@media (max-width: 640px) {
+  .sb-steps li, .sb-steps li:nth-child(2) { transform: none; }
+  .cw-submit .pl-card { box-shadow: 4px 4px 0 #151515; }
+}

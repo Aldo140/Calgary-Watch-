@@ -13,6 +13,7 @@ import { AlertTriangle, Ban, CheckCircle2, ExternalLink, Mail, Plus } from 'luci
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { db } from '@/src/firebase';
 import type { LeadStatus, PartnerLead } from '@/src/types/ops';
+import { LOCAL_SERVICES, SERVICE_GROUPS, serviceById } from '@/src/data/localServices';
 import { ClaimsPanel } from './ClaimsPanel';
 import { MarketHQPanel } from './MarketHQPanel';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, inputClass, inputStyle, mono, type Tone } from './ui';
@@ -72,7 +73,7 @@ function LeadCard({ lead }: { lead: PartnerLead }) {
       <div className="flex flex-wrap items-center gap-1.5">
         <h3 className="font-bold mr-1" style={{ color: T.ink }}>{lead.businessName}</h3>
         <Chip tone={TONE[lead.status] ?? 'neutral'}>{lead.status}</Chip>
-        <Chip>{lead.category}</Chip>
+        <Chip>{serviceById(lead.category)?.label ?? lead.category}</Chip>
         {lead.neighbourhood && <Chip>{lead.neighbourhood}</Chip>}
         {lead.importedFrom && <Chip mono>imported</Chip>}
         {lead.website && <a href={lead.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: T.signal }}>website <ExternalLink size={11} /></a>}
@@ -160,6 +161,7 @@ function LeadCard({ lead }: { lead: PartnerLead }) {
 function AddLead() {
   const [name, setName] = useState('');
   const [site, setSite] = useState('');
+  const [category, setCategory] = useState('business');
   const [msg, setMsg] = useState('');
   async function add() {
     if (!db) return;
@@ -167,21 +169,31 @@ function AddLead() {
     const now = Date.now();
     try {
       await setDoc(doc(db, 'partner_leads', id), {
-        id, entityId: null, entityKind: null, businessName: name.trim(), category: 'business', neighbourhood: '', website: site.trim() || null,
+        id, entityId: null, entityKind: null, businessName: name.trim(), category, neighbourhood: '', website: site.trim() || null,
         contactName: null, contactRole: null, contactEmail: null, emailSourceUrl: null, emailFoundAt: null, consentBasis: null,
         noSolicitationNotice: false, reasonRelevant: '', status: 'new', draftSubject: '', draftBody: '', followUps: 0, lastContactAt: null,
         nextFollowUpAt: null, conversationId: null, lastReply: null, doNotContact: false, notes: '', history: [{ at: now, type: 'found', summary: 'Added by hand.' }],
         createdAt: now, updatedAt: now,
       });
-      setName(''); setSite(''); setMsg('Added. The next daily run researches it.');
+      setName(''); setSite(''); setMsg(`Added${serviceById(category) ? ` under ${serviceById(category)!.label}; it gets the services-directory invitation` : ''}. The next daily run researches it.`);
     } catch (e) { setMsg(e instanceof Error ? e.message : 'Could not add'); }
   }
   return (
-    <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] items-end p-4 border-t" style={{ borderColor: T.line }}>
+    <div className="grid gap-2 sm:grid-cols-[1fr_1fr_1fr_auto] items-end p-4 border-t" style={{ borderColor: T.line }}>
       <Field label="Business name"><input value={name} onChange={e => setName(e.target.value)} className={inputClass} style={inputStyle} /></Field>
       <Field label="Website"><input value={site} onChange={e => setSite(e.target.value)} placeholder="https://" className={inputClass} style={inputStyle} /></Field>
+      <Field label="Kind of business">
+        <select value={category} onChange={e => setCategory(e.target.value)} className={inputClass} style={inputStyle}>
+          <option value="business">Local place (shop, café, venue)</option>
+          {(Object.keys(SERVICE_GROUPS) as Array<keyof typeof SERVICE_GROUPS>).map(g => (
+            <optgroup key={g} label={`Services: ${SERVICE_GROUPS[g].label}`}>
+              {LOCAL_SERVICES.filter(s => s.group === g).map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </optgroup>
+          ))}
+        </select>
+      </Field>
       <AdminButton variant="outline" tone="signal" disabled={!name.trim() || !/^https:\/\//.test(site)} onClick={add}><Plus size={14} /> Add lead</AdminButton>
-      {msg && <p className="text-xs sm:col-span-3" style={{ color: T.muted }}>{msg}</p>}
+      {msg && <p className="text-xs sm:col-span-4" style={{ color: T.muted }}>{msg}</p>}
     </div>
   );
 }

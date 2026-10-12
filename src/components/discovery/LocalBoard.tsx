@@ -5,6 +5,7 @@ import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
 import { hoodOf, localLinks, type LocalLinks } from '../../lib/localLinks';
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
+import { ServicesDirectory, ServicesIndex } from './LocalServices';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
@@ -111,8 +112,12 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
       <header className="cw-loc-hero">
         <div className="cw-loc-hero-copy">
           <p className="cw-loc-kicker"><span className="cw-loc-dot" aria-hidden="true" />CalgaryWatch Local</p>
-          <h1>The places Calgarians <span>keep to themselves.</span></h1>
-          <p className="cw-loc-lead">Independent spots worth crossing the city for, with how to do each one like a local. Picked by us, never sold.</p>
+          {category === 'services'
+            ? <h1>The Calgarians to call <span>when something breaks.</span></h1>
+            : <h1>The places Calgarians <span>keep to themselves.</span></h1>}
+          <p className="cw-loc-lead">{category === 'services'
+            ? 'Plumbers, furnace techs, snow removal and the other services every Calgary home needs, with what to ask before you hire. Picked by us, never sold.'
+            : 'Independent spots worth crossing the city for, with how to do each one like a local. Picked by us, never sold.'}</p>
           <ul className="cw-loc-stats" aria-label="At a glance">
             <li><b>{places.length}</b> {places.length === 1 ? 'place' : 'places'}</li>
             <li><b>{areas.size}</b> {areas.size === 1 ? 'neighbourhood' : 'neighbourhoods'}</li>
@@ -141,6 +146,8 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
           return <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{cap(c)} <i>{n}</i></Link>;
         })}
       </nav>
+
+      {category === 'services' ? <ServicesDirectory places={everyPlace} /> : null}
 
       {feature ? (
         <section className="cw-loc-feature" aria-labelledby="loc-feature">
@@ -202,6 +209,8 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
           </ul>
         </section>
       ) : !feature ? <p className="cw-loc-empty">Nothing in this category yet. <Link to="/submit">Know a place we should add?</Link></p> : null}
+
+      {!category ? <ServicesIndex places={everyPlace} /> : null}
 
       {!category && places.length > 1 ? (
         <section className="cw-loc-map" aria-labelledby="loc-map">

@@ -41,3 +41,23 @@ describe('outreach to organizers and prospects', () => {
     assert.deepEqual(checkPitch(t.body, cfg, ADDRESS), []);
   });
 });
+
+describe('outreach to Calgary service businesses', () => {
+  it('invites a service business to the services directory, and the pitch passes every CASL check', async () => {
+    const { serviceFacts } = await import('../scripts/ops/jobs/outreach');
+    const cfg = outreachConfig();
+    const ADDRESS = '123 Test St SW, Calgary AB';
+    const lead = { businessName: 'Bow Valley Plumbing', category: 'plumbing', neighbourhood: '' } as PartnerLead;
+    const facts = serviceFacts(lead)!;
+    assert.match(facts, /local\/services#svc-plumbing/);
+    const t = templatePitch(lead, facts, signature(cfg, ADDRESS));
+    assert.match(t.subject, /services list/);
+    assert.match(t.body, /plumbers/);
+    assert.doesNotMatch(t.body, /events/);
+    assert.deepEqual(checkPitch(t.body, cfg, ADDRESS), []);
+  });
+  it('leaves non-service leads on the existing templates', async () => {
+    const { serviceFacts } = await import('../scripts/ops/jobs/outreach');
+    assert.equal(serviceFacts({ businessName: 'Vertigo', category: 'arts', neighbourhood: '' }), null);
+  });
+});

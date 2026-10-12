@@ -25,20 +25,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ArrowLeft, Check, MailX, TriangleAlert } from 'lucide-react';
+import { ArrowUpRight, Check, MailX, TriangleAlert } from 'lucide-react';
+import { SiteLayout } from '../components/site/SiteLayout';
+import '../styles/brand-page.css';
+import '../styles/unsubscribe.css';
 import { auth, db } from '@/src/firebase';
 import { emailConsentPatch, readPlansProfile } from '@/src/lib/plansProfile';
 import { isValidUnsubToken } from '@/src/lib/digest';
-
-const T = {
-  paper: '#F7F3EA',
-  panel: '#FFFDF8',
-  ink: '#1C2B3A',
-  inkSoft: '#5A6B7D',
-  line: '#D9D2C3',
-  bow: '#2E8B7A',
-  clay: '#B0503A',
-};
 
 type Stage = 'confirm' | 'working' | 'done' | 'invalid' | 'error';
 
@@ -97,114 +90,83 @@ export default function UnsubscribePage() {
     }
   }, [uid, token, linkLooksValid, events, all]);
 
+  const settingsTo = events ? '/plans' : '/map';
+  const listName = all ? 'both weekly emails' : events ? 'the Thursday picks email' : 'the Monday digest';
+
   return (
-    <div className="min-h-screen" style={{ background: T.paper }}>
-      <main className="mx-auto flex min-h-screen w-full max-w-[600px] flex-col justify-center px-5 py-16">
-        <Link
-          to="/"
-          className="mb-8 inline-flex items-center gap-2 text-[13px] font-bold transition-opacity hover:opacity-70"
-          style={{ color: T.inkSoft }}
-        >
-          <ArrowLeft size={15} /> Calgary Watch
-        </Link>
-
-        <div className="p-7 sm:p-9" style={{ background: T.panel, border: `1.5px solid ${T.line}` }}>
-          {stage === 'confirm' || stage === 'working' ? (
-            <>
-              <MailX size={30} style={{ color: T.ink }} />
-              <h1
-                className="mt-4 font-display text-[1.7rem] font-extrabold leading-tight tracking-[-0.02em]"
-                style={{ color: T.ink }}
-              >
-                {all ? 'Stop both weekly emails?' : events ? 'Stop the Thursday picks email?' : 'Stop the weekly digest?'}
-              </h1>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-                {all
-                  ? 'You will stop getting the Monday safety reports and your event picks. Your account, saved area, interests, plans and badges stay as they are, and you can turn either back on from Your CalgaryWatch whenever you like.'
-                  : events
-                  ? 'You will stop receiving Thursday event picks. Your interests, your plans and your badges stay on your account, the Monday neighbourhood email is not affected, and you can turn picks back on from your plans page whenever you like.'
-                  : 'You will stop receiving the Monday email about your neighbourhood. Your account, your saved location and any reports you have filed are untouched, and you can turn the digest back on from settings whenever you like.'}
-              </p>
-              <button
-                type="button"
-                onClick={() => void confirm()}
-                disabled={stage === 'working'}
-                className="mt-6 inline-flex items-center gap-2 px-5 py-3 text-[14px] font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ background: T.ink, color: T.paper }}
-              >
-                {stage === 'working' ? 'Unsubscribing…' : 'Yes, unsubscribe me'}
-              </button>
-              {all ? (
-                <p className="mt-4 text-[13px]" style={{ color: T.inkSoft }}>
-                  Only want to stop one of them? <Link to="/plans#emails" className="font-bold underline" style={{ color: T.ink }}>Choose on Your CalgaryWatch</Link>
-                </p>
+    <SiteLayout>
+      <div className="bp un">
+        <section className="un-hero" aria-live="polite">
+          <div className="cw-wrap">
+            <div className={`un-card un-card-${stage}`}>
+              {stage === 'confirm' || stage === 'working' ? (
+                <>
+                  <span className="un-icon"><MailX size={28} aria-hidden="true" /></span>
+                  <p className="bp-eyebrow">Unsubscribe</p>
+                  <h1>{all ? 'Stop both weekly emails?' : events ? 'Stop the Thursday picks email?' : 'Stop the weekly digest?'}</h1>
+                  <p>
+                    {all
+                      ? 'You will stop getting the Monday safety reports and your event picks. Your account, saved area, interests, plans and badges stay as they are, and you can turn either back on from Your CalgaryWatch whenever you like.'
+                      : events
+                      ? 'You will stop receiving Thursday event picks. Your interests, your plans and your badges stay on your account, the Monday neighbourhood email is not affected, and you can turn picks back on from your plans page whenever you like.'
+                      : 'You will stop receiving the Monday email about your neighbourhood. Your account, your saved location and any reports you have filed are untouched, and you can turn the digest back on from settings whenever you like.'}
+                  </p>
+                  <div className="un-actions">
+                    <button type="button" className="bp-btn bp-btn-navy" onClick={() => void confirm()} disabled={stage === 'working'}>
+                      {stage === 'working' ? 'Unsubscribing…' : 'Yes, unsubscribe me'}
+                    </button>
+                    <Link className="bp-btn" to="/">Keep getting it</Link>
+                  </div>
+                  {all ? (
+                    <p className="un-fine">Only want to stop one of them? <Link to="/plans#emails">Choose on Your CalgaryWatch</Link></p>
+                  ) : null}
+                </>
               ) : null}
-            </>
-          ) : null}
 
-          {stage === 'done' ? (
-            <>
-              <span
-                className="flex size-11 items-center justify-center rounded-full"
-                style={{ background: 'rgba(46,139,122,0.14)' }}
-              >
-                <Check size={22} style={{ color: T.bow }} />
-              </span>
-              <h1
-                className="mt-4 font-display text-[1.7rem] font-extrabold leading-tight tracking-[-0.02em]"
-                style={{ color: T.ink }}
-              >
-                Done — you are unsubscribed.
-              </h1>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-                {immediate
-                  ? `It’s off now. You won’t get another ${all ? 'weekly email from us' : events ? 'Thursday picks email' : 'Monday email'}, and everything else on your account stays as it is.`
-                  : `Your request is recorded. It is applied when the ${all ? 'emails' : events ? 'picks email' : 'digest'} next run${all ? '' : 's'}, so in the rare case that a message is already in flight you may see one more. Nothing after that.`}
-              </p>
-              <Link
-                to={events ? '/plans' : '/map'}
-                className="mt-6 inline-flex items-center gap-2 px-5 py-3 text-[14px] font-bold transition-opacity hover:opacity-90"
-                style={{ background: T.ink, color: T.paper }}
-              >
-                {events ? 'Back to your plans' : 'Back to the map'}
-              </Link>
-            </>
-          ) : null}
+              {stage === 'done' ? (
+                <>
+                  <span className="un-icon un-icon-ok"><Check size={28} aria-hidden="true" /></span>
+                  <p className="bp-eyebrow">Unsubscribed</p>
+                  <h1>Done. You’re off {listName}.</h1>
+                  <p>
+                    {immediate
+                      ? `It’s off now. You won’t get another ${all ? 'weekly email from us' : events ? 'Thursday picks email' : 'Monday email'}, and everything else on your account stays as it is.`
+                      : `Your request is recorded. It is applied when the ${all ? 'emails' : events ? 'picks email' : 'digest'} next run${all ? '' : 's'}, so in the rare case that a message is already in flight you may see one more. Nothing after that.`}
+                  </p>
+                  <div className="un-actions">
+                    <Link className="bp-btn bp-btn-navy" to={events ? '/plans' : '/map'}>
+                      {events ? 'Back to your plans' : 'Back to the map'} <ArrowUpRight size={18} aria-hidden="true" />
+                    </Link>
+                    <Link className="bp-btn" to="/events">See what’s on</Link>
+                  </div>
+                </>
+              ) : null}
 
-          {stage === 'invalid' || stage === 'error' ? (
-            <>
-              <TriangleAlert size={30} style={{ color: T.clay }} />
-              <h1
-                className="mt-4 font-display text-[1.7rem] font-extrabold leading-tight tracking-[-0.02em]"
-                style={{ color: T.ink }}
-              >
-                {stage === 'invalid' ? 'That link did not work.' : 'Something went wrong.'}
-              </h1>
-              <p className="mt-3 text-[15px] leading-relaxed" style={{ color: T.inkSoft }}>
-                {stage === 'invalid'
-                  ? `It may have been truncated by your email client, or it belongs to a different account. You can always turn the ${events ? 'picks email off on your plans page' : 'digest off directly in your settings'}.`
-                  : 'We could not record your request just now. Please try again, or email us and we will do it by hand.'}
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  to={events ? '/plans' : '/map'}
-                  className="inline-flex items-center gap-2 px-5 py-3 text-[14px] font-bold transition-opacity hover:opacity-90"
-                  style={{ background: T.ink, color: T.paper }}
-                >
-                  Open settings
-                </Link>
-                <a
-                  href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(events ? 'Unsubscribe from Thursday picks' : 'Unsubscribe from the weekly digest')}`}
-                  className="inline-flex items-center gap-2 px-5 py-3 text-[14px] font-bold"
-                  style={{ border: `1.5px solid ${T.line}`, color: T.ink }}
-                >
-                  Email us instead
-                </a>
-              </div>
-            </>
-          ) : null}
-        </div>
-      </main>
-    </div>
+              {stage === 'invalid' || stage === 'error' ? (
+                <>
+                  <span className="un-icon un-icon-warn"><TriangleAlert size={28} aria-hidden="true" /></span>
+                  <p className="bp-eyebrow">Unsubscribe</p>
+                  <h1>{stage === 'invalid' ? 'That link did not work.' : 'Something went wrong.'}</h1>
+                  <p>
+                    {stage === 'invalid'
+                      ? `It may have been truncated by your email client, or it belongs to a different account. You can always turn the ${events ? 'picks email off on your plans page' : 'digest off directly in your settings'}.`
+                      : 'We could not record your request just now. Please try again, or email us and we will do it by hand.'}
+                  </p>
+                  <div className="un-actions">
+                    <Link className="bp-btn bp-btn-navy" to={settingsTo}>Open settings</Link>
+                    <a
+                      className="bp-btn"
+                      href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(events ? 'Unsubscribe from Thursday picks' : 'Unsubscribe from the weekly digest')}`}
+                    >
+                      Email us instead
+                    </a>
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      </div>
+    </SiteLayout>
   );
 }

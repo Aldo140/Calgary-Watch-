@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowUpRight, Check, Clock, LinkIcon, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Clock, LinkIcon, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../components/FirebaseProvider';
 import { SiteLayout } from '../components/site/SiteLayout';
+import { PageHero } from '../components/site/PageHero';
 import { InventoryForm } from '../components/discovery/InventoryForm';
 import { BadgeMark } from '../components/plans/BadgeMark';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { submitDiscovery } from '../lib/discoveryApi';
 import { readMySubmissionCount } from '../lib/plans';
 import '../styles/plans.css';
+import '../styles/submit.css';
 
 /**
  * Add an event or market. The ask is small and specific — a real listing with
@@ -29,18 +31,22 @@ export default function SubmitDiscoveryPage() {
 
   return (
     <SiteLayout>
+      <div className="bp sb">
+        <PageHero
+          id="sb-title"
+          kicker="Add to the calendar · free"
+          title={<>Know something <span>on in Calgary?</span></>}
+          lead="Share an event or market with the organizer’s own link. We check it against that page, then publish it for everyone browsing what’s on, and in the Thursday picks of people who’d like it."
+          aside={
+            <ol className="sb-steps">
+              <li><b>1</b><LinkIcon size={20} aria-hidden="true" /><span><strong>Link the source</strong>The organizer’s page or ticket listing, so we can check it.</span></li>
+              <li><b>2</b><ShieldCheck size={20} aria-hidden="true" /><span><strong>We verify it</strong>Dates, place and price, against that source.</span></li>
+              <li><b>3</b><Clock size={20} aria-hidden="true" /><span><strong>It goes live</strong>Once it matches the source. Sharing earns the Event scout badge.</span></li>
+            </ol>
+          }
+        />
+      </div>
       <div className="cw-plans cw-submit">
-        <header className="cw-wrap pl-head">
-          <p className="pl-eyebrow">Add to the calendar · free</p>
-          <h1>Know something <em>on in Calgary?</em></h1>
-          <p className="pl-lead">Share an event or market with the organizer’s own link. We check it against that page, then publish it for everyone browsing what’s on, and in the Thursday picks of people who’d like it.</p>
-          <ul className="cw-submit-steps">
-            <li><LinkIcon size={18} aria-hidden="true" /><span><strong>Link the source</strong>The organizer’s page or ticket listing, so we can check it.</span></li>
-            <li><ShieldCheck size={18} aria-hidden="true" /><span><strong>We verify it</strong>Dates, place and price, against that source.</span></li>
-            <li><Clock size={18} aria-hidden="true" /><span><strong>It goes live</strong>Once it matches the source. Sharing earns the Event scout badge.</span></li>
-          </ul>
-        </header>
-
         <div className="cw-wrap cw-submit-body">
           {sent ? (
             <section className="pl-card cw-submit-done" role="status">

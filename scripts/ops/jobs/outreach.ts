@@ -20,6 +20,7 @@ import { inboxSince, outlookConfigured, replyInThread, sendNew } from '../lib/ou
 import { resendConfigured, sendViaResend } from '../lib/resend';
 import type { DiscoveryIndex, Entity } from '../lib/posts';
 import { calgaryDate } from '../lib/time';
+import { serviceById } from '../../../src/data/localServices';
 
 type Log = (m: string) => void;
 const DAY = 86_400_000;
@@ -48,7 +49,29 @@ function factsFor(e: Entity): string {
   ].filter(Boolean).join('\n');
 }
 
+/** What we tell the writer about a service business we'd like to add to Local's services directory. */
+export function serviceFacts(lead: Pick<PartnerLead, 'businessName' | 'category' | 'neighbourhood'>): string | null {
+  const s = serviceById(lead.category);
+  if (!s) return null;
+  return [
+    `Business: ${lead.businessName}`,
+    `Service: ${s.label} (${s.trades.join(', ')})`,
+    lead.neighbourhood && `Neighbourhood: ${lead.neighbourhood}`,
+    `Not listed yet. It would go in CalgaryWatch Local's services directory: https://calgarywatch.ca/local/services#svc-${s.id}`,
+    'We list a business only after checking its details against its own website.',
+  ].filter(Boolean).join('\n');
+}
+
 export function templatePitch(lead: PartnerLead, facts: string, sig: string): { subject: string; body: string; reasonRelevant: string } {
+  const service = !facts.startsWith('Listing: ') ? serviceById(lead.category) : undefined;
+  if (service) {
+    // A Calgary trade or service business (plumber, furnace tech, snow removal...): an invitation to the services directory.
+    return {
+      subject: `Adding ${lead.businessName} to CalgaryWatch's Calgary services list`,
+      body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide that now includes a short list of local services people ask us about, starting with ${service.label.toLowerCase()}. I'd like to add ${lead.businessName}, built from the details on your own website and linking straight back to you.\n\nWhich parts of the city do you serve, and is there anything you'd like us to mention?\n\nThe listing is free and always will be.\n\n${sig}`,
+      reasonRelevant: `The message is about listing ${lead.businessName}'s ${service.trades[0]} business in CalgaryWatch's Calgary services directory.`,
+    };
+  }
   if (!facts.startsWith('Listing: ')) {
     // An organization we haven't listed yet (brand/partner-prospects.json): an invitation, not a "we listed you".
     return {
@@ -225,13 +248,13 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       continue;
     }
 
-    const facts = entity ? factsFor(entity) : `Business: ${lead.businessName}`;
+    const facts = entity ? factsFor(entity) : serviceFacts(lead) ?? `Business: ${lead.businessName}`;
     const withEmail: PartnerLead = { ...lead, contactEmail: found.email };
     let pitch = templatePitch(withEmail, facts, sig);
     const warnings: string[] = [];
     if (claudeConfigured()) {
       try {
-        const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false }, sig);
+        const w = await writePitch(cfg, { businessName: lead.businessName, category: serviceById(lead.category)?.label ?? lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false }, sig);
         const problems = checkPitch(w.body, cfg, address);
         if (problems.length) warnings.push(`Claude's draft was replaced by the template: ${problems.join(' ')}`); else pitch = w;
       } catch (e) { warnings.push(`Template draft; Claude failed: ${e instanceof Error ? e.message : e}`); }

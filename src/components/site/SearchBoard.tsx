@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { GlobalSearch } from './GlobalSearch';
+import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers } from './SearchAnswers';
 import { PageHero } from './PageHero';
 import type { SearchIntent } from '../../lib/searchIntent';
@@ -46,10 +46,15 @@ function detail(e: DiscoveryEntity) {
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
+  partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
+  /** For a community search with no listings of its own: what's on nearby. */
+  nearby?: { title: ReactNode; items: DiscoveryEntity[] };
 }) {
+  const listings = <><b>{listingCount}</b> {partial ? 'close ' : ''}{listingCount === 1 ? 'listing' : 'listings'}</>;
+  const ready = <><b>{answers}</b> ready-made {answers === 1 ? 'answer' : 'answers'}</>;
   return (
     <div className="bp sx">
       <PageHero
@@ -57,7 +62,7 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
         kicker={q ? 'Search results' : 'Search CalgaryWatch'}
         title={q ? <>Results for <span>“{q}”</span></> : <>Ask about <span>Calgary.</span></>}
         lead={q ? undefined : 'A neighbourhood, a street, what happened last night, or something to do this weekend. Answers come from the live map and every listing on the site.'}
-        ctas={<div className="sx-box"><GlobalSearch initial={q} /></div>}
+        ctas={<div className="sx-box"><GlobalSearch initial={q} suggest={suggest} /></div>}
         facts={<>{TRY.map(t => <li key={t}><Link to={`/search?q=${encodeURIComponent(t)}`}>{t}</Link></li>)}</>}
       />
 
@@ -66,9 +71,10 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
           <>
             <p className="sx-count" role="status">
               {resultCount
-                ? <><b>{listingCount}</b> {listingCount === 1 ? 'listing' : 'listings'}{answers ? <> and <b>{answers}</b> ready-made {answers === 1 ? 'answer' : 'answers'}</> : null}</>
+                ? <>{answers ? ready : null}{answers > 0 && listingCount > 0 ? ' and ' : null}{listingCount ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
                 : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
             </p>
+            {didYouMean ? <p className="sx-dym">Did you mean <Link to={`/search?q=${encodeURIComponent(didYouMean)}`}>{didYouMean}</Link>?</p> : null}
             <SearchAnswers intent={intent} now={now} />
             {Object.entries(groups).map(([kind, entities]) => {
               const section = DISCOVERY_SECTIONS.find(s => s.kind === kind);
@@ -78,26 +84,16 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                     <h2 id={`sx-${kind}`}>{section?.label}</h2>
                     {section ? <Link className="bp-link" to={section.path}>All {section.label.toLowerCase()} <ArrowRight size={15} aria-hidden="true" /></Link> : null}
                   </div>
-                  <ul className="sx-results">
-                    {entities.map(e => {
-                      const { place, date } = detail(e);
-                      return (
-                        <li key={e.id}>
-                          <Link to={entityPath(e)} className="sx-result">
-                            <span className={`sx-kind sx-kind-${e.kind}`}>{KIND[e.kind]}</span>
-                            <span className="sx-result-copy">
-                              <strong>{e.title}</strong>
-                              {date || place ? <small>{[date, place].filter(Boolean).join(' · ')}</small> : null}
-                            </span>
-                            <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  <Rows entities={entities} />
                 </section>
               );
             })}
+            {nearby?.items.length ? (
+              <section className="bp-section sx-group" aria-labelledby="sx-nearby">
+                <div className="bp-head"><h2 id="sx-nearby">{nearby.title}</h2><p>Nothing listed in this community yet, so here’s what’s closest.</p></div>
+                <Rows entities={nearby.items} />
+              </section>
+            ) : null}
             {!resultCount ? <Starters title="Try one of these" /> : null}
           </>
         ) : (
@@ -123,6 +119,28 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
         </section>
       </div>
     </div>
+  );
+}
+
+function Rows({ entities }: { entities: DiscoveryEntity[] }) {
+  return (
+    <ul className="sx-results">
+      {entities.map(e => {
+        const { place, date } = detail(e);
+        return (
+          <li key={e.id}>
+            <Link to={entityPath(e)} className="sx-result">
+              <span className={`sx-kind sx-kind-${e.kind}`}>{KIND[e.kind]}</span>
+              <span className="sx-result-copy">
+                <strong>{e.title}</strong>
+                {date || place ? <small>{[date, place].filter(Boolean).join(' · ')}</small> : null}
+              </span>
+              <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

@@ -1,11 +1,8 @@
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { lazy, Suspense } from 'react';
 import { filterInventory, matchesText, matchesTonight } from '../lib/discoveryCalendar';
-import { recordSearch } from '../lib/searchDemand';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
-import { SearchBoard } from '../components/site/SearchBoard';
 import { NotFoundHero } from './NotFoundPage';
-import { answerCount, parseSearchIntent } from '../lib/searchIntent';
 import { DiscoveryCard, EmptyInventory } from '../components/discovery/DiscoveryCards';
 import { EntityDetail } from '../components/entity/EntityDetail';
 import { EventDetail, PlaceDetail } from '../components/entity/ListingDetail';
@@ -21,7 +18,7 @@ import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
 import type { Event as EventEntity, Guide, Neighbourhood } from '../types/discovery';
-import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch, searchEntities } from '../lib/discovery';
+import { DISCOVERY_SECTIONS, LOCAL_CATEGORIES, QUADRANTS, matchesPeriod, normalizeSearch } from '../lib/discovery';
 
 // The 311 rank game, loaded only on the Neighbourhoods pages.
 const RankStrip = lazy(() => import('../components/check/RankStrip'));
@@ -38,30 +35,13 @@ export default function DiscoveryPage() {
   const quadrant = root === 'neighbourhoods' ? params.get('quadrant') : null;
   const entity = section && slug && !period && !category ? discoveryRepository.find(section.kind, slug) : undefined;
   const missing = !!slug && !period && !category && !entity;
-  const search = root === 'search'; const q = normalizeSearch(params.get('q') ?? '');
   const isTonight = period === 'today' && params.get('time') === 'tonight';
   let items = all.filter(e => e.kind === section?.kind && (!category || e.categories.includes(category)) && (!quadrant || (e.kind === 'neighbourhood' && e.quadrant === quadrant)));
   items = filterInventory(items, discoveryRepository.occurrences(), isTonight ? 'tonight' : period, params.get('filter') || undefined);
   // Search within a listing page (/events?q=jazz), on top of the date and interest filters.
   const within = (root === 'events' || root === 'markets') ? normalizeSearch(params.get('q') ?? '') : '';
   if (within) items = items.filter(e => matchesText(e, within));
-  // Search defaults to current/upcoming inventory, same as the listing pages — an ended
-  // or cancelled event/market shouldn't surface as a live suggestion. Its detail URL
-  // still resolves normally above (`entity`/`missing` don't go through this filter).
-  const groups = searchEntities(filterInventory(all, discoveryRepository.occurrences()), q);
-  const listingCount = Object.values(groups).flat().length;
-  // Neighbourhoods, streets and "yesterday police" get a ready-made answer above the listings.
-  const now = useMemo(() => Date.now(), [q]);
-  const intent = useMemo(() => parseSearchIntent(q, now), [q, now]);
-  const answers = search && q ? answerCount(intent) : 0;
-  const resultCount = listingCount + answers;
-  // Record what people look for (anonymously), after they stop typing.
-  useEffect(() => {
-    if (!search || !q) return;
-    const t = window.setTimeout(() => recordSearch(q, resultCount), 1200);
-    return () => clearTimeout(t);
-  }, [search, q, resultCount]);
-  const title = missing ? 'This page isn’t here yet.' : search ? 'Search Calgary.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
+  const title = missing ? 'This page isn’t here yet.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
   const relatedIds = entity?.kind === 'guide' ? entity.entries.map(e => e.entityId) : entity?.kind === 'neighbourhood' ? entity.entityIds : [];
   if (root === 'guides' && !missing) {
     return <SiteLayout>{entity?.kind === 'guide'
@@ -119,9 +99,6 @@ export default function DiscoveryPage() {
   if (entity?.kind === 'business') return <SiteLayout><PlaceDetail place={entity} all={all} /></SiteLayout>;
   if (missing) {
     return <SiteLayout><NotFoundHero code={`${section?.label ?? 'Listing'} · not found`} title={<>This listing has <span>moved on.</span></>} lead="It may have ended, moved, or not been published yet. Search for it, or see what’s on now." back={{ to: section?.path || '/', label: `See all ${section?.label.toLowerCase() || 'of Calgary'}` }} /></SiteLayout>;
-  }
-  if (search) {
-    return <SiteLayout><SearchBoard q={q} intent={intent} now={now} groups={groups} listingCount={listingCount} resultCount={resultCount} answers={answers} /></SiteLayout>;
   }
   return <SiteLayout><div className="cw-wrap cw-page">
     <nav className="cw-breadcrumb" aria-label="Breadcrumb"><Link to="/">Home</Link> / {section && <Link to={section.path}>{section.label}</Link>}{slug && <> / {entity?.title || slug}</>}</nav>

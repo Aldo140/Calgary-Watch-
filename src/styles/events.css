@@ -202,6 +202,25 @@
 .ev-row-body strong { font: 800 16.5px/1.15 var(--h-display); letter-spacing: -.015em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .ev-row-body span { font: 500 13px/1.3 Inter, sans-serif; color: var(--h-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* Date night: its way in, at the top of the listings. */
+.cw-site .ev-date {
+  position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 18px; margin-bottom: clamp(26px, 3.5vw, 40px);
+  padding: 14px 20px 14px 14px; border: 2px solid var(--b-ink); border-radius: 24px; color: #fff; text-decoration: none; overflow: hidden;
+  background: radial-gradient(circle at 92% 18%, rgba(255, 201, 214, .35) 0 70px, transparent 71px), linear-gradient(110deg, #1b1240 0%, #3a1650 55%, #6b1d4f 100%);
+  box-shadow: 6px 6px 0 #ffc9d6, 6px 6px 0 2px var(--b-ink); transition: transform .2s, box-shadow .2s;
+}
+.cw-site .ev-date:hover { color: #fff; transform: translate(-2px, -2px); box-shadow: 8px 8px 0 #ffc9d6, 8px 8px 0 2px var(--b-ink); }
+.ev-date-art { display: grid; place-items: center; width: 96px; height: 80px; border-radius: 16px; background: #ffc9d6; border: 2px solid var(--b-ink); }
+.ev-date-art .cw-menu-art, .ev-date-art svg { width: 80px; height: 64px; }
+.ev-date-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ev-date-kicker { font: 700 11px/1 var(--h-mono); letter-spacing: .1em; text-transform: uppercase; color: #ffc9d6; }
+.ev-date-copy strong { font: 800 clamp(22px, 2.2vw, 28px)/1.05 var(--h-display); letter-spacing: -.03em; }
+.ev-date-sub { font: 500 14.5px/1.35 Inter, sans-serif; color: rgba(255, 255, 255, .86); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-date-sub b { color: #fff; }
+.ev-date-cta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.ev-date-cta small { font: 700 11px/1 var(--h-mono); letter-spacing: .08em; text-transform: uppercase; color: #ffc9d6; }
+.ev-date-cta > span { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 18px; border-radius: 999px; background: #ffc9d6; color: var(--b-ink); border: 2px solid var(--b-ink); font: 800 14.5px/1 Inter, sans-serif; white-space: nowrap; }
+
 /* Signup nudge after the first day. */
 .cw-site .ev-foryou {
   display: flex; align-items: center; gap: 16px; margin-top: clamp(26px, 3.5vw, 40px); padding: 16px 18px; border: 2px solid var(--b-ink); border-radius: 22px;
@@ -306,6 +325,14 @@
   .ev-row .ev-price { grid-area: foot; justify-self: start; padding: 3px 8px; font-size: 12px; }
   .ev-row .ev-go { display: none; }
 
+  .cw-site .ev-date { grid-template-columns: 64px minmax(0, 1fr); grid-template-areas: 'art copy' 'cta cta'; gap: 12px 14px; margin: 0 -4px 30px; padding: 12px; border-radius: 20px; box-shadow: 4px 4px 0 #ffc9d6, 4px 4px 0 2px var(--b-ink); }
+  .ev-date-art { grid-area: art; width: 64px; height: 64px; border-radius: 14px; }
+  .ev-date-art svg { width: 56px; height: 46px; }
+  .ev-date-copy { grid-area: copy; }
+  .ev-date-copy strong { font-size: 21px; }
+  .ev-date-sub { white-space: normal; font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .ev-date-cta { grid-area: cta; flex-direction: row-reverse; justify-content: space-between; align-items: center; }
+  .ev-date-cta > span { height: 42px; }
   .cw-site .ev-foryou { flex-wrap: wrap; gap: 10px; padding: 16px; box-shadow: 4px 4px 0 var(--b-yellow), 4px 4px 0 2px var(--b-ink); }
   .ev-foryou-copy { flex-basis: 100%; order: 2; font-size: 15px; }
   .ev-foryou-cta { order: 3; }

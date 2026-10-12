@@ -162,6 +162,264 @@
       "website": "https://www.calgarystampede.com/",
       "category": "family",
       "why": "Year-round events at Stampede Park as well as the July Stampede."
+    },
+    {
+      "name": "Theatre Calgary",
+      "website": "https://www.theatrecalgary.com/",
+      "category": "arts",
+      "why": "Calgary's largest professional theatre company, staging a full season of plays and musicals downtown."
+    },
+    {
+      "name": "Werklund Centre (formerly Arts Commons)",
+      "website": "https://www.artscommons.ca/",
+      "category": "arts",
+      "why": "Downtown performing-arts centre with concerts, talks, exhibitions and free ArtsXpeditions pop-ups."
+    },
+    {
+      "name": "Downstage",
+      "website": "https://downstage.ca/",
+      "category": "arts",
+      "why": "Small professional theatre company that produces socially engaged plays and the Stage It Festival."
+    },
+    {
+      "name": "Ghost River Theatre",
+      "website": "https://www.ghostrivertheatre.com/",
+      "category": "arts",
+      "why": "Devised-theatre company running the West Village Theatre and staging immersive premieres."
+    },
+    {
+      "name": "StoryBook Theatre",
+      "website": "https://www.storybooktheatre.org/",
+      "category": "arts",
+      "why": "Volunteer-driven family theatre in Beddington that stages seasons of musicals and plays for young audiences."
+    },
+    {
+      "name": "Front Row Centre Players",
+      "website": "https://www.frontrowcentre.ca/",
+      "category": "arts",
+      "why": "Community musical theatre society that stages Broadway musicals each season."
+    },
+    {
+      "name": "Morpheus Theatre",
+      "website": "https://www.morpheustheatre.ca/",
+      "category": "arts",
+      "why": "Community theatre company that has staged a Gilbert and Sullivan show every season since 1996."
+    },
+    {
+      "name": "The Shakespeare Company",
+      "website": "https://shakespearecompany.com/",
+      "category": "arts",
+      "why": "Classical theatre company that stages Shakespeare productions and Bard events each season."
+    },
+    {
+      "name": "Quest Theatre",
+      "website": "https://questtheatre.org/",
+      "category": "arts",
+      "why": "Theatre company founded in 1984 that makes work for young audiences."
+    },
+    {
+      "name": "One Yellow Rabbit",
+      "website": "https://www.oyr.org/",
+      "category": "festival",
+      "why": "Theatre company behind the High Performance Rodeo, Calgary's annual January festival of contemporary performance."
+    },
+    {
+      "name": "Inside Out Theatre",
+      "website": "https://www.insideouttheatre.com/",
+      "category": "arts",
+      "why": "Deaf-, disability- and Mad-led company running accessible Good Host performances and community drama programs."
+    },
+    {
+      "name": "JazzYYC",
+      "website": "https://jazzyyc.com/",
+      "category": "music",
+      "why": "Jazz nonprofit running a June summer festival, a November Canadian festival and year-round shows."
+    },
+    {
+      "name": "Calgary Pro Musica",
+      "website": "https://calgarypromusica.ca/",
+      "category": "music",
+      "why": "Chamber music society presenting a season of touring ensembles at the Rozsa Centre."
+    },
+    {
+      "name": "Broken City",
+      "website": "https://brokencity.ca/",
+      "category": "music",
+      "why": "Beltline bar and venue with weekly live bands, a comedy open mic and DJ nights."
+    },
+    {
+      "name": "The Blues Can",
+      "website": "https://www.thebluescan.com/",
+      "category": "music",
+      "why": "Live blues room hosting shows most nights plus weekly jams."
+    },
+    {
+      "name": "Calgary Civic Symphony",
+      "website": "https://calgarycivicsymphony.ca/",
+      "category": "music",
+      "why": "Community orchestra founded in 1976 that presents a five-concert season at the Jack Singer Concert Hall."
+    },
+    {
+      "name": "Honens",
+      "website": "https://www.honens.com/",
+      "category": "music",
+      "why": "International piano competition that runs a festival and free Piano Project YYC concerts around the city."
+    },
+    {
+      "name": "Spiritus Chamber Choir",
+      "website": "https://www.spirituschamberchoir.ca/",
+      "category": "music",
+      "why": "Award-winning chamber choir that presents a four-concert season."
+    },
+    {
+      "name": "Comedy Cave",
+      "website": "https://comedycave.com/",
+      "category": "comedy",
+      "why": "Downtown stand-up club with shows Monday to Saturday featuring touring and local comics."
+    },
+    {
+      "name": "Calgary Society of Independent Filmmakers",
+      "website": "https://www.csif.org/",
+      "category": "film",
+      "why": "Independent film society, active since 1978, that runs workshops, screenings and a production fund."
+    },
+    {
+      "name": "Plaza Theatre",
+      "website": "https://www.theplaza.ca/",
+      "category": "film",
+      "why": "Historic independent cinema in Kensington that hosts screenings, film festivals and events."
+    },
+    {
+      "name": "Alberta Ballet",
+      "website": "https://www.albertaballet.com/",
+      "category": "dance",
+      "why": "Professional ballet company presenting a full season, including a Nutcracker and a 60th-anniversary gala."
+    },
+    {
+      "name": "Springboard Performance",
+      "website": "https://springboardperformance.com/",
+      "category": "dance",
+      "why": "Dance presenter behind Fluid Fest, Calgary's largest movement festival, with shows and cabarets."
+    },
+    {
+      "name": "The Military Museums",
+      "website": "https://themilitarymuseums.ca/",
+      "category": "museum",
+      "why": "Large tri-service museum that hosts commemorations, Mystery Nights and Remembrance Day events."
+    },
+    {
+      "name": "The Hangar Flight Museum",
+      "website": "https://thehangarmuseum.ca/",
+      "category": "museum",
+      "why": "Aviation museum that runs Open Aircraft Days, Wings and Wheels and other public events."
+    },
+    {
+      "name": "Stride Gallery",
+      "website": "https://www.stride.ab.ca/",
+      "category": "museum",
+      "why": "Artist-run centre with free exhibitions, residencies and public events."
+    },
+    {
+      "name": "The New Gallery",
+      "website": "https://thenewgallery.org/",
+      "category": "museum",
+      "why": "Artist-run centre in Chinatown with free exhibitions and outdoor programs."
+    },
+    {
+      "name": "Calgary Public Library",
+      "website": "https://www.calgarylibrary.ca/",
+      "category": "library",
+      "why": "Library system that runs free events, Rozsa Arts performances and family programs across its branches."
+    },
+    {
+      "name": "Calgary Chinese Cultural Centre",
+      "website": "https://www.culturalcentre.ca/",
+      "category": "community",
+      "why": "Chinatown cultural centre hosting the Xiang Loong Festival, Lunar New Year and Mid-Autumn events."
+    },
+    {
+      "name": "Alliance Française de Calgary",
+      "website": "https://www.afcalgary.ca/",
+      "category": "community",
+      "why": "French cultural centre running La French Run, a fashion show and family events."
+    },
+    {
+      "name": "Spruce Meadows",
+      "website": "https://www.sprucemeadows.com/",
+      "category": "sports",
+      "why": "Show-jumping venue hosting international tournaments and the International Christmas Market."
+    },
+    {
+      "name": "Cavalry FC",
+      "website": "https://cavalryfc.ca/",
+      "category": "sports",
+      "why": "Canadian Premier League soccer club that plays its home matches at ATCO Field, Spruce Meadows."
+    },
+    {
+      "name": "Calgary Marathon (Run Calgary)",
+      "website": "https://calgarymarathon.com/",
+      "category": "sports",
+      "why": "Nonprofit race weekend, Canada's longest-running marathon, with 5K to 42.2K races and kids' races."
+    },
+    {
+      "name": "Calgary Wild FC",
+      "website": "https://www.calgarywildfc.com/",
+      "category": "sports",
+      "why": "Professional women's soccer club in the Northern Super League that plays home matches at McMahon Stadium."
+    },
+    {
+      "name": "Calgary Pride",
+      "website": "https://calgarypride.ca/",
+      "category": "festival",
+      "why": "Nonprofit that produces Pride Week and the downtown Pride Parade each September."
+    },
+    {
+      "name": "Wordfest",
+      "website": "https://wordfest.com/",
+      "category": "festival",
+      "why": "Literary nonprofit running the October Imaginairium festival and year-round author events."
+    },
+    {
+      "name": "Calgary Girls Choir",
+      "website": "https://calgarygirlschoir.com/",
+      "category": "music",
+      "why": "Youth choir organization that presents festive and spring concerts."
+    },
+    {
+      "name": "The Old Trout Puppet Workshop",
+      "website": "https://www.theoldtrouts.org/",
+      "category": "arts",
+      "why": "Internationally known puppet theatre company that makes original shows and runs workshops."
+    },
+    {
+      "name": "Carifest Calgary",
+      "website": "https://carifestcalgary.com/",
+      "category": "festival",
+      "why": "Caribbean festival with a Stephen Avenue parade and free Carnival in the Park."
+    },
+    {
+      "name": "Calgary Hitmen",
+      "website": "https://hitmenhockey.com/",
+      "category": "sports",
+      "why": "WHL junior hockey team that plays home games and theme nights at the Saddledome."
+    },
+    {
+      "name": "WinSport",
+      "website": "https://www.winsport.ca/",
+      "category": "sports",
+      "why": "Canada Olympic Park operator hosting X Games Calgary, competitions, concerts and family attractions."
+    },
+    {
+      "name": "ReggaeFest",
+      "website": "https://www.reggaefest.ca/",
+      "category": "festival",
+      "why": "Calgary Reggae Festival Society's annual all-ages festival on St. Patrick's Island, plus other events through the year."
+    },
+    {
+      "name": "Calgary International Bluesfest",
+      "website": "https://www.calgarybluesfest.com/",
+      "category": "festival",
+      "why": "Annual blues festival held each summer, with festival-week club shows."
     }
   ]
 }

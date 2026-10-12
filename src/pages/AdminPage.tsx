@@ -135,7 +135,7 @@ export default function AdminPage() {
     demand: { title: 'Search demand', subtitle: 'What Calgary searches for, and what it couldn’t find' },
     partners: { title: 'Local partners', subtitle: 'Claims and commercial relationships, separate from editorial selections' },
     desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
-    planner: { title: 'Email planner', subtitle: 'Prepare Monday’s edition, review recipients and understand every delivery route' },
+    planner: { title: 'Email planner', subtitle: 'Who gets which email this week, what each one looks like, and the optional opening note' },
     reports: { title: 'Reports', subtitle: 'What is being reported, where, and when' },
     people: { title: 'People', subtitle: 'Who is signed up and who is contributing' },
     feeds: { title: 'Data feeds', subtitle: 'Live status of the sources behind the map' },

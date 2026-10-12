@@ -57,6 +57,7 @@ import {
 import type { IncidentCategory } from '../../src/types/index.js';
 import { eventsEmailMode, eventsIntro, eventsSubject } from '../../src/lib/eventsDigest.js';
 import { interestLabel, pickDistance, pickWhen, type EventInterestId, type EventPicks, type PickItem } from '../../src/lib/eventPicks.js';
+import { digestWeekKey } from '../../src/lib/digest.js';
 import { CID } from './art.js';
 import {
   areasHeading,
@@ -78,6 +79,7 @@ import {
   WELCOME,
 } from './copy.js';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { digestAngles, picksGlance, weekDays, type DigestAngle, type DayCount } from '../../src/lib/digestInsights.js';
 
 /**
  * The product's tokens, not a palette invented for email.
@@ -134,7 +136,17 @@ const C = {
   /** The one solid button: sun yellow with navy ink, as on the site. */
   button: '#FFDF4F',
   buttonInk: '#06162F',
+  /** Brand blue, the Monday cover. White type on it is 6.5:1. */
+  blue: '#1554D1',
+  /** Brand red, the instant-alert cover. Navy type on it is 5.9:1. */
+  coral: '#FF5A4E',
+  /** Paper, the welcome cover. */
+  paper: '#F2EFE8',
+  white: '#FFFFFF',
 } as const;
+
+/** Shared with the alert email so every message reads as one product. */
+export const EMAIL_TOKENS = C;
 
 /**
  * The app's category colours, lifted for this ground.
@@ -157,9 +169,9 @@ const TONE: Record<IncidentCategory, string> = {
   weather: '#A9B9CC',
 };
 
-const DISPLAY = "'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif";
-const MONO = "'IBM Plex Mono','SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
-const BODY = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif";
+export const DISPLAY = "'Bricolage Grotesque','Helvetica Neue',Helvetica,Arial,sans-serif";
+export const MONO = "'IBM Plex Mono','SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace";
+export const BODY = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,Helvetica,sans-serif";
 
 export interface DigestBranding {
   /**
@@ -347,59 +359,121 @@ function salutation(name: string, at: number, subline?: string): string {
   <div style="font:800 30px/1.12 ${DISPLAY};color:${C.gold};letter-spacing:-0.6px;">${escapeHtml(subline)}</div>` : ''}`;
 }
 
+/** "2026-W33" → "No. 33": the edition number on every cover. */
+function editionNo(weekKey: string): string {
+  const m = weekKey.match(/W(\d{1,2})$/);
+  return m ? `No. ${Number(m[1])}` : weekKey;
+}
+
+export type CoverTone = 'monday' | 'quiet' | 'city' | 'thursday' | 'welcome' | 'week' | 'alert';
+
 /**
- * The week, as one glanceable panel.
+ * Each edition gets its own cover colour, the way a playlist gets its own art.
  *
- * This replaced a single line of running text — "2 crime · 1 traffic · 1
- * infrastructure" — which was accurate and told a reader nothing they could
- * act on. Three questions get asked of a digest like this before any headline
- * is read: how much, compared to what, and what kind. The panel answers all
- * three in the order they are asked, and the eye gets them in one stop.
- *
- * The count is set large here without contradicting the lead paragraph, which
- * still states it in a sentence. Those do different work: the sentence is
- * somebody telling you something, the numeral is the thing you remember after
- * closing the message. A digest that only had the numeral would read as a
- * dashboard, and one that only had the sentence gives the week no shape.
- *
- * An earlier version of the breakdown was three auto-sized tiles, which came
- * out narrow for "Crime" and wide for "Infrastructure" and read as a mistake.
- * The bar avoids that by construction: the widths are the data, so there is no
- * arrangement of labels that can make it look broken.
- *
- * Nothing here is an image. It is table cells with background colours, which
- * is the one piece of layout every client renders — so the panel survives
- * images being blocked, which is the state most of these are first read in.
+ * A reader on two lists, or one who has been getting the Monday brief for a
+ * year, can tell which email this is from the thumbnail before reading a word:
+ * blue for Monday, cyan for a quiet week, yellow for Thursday picks, paper for
+ * the first letter, red for an alert. Every pairing is measured by the
+ * contrast audit, and none uses the cw-ink class, which a light-scheme client
+ * would force to cream.
  */
+const COVER: Record<CoverTone, { bg: string; ink: string; eyebrow: string }> = {
+  monday: { bg: C.blue, ink: C.white, eyebrow: C.gold },
+  quiet: { bg: C.bow, ink: C.page, eyebrow: C.page },
+  city: { bg: C.rail, ink: C.ink, eyebrow: C.gold },
+  thursday: { bg: C.gold, ink: C.page, eyebrow: C.page },
+  welcome: { bg: C.paper, ink: C.page, eyebrow: C.blue },
+  week: { bg: C.blue, ink: C.white, eyebrow: C.gold },
+  alert: { bg: C.coral, ink: C.page, eyebrow: C.page },
+};
+
+export function cover(options: {
+  tone: CoverTone;
+  eyebrow: string;
+  title: string;
+  sub?: string;
+  figure?: { value: string; label: string };
+}): string {
+  const t = COVER[options.tone];
+  const fig = options.figure ? `
+        <td width="150" class="cw-cover-fig" style="width:150px;padding:22px 22px 22px 0;vertical-align:bottom;text-align:right;">
+          <div style="font:800 64px/0.9 ${DISPLAY};color:${t.ink};letter-spacing:-2.5px;">${escapeHtml(options.figure.value)}</div>
+          <div style="font:700 10.5px/1.35 ${MONO};color:${t.ink};letter-spacing:.8px;text-transform:uppercase;padding-top:9px;">${escapeHtml(options.figure.label)}</div>
+        </td>` : '';
+  return `
+  <tr><td style="padding:22px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-cover cw-cover-${options.tone}" style="background:${t.bg};border-radius:14px;">
+      <tr>
+        <td style="padding:22px 22px 24px 24px;vertical-align:top;">
+          <div style="font:700 10.5px/1.3 ${MONO};color:${t.eyebrow};letter-spacing:1.4px;text-transform:uppercase;">${escapeHtml(options.eyebrow)}</div>
+          <div style="font:800 32px/1.04 ${DISPLAY};color:${t.ink};letter-spacing:-1px;padding-top:14px;">${escapeHtml(options.title)}</div>
+          ${options.sub ? `<div style="font:500 14px/1.45 ${BODY};color:${t.ink};padding-top:10px;">${escapeHtml(options.sub)}</div>` : ''}
+        </td>${fig}
+      </tr>
+    </table>
+  </td></tr>`;
+}
+
+/** "+3 vs last week" when there is a like-for-like baseline, else nothing. */
+function deltaPhrase(summary: DigestSummary): string {
+  if (summary.widenedToCity) return '';
+  if (summary.previousTotal === 0 && summary.total === 0) return '';
+  if (summary.delta === 0) return 'Same as last week';
+  return `${summary.delta > 0 ? '+' : '−'}${Math.abs(summary.delta)} vs last week`;
+}
+
+/** The Monday cover: the place, the count, and how it compares. */
+function mondayCover(summary: DigestSummary, kicker = 'Monday brief'): string {
+  const named = summary.areaName && summary.areaName !== 'your area';
+  const area = summary.scope === 'city' ? 'Calgary' : named ? displayAreaName(summary.areaName) : 'Near home';
+  const tone: CoverTone = summary.quiet ? 'quiet' : summary.scope === 'city' ? 'city' : 'monday';
+  const where = summary.scope === 'city' ? 'across Calgary' : summary.ringLabel;
+  const delta = deltaPhrase(summary);
+  return cover({
+    tone,
+    eyebrow: `${kicker} · ${editionNo(summary.weekKey)} · ${area}`,
+    title: summary.quiet ? 'A quiet week' : summary.scope === 'city' ? 'Calgary’s week'
+      : named ? `${area}’s week`.replace(/s’s week$/, 's’ week') : 'Your week',
+    sub: summary.quiet
+      ? `Nothing reported ${where}.${summary.previousTotal ? ` Last week: ${summary.previousTotal}.` : ''}`
+      : [`Reports ${where}`, delta].filter(Boolean).join(' · '),
+    figure: { value: String(summary.total), label: summary.total === 1 ? 'report' : 'reports' },
+  });
+}
+
+/**
+ * The week, day by day, and what kind of reports it was.
+ *
+ * The count lives on the cover now, so this panel answers the two questions the
+ * count raises: when, and what. Seven columns read left to right as the week
+ * did, with the busiest day picked out in yellow; the category bar under it
+ * keeps the old panel's mix. Everything is table cells with background
+ * colours, which every client renders and no image blocker can remove.
+ */
+function dayStrip(days: DayCount[], unit: string): string {
+  const max = Math.max(1, ...days.map((d) => d.count));
+  // Only a day that genuinely stood out gets the yellow; a tie picks nothing.
+  const top = days.filter((d) => d.count === max);
+  const busiest = top.length === 1 && max > 1 ? top[0] : null;
+  const cols = days.map((d) => {
+    const h = d.count ? Math.max(6, Math.round((d.count / max) * 44)) : 2;
+    const tone = d.count === 0 ? C.line : d === busiest ? C.gold : C.edge;
+    return `
+      <td width="${Math.floor(100 / days.length)}%" align="center" style="width:${(100 / days.length).toFixed(2)}%;vertical-align:bottom;padding:0 3px;">
+        <div class="${d.count ? 'cw-ink' : 'cw-soft'}" style="font:700 11.5px/1 ${MONO};color:${d.count ? C.ink : C.soft};padding-bottom:6px;">${d.count}</div>
+        <div style="height:${h}px;background:${tone};border-radius:3px 3px 0 0;font-size:0;line-height:0;">&nbsp;</div>
+        <div class="cw-soft" style="font:600 10px/1 ${MONO};color:${C.soft};letter-spacing:.6px;text-transform:uppercase;padding-top:7px;">${escapeHtml(d.label)}</div>
+      </td>`;
+  }).join('');
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" aria-label="${escapeHtml(unit)} by day">
+      <tr>${cols}</tr>
+    </table>`;
+}
+
 function weekBand(summary: DigestSummary): string {
   if (summary.quiet || summary.total === 0) return '';
-
-  const noun = summary.total === 1 ? 'report' : 'reports';
-  const where = summary.scope === 'city' ? 'across Calgary' : summary.ringLabel;
-
-  // ── The delta, as a chip ──────────────────────────────────────────────────
-  // Only when there is a like-for-like baseline. A digest that just widened its
-  // own scope is comparing a city against a neighbourhood, and a chip reading
-  // "+140" would be a lie told confidently.
-  const chip = (() => {
-    if (summary.widenedToCity) return '';
-    if (summary.previousTotal === 0 && summary.total === 0) return '';
-    const n = Math.abs(summary.delta);
-    const text = summary.delta === 0
-      ? 'Same as last week'
-      : `${summary.delta > 0 ? '+' : '&minus;'}${n} vs last week`;
-    // Fewer reports is the good direction, so it gets the teal the product
-    // already uses for anything positive; more gets gold rather than red,
-    // because a busier week is information and not an alarm.
-    const colour = summary.delta === 0 ? C.soft : summary.delta > 0 ? C.gold : C.bow;
-    return `
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="background:${C.rail};border:1px solid ${C.line};border-radius:11px;
-                   padding:5px 11px;white-space:nowrap;">
-          <span style="font:700 11px/1 ${MONO};color:${colour};">${text}</span>
-        </td></tr>
-      </table>`;
-  })();
 
   // ── The mix, as one bar ───────────────────────────────────────────────────
   // Percentages are rounded, and rounding does not sum to 100. The remainder
@@ -421,8 +495,8 @@ function weekBand(summary: DigestSummary): string {
       <td style="width:${c.pct}%;background:${TONE[c.category]};height:9px;font-size:0;
                  line-height:0;${i < parts.length - 1 ? `border-right:2px solid ${C.card};` : ''}">&nbsp;</td>`).join('');
 
-    // cw-stack turns the legend into one row per category below 480px, where
-    // five categories across cannot fit and would otherwise crush the labels.
+    // cw-legend flows the legend below 480px, where five categories across
+    // cannot fit and would otherwise crush the labels.
     const legend = parts.map((c) => `
       <td style="padding:0 16px 0 0;vertical-align:middle;white-space:nowrap;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0">
@@ -457,45 +531,123 @@ function weekBand(summary: DigestSummary): string {
   return `
   <tr><td style="padding:22px 36px 0;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:3px;">
-      <tr><td style="padding:15px 18px 16px;">
-
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:10px;">
+      <tr><td style="padding:16px 18px 18px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
           <tr>
             <td style="vertical-align:middle;">
-              <div style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.9px;
-                          text-transform:uppercase;">This week</div>
+              <div style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.9px;text-transform:uppercase;">Day by day</div>
             </td>
             <td align="right" style="vertical-align:middle;">
-              <div class="cw-soft" style="font:400 10.5px/1 ${MONO};color:${C.soft};
-                          letter-spacing:1px;text-transform:uppercase;">
-                ${escapeHtml(summary.areaName)}
+              <div class="cw-soft" style="font:400 10.5px/1 ${MONO};color:${C.soft};letter-spacing:1px;text-transform:uppercase;">
+                ${escapeHtml(dateRange(summary))}
               </div>
             </td>
           </tr>
         </table>
-
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-               class="cw-count" style="padding-top:9px;">
-          <tr>
-            <td style="vertical-align:bottom;">
-              <span class="cw-ink" style="font:700 38px/1 ${DISPLAY};color:${C.ink};">
-                ${summary.total}
-              </span>
-              <span class="cw-body" style="font:400 13.5px/1.4 ${BODY};color:${C.body};">
-                &nbsp;${noun} ${escapeHtml(where)}
-              </span>
-            </td>
-            <td align="right" style="vertical-align:bottom;">${chip}</td>
-          </tr>
-        </table>
-
-        <div style="height:14px;font-size:0;line-height:0;">&nbsp;</div>
+        <div style="height:16px;font-size:0;line-height:0;">&nbsp;</div>
+        ${dayStrip(weekDays(summary), 'Reports')}
+        <div style="height:18px;font-size:0;line-height:0;">&nbsp;</div>
         ${mix}
-
       </td></tr>
     </table>
   </td></tr>`;
+}
+
+const ANGLE_TONE = { gold: C.gold, bow: C.bow, coral: '#D2705C', soft: '#5C7699' } as const;
+
+/** The small picture under an angle: a split bar, a walk, or a before/after. */
+function angleVisual(angle: DigestAngle): string {
+  const v = angle.visual;
+  if (!v) return '';
+  if (v.kind === 'segments') {
+    const total = v.parts.reduce((n, p) => n + p.count, 0) || 1;
+    const shown = v.parts.filter((p) => p.count > 0);
+    const cells = shown.map((p, i) => `<td style="width:${Math.max(6, Math.round((p.count / total) * 100))}%;height:10px;background:${ANGLE_TONE[p.tone]};font-size:0;line-height:0;${i < shown.length - 1 ? `border-right:2px solid ${C.rail};` : ''}">&nbsp;</td>`).join('');
+    const legend = v.parts.map((p) => `<td style="padding:0 14px 0 0;white-space:nowrap;"><span style="display:inline-block;width:8px;height:8px;background:${ANGLE_TONE[p.tone]};border-radius:2px;"></span><span class="cw-soft" style="font:400 11.5px/1.4 ${BODY};color:${C.soft};">&nbsp;${escapeHtml(p.label)}</span><span class="cw-ink" style="font:700 11.5px/1.4 ${MONO};color:${C.ink};">&nbsp;${p.count}</span></td>`).join('');
+    return `
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:16px;border-radius:3px;overflow:hidden;"><tr>${cells}</tr></table>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="cw-legend" style="padding-top:10px;"><tr>${legend}</tr></table>`;
+  }
+  if (v.kind === 'walk') {
+    // A 20-minute walk is the far end of the ruler; anything past it pins there.
+    const pct = Math.max(4, Math.min(100, Math.round((v.minutes / 20) * 100)));
+    return `
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:18px;">
+        <tr>
+          <td style="width:${pct}%;height:6px;background:${C.gold};font-size:0;line-height:0;border-radius:3px 0 0 3px;">&nbsp;</td>
+          <td width="14" style="width:14px;"><div style="width:14px;height:14px;border-radius:50%;background:${C.gold};border:3px solid ${C.rail};font-size:0;line-height:0;">&nbsp;</div></td>
+          <td style="height:6px;background:${C.line};font-size:0;line-height:0;border-radius:0 3px 3px 0;">&nbsp;</td>
+        </tr>
+      </table>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="padding-top:8px;">
+        <tr>
+          <td class="cw-soft" style="font:600 10.5px/1 ${MONO};color:${C.soft};letter-spacing:.6px;text-transform:uppercase;">Home</td>
+          <td align="right" class="cw-soft" style="font:600 10.5px/1 ${MONO};color:${C.soft};letter-spacing:.6px;text-transform:uppercase;">20-min walk</td>
+        </tr>
+      </table>`;
+  }
+  const max = Math.max(1, v.before, v.after);
+  const bar = (label: string, n: number, tone: string) => `
+        <tr>
+          <td width="84" class="cw-soft" style="width:84px;font:600 10.5px/1 ${MONO};color:${C.soft};letter-spacing:.5px;text-transform:uppercase;padding:5px 0;">${escapeHtml(label)}</td>
+          <td style="padding:5px 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+            <td style="width:${n ? Math.max(4, Math.round((n / max) * 100)) : 1}%;height:10px;background:${n ? tone : C.line};font-size:0;line-height:0;border-radius:2px;">&nbsp;</td><td style="font-size:0;line-height:0;">&nbsp;</td>
+          </tr></table></td>
+          <td width="34" align="right" class="cw-ink" style="width:34px;font:700 12px/1 ${MONO};color:${C.ink};">${n}</td>
+        </tr>`;
+  return `
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:14px;">
+        ${bar(v.beforeLabel, v.before, '#5C7699')}${bar(v.afterLabel, v.after, C.gold)}
+      </table>`;
+}
+
+/**
+ * The CW pick: the one angle on this reader's week worth leading with, and two
+ * more in a line each. See src/lib/digestInsights.ts for how it is chosen.
+ */
+function angleBlock(summary: DigestSummary): string {
+  const [lead, ...rest] = digestAngles(summary, 3);
+  if (!lead) return '';
+  const more = rest.map((a) => `
+        <tr>
+          <td width="18" style="width:18px;vertical-align:top;font:700 14px/1.5 ${BODY};color:${C.gold};">•</td>
+          <td class="cw-body" style="padding:0 0 6px;font:400 13px/1.5 ${BODY};color:${C.body};"><strong class="cw-ink" style="color:${C.ink};">${escapeHtml(a.headline)}.</strong> ${escapeHtml(a.body)}</td>
+        </tr>`).join('');
+  return `
+  <tr><td style="padding:24px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-angle" style="background:${C.rail};border:1px solid ${C.line};border-radius:10px;">
+      <tr><td style="padding:18px 20px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td><span style="display:inline-block;padding:5px 9px;border-radius:999px;background:${C.gold};color:${C.buttonInk};font:700 10px/1 ${MONO};letter-spacing:1px;text-transform:uppercase;">CW pick</span></td>
+            <td align="right" class="cw-soft" style="font:600 10.5px/1 ${MONO};color:${C.soft};letter-spacing:1px;text-transform:uppercase;">${escapeHtml(lead.kicker)}</td>
+          </tr>
+        </table>
+        <div class="cw-ink" style="font:800 25px/1.12 ${DISPLAY};color:${C.ink};letter-spacing:-0.6px;padding-top:14px;">${escapeHtml(lead.headline)}</div>
+        ${p(escapeHtml(lead.body), { top: 8, size: 14.5 })}
+        ${angleVisual(lead)}
+        ${more ? `
+        <div style="height:1px;background:${C.line};font-size:0;line-height:0;margin:18px 0 12px;">&nbsp;</div>
+        <div style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.6px;text-transform:uppercase;padding-bottom:10px;">Also worth noticing</div>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">${more}</table>` : ''}
+      </td></tr>
+    </table>
+  </td></tr>`;
+}
+
+/** Plain-text version of the CW pick, so the text part says the same thing. */
+function angleText(summary: DigestSummary): string[] {
+  const [lead, ...rest] = digestAngles(summary, 3);
+  if (!lead) return [];
+  return [
+    `CW PICK: ${lead.kicker.toUpperCase()}`,
+    lead.headline,
+    wrap(lead.body),
+    ...rest.map((a) => wrap(`• ${a.headline}. ${a.body}`)),
+    '',
+  ];
 }
 
 /** Small caps heading above a block. Quiet, warm, not a system label. */
@@ -817,17 +969,22 @@ function footer(unsubscribeUrl: string, branding: DigestBranding, adminPreview =
  * blamed for our empty list. Set apart from the body so it is clearly an aside
  * rather than part of the week's news.
  */
-function locationPromptBlock(summary: DigestSummary): string {
+function locationPromptBlock(summary: DigestSummary, origin = 'https://calgarywatch.ca'): string {
   const prompt = locationPrompt(summary);
   if (!prompt) return '';
   return `
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
-         class="cw-card" style="background:${C.card};border:1px solid ${C.line};
-                border-left:3px solid ${C.bow};border-radius:3px;margin-top:16px;">
-    <tr><td style="padding:14px 16px;">
-      <div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">
-        ${escapeHtml(prompt)}
-      </div>
+         class="cw-card cw-make-it-yours" style="background:${C.card};border:1px solid ${C.line};border-radius:10px;margin-top:18px;">
+    <tr><td height="4" style="height:4px;background:${C.bow};font-size:0;line-height:0;border-radius:10px 10px 0 0;">&nbsp;</td></tr>
+    <tr><td style="padding:16px 18px 18px;">
+      <div style="font:700 10.5px/1 ${BODY};color:${C.bow};letter-spacing:1.6px;text-transform:uppercase;">Make it yours</div>
+      <div class="cw-ink" style="font:800 19px/1.25 ${DISPLAY};color:${C.ink};padding-top:9px;">Next Monday could be about your blocks</div>
+      <div class="cw-body" style="font:400 13.5px/1.55 ${BODY};color:${C.body};padding-top:6px;">${escapeHtml(prompt)}</div>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;">
+        <tr><td style="background:${C.button};border-radius:999px;">
+          <a href="${escapeHtml(origin)}/plans#area" style="display:inline-block;padding:11px 18px;font:700 13px/1 ${BODY};color:${C.buttonInk};text-decoration:none;">Add your neighbourhood&nbsp;→</a>
+        </td></tr>
+      </table>
     </td></tr>
   </table>`;
 }
@@ -955,6 +1112,10 @@ function shell(options: {
     .cw-tile-l { font-size: 9px !important; letter-spacing: .4px !important; }
     .cw-tile-s { font-size: 10.5px !important; }
     .cw-step img { margin-bottom: 6px !important; }
+    /* Covers: the figure drops under the title, left-aligned, so a long
+       area name keeps the full width instead of wrapping beside a 64px digit. */
+    .cw-cover-fig { text-align: left !important; padding: 0 24px 22px !important; border-radius: 0 0 14px 14px !important; }
+    .cw-hero-pick-title { font-size: 20px !important; }
   }
 
   /*
@@ -967,6 +1128,7 @@ function shell(options: {
    */
   @media (prefers-color-scheme: light) {
     .cw-page, .cw-shell { background: #06162F !important; }
+    .cw-angle { background: #15305A !important; border-color: #22406C !important; }
     .cw-card { background: #0E2242 !important; border-color: #22406C !important; }
     .cw-rail { background: #15305A !important; border-color: #22406C !important; }
     .cw-ink, .cw-ink a { color: #F2EFE8 !important; }
@@ -1019,14 +1181,16 @@ export function renderDigestHtml(options: {
     preheader: contribution?.preheader?.trim() || leadParagraph(summary),
     inner: `
     ${masthead(dateRange(summary))}
+    ${mondayCover(summary)}
     ${contributionBlock(contribution)}
     <tr><td style="padding:26px 36px 0;">
-      ${salutation(name, summary.until, mondaySubline(summary))}
-      ${p(escapeHtml(leadParagraph(summary)), { top: 14 })}
+      ${salutation(name, summary.until)}
+      ${p(escapeHtml(leadParagraph(summary)), { top: 12 })}
       ${categoryLine(options.categories, origin)}
-      ${locationPromptBlock(summary)}
+      ${locationPromptBlock(summary, origin)}
     </td></tr>
     ${weekBand(summary)}
+    ${angleBlock(summary)}
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
@@ -1034,6 +1198,52 @@ export function renderDigestHtml(options: {
     ${skylineRule()}
     ${footer(unsubscribeUrl, branding, options.adminPreview)}`,
   });
+}
+
+/**
+ * How this reader's Mondays are set up, as a checklist.
+ *
+ * The welcome used to explain the product to everybody the same way. What a
+ * new subscriber actually needs to know is what *their* email will be: about
+ * their blocks or the whole city, every topic or a few, Thursday picks or not.
+ * Each row says what is set, and anything unset carries the one link that
+ * fixes it, so nobody has to find a settings page to make the next one better.
+ */
+function setupChecklist(summary: DigestSummary, origin: string, offerThursday: boolean): string {
+  const area = summary.areaName && summary.areaName !== 'your area' ? displayAreaName(summary.areaName) : '';
+  const link = (href: string, label: string) => ` <a href="${escapeHtml(origin)}${href}" style="color:${C.bow};font-weight:700;text-decoration:none;">${label}&nbsp;→</a>`;
+  const rows: Array<{ done: boolean; title: string; body: string }> = [
+    summary.needsLocation
+      ? { done: false, title: 'Your area', body: `Not set yet, so your Mondays cover all of Calgary.${link('/plans#area', 'Add your neighbourhood')}` }
+      : { done: true, title: area ? `Your area: ${escapeHtml(area)}` : 'Your area', body: summary.scope === 'home' ? 'Reports within a walk, 3 km and 10 km of home, closest first.' : summary.scope === 'community' ? `Reports named in ${escapeHtml(area || 'your community')}, newest first.` : 'Your area was quiet, so this first one widens to the city.' },
+    { done: true, title: 'Every Monday, 9 a.m.', body: 'Quiet weeks get sent too, because knowing nothing happened is useful.' },
+    { done: true, title: 'Every topic', body: `Crime, traffic, infrastructure and weather.${link('/map?settings=alerts', 'Narrow it')}` },
+    offerThursday
+      ? { done: false, title: 'Thursday picks', body: `Off. Weekend picks for what you’re into, near home first.${link('/plans?email=thursday#emails', 'Add them')}` }
+      : { done: true, title: 'Thursday picks', body: 'On. This email is your hello for both, so nothing extra comes Thursday. From next Monday, one email carries your week and your picks.' },
+  ];
+  const cells = rows.map((r) => `
+      <tr>
+        <td width="34" style="width:34px;vertical-align:top;padding:2px 0 14px;">
+          ${r.done
+            ? `<div style="width:24px;height:24px;border-radius:50%;background:${C.gold};text-align:center;font:800 13px/24px ${BODY};color:${C.buttonInk};">✓</div>`
+            : `<div style="width:20px;height:20px;border-radius:50%;border:2px solid ${C.bow};text-align:center;font:800 14px/20px ${BODY};color:${C.bow};">+</div>`}
+        </td>
+        <td style="vertical-align:top;padding:0 0 14px;">
+          <div class="cw-ink" style="font:700 14.5px/1.35 ${DISPLAY};color:${C.ink};">${r.title}</div>
+          <div class="cw-soft" style="font:400 12.5px/1.5 ${BODY};color:${C.soft};padding-top:3px;">${r.body}</div>
+        </td>
+      </tr>`).join('');
+  return `
+  <tr><td style="padding:26px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card cw-setup" style="background:${C.card};border:1px solid ${C.line};border-radius:10px;">
+      <tr><td style="padding:18px 20px 6px;">
+        ${heading('How your Mondays are set up')}
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">${cells}</table>
+      </td></tr>
+    </table>
+  </td></tr>`;
 }
 
 /**
@@ -1066,7 +1276,15 @@ export function renderWelcomeHtml(options: {
     title: WELCOME.subject,
     preheader: WELCOME.paragraphs[0],
     inner: `
-    ${masthead(dateRange(summary))}
+    ${masthead(dateRange(summary), 'Welcome')}
+    ${cover({
+      tone: 'welcome',
+      eyebrow: `Your first Monday · ${editionNo(summary.weekKey)}`,
+      title: 'Welcome to the Monday brief',
+      sub: summary.needsLocation
+        ? 'One short email a week about what happened around Calgary.'
+        : `One short email a week about what happened around ${summary.areaName && summary.areaName !== 'your area' ? displayAreaName(summary.areaName) : 'home'}.`,
+    })}
     <tr><td style="padding:26px 36px 0;">
       ${salutation(name, summary.until)}
       <!-- Why it arrived, in the first line rather than the small print.
@@ -1077,6 +1295,7 @@ export function renderWelcomeHtml(options: {
       </div>
       ${note}
     </td></tr>
+    ${setupChecklist(summary, origin, Boolean(options.offerThursday))}
     ${processRow()}
 
     <!-- The ask. Boxed so it reads as a question and not as another paragraph
@@ -1102,9 +1321,13 @@ export function renderWelcomeHtml(options: {
     <tr><td style="padding:32px 36px 0;">
       <div style="height:1px;background:${C.edge};font-size:0;line-height:0;">&nbsp;</div>
       ${p(escapeHtml(WELCOME.sampleIntro), { top: 20, color: C.soft, size: 13.5 })}
-      ${p(escapeHtml(leadParagraph(summary)), { top: 12 })}
+    </td></tr>
+    ${mondayCover(summary, 'Sample')}
+    <tr><td style="padding:18px 36px 0;">
+      ${p(escapeHtml(leadParagraph(summary)), { top: 0 })}
     </td></tr>
     ${weekBand(summary)}
+    ${angleBlock(summary)}
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
@@ -1163,6 +1386,7 @@ export function renderDigestText(options: {
   lines.push(`${greeting(summary.until)}, ${name}.`, mondaySubline(summary), '');
   const topics = categoriesNote((options.categories ?? []).map((c) => DIGEST_CATEGORY_LABEL[c]).filter(Boolean));
   if (topics) lines.push(topics, '');
+  lines.push(...angleText(summary));
 
   if (summary.quiet) {
     lines.push(
@@ -1400,6 +1624,77 @@ function plansButton(origin: string, reminderDay = 'Thursday'): string {
 }
 
 /**
+ * The first pick, given a cover of its own.
+ *
+ * A list of eight equal rows asks the reader to do the choosing. The top pick
+ * is the one the ranking is most sure of, so it is set large with its reasons
+ * spelled out, and the rest follow as the usual rows.
+ */
+function heroPick(item: PickItem, origin: string, label = 'CW pick of the week'): string {
+  const where = [item.venue || item.neighbourhood, pickDistance(item.distanceM)].filter(Boolean).join(' · ');
+  const why = item.matched.filter((m) => m !== 'free').slice(0, 2).map((m) => interestLabel(m));
+  const reasons = [
+    why.length ? `Because you like ${why.join(' and ').toLowerCase()}` : '',
+    item.free ? 'Free' : '',
+    item.distanceM !== null && item.distanceM < 3000 ? 'Close to home' : '',
+  ].filter(Boolean);
+  return `
+  <tr><td style="padding:26px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card cw-hero-pick" style="background:${C.card};border:1px solid ${C.line};border-radius:12px;">
+      <tr><td height="5" style="height:5px;background:${C.gold};font-size:0;line-height:0;border-radius:12px 12px 0 0;">&nbsp;</td></tr>
+      <tr><td style="padding:18px 20px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td><span style="display:inline-block;padding:5px 9px;border-radius:999px;background:${C.gold};color:${C.buttonInk};font:700 10px/1 ${MONO};letter-spacing:1px;text-transform:uppercase;">${escapeHtml(label)}</span></td>
+            <td align="right" class="cw-ink" style="font:700 11.5px/1.3 ${MONO};color:${C.ink};">${escapeHtml(pickWhen(item.start))}</td>
+          </tr>
+        </table>
+        <a href="${escapeHtml(origin)}${escapeHtml(item.path)}" class="cw-hero-pick-title"
+           style="display:block;font:800 24px/1.15 ${DISPLAY};color:${C.ink};text-decoration:none;letter-spacing:-0.5px;padding-top:14px;">${escapeHtml(item.title)}</a>
+        ${where ? `<div class="cw-soft" style="font:400 13px/1.45 ${BODY};color:${C.soft};padding-top:6px;">${escapeHtml(where)}</div>` : ''}
+        ${item.summary ? p(escapeHtml(item.summary.slice(0, 220)), { top: 10, size: 14 }) : ''}
+        ${item.lineup?.summary ? p(escapeHtml(item.lineup.summary), { top: 8, size: 13.5 }) : ''}
+        ${reasons.length ? `<div style="padding-top:12px;">${reasons.map((r) => `<span style="display:inline-block;margin:0 6px 6px 0;padding:6px 10px;border-radius:999px;border:1px solid ${C.edge};font:600 11.5px/1 ${BODY};color:${C.bow};">${escapeHtml(r)}</span>`).join('')}</div>` : ''}
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:10px;">
+          <tr><td style="background:${C.button};border-radius:999px;">
+            <a href="${escapeHtml(origin)}${escapeHtml(item.path)}" style="display:inline-block;padding:11px 18px;font:700 13px/1 ${BODY};color:${C.buttonInk};text-decoration:none;">See the details&nbsp;→</a>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </td></tr>`;
+}
+
+/** The next seven days of picks as a strip, plus two numbers worth knowing. */
+function picksGlanceBlock(picks: EventPicks, list: PickItem[], at: number): string {
+  const g = picksGlance(picks, list, at);
+  if (g.total < 2) return '';
+  const tile = (n: number, label: string) => `
+          <td width="50%" style="width:50%;padding:0 4px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-angle" style="background:${C.rail};border-radius:8px;">
+              <tr><td style="padding:10px 12px;">
+                <span class="cw-ink" style="font:800 22px/1 ${DISPLAY};color:${C.ink};">${n}</span>
+                <span class="cw-soft" style="font:600 10.5px/1.3 ${MONO};color:${C.soft};letter-spacing:.6px;text-transform:uppercase;">&nbsp;${escapeHtml(label)}</span>
+              </td></tr>
+            </table>
+          </td>`;
+  return `
+  <tr><td style="padding:22px 36px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-radius:10px;">
+      <tr><td style="padding:16px 18px 18px;">
+        <div style="font:700 10.5px/1 ${BODY};color:${C.gold};letter-spacing:1.9px;text-transform:uppercase;padding-bottom:16px;">Your next seven days</div>
+        ${dayStrip(g.days, 'Picks')}
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:16px;">
+          <tr>${tile(g.free, 'free to go')}${tile(g.nearby, 'within 3 km')}</tr>
+        </table>
+      </td></tr>
+    </table>
+  </td></tr>`;
+}
+
+/**
  * The other list, offered once at the bottom — only to someone who isn't on
  * it. It links to the sign-up page with that email pre-ticked; nothing is
  * switched on from the email itself.
@@ -1472,19 +1767,34 @@ export function renderEventsHtml(options: EventsEmailOptions): string {
   assertBrandingComplete(branding);
   const { origin } = branding;
   const c = eventsEmailContent(options);
+  // The hero is the strongest new pick. A fallback week has no "pick" — it is
+  // what else is on — so it keeps the plain list; a reminder-only week leads
+  // with the plan itself.
+  const hero = c.mode === 'picks' ? c.list[0] : c.mode === 'going-only' ? picks.going[0] : undefined;
+  const rest = c.mode === 'picks' ? c.list.slice(1) : c.list;
+  const going = c.mode === 'going-only' ? picks.going.slice(1) : picks.going;
+  const area = options.area && options.area !== 'home' ? displayAreaName(options.area) : '';
+  const coverCopy = c.mode === 'fallback'
+    ? { title: 'Something different', sub: 'Nothing matched your interests, so here’s what else is on.', figure: { value: String(c.list.length), label: c.list.length === 1 ? 'thing on' : 'things on' } }
+    : c.mode === 'going-only'
+      ? { title: 'Don’t forget', sub: `You said you’re going to ${picks.going[0]?.title ?? 'something'}.`, figure: { value: String(picks.going.length), label: 'on your plans' } }
+      : { title: options.first ? 'Your first picks' : area ? `What’s on near ${area}` : 'Your next ten days', sub: area ? 'The next ten days, near home first' : 'The next ten days, across Calgary', figure: { value: String(c.list.length), label: c.list.length === 1 ? 'pick for you' : 'picks for you' } };
   return shell({
     title: c.subject,
     preheader: options.first ? 'Your first Thursday picks, chosen from what you’re into.' : c.lead,
     inner: `
     ${masthead(dateLabel(at), 'Thursday picks')}
+    ${cover({ tone: 'thursday', eyebrow: `Thursday picks · ${editionNo(digestWeekKey(at))}${area ? ` · ${area}` : ''}`, ...coverCopy })}
     <tr><td style="padding:26px 36px 0;">
-      ${salutation(firstName(options.displayName), at, thursdaySubline(options.area))}
-      ${options.first ? p(escapeHtml(FIRST_HELLO), { top: 13 }) : ''}
-      ${p(escapeHtml(c.lead), { top: options.first ? 10 : 13 })}
+      ${salutation(firstName(options.displayName), at)}
+      ${options.first ? p(escapeHtml(FIRST_HELLO), { top: 12 }) : ''}
+      ${p(escapeHtml(c.lead), { top: options.first ? 10 : 12 })}
       ${!options.area ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-left:3px solid ${C.bow};border-radius:3px;margin-top:16px;"><tr><td style="padding:14px 16px;"><div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">${escapeHtml(NO_AREA_LINE)} <a href="${escapeHtml(origin)}/plans" style="color:${C.bow};font-weight:700;text-decoration:none;">Add it&nbsp;→</a></div></td></tr></table>` : ''}
     </td></tr>
-    ${eventSection('You’re going', picks.going, origin)}
-    ${eventSection(c.listTitle, c.list, origin)}
+    ${hero ? heroPick(hero, origin, c.mode === 'going-only' ? 'You’re going' : 'CW pick of the week') : ''}
+    ${picksGlanceBlock(picks, c.list, at)}
+    ${eventSection('You’re going', going, origin)}
+    ${eventSection(c.mode === 'picks' && hero ? 'More picked for you' : c.listTitle, rest, origin)}
     ${c.mode === 'fallback' ? `<tr><td style="padding:0 36px;">${p(`<a href="${escapeHtml(origin)}/events" style="color:${C.bow};font-weight:700;text-decoration:none;">Everything on in Calgary&nbsp;→</a>`, { top: 6 })}</td></tr>` : ''}
     ${plansButton(origin)}
     ${options.offerMonday ? crossPromoHtml(origin, 'monday') : ''}
@@ -1679,10 +1989,16 @@ export function renderCombinedHtml(options: CombinedEmailOptions): string {
     preheader: contribution?.preheader?.trim() || c.lead,
     inner: `
     ${masthead(dateRange(summary), 'Your week')}
+    ${cover({
+      tone: 'week',
+      eyebrow: `Your week · ${editionNo(summary.weekKey)} · ${where}`,
+      title: c.subline.replace(/^Here’s /, '').replace(/\.$/, '').replace(/^./, (x) => x.toUpperCase()),
+      sub: picks.going.length ? `Next up: ${picks.going[0].title}` : 'Near home, then out and about',
+    })}
     ${contributionBlock(contribution)}
     <tr><td style="padding:26px 36px 0;">
-      ${salutation(firstName(options.displayName), summary.until, c.subline)}
-      ${p(escapeHtml(c.lead), { top: 14 })}
+      ${salutation(firstName(options.displayName), summary.until)}
+      ${p(escapeHtml(c.lead), { top: 12 })}
       ${options.firstCombined ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cw-card" style="background:${C.card};border:1px solid ${C.line};border-left:3px solid ${C.gold};border-radius:3px;margin-top:16px;"><tr><td style="padding:13px 16px;"><div class="cw-body" style="font:400 13px/1.55 ${BODY};color:${C.body};">${escapeHtml(COMBINED_HELLO)}</div></td></tr></table>` : ''}
     </td></tr>
     ${glance(options, c.list.length, c.mode === 'fallback')}
@@ -1691,9 +2007,10 @@ export function renderCombinedHtml(options: CombinedEmailOptions): string {
     <tr><td style="padding:16px 36px 0;">
       ${p(escapeHtml(leadParagraph(summary)), { top: 0 })}
       ${categoryLine(options.categories, origin)}
-      ${locationPromptBlock(summary)}
+      ${locationPromptBlock(summary, origin)}
     </td></tr>
     ${weekBand(summary)}
+    ${angleBlock(summary)}
     ${topAreasBlock(summary)}
     ${reportList(summary, origin)}
     ${cta(origin, summary.quiet ? CTA_LABEL_QUIET : CTA_LABEL)}
@@ -1702,8 +2019,9 @@ export function renderCombinedHtml(options: CombinedEmailOptions): string {
     <tr><td style="padding:16px 36px 0;">
       ${p(escapeHtml(c.eventsLead), { top: 0 })}
     </td></tr>
+    ${c.mode === 'picks' && c.list[0] ? heroPick(c.list[0], origin) : ''}
     ${eventSection('You’re going', picks.going, origin)}
-    ${eventSection(c.listTitle, c.list, origin)}
+    ${eventSection(c.mode === 'picks' && c.list[0] ? 'More picked for you' : c.listTitle, c.mode === 'picks' ? c.list.slice(1) : c.list, origin)}
     ${c.mode === 'fallback' ? `<tr><td style="padding:0 36px;">${p(`<a href="${escapeHtml(origin)}/events" style="color:${C.bow};font-weight:700;text-decoration:none;">Everything on in Calgary&nbsp;→</a>`, { top: 6 })}</td></tr>` : ''}
     ${plansButton(origin, 'Monday')}
 
@@ -1745,7 +2063,7 @@ export function renderCombinedText(options: CombinedEmailOptions): string {
   if (delta && !summary.quiet) lines.push(delta);
   const topics = categoriesNote((options.categories ?? []).map((cat) => DIGEST_CATEGORY_LABEL[cat]).filter(Boolean));
   if (topics) lines.push(topics);
-  lines.push('');
+  lines.push('', ...angleText(summary));
   if (summary.highlights.length) {
     lines.push(listHeading(summary).toUpperCase(), '');
     for (const item of summary.highlights) lines.push(`${rail(item)}${item.incident.title}`, `${' '.repeat(9)}${itemSubtitle(item)}`, '');

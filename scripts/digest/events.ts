@@ -137,13 +137,14 @@ async function run() {
   let sent = 0; let skipped = 0; let failed = 0;
 
   for (const profile of planned) {
-    // On both lists? Monday's combined email already carried this week's
-    // picks. One email covering both beats two that overlap. A redirected
-    // test still sends, so the Thursday format can always be proofed.
+    // On both lists? Monday's email already covered them: the combined
+    // email carried this week's picks, or the welcome was their one hello
+    // for both lists. One email beats two that overlap. A redirected test
+    // still sends, so the Thursday format can always be proofed.
     if (profile._mondayOn && !sender.testRecipient) {
       const monday = (await db.collection('digest_sends').doc(digestSendId(profile.uid, weekKey)).get()).data();
-      if (monday?.status === 'sent' && monday.kind === 'combined') {
-        console.log(`[events] skip ${profile.uid}: picks went out in Monday's combined email`);
+      if (monday?.status === 'sent' && (monday.kind === 'combined' || monday.coversEvents === true)) {
+        console.log(`[events] skip ${profile.uid}: Monday's ${monday.kind} email covered both lists`);
         skipped += 1;
         continue;
       }

@@ -1,5 +1,5 @@
 {
-  "note": "Calgary arts, music and festival organizations to invite to a free CalgaryWatch listing (added 2026-09-28 at the owner's request to expand outreach). Each becomes a lead; the daily job only emails an address published on the organization's own site, with every CASL check in brand/outreach.json. Websites checked live 2026-09-28.",
+  "note": "Calgary arts, music and festival organizations to invite to a free CalgaryWatch listing (added 2026-09-28 at the owner's request to expand outreach). Each becomes a lead; the daily job only emails an address published on the organization's own site, with every CASL check in brand/outreach.json. Websites checked live 2026-09-28. Calgary service businesses (plumbers, furnace techs, snow removal and the rest) use a service id from src/data/localServices.ts as their category (for example \"plumbing\", \"heating\", \"snow\"); they get the services-directory invitation instead of the events one (added 2026-10-11 at the owner's request).",
   "prospects": [
     {
       "name": "Vertigo Theatre",

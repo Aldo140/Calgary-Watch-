@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { collection, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
 import { AlertTriangle, CalendarHeart, Eye, Mail, MapPin, Users } from 'lucide-react';
 import { db } from '../../firebase';
-import { digestWeekKey } from '../../lib/digest';
+import { consentRefusal, digestWeekKey } from '../../lib/digest';
 import { eventsConsentRefusal } from '../../lib/eventsDigest';
 import { normalizeInterests } from '../../lib/eventPicks';
 import type { UserProfile } from '../../hooks/useAdminData';
@@ -57,23 +57,28 @@ export function ThursdayPicksPanel({ mondayProfiles, data }: { mondayProfiles: U
 
   const m = useMemo(() => {
     const mon = new Set(mondayProfiles.map((p) => p.uid));
+    // Readers Monday can mail. If they are on Thursday too, Monday's email
+    // covers both lists (the combined week, or the welcome as their one
+    // hello), and the Thursday sender skips them.
+    const mondayMailable = new Set(mondayProfiles.filter((p) => !consentRefusal(p)).map((p) => p.uid));
     const thu = thursday ?? [];
     const both = thu.filter((p) => mon.has(p.uid)).length;
     const refusals = new Map<string, number>();
-    let eligible = 0, noArea = 0, noInterests = 0, first = 0;
+    let eligible = 0, covered = 0, noArea = 0, noInterests = 0, first = 0;
     for (const p of thu) {
       const r = eventsConsentRefusal({
         uid: p.uid, email: p.email as string | undefined, eventsDigestOptIn: p.eventsDigestOptIn === true,
         eventsDigestOptInAt: typeof p.eventsDigestOptInAt === 'number' ? p.eventsDigestOptInAt : null, eventInterests: normalizeInterests(p.eventInterests),
       });
       if (r) { refusals.set(r, (refusals.get(r) ?? 0) + 1); continue; }
+      if (mondayMailable.has(p.uid)) { covered += 1; continue; }
       eligible += 1;
       if (!(p.neighborhood || p.inferredNeighborhood)) noArea += 1;
       if (!normalizeInterests(p.eventInterests).length) noInterests += 1;
       if (!p.eventsWelcomeSentAt) first += 1;
     }
     const neither = accounts !== undefined ? Math.max(0, accounts - mon.size - thu.length + both) : undefined;
-    return { both, mondayOnly: mon.size - both, thursdayOnly: thu.length - both, neither, eligible, refusals, noArea, noInterests, first };
+    return { both, mondayOnly: mon.size - both, thursdayOnly: thu.length - both, neither, eligible, covered, refusals, noArea, noInterests, first };
   }, [mondayProfiles, thursday, accounts]);
 
   const sent = (ledger ?? []).filter((l) => l.status === 'sent');
@@ -81,10 +86,10 @@ export function ThursdayPicksPanel({ mondayProfiles, data }: { mondayProfiles: U
 
   return (
     <div className="space-y-4">
-      <Panel title="Who gets which email" subtitle="Every account falls into exactly one of these. Each email offers the other list only to people not on it.">
+      <Panel title="Who is on which list" subtitle="Every account falls into exactly one of these. People on both lists get one email a week, on Monday. Each email offers the other list only to people not on it.">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: T.line }}>
           {[
-            { label: 'Both emails', value: thursday ? m.both : undefined, note: 'One combined Monday email', tone: 'ok' as const },
+            { label: 'Both lists', value: thursday ? m.both : undefined, note: 'One Monday email, no Thursday', tone: 'ok' as const },
             { label: 'Monday only', value: thursday ? m.mondayOnly : undefined, note: 'Sees the Thursday offer', tone: 'signal' as const },
             { label: 'Thursday only', value: thursday ? m.thursdayOnly : undefined, note: 'Sees the Monday offer', tone: 'signal' as const },
             { label: 'Neither', value: m.neither, note: 'Account, no email', tone: 'neutral' as const },
@@ -99,8 +104,8 @@ export function ThursdayPicksPanel({ mondayProfiles, data }: { mondayProfiles: U
       </Panel>
 
       <StatGrid>
-        <StatTile label="Will get Thursday’s email" value={thursday ? m.eligible : undefined} tone="ok" hint={`Before skips for empty weeks · week ${week}`} />
-        <StatTile label="First Thursday email" value={thursday ? m.first : undefined} hint="Gets the hello version" />
+        <StatTile label="Will get a Thursday email" value={thursday ? m.eligible : undefined} tone="ok" hint={m.covered ? `Thursday-only readers. The ${m.covered} on both lists get their picks in Monday’s email instead` : `Thursday-only readers, before skips for empty weeks · ${week}`} />
+        <StatTile label="First Thursday email" value={thursday ? m.first : undefined} hint="Thursday-only readers get the hello version. Both-list readers get their hello on Monday" />
         <StatTile label="No home area" value={thursday ? m.noArea : undefined} tone={m.noArea ? 'attention' : 'neutral'} hint="Picks without distances; asked to add one" />
         <StatTile label="Opt-outs waiting" value={pendingUnsubs} tone={pendingUnsubs ? 'attention' : 'neutral'} hint="Honoured at the start of the next run" />
       </StatGrid>

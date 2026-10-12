@@ -55,10 +55,10 @@ export function takeUsage(): Map<string, UsageTally> {
   return out;
 }
 
-async function structured<T extends z.ZodType>(system: string, user: string, schema: T, task = 'other'): Promise<z.infer<T>> {
+async function structured<T extends z.ZodType>(system: string, user: string, schema: T, task = 'other', maxTokens = 4000): Promise<z.infer<T>> {
   const response = await anthropic().beta.messages.parse({
     model: MODEL,
-    max_tokens: 4000,
+    max_tokens: maxTokens,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'medium', format: betaZodOutputFormat(schema) },
@@ -81,18 +81,20 @@ const PostSchema = z.object({
 });
 export type PostWriting = z.infer<typeof PostSchema>;
 
-export async function writePost(kit: BrandKit, input: { kind: string; title: string; facts: string; link: string; sponsored: boolean }): Promise<PostWriting> {
+export async function writePost(kit: BrandKit, input: { kind: string; title: string; facts: string; link: string; sponsored: boolean }, guidance: { playbook?: string | null; direction?: string | null } = {}): Promise<PostWriting> {
   const system = [
-    `You write Instagram posts for ${kit.name} (@${kit.handle}), a Calgary account.`,
+    `You write Instagram posts for ${kit.name} (@${kit.handle}), a Calgary account. Your job is to grow it: every post has to earn a stop, a save or a share from Calgarians, using only true facts.`,
+    guidance.playbook ? `The account's playbook (the owner's rules; follow it):\n${guidance.playbook}` : '',
+    guidance.direction ? `This week's direction from the content plan:\n${guidance.direction}` : '',
     `Voice: ${kit.voice.summary}`,
     `Rules:\n- ${kit.voice.rules.join('\n- ')}`,
     `Never use these phrases: ${kit.voice.bannedPhrases.join(', ')}.`,
     `Examples of the voice:\n${kit.voice.examples.map(e => `> ${e}`).join('\n')}`,
     'Use only the facts in the user message. If a detail is not there, leave it out. Do not guess times, prices or who is performing.',
-    'Write like a person who lives in Calgary, not a brand: plain words, sentence case, no hype, no exclamation marks. Use the name people would say ("Maria Bamford", not "Outback Presents Maria Bamford").',
+    'Write like a person who lives in Calgary, not a brand: plain words, sentence case, no hype, no exclamation marks. The first line is the hook. Use the name people would say ("Maria Bamford", not "Outback Presents Maria Bamford").',
     'Say "link in bio" rather than pasting URLs; Instagram captions do not make links clickable.',
     `End the caption with at most 5 hashtags, always including ${kit.hashtags.join(' ')}.`,
-  ].join('\n\n');
+  ].filter(Boolean).join('\n\n');
   const user = [
     `Post type: ${input.kind}${input.sponsored ? ' (PAID: the first line must start with "Featured partner")' : ''}`,
     `Working title: ${input.title}`,
@@ -189,5 +191,54 @@ export async function analyzeInspiration(posts: Array<{ handle: string; permalin
     posts.map((p, i) => `${i + 1}. @${p.handle} · ${p.reel ? 'Reel' : 'Post'} · ${p.engagement} likes+comments · ${p.lift}x its usual · ${p.permalink}\n${p.caption}`).join('\n\n'),
     InspirationSchema,
     'inspiration',
+  );
+}
+
+const PlanSchema = z.object({
+  direction: z.string().describe('Notes to the caption writer for this week, 3 to 6 short sentences: what to lean into, what to avoid, which hooks and angles fit, based only on the numbers, the playbook and the listings given.'),
+  plan: z.array(z.object({
+    date: z.string().describe('YYYY-MM-DD, within the next 7 days.'),
+    slot: z.string().describe('HH:mm, one of the posting slots given.'),
+    pillar: z.enum(['Things to do', 'Calgary moments', 'City news', 'Local and relatable']),
+    format: z.enum(['Reel', 'Carousel', 'Single image', 'Story']),
+    idea: z.string().describe('What the post is, in one sentence.'),
+    hook: z.string().describe('The first line of the caption or on-screen text, sentence case, true to the facts given.'),
+    asset: z.enum(['listing photo', 'creator clip', 'clip to shoot', 'our photo', 'text only']).describe('What it shows. "listing photo" only for a listing marked as having a photo.'),
+    listing: z.string().describe('For a listing post: the listing title exactly as given. Otherwise an empty string.'),
+  })).describe('The week ahead, 14 to 25 posts, following the playbook\'s mix. Use listings that have photos for "Things to do".'),
+  shootList: z.array(z.object({
+    what: z.string().describe('A 5 to 15 second phone clip Aldo could film, e.g. "First snow on the Peace Bridge".'),
+    where: z.string(),
+    when: z.string().describe('When to film it, e.g. "Thursday around sunset".'),
+    why: z.string().describe('One sentence: why it would do well, from the numbers or patterns given.'),
+  })).describe('2 to 5 clips worth shooting this week.'),
+  outreach: z.array(z.object({
+    handle: z.string().describe('An Instagram handle from the creators list given, without @.'),
+    postUrl: z.string().describe('The permalink of their post we would like to share, from the list given, or an empty string to ask in general.'),
+    why: z.string().describe('One sentence for Aldo: why this creator and this clip.'),
+    dm: z.string().describe('The direct message asking permission to share their clip as a Reel with credit and a tag, in a friendly, short, personal voice (under 450 characters). Mention the specific clip. Never pushy, never promise money or reach numbers.'),
+  })).describe('Up to 5 permission requests to creators. Only handles from the creators list.'),
+});
+export type ContentPlan = z.infer<typeof PlanSchema>;
+
+/** The coordinator: the week's plan, the writer's direction, clips to shoot and creators to ask, from the numbers and the playbook. */
+export async function planWeek(input: { playbook: string; numbers: string; inspiration: string; creators: string; listings: string; slots: string[]; today: string }): Promise<ContentPlan> {
+  return structured(
+    [
+      'You are the social media coordinator for @calgarydaily, a Calgary Instagram account with about 4,300 followers. Your goal is reach and follower growth: posts Calgarians stop on, save and share.',
+      `The owner's playbook (follow it):\n${input.playbook}`,
+      'Base every claim on the numbers, patterns and listings given. Never invent events, times, prices or creators. Ideas must be original, or a creator\'s clip shared only after they say yes (that is what the outreach DMs are for).',
+      'The bot cannot comment on other accounts or send DMs itself; Aldo sends the outreach DMs by hand from the app.',
+    ].join('\n\n'),
+    [
+      `Today: ${input.today}. Posting slots: ${input.slots.join(', ')}.`,
+      `Our numbers:\n${input.numbers}`,
+      `What is working on other Calgary accounts:\n${input.inspiration}`,
+      `Creators we could ask (handle · followers · their post that did best):\n${input.creators || '(none found yet)'}`,
+      `Listings in the next 7 days:\n${input.listings}`,
+    ].join('\n\n'),
+    PlanSchema,
+    'coordinator',
+    12000,
   );
 }

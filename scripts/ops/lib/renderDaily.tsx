@@ -8,9 +8,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { PostImageText, PostTemplate } from '../../../src/types/ops';
 import { ROOT } from './brand';
+import { photoData } from './photos';
 
 /** Bump when the look changes: queued posts in an older design are re-rendered before they publish. */
-export const DAILY_DESIGN_VERSION = 3;
+export const DAILY_DESIGN_VERSION = 4;
 
 export const DAILY = {
   orange: '#FE7F26',
@@ -29,7 +30,8 @@ function dataUri(relPath: string, type: string): string {
   return cache.get(relPath)!;
 }
 const logo = () => dataUri('brand/calgarydaily-logo.jpg', 'image/jpeg');
-const photo = (file: string) => dataUri(file, file.endsWith('.png') ? 'image/png' : 'image/jpeg');
+const photo = (p: NonNullable<PostImageText['photo']>) =>
+  p.file ? dataUri(p.file, p.file.endsWith('.png') ? 'image/png' : 'image/jpeg') : photoData(p.url ?? '') ?? '';
 
 /** The skyline and Calgary Tower from the logo, as a quiet silhouette along the bottom. */
 function skyline(color: string, opacity: number): string {
@@ -208,7 +210,7 @@ function PhotoCard({ text }: { text: PostImageText }) {
   const p = text.photo!;
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', backgroundImage: DAILY_GRADIENT, position: 'relative' }}>
-      <img src={photo(p.file)} width={1080} height={1262} style={{ position: 'absolute', left: 0, top: 0, objectFit: 'cover', objectPosition: p.focus ?? 'center' }} />
+      <img src={photo(p)} width={1080} height={1262} style={{ position: 'absolute', left: 0, top: 0, objectFit: 'cover', objectPosition: p.focus ?? 'center' }} />
       {/* The brand gradient rises out of the bottom of the photo; the top stays clear for the logo. */}
       <div style={{ display: 'flex', position: 'absolute', left: 0, top: 0, width: 1080, height: 1262, backgroundImage: `linear-gradient(180deg, #00000059 0%, #00000000 18%, #00000000 42%, ${DAILY.red}B3 66%, ${DAILY.magenta}F2 84%, ${DAILY.purple} 100%)` }} />
       <div style={{ display: 'flex', position: 'absolute', right: 28, top: 190, fontFamily: 'Inter', fontWeight: 600, fontSize: 19, color: '#FFFFFFD9' }}>{p.credit}</div>

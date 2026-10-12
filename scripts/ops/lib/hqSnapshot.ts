@@ -149,6 +149,8 @@ export interface HqSnapshot {
     inspiration: import('./scout').Outperformer[];
     analysis: (import('./claude').InspirationAnalysis & { at: number }) | null;
     updatedAt: number | null;
+    /** The coordinator's week (scripts/ops/jobs/coordinator.ts): the plan, and Aldo's part (clips to shoot, creator DMs to send). */
+    coordinator?: (import('./claude').ContentPlan & { at: number }) | null;
   };
   pipelinesAt: number;
   spend: { days: SpendDay[]; monthToDate: number; last7: number; last30: number };

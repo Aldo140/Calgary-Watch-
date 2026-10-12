@@ -53,6 +53,15 @@ function load<T>(file: string): T {
 }
 
 export const brandKit = (id: BrandId): BrandKit => load<BrandKit>(`${id}.json`);
+
+/**
+ * The account's playbook (brand/<id>-playbook.md): what works and what the owner
+ * wants, in plain words. Read fresh each run so an edit applies to the next post.
+ */
+export function playbook(id: BrandId): string | null {
+  try { return readFileSync(join(ROOT, 'brand', `${id}-playbook.md`), 'utf8').trim() || null; } catch { return null; }
+}
+
 export const outreachConfig = (): OutreachConfig => load<OutreachConfig>('outreach.json');
 export const ALL_BRANDS: BrandId[] = ['calgarywatch', 'calgarydaily'];
 /** Accounts the agent posts for. CalgaryWatch has no Instagram of its own; @calgarydaily is its sister account. */

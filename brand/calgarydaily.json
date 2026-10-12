@@ -29,13 +29,14 @@
       "Held. Together. is on at Nickle Galleries until Friday, 9 am to 4 pm, and it's free.\n\nFour artists and one question: what holds a community together? Worth a lunch break if you're near campus.\n\nListed by the University of Calgary. Details on CalgaryWatch, link in bio."
     ],
     "rules": [
+      "Read the playbook (given separately) first; it says what works on this account and what Aldo wants this week. The first line of every caption is the hook: it has to make a Calgarian stop scrolling, using only true facts. Never open with a generic line like \"Here's what's on today.\"",
       "Use only facts supplied with the item or its source page. Never invent numbers, quotes, performers, crowds, prices, parking, weather or what it feels like to be there. No first-hand claims (\"we went\", \"we loved\").",
-      "Sentence case everywhere. No all-caps words or hooks.",
-      "Roundup captions: one plain opening line (no date, no exclamation mark), then one line per item as \"Name, venue · time · free\" (free only if free; list two showings as \"5 and 8 pm\"), then \"Full list on CalgaryWatch, link in bio.\" No descriptions in roundups. Under 600 characters before the hashtags.",
-      "Spotlight captions: start with the name and when and where in one natural sentence, then at most two short sentences from the facts about what it is. You may add one practical, fact-based aside (\"Worth a lunch break if you're near campus\") only when the facts support it. Under 450 characters before the hashtags.",
+      "Sentence case everywhere. No all-caps words.",
+      "Roundup captions: open with one hook line that gives a reason to go out (the standout pick, something free, something on for one night only), no date, no exclamation mark. Then one line per item as \"Name, venue · time · free\" (free only if free; list two showings as \"5 and 8 pm\"), then \"Full list on CalgaryWatch, link in bio.\" No descriptions in roundups. Under 600 characters before the hashtags.",
+      "Spotlight captions: the first line is a hook built only from the facts: why a Calgarian would go (free, one night only, a first, a big name, a good date, good for kids). Then the name, when and where in one natural sentence, then at most two short sentences from the facts about what it is. You may add one practical, fact-based aside (\"Worth a lunch break if you're near campus\") only when the facts support it. Under 450 characters before the hashtags.",
       "Name the source organization once (\"Listed by the University of Calgary\").",
       "CalgaryDaily is the Instagram sister of CalgaryWatch (calgarywatch.ca). Point to it once: \"Full list on CalgaryWatch, link in bio.\" or \"Details on CalgaryWatch, link in bio.\"",
-      "No calls to action beyond that one line. Do not ask people to tag friends, comment, like or share.",
+      "Besides that one line, you may end with one short, natural question to the reader when it fits (\"Who's going?\"). Never ask people to tag friends, like, comment or share.",
       "At most one emoji, and usually none. Never use one in place of a fact.",
       "No hype and no marketing words: nothing is epic, iconic, unmissable, a must-see, a hidden gem or a vibe. No \"you won't want to miss\", \"mark your calendars\", \"sorted\", \"we've got you\" or \"link in bio!\" with an exclamation mark.",
       "News about crime, collisions, fires or other emergencies always waits for human approval and never uses illustrated scenes.",
@@ -65,7 +66,12 @@
       "look no further",
       "tag who",
       "tag a friend",
-      "tag your"
+      "tag your",
+      "like if",
+      "comment below",
+      "comment yes",
+      "double tap",
+      "drop a"
     ]
   },
   "hashtags": [
@@ -75,8 +81,8 @@
   ],
   "linkInBio": "https://calgarywatch.ca/?utm_source=instagram&utm_medium=social&utm_campaign=calgarydaily_bio",
   "autoPublish": {
-    "events": false,
-    "markets": false,
+    "events": true,
+    "markets": true,
     "roundups": true,
     "partner": false,
     "incidents": false
@@ -87,6 +93,6 @@
     "12:00",
     "15:00",
     "17:00",
-    "20:00"
+    "21:00"
   ]
 }

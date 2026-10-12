@@ -24,8 +24,11 @@ export interface PostImageText {
   footer: string;
   /** A plain line under the headline: the hook on roundups, one sentence from the organizer on spotlights. */
   blurb?: string | null;
-  /** Photo posts: an openly licensed image in brand/photos/ and its credit, printed on the image. */
-  photo?: { file: string; credit: string; focus?: string } | null;
+  /**
+   * Photo posts: an openly licensed image in brand/photos/ (file), or the listing's own
+   * photo (url, the organizer's image calgarywatch.ca shows too), with its credit printed on the image.
+   */
+  photo?: { file?: string; url?: string; credit: string; focus?: string } | null;
 }
 
 export interface OpsPost {

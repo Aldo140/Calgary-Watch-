@@ -6,12 +6,13 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { BrandId, OpsPost, PostTemplate } from '../../../src/types/ops';
-import { BRANDS, ROOT, brandKit, type BrandKit } from '../lib/brand';
+import { BRANDS, ROOT, brandKit, playbook, type BrandKit } from '../lib/brand';
 import { claudeConfigured, extractBrief, writePost } from '../lib/claude';
 import { COLLECTIONS, uploadImage, uploadVideo } from '../lib/firebase';
 import { publishCarousel, publishImage, publishReel } from '../lib/instagram';
 import { currentToken } from './igTokens';
 import { bestCaptions } from './insights';
+import { featuredListings, type CoordinatorDoc } from './coordinator';
 import { checkDraft, happenings, roundupHeadline, selectCandidates, templateDraft, reelSlides, type Candidate, type DiscoveryIndex, type Draft } from '../lib/posts';
 import { makeReel } from '../lib/reel';
 import { renderPost, renderReelBackdrop } from '../lib/render';
@@ -23,14 +24,14 @@ type Log = (m: string) => void;
 const postId = (fingerprint: string) => `post-${createHash('sha256').update(fingerprint).digest('hex').slice(0, 20)}`;
 
 /** Claude's draft checked against the brand; the template draft when there is no key or it fails. */
-async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items']; format?: Candidate['format'] }, kit: BrandKit, base: Draft, note: string, log: Log): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
+async function writeDraft(c: Pick<Candidate, 'template' | 'title' | 'facts' | 'link'> & { items?: Candidate['items']; format?: Candidate['format'] }, kit: BrandKit, base: Draft, note: string, log: Log, direction: string | null = null): Promise<{ draft: Draft; warnings: string[]; by: 'claude' | 'template' }> {
   if (!claudeConfigured()) return { draft: base, warnings: checkDraft(base, kit), by: 'template' };
   try {
     const w = await writePost(kit, {
       kind: c.format === 'reel' ? (c.title.startsWith('Tonight') ? 'Tonight roundup Reel (open with one plain line about tonight; then one line per plan with its time)' : 'weekend roundup Reel (open with one plain line about the weekend; then one line per plan with its day)') : c.template === 'roundup' ? 'roundup of several listings' : c.template === 'update' ? 'news or city update' : 'single listing',
       title: c.title + (note ? `\nReviewer's note for this redraft: ${note}` : ''),
       facts: c.facts, link: c.link, sponsored: c.template === 'partner',
-    });
+    }, { playbook: playbook(kit.id), direction });
     // The image keeps the plain facts (clean names, times, places) from the template. Listing posts
     // keep the event's own name as the headline; on a roundup Claude's opening line becomes the blurb.
     const listing = c.template === 'roundup' || c.template === 'event';
@@ -90,6 +91,8 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
 
   // The account's best-performing captions join the voice examples, so the writer leans toward what works.
   const published = db ? (await db.collection(COLLECTIONS.posts).where('status', '==', 'published').get()).docs.map(d => d.data() as OpsPost) : [];
+  // The week's content plan: direction for the writer and the listings it wants featured.
+  const plan = db ? ((await db.collection(COLLECTIONS.health).doc('coordinator').get()).data() as CoordinatorDoc | undefined) ?? null : null;
 
   let made = 0;
   for (const brand of BRANDS) {
@@ -101,9 +104,10 @@ export async function draftPosts(db: Firestore | null, index: DiscoveryIndex, no
     if (db) waiting = (await db.collection(COLLECTIONS.posts).where('status', '==', 'drafted').select('brand').get()).docs.filter(d => d.get('brand') === brand).length;
     if (waiting >= kit.postsPerDay * 3) { log(`${brand}: ${waiting} drafts already waiting for review; not adding more.`); continue; }
 
-    for (const c of selectCandidates(index, kit, now, queued, recent.get(brand), booked.get(brand))) {
+    const direction = brand === 'calgarydaily' ? plan?.direction ?? null : null;
+    for (const c of selectCandidates(index, kit, now, queued, recent.get(brand), booked.get(brand), brand === 'calgarydaily' ? featuredListings(plan) : undefined)) {
       const id = postId(c.fingerprint);
-      const { draft, warnings, by } = await writeDraft(c, writerKit, templateDraft(c, kit), '', log);
+      const { draft, warnings, by } = await writeDraft(c, writerKit, templateDraft(c, kit), '', log, direction);
       let image: { imageUrl: string | null; imagePath: string | null };
       let videoUrl: string | null = null;
       // The cover doubles as the post image (and the site's thumbnail).
@@ -296,13 +300,15 @@ export async function publishDue(db: Firestore, now: number, log: Log): Promise<
  * Posts that may go out without a person approving them: event, market and
  * roundup posts built only from verified listings, with no warnings, for a
  * brand whose kit turns that category on (the owner opted CalgaryDaily in on
- * 2026-09-25). News briefs, sensitive stories and paid posts always wait.
+ * 2026-09-25, and for everything on 2026-10-10). Spotlights need the listing's
+ * photo. News briefs, sensitive stories and paid posts always wait.
  */
 export function autoPublishable(p: OpsPost): boolean {
   const kit = brandKit(p.brand);
   if (!kit.confirmed || p.sponsored || p.status !== 'drafted' || (p.warnings ?? []).length) return false;
   if (p.template === 'roundup') return kit.autoPublish.roundups;
-  if (p.template === 'event') return p.fingerprint.includes('|market|') ? kit.autoPublish.markets : kit.autoPublish.events;
+  // Text-only spotlights drew a median of 45 views, so only spotlights carrying the listing's real photo go out on their own.
+  if (p.template === 'event') return Boolean(p.imageText.photo) && (p.fingerprint.includes('|market|') ? kit.autoPublish.markets : kit.autoPublish.events);
   return false;
 }
 

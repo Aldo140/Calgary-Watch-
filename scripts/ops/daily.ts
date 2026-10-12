@@ -16,6 +16,7 @@ import { checkHealth, sendSummary } from './jobs/health';
 import { collectInsights } from './jobs/insights';
 import { collectAccountHistory } from './jobs/accountHistory';
 import { runScout } from './jobs/scout';
+import { coordinate } from './jobs/coordinator';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
 import { flushUsage } from './jobs/usage';
 
@@ -39,15 +40,18 @@ if (!db) {
   await step('draft posts', () => draftPosts(null, index, now, log));
   await step('health', () => checkHealth(null, index, now, log));
 } else {
+  // Posting first: if the day's Firestore quota runs out partway, today's posts are already queued.
+  // The plan and drafting use yesterday's numbers; the numbers are refreshed after.
   await step('monitor posts', () => monitorPosts(db, index, now, log));
-  await step('insights', () => collectInsights(db, now, log));
-  await step('account history', () => collectAccountHistory(db, now, log));
-  await step('scout', () => runScout(db, now, log));
+  await step('content plan', () => coordinate(db, index, now, log));
   await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
   await step('draft posts', () => draftPosts(db, index, now, log));
   await step('queue drafts', () => queueDrafts(db, now, log));
   await step('auto-approve', () => autoApprove(db, now, log));
   await step('one post per slot', () => resolveDoubleBookings(db, now, log));
+  await step('insights', () => collectInsights(db, now, log));
+  await step('account history', () => collectAccountHistory(db, now, log));
+  await step('scout', () => runScout(db, now, log));
   await step('find leads', () => findLeads(db, index, now, log));
   await step('draft pitches', () => draftPitches(db, index, now, log));
   let health = null as Awaited<ReturnType<typeof checkHealth>> | null;

@@ -1156,6 +1156,187 @@
       "updatedAt": "2026-09-22T16:44:40.770Z"
     },
     {
+      "id": "biz-wilder-institutes-calgary-zoo",
+      "kind": "business",
+      "slug": "wilder-institutes-calgary-zoo",
+      "name": "Wilder Institute’s Calgary Zoo",
+      "title": "Wilder Institute’s Calgary Zoo",
+      "summary": "Calgary’s zoo by the Bow River, run by the Wilder Institute conservation charity, with animals from around the world and seasonal events all year.",
+      "description": "Wilder Institute’s Calgary Zoo is home to animals from around the world, gardens and a year-round calendar of seasonal events, from ZooBOO at Halloween to Sunday Safari Brunch. The zoo is run by the Wilder Institute, a conservation charity. Hours, tickets and event details change through the year, so the zoo’s official website is the source of truth for anything you plan around.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "zoo",
+        "family",
+        "animals",
+        "conservation",
+        "attraction",
+        "Bridgeland"
+      ],
+      "address": "1300 Zoo Road NE, Calgary, AB T2E 7V6",
+      "neighbourhood": "Bridgeland",
+      "website": "https://www.calgaryzoo.com/",
+      "sourceId": "calgary-zoo",
+      "sources": [
+        {
+          "name": "Wilder Institute’s Calgary Zoo",
+          "url": "https://www.calgaryzoo.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T17:30:00-06:00"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+      },
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        }
+      ],
+      "socials": {
+        "website": "https://www.calgaryzoo.com/"
+      },
+      "services": [
+        "Daily zoo admission",
+        "Memberships",
+        "Seasonal events",
+        "Wildlife conservation"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-13T17:30:00-06:00",
+      "updatedAt": "2026-10-13T17:30:00-06:00"
+    },
+    {
+      "id": "biz-downstage",
+      "kind": "business",
+      "slug": "downstage",
+      "name": "Downstage",
+      "title": "Downstage",
+      "summary": "A Calgary theatre company making socially engaged new work, performing at the Motel Theatre in the Werklund Centre.",
+      "description": "Downstage creates and presents new Calgary theatre about the issues people are living with now, and builds conversation around each show. Its 2026–27 season at the Motel Theatre in the Werklund Centre includes Dreaming Climate Consciousness (October 23 and 24, four short plays set in one shared climate future), Creative Stretch on Mondays from October to May, and A Study of Choices (April 7 to 11, 2027). More dates are added through the year, so check Downstage’s current season page for times and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "theatre",
+        "performing arts",
+        "new plays",
+        "Downtown"
+      ],
+      "address": "Motel Theatre, Werklund Centre, 205 8 Avenue SE, Calgary, AB",
+      "neighbourhood": "Downtown",
+      "website": "https://downstage.ca/",
+      "sources": [
+        {
+          "name": "Downstage",
+          "url": "https://downstage.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T17:30:00-06:00"
+        },
+        {
+          "name": "Downstage current season",
+          "url": "https://downstage.ca/currentseason/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T17:30:00-06:00"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+      },
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        }
+      ],
+      "socials": {
+        "website": "https://downstage.ca/",
+        "season": "https://downstage.ca/currentseason/"
+      },
+      "services": [
+        "Professional theatre productions",
+        "New play development",
+        "Community workshops"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-13T17:30:00-06:00",
+      "updatedAt": "2026-10-13T17:30:00-06:00"
+    },
+    {
+      "id": "biz-ghost-river-theatre",
+      "kind": "business",
+      "slug": "ghost-river-theatre",
+      "name": "Ghost River Theatre",
+      "title": "Ghost River Theatre",
+      "summary": "A Calgary devised-theatre company making original, often immersive work, based at the West Village Theatre in Sunalta.",
+      "description": "Ghost River Theatre creates original devised theatre, built by its artists from the ground up and often immersive. It doesn’t run a fixed subscription season: projects are developed, staged and toured over time, and its 2026/27 Experiences page lists what is in the works. Ghost River’s main website carries the most current dates, so check it before you plan a night out.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "theatre",
+        "performing arts",
+        "devised theatre",
+        "immersive",
+        "Sunalta"
+      ],
+      "address": "West Village Theatre, 2007 10 Avenue SW, Calgary, AB",
+      "neighbourhood": "Sunalta",
+      "website": "https://www.ghostrivertheatre.com/",
+      "sources": [
+        {
+          "name": "Ghost River Theatre",
+          "url": "https://www.ghostrivertheatre.com/#grt",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T17:30:00-06:00"
+        },
+        {
+          "name": "Ghost River Theatre 2026/27 Experiences",
+          "url": "https://www.ghostrivertheatre.com/202627experiences",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T17:30:00-06:00"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+      },
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        }
+      ],
+      "socials": {
+        "website": "https://www.ghostrivertheatre.com/",
+        "experiences": "https://www.ghostrivertheatre.com/202627experiences"
+      },
+      "services": [
+        "Original devised theatre",
+        "Immersive productions",
+        "Theatre training"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-13T17:30:00-06:00",
+      "updatedAt": "2026-10-13T17:30:00-06:00"
+    },
+    {
       "id": "d6d4476cb83f44b8639ea3ecfd7c",
       "kind": "market",
       "slug": "hillhurst-sunnyside-farmers-market-d6d447",
@@ -1512,6 +1693,11 @@
       "updatedAt": "2026-10-13T21:37:51.577Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "dalhousie-harvest-farmers-market",
+      "image": {
+        "src": "https://calgarywatch.ca/images/markets/dalhousie-harvest-farmers-market.webp",
+        "alt": "Dalhousie Harvest Farmers' Market poster: Saturday, October 24, 10 am to 3 pm, with photos of a crocheted ghost, blueberry scones, honey, cinnamon buns, soup and a roast from local vendors",
+        "credit": "Image: Dalhousie Community Association"
+      },
       "neighbourhood": "Dalhousie",
       "address": "5432 Dalhart Rd NW, Calgary, AB",
       "venue": "Dalhousie Community Association",
@@ -7001,12 +7187,12 @@
       "sourceId": "visit-calgary",
       "sourceRecordId": "sunday-safari-brunch@2026-10-18",
       "address": "1300 Zoo Rd Ne, Calgary, AB",
-      "venue": "Wilder Institute",
+      "venue": "Wilder Institute’s Calgary Zoo",
       "start": "2026-10-18T09:00:00-06:00",
       "end": "2026-10-18T17:00:00.000Z",
       "timezone": "America/Edmonton",
       "pricing": "unknown",
-      "organizer": "Wilder institute/Calgary Zoo",
+      "organizer": "Wilder Institute’s Calgary Zoo",
       "cancelled": false
     },
     {
@@ -7037,12 +7223,12 @@
       "sourceId": "visit-calgary",
       "sourceRecordId": "sunday-safari-brunch@2026-10-25",
       "address": "1300 Zoo Rd Ne, Calgary, AB",
-      "venue": "Wilder Institute",
+      "venue": "Wilder Institute’s Calgary Zoo",
       "start": "2026-10-25T09:00:00-06:00",
       "end": "2026-10-25T17:00:00.000Z",
       "timezone": "America/Edmonton",
       "pricing": "unknown",
-      "organizer": "Wilder institute/Calgary Zoo",
+      "organizer": "Wilder Institute’s Calgary Zoo",
       "cancelled": false
     },
     {
@@ -7073,12 +7259,12 @@
       "sourceId": "visit-calgary",
       "sourceRecordId": "sunday-safari-brunch@2026-11-01",
       "address": "1300 Zoo Rd Ne, Calgary, AB",
-      "venue": "Wilder Institute",
+      "venue": "Wilder Institute’s Calgary Zoo",
       "start": "2026-11-01T09:00:00-06:00",
       "end": "2026-11-01T17:00:00.000Z",
       "timezone": "America/Edmonton",
       "pricing": "unknown",
-      "organizer": "Wilder institute/Calgary Zoo",
+      "organizer": "Wilder Institute’s Calgary Zoo",
       "cancelled": false
     },
     {
@@ -11187,7 +11373,7 @@
       "slug": "zooboo-at-the-calgary-zoo-d8007d",
       "title": "ZooBOO at the Calgary Zoo",
       "summary": "The zoo's Halloween weekend: come in costume for treats and trick-or-treat stations around the paths.",
-      "description": "ZooBOO is the Wilder Institute/Calgary Zoo's Halloween celebration, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
+      "description": "ZooBOO is the Halloween celebration at Wilder Institute’s Calgary Zoo, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
       "categories": [
         "family",
         "holiday",
@@ -11200,7 +11386,7 @@
       ],
       "sources": [
         {
-          "name": "Wilder Institute/Calgary Zoo",
+          "name": "Wilder Institute’s Calgary Zoo",
           "url": "https://www.calgaryzoo.com/",
           "kind": "official",
           "retrievedAt": "2026-10-13T21:37:51.577Z"
@@ -11215,12 +11401,12 @@
       "sourceRecordId": "zooboo-2026-10-31",
       "neighbourhood": "Bridgeland",
       "address": "210 St. George's Drive NE, Calgary, AB",
-      "venue": "Wilder Institute/Calgary Zoo",
+      "venue": "Wilder Institute’s Calgary Zoo",
       "start": "2026-10-31T09:00:00-06:00",
       "end": "2026-10-31T17:30:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "organizer": "Wilder Institute/Calgary Zoo",
+      "organizer": "Wilder Institute’s Calgary Zoo",
       "cancelled": false
     },
     {
@@ -11229,7 +11415,7 @@
       "slug": "zooboo-at-the-calgary-zoo-d20429",
       "title": "ZooBOO at the Calgary Zoo",
       "summary": "The zoo's Halloween weekend: come in costume for treats and trick-or-treat stations around the paths.",
-      "description": "ZooBOO is the Wilder Institute/Calgary Zoo's Halloween celebration, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
+      "description": "ZooBOO is the Halloween celebration at Wilder Institute’s Calgary Zoo, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
       "categories": [
         "family",
         "holiday",
@@ -11242,7 +11428,7 @@
       ],
       "sources": [
         {
-          "name": "Wilder Institute/Calgary Zoo",
+          "name": "Wilder Institute’s Calgary Zoo",
           "url": "https://www.calgaryzoo.com/",
           "kind": "official",
           "retrievedAt": "2026-10-13T21:37:51.577Z"
@@ -11257,12 +11443,12 @@
       "sourceRecordId": "zooboo-2026-11-01",
       "neighbourhood": "Bridgeland",
       "address": "210 St. George's Drive NE, Calgary, AB",
-      "venue": "Wilder Institute/Calgary Zoo",
+      "venue": "Wilder Institute’s Calgary Zoo",
       "start": "2026-11-01T09:00:00-06:00",
       "end": "2026-11-01T17:30:00-06:00",
       "timezone": "America/Edmonton",
       "pricing": "paid",
-      "organizer": "Wilder Institute/Calgary Zoo",
+      "organizer": "Wilder Institute’s Calgary Zoo",
       "cancelled": false
     },
     {

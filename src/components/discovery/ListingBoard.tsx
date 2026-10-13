@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import type { DiscoveryEntity, Event as EventEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath, startClock } from '../../lib/discovery';
-import { EventArt, MarketArt } from './ListingArt';
+import { EventArt, MarketCover } from './ListingArt';
 import '../../styles/plans.css';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
@@ -83,7 +83,7 @@ export function MarketCard({ entity, occurrences, now }: { entity: Market; occur
     <li className={`cw-lb-card cw-lb-market${open ? ' is-open' : ''}`}>
       <Link to={entityPath(entity)}>
         <span className="cw-lb-media">
-          <MarketArt id={entity.id} title={entity.title} day={next ? weekdayShort.format(at(next.start)) : undefined} />
+          <MarketCover market={entity} day={next ? weekdayShort.format(at(next.start)) : undefined} />
           {open ? <span className="cw-lb-open"><span className="cw-lb-pulse" aria-hidden="true" />Open now</span> : null}
         </span>
         <span className="cw-lb-body">

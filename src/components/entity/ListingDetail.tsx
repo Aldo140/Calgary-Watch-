@@ -120,7 +120,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const open = !past && !event.cancelled;
   const photo = /^https:\/\//.test(event.image?.src ?? '') ? event.image : undefined;
   const organization = all.find((entity): entity is Business =>
-    entity.kind === 'business' && !!event.sourceId && entity.sourceId === event.sourceId
+    entity.kind === 'business' && ((!!event.sourceId && entity.sourceId === event.sourceId) || entity.title === event.organizer)
   );
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
@@ -241,9 +241,12 @@ export function PlaceDetail({ place, all }: { place: Business; all: readonly Dis
   const note = LOCAL_NOTES[place.id];
   const site = place.website || place.sources.find(s => s.kind === 'official')?.url;
   const season = place.socials.season;
+  // Companies without a fixed season (Ghost River Theatre) point to their current projects instead.
+  const experiences = place.socials.experiences;
   const others = all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly)).slice(0, 4);
   const upcoming = all
-    .filter((entity): entity is Event => entity.kind === 'event' && !!place.sourceId && entity.sourceId === place.sourceId && !entity.cancelled && Date.parse(entity.end) > now)
+    // The organization's own feed, plus copies from aggregators (Tourism Calgary) that name it as organizer.
+    .filter((entity): entity is Event => entity.kind === 'event' && ((!!place.sourceId && entity.sourceId === place.sourceId) || entity.organizer === place.title) && !entity.cancelled && Date.parse(entity.end) > now)
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
   const hours = place.hours ? Object.entries(place.hours) : [];
 
@@ -288,6 +291,7 @@ export function PlaceDetail({ place, all }: { place: Business; all: readonly Dis
             <p>{place.description}</p>
             {place.services?.length ? <p className="mk-amenities">{place.services.map(s => <span key={s} className="mk-tag">{s}</span>)}</p> : null}
             {season ? <a className="mk-organizer" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current season and tickets</a> : null}
+            {experiences ? <a className="mk-organizer" href={experiences} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current and upcoming experiences</a> : null}
           </section>
 
           {upcoming.length ? (

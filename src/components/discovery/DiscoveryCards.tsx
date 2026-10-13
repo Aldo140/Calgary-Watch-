@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, Calendar, MapPin, Tag } from 'lucide-react';
 import type { DiscoveryEntity, EntityKind } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
-import { EventArt, MarketArt, ShopArt } from './ListingArt';
+import { EventArt, MarketCover, ShopArt } from './ListingArt';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 export function SectionHeading({ title, to, label = 'Explore all', eyebrow }: { title: string; to?: string; label?: string; eyebrow?: string }) {
@@ -45,7 +45,7 @@ export function DiscoveryCard({ entity }: { entity: DiscoveryEntity }) {
       <Link to={entityPath(entity)}>
         <div className="cw-card-image">
           {entity.kind === 'market'
-            ? <MarketArt id={entity.id} title={entity.title} />
+            ? <MarketCover market={entity} />
             : entity.kind === 'business'
             ? <ShopArt id={entity.id} title={entity.title} tags={entity.tags} categories={entity.categories} />
             : entity.kind === 'event' && !/^https:\/\//.test(entity.image?.src ?? '')

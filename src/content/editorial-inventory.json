@@ -500,7 +500,6 @@
           "name": "Bridgeland-Riverside Farmers’ Market",
           "area": "Bridgeland",
           "mapQuery": "Bridgeland-Riverside Community Association, 917 Centre Ave NE, Calgary, AB",
-          "entityId": "f9e4cdd719a09b4128a1865e055e",
           "note": "A community-hall market on the hill above the river. Pair it with a walk down to the Bow."
         },
         {
@@ -794,6 +793,81 @@
         "Kids 12 and under ride Calgary Transit free.",
         "Bring a water bottle. The library and the gardens have fountains."
       ]
+    },
+    {
+      "id": "biz-calgary-chinese-cultural-centre",
+      "kind": "business",
+      "slug": "calgary-chinese-cultural-centre",
+      "name": "Calgary Chinese Cultural Centre",
+      "title": "Calgary Chinese Cultural Centre",
+      "summary": "A Chinatown cultural hub for Chinese arts, language, wellness, recreation and community celebrations throughout the year.",
+      "description": "The Calgary Chinese Cultural Centre is a charitable non-profit gathering place serving Chinatown, Calgary’s Chinese community and Calgarians more broadly. Its year-round programs span Chinese arts and heritage, Mandarin, calligraphy and painting, music and dance, Tai Chi and Qigong, martial arts, recreation, wellness, and family and senior activities. Current fall 2026 sessions include Wing Chun, Adult Mandarin, Chinese Xie Yi Painting, Table Tennis and beginner Yang Style Tai Chi. Dates and registration can change, so use the Centre’s official programs and events pages for the current schedule.",
+      "categories": [
+        "arts",
+        "services"
+      ],
+      "tags": [
+        "Chinatown",
+        "Chinese culture",
+        "community centre",
+        "classes",
+        "family",
+        "education"
+      ],
+      "address": "197 1st Street SW, Calgary, AB T2P 4M4",
+      "neighbourhood": "Chinatown",
+      "phone": "403-262-5071",
+      "website": "https://www.culturalcentre.ca/",
+      "sources": [
+        {
+          "name": "Calgary Chinese Cultural Centre",
+          "url": "https://www.culturalcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T18:00:00-06:00"
+        },
+        {
+          "name": "Calgary Chinese Cultural Centre programs",
+          "url": "https://www.culturalcentre.ca/programs",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T18:00:00-06:00"
+        },
+        {
+          "name": "Calgary Chinese Cultural Centre events",
+          "url": "https://www.culturalcentre.ca/events",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T18:00:00-06:00"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Illustrated Calgary festival scene with live music, food, cyclists and people gathering beside the river"
+      },
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "Illustrated Calgary festival scene with live music, food, cyclists and people gathering beside the river"
+        }
+      ],
+      "socials": {
+        "website": "https://www.culturalcentre.ca/",
+        "programs": "https://www.culturalcentre.ca/programs",
+        "events": "https://www.culturalcentre.ca/events",
+        "email": "mailto:info@culturalcentre.ca"
+      },
+      "services": [
+        "Chinese arts and heritage",
+        "Language and educational programs",
+        "Wellness and martial arts",
+        "Family and community events",
+        "Recreation and senior programs"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-13T18:00:00-06:00",
+      "updatedAt": "2026-10-13T18:00:00-06:00"
     },
     {
       "id": "biz-rosso-inglewood",

@@ -243,7 +243,7 @@ export function PlaceDetail({ place, all }: { place: Business; all: readonly Dis
     <div className="mk mk-detail cw-home2 ld">
       <Hero
         crumb={{ to: '/local', label: 'Local', current: place.title }}
-        status={<><Sparkles size={15} aria-hidden="true" />{place.partner ? 'Featured partner' : note?.pick ?? 'Picked by CalgaryWatch'}</>}
+        status={<><Sparkles size={15} aria-hidden="true" />{place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : 'Local organization')}</>}
         title={place.title}
         verifiedId={place.id}
         lead={place.summary}

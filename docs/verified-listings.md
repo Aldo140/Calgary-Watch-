@@ -46,10 +46,12 @@ Limitations: ranking picks up a new approval at the next build (badge is immedia
 
 ## What outreach may say
 
-`scripts/ops/lib/claimFacts.ts` turns each lead into facts (`hasPublishedEntity`, `claimable`, `claimUrl`, `claimStatus`, `verified`, `verificationBenefitEnabled`). The template claim line, the Claude prompts (`CLAIM_RULES`) and a final check (`claimLanguageProblems`) all use them.
+`scripts/ops/lib/claimFacts.ts` turns each lead into facts (`hasPublishedEntity`, `entityId`, `entityKind`, `claimable`, `claimUrl`, `claimStatus`, `verified`, `verificationBenefitEnabled`). The template claim line, the Claude prompts (`CLAIM_RULES`) and a final check (`claimLanguageProblems`) all use them.
 
 - Claiming is offered only for a real, published listing in the current index, through its own `https://calgarywatch.ca/claim/{entityId}`.
 - The visibility benefit is mentioned only when that listing is the organization itself (a business or market), it is not yet verified, and every ranking weight is positive (`VERIFICATION_PRIORITY_ENABLED`). Not for prospects, service-directory invitations, or an organizer whose only listing is one event (those get the plain claim line).
+- An organizer whose only listing is one event hears about "the event listing", never an organization listing. A prospect with nothing listed never hears "your listing", "already listed" or "claim your listing", and that includes the template follow-up.
+- When a prospect later gets a real business or market listing, its existing lead (matched by website host) takes that listing, so replies carry its claim link and no second lead is created.
 - A verified listing is never asked to claim: no new lead, pending drafts and follow-ups move to `claimed`, and replies carry no claim link.
 
 Permitted (vary the words, keep the meaning):

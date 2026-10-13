@@ -107,6 +107,34 @@ export function withClaimLink(body: string, facts: ClaimFacts, sig: string, seed
   return at > 0 ? `${body.slice(0, at)}${line}\n\n${body.slice(at)}` : `${body}\n\n${line}`;
 }
 
+/** The template follow-up. Only a lead with a published listing hears about "your listing". */
+export function followUpTemplate(lead: Pick<PartnerLead, 'businessName'>, claim: ClaimFacts, sig: string): string {
+  const about = !claim.hasPublishedEntity
+    ? `listing ${lead.businessName} on CalgaryWatch. If you'd like that, a one-line reply is plenty.`
+    : claim.entityKind === 'event'
+      ? `the CalgaryWatch event listing for ${lead.businessName}. If anything needs changing, a one-line reply is plenty.`
+      : `${lead.businessName}'s listing on CalgaryWatch. If anything needs changing, a one-line reply is plenty.`;
+  return `Hello again,\n\nJust following up on my note about ${about}\n\n${sig}`;
+}
+
+/**
+ * Prospects we wrote to before they were listed get their listing once it
+ * exists: the lead whose website matches takes the new entity, so its replies
+ * carry the claim link and nobody is pitched twice.
+ */
+export function adoptListings(leads: ReadonlyArray<Pick<PartnerLead, 'id' | 'entityId' | 'website'>>, entities: readonly Entity[]): Map<string, Entity> {
+  const unlisted = new Map<string, string>();
+  for (const l of leads) { const h = !l.entityId && l.website ? hostOf(l.website) : ''; if (h && !unlisted.has(h)) unlisted.set(h, l.id); }
+  const out = new Map<string, Entity>();
+  for (const e of entities) {
+    if (!LEAD_KINDS.has(e.kind) || e.status !== 'published' || e.fixture) continue;
+    const site = websiteFor(e);
+    const id = site ? unlisted.get(hostOf(site)) : undefined;
+    if (id && !out.has(id)) { out.set(id, e); unlisted.delete(hostOf(site!)); }
+  }
+  return out;
+}
+
 async function fetchText(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, { headers: { 'user-agent': 'CalgaryWatchBot/1.0 (+https://calgarywatch.ca)' }, signal: AbortSignal.timeout(15_000), redirect: 'follow' });
@@ -142,8 +170,17 @@ export async function findLeads(db: Firestore, index: DiscoveryIndex, now: numbe
   const existing = new Set((await db.collection(COLLECTIONS.leads).select().get()).docs.map(d => d.id));
   // A listing its organization already claimed and verified is never pitched.
   const verified = await loadVerifiedIds(db, index);
+  // A prospect that now has a listing keeps its lead and takes the listing.
+  const prospects = (await db.collection(COLLECTIONS.leads).where('entityId', '==', null).select('website').get()).docs
+    .map(d => ({ id: d.id, entityId: null, website: (d.get('website') as string | null) ?? null }));
+  const adopted = new Set<string>();
+  for (const [leadId, e] of adoptListings(prospects, index.entities.filter(x => !existing.has(leadIdFor(x))))) {
+    await db.collection(COLLECTIONS.leads).doc(leadId).update({ entityId: e.id, entityKind: e.kind, updatedAt: now, history: push(event('status', `Now listed on CalgaryWatch as a ${e.kind} (${e.id}).`)) });
+    adopted.add(e.id);
+    log(`prospect now listed: ${leadId} → ${e.id}`);
+  }
   for (const e of index.entities) {
-    if (!LEAD_KINDS.has(e.kind) || e.status !== 'published' || e.fixture || existing.has(leadIdFor(e)) || verified.has(e.id)) continue;
+    if (!LEAD_KINDS.has(e.kind) || e.status !== 'published' || e.fixture || existing.has(leadIdFor(e)) || verified.has(e.id) || adopted.has(e.id)) continue;
     const lead: PartnerLead = {
       id: leadIdFor(e), entityId: e.id, entityKind: e.kind, businessName: e.name ?? e.title,
       category: e.categories?.[0] ?? e.kind, neighbourhood: e.neighbourhood ?? '', website: websiteFor(e),
@@ -322,7 +359,7 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       await doc.ref.update({ status: 'no-response', nextFollowUpAt: null, updatedAt: now, history: push(event('status', 'No reply after follow-up; closed.')) });
       continue;
     }
-    let body = `Hello again,\n\nJust following up on my note about ${lead.businessName}'s listing on CalgaryWatch. If anything needs changing, a one-line reply is plenty.\n\n${sig}`;
+    let body = followUpTemplate(lead, claim, sig);
     if (claudeConfigured()) {
       try {
         const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts: '', followUp: true, previous: lead.draftBody, claim }, sig);

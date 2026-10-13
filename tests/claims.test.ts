@@ -80,7 +80,7 @@ describe('outreach carries the claim link', () => {
   const claimable = claimFactsFor({ entityId: 'abc', entityKind: 'organizer', status: 'new' } as PartnerLead, { id: 'abc', kind: 'event', title: 'A', slug: 'a', status: 'published' });
   it('goes just above the signature, once', () => {
     const body = withClaimLink(`Hello,\n\nWe listed you.\n\n${sig}`, claimable, sig);
-    assert.match(body, /claim the listing for free and send changes directly: https:\/\/calgarywatch\.ca\/claim\/abc\n\nAldo Ortiz/);
+    assert.match(body, /claim the event listing for free and send changes directly: https:\/\/calgarywatch\.ca\/claim\/abc\n\nAldo Ortiz/);
     assert.equal(withClaimLink(body, claimable, sig), body);
   });
   it('is left out for prospects we have not listed', () => {

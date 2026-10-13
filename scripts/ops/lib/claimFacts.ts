@@ -23,6 +23,10 @@ import type { Entity } from './posts';
 export const CLAIM_BASE = 'https://calgarywatch.ca/claim/';
 
 export interface ClaimFacts {
+  /** The listing the lead points at, when it is published. */
+  entityId: string | null;
+  /** That listing's kind (business, market, event), when published. */
+  entityKind: string | null;
   /** The lead points at a real, published listing in the current index. */
   hasPublishedEntity: boolean;
   /** That listing is the organization itself (business or market), not one of its events. */
@@ -40,7 +44,7 @@ export interface ClaimFacts {
 
 /** No listing to claim: what a prospect or service invitation gets. */
 export const NO_CLAIM: ClaimFacts = {
-  hasPublishedEntity: false, organizationListed: false, claimable: false, claimUrl: null,
+  entityId: null, entityKind: null, hasPublishedEntity: false, organizationListed: false, claimable: false, claimUrl: null,
   claimStatus: 'not-claimable', verified: false, verificationBenefitEnabled: false,
 };
 
@@ -57,6 +61,8 @@ export function claimFactsFor(
   const claimable = hasPublishedEntity && !verified;
   const organizationListed = hasPublishedEntity && LEAD_KINDS.has(entity!.kind) && lead.entityKind !== 'organizer' && lead.entityKind !== 'prospect';
   return {
+    entityId: hasPublishedEntity ? entity!.id : null,
+    entityKind: hasPublishedEntity ? entity!.kind : null,
     hasPublishedEntity,
     organizationListed,
     claimable,
@@ -71,6 +77,8 @@ export function claimFactsFor(
 export function claimFactsText(f: ClaimFacts): string {
   return [
     `hasPublishedEntity: ${f.hasPublishedEntity}`,
+    `entityId: ${f.entityId ?? 'none'}`,
+    `entityKind: ${f.entityKind ?? 'none'}${f.hasPublishedEntity && !f.organizationListed ? ' (one of their events is listed; the organization itself has no listing)' : ''}`,
     `claimable: ${f.claimable}`,
     `claimUrl: ${f.claimUrl ?? 'none'}`,
     `claimStatus: ${f.claimStatus}`,
@@ -86,6 +94,9 @@ export const CLAIM_RULES = [
   '- Only mention the verified benefit if verificationBenefitEnabled is true. Then say it plainly: once verified, the listing is marked as verified on CalgaryWatch, and verified organizations get more weight or priority when we surface relevant recommendations and listings. Nothing more.',
   '- Never promise or imply guaranteed ranking, top ranking, guaranteed placement, always being shown first, guaranteed traffic or being featured everywhere.',
   '- Never say the listing is verified or claimed unless verified is true. If verified is true, do not ask them to claim it.',
+  '- If hasPublishedEntity is false, nothing about them is listed yet: never say "your listing", "already listed" or "claim your listing".',
+  '- If entityKind is event, call it "the event listing"; never imply a permanent listing for the organization exists.',
+  '- Never invent or change any of these facts.',
 ].join('\n');
 
 /**
@@ -97,7 +108,7 @@ const BENEFIT_LINES: ReadonlyArray<(url: string) => string> = [
   url => `Prefer to keep it up to date yourself? Claiming the listing is free, and it also gives it a verified status. We give verified organizations more weight when deciding what to surface in relevant CalgaryWatch recommendations, so there's a visibility benefit too: ${url}`,
   url => `If you'd like to manage it yourself, you can claim it for free. Once you're verified, the listing shows it's been confirmed by your organization, and we give verified listings more weight when choosing which organizations to surface across CalgaryWatch: ${url}`,
 ];
-const PLAIN_LINE = (url: string) => `Prefer to keep it up to date yourself? You can claim the listing for free and send changes directly: ${url}`;
+const PLAIN_LINE = (url: string, what: string) => `Prefer to keep it up to date yourself? You can claim the ${what} for free and send changes directly: ${url}`;
 
 function pick<T>(list: readonly T[], seed: string): T {
   return list[parseInt(createHash('sha256').update(seed).digest('hex').slice(0, 8), 16) % list.length];
@@ -106,7 +117,8 @@ function pick<T>(list: readonly T[], seed: string): T {
 /** The claim line for these facts, or null when no claim should be offered. */
 export function claimLine(f: ClaimFacts, seed = ''): string | null {
   if (!f.claimable || !f.claimUrl) return null;
-  return f.verificationBenefitEnabled ? pick(BENEFIT_LINES, seed || f.claimUrl)(f.claimUrl) : PLAIN_LINE(f.claimUrl);
+  if (f.verificationBenefitEnabled) return pick(BENEFIT_LINES, seed || f.claimUrl)(f.claimUrl);
+  return PLAIN_LINE(f.claimUrl, f.entityKind === 'event' ? 'event listing' : 'listing');
 }
 
 const GUARANTEE = /guarantee[sd]?\b[^.\n]{0,60}\b(rank|placement|top|traffic|visib|spot|position|exposure|first)|\b(top|#1|number[- ]one) (ranking|placement|spot|position)\b|always (be )?(shown|appear(s|ing)?|listed|ranked) (first|at the top|on top)|featured everywhere/i;

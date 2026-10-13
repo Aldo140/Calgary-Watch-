@@ -18,8 +18,8 @@ import { searchListings } from '../src/lib/listingSearch.ts';
 import { linksFor } from '../src/lib/neighbourhoods.ts';
 import { buildEventPicks } from '../src/lib/eventPicks.ts';
 import { CLAIM_BENEFIT, VerifiedBadge } from '../src/components/entity/VerifiedBadge.tsx';
-import { NO_CLAIM, claimFactsFor, claimLanguageProblems, claimLine, claimUrlFor, guaranteeProblems } from '../scripts/ops/lib/claimFacts.ts';
-import { templatePitch, withClaimLink } from '../scripts/ops/jobs/outreach.ts';
+import { NO_CLAIM, claimFactsFor, claimFactsText, claimLanguageProblems, claimLine, claimUrlFor, guaranteeProblems } from '../scripts/ops/lib/claimFacts.ts';
+import { adoptListings, followUpTemplate, templatePitch, withClaimLink } from '../scripts/ops/jobs/outreach.ts';
 import type { Business, DiscoveryEntity, Event, Neighbourhood } from '../src/types/discovery.ts';
 import type { PartnerLead } from '../src/types/ops.ts';
 
@@ -237,6 +237,32 @@ describe('outreach claim facts', () => {
     const f = claimFactsFor(lead(), listed);
     assert.ok(claimLanguageProblems(`Claim it: https://calgarywatch.ca/claim/someone-else\n`, f).length, 'an invented link is caught');
     assert.deepEqual(claimLanguageProblems(`Claim it: ${f.claimUrl}.`, f), []);
+  });
+
+  it('organizer leads hear about the event listing, prospects never about "your listing"', () => {
+    const org = claimFactsFor({ entityId: 'ev-1', entityKind: 'organizer', status: 'contacted' } as PartnerLead, { id: 'ev-1', kind: 'event', title: 'Show', slug: 'show', status: 'published' });
+    assert.match(claimLine(org)!, /claim the event listing/);
+    assert.match(claimFactsText(org), /entityKind: event \(one of their events is listed/);
+    assert.match(followUpTemplate({ businessName: 'Downstage' }, org, sig), /the CalgaryWatch event listing for Downstage/);
+    const prospect = followUpTemplate({ businessName: 'Downstage' }, NO_CLAIM, sig);
+    assert.doesNotMatch(prospect, /Downstage's listing|your listing|already listed|claim/i);
+    assert.match(prospect, /my note about listing Downstage on CalgaryWatch/);
+    assert.match(followUpTemplate({ businessName: 'Vertigo Theatre' }, claimFactsFor(lead(), listed), sig), /Vertigo Theatre's listing on CalgaryWatch/);
+    assert.match(claimFactsText(claimFactsFor(lead(), listed)), /entityId: biz-vertigo-theatre\nentityKind: business\n/);
+  });
+
+  it('a prospect that gets a real listing takes it over instead of a second lead', () => {
+    const leads = [
+      { id: 'lead-prospect-downstage-ca', entityId: null, website: 'https://downstage.ca/' },
+      { id: 'lead-biz-x', entityId: 'biz-x', website: 'https://x.ca/' },
+    ];
+    const entities = [
+      { id: 'biz-downstage', kind: 'business', title: 'Downstage', slug: 'downstage', status: 'published', website: 'https://www.downstage.ca/currentseason/' },
+      { id: 'ev-downstage', kind: 'event', title: 'Creative Stretch', slug: 'cs', status: 'published', website: 'https://downstage.ca/' },
+      { id: 'biz-other', kind: 'business', title: 'Other', slug: 'other', status: 'draft', website: 'https://x.ca/' },
+    ];
+    const adopted = adoptListings(leads, entities);
+    assert.deepEqual([...adopted].map(([l, e]) => [l, e.id]), [['lead-prospect-downstage-ca', 'biz-downstage']]);
   });
 
   it('refuses guarantee language anywhere', () => {

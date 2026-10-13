@@ -2,6 +2,7 @@ import { initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
+import { resolveFirebaseAuthDomain } from './lib/firebaseAuthDomain';
 
 const requiredFirebaseEnv = [
   'VITE_FIREBASE_API_KEY',
@@ -29,7 +30,11 @@ if (!isFirebaseConfigured && import.meta.env.DEV) {
 
 const runtimeFirebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
+  authDomain: resolveFirebaseAuthDomain(
+    import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
+    typeof window === 'undefined' ? '' : window.location.hostname,
+    import.meta.env.PROD
+  ),
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string,

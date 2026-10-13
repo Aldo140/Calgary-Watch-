@@ -64,7 +64,7 @@ describe('Vertigo Theatre organization listing', () => {
   it('uses the existing claim CTA and route', () => {
     assert.match(read('src/App.tsx'), /path="\/claim\/:id"/);
     assert.match(read('src/pages/ClaimListingPage.tsx'), /Run \{entity\.title\}\? <em>Claim it\.<\/em>/);
-    assert.match(read('src/components/entity/ListingDetail.tsx'), /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" \/>/);
+    assert.match(read('src/components/discovery/LocalPlace.tsx'), /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" \/>/);
     assert.match(read('src/components/entity/ClaimCta.tsx'), /to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}/);
   });
 
@@ -98,8 +98,9 @@ describe('Vertigo Theatre organization listing', () => {
 
   it('renders the reusable organization-to-productions relationship', () => {
     const listing = read('src/components/entity/ListingDetail.tsx');
-    assert.match(listing, /entity\.sourceId === place\.sourceId/);
-    assert.match(listing, /Upcoming at \{place\.title\}/);
+    const place = read('src/components/discovery/LocalPlace.tsx');
+    assert.match(place, /e\.sourceId === place\.sourceId/);
+    assert.match(place, /Coming up at <mark>\{name\}\.<\/mark>/);
     assert.match(listing, /entity\.sourceId === event\.sourceId/);
     assert.match(listing, /<Link to=\{entityPath\(organization\)\}>\{event\.organizer\}<\/Link>/);
   });

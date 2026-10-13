@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
@@ -10,6 +10,7 @@ import { CalgarySky, type SkyVariant } from '../home/CalgarySky';
 import { TEAR } from '../home/HomeHero';
 import { SkyGlyph } from '../home/WeekPlanner';
 import { ShopArt } from './ListingArt';
+import { useSkyOverlayRegistration } from '../../lib/skyOverlay';
 
 const dateline = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
 const shortDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
@@ -33,7 +34,7 @@ function variantFor(width: number): SkyVariant {
 }
 
 /** Floors over a shop: a brick wall with a row of windows per floor, lit after dark. */
-function Upper({ floors, wall, seed, night }: { floors: number; wall: string; seed: number; night: boolean }) {
+export function Upper({ floors, wall, seed, night }: { floors: number; wall: string; seed: number; night: boolean }) {
   if (!floors) return null;
   const h = floors * 44 + 14;
   return (
@@ -48,11 +49,15 @@ function Upper({ floors, wall, seed, night }: { floors: number; wall: string; se
   );
 }
 
+/** What the live sky gives the content drawn inside it. */
+export interface SkyState { night: boolean; variant: SkyVariant; now: number; temp?: number; skyIcon?: SkyIcon; skyLabel?: string }
+
 /**
- * The /local hero: the homepage's live Calgary sky, with every place in the book
- * standing shoulder to shoulder along one street in front of downtown.
+ * The homepage's live Calgary sky as a frame for any Local hero: the real sun, moon and
+ * weather, the header borrowing its ink, and the torn paper edge at the bottom.
  */
-export function LocalHero({ places, category, counts, areas }: { places: Business[]; category?: string; counts: Record<string, number>; areas: number }) {
+export function LiveSky({ className, labelledBy, children }: { className?: string; labelledBy: string; children: (sky: SkyState) => ReactNode }) {
+  useSkyOverlayRegistration();
   const ref = useRef<HTMLElement>(null);
   const weather = useCalgaryWeather();
   const [now, setNow] = useState(() => Date.now());
@@ -80,12 +85,9 @@ export function LocalHero({ places, category, counts, areas }: { places: Busines
     return () => site?.removeAttribute('data-sky-tone');
   }, [palette.tone]);
 
-  const street = useMemo(() => places.slice().sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title)), [places]);
-  const total = counts.all ?? places.length;
-
   return (
     <div className="cw-home2 lx">
-      <section className="h-hero lx-hero" data-tone={palette.tone} data-night={night || undefined} ref={ref} style={{ background: palette.top }} aria-labelledby="lx-title">
+      <section className={`h-hero lx-hero${className ? ` ${className}` : ''}`} data-tone={palette.tone} data-night={night || undefined} ref={ref} style={{ background: palette.top }} aria-labelledby={labelledBy}>
         <CalgarySky
           palette={palette}
           sun={sun}
@@ -96,17 +98,45 @@ export function LocalHero({ places, category, counts, areas }: { places: Busines
           variant={variant}
           now={Math.floor(now / 300000)}
         />
+        {children({ night, variant, now, temp: current?.temp, skyIcon: sky?.icon, skyLabel: sky?.label })}
+        <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
+          <path d={TEAR} className="h-tear-paper" />
+        </svg>
+      </section>
+    </div>
+  );
+}
+
+/** "Live sky · 5:12 p.m. · Tuesday, October 13 · <where> · 9° clear", as on the homepage. */
+export function SkyDateline({ sky, where }: { sky: SkyState; where: string }) {
+  return (
+    <p className="h-dateline">
+      <span className="h-dateline-live" title="Live sky: the sun’s real position over Calgary right now">
+        <span className="h-pulse" aria-hidden="true" />Live sky · {clock.format(new Date(sky.now))}
+      </span>
+      <span className="h-date-long">{dateline.format(new Date(sky.now))}</span>
+      <span className="h-date-short">{shortDate.format(new Date(sky.now))}</span>
+      <span className="h-date-city" aria-hidden="true">·</span>
+      <span className="h-date-city">{where}</span>
+      {sky.temp !== undefined && sky.skyIcon ? <span className="h-dateline-wx"><SkyGlyph icon={sky.skyIcon} size={15} /> {Math.round(sky.temp)}° {sky.skyLabel?.toLowerCase()}</span> : null}
+    </p>
+  );
+}
+
+/**
+ * The /local hero: the homepage's live Calgary sky, with every place in the book
+ * standing shoulder to shoulder along one street in front of downtown.
+ */
+export function LocalHero({ places, category, counts, areas }: { places: Business[]; category?: string; counts: Record<string, number>; areas: number }) {
+  const street = useMemo(() => places.slice().sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title)), [places]);
+  const total = counts.all ?? places.length;
+
+  return (
+    <LiveSky labelledBy="lx-title">
+      {sky => <>
         <div className="cw-wrap h-hero-inner lx-hero-inner">
-          <p className="h-dateline">
-            <span className="h-dateline-live" title="Live sky: the sun’s real position over Calgary right now">
-              <span className="h-pulse" aria-hidden="true" />Live sky · {clock.format(new Date(now))}
-            </span>
-            <span className="h-date-long">{dateline.format(new Date(now))}</span>
-            <span className="h-date-short">{shortDate.format(new Date(now))}</span>
-            <span className="h-date-city" aria-hidden="true">·</span>
-            <span className="h-date-city">CalgaryWatch Local</span>
-            {current && sky ? <span className="h-dateline-wx"><SkyGlyph icon={sky.icon} size={15} /> {Math.round(current.temp)}° {sky.label.toLowerCase()}</span> : null}
-          </p>
+          <SkyDateline sky={sky} where="CalgaryWatch Local" />
           {category === 'services'
             ? <h1 id="lx-title" className="lx-title">The Calgarians to call <em>when something breaks.</em></h1>
             : <h1 id="lx-title" className="lx-title">The places Calgarians <em>keep to themselves.</em></h1>}
@@ -120,35 +150,34 @@ export function LocalHero({ places, category, counts, areas }: { places: Busines
             {LOCAL_CATEGORIES.map(c => <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{cap(c)} <i>{counts[c] ?? 0}</i></Link>)}
           </nav>
         </div>
+        {street.length ? <Street places={street} night={sky.night} label="Every place in the book" /> : null}
+      </>}
+    </LiveSky>
+  );
+}
 
-        {street.length ? (
-          <div className="lx-street">
-            <ul className="lx-block" aria-label="Every place in the book">
-              {street.map((p, i) => {
-                const up = UPPER[i % UPPER.length];
-                return (
-                  <li key={p.id} style={{ ['--i' as string]: i }}>
-                    <Link to={entityPath(p)} className="lx-shop">
-                      <Upper floors={up.floors} wall={up.wall} seed={i + 1} night={night} />
-                      <span className="lx-shop-front">
-                        <ShopArt id={p.id} title={p.title} tags={p.tags} categories={p.categories} />
-                        {p.partner ? <span className="lx-shop-flag lx-shop-flag-partner">Featured partner</span> : p.editorialSelection ? <span className="lx-shop-flag">Our pick</span> : null}
-                      </span>
-                      <span className="lx-shop-sign"><b>{shortName(p.title)}</b><small>{p.neighbourhood}</small></span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-            <span className="lx-road" aria-hidden="true" />
-          </div>
-        ) : null}
-
-        <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
-          <path d={TEAR} className="h-tear-paper" />
-        </svg>
-      </section>
+/** A block of storefronts on one road: the /local hero, and "next door" on a place page. */
+export function Street({ places, night, label }: { places: Business[]; night: boolean; label: string }) {
+  return (
+    <div className="lx-street">
+      <ul className="lx-block" aria-label={label}>
+        {places.map((p, i) => {
+          const up = UPPER[i % UPPER.length];
+          return (
+            <li key={p.id} style={{ ['--i' as string]: i }}>
+              <Link to={entityPath(p)} className="lx-shop">
+                <Upper floors={up.floors} wall={up.wall} seed={i + 1} night={night} />
+                <span className="lx-shop-front">
+                  <ShopArt id={p.id} title={p.title} tags={p.tags} categories={p.categories} />
+                  {p.partner ? <span className="lx-shop-flag lx-shop-flag-partner">Featured partner</span> : p.editorialSelection ? <span className="lx-shop-flag">Our pick</span> : null}
+                </span>
+                <span className="lx-shop-sign"><b>{shortName(p.title)}</b><small>{p.neighbourhood}</small></span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+      <span className="lx-road" aria-hidden="true" />
     </div>
   );
 }

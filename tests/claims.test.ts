@@ -10,6 +10,8 @@ import { describe, it } from 'node:test';
 
 import { claimEvidence, claimId, claimProblem, emailDomain, siteDomain, sourceDomains } from '../src/lib/claims.ts';
 import { withClaimLink } from '../scripts/ops/jobs/outreach.ts';
+import { NO_CLAIM, claimFactsFor } from '../scripts/ops/lib/claimFacts.ts';
+import type { PartnerLead } from '../src/types/ops.ts';
 
 const ballet = [{ url: 'https://www.albertaballet.com/shows/the-nutcracker' }];
 const vertigo = [{ url: 'https://purchase.vertigotheatre.com/Events?attribute_EventType=2627Season' }];
@@ -75,12 +77,13 @@ describe('rules contract', () => {
 
 describe('outreach carries the claim link', () => {
   const sig = 'Aldo Ortiz\nFounder, CalgaryWatch';
+  const claimable = claimFactsFor({ entityId: 'abc', entityKind: 'organizer', status: 'new' } as PartnerLead, { id: 'abc', kind: 'event', title: 'A', slug: 'a', status: 'published' });
   it('goes just above the signature, once', () => {
-    const body = withClaimLink(`Hello,\n\nWe listed you.\n\n${sig}`, { entityId: 'abc' }, sig);
+    const body = withClaimLink(`Hello,\n\nWe listed you.\n\n${sig}`, claimable, sig);
     assert.match(body, /claim the listing for free and send changes directly: https:\/\/calgarywatch\.ca\/claim\/abc\n\nAldo Ortiz/);
-    assert.equal(withClaimLink(body, { entityId: 'abc' }, sig), body);
+    assert.equal(withClaimLink(body, claimable, sig), body);
   });
   it('is left out for prospects we have not listed', () => {
-    assert.equal(withClaimLink('Hi', { entityId: null }, sig), 'Hi');
+    assert.equal(withClaimLink('Hi', NO_CLAIM, sig), 'Hi');
   });
 });

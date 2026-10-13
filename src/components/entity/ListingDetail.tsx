@@ -42,8 +42,8 @@ function useShare(title: string, text: string, url: string) {
 }
 
 /** The navy hero every listing page opens on: status, title, where, the actions, and the art. */
-function Hero({ crumb, status, live, title, verifiedId, lead, where, actions, art }: {
-  crumb: { to: string; label: string; current: string }; status: ReactNode; live?: boolean; title: string; verifiedId: string;
+function Hero({ crumb, status, live, title, verifiedId, verifiedAt, lead, where, actions, art }: {
+  crumb: { to: string; label: string; current: string }; status: ReactNode; live?: boolean; title: string; verifiedId: string; verifiedAt?: string;
   lead: string; where: ReactNode; actions: ReactNode; art: ReactNode;
 }) {
   return (
@@ -53,7 +53,7 @@ function Hero({ crumb, status, live, title, verifiedId, lead, where, actions, ar
         <div className="mk-dhero-copy">
           <p className={`mk-status${live ? ' is-open' : ''}`}>{status}</p>
           <h1 id="ld-title">{title}</h1>
-          <VerifiedMark entityId={verifiedId} />
+          <VerifiedMark entityId={verifiedId} verifiedAt={verifiedAt} />
           {lead ? <p className="mk-dlead">{lead}</p> : null}
           <p className="mk-dwhere">{where}</p>
           <div className="mk-dactions">{actions}</div>
@@ -153,6 +153,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
         live={on}
         title={event.title}
         verifiedId={event.id}
+        verifiedAt={event.ownerVerifiedAt}
         lead={event.summary && event.summary !== event.title && !event.summary.startsWith(`${event.title}, listed by`) ? event.summary : ''}
         where={<><MapPin size={16} aria-hidden="true" />{event.venue || event.neighbourhood || cleanAddress(event.address)}{event.venue && event.neighbourhood ? `, ${event.neighbourhood}` : ''}<span className={`mk-tag is-light${event.pricing === 'free' ? ' ld-free' : ''}`}>{price}</span></>}
         actions={open ? <>
@@ -213,7 +214,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
 
         <div className="mk-dfoot">
           <SourceBadge entity={event} />
-          <ClaimCta entityId={event.id} title={event.title} kind="event" />
+          <ClaimCta entityId={event.id} title={event.title} kind="event" verifiedAt={event.ownerVerifiedAt} />
         </div>
       </div>
 
@@ -254,6 +255,7 @@ export function PlaceDetail({ place, all }: { place: Business; all: readonly Dis
         status={<><Sparkles size={15} aria-hidden="true" />{place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : 'Local organization')}</>}
         title={place.title}
         verifiedId={place.id}
+        verifiedAt={place.ownerVerifiedAt}
         lead={place.summary}
         where={<><MapPin size={16} aria-hidden="true" />{place.neighbourhood || cleanAddress(place.address)}{quadrant(place.address) ? ` ${quadrant(place.address)}` : ''}{note?.since ? <span className="mk-tag is-light">{note.since}</span> : null}</>}
         actions={<>
@@ -315,7 +317,7 @@ export function PlaceDetail({ place, all }: { place: Business; all: readonly Dis
 
         <div className="mk-dfoot">
           <SourceBadge entity={place} />
-          <ClaimCta entityId={place.id} title={place.title} kind="business" />
+          <ClaimCta entityId={place.id} title={place.title} kind="business" verifiedAt={place.ownerVerifiedAt} />
         </div>
       </div>
 

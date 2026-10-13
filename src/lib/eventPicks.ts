@@ -18,6 +18,7 @@ import type { DiscoveryEntity, Event, Market, MarketOccurrence } from '../types/
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { entityPath } from './discovery';
 import { calgaryDateTimeFormat } from './calgaryTz';
+import { VERIFIED_WEIGHT, verificationCounts } from './verified';
 
 export type EventInterestId =
   | 'music' | 'arts' | 'family' | 'food' | 'sports'
@@ -138,6 +139,8 @@ export interface PickItem {
   matched: EventInterestId[];
   /** Straight-line metres from the reader's home area, when both ends are known. */
   distanceM: number | null;
+  /** Claimed and confirmed by the organization (verified.ts). */
+  verified?: boolean;
   /** Markets only: the organizer's published lineup for this date (Market HQ). */
   lineup?: { summary: string; note: string };
 }
@@ -206,6 +209,7 @@ function toItem({ entity, key, start, end }: { entity: Event | Market; key: stri
     interests,
     matched: interests.filter((i) => wanted.has(i)),
     distanceM: home && where ? Math.round(metresBetween(home, where)) : null,
+    verified: verificationCounts({ ...entity, end }, Date.parse(start)),
   };
 }
 
@@ -229,6 +233,8 @@ export function buildEventPicks(options: PickOptions): EventPicks {
     else if (i.distanceM !== null) s += i.distanceM <= 3000 ? 2 : i.distanceM <= 8000 ? 1 : 0;
     // A little preference for sooner, never enough to beat a real match.
     s += Math.max(0, 1 - (Date.parse(i.start) - from) / (to - from));
+    // Verified by the organization: orders otherwise equal picks, never beats a match.
+    if (i.verified) s += VERIFIED_WEIGHT.picks;
     return s;
   };
 

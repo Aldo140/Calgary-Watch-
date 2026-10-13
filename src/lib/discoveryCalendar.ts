@@ -115,7 +115,7 @@ export function weekAgenda(entities: readonly DiscoveryEntity[], occurrences: re
     if (!(Date.parse(end) > now.getTime())) return;
     const from = calgaryDate(new Date(start)), to = calgaryDate(new Date(end));
     const tags = [...e.categories, ...e.tags].map(t => t.toLowerCase());
-    const base = interestScore(e, start);
+    const base = interestScore(e, start, now.getTime());
     for (const day of week) {
       if (day.date < from || day.date > to) continue;
       // Something that began on an earlier day is a carry-over, not today's news.

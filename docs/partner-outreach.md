@@ -61,14 +61,14 @@ Partner replies kept asking for the same things, so organizers now get a self-se
    - A matching work email needs a one-click "Confirm by email" first.
    - A personal or other-domain address needs checking through the organization's published contact details.
 4. On approval:
-   - The listing shows **Managed by the organizer** (`verified_listings/{entityId}`).
+   - The listing shows **Verified** (`verified_listings/{entityId}`) and gets a modest ranking lift from the next build. See [verified-listings.md](verified-listings.md).
    - The partner lead moves to `claimed`, so outreach stops.
    - The claim page becomes the organizer's direct line, with change types for dates and hours, location, link, photo, description, cancelled and other.
 5. Changes queue in the same admin panel. Make the edit in Events & markets, then mark it applied. The organizer sees the status on their claim page.
 
 For photo changes, encourage organizers to email the original files to `aldo@calgarywatch.ca` with the listing name. The claim form can record the request and an optional image link, but email preserves the original quality and is the preferred route for future partner replies.
 
-Every outreach email, follow-up and drafted reply to a listed organization now ends with the claim link, placed just above the signature (`withClaimLink` in `scripts/ops/jobs/outreach.ts`).
+Every outreach email, follow-up and drafted reply to an organization with a claimable listing ends with the claim link, placed just above the signature (`withClaimLink` in `scripts/ops/jobs/outreach.ts`). Where the listing is the organization itself, that line also says what verification brings; rules and permitted wording are in [verified-listings.md](verified-listings.md).
 
 Data:
 - `listing_claims/{uid}_{entityId}`: written by the claimant, decided by admin.

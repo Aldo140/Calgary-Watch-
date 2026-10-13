@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import { createDiscoveryRepository, entityPath } from '../src/lib/discovery.ts';
+import { renderRouteHtml } from '../scripts/seo/rewriteHtml.ts';
 import type { Business, DiscoveryEntity, Event } from '../src/types/discovery.ts';
 
 const entityId = 'biz-vertigo-theatre';
@@ -65,6 +66,16 @@ describe('Vertigo Theatre organization listing', () => {
     assert.match(read('src/pages/ClaimListingPage.tsx'), /Run \{entity\.title\}\? <em>Claim it\.<\/em>/);
     assert.match(read('src/components/entity/ListingDetail.tsx'), /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" \/>/);
     assert.match(read('src/components/entity/ClaimCta.tsx'), /to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}/);
+  });
+
+  it('prerenders a useful direct claim page for Firebase Hosting', () => {
+    const shell = '<html><head><title>CalgaryWatch</title></head><body><div id="root"></div></body></html>';
+    const html = renderRouteHtml(shell, '/claim/biz-vertigo-theatre', 'https://calgarywatch.ca');
+    assert.match(html, /<title>Claim Vertigo Theatre \| CalgaryWatch<\/title>/);
+    assert.match(html, /name="robots" content="noindex, nofollow"/);
+    assert.match(html, /<h1>Run Vertigo Theatre\? Claim it\.<\/h1>/);
+    assert.doesNotMatch(html, /Listing unavailable|Page not found/);
+    assert.match(read('scripts/seo/prerender.ts'), /`\/claim\/\$\{encodeURIComponent\(entity\.id\)\}`/);
   });
 
   it('preserves all six reviewed productions and relates them through sourceId', () => {

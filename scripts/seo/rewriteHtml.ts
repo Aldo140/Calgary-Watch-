@@ -380,12 +380,18 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
 /** Place route content inside the React mount point for the first response. */
 export function upsertStaticRouteBody(html: string, pathname: string): string {
   const entity = discoveryRepository.list().find(e => entityPath(e) === pathname);
+  const claimMatch = pathname.match(/^\/claim\/([^/]+)$/);
+  const claimId = claimMatch ? decodeURIComponent(claimMatch[1]) : undefined;
+  const claimEntity = claimId
+    ? discoveryRepository.list().find(e => e.id === claimId && ['event', 'market', 'business'].includes(e.kind))
+    : undefined;
   const section = DISCOVERY_SECTIONS.find(s => pathname === s.path);
   const dated = (start: string, end: string) => `${calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(start))} to ${calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', dateStyle:'full',timeStyle:'short' }).format(new Date(end))} (Calgary time)`;
   const sourceLinks = entity?.sources.map(s=>staticLink(s.url,s.name)).join(' · ');
   const dates = entity?.kind === 'event' ? `<p>${escapeText(dated(entity.start,entity.end))}${entity.cancelled ? ' — Cancelled' : ''}</p>` : entity?.kind === 'market' ? `<ul>${discoveryRepository.occurrences().filter(o=>o.marketId===entity.id).map(o=>`<li>${escapeText(dated(o.start,o.end))}${o.cancelled?' — Cancelled':''}</li>`).join('')}</ul>` : '';
   const stops = entity?.kind === 'guide' && entity.stops?.length ? `<p>${escapeText(entity.introduction)}</p><ol>${entity.stops.map(s=>`<li><h2>${escapeText(s.name)}</h2><p>${escapeText(s.area)}</p><p>${escapeText(s.note)}</p></li>`).join('')}</ol>` : '';
-  const body = entity ? `<main><article><h1>${escapeText(entity.title)}</h1><p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}${stops}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section && !buildStaticRouteBody(pathname) ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname);
+  const claimBody = claimEntity ? `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>Run ${escapeText(claimEntity.title)}? Claim it.</h1><p>Claiming is free. We’ll verify that you represent the organization before giving you a direct way to request updates to its dates, photos and links.</p><p>${staticLink(entityPath(claimEntity), `View ${claimEntity.title}`)}</p></article></main>` : '';
+  const body = claimBody || (entity ? `<main><article><h1>${escapeText(entity.title)}</h1><p>${escapeText(entity.summary)}</p><p>${escapeText(entity.description)}</p>${'address' in entity ? `<p>${escapeText(entity.address)}</p>`:''}${dates}${stops}<p>Last checked: ${escapeText(entity.verifiedAt||entity.updatedAt)}</p><p>${sourceLinks}</p></article></main>` : section && !buildStaticRouteBody(pathname) ? `<main><h1>${escapeText(section.label)} in Calgary</h1><ul>${discoveryRepository.list().filter(e=>e.kind===section.kind).map(e=>`<li>${staticLink(entityPath(e),e.title)}</li>`).join('')}</ul></main>` : buildStaticRouteBody(pathname));
   if (!body) return html;
   return html.replace(/<div id=["']root["']>[\s\S]*?<\/div>/i, `<div id="root">${body}</div>`);
 }

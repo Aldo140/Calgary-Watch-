@@ -237,6 +237,18 @@ export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
 export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', '/plans', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
 
 export function getSeoConfig(pathname: string, repository: DiscoveryRepository = discoveryRepository): SeoConfig {
+  const claimMatch = pathname.match(/^\/claim\/([^/]+)$/);
+  const claimId = claimMatch ? decodeURIComponent(claimMatch[1]) : undefined;
+  const claimEntity = claimId
+    ? repository.list().find(entity => entity.id === claimId && ['event', 'market', 'business'].includes(entity.kind))
+    : undefined;
+  if (claimEntity) return {
+    title: `Claim ${claimEntity.title} | CalgaryWatch`,
+    description: `Verify that you represent ${claimEntity.title} to request updates to its CalgaryWatch dates, photos and links.`,
+    index: false,
+    pageType: 'WebPage',
+    image: claimEntity.image ? new URL(claimEntity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE,
+  };
   const [section, slug] = pathname.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;

@@ -45,8 +45,11 @@ async function run(): Promise<void> {
   }
 
   let written = 0;
+  const claimRoutes = discoveryRepository.list()
+    .filter(entity => ['event', 'market', 'business'].includes(entity.kind))
+    .map(entity => `/claim/${encodeURIComponent(entity.id)}`);
 
-  for (const route of new Set([...PRERENDER_OUTPUT_ROUTES, '/submit', ...discoveryRepository.list().map(entityPath)])) {
+  for (const route of new Set([...PRERENDER_OUTPUT_ROUTES, '/submit', ...discoveryRepository.list().map(entityPath), ...claimRoutes])) {
     const html = renderRouteHtml(shell, route, PRODUCTION_ORIGIN);
     const outPath = join(DIST, outputPathForRoute(route));
 

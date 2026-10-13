@@ -42,7 +42,10 @@ export function ServicesIndex({ places, now = new Date() }: { places: Business[]
   return (
     <section className="cw-svc cw-svc-index" aria-labelledby="svc-index">
       <div className="cw-loc-section-head">
-        <h2 id="svc-index">Services Calgarians need</h2>
+        <div>
+          <p className="lx-eyebrow">For the house, the yard and the car</p>
+          <h2 id="svc-index">Services <mark>Calgarians need.</mark></h2>
+        </div>
         <p>Plumbers, furnace techs, snow removal and the rest, with what to ask before you hire. <Link to="/local/services">See every service <ArrowUpRight size={14} aria-hidden="true" /></Link></p>
       </div>
       <BusyNow month={month} now={now} />

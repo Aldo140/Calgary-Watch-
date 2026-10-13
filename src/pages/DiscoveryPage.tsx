@@ -14,6 +14,7 @@ import { GuideDetail, GuidesBoard } from '../components/guides/Guides';
 import { NeighbourhoodDetail, NeighbourhoodsBoard } from '../components/neighbourhoods/Neighbourhoods';
 import { MarketsBoard } from '../components/markets/MarketsBoard';
 import { MarketDetail } from '../components/markets/MarketDetail';
+import '../styles/home.css';
 import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
@@ -59,7 +60,7 @@ export default function DiscoveryPage() {
       : <MarketsBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} period={period} query={within} />}</SiteLayout>;
   }
   if (root === 'local' && !entity && !missing) {
-    return <SiteLayout><div className="cw-wrap cw-page"><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></div></SiteLayout>;
+    return <SiteLayout><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></SiteLayout>;
   }
   if ((root === 'events' || root === 'markets') && !entity && !missing) {
     const filterLinks = [

@@ -10,6 +10,7 @@ import { RankNudge } from './RankNudge';
 import { AccountMenu } from './AccountMenu';
 import { useAuth } from '../FirebaseProvider';
 import { SiteFooter } from './SiteFooter';
+import { LOCAL_CATEGORIES } from '../../lib/discovery';
 
 export function Wordmark() {
   return (
@@ -75,7 +76,8 @@ export function SiteHeader() {
     return () => { root.style.overflow = previous; window.removeEventListener('keydown', onKey); };
   }, [open]);
 
-  const overlay = pathname === '/' && !scrolled && !open;
+  // The homepage and the /local board both open on the live sky, so the header floats over it.
+  const overlay = (pathname === '/' || pathname === '/local' || LOCAL_CATEGORIES.some(c => pathname === `/local/${c}`)) && !scrolled && !open;
 
   return (
     <header className="cw-nav" data-scrolled={scrolled} data-overlay={overlay} data-open={open}>

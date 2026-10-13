@@ -1086,6 +1086,73 @@
       "verification": "source-checked",
       "verifiedAt": "2026-09-22T16:44:40.770Z",
       "updatedAt": "2026-09-22T16:44:40.770Z"
+    },
+    {
+      "id": "biz-vertigo-theatre",
+      "kind": "business",
+      "slug": "vertigo-theatre",
+      "name": "Vertigo Theatre",
+      "title": "Vertigo Theatre",
+      "summary": "A downtown Calgary theatre devoted to mystery, suspense and stories that keep audiences guessing.",
+      "description": "Vertigo Theatre presents a full season of professional live theatre in Calgary Tower Centre, with a long-running focus on mystery, thriller and suspense. Its 50th-anniversary 2026–27 season includes six productions, from the world premiere of The Lodger to Sherlock Holmes, The 39 Steps and a new Detective Murdoch mystery. Check Vertigo’s official season page for current performance times and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "theatre",
+        "performing arts",
+        "live theatre",
+        "mystery",
+        "thriller",
+        "Downtown"
+      ],
+      "address": "161, 115 9 Avenue SE, Calgary, AB T2G 0P5",
+      "neighbourhood": "Downtown",
+      "phone": "403-221-3708",
+      "website": "https://www.vertigotheatre.com/",
+      "sourceId": "vertigo-theatre",
+      "sources": [
+        {
+          "name": "Vertigo Theatre",
+          "url": "https://www.vertigotheatre.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T22:00:00-06:00"
+        },
+        {
+          "name": "Vertigo Theatre 2026–27 season",
+          "url": "https://purchase.vertigotheatre.com/Events?attribute_EventType=2627Season",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T22:00:00-06:00"
+        }
+      ],
+      "image": {
+        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+      },
+      "images": [
+        {
+          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
+          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        }
+      ],
+      "socials": {
+        "website": "https://www.vertigotheatre.com/",
+        "season": "https://purchase.vertigotheatre.com/Events?attribute_EventType=2627Season"
+      },
+      "services": [
+        "Professional live theatre",
+        "Mystery and suspense productions",
+        "Season subscriptions",
+        "Single-show tickets",
+        "Venue rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-13T22:00:00-06:00",
+      "updatedAt": "2026-10-13T22:00:00-06:00"
     }
   ]
 }

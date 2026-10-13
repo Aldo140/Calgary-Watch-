@@ -119,6 +119,9 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const interests: EventInterestId[] = interestsFor(event).filter(i => i !== 'free');
   const open = !past && !event.cancelled;
   const photo = /^https:\/\//.test(event.image?.src ?? '') ? event.image : undefined;
+  const organization = all.find((entity): entity is Business =>
+    entity.kind === 'business' && !!event.sourceId && entity.sourceId === event.sourceId
+  );
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
   const seen = new Set([event.id, ...alsoOn.map(e => e.id)]);
@@ -166,7 +169,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
             <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{dayLong.format(start)}<span>{time.format(start)}{event.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${dayLong.format(end)}, `}${time.format(end)}`}</span></dd></div>
             <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{event.venue || event.neighbourhood || 'See the organizer'}<span>{cleanAddress(event.address)}</span></dd></div>
             <div><dt><Tag size={16} aria-hidden="true" /> Price</dt><dd>{price}{event.pricing === 'unknown' ? <span>Not listed yet</span> : null}</dd></div>
-            <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{event.organizer}</dd></div>
+            <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{organization ? <Link to={entityPath(organization)}>{event.organizer}</Link> : event.organizer}</dd></div>
           </dl>
 
           {open && !event.developmentOnly ? <div className="ld-going"><GoingButton eventId={event.id} start={event.start} /></div> : null}
@@ -232,11 +235,16 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
  * there and what's around it. Paid placement is labelled, never a pick.
  */
 export function PlaceDetail({ place, all }: { place: Business; all: readonly DiscoveryEntity[] }) {
+  const [now] = useState(() => Date.now());
   const url = `https://calgarywatch.ca${entityPath(place)}`;
   const { shared, share } = useShare(place.title, place.summary, url);
   const note = LOCAL_NOTES[place.id];
   const site = place.website || place.sources.find(s => s.kind === 'official')?.url;
+  const season = place.socials.season;
   const others = all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly)).slice(0, 4);
+  const upcoming = all
+    .filter((entity): entity is Event => entity.kind === 'event' && !!place.sourceId && entity.sourceId === place.sourceId && !entity.cancelled && Date.parse(entity.end) > now)
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
   const hours = place.hours ? Object.entries(place.hours) : [];
 
   return (
@@ -279,7 +287,15 @@ export function PlaceDetail({ place, all }: { place: Business; all: readonly Dis
             <header className="mk-sec-head"><h2 id="ld-about"><span>The story</span></h2></header>
             <p>{place.description}</p>
             {place.services?.length ? <p className="mk-amenities">{place.services.map(s => <span key={s} className="mk-tag">{s}</span>)}</p> : null}
+            {season ? <a className="mk-organizer" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current season and tickets</a> : null}
           </section>
+
+          {upcoming.length ? (
+            <section className="mk-dsec" aria-labelledby="ld-upcoming">
+              <header className="mk-sec-head"><h2 id="ld-upcoming"><span>Upcoming at {place.title}</span></h2><p>Dates from the organization’s official season.</p></header>
+              <Rows items={upcoming} />
+            </section>
+          ) : null}
 
           {others.length ? (
             <section className="mk-dsec" aria-labelledby="ld-others">

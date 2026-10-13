@@ -61,7 +61,12 @@ jobs:
               last_daily=$day
             fi
             for job in $(node ops/agent-jobs.ts pending mail || true); do
-              gh workflow run hq-agent-mail.yml -f job="$job" && echo "$(date -u +%H:%M) started an HQ email job" || echo "::warning::couldn't start HQ email job $job"
+              if gh workflow run hq-agent-mail.yml -f job="$job"; then
+                echo "$(date -u +%H:%M) started an HQ email job"
+              else
+                echo "::warning::couldn't start HQ email job $job; returning it to the queue"
+                node ops/agent-jobs.ts release "$job" || echo "::error::couldn't return HQ email job $job to the queue"
+              fi
             done
             sleep 60
           done

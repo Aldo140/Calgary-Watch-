@@ -346,16 +346,25 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   // per-run cap is sized for that: it still spreads the day's sends over several runs.
   let budget = Math.min(cfg.limits.sendsPerDay - sentToday, cfg.limits.sendsPerRun ?? Infinity);
   const approved = (await db.collection(COLLECTIONS.leads).where('status', '==', 'approved').get()).docs;
+  const sendable: typeof approved = [];
+  for (const doc of approved) {
+    const lead = doc.data() as PartnerLead;
+    const blocker = sendBlocker(lead, sup.emails, sup.domains);
+    if (blocker) {
+      await doc.ref.update({ status: 'blocked', notes: blocker, updatedAt: now, history: push(event('status', `Not sent: ${blocker}`)) });
+      log(`not sent to ${lead.businessName}: ${blocker}`);
+    } else {
+      sendable.push(doc);
+    }
+  }
   // Text Aldo when a run has email to send, and again with how it went.
-  const planned = Math.max(0, Math.min(budget, approved.length));
+  const planned = Math.max(0, Math.min(budget, sendable.length));
   const sentNames: string[] = [];
   let failed: { business: string; error: string } | null = null;
   if (planned) await reportOutreach({ event: 'start', planned }, log);
-  for (const doc of approved) {
+  for (const doc of sendable) {
     if (budget <= 0) { log('Send limit for this run or today reached.'); break; }
     const lead = doc.data() as PartnerLead;
-    const blocker = sendBlocker(lead, sup.emails, sup.domains);
-    if (blocker) { await doc.ref.update({ status: 'blocked', notes: blocker, updatedAt: now, history: push(event('status', `Not sent: ${blocker}`)) }); log(`not sent to ${lead.businessName}: ${blocker}`); continue; }
     try {
       // A follow-up goes out as its own "Re:" message; the first conversation id is kept for matching replies.
       const isFollowUp = Boolean(lead.conversationId);
@@ -376,7 +385,7 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
     }
   }
   if (planned) {
-    await reportOutreach({ event: 'done', sent: sentNames, failed, sentToday: sentToday + sentNames.length, cap: cfg.limits.sendsPerDay, left: Math.max(0, approved.length - sentNames.length) }, log);
+    await reportOutreach({ event: 'done', sent: sentNames, failed, sentToday: sentToday + sentNames.length, cap: cfg.limits.sendsPerDay, left: Math.max(0, sendable.length - sentNames.length) }, log);
   }
 }
 

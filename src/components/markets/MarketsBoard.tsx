@@ -8,7 +8,7 @@ import {
   neighbourhoodFor, nextOpen, quadrantOf, season, shortName, statusLine, upcoming, weekdayShort,
 } from '../../lib/marketDays';
 import { pickWhen } from '../../lib/eventPicks';
-import { MarketArt } from '../discovery/ListingArt';
+import { MarketCover } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
 import { MarketMap } from './MarketMap';
 import '../../styles/home.css';
@@ -38,7 +38,7 @@ function NextUp({ market, next, now }: { market: Market; next: MarketOccurrence;
   return (
     <article className={`mk-next${open ? ' is-open' : ''}`}>
       <Link to={entityPath(market)} className="mk-next-art" tabIndex={-1} aria-hidden="true">
-        <MarketArt id={market.id} title={market.title} day={weekdayShort.format(new Date(next.start))} />
+        <MarketCover market={market} day={weekdayShort.format(new Date(next.start))} />
       </Link>
       <div className="mk-next-body">
         <p className="mk-next-label">{open ? <><span className="cw-lb-pulse mk-pulse" aria-hidden="true" />Open right now</> : 'Next market day'}</p>
@@ -66,7 +66,7 @@ function MarketRow({ market, n, occurrences, now }: { market: Market; n: number;
     <li className={`mk-row${open ? ' is-open' : ''}`} data-market={market.id}>
       <Link to={entityPath(market)}>
         <span className="mk-row-n" aria-hidden="true">{n}</span>
-        <span className="mk-row-art" aria-hidden="true"><MarketArt id={market.id} title={market.title} day={next ? weekdayShort.format(new Date(next.start)) : undefined} /></span>
+        <span className="mk-row-art" aria-hidden="true"><MarketCover market={market} day={next ? weekdayShort.format(new Date(next.start)) : undefined} /></span>
         <span className="mk-row-body">
           <small className="mk-row-when">{open ? <><span className="cw-lb-pulse mk-pulse" aria-hidden="true" />{statusLine(next, now)}</> : statusLine(next, now)}</small>
           <strong>{market.title}</strong>

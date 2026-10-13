@@ -72,6 +72,8 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const note = place.partner ? undefined : LOCAL_NOTES[place.id];
   const site = place.website || place.sources.find(s => s.kind === 'official')?.url;
   const season = place.socials.season;
+  // Companies without a fixed season (Ghost River Theatre) point to their current projects instead.
+  const experiences = place.socials.experiences;
   const q = quadrant(place.address);
   const [name, branch] = place.title.split(/\s+[—–]\s+/);
   const links = localLinks(place, all, occurrences, LOCAL_NOTES[place.id], now);
@@ -80,7 +82,8 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const others = all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly))
     .sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title));
   const upcoming = all
-    .filter((e): e is Event => e.kind === 'event' && !!place.sourceId && e.sourceId === place.sourceId && !e.cancelled && Date.parse(e.end) > now)
+    // The organization's own feed, plus copies from aggregators (Tourism Calgary) that name it as organizer.
+    .filter((e): e is Event => e.kind === 'event' && ((!!place.sourceId && e.sourceId === place.sourceId) || e.organizer === place.title) && !e.cancelled && Date.parse(e.end) > now)
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
     .slice(0, 6);
   const hours = place.hours ? Object.entries(place.hours) : [];
@@ -165,6 +168,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               </>
             ) : null}
             {season ? <a className="lx-text-link lp-season" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current season and tickets</a> : null}
+            {experiences ? <a className="lx-text-link lp-season" href={experiences} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current and upcoming experiences</a> : null}
           </div>
         </section>
 

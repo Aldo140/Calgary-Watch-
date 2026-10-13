@@ -83,6 +83,23 @@ export const MarketArt = memo(function MarketArt({ id, title, day }: { id: strin
   );
 });
 
+/**
+ * A market's cover: the organizer's own photo when they supplied one, else the generated art.
+ * Supplied images are often posters with text on them, so they are fitted, never cropped,
+ * over a blurred copy of themselves so any frame shape is filled.
+ */
+export function MarketCover({ market, day, eager }: { market: { id: string; title: string; image?: { src: string; alt: string; credit?: string } }; day?: string; eager?: boolean }) {
+  const photo = market.image && /^https:\/\//.test(market.image.src) ? market.image : undefined;
+  if (!photo) return <MarketArt id={market.id} title={market.title} day={day} />;
+  // Our own assets are referenced absolutely (the inventory requires https); serve them same-origin.
+  const src = photo.src.replace(/^https:\/\/(www\.)?calgarywatch\.ca(?=\/)/, '');
+  return (
+    <span className="cw-art cw-art-photo" style={{ ['--photo' as string]: `url("${src}")` }}>
+      <img src={src} alt={photo.alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+    </span>
+  );
+}
+
 const EVENT_WAYS: Record<string, { bg: string; fg: string; accent: string }> = {
   music: { bg: '#1554d1', fg: '#ffdf4f', accent: '#00c2e0' },
   arts: { bg: '#ffdf4f', fg: '#1554d1', accent: '#ff8a3d' },

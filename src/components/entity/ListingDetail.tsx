@@ -119,7 +119,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const open = !past && !event.cancelled;
   const photo = /^https:\/\//.test(event.image?.src ?? '') ? event.image : undefined;
   const organization = all.find((entity): entity is Business =>
-    entity.kind === 'business' && !!event.sourceId && entity.sourceId === event.sourceId
+    entity.kind === 'business' && ((!!event.sourceId && entity.sourceId === event.sourceId) || entity.title === event.organizer)
   );
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);

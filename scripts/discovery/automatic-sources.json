@@ -425,7 +425,12 @@
           "endTime": "15:00:00",
           "seasonStart": "2026-10-24",
           "seasonEnd": "2026-10-24",
-          "occurrenceCount": 1
+          "occurrenceCount": 1,
+          "image": {
+            "src": "https://calgarywatch.ca/images/markets/dalhousie-harvest-farmers-market.webp",
+            "alt": "Dalhousie Harvest Farmers' Market poster: Saturday, October 24, 10 am to 3 pm, with photos of a crocheted ghost, blueberry scones, honey, cinnamon buns, soup and a roast from local vendors",
+            "credit": "Image: Dalhousie Community Association"
+          }
         },
         {
           "id": "fresh-and-local-market",

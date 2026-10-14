@@ -8,6 +8,8 @@ export interface EntityBase {
   status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked' | 'source-feed';
   verifiedAt?: string; fetchedAt?: string; sourceId?: string; sourceRecordId?: string;
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
+  /** Set by the build only when an admin approved a listing claim for it (src/lib/verified.ts). Not the source check above. */
+  ownerVerifiedAt?: string;
   scores?: { featured?: number; editorial?: number; demand?: number; popularity?: number };
 }
 export interface Location { address: string; coordinates?: { lat: number; lng: number }; venue?: string }

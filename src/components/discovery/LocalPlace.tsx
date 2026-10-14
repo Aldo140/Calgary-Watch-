@@ -100,7 +100,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               <SkyDateline sky={sky} where={place.neighbourhood || 'Calgary'} />
               <p className={`lp-status${place.partner ? ' is-partner' : ''}`}>{status}</p>
               <h1 id="lp-title" className="lp-title">{name}{branch ? <em>{branch}</em> : null}</h1>
-              <VerifiedMark entityId={place.id} />
+              <VerifiedMark entityId={place.id} verifiedAt={place.ownerVerifiedAt} />
               <p className="h-summary lp-lead">{place.summary}</p>
               <div className="lp-actions" ref={actions}>
                 <a className="lp-btn lp-btn-sun" href={directionsUrl(place)} target="_blank" rel="noopener noreferrer"><Navigation size={17} aria-hidden="true" />Directions</a>
@@ -265,7 +265,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
 
       <div className="cw-wrap lp-foot">
         <SourceBadge entity={place} />
-        <ClaimCta entityId={place.id} title={place.title} kind="business" />
+        <ClaimCta entityId={place.id} title={place.title} kind="business" verifiedAt={place.ownerVerifiedAt} />
       </div>
 
       <div className="lp-dock" role="group" aria-label="Visit" data-show={docked || undefined}>

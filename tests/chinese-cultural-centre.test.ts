@@ -54,7 +54,7 @@ describe('Calgary Chinese Cultural Centre listing', () => {
     assert.equal(claimLookup?.title, 'Calgary Chinese Cultural Centre');
     assert.match(app, /path="\/claim\/:id"/);
     assert.match(claimPage, /Run \{entity\.title\}\? <em>Claim it\.<\/em>/);
-    assert.match(listingPage, /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" \/>/);
+    assert.match(listingPage, /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" verifiedAt=\{place\.ownerVerifiedAt\} \/>/);
     assert.match(claimCta, /to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}/);
     assert.equal(`/claim/${entity.id}`, '/claim/biz-calgary-chinese-cultural-centre');
   });

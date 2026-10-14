@@ -180,7 +180,7 @@ export default function ClaimListingPage() {
             </motion.div>
             <motion.ul className="cl-perks" {...rise(6)}>
               {PERKS.map((p) => <li key={p.title}><p.icon size={18} aria-hidden="true" /><span><strong>{p.title}</strong>{p.body}</span></li>)}
-              <li><BadgeCheck size={18} aria-hidden="true" /><span><strong>“Managed by the organizer”</strong>A mark on your listing once it’s confirmed.</span></li>
+              <li><BadgeCheck size={18} aria-hidden="true" /><span><strong>A verified listing</strong>Once we confirm you, it’s marked as verified, and verified listings get more weight when we surface relevant listings and recommendations across CalgaryWatch.</span></li>
             </motion.ul>
           </aside>
         </div>

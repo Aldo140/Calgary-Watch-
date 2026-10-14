@@ -9,6 +9,7 @@ import { LocalHero } from './LocalHero';
 import { ServicesDirectory, ServicesIndex } from './LocalServices';
 import { TEAR } from '../home/HomeHero';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import { byVerified } from '../../lib/verified';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 
@@ -109,7 +110,7 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
   const hoods = all.filter((e): e is Neighbourhood => e.kind === 'neighbourhood');
   const everyPlace = all.filter((e): e is Business => e.kind === 'business');
   const places = items.filter((e): e is Business => e.kind === 'business')
-    .sort((a, b) => Number(b.partner) - Number(a.partner) || Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title));
+    .sort((a, b) => Number(b.partner) - Number(a.partner) || Number(b.editorialSelection) - Number(a.editorialSelection) || byVerified(a, b, now) || a.title.localeCompare(b.title));
   const linksFor = new Map(everyPlace.map(p => [p.id, localLinks(p, all, occurrences, LOCAL_NOTES[p.id], now)]));
   const quadOf = (p: Business) => hoodOf(p, hoods)?.quadrant;
   const picks = places.filter(p => p.editorialSelection && !p.partner);

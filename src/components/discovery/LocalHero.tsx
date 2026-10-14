@@ -11,6 +11,7 @@ import { TEAR } from '../home/HomeHero';
 import { SkyGlyph } from '../home/WeekPlanner';
 import { ShopArt } from './ListingArt';
 import { useSkyOverlayRegistration } from '../../lib/skyOverlay';
+import { byVerified } from '../../lib/verified';
 
 const dateline = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
 const shortDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
@@ -129,7 +130,7 @@ export function SkyDateline({ sky, where }: { sky: SkyState; where: string }) {
  * standing shoulder to shoulder along one street in front of downtown.
  */
 export function LocalHero({ places, category, counts, areas }: { places: Business[]; category?: string; counts: Record<string, number>; areas: number }) {
-  const street = useMemo(() => places.slice().sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title)), [places]);
+  const street = useMemo(() => places.slice().sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || byVerified(a, b) || a.title.localeCompare(b.title)), [places]);
   const total = counts.all ?? places.length;
 
   return (

@@ -6,6 +6,7 @@ import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
 import { z } from 'zod';
 import type { ReplyClass } from '../../../src/types/ops';
 import type { BrandKit, OutreachConfig } from './brand';
+import { CLAIM_RULES, NO_CLAIM, claimFactsText, type ClaimFacts } from './claimFacts';
 
 const MODEL = 'claude-opus-5';
 
@@ -128,7 +129,7 @@ const PitchSchema = z.object({
   reasonRelevant: z.string().describe('One sentence: why this message is relevant to the recipient in their business role.'),
 });
 
-export async function writePitch(cfg: OutreachConfig, lead: { businessName: string; category: string; neighbourhood: string; facts: string; followUp: boolean; previous?: string }, signature: string) {
+export async function writePitch(cfg: OutreachConfig, lead: { businessName: string; category: string; neighbourhood: string; facts: string; followUp: boolean; previous?: string; claim?: ClaimFacts }, signature: string) {
   const offer = cfg.paidOfferEnabled ? [...cfg.offer, ...cfg.paidOffer] : cfg.offer;
   const system = [
     `You write short, personal business emails for ${cfg.sender.name}, ${cfg.sender.title}.`,
@@ -136,11 +137,13 @@ export async function writePitch(cfg: OutreachConfig, lead: { businessName: stri
     `What we can offer (only offer these, word them naturally):\n- ${offer.join('\n- ')}`,
     cfg.paidOfferEnabled ? 'A paid placement may be mentioned once, as optional, and must be described as labelled.' : 'Do not mention prices, paid placement, advertising or sponsorship at all.',
     'Rules: one specific reason we are writing to this business, taken from the facts. No flattery, no claims about traffic or audience size, no urgency, no invented details. Ask one easy question. Plain text, no bullet lists.',
+    CLAIM_RULES,
     `The body must end with exactly this sign-off and nothing after it:\n${signature}`,
   ].join('\n\n');
+  const claim = `Claim facts:\n${claimFactsText(lead.claim ?? NO_CLAIM)}`;
   const user = lead.followUp
-    ? `Write a brief, polite follow-up (under 80 words) to an unanswered email.\nBusiness: ${lead.businessName}\nPrevious email:\n${lead.previous ?? ''}`
-    : `Business: ${lead.businessName}\nCategory: ${lead.category}\nNeighbourhood: ${lead.neighbourhood}\nWhat CalgaryWatch already lists about them:\n${lead.facts}`;
+    ? `Write a brief, polite follow-up (under 80 words) to an unanswered email.\nBusiness: ${lead.businessName}\nPrevious email:\n${lead.previous ?? ''}\n\n${claim}`
+    : `Business: ${lead.businessName}\nCategory: ${lead.category}\nNeighbourhood: ${lead.neighbourhood}\nWhat CalgaryWatch already lists about them:\n${lead.facts}\n\n${claim}`;
   return structured(system, user, PitchSchema, 'outreach');
 }
 
@@ -151,16 +154,17 @@ const ReplySchema = z.object({
   suggestedBody: z.string().describe('A short reply for the founder to approve, signed with the given sign-off. Empty for stop and auto-reply.'),
 });
 
-export async function classifyReply(cfg: OutreachConfig, input: { businessName: string; ourEmail: string; theirReply: string }, signature: string): Promise<{ classification: ReplyClass; summary: string; suggestedSubject: string; suggestedBody: string }> {
+export async function classifyReply(cfg: OutreachConfig, input: { businessName: string; ourEmail: string; theirReply: string; claim?: ClaimFacts }, signature: string): Promise<{ classification: ReplyClass; summary: string; suggestedSubject: string; suggestedBody: string }> {
   return structured(
     [
       `You help ${cfg.sender.name} at CalgaryWatch handle replies from local businesses.`,
       'Classify the reply. "stop" means any request not to be contacted again, however polite. "auto-reply" is an out-of-office or ticket acknowledgement.',
       `Draft a helpful response only from what CalgaryWatch actually offers:\n- ${(cfg.paidOfferEnabled ? [...cfg.offer, ...cfg.paidOffer] : cfg.offer).join('\n- ')}`,
       cfg.paidOfferEnabled ? '' : 'If they ask about price or advertising, say paid options are not open yet and offer to let them know when they are.',
+      CLAIM_RULES,
       `Sign off with:\n${signature}`,
     ].filter(Boolean).join('\n\n'),
-    `Business: ${input.businessName}\n\nOur email:\n${input.ourEmail}\n\nTheir reply:\n${input.theirReply.slice(0, 8000)}`,
+    `Business: ${input.businessName}\n\nClaim facts:\n${claimFactsText(input.claim ?? NO_CLAIM)}\n\nOur email:\n${input.ourEmail}\n\nTheir reply:\n${input.theirReply.slice(0, 8000)}`,
     ReplySchema,
     'replies',
   );

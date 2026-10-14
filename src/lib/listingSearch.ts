@@ -3,6 +3,7 @@ import { calgaryDate } from './discovery';
 import { matchesTonight } from './discoveryCalendar';
 import { communityByName, editDistance, normalizeWords } from './searchIntent';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
+import { verifiedBoost } from './verified';
 
 /**
  * Listing search for /search: what people type, not what a database wants.
@@ -245,6 +246,8 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
     const title = x.fields[0][2];
     if (phrase.length > 2 && title.includes(phrase)) score += title.startsWith(phrase) ? 12 : 8;
     score += Math.min(3, (e.scores?.featured ?? 0) + (e.scores?.editorial ?? 0));
+    // Verified by the organization: a notch up, never past a better match (verified.ts).
+    score += verifiedBoost(e, 'search', now.getTime());
     hits.push({ e, score, matched, at });
   }
   const need = query.words.length;

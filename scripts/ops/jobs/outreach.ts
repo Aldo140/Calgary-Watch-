@@ -22,6 +22,7 @@ import { resendConfigured, sendViaResend } from '../lib/resend';
 import type { DiscoveryIndex, Entity } from '../lib/posts';
 import { calgaryDate } from '../lib/time';
 import { serviceById } from '../../../src/data/localServices';
+import { claimFactsFor, claimLanguageProblems, claimLine, guaranteeProblems, type ClaimFacts } from '../lib/claimFacts';
 
 type Log = (m: string) => void;
 const DAY = 86_400_000;
@@ -90,16 +91,48 @@ export function templatePitch(lead: PartnerLead, facts: string, sig: string): { 
 }
 
 /**
- * Every listed organization gets the self-serve route: a claim link, placed
- * just above the signature. Partner replies kept asking for "a direct line to
- * update our listings" and "a form for dates and production photos"; this is
- * that, with a verified sender attached.
+ * Every claimable listed organization gets the self-serve route: a claim link,
+ * placed just above the signature. Partner replies kept asking for "a direct
+ * line to update our listings" and "a form for dates and production photos";
+ * this is that, with a verified sender attached. Where the listing is the
+ * organization itself, the line also says what verification brings (a
+ * "Verified" mark and more weight in relevant listings), worded a few ways.
+ * Nothing is added for a listing that isn't claimable or is already verified.
  */
-export function withClaimLink(body: string, lead: Pick<PartnerLead, 'entityId'>, sig: string): string {
-  if (!lead.entityId || body.includes('/claim/')) return body;
-  const line = `Prefer to keep it up to date yourself? You can claim the listing for free and send changes directly: https://calgarywatch.ca/claim/${encodeURIComponent(lead.entityId)}`;
+export function withClaimLink(body: string, facts: ClaimFacts, sig: string, seed = ''): string {
+  if (body.includes('/claim/')) return body;
+  const line = claimLine(facts, seed);
+  if (!line) return body;
   const at = body.lastIndexOf(sig);
   return at > 0 ? `${body.slice(0, at)}${line}\n\n${body.slice(at)}` : `${body}\n\n${line}`;
+}
+
+/** The template follow-up. Only a lead with a published listing hears about "your listing". */
+export function followUpTemplate(lead: Pick<PartnerLead, 'businessName'>, claim: ClaimFacts, sig: string): string {
+  const about = !claim.hasPublishedEntity
+    ? `listing ${lead.businessName} on CalgaryWatch. If you'd like that, a one-line reply is plenty.`
+    : claim.entityKind === 'event'
+      ? `the CalgaryWatch event listing for ${lead.businessName}. If anything needs changing, a one-line reply is plenty.`
+      : `${lead.businessName}'s listing on CalgaryWatch. If anything needs changing, a one-line reply is plenty.`;
+  return `Hello again,\n\nJust following up on my note about ${about}\n\n${sig}`;
+}
+
+/**
+ * Prospects we wrote to before they were listed get their listing once it
+ * exists: the lead whose website matches takes the new entity, so its replies
+ * carry the claim link and nobody is pitched twice.
+ */
+export function adoptListings(leads: ReadonlyArray<Pick<PartnerLead, 'id' | 'entityId' | 'website'>>, entities: readonly Entity[]): Map<string, Entity> {
+  const unlisted = new Map<string, string>();
+  for (const l of leads) { const h = !l.entityId && l.website ? hostOf(l.website) : ''; if (h && !unlisted.has(h)) unlisted.set(h, l.id); }
+  const out = new Map<string, Entity>();
+  for (const e of entities) {
+    if (!LEAD_KINDS.has(e.kind) || e.status !== 'published' || e.fixture) continue;
+    const site = websiteFor(e);
+    const id = site ? unlisted.get(hostOf(site)) : undefined;
+    if (id && !out.has(id)) { out.set(id, e); unlisted.delete(hostOf(site!)); }
+  }
+  return out;
 }
 
 async function fetchText(url: string): Promise<string | null> {
@@ -108,6 +141,19 @@ async function fetchText(url: string): Promise<string | null> {
     if (!res.ok || !/text\/html/.test(res.headers.get('content-type') ?? '')) return null;
     return (await res.text()).slice(0, 2_000_000);
   } catch { return null; }
+}
+
+/**
+ * Listings with an approved claim: the build's stamp plus approvals since the
+ * last build. Only approved claims count (src/lib/verified.ts).
+ */
+export async function loadVerifiedIds(db: Firestore, index: DiscoveryIndex): Promise<Set<string>> {
+  const ids = new Set(index.entities.filter(e => e.ownerVerifiedAt).map(e => e.id));
+  for (const d of (await db.collection('listing_claims').where('status', '==', 'approved').select('entityId').get()).docs) {
+    const id = d.get('entityId');
+    if (typeof id === 'string' && id) ids.add(id);
+  }
+  return ids;
 }
 
 async function loadSuppression(db: Firestore): Promise<{ emails: Set<string>; domains: Set<string> }> {
@@ -122,8 +168,19 @@ async function loadSuppression(db: Firestore): Promise<{ emails: Set<string>; do
 /** New leads come only from businesses and markets already listed on the site. */
 export async function findLeads(db: Firestore, index: DiscoveryIndex, now: number, log: Log): Promise<void> {
   const existing = new Set((await db.collection(COLLECTIONS.leads).select().get()).docs.map(d => d.id));
+  // A listing its organization already claimed and verified is never pitched.
+  const verified = await loadVerifiedIds(db, index);
+  // A prospect that now has a listing keeps its lead and takes the listing.
+  const prospects = (await db.collection(COLLECTIONS.leads).where('entityId', '==', null).select('website').get()).docs
+    .map(d => ({ id: d.id, entityId: null, website: (d.get('website') as string | null) ?? null }));
+  const adopted = new Set<string>();
+  for (const [leadId, e] of adoptListings(prospects, index.entities.filter(x => !existing.has(leadIdFor(x))))) {
+    await db.collection(COLLECTIONS.leads).doc(leadId).update({ entityId: e.id, entityKind: e.kind, updatedAt: now, history: push(event('status', `Now listed on CalgaryWatch as a ${e.kind} (${e.id}).`)) });
+    adopted.add(e.id);
+    log(`prospect now listed: ${leadId} → ${e.id}`);
+  }
   for (const e of index.entities) {
-    if (!LEAD_KINDS.has(e.kind) || e.status !== 'published' || e.fixture || existing.has(leadIdFor(e))) continue;
+    if (!LEAD_KINDS.has(e.kind) || e.status !== 'published' || e.fixture || existing.has(leadIdFor(e)) || verified.has(e.id) || adopted.has(e.id)) continue;
     const lead: PartnerLead = {
       id: leadIdFor(e), entityId: e.id, entityKind: e.kind, businessName: e.name ?? e.title,
       category: e.categories?.[0] ?? e.kind, neighbourhood: e.neighbourhood ?? '', website: websiteFor(e),
@@ -138,7 +195,7 @@ export async function findLeads(db: Firestore, index: DiscoveryIndex, now: numbe
   }
   // Event organizers and venues, once each.
   for (const o of organizerLeads(index.entities, now)) {
-    if (existing.has(o.id)) continue;
+    if (existing.has(o.id) || verified.has(o.entity.id)) continue;
     const lead: PartnerLead = {
       id: o.id, entityId: o.entity.id, entityKind: 'organizer', businessName: o.name,
       category: o.entity.categories?.[0] ?? 'events', neighbourhood: o.entity.neighbourhood ?? '', website: o.website,
@@ -176,6 +233,11 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   const sig = signature(cfg, address);
   const sup = await loadSuppression(db);
   const byId = new Map(index.entities.map(e => [e.id, e]));
+  const verified = await loadVerifiedIds(db, index);
+  const factsOf = (lead: PartnerLead) => claimFactsFor(lead, lead.entityId ? byId.get(lead.entityId) : undefined, verified);
+  // Every rule a pitch must pass, including what it says about claiming.
+  const problemsWith = (body: string, claim?: ClaimFacts) => [...checkPitch(body, cfg, address), ...(claim ? claimLanguageProblems(body, claim) : guaranteeProblems(body))];
+  const claimedNow = (why: string) => ({ status: 'claimed', nextFollowUpAt: null, updatedAt: now, history: push(event('status', why)) });
 
   // Anyone already contacted under another lead (including imported history) is never pitched twice.
   const contactedBy = new Map<string, string>();
@@ -193,7 +255,8 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   if (cfg.autoSend) {
     for (const doc of (await db.collection(COLLECTIONS.leads).where('status', 'in', ['ready', 'follow-up-ready']).get()).docs) {
       const lead = doc.data() as PartnerLead;
-      if (lead.reviewedByEmail || checkPitch(lead.draftBody, cfg, address).length || sendBlocker(lead, sup.emails, sup.domains)) continue;
+      if (lead.reviewedByEmail || problemsWith(lead.draftBody, factsOf(lead)).length || sendBlocker(lead, sup.emails, sup.domains)) continue;
+      if (factsOf(lead).verified) { await doc.ref.update(claimedNow('Listing already verified; not pitching.')); continue; }
       await doc.ref.update({ status: 'approved', updatedAt: now, history: push(autoApproved()) });
       log(`queued to send: ${lead.businessName}`);
     }
@@ -203,6 +266,12 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   for (const doc of fresh) {
     const lead = doc.data() as PartnerLead;
     const entity = lead.entityId ? byId.get(lead.entityId) : undefined;
+    const claim = factsOf(lead);
+    if (claim.verified) {
+      await doc.ref.update(claimedNow('Listing already claimed and verified; not pitching.'));
+      log(`already verified: ${lead.businessName}`);
+      continue;
+    }
     let found: { email: string; url: string } | null = null, notice = false;
     if (lead.contactEmail && lead.emailSourceUrl) {
       // Entered by hand in the admin: still confirm the address is on that page and there's no notice.
@@ -255,13 +324,13 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
     const warnings: string[] = [];
     if (claudeConfigured()) {
       try {
-        const w = await writePitch(cfg, { businessName: lead.businessName, category: serviceById(lead.category)?.label ?? lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false }, sig);
-        const problems = checkPitch(w.body, cfg, address);
+        const w = await writePitch(cfg, { businessName: lead.businessName, category: serviceById(lead.category)?.label ?? lead.category, neighbourhood: lead.neighbourhood, facts, followUp: false, claim }, sig);
+        const problems = problemsWith(withClaimLink(w.body, claim, sig, lead.id), claim);
         if (problems.length) warnings.push(`Claude's draft was replaced by the template: ${problems.join(' ')}`); else pitch = w;
       } catch (e) { warnings.push(`Template draft; Claude failed: ${e instanceof Error ? e.message : e}`); }
     }
-    pitch = { ...pitch, body: withClaimLink(pitch.body, lead, sig) };
-    const problems = checkPitch(pitch.body, cfg, address);
+    pitch = { ...pitch, body: withClaimLink(pitch.body, claim, sig, lead.id) };
+    const problems = problemsWith(pitch.body, claim);
     const status = problems.length ? 'blocked' : cfg.autoSend ? 'approved' : 'ready';
     await doc.ref.update({
       contactEmail: found.email, emailSourceUrl: found.url, emailFoundAt: now, consentBasis: consentBasisFor(found.url),
@@ -283,19 +352,22 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
   for (const doc of contacted) {
     const lead = doc.data() as PartnerLead;
     if (!lead.nextFollowUpAt || lead.nextFollowUpAt > now) continue;
+    const claim = factsOf(lead);
+    // They claimed it since the first email: that's the answer; no follow-up.
+    if (claim.verified) { await doc.ref.update(claimedNow('Listing claimed and verified; no follow-up.')); continue; }
     if (lead.followUps >= cfg.limits.maxFollowUps) {
       await doc.ref.update({ status: 'no-response', nextFollowUpAt: null, updatedAt: now, history: push(event('status', 'No reply after follow-up; closed.')) });
       continue;
     }
-    let body = `Hello again,\n\nJust following up on my note about ${lead.businessName}'s listing on CalgaryWatch. If anything needs changing, a one-line reply is plenty.\n\n${sig}`;
+    let body = followUpTemplate(lead, claim, sig);
     if (claudeConfigured()) {
       try {
-        const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts: '', followUp: true, previous: lead.draftBody }, sig);
-        if (!checkPitch(w.body, cfg, address).length) body = w.body;
+        const w = await writePitch(cfg, { businessName: lead.businessName, category: lead.category, neighbourhood: lead.neighbourhood, facts: '', followUp: true, previous: lead.draftBody, claim }, sig);
+        if (!problemsWith(withClaimLink(w.body, claim, sig, lead.id), claim).length) body = w.body;
       } catch { /* keep the template follow-up */ }
     }
-    body = withClaimLink(body, lead, sig);
-    const ok = !checkPitch(body, cfg, address).length;
+    body = withClaimLink(body, claim, sig, lead.id);
+    const ok = !problemsWith(body, claim).length;
     const status = ok && cfg.autoSend ? 'approved' : 'follow-up-ready';
     await doc.ref.update({
       status, draftSubject: `Re: ${lead.draftSubject.replace(/^Re:\s*/i, '')}`, draftBody: body, updatedAt: now,
@@ -411,8 +483,10 @@ async function recordBounce(b: Bounce, noticeId: string, byEmail: Map<string, Fi
 }
 
 /** Match inbox replies to leads, honour opt-outs immediately, and draft suggested responses. */
-export async function syncReplies(db: Firestore, now: number, log: Log): Promise<void> {
+export async function syncReplies(db: Firestore, now: number, log: Log, index: DiscoveryIndex = { entities: [], occurrences: [] }): Promise<void> {
   if (!outlookConfigured()) return;
+  const byId = new Map(index.entities.map(e => [e.id, e]));
+  const verified = await loadVerifiedIds(db, index);
   const stateRef = db.collection(COLLECTIONS.health).doc('outreach_inbox');
   const since = ((await stateRef.get()).get('lastCheckedAt') as number | undefined) ?? now - 14 * DAY;
   const leads = (await db.collection(COLLECTIONS.leads).where('conversationId', '!=', null).get()).docs;
@@ -432,19 +506,26 @@ export async function syncReplies(db: Firestore, now: number, log: Log): Promise
     if (!doc) continue;
     const lead = doc.data() as PartnerLead;
     if (lead.replyIds?.includes(m.id)) continue;
+    const claim = claimFactsFor(lead, lead.entityId ? byId.get(lead.entityId) : undefined, verified);
 
     let classification: ReplyClass | null = isStopRequest(m.text) ? 'stop' : null;
     let suggested = { suggestedSubject: `Re: ${m.subject}`, suggestedBody: '', summary: m.text.slice(0, 200) };
     if (!classification && claudeConfigured()) {
       try {
-        const c = await classifyReply(cfg, { businessName: lead.businessName, ourEmail: lead.draftBody, theirReply: m.text }, sig);
+        const c = await classifyReply(cfg, { businessName: lead.businessName, ourEmail: lead.draftBody, theirReply: m.text, claim }, sig);
         classification = c.classification; suggested = c;
       } catch (e) { log(`classify failed for ${lead.businessName}: ${e instanceof Error ? e.message : e}`); }
     }
     classification ??= 'other';
     // Every human reply gets the self-serve route, so "send us the direct line"
     // and "can I send a photo" are answered with the claim page itself.
-    if (suggested.suggestedBody) suggested = { ...suggested, suggestedBody: withClaimLink(suggested.suggestedBody, lead, sig) };
+    if (suggested.suggestedBody) suggested = { ...suggested, suggestedBody: withClaimLink(suggested.suggestedBody, claim, sig, lead.id) };
+    // A suggestion that says more about claiming than is true is dropped; a person writes that reply.
+    const wrong = suggested.suggestedBody ? claimLanguageProblems(suggested.suggestedBody, claim) : [];
+    if (wrong.length) {
+      log(`suggested reply dropped for ${lead.businessName}: ${wrong.join(' ')}`);
+      suggested = { ...suggested, suggestedBody: '' };
+    }
 
     if (classification === 'stop') {
       await db.collection(COLLECTIONS.suppression).doc(suppressionId(m.from)).set({ email: m.from, reason: 'Asked to stop', leadId: lead.id, at: now });

@@ -2,6 +2,7 @@ import { mkdir, rename, writeFile } from 'node:fs/promises';
 import domain from '../../functions/discovery-domain.cjs';
 import { collectSources, editorialEntities } from './feeds';
 import { isCampusOnly } from '../../src/lib/eventRank';
+import { applyOwnerVerification, ownerVerification, type ClaimRecord, type VerifiedMarkRecord } from '../../src/lib/verified';
 
 /**
  * Builds src/generated/discovery-index.json for the site, from three inputs:
@@ -9,6 +10,7 @@ import { isCampusOnly } from '../../src/lib/eventRank';
  *  2. Events and markets fetched live from trusted organizer feeds at build time.
  *  3. Firestore: anything an editor published, and any draft/archive/cancel decision,
  *     which always overrides the feed copy of the same listing.
+ *  4. Firestore: approved listing claims, which mark a listing verified (src/lib/verified.ts).
  * Firestore is optional (local runs, outages); the build still ships 1 and 2.
  */
 type Entity = Record<string, unknown> & { id: string; kind: string; status?: string };
@@ -17,6 +19,7 @@ const log = (m: string) => console.log(`[export] ${m}`);
 const feed = await collectSources(log);
 
 let stored: { entities: Entity[]; occurrences: Entity[] } = { entities: [], occurrences: [] };
+let claims: { approved: ClaimRecord[]; marks: VerifiedMarkRecord[] } = { approved: [], marks: [] };
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     const { inventoryDatabase } = await import('./firebase');
@@ -34,6 +37,23 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     ]);
     log(`Firestore: ${stored.entities.length} events and markets`);
   } catch (e) { log(`Firestore unavailable, building from feeds only: ${e instanceof Error ? e.message : String(e)}`); }
+  // Verified listings: only an approved claim counts. The public mark supplies the date.
+  try {
+    const { inventoryDatabase } = await import('./firebase');
+    const db = inventoryDatabase();
+    const [approved, marks] = await Promise.race([
+      Promise.all([
+        db.collection('listing_claims').where('status', '==', 'approved').select('entityId', 'status', 'reviewedAt').get(),
+        db.collection('verified_listings').select('entityId', 'verifiedAt').get(),
+      ]),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out after 30s')), 30_000).unref()),
+    ]);
+    claims = {
+      approved: approved.docs.map(d => ({ entityId: String(d.get('entityId') ?? ''), status: String(d.get('status') ?? ''), reviewedAt: d.get('reviewedAt') ?? null })),
+      marks: marks.docs.map(d => ({ entityId: d.id, verifiedAt: d.get('verifiedAt') ?? null })),
+    };
+    log(`Verified listings: ${claims.approved.length} approved claims`);
+  } catch (e) { log(`Claims unavailable, no listing marked verified this build: ${e instanceof Error ? e.message : String(e)}`); }
 } else log('No Firestore credentials; building from feeds only.');
 
 // An editor's decision in Firestore wins over the feed copy of the same listing.
@@ -71,7 +91,12 @@ for (const o of stored.occurrences) if (!occById.has(o.id)) occById.set(o.id, o)
 
 const snapshot = domain.publishSnapshot([...byId.values()], [...occById.values()]);
 const editorial = await editorialEntities();
-const index = { ...snapshot, entities: [...editorial, ...snapshot.entities] };
+// Stamped last, over every source, so nothing a feed or entity document says about itself survives.
+const verified = ownerVerification(claims.approved, claims.marks);
+const entities = applyOwnerVerification([...editorial, ...snapshot.entities] as Entity[], verified);
+const index = { ...snapshot, entities };
+const stamped = entities.filter(e => e.ownerVerifiedAt).length;
+if (stamped) log(`Marked ${stamped} listings verified`);
 
 await mkdir('src/generated', { recursive: true });
 await writeFile('src/generated/discovery-index.json.tmp', JSON.stringify(index, null, 2) + '\n');

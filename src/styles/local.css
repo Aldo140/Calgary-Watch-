@@ -384,8 +384,11 @@
   .lx-street[data-swiped] .lx-swipe-hint { opacity: 0; }
   .lx-swipe-count { padding: 7px 11px; border: 2px solid #151515; border-radius: 999px; background: var(--yellow); color: #151515; box-shadow: 2px 2px 0 #151515; }
   .lx-block {
-    justify-content: flex-start; overflow-x: auto; overflow-y: visible; scroll-snap-type: x mandatory; scroll-padding: 0 16px;
-    padding: 18px 16px 30px; margin-bottom: -30px; scrollbar-width: none; max-width: none;
+    /* Horizontal only: overflow-y must not become a second scroll axis, or a vertical
+       swipe that starts on the street gets stuck there instead of scrolling the page. */
+    justify-content: flex-start; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x pan-y;
+    scroll-snap-type: x mandatory; scroll-padding: 0 16px;
+    padding: 18px 16px 40px; margin-bottom: -40px; scrollbar-width: none; max-width: none;
   }
   .lx-block::-webkit-scrollbar { display: none; }
   .lx-block li { flex: 0 0 48%; scroll-snap-align: start; animation-name: lx-rise-x; }

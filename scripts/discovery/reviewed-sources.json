@@ -1272,5 +1272,120 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "downstage",
+      "name": "Downstage",
+      "approved": true,
+      "hosts": [
+        "downstage.ca",
+        "www.downstage.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "dreaming-climate-consciousness-2026-10-23",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "new plays"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "Dreaming Climate Consciousness",
+          "summary": "Four short plays by Calgary playwrights, set in one shared, imagined climate future.",
+          "description": "Dreaming Climate Consciousness brings four new short plays by Calgary playwrights to Downstage’s stage at the Motel Theatre in the Werklund Centre, each one a window into the same collectively imagined climate future. It plays October 23 and 24. Showtimes and tickets are on Downstage’s current season page.",
+          "start": "2026-10-23T00:00:00-06:00",
+          "end": "2026-10-24T00:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "dreaming-climate-consciousness-2026-10-24",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "new plays"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "Dreaming Climate Consciousness",
+          "summary": "Four short plays by Calgary playwrights, set in one shared, imagined climate future.",
+          "description": "Dreaming Climate Consciousness brings four new short plays by Calgary playwrights to Downstage’s stage at the Motel Theatre in the Werklund Centre, each one a window into the same collectively imagined climate future. It plays October 23 and 24. Showtimes and tickets are on Downstage’s current season page.",
+          "start": "2026-10-24T00:00:00-06:00",
+          "end": "2026-10-25T00:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "creative-stretch-2026-27",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "workshop",
+            "weekly"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "Creative Stretch with Downstage",
+          "summary": "Downstage’s Monday Creative Stretch sessions at the Motel Theatre, running October to May.",
+          "description": "Creative Stretch is Downstage’s recurring Monday session at the Motel Theatre in the Werklund Centre, running most Mondays from October 19, 2026 to May 31, 2027. Check Downstage’s current season page for session times and any weeks off.",
+          "start": "2026-10-19T00:00:00-06:00",
+          "end": "2027-05-31T23:59:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "a-study-of-choices-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "new plays"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "A Study of Choices",
+          "summary": "Three performers take the stage each night with no idea what awaits them, so no two shows are the same.",
+          "description": "In A Study of Choices, three performers arrive on stage each night without knowing what awaits them, interpreting instructions and improvised sound given to them in the moment, so no two performances are alike. It runs April 7 to 11, 2027 at the Motel Theatre in the Werklund Centre. Showtimes and tickets are on Downstage’s current season page.",
+          "start": "2027-04-07T00:00:00-06:00",
+          "end": "2027-04-12T00:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
   }
 ]

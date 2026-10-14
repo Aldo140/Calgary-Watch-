@@ -1271,7 +1271,8 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-13T17:30:00-06:00",
-      "updatedAt": "2026-10-13T17:30:00-06:00"
+      "updatedAt": "2026-10-13T17:30:00-06:00",
+      "sourceId": "downstage"
     },
     {
       "id": "biz-ghost-river-theatre",

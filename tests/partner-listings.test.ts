@@ -6,7 +6,9 @@ import { createDiscoveryRepository, entityPath } from '../src/lib/discovery.ts';
 import { renderRouteHtml } from '../scripts/seo/rewriteHtml.ts';
 import { RecurringMarketProvider, type SourceConfig } from '../scripts/discovery/providers.ts';
 import { canonicalOrganizer } from '../scripts/discovery/visitCalgary.ts';
-import type { Business, DiscoveryEntity, Market } from '../src/types/discovery.ts';
+import { filterInventory, weekAgenda } from '../src/lib/discoveryCalendar.ts';
+import { buildEventsBoard } from '../src/lib/eventsBoard.ts';
+import type { Business, DiscoveryEntity, Event as EventEntity, Market, MarketOccurrence } from '../src/types/discovery.ts';
 
 // Organizations that replied to outreach (docs/partner-outreach.md). Each one we email a
 // claim link must be a real published entity whose public and claim routes resolve.
@@ -122,5 +124,48 @@ describe('Mercantile on 9th', () => {
     assert.equal(event && entityPath(event), '/events/mercantile-on-9th-697290');
     assert.equal(generated.entities.filter(e => /mercantile on 9th/i.test(e.title)).length, 1);
     assert.match(renderRouteHtml(shell, `/claim/${id}`, 'https://calgarywatch.ca'), /<h1>Run Mercantile on 9th\? Claim it\.<\/h1>/);
+  });
+});
+
+describe('partner events on the calendar', () => {
+  const now = new Date('2026-10-14T12:00:00-06:00');
+  const events = filterInventory(generated.entities.filter(e => e.kind === 'event'), [], undefined, undefined, now) as EventEntity[];
+  const board = buildEventsBoard(events, now);
+  const listed = new Set([...board.running.map(e => e.id), ...board.days.flatMap(d => d.entries.map(x => x.event.id))]);
+  const upcomingBy = (match: (e: EventEntity) => boolean) => (generated.entities.filter(e => e.kind === 'event') as EventEntity[]).filter(e => match(e) && Date.parse(e.end) > now.getTime());
+
+  for (const [org, match, min] of [
+    ['Vertigo Theatre', (e: EventEntity) => e.sourceId === 'vertigo-theatre', 6],
+    ['Wilder Institute’s Calgary Zoo', (e: EventEntity) => e.organizer === 'Wilder Institute’s Calgary Zoo', 5],
+    ['Downstage', (e: EventEntity) => e.sourceId === 'downstage', 4],
+    ['Mercantile on 9th', (e: EventEntity) => e.id === '6972906c904ecd4acb9407299e22', 1],
+  ] as const) {
+    it(`lists every upcoming ${org} event on /events`, () => {
+      const upcoming = upcomingBy(match);
+      assert.ok(upcoming.length >= min, `${org}: ${upcoming.length} upcoming`);
+      for (const e of upcoming) assert.ok(listed.has(e.id), `${e.title} (${e.start}) is missing from the events board`);
+    });
+  }
+
+  it('links Downstage’s events to its organization page', () => {
+    const downstage = generated.entities.find(e => e.id === 'biz-downstage') as Business;
+    assert.equal(downstage.sourceId, 'downstage');
+    const titles = upcomingBy(e => e.sourceId === 'downstage').map(e => e.title).sort();
+    assert.deepEqual(titles, ['A Study of Choices', 'Creative Stretch with Downstage', 'Dreaming Climate Consciousness', 'Dreaming Climate Consciousness']);
+    for (const e of upcomingBy(e => e.sourceId === 'downstage')) {
+      assert.equal(e.organizer, 'Downstage');
+      assert.equal(e.endTimeEstimated, true, 'Downstage has not published showtimes; never invent them');
+      assert.match(e.start, /T00:00:00-0[67]:00$/);
+    }
+  });
+
+  it('puts the Dalhousie Harvest market day on the homepage week', () => {
+    const occurrences = generated.occurrences as unknown as MarketOccurrence[];
+    const week = weekAgenda(generated.entities, occurrences, 7, new Date('2026-10-20T12:00:00-06:00'));
+    assert.ok(week.some(d => d.date === '2026-10-24' && d.items.some(i => i.to === '/markets/dalhousie-harvest-farmers-market-b3bbb0')));
+  });
+
+  it('shows a date-only event without a fake midnight start on its page', () => {
+    assert.match(read('src/components/entity/ListingDetail.tsx'), /<span>\{startClock\(event\.start, time\)\}/);
   });
 });

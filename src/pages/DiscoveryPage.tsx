@@ -5,7 +5,8 @@ import { SiteLayout } from '../components/site/SiteLayout';
 import { NotFoundHero } from './NotFoundPage';
 import { DiscoveryCard, EmptyInventory } from '../components/discovery/DiscoveryCards';
 import { EntityDetail } from '../components/entity/EntityDetail';
-import { EventDetail, PlaceDetail } from '../components/entity/ListingDetail';
+import { EventDetail } from '../components/entity/ListingDetail';
+import { LocalPlace } from '../components/discovery/LocalPlace';
 import { ListingBoard } from '../components/discovery/ListingBoard';
 import { EventsBoard } from '../components/discovery/EventsBoard';
 import { boardCount } from '../lib/eventsBoard';
@@ -14,6 +15,7 @@ import { GuideDetail, GuidesBoard } from '../components/guides/Guides';
 import { NeighbourhoodDetail, NeighbourhoodsBoard } from '../components/neighbourhoods/Neighbourhoods';
 import { MarketsBoard } from '../components/markets/MarketsBoard';
 import { MarketDetail } from '../components/markets/MarketDetail';
+import '../styles/home.css';
 import '../styles/local.css';
 import '../styles/listings.css';
 import { discoveryRepository } from '../data/discovery';
@@ -59,7 +61,7 @@ export default function DiscoveryPage() {
       : <MarketsBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} period={period} query={within} />}</SiteLayout>;
   }
   if (root === 'local' && !entity && !missing) {
-    return <SiteLayout><div className="cw-wrap cw-page"><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></div></SiteLayout>;
+    return <SiteLayout><LocalBoard items={items} all={all} occurrences={discoveryRepository.occurrences()} category={category} /></SiteLayout>;
   }
   if ((root === 'events' || root === 'markets') && !entity && !missing) {
     const filterLinks = [
@@ -96,7 +98,7 @@ export default function DiscoveryPage() {
     </div></SiteLayout>;
   }
   if (entity?.kind === 'event') return <SiteLayout><EventDetail event={entity} all={all} /></SiteLayout>;
-  if (entity?.kind === 'business') return <SiteLayout><PlaceDetail place={entity} all={all} /></SiteLayout>;
+  if (entity?.kind === 'business') return <SiteLayout><LocalPlace place={entity} all={all} occurrences={discoveryRepository.occurrences()} /></SiteLayout>;
   if (missing) {
     return <SiteLayout><NotFoundHero code={`${section?.label ?? 'Listing'} · not found`} title={<>This listing has <span>moved on.</span></>} lead="It may have ended, moved, or not been published yet. Search for it, or see what’s on now." back={{ to: section?.path || '/', label: `See all ${section?.label.toLowerCase() || 'of Calgary'}` }} /></SiteLayout>;
   }

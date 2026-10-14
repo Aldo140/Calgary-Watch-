@@ -150,16 +150,18 @@ export default function PlansPage() {
     if (!profile) return;
     const id = location.hash.slice(1);
     const member = Boolean(profile.piiConsentAt || profile.eventInterests.length);
-    if (params.get('edit') === '1' && !asUid && member) {
+    // Email and unsubscribe links point members at #emails or #area: those open settings too.
+    const focus: SettingsFocus | undefined = id === 'emails' ? 'emails' : id === 'pl-step-interests' || id === 'interests' ? 'interests' : id === 'home' || id === 'area' ? 'home' : undefined;
+    if ((params.get('edit') === '1' || focus) && !asUid && member) {
       setDraft(draftFrom(profile, pending)); setError(''); setEditing(true);
-      setSheetFocus(id === 'emails' ? 'emails' : id === 'pl-step-interests' || id === 'interests' ? 'interests' : id === 'home' ? 'home' : undefined);
-      // Drop the flag so the same link can open settings again later.
+      setSheetFocus(focus);
+      // Drop the flag and hash so the same link can open settings again later.
       const rest = new URLSearchParams(params); rest.delete('edit');
       navigate({ search: rest.toString() ? `?${rest}` : '' }, { replace: true });
       firstLink.current = false;
       return;
     }
-    if (firstLink.current) { if (id === 'emails') setStep(1); else if (id === 'pl-step-interests') setStep(2); }
+    if (firstLink.current) { if (id === 'emails') setStep(1); else if (id === 'pl-step-interests' || id === 'interests') setStep(2); }
     firstLink.current = false;
     if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     // eslint-disable-next-line react-hooks/exhaustive-deps

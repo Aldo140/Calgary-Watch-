@@ -2,6 +2,8 @@
 <html lang="en-CA">
   <head>
     <meta charset="UTF-8" />
+    <!-- Decides before first paint whether this load shows the splash (see #cw-splash below). -->
+    <script>try { if (sessionStorage.getItem('cw-splash') === '1') document.documentElement.classList.add('cw-quick-boot'); } catch (e) {}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!--
       Security Headers are enforced via HTTP response headers on the server
@@ -354,14 +356,21 @@
       @keyframes cws-city { from { opacity: 0; transform: translateY(40%); } }
       @keyframes cws-load { from { transform: scaleX(0); } }
       @keyframes cws-drift { from { transform: translate3d(-3%, 2%, 0) rotate(0deg); } to { transform: translate3d(3%, -2%, 0) rotate(8deg); } }
-      /* A reload in the same visit skips the build-up and goes straight to the finished mark. */
-      #cw-splash.is-quick *, #cw-splash.is-quick *::after { animation-duration: 1ms !important; animation-delay: 0s !important; }
-      #cw-splash.is-quick .cws-roll-in, #cw-splash.is-quick .cws-spark, #cw-splash.is-quick .cws-live::after { animation: none !important; }
+      /*
+        A reload in the same visit skips the splash. Popping the full sheet up
+        for a moment and lifting it away read as a flash, so instead the page
+        stays on the plain navy background and fades in once the first route
+        has rendered (the class is set by the script at the top of <head>).
+      */
+      html.cw-quick-boot #cw-splash { display: none; }
+      html.cw-quick-boot #root { opacity: 0; }
+      #root { transition: opacity 220ms ease-out; }
       @media (prefers-reduced-motion: reduce) {
         #cw-splash *, #cw-splash *::before, #cw-splash *::after { animation: none !important; }
         #cw-splash { transition: opacity 300ms ease; }
         #cw-splash.is-leaving { transform: none; opacity: 0; }
         #cw-splash.is-leaving .cws-stage { transform: translateY(-4vh); opacity: 1; }
+        #root { transition: none; }
       }
     </style>
     <noscript><style>#cw-splash { display: none !important; } html, body { overflow: auto !important; }</style></noscript>
@@ -427,12 +436,16 @@
         if (!el) return;
         var root = document.documentElement;
         var start = Date.now();
-        var seen = false;
-        try { seen = sessionStorage.getItem('cw-splash') === '1'; sessionStorage.setItem('cw-splash', '1'); } catch (e) {}
-        if (seen) el.className = 'is-quick';
+        // A reload in the same visit never shows the splash: the page just fades in.
+        if (root.classList.contains('cw-quick-boot')) {
+          el.parentNode.removeChild(el);
+          window.__cwSplashDone = function () { root.classList.remove('cw-quick-boot'); };
+          setTimeout(window.__cwSplashDone, 10000);
+          return;
+        }
+        try { sessionStorage.setItem('cw-splash', '1'); } catch (e) {}
         root.classList.add('cw-splashing');
-        // First visit plays the whole build-up; a reload in the same visit just bows out.
-        var minShow = seen ? 200 : 1300;
+        var minShow = 1300;
         var clock = document.getElementById('cws-clock');
         try { clock.textContent = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date()); } catch (e) {}
         var done = false;

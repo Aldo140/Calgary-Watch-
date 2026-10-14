@@ -78,7 +78,7 @@ describe('partner organization listings', () => {
     assert.equal(ghost.socials.season, undefined);
     assert.equal(ghost.socials.experiences, 'https://www.ghostrivertheatre.com/202627experiences');
     assert.match(ghost.description, /doesn’t run a fixed subscription season/);
-    assert.match(read('src/components/entity/ListingDetail.tsx'), /Current and upcoming experiences/);
+    assert.match(read('src/components/discovery/LocalPlace.tsx'), /Current and upcoming experiences/);
   });
 });
 

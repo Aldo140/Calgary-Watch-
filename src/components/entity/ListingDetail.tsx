@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation, Phone, Quote,
-  Share2, ShieldCheck, Sparkles, Store, Tag, Ticket, User,
+  ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation,
+  Share2, ShieldCheck, Tag, Ticket, User,
 } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
@@ -10,8 +10,7 @@ import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { interestLabel, interestsFor, pickWhen, type EventInterestId } from '../../lib/eventPicks';
 import { communityFor, directionsUrl, eventsSameDay, neighbourhoodFor } from '../../lib/marketDays';
-import { LOCAL_NOTES } from '../../data/localNotes';
-import { EventArt, ShopArt } from '../discovery/ListingArt';
+import { EventArt } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
 import { ClaimCta, VerifiedMark } from './ClaimCta';
 import { SourceBadge } from './EntityDetail';
@@ -227,109 +226,6 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
           <button type="button" onClick={() => void share()}>{shared ? <Check size={18} aria-hidden="true" /> : <Share2 size={18} aria-hidden="true" />} {shared ? 'Copied' : 'Share'}</button>
         </div>
       ) : null}
-    </div>
-  );
-}
-
-/**
- * One Local place: why we picked it and what not to miss, then how to get
- * there and what's around it. Paid placement is labelled, never a pick.
- */
-export function PlaceDetail({ place, all }: { place: Business; all: readonly DiscoveryEntity[] }) {
-  const [now] = useState(() => Date.now());
-  const url = `https://calgarywatch.ca${entityPath(place)}`;
-  const { shared, share } = useShare(place.title, place.summary, url);
-  const note = LOCAL_NOTES[place.id];
-  const site = place.website || place.sources.find(s => s.kind === 'official')?.url;
-  const season = place.socials.season;
-  // Companies without a fixed season (Ghost River Theatre) point to their current projects instead.
-  const experiences = place.socials.experiences;
-  const others = all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly)).slice(0, 4);
-  const upcoming = all
-    // The organization's own feed, plus copies from aggregators (Tourism Calgary) that name it as organizer.
-    .filter((entity): entity is Event => entity.kind === 'event' && ((!!place.sourceId && entity.sourceId === place.sourceId) || entity.organizer === place.title) && !entity.cancelled && Date.parse(entity.end) > now)
-    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
-  const hours = place.hours ? Object.entries(place.hours) : [];
-
-  return (
-    <div className="mk mk-detail cw-home2 ld">
-      <Hero
-        crumb={{ to: '/local', label: 'Local', current: place.title }}
-        status={<><Sparkles size={15} aria-hidden="true" />{place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : 'Local organization')}</>}
-        title={place.title}
-        verifiedId={place.id}
-        verifiedAt={place.ownerVerifiedAt}
-        lead={place.summary}
-        where={<><MapPin size={16} aria-hidden="true" />{place.neighbourhood || cleanAddress(place.address)}{quadrant(place.address) ? ` ${quadrant(place.address)}` : ''}{note?.since ? <span className="mk-tag is-light">{note.since}</span> : null}</>}
-        actions={<>
-          <a className="mk-btn mk-btn-sun" href={directionsUrl(place)} target="_blank" rel="noopener noreferrer"><Navigation size={17} aria-hidden="true" /> Directions</a>
-          {site ? <a className="mk-btn" href={site} target="_blank" rel="noopener noreferrer"><ExternalLink size={17} aria-hidden="true" /> Their site</a> : null}
-          <button type="button" className="mk-btn" onClick={() => void share()}>{shared ? <Check size={17} aria-hidden="true" /> : <Share2 size={17} aria-hidden="true" />} {shared ? 'Link copied' : 'Share'}</button>
-        </>}
-        art={<ShopArt id={place.id} title={place.title} tags={place.tags} categories={place.categories} />}
-      />
-
-      <div className="cw-wrap mk-page mk-dgrid">
-        <div className="mk-dmain">
-          <dl className="mk-facts">
-            <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{cleanAddress(place.address)}<span>{place.neighbourhood}</span></dd></div>
-            {note?.since ? <div><dt><Store size={16} aria-hidden="true" /> Since</dt><dd>{note.since}</dd></div> : null}
-            {place.phone ? <div><dt><Phone size={16} aria-hidden="true" /> Phone</dt><dd><a href={`tel:${place.phone.replace(/[^\d+]/g, '')}`}>{place.phone}</a></dd></div> : null}
-            {hours.length ? <div><dt><Clock size={16} aria-hidden="true" /> Hours</dt><dd>{hours.slice(0, 2).map(([d, h]) => `${d} ${h}`).join(' · ')}{hours.length > 2 ? <span>More on their site</span> : null}</dd></div> : null}
-          </dl>
-
-          {note && !place.partner ? (
-            <div className="mk-take ld-take">
-              <Quote size={26} aria-hidden="true" />
-              <span className="mk-take-kicker">{note.pick}</span>
-              <span className="mk-take-note">{note.note}</span>
-              {note.dontMiss.length ? <span className="ld-dontmiss"><b>Don’t miss</b>{note.dontMiss.map(d => <span key={d} className="mk-tag">{d}</span>)}</span> : null}
-            </div>
-          ) : null}
-          {place.partner ? <p className="cw-preview-note">Sponsored · {place.sponsorshipDisclosure || 'Featured partner placement. Payment does not imply editorial selection.'}</p> : null}
-
-          <section className="mk-dsec mk-about" aria-labelledby="ld-about">
-            <header className="mk-sec-head"><h2 id="ld-about"><span>The story</span></h2></header>
-            <p>{place.description}</p>
-            {place.services?.length ? <p className="mk-amenities">{place.services.map(s => <span key={s} className="mk-tag">{s}</span>)}</p> : null}
-            {season ? <a className="mk-organizer" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current season and tickets</a> : null}
-            {experiences ? <a className="mk-organizer" href={experiences} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current and upcoming experiences</a> : null}
-          </section>
-
-          {upcoming.length ? (
-            <section className="mk-dsec" aria-labelledby="ld-upcoming">
-              <header className="mk-sec-head"><h2 id="ld-upcoming"><span>Upcoming at {place.title}</span></h2><p>Dates from the organization’s official season.</p></header>
-              <Rows items={upcoming} />
-            </section>
-          ) : null}
-
-          {others.length ? (
-            <section className="mk-dsec" aria-labelledby="ld-others">
-              <header className="mk-sec-head"><h2 id="ld-others"><span>More places worth knowing</span></h2><p><Link to="/local">The whole little black book</Link></p></header>
-              <ul className="ld-places">
-                {others.map(o => (
-                  <li key={o.id}><Link to={entityPath(o)}><span className="ld-places-art" aria-hidden="true"><ShopArt id={o.id} title={o.title} tags={o.tags} categories={o.categories} /></span><strong>{o.title}</strong><small>{o.neighbourhood}</small></Link></li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </div>
-
-        <aside className="mk-dside" aria-label="Around this place">
-          <Around place={place} all={all} title={place.neighbourhood ? `${place.neighbourhood}${quadrant(place.address) ? `, ${quadrant(place.address)} Calgary` : ''}` : 'Getting there'} />
-        </aside>
-
-        <div className="mk-dfoot">
-          <SourceBadge entity={place} />
-          <ClaimCta entityId={place.id} title={place.title} kind="business" verifiedAt={place.ownerVerifiedAt} />
-        </div>
-      </div>
-
-      <div className="mk-dock" role="group" aria-label="Visit">
-        <a href={directionsUrl(place)} target="_blank" rel="noopener noreferrer" className="is-main"><Navigation size={18} aria-hidden="true" /> Directions</a>
-        {site ? <a href={site} target="_blank" rel="noopener noreferrer"><ExternalLink size={18} aria-hidden="true" /> Site</a> : null}
-        <button type="button" onClick={() => void share()}>{shared ? <Check size={18} aria-hidden="true" /> : <Share2 size={18} aria-hidden="true" />} {shared ? 'Copied' : 'Share'}</button>
-      </div>
     </div>
   );
 }

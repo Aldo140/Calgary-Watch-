@@ -4,6 +4,7 @@
  */
 
 import { normalizeInterests, type EventInterestId } from './eventPicks';
+import { readBusinessAccount, type BusinessAccount } from './businessAccount';
 
 export interface PlansProfile {
   displayName?: string;
@@ -20,6 +21,8 @@ export interface PlansProfile {
   eventInterests: EventInterestId[];
   eventsDigestOptIn: boolean;
   eventsDigestOptInAt?: number | null;
+  /** Set by an admin when a listing claim is approved (businessAccount.ts). */
+  business?: BusinessAccount | null;
 }
 
 export function readPlansProfile(data: Record<string, unknown> | undefined): PlansProfile {
@@ -41,6 +44,7 @@ export function readPlansProfile(data: Record<string, unknown> | undefined): Pla
     eventInterests: normalizeInterests(d.eventInterests),
     eventsDigestOptIn: d.eventsDigestOptIn === true,
     eventsDigestOptInAt: num('eventsDigestOptInAt') ?? null,
+    business: readBusinessAccount(d),
   };
 }
 

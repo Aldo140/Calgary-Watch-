@@ -18,6 +18,16 @@ None of these verify a listing: opening the claim page, signing in, submitting o
 
 Existing approved claims count automatically; nobody has to claim again. Nothing else (outreach contacts, partner status) is ever treated as verified.
 
+## Business accounts
+
+Claiming needs a CalgaryWatch account: the claim page asks for a Google sign-in, and the rules accept a claim only from a signed-in account with a verified email. When the claim is approved, that account becomes a **business account**: `accountType: 'business'`, the listings it manages (`businessListings`) and `businessSince` on `users/{uid}` (`src/lib/businessAccount.ts`).
+
+- Only an admin can set these fields. A member can't add, change or remove them on their own profile (firestore.rules, `users`).
+- The member sees "Business account" on their dashboard's listings card and on the claim page. Admin sees a Business chip and a "Business accounts" filter in Members.
+- Claims approved before business accounts existed are brought in line with **Mark business accounts** under Claimed listings → verified listings. It is safe to press again.
+- A business account is not a Featured partner. That label stays for paid placements.
+- The admin write needs the updated rules deployed (Deploy Firebase Backend, target `rules`). Until then, approving still works but shows that the account wasn't marked.
+
 ## Which listings can be verified
 
 Any published event, market or business listing with a `/claim/{entityId}` page. Guides and neighbourhoods are CalgaryWatch's own and can't be claimed.

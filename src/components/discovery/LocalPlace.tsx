@@ -8,7 +8,7 @@ import { communityFor, directionsUrl } from '../../lib/marketDays';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
-import { LiveSky, SkyDateline, Street, Upper } from './LocalHero';
+import { LiveSky, SkyDateline, Street, Traffic, Upper } from './LocalHero';
 import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
 import { SourceBadge } from '../entity/EntityDetail';
 import { TEAR } from '../home/HomeHero';
@@ -119,7 +119,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               <figcaption className="lp-plate"><MapPin size={14} aria-hidden="true" />{cleanAddress(place.address)}</figcaption>
             </figure>
           </div>
-          <span className="lx-road lp-road" aria-hidden="true" />
+          <div className="lx-road lp-road" aria-hidden="true"><Traffic /></div>
         </>}
       </LiveSky>
 

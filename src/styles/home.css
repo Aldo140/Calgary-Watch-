@@ -146,10 +146,12 @@
 @keyframes h-geese { 0% { transform: translateX(1760px); } 60%, 100% { transform: translateX(-160px); } }
 .cw-home2 .h-goose { transform-box: fill-box; transform-origin: center; animation: h-flap .55s ease-in-out infinite alternate; }
 @keyframes h-flap { to { transform: scaleY(.45); } }
+.cw-home2 .h-plane { animation: h-plane 90s linear infinite; animation-delay: -26s; }
+@keyframes h-plane { 0% { transform: translate(-260px, 30px); } 65%, 100% { transform: translate(1860px, -40px); } }
 /* The tow plane: flies right to left in the band between the header and the
    dateline, which on desktop is above the towers. With reduced motion it simply
    rests on the right. */
-.cw-home2 .h-tow { position: absolute; left: 0; right: 0; top: 78px; height: 56px; pointer-events: none; }
+.cw-home2 .h-tow { position: absolute; left: 0; right: 0; top: 70px; height: 56px; pointer-events: none; }
 .cw-home2 .h-tow-fly {
   position: absolute; left: 0; top: 0; width: max-content;
   transform: translateX(calc(100vw - 100% - 5vw));

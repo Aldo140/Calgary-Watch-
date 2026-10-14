@@ -6,12 +6,11 @@ export type SkyVariant = 'mobile' | 'tablet' | 'desktop';
 
 /** Extra sky above the city per layout, so the headline always sits in open sky
  * and the skyline sits below it (the SVG is anchored bottom-centre and sliced). */
-/** `size` enlarges the train and cyclist where the scene is drawn small. The plane
- * and its banner fly in HomeHero, over the sky rather than inside it. */
-const VIEW: Record<SkyVariant, { y: number; moon: [number, number]; size: { train: number; bike: number } }> = {
-  desktop: { y: -250, moon: [1330, 150], size: { train: 1, bike: 1 } },
-  tablet: { y: -700, moon: [1260, -140], size: { train: 1.3, bike: 1.35 } },
-  mobile: { y: -900, moon: [1110, -640], size: { train: 1.7, bike: 2.2 } },
+/** `size` enlarges the plane, train and cyclist where the scene is drawn small. */
+const VIEW: Record<SkyVariant, { y: number; moon: [number, number]; plane: number; size: { plane: number; train: number; bike: number } }> = {
+  desktop: { y: -250, moon: [1330, 150], plane: 10, size: { plane: 1, train: 1, bike: 1 } },
+  tablet: { y: -700, moon: [1260, -140], plane: -560, size: { plane: 1.6, train: 1.3, bike: 1.35 } },
+  mobile: { y: -900, moon: [1110, -640], plane: 262, size: { plane: 2.4, train: 1.7, bike: 2.2 } },
 };
 const W = 1600, BASE = 705, RIVER = 712, BANK = 795;
 
@@ -55,7 +54,7 @@ const LANDMARKS = {
 };
 const TREES_X = [30, 90, 150, 215, 270, 330, 380, 1180, 1236, 1300, 1370, 1440, 1510, 1570];
 
-export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, cloudCover, windKph, precip, variant, now }: {
+export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, cloudCover, windKph, precip, variant, now, plane = true }: {
   palette: SkyPalette;
   sun: { altitude: number; azimuth: number };
   phase: number;
@@ -64,6 +63,8 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
   precip: SkyIcon | null;
   variant: SkyVariant;
   now: number;
+  /** The homepage flies its own banner-towing plane over the sky instead. */
+  plane?: boolean;
 }) {
   const view = VIEW[variant];
   const top = view.y;
@@ -129,6 +130,7 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
         <pattern id="hs-diag" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0,24L12,0L24,24" fill="none" stroke="#fff" strokeOpacity=".2" strokeWidth="1.2" /></pattern>
         <pattern id="hs-fins" width="8" height="10" patternUnits="userSpaceOnUse"><path d="M4,0V10" stroke="#fff" strokeOpacity=".14" strokeWidth="1.4" /></pattern>
         <pattern id="hs-helix" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M0,0L14,14M14,0L0,14" stroke="#e2403a" strokeWidth="2.4" /></pattern>
+        <linearGradient id="hs-trail" x1="-230" x2="-18" y1="0" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stopColor="#fff" stopOpacity="0" /><stop offset="1" stopColor="#fff" stopOpacity=".75" /></linearGradient>
         <radialGradient id="hs-moonglow"><stop offset=".25" stopColor="#f6f1de" stopOpacity=".22" /><stop offset="1" stopColor="#f6f1de" stopOpacity="0" /></radialGradient>
         <clipPath id="hs-river-clip"><rect x="0" y={RIVER} width={W} height={BANK - RIVER} /></clipPath>
       </defs>
@@ -174,6 +176,17 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
             ))}
           </g>
         </g>
+      ) : null}
+      {plane ? (
+      <g transform={`translate(0 ${view.plane})`}>
+        <g className="h-plane"><g transform={`scale(${view.size.plane})`}>
+          {night < 0.5 ? <path d="M-230,1H-18" stroke="url(#hs-trail)" strokeWidth="2.5" /> : null}
+          <path d="M-18,0C-12,-2.6 8,-2.6 16,-1.2C19,-.6 19,.6 16,1.2C8,2.6 -12,2.6 -18,0Z" fill={mix(p.city, '#ffffff', 0.75 - night * 0.55)} />
+          <path d="M-2,0L-8,-9H-4L6,0L-4,9H-8Z" fill={mix(p.city, '#ffffff', 0.6 - night * 0.45)} />
+          <path d="M-17,0L-20,-6H-17L-12,0Z" fill={mix(p.city, '#ffffff', 0.6 - night * 0.45)} />
+          {night > 0.3 ? <><circle className="h-strobe" cx="-7" cy="-9" r="1.8" fill="#ff5a4e" /><circle className="h-strobe h-strobe-2" cx="-7" cy="9" r="1.8" fill="#fff" /></> : null}
+        </g></g>
+      </g>
       ) : null}
 
       <path d={ridge(FAR)} fill={p.far} />

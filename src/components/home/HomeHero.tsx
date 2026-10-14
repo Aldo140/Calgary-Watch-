@@ -114,6 +114,7 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
         windKph={current?.windKph ?? 8}
         precip={precip}
         variant={variant}
+        plane={false}
         now={Math.floor(now / 300000)}
       />
       <div className="cw-wrap h-hero-inner">

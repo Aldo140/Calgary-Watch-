@@ -166,13 +166,17 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
+      // Business-account fields (src/lib/businessAccount.ts) are admin-only:
+      // they're set when a listing claim is approved, never by the member.
       allow create: if isOwner(userId) &&
                     isValidUser(request.resource.data) &&
+                    !request.resource.data.keys().hasAny(['accountType', 'businessListings', 'businessSince']) &&
                     (request.resource.data.role == 'user' ||
                      (request.resource.data.role == 'admin' && isApprovedAdminToken()));
       // Self-service profile update.
       allow update: if isOwner(userId) &&
                     isValidUser(request.resource.data) &&
+                    !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountType', 'businessListings', 'businessSince']) &&
                     (request.resource.data.role == resource.data.role ||
                      (request.resource.data.role == 'admin' && isApprovedAdminToken()));
       // Admin directory edits. isValidUser() cannot be reused here because it
@@ -183,8 +187,11 @@ service cloud.firestore {
       // role escalation still requires the approved admin token.
       allow update: if isAdmin() &&
                     request.resource.data.diff(resource.data).changedKeys().hasOnly([
-                      'displayName', 'notes', 'role'
+                      'displayName', 'notes', 'role', 'accountType', 'businessListings', 'businessSince'
                     ]) &&
+                    request.resource.data.get('accountType', 'personal') in ['personal', 'business'] &&
+                    request.resource.data.get('businessListings', []) is list &&
+                    request.resource.data.get('businessListings', []).size() <= 50 &&
                     request.resource.data.uid == resource.data.uid &&
                     request.resource.data.email == resource.data.email &&
                     request.resource.data.get('notes', '') is string &&

@@ -16,7 +16,7 @@ import { emailPlan } from '@/src/lib/memberHome';
 import { Chip, EmptyState, FilterChip, FilterRow, Panel, SearchField, SkeletonRows, T, TimeAgo, mono } from './ui';
 
 type Row = { id: string; uid: string } & Record<string, unknown>;
-type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'new';
+type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'business' | 'new';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const num = (v: unknown) => (typeof v === 'number' ? v : 0);
@@ -36,6 +36,7 @@ function shape(r: Row) {
     interests: normalizeInterests(r.eventInterests),
     createdAt: num(r.createdAt),
     role: str(r.role),
+    business: r.accountType === 'business',
     plan: emailPlan(weekly, events, Date.now()),
   };
 }
@@ -47,6 +48,7 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
   { id: 'events', label: 'Event picks only', match: (m) => !m.weekly && m.events },
   { id: 'none', label: 'No email', match: (m) => !m.weekly && !m.events },
   { id: 'no-area', label: 'No home area', match: (m) => !m.area },
+  { id: 'business', label: 'Business accounts', match: (m) => m.business },
   { id: 'new', label: 'New this week', match: (m) => m.createdAt > Date.now() - 7 * 86_400_000 },
 ];
 
@@ -93,6 +95,7 @@ export function MembersDirectory() {
                       <span className="flex items-center gap-2">
                         <strong className="text-sm truncate" style={{ color: T.ink }}>{m.name}</strong>
                         {m.role === 'admin' ? <Chip tone="signal">Admin</Chip> : null}
+                        {m.business ? <Chip tone="ok">Business</Chip> : null}
                       </span>
                       <span className="block text-xs truncate" style={{ color: T.muted }}>
                         {m.area ? <><MapPin size={11} className="inline -mt-0.5" /> {m.area} · </> : 'No area · '}{m.plan.kind === 'none' ? 'No email' : m.plan.name}

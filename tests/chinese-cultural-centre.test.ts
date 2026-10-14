@@ -46,7 +46,7 @@ describe('Calgary Chinese Cultural Centre listing', () => {
   it('is eligible for the existing claim route and CTA', () => {
     assert.ok(entity);
     const claimPage = readFileSync(new URL('src/pages/ClaimListingPage.tsx', root), 'utf8');
-    const listingPage = readFileSync(new URL('src/components/entity/ListingDetail.tsx', root), 'utf8');
+    const listingPage = readFileSync(new URL('src/components/discovery/LocalPlace.tsx', root), 'utf8');
     const claimCta = readFileSync(new URL('src/components/entity/ClaimCta.tsx', root), 'utf8');
     const app = readFileSync(new URL('src/App.tsx', root), 'utf8');
 

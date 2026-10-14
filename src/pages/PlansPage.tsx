@@ -73,7 +73,7 @@ function requestedEmails(params: URLSearchParams): Pick<PlansDraft, 'weeklyDiges
   return { weeklyDigestOptIn: want !== 'thursday', eventsDigestOptIn: want !== 'monday' };
 }
 
-/** Development only: `/plans?demo=member|joined|partner|monday|new` renders a signed-in reader without Firebase. */
+/** Development only: `/plans?demo=member|joined|business|monday|new` renders a signed-in reader without Firebase. */
 function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; goingIds: Set<string>; claims: Claim[]; joined: boolean } | null {
   const mode = import.meta.env.DEV ? params.get('demo') : null;
   return useMemo(() => {
@@ -88,14 +88,14 @@ function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; 
     };
     const now = Date.now();
     const events = discoveryRepository.list().filter((e): e is Extract<typeof e, { kind: 'event' }> => e.kind === 'event');
-    const n = mode === 'member' || mode === 'partner' ? 1 : 0;
+    const n = mode === 'member' || mode === 'business' ? 1 : 0;
     const soon = events.filter((e) => Date.parse(e.start) > now).slice(0, 3 * n);
     // A run that's on now and a few that already happened, so both halves of "Your plans" show.
     const live = events.filter((e) => Date.parse(e.start) < now && Date.parse(e.end) > now).slice(0, n);
     const past = events.filter((e) => Date.parse(e.end) < now).sort((a, b) => Date.parse(b.end) - Date.parse(a.end)).slice(0, 3 * n);
-    // A partner: one listing confirmed, one still being checked.
+    // A business account: one listing confirmed, one still being checked.
     const venues = [...discoveryRepository.list().filter((e) => e.kind === 'market').slice(0, 1), ...discoveryRepository.list().filter((e) => e.kind === 'business').slice(0, 1)];
-    const claims = mode === 'partner' ? venues.map((e, i) => ({ entityId: e.id, entityTitle: e.title, entityPath: entityPath(e), status: i ? 'pending' : 'approved' })) : [];
+    const claims = mode === 'business' ? venues.map((e, i) => ({ entityId: e.id, entityTitle: e.title, entityPath: entityPath(e), status: i ? 'pending' : 'approved' })) : [];
     return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)), claims, joined: mode === 'joined' };
   }, [mode]);
 }
@@ -350,7 +350,7 @@ export default function PlansPage() {
         <MemberDashboard
           user={user} first={first} area={area} now={now} memberSince={profile?.createdAt}
           picks={picks.picks} weekPicks={weekPicks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
-          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={demo ? demo.claims : myClaims ?? []}
+          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={demo ? demo.claims : myClaims ?? []} business={demo ? (demo.claims.length ? { since: Date.parse('2026-09-02'), listings: [demo.claims[0].entityId] } : null) : profile?.business}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
           adminView={asUid ? profile?.displayName ?? '' : null}
           notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}

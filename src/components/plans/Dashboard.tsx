@@ -18,6 +18,7 @@ import { useCalgaryWeather } from '../../hooks/useCalgaryWeather';
 import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
 import { moonPhase, skyPalette, sunPosition } from '../../lib/sky';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import type { BusinessAccount } from '../../lib/businessAccount';
 import { calgaryDate } from '../../lib/discovery';
 import { addCalgaryDays } from '../../lib/discoveryCalendar';
 import { BADGES, type BadgeId, type BadgeState } from '../../lib/badges';
@@ -96,6 +97,8 @@ export interface DashboardProps {
   steps: SetupStep[];
   plan: EmailPlan;
   claims: Claim[];
+  /** Set once a listing claim is approved. */
+  business?: BusinessAccount | null;
   busy: SetupStepId | null;
   onAct: (id: SetupStepId) => void;
   onEdit: (focus?: 'home' | 'emails' | 'interests') => void;
@@ -262,7 +265,7 @@ function DeskBody(p: DashboardProps) {
         <Tracklist {...p} />
       </div>
       <aside className="pd-side" aria-label="More for you">
-        <BusinessCard claims={p.claims} />
+        <BusinessCard claims={p.claims} business={p.business} />
         <NearCard near={p.near} area={p.area} now={p.now} />
         <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} />
         <Fine />
@@ -277,7 +280,7 @@ function PhoneBody(p: DashboardProps) {
       <Plans {...p} phone />
       <NearCard near={p.near} area={p.area} now={p.now} />
       <Tracklist {...p} phone />
-      <BusinessCard claims={p.claims} />
+      <BusinessCard claims={p.claims} business={p.business} />
       <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} phone />
       <Fine />
       <PhoneDock {...p} />
@@ -388,7 +391,7 @@ function MemberPass(p: DashboardProps) {
       <span className="pd-pass-top">
         <img src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" width="34" height="34" />
         <span>CalgaryWatch</span>
-        <b data-partner={p.claims.some((c) => c.status === 'approved') || undefined}>{p.claims.some((c) => c.status === 'approved') ? 'Partner' : 'Member'}</b>
+        <b data-business={Boolean(p.business) || p.claims.some((c) => c.status === 'approved') || undefined}>{p.business || p.claims.some((c) => c.status === 'approved') ? 'Business' : 'Member'}</b>
       </span>
       <span className="pd-pass-who">
         <span className="pd-pass-ava" aria-hidden="true">{p.user.photoURL ? <img src={p.user.photoURL} alt="" referrerPolicy="no-referrer" /> : name.slice(0, 1)}</span>
@@ -910,20 +913,21 @@ function BadgeShelf({ badges, busy, onAct, phone }: { badges: BadgeState[]; busy
 }
 
 /**
- * Partner state: a listing this member manages. Approved means the
+ * Business account: listings this member manages. Approved means the
  * organization confirmed it (the Verified badge shows on the listing);
  * anything else is honest about where the claim stands. Account features
  * for businesses build on this card.
  */
-function BusinessCard({ claims }: { claims: Claim[] }) {
-  if (!claims.length) return null;
+function BusinessCard({ claims, business }: { claims: Claim[]; business?: BusinessAccount | null }) {
+  if (!claims.length && !business) return null;
   const approved = claims.filter((c) => c.status === 'approved');
+  const isBusiness = Boolean(business) || approved.length > 0;
   const others = claims.filter((c) => c.status !== 'approved');
   const state = (s: string) => (s === 'rejected' ? { label: 'Not confirmed', note: 'Reply to our email and we’ll take another look.' } : { label: 'Being confirmed', note: 'We check every claim by hand before the Verified badge shows.' });
   return (
-    <section className="pd-card pd-biz" data-partner={approved.length > 0} aria-labelledby="pd-biz">
-      <p className="pd-kicker"><Store size={14} aria-hidden="true" /> {approved.length ? 'Partner · you manage' : 'For organizers'}</p>
-      <h2 id="pd-biz">{approved.length ? (approved.length > 1 ? 'Your listings' : 'Your listing') : 'Your claim'}</h2>
+    <section className="pd-card pd-biz" data-business={isBusiness} aria-labelledby="pd-biz">
+      <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${fmt(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
+      <h2 id="pd-biz">{approved.length > 1 || (!approved.length && (business?.listings.length ?? 0) > 1) ? 'Your listings' : approved.length || business ? 'Your listing' : 'Your claim'}</h2>
       <ul className="pd-biz-list">
         {approved.map((c) => (
           <li key={c.entityId} className="pd-biz-item" data-status="approved">

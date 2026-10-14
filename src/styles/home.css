@@ -129,6 +129,13 @@
 /* Phone headline: the mark fills the space beside "What's", centred both ways. */
 .cw-home2 .h-hero-mark { width: min(92%, 2.5em); height: auto; aspect-ratio: 1; animation: h-mark-in .7s cubic-bezier(.2, 1.4, .4, 1) both; }
 @keyframes h-mark-in { from { transform: scale(.6); opacity: 0; } }
+/* Wider screens: the mark sits in the open sky right of "What's". */
+@media (min-width: 641px) {
+  .cw-home2 .h-hero h1 { position: relative; }
+  .cw-home2 .h-mark-slot { display: block; position: absolute; left: 3.02em; top: -.04em; width: .98em; }
+  .cw-home2 .h-hero-mark { display: block; width: 100%; filter: drop-shadow(0 8px 14px rgba(4, 10, 28, .3)); }
+}
+
 
 .cw-home2 .h-tear { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(34px, 4vw, 60px); display: block; }
 .cw-home2 .h-tear-paper { fill: var(--cw-bg, #faf8f3); }

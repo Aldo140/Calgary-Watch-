@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { RadarArt, TicketArt } from '../home/HomeYours';
 import { EnvelopeArt } from './SignupFlow';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
-import type { PickItem } from '../../lib/eventPicks';
+import { isOnNow, type PickItem } from '../../lib/eventPicks';
 import type { EmailPlan, NearReport } from '../../lib/memberHome';
 import '../../styles/glance.css';
 
@@ -19,8 +19,10 @@ import '../../styles/glance.css';
 const fmt = (t: number | string, o: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...o }).format(new Date(t));
 const time = (t: number | string) => fmt(t, { hour: 'numeric', minute: '2-digit' }).replace(':00', '');
 
-export function planDay(start: string): string {
-  return `${fmt(start, { weekday: 'short', month: 'short', day: 'numeric' })} · ${time(start)}`;
+/** "Fri, Oct 16 · 7:30 p.m.", or "On now · until Oct 24" for a run that already opened. */
+export function planDay(item: { start: string; end: string }, now = Date.now()): string {
+  if (isOnNow(item, now)) return `On now · until ${fmt(item.end, { month: 'short', day: 'numeric' })}`;
+  return `${fmt(item.start, { weekday: 'short', month: 'short', day: 'numeric' })} · ${time(item.start)}`;
 }
 
 /** One plain sentence that answers "anything I should know?" before the reader scrolls. */
@@ -28,7 +30,10 @@ export function briefing({ near, nearReady, area, picks, next }: { near: NearRep
   const where = area || 'home';
   const safety = !nearReady ? '' : near.length ? `${near.length} report${near.length === 1 ? '' : 's'} near ${where} in the last day.` : `All quiet near ${where} in the last day.`;
   const plans = picks ? `${picks} pick${picks === 1 ? '' : 's'} for the next 10 days` : 'No picks match this week yet';
-  const going = next ? `, and you’re going to ${next.title.length > 42 ? `${next.title.slice(0, 40).trim()}…` : next.title} on ${fmt(next.start, { weekday: 'long' })}.` : '.';
+  const name = next ? (next.title.length > 42 ? `${next.title.slice(0, 40).trim()}…` : next.title) : '';
+  const going = !next ? '.'
+    : isOnNow(next) ? `, and ${name} is on now until ${fmt(next.end, { month: 'long', day: 'numeric' })}.`
+    : `, and you’re going to ${name} on ${fmt(next.start, { weekday: 'long' })}.`;
   return [safety, plans + going].filter(Boolean).join(' ');
 }
 
@@ -77,7 +82,7 @@ export function GlanceTiles({ area, near, nearReady, next, plan, nearHref, picks
       <Tile
         tone="cyan" art={<TicketArt />} label="Your next plan"
         title={next ? next.title : 'Nothing planned yet'}
-        sub={next ? [planDay(next.start), next.venue || next.neighbourhood].filter(Boolean).join(' · ') : 'Tap “I’m going” on a pick for a reminder'}
+        sub={next ? [planDay(next, now), next.venue || next.neighbourhood].filter(Boolean).join(' · ') : 'Tap “I’m going” on a pick for a reminder'}
         action={<GlanceLink to={next ? next.path : picksHref}>{next ? 'Details' : 'Find something'}</GlanceLink>}
       />
       <Tile

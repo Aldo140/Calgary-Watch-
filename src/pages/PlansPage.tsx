@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Shield } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { useMyClaims } from '../lib/claimsApi';
 import { SignupForm, SignupSky } from '../components/plans/SignupFlow';
-import { MemberDashboard } from '../components/plans/Dashboard';
+import { MemberDashboard, type Claim } from '../components/plans/Dashboard';
+import { SettingsSheet, type SettingsFocus } from '../components/plans/SettingsSheet';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
+import { entityPath } from '../lib/discovery';
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { computeBadges, orderBadges, type BadgeId } from '../lib/badges';
 import { emailPlan, nearHome, setupSteps, type SetupStepId } from '../lib/memberHome';
@@ -71,8 +73,8 @@ function requestedEmails(params: URLSearchParams): Pick<PlansDraft, 'weeklyDiges
   return { weeklyDigestOptIn: want !== 'thursday', eventsDigestOptIn: want !== 'monday' };
 }
 
-/** Development only: `/plans?demo=member|monday|new` renders a signed-in reader without Firebase. */
-function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; goingIds: Set<string> } | null {
+/** Development only: `/plans?demo=member|joined|partner|monday|new` renders a signed-in reader without Firebase. */
+function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; goingIds: Set<string>; claims: Claim[]; joined: boolean } | null {
   const mode = import.meta.env.DEV ? params.get('demo') : null;
   return useMemo(() => {
     if (!mode) return null;
@@ -81,17 +83,20 @@ function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; 
     const profile: PlansProfile = {
       displayName: 'Vicky Penny', createdAt: Date.parse('2026-05-01'),
       neighborhood: set ? 'Beltline' : '', piiConsentAt: set ? 1 : undefined,
-      weeklyDigestOptIn: set, eventsDigestOptIn: mode === 'member',
+      weeklyDigestOptIn: set, eventsDigestOptIn: mode !== 'monday',
       eventInterests: set ? ['music', 'food'] : [],
     };
     const now = Date.now();
     const events = discoveryRepository.list().filter((e): e is Extract<typeof e, { kind: 'event' }> => e.kind === 'event');
-    const n = mode === 'member' ? 1 : 0;
+    const n = mode === 'member' || mode === 'partner' ? 1 : 0;
     const soon = events.filter((e) => Date.parse(e.start) > now).slice(0, 3 * n);
     // A run that's on now and a few that already happened, so both halves of "Your plans" show.
     const live = events.filter((e) => Date.parse(e.start) < now && Date.parse(e.end) > now).slice(0, n);
     const past = events.filter((e) => Date.parse(e.end) < now).sort((a, b) => Date.parse(b.end) - Date.parse(a.end)).slice(0, 3 * n);
-    return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)) };
+    // A partner: one listing confirmed, one still being checked.
+    const venues = [...discoveryRepository.list().filter((e) => e.kind === 'market').slice(0, 1), ...discoveryRepository.list().filter((e) => e.kind === 'business').slice(0, 1)];
+    const claims = mode === 'partner' ? venues.map((e, i) => ({ entityId: e.id, entityTitle: e.title, entityPath: entityPath(e), status: i ? 'pending' : 'approved' })) : [];
+    return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)), claims, joined: mode === 'joined' };
   }, [mode]);
 }
 
@@ -102,7 +107,7 @@ export default function PlansPage() {
   const demo = useDemo(params);
   // Admin can open any member's dashboard read-only: /plans?as=<uid>.
   const asUid = auth0.isAdmin ? (params.get('as') || '').trim() || null : null;
-  const { signIn, isAuthReady, isFirebaseConfigured } = auth0;
+  const { signIn, logout, isAuthReady, isFirebaseConfigured } = auth0;
   const subjectUid = demo ? undefined : asUid ?? auth0.user?.uid;
   const liveProfile = usePlansProfile(subjectUid);
   const profile = demo?.profile ?? liveProfile;
@@ -121,11 +126,12 @@ export default function PlansPage() {
   // A first-time visitor starts with the email(s) the link they followed was about, visibly ticked.
   const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params), interests: normalizeInterests((params.get('interests') ?? '').split(',')) }));
   const [editing, setEditing] = useState(false);
+  const [sheetFocus, setSheetFocus] = useState<SettingsFocus | undefined>(undefined);
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [savedAt, setSavedAt] = useState<number | null>(null);
-  const [joined, setJoined] = useState<BadgeId[] | null>(null);
+  const [joined, setJoined] = useState<BadgeId[] | null>(() => (demo?.joined ? ['founding', 'neighbour', 'monday-reader', 'on-the-list'] as BadgeId[] : null));
   const [busy, setBusy] = useState<SetupStepId | null>(null);
   const [reportCount, setReportCount] = useState<number | undefined>(undefined);
   const [submissionCount, setSubmissionCount] = useState<number | undefined>(undefined);
@@ -136,17 +142,28 @@ export default function PlansPage() {
 
   useEffect(() => { document.title = 'Your CalgaryWatch | Emails, plans & badges'; }, []);
 
-  // Deep links from the account menu: ?edit=1 opens the editor, #id scrolls there once it exists.
-  const deepLinked = useRef(false);
+  // Deep links (account menu, emails): ?edit=1 opens settings, #id scrolls there once it exists.
+  // Runs on every navigation, so the menu works while you're already on this page.
+  const location = useLocation();
+  const firstLink = useRef(true);
   useEffect(() => {
-    if (deepLinked.current || !profile) return;
-    deepLinked.current = true;
-    if (params.get('edit') === '1' && !readOnly) { setDraft(draftFrom(profile, pending)); setEditing(true); }
-    const id = window.location.hash.slice(1);
-    if (id === 'emails') setStep(1); else if (id === 'pl-step-interests') setStep(2);
+    if (!profile) return;
+    const id = location.hash.slice(1);
+    const member = Boolean(profile.piiConsentAt || profile.eventInterests.length);
+    if (params.get('edit') === '1' && !asUid && member) {
+      setDraft(draftFrom(profile, pending)); setError(''); setEditing(true);
+      setSheetFocus(id === 'emails' ? 'emails' : id === 'pl-step-interests' || id === 'interests' ? 'interests' : id === 'home' ? 'home' : undefined);
+      // Drop the flag so the same link can open settings again later.
+      const rest = new URLSearchParams(params); rest.delete('edit');
+      navigate({ search: rest.toString() ? `?${rest}` : '' }, { replace: true });
+      firstLink.current = false;
+      return;
+    }
+    if (firstLink.current) { if (id === 'emails') setStep(1); else if (id === 'pl-step-interests') setStep(2); }
+    firstLink.current = false;
     if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [Boolean(profile), location.key]);
 
   // Hydrate the form from the profile once per account, keeping anything the
   // reader picked before signing in.
@@ -183,7 +200,8 @@ export default function PlansPage() {
 
   // Set up = has a home area on file (the one thing every email needs).
   const hasPlans = Boolean(profile && (profile.piiConsentAt || profile.eventInterests.length));
-  const showForm = !user || !profile || !hasPlans || editing;
+  // Members change settings in a sheet over the dashboard; the 3-step card is for signing up.
+  const showForm = !user || !profile || !hasPlans;
   const dashboard = Boolean(user && profile && hasPlans);
   const area = profile ? homeAreaOf(profile) : '';
   const entities = discoveryRepository.list();
@@ -193,6 +211,11 @@ export default function PlansPage() {
   const picks = useMemo(
     () => buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area || draftArea, goingIds: mine.ids, days: 10, limit: 8 }),
     [entities, occurrences, interests, addressPoint, area, draftArea, mine.ids],
+  );
+  // Everything picked for the next ten days, so the dashboard can show any one day.
+  const weekPicks = useMemo(
+    () => (showForm ? [] : buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area, goingIds: mine.ids, days: 10, limit: 80 }).picks),
+    [showForm, entities, occurrences, interests, addressPoint, area, mine.ids],
   );
   const timeline = useMemo(() => buildPlanTimeline({ entities, occurrences, goingIds: mine.ids }), [entities, occurrences, mine.ids]);
 
@@ -250,12 +273,16 @@ export default function PlansPage() {
     : '';
   const progress = [hasArea && (!needsConsent || draft.consent), draft.weeklyDigestOptIn || draft.eventsDigestOptIn, draft.interests.length > 0];
 
-  const openEditor = (focus?: 'interests' | 'home') => {
+  const openEditor = (focus?: SettingsFocus) => {
     setDraft(draftFrom(profile, pending));
+    setError('');
     setEditing(true);
-    setStep(focus === 'interests' ? 2 : 0);
+    setSheetFocus(focus);
+    if (hasPlans) return;
+    setStep(focus === 'interests' ? 2 : focus === 'emails' ? 1 : 0);
     requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
+  const closeSheet = () => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); };
 
   const addEmail = async (which: 'monday' | 'thursday') => {
     if (!user || !profile) return;
@@ -294,7 +321,7 @@ export default function PlansPage() {
       if (firstTime && unlocks.length) { setJoined(unlocks); celebrateBadge(unlocks[0]); }
       setEditing(false);
       setStep(0);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (firstTime) window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError('Your plans didn’t save. Check your connection and try again.');
     } finally {
@@ -322,11 +349,19 @@ export default function PlansPage() {
       <SiteLayout>
         <MemberDashboard
           user={user} first={first} area={area} now={now} memberSince={profile?.createdAt}
-          picks={picks.picks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
-          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={myClaims ?? []}
+          picks={picks.picks} weekPicks={weekPicks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
+          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={demo ? demo.claims : myClaims ?? []}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
           adminView={asUid ? profile?.displayName ?? '' : null}
           notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}
+          onDismissWelcome={() => setJoined(null)}
+        />
+        <SettingsSheet
+          open={editing} focus={sheetFocus} user={user} memberSince={profile?.createdAt}
+          draft={draft} setDraft={setDraft} suggestions={suggestions} communityCount={communities.length}
+          needsConsent={needsConsent} pending={pending} error={error} setError={setError} saving={saving} readOnly={Boolean(asUid)}
+          onToggleInterest={toggleInterest} onSave={() => void save()} onClose={closeSheet}
+          onSignOut={demo ? undefined : () => { setEditing(false); void logout(); }}
         />
       </SiteLayout>
     );
@@ -373,5 +408,5 @@ function savedSummary(profile: PlansProfile | null): string {
   const plan = emailPlan(profile?.weeklyDigestOptIn === true, profile?.eventsDigestOptIn === true, Date.now());
   if (plan.kind === 'none' || !plan.next) return 'No emails for now; your picks and plans stay here.';
   const when = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(plan.next);
-  return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1]}.`;
+  return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1].replace(/\.$/, '')}.`;
 }

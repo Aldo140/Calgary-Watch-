@@ -84,7 +84,7 @@ export function extractEmails(html: string, siteHost: string): string[] {
   for (const m of text.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,24}/gi)) {
     // A phone number run straight into the address ("264-7243info@…") is not part of it.
     const e = normalizeEmail(m[0]).replace(/\.$/, '').replace(/^\+?(?:\d[\d.-]*){7,}(?=[a-z])/i, '');
-    if (JUNK.test(e) || /\.(png|jpe?g|gif|webp|svg)$/i.test(e) || /@\dx\./.test(e)) continue;
+    if (JUNK.test(e) || /\.(png|jpe?g|gif|webp|svg)$/i.test(e) || /@\dx[.-]/.test(e) || /^\d+x\d+[_-]/.test(e)) continue;
     found.add(e);
   }
   const rank = (e: string) => {

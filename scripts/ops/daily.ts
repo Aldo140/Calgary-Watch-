@@ -19,6 +19,7 @@ import { runScout } from './jobs/scout';
 import { coordinate } from './jobs/coordinator';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
 import { flushUsage } from './jobs/usage';
+import { saveBackup } from './jobs/publishBackup';
 
 const log = (m: string) => console.log(`[ops:daily] ${m}`);
 const index = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
@@ -49,6 +50,7 @@ if (!db) {
   await step('queue drafts', () => queueDrafts(db, now, log));
   await step('auto-approve', () => autoApprove(db, now, log));
   await step('one post per slot', () => resolveDoubleBookings(db, now, log));
+  await step('publish backup', () => saveBackup(db, now, log));
   await step('insights', () => collectInsights(db, now, log));
   await step('account history', () => collectAccountHistory(db, now, log));
   await step('scout', () => runScout(db, now, log));

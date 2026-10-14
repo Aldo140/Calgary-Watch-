@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
@@ -151,7 +151,7 @@ export function LocalHero({ places, category, counts, areas }: { places: Busines
             {LOCAL_CATEGORIES.map(c => <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{cap(c)} <i>{counts[c] ?? 0}</i></Link>)}
           </nav>
         </div>
-        {street.length ? <Street places={street} night={sky.night} label="Every place in the book" /> : null}
+        {street.length ? <Scenery><Street places={street} night={sky.night} label="Every place in the book" /></Scenery> : null}
       </>}
     </LiveSky>
   );
@@ -262,9 +262,33 @@ const TRAFFIC: { kind: VehicleKind; paint: string; lane: 'far' | 'near'; dur: nu
   { kind: 'car', paint: '#7b56c7', lane: 'far', dur: FAR, delay: -FAR * .71, park: 80 },
 ];
 
-export function Traffic() {
+/**
+ * The scenery is decoration. If any of it throws on some phone, drop it and keep the
+ * page: the headline, the shop list and everything below still render.
+ */
+class Scenery extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error: unknown) { console.error('Local scenery failed', error); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+
+function TrafficLanes() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [onScreen, setOnScreen] = useState(true);
+
+  // Only drive while the road is on screen; a phone scrolling the rest of the page
+  // shouldn't keep animating seven vehicles it can't see.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { rootMargin: '80px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <div className="lx-traffic" aria-hidden="true">
+    <div className="lx-traffic" aria-hidden="true" ref={ref} data-paused={onScreen ? undefined : ''}>
       {TRAFFIC.map((v, i) => (
         <span key={i} className={`lx-vehicle lx-lane-${v.lane} lx-v-${v.kind}`} style={{ ['--dur' as string]: `${v.dur}s`, ['--delay' as string]: `${v.delay}s`, ['--park' as string]: `${v.park}%` }}>
           <Vehicle kind={v.kind} paint={v.paint} />
@@ -272,6 +296,10 @@ export function Traffic() {
       ))}
     </div>
   );
+}
+
+export function Traffic() {
+  return <Scenery><TrafficLanes /></Scenery>;
 }
 
 /** A block of storefronts on one road: the /local hero, and "next door" on a place page. */

@@ -56,6 +56,9 @@ export function takeUsage(): Map<string, UsageTally> {
   return out;
 }
 
+/** Half of an emoji (a lone surrogate, e.g. from cutting a caption mid-emoji) makes the request body invalid JSON. */
+export const wellFormed = (text: string) => text.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+
 async function structured<T extends z.ZodType>(system: string, user: string, schema: T, task = 'other', maxTokens = 4000): Promise<z.infer<T>> {
   const response = await anthropic().beta.messages.parse({
     model: MODEL,
@@ -63,8 +66,8 @@ async function structured<T extends z.ZodType>(system: string, user: string, sch
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     output_config: { effort: 'medium', format: betaZodOutputFormat(schema) },
-    system,
-    messages: [{ role: 'user', content: user }],
+    system: wellFormed(system),
+    messages: [{ role: 'user', content: wellFormed(user) }],
   });
   record(task, response.model ?? MODEL, response.usage ?? {});
   if (response.stop_reason === 'refusal') throw new Error('Claude declined to draft this item.');

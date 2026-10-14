@@ -86,6 +86,7 @@ jobs:
         if: steps.moved.outputs.moved == 'false'
         run: npm run ops:hourly
         env:
+          HQ_ACCESS_TOKEN: ${{ steps.hq.outputs.access_token }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}

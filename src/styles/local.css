@@ -7,7 +7,7 @@
   --ink: #151515; --yellow: #ffdf4f; --cyan: #00c2e0; --blue: #1554d1; --navy: #06162f; --stamp: #d8433f;
   --paper: var(--cw-bg, #faf8f3); --card: #fffdf7; --muted: #4a4f57; --lilac: #dfe6fb;
   --display: 'Bricolage Grotesque', Inter, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
-  padding-bottom: clamp(56px, 7vw, 96px); overflow-x: clip;
+  padding-bottom: clamp(56px, 7vw, 96px); overflow-x: hidden; overflow-x: clip;
 }
 .cw-loc :where(h1, h2, h3, p, ul, ol) { margin: 0; }
 :where(.cw-loc ul, .cw-loc ol) { list-style: none; padding: 0; }
@@ -102,18 +102,28 @@
 .lx-hero[data-night] .lx-road { background-color: #1c2030; }
 
 /* Traffic. Vehicles drive by animating left, so with motion turned off they sit parked at --park. */
-.lx-traffic { position: absolute; inset: 0; pointer-events: none; }
+/*
+ * Traffic. Vehicles park at --park; where the browser supports container units they
+ * drive by animating transform (compositor only, no layout per frame). Off screen,
+ * the lanes pause.
+ */
+.lx-traffic { position: absolute; inset: 0; pointer-events: none; container-type: inline-size; }
 .lx-vehicle { position: absolute; left: var(--park, 50%); line-height: 0; transform-origin: 50% 100%; }
 .lx-vehicle svg { display: block; width: auto; height: auto; overflow: visible; }
-.lx-lane-near { bottom: calc(var(--tear, 0px) + 6px); z-index: 2; animation: lx-drive var(--dur) linear var(--delay) infinite; }
-.lx-lane-far { bottom: calc(var(--tear, 0px) + (var(--road, 96px) - var(--walk, 0px)) / 2 - 4px); z-index: 1; transform: scale(.8); animation: lx-drive-back var(--dur) linear var(--delay) infinite; }
+.lx-lane-near { bottom: calc(var(--tear, 0px) + 6px); z-index: 2; }
+.lx-lane-far { bottom: calc(var(--tear, 0px) + (var(--road, 96px) - var(--walk, 0px)) / 2 - 4px); z-index: 1; scale: .8; }
 .lx-lane-far svg { transform: scaleX(-1); }
 .lx-lane-far svg text { transform: scaleX(-1); transform-box: fill-box; transform-origin: center; }
-@keyframes lx-drive { from { left: -280px; } to { left: 100%; } }
-@keyframes lx-drive-back { from { left: 100%; } to { left: -280px; } }
-.lx-v-bike { animation-timing-function: linear; }
-.lx-v-bike svg { animation: lx-pedal .5s ease-in-out infinite alternate; }
-@keyframes lx-pedal { to { transform: translateY(-1.5px); } }
+@supports (width: 1cqw) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lx-vehicle { left: 0; will-change: transform; }
+    .lx-lane-near { animation: lx-drive var(--dur) linear var(--delay) infinite; }
+    .lx-lane-far { animation: lx-drive-back var(--dur) linear var(--delay) infinite; }
+    .lx-traffic[data-paused] .lx-vehicle { animation-play-state: paused; }
+  }
+}
+@keyframes lx-drive { from { transform: translateX(-280px); } to { transform: translateX(100cqw); } }
+@keyframes lx-drive-back { from { transform: translateX(100cqw); } to { transform: translateX(-280px); } }
 .lx-win { fill: #bfe3f0; }
 .lx-beam { fill: #ffe39a; opacity: 0; }
 .lx-hero[data-night] .lx-win { fill: #ffd88a; }
@@ -388,17 +398,25 @@
        swipe that starts on the street gets stuck there instead of scrolling the page. */
     justify-content: flex-start; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x pan-y;
     scroll-snap-type: x mandatory; scroll-padding: 0 16px;
-    padding: 18px 16px 40px; margin-bottom: -40px; scrollbar-width: none; max-width: none;
+    padding: 18px 16px 40px; scrollbar-width: none;
+    /* The street is a flex column on phones, and auto side margins there would size this
+       to its content (every shop side by side) in Safari, blowing each shop up to fill it. */
+    width: 100%; max-width: none; margin: 0 0 -40px; align-self: stretch;
   }
   .lx-block::-webkit-scrollbar { display: none; }
-  .lx-block li { flex: 0 0 48%; scroll-snap-align: start; animation-name: lx-rise-x; }
+  .lx-block li { flex: 0 0 48vw; scroll-snap-align: start; animation-name: lx-rise-x; }
   @keyframes lx-rise-x { from { transform: translateX(60px); opacity: 0; } }
   .lx-block li:last-child { margin-right: 16px; }
   .lx-shop-sign b { font-size: 14px; }
   .lx-shop-sign small { font-size: 9px; }
   .lx-lamp { width: 22px; bottom: -26px; right: -11px; }
-  .lx-lane-near { transform: scale(.56); }
-  .lx-lane-far { transform: scale(.52); }
+  .lx-lane-near { scale: .56; }
+  .lx-lane-far { scale: .52; }
+  /* Lighter on phones: two fewer vehicles, and no big blurred glows to composite. */
+  .lx-lane-far.lx-v-van, .lx-lane-far.lx-v-car { display: none; }
+  .lx-hero[data-night] .lx-shop-front { box-shadow: none; }
+  .lx-hero[data-night] .lx-lamp-bulb { filter: none; }
+  .lx-beam { display: none; }
 
   .lx-head { margin: 56px 0 18px; gap: 10px; }
   .lx-head h2 { font-size: clamp(32px, 9.4vw, 40px); }

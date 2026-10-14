@@ -36,13 +36,41 @@ function BusyNow({ month, now }: { month: number; now: Date }) {
   );
 }
 
+const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** Every service against the twelve months: when Calgarians book it most, with this month marked. */
+function ServiceYear({ month }: { month: number }) {
+  return (
+    <div className="cw-svc-year" role="table" aria-label="When Calgarians book each service">
+      <div className="cw-svc-year-row cw-svc-year-head" role="row">
+        <span role="columnheader">Service</span>
+        {MONTHS.map((m, i) => <span key={i} role="columnheader" aria-label={MONTH_NAMES[i]} className={i + 1 === month ? 'is-now' : undefined}>{m}</span>)}
+      </div>
+      {LOCAL_SERVICES.map(s => (
+        <div key={s.id} className={`cw-svc-year-row cw-svc-group-${s.group}`} role="row">
+          <a role="rowheader" href={`#svc-${s.id}`}><Icon id={s.id} size={15} />{s.label}</a>
+          {MONTHS.map((_, i) => {
+            const peak = s.peak.includes(i + 1);
+            return <span key={i} role="cell" className={`${peak ? 'is-peak' : ''}${i + 1 === month ? ' is-now' : ''}`} aria-label={`${MONTH_NAMES[i]}: ${peak ? 'busy' : 'quiet'}`} />;
+          })}
+        </div>
+      ))}
+      <p className="cw-svc-year-key"><i className="is-peak" aria-hidden="true" /> Busiest months · <i className="is-now" aria-hidden="true" /> {MONTH_NAMES[month - 1]}, right now</p>
+    </div>
+  );
+}
+
 /** A compact index of every service on the main Local page. */
 export function ServicesIndex({ places, now = new Date() }: { places: Business[]; now?: Date }) {
   const month = calgaryMonth(now);
   return (
     <section className="cw-svc cw-svc-index" aria-labelledby="svc-index">
       <div className="cw-loc-section-head">
-        <h2 id="svc-index">Services Calgarians need</h2>
+        <div>
+          <p className="lx-eyebrow">For the house, the yard and the car</p>
+          <h2 id="svc-index">Services <mark>Calgarians need.</mark></h2>
+        </div>
         <p>Plumbers, furnace techs, snow removal and the rest, with what to ask before you hire. <Link to="/local/services">See every service <ArrowUpRight size={14} aria-hidden="true" /></Link></p>
       </div>
       <BusyNow month={month} now={now} />
@@ -83,13 +111,17 @@ export function ServicesDirectory({ places, now = new Date() }: { places: Busine
   return (
     <section className="cw-svc cw-svc-full" aria-labelledby="svc-full">
       <div className="cw-loc-section-head">
-        <h2 id="svc-full">Services Calgarians need</h2>
-        <p>We only list a business after checking it against its own site. Until a service has picks, you get the questions worth asking first. Know someone you’d send a friend to? Recommend them.</p>
+        <div>
+          <p className="lx-eyebrow">Book before the rush</p>
+          <h2 id="svc-full">The Calgary <mark>year.</mark></h2>
+        </div>
+        <p>When Calgarians book each service, month by month. We only list a business after checking it against its own site; until a service has picks, you get the questions worth asking first.</p>
       </div>
       <BusyNow month={month} now={now} />
-      {GROUPS.map(g => (
-        <div key={g} className="cw-svc-block">
-          <h3 className="cw-svc-block-head">{SERVICE_GROUPS[g].label}<small>{SERVICE_GROUPS[g].blurb}</small></h3>
+      <ServiceYear month={month} />
+      {GROUPS.map((g, gi) => (
+        <div key={g} className={`cw-svc-block cw-svc-group-${g}`}>
+          <h3 className="cw-svc-block-head"><i>{String(gi + 1).padStart(2, '0')}</i>{SERVICE_GROUPS[g].label}<small>{SERVICE_GROUPS[g].blurb}</small></h3>
           <ul className="cw-svc-cards">
             {LOCAL_SERVICES.filter(s => s.group === g).map(s => {
               const listed = places.filter(p => offersService(p, s));

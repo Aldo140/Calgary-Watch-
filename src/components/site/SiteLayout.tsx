@@ -10,6 +10,7 @@ import { RankNudge } from './RankNudge';
 import { AccountMenu } from './AccountMenu';
 import { useAuth } from '../FirebaseProvider';
 import { SiteFooter } from './SiteFooter';
+import { useSkyOverlay } from '../../lib/skyOverlay';
 
 export function Wordmark() {
   return (
@@ -75,7 +76,9 @@ export function SiteHeader() {
     return () => { root.style.overflow = previous; window.removeEventListener('keydown', onKey); };
   }, [open]);
 
-  const overlay = pathname === '/' && !scrolled && !open;
+  // The homepage and the Local pages open on the live sky, so the header floats over it.
+  const sky = useSkyOverlay();
+  const overlay = (pathname === '/' || sky) && !scrolled && !open;
 
   return (
     <header className="cw-nav" data-scrolled={scrolled} data-overlay={overlay} data-open={open}>

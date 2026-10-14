@@ -57,6 +57,10 @@ export type UserProfile = {
   digestWelcomeSentAt?: number | null;
   digestUnsubscribedAt?: number | null;
   digestUnsubscribeSource?: string | null;
+  /** Set by an admin when a listing claim is approved (businessAccount.ts). */
+  accountType?: 'personal' | 'business';
+  businessListings?: string[];
+  businessSince?: number;
 };
 
 export type PageViewDoc = {

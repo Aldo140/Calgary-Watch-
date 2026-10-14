@@ -57,6 +57,9 @@
 .cl-verified { display: inline-flex; align-items: center; gap: 6px; margin: 10px 0 0; padding: 6px 12px 6px 8px; border-radius: 999px; background: #e3f4ef; color: #145a4c; font: 600 13px/1 Inter, sans-serif; border: 1px solid #a9d9c8; }
 .cl-verified-by { font-weight: 500; opacity: .82; }
 .cl-verified-by::before { content: '·'; margin: 0 6px 0 2px; }
+.cl-business { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 14px; padding: 10px 12px; border-radius: 12px; background: #e3f4ef; color: #145a4c; border: 1px solid #a9d9c8; font: 500 14px/1.45 Inter, sans-serif; }
+.cl-business svg { flex: none; margin-top: 2px; }
+.cl-business a { color: inherit; text-decoration: underline; }
 
 @media (max-width: 980px) {
   .cl-grid { grid-template-columns: minmax(0, 1fr); }

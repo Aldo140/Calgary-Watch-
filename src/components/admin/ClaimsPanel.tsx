@@ -6,12 +6,13 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { collection, doc, limit, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, limit, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { BadgeCheck, ExternalLink, Mail, X } from 'lucide-react';
 import { db } from '@/src/firebase';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { discoveryRepository } from '@/src/data/discovery';
 import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence, claimId, type ListingClaim, type ListingUpdate } from '@/src/lib/claims';
+import { businessAccountPatch, businessAccountsFromClaims, readBusinessAccount } from '@/src/lib/businessAccount';
 import type { PartnerLead } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Panel, T, TimeAgo, mono } from './ui';
 
@@ -50,6 +51,8 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       await updateDoc(doc(db, CLAIMS, claimId(c.uid, c.entityId)), { status: approve ? 'approved' : 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
         await setDoc(doc(db, VERIFIED, c.entityId), { entityId: c.entityId, title: c.entityTitle, verifiedAt: Date.now(), verifiedBy: by });
+        // The claimant's own account becomes a business account (businessAccount.ts).
+        await markBusiness(c.uid, [c.entityId]).catch((e) => setError(`Claim approved, but the account wasn’t marked as a business account: ${e instanceof Error ? e.message : e}`));
         // The outreach pipeline learns the listing was claimed, so it stops pitching —
         // every lead for it (a listing can have a business lead and an organizer lead).
         for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
@@ -61,6 +64,32 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     } finally {
       setBusy('');
     }
+  }
+
+  /** Mark one claimant's profile as a business account managing these listings. */
+  async function markBusiness(uid: string, entityIds: string[], since?: number) {
+    if (!db) return;
+    const ref = doc(db, 'users', uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error('they have no profile yet.');
+    const data = snap.data();
+    const current = readBusinessAccount(data);
+    if (current && entityIds.every((id) => current.listings.includes(id))) return;
+    let patch = businessAccountPatch(data, entityIds[0], since ?? Date.now());
+    for (const id of entityIds.slice(1)) patch = businessAccountPatch({ ...data, ...patch }, id, patch.businessSince);
+    await updateDoc(ref, patch);
+  }
+
+  /** Every approved claim's account marked, including claims approved before business accounts existed. */
+  async function markAllBusiness() {
+    if (!verified) return;
+    setBusy('accounts'); setError('');
+    const failed: string[] = [];
+    for (const [uid, row] of businessAccountsFromClaims(verified)) {
+      await markBusiness(uid, row.listings, row.since || undefined).catch(() => failed.push(uid));
+    }
+    setBusy('');
+    setError(failed.length ? `${failed.length} account${failed.length === 1 ? '' : 's'} couldn’t be marked (no profile yet).` : '');
   }
 
   async function settle(u: ListingUpdate & { id: string }, status: 'applied' | 'declined') {
@@ -133,6 +162,10 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             <BadgeCheck size={14} className="inline -mt-0.5 mr-1" aria-hidden="true" />{verified.length} verified listing{verified.length === 1 ? '' : 's'}
             <span className="font-normal" style={{ color: T.muted }}> · each has an approved claim, so it shows “Verified” and gets its ranking weight</span>
           </summary>
+          <div className="px-4 pt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: T.muted }}>
+            <span>Each claimant’s account is a business account. Claims approved before that existed can be brought in line here.</span>
+            <AdminButton variant="ghost" disabled={busy === 'accounts'} onClick={() => void markAllBusiness()}><BadgeCheck size={14} /> {busy === 'accounts' ? 'Marking…' : 'Mark business accounts'}</AdminButton>
+          </div>
           {verified.map((c) => (
             <div key={c.entityId + c.uid} className="px-4 pb-3 text-xs flex flex-wrap gap-x-3 gap-y-1" style={{ color: T.muted }}>
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>

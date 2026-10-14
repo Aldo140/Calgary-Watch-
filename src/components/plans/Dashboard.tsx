@@ -2,7 +2,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import {
-  ArrowDown, ArrowUpRight, Award, Bell, ListMusic, Sun, Ticket, Check, Footprints, HeartHandshake, MapPin, Mic, Music, Palette,
+  ArrowDown, ArrowUpRight, Award, BadgeCheck, Bell, ListMusic, Sun, Ticket, Check, Footprints, HeartHandshake, MapPin, Mic, Music, Palette,
   Pencil, Radio, Settings2, ShoppingBasket, Shield, Sparkles, Trophy, Users, UtensilsCrossed, type LucideIcon,
 } from 'lucide-react';
 import type { User } from 'firebase/auth';
@@ -18,6 +18,7 @@ import { useCalgaryWeather } from '../../hooks/useCalgaryWeather';
 import { describeSky, type SkyIcon } from '../../lib/weatherCodes';
 import { moonPhase, skyPalette, sunPosition } from '../../lib/sky';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import type { BusinessAccount } from '../../lib/businessAccount';
 import { BADGES, type BadgeId, type BadgeState } from '../../lib/badges';
 import { EVENT_INTERESTS, pickDistance, pickWhen, type EventInterestId, type PickItem, type PlanEntry, type PlanTimeline } from '../../lib/eventPicks';
 import { partOfDay, setupPercent, type EmailPlan, type NearReport, type SetupStep, type SetupStepId } from '../../lib/memberHome';
@@ -88,6 +89,8 @@ export interface DashboardProps {
   steps: SetupStep[];
   plan: EmailPlan;
   claims: Array<{ entityId: string; entityTitle: string; status: string }>;
+  /** Set once a listing claim is approved. */
+  business?: BusinessAccount | null;
   busy: SetupStepId | null;
   onAct: (id: SetupStepId) => void;
   onEdit: (focus?: 'interests' | 'home') => void;
@@ -123,7 +126,7 @@ function DeskBody(p: DashboardProps) {
       <aside className="pd-side" aria-label="More for you">
         <NearCard near={p.near} area={p.area} now={p.now} />
         <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} />
-        <ListingsCard claims={p.claims} />
+        <ListingsCard claims={p.claims} business={p.business} />
         <Fine />
       </aside>
     </div>
@@ -137,7 +140,7 @@ function PhoneBody(p: DashboardProps) {
       <NearCard near={p.near} area={p.area} now={p.now} />
       <Tracklist {...p} phone />
       <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} phone />
-      <ListingsCard claims={p.claims} />
+      <ListingsCard claims={p.claims} business={p.business} />
       <Fine />
       <PhoneDock hasPlans={p.timeline.ahead.length + p.timeline.past.length > 0} />
     </div>
@@ -698,12 +701,12 @@ function BadgeShelf({ badges, busy, onAct, phone }: { badges: BadgeState[]; busy
   );
 }
 
-function ListingsCard({ claims }: { claims: Array<{ entityId: string; entityTitle: string; status: string }> }) {
-  if (!claims.length) return null;
+function ListingsCard({ claims, business }: { claims: Array<{ entityId: string; entityTitle: string; status: string }>; business?: BusinessAccount | null }) {
+  if (!claims.length && !business) return null;
   const label = (s: string) => (s === 'approved' ? 'You manage it' : s === 'rejected' ? 'Not confirmed' : 'Being confirmed');
   return (
     <section className="pd-card" aria-labelledby="pd-listings">
-      <p className="pd-kicker">For organizers</p>
+      <p className="pd-kicker">{business ? <><BadgeCheck size={13} aria-hidden="true" /> Business account</> : 'For organizers'}</p>
       <h2 id="pd-listings">Your listings</h2>
       <ul className="pd-near-list">
         {claims.map((c) => (

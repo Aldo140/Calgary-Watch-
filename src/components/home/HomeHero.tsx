@@ -46,6 +46,35 @@ function devOverrides(): { at?: number; wx?: SkyIcon; cc?: number } {
   return { at: Number.isFinite(at) ? at : undefined, wx: (q.get('wx') as SkyIcon | null) ?? undefined, cc: q.get('cc') ? Number(q.get('cc')) : undefined };
 }
 
+/** A little plane tows the CalgaryWatch banner right to left across the sky,
+ * above the towers on desktop and just over the skyline on phones. */
+function TowBanner() {
+  return (
+    <div className="h-tow" aria-hidden="true">
+      <div className="h-tow-fly">
+        <div className="h-tow-bob">
+          <svg className="h-tow-plane" viewBox="0 0 112 52" width="112" height="52">
+            <ellipse className="h-tow-prop" cx="9" cy="27" rx="2.5" ry="13" />
+            <path d="M10,27C10,22 15,19 24,19H70L94,12C97,11 99,13 98,16L92,30C91,33 88,35 84,35H24C15,35 10,32 10,27Z" fill="#fffaf0" stroke="#151515" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M84,19L93,4C94,2 97,2 98,4L96,19Z" fill="#e2403a" stroke="#151515" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M24,28H86" stroke="#e2403a" strokeWidth="3" />
+            <path d="M22,22C24,20 28,19 33,19H40V26H22Z" fill="#9fdcf0" stroke="#151515" strokeWidth="1.6" strokeLinejoin="round" />
+            <path d="M40,29L62,29L50,48H40Z" fill="#1554d1" stroke="#151515" strokeWidth="2" strokeLinejoin="round" />
+            <circle className="h-strobe" cx="47" cy="45" r="2" fill="#ff5a4e" />
+          </svg>
+          <svg className="h-tow-rope" viewBox="0 0 64 52" width="64" height="52">
+            <path d="M0,28C18,30 34,28 46,26M46,26L64,8M46,26L64,46" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+          <div className="h-banner">
+            <img src="/images/brand/calgarywatch-city-spark-v2.webp" width="36" height="36" alt="" />
+            <span>CALGARY<b>WATCH</b><i>•</i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weather: CalgaryWeather; onPickDay: (index: number) => void }) {
   const ref = useRef<HTMLElement>(null);
   const dev = useMemo(devOverrides, []);
@@ -85,6 +114,7 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
         windKph={current?.windKph ?? 8}
         precip={precip}
         variant={variant}
+        plane={false}
         now={Math.floor(now / 300000)}
       />
       <div className="cw-wrap h-hero-inner">
@@ -117,6 +147,7 @@ export function HomeHero({ days, weather, onPickDay }: { days: AgendaDay[]; weat
           {INTENTS.map(i => <Link key={i.label} to={i.to} className={i.live ? 'h-intent-live' : undefined}>{i.live ? <span className="h-intent-dot" aria-hidden="true" /> : null}{i.label}</Link>)}
         </nav>
       </div>
+      <TowBanner />
       <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
         <path d={TEAR} className="h-tear-paper" />

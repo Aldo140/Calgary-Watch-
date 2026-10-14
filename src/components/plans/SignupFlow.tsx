@@ -83,7 +83,7 @@ export function EnvelopeArt() {
   );
 }
 
-const TILE_ICON: Record<EventInterestId, React.ComponentType<{ size?: number; strokeWidth?: number }>> = {
+export const TILE_ICON: Record<EventInterestId, React.ComponentType<{ size?: number; strokeWidth?: number }>> = {
   music: Music, arts: Palette, family: Baby, food: UtensilsCrossed, markets: Store,
   sports: Trophy, outdoors: Trees, learning: Mic, community: HeartHandshake, free: Ticket,
 };

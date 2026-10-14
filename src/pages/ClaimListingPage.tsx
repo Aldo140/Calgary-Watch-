@@ -109,6 +109,7 @@ export default function ClaimListingPage() {
                     <ArrowUpRight size={20} aria-hidden="true" />
                   </Link>
                 ) : null}
+                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>Your account is a business account.</strong> It manages this listing; you’ll see it on your <Link to="/plans">dashboard</Link>.</span></p>
                 <Manage claim={claim} />
               </>
             ) : claim?.status === 'pending' ? (
@@ -164,7 +165,7 @@ export default function ClaimListingPage() {
                   <button type="submit" className="pl-btn" data-ready={!claimProblem(draft)} disabled={busy || !isFirebaseConfigured}>
                     {busy ? 'Sending…' : user ? 'Claim this listing' : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
-                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Registering is a Google sign-in. What you typed is kept through it.'}</p>
+                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Claiming needs a CalgaryWatch account: a Google sign-in, and what you typed is kept through it. Once we confirm you, it becomes a business account.'}</p>
                 </div>
               </motion.form>
             )}

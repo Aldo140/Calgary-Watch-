@@ -11,6 +11,7 @@ import { resolveDoubleBookings, autoApprove, publishDue, redraftAndBriefs } from
 import { sendApproved, syncReplies } from './jobs/outreach';
 import { exitForQuota, isQuotaExhausted } from '../lib/quota';
 import { flushUsage } from './jobs/usage';
+import { publishFromBackup, reconcileBackup, saveBackup } from './jobs/publishBackup';
 
 const log = (m: string) => console.log(`[ops:hourly] ${m}`);
 if (!hasFirebase()) {
@@ -30,15 +31,20 @@ async function step(name: string, run: () => Promise<unknown>) {
   }
 }
 
+// Before anything publishes: posts the backup sent while the quota was out are marked published.
+await step('publish backup check', () => reconcileBackup(db, now, log));
 await step('queue drafts', () => queueDrafts(db, now, log));
 await step('auto-approve', () => autoApprove(db, now, log));
 await step('one post per slot', () => resolveDoubleBookings(db, now, log));
 await step('publish', () => publishDue(db, now, log));
+await step('publish backup', () => saveBackup(db, now, log));
 await step('redrafts and briefs', () => redraftAndBriefs(db, now, log));
 // The listings, so suggested replies only offer a claim for a real, unclaimed one.
 const index = await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8').then(t => JSON.parse(t) as DiscoveryIndex).catch(() => undefined);
 await step('replies', () => syncReplies(db, now, log, index));
 await step('send', () => sendApproved(db, now, log));
+// Firestore's free quota is gone for the day: publish what is due from the copy in HQ.
+if (quota) await publishFromBackup(now, log).catch(e => { failed = true; log(`publish backup failed: ${e instanceof Error ? e.message : e}`); });
 await flushUsage(db, now, 'hourly', log).catch(e => log(`usage not recorded: ${e instanceof Error ? e.message : e}`));
 if (failed) process.exitCode = 1;
 else if (quota) exitForQuota('Operations hourly');

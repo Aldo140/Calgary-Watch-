@@ -112,7 +112,7 @@ function publishSnapshot(entities, occurrences, now = new Date()) {
   const ids = new Set(visible.map(e => e.id));
   const paths = new Set();
   for (const e of visible) { const key = `${e.kind}/${e.slug}`; if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(e.slug) || paths.has(key)) throw Error('Invalid or conflicting published slug'); paths.add(key); }
-  const fields = ['id','kind','slug','title','summary','description','categories','tags','sources','image','status','verification','verifiedAt','fetchedAt','updatedAt','sourceId','sourceRecordId','neighbourhood','address','coordinates','venue','start','end','timezone','pricing','priceRange','tickets','organizer','cancelled','amenities','parking','transit','petFriendly','familyFriendly','vendorIds','images'];
+  const fields = ['id','kind','slug','title','summary','description','categories','tags','sources','image','status','verification','verifiedAt','fetchedAt','updatedAt','sourceId','sourceRecordId','neighbourhood','address','coordinates','venue','start','end','endTimeEstimated','timezone','pricing','priceRange','tickets','organizer','cancelled','amenities','parking','transit','petFriendly','familyFriendly','vendorIds','images'];
   const publicEntities = visible.map(e => Object.fromEntries(fields.filter(k=>e[k]!==undefined).map(k=>[k,e[k]])));
   return { version: 1, generatedAt: now.toISOString(), entities: publicEntities, occurrences: occurrences.filter(o => ids.has(o.marketId) && Date.parse(o.end) > Date.parse(o.start)).map(o=>Object.fromEntries(['id','marketId','sourceRecordId','start','end','timezone','cancelled','source'].filter(k=>o[k]!==undefined).map(k=>[k,o[k]]))) };
 }

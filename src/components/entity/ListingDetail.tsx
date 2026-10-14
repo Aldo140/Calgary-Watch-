@@ -5,7 +5,7 @@ import {
   Share2, ShieldCheck, Tag, Ticket, User,
 } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event } from '../../types/discovery';
-import { entityPath } from '../../lib/discovery';
+import { entityPath, startClock } from '../../lib/discovery';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { interestLabel, interestsFor, pickWhen, type EventInterestId } from '../../lib/eventPicks';
@@ -111,7 +111,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const today = dayKey.format(start) === dayKey.format(new Date(now));
   const sameDay = dayKey.format(start) === dayKey.format(end);
   const status = event.cancelled ? 'Cancelled by the organizer' : past ? 'This event has finished'
-    : on ? `On now · until ${time.format(end)}` : `${today ? 'Today' : dayLong.format(start)} · ${time.format(start)}`;
+    : on ? `On now · until ${time.format(end)}` : `${today ? 'Today' : dayLong.format(start)} · ${startClock(event.start, time)}`;
   const price = event.cancelled ? 'Cancelled' : event.pricing === 'free' ? 'Free' : event.priceRange ? `$${event.priceRange[0]}${event.priceRange[1] !== event.priceRange[0] ? `–$${event.priceRange[1]}` : ''}` : event.pricing === 'paid' ? 'Ticketed' : 'Check with the organizer';
   const cal = { id: event.id, title: event.title, start: event.start, end: event.end, location: [event.venue, event.address].filter(Boolean).join(', '), description: event.summary, url };
   const organizerSite = event.sources.find(s => s.kind === 'official')?.url ?? event.sources[0]?.url;
@@ -166,7 +166,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
       <div className="cw-wrap mk-page mk-dgrid">
         <div className="mk-dmain">
           <dl className="mk-facts">
-            <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{dayLong.format(start)}<span>{time.format(start)}{event.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${dayLong.format(end)}, `}${time.format(end)}`}</span></dd></div>
+            <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{dayLong.format(start)}<span>{startClock(event.start, time)}{event.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${dayLong.format(end)}, `}${time.format(end)}`}</span></dd></div>
             <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{event.venue || event.neighbourhood || 'See the organizer'}<span>{cleanAddress(event.address)}</span></dd></div>
             <div><dt><Tag size={16} aria-hidden="true" /> Price</dt><dd>{price}{event.pricing === 'unknown' ? <span>Not listed yet</span> : null}</dd></div>
             <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{organization ? <Link to={entityPath(organization)}>{event.organizer}</Link> : event.organizer}</dd></div>

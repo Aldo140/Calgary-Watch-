@@ -61,7 +61,7 @@ Notes for whoever writes next:
 - Only the rows above have real entities. Say "your listing" or "claim your listing" only with the entity's own claim URL. For Mercantile on 9th it is the event listing, not an organization listing.
 - The zoo's events (ZooBOO, Sunday Safari Brunch) use the zoo's own name, including copies from Tourism Calgary (`canonicalOrganizer` in `scripts/discovery/visitCalgary.ts`), and show on the zoo's page.
 - Ghost River's address (West Village Theatre, 2007 10 Avenue SW) came from a directory, not their own site. Confirm it if they claim.
-- Downstage's events need start times before they can be listed as events; their dates are in the listing description until then. Add From Scratch dates when they send them.
+- Downstage's season is on the events calendar from its season page (`downstage` in reviewed-sources.json): Dreaming Climate Consciousness on Oct 23 and 24, Creative Stretch from Oct 19 to May 31, and A Study of Choices from Apr 7 to 11, 2027. They're date-only ("All day") because Downstage hasn't published showtimes. Add the times, and any From Scratch dates, when Dylan sends them.
 - Dalhousie: the wide poster is the listing image (`public/images/markets/dalhousie-harvest-farmers-market.webp`). Market pages show one image, so the square version was not used. Both posters are for Saturday, October 24; replace the image when they send next season's.
 - Downstage and Ghost River were outreach prospects (`brand/partner-prospects.json`) before 2026-10-13, so their existing outreach leads have no entity ID.
 

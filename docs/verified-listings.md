@@ -28,6 +28,16 @@ Claiming needs a CalgaryWatch account: the claim page asks for a Google sign-in,
 - A business account is not a Featured partner. That label stays for paid placements.
 - The admin write needs the updated rules deployed (Deploy Firebase Backend, target `rules`). Until then, approving still works but shows that the account wasn't marked.
 
+## Approval email
+
+When a claim is approved, the claimant gets one email saying the listing is verified and what that gives them: the Verified mark, the business account and dashboard, the ranking weight (only while `VERIFICATION_PRIORITY_ENABLED`, with no placement promise), and how to send changes. The copy is in `src/lib/claimApprovalEmail.ts`; `scripts/claims/send-approval-emails.ts` sends it through Resend from the outreach sender, with replies going to the same mailbox.
+
+- It runs hourly in Apply Discovery Moderation (`discovery-actions.yml`), so the email arrives within about an hour of approval.
+- It goes to the account email, plus the work email when that is a different address.
+- Each claim is emailed once. The claim records `approvalEmailStatus` (sent, failed or skipped) and the time, and Claimed listings → verified listings shows it.
+- Claims approved before `APPROVAL_EMAILS_SINCE` (2026-10-14) never get one.
+- To check the copy, run Apply Discovery Moderation by hand with `claim_email_sample` set to an address. It sends one sample built from a real listing and nothing else runs.
+
 ## Which listings can be verified
 
 Any published event, market or business listing with a `/claim/{entityId}` page. Guides and neighbourhoods are CalgaryWatch's own and can't be claimed.

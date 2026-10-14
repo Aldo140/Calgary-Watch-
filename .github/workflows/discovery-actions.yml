@@ -3,11 +3,17 @@ name: Apply Discovery Moderation
 # Applies admin event/market decisions queued in discovery_actions when the
 # manageDiscovery Cloud Function isn't deployed (scripts/discovery/actions.ts),
 # then republishes the site only if something changed. Cheap when idle: one
-# query for pending actions.
+# query for pending actions. Also sends the queued vendor emails and the
+# approval email for each newly approved listing claim.
 on:
   schedule:
     - cron: '27 * * * *'
   workflow_dispatch:
+    inputs:
+      claim_email_sample:
+        description: 'Only send a sample claim approval email to this address (nothing else runs)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -28,8 +34,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Send a sample claim approval email
+        if: ${{ inputs.claim_email_sample }}
+        run: npx tsx scripts/claims/send-approval-emails.ts
+        env:
+          CLAIM_EMAIL_SAMPLE_TO: ${{ inputs.claim_email_sample }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
       - name: Apply queued moderation
         id: apply
+        if: ${{ !inputs.claim_email_sample }}
         run: npm run discovery:actions
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -37,6 +51,7 @@ jobs:
           VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
       # Vendor emails queued in Market HQ. Cheap when idle: one query.
       - name: Send queued vendor messages
+        if: ${{ !inputs.claim_email_sample }}
         run: npx tsx scripts/markets/send-vendor-messages.ts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -44,8 +59,17 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
           DIGEST_FROM: ${{ vars.DIGEST_FROM }}
+      # One email per newly approved listing claim (src/lib/claimApprovalEmail.ts).
+      - name: Send claim approval emails
+        if: ${{ !inputs.claim_email_sample }}
+        run: npx tsx scripts/claims/send-approval-emails.ts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_MAILING_ADDRESS: ${{ vars.DIGEST_MAILING_ADDRESS }}
       - name: Republish the site
-        if: steps.apply.outputs.applied != '' && steps.apply.outputs.applied != '0'
+        if: ${{ !inputs.claim_email_sample && steps.apply.outputs.applied != '' && steps.apply.outputs.applied != '0' }}
         run: gh workflow run deploy-firebase.yml --ref main
         env:
           GH_TOKEN: ${{ github.token }}

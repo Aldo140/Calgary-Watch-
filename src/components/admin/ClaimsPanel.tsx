@@ -12,14 +12,26 @@ import { db } from '@/src/firebase';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { discoveryRepository } from '@/src/data/discovery';
 import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence, claimId, type ListingClaim, type ListingUpdate } from '@/src/lib/claims';
+import { APPROVAL_EMAILS_SINCE, type ApprovalEmailStatus } from '@/src/lib/claimApprovalEmail';
 import { businessAccountPatch, businessAccountsFromClaims, readBusinessAccount } from '@/src/lib/businessAccount';
 import type { PartnerLead } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Panel, T, TimeAgo, mono } from './ui';
 
+/** An approved claim, with what happened to its approval email (scripts/claims/send-approval-emails.ts). */
+type VerifiedClaim = ListingClaim & { reviewedBy?: string; approvalEmailStatus?: ApprovalEmailStatus; approvalEmailAt?: number; approvalEmailError?: string };
+
+function approvalEmailNote(c: VerifiedClaim): string {
+  const when = c.approvalEmailAt ? ` ${new Date(c.approvalEmailAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}` : '';
+  if (c.approvalEmailStatus === 'sent') return `Approval email sent${when}`;
+  if (c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped') return `Approval email not sent: ${c.approvalEmailError ?? 'unknown error'}`;
+  if (c.approvalEmailStatus === 'sending') return 'Approval email sending';
+  return (c.reviewedAt ?? 0) >= APPROVAL_EMAILS_SINCE ? 'Approval email goes out within the hour' : '';
+}
+
 export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const { user } = useAuth();
   const [claims, setClaims] = useState<ListingClaim[] | null>(null);
-  const [verified, setVerified] = useState<Array<ListingClaim & { reviewedBy?: string }> | null>(null);
+  const [verified, setVerified] = useState<Array<VerifiedClaim> | null>(null);
   const [updates, setUpdates] = useState<Array<ListingUpdate & { id: string }> | null>(null);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
@@ -34,7 +46,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       () => setUpdates([]));
     // Approved claims are what make a listing verified (badge and ranking weight, src/lib/verified.ts).
     const c = onSnapshot(query(collection(db, CLAIMS), where('status', '==', 'approved'), limit(300)),
-      (s) => setVerified(s.docs.map((d) => d.data() as ListingClaim & { reviewedBy?: string }).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0))),
+      (s) => setVerified(s.docs.map((d) => d.data() as VerifiedClaim).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0))),
       () => setVerified([]));
     return () => { a(); b(); c(); };
   }, []);
@@ -171,6 +183,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
+              {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
             </div>
           ))}
         </details>

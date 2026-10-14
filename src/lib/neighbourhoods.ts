@@ -2,6 +2,7 @@ import type { DiscoveryEntity, Guide, MarketOccurrence, Neighbourhood } from '..
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { filterInventory, upcomingOccurrences } from './discoveryCalendar';
 import { isCampusOnly } from './eventRank';
+import { byVerified } from './verified';
 
 /**
  * Ties a neighbourhood page to the rest of the site. Neighbourhood documents
@@ -135,7 +136,9 @@ export function linksFor(hood: Neighbourhood, all: readonly DiscoveryEntity[], o
       return { entity: e, ...c, when } as Linked;
     })
     .filter((x): x is Linked => !!x)
-    .sort((a, b) => RANK[a.closeness] - RANK[b.closeness] || (a.when && b.when ? Date.parse(a.when) - Date.parse(b.when) : (a.km ?? 9) - (b.km ?? 9)));
+    // Dated listings stay soonest first. Places have no date: a verified place
+    // leads others equally close (verified.ts).
+    .sort((a, b) => RANK[a.closeness] - RANK[b.closeness] || (a.when && b.when ? Date.parse(a.when) - Date.parse(b.when) : byVerified(a.entity, b.entity, now.getTime()) || (a.km ?? 9) - (b.km ?? 9)));
   // The same series (a ghost tour every night, "(Sundays)", "(Fridays)") shows once, at its next date.
   const series = (l: Linked) => norm(l.entity.title).replace(/\s*\([^)]*\)\s*/g, ' ').trim();
   const once = linked('event').filter((l, i, list) => list.findIndex(o => series(o) === series(l)) === i);

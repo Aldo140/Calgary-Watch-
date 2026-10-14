@@ -18,6 +18,7 @@ import { AdminButton, Chip, EmptyState, Panel, T, TimeAgo, mono } from './ui';
 export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const { user } = useAuth();
   const [claims, setClaims] = useState<ListingClaim[] | null>(null);
+  const [verified, setVerified] = useState<Array<ListingClaim & { reviewedBy?: string }> | null>(null);
   const [updates, setUpdates] = useState<Array<ListingUpdate & { id: string }> | null>(null);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
@@ -30,7 +31,11 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     const b = onSnapshot(query(collection(db, UPDATES), where('status', '==', 'pending'), limit(100)),
       (s) => setUpdates(s.docs.map((d) => ({ ...(d.data() as ListingUpdate), id: d.id })).sort((x, y) => x.createdAt - y.createdAt)),
       () => setUpdates([]));
-    return () => { a(); b(); };
+    // Approved claims are what make a listing verified (badge and ranking weight, src/lib/verified.ts).
+    const c = onSnapshot(query(collection(db, CLAIMS), where('status', '==', 'approved'), limit(300)),
+      (s) => setVerified(s.docs.map((d) => d.data() as ListingClaim & { reviewedBy?: string }).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0))),
+      () => setVerified([]));
+    return () => { a(); b(); c(); };
   }, []);
 
   const entities = useMemo(() => new Map(discoveryRepository.list().map((e) => [e.id, e])), []);
@@ -45,9 +50,11 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       await updateDoc(doc(db, CLAIMS, claimId(c.uid, c.entityId)), { status: approve ? 'approved' : 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
         await setDoc(doc(db, VERIFIED, c.entityId), { entityId: c.entityId, title: c.entityTitle, verifiedAt: Date.now(), verifiedBy: by });
-        // The outreach pipeline learns the listing was claimed, so it stops pitching.
-        const lead = leads?.find((l) => l.entityId === c.entityId);
-        if (lead) await updateDoc(doc(db, 'partner_leads', lead.id), { status: 'claimed', updatedAt: Date.now() }).catch(() => undefined);
+        // The outreach pipeline learns the listing was claimed, so it stops pitching —
+        // every lead for it (a listing can have a business lead and an organizer lead).
+        for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
+          await updateDoc(doc(db, 'partner_leads', lead.id), { status: 'claimed', updatedAt: Date.now() }).catch(() => undefined);
+        }
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Save failed');
@@ -120,6 +127,21 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
           <p className="text-xs" style={{ color: T.muted }}>Make the edit in Events &amp; markets, then mark it applied. The organizer sees the status on their claim page.</p>
         </article>
       ))}
+      {verified?.length ? (
+        <details className="border-t" style={{ borderColor: T.line }}>
+          <summary className="p-4 text-sm font-semibold cursor-pointer" style={{ color: T.ink }}>
+            <BadgeCheck size={14} className="inline -mt-0.5 mr-1" aria-hidden="true" />{verified.length} verified listing{verified.length === 1 ? '' : 's'}
+            <span className="font-normal" style={{ color: T.muted }}> · each has an approved claim, so it shows “Verified” and gets its ranking weight</span>
+          </summary>
+          {verified.map((c) => (
+            <div key={c.entityId + c.uid} className="px-4 pb-3 text-xs flex flex-wrap gap-x-3 gap-y-1" style={{ color: T.muted }}>
+              <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
+              <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
+              <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
+            </div>
+          ))}
+        </details>
+      ) : null}
     </Panel>
   );
 }

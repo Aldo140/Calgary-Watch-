@@ -77,7 +77,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
           <div className="mk-dhero-copy">
             <p className={`mk-status${open ? ' is-open' : ''}`}>{open ? <span className="cw-lb-pulse mk-pulse" aria-hidden="true" /> : <Clock size={15} aria-hidden="true" />}{next ? (open ? statusLine(next, now) : `Next: ${statusLine(next, now)}`) : 'No upcoming dates confirmed'}</p>
             <h1 id="mk-d-title">{market.title}</h1>
-            <VerifiedMark entityId={market.id} />
+            <VerifiedMark entityId={market.id} verifiedAt={market.ownerVerifiedAt} />
             <p className="mk-dlead">{market.summary}</p>
             <p className="mk-dwhere"><MapPin size={16} aria-hidden="true" />{market.venue && !market.title.includes(market.venue) ? `${market.venue}, ` : ''}{market.neighbourhood}{q ? ` ${q}` : ''}{kind ? <span className="mk-tag is-light">{kind}</span> : null}</p>
             <div className="mk-dactions">
@@ -183,7 +183,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
 
         <div className="mk-dfoot">
           <SourceBadge entity={market} />
-          <ClaimCta entityId={market.id} title={market.title} kind="market" />
+          <ClaimCta entityId={market.id} title={market.title} kind="market" verifiedAt={market.ownerVerifiedAt} />
         </div>
       </div>
 

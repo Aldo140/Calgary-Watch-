@@ -65,16 +65,21 @@ export async function readMyUpdates(uid: string, entityId: string): Promise<Arra
 
 const verifiedCache = new Map<string, boolean>();
 
-/** "Managed by the organizer": one public read per listing, remembered for the visit. */
-export function useVerifiedListing(entityId: string): boolean {
-  const [on, setOn] = useState(() => verifiedCache.get(entityId) ?? false);
+/**
+ * The "Verified" mark: one public read per listing, remembered for the visit.
+ * `built` is the build's stamp from approved claims (src/lib/verified.ts); when
+ * it is already set there is nothing to read.
+ */
+export function useVerifiedListing(entityId: string, built = false): boolean {
+  const [on, setOn] = useState(() => built || (verifiedCache.get(entityId) ?? false));
   useEffect(() => {
+    if (built) { setOn(true); return; }
     if (!db || verifiedCache.has(entityId)) { setOn(verifiedCache.get(entityId) ?? false); return; }
     let live = true;
     getDoc(doc(db, VERIFIED, entityId))
       .then((s) => { verifiedCache.set(entityId, s.exists()); if (live) setOn(s.exists()); })
       .catch(() => verifiedCache.set(entityId, false));
     return () => { live = false; };
-  }, [entityId]);
+  }, [entityId, built]);
   return on;
 }

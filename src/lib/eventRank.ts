@@ -1,5 +1,6 @@
 import type { DiscoveryEntity } from '../types/discovery';
 import { calgaryDateTimeFormat } from './calgaryTz';
+import { verifiedBoost } from './verified';
 
 /**
  * How likely a listing is to be something Calgarians actually go out for. The day
@@ -31,7 +32,7 @@ const ROOM_CODE = /\b(room|rm\.?)\s*\w+|\b[A-Z]{2,4}\s?\d{3}\b/;
 const CAMPUS_ONLY = /\bunwind\b|wellness|student|staff|faculty|alumni|orientation|convocation|commitments|info(rmation)? session|professional development|conversation table|research (symposium|day|showcase)|thesis|defen[cs]e|speaker series|elders on campus/i;
 const CAMPUS_SOURCES = new Set(['ucalgary-arts', 'mru-public']);
 
-type Rankable = Pick<DiscoveryEntity, 'kind' | 'title' | 'categories' | 'tags' | 'image' | 'sourceId' | 'verification' | 'scores'> & { venue?: string; neighbourhood?: string; pricing?: string };
+type Rankable = Pick<DiscoveryEntity, 'kind' | 'title' | 'categories' | 'tags' | 'image' | 'sourceId' | 'verification' | 'scores'> & Partial<Pick<DiscoveryEntity, 'status' | 'ownerVerifiedAt'>> & { venue?: string; neighbourhood?: string; pricing?: string; cancelled?: boolean; end?: string };
 
 const text = (e: Rankable) => `${e.title} ${[...e.categories, ...e.tags].join(' ')}`;
 const hour = (iso: string) => Number(calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: '2-digit', hourCycle: 'h23' }).format(new Date(iso)));
@@ -43,7 +44,7 @@ export function isCampusOnly(e: Rankable): boolean {
 }
 
 /** Higher is more worth going to. `start` is when this occurrence begins. */
-export function interestScore(e: Rankable, start?: string): number {
+export function interestScore(e: Rankable, start?: string, now = Date.now()): number {
   const t = text(e);
   const venue = `${e.venue ?? ''} ${e.neighbourhood ?? ''}`;
   let s = 0;
@@ -54,6 +55,7 @@ export function interestScore(e: Rankable, start?: string): number {
   if (e.sourceId === 'ticketmaster-calgary') s += 2;
   else if (e.sourceId === 'visit-calgary') s += 1;
   if (e.verification === 'source-checked') s += 2; // hand-reviewed by an editor
+  s += verifiedBoost(e, 'interest', now); // claimed and confirmed by the organization (verified.ts)
   if (e.image) s += 1;
   if (e.kind === 'market') s += /farmers'? market|crossroads|christmas|holiday|winter market/i.test(e.title) ? 3 : 2;
   s += Math.min(5, (e.scores?.featured ?? 0) + (e.scores?.editorial ?? 0));

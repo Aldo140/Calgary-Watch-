@@ -12,6 +12,17 @@ import { calgaryOffset, type InventoryProvider, type SourceConfig, type SourceRe
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { cleanText } from '../../src/lib/cleanText.js';
 
+
+/**
+ * Organizations that asked us to use their own name. Tourism Calgary lists the zoo as
+ * "Wilder institute/Calgary Zoo" or just "Wilder Institute"; the zoo's media team asked
+ * for "Wilder Institute’s Calgary Zoo" (or "the zoo").
+ */
+export function canonicalOrganizer(name: string): string {
+  if (/^\s*(the\s+)?(wilder\s+institute(['’]s)?([\s,/&-]*(the\s+)?calgary\s+zoo)?|calgary\s+zoo)\s*$/i.test(name)) return 'Wilder Institute’s Calgary Zoo';
+  return name;
+}
+
 export interface VisitCalgaryHit {
   slug: string; permalink: string; searchable_taxonomies?: string;
   data: {
@@ -88,8 +99,8 @@ export function mapVisitCalgaryEvents(hits: VisitCalgaryHit[], places: Map<strin
     const price = clean(d.price);
     const nums = (price.match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
     const pricing = truthy(d.is_free) ? 'free' : nums.length ? 'paid' : 'unknown';
-    const organizer = (clean(d.organizer_name) || place.venue || clean(d.location) || 'Tourism Calgary').slice(0, 480);
-    const venue = (place.venue || clean(d.location)).slice(0, 280);
+    const organizer = canonicalOrganizer(clean(d.organizer_name) || place.venue || clean(d.location) || 'Tourism Calgary').slice(0, 480);
+    const venue = canonicalOrganizer(place.venue || clean(d.location)).slice(0, 280);
     const address = [place.street, place.locality, 'AB'].filter(Boolean).join(', ').slice(0, 480);
     for (const [from, to] of runs) {
       const start = local(from, startTime ?? '00:00');

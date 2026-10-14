@@ -1,4 +1,4 @@
-import type { InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
+import type { EntityImage, InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { cleanText } from '../../src/lib/cleanText.js';
 export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe' | 'visitcalgary' | 'squarespace'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
@@ -181,6 +181,8 @@ export interface RecurringMarketDefinition {
   seasonStart?: string; seasonEnd?: string;
   /** How many upcoming dates to publish as occurrences. Defaults to 8. */
   occurrenceCount?: number;
+  /** A photo the organizer supplied for the listing (https, with alt text and credit). */
+  image?: EntityImage;
 }
 
 const WEEKDAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -232,6 +234,7 @@ export class RecurringMarketProvider implements InventoryProvider {
         ...(market.transit ? { transit: market.transit } : {}),
         ...(market.petFriendly !== undefined ? { petFriendly: market.petFriendly } : {}),
         ...(market.familyFriendly !== undefined ? { familyFriendly: market.familyFriendly } : {}),
+        ...(market.image ? { image: market.image } : {}),
       };
       return { id: market.id, input: input as InventorySubmissionInput };
     }).filter(record => (record.input as MarketSubmissionInput).occurrences.length > 0);

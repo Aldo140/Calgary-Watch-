@@ -975,7 +975,7 @@
   {
     "source": {
       "id": "calgary-zoo",
-      "name": "Wilder Institute/Calgary Zoo",
+      "name": "Wilder Institute’s Calgary Zoo",
       "approved": true,
       "hosts": [
         "www.calgaryzoo.com",
@@ -998,13 +998,13 @@
             "holiday",
             "outdoor"
           ],
-          "organizer": "Wilder Institute/Calgary Zoo",
+          "organizer": "Wilder Institute’s Calgary Zoo",
           "pricing": "paid",
           "title": "ZooBOO at the Calgary Zoo",
           "summary": "The zoo's Halloween weekend: come in costume for treats and trick-or-treat stations around the paths.",
-          "description": "ZooBOO is the Wilder Institute/Calgary Zoo's Halloween celebration, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
+          "description": "ZooBOO is the Halloween celebration at Wilder Institute’s Calgary Zoo, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
           "address": "210 St. George's Drive NE, Calgary, AB",
-          "venue": "Wilder Institute/Calgary Zoo",
+          "venue": "Wilder Institute’s Calgary Zoo",
           "neighbourhood": "Bridgeland",
           "sourceUrl": "https://www.calgaryzoo.com/",
           "start": "2026-10-31T09:00:00-06:00",
@@ -1025,13 +1025,13 @@
             "holiday",
             "outdoor"
           ],
-          "organizer": "Wilder Institute/Calgary Zoo",
+          "organizer": "Wilder Institute’s Calgary Zoo",
           "pricing": "paid",
           "title": "ZooBOO at the Calgary Zoo",
           "summary": "The zoo's Halloween weekend: come in costume for treats and trick-or-treat stations around the paths.",
-          "description": "ZooBOO is the Wilder Institute/Calgary Zoo's Halloween celebration, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
+          "description": "ZooBOO is the Halloween celebration at Wilder Institute’s Calgary Zoo, open 9 am to 5:30 pm. Costumes are encouraged. Included with zoo admission; check the zoo's site for current tickets and hours.",
           "address": "210 St. George's Drive NE, Calgary, AB",
-          "venue": "Wilder Institute/Calgary Zoo",
+          "venue": "Wilder Institute’s Calgary Zoo",
           "neighbourhood": "Bridgeland",
           "sourceUrl": "https://www.calgaryzoo.com/",
           "start": "2026-11-01T09:00:00-06:00",

@@ -40,15 +40,40 @@ aldo@calgarywatch.ca
 https://calgarywatch.ca
 
 
+## Email-derived listing status
+
+What each organization that replied asked for, and whether the site now matches what we told them. Keep this to operational facts; the emails themselves stay in the inbox. Updated 2026-10-13.
+
+Statuses: **READY TO REPLY** (the site is done; a claim link can go out), **WAITING ON SITE WORK** (merged but not yet deployed, or still to build), **WAITING ON ASSET**, **ALREADY COMPLETE**, **NO REPLY NEEDED**.
+
+| Organization | Contact | They asked for | Source of truth | Entity ID | Public URL | Claim URL | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Vertigo Theatre | Kendra Hutchinson, publicist (kendra.hutchinson@vertigotheatre.com) | A direct line to update listings; happy to fill a form and add production photos | https://purchase.vertigotheatre.com/Events?attribute_EventType=2627Season | `biz-vertigo-theatre` | https://calgarywatch.ca/local/vertigo-theatre | https://calgarywatch.ca/claim/biz-vertigo-theatre | READY TO REPLY |
+| Wilder Institute’s Calgary Zoo | Media Relations (mediarelations@calgaryzoo.com) | Use the official site and socials as the source; call it "Wilder Institute’s Calgary Zoo" or "the zoo" | https://www.calgaryzoo.com/ | `biz-wilder-institutes-calgary-zoo` | https://calgarywatch.ca/local/wilder-institutes-calgary-zoo | https://calgarywatch.ca/claim/biz-wilder-institutes-calgary-zoo | WAITING ON SITE WORK until the listing deploys, then READY TO REPLY |
+| Calgary Chinese Cultural Centre | Nicole (info@culturalcentre.ca) | Use the official website for current information | https://www.culturalcentre.ca/ | `biz-calgary-chinese-cultural-centre` | https://calgarywatch.ca/local/calgary-chinese-cultural-centre | https://calgarywatch.ca/claim/biz-calgary-chinese-cultural-centre | READY TO REPLY |
+| Downstage | Dylan Bauer; Clare Preuss, Artistic Director | Creative Stretch most Mondays; Dreaming Climate Consciousness Oct 23–24; From Scratch dates to follow; four images possibly, pending their sign-off | https://downstage.ca/currentseason/ | `biz-downstage` | https://calgarywatch.ca/local/downstage | https://calgarywatch.ca/claim/biz-downstage | WAITING ON SITE WORK until the listing deploys, then READY TO REPLY. Images: WAITING ON ASSET (not approved yet; listing uses neutral art) |
+| Ghost River Theatre | Sharon Kahanoff, Executive Director (ed@ghostrivertheatre.com) | No fixed season; the main page is kept most current, 2026/27 Experiences is secondary | https://www.ghostrivertheatre.com/#grt | `biz-ghost-river-theatre` | https://calgarywatch.ca/local/ghost-river-theatre | https://calgarywatch.ca/claim/biz-ghost-river-theatre | NO REPLY NEEDED (thread closed with "Thanks Aldo!"). Listing exists for when we next write |
+| Dalhousie Harvest Farmers’ Market | Sonja Devauld, Marketing and Communications Manager, Dalhousie Community Association (marcom@dalhousiecalgary.ca) | Confirmed the listing is correct; sent two images for the Harvest Market | https://www.dalhousiecalgary.ca/farmersmarket-harvest/ | `b3bbb09ef98f18fa6f66383e98f1` | https://calgarywatch.ca/markets/dalhousie-harvest-farmers-market-b3bbb0 | https://calgarywatch.ca/claim/b3bbb09ef98f18fa6f66383e98f1 | WAITING ON SITE WORK until the image deploys, then READY TO REPLY |
+| Mercantile on 9th (event) | Jill Hawker, organizer (jill@allthingsjill.ca); intro from Karen Bray, Inglewood BIA | Event listing | https://www.inglewoodyyc.ca/ | `6972906c904ecd4acb9407299e22` (event) | https://calgarywatch.ca/events/mercantile-on-9th-697290 | https://calgarywatch.ca/claim/6972906c904ecd4acb9407299e22 | READY TO REPLY, as an **event** listing. Our last email bounced (Outlook delivery), not a site issue |
+
+Notes for whoever writes next:
+
+- Only the rows above have real entities. Say "your listing" or "claim your listing" only with the entity's own claim URL. For Mercantile on 9th it is the event listing, not an organization listing.
+- The zoo's events (ZooBOO, Sunday Safari Brunch) use the zoo's own name, including copies from Tourism Calgary (`canonicalOrganizer` in `scripts/discovery/visitCalgary.ts`), and show on the zoo's page.
+- Ghost River's address (West Village Theatre, 2007 10 Avenue SW) came from a directory, not their own site. Confirm it if they claim.
+- Downstage's events need start times before they can be listed as events; their dates are in the listing description until then. Add From Scratch dates when they send them.
+- Dalhousie: the wide poster is the listing image (`public/images/markets/dalhousie-harvest-farmers-market.webp`). Market pages show one image, so the square version was not used. Both posters are for Saturday, October 24; replace the image when they send next season's.
+- Downstage and Ghost River were outreach prospects (`brand/partner-prospects.json`) before 2026-10-13, so their existing outreach leads have no entity ID.
+
 ## Claimed listings
 
 Partner replies kept asking for the same things, so organizers now get a self-serve route:
 
 | Reply (Oct 2026) | What they asked for | Where it lands now |
 | --- | --- | --- |
-| Vertigo Theatre | "a direct line to update our listings", happy to "fill out a form and add production photos" | The 2026–27 season (6 productions) was added from vertigotheatre.com/2026-27; they can claim the listings and send dates and photos from the claim page |
+| Vertigo Theatre | "a direct line to update our listings", happy to "fill out a form and add production photos" | Organization listing `biz-vertigo-theatre` (/local/vertigo-theatre) shows its six 2026–27 productions; claiming it gives them the direct line, and photos come by email |
 | Alberta Ballet | Venue is the Jubilee Auditorium, not "in Banff Trail" | Fixed: shows the Southern Alberta Jubilee Auditorium, with no neighbourhood (times also corrected to UTC−6) |
-| Dalhousie Community Association | Replace our image | Photo change from the claim page |
+| Dalhousie Community Association | Replace our image | Done 2026-10-13 with the poster Sonja supplied; markets now show an organizer photo when one is supplied |
 | Calgary Farmers' Market | Link to the homepage; we also have a West location | Link change and an extra location |
 | Farmers & Makers Market | STOP | Suppressed automatically; never contacted again |
 

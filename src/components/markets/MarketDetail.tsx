@@ -9,7 +9,7 @@ import {
   communityFor, dayNum, directionsUrl, eventsSameDay, guideTake, hours, isOpen, monthShort, neighbourhoodFor, nextOpen,
   quadrantOf, relativeDay, schedulePattern, season, shortName, statusLine, upcoming, weekdayLong, weekdayShort,
 } from '../../lib/marketDays';
-import { MarketArt } from '../discovery/ListingArt';
+import { MarketCover } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
 import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
 import { SourceBadge } from '../entity/EntityDetail';
@@ -86,7 +86,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
               <button type="button" className="mk-btn" onClick={() => void share()}>{shared ? <Check size={17} aria-hidden="true" /> : <Share2 size={17} aria-hidden="true" />} {shared ? 'Link copied' : 'Share'}</button>
             </div>
           </div>
-          <figure className="mk-dart"><MarketArt id={market.id} title={market.title} day={next ? weekdayShort.format(new Date(next.start)) : undefined} /></figure>
+          <figure className="mk-dart"><MarketCover market={market} eager day={next ? weekdayShort.format(new Date(next.start)) : undefined} /></figure>
         </div>
         <svg className="h-tear" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <path d={TEAR} transform="translate(0 -5)" className="h-tear-shade" />
@@ -127,6 +127,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
             <p>{market.description}</p>
             {market.amenities.length ? <p className="mk-amenities">{market.amenities.map(a => <span key={a} className="mk-tag">{cap(a)}</span>)}</p> : null}
             {organizerSite ? <a className="mk-organizer" href={organizerSite} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" /> {market.organizer}’s site</a> : null}
+            {market.image?.credit ? <p className="mk-muted mk-photo-credit">Top image supplied by the organizer. {market.image.credit}</p> : null}
           </section>
 
           {take ? (

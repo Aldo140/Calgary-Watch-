@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { plansView } from '../lib/plansView';
 import { Shield } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -17,7 +18,7 @@ import { emailPlan, nearHome, setupSteps, type SetupStepId } from '../lib/member
 import { useLivePulse } from '../hooks/useLivePulse';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
 import { buildEventPicks, buildPlanTimeline, normalizeInterests, neighbourhoodPoint, interestsFor, type EventInterestId } from '../lib/eventPicks';
-import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
+import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfileState, type PlansDraft, type PlansProfile } from '../lib/plans';
 import { resolveHomeLocation, useHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
 import '../styles/plans.css';
@@ -109,7 +110,8 @@ export default function PlansPage() {
   const asUid = auth0.isAdmin ? (params.get('as') || '').trim() || null : null;
   const { signIn, logout, isAuthReady, isFirebaseConfigured } = auth0;
   const subjectUid = demo ? undefined : asUid ?? auth0.user?.uid;
-  const liveProfile = usePlansProfile(subjectUid);
+  const profileState = usePlansProfileState(subjectUid);
+  const liveProfile = profileState.profile;
   const profile = demo?.profile ?? liveProfile;
   const viewed = useMemo(() => (asUid && liveProfile
     ? ({ uid: asUid, displayName: liveProfile.displayName ?? '', email: liveProfile.email ?? '', photoURL: liveProfile.photoURL ?? '' } as unknown as User)
@@ -172,6 +174,7 @@ export default function PlansPage() {
   useEffect(() => {
     if (!user || !profile || hydratedFor.current === user.uid) return;
     hydratedFor.current = user.uid;
+    if (asUid) { setDraft(draftFrom(profile, pending)); return; }
     setDraft((local) => {
       const stored = draftFrom(profile, pending);
       const fresh = !profile.piiConsentAt && !profile.eventInterests.length;
@@ -203,8 +206,9 @@ export default function PlansPage() {
   // Set up = has a home area on file (the one thing every email needs).
   const hasPlans = Boolean(profile && (profile.piiConsentAt || profile.eventInterests.length));
   // Members change settings in a sheet over the dashboard; the 3-step card is for signing up.
-  const showForm = !user || !profile || !hasPlans;
-  const dashboard = Boolean(user && profile && hasPlans);
+  const view = plansView(Boolean(user), profile, Boolean(asUid));
+  const showForm = view === 'setup';
+  const dashboard = view === 'dashboard';
   const area = profile ? homeAreaOf(profile) : '';
   const entities = discoveryRepository.list();
   const occurrences = discoveryRepository.occurrences();
@@ -301,6 +305,7 @@ export default function PlansPage() {
     if (id === 'home') return openEditor('home');
     if (id === 'interests') return openEditor('interests');
     if (id === 'plan') { document.getElementById('pd-picks')?.scrollIntoView({ behavior: 'smooth' }); return; }
+    if (asUid) return;
     if (id === 'share') { navigate('/submit'); return; }
     setBusy(id);
     try { await addEmail(id === 'monday' ? 'monday' : 'thursday'); } finally { setBusy(null); }
@@ -344,6 +349,15 @@ export default function PlansPage() {
     ? communities.filter((c) => c.toLowerCase().includes(q)).sort((a, b) => Number(!a.toLowerCase().startsWith(q)) - Number(!b.toLowerCase().startsWith(q))).slice(0, 6)
     : [];
   const first = (user?.displayName || '').split(' ')[0];
+
+  if (view === 'loading') return (
+    <SiteLayout><div className="cw-wrap" role="status" aria-live="polite">
+      {profileState.status === 'error' ? <p role="alert">Could not load this member’s dashboard: {profileState.error}</p>
+        : profileState.status === 'missing' ? <p>This member’s profile could not be found.</p>
+        : <p>Loading this member’s dashboard…</p>}
+      <Link to="/admin?section=members">Back to Members &amp; plans</Link>
+    </div></SiteLayout>
+  );
 
   if (dashboard && !showForm && user) {
     const images = new Map(entities.map((e) => [e.id, e.image?.src]));

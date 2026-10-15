@@ -31,19 +31,27 @@ export function rsvpId(uid: string, eventId: string): string {
   return `${uid}_${eventId}`;
 }
 
-const profiles = new Map<string, ReturnType<typeof createSharedLiveValue<PlansProfile | null>>>();
-const noProfile = createSharedLiveValue<PlansProfile | null>(null, () => () => {});
-/** Header, dashboard and nudges share one live private profile per authenticated UID. */
-export function usePlansProfile(uid: string | undefined): PlansProfile | null {
+export type PlansProfileState = { profile: PlansProfile | null; status: 'loading' | 'ready' | 'missing' | 'error'; error?: string };
+const initialProfile: PlansProfileState = { profile: null, status: 'loading' };
+const profiles = new Map<string, ReturnType<typeof createSharedLiveValue<PlansProfileState>>>();
+const noProfile = createSharedLiveValue<PlansProfileState>(initialProfile, () => () => {});
+/** Shared state exposes read failures without presenting them as incomplete signup. */
+export function usePlansProfileState(uid: string | undefined): PlansProfileState {
   let stream = uid ? profiles.get(uid) : noProfile;
   if (!stream) {
     const id = uid!;
-    stream = createSharedLiveValue<PlansProfile | null>(null, publish => db
-      ? trackSubscription(`member:profile:${id}`, () => onSnapshot(doc(db!, 'users', id), snap => publish(readPlansProfile(snap.data())), () => publish(null)))
-      : () => {});
+    stream = createSharedLiveValue<PlansProfileState>(initialProfile, publish => db
+      ? trackSubscription(`member:profile:${id}`, () => onSnapshot(doc(db!, 'users', id),
+        snap => publish(snap.exists() ? { profile: readPlansProfile(snap.data()), status: 'ready' } : { profile: null, status: 'missing' }),
+        error => publish({ profile: null, status: 'error', error: error.message })))
+      : () => { publish({ profile: null, status: 'error', error: 'Sign-in is not configured for this build.' }); });
     profiles.set(id, stream);
   }
-  return useSyncExternalStore(stream.subscribe, stream.getSnapshot, () => null);
+  return useSyncExternalStore(stream.subscribe, stream.getSnapshot, () => initialProfile);
+}
+/** Header, dashboard and nudges share the same private profile subscription. */
+export function usePlansProfile(uid: string | undefined): PlansProfile | null {
+  return usePlansProfileState(uid).profile;
 }
 
 export interface PlansDraft {

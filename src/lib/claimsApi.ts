@@ -1,3 +1,4 @@
+import { createSharedLiveValue, trackSubscription } from './readEfficiency';
 import { listingUpdateRequest } from './listingUpdates';
 import { approvedPublicMark } from './claimApproval';
 import { discoveryRepository } from '../data/discovery';
@@ -8,18 +9,23 @@ import type { User } from 'firebase/auth';
 import { db } from '../firebase';
 import { CLAIMS, UPDATES, VERIFIED, claimId, type ClaimDraft, type ListingClaim, type UpdateField } from './claims';
 
-/** The signed-in reader's claims, live. `null` while loading. */
+const claimStreams = new Map<string, ReturnType<typeof createSharedLiveValue<ListingClaim[] | null>>>();
+function claimStream(uid: string) {
+  let stream = claimStreams.get(uid);
+  if (!stream) {
+    stream = createSharedLiveValue<ListingClaim[] | null>(null, publish => db
+      ? trackSubscription(`member:claims:${uid}`, () => onSnapshot(query(collection(db!, CLAIMS), where('uid','==',uid), limit(50)),
+        snap => publish(snap.docs.map(d => d.data() as ListingClaim).sort((a,b) => b.createdAt-a.createdAt)), () => publish(null)))
+      : () => {});
+    claimStreams.set(uid, stream);
+  }
+  return stream;
+}
+const noClaims = createSharedLiveValue<ListingClaim[] | null>(null, () => () => {});
+/** Nav, dashboard and claim page share one query for this authenticated UID. */
 export function useMyClaims(uid: string | undefined): ListingClaim[] | null {
-  const [claims, setClaims] = useState<ListingClaim[] | null>(null);
-  useEffect(() => {
-    if (!uid || !db) { setClaims(uid ? [] : null); return; }
-    return onSnapshot(
-      query(collection(db, CLAIMS), where('uid', '==', uid), limit(50)),
-      (s) => setClaims(s.docs.map((d) => d.data() as ListingClaim).sort((a, b) => b.createdAt - a.createdAt)),
-      () => setClaims([]),
-    );
-  }, [uid]);
-  return claims;
+  const stream = uid ? claimStream(uid) : noClaims;
+  return useSyncExternalStore(stream.subscribe, stream.getSnapshot, () => null);
 }
 
 export async function submitClaim(user: User, entity: { id: string; title: string; path: string }, draft: ClaimDraft): Promise<void> {
@@ -41,7 +47,7 @@ export async function submitClaim(user: User, entity: { id: string; title: strin
     status: 'pending',
     createdAt: Date.now(),
   };
-  await setDoc(doc(db, CLAIMS, claimId(user.uid, entity.id)), claim);
+  await setDoc(doc(db!, CLAIMS, claimId(user.uid, entity.id)), claim);
 }
 
 export async function submitUpdate(user: User, claim: Pick<ListingClaim, 'entityId' | 'entityTitle'>, field: UpdateField, details: string, url: string): Promise<void> {
@@ -75,11 +81,11 @@ export function useVerifiedListing(entityId: string, built = false): boolean {
   const subscribe = useCallback((notify: () => void) => {
     state.listeners.add(notify);
     if (db && !state.stop) {
-      state.stop = onSnapshot(doc(db, VERIFIED, entityId), snap => {
+      state.stop = trackSubscription(`listing:verification:${entityId}`, () => onSnapshot(doc(db!, VERIFIED, entityId), snap => {
         // Legacy marks have no claim reference. Only an approved-claim build stamp can vouch for those.
         state.value = snap.exists() ? (approvedPublicMark(entityId, snap.data()) || (built && !snap.data().claimId)) : built;
         state.listeners.forEach(fn => fn());
-      }, error => { state.value = error.code === 'permission-denied' ? false : built; state.listeners.forEach(fn => fn()); });
+      }, error => { state.value = error.code === 'permission-denied' ? false : built; state.listeners.forEach(fn => fn()); }));
     }
     return () => { state.listeners.delete(notify); if (!state.listeners.size) { state.stop?.(); state.stop = undefined; } };
   }, [state, entityId, built]);

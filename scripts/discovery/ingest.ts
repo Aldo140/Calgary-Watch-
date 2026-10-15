@@ -1,3 +1,4 @@
+import { isQuotaExhausted } from '../lib/quota';
 import { readFile } from 'node:fs/promises';
 import { inventoryDatabase } from './firebase';
 import { JsonFeedProvider, EditorialFileProvider, TicketmasterProvider, RecurringMarketProvider, IcsFeedProvider, TribeEventsProvider, type InventoryProvider, type SourceConfig, type SourceRecord } from './providers';
@@ -33,7 +34,7 @@ function providerFor(batch: { source: SourceConfig; records?: SourceRecord[] }):
   }
 }
 
-let failed = 0;
+let failed = 0; let completed = 0;
 for (const batch of batches) {
   const name = batch.source.name;
   try {
@@ -52,7 +53,8 @@ for (const batch of batches) {
         return false;
       }
     });
-    if (!write) { console.log(`${name}: ${records.length} valid of ${fetched.length} (dry run)`); continue; }
+    if (!records.length) annotate('warning', name, 'No valid listings returned; check source availability and validation warnings.');
+    if (!write) { completed++; console.log(`${name}: ${records.length} valid of ${fetched.length} (dry run)`); continue; }
 
     const db = inventoryDatabase();
     await db.collection('discovery_sources').doc(provider.source.id).set(provider.source);
@@ -82,11 +84,16 @@ for (const batch of batches) {
       written++;
     }
     if (pending) await bulk.commit();
+    completed++;
     annotate('notice', name, `${records.length} listings: ${written} new or changed, ${refreshed} refreshed.`);
   } catch (error) {
+    if (isQuotaExhausted(error)) {
+      annotate('error', name, 'Firestore quota exhausted during ingest. Stopped remaining providers. Earlier committed records may remain; rerun after midnight Pacific or quota increase.');
+      process.exitCode = 1; break;
+    }
     failed++;
     annotate('error', name, error instanceof Error ? error.message : String(error));
   }
 }
 // Fail the job only when nothing worked, so one broken feed can't block the rebuild.
-if (failed && failed === batches.length) process.exit(1);
+if (failed && !completed) process.exitCode = 1;

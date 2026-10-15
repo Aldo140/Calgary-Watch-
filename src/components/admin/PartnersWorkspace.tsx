@@ -1,3 +1,4 @@
+import { firestoreActionError } from '@/src/lib/firestoreErrors';
 /**
  * Local partners: the outreach pipeline. Leads enter only through a real listing
  * on the site; the daily job researches the business's own published address and
@@ -54,7 +55,7 @@ function LeadCard({ lead }: { lead: PartnerLead }) {
     if (!db) return;
     setBusy(true); setError('');
     try { await updateDoc(doc(db, 'partner_leads', lead.id), { ...patch, reviewedByEmail: by, updatedAt: Date.now() }); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Save failed'); }
+    catch (e) { setError(firestoreActionError(e)); }
     finally { setBusy(false); }
   }
   async function doNotContact() {

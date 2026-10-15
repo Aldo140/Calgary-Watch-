@@ -1,3 +1,6 @@
+import { adminDataNeeds } from '@/src/lib/adminDataNeeds';
+import { firestoreActionError } from '@/src/lib/firestoreErrors';
+import { trackSubscription, adminReadCache } from '@/src/lib/readEfficiency';
 /**
  * Shared admin data layer.
  *
@@ -144,7 +147,8 @@ function coerceTimestamp(value: unknown): number {
   return 0;
 }
 
-export function useAdminData() {
+export function useAdminData(section = 'all') {
+  const needs = adminDataNeeds(section);
   const { user, isAuthReady, isAdmin } = useAuth();
 
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -245,7 +249,7 @@ export function useAdminData() {
       // Surfaced rather than swallowed: this used to fail silently, which made
       // a rules rejection look identical to a successful restore.
       console.error('Failed to restore incident:', err);
-      alert('Could not restore this incident. Check your admin permissions.');
+      alert(firestoreActionError(err));
     } finally {
       setRestoringId(null);
     }
@@ -299,7 +303,7 @@ export function useAdminData() {
       }
     } catch (err) {
       console.error('Failed to permanently delete incident:', err);
-      alert('Could not delete this incident. Check your admin permissions.');
+      alert(firestoreActionError(err));
     } finally {
       setDeletingId(null);
     }
@@ -308,77 +312,64 @@ export function useAdminData() {
   // ── Data subscriptions ────────────────────────────────────────────────────
 
   useEffect(() => {
+    if (!needs.incidents) { setLoadingData(false); return; }
     if (!isAuthReady || !user || !isAdmin || !db) return;
-
-    // Admin is the permanent record: the full archive (including legacy rows
-    // without a timestamp) is read once per tab and shared with /admin/incidents,
-    // with a live window on the newest reports. See src/lib/adminStore.ts.
-    const unsubIncidents = adminIncidents.subscribe(db, ({ rows, loading }) => {
+    return adminIncidents.subscribe(db, ({ rows, loading }) => {
       setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp));
-      if (!loading) setLoadingData(false);
+      setLoadingData(loading);
     });
+  }, [isAuthReady, isAdmin, user?.uid, needs.incidents]);
 
-    const unsubStats = onSnapshot(collection(db, 'community_stats'), (snapshot) => {
-      const rows = snapshot.docs
-        .map((row) => ({ id: row.id, ...row.data() } as CommunityStats & { id: string; deleted?: boolean }))
-        .filter((row) => incidentVisibility(row) !== 'deleted');
-      setCommunityStats(rows);
-    });
+  useEffect(() => {
+    if (!isAuthReady || !user || !isAdmin || !db || !needs.stats) return;
+    return trackSubscription('admin:community_stats', () => onSnapshot(collection(db!, 'community_stats'), snapshot => {
+      setCommunityStats(snapshot.docs.map(row => ({ id: row.id, ...row.data() } as CommunityStats & { id: string; deleted?: boolean })).filter(row => incidentVisibility(row) !== 'deleted'));
+    }));
+  }, [isAuthReady, isAdmin, user?.uid, needs.stats]);
 
-    // Newest 200 for lists and charts; the total comes from a server count below.
-    const unsubUsers = onSnapshot(query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(200)), (snapshot) => {
-      setUsers(snapshot.docs.map((row) => ({ ...row.data(), uid: row.id } as UserProfile)));
-      setUsersLoaded(true);
-    });
+  useEffect(() => {
+    if (!isAuthReady || !user || !isAdmin || !db || !needs.users) return;
+    return trackSubscription('admin:recent_users', () => onSnapshot(query(collection(db!, 'users'), orderBy('createdAt', 'desc'), limit(200)), snapshot => {
+      setUsers(snapshot.docs.map(row => ({ ...row.data(), uid: row.id } as UserProfile))); setUsersLoaded(true);
+    }));
+  }, [isAuthReady, isAdmin, user?.uid, needs.users]);
 
-    // The general directory is intentionally capped for interface performance;
-    // the delivery forecast cannot be. This narrower query reads every opted-in
-    // profile so its counts still match the sender after the directory grows.
-    const unsubDigestSubscribers = onSnapshot(
-      query(collection(db, 'users'), where('weeklyDigestOptIn', '==', true)),
-      (snapshot) => {
-        setDigestSubscribers(snapshot.docs.map((row) => ({ ...row.data(), uid: row.id } as UserProfile)));
-        setDigestSubscribersLoaded(true);
-        setDigestSubscribersError('');
-      },
-      (error) => {
-        console.error('Could not load digest subscribers:', error);
-        setDigestSubscribersLoaded(true);
-        setDigestSubscribersError('Recipient profiles could not be loaded. Check the deployed admin read rules before relying on this forecast.');
-      },
-    );
+  useEffect(() => {
+    if (!isAuthReady || !user || !isAdmin || !db || !needs.subscribers) return;
+    return trackSubscription('admin:digest_recipients', () => onSnapshot(query(collection(db!, 'users'), where('weeklyDigestOptIn', '==', true)), snapshot => {
+      setDigestSubscribers(snapshot.docs.map(row => ({ ...row.data(), uid: row.id } as UserProfile)));
+      setDigestSubscribersLoaded(true); setDigestSubscribersError('');
+    }, error => { setDigestSubscribersLoaded(true); setDigestSubscribersError(firestoreActionError(error)); }));
+  }, [isAuthReady, isAdmin, user?.uid, needs.subscribers]);
 
-    // Page views: the newest 200, re-read every five minutes. A live listener
-    // here billed one read for every page any visitor opened while admin was up.
-    const loadPageViews = () => getDocs(query(collection(db!, 'page_views'), orderBy('timestamp', 'desc'), limit(200)))
-      .then((snapshot) => setPageViewDocs(snapshot.docs.map(d => d.data() as PageViewDoc)))
-      .catch(() => {});
-    void loadPageViews();
-    const pageViewTimer = window.setInterval(loadPageViews, 5 * 60 * 1000);
-    const unsubPageViews = () => clearInterval(pageViewTimer);
-
-    // True total count — not capped by the snapshot limit
-    const fetchTotalCount = async () => {
-      try {
-        const snap = await getCountFromServer(collection(db!, 'page_views'));
-        setTotalPageViews(snap.data().count);
-      } catch {
-        setTotalPageViews(null);
-      }
+  useEffect(() => {
+    if (!isAuthReady || !user || !isAdmin || !db || !needs.visits) return;
+    const database = db; let active = true;
+    const load = () => {
+      if (document.hidden) return;
+      void adminReadCache.read(`${user.uid}:page_views`, () => getDocs(query(collection(database, 'page_views'), orderBy('timestamp','desc'), limit(200))), 5 * 60_000)
+        .then(snap => { if (active) setPageViewDocs(snap.docs.map(d => d.data() as PageViewDoc)); }).catch(() => {});
+      void adminReadCache.read(`${user.uid}:page_view_count`, () => getCountFromServer(collection(database, 'page_views')), 5 * 60_000)
+        .then(snap => { if (active) setTotalPageViews(snap.data().count); }).catch(() => { if (active) setTotalPageViews(null); });
     };
-    fetchTotalCount();
-    getCountFromServer(collection(db!, 'users')).then((s) => setAccountCount(s.data().count)).catch(() => setAccountCount(null));
-    const countInterval = 0;
+    load(); const timer = window.setInterval(load, 5 * 60_000);
+    return () => { active = false; clearInterval(timer); };
+  }, [isAuthReady, isAdmin, user?.uid, needs.visits]);
 
-    const unsubFlagged = onSnapshot(
-      query(collection(db, 'incidents'), where('visibility', '==', 'flagged'), orderBy('flagged_at', 'desc')),
-      (snapshot) => {
-        setFlaggedIncidents(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Incident)));
-      }
-    );
+  useEffect(() => {
+    if (!isAuthReady || !user || !isAdmin || !db || !needs.users) return;
+    let active = true;
+    void adminReadCache.read(`${user.uid}:account_count`, () => getCountFromServer(collection(db!, 'users')), 5 * 60_000)
+      .then(snap => { if (active) setAccountCount(snap.data().count); }).catch(() => { if (active) setAccountCount(null); });
+    return () => { active = false; };
+  }, [isAuthReady, isAdmin, user?.uid, needs.users]);
 
-    return () => { unsubIncidents(); unsubStats(); unsubUsers(); unsubDigestSubscribers(); unsubPageViews(); unsubFlagged(); clearInterval(countInterval); };
-  }, [isAuthReady, isAdmin, user]);
+  useEffect(() => {
+    if (!isAuthReady || !user || !isAdmin || !db || !needs.flagged) return;
+    return trackSubscription('admin:flagged', () => onSnapshot(query(collection(db!, 'incidents'), where('visibility','==','flagged'), orderBy('flagged_at','desc')), snapshot => {
+      setFlaggedIncidents(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Incident)));
+    }));
+  }, [isAuthReady, isAdmin, user?.uid, needs.flagged]);
 
   // ── API health polling ────────────────────────────────────────────────────
 
@@ -423,9 +414,9 @@ export function useAdminData() {
   }, []);
 
   useEffect(() => {
-    if (!isAuthReady || !isAdmin || !db) return;
-    const unsubscribe = onSnapshot(
-      collection(db, 'ingestion_health'),
+    if (!isAuthReady || !isAdmin || !db || !needs.health) return;
+    const unsubscribe = trackSubscription('admin:ingestion_health', () => onSnapshot(
+      collection(db!, 'ingestion_health'),
       (snapshot) => {
         const next: Record<string, ScheduledHealthDoc> = {};
         snapshot.docs.forEach((row) => { next[row.id] = row.data() as ScheduledHealthDoc; });
@@ -433,22 +424,22 @@ export function useAdminData() {
         setHealthClock(Date.now());
       },
       () => setScheduledHealthDocs({}),
-    );
+    ));
     const clock = setInterval(() => setHealthClock(Date.now()), 60_000);
     return () => { unsubscribe(); clearInterval(clock); };
-  }, [isAuthReady, isAdmin]);
+  }, [isAuthReady, isAdmin, needs.health]);
 
   useEffect(() => {
-    if (!isAuthReady || !isAdmin) return;
+    if (!isAuthReady || !isAdmin || !needs.health) return;
     checkApis();
     const interval = setInterval(checkApis, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [isAuthReady, isAdmin, checkApis]);
+  }, [isAuthReady, isAdmin, checkApis, needs.health]);
 
   // Fetch live counts from Calgary Open Data APIs for dashboard KPI cards.
   // These incidents are never written to Firestore, so they must be counted directly.
   useEffect(() => {
-    if (!isAuthReady || !isAdmin) return;
+    if (!isAuthReady || !isAdmin || !needs.health) return;
     const fetchLiveCounts = async () => {
       try {
         const [trafficRes, res311] = await Promise.allSettled([
@@ -470,7 +461,7 @@ export function useAdminData() {
     fetchLiveCounts();
     const interval = setInterval(fetchLiveCounts, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [isAuthReady, isAdmin]);
+  }, [isAuthReady, isAdmin, needs.health]);
 
   // ── KPI derivations ───────────────────────────────────────────────────────
 
@@ -886,7 +877,7 @@ export function useAdminData() {
       await writeAuditLog('incident_soft_delete', 'incidents', incidentId, { visibility: 'deleted' });
     } catch (err) {
       console.error('Failed to soft-delete incident:', err);
-      alert('Could not delete this incident. Check your admin permissions.');
+      alert(firestoreActionError(err));
     }
   };
 
@@ -907,7 +898,7 @@ export function useAdminData() {
       await writeAuditLog('community_stats_soft_delete', 'community_stats', statsId, { deleted: true });
     } catch (err) {
       console.error('Failed to soft-delete community stats:', err);
-      alert('Could not delete this row. Check your admin permissions.');
+      alert(firestoreActionError(err));
     }
   };
 

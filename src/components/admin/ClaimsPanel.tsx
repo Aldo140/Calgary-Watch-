@@ -1,3 +1,5 @@
+import { firestoreActionError, isFirestoreQuotaError, QUOTA_COOLDOWN_MS } from '@/src/lib/firestoreErrors';
+import { trackSubscription } from '@/src/lib/readEfficiency';
 /**
  * Claimed listings: organizers who registered to manage their own listing,
  * and the changes they've asked for. Evidence is recomputed here from the
@@ -14,7 +16,7 @@ import { discoveryRepository } from '@/src/data/discovery';
 import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence, claimId, type ListingClaim, type ListingUpdate } from '@/src/lib/claims';
 import { claimApprovalWrites } from '@/src/lib/claimApproval';
 import { APPROVAL_EMAILS_SINCE, type ApprovalEmailStatus } from '@/src/lib/claimApprovalEmail';
-import { businessAccountPatch, businessAccountsFromClaims, readBusinessAccount } from '@/src/lib/businessAccount';
+import { businessAccountPatch, businessAccountsFromClaims } from '@/src/lib/businessAccount';
 import type { PartnerLead } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Panel, T, TimeAgo, mono } from './ui';
 
@@ -36,19 +38,24 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const [updates, setUpdates] = useState<Array<ListingUpdate & { id: string }> | null>(null);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [blockedUntil, setBlockedUntil] = useState(0);
+  const quotaWait = blockedUntil > Date.now();
+  useEffect(() => { if (!blockedUntil) return; const timer = setTimeout(() => setBlockedUntil(0), Math.max(0, blockedUntil - Date.now())); return () => clearTimeout(timer); }, [blockedUntil]);
+  const fail = (e: unknown, atomic = false) => { setError(firestoreActionError(e, atomic)); if (isFirestoreQuotaError(e)) setBlockedUntil(Date.now() + QUOTA_COOLDOWN_MS); };
 
   useEffect(() => {
     if (!db) return;
-    const a = onSnapshot(query(collection(db, CLAIMS), where('status', '==', 'pending'), limit(100)),
+    const a = trackSubscription('claims:pending', () => onSnapshot(query(collection(db!, CLAIMS), where('status', '==', 'pending'), limit(100)),
       (s) => setClaims(s.docs.map((d) => d.data() as ListingClaim).sort((x, y) => x.createdAt - y.createdAt)),
-      (e) => setError(e.message.includes('permission') ? 'Claim rules are not deployed yet. Run "Deploy Firebase Backend" with target rules.' : e.message));
-    const b = onSnapshot(query(collection(db, UPDATES), where('status', '==', 'pending'), limit(100)),
+      (e) => setError(e.message.includes('permission') ? 'Claim rules are not deployed yet. Run "Deploy Firebase Backend" with target rules.' : firestoreActionError(e))));
+    const b = trackSubscription('claims:updates', () => onSnapshot(query(collection(db!, UPDATES), where('status', '==', 'pending'), limit(100)),
       (s) => setUpdates(s.docs.map((d) => ({ ...(d.data() as ListingUpdate), id: d.id })).sort((x, y) => x.createdAt - y.createdAt)),
-      () => setUpdates([]));
+      (e) => setError(firestoreActionError(e))));
     // Approved claims are what make a listing verified (badge and ranking weight, src/lib/verified.ts).
-    const c = onSnapshot(query(collection(db, CLAIMS), where('status', '==', 'approved'), limit(300)),
+    const c = trackSubscription('claims:approved', () => onSnapshot(query(collection(db!, CLAIMS), where('status', '==', 'approved'), limit(300)),
       (s) => setVerified(s.docs.map((d) => d.data() as VerifiedClaim).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0))),
-      () => setVerified([]));
+      (e) => setError(firestoreActionError(e))));
     return () => { a(); b(); c(); };
   }, []);
 
@@ -56,10 +63,10 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const by = user?.email ?? 'admin';
 
   async function decide(c: ListingClaim, approve: boolean) {
-    if (!db) return;
+    if (!db || busy || quotaWait) return;
     const note = approve ? '' : (prompt('Why? The organizer sees this.', 'We couldn’t match you to the organization.') ?? '');
     if (!approve && !note) return;
-    setBusy(c.entityId); setError('');
+    setBusy(c.entityId); setError(''); setNotice('');
     try {
       const database = db;
       if (!approve) await updateDoc(doc(database, CLAIMS, claimId(c.uid, c.entityId)), { status: 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
@@ -75,15 +82,16 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
           tx.update(claimRef, writes.claim);
           tx.set(doc(database, VERIFIED, c.entityId), writes.mark);
           tx.update(accountRef, writes.account);
-        });
+        }, { maxAttempts: 1 });
         // The outreach pipeline learns the listing was claimed, so it stops pitching —
         // every lead for it (a listing can have a business lead and an organizer lead).
         for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
-          await updateDoc(doc(db, 'partner_leads', lead.id), { status: 'claimed', updatedAt: Date.now() }).catch(() => undefined);
+          await updateDoc(doc(db!, 'partner_leads', lead.id), { status: 'claimed', updatedAt: Date.now() }).catch(() => undefined);
         }
       }
+      setNotice(approve ? (c.status === 'approved' ? `${c.entityTitle}: verification and business-account association are consistent. Existing approval and email history were preserved.` : `${c.entityTitle}: claim approved, verification and business account saved. Approval email is handled separately.`) : 'Claim declined.');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Save failed');
+      fail(e, true);
     } finally {
       setBusy('');
     }
@@ -93,33 +101,34 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   async function markBusiness(uid: string, entityIds: string[], since?: number) {
     if (!db) return;
     const ref = doc(db, 'users', uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) throw new Error('they have no profile yet.');
-    const data = snap.data();
-    const current = readBusinessAccount(data);
-    if (current && entityIds.every((id) => current.listings.includes(id))) return;
-    let patch = businessAccountPatch(data, entityIds[0], since ?? Date.now());
-    for (const id of entityIds.slice(1)) patch = businessAccountPatch({ ...data, ...patch }, id, patch.businessSince);
-    await updateDoc(ref, patch);
+    await runTransaction(db, async tx => {
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error('They have no profile yet.');
+      const data = snap.data();
+      let patch = businessAccountPatch(data, entityIds[0], since ?? Date.now());
+      for (const id of entityIds.slice(1)) patch = businessAccountPatch({ ...data, ...patch }, id, patch.businessSince);
+      tx.update(ref, patch);
+    }, { maxAttempts: 1 });
   }
 
   /** Every approved claim's account marked, including claims approved before business accounts existed. */
   async function markAllBusiness() {
-    if (!verified) return;
-    setBusy('accounts'); setError('');
-    const failed: string[] = [];
+    if (!verified || busy || quotaWait) return;
+    setBusy('accounts'); setError(''); setNotice('');
+    let completed = 0; let failed = 0; let quota = false;
     for (const [uid, row] of businessAccountsFromClaims(verified)) {
-      await markBusiness(uid, row.listings, row.since || undefined).catch(() => failed.push(uid));
+      try { await markBusiness(uid, row.listings, row.since || undefined); completed++; }
+      catch (e) { failed++; if (isFirestoreQuotaError(e)) { fail(e); quota = true; break; } }
     }
     setBusy('');
-    setError(failed.length ? `${failed.length} account${failed.length === 1 ? '' : 's'} couldn’t be marked (no profile yet).` : '');
+    if (!quota) { if (failed) setError(`${failed} account(s) could not be updated. ${completed} account(s) were checked; inspect the profiles before retrying.`); else setNotice(`${completed} business account(s) checked and brought into line with approved claims.`); }
   }
 
   async function settle(u: ListingUpdate & { id: string }, status: 'applied' | 'declined') {
-    if (!db) return;
+    if (!db || busy || quotaWait) return;
     setBusy(u.id);
-    try { await updateDoc(doc(db, UPDATES, u.id), { status, reviewedAt: Date.now(), reviewedBy: by }); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Save failed'); }
+    try { await updateDoc(doc(db!, UPDATES, u.id), { status, reviewedAt: Date.now(), reviewedBy: by }); }
+    catch (e) { fail(e, true); }
     finally { setBusy(''); }
   }
 
@@ -130,6 +139,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       subtitle={waiting ? `${claims?.length ?? 0} claim${claims?.length === 1 ? '' : 's'} to confirm · ${updates?.length ?? 0} change${updates?.length === 1 ? '' : 's'} to apply` : 'Organizers who registered to manage their own listing, and the changes they send.'}
       padded={false}
     >
+      {notice ? <p role="status" className="p-4 text-sm" style={{ color: T.ok }}>{notice}</p> : null}
       {error ? <p role="alert" className="p-4 text-sm" style={{ color: T.critical }}>{error}</p> : null}
       {claims === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
         : !claims.length && !updates?.length ? <EmptyState icon={<BadgeCheck size={20} />} title="Nothing waiting" body="Claims arrive from the “Claim this listing” link on every listing, and from partner emails." />
@@ -151,13 +161,13 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             <div className="flex flex-wrap items-center gap-2"><Chip tone={copy.tone}>{copy.label}</Chip><span className="text-xs" style={{ color: T.muted }}>{copy.next}</span></div>
             {c.note ? <p className="text-sm rounded-lg p-2" style={{ background: T.surface, color: T.ink }}>“{c.note}”</p> : null}
             <div className="flex flex-wrap gap-2">
-              <AdminButton tone="ok" disabled={busy === c.entityId} onClick={() => void decide(c, true)}><BadgeCheck size={15} /> Approve</AdminButton>
+              <AdminButton tone="ok" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}><BadgeCheck size={15} /> Approve</AdminButton>
               <a className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: T.line, color: T.ink }}
                  href={`mailto:${c.workEmail}?subject=${encodeURIComponent(`Confirming your CalgaryWatch claim for ${c.entityTitle}`)}&body=${encodeURIComponent(`Hi ${c.name.split(' ')[0]},\n\nYou asked to manage the ${c.entityTitle} listing on CalgaryWatch. Could you reply to confirm this was you? Once you do, the listing is yours to keep up to date.\n\nThanks,\nAldo`)}`}>
                 <Mail size={13} /> Confirm by email
               </a>
               {entity ? <a className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: T.line, color: T.ink }} href={c.entityPath} target="_blank" rel="noreferrer"><ExternalLink size={13} /> Listing</a> : null}
-              <AdminButton variant="ghost" disabled={busy === c.entityId} onClick={() => void decide(c, false)}><X size={14} /> Decline</AdminButton>
+              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, false)}><X size={14} /> Decline</AdminButton>
             </div>
           </article>
         );
@@ -173,8 +183,8 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
           <p className="text-sm whitespace-pre-wrap" style={{ color: T.ink }}>{u.details}</p>
           {u.url ? <a className="text-xs break-all" style={{ color: T.signal }} href={u.url} target="_blank" rel="noreferrer">{u.url}</a> : null}
           <div className="flex flex-wrap gap-2">
-            <AdminButton tone="ok" disabled={busy === u.id} onClick={() => void settle(u, 'applied')}>Mark applied</AdminButton>
-            <AdminButton variant="ghost" disabled={busy === u.id} onClick={() => void settle(u, 'declined')}>Not changing</AdminButton>
+            <AdminButton tone="ok" disabled={Boolean(busy) || quotaWait} onClick={() => void settle(u, 'applied')}>Mark applied</AdminButton>
+            <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void settle(u, 'declined')}>Not changing</AdminButton>
           </div>
           <p className="text-xs" style={{ color: T.muted }}>Make the edit in Events &amp; markets, then mark it applied. The organizer sees the status on their claim page.</p>
         </article>
@@ -187,14 +197,14 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
           </summary>
           <div className="px-4 pt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: T.muted }}>
             <span>Each claimant’s account is a business account. Claims approved before that existed can be brought in line here.</span>
-            <AdminButton variant="ghost" disabled={busy === 'accounts'} onClick={() => void markAllBusiness()}><BadgeCheck size={14} /> {busy === 'accounts' ? 'Marking…' : 'Mark business accounts'}</AdminButton>
+            <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void markAllBusiness()}><BadgeCheck size={14} /> {busy === 'accounts' ? 'Marking…' : 'Mark business accounts'}</AdminButton>
           </div>
           {verified.map((c) => (
             <div key={c.entityId + c.uid} className="px-4 pb-3 text-xs flex flex-wrap gap-x-3 gap-y-1" style={{ color: T.muted }}>
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
-              <AdminButton variant="ghost" disabled={busy === c.entityId} onClick={() => void decide(c, true)}>Repair verification &amp; account</AdminButton>
+              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>Repair verification &amp; account</AdminButton>
               {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
             </div>
           ))}

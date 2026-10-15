@@ -1,3 +1,4 @@
+import { firestoreActionError } from '@/src/lib/firestoreErrors';
 /**
  * Operations: the @calgarydaily post queue (CalgaryWatch's sister account; there
  * is no separate CalgaryWatch Instagram), how the account is doing, and the
@@ -51,7 +52,7 @@ function PostCard({ post }: { post: OpsPost }) {
     setBusy(true); setError('');
     try {
       await updateDoc(doc(db, 'ops_queue', post.id), { caption, altText: alt, note, ...patch, reviewedByEmail: user.email ?? null, reviewedAt: Date.now(), updatedAt: Date.now() });
-    } catch (e) { setError(e instanceof Error ? e.message : 'Save failed'); } finally { setBusy(false); }
+    } catch (e) { setError(firestoreActionError(e)); } finally { setBusy(false); }
   }
 
   return (

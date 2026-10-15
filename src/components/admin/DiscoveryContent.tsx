@@ -1,3 +1,4 @@
+import { firestoreActionError } from '@/src/lib/firestoreErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { AlertTriangle, CalendarDays, ExternalLink, Inbox, Plus, RefreshCw, Store } from 'lucide-react';
@@ -57,7 +58,7 @@ export function DiscoveryContent() {
     setQueue(actions ? actions.docs.map((d) => d.data() as QueuedAction) : []);
     setLoaded(true);
   }
-  useEffect(() => { void load().catch((e) => { setError(e.message); setLoaded(true); }); }, []);
+  useEffect(() => { void load().catch((e) => { setError(firestoreActionError(e)); setLoaded(true); }); }, []);
 
   async function run(data: Record<string, unknown>) {
     setBusy(true); setError(''); setMessage('');
@@ -68,7 +69,7 @@ export function DiscoveryContent() {
         ? 'Queued. The moderation job applies it within the hour, then republishes the site.'
         : 'Saved. Published changes reach the public site after the next verified export and release.');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Save failed');
+      setError(firestoreActionError(e));
       throw e;
     } finally {
       setBusy(false);
@@ -94,7 +95,7 @@ export function DiscoveryContent() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <AdminButton tone="signal" onClick={() => setEditor({ sourceId: approvedSources[0]?.id || '', recordId: crypto.randomUUID() })}><Plus size={15} /> Add a listing</AdminButton>
-        <AdminButton variant="outline" tone="neutral" disabled={busy} onClick={() => void load().catch((e) => setError(e.message))}><RefreshCw size={14} /> Refresh</AdminButton>
+        <AdminButton variant="outline" tone="neutral" disabled={busy} onClick={() => void load().catch((e) => setError(firestoreActionError(e)))}><RefreshCw size={14} /> Refresh</AdminButton>
         {pendingQueue ? <Chip tone="attention">{pendingQueue} change{pendingQueue > 1 ? 's' : ''} queued</Chip> : null}
         <span className="text-xs" style={{ color: T.muted }}>Verification expires after 14 days. A source change sends a listing back to review.</span>
       </div>

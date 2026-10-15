@@ -1,8 +1,10 @@
+import { firestoreActionError } from '@/src/lib/firestoreErrors';
 import { useEffect, useState } from 'react';
 import { collection, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 
 export interface AdminWorkload {
+  error?: string;
   suggestions: number;
   failedActions: number;
   stuckActions: number;
@@ -21,31 +23,36 @@ export function useAdminWorkload(enabled: boolean): AdminWorkload {
   useEffect(() => {
     if (!enabled || !db) return;
     const database = db;
-    const count = (q: Parameters<typeof getCountFromServer>[0]) => getCountFromServer(q).then((s) => s.data().count).catch(() => 0);
+    let active = true; let pending = false;
+    const count = (q: Parameters<typeof getCountFromServer>[0]) => getCountFromServer(q).then((s) => s.data().count);
     // Single-field filters only, so no composite index has to be deployed
     // (the rules-only backend release does not create indexes). The queue is
     // small: a handful of pending or failed rows at most.
     const queue = () => getDocs(query(collection(database, 'discovery_actions'), where('status', 'in', ['pending', 'failed']), limit(100)))
-      .then((s) => s.docs.map((d) => d.data() as { status: string; createdAt?: number }))
-      .catch(() => [] as Array<{ status: string; createdAt?: number }>);
-    const load = () => void Promise.all([
+      .then((s) => s.docs.map((d) => d.data() as { status: string; createdAt?: number }));
+    const load = () => {
+      if (!active || pending || document.hidden) return;
+      pending = true;
+      void Promise.all([
       count(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'))),
       queue(),
       count(query(collection(database, 'listing_claims'), where('status', '==', 'pending'))),
       count(query(collection(database, 'listing_updates'), where('status', '==', 'pending'))),
       count(query(collection(database, 'market_service_requests'), where('status', '==', 'new'))),
     ]).then(([suggestions, rows, claims, updates, service]) => {
+      if (!active) return;
       const now = Date.now();
       setW({
-        suggestions,
+        error: '', suggestions,
         claims: claims + updates + service,
         failedActions: rows.filter((r) => r.status === 'failed' && (r.createdAt ?? 0) > now - 7 * 86_400_000).length,
         stuckActions: rows.filter((r) => r.status === 'pending' && (r.createdAt ?? now) < now - 2 * 3_600_000).length,
       });
-    });
+    }).catch(error => { if (active) setW(previous => ({ ...previous, error: firestoreActionError(error) })); }).finally(() => { pending = false; });
+    };
     load();
     const t = window.setInterval(load, 10 * 60 * 1000);
-    return () => clearInterval(t);
+    return () => { active = false; clearInterval(t); };
   }, [enabled]);
   return w;
 }

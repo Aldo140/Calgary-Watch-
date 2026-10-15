@@ -15,5 +15,5 @@ export const discoveryIndexingEnabled = true;
 export const INDEXED_DISCOVERY_KINDS: ReadonlySet<DiscoveryEntity['kind']> = new Set(['event', 'market', 'guide', 'neighbourhood']);
 /** Indexed and worth listing in the sitemap: an indexed kind, and not an event that has already ended. */
 export function sitemapInventory(entity: DiscoveryEntity, now = new Date()): boolean {
-  return INDEXED_DISCOVERY_KINDS.has(entity.kind) && !(entity.kind === 'event' && Date.parse(entity.end) < now.getTime());
+  return INDEXED_DISCOVERY_KINDS.has(entity.kind) && !(entity.kind === 'event' && (entity.cancelled || Date.parse(entity.end) <= now.getTime()));
 }

@@ -238,7 +238,8 @@ export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', '/p
 
 export function getSeoConfig(pathname: string, repository: DiscoveryRepository = discoveryRepository): SeoConfig {
   const claimMatch = pathname.match(/^\/claim\/([^/]+)$/);
-  const claimId = claimMatch ? decodeURIComponent(claimMatch[1]) : undefined;
+  let claimId: string | undefined;
+  try { claimId = claimMatch ? decodeURIComponent(claimMatch[1]) : undefined; } catch { /* Malformed route remains noindex below. */ }
   const claimEntity = claimId
     ? repository.list().find(entity => entity.id === claimId && ['event', 'market', 'business'].includes(entity.kind))
     : undefined;

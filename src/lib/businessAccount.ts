@@ -35,7 +35,7 @@ export function readBusinessAccount(data: Record<string, unknown> | undefined | 
 export function businessAccountPatch(existing: Record<string, unknown> | undefined | null, entityId: string, now: number): { accountType: typeof BUSINESS; businessListings: string[]; businessSince: number } {
   const current = readBusinessAccount(existing);
   const listings = [...new Set([...(current?.listings ?? []), entityId].filter(Boolean))];
-  return { accountType: BUSINESS, businessListings: listings, businessSince: current?.since || now };
+  return { accountType: BUSINESS, businessListings: listings, businessSince: current?.since && now > 0 ? Math.min(current.since, now) : current?.since || now };
 }
 
 /** Approved claims grouped by account: what every claimant's profile should say. */

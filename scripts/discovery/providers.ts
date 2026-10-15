@@ -1,3 +1,4 @@
+import { providerFetch } from '../lib/providerFetch';
 import type { EntityImage, InventorySubmissionInput, MarketSubmissionInput } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { cleanText } from '../../src/lib/cleanText.js';
@@ -126,37 +127,48 @@ export function mapTicketmasterEvents(events: TicketmasterEvent[]): SourceRecord
 }
 
 export class TicketmasterProvider implements InventoryProvider {
-  // Discovery API caps a page at 200 results; Calgary's 90-day window normally fits
-  // in one, but a busy season (Stampede, playoffs) can exceed it. Walk pages until
-  // the API says there are no more, capped well above anything Calgary plausibly
-  // produces in 90 days so a bug elsewhere can't spin this into an unbounded loop.
-  private static readonly PAGE_SIZE = 200;
-  private static readonly MAX_PAGES = 10;
-
+  // Ticketmaster's deep-paging ceiling is 1,000 results (five 200-result pages).
+  // Split dense date ranges rather than requesting page 5 or silently truncating.
   constructor(public source: SourceConfig) {}
   async fetch(): Promise<SourceRecord[]> {
     const apiKey = process.env.TICKETMASTER_API_KEY?.trim();
     if (!apiKey) throw Error('TICKETMASTER_API_KEY is not configured');
-    const from = new Date(); const to = new Date(from.getTime() + 90 * 24 * 60 * 60 * 1000);
+    const from = new Date(); const to = new Date(from.getTime() + 90 * 86400000);
     const events: TicketmasterEvent[] = [];
-    let totalPages = 1;
-    for (let page = 0; page < totalPages && page < TicketmasterProvider.MAX_PAGES; page++) {
+    let requests = 0;
+    const requestPage = async (start: Date, end: Date, page: number) => {
+      if (++requests > 40) throw Error('Ticketmaster request budget exceeded while splitting dense date ranges; no partial inventory was returned.');
       const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json');
-      url.searchParams.set('apikey', apiKey); url.searchParams.set('countryCode', 'CA'); url.searchParams.set('marketId', '108'); url.searchParams.set('startDateTime', ticketmasterDate(from)); url.searchParams.set('endDateTime', ticketmasterDate(to)); url.searchParams.set('includeTBA', 'no'); url.searchParams.set('includeTBD', 'no'); url.searchParams.set('sort', 'date,asc'); url.searchParams.set('size', String(TicketmasterProvider.PAGE_SIZE)); url.searchParams.set('page', String(page));
-      const response = await fetch(url, { signal: AbortSignal.timeout(20_000), headers: { Accept: 'application/json', 'User-Agent': 'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
+      for (const [key,value] of Object.entries({apikey:apiKey,countryCode:'CA',marketId:'108',startDateTime:ticketmasterDate(start),endDateTime:ticketmasterDate(end),includeTBA:'no',includeTBD:'no',sort:'date,asc',size:'200',page:String(page)})) url.searchParams.set(key,value);
+      const response = await providerFetch(url, { signal: AbortSignal.timeout(20_000), headers: { Accept:'application/json', 'User-Agent':'CalgaryWatch/1.0 (event discovery; contact aldo@calgarywatch.ca)' } });
       if (!response.ok) {
-        const detail = (await response.text()).replace(/\s+/g, ' ').slice(0, 300);
-        throw Error(`Ticketmaster API returned HTTP ${response.status}${detail ? `: ${detail}` : ''}`);
+        const detail = (await response.text()).split(apiKey).join('[redacted]').replace(/apikey[=:][^\s&"<>]+/gi,'apikey=[redacted]').replace(/\s+/g,' ').slice(0,300);
+        throw Error(`Ticketmaster page ${page} returned HTTP ${response.status}${detail ? `: ${detail}` : ''}`);
       }
-      const body = await response.json() as { _embedded?: { events?: TicketmasterEvent[] }; page?: { totalPages?: number } };
-      events.push(...(body._embedded?.events ?? []));
-      totalPages = Math.min(body.page?.totalPages ?? 1, TicketmasterProvider.MAX_PAGES);
+      return await response.json() as { _embedded?: { events?: TicketmasterEvent[] }; page?: { totalPages?: number } };
+    };
+    const windows = [{start:from,end:to,depth:0}];
+    while (windows.length) {
+      const {start,end,depth} = windows.shift()!;
+      const first = await requestPage(start,end,0);
+      const pages = first.page?.totalPages ?? 1;
+      if (!Number.isInteger(pages) || pages < 0) throw Error('Ticketmaster returned invalid pagination metadata.');
+      if (pages > 5) {
+        if (depth >= 8 || end.getTime()-start.getTime() < 2000) throw Error('Ticketmaster date range remains too dense for the 1,000-result limit; no partial inventory was returned.');
+        const midpoint = Math.floor((start.getTime()+end.getTime())/2000)*1000;
+        windows.unshift({start,end:new Date(midpoint),depth:depth+1},{start:new Date(midpoint+1000),end,depth:depth+1});
+        continue;
+      }
+      events.push(...(first._embedded?.events ?? []));
+      for (let page=1;page<pages;page++) events.push(...((await requestPage(start,end,page))._embedded?.events ?? []));
     }
+    const unique = [...new Map(events.map(e => [e.id,e])).values()];
+    events.splice(0,events.length,...unique);
     const records = mapTicketmasterEvents(events);
     const missingDates = events.filter(event => !localDateTime(event.dates?.start?.localDate, event.dates?.start?.localTime) || !localDateTime(event.dates?.end?.localDate, event.dates?.end?.localTime)).length;
     const missingVenue = events.filter(event => !event._embedded?.venues?.[0]).length;
     const missingCanadianVenue = events.filter(event => event._embedded?.venues?.[0] && event._embedded.venues[0].country?.countryCode !== 'CA').length;
-    console.log(`[Ticketmaster] ${events.length} event(s) received across ${totalPages} page(s), ${records.length} accepted; ${missingDates} missing confirmed dates, ${missingVenue} missing venues, ${missingCanadianVenue} outside Canada.`);
+    console.log(`[Ticketmaster] ${events.length} event(s) received across ${requests} page request(s), ${records.length} accepted; ${missingDates} missing confirmed dates, ${missingVenue} missing venues, ${missingCanadianVenue} outside Canada.`);
     return records;
   }
 }

@@ -1,10 +1,10 @@
-import { publishedInventory } from './discoveryPublication';
+import { publishedInventory, sitemapInventory } from './discoveryPublication';
 import type { DiscoveryEntity, MarketOccurrence } from '../types/discovery';
 import { entityPath, validateEntity } from './discovery';
 
 /** Future inventory publisher shares these rules with dynamic SEO and sitemap generation. */
 export function indexableEntities(entities: readonly DiscoveryEntity[]): DiscoveryEntity[] {
-  return entities.filter(e => validateEntity(e) && publishedInventory(e));
+  return entities.filter(e => validateEntity(e) && publishedInventory(e) && sitemapInventory(e));
 }
 export function buildEntityJsonLd(entity: DiscoveryEntity, origin: string, occurrences: readonly MarketOccurrence[] = []): object {
   const type = { event: 'Event', market: 'Place', business: entity.categories.includes('food') ? 'Restaurant' : 'LocalBusiness', guide: 'Article', neighbourhood: 'Place' }[entity.kind];

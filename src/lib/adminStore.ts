@@ -1,3 +1,4 @@
+import { trackSubscription } from './readEfficiency';
 /**
  * Shared, read-once data for the admin console.
  *
@@ -26,11 +27,17 @@ function createStore<T extends { id: string }>(load: (db: Firestore) => Promise<
   let loading = false;
   let error = '';
   let loadedAt: number | null = null;
+  let pending: Promise<void> | undefined;
   let unlive: (() => void) | null = null;
   const listeners = new Set<Listener<T>>();
   const emit = () => listeners.forEach((l) => l({ rows, loading, error, loadedAt }));
 
-  async function refresh(db: Firestore) {
+  function refresh(db: Firestore): Promise<void> {
+    if (pending) return pending;
+    pending = loadOnce(db).finally(() => { pending = undefined; });
+    return pending;
+  }
+  async function loadOnce(db: Firestore) {
     loading = true; emit();
     try {
       rows = await load(db);
@@ -48,12 +55,12 @@ function createStore<T extends { id: string }>(load: (db: Firestore) => Promise<
       listener({ rows, loading, error, loadedAt });
       if (loadedAt === null && !loading) void refresh(db);
       if (live && !unlive) {
-        unlive = live(db, (fresh) => {
+        unlive = trackSubscription('admin:archive_live', () => live(db, (fresh) => {
           const byId = new Map(rows.map((r) => [r.id, r]));
           for (const r of fresh) byId.set(r.id, r);
           rows = [...byId.values()];
           emit();
-        });
+        }));
       }
       return () => {
         listeners.delete(listener);

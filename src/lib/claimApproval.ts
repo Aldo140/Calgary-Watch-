@@ -7,7 +7,7 @@ export function claimApprovalWrites(c: ListingClaim, profile: Record<string, unk
   if (!c.uid || !c.entityId || !profile || profile.uid !== c.uid) throw new Error('The claimant has no matching user profile. Ask them to sign in again, then retry approval.');
   const at = c.status === 'approved' ? (c.reviewedAt ?? 0) : now;
   return {
-    claim: { status: 'approved', reviewedAt: at, reviewedBy: by, reviewNote: '' },
+    claim: { status: 'approved', reviewedAt: at, ...(c.status === 'approved' ? {} : { reviewedBy: by, reviewNote: '' }) },
     mark: { entityId: c.entityId, title: c.entityTitle, claimId: claimId(c.uid, c.entityId), verifiedAt: at, verifiedBy: by },
     account: businessAccountPatch(profile, c.entityId, at || now),
   };

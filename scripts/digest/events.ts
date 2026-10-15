@@ -1,3 +1,4 @@
+import { isQuotaExhausted } from '../lib/quota';
 /**
  * CalgaryWatch — Thursday event picks
  *
@@ -41,7 +42,7 @@ function initFirebase(): Firestore {
   const json = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!json) throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set.');
   if (!getApps().length) initializeApp({ credential: cert(JSON.parse(json)) });
-  return getFirestore();
+  return getFirestore(process.env.VITE_FIRESTORE_DATABASE_ID || '(default)');
 }
 
 type Loaded = EventsDigestRecipient & { _address: string; _mondayOn: boolean };
@@ -153,12 +154,15 @@ async function run() {
     const claim = db.collection(SENDS).doc(eventsSendId(profile.uid, claimKey));
     try {
       await claim.create({ uid: profile.uid, weekKey, claimedAt: Date.now(), status: 'claimed' });
-    } catch {
+    } catch (error) {
+      const code = (error as { code?: unknown })?.code;
+      if (code !== 6 && code !== 'already-exists') throw new Error('events: reserving send failed; no email attempted', { cause: error });
       console.log(`[events] skip ${profile.uid}: already sent for ${weekKey}`);
       skipped += 1;
       continue;
     }
 
+    let providerAccepted = false;
     try {
       const { picks, fallback, mode, area } = await readerPicks({
         db, inventory, uid: profile.uid, interests: profile.eventInterests,
@@ -200,6 +204,7 @@ async function run() {
         if (result.skipped) skipped += 1; else sent += 1;
         console.log(`[events] ${result.blocked ? 'blocked' : result.skipped ? 'dry run' : 'test sent'} ${profile.uid} — ${mode}${shared.first ? ' (first)' : ''}, ${picks.going.length} going, ${content.list.length} listed; claim released`);
       } else if (result.ok) {
+        providerAccepted = true;
         sent += 1;
         await claim.set({ status: 'sent', sentAt: Date.now(), providerId: result.id ?? null, subject: email.subject, mode, first: shared.first, picks: content.list.length, going: picks.going.length }, { merge: true });
         if (!profile.eventsWelcomeSentAt) await db.collection('users').doc(profile.uid).set({ eventsWelcomeSentAt: Date.now() }, { merge: true });
@@ -211,7 +216,9 @@ async function run() {
       }
     } catch (error) {
       failed += 1;
-      await claim.delete().catch(() => {});
+      if (!providerAccepted) await claim.delete().catch(() => {});
+      else console.error('[events] Provider accepted email but recording completion failed. Reservation retained; inspect provider history before retrying.');
+      if (isQuotaExhausted(error)) throw new Error('events: Firestore quota exhausted; stopping remaining recipients', { cause: error });
       console.error(`[events] FAILED ${profile.uid}:`, error);
     }
     await sleep(sender.throttleMs);

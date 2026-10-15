@@ -19,7 +19,7 @@ import { PartnersWorkspace } from '../components/admin/PartnersWorkspace';
  * numbers. Nothing is computed twice.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -100,8 +100,12 @@ function Legend({ items }: { items: { label: string; value?: number; color: stri
 
 export default function AdminPage() {
   const { logout } = useAuth();
-  const [section, setSection] = useState<Section>('desk');
-  const d = useAdminData();
+  const [section, setSection] = useState<Section>(() => {
+    const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('section');
+    return ['desk','planner','reports','people','feeds','visitors','city','content','demand','partners','ops','members'].includes(requested ?? '') ? requested as Section : 'desk';
+  });
+  useEffect(() => { const url = new URL(window.location.href); url.searchParams.set('section', section); window.history.replaceState(null, '', url); }, [section]);
+  const d = useAdminData(section);
   const work = useAdminWorkload(Boolean(d.isAdmin));
 
   const failingFeeds = d.apiHealths.filter((a) =>
@@ -185,12 +189,13 @@ export default function AdminPage() {
       onSignOut={logout}
       actions={
         <>
+          {work.error ? <span role="alert" className="text-xs text-red-700">{work.error}</span> : null}
           <Chip tone={d.loadingData ? 'attention' : 'ok'}>
             <StatusDot tone={d.loadingData ? 'attention' : 'ok'} pulse={d.loadingData} />
             {d.loadingData ? 'Syncing' : 'Live'}
           </Chip>
           {/* The archive is read once per tab; this re-reads it on demand. */}
-          <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton>
+          {['desk','reports','people'].includes(section) ? <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton> : null}
         </>
       }
     >

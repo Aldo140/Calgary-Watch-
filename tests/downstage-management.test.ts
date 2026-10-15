@@ -74,7 +74,7 @@ describe('Downstage claim and account state',()=>{
   });
   it('keeps the approved management page and dashboard on the same stable claim URL',()=>{
     const page=read('src/pages/ClaimListingPage.tsx');assert.match(page,/claim\?\.status === 'approved'/);assert.match(page,/<ListingManagement claim=\{claim\}/);
-    const dashboard=read('src/components/plans/Dashboard.tsx');assert.match(dashboard,/\/claim\/\$\{encodeURIComponent\(c.entityId\)\}/);assert.match(dashboard,/Send a change/);
+    const dashboard=read('src/components/plans/BusinessListings.tsx');assert.match(dashboard,/listingManagementPath\(c.entityId, previewUid\)/);assert.match(dashboard,/Send a change/);
   });
 });
 

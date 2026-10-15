@@ -134,3 +134,18 @@ These are deployment targets; their live responses were not certified here.
 - `tests/read-efficiency.test.ts`
 - `tests/rules-contract.test.ts`
 - `tests/ticketmaster-provider.test.ts`
+
+## Business dashboard preview follow-up
+
+An approved business owner now reaches their dashboard without completing personal email/interests onboarding. An approved claim also supports the historical account-repair case; pending/rejected claims do not grant Business verification.
+
+Admin entry points:
+
+- Members & plans → Business accounts → select the member → Their dashboard.
+- Local partners → Claimed listings → approved claim → View business dashboard.
+
+Both show the selected member's Business account, verified listings and pending/rejected claim states using the same BusinessListings component as the owner. Mobile places this card first. After a successful approval/repair the cached member directory is patched, without another full collection read; failed transactions do not update that cache.
+
+“Send a change” retains `?as=<member UID>` through claim management. Only an authenticated admin can select another UID. Request history belongs to that selected member; submissions are blocked in preview. Market HQ preserves the same preview context, requires an approved claim for the selected member and disables its editing controls while leaving tab navigation available. These are read-only inspections, not sign-in impersonation.
+
+Follow-up validation: 1,132 tests passed; TypeScript/lint and production build passed. Render regressions compare owner/admin Business listing HTML, allowing only preview-link differences. No real member account, production claim or email was modified. Verify the deployed preview and owner session with an intentionally approved test account after Hosting completes.

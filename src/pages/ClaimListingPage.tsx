@@ -3,7 +3,7 @@ import { restoreClaimDraft } from '../lib/claimDraft';
 import { useVerifiedListing } from '../lib/claimsApi';
 import { VerifiedBadge } from '../components/entity/VerifiedBadge';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, BadgeCheck, CalendarClock, Check, Clock, ImagePlus, Link2, Lock, MapPinned, ShieldCheck, Sparkles } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -36,10 +36,13 @@ export default function ClaimListingPage() {
 }
 
 function ClaimForm({ id }: { id: string }) {
-  const { user, signIn, isFirebaseConfigured } = useAuth();
+  const { user, signIn, isFirebaseConfigured, isAdmin } = useAuth();
+  const [params] = useSearchParams();
+  const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
+  const subjectUid = previewUid ?? user?.uid;
   const reduce = useReducedMotion();
   const entity = useMemo(() => discoveryRepository.list().find((e) => e.id === id && !e.developmentOnly && ['event', 'market', 'business'].includes(e.kind)), [id]);
-  const claims = useMyClaims(user?.uid);
+  const claims = useMyClaims(subjectUid);
   const claim = claims?.find((c) => c.entityId === id) ?? null;
   const sites = entity ? sourceDomains(entity.sources) : [];
   const [draft, setDraft] = useState<ClaimDraft>(() => { try { return restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { return restoreClaimDraft(null); } });
@@ -61,7 +64,7 @@ function ClaimForm({ id }: { id: string }) {
   const domainMatch = !!workDomain && sites.some((s) => workDomain === s || workDomain.endsWith(`.${s}`));
 
   const send = async () => {
-    if (!entity) return;
+    if (!entity || previewUid) return;
     const current = auth?.currentUser;
     const problem = claimProblem(draft);
     if (problem) { setError(problem); return; }
@@ -78,7 +81,7 @@ function ClaimForm({ id }: { id: string }) {
     }
   };
   useEffect(() => {
-    if (pending.current && user && claims) { pending.current = false; if (!claim) void send(); }
+    if (!previewUid && pending.current && user && claims) { pending.current = false; if (!claim) void send(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, claims]);
 
@@ -99,6 +102,7 @@ function ClaimForm({ id }: { id: string }) {
   return (
     <SiteLayout>
       <div className="cw-plans cl-page">
+        {previewUid ? <div className="cw-wrap"><p className="pl-adminview" role="status"><strong>Admin view — read-only.</strong> This member’s listing management. <Link to={`/plans?as=${encodeURIComponent(previewUid)}`}>Back to their dashboard</Link></p></div> : null}
         <header className="cw-wrap cl-head">
           <motion.p className="pl-eyebrow" {...rise(0)}>For organizers · free</motion.p>
           <motion.h1 className="cl-title" {...rise(1)}>Run {entity.title}? <em>Claim it.</em></motion.h1>
@@ -112,16 +116,16 @@ function ClaimForm({ id }: { id: string }) {
 
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
-            {claim?.status === 'approved' ? (
+            {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved' ? (
               <>
                 {entity.kind === 'market' ? (
-                  <Link to={`/organizer/${encodeURIComponent(entity.id)}`} className="hq-open">
+                  <Link to={previewUid ? `/organizer/${encodeURIComponent(entity.id)}?as=${encodeURIComponent(previewUid)}` : `/organizer/${encodeURIComponent(entity.id)}`} className="hq-open">
                     <span><strong>Open Market HQ</strong><small>Vendors, weekly lineups, applications and vendor emails.</small></span>
                     <ArrowUpRight size={20} aria-hidden="true" />
                   </Link>
                 ) : null}
-                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>Your account is a business account.</strong> It manages this listing; you’ll see it on your <Link to="/plans">dashboard</Link>.</span></p>
-                <ListingManagement claim={claim} />
+                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>Your account is a business account.</strong> It manages this listing; you’ll see it on your <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
+                <ListingManagement claim={claim} previewUid={previewUid} />
               </>
             ) : verifiedListing ? (
               <section><VerifiedBadge /><p>This listing has been confirmed by its organization.</p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${entity.title}`)}`}>Suggest a correction</a></section>
@@ -142,7 +146,7 @@ function ClaimForm({ id }: { id: string }) {
                   <p>{claim.reviewNote || 'We weren’t able to match you to the organization.'} Email <a href="mailto:aldo@calgarywatch.ca">aldo@calgarywatch.ca</a> from your organization’s address and we’ll sort it out.</p>
                 </div>
               </section>
-            ) : (
+            ) : previewUid ? <p>This member has not claimed this listing.</p> : (
               <motion.form className="pl-form cl-form" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate {...rise(4)}>
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">01</span> Who are you?</legend>

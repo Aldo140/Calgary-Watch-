@@ -55,14 +55,15 @@ export async function submitUpdate(user: User, claim: Pick<ListingClaim, 'entity
   await addDoc(collection(db, UPDATES), listingUpdateRequest(user.uid, claim, field, details, url, Date.now()));
 }
 
-export async function readMyUpdates(uid: string, entityId: string): Promise<Array<{ field: UpdateField; details: string; status: string; createdAt: number }>> {
+export async function readMyUpdates(uid: string, entityId: string, reportErrors = false): Promise<Array<{ field: UpdateField; details: string; status: string; createdAt: number }>> {
   if (!db) return [];
   try {
     const s = await getDocs(query(collection(db, UPDATES), where('uid', '==', uid), limit(50)));
     return s.docs.map((d) => d.data() as { entityId: string; field: UpdateField; details: string; status: string; createdAt: number })
       .filter((u) => u.entityId === entityId)
       .sort((a, b) => b.createdAt - a.createdAt);
-  } catch {
+  } catch (error) {
+    if (reportErrors) throw error;
     return [];
   }
 }

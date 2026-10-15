@@ -206,7 +206,7 @@ export default function PlansPage() {
   // Set up = has a home area on file (the one thing every email needs).
   const hasPlans = Boolean(profile && (profile.piiConsentAt || profile.eventInterests.length));
   // Members change settings in a sheet over the dashboard; the 3-step card is for signing up.
-  const view = plansView(Boolean(user), profile, Boolean(asUid));
+  const view = plansView(Boolean(user), profile, Boolean(asUid), myClaims?.some(c => c.status === 'approved'));
   const showForm = view === 'setup';
   const dashboard = view === 'dashboard';
   const area = profile ? homeAreaOf(profile) : '';
@@ -368,7 +368,7 @@ export default function PlansPage() {
           picks={picks.picks} weekPicks={weekPicks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
           near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={demo ? demo.claims : myClaims ?? []} business={demo ? (demo.claims.length ? { since: Date.parse('2026-09-02'), listings: [demo.claims[0].entityId] } : null) : profile?.business}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
-          adminView={asUid ? profile?.displayName ?? '' : null}
+          adminView={asUid ? profile?.displayName ?? '' : null} previewUid={asUid ?? undefined}
           notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}
           onDismissWelcome={() => setJoined(null)}
         />

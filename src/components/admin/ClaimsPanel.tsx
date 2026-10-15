@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { adminUsers } from '@/src/lib/adminStore';
 import { firestoreActionError, isFirestoreQuotaError, QUOTA_COOLDOWN_MS } from '@/src/lib/firestoreErrors';
 import { trackSubscription } from '@/src/lib/readEfficiency';
 /**
@@ -72,7 +74,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       if (!approve) await updateDoc(doc(database, CLAIMS, claimId(c.uid, c.entityId)), { status: 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
         if (!entities.has(c.entityId)) throw new Error('This listing is not in the published inventory. Restore the canonical listing before approving.');
-        await runTransaction(database, async tx => {
+        const result = await runTransaction(database, async tx => {
           const claimRef = doc(database, CLAIMS, claimId(c.uid, c.entityId));
           const accountRef = doc(database, 'users', c.uid);
           const claimSnap = await tx.get(claimRef);
@@ -82,7 +84,9 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
           tx.update(claimRef, writes.claim);
           tx.set(doc(database, VERIFIED, c.entityId), writes.mark);
           tx.update(accountRef, writes.account);
+          return writes.account;
         }, { maxAttempts: 1 });
+        adminUsers.patch(c.uid, result);
         // The outreach pipeline learns the listing was claimed, so it stops pitching —
         // every lead for it (a listing can have a business lead and an organizer lead).
         for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
@@ -101,14 +105,16 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   async function markBusiness(uid: string, entityIds: string[], since?: number) {
     if (!db) return;
     const ref = doc(db, 'users', uid);
-    await runTransaction(db, async tx => {
+    const result = await runTransaction(db, async tx => {
       const snap = await tx.get(ref);
       if (!snap.exists()) throw new Error('They have no profile yet.');
       const data = snap.data();
       let patch = businessAccountPatch(data, entityIds[0], since ?? Date.now());
       for (const id of entityIds.slice(1)) patch = businessAccountPatch({ ...data, ...patch }, id, patch.businessSince);
       tx.update(ref, patch);
+      return patch;
     }, { maxAttempts: 1 });
+    adminUsers.patch(uid, result);
   }
 
   /** Every approved claim's account marked, including claims approved before business accounts existed. */
@@ -204,6 +210,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
+              <Link to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
               <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>Repair verification &amp; account</AdminButton>
               {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
             </div>

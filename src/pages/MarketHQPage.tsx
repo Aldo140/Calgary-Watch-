@@ -41,12 +41,13 @@ export default function MarketHQPage() {
   const { user, signIn, isAdmin, isFirebaseConfigured } = useAuth();
   const reduce = useReducedMotion();
   const market = useMemo(() => discoveryRepository.list().find((e) => e.id === id && e.kind === 'market'), [id]);
-  const claims = useMyClaims(user?.uid);
+  const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
+  const claims = useMyClaims(previewUid ?? user?.uid);
   const claim = claims?.find((c) => c.entityId === id);
   // Development only: ?demo=1 renders sample data without Firebase.
   const demo = import.meta.env.DEV && params.has('demo');
   const organizer = demo || claim?.status === 'approved';
-  const allowed = organizer || isAdmin;
+  const allowed = previewUid ? organizer : organizer || isAdmin;
   const tab = (params.get('tab') as Tab) || 'lineup';
   const setTab = (t: Tab) => setParams((p) => { p.set('tab', t); return p; }, { replace: true });
 
@@ -105,6 +106,7 @@ export default function MarketHQPage() {
   return (
     <SiteLayout>
       <div className="cw-plans hq">
+        {previewUid ? <div className="cw-wrap"><p className="pl-adminview" role="status">Admin view — read-only. <Link to={`/plans?as=${encodeURIComponent(previewUid)}`}>Back to their dashboard</Link></p></div> : null}
         <header className="cw-wrap hq-head">
           <motion.p className="pl-eyebrow" initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             Market HQ · {organizer ? 'run by you' : 'run by CalgaryWatch'}
@@ -132,15 +134,17 @@ export default function MarketHQPage() {
         </header>
 
         <div className="cw-wrap hq-body">
+          <fieldset disabled={Boolean(previewUid)} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
               {tab === 'lineup' ? <LineupTab marketId={id} dates={dates} vendors={vendors ?? []} lineups={lineups ?? []} />
                 : tab === 'vendors' ? <VendorsTab marketId={id} vendors={vendors ?? []} contacts={contacts ?? []} />
                 : tab === 'applications' ? <ApplicationsTab apps={apps ?? []} marketId={id} />
-                : tab === 'messages' ? <MessagesTab market={{ id, title: market.title }} dates={dates} vendors={vendors ?? []} contacts={contacts ?? []} lineups={lineups ?? []} messages={messages ?? []} replyTo={claim?.workEmail || user?.email || ''} />
+                : tab === 'messages' ? <MessagesTab market={{ id, title: market.title }} dates={dates} vendors={vendors ?? []} contacts={contacts ?? []} lineups={lineups ?? []} messages={messages ?? []} replyTo={claim?.workEmail || (previewUid ? '' : user?.email) || ''} />
                 : <PlanTab market={{ id, title: market.title, path: entityPath(market) }} organizer={organizer} />}
             </motion.div>
           </AnimatePresence>
+          </fieldset>
         </div>
       </div>
     </SiteLayout>

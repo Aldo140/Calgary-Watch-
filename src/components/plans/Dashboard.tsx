@@ -1,3 +1,4 @@
+import { BusinessListings as BusinessCard } from './BusinessListings';
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
@@ -106,6 +107,7 @@ export interface DashboardProps {
   onDismissWelcome?: () => void;
   /** Admin viewing someone else's dashboard. */
   adminView?: string | null;
+  previewUid?: string;
   /** Account creation, for the member card. */
   memberSince?: number;
   /** Shown under the title right after saving: "You're in" or "Saved". */
@@ -265,7 +267,7 @@ function DeskBody(p: DashboardProps) {
         <Tracklist {...p} />
       </div>
       <aside className="pd-side" aria-label="More for you">
-        <BusinessCard claims={p.claims} business={p.business} />
+        <BusinessCard claims={p.claims} business={p.business} previewUid={p.previewUid} />
         <NearCard near={p.near} area={p.area} now={p.now} />
         <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} />
         <Fine />
@@ -277,10 +279,10 @@ function DeskBody(p: DashboardProps) {
 function PhoneBody(p: DashboardProps) {
   return (
     <div className="cw-wrap pd-body">
+      <BusinessCard claims={p.claims} business={p.business} previewUid={p.previewUid} />
       <Plans {...p} phone />
       <NearCard near={p.near} area={p.area} now={p.now} />
       <Tracklist {...p} phone />
-      <BusinessCard claims={p.claims} business={p.business} />
       <BadgeShelf badges={p.badges} busy={p.busy} onAct={p.onAct} phone />
       <Fine />
       <PhoneDock {...p} />
@@ -908,45 +910,6 @@ function BadgeShelf({ badges, busy, onAct, phone }: { badges: BadgeState[]; busy
           ) : null}
         </>
       ) : <p className="pd-earn-none">Every badge earned. Nice work, neighbour.</p>}
-    </section>
-  );
-}
-
-/**
- * Business account: listings this member manages. Approved means the
- * organization confirmed it (the Verified badge shows on the listing);
- * anything else is honest about where the claim stands. Account features
- * for businesses build on this card.
- */
-function BusinessCard({ claims, business }: { claims: Claim[]; business?: BusinessAccount | null }) {
-  if (!claims.length && !business) return null;
-  const approved = claims.filter((c) => c.status === 'approved');
-  const isBusiness = Boolean(business) || approved.length > 0;
-  const others = claims.filter((c) => c.status !== 'approved');
-  const state = (s: string) => (s === 'rejected' ? { label: 'Not confirmed', note: 'Reply to our email and we’ll take another look.' } : { label: 'Being confirmed', note: 'We check every claim by hand before the Verified badge shows.' });
-  return (
-    <section className="pd-card pd-biz" data-business={isBusiness} aria-labelledby="pd-biz">
-      <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${fmt(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
-      <h2 id="pd-biz">{approved.length > 1 || (!approved.length && (business?.listings.length ?? 0) > 1) ? 'Your listings' : approved.length || business ? 'Your listing' : 'Your claim'}</h2>
-      <ul className="pd-biz-list">
-        {approved.map((c) => (
-          <li key={c.entityId} className="pd-biz-item" data-status="approved">
-            <span className="pd-biz-title"><strong>{c.entityTitle}</strong><span className="pd-biz-ok"><BadgeCheck size={14} aria-hidden="true" /> Verified</span></span>
-            <span className="pd-biz-acts">
-              {c.entityPath ? <Link to={c.entityPath} className="pd-biz-btn">View listing <ArrowUpRight size={15} aria-hidden="true" /></Link> : null}
-              <Link to={`/claim/${encodeURIComponent(c.entityId)}`} className="pd-biz-btn" data-k="ghost">Send a change</Link>
-            </span>
-          </li>
-        ))}
-        {others.map((c) => (
-          <li key={c.entityId} className="pd-biz-item" data-status={c.status}>
-            <Link to={`/claim/${encodeURIComponent(c.entityId)}`} className="pd-biz-row">
-              <span className="pd-dot" data-cat={c.status === 'rejected' ? 'crime' : 'wait'} aria-hidden="true" />
-              <span><strong>{c.entityTitle}</strong><small>{state(c.status).label} · {state(c.status).note}</small></span>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

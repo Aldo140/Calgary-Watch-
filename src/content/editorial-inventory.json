@@ -1247,13 +1247,17 @@
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        "src": "/images/downstage/downstage-2026-27-season.png",
+        "alt": "Downstage 2026–2027 season poster featuring artwork for From Scratch, Dreaming Climate Consciousness, A Study of Choices and Creative Stretch",
+        "credit": "Season artwork by Leetia Lyons",
+        "presentation": "poster"
       },
       "images": [
         {
-          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+          "src": "/images/downstage/downstage-2026-27-season.png",
+          "alt": "Downstage 2026–2027 season poster featuring artwork for From Scratch, Dreaming Climate Consciousness, A Study of Choices and Creative Stretch",
+          "credit": "Season artwork by Leetia Lyons",
+          "presentation": "poster"
         }
       ],
       "socials": {

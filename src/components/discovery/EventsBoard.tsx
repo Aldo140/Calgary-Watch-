@@ -19,6 +19,7 @@ import { EventArt, eventArtKind } from './ListingArt';
 import { MenuArt } from '../site/MenuArt';
 import { discoveryRepository } from '../../data/discovery';
 import { resolvePicks } from '../../lib/dateNight';
+import { eventArtwork, listingImageSrc } from '../../lib/organizations';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/home-v3.css';
@@ -66,8 +67,9 @@ function times(starts: string[]) {
 const place = (e: EventEntity) => [e.venue || e.address, e.venue && e.neighbourhood ? e.neighbourhood : ''].filter(Boolean).join(' · ');
 
 function Art({ e }: { e: EventEntity }) {
-  return e.image && /^https:\/\//.test(e.image.src)
-    ? <img src={e.image.src} alt={e.image.alt} loading="lazy" decoding="async" />
+  const image = eventArtwork(e, discoveryRepository.list());
+  return image
+    ? <img className={image.presentation === 'poster' ? 'is-poster' : undefined} src={listingImageSrc(image)} alt={image.alt} loading="lazy" decoding="async" />
     : <EventArt id={e.id} title={e.title} categories={e.categories} />;
 }
 
@@ -340,10 +342,10 @@ function Day({ day, today, heroPick }: { day: EventDay; today: string; heroPick?
 }
 
 function Lead({ entry, dupe }: { entry: DayEntry; dupe?: boolean }) {
-  const e = entry.event; const cost = price(e);
+  const e = entry.event; const cost = price(e); const image = eventArtwork(e, discoveryRepository.list());
   return (
     <Link to={entityPath(e)} className={`ev-lead-card${dupe ? ' is-dupe' : ''}`}>
-      <span className="ev-lead-art"><Art e={e} />{e.image?.credit ? <em>{e.image.credit}</em> : null}</span>
+      <span className="ev-lead-art"><Art e={e} />{image?.credit ? <em>{image.credit}</em> : null}</span>
       <span className="ev-lead-body">
         <span className="ev-lead-tag">Pick of the day</span>
         <span className="ev-lead-time">{times(entry.starts)}</span>

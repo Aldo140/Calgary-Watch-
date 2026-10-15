@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { organizerProfile } from '../../lib/organizations';
+import { eventArtwork, listingImageSrc, organizerProfile } from '../../lib/organizations';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation,
@@ -118,7 +118,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const organizerSite = event.sources.find(s => s.kind === 'official')?.url ?? event.sources[0]?.url;
   const interests: EventInterestId[] = interestsFor(event).filter(i => i !== 'free');
   const open = !past && !event.cancelled;
-  const photo = /^https:\/\//.test(event.image?.src ?? '') ? event.image : undefined;
+  const photo = eventArtwork(event, all);
   const organization = organizerProfile(event, all);
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
@@ -159,7 +159,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
           <button type="button" className="mk-btn" onClick={download}><CalendarPlus size={17} aria-hidden="true" /> Add to calendar</button>
           <button type="button" className="mk-btn" onClick={() => void share()}>{shared ? <Check size={17} aria-hidden="true" /> : <Share2 size={17} aria-hidden="true" />} {shared ? 'Link copied' : 'Share'}</button>
         </> : <Link className="mk-btn mk-btn-sun" to="/events">See what’s on instead <ArrowRight size={17} aria-hidden="true" /></Link>}
-        art={photo ? <img className="ld-photo" src={photo.src} alt={photo.alt} width="1200" height="677" /> : <EventArt id={event.id} title={event.title} categories={event.categories} />}
+        art={photo ? <><img className={`ld-photo${photo.presentation === 'poster' ? ' is-poster' : ''}`} src={listingImageSrc(photo)} alt={photo.alt} width="1200" height="677" />{photo.credit ? <figcaption className="ld-photo-credit">{photo.credit}</figcaption> : null}</> : <EventArt id={event.id} title={event.title} categories={event.categories} />}
       />
 
       <div className="cw-wrap mk-page mk-dgrid">

@@ -1305,6 +1305,12 @@
           "title": "Dreaming Climate Consciousness",
           "summary": "Four short plays by Calgary playwrights, set in one shared, imagined climate future.",
           "description": "Dreaming Climate Consciousness brings four new short plays by Calgary playwrights to Downstage’s stage at the Motel Theatre in the Werklund Centre, each one a window into the same collectively imagined climate future. It plays October 23 and 24. Showtimes and tickets are on Downstage’s current season page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/dreaming-climate-consciousness.jpg",
+            "alt": "Dreaming Climate Consciousness production artwork with a tree-ring landscape surrounded by people and animals",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
           "start": "2026-10-23T00:00:00-06:00",
           "end": "2026-10-24T00:00:00-06:00",
           "endTimeEstimated": true
@@ -1330,6 +1336,12 @@
           "title": "Dreaming Climate Consciousness",
           "summary": "Four short plays by Calgary playwrights, set in one shared, imagined climate future.",
           "description": "Dreaming Climate Consciousness brings four new short plays by Calgary playwrights to Downstage’s stage at the Motel Theatre in the Werklund Centre, each one a window into the same collectively imagined climate future. It plays October 23 and 24. Showtimes and tickets are on Downstage’s current season page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/dreaming-climate-consciousness.jpg",
+            "alt": "Dreaming Climate Consciousness production artwork with a tree-ring landscape surrounded by people and animals",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
           "start": "2026-10-24T00:00:00-06:00",
           "end": "2026-10-25T00:00:00-06:00",
           "endTimeEstimated": true
@@ -1356,6 +1368,12 @@
           "title": "Creative Stretch with Downstage",
           "summary": "Downstage’s Monday Creative Stretch sessions at the Motel Theatre, running October to May.",
           "description": "Creative Stretch is Downstage’s recurring Monday session at the Motel Theatre in the Werklund Centre, running most Mondays from October 19, 2026 to May 31, 2027. Check Downstage’s current season page for session times and any weeks off.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/creative-stretch.jpg",
+            "alt": "Creative Stretch production artwork with overlapping figures in motion on a pink background",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
           "start": "2026-10-19T00:00:00-06:00",
           "end": "2027-05-31T23:59:00-06:00",
           "endTimeEstimated": true
@@ -1381,6 +1399,12 @@
           "title": "A Study of Choices",
           "summary": "Three performers take the stage each night with no idea what awaits them, so no two shows are the same.",
           "description": "In A Study of Choices, three performers arrive on stage each night without knowing what awaits them, interpreting instructions and improvised sound given to them in the moment, so no two performances are alike. It runs April 7 to 11, 2027 at the Motel Theatre in the Werklund Centre. Showtimes and tickets are on Downstage’s current season page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/a-study-of-choices.jpg",
+            "alt": "A Study of Choices production artwork with blue figures balancing across mustard-coloured lines",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
           "start": "2027-04-07T00:00:00-06:00",
           "end": "2027-04-12T00:00:00-06:00",
           "endTimeEstimated": true

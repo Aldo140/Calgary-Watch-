@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-15T20:13:12.513Z",
+  "generatedAt": "2026-10-15T20:58:35.319Z",
   "entities": [
     {
       "id": "hood-inglewood-se",
@@ -1248,13 +1248,17 @@
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        "src": "/images/downstage/downstage-2026-27-season.png",
+        "alt": "Downstage 2026–2027 season poster featuring artwork for From Scratch, Dreaming Climate Consciousness, A Study of Choices and Creative Stretch",
+        "credit": "Season artwork by Leetia Lyons",
+        "presentation": "poster"
       },
       "images": [
         {
-          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+          "src": "/images/downstage/downstage-2026-27-season.png",
+          "alt": "Downstage 2026–2027 season poster featuring artwork for From Scratch, Dreaming Climate Consciousness, A Study of Choices and Creative Stretch",
+          "credit": "Season artwork by Leetia Lyons",
+          "presentation": "poster"
         }
       ],
       "socials": {
@@ -11777,14 +11781,20 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-15T20:58:35.319Z"
         }
       ],
+      "image": {
+        "src": "https://calgarywatch.ca/images/downstage/dreaming-climate-consciousness.jpg",
+        "alt": "Dreaming Climate Consciousness production artwork with a tree-ring landscape surrounded by people and animals",
+        "credit": "Artwork by Leetia Lyons",
+        "presentation": "poster"
+      },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-15T20:58:35.319Z",
+      "fetchedAt": "2026-10-15T20:58:35.319Z",
+      "updatedAt": "2026-10-15T20:58:35.319Z",
       "sourceId": "downstage",
       "sourceRecordId": "dreaming-climate-consciousness-2026-10-23",
       "neighbourhood": "Downtown",
@@ -11818,14 +11828,20 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-15T20:58:35.319Z"
         }
       ],
+      "image": {
+        "src": "https://calgarywatch.ca/images/downstage/dreaming-climate-consciousness.jpg",
+        "alt": "Dreaming Climate Consciousness production artwork with a tree-ring landscape surrounded by people and animals",
+        "credit": "Artwork by Leetia Lyons",
+        "presentation": "poster"
+      },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-15T20:58:35.319Z",
+      "fetchedAt": "2026-10-15T20:58:35.319Z",
+      "updatedAt": "2026-10-15T20:58:35.319Z",
       "sourceId": "downstage",
       "sourceRecordId": "dreaming-climate-consciousness-2026-10-24",
       "neighbourhood": "Downtown",
@@ -11860,14 +11876,20 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-15T20:58:35.319Z"
         }
       ],
+      "image": {
+        "src": "https://calgarywatch.ca/images/downstage/creative-stretch.jpg",
+        "alt": "Creative Stretch production artwork with overlapping figures in motion on a pink background",
+        "credit": "Artwork by Leetia Lyons",
+        "presentation": "poster"
+      },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-15T20:58:35.319Z",
+      "fetchedAt": "2026-10-15T20:58:35.319Z",
+      "updatedAt": "2026-10-15T20:58:35.319Z",
       "sourceId": "downstage",
       "sourceRecordId": "creative-stretch-2026-27",
       "neighbourhood": "Downtown",
@@ -11901,14 +11923,20 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-15T20:58:35.319Z"
         }
       ],
+      "image": {
+        "src": "https://calgarywatch.ca/images/downstage/a-study-of-choices.jpg",
+        "alt": "A Study of Choices production artwork with blue figures balancing across mustard-coloured lines",
+        "credit": "Artwork by Leetia Lyons",
+        "presentation": "poster"
+      },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-15T20:58:35.319Z",
+      "fetchedAt": "2026-10-15T20:58:35.319Z",
+      "updatedAt": "2026-10-15T20:58:35.319Z",
       "sourceId": "downstage",
       "sourceRecordId": "a-study-of-choices-2027",
       "neighbourhood": "Downtown",

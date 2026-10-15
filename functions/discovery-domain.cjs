@@ -12,9 +12,13 @@ const slugify = v => v.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-
 // editorial entry with no coordinates is still a valid listing. Image credit is retained
 // so displayed photography always carries visible provenance, never anonymous imagery.
 const image = v => {
-  if (!v || typeof v !== 'object' || Object.keys(v).some(k => !['src','alt','credit'].includes(k))) throw Error('Invalid image fields');
+  if (!v || typeof v !== 'object' || Object.keys(v).some(k => !['src','alt','credit','presentation'].includes(k))) throw Error('Invalid image fields');
   const out = { src: https(v.src), alt: text(v.alt, 300) };
   if (v.credit !== undefined) out.credit = text(v.credit, 200);
+  if (v.presentation !== undefined) {
+    if (v.presentation !== 'poster') throw Error('Invalid image presentation');
+    out.presentation = v.presentation;
+  }
   return out;
 };
 const coordinates = v => {

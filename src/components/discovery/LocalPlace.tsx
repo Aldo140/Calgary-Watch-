@@ -152,6 +152,18 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           {hours.length ? <div className="lp-fact"><small><Clock size={14} aria-hidden="true" />Hours</small><strong>{hours.slice(0, 2).map(([d, h]) => `${d} ${h}`).join(' · ')}</strong>{hours.length > 2 ? <span>More on their site</span> : null}</div> : null}
         </section>
 
+        {place.image?.presentation === 'poster' ? (
+          <section className="lp-season-art" aria-labelledby="lp-season-art">
+            <header>
+              <p className="lx-eyebrow">From the company</p>
+              <h2 id="lp-season-art">{place.id === 'biz-downstage' ? 'The 2026–27 season.' : 'Featured artwork.'}</h2>
+              <p>{place.id === 'biz-downstage' ? 'Downstage’s season at a glance. Open the official season page for current dates, times and tickets.' : 'Artwork supplied or published by the organization.'}</p>
+              {season ? <a className="lp-btn lp-btn-sun" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={17} aria-hidden="true" />View the season</a> : null}
+            </header>
+            <ListingArtwork image={place.image} />
+          </section>
+        ) : null}
+
         <section className="lp-story" aria-labelledby="lp-story">
           <header>
             <p className="lx-eyebrow">From their own site</p>
@@ -169,8 +181,6 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
             {experiences ? <a className="lx-text-link lp-season" href={experiences} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current and upcoming experiences</a> : null}
           </div>
         </section>
-
-        {place.image?.presentation === 'poster' ? <ListingArtwork image={place.image} /> : null}
 
         {!upcoming.length && place.categories.includes('arts') ? <p>No upcoming events are currently listed. Check the official website for the latest programme.</p> : null}
         {upcoming.length ? (

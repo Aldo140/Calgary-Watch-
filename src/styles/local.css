@@ -547,6 +547,14 @@
 .lp-fact span { font: 400 13.5px/1.4 Inter, sans-serif; color: rgba(255, 255, 255, .72); }
 
 .lp-story { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: clamp(24px, 5vw, 80px); margin-top: clamp(72px, 8vw, 120px); padding-top: clamp(28px, 3vw, 40px); border-top: 2px solid var(--ink); }
+.lp-season-art { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(300px, 1fr); gap: clamp(28px, 5vw, 72px); align-items: center; margin-top: clamp(54px, 7vw, 96px); padding: clamp(24px, 4vw, 52px); border-radius: 16px; background: var(--navy); color: #fff; }
+.lp-season-art header > p:not(.lx-eyebrow) { max-width: 35rem; color: #d7e2ef; font: 500 16px/1.6 Inter, sans-serif; }
+.lp-season-art h2 { margin: 10px 0 16px; max-width: 10ch; color: #fff; font: 800 clamp(42px, 5vw, 72px)/.94 var(--display); letter-spacing: -.035em; text-wrap: balance; }
+.lp-season-art .lx-eyebrow { color: var(--yellow); }
+.lp-season-art header .lp-btn { margin-top: 18px; }
+.lp-season-art .cw-listing-poster { width: 100%; max-width: 42rem; margin: 0 auto; }
+.lp-season-art .cw-listing-poster img { display: block; width: 100%; height: auto; object-fit: contain; }
+.lp-season-art .cw-listing-poster figcaption { margin-top: 10px; color: #d7e2ef; font: 600 12px/1.5 var(--mono); }
 .lp-story h2 { font: 800 clamp(48px, 6vw, 88px)/.9 var(--display); letter-spacing: -.05em; }
 .lp-story mark { color: inherit; background: linear-gradient(transparent 58%, var(--yellow) 58% 92%, transparent 92%); }
 .lp-story-body > p:first-child { font: 400 clamp(18px, 1.6vw, 21px)/1.6 Inter, sans-serif; color: var(--ink); }
@@ -586,7 +594,7 @@
 @media (max-width: 900px) {
   .lp-hero-in { grid-template-columns: minmax(0, 1fr); }
   .lp-building { justify-self: center; margin: 0; width: min(88%, 480px); }
-  .lp-take, .lp-story { grid-template-columns: minmax(0, 1fr); }
+  .lp-take, .lp-story, .lp-season-art { grid-template-columns: minmax(0, 1fr); }
   .lp-foot { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {

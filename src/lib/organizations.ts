@@ -1,4 +1,4 @@
-import type { Business, DiscoveryEntity, Event } from '../types/discovery';
+import type { Business, DiscoveryEntity, EntityImage, Event } from '../types/discovery';
 import { publishedInventory } from './discoveryPublication';
 
 /** Exact official provenance only. Venue names and fuzzy organizer names are never ownership. */
@@ -28,6 +28,18 @@ export function associateOrganizers<T extends { id: string; kind: string; title?
 
 export function organizerProfile(event: Event, all: readonly DiscoveryEntity[]): Business | undefined {
   return all.find((e): e is Business => e.kind === 'business' && e.id === event.organizerEntityId && publishedInventory(e));
+}
+
+/** Event artwork wins. A credited organizer poster is the fallback only when the event has none. */
+export function eventArtwork(event: Event, all: readonly DiscoveryEntity[]): EntityImage | undefined {
+  if (event.image) return event.image;
+  const image = organizerProfile(event, all)?.image;
+  return image?.presentation === 'poster' ? image : undefined;
+}
+
+/** CalgaryWatch-owned images stay same-origin in previews and production. */
+export function listingImageSrc(image: EntityImage): string {
+  return image.src.replace(/^https:\/\/(?:www\.)?calgarywatch\.ca(?=\/)/, '');
 }
 
 /** Relationship is presentation only; listing_claims still grants access per exact entity ID. */

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { createDiscoveryRepository, entityPath } from '../src/lib/discovery';
-import { associateOrganizers, organizerEvents, organizerProfile } from '../src/lib/organizations';
+import { associateOrganizers, eventArtwork, listingImageSrc, organizerEvents, organizerProfile } from '../src/lib/organizations';
 import { claimApprovalWrites } from '../src/lib/claimApproval';
 import { ownerVerification } from '../src/lib/verified';
 import { listingUpdateProblem, listingUpdateRequest } from '../src/lib/listingUpdates';
@@ -42,6 +42,14 @@ describe('Downstage canonical listing and events',()=>{
   it('shows upcoming associated performances and links them back to Downstage',()=>{
     assert.equal(organizerEvents(downstage.id,entities,now).length,4);
     for(const event of events)assert.equal(organizerProfile(event,entities)?.id,downstage.id);
+  });
+  it('uses production artwork first and the credited season poster only as a fallback',()=>{
+    assert.equal(downstage.image?.presentation,'poster');
+    assert.equal(downstage.image?.credit,'Season artwork by Leetia Lyons');
+    assert.ok(events.every(e=>e.image?.presentation==='poster'&&e.image.credit==='Artwork by Leetia Lyons'));
+    assert.equal(eventArtwork(events[0],entities)?.src,events[0].image?.src);
+    assert.equal(eventArtwork({...events[0],image:undefined},entities)?.src,downstage.image?.src);
+    assert.equal(listingImageSrc(events[0].image!),'/images/downstage/dreaming-climate-consciousness.jpg');
   });
   it('does not attribute venue-only events or cancelled/ended/unpublished shows',()=>{
     const unrelated={...events[0],id:'other',organizer:'A different company',organizerEntityId:'biz-downstage'};
@@ -95,5 +103,5 @@ describe('controlled organizer change requests',()=>{
  it('renders original season posters with attribution and an uncropped layout',()=>{
    const html=renderToStaticMarkup(createElement(ListingArtwork,{image:{src:'/supplied-original.png',alt:'Downstage 2026–2027 season poster',credit:'Season artwork by Leetia Lyons'}}));
    assert.match(html,/Season artwork by Leetia Lyons/);assert.match(html,/Downstage 2026–2027 season poster/);
-   const css=read('src/styles/claim.css');assert.match(css,/\.cw-listing-poster img[^}]*height: auto[^}]*object-fit: contain/);
+   const css=read('src/styles/local.css');assert.match(css,/\.cw-listing-poster img[^}]*height: auto[^}]*object-fit: contain/);
  });

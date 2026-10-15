@@ -8,6 +8,8 @@ import { entityPath, startClock } from '../../lib/discovery';
 import { EventArt, MarketCover } from './ListingArt';
 import '../../styles/plans.css';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import { eventArtwork, listingImageSrc } from '../../lib/organizations';
+import { discoveryRepository } from '../../data/discovery';
 
 const fmt = (opts: Intl.DateTimeFormatOptions) => calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', ...opts });
 const dayKey = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -45,12 +47,13 @@ function upcomingDates(market: Market, occurrences: readonly MarketOccurrence[],
 export function EventCard({ entity, now }: { entity: EventEntity; now: Date }) {
   const cost = price(entity);
   const place = entity.venue || entity.neighbourhood || entity.address;
+  const image = eventArtwork(entity, discoveryRepository.list());
   return (
     <li className="cw-lb-card cw-lb-event">
       <Link to={entityPath(entity)}>
         <span className="cw-lb-media">
-          {entity.image && /^https:\/\//.test(entity.image.src)
-            ? <img src={entity.image.src} alt={entity.image.alt} loading="lazy" decoding="async" />
+          {image
+            ? <img className={image.presentation === 'poster' ? 'is-poster' : undefined} src={listingImageSrc(image)} alt={image.alt} loading="lazy" decoding="async" />
             : <EventArt id={entity.id} title={entity.title} categories={entity.categories} />}
           <span className="cw-lb-stub" aria-hidden="true">
             <small>{weekdayShort.format(at(entity.start))}</small>
@@ -63,7 +66,7 @@ export function EventCard({ entity, now }: { entity: EventEntity; now: Date }) {
           <small className="cw-lb-when">{relativeDay(entity.start, now)} · {monthDay.format(at(entity.start))} · {startClock(entity.start, clock)}</small>
           <strong>{entity.title}</strong>
           {place ? <span className="cw-lb-place">{place}{entity.neighbourhood && entity.venue ? ` · ${entity.neighbourhood}` : ''}</span> : null}
-          {entity.image?.credit ? <em className="cw-lb-credit">{entity.image.credit}</em> : null}
+          {image?.credit ? <em className="cw-lb-credit">{image.credit}</em> : null}
         </span>
         <span className="cw-lb-go" aria-hidden="true"><ArrowUpRight size={18} /></span>
       </Link>

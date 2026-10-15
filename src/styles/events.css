@@ -170,6 +170,8 @@
 .ev-lead-card:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--b-ink); }
 .ev-lead-art { position: relative; display: block; min-height: 250px; border-right: 2px solid var(--b-ink); background: var(--b-lilac); overflow: hidden; }
 .ev-lead-art > img, .ev-lead-art > .cw-art { position: absolute; inset: 0; }
+.ev-lead-art > img, .ev-row-art > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ev-lead-art > img.is-poster, .ev-row-art > img.is-poster { object-fit: contain; background: #f2e9b5; }
 .ev-lead-art em { position: absolute; left: 10px; bottom: 8px; padding: 3px 7px; border-radius: 6px; background: rgba(255, 255, 255, .85); font: 500 10.5px/1.2 var(--h-mono); font-style: normal; }
 .ev-lead-body { display: flex; flex-direction: column; gap: 8px; padding: clamp(18px, 2.4vw, 30px); }
 .ev-lead-tag { align-self: flex-start; padding: 5px 10px; border-radius: 999px; background: var(--b-ink); color: var(--b-yellow); font: 700 11px/1 var(--h-mono); letter-spacing: .08em; text-transform: uppercase; }

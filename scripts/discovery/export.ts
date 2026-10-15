@@ -1,4 +1,5 @@
-import { mkdir, rename, writeFile } from 'node:fs/promises';
+import { associateOrganizers } from '../../src/lib/organizations';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import domain from '../../functions/discovery-domain.cjs';
 import { collectSources, editorialEntities } from './feeds';
 import { isCampusOnly } from '../../src/lib/eventRank';
@@ -16,7 +17,18 @@ import { applyOwnerVerification, ownerVerification, type ClaimRecord, type Verif
 type Entity = Record<string, unknown> & { id: string; kind: string; status?: string };
 
 const log = (m: string) => console.log(`[export] ${m}`);
+let cachedOrder: Map<string, number> | undefined;
 const feed = await collectSources(log);
+if (process.env.DISCOVERY_OFFLINE === '1') {
+  // Retain the checked-in snapshot when live feeds are deliberately unavailable.
+  // Reviewed updates win by exact ID; do not delete unrelated production inventory.
+  const cached = JSON.parse(await readFile('src/generated/discovery-index.json', 'utf8')) as { entities: Entity[]; occurrences: Entity[] };
+  cachedOrder = new Map(cached.entities.map((e, i) => [e.id, i]));
+  const ids = new Set(feed.entities.map(e => e.id));
+  for (const e of cached.entities) if (['event', 'market'].includes(e.kind) && !ids.has(e.id)) feed.entities.push(e);
+  const occurrences = new Set(feed.occurrences.map(o => o.id));
+  for (const o of cached.occurrences) if (!occurrences.has(o.id)) feed.occurrences.push(o);
+}
 
 let stored: { entities: Entity[]; occurrences: Entity[] } = { entities: [], occurrences: [] };
 let claims: { approved: ClaimRecord[]; marks: VerifiedMarkRecord[] } = { approved: [], marks: [] };
@@ -93,7 +105,8 @@ const snapshot = domain.publishSnapshot([...byId.values()], [...occById.values()
 const editorial = await editorialEntities();
 // Stamped last, over every source, so nothing a feed or entity document says about itself survives.
 const verified = ownerVerification(claims.approved, claims.marks);
-const entities = applyOwnerVerification([...editorial, ...snapshot.entities] as Entity[], verified);
+const entities = applyOwnerVerification(associateOrganizers([...editorial, ...snapshot.entities] as Entity[]), verified);
+if (cachedOrder) entities.sort((a, b) => (cachedOrder!.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (cachedOrder!.get(b.id) ?? Number.MAX_SAFE_INTEGER));
 const index = { ...snapshot, entities };
 const stamped = entities.filter(e => e.ownerVerifiedAt).length;
 if (stamped) log(`Marked ${stamped} listings verified`);

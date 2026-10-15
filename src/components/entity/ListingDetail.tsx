@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { organizerProfile } from '../../lib/organizations';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation,
@@ -118,9 +119,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const interests: EventInterestId[] = interestsFor(event).filter(i => i !== 'free');
   const open = !past && !event.cancelled;
   const photo = /^https:\/\//.test(event.image?.src ?? '') ? event.image : undefined;
-  const organization = all.find((entity): entity is Business =>
-    entity.kind === 'business' && ((!!event.sourceId && entity.sourceId === event.sourceId) || entity.title === event.organizer)
-  );
+  const organization = organizerProfile(event, all);
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
   const seen = new Set([event.id, ...alsoOn.map(e => e.id)]);
@@ -212,6 +211,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
         </aside>
 
         <div className="mk-dfoot">
+          {organization ? <p><Link to={entityPath(organization)}>More from {organization.title} <ArrowRight size={16} aria-hidden="true" /></Link></p> : null}
           <SourceBadge entity={event} />
           <ClaimCta entityId={event.id} title={event.title} kind="event" verifiedAt={event.ownerVerifiedAt} />
         </div>

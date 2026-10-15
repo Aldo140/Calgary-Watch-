@@ -1335,6 +1335,117 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-13T17:30:00-06:00",
       "updatedAt": "2026-10-13T17:30:00-06:00"
+    },
+    {
+      "id": "biz-theatre-calgary",
+      "kind": "business",
+      "slug": "theatre-calgary",
+      "title": "Theatre Calgary",
+      "name": "Theatre Calgary",
+      "website": "https://www.theatrecalgary.com/",
+      "address": "220 9 Avenue SE, Calgary, AB",
+      "summary": "Calgary theatre company presenting performances at the Max Bell Theatre.",
+      "description": "Find Theatre Calgary performances and follow its official website for the current season, tickets and production details. CalgaryWatch links associated performances below; individual dates and availability remain with the company.",
+      "neighbourhood": "Downtown",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "arts",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Theatre Calgary",
+          "url": "https://www.theatrecalgary.com/",
+          "kind": "official"
+        }
+      ],
+      "socials": {
+        "website": "https://www.theatrecalgary.com/"
+      },
+      "services": [],
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-15T00:00:00Z"
+    },
+    {
+      "id": "biz-alliance-francaise-calgary",
+      "kind": "business",
+      "slug": "alliance-francaise-calgary",
+      "title": "Alliance Française de Calgary",
+      "name": "Alliance Française de Calgary",
+      "website": "https://www.afcalgary.ca/",
+      "address": "Calgary, AB",
+      "summary": "Discover Alliance Française de Calgary through its official homepage.",
+      "description": "Use the organization’s homepage for its current activities and published information. CalgaryWatch links officially sourced associated events here when available. Check the official site for locations, schedules and registration.",
+      "neighbourhood": "",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "arts",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alliance Française de Calgary",
+          "url": "https://www.afcalgary.ca/",
+          "kind": "official"
+        }
+      ],
+      "socials": {
+        "website": "https://www.afcalgary.ca/"
+      },
+      "services": [],
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-15T00:00:00Z"
+    },
+    {
+      "id": "biz-werklund-centre",
+      "kind": "business",
+      "slug": "werklund-centre",
+      "title": "Werklund Centre",
+      "name": "Werklund Centre",
+      "website": "https://www.werklundcentre.ca/",
+      "address": "205 8 Avenue SE, Calgary, AB",
+      "summary": "Downtown Calgary performing arts centre, formerly Arts Commons.",
+      "description": "Werklund Centre is a home for performing arts in downtown Calgary. Visit its official website for current programming and visitor information. Events held in its venues are not automatically events organized by the centre; only officially attributed organizer events appear below.",
+      "neighbourhood": "Downtown",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "arts",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official"
+        }
+      ],
+      "socials": {
+        "website": "https://www.werklundcentre.ca/"
+      },
+      "services": [],
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-15T00:00:00Z"
     }
   ]
 }

@@ -57,7 +57,7 @@ export function claimFactsFor(
 ): ClaimFacts {
   const hasPublishedEntity = Boolean(lead.entityId && entity && entity.id === lead.entityId
     && entity.status === 'published' && !entity.fixture && !entity.developmentOnly);
-  const verified = hasPublishedEntity && (verifiedIds.has(entity!.id) || Boolean(entity!.ownerVerifiedAt) || lead.status === 'claimed');
+  const verified = hasPublishedEntity && (verifiedIds.has(entity!.id) || Boolean(entity!.ownerVerifiedAt));
   const claimable = hasPublishedEntity && !verified;
   const organizationListed = hasPublishedEntity && LEAD_KINDS.has(entity!.kind) && lead.entityKind !== 'organizer' && lead.entityKind !== 'prospect';
   return {
@@ -134,6 +134,11 @@ export function guaranteeProblems(body: string): string[] {
 /** Everything a message says about claiming and verification that the facts don't support. */
 export function claimLanguageProblems(body: string, f: ClaimFacts): string[] {
   const problems = guaranteeProblems(body);
+  // A claim URL guard alone misses plain false claims in both subjects and bodies.
+  const saysListed = /\balready listed\b|\byour (?:CalgaryWatch )?(?:listing|profile)\b|\bwe(?:['’]ve| have)? added\b|\b(?:your profile|your listing) is live\b|\blisted on CalgaryWatch\b|\bclaim your (?:existing )?listing\b/i;
+  if (!f.hasPublishedEntity && saysListed.test(body)) problems.push('Claims an existing listing without a published entity.');
+  if (f.hasPublishedEntity && f.entityKind === 'event' && body.split(/[.!?\n]/).some(line => saysListed.test(line) && !/\bevent\b/i.test(line))) problems.push('Describes an organization listing when only an event is published.');
+  if (f.hasPublishedEntity && !f.organizationListed && /\byour (?:organization|company|business) (?:listing|profile)\b|\byour profile is live\b/i.test(body)) problems.push('An event listing is not an organization profile.');
   const links = [...body.matchAll(CLAIM_LINK)].map(m => `https://${m[0].replace(/[.,;:!?]+$/, '')}`);
   if (links.length && !f.claimable) problems.push('Offers a claim link for a listing that is not claimable.');
   else if (links.some(l => l !== f.claimUrl)) problems.push('Uses a claim link other than the listing’s own claim page.');

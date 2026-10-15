@@ -1,3 +1,4 @@
+import { discoveryRepository } from '../../data/discovery';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { useVerifiedListing } from '../../lib/claimsApi';
@@ -17,6 +18,8 @@ export function VerifiedMark({ entityId, verifiedAt }: { entityId: string; verif
 /** At the foot of a listing: the invitation to claim it, or a correction link once claimed. */
 export function ClaimCta({ entityId, title, kind, verifiedAt }: { entityId: string; title: string; kind: string; verifiedAt?: string }) {
   const verified = useVerifiedListing(entityId, Boolean(verifiedAt));
+  const exists = discoveryRepository.list().some(e => e.id === entityId && ['event', 'market', 'business'].includes(e.kind) && !e.developmentOnly);
+  if (!exists) return null;
   if (verified) {
     return <p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${title}`)}`}>Suggest a correction</a></p>;
   }

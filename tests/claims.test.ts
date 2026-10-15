@@ -66,8 +66,8 @@ describe('rules contract', () => {
   });
   it('the verified mark is public to read, admin to write', () => {
     const v = block('verified_listings');
-    assert.match(v, /allow read: if true/);
-    assert.match(v, /allow write: if isAdmin\(\)/);
+    assert.match(v, /listing_claims/);
+    assert.match(v, /allow create, update: if isAdmin\(\)/);
   });
   it('the client writes exactly the fields the rule allows', () => {
     const api = readFileSync(new URL('../src/lib/claimsApi.ts', import.meta.url), 'utf8');

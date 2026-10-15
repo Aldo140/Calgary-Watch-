@@ -51,7 +51,7 @@ Statuses: **READY TO REPLY** (the site is done; a claim link can go out), **WAIT
 | Vertigo Theatre | Kendra Hutchinson, publicist (kendra.hutchinson@vertigotheatre.com) | A direct line to update listings; happy to fill a form and add production photos | https://purchase.vertigotheatre.com/Events?attribute_EventType=2627Season | `biz-vertigo-theatre` | https://calgarywatch.ca/local/vertigo-theatre | https://calgarywatch.ca/claim/biz-vertigo-theatre | READY TO REPLY |
 | Wilder Institute’s Calgary Zoo | Media Relations (mediarelations@calgaryzoo.com) | Use the official site and socials as the source; call it "Wilder Institute’s Calgary Zoo" or "the zoo" | https://www.calgaryzoo.com/ | `biz-wilder-institutes-calgary-zoo` | https://calgarywatch.ca/local/wilder-institutes-calgary-zoo | https://calgarywatch.ca/claim/biz-wilder-institutes-calgary-zoo | WAITING ON SITE WORK until the listing deploys, then READY TO REPLY |
 | Calgary Chinese Cultural Centre | Nicole (info@culturalcentre.ca) | Use the official website for current information | https://www.culturalcentre.ca/ | `biz-calgary-chinese-cultural-centre` | https://calgarywatch.ca/local/calgary-chinese-cultural-centre | https://calgarywatch.ca/claim/biz-calgary-chinese-cultural-centre | READY TO REPLY |
-| Downstage | Dylan Bauer; Clare Preuss, Artistic Director | Creative Stretch most Mondays; Dreaming Climate Consciousness Oct 23–24; From Scratch dates to follow; four images possibly, pending their sign-off | https://downstage.ca/currentseason/ | `biz-downstage` | https://calgarywatch.ca/local/downstage | https://calgarywatch.ca/claim/biz-downstage | WAITING ON SITE WORK until the listing deploys, then READY TO REPLY. Images: WAITING ON ASSET (not approved yet; listing uses neutral art) |
+| Downstage | Dylan Bauer; Clare Preuss, Artistic Director | Creative Stretch most Mondays; Dreaming Climate Consciousness Oct 23–24; From Scratch dates to follow; Clare approved season artwork by Leetia Lyons; original asset file needed for installation | https://downstage.ca/currentseason/ | `biz-downstage` | https://calgarywatch.ca/local/downstage | https://calgarywatch.ca/claim/biz-downstage | WAITING ON SITE WORK until the listing deploys, then READY TO REPLY. Images: ARTWORK PERMISSION CONFIRMED by Clare; supplied poster selected, original image file not available to this runtime (neutral art retained until installed) |
 | Ghost River Theatre | Sharon Kahanoff, Executive Director (ed@ghostrivertheatre.com) | No fixed season; the main page is kept most current, 2026/27 Experiences is secondary | https://www.ghostrivertheatre.com/#grt | `biz-ghost-river-theatre` | https://calgarywatch.ca/local/ghost-river-theatre | https://calgarywatch.ca/claim/biz-ghost-river-theatre | NO REPLY NEEDED (thread closed with "Thanks Aldo!"). Listing exists for when we next write |
 | Dalhousie Harvest Farmers’ Market | Sonja Devauld, Marketing and Communications Manager, Dalhousie Community Association (marcom@dalhousiecalgary.ca) | Confirmed the listing is correct; sent two images for the Harvest Market | https://www.dalhousiecalgary.ca/farmersmarket-harvest/ | `b3bbb09ef98f18fa6f66383e98f1` | https://calgarywatch.ca/markets/dalhousie-harvest-farmers-market-b3bbb0 | https://calgarywatch.ca/claim/b3bbb09ef98f18fa6f66383e98f1 | WAITING ON SITE WORK until the image deploys, then READY TO REPLY |
 | Mercantile on 9th (event) | Jill Hawker, organizer (jill@allthingsjill.ca); intro from Karen Bray, Inglewood BIA | Event listing | https://www.inglewoodyyc.ca/ | `6972906c904ecd4acb9407299e22` (event) | https://calgarywatch.ca/events/mercantile-on-9th-697290 | https://calgarywatch.ca/claim/6972906c904ecd4acb9407299e22 | READY TO REPLY, as an **event** listing. Our last email bounced (Outlook delivery), not a site issue |
@@ -130,3 +130,28 @@ Data:
 - `market_service_requests/{uid}_{marketId}`.
 
 The rules have 27 emulator cases and contract tests in `tests/markets.test.ts`. Payments, stall maps and document storage are deliberately not built yet; payments need a server, which the current Firebase plan doesn't include.
+
+## Positive respondents: permanent profile handoff (2026-10-15)
+
+These contacts are CRM context only, never claim authorization:
+
+| Organization | Contact/context | Canonical profile ID |
+|---|---|---|
+| Theatre Calgary | Paula Sundby wants performances included and asked about uploads, management and claiming. | `biz-theatre-calgary` |
+| Alliance Française de Calgary | Antoine H. replied positively and requested https://www.afcalgary.ca/ as primary source. | `biz-alliance-francaise-calgary` |
+| Werklund Centre | Alex Bonyun volunteered as main contact for questions/corrections. | `biz-werklund-centre` |
+| Mercantile on 9th | Existing claim/account case; retain event `6972906c904ecd4acb9407299e22`. Actual account/claim status is not accessible in this environment. | Existing event; no duplicate profile created |
+
+Before sending profile/claim links: check for the canonical entity, deploy/reuse it, verify the actual public and claim pages, then share them only in an authorized email workflow. Event/source/prospect/venue mentions alone are not business profiles. See [organization-claims-rollout.md](organization-claims-rollout.md) for URLs, auth/approval findings and the conditional Mercantile audit/repair procedure. No messages were sent by this task.
+
+
+## Downstage claim-management handoff (2026-10-15)
+
+- Contacts: Clare Preuss (`clare@downstage.ca`) and Dylan Bauer (`dylan@downstage.ca`). Positive response. These are outreach contacts, not authorization records.
+- Canonical organization: `biz-downstage`; public https://calgarywatch.ca/local/downstage; stable claim/status/manage URL https://calgarywatch.ca/claim/biz-downstage.
+- Clare says she already submitted a claim and has additional listing details to send. Preserve her existing submission. Actual production pending/approved state requires inspection in Admin → Local partners → Claimed listings; do not submit another claim or approve it as a test.
+- After approval the submitting account receives the existing business designation and Downstage in businessListings. Its dashboard's Send a change link leads to the same claim/manage page. Requests go to listing_updates for review; they do not edit public discovery records directly.
+- Clare supplied permission for Leetia Lyons season artwork. The user selected the 2026–2027 season poster shown in this conversation. It has not been installed because the original image file is not exposed to the runtime; no Dropbox download, recreation or replacement art was used. The full-poster component preserves aspect ratio and supports artist credit when the file is attached.
+- Future specific artwork/photos: email the exact original files to aldo@calgarywatch.ca, with the listing name and requested artist/photographer credit. The form accepts context and an optional HTTPS source URL; it has no file upload.
+- The four existing Downstage event records remain canonical: Dreaming Climate Consciousness on Oct 23 and Oct 24, Creative Stretch (free, as Dylan confirmed), and A Study of Choices. Canonical organizerEntityId links them to biz-downstage. From Scratch has no scheduled record; do not invent dates.
+- Before replying: review/deploy the pending code, install the actual approved image file, verify live public/manage routes and inspect Clare's existing production claim/account/email status. Approval is a separate admin decision. No email was sent by this task.

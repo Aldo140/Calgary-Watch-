@@ -1,7 +1,7 @@
 /** Discovery documents are separate from incidents. Dates use ISO 8601 with an offset. */
 export type EntityKind = 'event' | 'market' | 'business' | 'guide' | 'neighbourhood';
 export interface EntitySource { name: string; url: string; retrievedAt?: string; kind: 'official' | 'editorial' | 'submission' | 'fixture' }
-export interface EntityImage { src: string; alt: string; credit?: string }
+export interface EntityImage { src: string; alt: string; credit?: string; presentation?: 'poster' }
 export interface EntityBase {
   id: string; kind: EntityKind; slug: string; title: string; summary: string; description: string;
   categories: string[]; tags: string[]; sources: EntitySource[]; image?: EntityImage;
@@ -17,7 +17,7 @@ export interface Event extends EntityBase, Location {
   kind: 'event'; start: string; end: string; timezone: 'America/Edmonton';
   endTimeEstimated?: boolean;
   pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string;
-  organizer: string; cancelled?: boolean;
+  organizer: string; organizerEntityId?: string; cancelled?: boolean;
 }
 export interface Market extends EntityBase, Location {
   kind: 'market'; amenities: string[]; parking?: string; transit?: string;

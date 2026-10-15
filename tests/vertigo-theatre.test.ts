@@ -99,9 +99,9 @@ describe('Vertigo Theatre organization listing', () => {
   it('renders the reusable organization-to-productions relationship', () => {
     const listing = read('src/components/entity/ListingDetail.tsx');
     const place = read('src/components/discovery/LocalPlace.tsx');
-    assert.match(place, /e\.sourceId === place\.sourceId/);
-    assert.match(place, /Coming up at <mark>\{name\}\.<\/mark>/);
-    assert.match(listing, /entity\.sourceId === event\.sourceId/);
+    assert.match(place, /organizerEvents\(place.id, all, now\)/);
+    assert.match(place, /Upcoming events from <mark>\{name\}\.<\/mark>/);
+    assert.match(listing, /organizerProfile\(event, all\)/);
     assert.match(listing, /<Link to=\{entityPath\(organization\)\}>\{event\.organizer\}<\/Link>/);
   });
 });

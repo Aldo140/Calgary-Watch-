@@ -83,8 +83,8 @@ describe('verified state follows approved claims only', () => {
 
   it('approval in admin writes the public mark and closes every lead for the listing', () => {
     const panel = readFileSync(new URL('../src/components/admin/ClaimsPanel.tsx', import.meta.url), 'utf8');
-    assert.match(panel, /status: approve \? 'approved' : 'rejected'/);
-    assert.match(panel, /if \(approve\) \{\s*await setDoc\(doc\(db, VERIFIED, c\.entityId\)/);
+    assert.match(panel, /tx.update\(claimRef, writes.claim\)/);
+    assert.match(panel, /tx.set\(doc\(database, VERIFIED, c\.entityId\), writes.mark\)/);
     assert.match(panel, /leads\?\.filter\(\(l\) => l\.entityId === c\.entityId\)/);
   });
 });
@@ -218,7 +218,6 @@ describe('outreach claim facts', () => {
     for (const f of [
       claimFactsFor(lead(), { ...listed, ...VERIFIED }),
       claimFactsFor(lead(), listed, new Set(['biz-vertigo-theatre'])),
-      claimFactsFor(lead({ status: 'claimed' }), listed),
     ]) {
       assert.equal(f.verified, true);
       assert.equal(f.claimable, false);

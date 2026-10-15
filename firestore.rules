@@ -186,7 +186,7 @@ service cloud.firestore {
       // admin can annotate a profile without rewriting identity fields, and
       // role escalation still requires the approved admin token.
       allow update: if isAdmin() &&
-                    request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly([
                       'displayName', 'notes', 'role', 'accountType', 'businessListings', 'businessSince'
                     ]) &&
                     request.resource.data.get('accountType', 'personal') in ['personal', 'business'] &&
@@ -818,8 +818,15 @@ service cloud.firestore {
 
     // Public "managed by the organizer" flag, one doc per listing.
     match /verified_listings/{entityId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      // Legacy marks remain readable for approved-claim build stamps. New marks are checked against the live claim.
+      allow read: if !exists(/databases/$(database)/documents/verified_listings/$(entityId)) || !('claimId' in resource.data) ||
+        (get(/databases/$(database)/documents/listing_claims/$(resource.data.claimId)).data.status == 'approved' &&
+         get(/databases/$(database)/documents/listing_claims/$(resource.data.claimId)).data.entityId == entityId);
+      allow create, update: if isAdmin() && request.resource.data.entityId == entityId &&
+        request.resource.data.claimId is string &&
+        getAfter(/databases/$(database)/documents/listing_claims/$(request.resource.data.claimId)).data.status == 'approved' &&
+        getAfter(/databases/$(database)/documents/listing_claims/$(request.resource.data.claimId)).data.entityId == entityId;
+      allow delete: if isAdmin();
     }
 
     // ── Market HQ ────────────────────────────────────────────────────────

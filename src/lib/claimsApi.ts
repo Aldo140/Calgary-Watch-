@@ -1,5 +1,9 @@
-import { useEffect, useState } from 'react';
-import { addDoc, collection, doc, getDoc, getDocs, limit, onSnapshot, query, setDoc, where } from 'firebase/firestore';
+import { listingUpdateRequest } from './listingUpdates';
+import { approvedPublicMark } from './claimApproval';
+import { discoveryRepository } from '../data/discovery';
+import { entityPath } from './discovery';
+import { useEffect, useState, useSyncExternalStore, useCallback } from 'react';
+import { addDoc, collection, doc, getDocs, limit, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
 import { db } from '../firebase';
 import { CLAIMS, UPDATES, VERIFIED, claimId, type ClaimDraft, type ListingClaim, type UpdateField } from './claims';
@@ -20,6 +24,9 @@ export function useMyClaims(uid: string | undefined): ListingClaim[] | null {
 
 export async function submitClaim(user: User, entity: { id: string; title: string; path: string }, draft: ClaimDraft): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
+  const published = discoveryRepository.list().find(e => e.id === entity.id && ['event', 'market', 'business'].includes(e.kind) && !e.developmentOnly);
+  if (!published || entityPath(published) !== entity.path) throw new Error('This listing is not published.');
+  if (!user.emailVerified) throw new Error('Use a Google account with a verified email address.');
   const claim: ListingClaim = {
     uid: user.uid,
     entityId: entity.id,
@@ -39,16 +46,7 @@ export async function submitClaim(user: User, entity: { id: string; title: strin
 
 export async function submitUpdate(user: User, claim: Pick<ListingClaim, 'entityId' | 'entityTitle'>, field: UpdateField, details: string, url: string): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
-  await addDoc(collection(db, UPDATES), {
-    uid: user.uid,
-    entityId: claim.entityId,
-    entityTitle: claim.entityTitle,
-    field,
-    details: details.trim().slice(0, 2000),
-    url: url.trim().slice(0, 2000),
-    status: 'pending',
-    createdAt: Date.now(),
-  });
+  await addDoc(collection(db, UPDATES), listingUpdateRequest(user.uid, claim, field, details, url, Date.now()));
 }
 
 export async function readMyUpdates(uid: string, entityId: string): Promise<Array<{ field: UpdateField; details: string; status: string; createdAt: number }>> {
@@ -63,23 +61,27 @@ export async function readMyUpdates(uid: string, entityId: string): Promise<Arra
   }
 }
 
-const verifiedCache = new Map<string, boolean>();
+type MarkState = { value?: boolean; listeners: Set<() => void>; stop?: () => void };
+const marks = new Map<string, MarkState>();
+function markState(id: string): MarkState {
+  let state = marks.get(id);
+  if (!state) { state = { listeners: new Set() }; marks.set(id, state); }
+  return state;
+}
 
-/**
- * The "Verified" mark: one public read per listing, remembered for the visit.
- * `built` is the build's stamp from approved claims (src/lib/verified.ts); when
- * it is already set there is nothing to read.
- */
+/** One shared live result prevents the badge and claim CTA from contradicting each other. */
 export function useVerifiedListing(entityId: string, built = false): boolean {
-  const [on, setOn] = useState(() => built || (verifiedCache.get(entityId) ?? false));
-  useEffect(() => {
-    if (built) { setOn(true); return; }
-    if (!db || verifiedCache.has(entityId)) { setOn(verifiedCache.get(entityId) ?? false); return; }
-    let live = true;
-    getDoc(doc(db, VERIFIED, entityId))
-      .then((s) => { verifiedCache.set(entityId, s.exists()); if (live) setOn(s.exists()); })
-      .catch(() => verifiedCache.set(entityId, false));
-    return () => { live = false; };
-  }, [entityId, built]);
-  return on;
+  const state = markState(entityId);
+  const subscribe = useCallback((notify: () => void) => {
+    state.listeners.add(notify);
+    if (db && !state.stop) {
+      state.stop = onSnapshot(doc(db, VERIFIED, entityId), snap => {
+        // Legacy marks have no claim reference. Only an approved-claim build stamp can vouch for those.
+        state.value = snap.exists() ? (approvedPublicMark(entityId, snap.data()) || (built && !snap.data().claimId)) : built;
+        state.listeners.forEach(fn => fn());
+      }, error => { state.value = error.code === 'permission-denied' ? false : built; state.listeners.forEach(fn => fn()); });
+    }
+    return () => { state.listeners.delete(notify); if (!state.listeners.size) { state.stop?.(); state.stop = undefined; } };
+  }, [state, entityId, built]);
+  return useSyncExternalStore(subscribe, () => state.value ?? built, () => built);
 }

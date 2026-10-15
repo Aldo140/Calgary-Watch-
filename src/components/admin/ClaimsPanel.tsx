@@ -6,12 +6,13 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { collection, doc, getDoc, limit, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDoc, limit, onSnapshot, query, setDoc, updateDoc, runTransaction, where } from 'firebase/firestore';
 import { BadgeCheck, ExternalLink, Mail, X } from 'lucide-react';
 import { db } from '@/src/firebase';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { discoveryRepository } from '@/src/data/discovery';
 import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence, claimId, type ListingClaim, type ListingUpdate } from '@/src/lib/claims';
+import { claimApprovalWrites } from '@/src/lib/claimApproval';
 import { APPROVAL_EMAILS_SINCE, type ApprovalEmailStatus } from '@/src/lib/claimApprovalEmail';
 import { businessAccountPatch, businessAccountsFromClaims, readBusinessAccount } from '@/src/lib/businessAccount';
 import type { PartnerLead } from '@/src/types/ops';
@@ -60,11 +61,21 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     if (!approve && !note) return;
     setBusy(c.entityId); setError('');
     try {
-      await updateDoc(doc(db, CLAIMS, claimId(c.uid, c.entityId)), { status: approve ? 'approved' : 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
+      const database = db;
+      if (!approve) await updateDoc(doc(database, CLAIMS, claimId(c.uid, c.entityId)), { status: 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
-        await setDoc(doc(db, VERIFIED, c.entityId), { entityId: c.entityId, title: c.entityTitle, verifiedAt: Date.now(), verifiedBy: by });
-        // The claimant's own account becomes a business account (businessAccount.ts).
-        await markBusiness(c.uid, [c.entityId]).catch((e) => setError(`Claim approved, but the account wasn’t marked as a business account: ${e instanceof Error ? e.message : e}`));
+        if (!entities.has(c.entityId)) throw new Error('This listing is not in the published inventory. Restore the canonical listing before approving.');
+        await runTransaction(database, async tx => {
+          const claimRef = doc(database, CLAIMS, claimId(c.uid, c.entityId));
+          const accountRef = doc(database, 'users', c.uid);
+          const claimSnap = await tx.get(claimRef);
+          const accountSnap = await tx.get(accountRef);
+          if (!claimSnap.exists()) throw new Error('The claim no longer exists.');
+          const writes = claimApprovalWrites(claimSnap.data() as ListingClaim, accountSnap.data(), by, Date.now());
+          tx.update(claimRef, writes.claim);
+          tx.set(doc(database, VERIFIED, c.entityId), writes.mark);
+          tx.update(accountRef, writes.account);
+        });
         // The outreach pipeline learns the listing was claimed, so it stops pitching —
         // every lead for it (a listing can have a business lead and an organizer lead).
         for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
@@ -183,6 +194,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
+              <AdminButton variant="ghost" disabled={busy === c.entityId} onClick={() => void decide(c, true)}>Repair verification &amp; account</AdminButton>
               {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
             </div>
           ))}

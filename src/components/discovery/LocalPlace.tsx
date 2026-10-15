@@ -1,8 +1,10 @@
+import { ListingArtwork } from '../entity/ListingArtwork';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, MapPin, Navigation, Phone, Quote, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
+import { organizerEvents } from '../../lib/organizations';
 import { localLinks } from '../../lib/localLinks';
 import { communityFor, directionsUrl } from '../../lib/marketDays';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
@@ -57,6 +59,7 @@ function Lamp() {
  */
 export function LocalPlace({ place, all, occurrences }: { place: Business; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[] }) {
   const [now] = useState(() => Date.now());
+  const upcoming = organizerEvents(place.id, all, now);
   const url = `https://calgarywatch.ca${entityPath(place)}`;
   const { shared, share } = useShare(place.title, place.summary, url);
   // The phone's Visit dock appears once the hero's own buttons have scrolled away.
@@ -81,11 +84,6 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const guide = links.guides[0];
   const others = all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly))
     .sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title));
-  const upcoming = all
-    // The organization's own feed, plus copies from aggregators (Tourism Calgary) that name it as organizer.
-    .filter((e): e is Event => e.kind === 'event' && ((!!place.sourceId && e.sourceId === place.sourceId) || e.organizer === place.title) && !e.cancelled && Date.parse(e.end) > now)
-    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
-    .slice(0, 6);
   const hours = place.hours ? Object.entries(place.hours) : [];
   const status = place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : `${place.categories[0] ? `${place.categories[0][0].toUpperCase()}${place.categories[0].slice(1)} · ` : ''}Local organization`);
   let n = 0;
@@ -172,12 +170,15 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           </div>
         </section>
 
+        {place.image?.presentation === 'poster' ? <ListingArtwork image={place.image} /> : null}
+
+        {!upcoming.length && place.categories.includes('arts') ? <p>No upcoming events are currently listed. Check the official website for the latest programme.</p> : null}
         {upcoming.length ? (
           <section className="lp-upcoming" aria-labelledby="lp-upcoming">
             <header className="lx-head">
               <div>
                 <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />From the official season</p>
-                <h2 id="lp-upcoming">Coming up at <mark>{name}.</mark></h2>
+                <h2 id="lp-upcoming">Upcoming events from <mark>{name}.</mark></h2>
               </div>
             </header>
             <ul className="lp-dates">

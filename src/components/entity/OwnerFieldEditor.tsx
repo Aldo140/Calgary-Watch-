@@ -30,6 +30,6 @@ export function OwnerFieldEditor({field,value,disabled,onChange}:{field:string;v
     {['cancelled','petFriendly','familyFriendly'].includes(field)?<select value={value||'false'} disabled={disabled} onChange={e=>change(e.target.value)}><option value="false">No</option><option value="true">Yes</option></select>:
       field==='pricing'?<select value={value||'unknown'} disabled={disabled} onChange={e=>change(e.target.value)}><option value="unknown">See official source</option><option value="free">Free</option><option value="paid">Paid</option></select>:
       ['description','summary'].includes(field)?<textarea rows={field==='description'?6:3} value={value} readOnly={disabled} onChange={e=>change(e.target.value)} />:
-      <input value={value} readOnly={disabled} onChange={e=>change(e.target.value)} placeholder={['start','end'].includes(field)?'2026-10-23T19:00:00-06:00':undefined} />}
+      <input type={field==='phone'?'tel':['website','tickets'].includes(field)?'url':field==='priceLevel'?'number':'text'} autoComplete={field==='phone'?'tel':field==='website'?'url':field==='address'?'street-address':'off'} min={field==='priceLevel'?1:undefined} max={field==='priceLevel'?4:undefined} step={field==='priceLevel'?1:undefined} value={value} readOnly={disabled} onChange={e=>change(e.target.value)} placeholder={['start','end'].includes(field)?'2026-10-23T19:00:00-06:00':undefined} />}
   </label>;
 }

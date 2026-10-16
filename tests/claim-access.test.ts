@@ -24,6 +24,7 @@ const inventory=[event,business,{...event,id:'linked-event',organizerEntityId:bu
 async function render({admin=false,user=true,claim=null,path='/claim/festival',verified=false,loading=false,failed=false}:{admin?:boolean;user?:boolean;claim?:Record<string,unknown>|null;path?:string;verified?:boolean;loading?:boolean;failed?:boolean}={}){
  const userData=user?{uid:'me',email:'me@gmail.com',emailVerified:true,displayName:'My account'}:null;
  const component=await import(compile('../src/pages/ClaimListingPage.tsx',{
+  '../lib/claimPresentation':compile('../src/lib/claimPresentation.ts'),
   '../lib/claimOrganization':organizationModule,
   '../components/admin/AdminAccessBar':compile('../src/components/admin/AdminAccessBar.tsx'),
   '../hooks/useAdminEditMode':compile('../src/hooks/useAdminEditMode.ts'),

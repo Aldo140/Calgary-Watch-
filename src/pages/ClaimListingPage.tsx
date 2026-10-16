@@ -1,3 +1,4 @@
+import { claimPresentation } from '../lib/claimPresentation';
 import {claimOrganization,approvedManagementOrganization,standaloneOrganization} from '../lib/claimOrganization';
 import {AdminAccessBar} from '../components/admin/AdminAccessBar';
 import {useAdminEditMode} from '../hooks/useAdminEditMode';
@@ -9,7 +10,7 @@ import { VerifiedBadge } from '../components/entity/VerifiedBadge';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowUpRight, BadgeCheck, CalendarClock, Check, Clock, ImagePlus, Link2, Lock, MapPinned, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, CalendarClock, CalendarDays, Check, Clock, ImagePlus, Link2, Lock, MapPinned, ShieldCheck, Store, Theater, Music, Palette, Building2, UtensilsCrossed, Users } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { discoveryRepository } from '../data/discovery';
@@ -128,11 +129,14 @@ function ClaimForm({ id }: { id: string }) {
     );
   }
 
+  const presentation = claimPresentation(listing ?? entity, profile);
+  const CategoryIcon = { market: Store, stage: Theater, music: Music, arts: Palette, food: UtensilsCrossed, community: Users, business: Building2, event: CalendarDays }[presentation.key];
+  const benefits = PERKS.map(perk => perk.icon === CalendarClock ? { ...perk, title: presentation.dates } : perk.icon === Link2 ? { ...perk, title: presentation.link } : perk);
   const rise = (i: number) => ({ initial: reduce ? false : { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, ease: EASE_OUT, delay: 0.05 + i * 0.07 } });
 
   return (
     <SiteLayout>
-      <div className="cw-plans cl-page">
+      <div className="cw-plans cl-page" data-category={presentation.key}>
         {isAdmin ? <div className="cw-wrap">
           {adminView ? <>
             <AdminAccessBar enabled={adminMode.enabled} onChange={adminMode.setEnabled} subject={entity.title}/>
@@ -140,9 +144,13 @@ function ClaimForm({ id }: { id: string }) {
           </> : <p className="pl-fine">You’re viewing the same claim page organizers use. Your administrator role does not claim this organization. <Link to={adminViewUrl}>Open admin management</Link>.</p>}
         </div> : null}
         <header className="cw-wrap cl-head">
-          <motion.p className="pl-eyebrow" {...rise(0)}>For organizers · free</motion.p>
+          <div className="cl-hero-copy">
+          <motion.p className="pl-eyebrow" {...rise(0)}><CategoryIcon size={17} aria-hidden="true" /> {presentation.label} · free</motion.p>
           <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'||adminView?<>Manage <em>{entity.title}.</em></>:<>Claim <em>{profile?.title??entity.title}.</em></>}</motion.h1>
-          <motion.p className="cl-lead" {...rise(2)}>Keep your listing and linked events right: dates, descriptions, addresses and links. After verification, save one update every seven days per business. Changes publish automatically without admin approval; CalgaryWatch is notified. Images cannot be added, changed or deleted in the editor. Once your claim is approved, your listing shows that it’s confirmed by your organization.</motion.p>
+          <motion.p className="cl-lead" {...rise(2)}><strong>{presentation.intro}</strong> {presentation.detail}</motion.p>
+          <ul className="cl-assurances" aria-label="Free organizer access"><li><Check size={15} aria-hidden="true" />Free organization account</li><li><Check size={15} aria-hidden="true" />No neighbourhood required</li><li><ShieldCheck size={15} aria-hidden="true" />Authority checked before editing</li></ul>
+          </div>
+          <div className="cl-hero-stamp" aria-hidden="true"><span className="cl-stamp-icon"><CategoryIcon size={58} strokeWidth={1.6} /></span><span>Made for</span><strong>{profile?.title ?? entity.title}</strong><small>Your organization. One workspace.</small></div>
           <motion.ol className="cl-steps" aria-label="How claiming works" {...rise(3)}>
             <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in with Google</li>
             <li data-done={!!claim}><span>{claim ? <Check size={14} strokeWidth={3} /> : 2}</span> Tell us who you are</li>
@@ -153,8 +161,8 @@ function ClaimForm({ id }: { id: string }) {
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
             {claimLoadError ? <div role="alert" className="pl-error"><p>We couldn’t check existing claims. Your form is still here; this does not mean your account cannot claim this organization.</p><button type="button" className="pl-btn" onClick={() => window.location.reload()}>Reload and try again</button></div> : null}
-            {!claim&&!adminView ? <p className="pl-fine">{user ? 'Already signed in? Use this account to request access—no new account or paid plan is needed.' : 'New here? Google sign-in creates your free account. Already have an account? Sign in with it and continue here.'} You can apply with a personal or work Google account; we confirm your authority before enabling changes.</p> : null}
-            {!claim&&!adminView&&profile?<section className="cl-listing" aria-label="Prefilled organization profile"><p className="pl-kicker">Your prefilled organization profile</p><h2>{profile.title}</h2>{listing&&listing.id!==entity.id?<p>For your listing: <Link to={entityPath(listing)}>{listing.title}</Link></p>:null}<p>{profile.managementOnly?'Your management workspace starts with this listing. You can add events after approval, without creating a separate public company page.':'Manage this organization profile and its confirmed linked events after approval.'}</p>{profile.website?<a href={profile.website} target="_blank" rel="noopener noreferrer">Organization source ↗</a>:null}{profile.address?<p>{profile.address}</p>:null}<p>We confirm your authority before enabling edits. Existing unrelated listings are never added to your account automatically.</p></section>:null}
+            {!claim&&!adminView ? <p className="cl-account-note">{user ? 'Already signed in? Use this account to request access—no new account or paid plan is needed.' : 'New here? Google sign-in creates your free account. Already have an account? Sign in with it and continue here.'} You can apply with a personal or work Google account; we confirm your authority before enabling changes.</p> : null}
+            {!claim&&!adminView&&profile?<section className="cl-context" aria-label="Prefilled organization profile"><p className="pl-kicker">Your prefilled organization profile</p><h2>{profile.title}</h2>{listing&&listing.id!==entity.id?<p>For your listing: <Link to={entityPath(listing)}>{listing.title}</Link></p>:null}<p>{profile.managementOnly?'Your management workspace starts with this listing. You can add events after approval, without creating a separate public company page.':'Manage this organization profile and its confirmed linked events after approval.'}</p>{profile.website?<a href={profile.website} target="_blank" rel="noopener noreferrer">Organization source ↗</a>:null}{profile.address?<p>{profile.address}</p>:null}<p>We confirm your authority before enabling edits. Existing unrelated listings are never added to your account automatically.</p></section>:null}
             {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||adminView ? (
               <>
                 {entity.kind === 'market' ? (
@@ -184,23 +192,24 @@ function ClaimForm({ id }: { id: string }) {
                 </div>
               </section>
             ) : previewUid ? <p>This member has not claimed this listing.</p> : (
-              <motion.form className="pl-form cl-form" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate {...rise(4)}>
+              <motion.form aria-label="Organization claim application" className="pl-form cl-form" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate {...rise(4)}>
+                <div className="cl-form-intro"><p className="pl-kicker">Your organization access</p><h2>Let’s make the introduction.</h2><p>A few details help us confirm you’re the right person. Personal and work Google accounts are welcome.</p></div>
                 <>{verifiedListing?<p role="status"><VerifiedBadge /> This organization is already claimed. You can request access as another representative; existing managers keep their access while we review your request.</p>:null}</>
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">01</span> Who are you?</legend>
                   <label className="pl-field"><span>Your name</span><input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} autoComplete="name" /></label>
                   <div className="cl-roles" role="radiogroup" aria-label="Your role">
                     {CLAIM_ROLES.map((r) => (
-                      <button key={r} type="button" className="pl-chip cl-role" aria-pressed={draft.role === r} onClick={() => setDraft((d) => ({ ...d, role: r }))}>
-                        <span className="pl-chip-tick" aria-hidden="true">{draft.role === r ? <Check size={14} strokeWidth={3} /> : null}</span><strong>{r}</strong>
-                      </button>
+                      <label key={r} className="cl-role" data-selected={draft.role === r}>
+                        <input type="radio" name="claim-role" value={r} checked={draft.role === r} onChange={() => setDraft((d) => ({ ...d, role: r }))} /><strong>{r}</strong>
+                      </label>
                     ))}
                   </div>
                 </fieldset>
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">02</span> How do we reach you?</legend>
                   <label className="pl-field">
-                    <span>Email at {sites[0] ? `@${sites[0]}` : 'your organization'} <small>(best)</small></span>
+                    <span>Contact email <small>{sites[0] ? `@${sites[0]} is helpful, but not required` : 'Personal or work email'}</small></span>
                     <input type="email" value={draft.workEmail} onChange={(e) => setDraft((d) => ({ ...d, workEmail: e.target.value }))} autoComplete="email" placeholder={sites[0] ? `you@${sites[0]}` : 'you@yourorganization.ca'} />
                   </label>
                   {workDomain ? (
@@ -209,7 +218,7 @@ function ClaimForm({ id }: { id: string }) {
                     </p>
                   ) : null}
                   <label className="pl-field"><span>Phone <small>(optional, for a quick confirm)</small></span><input type="tel" value={draft.phone} onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))} autoComplete="tel" /></label>
-                  <label className="pl-field"><span>Anything to fix right away? <small>(optional)</small></span><textarea className="cl-textarea" rows={3} value={draft.note} onChange={(e) => setDraft((d) => ({ ...d, note: e.target.value }))} placeholder="e.g. Our address is the Jubilee Auditorium, and here's our season page…" /></label>
+                  <label className="pl-field"><span>Anything to fix right away? <small>(optional)</small></span><textarea className="cl-textarea" rows={3} value={draft.note} onChange={(e) => setDraft((d) => ({ ...d, note: e.target.value }))} placeholder={presentation.placeholder} /></label>
                   <label className="pl-check">
                     <input type="checkbox" checked={draft.agree} onChange={(e) => setDraft((d) => ({ ...d, agree: e.target.checked }))} />
                     <span><strong>I’m allowed to manage this listing</strong> for {profile?.title??entity.title}. CalgaryWatch keeps the listing free and independent: claiming doesn’t buy placement, and our picks stay our own. <Link to="/partners">How we work with organizers</Link></span>
@@ -234,9 +243,10 @@ function ClaimForm({ id }: { id: string }) {
               <p className="cl-listing-src">Built from {sites.length ? sites.join(', ') : 'the organizer’s own page'}</p>
               <Link to={entityPath(entity)} className="cl-listing-go">See the listing <ArrowUpRight size={16} aria-hidden="true" /></Link>
             </motion.div>
+            <section className="cl-publishing" aria-labelledby="cl-publishing-title"><p className="pl-kicker">Once you’re approved</p><h2 id="cl-publishing-title">Keep it current. On your terms.</h2><dl><div><dt>One submission every seven days</dt><dd>Per business, shared across your profile and events. Bundle several changes or events into one submission.</dd></div><div><dt>Updates publish automatically</dt><dd>CalgaryWatch is notified; another approval isn’t needed.</dd></div><div><dt>Images stay with CalgaryWatch</dt><dd>Images cannot be added, changed or deleted in the editor. Email us for artwork changes.</dd></div></dl></section>
             <motion.ul className="cl-perks" {...rise(6)}>
-              {PERKS.map((p) => <li key={p.title}><p.icon size={18} aria-hidden="true" /><span><strong>{p.title}</strong>{p.body}</span></li>)}
-              <li><BadgeCheck size={18} aria-hidden="true" /><span><strong>A verified listing</strong>Once we confirm you, it’s marked as verified, and verified listings get more weight when we surface relevant listings and recommendations across CalgaryWatch.</span></li>
+              {benefits.map((p) => <li key={p.title}><p.icon size={18} aria-hidden="true" /><span><strong>{p.title}</strong>{p.body}</span></li>)}
+              <li><BadgeCheck size={18} aria-hidden="true" /><span><strong>Managed by your organization</strong>After approval, your listing shows it’s confirmed by your organization. Claiming is free and doesn’t buy placement.</span></li>
             </motion.ul>
           </aside>
         </div>

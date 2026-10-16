@@ -21,7 +21,7 @@
  * Pure, so the rules are tested without Firestore.
  */
 
-export interface ClaimRecord { entityId: string; status: string; reviewedAt?: number | null }
+export interface ClaimRecord { approvedOrganizationId?: string; entityId: string; status: string; reviewedAt?: number | null }
 export interface VerifiedMarkRecord { entityId: string; verifiedAt?: number | null }
 
 /**
@@ -33,6 +33,7 @@ export function ownerVerification(claims: readonly ClaimRecord[], marks: readonl
   for (const c of claims) {
     if (c.status !== 'approved' || !c.entityId) continue;
     const at = typeof c.reviewedAt === 'number' && Number.isFinite(c.reviewedAt) ? c.reviewedAt : 0;
+    if(c.approvedOrganizationId){const prior=approvedAt.get(c.approvedOrganizationId);if(prior===undefined||(at&&(!prior||at<prior)))approvedAt.set(c.approvedOrganizationId,at);}
     const prev = approvedAt.get(c.entityId);
     if (prev === undefined || (at && (!prev || at < prev))) approvedAt.set(c.entityId, at);
   }
@@ -45,7 +46,7 @@ export function ownerVerification(claims: readonly ClaimRecord[], marks: readonl
   return out;
 }
 
-type Stampable = { id: string; kind?: string; ownerVerifiedAt?: unknown; claimed?: unknown };
+type Stampable = { id: string; kind?: string; organizerEntityId?: string; ownerVerifiedAt?: unknown; claimed?: unknown };
 
 /**
  * Entities with `ownerVerifiedAt` set from approved claims only. Any value the
@@ -54,7 +55,7 @@ type Stampable = { id: string; kind?: string; ownerVerifiedAt?: unknown; claimed
 export function applyOwnerVerification<T extends Stampable>(entities: readonly T[], verified: ReadonlyMap<string, string>): T[] {
   return entities.map(e => {
     const { ownerVerifiedAt: _ignored, ...rest } = e;
-    const at = verified.get(e.id);
+    const at = verified.get(e.id) || (e.organizerEntityId ? verified.get(e.organizerEntityId) : undefined);
     const out = (at ? { ...rest, ownerVerifiedAt: at } : rest) as T;
     if (e.kind === 'business') (out as Stampable).claimed = Boolean(at);
     return out;

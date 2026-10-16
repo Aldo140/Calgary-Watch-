@@ -1,0 +1,27 @@
+# Organization workspaces
+
+The organization profile is the management centre at `/organization/{business-id}`. Members & plans displays the approved company, source approval, role, linked upcoming event count and the same read-only workspace the member sees. Business dashboards link directly to it.
+
+An approved business-profile claim authorizes the organization and its explicitly related events. A historical event/market claim remains listing-only until an admin selects the correct organization in Claims and saves approval/repair. This is a deliberate authority grant, not an inferred entitlement from a shared venue. Approval repairs preserve the original decision date and email history.
+
+A workspace draft bundles up to 25 additions, edits or removals across the profile, linked markets and events. Market date changes use the same submission and preserve date ownership. It is retained on the member’s current device. Review lists every change. A required confirmation explains that the complete submission uses seven days of allowance for the business, shared across all representatives. Members can draft their next changes while waiting. Images, provenance, ownership and identity remain protected. Removing an event hides its public listing and retains its images and audit record; it can be restored.
+
+`submitOrganizationBatch` is an authenticated callable in northamerica-northeast1. One transaction rechecks actual approved claims, the trusted catalogue, pending legacy requests, target ownership and the shared weekly allowance; then writes all live projections, the allowance and a before/after admin notification. No member can directly write the catalogue, projections or allowance. Failed transactions publish nothing. A stable request UUID and payload hash make retries idempotent, including after a reload. No email is sent by this callable.
+
+The public site shares one bounded listener for projections newer than its built snapshot, stops it while hidden and merges server content across discovery, search and dashboards. New event routes work before the next static build. Future exports merge projections and removal tombstones after feeds so an ingest cannot resurrect removed events. A subsequent Hosting release supplies static HTML, sitemap and crawler metadata; instant publication is visible to the JavaScript application immediately after the transaction, while static crawlers wait for that release.
+
+## Activation
+
+1. Deploy the latest Hosting build. Its post-deployment catalogue sync reads inventory once and writes changed canonical records only. A catalogue is necessary for safe server-side ownership checks.
+2. Deploy rules and the new callable using the existing **Deploy Firebase Backend** workflow, target `all` (or rules and functions separately). Cloud Functions requires the project's supported billing and IAM configuration. Hosting alone does not activate the callable. The functions predeploy packages the shared TypeScript validation using the installed root dependencies.
+3. Confirm historical event/market-only representatives’ organization authority in Claims. Do not invent approvals or broaden access automatically.
+4. Verify with two representatives: one bundled add/edit/remove commits immediately, both see the same next eligible time, a second submission is rejected, another organization is denied, images cannot be changed, and admin preview cannot submit.
+5. Run the production roster audit documented in organization-coverage-review.md and review official programme pages for missing confirmed dates.
+
+The existing scheduled publisher remains compatible with older queued and listing-only edits. New organization submissions are marked already published, so the legacy worker does not dispatch unnecessary releases for them. Both paths use the canonical business allowance. Historical audit records and sent-email records remain intact.
+
+## Validation limits
+
+The transaction adapter tests exercise the real submission handler and atomic failure, idempotency, shared representative limits, cross-organization protection and legacy pending-job conflicts. They are not a substitute for authenticated production verification. This environment has no usable production service-account binding; official source requests and the Firestore emulator download are blocked by the network proxy. No production deployment, source completeness claim or production roster repair is implied by local tests.
+
+Local validation: 1,164 tests passed, TypeScript passed, production build and 612 prerendered pages passed. Browser checks of the actual workspace passed with only Firebase boundaries mocked: multiple targets, draft persistence across reload, confirmation/cancel, shared submission payload, weekly lock, read-only preview and a 390px mobile viewport. The Firestore emulator tests were not run locally because the emulator artifact download is blocked.

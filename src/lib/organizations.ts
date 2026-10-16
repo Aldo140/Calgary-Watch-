@@ -3,6 +3,8 @@ import { publishedInventory } from './discoveryPublication';
 
 /** Exact official provenance only. Venue names and fuzzy organizer names are never ownership. */
 const ORGANIZATIONS = [
+  {id:'biz-inglewood-bia',names:['Inglewood BIA','Inglewood Business Improvement Area'],hosts:['inglewoodyyc.ca']},
+  {id:'biz-dalhousie-community-association',names:['Dalhousie Community Association'],hosts:['dalhousiecalgary.ca']},
   { id: 'biz-theatre-calgary', names: ['Theatre Calgary'], hosts: ['theatrecalgary.com'] },
   { id: 'biz-alliance-francaise-calgary', names: ['Alliance Française de Calgary', 'Alliance Française Calgary', 'Alliance Francaise de Calgary'], hosts: ['afcalgary.ca'] },
   { id: 'biz-werklund-centre', names: ['Werklund Centre', 'Arts Commons'], hosts: ['werklundcentre.ca', 'artscommons.ca'] },
@@ -17,7 +19,7 @@ export function associateOrganizers<T extends { id: string; kind: string; title?
     return { id: e.id, names: known?.names ?? [String(e.title ?? '')], hosts: known?.hosts ?? sources.filter(s => s.kind === 'official').map(s => host(String(s.url ?? ''))).filter(Boolean) };
   });
   return entities.map(e => {
-    if (e.kind !== 'event') return e;
+    if (e.kind !== 'event' && e.kind !== 'market') return e;
     const { organizerEntityId: _ignored, ...rest } = e;
     const sources = Array.isArray(e.sources) ? e.sources : [];
     const org = profiles.find(o => o.names.includes(String(e.organizer ?? '').trim())

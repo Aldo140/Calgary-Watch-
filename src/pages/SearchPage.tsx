@@ -1,3 +1,4 @@
+import { useOrganizationLive } from '../lib/organizationLive';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -25,6 +26,7 @@ const COMMUNITY_KEYS = CALGARY_COMMUNITIES.flatMap(c => [c.name, ...(c.aliases ?
  * typing, all from data already in the page. Nothing waits on the network.
  */
 export default function SearchPage() {
+  useOrganizationLive();
   const [params] = useSearchParams();
   const q = normalizeSearch(params.get('q') ?? '');
   const all = discoveryRepository.list();

@@ -1,3 +1,4 @@
+import { mergeOrganizationContent, mergeOrganizationOccurrences, ORGANIZATION_LIVE, type OrganizationProjection } from '../../src/lib/organizationWorkspace';
 import { ownerEditTargets, applyOwnerOccurrences, applyOwnerContent, OWNER_CONTENT } from '../../src/lib/ownerListingEdits';
 import { associateOrganizers } from '../../src/lib/organizations';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
@@ -56,13 +57,13 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     const db = inventoryDatabase();
     const [approved, marks] = await Promise.race([
       Promise.all([
-        db.collection('listing_claims').where('status', '==', 'approved').select('entityId', 'status', 'reviewedAt').get(),
+        db.collection('listing_claims').where('status', '==', 'approved').select('entityId', 'status', 'reviewedAt', 'approvedOrganizationId').get(),
         db.collection('verified_listings').select('entityId', 'verifiedAt').get(),
       ]),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out after 30s')), 30_000).unref()),
     ]);
     claims = {
-      approved: approved.docs.map(d => ({ entityId: String(d.get('entityId') ?? ''), status: String(d.get('status') ?? ''), reviewedAt: d.get('reviewedAt') ?? null })),
+      approved: approved.docs.map(d => ({ entityId: String(d.get('entityId') ?? ''), ...(d.get('approvedOrganizationId')?{approvedOrganizationId:String(d.get('approvedOrganizationId'))}:{}), status: String(d.get('status') ?? ''), reviewedAt: d.get('reviewedAt') ?? null })),
       marks: marks.docs.map(d => ({ entityId: d.id, verifiedAt: d.get('verifiedAt') ?? null })),
     };
     log(`Verified listings: ${claims.approved.length} approved claims`);
@@ -118,6 +119,14 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   log(`Owner content: ${content.size} applied listing overrides`);
 }
 if (cachedOrder) entities.sort((a, b) => (cachedOrder!.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (cachedOrder!.get(b.id) ?? Number.MAX_SAFE_INTEGER));
+if(process.env.FIREBASE_SERVICE_ACCOUNT){
+  const {inventoryDatabase}=await import('./firebase');
+  const live=await inventoryDatabase().collection(ORGANIZATION_LIVE).get();
+  entities=mergeOrganizationContent(entities as unknown as import('../../src/types/discovery').DiscoveryEntity[],live.docs.map(d=>d.data() as OrganizationProjection)) as unknown as Entity[];
+  snapshot.occurrences=mergeOrganizationOccurrences(snapshot.occurrences,live.docs.map(d=>d.data() as OrganizationProjection));
+  entities=applyOwnerVerification(entities,verified);
+  log(`Organization submissions: ${live.size} live records merged, including removals`);
+}
 const index = { ...snapshot, entities };
 const stamped = entities.filter(e => e.ownerVerifiedAt).length;
 if (stamped) log(`Marked ${stamped} listings verified`);

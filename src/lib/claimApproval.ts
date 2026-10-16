@@ -15,5 +15,5 @@ export function claimApprovalWrites(c: ListingClaim, profile: Record<string, unk
 
 /** Old public marks alone aren't evidence. Legacy approvals still verify through the exported stamp. */
 export function approvedPublicMark(entityId: string, mark: Record<string, unknown> | undefined): boolean {
-  return mark?.entityId === entityId && typeof mark.claimId === 'string' && mark.claimId.endsWith(`_${entityId}`);
+  return mark?.entityId === entityId && typeof mark.claimId === 'string' && (mark.claimId.endsWith(`_${entityId}`)||mark.organizationId===entityId);
 }

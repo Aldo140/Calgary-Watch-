@@ -1,3 +1,4 @@
+import { useOrganizationLive } from '../lib/organizationLive';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
@@ -65,6 +66,7 @@ const injectJsonLd = (id: string, data: object) => {
 };
 
 export default function SeoManager() {
+  const {version}=useOrganizationLive();
   const location = useLocation();
 
   useEffect(() => {
@@ -91,7 +93,7 @@ export default function SeoManager() {
 
     // Per-route WebPage JSON-LD — helps Google understand page type, breadcrumb, and freshness
     injectJsonLd('page-schema', buildPageJsonLd(location.pathname, SITE_ORIGIN));
-  }, [location.pathname]);
+  }, [location.pathname,version]);
 
   return null;
 }

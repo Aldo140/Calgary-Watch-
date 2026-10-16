@@ -67,3 +67,29 @@ test('queued edits and legacy manual requests cannot bypass the new atomic path'
   await assert.rejects(setDoc(doc(db,'owner_listing_edits','alone'),{uid:'u1',rootId:'biz-test',entityId:'biz-test',entityTitle:'Test',changes:{description:'details'},status:'queued',createdAt:serverTimestamp(),notificationPending:false}),/permission/i);
   await assert.rejects(setDoc(doc(db,'listing_updates','legacy'),{uid:'u1',entityId:'biz-test',entityTitle:'Test',field:'description',details:'details',url:'',status:'pending',createdAt:Date.now()}),/permission/i);
 });
+
+test('members cannot forge organization scope or write trusted catalogue/live projections',async()=>{
+  const db=client('u1');
+  await assert.rejects(setDoc(doc(db,'listing_claims','u1_biz-test'),{approvedOrganizationId:'biz-another'},{merge:true}));
+  await assert.rejects(setDoc(doc(db,'organization_catalog','biz-test'),{entity:{id:'biz-test',kind:'business'}}));
+  await assert.rejects(setDoc(doc(db,'organization_live_content','biz-test'),{entityId:'biz-test',organizationId:'biz-test',deleted:false}));
+});
+
+test('real organization transactions serialize two representatives against one weekly allowance',async()=>{
+  const {initializeApp:initializeAdmin,deleteApp:deleteAdmin}=await import('firebase-admin/app');
+  const {getFirestore:getAdminDb}=await import('firebase-admin/firestore');
+  const {submitOrganizationBatch}=await import('../../scripts/claims/organization-submit');
+  const {readFile}=await import('node:fs/promises');
+  const inventory=JSON.parse(await readFile('src/generated/discovery-index.json','utf8'));
+  const org=inventory.entities.find((e:any)=>e.id==='biz-downstage');
+  const app=initializeAdmin({projectId},'organization-transactions'),admin=getAdminDb(app);
+  try{
+    await admin.collection('organization_catalog').doc(org.id).set({entity:org});
+    await Promise.all(['u1','u2'].map(uid=>admin.collection('listing_claims').doc(`${uid}_${org.id}`).set({uid,entityId:org.id,status:'approved'})));
+    const attempts=await Promise.allSettled(['u1','u2'].map((uid,i)=>submitOrganizationBatch(admin,uid,{organizationId:org.id,requestId:`${i+1}2345678-1234-1234-1234-123456789abc`,operations:[{entityId:org.id,action:'edit',changes:{phone:`403-555-010${i}`}}]})));
+    assert.equal(attempts.filter(result=>result.status==='fulfilled').length,1);
+    const [rate,live,receipts]=await Promise.all([admin.collection('owner_business_edit_limits').doc(org.id).get(),admin.collection('organization_live_content').doc(org.id).get(),admin.collection('owner_listing_edits').get()]);
+    assert.equal(rate.exists,true);assert.equal(live.exists,true);assert.equal(receipts.size,1);assert.equal(receipts.docs[0].get('notificationPending'),true);
+    assert.equal(live.get('batchId'),rate.get('editId'));
+  }finally{await admin.terminate();await deleteAdmin(app);}
+});

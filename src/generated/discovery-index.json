@@ -1714,7 +1714,8 @@
       ],
       "familyFriendly": true,
       "vendorIds": [],
-      "images": []
+      "images": [],
+      "organizerEntityId": "biz-dalhousie-community-association"
     },
     {
       "id": "7f9cc882ba6d001cee153f0095d1",
@@ -11760,7 +11761,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "Inglewood BIA",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-inglewood-bia"
     },
     {
       "id": "23a7a3c1b052dbc5d7201637ebb0",
@@ -12062,6 +12064,80 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-15T00:00:00Z"
+    },
+    {
+      "id": "biz-inglewood-bia",
+      "kind": "business",
+      "slug": "inglewood-bia",
+      "title": "Inglewood Business Improvement Area",
+      "name": "Inglewood Business Improvement Area",
+      "summary": "The business improvement area organizing events and supporting local businesses in Inglewood.",
+      "description": "The business improvement area organizing events and supporting local businesses in Inglewood. Confirm upcoming dates with the organization’s official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "community"
+      ],
+      "sources": [
+        {
+          "name": "Inglewood Business Improvement Area",
+          "url": "https://www.inglewoodyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-15T20:13:12.146Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-15T20:13:12.146Z",
+      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "address": "Inglewood, Calgary",
+      "website": "https://www.inglewoodyyc.ca/",
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false
+    },
+    {
+      "id": "biz-dalhousie-community-association",
+      "kind": "business",
+      "slug": "dalhousie-community-association",
+      "title": "Dalhousie Community Association",
+      "name": "Dalhousie Community Association",
+      "summary": "The community association behind the Dalhousie Harvest Farmers’ Market.",
+      "description": "The community association behind the Dalhousie Harvest Farmers’ Market. Confirm upcoming dates with the organization’s official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "community"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
+          "kind": "official",
+          "retrievedAt": "2026-10-15T20:13:12.146Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-15T20:13:12.146Z",
+      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "address": "5432 Dalhart Road NW, Calgary",
+      "website": "https://www.dalhousiecalgary.ca/",
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false
     }
   ],
   "occurrences": [

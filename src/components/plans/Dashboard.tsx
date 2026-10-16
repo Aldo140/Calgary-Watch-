@@ -76,7 +76,7 @@ export function useIsPhone(): boolean {
 }
 
 /** A listing this member asked to manage (see docs/verified-listings.md). */
-export interface Claim { entityId: string; entityTitle: string; entityPath?: string; status: string }
+export interface Claim { approvedOrganizationId?: string; entityId: string; entityTitle: string; entityPath?: string; status: string }
 
 export interface DashboardProps {
   user: User;

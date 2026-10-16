@@ -1,3 +1,4 @@
+import { approvedOrganization } from '../lib/organizationWorkspace';
 import { ListingManagement } from '../components/entity/ListingManagement';
 import { restoreClaimDraft } from '../lib/claimDraft';
 import { useVerifiedListing } from '../lib/claimsApi';
@@ -43,7 +44,7 @@ function ClaimForm({ id }: { id: string }) {
   const reduce = useReducedMotion();
   const entity = useMemo(() => discoveryRepository.list().find((e) => e.id === id && !e.developmentOnly && ['event', 'market', 'business'].includes(e.kind)), [id]);
   const claims = useMyClaims(subjectUid);
-  const parentClaim = entity?.kind === 'event' ? claims?.find(c => c.status === 'approved' && c.entityId === entity.organizerEntityId) : undefined;
+  const parentClaim = (entity?.kind === 'event'||entity?.kind==='market') ? claims?.find(c => c.status === 'approved' && c.entityId === entity.organizerEntityId) : undefined;
   const claim = parentClaim ?? claims?.find((c) => c.entityId === id) ?? null;
   const sites = entity ? sourceDomains(entity.sources) : [];
   const [draft, setDraft] = useState<ClaimDraft>(() => { try { return restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { return restoreClaimDraft(null); } });
@@ -126,7 +127,7 @@ function ClaimForm({ id }: { id: string }) {
                   </Link>
                 ) : null}
                 <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>Your account is a business account.</strong> It manages this listing; you’ll see it on your <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
-                <ListingManagement claim={claim} previewUid={previewUid} initialTargetId={entity.id} />
+                {claim&&approvedOrganization(claim,discoveryRepository.list())?<Link className="pl-btn" to={`/organization/${approvedOrganization(claim,discoveryRepository.list())!.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>Manage organization profile &amp; all events</Link>:<ListingManagement claim={claim} previewUid={previewUid} initialTargetId={entity.id} />}
               </>
             ) : verifiedListing ? (
               <section><VerifiedBadge /><p>This listing has been confirmed by its organization.</p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${entity.title}`)}`}>Suggest a correction</a></section>

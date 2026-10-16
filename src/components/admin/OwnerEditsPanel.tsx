@@ -15,7 +15,7 @@ export function OwnerEditsPanel() {
     {!rows.length?<p>No owner updates loaded.</p>:rows.map(row=><article key={row.id} className="border-t py-3 space-y-2">
       <div className="flex gap-2 items-center"><strong>{row.entityTitle}</strong><Chip tone={row.status==='failed'?'critical':row.status==='applied'?'ok':'attention'}>{row.status==='applied'?(row.publishedAt?'Published automatically':'Applied; awaiting release'):row.status==='failed'?'Could not apply':'Queued automatically'}</Chip>{row.notificationPending?<Chip tone="signal">New</Chip>:null}</div>
       <Link to={`/plans?as=${encodeURIComponent(row.uid)}`}>View owner’s dashboard</Link>
-      <p>{row.status==='failed'?row.error:'No admin approval is required. Public pages update when the automatic Hosting release succeeds.'}</p>
+      <p>{row.status==='failed'?row.error:(row as OwnerEdit & {live?:boolean}).live?'Published immediately as one organization submission. No approval required.':'No admin approval is required. Public pages update when the automatic Hosting release succeeds.'}</p>
       <p>{row.publicationWarning}</p>
       <dl>{Object.keys(row.changes).map(field=><div key={field}><dt><strong>{field}</strong></dt><dd>{row.before?`${JSON.stringify(row.before[field])} → `:''}{JSON.stringify(row.after?.[field]??row.changes[field])}</dd></div>)}</dl>
       {row.notificationPending?<AdminButton disabled={Boolean(busy)} onClick={async()=>{if(!db)return;setBusy(row.id);try{await updateDoc(doc(db,OWNER_EDITS,row.id),{notificationPending:false});}catch(e){setError(firestoreActionError(e));}finally{setBusy('');}}}>Mark notification read</AdminButton>:null}

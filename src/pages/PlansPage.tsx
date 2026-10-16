@@ -1,3 +1,4 @@
+import { useOrganizationLive } from '../lib/organizationLive';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { plansView } from '../lib/plansView';
@@ -102,6 +103,7 @@ function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; 
 }
 
 export default function PlansPage() {
+  useOrganizationLive();
   const auth0 = useAuth();
   const [params] = useSearchParams();
   const navigate = useNavigate();

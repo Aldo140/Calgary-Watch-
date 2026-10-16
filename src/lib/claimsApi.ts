@@ -78,6 +78,14 @@ function markState(id: string): MarkState {
 
 /** One shared live result prevents the badge and claim CTA from contradicting each other. */
 export function useVerifiedListing(entityId: string, built = false): boolean {
+  const entity=discoveryRepository.list().find(e=>e.id===entityId);
+  const parentId=(entity?.kind==='event'||entity?.kind==='market')?entity.organizerEntityId:undefined;
+  const parent=parentId?discoveryRepository.list().find(e=>e.id===parentId):undefined;
+  const direct=useListingMark(entityId,built);
+  const organization=useListingMark(parentId??entityId,parentId?Boolean(parent?.ownerVerifiedAt):built);
+  return direct||organization;
+}
+function useListingMark(entityId: string, built = false): boolean {
   const state = markState(entityId);
   const subscribe = useCallback((notify: () => void) => {
     state.listeners.add(notify);

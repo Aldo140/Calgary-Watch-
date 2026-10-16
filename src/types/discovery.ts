@@ -5,7 +5,7 @@ export interface EntityImage { src: string; alt: string; credit?: string; presen
 export interface EntityBase {
   id: string; kind: EntityKind; slug: string; title: string; summary: string; description: string;
   categories: string[]; tags: string[]; sources: EntitySource[]; image?: EntityImage;
-  status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked' | 'source-feed';
+  status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked' | 'source-feed' | 'organization-confirmed';
   verifiedAt?: string; fetchedAt?: string; sourceId?: string; sourceRecordId?: string;
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
   /** Set by the build only when an admin approved a listing claim for it (src/lib/verified.ts). Not the source check above. */
@@ -22,7 +22,7 @@ export interface Event extends EntityBase, Location {
   organizer: string; organizerEntityId?: string; cancelled?: boolean;
 }
 export interface Market extends EntityBase, Location {
-  kind: 'market'; amenities: string[]; parking?: string; transit?: string;
+  kind: 'market'; organizerEntityId?: string; amenities: string[]; parking?: string; transit?: string;
   petFriendly?: boolean; familyFriendly?: boolean; organizer: string; vendorIds: string[]; images: EntityImage[];
 }
 export interface MarketOccurrence { id: string; marketId: string; start: string; end: string; timezone: 'America/Edmonton'; cancelled: boolean; source: EntitySource }

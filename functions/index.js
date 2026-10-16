@@ -338,3 +338,5 @@ exports.onIncidentFeedbackWritten = onDocumentWritten({
 
 // Events and Markets moderation and public suggestion boundary.
 Object.assign(exports, require('./discovery.cjs'));
+
+Object.assign(exports, require('./organization.cjs'));

@@ -30,6 +30,14 @@
       {
         "source": "/admin/**",
         "destination": "/index.html"
+      },
+      {
+        "source": "/organization/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/events/**",
+        "destination": "/index.html"
       }
     ],
     "headers": [
@@ -147,6 +155,15 @@
           {
             "key": "X-Robots-Tag",
             "value": "noindex, follow"
+          }
+        ]
+      },
+      {
+        "source": "/organization/**",
+        "headers": [
+          {
+            "key": "X-Robots-Tag",
+            "value": "noindex, nofollow"
           }
         ]
       }

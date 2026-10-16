@@ -39,6 +39,7 @@ export interface ListingClaim {
   note: string;
   status: ClaimStatus;
   createdAt: number;
+  approvedOrganizationId?: string;
   reviewedAt?: number | null;
   reviewNote?: string;
 }

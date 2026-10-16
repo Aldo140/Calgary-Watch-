@@ -38,6 +38,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const [claims, setClaims] = useState<ListingClaim[] | null>(null);
   const [verified, setVerified] = useState<Array<VerifiedClaim> | null>(null);
   const [updates, setUpdates] = useState<Array<ListingUpdate & { id: string }> | null>(null);
+  const [scope,setScope]=useState<Record<string,string>>({});
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -81,8 +82,14 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
           const accountSnap = await tx.get(accountRef);
           if (!claimSnap.exists()) throw new Error('The claim no longer exists.');
           const writes = claimApprovalWrites(claimSnap.data() as ListingClaim, accountSnap.data(), by, Date.now());
+          const chosen=scope[c.uid+'_'+c.entityId]??claimSnap.data().approvedOrganizationId;
+          const organization=chosen?entities.get(chosen):undefined;
+          if(chosen&&organization?.kind!=='business')throw Error('Select a published organization profile.');
+          if(chosen)Object.assign(writes.claim,{approvedOrganizationId:chosen});
           tx.update(claimRef, writes.claim);
           tx.set(doc(database, VERIFIED, c.entityId), writes.mark);
+          if(chosen&&organization)tx.set(doc(database,VERIFIED,chosen),{...writes.mark,entityId:chosen,title:organization.title,organizationId:chosen});
+          if(chosen)writes.account=businessAccountPatch({...accountSnap.data(),...writes.account},chosen,writes.account.businessSince);
           tx.update(accountRef, writes.account);
           return writes.account;
         }, { maxAttempts: 1 });
@@ -166,6 +173,9 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             <p className="text-xs" style={{ fontFamily: mono, color: T.muted }}>Signed in as {c.accountEmail} · work {c.workEmail}{c.phone ? ` · ${c.phone}` : ''}</p>
             <div className="flex flex-wrap items-center gap-2"><Chip tone={copy.tone}>{copy.label}</Chip><span className="text-xs" style={{ color: T.muted }}>{copy.next}</span></div>
             {c.note ? <p className="text-sm rounded-lg p-2" style={{ background: T.surface, color: T.ink }}>“{c.note}”</p> : null}
+            <label className="block text-sm">Organization management access (confirm their authority, not just the venue)
+              <select value={scope[c.uid+'_'+c.entityId]??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">This listing only{entity?.kind==='business'?' (organization profile includes its events)':''}</option>{[...entities.values()].filter(e=>e.kind==='business').map(e=><option key={e.id} value={e.id}>{e.title} — profile and all organization events</option>)}</select>
+            </label>
             <div className="flex flex-wrap gap-2">
               <AdminButton tone="ok" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}><BadgeCheck size={15} /> Approve</AdminButton>
               <a className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: T.line, color: T.ink }}
@@ -210,8 +220,10 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
+              <span>{c.approvedOrganizationId?`Organization: ${entities.get(c.approvedOrganizationId)?.title??c.approvedOrganizationId}`:entities.get(c.entityId)?.kind==='business'?'Organization profile and linked events':'Specific listing access only'}</span>
+              <label>Confirm organization access <select value={scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep current scope</option>{[...entities.values()].filter(e=>e.kind==='business').map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label>
               <Link to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
-              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>Repair verification &amp; account</AdminButton>
+              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>{scope[c.uid+'_'+c.entityId]?'Save organization access & repair':'Repair verification & account'}</AdminButton>
               {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
             </div>
           ))}

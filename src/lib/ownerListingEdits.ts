@@ -14,7 +14,7 @@ export function ownerEditableFields(kind: string): string[] { return kind in byK
 export function ownerEditTargets(rootId: string, entities: readonly DiscoveryEntity[]): DiscoveryEntity[] {
   const root = entities.find(e=>e.id===rootId && ['business','event','market'].includes(e.kind) && e.status==='published');
   if (!root) return [];
-  return [root,...entities.filter(e=>e.id!==rootId && root.kind==='business' && e.kind==='event' && e.organizerEntityId===rootId && e.status==='published')];
+  return [root,...entities.filter(e=>e.id!==rootId && root.kind==='business' && (e.kind==='event'||e.kind==='market') && e.organizerEntityId===rootId && e.status==='published')];
 }
 function https(value: string) { if(!value) return true; try {const url=new URL(value);return url.protocol==='https:' && !url.username && !url.password;}catch{return false;} }
 /** Shared browser/worker validation. Protected identity, images and verification never enter an override. */
@@ -54,7 +54,7 @@ export function ownerEditPatch(entity: DiscoveryEntity, changes: Record<string, 
   if(entity.kind==='business'&&typeof out.title==='string')out.name=out.title;
   return out;
 }
-export function ownerBusinessId(entity: DiscoveryEntity, rootId: string): string { return entity.kind === 'event' && entity.organizerEntityId ? entity.organizerEntityId : rootId; }
+export function ownerBusinessId(entity: DiscoveryEntity, rootId: string): string { return (entity.kind === 'event'||entity.kind==='market') && entity.organizerEntityId ? entity.organizerEntityId : rootId; }
 export function nextOwnerEditAt(last: number): number { return last ? last + OWNER_EDIT_INTERVAL : 0; }
 export function parseOwnerField(field: string, text: string): unknown {
   if(['hours','socials','coordinates','priceRange','occurrences'].includes(field))return JSON.parse(text);

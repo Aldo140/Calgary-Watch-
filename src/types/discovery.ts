@@ -10,6 +10,8 @@ export interface EntityBase {
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
   /** Set by the build only when an admin approved a listing claim for it (src/lib/verified.ts). Not the source check above. */
   ownerVerifiedAt?: string;
+  /** Server-applied content version, used only to acknowledge successful publication. */
+  ownerContentAppliedAt?: number;
   scores?: { featured?: number; editorial?: number; demand?: number; popularity?: number };
 }
 export interface Location { address: string; coordinates?: { lat: number; lng: number }; venue?: string }

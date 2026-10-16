@@ -800,20 +800,64 @@ service cloud.firestore {
     // content editor. Only an approved claim for this listing can file one.
     match /listing_updates/{id} {
       allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
-      allow create: if isAuthenticated() &&
-                    hasOnlyAllowedFields(['uid', 'entityId', 'entityTitle', 'field', 'details', 'url', 'status', 'createdAt']) &&
-                    request.resource.data.uid == request.auth.uid &&
-                    request.resource.data.entityId is string &&
-                    request.resource.data.entityTitle is string && request.resource.data.entityTitle.size() <= 160 &&
-                    request.resource.data.field in ['link', 'dates', 'location', 'photo', 'description', 'cancel', 'other'] &&
-                    request.resource.data.details is string && request.resource.data.details.size() <= 2000 &&
-                    request.resource.data.url is string && request.resource.data.url.size() <= 2000 &&
-                    request.resource.data.status == 'pending' &&
-                    request.resource.data.createdAt is number &&
-                    get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + request.resource.data.entityId)).data.status == 'approved';
+      // Historical requests remain readable; new edits use the weekly automatic publisher.
+      allow create: if false;
       allow update: if isAdmin() &&
                     request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'reviewedAt', 'reviewedBy', 'adminNote']);
       allow delete: if false;
+    }
+
+    // Owners submit structured automatic-publication jobs, never trusted public content.
+    // The publisher independently validates canonical organizer relationships and every field.
+    function approvedListingOwner(rootId) {
+      return isAuthenticated() && request.auth.token.email_verified == true &&
+        get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + rootId)).data.status == 'approved' &&
+        get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + rootId)).data.uid == request.auth.uid &&
+        get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + rootId)).data.entityId == rootId;
+    }
+    match /owner_listing_edit_limits/{rootId} {
+      allow read: if isAdmin() || approvedListingOwner(rootId);
+      allow create, update: if approvedListingOwner(rootId) &&
+        request.resource.data.keys().hasOnly(['uid','editId','lastSubmittedAt']) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.editId is string && request.resource.data.editId.size() <= 150 &&
+        request.resource.data.lastSubmittedAt == request.time &&
+        (!exists(/databases/$(database)/documents/owner_listing_edit_limits/$(rootId)) ||
+          resource.data.lastSubmittedAt + duration.value(7, 'd') <= request.time) &&
+        getAfter(/databases/$(database)/documents/owner_listing_edits/$(request.resource.data.editId)).data.uid == request.auth.uid &&
+        getAfter(/databases/$(database)/documents/owner_listing_edits/$(request.resource.data.editId)).data.rootId == rootId &&
+        getAfter(/databases/$(database)/documents/owner_listing_edits/$(request.resource.data.editId)).data.status == 'queued' &&
+        getAfter(/databases/$(database)/documents/owner_listing_edits/$(request.resource.data.editId)).data.createdAt == request.time;
+      allow delete: if false;
+    }
+    match /owner_listing_edits/{editId} {
+      allow read: if isAdmin() || (isAuthenticated() &&
+        (resource == null || resource.data.uid == request.auth.uid));
+      allow create: if approvedListingOwner(request.resource.data.rootId) &&
+        request.resource.data.keys().hasOnly(['uid','rootId','entityId','entityTitle','changes','status','createdAt','notificationPending']) &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.rootId is string && request.resource.data.rootId.size() <= 120 &&
+        request.resource.data.entityId is string && request.resource.data.entityId.size() <= 120 &&
+        request.resource.data.entityTitle is string && request.resource.data.entityTitle.size() <= 200 &&
+        request.resource.data.changes is map && request.resource.data.changes.size() > 0 && request.resource.data.changes.size() <= 30 &&
+        request.resource.data.changes.keys().hasOnly(['occurrences','title','summary','description','address','venue','neighbourhood','categories','tags','coordinates','website','phone','hours','socials','services','offer','priceLevel','start','end','pricing','priceRange','tickets','cancelled','organizer','amenities','parking','transit','petFriendly','familyFriendly']) &&
+        request.resource.data.status == 'queued' && request.resource.data.notificationPending == false &&
+        request.resource.data.createdAt == request.time &&
+        getAfter(/databases/$(database)/documents/owner_listing_edit_limits/$(request.resource.data.rootId)).data.editId == editId &&
+        getAfter(/databases/$(database)/documents/owner_listing_edit_limits/$(request.resource.data.rootId)).data.uid == request.auth.uid &&
+        getAfter(/databases/$(database)/documents/owner_listing_edit_limits/$(request.resource.data.rootId)).data.lastSubmittedAt == request.time;
+      // Notification acknowledgement is independent of publication, never an approval.
+      allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notificationPending']) && request.resource.data.notificationPending == false;
+      allow delete: if false;
+    }
+    // Public availability timestamp only; the trusted publisher enforces cross-claim business limits.
+    match /owner_business_edit_limits/{businessId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /owner_listing_content/{entityId} {
+      allow read: if true;
+      allow write: if false;
     }
 
     // Public "managed by the organizer" flag, one doc per listing.

@@ -1,3 +1,4 @@
+import { ownerEditTargets, applyOwnerOccurrences, applyOwnerContent, OWNER_CONTENT } from '../../src/lib/ownerListingEdits';
 import { associateOrganizers } from '../../src/lib/organizations';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import domain from '../../functions/discovery-domain.cjs';
@@ -105,7 +106,17 @@ const snapshot = domain.publishSnapshot([...byId.values()], [...occById.values()
 const editorial = await editorialEntities();
 // Stamped last, over every source, so nothing a feed or entity document says about itself survives.
 const verified = ownerVerification(claims.approved, claims.marks);
-const entities = applyOwnerVerification(associateOrganizers([...editorial, ...snapshot.entities] as Entity[]), verified);
+let entities = applyOwnerVerification(associateOrganizers([...editorial, ...snapshot.entities] as Entity[]), verified);
+// Applied owner edits win over feeds on every subsequent rebuild. Protected metadata is untouched.
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  const { inventoryDatabase } = await import('./firebase');
+  // Fail closed: never deploy a feed-only rebuild which silently erases accepted owner content.
+  const content = await inventoryDatabase().collection(OWNER_CONTENT).get();
+  const ownerRecords=content.docs.map(d => d.data() as {rootId:string;entityId:string;changes:Record<string,unknown>;appliedAt?:number}).filter(record=>ownerEditTargets(record.rootId,entities as unknown as import('../../src/types/discovery').DiscoveryEntity[]).some(e=>e.id===record.entityId));
+  snapshot.occurrences=applyOwnerOccurrences(snapshot.occurrences,ownerRecords);
+  entities = applyOwnerContent(entities as unknown as import('../../src/types/discovery').DiscoveryEntity[], ownerRecords) as unknown as Entity[];
+  log(`Owner content: ${content.size} applied listing overrides`);
+}
 if (cachedOrder) entities.sort((a, b) => (cachedOrder!.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (cachedOrder!.get(b.id) ?? Number.MAX_SAFE_INTEGER));
 const index = { ...snapshot, entities };
 const stamped = entities.filter(e => e.ownerVerifiedAt).length;

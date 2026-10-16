@@ -28,7 +28,7 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
             <span className="pd-biz-title"><strong>{c.entityTitle}</strong><span className="pd-biz-ok"><BadgeCheck size={14} aria-hidden="true" /> Verified</span></span>
             <span className="pd-biz-acts">
               {c.entityPath ? <Link to={c.entityPath} className="pd-biz-btn">View listing <ArrowUpRight size={15} aria-hidden="true" /></Link> : null}
-              <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-btn" data-k="ghost">Send a change</Link>
+              <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-btn" data-k="ghost">Manage listing</Link>
             </span>
           </li>
         ))}

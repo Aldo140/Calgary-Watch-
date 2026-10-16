@@ -7,7 +7,7 @@
  *  - the Verified mark shows on the listing as soon as the claim is approved
  *    (ClaimCta reads verified_listings at runtime);
  *  - the account is a business account (src/lib/businessAccount.ts) and the
- *    dashboard at /plans shows the listing with "Send a change";
+ *    dashboard at /plans shows the listing with "Manage listing";
  *  - the ranking weight (src/lib/verified.ts) is mentioned only while
  *    VERIFICATION_PRIORITY_ENABLED, and starts with the next site build.
  * No guarantee wording, ever (docs/verified-listings.md).
@@ -75,7 +75,7 @@ export function approvalEmail(
     { lead: 'Verified mark.', body: `${title} now shows “Verified · Confirmed by the organization” on CalgaryWatch.`, url: listingUrl },
     { lead: 'Business account.', body: 'Your CalgaryWatch account is now a business account. Your dashboard shows the listing, and you can send changes from there.', url: `${SITE}/plans` },
     ...(priority ? [{ lead: 'More weight in recommendations.', body: 'Verified listings are given more weight when we surface relevant listings and recommendations across CalgaryWatch. It’s a modest nudge that starts with the next site update, usually within a day, not a fixed spot.' }] : []),
-    { lead: 'Direct updates.', body: 'When dates, hours, the address, your link or photos change, send it through your dashboard or the listing’s claim page. We check each change and update the listing.', url: claimUrl },
+    { lead: 'Direct updates.', body: 'Edit your profile and explicitly linked events from your dashboard or the listing’s management page. Save one update every seven days per business, with several fields in one save. Changes publish automatically without admin approval, and CalgaryWatch is notified. Images cannot be added, changed or deleted there; email us about images.', url: claimUrl },
   ];
 
   const subject = `${title} is now verified on CalgaryWatch`;

@@ -86,7 +86,7 @@ export function useVerifiedListing(entityId: string, built = false): boolean {
         // Legacy marks have no claim reference. Only an approved-claim build stamp can vouch for those.
         state.value = snap.exists() ? (approvedPublicMark(entityId, snap.data()) || (built && !snap.data().claimId)) : built;
         state.listeners.forEach(fn => fn());
-      }, error => { state.value = error.code === 'permission-denied' ? false : built; state.listeners.forEach(fn => fn()); }));
+      }, error => { state.value = error.code === 'permission-denied' ? false : (state.value ?? built); state.listeners.forEach(fn => fn()); }));
     }
     return () => { state.listeners.delete(notify); if (!state.listeners.size) { state.stop?.(); state.stop = undefined; } };
   }, [state, entityId, built]);

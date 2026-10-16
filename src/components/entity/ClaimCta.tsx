@@ -21,12 +21,12 @@ export function ClaimCta({ entityId, title, kind, verifiedAt }: { entityId: stri
   const exists = discoveryRepository.list().some(e => e.id === entityId && ['event', 'market', 'business'].includes(e.kind) && !e.developmentOnly);
   if (!exists) return null;
   if (verified) {
-    return <p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${title}`)}`}>Suggest a correction</a></p>;
+    return <aside className="cl-cta"><VerifiedBadge /><p><strong>Claimed by the organization.</strong> This listing is confirmed by its organization.</p><p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${title}`)}`}>Suggest a correction</a></p></aside>;
   }
   const what = kind === 'business' ? 'business' : kind === 'market' ? 'market' : 'event';
   return (
     <aside className="cl-cta">
-      <p><strong>Is this your {what}?</strong> Claim it free to keep the dates, photos and links right yourself. {CLAIM_BENEFIT}</p>
+      <p><strong>Is this your {what}?</strong> Claim it free to update dates, details and links yourself. One saved update every seven days per business; no admin approval needed. Images are managed by CalgaryWatch. {CLAIM_BENEFIT}</p>
       <Link to={`/claim/${encodeURIComponent(entityId)}`}>Claim this listing <ArrowUpRight size={16} aria-hidden="true" /></Link>
     </aside>
   );

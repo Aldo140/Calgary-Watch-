@@ -74,7 +74,7 @@ describe('Downstage claim and account state',()=>{
   });
   it('keeps the approved management page and dashboard on the same stable claim URL',()=>{
     const page=read('src/pages/ClaimListingPage.tsx');assert.match(page,/claim\?\.status === 'approved'/);assert.match(page,/<ListingManagement claim=\{claim\}/);
-    const dashboard=read('src/components/plans/BusinessListings.tsx');assert.match(dashboard,/listingManagementPath\(c.entityId, previewUid\)/);assert.match(dashboard,/Send a change/);
+    const dashboard=read('src/components/plans/BusinessListings.tsx');assert.match(dashboard,/listingManagementPath\(c.entityId, previewUid\)/);assert.match(dashboard,/Manage listing/);
   });
 });
 
@@ -94,8 +94,8 @@ describe('controlled organizer change requests',()=>{
     const api=read('src/lib/claimsApi.ts');const fn=api.slice(api.indexOf('export async function submitUpdate'),api.indexOf('export async function readMyUpdates'));
     assert.match(fn,/addDoc\(collection\(db, UPDATES\), listingUpdateRequest/);assert.doesNotMatch(fn,/setDoc|updateDoc/);
   });
-  it('clearly promises review and original files by email, with no file upload control',()=>{
-    const ui=read('src/components/entity/ListingManagement.tsx');assert.match(ui,/Your public listing changes only after we apply the update/);assert.match(ui,/email the exact files/);
+  it('explains automatic publishing and image restrictions with no file upload control',()=>{
+    const ui=read('src/components/entity/ListingManagement.tsx');assert.match(ui,/OWNER_EDIT_POLICY/);assert.match(ui,/exact files/);
     assert.match(ui,/does not upload image files/);assert.match(ui,/LISTING_CONTACT_EMAIL/);assert.equal(LISTING_CONTACT_EMAIL,'aldo@calgarywatch.ca');assert.doesNotMatch(ui,/type="file"/);
   });
 });

@@ -20,7 +20,7 @@ import '../styles/hq.css';
 
 const PERKS = [
   { icon: CalendarClock, title: 'Dates and hours', body: 'New run dates, holiday hours, a show that moved.' },
-  { icon: ImagePlus, title: 'Your own photos', body: 'Email the original files for the best quality.' },
+  { icon: ImagePlus, title: 'Images stay with CalgaryWatch', body: 'Image changes and removals are handled by email.' },
   { icon: MapPinned, title: 'Addresses and locations', body: 'Fix a venue, or add a second branch.' },
   { icon: Link2, title: 'The link we send people to', body: 'Homepage, tickets or your season page.' },
 ];
@@ -43,7 +43,8 @@ function ClaimForm({ id }: { id: string }) {
   const reduce = useReducedMotion();
   const entity = useMemo(() => discoveryRepository.list().find((e) => e.id === id && !e.developmentOnly && ['event', 'market', 'business'].includes(e.kind)), [id]);
   const claims = useMyClaims(subjectUid);
-  const claim = claims?.find((c) => c.entityId === id) ?? null;
+  const parentClaim = entity?.kind === 'event' ? claims?.find(c => c.status === 'approved' && c.entityId === entity.organizerEntityId) : undefined;
+  const claim = parentClaim ?? claims?.find((c) => c.entityId === id) ?? null;
   const sites = entity ? sourceDomains(entity.sources) : [];
   const [draft, setDraft] = useState<ClaimDraft>(() => { try { return restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { return restoreClaimDraft(null); } });
   const [busy, setBusy] = useState(false);
@@ -106,7 +107,7 @@ function ClaimForm({ id }: { id: string }) {
         <header className="cw-wrap cl-head">
           <motion.p className="pl-eyebrow" {...rise(0)}>For organizers · free</motion.p>
           <motion.h1 className="cl-title" {...rise(1)}>Run {entity.title}? <em>Claim it.</em></motion.h1>
-          <motion.p className="cl-lead" {...rise(2)}>Keep your own listing right: dates, photos, addresses and the link people follow. Send corrections to CalgaryWatch for review. Once your claim is approved, your listing shows that it’s confirmed by your organization.</motion.p>
+          <motion.p className="cl-lead" {...rise(2)}>Keep your listing and linked events right: dates, descriptions, addresses and links. After verification, save one update every seven days per business. Changes publish automatically without admin approval; CalgaryWatch is notified. Images cannot be added, changed or deleted in the editor. Once your claim is approved, your listing shows that it’s confirmed by your organization.</motion.p>
           <motion.ol className="cl-steps" aria-label="How claiming works" {...rise(3)}>
             <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in with Google</li>
             <li data-done={!!claim}><span>{claim ? <Check size={14} strokeWidth={3} /> : 2}</span> Tell us who you are</li>
@@ -125,7 +126,7 @@ function ClaimForm({ id }: { id: string }) {
                   </Link>
                 ) : null}
                 <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>Your account is a business account.</strong> It manages this listing; you’ll see it on your <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
-                <ListingManagement claim={claim} previewUid={previewUid} />
+                <ListingManagement claim={claim} previewUid={previewUid} initialTargetId={entity.id} />
               </>
             ) : verifiedListing ? (
               <section><VerifiedBadge /><p>This listing has been confirmed by its organization.</p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${entity.title}`)}`}>Suggest a correction</a></section>

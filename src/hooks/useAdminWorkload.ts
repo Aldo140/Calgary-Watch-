@@ -5,6 +5,7 @@ import { db } from '@/src/firebase';
 
 export interface AdminWorkload {
   error?: string;
+  ownerUpdates: number;
   suggestions: number;
   failedActions: number;
   stuckActions: number;
@@ -19,7 +20,7 @@ export interface AdminWorkload {
  * moderation queued long enough that the job itself probably isn't running.
  */
 export function useAdminWorkload(enabled: boolean): AdminWorkload {
-  const [w, setW] = useState<AdminWorkload>({ suggestions: 0, failedActions: 0, stuckActions: 0, claims: 0 });
+  const [w, setW] = useState<AdminWorkload>({ suggestions: 0, failedActions: 0, stuckActions: 0, claims: 0, ownerUpdates: 0 });
   useEffect(() => {
     if (!enabled || !db) return;
     const database = db;
@@ -39,11 +40,12 @@ export function useAdminWorkload(enabled: boolean): AdminWorkload {
       count(query(collection(database, 'listing_claims'), where('status', '==', 'pending'))),
       count(query(collection(database, 'listing_updates'), where('status', '==', 'pending'))),
       count(query(collection(database, 'market_service_requests'), where('status', '==', 'new'))),
-    ]).then(([suggestions, rows, claims, updates, service]) => {
+      count(query(collection(database, 'owner_listing_edits'), where('notificationPending', '==', true))),
+    ]).then(([suggestions, rows, claims, updates, service, ownerUpdates]) => {
       if (!active) return;
       const now = Date.now();
       setW({
-        error: '', suggestions,
+        error: '', suggestions, ownerUpdates,
         claims: claims + updates + service,
         failedActions: rows.filter((r) => r.status === 'failed' && (r.createdAt ?? 0) > now - 7 * 86_400_000).length,
         stuckActions: rows.filter((r) => r.status === 'pending' && (r.createdAt ?? now) < now - 2 * 3_600_000).length,

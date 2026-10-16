@@ -1,3 +1,4 @@
+import { OwnerEditsPanel } from './OwnerEditsPanel';
 import { firestoreActionError } from '@/src/lib/firestoreErrors';
 /**
  * Local partners: the outreach pipeline. Leads enter only through a real listing
@@ -214,6 +215,7 @@ export function PartnersWorkspace() {
 
   return (
     <div className="space-y-4">
+      <OwnerEditsPanel />
       <ClaimsPanel leads={leads} />
       <MarketHQPanel />
       <Panel title="Partner outreach" subtitle="Emails that pass every rule are sent automatically (cancel any under In progress). Businesses come from real listings; replies wait for you; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>

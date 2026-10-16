@@ -26,7 +26,7 @@ for(const verified of [false,true]) {
   for(const kind of ['event','market','business']) it(`${verified?'approved':'unclaimed'} ${kind} has consistent badge and claim presentation`,()=>{
     const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement('div',null,
       createElement(component.VerifiedMark,{entityId:kind+'-test'}),createElement(component.ClaimCta,{entityId:kind+'-test',kind,title:'Test'}))));
-    if(verified){assert.match(html,/Confirmed by the organization/);assert.match(html,/Suggest a correction/);assert.doesNotMatch(html,/Claim this listing|href="\/claim\//);}
+    if(verified){assert.match(html,/Confirmed by the organization/);assert.match(html,/Suggest a correction/);assert.match(html,/Claimed by the organization/);assert.doesNotMatch(html,/Is this your|Claim it free|given more weight/);assert.doesNotMatch(html,/Claim this listing|href="\/claim\//);}
     else{assert.match(html,new RegExp(`href="/claim/${kind}-test"`));assert.match(html,/Claim this listing/);assert.doesNotMatch(html,/>Verified</);}
   });
   it(`missing entities cannot produce a claim link (${verified})`,()=>{

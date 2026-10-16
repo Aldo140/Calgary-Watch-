@@ -61,3 +61,17 @@ export function organizerMarkets(id: string, all: readonly DiscoveryEntity[], no
 
 /** Reviewed identities are shared by association and outreach, including legacy names. */
 export function organizationIdentityForName(name:string){const normalize=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');const found=ORGANIZATIONS.find(o=>o.names.some(n=>normalize(n)===normalize(name)));return found?{...found,slug:found.id.replace(/^biz-/,'')}:undefined;}
+
+/** A city-only organization address is not a visitor entrance. */
+export function organizationVisitAddress(address: string): boolean {
+  const value = address.trim();
+  return Boolean(value && !/^calgary(?:,?\s+(?:ab|alberta))?(?:,?\s+canada)?\.?$/i.test(value));
+}
+
+/** Runs already in progress remain discoverable; no inferred organizer relationships. */
+export function publicOrganizationEvents(events: readonly Event[], search: string, days: number, now: number): Event[] {
+  const needle = search.normalize('NFKC').trim().toLocaleLowerCase('en-CA');
+  const until = days ? now + days * 86_400_000 : Infinity;
+  return events.filter(event => Date.parse(event.end) > now && Date.parse(event.start) < until
+    && `${event.title} ${event.venue ?? ''} ${event.address}`.normalize('NFKC').toLocaleLowerCase('en-CA').includes(needle));
+}

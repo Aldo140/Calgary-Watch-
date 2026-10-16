@@ -1,5 +1,8 @@
+import { calgaryDateTimeFormat } from './calgaryTz';
 import type { DiscoveryEntity } from '../types/discovery';
 import type { OrganizationProjection } from './organizationWorkspace';
+const programmeDateFormatter = calgaryDateTimeFormat('en-CA', { dateStyle: 'medium', timeStyle: 'short' });
+
 /** A slower initial read must never overwrite a newer live update or removal. */
 export function mergeOrganizationRows(current:readonly OrganizationProjection[],incoming:readonly OrganizationProjection[]):OrganizationProjection[]{
   const rows=new Map(current.map(row=>[row.entityId,row]));
@@ -19,4 +22,11 @@ export function filterOrganizationProgramme(entities:readonly DiscoveryEntity[],
   const needle=search.normalize('NFKC').trim().toLocaleLowerCase('en-CA');
   return entities.filter(entity=>(entity.kind==='event'||entity.kind==='market')&&(filter==='all'||organizationListingState(entity,deleted,now)===filter)&&`${entity.title} ${'address' in entity?entity.address:''}`.normalize('NFKC').toLocaleLowerCase('en-CA').includes(needle))
     .sort((a,b)=>a.kind==='event'&&b.kind==='event'?Date.parse(a.start)-Date.parse(b.start)||a.title.localeCompare(b.title):a.kind===b.kind?a.title.localeCompare(b.title):a.kind==='event'?-1:1);
+}
+
+/** Date-only productions never display placeholder midnight as a showtime. */
+export function organizationSchedule(entity: DiscoveryEntity): string {
+  if (entity.kind !== 'event') return 'Market · open its calendar for dates';
+  if (entity.schedulePrecision === 'date') return `${entity.start.slice(0, 10)} · Check official showtimes`;
+  return programmeDateFormatter.format(new Date(entity.start));
 }

@@ -41,7 +41,7 @@ test('management preview selects member history and blocks submission',()=>{
   const read=(p:string)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
   const page=read('src/pages/ClaimListingPage.tsx'), manager=read('src/components/entity/ListingManagement.tsx');
   assert.match(page,/previewUid = isAdmin \?/);assert.match(page,/useMyClaims\(subjectUid\)/);
-  assert.match(page,/if \(!entity \|\| previewUid\) return/);
+  assert.match(page,/if \(!entity \|\| previewUid \|\| adminView \|\| busy\) return/);
   assert.match(manager,/loadOwnerEditor\(claim.entityId,subjectUid\)/);
   assert.match(manager,/if\(!user\|\|readOnly\|\|busy/);
   assert.match(manager,/disabled=\{readOnly\|\|locked\|\|busy/);

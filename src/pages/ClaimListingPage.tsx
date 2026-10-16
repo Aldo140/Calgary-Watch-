@@ -15,7 +15,7 @@ import { useAuth } from '../components/FirebaseProvider';
 import { discoveryRepository } from '../data/discovery';
 import { entityPath } from '../lib/discovery';
 import { CLAIM_ROLES, claimEvidence, claimProblem, claimTimeline, emailDomain, sourceDomains, type ClaimDraft } from '../lib/claims';
-import { submitClaim, useMyClaims } from '../lib/claimsApi';
+import { submitClaim, useMyClaims, useClaimLoadError } from '../lib/claimsApi';
 import { auth } from '../firebase';
 import { EASE_OUT } from '../components/plans/Motion';
 import '../styles/plans.css';
@@ -30,9 +30,9 @@ const PERKS = [
 ];
 
 /**
- * Claim a listing: register with Google, say who you are, and we confirm.
- * Once approved, the same page becomes the organizer's direct line: every
- * change request lands in admin with a verified sender attached.
+ * Anyone can request a claim with a new or existing Google account.
+ * Admin management is an explicit preview, separate from a personal claim.
+ * Approval is still required before organization editing is granted.
  */
 export default function ClaimListingPage() {
   const { id = '' } = useParams();
@@ -43,10 +43,19 @@ function ClaimForm({ id }: { id: string }) {
   const { user, signIn, isFirebaseConfigured, isAdmin } = useAuth();
   const [params] = useSearchParams();
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
+  const adminView = isAdmin && (!!previewUid || params.get('view') === 'admin');
+  const claimParams = new URLSearchParams(params);
+  claimParams.delete('as');
+  claimParams.delete('view');
+  const claimViewUrl = `/claim/${encodeURIComponent(id)}${claimParams.size ? `?${claimParams}` : ''}`;
+  const adminParams = new URLSearchParams(claimParams);
+  adminParams.set('view', 'admin');
+  const adminViewUrl = `/claim/${encodeURIComponent(id)}?${adminParams}`;
   const subjectUid = previewUid ?? user?.uid;
-  const adminMode=useAdminEditMode(isAdmin,`${user?.uid}:${subjectUid}:${id}`);
+  const adminMode=useAdminEditMode(adminView,`${user?.uid}:${subjectUid}:${id}`);
   const reduce = useReducedMotion();
   const claims = useMyClaims(subjectUid);
+  const claimLoadError = useClaimLoadError(subjectUid);
   const listing = useMemo(() => {
     const inventory=discoveryRepository.list();
     const context=inventory.find(e=>e.id===params.get('listing'));
@@ -60,7 +69,7 @@ function ClaimForm({ id }: { id: string }) {
 
   const parentClaim = (entity?.kind === 'event'||entity?.kind==='market') ? claims?.find(c => c.status === 'approved' && c.entityId === entity.organizerEntityId) : undefined;
   const claim = parentClaim ?? claims?.find((c) => (c.entityId === entity?.id||c.status==='approved'&&c.approvedOrganizationId===entity?.id)) ?? null;
-  const management=(claim?approvedManagementOrganization(claim,discoveryRepository.list()):undefined)??(isAdmin&&entity?claimOrganization(entity,discoveryRepository.list())?.profile:undefined);
+  const management=(claim?approvedManagementOrganization(claim,discoveryRepository.list()):undefined)??(adminView&&entity?claimOrganization(entity,discoveryRepository.list())?.profile:undefined);
   const profile=management??(legacyClaim&&entity&&(entity.kind==='event'||entity.kind==='market')?standaloneOrganization(entity):organization?.profile);
   const sites = entity ? sourceDomains(entity.sources) : [];
   const [draft, setDraft] = useState<ClaimDraft>(() => { try { return restoreClaimDraft(sessionStorage.getItem(`claim-draft:${id}`)); } catch { return restoreClaimDraft(null); } });
@@ -82,8 +91,12 @@ function ClaimForm({ id }: { id: string }) {
   const domainMatch = !!workDomain && sites.some((s) => workDomain === s || workDomain.endsWith(`.${s}`));
 
   const send = async () => {
-    if (!entity || previewUid) return;
+    if (!entity || previewUid || adminView || busy) return;
     const current = auth?.currentUser;
+    if (current && (!claims || claimLoadError)) {
+      setError('Wait until we can check your existing claims, then try again. Your form is still here.');
+      return;
+    }
     const problem = claimProblem(draft);
     if (problem) { setError(problem); return; }
     if (!current) { pending.current = true; await signIn(); if (!auth?.currentUser) pending.current = false; return; }
@@ -120,10 +133,15 @@ function ClaimForm({ id }: { id: string }) {
   return (
     <SiteLayout>
       <div className="cw-plans cl-page">
-        {isAdmin?<div className="cw-wrap"><AdminAccessBar enabled={adminMode.enabled} onChange={adminMode.setEnabled} subject={entity.title}/></div>:null}
+        {isAdmin ? <div className="cw-wrap">
+          {adminView ? <>
+            <AdminAccessBar enabled={adminMode.enabled} onChange={adminMode.setEnabled} subject={entity.title}/>
+            <p className="pl-fine">This is administrator access, not a claim application. <Link to={claimViewUrl}>Open the normal claim page with my account</Link>.</p>
+          </> : <p className="pl-fine">You’re viewing the same claim page organizers use. Your administrator role does not claim this organization. <Link to={adminViewUrl}>Open admin management</Link>.</p>}
+        </div> : null}
         <header className="cw-wrap cl-head">
           <motion.p className="pl-eyebrow" {...rise(0)}>For organizers · free</motion.p>
-          <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'?<>Manage <em>{entity.title}.</em></>:<>Manage <em>{profile?.title??entity.title}.</em></>}</motion.h1>
+          <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'||adminView?<>Manage <em>{entity.title}.</em></>:<>Claim <em>{profile?.title??entity.title}.</em></>}</motion.h1>
           <motion.p className="cl-lead" {...rise(2)}>Keep your listing and linked events right: dates, descriptions, addresses and links. After verification, save one update every seven days per business. Changes publish automatically without admin approval; CalgaryWatch is notified. Images cannot be added, changed or deleted in the editor. Once your claim is approved, your listing shows that it’s confirmed by your organization.</motion.p>
           <motion.ol className="cl-steps" aria-label="How claiming works" {...rise(3)}>
             <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in with Google</li>
@@ -134,8 +152,10 @@ function ClaimForm({ id }: { id: string }) {
 
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
-            {!claim&&!isAdmin&&profile?<section className="cl-listing" aria-label="Prefilled organization profile"><p className="pl-kicker">Your prefilled organization profile</p><h2>{profile.title}</h2>{listing&&listing.id!==entity.id?<p>For your listing: <Link to={entityPath(listing)}>{listing.title}</Link></p>:null}<p>{profile.managementOnly?'Your management workspace starts with this listing. You can add events after approval, without creating a separate public company page.':'Manage this organization profile and its confirmed linked events after approval.'}</p>{profile.website?<a href={profile.website} target="_blank" rel="noopener noreferrer">Organization source ↗</a>:null}{profile.address?<p>{profile.address}</p>:null}<p>We confirm your authority before enabling edits. Existing unrelated listings are never added to your account automatically.</p></section>:null}
-            {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||isAdmin ? (
+            {claimLoadError ? <div role="alert" className="pl-error"><p>We couldn’t check existing claims. Your form is still here; this does not mean your account cannot claim this organization.</p><button type="button" className="pl-btn" onClick={() => window.location.reload()}>Reload and try again</button></div> : null}
+            {!claim&&!adminView ? <p className="pl-fine">{user ? 'Already signed in? Use this account to request access—no new account or paid plan is needed.' : 'New here? Google sign-in creates your free account. Already have an account? Sign in with it and continue here.'} You can apply with a personal or work Google account; we confirm your authority before enabling changes.</p> : null}
+            {!claim&&!adminView&&profile?<section className="cl-listing" aria-label="Prefilled organization profile"><p className="pl-kicker">Your prefilled organization profile</p><h2>{profile.title}</h2>{listing&&listing.id!==entity.id?<p>For your listing: <Link to={entityPath(listing)}>{listing.title}</Link></p>:null}<p>{profile.managementOnly?'Your management workspace starts with this listing. You can add events after approval, without creating a separate public company page.':'Manage this organization profile and its confirmed linked events after approval.'}</p>{profile.website?<a href={profile.website} target="_blank" rel="noopener noreferrer">Organization source ↗</a>:null}{profile.address?<p>{profile.address}</p>:null}<p>We confirm your authority before enabling edits. Existing unrelated listings are never added to your account automatically.</p></section>:null}
+            {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||adminView ? (
               <>
                 {entity.kind === 'market' ? (
                   <Link to={previewUid ? `/organizer/${encodeURIComponent(entity.id)}?as=${encodeURIComponent(previewUid)}` : `/organizer/${encodeURIComponent(entity.id)}`} className="hq-open">
@@ -143,7 +163,7 @@ function ClaimForm({ id }: { id: string }) {
                     <ArrowUpRight size={20} aria-hidden="true" />
                   </Link>
                 ) : null}
-                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>{isAdmin?'Administrator listing access.':'Your account is a business account.'}</strong> {isAdmin?'This preview does not change ownership or approval. Open the selected account’s':'It manages this listing; you’ll see it on your'} <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
+                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>{adminView?'Administrator listing access.':'Your account is a business account.'}</strong> {adminView?'This preview does not change ownership or approval. Open the selected account’s':'It manages this listing; you’ll see it on your'} <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
                 {management?<Link className="pl-btn" to={`/organization/${management.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>{management.managementOnly?'Manage organizer workspace & events':'Manage organization profile & all events'}</Link>:<ListingManagement key={`${id}:${adminMode.enabled}`} claim={claim??{entityId:entity.id,entityTitle:entity.title}} previewUid={previewUid} initialTargetId={entity.id} adminEdit={adminMode.enabled} />}
               </>
             ) : claim?.status === 'pending' ? (
@@ -198,9 +218,9 @@ function ClaimForm({ id }: { id: string }) {
                 {error ? <p className="pl-error" role="alert">{error}</p> : null}
                 <div className="pl-actions">
                   <button type="submit" className="pl-btn" data-ready={!claimProblem(draft)} disabled={busy || !isFirebaseConfigured || Boolean(user&&!claims)}>
-                    {busy ? 'Sending…' : user ? verifiedListing?'Request organization access':'Claim organization profile' : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
+                    {busy ? 'Sending…' : claimLoadError ? 'Claim check unavailable' : user && !claims ? 'Checking your claims…' : user ? verifiedListing?'Request organization access':'Claim organization profile' : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
-                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Claiming needs a CalgaryWatch account: a Google sign-in, and what you typed is kept through it. Once we confirm you, it becomes a business account.'}</p>
+                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Continue with a new or existing Google account. Your form is kept through sign-in. No paid plan is needed; organization access starts after approval.'}</p>
                 </div>
               </motion.form>
             )}

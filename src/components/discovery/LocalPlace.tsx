@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, MapPin, Navigation, Phone, Quote, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
-import { organizerEvents } from '../../lib/organizations';
+import { organizerEvents, organizerMarkets } from '../../lib/organizations';
 import { localLinks } from '../../lib/localLinks';
-import { communityFor, directionsUrl } from '../../lib/marketDays';
+import { communityFor, directionsUrl, nextOpen } from '../../lib/marketDays';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
@@ -60,6 +60,7 @@ function Lamp() {
 export function LocalPlace({ place, all, occurrences }: { place: Business; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[] }) {
   const [now] = useState(() => Date.now());
   const upcoming = organizerEvents(place.id, all, now);
+  const markets = organizerMarkets(place.id, all, now);
   const url = `https://calgarywatch.ca${entityPath(place)}`;
   const { shared, share } = useShare(place.title, place.summary, url);
   // The phone's Visit dock appears once the hero's own buttons have scrolled away.
@@ -182,6 +183,25 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           </div>
         </section>
 
+        {markets.length ? (
+          <section className="lp-upcoming" aria-labelledby="lp-markets">
+            <header className="lx-head"><div>
+              <p className="lx-eyebrow">From this organization</p>
+              <h2 id="lp-markets">Markets from <mark>{name}.</mark></h2>
+              <p>Choose a location for its market days, directions and official information.</p>
+            </div></header>
+            <ul className="lp-dates">
+              {markets.map(market => {
+                const next = nextOpen(market, occurrences, new Date(now));
+                return <li key={market.id}><Link to={entityPath(market)}>
+                  {next ? <time dateTime={next.start}><small>{wday.format(new Date(next.start))}</small><b>{dnum.format(new Date(next.start))}</b><small>{mon.format(new Date(next.start))}</small></time> : <Store size={32} aria-hidden="true" />}
+                  <span><strong>{market.title}</strong><em>{next ? `Next market: ${day.format(new Date(next.start))}` : 'Check the official website for upcoming dates'} · {market.address}</em></span>
+                  <Go />
+                </Link></li>;
+              })}
+            </ul>
+          </section>
+        ) : null}
         {!upcoming.length && place.categories.includes('arts') ? <p>No upcoming events are currently listed. Check the official website for the latest programme.</p> : null}
         {upcoming.length ? (
           <section className="lp-upcoming" aria-labelledby="lp-upcoming">

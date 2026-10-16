@@ -1,4 +1,4 @@
-import type { Business, DiscoveryEntity, EntityImage, Event } from '../types/discovery';
+import type { Business, DiscoveryEntity, EntityImage, Event, Market } from '../types/discovery';
 import { publishedInventory } from './discoveryPublication';
 
 /** Exact official provenance only. Venue names and fuzzy organizer names are never ownership. */
@@ -51,6 +51,12 @@ export function organizerEvents(id: string, all: readonly DiscoveryEntity[], now
   return all.filter((e): e is Event => e.kind === 'event' && e.organizerEntityId === id && publishedInventory(e, new Date(now))
     && !e.cancelled && Number.isFinite(Date.parse(e.end)) && Date.parse(e.end) > now)
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+}
+
+/** Market locations keep their own calendars; a shared organizer must not merge them. */
+export function organizerMarkets(id: string, all: readonly DiscoveryEntity[], now = Date.now()): Market[] {
+  return all.filter((e): e is Market => e.kind === 'market' && e.organizerEntityId === id && publishedInventory(e, new Date(now)))
+    .sort((a, b) => a.title.localeCompare(b.title));
 }
 
 /** Reviewed identities are shared by association and outreach, including legacy names. */

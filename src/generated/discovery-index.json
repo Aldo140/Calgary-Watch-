@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-16T18:06:47.954Z",
+  "generatedAt": "2026-10-16T20:50:29.273Z",
   "entities": [
     {
       "id": "hood-inglewood-se",
@@ -1362,14 +1362,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://farmersmarket.hsca.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "hillhurst-sunnyside-farmers-market",
       "neighbourhood": "Hillhurst",
@@ -1407,14 +1407,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://calgaryfarmersmarket.ca/cfm-west/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "calgary-farmers-market-west",
       "neighbourhood": "Greenwood/Greenbriar",
@@ -1431,7 +1431,8 @@
       "petFriendly": false,
       "familyFriendly": true,
       "vendorIds": [],
-      "images": []
+      "images": [],
+      "organizerEntityId": "biz-calgary-farmers-market"
     },
     {
       "id": "2a55ade6e02d4308cc4f09f59f02",
@@ -1455,14 +1456,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://calgaryfarmersmarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "calgary-farmers-market-south",
       "neighbourhood": "Fairview Industrial",
@@ -1479,7 +1480,8 @@
       "petFriendly": false,
       "familyFriendly": true,
       "vendorIds": [],
-      "images": []
+      "images": [],
+      "organizerEntityId": "biz-calgary-farmers-market"
     },
     {
       "id": "3e483396c1c2ea35ca05c3f284e3",
@@ -1504,14 +1506,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.crossroadsmarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "crossroads-market",
       "neighbourhood": "Ramsay",
@@ -1550,14 +1552,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.farmersmakersmarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "farmers-makers-market-marda-loop",
       "neighbourhood": "South Calgary",
@@ -1574,7 +1576,8 @@
       "petFriendly": true,
       "familyFriendly": true,
       "vendorIds": [],
-      "images": []
+      "images": [],
+      "organizerEntityId": "biz-calgary-earth-market-society"
     },
     {
       "id": "ef9a9e8453e7dfa21099a0dab63c",
@@ -1598,14 +1601,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://calgarywintermarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "calgary-winter-market",
       "neighbourhood": "Eau Claire",
@@ -1643,14 +1646,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://marketcollective.ca/faqs/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "holiday-market-collective",
       "neighbourhood": "Victoria Park",
@@ -1688,7 +1691,7 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "image": {
@@ -1698,9 +1701,9 @@
       },
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "dalhousie-harvest-farmers-market",
       "neighbourhood": "Dalhousie",
@@ -1739,14 +1742,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "fresh-and-local-market",
       "address": "12445 Lake Fraser Drive SE, Calgary, AB",
@@ -6253,7 +6256,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "8749bfa3fb210e9cde56604699e0",
@@ -6288,7 +6292,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "feee9e928a9d0bedfe5a0cb11385",
@@ -6323,7 +6328,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "d08e225d627bd4834912cefa7410",
@@ -6358,7 +6364,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "78a61e1fd4812b02a66e64060fbd",
@@ -6393,7 +6400,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "9dfc30800ceaf924dbf36f25765d",
@@ -6428,7 +6436,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "ed7badb03dcd70000e7d6123faba",
@@ -6463,7 +6472,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "2f3e8d1754d6d0e0fab4e946c500",
@@ -6498,7 +6508,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "d03c5e2153fe96930974bc198682",
@@ -6533,7 +6544,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "65133efe763d1b2412dc616bbdc0",
@@ -6568,7 +6580,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "b604871539be53df73d4a31d3b89",
@@ -6603,7 +6616,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "efb83dc037be05e2d84e24b67932",
@@ -6638,7 +6652,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "e869e616c67f8616c68539a5c11b",
@@ -6673,7 +6688,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "a06eb727acef22bfc79a185295f4",
@@ -6708,7 +6724,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "d9753fabe0dda5b0664e58cc7e9c",
@@ -6743,7 +6760,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "d8850456a3cff3e991889f234980",
@@ -6778,7 +6796,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "2b91276b44d21dbc8d310a53a0e7",
@@ -6813,7 +6832,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "45bc8d7aa61076b3a1e88fce8729",
@@ -6848,7 +6868,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "e16b9bb2a3ecd93f91785c7de9c8",
@@ -6883,7 +6904,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "d8774970ebba4a44896c2b627e07",
@@ -6918,7 +6940,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "e94ede73df6b20ad489c9d00ba84",
@@ -6953,7 +6976,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "68b58d5b5d9b08ec89b1b0007120",
@@ -6988,7 +7012,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "0de5fadc26a12cf6672fb7fc98d5",
@@ -7023,7 +7048,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "8360824af9b175266bf79eac1dca",
@@ -7058,7 +7084,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "692111b04eef9173e4eb7f61ad26",
@@ -7093,7 +7120,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "fea7cfdd6882b8c24c285c441e9a",
@@ -7128,7 +7156,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "7073745554b5af868cb8f92ad2f8",
@@ -7163,7 +7192,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Heritage Park Historical Village",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-heritage-park"
     },
     {
       "id": "fe09548e15b0340ea7f853492f4f",
@@ -8704,7 +8734,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "4c4ddf2b132e8202b1f478da38b8",
@@ -8739,7 +8770,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "fbc67f856a661bcf9b4467ec0a5b",
@@ -8774,7 +8806,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "b23be52cbe28e58dbc03edc29145",
@@ -8809,7 +8842,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "9f5e467bbbb17cd26667bfc5f856",
@@ -8844,7 +8878,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "01f4574070cdd256c6560b4c1db6",
@@ -8879,7 +8914,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "27020135e9e3f1c5aba254aa3d16",
@@ -8914,7 +8950,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "a3c37354b50d94dd05d9309bb341",
@@ -8947,7 +8984,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "caee75b15c7d628736cbbaf20f88",
@@ -8982,7 +9020,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "6fc1f2187992faa833d4d52fcb04",
@@ -9017,7 +9056,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "9de363d43357bc12b86c5d900e6d",
@@ -9050,7 +9090,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "6cb8d72fd61f1a27121584494922",
@@ -9083,7 +9124,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "8ecbf5ad2960469336fad7362606",
@@ -9118,7 +9160,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "21fb444a605bd7c6bbea83cdee83",
@@ -9153,7 +9196,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "a1c23074a65cce8d1378e100522b",
@@ -9188,7 +9232,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "6c06be4a048824bc714a2732c021",
@@ -9223,7 +9268,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "fdae7baf3bbf1c0a12c872887cf1",
@@ -9258,7 +9304,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "b4fb15178757e386e3e33ed45960",
@@ -9291,7 +9338,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "67ed4ba7c206a86c25f996af1fef",
@@ -9326,7 +9374,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "8ff4db723be75f0c004f92f8e4f7",
@@ -9361,7 +9410,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "394d152b8e38c08a96919d9f7779",
@@ -9396,7 +9446,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "9226bcd3bec6ee0a3b98712af169",
@@ -9429,7 +9480,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "d4f17c0003a1b6d9629a76a4bbcf",
@@ -9464,7 +9516,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "c78679465deb3e8eeb9750166272",
@@ -9497,7 +9550,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "ab0dfc97d60a8dced6bf4741531f",
@@ -9532,7 +9586,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "40a73caece9936e923841247e565",
@@ -9567,7 +9622,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "7e0ddfb3d9257d64cde5c5edabe6",
@@ -9602,7 +9658,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "b72c727424f7aad20fe790a74598",
@@ -9635,7 +9692,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "The Confluence Historic Site & Parkland",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-the-confluence"
     },
     {
       "id": "549a424a18296d79022044222e56",
@@ -9670,7 +9728,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "92e9516589f0261f0dcd612da15d",
@@ -9705,7 +9764,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "5677d200e9e600aea758c16926bc",
@@ -9740,7 +9800,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "721acd25f02d7dd8112d748ea5cc",
@@ -9775,7 +9836,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "1cd7f3884bfb0976d8bab80b443b",
@@ -9810,7 +9872,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "bc26bdbd9b3b3142bdfc05e75b74",
@@ -9845,7 +9908,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "66fd0694f2fa0b5026e8a6a7b80e",
@@ -9878,7 +9942,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "41898bb7038c2d3e82bf704fdaf6",
@@ -9913,7 +9978,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "542b66af4a57b12e762657391757",
@@ -9948,7 +10014,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "c2ca8ed77aa58c8613345619eaba",
@@ -9983,7 +10050,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "ecda7f9745da9253161f2ce868f3",
@@ -10018,7 +10086,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "831969912b0bef4c67b7b8d8da78",
@@ -10051,7 +10120,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "0213db61bf6844364426a97ffb6f",
@@ -10086,7 +10156,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "09b75be8b1e1cfd411ebe7e4435a",
@@ -10119,7 +10190,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "4cb9b1b0e1beb8ee58ccf72dcda4",
@@ -10152,7 +10224,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "82cb1e92bae2874d57977c9de186",
@@ -10187,7 +10260,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "30ad695869b601b78ef7a1cf7198",
@@ -10220,7 +10294,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "cf64c4cefb9cfbdd15c41f31eeee",
@@ -10253,7 +10328,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Contemporary Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-contemporary-calgary"
     },
     {
       "id": "71904654ad0de6e8275e268cf600",
@@ -10272,14 +10348,14 @@
           "name": "Alcove Centre for the Arts",
           "url": "https://www.alcoveartscentre.ca/upcomingprograms/love-letters-from-the-diaspora",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "alcove",
       "sourceRecordId": "love-letters-2026-09-26",
       "neighbourhood": "Beltline",
@@ -10308,14 +10384,14 @@
           "name": "Alcove Centre for the Arts",
           "url": "https://www.alcoveartscentre.ca/upcomingprograms/comics-workshop-sept-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "alcove",
       "sourceRecordId": "comics-workshop-2026-09-27",
       "neighbourhood": "Downtown",
@@ -10349,14 +10425,14 @@
           "name": "Theatre Calgary",
           "url": "https://www.theatrecalgary.com/shows/2026-2027-little-shop-of-horrors",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "theatre-calgary",
       "sourceRecordId": "little-shop-of-horrors-2026",
       "neighbourhood": "Downtown",
@@ -10392,14 +10468,14 @@
           "name": "Wordfest",
           "url": "https://wordfest.com/festival/imaginairium/schedule/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "wordfest",
       "sourceRecordId": "imaginairium-2026-opening-night",
       "neighbourhood": "East Village",
@@ -10411,7 +10487,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Wordfest",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-wordfest"
     },
     {
       "id": "031bc5ef0032af5bd3aada3a7c4c",
@@ -10435,14 +10512,14 @@
           "name": "Wordfest",
           "url": "https://wordfest.com/festival/imaginairium/schedule/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "wordfest",
       "sourceRecordId": "imaginairium-2026-literary-death-match",
       "neighbourhood": "Beltline",
@@ -10454,7 +10531,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Wordfest",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-wordfest"
     },
     {
       "id": "27a2c5e3ac84cf62f3e7d4bba188",
@@ -10476,14 +10554,14 @@
           "name": "Wordfest",
           "url": "https://wordfest.com/festival/imaginairium/schedule/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "wordfest",
       "sourceRecordId": "imaginairium-2026-bonnie-garmus",
       "neighbourhood": "Lincoln Park",
@@ -10495,7 +10573,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Wordfest",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-wordfest"
     },
     {
       "id": "e69c7c33d8cb5eaba09c7b69f93f",
@@ -10517,14 +10596,14 @@
           "name": "Scotiabank Saddledome",
           "url": "https://scotiabanksaddledome.com/events/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "scotiabank-saddledome",
       "sourceRecordId": "sidhu-moose-wala-2026-10-19",
       "neighbourhood": "Beltline",
@@ -10559,14 +10638,14 @@
           "name": "Scotiabank Saddledome",
           "url": "https://scotiabanksaddledome.com/events/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "scotiabank-saddledome",
       "sourceRecordId": "smashing-pumpkins-2026-11-03",
       "neighbourhood": "Beltline",
@@ -10602,14 +10681,14 @@
           "name": "Alberta Ballet",
           "url": "https://www.albertaballet.com/shows/the-nutcracker",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "alberta-ballet",
       "sourceRecordId": "nutcracker-calgary-2026",
       "address": "Southern Alberta Jubilee Auditorium, 1415 14 Ave NW, Calgary, AB",
@@ -10620,7 +10699,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Alberta Ballet",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-alberta-ballet"
     },
     {
       "id": "d26f0f470edce55754294b100bf6",
@@ -10644,14 +10724,14 @@
           "name": "Spruce Meadows",
           "url": "https://www.sprucemeadows.com/icm-faq/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "spruce-meadows",
       "sourceRecordId": "international-christmas-market-2026",
       "address": "18011 Spruce Meadows Way SW, Calgary, AB",
@@ -10687,14 +10767,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-lodger-2026",
       "neighbourhood": "Downtown",
@@ -10732,14 +10812,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "sherlock-holmes-hunt-for-moriarty-2026",
       "neighbourhood": "Downtown",
@@ -10776,14 +10856,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-veil-2027",
       "neighbourhood": "Downtown",
@@ -10820,14 +10900,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "last-candle-2027",
       "neighbourhood": "Downtown",
@@ -10865,14 +10945,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-39-steps-2027",
       "neighbourhood": "Downtown",
@@ -10909,14 +10989,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-midnight-torch-2027",
       "neighbourhood": "Downtown",
@@ -10953,14 +11033,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-09",
       "neighbourhood": "Beltline",
@@ -10995,14 +11075,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-10",
       "neighbourhood": "Beltline",
@@ -11037,14 +11117,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-16",
       "neighbourhood": "Beltline",
@@ -11079,14 +11159,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-17",
       "neighbourhood": "Beltline",
@@ -11121,14 +11201,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-22",
       "neighbourhood": "Beltline",
@@ -11163,14 +11243,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-23",
       "neighbourhood": "Beltline",
@@ -11205,14 +11285,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-24",
       "neighbourhood": "Beltline",
@@ -11247,14 +11327,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-25",
       "neighbourhood": "Beltline",
@@ -11289,14 +11369,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-29",
       "neighbourhood": "Beltline",
@@ -11331,14 +11411,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-30",
       "neighbourhood": "Beltline",
@@ -11373,14 +11453,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-31",
       "neighbourhood": "Beltline",
@@ -11415,14 +11495,14 @@
           "name": "Wilder Institute’s Calgary Zoo",
           "url": "https://www.calgaryzoo.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-zoo",
       "sourceRecordId": "zooboo-2026-10-31",
       "neighbourhood": "Bridgeland",
@@ -11458,14 +11538,14 @@
           "name": "Wilder Institute’s Calgary Zoo",
           "url": "https://www.calgaryzoo.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-zoo",
       "sourceRecordId": "zooboo-2026-11-01",
       "neighbourhood": "Bridgeland",
@@ -11499,14 +11579,14 @@
           "name": "Calgary Opera",
           "url": "https://www.calgaryopera.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-opera",
       "sourceRecordId": "tosca-2026-10-16",
       "address": "1415 14 Avenue NW, Calgary, AB",
@@ -11516,7 +11596,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Calgary Opera",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-opera"
     },
     {
       "id": "6bb9a16f1f4ef801c1ef28fcb2c3",
@@ -11538,14 +11619,14 @@
           "name": "Calgary Opera",
           "url": "https://www.calgaryopera.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-opera",
       "sourceRecordId": "tosca-2026-10-18",
       "address": "1415 14 Avenue NW, Calgary, AB",
@@ -11555,7 +11636,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Calgary Opera",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-opera"
     },
     {
       "id": "4decfcebd2b8e5acf6c2c3caa958",
@@ -11577,14 +11659,14 @@
           "name": "Calgary Opera",
           "url": "https://www.calgaryopera.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-opera",
       "sourceRecordId": "tosca-2026-10-24",
       "address": "1415 14 Avenue NW, Calgary, AB",
@@ -11594,7 +11676,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "Calgary Opera",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-calgary-opera"
     },
     {
       "id": "24f247ae1d92c16eab48fc6ccd52",
@@ -11618,14 +11701,14 @@
           "name": "Calgary Philharmonic Orchestra",
           "url": "https://calgaryphil.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-phil",
       "sourceRecordId": "moana-2026-10-09",
       "neighbourhood": "Downtown",
@@ -11661,14 +11744,14 @@
           "name": "Calgary Philharmonic Orchestra",
           "url": "https://calgaryphil.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-phil",
       "sourceRecordId": "moana-2026-10-10",
       "neighbourhood": "Downtown",
@@ -11702,14 +11785,14 @@
           "name": "Grey Eagle Resort & Casino",
           "url": "https://www.greyeagleresortandcasino.ca/events/2026-oct/the-beach-boys",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "grey-eagle",
       "sourceRecordId": "beach-boys-2026-10-19",
       "address": "3777 Grey Eagle Drive, Calgary, AB",
@@ -11743,14 +11826,14 @@
           "name": "Inglewood Business Improvement Area",
           "url": "https://www.inglewoodyyc.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "inglewood-bia",
       "sourceRecordId": "mercantile-on-9th-2026-11-28",
       "neighbourhood": "Inglewood",
@@ -11783,7 +11866,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "image": {
@@ -11794,9 +11877,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "downstage",
       "sourceRecordId": "dreaming-climate-consciousness-2026-10-23",
       "neighbourhood": "Downtown",
@@ -11830,7 +11913,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "image": {
@@ -11841,9 +11924,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "downstage",
       "sourceRecordId": "dreaming-climate-consciousness-2026-10-24",
       "neighbourhood": "Downtown",
@@ -11878,7 +11961,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "image": {
@@ -11889,9 +11972,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "downstage",
       "sourceRecordId": "creative-stretch-2026-27",
       "neighbourhood": "Downtown",
@@ -11925,7 +12008,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "image": {
@@ -11936,9 +12019,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "downstage",
       "sourceRecordId": "a-study-of-choices-2027",
       "neighbourhood": "Downtown",
@@ -12193,14 +12276,14 @@
           "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "atp-partner-season-2026-27",
       "sourceRecordId": "evil-dead-the-musical",
       "address": "Martha Cohen Theatre, Calgary, Alberta",
@@ -12232,14 +12315,14 @@
           "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "atp-partner-season-2026-27",
       "sourceRecordId": "the-hobbit",
       "address": "Martha Cohen Theatre, Calgary, Alberta",
@@ -12271,14 +12354,14 @@
           "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "atp-partner-season-2026-27",
       "sourceRecordId": "fifteen-dogs",
       "address": "Martha Cohen Theatre, Calgary, Alberta",
@@ -12310,14 +12393,14 @@
           "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "atp-partner-season-2026-27",
       "sourceRecordId": "burning-mom",
       "address": "Martha Cohen Theatre, Calgary, Alberta",
@@ -12349,14 +12432,14 @@
           "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "atp-partner-season-2026-27",
       "sourceRecordId": "dream-a-canadian-musical",
       "address": "Martha Cohen Theatre, Calgary, Alberta",
@@ -12388,14 +12471,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "madonna-immaculate-collection",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12427,14 +12510,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "a-pirates-life",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12466,14 +12549,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "diving-great-barrier-reef",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12505,14 +12588,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "fran-lebowitz",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12544,14 +12627,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "changing-lens-saving-planet",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12583,14 +12666,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "van-halen-1984",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12622,14 +12705,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "earth-after-dark",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12661,14 +12744,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "yamato-tamayura",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12700,14 +12783,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "saving-natures-symphony",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12739,14 +12822,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "fleetwood-mac-rumours",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12778,14 +12861,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "acdc-highway-to-hell",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12817,14 +12900,14 @@
           "name": "Werklund Centre — user-supplied What’s On inventory",
           "url": "https://www.werklundcentre.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "werklund-partner-season-2026-27",
       "sourceRecordId": "stories-saturday-night",
       "address": "Jack Singer Concert Hall, Calgary, Alberta",
@@ -12858,14 +12941,14 @@
           "name": "Calgary Folk Music Festival — user-supplied partner confirmation",
           "url": "https://www.calgaryfolkfest.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-16T18:06:47.585Z"
+          "retrievedAt": "2026-10-16T20:50:28.777Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-16T18:06:47.585Z",
-      "fetchedAt": "2026-10-16T18:06:47.585Z",
-      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "verifiedAt": "2026-10-16T20:50:28.777Z",
+      "fetchedAt": "2026-10-16T20:50:28.777Z",
+      "updatedAt": "2026-10-16T20:50:28.777Z",
       "sourceId": "calgary-folk-festival-partner",
       "sourceRecordId": "calgary-folk-music-festival-2027",
       "address": "Calgary, Alberta",
@@ -12877,6 +12960,746 @@
       "pricing": "unknown",
       "organizer": "Calgary Folk Music Festival",
       "cancelled": false
+    },
+    {
+      "id": "biz-heritage-park",
+      "kind": "business",
+      "slug": "heritage-park",
+      "title": "Heritage Park Historical Village",
+      "name": "Heritage Park Historical Village",
+      "website": "https://heritagepark.ca/",
+      "address": "1900 Heritage Drive SW, Calgary, AB",
+      "summary": "A Calgary heritage attraction with ghost tours, seasonal activities and special events.",
+      "description": "Explore Heritage Park’s own programme of tours and seasonal events. Check the individual event page for admission, entry times and which areas are open.",
+      "categories": [
+        "family",
+        "heritage"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-13/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-14/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/culturally-speaking-calgary-general-hospital-its-part-in-the-calgary-story/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/homeschooler-days/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-thursdays/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-fridays/2026-10-16/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghost-teas/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-saturdays/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghost-teas/2026-10-18/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-sundays/2026-10-18/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out-adult-night/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out-3/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out/2026-10-24/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out/2026-10-25/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-28/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-29/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-thursdays/2026-10-29/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-30/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-fridays/2026-10-30/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-31/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-saturdays/2026-10-31/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-11-07/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-11-21/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/homeschooler-days/2026-12-04/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-12-05/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://heritagepark.ca/"
+      },
+      "services": [
+        "Seasonal events",
+        "Heritage experiences"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-the-confluence",
+      "kind": "business",
+      "slug": "the-confluence",
+      "title": "The Confluence Historic Site & Parkland",
+      "name": "The Confluence Historic Site & Parkland",
+      "website": "https://www.theconfluence.ca/",
+      "address": "750 9 Avenue SE, Calgary, AB",
+      "summary": "A Calgary gathering place for history, talks, creative workshops and cultural events.",
+      "description": "The Confluence’s programme includes talks, film nights, crafts and community gatherings. Find the events it organizes below and check its official pages for current registration and visitor information.",
+      "categories": [
+        "arts",
+        "heritage"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/the-inbetween-leader-book-launch",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-10-14",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales-oct15",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales-oct16",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creefiresidestories-oct17",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/truecrime26-oct17",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-oct18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/deadlyab-oct18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/frightfulfamilyfavourites-paranorman",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/hdht-oct2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/ghosttrivia",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/truecrime2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/howtrueistrue-theconjuring2",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/deadlyab2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/frightfulfamilyfavourites-corpsebride",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/rocky-horror",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/halloween",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/beyond-the-history-books/nov-5-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/cjff-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/girlwintertour",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-nov15",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-11-18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/pdworkshops-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/howtrueistrue-argo",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-12-02",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/reeltalk-thedivorcee",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-dec13",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theconfluence.ca/"
+      },
+      "services": [
+        "Talks and cultural events",
+        "Creative workshops"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-contemporary-calgary",
+      "kind": "business",
+      "slug": "contemporary-calgary",
+      "title": "Contemporary Calgary",
+      "name": "Contemporary Calgary",
+      "website": "https://www.contemporarycalgary.com/",
+      "address": "701 11 Street SW, Calgary, AB",
+      "summary": "Contemporary art exhibitions, artist talks and creative programmes in Calgary.",
+      "description": "Discover exhibitions and public programmes at Contemporary Calgary. Exhibition runs and separately scheduled talks or workshops may have different admission and registration requirements; use each official event page before visiting.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/ghazaleh-avarzamani-of-manual",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/adelita-husni-bey-agency",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/ghazaleh-avarzamani-churn-earn-burn-and-then-return",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/jane-jin-kaisen-burial-of-this-order",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/curtis-talwst-santiago-worlds-worlds-worlds",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/october-drop-in-art-making-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/october-open-studio-for-55-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/fluid-fest-2026-presented-by-springboard-performance",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/perspective-film-series-beauty-and-the-dogs-2017",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/damien-eagle-bear-when-you-see-it",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/exhibition-opening-damien-eagle-bear-when-you-see-it",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-tagalog-tour-oct-24",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-kids-press-into-fall",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/november-open-studio-for-55-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/free-first-thursday-nov-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/november-drop-in-art-making-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-french-tour-nov-14",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-ukrainian-tour-nov-21",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.contemporarycalgary.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Public programmes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-opera",
+      "kind": "business",
+      "slug": "calgary-opera",
+      "title": "Calgary Opera",
+      "name": "Calgary Opera",
+      "website": "https://www.calgaryopera.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary opera productions and special performances.",
+      "description": "Calgary Opera presents staged productions and special performances. Locations vary by event; the Southern Alberta Jubilee Auditorium is a performance venue rather than an office address for this profile. Check the official production page for language, surtitles, dates and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Opera",
+          "url": "https://www.calgaryopera.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryopera.com/"
+      },
+      "services": [
+        "Opera performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-wordfest",
+      "kind": "business",
+      "slug": "wordfest",
+      "title": "Wordfest",
+      "name": "Wordfest",
+      "website": "https://wordfest.com/",
+      "address": "Calgary, AB",
+      "summary": "Author conversations and literary performances, including the Imaginairium festival.",
+      "description": "Wordfest brings writers and readers together through author conversations, literary performances and its Imaginairium festival. Events use several Calgary venues; check each listing for the actual location, admission and accessibility details.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Wordfest",
+          "url": "https://wordfest.com/festival/imaginairium/schedule/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wordfest.com/"
+      },
+      "services": [
+        "Author conversations",
+        "Literary festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-alberta-ballet",
+      "kind": "business",
+      "slug": "alberta-ballet",
+      "title": "Alberta Ballet",
+      "name": "Alberta Ballet",
+      "website": "https://www.albertaballet.com/",
+      "address": "Calgary, AB",
+      "summary": "Ballet performances in Calgary, including The Nutcracker.",
+      "description": "Find Alberta Ballet’s Calgary performances and follow its official production pages for current dates and tickets. Performance venues are listed on the individual events; this organization profile does not present the Jubilee Auditorium as the company’s office.",
+      "categories": [
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Ballet",
+          "url": "https://www.albertaballet.com/shows/the-nutcracker",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.albertaballet.com/"
+      },
+      "services": [
+        "Ballet performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-farmers-market",
+      "kind": "business",
+      "slug": "calgary-farmers-market",
+      "title": "Calgary Farmers' Market",
+      "name": "Calgary Farmers' Market",
+      "website": "https://calgaryfarmersmarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "One market organization with South and West Calgary locations.",
+      "description": "Explore the South and West market locations below. Each location keeps its own address and scheduled market days; check the location’s official page for current hours and holiday exceptions.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        },
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryfarmersmarket.ca/"
+      },
+      "services": [
+        "Farmers markets",
+        "Local food"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-earth-market-society",
+      "kind": "business",
+      "slug": "calgary-earth-market-society",
+      "title": "Calgary Earth Market Society",
+      "name": "Calgary Earth Market Society",
+      "website": "https://www.farmersmakersmarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "Organizer of the Farmers & Makers Market at cSPACE.",
+      "description": "Find the Farmers & Makers Market at cSPACE below, with its own location and scheduled market days. The market is organized by Calgary Earth Market Society; cSPACE is the host location. Check the organizer’s page for seasonal changes.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.farmersmakersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.farmersmakersmarket.ca/"
+      },
+      "services": [
+        "Farmers and makers market"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
     }
   ],
   "occurrences": [
@@ -12892,7 +13715,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12907,7 +13730,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12922,7 +13745,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12937,7 +13760,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12952,7 +13775,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12967,7 +13790,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12982,7 +13805,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -12997,7 +13820,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13012,7 +13835,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13027,7 +13850,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13042,7 +13865,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13057,7 +13880,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13072,7 +13895,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13087,7 +13910,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13102,7 +13925,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13117,7 +13940,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13132,7 +13955,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13147,7 +13970,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13162,7 +13985,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13177,7 +14000,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13192,7 +14015,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13207,7 +14030,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13222,7 +14045,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13237,7 +14060,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13252,7 +14075,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13267,7 +14090,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13282,7 +14105,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13297,7 +14120,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13312,7 +14135,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13327,7 +14150,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13342,7 +14165,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13357,7 +14180,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13372,7 +14195,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13387,7 +14210,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13402,7 +14225,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13417,7 +14240,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13432,7 +14255,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13447,7 +14270,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13462,7 +14285,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13477,7 +14300,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13492,7 +14315,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13507,7 +14330,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13522,7 +14345,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13537,7 +14360,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.crossroadsmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13552,7 +14375,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.farmersmakersmarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13567,7 +14390,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13582,7 +14405,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13597,7 +14420,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13612,7 +14435,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13627,7 +14450,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13642,7 +14465,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13657,7 +14480,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13672,7 +14495,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13687,7 +14510,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13702,7 +14525,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13717,7 +14540,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13732,7 +14555,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13747,7 +14570,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13762,7 +14585,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13777,7 +14600,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13792,7 +14615,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13807,7 +14630,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13822,7 +14645,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13837,7 +14660,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13852,7 +14675,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgarywintermarket.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13867,7 +14690,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://marketcollective.ca/faqs/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13882,7 +14705,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://marketcollective.ca/faqs/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13897,7 +14720,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://marketcollective.ca/faqs/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13912,7 +14735,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://marketcollective.ca/faqs/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13927,7 +14750,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://marketcollective.ca/faqs/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13942,7 +14765,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://marketcollective.ca/faqs/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13957,7 +14780,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13972,7 +14795,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -13987,7 +14810,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14002,7 +14825,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14017,7 +14840,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14032,7 +14855,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14047,7 +14870,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14062,7 +14885,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14077,7 +14900,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14092,7 +14915,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14107,7 +14930,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14122,7 +14945,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14137,7 +14960,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14152,7 +14975,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14167,7 +14990,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14182,7 +15005,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14197,7 +15020,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14212,7 +15035,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14227,7 +15050,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14242,7 +15065,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14257,7 +15080,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14272,7 +15095,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14287,7 +15110,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14302,7 +15125,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {
@@ -14317,7 +15140,7 @@
         "name": "Spruce Meadows",
         "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
-        "retrievedAt": "2026-10-16T18:06:47.585Z"
+        "retrievedAt": "2026-10-16T20:50:28.777Z"
       }
     },
     {

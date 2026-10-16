@@ -1561,6 +1561,746 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-heritage-park",
+      "kind": "business",
+      "slug": "heritage-park",
+      "title": "Heritage Park Historical Village",
+      "name": "Heritage Park Historical Village",
+      "website": "https://heritagepark.ca/",
+      "address": "1900 Heritage Drive SW, Calgary, AB",
+      "summary": "A Calgary heritage attraction with ghost tours, seasonal activities and special events.",
+      "description": "Explore Heritage Park’s own programme of tours and seasonal events. Check the individual event page for admission, entry times and which areas are open.",
+      "categories": [
+        "family",
+        "heritage"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-13/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-14/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/culturally-speaking-calgary-general-hospital-its-part-in-the-calgary-story/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/homeschooler-days/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-thursdays/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-fridays/2026-10-16/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghost-teas/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-saturdays/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghost-teas/2026-10-18/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-sundays/2026-10-18/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out-adult-night/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out-3/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out/2026-10-24/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out/2026-10-25/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-28/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-29/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-thursdays/2026-10-29/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-30/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-fridays/2026-10-30/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-31/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-saturdays/2026-10-31/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-11-07/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-11-21/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/homeschooler-days/2026-12-04/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-12-05/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://heritagepark.ca/"
+      },
+      "services": [
+        "Seasonal events",
+        "Heritage experiences"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-the-confluence",
+      "kind": "business",
+      "slug": "the-confluence",
+      "title": "The Confluence Historic Site & Parkland",
+      "name": "The Confluence Historic Site & Parkland",
+      "website": "https://www.theconfluence.ca/",
+      "address": "750 9 Avenue SE, Calgary, AB",
+      "summary": "A Calgary gathering place for history, talks, creative workshops and cultural events.",
+      "description": "The Confluence’s programme includes talks, film nights, crafts and community gatherings. Find the events it organizes below and check its official pages for current registration and visitor information.",
+      "categories": [
+        "arts",
+        "heritage"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/the-inbetween-leader-book-launch",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-10-14",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales-oct15",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales-oct16",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creefiresidestories-oct17",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/truecrime26-oct17",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-oct18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/deadlyab-oct18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/frightfulfamilyfavourites-paranorman",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/hdht-oct2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/ghosttrivia",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/truecrime2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/howtrueistrue-theconjuring2",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/deadlyab2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/frightfulfamilyfavourites-corpsebride",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/rocky-horror",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/halloween",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/beyond-the-history-books/nov-5-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/cjff-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/girlwintertour",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-nov15",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-11-18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/pdworkshops-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/howtrueistrue-argo",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-12-02",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/reeltalk-thedivorcee",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-dec13",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theconfluence.ca/"
+      },
+      "services": [
+        "Talks and cultural events",
+        "Creative workshops"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-contemporary-calgary",
+      "kind": "business",
+      "slug": "contemporary-calgary",
+      "title": "Contemporary Calgary",
+      "name": "Contemporary Calgary",
+      "website": "https://www.contemporarycalgary.com/",
+      "address": "701 11 Street SW, Calgary, AB",
+      "summary": "Contemporary art exhibitions, artist talks and creative programmes in Calgary.",
+      "description": "Discover exhibitions and public programmes at Contemporary Calgary. Exhibition runs and separately scheduled talks or workshops may have different admission and registration requirements; use each official event page before visiting.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/ghazaleh-avarzamani-of-manual",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/adelita-husni-bey-agency",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/ghazaleh-avarzamani-churn-earn-burn-and-then-return",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/jane-jin-kaisen-burial-of-this-order",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/curtis-talwst-santiago-worlds-worlds-worlds",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/october-drop-in-art-making-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/october-open-studio-for-55-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/fluid-fest-2026-presented-by-springboard-performance",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/perspective-film-series-beauty-and-the-dogs-2017",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/damien-eagle-bear-when-you-see-it",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/exhibition-opening-damien-eagle-bear-when-you-see-it",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-tagalog-tour-oct-24",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-kids-press-into-fall",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/november-open-studio-for-55-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/free-first-thursday-nov-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/november-drop-in-art-making-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-french-tour-nov-14",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-ukrainian-tour-nov-21",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.contemporarycalgary.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Public programmes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-opera",
+      "kind": "business",
+      "slug": "calgary-opera",
+      "title": "Calgary Opera",
+      "name": "Calgary Opera",
+      "website": "https://www.calgaryopera.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary opera productions and special performances.",
+      "description": "Calgary Opera presents staged productions and special performances. Locations vary by event; the Southern Alberta Jubilee Auditorium is a performance venue rather than an office address for this profile. Check the official production page for language, surtitles, dates and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Opera",
+          "url": "https://www.calgaryopera.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryopera.com/"
+      },
+      "services": [
+        "Opera performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-wordfest",
+      "kind": "business",
+      "slug": "wordfest",
+      "title": "Wordfest",
+      "name": "Wordfest",
+      "website": "https://wordfest.com/",
+      "address": "Calgary, AB",
+      "summary": "Author conversations and literary performances, including the Imaginairium festival.",
+      "description": "Wordfest brings writers and readers together through author conversations, literary performances and its Imaginairium festival. Events use several Calgary venues; check each listing for the actual location, admission and accessibility details.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Wordfest",
+          "url": "https://wordfest.com/festival/imaginairium/schedule/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wordfest.com/"
+      },
+      "services": [
+        "Author conversations",
+        "Literary festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-alberta-ballet",
+      "kind": "business",
+      "slug": "alberta-ballet",
+      "title": "Alberta Ballet",
+      "name": "Alberta Ballet",
+      "website": "https://www.albertaballet.com/",
+      "address": "Calgary, AB",
+      "summary": "Ballet performances in Calgary, including The Nutcracker.",
+      "description": "Find Alberta Ballet’s Calgary performances and follow its official production pages for current dates and tickets. Performance venues are listed on the individual events; this organization profile does not present the Jubilee Auditorium as the company’s office.",
+      "categories": [
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Ballet",
+          "url": "https://www.albertaballet.com/shows/the-nutcracker",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.albertaballet.com/"
+      },
+      "services": [
+        "Ballet performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-farmers-market",
+      "kind": "business",
+      "slug": "calgary-farmers-market",
+      "title": "Calgary Farmers' Market",
+      "name": "Calgary Farmers' Market",
+      "website": "https://calgaryfarmersmarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "One market organization with South and West Calgary locations.",
+      "description": "Explore the South and West market locations below. Each location keeps its own address and scheduled market days; check the location’s official page for current hours and holiday exceptions.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        },
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryfarmersmarket.ca/"
+      },
+      "services": [
+        "Farmers markets",
+        "Local food"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-earth-market-society",
+      "kind": "business",
+      "slug": "calgary-earth-market-society",
+      "title": "Calgary Earth Market Society",
+      "name": "Calgary Earth Market Society",
+      "website": "https://www.farmersmakersmarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "Organizer of the Farmers & Makers Market at cSPACE.",
+      "description": "Find the Farmers & Makers Market at cSPACE below, with its own location and scheduled market days. The market is organized by Calgary Earth Market Society; cSPACE is the host location. Check the organizer’s page for seasonal changes.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.farmersmakersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.farmersmakersmarket.ca/"
+      },
+      "services": [
+        "Farmers and makers market"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
     }
   ]
 }

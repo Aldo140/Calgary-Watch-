@@ -1,0 +1,183 @@
+{
+  "as_of": "2026-10-16",
+  "scope": "research candidates, not confirmed events, partners or live-verified businesses",
+  "live_access": "Official-site retry returned proxy CONNECT 403. No source page retrieved.",
+  "leads": [
+    {
+      "id": "scout-20261016-01",
+      "kind": "market",
+      "name": "Little Modern Market",
+      "fit": "Independent makers and a distinctive shopping outing; investigate upcoming Calgary editions.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-02",
+      "kind": "market",
+      "name": "Curated Markets — Calgary editions",
+      "fit": "Potential multi-date maker-market organizer; confirm which editions are actually in Calgary.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-03",
+      "kind": "market",
+      "name": "Authentically Indigenous",
+      "fit": "Indigenous artisan-market prospect; identify the organizer’s own current announcements and attribution.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-04",
+      "kind": "market",
+      "name": "MarketSpot — Calgary editions",
+      "fit": "Potential artisan pop-ups and repeat shopping events; verify the organizer and each Calgary location.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-05",
+      "kind": "market",
+      "name": "Bridgeland-Riverside Community Association markets",
+      "fit": "Neighbourhood-scale prospect with strong local relevance; verify any actual upcoming market.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-06",
+      "kind": "market",
+      "name": "Crescent Heights community markets",
+      "fit": "Neighbourhood-scale prospect; identify the responsible organizer and current announcement.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-07",
+      "kind": "market",
+      "name": "Renfrew community markets",
+      "fit": "Neighbourhood-scale prospect for local makers; no holiday edition or date assumed.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-08",
+      "kind": "market",
+      "name": "Montgomery community markets",
+      "fit": "Northwest neighbourhood prospect; confirm whether a public upcoming market exists.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-09",
+      "kind": "business",
+      "name": "The Alice Sanctuary",
+      "fit": "Distinctive regional experience prospect; confirm current public visitor opportunities and municipality.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-10",
+      "kind": "business",
+      "name": "Pages Books on Kensington",
+      "fit": "Independent bookstore prospect; verify current business details and any public author events.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-11",
+      "kind": "business",
+      "name": "Oolong Tea House",
+      "fit": "Distinctive Kensington small-business prospect; confirm current operation and any public programming.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-12",
+      "kind": "event",
+      "name": "Calgary Comic & Entertainment Expo — next announced edition",
+      "fit": "Large fandom convention worth planning ahead for; verify official dates, public admission and organizer.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-13",
+      "kind": "event",
+      "name": "Calgary International Auto and Truck Show — next announced edition",
+      "fit": "Major consumer-show prospect; confirm the next actual announced edition and public sessions.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-14",
+      "kind": "event",
+      "name": "High Performance Rodeo — next announced festival",
+      "fit": "Major performing-arts festival prospect; verify One Yellow Rabbit’s programme and individual productions.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-15",
+      "kind": "event",
+      "name": "Block Heater — next announced festival",
+      "fit": "Strong winter music-festival fit; verify Calgary Folk Music Festival’s own announcement and venues.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    },
+    {
+      "id": "scout-20261016-16",
+      "kind": "event",
+      "name": "Calgary Underground Film Festival — next announced edition",
+      "fit": "Distinctive festival prospect; confirm official edition dates and programme rather than using annual patterns.",
+      "status": "needs_official_source_verification",
+      "source_url": null,
+      "confirmed_dates": [],
+      "publish": false,
+      "next_action": "Locate organizer-owned website, confirm upcoming public Calgary/area edition and dates, venue, organizer, ticket policy, contact and image rights; compare existing listings before publication."
+    }
+  ]
+}

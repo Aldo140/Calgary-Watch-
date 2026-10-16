@@ -286,3 +286,9 @@
   .su-mark, .su-stamp { animation: none; }
   .su-deal button, .su-mail, .su-tile, .su-input, .su-next { transition: none; }
 }
+
+.su-location { margin: 18px 0; }
+.su-location > button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.su-location .su-hint { margin-top: 6px; }
+.su-location [role="status"]:empty { display: none; }
+.su-q h2 small { font: 500 .45em/1.3 var(--sans, sans-serif); letter-spacing: 0; }

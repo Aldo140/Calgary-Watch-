@@ -1,3 +1,4 @@
+import { plansAreaPatch, plansSetupProblem } from './plansSetup';
 import { createSharedLiveValue, trackSubscription } from './readEfficiency';
 /**
  * Plans: event interests, "I'm going", and the Thursday picks email.
@@ -72,19 +73,15 @@ export interface PlansDraft {
  */
 export async function savePlans(user: User, existing: PlansProfile | null, draft: PlansDraft): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
-  const neighborhood = draft.neighborhood.trim().slice(0, 80);
-  const address = draft.address.trim().slice(0, 160);
+  const problem = plansSetupProblem(draft, existing);
+  if (problem) throw Error(problem);
   const now = Date.now();
   await setDoc(doc(db!, 'users', user.uid), {
     uid: user.uid,
     displayName: user.displayName || existing?.displayName || 'Calgary User',
     email: user.email || existing?.email || '',
     photoURL: user.photoURL || existing?.photoURL || '',
-    neighborhood,
-    address,
-    inferredNeighborhood: draft.inferredNeighborhood.trim().slice(0, 80),
-    locationPreferenceType: address ? 'address' : 'neighborhood',
-    piiConsentAt: existing?.piiConsentAt || now,
+    ...plansAreaPatch(draft, existing, now),
     onboardingCompletedAt: existing?.onboardingCompletedAt || now,
     eventInterests: draft.interests,
     ...emailConsentPatch(existing, { weekly: draft.weeklyDigestOptIn, events: draft.eventsDigestOptIn }, now),

@@ -80,3 +80,8 @@ export function emailConsentPatch(
       { on: 'eventsDigestOptIn', at: 'eventsDigestOptInAt', offAt: 'eventsDigestUnsubscribedAt', offSource: 'eventsDigestUnsubscribeSource' }),
   };
 }
+
+/** Completion is independent of optional location and interests. */
+export function hasCompletedPlans(profile: PlansProfile | null): boolean {
+  return Boolean(profile && (profile.onboardingCompletedAt || profile.piiConsentAt || profile.eventInterests.length));
+}

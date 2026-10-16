@@ -1,3 +1,5 @@
+import { plansSetupProblem } from '../lib/plansSetup';
+import { hasCompletedPlans } from '../lib/plansProfile';
 import {useAdminEditMode} from '../hooks/useAdminEditMode';
 import {adminMemberAction} from '../lib/adminMemberApi';
 import { useOrganizationLive } from '../lib/organizationLive';
@@ -156,7 +158,7 @@ export default function PlansPage() {
   useEffect(() => {
     if (!profile) return;
     const id = location.hash.slice(1);
-    const member = Boolean(profile.piiConsentAt || profile.eventInterests.length);
+    const member = hasCompletedPlans(profile);
     // Email and unsubscribe links point members at #emails or #area: those open settings too.
     const focus: SettingsFocus | undefined = id === 'emails' ? 'emails' : id === 'pl-step-interests' || id === 'interests' ? 'interests' : id === 'home' || id === 'area' ? 'home' : undefined;
     if ((params.get('edit') === '1' || focus) && !asUid && member) {
@@ -182,7 +184,7 @@ export default function PlansPage() {
     if (asUid) { setDraft(draftFrom(profile, pending)); return; }
     setDraft((local) => {
       const stored = draftFrom(profile, pending);
-      const fresh = !profile.piiConsentAt && !profile.eventInterests.length;
+      const fresh = !hasCompletedPlans(profile);
       // Keep what they chose before signing in; a brand-new account also keeps the ticked emails.
       return {
         ...stored,
@@ -208,8 +210,8 @@ export default function PlansPage() {
     return () => { live = false; };
   }, [user, demo]);
 
-  // Set up = has a home area on file (the one thing every email needs).
-  const hasPlans = Boolean(profile && (profile.piiConsentAt || profile.eventInterests.length));
+  // Finishing setup does not require a location or email subscription.
+  const hasPlans = hasCompletedPlans(profile);
   // Members change settings in a sheet over the dashboard; the 3-step card is for signing up.
   const view = plansView(Boolean(user), profile, Boolean(asUid), myClaims?.some(c => c.status === 'approved'));
   const showForm = view === 'setup';
@@ -278,11 +280,8 @@ export default function PlansPage() {
 
   const hasArea = Boolean(draft.neighborhood.trim() || draft.address.trim());
   const needsConsent = hasArea && !profile?.piiConsentAt;
-  const problem = !hasArea ? 'Add your neighbourhood or address, so everything starts near home.'
-    : needsConsent && !draft.consent ? 'Tick the box so we can store your area.'
-    : draft.eventsDigestOptIn && !draft.interests.length ? 'Pick at least one interest for your event picks, or untick that email.'
-    : '';
-  const progress = [hasArea && (!needsConsent || draft.consent), draft.weeklyDigestOptIn || draft.eventsDigestOptIn, draft.interests.length > 0];
+  const problem = plansSetupProblem(draft, profile);
+  const progress = [!hasArea || (!needsConsent || draft.consent), draft.weeklyDigestOptIn || draft.eventsDigestOptIn, draft.interests.length > 0];
 
   const openEditor = (focus?: SettingsFocus) => {
     setDraft(draftFrom(profile, pending));

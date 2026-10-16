@@ -1,3 +1,4 @@
+import { LocationShortcut } from './LocationShortcut';
 import { useEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -49,6 +50,8 @@ export function SettingsSheet(p: SettingsSheetProps) {
   const reduce = useReducedMotion();
   const panel = useRef<HTMLDivElement>(null);
   const { draft, setDraft } = p;
+  const active = useRef(p.open);
+  active.current = p.open;
   const [byAddress, setByAddress] = useState(Boolean(draft.address));
   useEffect(() => { if (p.open) setByAddress(Boolean(draft.address)); }, [p.open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -99,8 +102,10 @@ export function SettingsSheet(p: SettingsSheetProps) {
               <fieldset disabled={p.readOnly||p.saving} style={{border:0,padding:0,margin:0,minWidth:0}}>
               <section id="ss-home" className="ss-sec" aria-labelledby="ss-home-h">
                 <p className="ss-k">01 · Home</p>
-                <h3 id="ss-home-h">Where’s home?</h3>
-                <p className="ss-help">Everything on your dashboard starts near here: picks, the near-home check and your Monday email.</p>
+                <h3 id="ss-home-h">Where’s home? (optional)</h3>
+                <p className="ss-help">Add an area for nearby picks, or leave it blank for all of Calgary. You can change it any time.</p>
+                <LocationShortcut value={`${draft.neighborhood}|${draft.address}`} disabled={p.saving || p.readOnly} onSelect={(neighborhood) => { if (!active.current) return; setByAddress(false); p.setError(''); setDraft(d => ({ ...d, neighborhood, address: '', inferredNeighborhood: '' })); }} />
+                {(draft.neighborhood || draft.address) ? <button type="button" className="su-link" disabled={p.saving || p.readOnly} onClick={() => { p.setError(''); setDraft(d => ({ ...d, neighborhood: '', address: '', inferredNeighborhood: '', consent: false })); }}>Remove location — use all Calgary</button> : null}
                 {!byAddress ? (
                   <label className="su-input">
                     <Search size={20} aria-hidden="true" />

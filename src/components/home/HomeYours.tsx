@@ -1,3 +1,4 @@
+import { hasCompletedPlans } from '../../lib/plansProfile';
 import { useMemo, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
@@ -50,14 +51,14 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
   const enter = { initial: reduce ? false : { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { type: 'spring' as const, stiffness: 150, damping: 20 } };
 
   // Signed in but never finished the three questions: send them back to finish, not to an empty dashboard.
-  if (user && profile && !profile.piiConsentAt && !profile.eventInterests.length) {
+  if (user && profile && !hasCompletedPlans(profile)) {
     const first = (user.displayName || '').split(' ')[0];
     return (
       <motion.section className="h-yours" data-state="guest" aria-labelledby="h-yours-title" {...enter}>
         <div className="h-yours-copy">
           <p className="h-yours-kicker"><span>Your CalgaryWatch</span><span className="h-yours-tag">Almost there</span></p>
           <h2 id="h-yours-title">Almost yours{first ? <>, <Scribble>{first}.</Scribble></> : '.'}</h2>
-          <p className="h-yours-lead">You’re signed in. Tell us where home is and what you’re into, and your dashboard fills in: what happened nearby, picks for the week and your plans.</p>
+          <p className="h-yours-lead">You’re signed in. Choose any preferences you’d like—location is optional—and your dashboard fills in: what happened nearby, picks for the week and your plans.</p>
           <div className="h-yours-actions">
             <Link to="/plans" className="h-yours-go">Finish setting up <ArrowUpRight size={18} aria-hidden="true" /></Link>
           </div>
@@ -145,7 +146,7 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
       <div className="h-yours-copy">
         <p className="h-yours-kicker"><span>Your CalgaryWatch</span><span className="h-yours-tag">Free</span></p>
         <h2 id="h-yours-title">Make Calgary <Scribble>yours.</Scribble></h2>
-        <p className="h-yours-lead">Tell us where home is and what you’re into. Get what happened nearby and what’s worth leaving the house for, in one Monday email.</p>
+        <p className="h-yours-lead">Choose your emails and interests. Add a neighbourhood for nearby picks, or explore all of Calgary.</p>
         <div className="h-yours-actions">
           <Link to="/plans" className="h-yours-go">Sign up free <ArrowUpRight size={18} aria-hidden="true" /></Link>
           <button type="button" className="h-yours-signin" onClick={async () => { await signIn(); navigate('/plans'); }}>I have an account</button>

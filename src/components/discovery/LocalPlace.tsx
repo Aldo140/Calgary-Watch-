@@ -196,7 +196,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
                 <li key={e.id}>
                   <Link to={entityPath(e)}>
                     <time dateTime={e.start}><small>{wday.format(new Date(e.start))}</small><b>{dnum.format(new Date(e.start))}</b><small>{mon.format(new Date(e.start))}</small></time>
-                    <span><strong>{e.title}</strong><em>{hm.format(new Date(e.start))}{e.venue ? ` · ${e.venue}` : ''}</em></span>
+                    <span><strong>{e.title}</strong><em>{e.schedulePrecision==='date'?'Check official showtimes':hm.format(new Date(e.start))}{e.venue ? ` · ${e.venue}` : ''}</em></span>
                     <Go />
                   </Link>
                 </li>

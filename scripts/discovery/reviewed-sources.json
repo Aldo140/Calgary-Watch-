@@ -1411,5 +1411,460 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "atp-partner-season-2026-27",
+      "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+      "approved": true,
+      "hosts": [
+        "www.werklundcentre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "evil-dead-the-musical",
+        "input": {
+          "kind": "event",
+          "title": "Evil Dead the Musical",
+          "summary": "Evil Dead the Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Evil Dead the Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-10-13T00:00:00-06:00",
+          "end": "2026-11-15T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "the-hobbit",
+        "input": {
+          "kind": "event",
+          "title": "The Hobbit",
+          "summary": "The Hobbit is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "The Hobbit is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-12-01T00:00:00-06:00",
+          "end": "2027-01-04T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "fifteen-dogs",
+        "input": {
+          "kind": "event",
+          "title": "Fifteen Dogs",
+          "summary": "Fifteen Dogs is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Fifteen Dogs is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-02T00:00:00-06:00",
+          "end": "2027-02-22T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "burning-mom",
+        "input": {
+          "kind": "event",
+          "title": "Burning Mom",
+          "summary": "Burning Mom is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Burning Mom is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-04-06T00:00:00-06:00",
+          "end": "2027-04-26T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "dream-a-canadian-musical",
+        "input": {
+          "kind": "event",
+          "title": "Dream: A Canadian Musical",
+          "summary": "Dream: A Canadian Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Dream: A Canadian Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-05-25T00:00:00-06:00",
+          "end": "2027-06-21T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "werklund-partner-season-2026-27",
+      "name": "Werklund Centre — user-supplied What’s On inventory",
+      "approved": true,
+      "hosts": [
+        "www.werklundcentre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "madonna-immaculate-collection",
+        "input": {
+          "kind": "event",
+          "title": "Madonna: The Immaculate Collection",
+          "summary": "Classic Albums Live performs Madonna’s The Immaculate Collection.",
+          "description": "Classic Albums Live performs Madonna’s The Immaculate Collection. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-10-23T00:00:00-06:00",
+          "end": "2026-10-24T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "a-pirates-life",
+        "input": {
+          "kind": "event",
+          "title": "A Pirate’s Life",
+          "summary": "Archaeologist Lisa Briggs explores famous treasures and pirates.",
+          "description": "Archaeologist Lisa Briggs explores famous treasures and pirates. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-11-01T00:00:00-06:00",
+          "end": "2026-11-03T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "diving-great-barrier-reef",
+        "input": {
+          "kind": "event",
+          "title": "Diving the Great Barrier Reef",
+          "summary": "Erika Woolsey discusses the Great Barrier Reef, coral spawning, reef loss and conservation.",
+          "description": "Erika Woolsey discusses the Great Barrier Reef, coral spawning, reef loss and conservation. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-01-24T00:00:00-06:00",
+          "end": "2027-01-26T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "fran-lebowitz",
+        "input": {
+          "kind": "event",
+          "title": "An Evening with Fran Lebowitz",
+          "summary": "An unscripted conversation with Fran Lebowitz featuring cultural commentary, wit and observations.",
+          "description": "An unscripted conversation with Fran Lebowitz featuring cultural commentary, wit and observations. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-05T00:00:00-06:00",
+          "end": "2027-02-06T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "changing-lens-saving-planet",
+        "input": {
+          "kind": "event",
+          "title": "Changing the Lens on Saving the Planet",
+          "summary": "Featuring Bertie Gregory and hosted by Jay Ingram.",
+          "description": "Featuring Bertie Gregory and hosted by Jay Ingram. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-19T00:00:00-06:00",
+          "end": "2027-02-20T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "van-halen-1984",
+        "input": {
+          "kind": "event",
+          "title": "Van Halen: 1984",
+          "summary": "Classic Albums Live performs Van Halen’s 1984 note-for-note and cut-for-cut.",
+          "description": "Classic Albums Live performs Van Halen’s 1984 note-for-note and cut-for-cut. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-26T00:00:00-06:00",
+          "end": "2027-02-27T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "earth-after-dark",
+        "input": {
+          "kind": "event",
+          "title": "Earth After Dark",
+          "summary": "Featuring Babak Tafreshi.",
+          "description": "Featuring Babak Tafreshi. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-03-14T00:00:00-06:00",
+          "end": "2027-03-16T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "yamato-tamayura",
+        "input": {
+          "kind": "event",
+          "title": "YAMATO TAMAYURA",
+          "summary": "Echoes of the Soul: a YAMATO Wadaiko drumming performance.",
+          "description": "Echoes of the Soul: a YAMATO Wadaiko drumming performance. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-03-31T00:00:00-06:00",
+          "end": "2027-04-01T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "saving-natures-symphony",
+        "input": {
+          "kind": "event",
+          "title": "Saving Nature’s Symphony",
+          "summary": "Acoustic biologist and National Geographic Explorer Dr. Ben Mirin combines animal sounds, conservation, storytelling and music.",
+          "description": "Acoustic biologist and National Geographic Explorer Dr. Ben Mirin combines animal sounds, conservation, storytelling and music. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-04-11T00:00:00-06:00",
+          "end": "2027-04-13T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "fleetwood-mac-rumours",
+        "input": {
+          "kind": "event",
+          "title": "Fleetwood Mac: Rumours",
+          "summary": "Classic Albums Live performs Fleetwood Mac’s Rumours live.",
+          "description": "Classic Albums Live performs Fleetwood Mac’s Rumours live. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-04-15T00:00:00-06:00",
+          "end": "2027-04-16T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "acdc-highway-to-hell",
+        "input": {
+          "kind": "event",
+          "title": "AC/DC: Highway to Hell",
+          "summary": "Classic Albums Live performs Highway to Hell note-for-note and cut-for-cut, followed by additional AC/DC songs.",
+          "description": "Classic Albums Live performs Highway to Hell note-for-note and cut-for-cut, followed by additional AC/DC songs. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-05-13T00:00:00-06:00",
+          "end": "2027-05-14T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "stories-saturday-night",
+        "input": {
+          "kind": "event",
+          "title": "Stories for a Saturday Night",
+          "summary": "An Evening with Ira Glass.",
+          "description": "An Evening with Ira Glass. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-05-22T00:00:00-06:00",
+          "end": "2027-05-23T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-folk-festival-partner",
+      "name": "Calgary Folk Music Festival — user-supplied partner confirmation",
+      "approved": true,
+      "hosts": [
+        "www.calgaryfolkfest.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "calgary-folk-music-festival-2027",
+        "input": {
+          "kind": "event",
+          "title": "Calgary Folk Music Festival 2027",
+          "summary": "July 22–25, 2027. Tickets are not currently on sale; the lineup is still being built.",
+          "description": "Calgary Folk Music Festival confirmed July 22–25, 2027 in its partner response. Tickets are not currently on sale and the 2027 lineup is still being built. Check the official festival website for later lineup, ticket and venue updates. Daily performance times have not been supplied.",
+          "address": "Calgary, Alberta",
+          "organizer": "Calgary Folk Music Festival",
+          "sourceUrl": "https://www.calgaryfolkfest.com/",
+          "categories": [
+            "music",
+            "festival"
+          ],
+          "tags": [
+            "2027 festival",
+            "partner-confirmed dates"
+          ],
+          "start": "2027-07-22T00:00:00-06:00",
+          "end": "2027-07-26T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "ticketSaleStatus": "not-on-sale",
+          "pricing": "unknown"
+        }
+      }
+    ]
   }
 ]

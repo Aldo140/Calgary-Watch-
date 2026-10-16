@@ -1,3 +1,4 @@
+import {lastEventDate,calendarDateForDisplay} from '../../lib/eventSchedule';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarPlus, Check, Clock, MapPin, Share2, Tag, Ticket, User } from 'lucide-react';
@@ -28,9 +29,9 @@ export function EventPanel({ entity, all, part = 'both' }: { entity: Event; all:
   const address = (entity.address || '').split(',').map((p) => p.trim()).filter((p) => p && p !== 'Calgary' && p !== venue).join(', ');
   const where = [address, entity.neighbourhood].filter(Boolean).join(' · ');
   const sameDay = day.format(new Date(entity.start)) === day.format(new Date(entity.end));
-  const cal = { id: entity.id, title: entity.title, start: entity.start, end: entity.end, location: [entity.venue, entity.address].filter(Boolean).join(', '), description: entity.summary, url };
+  const cal = { dateOnly:entity.schedulePrecision==='date', id: entity.id, title: entity.title, start: entity.start, end: entity.end, location: [entity.venue, entity.address].filter(Boolean).join(', '), description: entity.summary, url };
   const interests: EventInterestId[] = interestsFor(entity).filter((i) => i !== 'free');
-  const price = entity.cancelled ? 'Cancelled' : entity.pricing === 'free' ? 'Free' : entity.priceRange ? `$${entity.priceRange[0]}${entity.priceRange[1] !== entity.priceRange[0] ? `–$${entity.priceRange[1]}` : ''}` : entity.pricing === 'paid' ? 'Ticketed, see organizer' : 'Check with the organizer';
+  const price = entity.cancelled ? 'Cancelled' : entity.ticketSaleStatus==='not-on-sale'?'Tickets not yet on sale': entity.pricing === 'free' ? 'Free' : entity.priceRange ? `$${entity.priceRange[0]}${entity.priceRange[1] !== entity.priceRange[0] ? `–$${entity.priceRange[1]}` : ''}` : entity.pricing === 'paid' ? 'Ticketed, see organizer' : 'Check with the organizer';
 
   const more = all
     .filter((e): e is Event => e.kind === 'event' && e.id !== entity.id && !e.cancelled && Date.parse(e.end) > Date.now())
@@ -59,7 +60,7 @@ export function EventPanel({ entity, all, part = 'both' }: { entity: Event; all:
     <>
       {part !== 'more' ? <section className="cw-evp" aria-label="Plan it">
         <dl className="cw-evp-facts">
-          <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{day.format(new Date(entity.start))}<span>{time.format(new Date(entity.start))}{entity.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${day.format(new Date(entity.end))}, `}${time.format(new Date(entity.end))}`} · Calgary time</span></dd></div>
+          <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{day.format(entity.schedulePrecision==='date'?calendarDateForDisplay(entity.start):new Date(entity.start))}{entity.schedulePrecision==='date'?<span>{day.format(calendarDateForDisplay(lastEventDate(entity.end)))!==day.format(new Date(entity.start))?`Through ${day.format(calendarDateForDisplay(lastEventDate(entity.end)))} · `:''}Check official showtimes</span>:<span>{time.format(new Date(entity.start))}{entity.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${day.format(new Date(entity.end))}, `}${time.format(new Date(entity.end))}`} · Calgary time</span>}</dd></div>
           {venue || where ? <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{venue || entity.neighbourhood || entity.address}{where && where !== (venue || entity.neighbourhood) ? <span>{where}</span> : null}</dd></div> : null}
           <div><dt><Tag size={16} aria-hidden="true" /> Price</dt><dd>{price}</dd></div>
           <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{entity.organizer}</dd></div>
@@ -71,7 +72,7 @@ export function EventPanel({ entity, all, part = 'both' }: { entity: Event; all:
               <button type="button" onClick={download}><CalendarPlus size={17} aria-hidden="true" /> Add to calendar</button>
               <a href={googleCalendarUrl(cal)} target="_blank" rel="noopener noreferrer">Google Calendar</a>
               <button type="button" onClick={() => void share()}>{shared ? <Check size={17} aria-hidden="true" /> : <Share2 size={17} aria-hidden="true" />} {shared ? 'Link copied' : 'Share'}</button>
-              {entity.tickets ? <a className="cw-evp-tickets" href={entity.tickets} target="_blank" rel="noopener noreferrer"><Ticket size={17} aria-hidden="true" /> Tickets from organizer</a> : null}
+              {entity.tickets&&entity.ticketSaleStatus!=='not-on-sale' ? <a className="cw-evp-tickets" href={entity.tickets} target="_blank" rel="noopener noreferrer"><Ticket size={17} aria-hidden="true" /> Tickets from organizer</a> : null}
             </div>
           </div>
         )}

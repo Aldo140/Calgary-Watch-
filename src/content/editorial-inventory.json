@@ -1525,6 +1525,42 @@
       "claimed": false,
       "partner": false,
       "editorialSelection": false
+    },
+    {
+      "id": "biz-alberta-theatre-projects",
+      "kind": "business",
+      "slug": "alberta-theatre-projects",
+      "title": "Alberta Theatre Projects",
+      "name": "Alberta Theatre Projects",
+      "website": "https://albertatheatreprojects.com/",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "summary": "Alberta Theatre Projects presents theatre at the Martha Cohen Theatre in Calgary.",
+      "description": "Visit Alberta Theatre Projects’ official website for its current season, performance information and organization details. Its own productions appear below; events presented by other organizations at the same venue are not attributed to ATP.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "theatre",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects",
+          "url": "https://albertatheatreprojects.com/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://albertatheatreprojects.com/"
+      },
+      "services": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
     }
   ]
 }

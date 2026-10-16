@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-15T20:58:35.319Z",
+  "generatedAt": "2026-10-16T18:06:47.954Z",
   "entities": [
     {
       "id": "hood-inglewood-se",
@@ -1362,14 +1362,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://farmersmarket.hsca.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "hillhurst-sunnyside-farmers-market",
       "neighbourhood": "Hillhurst",
@@ -1407,14 +1407,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://calgaryfarmersmarket.ca/cfm-west/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "calgary-farmers-market-west",
       "neighbourhood": "Greenwood/Greenbriar",
@@ -1455,14 +1455,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://calgaryfarmersmarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "calgary-farmers-market-south",
       "neighbourhood": "Fairview Industrial",
@@ -1504,14 +1504,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.crossroadsmarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "crossroads-market",
       "neighbourhood": "Ramsay",
@@ -1550,14 +1550,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.farmersmakersmarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "farmers-makers-market-marda-loop",
       "neighbourhood": "South Calgary",
@@ -1598,14 +1598,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://calgarywintermarket.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "calgary-winter-market",
       "neighbourhood": "Eau Claire",
@@ -1643,14 +1643,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://marketcollective.ca/faqs/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "holiday-market-collective",
       "neighbourhood": "Victoria Park",
@@ -1688,7 +1688,7 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "image": {
@@ -1698,9 +1698,9 @@
       },
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "dalhousie-harvest-farmers-market",
       "neighbourhood": "Dalhousie",
@@ -1739,14 +1739,14 @@
           "name": "Recurring Calgary community markets",
           "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-feed",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "recurring-markets-calgary",
       "sourceRecordId": "fresh-and-local-market",
       "address": "12445 Lake Fraser Drive SE, Calgary, AB",
@@ -10272,14 +10272,14 @@
           "name": "Alcove Centre for the Arts",
           "url": "https://www.alcoveartscentre.ca/upcomingprograms/love-letters-from-the-diaspora",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "alcove",
       "sourceRecordId": "love-letters-2026-09-26",
       "neighbourhood": "Beltline",
@@ -10308,14 +10308,14 @@
           "name": "Alcove Centre for the Arts",
           "url": "https://www.alcoveartscentre.ca/upcomingprograms/comics-workshop-sept-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "alcove",
       "sourceRecordId": "comics-workshop-2026-09-27",
       "neighbourhood": "Downtown",
@@ -10349,14 +10349,14 @@
           "name": "Theatre Calgary",
           "url": "https://www.theatrecalgary.com/shows/2026-2027-little-shop-of-horrors",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "theatre-calgary",
       "sourceRecordId": "little-shop-of-horrors-2026",
       "neighbourhood": "Downtown",
@@ -10392,14 +10392,14 @@
           "name": "Wordfest",
           "url": "https://wordfest.com/festival/imaginairium/schedule/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "wordfest",
       "sourceRecordId": "imaginairium-2026-opening-night",
       "neighbourhood": "East Village",
@@ -10435,14 +10435,14 @@
           "name": "Wordfest",
           "url": "https://wordfest.com/festival/imaginairium/schedule/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "wordfest",
       "sourceRecordId": "imaginairium-2026-literary-death-match",
       "neighbourhood": "Beltline",
@@ -10476,14 +10476,14 @@
           "name": "Wordfest",
           "url": "https://wordfest.com/festival/imaginairium/schedule/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "wordfest",
       "sourceRecordId": "imaginairium-2026-bonnie-garmus",
       "neighbourhood": "Lincoln Park",
@@ -10517,14 +10517,14 @@
           "name": "Scotiabank Saddledome",
           "url": "https://scotiabanksaddledome.com/events/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "scotiabank-saddledome",
       "sourceRecordId": "sidhu-moose-wala-2026-10-19",
       "neighbourhood": "Beltline",
@@ -10559,14 +10559,14 @@
           "name": "Scotiabank Saddledome",
           "url": "https://scotiabanksaddledome.com/events/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "scotiabank-saddledome",
       "sourceRecordId": "smashing-pumpkins-2026-11-03",
       "neighbourhood": "Beltline",
@@ -10602,14 +10602,14 @@
           "name": "Alberta Ballet",
           "url": "https://www.albertaballet.com/shows/the-nutcracker",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "alberta-ballet",
       "sourceRecordId": "nutcracker-calgary-2026",
       "address": "Southern Alberta Jubilee Auditorium, 1415 14 Ave NW, Calgary, AB",
@@ -10644,14 +10644,14 @@
           "name": "Spruce Meadows",
           "url": "https://www.sprucemeadows.com/icm-faq/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "spruce-meadows",
       "sourceRecordId": "international-christmas-market-2026",
       "address": "18011 Spruce Meadows Way SW, Calgary, AB",
@@ -10687,14 +10687,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-lodger-2026",
       "neighbourhood": "Downtown",
@@ -10732,14 +10732,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "sherlock-holmes-hunt-for-moriarty-2026",
       "neighbourhood": "Downtown",
@@ -10776,14 +10776,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-veil-2027",
       "neighbourhood": "Downtown",
@@ -10820,14 +10820,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "last-candle-2027",
       "neighbourhood": "Downtown",
@@ -10865,14 +10865,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-39-steps-2027",
       "neighbourhood": "Downtown",
@@ -10909,14 +10909,14 @@
           "name": "Vertigo Theatre",
           "url": "https://www.vertigotheatre.com/2026-27",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "vertigo-theatre",
       "sourceRecordId": "the-midnight-torch-2027",
       "neighbourhood": "Downtown",
@@ -10953,14 +10953,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-09",
       "neighbourhood": "Beltline",
@@ -10995,14 +10995,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-10",
       "neighbourhood": "Beltline",
@@ -11037,14 +11037,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-16",
       "neighbourhood": "Beltline",
@@ -11079,14 +11079,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-17",
       "neighbourhood": "Beltline",
@@ -11121,14 +11121,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-22",
       "neighbourhood": "Beltline",
@@ -11163,14 +11163,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-23",
       "neighbourhood": "Beltline",
@@ -11205,14 +11205,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-24",
       "neighbourhood": "Beltline",
@@ -11247,14 +11247,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-25",
       "neighbourhood": "Beltline",
@@ -11289,14 +11289,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-29",
       "neighbourhood": "Beltline",
@@ -11331,14 +11331,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-30",
       "neighbourhood": "Beltline",
@@ -11373,14 +11373,14 @@
           "name": "ScreamFest Calgary",
           "url": "https://screamfest.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "screamfest",
       "sourceRecordId": "screamfest-2026-10-31",
       "neighbourhood": "Beltline",
@@ -11415,14 +11415,14 @@
           "name": "Wilder Institute’s Calgary Zoo",
           "url": "https://www.calgaryzoo.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-zoo",
       "sourceRecordId": "zooboo-2026-10-31",
       "neighbourhood": "Bridgeland",
@@ -11458,14 +11458,14 @@
           "name": "Wilder Institute’s Calgary Zoo",
           "url": "https://www.calgaryzoo.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-zoo",
       "sourceRecordId": "zooboo-2026-11-01",
       "neighbourhood": "Bridgeland",
@@ -11499,14 +11499,14 @@
           "name": "Calgary Opera",
           "url": "https://www.calgaryopera.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-opera",
       "sourceRecordId": "tosca-2026-10-16",
       "address": "1415 14 Avenue NW, Calgary, AB",
@@ -11538,14 +11538,14 @@
           "name": "Calgary Opera",
           "url": "https://www.calgaryopera.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-opera",
       "sourceRecordId": "tosca-2026-10-18",
       "address": "1415 14 Avenue NW, Calgary, AB",
@@ -11577,14 +11577,14 @@
           "name": "Calgary Opera",
           "url": "https://www.calgaryopera.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-opera",
       "sourceRecordId": "tosca-2026-10-24",
       "address": "1415 14 Avenue NW, Calgary, AB",
@@ -11618,14 +11618,14 @@
           "name": "Calgary Philharmonic Orchestra",
           "url": "https://calgaryphil.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-phil",
       "sourceRecordId": "moana-2026-10-09",
       "neighbourhood": "Downtown",
@@ -11661,14 +11661,14 @@
           "name": "Calgary Philharmonic Orchestra",
           "url": "https://calgaryphil.com/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "calgary-phil",
       "sourceRecordId": "moana-2026-10-10",
       "neighbourhood": "Downtown",
@@ -11702,14 +11702,14 @@
           "name": "Grey Eagle Resort & Casino",
           "url": "https://www.greyeagleresortandcasino.ca/events/2026-oct/the-beach-boys",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "grey-eagle",
       "sourceRecordId": "beach-boys-2026-10-19",
       "address": "3777 Grey Eagle Drive, Calgary, AB",
@@ -11743,14 +11743,14 @@
           "name": "Inglewood Business Improvement Area",
           "url": "https://www.inglewoodyyc.ca/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:13:12.146Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:13:12.146Z",
-      "fetchedAt": "2026-10-15T20:13:12.146Z",
-      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "inglewood-bia",
       "sourceRecordId": "mercantile-on-9th-2026-11-28",
       "neighbourhood": "Inglewood",
@@ -11783,7 +11783,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:58:35.319Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "image": {
@@ -11794,9 +11794,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:58:35.319Z",
-      "fetchedAt": "2026-10-15T20:58:35.319Z",
-      "updatedAt": "2026-10-15T20:58:35.319Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "downstage",
       "sourceRecordId": "dreaming-climate-consciousness-2026-10-23",
       "neighbourhood": "Downtown",
@@ -11830,7 +11830,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:58:35.319Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "image": {
@@ -11841,9 +11841,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:58:35.319Z",
-      "fetchedAt": "2026-10-15T20:58:35.319Z",
-      "updatedAt": "2026-10-15T20:58:35.319Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "downstage",
       "sourceRecordId": "dreaming-climate-consciousness-2026-10-24",
       "neighbourhood": "Downtown",
@@ -11878,7 +11878,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:58:35.319Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "image": {
@@ -11889,9 +11889,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:58:35.319Z",
-      "fetchedAt": "2026-10-15T20:58:35.319Z",
-      "updatedAt": "2026-10-15T20:58:35.319Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "downstage",
       "sourceRecordId": "creative-stretch-2026-27",
       "neighbourhood": "Downtown",
@@ -11925,7 +11925,7 @@
           "name": "Downstage",
           "url": "https://downstage.ca/currentseason/",
           "kind": "official",
-          "retrievedAt": "2026-10-15T20:58:35.319Z"
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
         }
       ],
       "image": {
@@ -11936,9 +11936,9 @@
       },
       "status": "published",
       "verification": "source-checked",
-      "verifiedAt": "2026-10-15T20:58:35.319Z",
-      "fetchedAt": "2026-10-15T20:58:35.319Z",
-      "updatedAt": "2026-10-15T20:58:35.319Z",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
       "sourceId": "downstage",
       "sourceRecordId": "a-study-of-choices-2027",
       "neighbourhood": "Downtown",
@@ -12138,6 +12138,745 @@
       "claimed": false,
       "partner": false,
       "editorialSelection": false
+    },
+    {
+      "id": "biz-alberta-theatre-projects",
+      "kind": "business",
+      "slug": "alberta-theatre-projects",
+      "title": "Alberta Theatre Projects",
+      "name": "Alberta Theatre Projects",
+      "website": "https://albertatheatreprojects.com/",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "summary": "Alberta Theatre Projects presents theatre at the Martha Cohen Theatre in Calgary.",
+      "description": "Visit Alberta Theatre Projects’ official website for its current season, performance information and organization details. Its own productions appear below; events presented by other organizations at the same venue are not attributed to ATP.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "theatre",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects",
+          "url": "https://albertatheatreprojects.com/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://albertatheatreprojects.com/"
+      },
+      "services": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "ba4a9b9d6a5ad4e1853ac0657a3a",
+      "kind": "event",
+      "slug": "evil-dead-the-musical-ba4a9b",
+      "title": "Evil Dead the Musical",
+      "summary": "Evil Dead the Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+      "description": "Evil Dead the Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "atp-partner-season-2026-27",
+      "sourceRecordId": "evil-dead-the-musical",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "venue": "Martha Cohen Theatre",
+      "start": "2026-10-13T00:00:00-06:00",
+      "end": "2026-11-15T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Alberta Theatre Projects",
+      "cancelled": false,
+      "organizerEntityId": "biz-alberta-theatre-projects"
+    },
+    {
+      "id": "fa6ca5baab9481fb5de5adb2ef50",
+      "kind": "event",
+      "slug": "the-hobbit-fa6ca5",
+      "title": "The Hobbit",
+      "summary": "The Hobbit is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+      "description": "The Hobbit is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "atp-partner-season-2026-27",
+      "sourceRecordId": "the-hobbit",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "venue": "Martha Cohen Theatre",
+      "start": "2026-12-01T00:00:00-06:00",
+      "end": "2027-01-04T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Alberta Theatre Projects",
+      "cancelled": false,
+      "organizerEntityId": "biz-alberta-theatre-projects"
+    },
+    {
+      "id": "160a131f1ec39178c27d0b3d114d",
+      "kind": "event",
+      "slug": "fifteen-dogs-160a13",
+      "title": "Fifteen Dogs",
+      "summary": "Fifteen Dogs is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+      "description": "Fifteen Dogs is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "atp-partner-season-2026-27",
+      "sourceRecordId": "fifteen-dogs",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "venue": "Martha Cohen Theatre",
+      "start": "2027-02-02T00:00:00-06:00",
+      "end": "2027-02-22T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Alberta Theatre Projects",
+      "cancelled": false,
+      "organizerEntityId": "biz-alberta-theatre-projects"
+    },
+    {
+      "id": "319ee7832f1382a548da0f3551ac",
+      "kind": "event",
+      "slug": "burning-mom-319ee7",
+      "title": "Burning Mom",
+      "summary": "Burning Mom is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+      "description": "Burning Mom is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "atp-partner-season-2026-27",
+      "sourceRecordId": "burning-mom",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "venue": "Martha Cohen Theatre",
+      "start": "2027-04-06T00:00:00-06:00",
+      "end": "2027-04-26T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Alberta Theatre Projects",
+      "cancelled": false,
+      "organizerEntityId": "biz-alberta-theatre-projects"
+    },
+    {
+      "id": "074661c66dfab9df34ef0e28a114",
+      "kind": "event",
+      "slug": "dream-a-canadian-musical-074661",
+      "title": "Dream: A Canadian Musical",
+      "summary": "Dream: A Canadian Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+      "description": "Dream: A Canadian Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "atp-partner-season-2026-27",
+      "sourceRecordId": "dream-a-canadian-musical",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "venue": "Martha Cohen Theatre",
+      "start": "2027-05-25T00:00:00-06:00",
+      "end": "2027-06-21T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Alberta Theatre Projects",
+      "cancelled": false,
+      "organizerEntityId": "biz-alberta-theatre-projects"
+    },
+    {
+      "id": "568b62fc1a10a80c308f6eb3826c",
+      "kind": "event",
+      "slug": "madonna-the-immaculate-collection-568b62",
+      "title": "Madonna: The Immaculate Collection",
+      "summary": "Classic Albums Live performs Madonna’s The Immaculate Collection.",
+      "description": "Classic Albums Live performs Madonna’s The Immaculate Collection. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "music"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "madonna-immaculate-collection",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2026-10-23T00:00:00-06:00",
+      "end": "2026-10-24T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "d19187747dd816683c8824f00f96",
+      "kind": "event",
+      "slug": "a-pirate-s-life-d19187",
+      "title": "A Pirate’s Life",
+      "summary": "Archaeologist Lisa Briggs explores famous treasures and pirates.",
+      "description": "Archaeologist Lisa Briggs explores famous treasures and pirates. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "a-pirates-life",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2026-11-01T00:00:00-06:00",
+      "end": "2026-11-03T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "cb65c39961cb3a3810ce125e2e2c",
+      "kind": "event",
+      "slug": "diving-the-great-barrier-reef-cb65c3",
+      "title": "Diving the Great Barrier Reef",
+      "summary": "Erika Woolsey discusses the Great Barrier Reef, coral spawning, reef loss and conservation.",
+      "description": "Erika Woolsey discusses the Great Barrier Reef, coral spawning, reef loss and conservation. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "diving-great-barrier-reef",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-01-24T00:00:00-06:00",
+      "end": "2027-01-26T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "8a57eaceba96cc1c92cf603d4c39",
+      "kind": "event",
+      "slug": "an-evening-with-fran-lebowitz-8a57ea",
+      "title": "An Evening with Fran Lebowitz",
+      "summary": "An unscripted conversation with Fran Lebowitz featuring cultural commentary, wit and observations.",
+      "description": "An unscripted conversation with Fran Lebowitz featuring cultural commentary, wit and observations. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "fran-lebowitz",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-02-05T00:00:00-06:00",
+      "end": "2027-02-06T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "45fd21770bcc1428076129eadb45",
+      "kind": "event",
+      "slug": "changing-the-lens-on-saving-the-planet-45fd21",
+      "title": "Changing the Lens on Saving the Planet",
+      "summary": "Featuring Bertie Gregory and hosted by Jay Ingram.",
+      "description": "Featuring Bertie Gregory and hosted by Jay Ingram. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "changing-lens-saving-planet",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-02-19T00:00:00-06:00",
+      "end": "2027-02-20T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "1b01826639ebb8d8775abe5810a0",
+      "kind": "event",
+      "slug": "van-halen-1984-1b0182",
+      "title": "Van Halen: 1984",
+      "summary": "Classic Albums Live performs Van Halen’s 1984 note-for-note and cut-for-cut.",
+      "description": "Classic Albums Live performs Van Halen’s 1984 note-for-note and cut-for-cut. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "music"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "van-halen-1984",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-02-26T00:00:00-06:00",
+      "end": "2027-02-27T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "0c798023b734e9dcdb24b28aa50a",
+      "kind": "event",
+      "slug": "earth-after-dark-0c7980",
+      "title": "Earth After Dark",
+      "summary": "Featuring Babak Tafreshi.",
+      "description": "Featuring Babak Tafreshi. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "earth-after-dark",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-03-14T00:00:00-06:00",
+      "end": "2027-03-16T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "61f94c72e9eebdc67351430c29ad",
+      "kind": "event",
+      "slug": "yamato-tamayura-61f94c",
+      "title": "YAMATO TAMAYURA",
+      "summary": "Echoes of the Soul: a YAMATO Wadaiko drumming performance.",
+      "description": "Echoes of the Soul: a YAMATO Wadaiko drumming performance. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "music"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "yamato-tamayura",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-03-31T00:00:00-06:00",
+      "end": "2027-04-01T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "07c25216306f8301ddcc146f4711",
+      "kind": "event",
+      "slug": "saving-nature-s-symphony-07c252",
+      "title": "Saving Nature’s Symphony",
+      "summary": "Acoustic biologist and National Geographic Explorer Dr. Ben Mirin combines animal sounds, conservation, storytelling and music.",
+      "description": "Acoustic biologist and National Geographic Explorer Dr. Ben Mirin combines animal sounds, conservation, storytelling and music. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "saving-natures-symphony",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-04-11T00:00:00-06:00",
+      "end": "2027-04-13T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "93815910a8fc294922b32dc9c7c7",
+      "kind": "event",
+      "slug": "fleetwood-mac-rumours-938159",
+      "title": "Fleetwood Mac: Rumours",
+      "summary": "Classic Albums Live performs Fleetwood Mac’s Rumours live.",
+      "description": "Classic Albums Live performs Fleetwood Mac’s Rumours live. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "music"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "fleetwood-mac-rumours",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-04-15T00:00:00-06:00",
+      "end": "2027-04-16T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "238163e2f490da6dcc818bb8caec",
+      "kind": "event",
+      "slug": "ac-dc-highway-to-hell-238163",
+      "title": "AC/DC: Highway to Hell",
+      "summary": "Classic Albums Live performs Highway to Hell note-for-note and cut-for-cut, followed by additional AC/DC songs.",
+      "description": "Classic Albums Live performs Highway to Hell note-for-note and cut-for-cut, followed by additional AC/DC songs. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "music"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "acdc-highway-to-hell",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-05-13T00:00:00-06:00",
+      "end": "2027-05-14T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "10f04b1e07eb918d2c6e3284bc1a",
+      "kind": "event",
+      "slug": "stories-for-a-saturday-night-10f04b",
+      "title": "Stories for a Saturday Night",
+      "summary": "An Evening with Ira Glass.",
+      "description": "An Evening with Ira Glass. Dates are the announced run; check the official programme for individual performances and showtimes.",
+      "categories": [
+        "talks"
+      ],
+      "tags": [
+        "2026-27 season"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre — user-supplied What’s On inventory",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "werklund-partner-season-2026-27",
+      "sourceRecordId": "stories-saturday-night",
+      "address": "Jack Singer Concert Hall, Calgary, Alberta",
+      "venue": "Jack Singer Concert Hall",
+      "start": "2027-05-22T00:00:00-06:00",
+      "end": "2027-05-23T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Werklund Centre",
+      "cancelled": false,
+      "organizerEntityId": "biz-werklund-centre"
+    },
+    {
+      "id": "a35b908bde4fec3931fc15d01eb8",
+      "kind": "event",
+      "slug": "calgary-folk-music-festival-2027-a35b90",
+      "title": "Calgary Folk Music Festival 2027",
+      "summary": "July 22–25, 2027. Tickets are not currently on sale; the lineup is still being built.",
+      "description": "Calgary Folk Music Festival confirmed July 22–25, 2027 in its partner response. Tickets are not currently on sale and the 2027 lineup is still being built. Check the official festival website for later lineup, ticket and venue updates. Daily performance times have not been supplied.",
+      "categories": [
+        "music",
+        "festival"
+      ],
+      "tags": [
+        "2027 festival",
+        "partner-confirmed dates"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Folk Music Festival — user-supplied partner confirmation",
+          "url": "https://www.calgaryfolkfest.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T18:06:47.585Z",
+      "fetchedAt": "2026-10-16T18:06:47.585Z",
+      "updatedAt": "2026-10-16T18:06:47.585Z",
+      "sourceId": "calgary-folk-festival-partner",
+      "sourceRecordId": "calgary-folk-music-festival-2027",
+      "address": "Calgary, Alberta",
+      "start": "2027-07-22T00:00:00-06:00",
+      "end": "2027-07-26T00:00:00-06:00",
+      "schedulePrecision": "date",
+      "ticketSaleStatus": "not-on-sale",
+      "timezone": "America/Edmonton",
+      "pricing": "unknown",
+      "organizer": "Calgary Folk Music Festival",
+      "cancelled": false
     }
   ],
   "occurrences": [
@@ -12153,7 +12892,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12168,7 +12907,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12183,7 +12922,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12198,7 +12937,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12213,7 +12952,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12228,7 +12967,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12243,7 +12982,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12258,22 +12997,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://farmersmarket.hsca.ca/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "91988d164682ebf1efb3f134329c",
-      "marketId": "f100f20bace6917b47385f90a0d2",
-      "sourceRecordId": "calgary-farmers-market-west:2026-10-15:09:00:00",
-      "start": "2026-10-15T09:00:00-06:00",
-      "end": "2026-10-15T19:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12288,7 +13012,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12303,7 +13027,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12318,7 +13042,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12333,7 +13057,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12348,7 +13072,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12363,7 +13087,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12378,7 +13102,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12393,7 +13117,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12408,7 +13132,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12423,7 +13147,7 @@
         "name": "Recurring Calgary community markets",
         "url": "https://calgaryfarmersmarket.ca/cfm-west/",
         "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
       }
     },
     {
@@ -12432,6 +13156,1176 @@
       "sourceRecordId": "calgary-farmers-market-west:2026-10-30:09:00:00",
       "start": "2026-10-30T09:00:00-06:00",
       "end": "2026-10-30T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "669996cf337b8c109502fb10c7cc",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-31:09:00:00",
+      "start": "2026-10-31T09:00:00-06:00",
+      "end": "2026-10-31T19:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "74e7adb7fd88cf1da7076c05c12c",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-16:09:00:00",
+      "start": "2026-10-16T09:00:00-06:00",
+      "end": "2026-10-16T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "ad5c165ae28428cccf8dff5c99a4",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-17:09:00:00",
+      "start": "2026-10-17T09:00:00-06:00",
+      "end": "2026-10-17T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "b77731929f811626b033e6e42370",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-18:09:00:00",
+      "start": "2026-10-18T09:00:00-06:00",
+      "end": "2026-10-18T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "fb8244c91bdffc582507208f6639",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-22:09:00:00",
+      "start": "2026-10-22T09:00:00-06:00",
+      "end": "2026-10-22T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f7cdf888f986c989d047a278cd70",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-23:09:00:00",
+      "start": "2026-10-23T09:00:00-06:00",
+      "end": "2026-10-23T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "bb5481d3b3f9cb52a51ae7ac1ce4",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-24:09:00:00",
+      "start": "2026-10-24T09:00:00-06:00",
+      "end": "2026-10-24T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "6a36ab5edb21e5071095b36c911d",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-25:09:00:00",
+      "start": "2026-10-25T09:00:00-06:00",
+      "end": "2026-10-25T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "01b64785c325e35191613e6f7b26",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-29:09:00:00",
+      "start": "2026-10-29T09:00:00-06:00",
+      "end": "2026-10-29T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "8383cee1497415d96a30a2cce7fd",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-30:09:00:00",
+      "start": "2026-10-30T09:00:00-06:00",
+      "end": "2026-10-30T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "2dc5667065c71e53983cb780c1d9",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-10-31:09:00:00",
+      "start": "2026-10-31T09:00:00-06:00",
+      "end": "2026-10-31T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "de57fe04ed1a9c227cd09bca2d90",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-11-01:09:00:00",
+      "start": "2026-11-01T09:00:00-06:00",
+      "end": "2026-11-01T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "223b2348bf589745e02865cd5efa",
+      "marketId": "2a55ade6e02d4308cc4f09f59f02",
+      "sourceRecordId": "calgary-farmers-market-south:2026-11-05:09:00:00",
+      "start": "2026-11-05T09:00:00-06:00",
+      "end": "2026-11-05T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgaryfarmersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f37dccaca2e3c33464c1733710b5",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-16:09:00:00",
+      "start": "2026-10-16T09:00:00-06:00",
+      "end": "2026-10-16T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "043bba0fa9b3f8b1ebc42bfe22a2",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-17:09:00:00",
+      "start": "2026-10-17T09:00:00-06:00",
+      "end": "2026-10-17T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "994b12c3c6663725a17c99ec47be",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-18:09:00:00",
+      "start": "2026-10-18T09:00:00-06:00",
+      "end": "2026-10-18T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "35069adaab54536cadf91ab65072",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-23:09:00:00",
+      "start": "2026-10-23T09:00:00-06:00",
+      "end": "2026-10-23T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "0686ad94c274e2ecae96bc9645ae",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-24:09:00:00",
+      "start": "2026-10-24T09:00:00-06:00",
+      "end": "2026-10-24T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "7deccf46be437b81461d9eef49cc",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-25:09:00:00",
+      "start": "2026-10-25T09:00:00-06:00",
+      "end": "2026-10-25T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "76bd6072bfead0a5bc3bbb86971b",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-30:09:00:00",
+      "start": "2026-10-30T09:00:00-06:00",
+      "end": "2026-10-30T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "9b92b0dccad129cdfc2141ddf54f",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-10-31:09:00:00",
+      "start": "2026-10-31T09:00:00-06:00",
+      "end": "2026-10-31T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "1d3e247fc009c2d3fbe36451ad87",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-11-01:09:00:00",
+      "start": "2026-11-01T09:00:00-06:00",
+      "end": "2026-11-01T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "9eef60d4f933b69a2b2b4d4c9aed",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-11-06:09:00:00",
+      "start": "2026-11-06T09:00:00-06:00",
+      "end": "2026-11-06T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "ff18849b4e39923785d2269ac732",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-11-07:09:00:00",
+      "start": "2026-11-07T09:00:00-06:00",
+      "end": "2026-11-07T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "d07d28f0bba2b28c8aa8dffa0945",
+      "marketId": "3e483396c1c2ea35ca05c3f284e3",
+      "sourceRecordId": "crossroads-market:2026-11-08:09:00:00",
+      "start": "2026-11-08T09:00:00-06:00",
+      "end": "2026-11-08T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.crossroadsmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "6d5c2834a74853f079c58d3948e3",
+      "marketId": "ec8af09816f955c314652ffe376b",
+      "sourceRecordId": "farmers-makers-market-marda-loop:2026-10-17:10:00:00",
+      "start": "2026-10-17T10:00:00-06:00",
+      "end": "2026-10-17T14:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.farmersmakersmarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "807e90ce9cdfb29e8c59d8b37bd9",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-19:11:00:00",
+      "start": "2026-11-19T11:00:00-06:00",
+      "end": "2026-11-19T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "fb57ebc52994c69db2d3ce6fa66b",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-20:11:00:00",
+      "start": "2026-11-20T11:00:00-06:00",
+      "end": "2026-11-20T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "376e8e174c528fea59e72e61a05d",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-21:11:00:00",
+      "start": "2026-11-21T11:00:00-06:00",
+      "end": "2026-11-21T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "b3a3a43eea7567f50c6ebdd370be",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-22:11:00:00",
+      "start": "2026-11-22T11:00:00-06:00",
+      "end": "2026-11-22T18:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "be6138dd9b65f0f537f682ff7b53",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-26:11:00:00",
+      "start": "2026-11-26T11:00:00-06:00",
+      "end": "2026-11-26T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "0771d2d7151fc9589e49414372a8",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-27:11:00:00",
+      "start": "2026-11-27T11:00:00-06:00",
+      "end": "2026-11-27T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f223403d671245154374e1e5fb97",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-28:11:00:00",
+      "start": "2026-11-28T11:00:00-06:00",
+      "end": "2026-11-28T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "64c78e5ed54f1518773d0919c124",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-11-29:11:00:00",
+      "start": "2026-11-29T11:00:00-06:00",
+      "end": "2026-11-29T18:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "4778a6fdd7fb3f45afdd571f0d2e",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-03:11:00:00",
+      "start": "2026-12-03T11:00:00-06:00",
+      "end": "2026-12-03T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "125d511e8dd91a03f876ac65c7db",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-04:11:00:00",
+      "start": "2026-12-04T11:00:00-06:00",
+      "end": "2026-12-04T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "873612770bd0c2796f2b3421f001",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-05:11:00:00",
+      "start": "2026-12-05T11:00:00-06:00",
+      "end": "2026-12-05T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "93eb5fd89f7214bb952686713d2a",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-06:11:00:00",
+      "start": "2026-12-06T11:00:00-06:00",
+      "end": "2026-12-06T18:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "a8bcb38722d34fa0ade3cd35d48e",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-10:11:00:00",
+      "start": "2026-12-10T11:00:00-06:00",
+      "end": "2026-12-10T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "255b4a992b076425ef3c10282f27",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-11:11:00:00",
+      "start": "2026-12-11T11:00:00-06:00",
+      "end": "2026-12-11T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "160ee1c96bcb3b34f48d2682d14a",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-12:11:00:00",
+      "start": "2026-12-12T11:00:00-06:00",
+      "end": "2026-12-12T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "3be65783341eabe874c08f0d5031",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-13:11:00:00",
+      "start": "2026-12-13T11:00:00-06:00",
+      "end": "2026-12-13T18:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f4d790bb1736ebebd6dcb5b0fd50",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-17:11:00:00",
+      "start": "2026-12-17T11:00:00-06:00",
+      "end": "2026-12-17T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "1146574a28ded1ddc275f44be1b6",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-18:11:00:00",
+      "start": "2026-12-18T11:00:00-06:00",
+      "end": "2026-12-18T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "a2a4e502c24dedc9684e3cc58d99",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-19:11:00:00",
+      "start": "2026-12-19T11:00:00-06:00",
+      "end": "2026-12-19T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "ddcc90e14754c8cb521ae2c59dcd",
+      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
+      "sourceRecordId": "calgary-winter-market:2026-12-20:11:00:00",
+      "start": "2026-12-20T11:00:00-06:00",
+      "end": "2026-12-20T18:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://calgarywintermarket.ca/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "8f325a452730f4093e45b33e8773",
+      "marketId": "27e5a74cc3caf7b9df0413a37889",
+      "sourceRecordId": "holiday-market-collective:2026-12-04:16:00:00",
+      "start": "2026-12-04T16:00:00-06:00",
+      "end": "2026-12-04T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://marketcollective.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "4275802d9114c5db25c2e5d9cfa5",
+      "marketId": "27e5a74cc3caf7b9df0413a37889",
+      "sourceRecordId": "holiday-market-collective:2026-12-05:10:00:00",
+      "start": "2026-12-05T10:00:00-06:00",
+      "end": "2026-12-05T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://marketcollective.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "a15fac6245c679657a41a99da624",
+      "marketId": "27e5a74cc3caf7b9df0413a37889",
+      "sourceRecordId": "holiday-market-collective:2026-12-06:10:00:00",
+      "start": "2026-12-06T10:00:00-06:00",
+      "end": "2026-12-06T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://marketcollective.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "43c4b09eba7de0e899f593bf0650",
+      "marketId": "27e5a74cc3caf7b9df0413a37889",
+      "sourceRecordId": "holiday-market-collective:2026-12-11:16:00:00",
+      "start": "2026-12-11T16:00:00-06:00",
+      "end": "2026-12-11T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://marketcollective.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "b5e8c0742bb3d4fc84d4be0ebaba",
+      "marketId": "27e5a74cc3caf7b9df0413a37889",
+      "sourceRecordId": "holiday-market-collective:2026-12-12:10:00:00",
+      "start": "2026-12-12T10:00:00-06:00",
+      "end": "2026-12-12T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://marketcollective.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "c9fbd5605f4636fb2ea7507e9438",
+      "marketId": "27e5a74cc3caf7b9df0413a37889",
+      "sourceRecordId": "holiday-market-collective:2026-12-13:10:00:00",
+      "start": "2026-12-13T10:00:00-06:00",
+      "end": "2026-12-13T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://marketcollective.ca/faqs/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "db87b8fe7f51e59ae6d8183c6987",
+      "marketId": "b3bbb09ef98f18fa6f66383e98f1",
+      "sourceRecordId": "dalhousie-harvest-farmers-market:2026-10-24:10:00:00",
+      "start": "2026-10-24T10:00:00-06:00",
+      "end": "2026-10-24T15:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "c3d8f8b01c7bb3fbeb7f9c9c1b62",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-16:11:00:00",
+      "start": "2026-10-16T11:00:00-06:00",
+      "end": "2026-10-16T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "fca46e2837ba5f21264da362fe6d",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-17:11:00:00",
+      "start": "2026-10-17T11:00:00-06:00",
+      "end": "2026-10-17T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "7465559b6016f757fbc43f4f7742",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-18:11:00:00",
+      "start": "2026-10-18T11:00:00-06:00",
+      "end": "2026-10-18T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "cfaf4a164aa6f6aa470b3561d52a",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-22:11:00:00",
+      "start": "2026-10-22T11:00:00-06:00",
+      "end": "2026-10-22T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "4f070782874121c26ca6e92a07e9",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-23:11:00:00",
+      "start": "2026-10-23T11:00:00-06:00",
+      "end": "2026-10-23T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "041f5be1e399d5e3bf89a495dd8b",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-24:11:00:00",
+      "start": "2026-10-24T11:00:00-06:00",
+      "end": "2026-10-24T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "71fd3e098359c4e94a2b4487f97e",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-25:11:00:00",
+      "start": "2026-10-25T11:00:00-06:00",
+      "end": "2026-10-25T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "ee97f721410a77464e20efde6d15",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-29:11:00:00",
+      "start": "2026-10-29T11:00:00-06:00",
+      "end": "2026-10-29T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "73ddb7cc126db5d2037aee90453f",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-30:11:00:00",
+      "start": "2026-10-30T11:00:00-06:00",
+      "end": "2026-10-30T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "1608ebd551bbef1cad5defdde24f",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-10-31:11:00:00",
+      "start": "2026-10-31T11:00:00-06:00",
+      "end": "2026-10-31T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "d0dbb181de8f2ef40049668015b6",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-11-01:11:00:00",
+      "start": "2026-11-01T11:00:00-06:00",
+      "end": "2026-11-01T17:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f45055290a641662b18a137923f2",
+      "marketId": "7f9cc882ba6d001cee153f0095d1",
+      "sourceRecordId": "fresh-and-local-market:2026-11-05:11:00:00",
+      "start": "2026-11-05T11:00:00-06:00",
+      "end": "2026-11-05T20:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Recurring Calgary community markets",
+        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "462a831e113d03849e252e11fdfa",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-13",
+      "start": "2026-11-13T12:00:00-07:00",
+      "end": "2026-11-13T21:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "c91d14066280bee7da0ac64a7373",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-14",
+      "start": "2026-11-14T10:00:00-07:00",
+      "end": "2026-11-14T19:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "ac2fcaa188a588e97f4bd640c1e6",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-15",
+      "start": "2026-11-15T10:00:00-07:00",
+      "end": "2026-11-15T18:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "bac27e3684f2a5cbfc0a95dd5ac1",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-20",
+      "start": "2026-11-20T12:00:00-07:00",
+      "end": "2026-11-20T21:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "9552cd0487434654009a318ea07f",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-21",
+      "start": "2026-11-21T10:00:00-07:00",
+      "end": "2026-11-21T19:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "77d72e1bb28d266f70d824b8be2d",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-22",
+      "start": "2026-11-22T10:00:00-07:00",
+      "end": "2026-11-22T18:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "e93c77530d168ede7c83ceab1163",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-27",
+      "start": "2026-11-27T12:00:00-07:00",
+      "end": "2026-11-27T21:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "5b4037930d3c6fc80445166b1d0a",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-28",
+      "start": "2026-11-28T10:00:00-07:00",
+      "end": "2026-11-28T19:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f43cbfb85d205f31666cd11c1e01",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-11-29",
+      "start": "2026-11-29T10:00:00-07:00",
+      "end": "2026-11-29T18:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "7826635fdb9720d7ff9ce922ded0",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-12-04",
+      "start": "2026-12-04T12:00:00-07:00",
+      "end": "2026-12-04T21:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "f04f46d4cc4a7c0b1cfdd67cfd73",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-12-05",
+      "start": "2026-12-05T10:00:00-07:00",
+      "end": "2026-12-05T19:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "e5423a68eae5d337aa19a9472629",
+      "marketId": "d26f0f470edce55754294b100bf6",
+      "sourceRecordId": "icm-2026-12-06",
+      "start": "2026-12-06T10:00:00-07:00",
+      "end": "2026-12-06T18:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "cancelled": false,
+      "source": {
+        "name": "Spruce Meadows",
+        "url": "https://www.sprucemeadows.com/icm-faq/",
+        "kind": "official",
+        "retrievedAt": "2026-10-16T18:06:47.585Z"
+      }
+    },
+    {
+      "id": "91988d164682ebf1efb3f134329c",
+      "marketId": "f100f20bace6917b47385f90a0d2",
+      "sourceRecordId": "calgary-farmers-market-west:2026-10-15:09:00:00",
+      "start": "2026-10-15T09:00:00-06:00",
+      "end": "2026-10-15T19:00:00-06:00",
       "timezone": "America/Edmonton",
       "cancelled": false,
       "source": {
@@ -12457,771 +14351,6 @@
       }
     },
     {
-      "id": "74e7adb7fd88cf1da7076c05c12c",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-16:09:00:00",
-      "start": "2026-10-16T09:00:00-06:00",
-      "end": "2026-10-16T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "ad5c165ae28428cccf8dff5c99a4",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-17:09:00:00",
-      "start": "2026-10-17T09:00:00-06:00",
-      "end": "2026-10-17T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "b77731929f811626b033e6e42370",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-18:09:00:00",
-      "start": "2026-10-18T09:00:00-06:00",
-      "end": "2026-10-18T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "fb8244c91bdffc582507208f6639",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-22:09:00:00",
-      "start": "2026-10-22T09:00:00-06:00",
-      "end": "2026-10-22T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "f7cdf888f986c989d047a278cd70",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-23:09:00:00",
-      "start": "2026-10-23T09:00:00-06:00",
-      "end": "2026-10-23T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "bb5481d3b3f9cb52a51ae7ac1ce4",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-24:09:00:00",
-      "start": "2026-10-24T09:00:00-06:00",
-      "end": "2026-10-24T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "6a36ab5edb21e5071095b36c911d",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-25:09:00:00",
-      "start": "2026-10-25T09:00:00-06:00",
-      "end": "2026-10-25T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "01b64785c325e35191613e6f7b26",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-29:09:00:00",
-      "start": "2026-10-29T09:00:00-06:00",
-      "end": "2026-10-29T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "8383cee1497415d96a30a2cce7fd",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-30:09:00:00",
-      "start": "2026-10-30T09:00:00-06:00",
-      "end": "2026-10-30T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "2dc5667065c71e53983cb780c1d9",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-10-31:09:00:00",
-      "start": "2026-10-31T09:00:00-06:00",
-      "end": "2026-10-31T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "de57fe04ed1a9c227cd09bca2d90",
-      "marketId": "2a55ade6e02d4308cc4f09f59f02",
-      "sourceRecordId": "calgary-farmers-market-south:2026-11-01:09:00:00",
-      "start": "2026-11-01T09:00:00-06:00",
-      "end": "2026-11-01T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgaryfarmersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "f37dccaca2e3c33464c1733710b5",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-16:09:00:00",
-      "start": "2026-10-16T09:00:00-06:00",
-      "end": "2026-10-16T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "043bba0fa9b3f8b1ebc42bfe22a2",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-17:09:00:00",
-      "start": "2026-10-17T09:00:00-06:00",
-      "end": "2026-10-17T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "994b12c3c6663725a17c99ec47be",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-18:09:00:00",
-      "start": "2026-10-18T09:00:00-06:00",
-      "end": "2026-10-18T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "35069adaab54536cadf91ab65072",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-23:09:00:00",
-      "start": "2026-10-23T09:00:00-06:00",
-      "end": "2026-10-23T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "0686ad94c274e2ecae96bc9645ae",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-24:09:00:00",
-      "start": "2026-10-24T09:00:00-06:00",
-      "end": "2026-10-24T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "7deccf46be437b81461d9eef49cc",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-25:09:00:00",
-      "start": "2026-10-25T09:00:00-06:00",
-      "end": "2026-10-25T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "76bd6072bfead0a5bc3bbb86971b",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-30:09:00:00",
-      "start": "2026-10-30T09:00:00-06:00",
-      "end": "2026-10-30T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "9b92b0dccad129cdfc2141ddf54f",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-10-31:09:00:00",
-      "start": "2026-10-31T09:00:00-06:00",
-      "end": "2026-10-31T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "1d3e247fc009c2d3fbe36451ad87",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-11-01:09:00:00",
-      "start": "2026-11-01T09:00:00-06:00",
-      "end": "2026-11-01T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "9eef60d4f933b69a2b2b4d4c9aed",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-11-06:09:00:00",
-      "start": "2026-11-06T09:00:00-06:00",
-      "end": "2026-11-06T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "ff18849b4e39923785d2269ac732",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-11-07:09:00:00",
-      "start": "2026-11-07T09:00:00-06:00",
-      "end": "2026-11-07T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "d07d28f0bba2b28c8aa8dffa0945",
-      "marketId": "3e483396c1c2ea35ca05c3f284e3",
-      "sourceRecordId": "crossroads-market:2026-11-08:09:00:00",
-      "start": "2026-11-08T09:00:00-06:00",
-      "end": "2026-11-08T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.crossroadsmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "6d5c2834a74853f079c58d3948e3",
-      "marketId": "ec8af09816f955c314652ffe376b",
-      "sourceRecordId": "farmers-makers-market-marda-loop:2026-10-17:10:00:00",
-      "start": "2026-10-17T10:00:00-06:00",
-      "end": "2026-10-17T14:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.farmersmakersmarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "807e90ce9cdfb29e8c59d8b37bd9",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-19:11:00:00",
-      "start": "2026-11-19T11:00:00-06:00",
-      "end": "2026-11-19T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "fb57ebc52994c69db2d3ce6fa66b",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-20:11:00:00",
-      "start": "2026-11-20T11:00:00-06:00",
-      "end": "2026-11-20T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "376e8e174c528fea59e72e61a05d",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-21:11:00:00",
-      "start": "2026-11-21T11:00:00-06:00",
-      "end": "2026-11-21T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "b3a3a43eea7567f50c6ebdd370be",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-22:11:00:00",
-      "start": "2026-11-22T11:00:00-06:00",
-      "end": "2026-11-22T18:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "be6138dd9b65f0f537f682ff7b53",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-26:11:00:00",
-      "start": "2026-11-26T11:00:00-06:00",
-      "end": "2026-11-26T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "0771d2d7151fc9589e49414372a8",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-27:11:00:00",
-      "start": "2026-11-27T11:00:00-06:00",
-      "end": "2026-11-27T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "f223403d671245154374e1e5fb97",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-28:11:00:00",
-      "start": "2026-11-28T11:00:00-06:00",
-      "end": "2026-11-28T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "64c78e5ed54f1518773d0919c124",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-11-29:11:00:00",
-      "start": "2026-11-29T11:00:00-06:00",
-      "end": "2026-11-29T18:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "4778a6fdd7fb3f45afdd571f0d2e",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-03:11:00:00",
-      "start": "2026-12-03T11:00:00-06:00",
-      "end": "2026-12-03T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "125d511e8dd91a03f876ac65c7db",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-04:11:00:00",
-      "start": "2026-12-04T11:00:00-06:00",
-      "end": "2026-12-04T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "873612770bd0c2796f2b3421f001",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-05:11:00:00",
-      "start": "2026-12-05T11:00:00-06:00",
-      "end": "2026-12-05T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "93eb5fd89f7214bb952686713d2a",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-06:11:00:00",
-      "start": "2026-12-06T11:00:00-06:00",
-      "end": "2026-12-06T18:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "a8bcb38722d34fa0ade3cd35d48e",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-10:11:00:00",
-      "start": "2026-12-10T11:00:00-06:00",
-      "end": "2026-12-10T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "255b4a992b076425ef3c10282f27",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-11:11:00:00",
-      "start": "2026-12-11T11:00:00-06:00",
-      "end": "2026-12-11T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "160ee1c96bcb3b34f48d2682d14a",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-12:11:00:00",
-      "start": "2026-12-12T11:00:00-06:00",
-      "end": "2026-12-12T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "3be65783341eabe874c08f0d5031",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-13:11:00:00",
-      "start": "2026-12-13T11:00:00-06:00",
-      "end": "2026-12-13T18:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "f4d790bb1736ebebd6dcb5b0fd50",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-17:11:00:00",
-      "start": "2026-12-17T11:00:00-06:00",
-      "end": "2026-12-17T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "1146574a28ded1ddc275f44be1b6",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-18:11:00:00",
-      "start": "2026-12-18T11:00:00-06:00",
-      "end": "2026-12-18T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "a2a4e502c24dedc9684e3cc58d99",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-19:11:00:00",
-      "start": "2026-12-19T11:00:00-06:00",
-      "end": "2026-12-19T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "ddcc90e14754c8cb521ae2c59dcd",
-      "marketId": "ef9a9e8453e7dfa21099a0dab63c",
-      "sourceRecordId": "calgary-winter-market:2026-12-20:11:00:00",
-      "start": "2026-12-20T11:00:00-06:00",
-      "end": "2026-12-20T18:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://calgarywintermarket.ca/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "8f325a452730f4093e45b33e8773",
-      "marketId": "27e5a74cc3caf7b9df0413a37889",
-      "sourceRecordId": "holiday-market-collective:2026-12-04:16:00:00",
-      "start": "2026-12-04T16:00:00-06:00",
-      "end": "2026-12-04T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://marketcollective.ca/faqs/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "4275802d9114c5db25c2e5d9cfa5",
-      "marketId": "27e5a74cc3caf7b9df0413a37889",
-      "sourceRecordId": "holiday-market-collective:2026-12-05:10:00:00",
-      "start": "2026-12-05T10:00:00-06:00",
-      "end": "2026-12-05T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://marketcollective.ca/faqs/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "a15fac6245c679657a41a99da624",
-      "marketId": "27e5a74cc3caf7b9df0413a37889",
-      "sourceRecordId": "holiday-market-collective:2026-12-06:10:00:00",
-      "start": "2026-12-06T10:00:00-06:00",
-      "end": "2026-12-06T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://marketcollective.ca/faqs/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "43c4b09eba7de0e899f593bf0650",
-      "marketId": "27e5a74cc3caf7b9df0413a37889",
-      "sourceRecordId": "holiday-market-collective:2026-12-11:16:00:00",
-      "start": "2026-12-11T16:00:00-06:00",
-      "end": "2026-12-11T21:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://marketcollective.ca/faqs/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "b5e8c0742bb3d4fc84d4be0ebaba",
-      "marketId": "27e5a74cc3caf7b9df0413a37889",
-      "sourceRecordId": "holiday-market-collective:2026-12-12:10:00:00",
-      "start": "2026-12-12T10:00:00-06:00",
-      "end": "2026-12-12T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://marketcollective.ca/faqs/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "c9fbd5605f4636fb2ea7507e9438",
-      "marketId": "27e5a74cc3caf7b9df0413a37889",
-      "sourceRecordId": "holiday-market-collective:2026-12-13:10:00:00",
-      "start": "2026-12-13T10:00:00-06:00",
-      "end": "2026-12-13T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://marketcollective.ca/faqs/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "db87b8fe7f51e59ae6d8183c6987",
-      "marketId": "b3bbb09ef98f18fa6f66383e98f1",
-      "sourceRecordId": "dalhousie-harvest-farmers-market:2026-10-24:10:00:00",
-      "start": "2026-10-24T10:00:00-06:00",
-      "end": "2026-10-24T15:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
       "id": "ce6d2c9bc565f10a34c7efe62b02",
       "marketId": "7f9cc882ba6d001cee153f0095d1",
       "sourceRecordId": "fresh-and-local-market:2026-10-15:11:00:00",
@@ -13232,351 +14361,6 @@
       "source": {
         "name": "Recurring Calgary community markets",
         "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "c3d8f8b01c7bb3fbeb7f9c9c1b62",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-16:11:00:00",
-      "start": "2026-10-16T11:00:00-06:00",
-      "end": "2026-10-16T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "fca46e2837ba5f21264da362fe6d",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-17:11:00:00",
-      "start": "2026-10-17T11:00:00-06:00",
-      "end": "2026-10-17T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "7465559b6016f757fbc43f4f7742",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-18:11:00:00",
-      "start": "2026-10-18T11:00:00-06:00",
-      "end": "2026-10-18T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "cfaf4a164aa6f6aa470b3561d52a",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-22:11:00:00",
-      "start": "2026-10-22T11:00:00-06:00",
-      "end": "2026-10-22T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "4f070782874121c26ca6e92a07e9",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-23:11:00:00",
-      "start": "2026-10-23T11:00:00-06:00",
-      "end": "2026-10-23T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "041f5be1e399d5e3bf89a495dd8b",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-24:11:00:00",
-      "start": "2026-10-24T11:00:00-06:00",
-      "end": "2026-10-24T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "71fd3e098359c4e94a2b4487f97e",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-25:11:00:00",
-      "start": "2026-10-25T11:00:00-06:00",
-      "end": "2026-10-25T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "ee97f721410a77464e20efde6d15",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-29:11:00:00",
-      "start": "2026-10-29T11:00:00-06:00",
-      "end": "2026-10-29T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "73ddb7cc126db5d2037aee90453f",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-30:11:00:00",
-      "start": "2026-10-30T11:00:00-06:00",
-      "end": "2026-10-30T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "1608ebd551bbef1cad5defdde24f",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-10-31:11:00:00",
-      "start": "2026-10-31T11:00:00-06:00",
-      "end": "2026-10-31T20:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "d0dbb181de8f2ef40049668015b6",
-      "marketId": "7f9cc882ba6d001cee153f0095d1",
-      "sourceRecordId": "fresh-and-local-market:2026-11-01:11:00:00",
-      "start": "2026-11-01T11:00:00-06:00",
-      "end": "2026-11-01T17:00:00-06:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Recurring Calgary community markets",
-        "url": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "462a831e113d03849e252e11fdfa",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-13",
-      "start": "2026-11-13T12:00:00-07:00",
-      "end": "2026-11-13T21:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "c91d14066280bee7da0ac64a7373",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-14",
-      "start": "2026-11-14T10:00:00-07:00",
-      "end": "2026-11-14T19:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "ac2fcaa188a588e97f4bd640c1e6",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-15",
-      "start": "2026-11-15T10:00:00-07:00",
-      "end": "2026-11-15T18:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "bac27e3684f2a5cbfc0a95dd5ac1",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-20",
-      "start": "2026-11-20T12:00:00-07:00",
-      "end": "2026-11-20T21:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "9552cd0487434654009a318ea07f",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-21",
-      "start": "2026-11-21T10:00:00-07:00",
-      "end": "2026-11-21T19:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "77d72e1bb28d266f70d824b8be2d",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-22",
-      "start": "2026-11-22T10:00:00-07:00",
-      "end": "2026-11-22T18:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "e93c77530d168ede7c83ceab1163",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-27",
-      "start": "2026-11-27T12:00:00-07:00",
-      "end": "2026-11-27T21:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "5b4037930d3c6fc80445166b1d0a",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-28",
-      "start": "2026-11-28T10:00:00-07:00",
-      "end": "2026-11-28T19:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "f43cbfb85d205f31666cd11c1e01",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-11-29",
-      "start": "2026-11-29T10:00:00-07:00",
-      "end": "2026-11-29T18:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "7826635fdb9720d7ff9ce922ded0",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-12-04",
-      "start": "2026-12-04T12:00:00-07:00",
-      "end": "2026-12-04T21:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "f04f46d4cc4a7c0b1cfdd67cfd73",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-12-05",
-      "start": "2026-12-05T10:00:00-07:00",
-      "end": "2026-12-05T19:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
-        "kind": "official",
-        "retrievedAt": "2026-10-15T20:13:12.146Z"
-      }
-    },
-    {
-      "id": "e5423a68eae5d337aa19a9472629",
-      "marketId": "d26f0f470edce55754294b100bf6",
-      "sourceRecordId": "icm-2026-12-06",
-      "start": "2026-12-06T10:00:00-07:00",
-      "end": "2026-12-06T18:00:00-07:00",
-      "timezone": "America/Edmonton",
-      "cancelled": false,
-      "source": {
-        "name": "Spruce Meadows",
-        "url": "https://www.sprucemeadows.com/icm-faq/",
         "kind": "official",
         "retrievedAt": "2026-10-15T20:13:12.146Z"
       }

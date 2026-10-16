@@ -37,7 +37,7 @@ export function DiscoveryCard({ entity }: { entity: DiscoveryEntity }) {
     : null;
 
   const priceTag = entity.kind === 'event'
-    ? entity.pricing === 'free' ? 'Free Admission' : entity.pricing === 'paid' ? 'Tickets / Entry' : null
+    ? entity.ticketSaleStatus==='not-on-sale'?'Tickets not yet on sale':entity.pricing === 'free' ? 'Free Admission' : entity.pricing === 'paid' ? 'Tickets / Entry' : null
     : null;
 
   return (

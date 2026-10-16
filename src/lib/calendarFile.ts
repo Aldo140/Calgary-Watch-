@@ -6,7 +6,7 @@
 const ics = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 const escape = (v: string) => v.replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 
-export interface CalendarEvent { id: string; title: string; start: string; end: string; location?: string; description?: string; url: string }
+export interface CalendarEvent { id: string; title: string; start: string; end: string; location?: string; description?: string; url: string; dateOnly?:boolean }
 
 export function icsFile(e: CalendarEvent, now = new Date()): string {
   return [
@@ -14,8 +14,8 @@ export function icsFile(e: CalendarEvent, now = new Date()): string {
     'BEGIN:VEVENT',
     `UID:${e.id}@calgarywatch.ca`,
     `DTSTAMP:${ics(now.toISOString())}`,
-    `DTSTART:${ics(e.start)}`,
-    `DTEND:${ics(e.end)}`,
+    e.dateOnly?`DTSTART;VALUE=DATE:${e.start.slice(0,10).replace(/-/g,'')}`:`DTSTART:${ics(e.start)}`,
+    e.dateOnly?`DTEND;VALUE=DATE:${e.end.slice(0,10).replace(/-/g,'')}`:`DTEND:${ics(e.end)}`,
     `SUMMARY:${escape(e.title)}`,
     ...(e.location ? [`LOCATION:${escape(e.location)}`] : []),
     `DESCRIPTION:${escape([e.description, `Details: ${e.url}`].filter(Boolean).join('\n\n'))}`,
@@ -25,6 +25,6 @@ export function icsFile(e: CalendarEvent, now = new Date()): string {
 }
 
 export function googleCalendarUrl(e: CalendarEvent): string {
-  const p = new URLSearchParams({ action: 'TEMPLATE', text: e.title, dates: `${ics(e.start)}/${ics(e.end)}`, details: `${e.description ? `${e.description}\n\n` : ''}${e.url}`, ...(e.location ? { location: e.location } : {}) });
+  const p = new URLSearchParams({ action: 'TEMPLATE', text: e.title, dates: e.dateOnly?`${e.start.slice(0,10).replace(/-/g,'')}/${e.end.slice(0,10).replace(/-/g,'')}`:`${ics(e.start)}/${ics(e.end)}`, details: `${e.description ? `${e.description}\n\n` : ''}${e.url}`, ...(e.location ? { location: e.location } : {}) });
   return `https://calendar.google.com/calendar/render?${p}`;
 }

@@ -175,7 +175,7 @@ describe('ranking', () => {
 
 describe('outreach claim facts', () => {
   const sig = 'Aldo Ortiz\nFounder, CalgaryWatch';
-  const lead = (extra: Partial<PartnerLead> = {}) => ({ entityId: 'biz-vertigo-theatre', entityKind: 'business', status: 'new', ...extra }) as PartnerLead;
+  const lead = (extra: Partial<PartnerLead> = {}) => ({ businessName:'Vertigo Theatre', entityId: 'biz-vertigo-theatre', entityKind: 'business', status: 'new', ...extra }) as PartnerLead;
   const listed = { id: 'biz-vertigo-theatre', kind: 'business', title: 'Vertigo Theatre', slug: 'vertigo-theatre', status: 'published' };
 
   it('9. a real, claimable organization listing may mention verified priority', () => {

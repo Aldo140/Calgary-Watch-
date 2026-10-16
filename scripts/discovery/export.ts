@@ -1,3 +1,4 @@
+import {mergePartnerUpdates} from './partnerUpdates';
 import { mergeOrganizationContent, mergeOrganizationOccurrences, ORGANIZATION_LIVE, type OrganizationProjection } from '../../src/lib/organizationWorkspace';
 import { ownerEditTargets, applyOwnerOccurrences, applyOwnerContent, OWNER_CONTENT } from '../../src/lib/ownerListingEdits';
 import { associateOrganizers } from '../../src/lib/organizations';
@@ -76,6 +77,12 @@ for (const e of stored.entities) {
   if (e.status === 'published') byId.set(e.id, e);
   else if (e.status === 'draft' || e.status === 'archived') byId.delete(e.id);
 }
+// Reconcile partner confirmations before generic title/date deduplication can discard an older canonical ID.
+const partnerSourceIds=new Set(['atp-partner-season-2026-27','werklund-partner-season-2026-27','calgary-folk-festival-partner']);
+const blocked=new Set(stored.entities.filter(e=>e.status==='draft'||e.status==='archived').map(e=>e.id));
+const confirmations=feed.entities.filter(e=>e.kind==='event'&&partnerSourceIds.has(String(e.sourceId))&&!blocked.has(e.id));
+const reconciled=mergePartnerUpdates([...byId.values()] as unknown as import('../../src/types/discovery').DiscoveryEntity[],confirmations as unknown as import('../../src/types/discovery').Event[]);
+byId.clear();for(const entity of reconciled)byId.set(entity.id,entity as unknown as Entity);
 // The same listing can arrive from two sources (e.g. an automatic market schedule and a
 // hand-reviewed record). Keep the first: same kind, same title and, for events, same start.
 const norm = (v: unknown) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -107,7 +114,7 @@ const snapshot = domain.publishSnapshot([...byId.values()], [...occById.values()
 const editorial = await editorialEntities();
 // Stamped last, over every source, so nothing a feed or entity document says about itself survives.
 const verified = ownerVerification(claims.approved, claims.marks);
-let entities = applyOwnerVerification(associateOrganizers([...editorial, ...snapshot.entities] as Entity[]), verified);
+let entities:Entity[] = applyOwnerVerification(associateOrganizers(mergePartnerUpdates([...editorial,...snapshot.entities] as unknown as import('../../src/types/discovery').DiscoveryEntity[])), verified) as unknown as Entity[];
 // Applied owner edits win over feeds on every subsequent rebuild. Protected metadata is untouched.
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   const { inventoryDatabase } = await import('./firebase');

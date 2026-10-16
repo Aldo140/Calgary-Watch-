@@ -5,6 +5,8 @@ import { publishedInventory } from './discoveryPublication';
 const ORGANIZATIONS = [
   {id:'biz-inglewood-bia',names:['Inglewood BIA','Inglewood Business Improvement Area'],hosts:['inglewoodyyc.ca']},
   {id:'biz-dalhousie-community-association',names:['Dalhousie Community Association'],hosts:['dalhousiecalgary.ca']},
+  { id: 'biz-alberta-theatre-projects', names: ['Alberta Theatre Projects'], hosts: ['albertatheatreprojects.com','werklundcentre.ca'] },
+  { id:'biz-downstage',names:['Downstage'],hosts:['downstage.ca'] },
   { id: 'biz-theatre-calgary', names: ['Theatre Calgary'], hosts: ['theatrecalgary.com'] },
   { id: 'biz-alliance-francaise-calgary', names: ['Alliance Française de Calgary', 'Alliance Française Calgary', 'Alliance Francaise de Calgary'], hosts: ['afcalgary.ca'] },
   { id: 'biz-werklund-centre', names: ['Werklund Centre', 'Arts Commons'], hosts: ['werklundcentre.ca', 'artscommons.ca'] },
@@ -50,3 +52,6 @@ export function organizerEvents(id: string, all: readonly DiscoveryEntity[], now
     && !e.cancelled && Number.isFinite(Date.parse(e.end)) && Date.parse(e.end) > now)
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
 }
+
+/** Reviewed identities are shared by association and outreach, including legacy names. */
+export function organizationIdentityForName(name:string){const normalize=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');const found=ORGANIZATIONS.find(o=>o.names.some(n=>normalize(n)===normalize(name)));return found?{...found,slug:found.id.replace(/^biz-/,'')}:undefined;}

@@ -52,6 +52,7 @@ function price(e: EventEntity) {
     const [lo, hi] = e.priceRange.map(n => `$${Math.round(n)}`);
     return lo === hi ? lo : `${lo}–${hi}`;
   }
+  if(e.ticketSaleStatus==='not-on-sale')return 'Tickets not yet on sale';
   return e.pricing === 'paid' ? 'Tickets' : null;
 }
 
@@ -265,7 +266,7 @@ function Sky({ pick, today, children }: { pick?: EventEntity; today: string; chi
               <span className="ev-pick-tag"><Sparkles size={13} aria-hidden="true" /> {pickLabel}</span>
               <span className="ev-pick-art"><Art e={pick} /></span>
               <span className="ev-pick-body">
-                <small>{startClock(pick.start, clock)}{price(pick) ? ` · ${price(pick)}` : ''}</small>
+                <small>{pick.schedulePrecision==='date'?'Check official showtimes':startClock(pick.start, clock)}{price(pick) ? ` · ${price(pick)}` : ''}</small>
                 <strong>{pick.title}</strong>
                 <span>{place(pick)}</span>
               </span>
@@ -348,7 +349,7 @@ function Lead({ entry, dupe }: { entry: DayEntry; dupe?: boolean }) {
       <span className="ev-lead-art"><Art e={e} />{image?.credit ? <em>{image.credit}</em> : null}</span>
       <span className="ev-lead-body">
         <span className="ev-lead-tag">Pick of the day</span>
-        <span className="ev-lead-time">{times(entry.starts)}</span>
+        <span className="ev-lead-time">{e.schedulePrecision==='date'?'Check official showtimes':times(entry.starts)}</span>
         <strong>{e.title}</strong>
         <span className="ev-lead-place">{place(e)}</span>
         <span className="ev-lead-foot">
@@ -366,7 +367,7 @@ function Row({ entry, dupe }: { entry: DayEntry; dupe?: boolean }) {
   return (
     <li className={dupe ? 'is-dupe' : undefined}>
       <Link to={entityPath(e)} className="ev-row">
-        <span className="ev-row-time">{times(entry.starts)}</span>
+        <span className="ev-row-time">{e.schedulePrecision==='date'?'Check official showtimes':times(entry.starts)}</span>
         <span className="ev-row-art"><Art e={e} /></span>
         <span className="ev-row-body">
           <strong>{e.title}</strong>

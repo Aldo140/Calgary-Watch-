@@ -2301,6 +2301,409 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-crossroads-market",
+      "kind": "business",
+      "slug": "crossroads-market",
+      "title": "Crossroads Market",
+      "name": "Crossroads Market",
+      "website": "https://www.crossroadsmarket.ca/",
+      "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+      "summary": "A year-round Calgary market for fresh food, independent vendors, local shopping and a food hall.",
+      "description": "Operating since 1987, Crossroads brings together fresh food, groceries, specialty vendors, restaurants and independent makers. The regular market opens Friday–Sunday, 9 a.m.–5 p.m., with free parking. Vendor applications are available through the organization. Guest markets at this location may have different organizers and hours.",
+      "categories": [
+        "markets",
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "farmers-market",
+        "makers",
+        "family-friendly",
+        "year-round"
+      ],
+      "sources": [
+        {
+          "name": "Crossroads Market — supplied source research",
+          "url": "https://www.crossroadsmarket.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crossroadsmarket.ca/"
+      },
+      "services": [
+        "Year-round market",
+        "Food hall",
+        "Vendor applications"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "email": "info@crossroadsmarket.ca",
+      "phone": "403-291-5208",
+      "hours": {
+        "Friday": "9 a.m.–5 p.m.",
+        "Saturday": "9 a.m.–5 p.m.",
+        "Sunday": "9 a.m.–5 p.m."
+      }
+    },
+    {
+      "id": "biz-hillhurst-sunnyside-community-association",
+      "kind": "business",
+      "slug": "hillhurst-sunnyside-community-association",
+      "title": "Hillhurst Sunnyside Community Association",
+      "name": "Hillhurst Sunnyside Community Association",
+      "website": "https://farmersmarket.hsca.ca/",
+      "address": "1320 5 Avenue NW, Calgary, AB T2N 0S2",
+      "summary": "The community organization behind Hillhurst Sunnyside Farmers’ Market.",
+      "description": "The HSCA farmers’ market connects neighbours with local food producers, artisans and makers. The year-round Wednesday market runs 3–7 p.m. The indoor season runs October 14, 2026–May 12, 2027. Sunnyside CTrain is about a five-minute walk away; check the market site for seasonal arrangements.",
+      "categories": [
+        "markets",
+        "food",
+        "community"
+      ],
+      "tags": [
+        "farmers-market",
+        "community",
+        "year-round",
+        "indoor-winter"
+      ],
+      "sources": [
+        {
+          "name": "Hillhurst Sunnyside Community Association — supplied source research",
+          "url": "https://farmersmarket.hsca.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://farmersmarket.hsca.ca/"
+      },
+      "services": [
+        "Farmers market",
+        "Local food and artisans"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "hours": {
+        "Wednesday": "3–7 p.m."
+      }
+    },
+    {
+      "id": "biz-little-modern-market",
+      "kind": "business",
+      "slug": "little-modern-market",
+      "title": "Little Modern Market",
+      "name": "Little Modern Market",
+      "website": "https://www.littlemodernmarket.com/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary pop-up market connecting local makers, artists, boutiques and small businesses.",
+      "description": "Established in 2016, Little Modern Market brings local makers, artists, boutiques and food vendors together with a community charity component, typically featuring 100–120 vendors per market. Its 2026 venue is the Red & White Club / Olympic Volunteer Centre at McMahon Stadium, 1833 Crowchild Trail NW. Admission is free with an encouraged donation to the featured charity. Certified service dogs only; check each edition for activities and workshops.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "makers",
+        "artisan-market",
+        "pop-up",
+        "family-friendly"
+      ],
+      "sources": [
+        {
+          "name": "Little Modern Market",
+          "url": "https://www.littlemodernmarket.com/",
+          "kind": "official"
+        },
+        {
+          "name": "2026 market venue and applications",
+          "url": "https://www.littlemodernmarket.com/apply",
+          "kind": "official"
+        },
+        {
+          "name": "Holiday market hours corroboration supplied by user",
+          "url": "https://www.yyc.buzz/events/calendar/2026/11",
+          "kind": "editorial"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.littlemodernmarket.com/"
+      },
+      "services": [
+        "Pop-up markets",
+        "Local business promotion"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-fresh-local-market-kitchens",
+      "kind": "business",
+      "slug": "fresh-local-market-kitchens",
+      "title": "Fresh & Local Market + Kitchens",
+      "name": "Fresh & Local Market + Kitchens",
+      "website": "https://freshandlocal.ca/",
+      "address": "#426, 12445 Lake Fraser Drive SE, Calgary, AB T2J 7A4",
+      "summary": "A year-round indoor local-food market and culinary marketplace in Avenida Village.",
+      "description": "Fresh & Local combines regional food producers, prepared food, culinary kitchens and specialty vendors. The organization describes more than 275 local producers and around 40 culinary kitchens and food artisans. Its 2026 food-festival programme included monthly celebrations through September. Follow the official news and events page for new programming.",
+      "categories": [
+        "markets",
+        "food"
+      ],
+      "tags": [
+        "food-hall",
+        "local-food",
+        "year-round",
+        "family-friendly"
+      ],
+      "sources": [
+        {
+          "name": "Fresh & Local",
+          "url": "https://freshandlocal.ca/",
+          "kind": "official"
+        },
+        {
+          "name": "Official news and events",
+          "url": "https://freshandlocal.ca/news-events/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://freshandlocal.ca/"
+      },
+      "services": [
+        "Indoor market",
+        "Culinary kitchens",
+        "Local producers"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "phone": "403-425-4155",
+      "hours": {
+        "Thursday": "11 a.m.–8 p.m.",
+        "Friday": "11 a.m.–8 p.m.",
+        "Saturday": "11 a.m.–8 p.m.",
+        "Sunday": "11 a.m.–5 p.m."
+      }
+    },
+    {
+      "id": "biz-makers",
+      "kind": "business",
+      "slug": "makers",
+      "title": "MAKERS",
+      "name": "MAKERS",
+      "website": "https://www.shopmakers.ca/",
+      "address": "Calgary, AB",
+      "summary": "Canadian maker marketplaces at Market Mall, The CORE and Southcentre.",
+      "description": "MAKERS showcases independent Canadian makers through permanent retail marketplaces featuring jewellery, art, candles, apparel, home décor and gifts. Calgary locations at Market Mall, The CORE and Southcentre keep their own hours and contact emails. These are permanent retail locations, not separately announced craft fairs. CrossIron Mills is outside this Calgary-only set.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "makers",
+        "artisan",
+        "indoor",
+        "year-round",
+        "retail"
+      ],
+      "sources": [
+        {
+          "name": "MAKERS Calgary contacts",
+          "url": "https://www.shopmakers.ca/contact",
+          "kind": "official"
+        },
+        {
+          "name": "Market Mall",
+          "url": "https://www.shopmakers.ca/makers-market-mall",
+          "kind": "official"
+        },
+        {
+          "name": "The CORE",
+          "url": "https://www.shopmakers.ca/makers-the-core",
+          "kind": "official"
+        },
+        {
+          "name": "Southcentre",
+          "url": "https://www.shopmakers.ca/makers-southcentre",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shopmakers.ca/"
+      },
+      "services": [
+        "Maker retail marketplaces",
+        "Independent Canadian goods"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-the-barn-artisan-market",
+      "kind": "business",
+      "slug": "the-barn-artisan-market",
+      "title": "The Barn Artisan Market",
+      "name": "The Barn Artisan Market",
+      "website": "https://thebarnartisanmarket.ca/",
+      "address": "Shawnessy Barn, 224 Shawmeadows Road SW, Calgary, AB",
+      "summary": "An artisan market at Shawnessy Barn with Alberta-made goods and a changing local vendor lineup.",
+      "description": "Established in January 2020, The Barn Artisan Market features more than 30 local vendors across two floors of Shawnessy Barn. Admission and parking are free. Products must be handcrafted, created or made in Alberta; MLM, direct sales and drop-shipping are excluded. The usual fourth-Sunday pattern has exceptions: the 2026 Christmas Market is November 29. Check the calendar below for confirmed market dates.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "artisan-market",
+        "makers",
+        "free",
+        "indoor",
+        "year-round"
+      ],
+      "sources": [
+        {
+          "name": "The Barn Artisan Market — supplied source research",
+          "url": "https://thebarnartisanmarket.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thebarnartisanmarket.ca/"
+      },
+      "services": [
+        "Artisan markets",
+        "Made-in-Alberta products"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "email": "info@thebarnartisanmarket.ca"
+    },
+    {
+      "id": "biz-calgary-yuletide-festival-society",
+      "kind": "business",
+      "slug": "calgary-yuletide-festival-society",
+      "title": "Calgary Yuletide Festival Society",
+      "name": "Calgary Yuletide Festival Society",
+      "website": "https://calgarywintermarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "The nonprofit organizer behind Calgary Winter Market at Eau Claire Plaza.",
+      "description": "Calgary Yuletide Festival Society organizes Calgary Winter Market, a European-inspired outdoor holiday market with retail huts, food and drinks, entertainment, children’s activities, a carousel and a Brauhaus tent. The 2026 edition runs on selected days November 19–December 24 at Eau Claire Plaza. The market location is listed separately from the organization’s base.",
+      "categories": [
+        "markets",
+        "community",
+        "holiday"
+      ],
+      "tags": [
+        "nonprofit",
+        "community",
+        "christmas-market",
+        "outdoor"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Winter Market",
+          "url": "https://calgarywintermarket.ca/",
+          "kind": "official"
+        },
+        {
+          "name": "Organizer contact page",
+          "url": "https://calgarywintermarket.ca/pages/contact",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarywintermarket.ca/"
+      },
+      "services": [
+        "Seasonal holiday market"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-ymca-calgary",
+      "kind": "business",
+      "slug": "ymca-calgary",
+      "title": "YMCA Calgary",
+      "name": "YMCA Calgary",
+      "website": "https://www.ymcacalgary.org/",
+      "address": "Association office: 200-1422 Kensington Road NW, Calgary, AB T2N 3P9",
+      "summary": "A Calgary nonprofit operating recreation centres, camps, child development and community programming.",
+      "description": "YMCA Calgary connects communities through recreation, camps, child development and community programmes. Its free 2026 Winter Markets bring local vendors to four branches across five dates. The Kensington address is the association office; each winter-market listing has its own branch location and contact email.",
+      "categories": [
+        "community",
+        "markets",
+        "family"
+      ],
+      "tags": [
+        "nonprofit",
+        "community",
+        "recreation",
+        "family"
+      ],
+      "sources": [
+        {
+          "name": "YMCA Calgary contacts (media email; branch contacts preferred for markets)",
+          "url": "https://www.ymcacalgary.org/about/contact-us",
+          "kind": "official"
+        },
+        {
+          "name": "2026 Winter Markets",
+          "url": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ymcacalgary.org/"
+      },
+      "services": [
+        "Recreation centres",
+        "Community programmes",
+        "Winter markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "email": "media@ymcacalgary.org"
     }
   ]
 }

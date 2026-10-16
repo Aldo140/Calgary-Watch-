@@ -3,7 +3,7 @@ import type { EntityImage, InventorySubmissionInput, MarketSubmissionInput } fro
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
 import { cleanText } from '../../src/lib/cleanText.js';
 export interface SourceConfig { id: string; name: string; approved: boolean; hosts: string[]; kind: 'official' | 'editorial'; autoPublish?: boolean; feedUrl?: string; provider?: 'ticketmaster' | 'recurring-market' | 'ics' | 'tribe' | 'visitcalgary' | 'squarespace'; markets?: RecurringMarketDefinition[]; ics?: IcsSourceOptions }
-export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean }
+export interface SourceRecord { id: string; input: InventorySubmissionInput; cancelled?: boolean; supportingSources?: Array<{name: string; url: string; kind: 'editorial'}> }
 export interface InventoryProvider { source: SourceConfig; fetch(): Promise<SourceRecord[]> }
 /** Explicit JSON contract; adapters translate provider-specific APIs into this shape. */
 export class JsonFeedProvider implements InventoryProvider {

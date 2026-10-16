@@ -34,7 +34,9 @@
         "calgarywintermarket.ca",
         "marketcollective.ca",
         "www.dalhousiecalgary.ca",
-        "www.avenuecalgary.com"
+        "www.avenuecalgary.com",
+        "freshandlocal.ca",
+        "www.shopmakers.ca"
       ],
       "kind": "official",
       "provider": "recurring-market",
@@ -43,7 +45,7 @@
           "id": "hillhurst-sunnyside-farmers-market",
           "title": "Hillhurst Sunnyside Farmers' Market",
           "summary": "A year-round Wednesday farmers' market run by the Hillhurst Sunnyside Community Association.",
-          "description": "Weekly community farmers' market at the Hillhurst Sunnyside Community Centre, running year-round every Wednesday afternoon. Local produce, food vendors and makers, and a community social gathering as much as a market.",
+          "description": "A year-round Alberta Approved Farmers’ Market run by Hillhurst Sunnyside Community Association. Wednesdays 3–7 p.m.; the indoor season runs October 14, 2026–May 12, 2027. Check the organizer for seasonal venue arrangements and holiday exceptions.",
           "address": "1320 5 Ave NW, Calgary, AB",
           "venue": "Hillhurst Sunnyside Community Centre",
           "neighbourhood": "Hillhurst",
@@ -67,7 +69,9 @@
           "dayOfWeek": 3,
           "startTime": "15:00:00",
           "endTime": "19:00:00",
-          "occurrenceCount": 8
+          "occurrenceCount": 30,
+          "parking": "HSCA parking lot and nearby parking options.",
+          "transit": "About a five-minute walk from Sunnyside CTrain; bus services nearby."
         },
         {
           "id": "bridgeland-riverside-farmers-market",
@@ -217,7 +221,7 @@
           "title": "Crossroads Market",
           "summary": "A year-round weekend market with fresh food, local vendors, antiques and a food court.",
           "description": "Crossroads Market has welcomed Calgarians since 1987. The indoor market is open year-round every Friday, Saturday and Sunday from 9 a.m. to 5 p.m., with fresh food, local vendors, crafts, antiques and a food court.",
-          "address": "1235 26 Ave SE, Calgary, AB",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
           "venue": "Crossroads Market",
           "neighbourhood": "Ramsay",
           "organizer": "Crossroads Market",
@@ -256,7 +260,8 @@
               "endTime": "17:00:00"
             }
           ],
-          "occurrenceCount": 12
+          "occurrenceCount": 36,
+          "parking": "Free parking is listed by the market."
         },
         {
           "id": "farmers-makers-market-marda-loop",
@@ -294,58 +299,6 @@
           "seasonStart": "2026-05-23",
           "seasonEnd": "2026-10-17",
           "occurrenceCount": 8
-        },
-        {
-          "id": "calgary-winter-market",
-          "title": "Calgary Winter Market",
-          "summary": "A ticketed, European-style outdoor holiday market at Eau Claire Plaza.",
-          "description": "Outdoor European-style winter market with more than 40 retail huts, a heated market tent, food and entertainment. Open Thursday to Sunday from November 19, then every day from December 15 to 24. Entry tickets are $10 in advance.",
-          "address": "101 Barclay Parade SW, Calgary, AB",
-          "venue": "Eau Claire Plaza",
-          "neighbourhood": "Eau Claire",
-          "organizer": "Calgary Winter Market",
-          "sourceUrl": "https://calgarywintermarket.ca/",
-          "categories": [
-            "market",
-            "holiday"
-          ],
-          "tags": [
-            "christmas market",
-            "outdoor",
-            "seasonal",
-            "ticketed"
-          ],
-          "amenities": [
-            "market huts",
-            "food vendors",
-            "entertainment"
-          ],
-          "familyFriendly": true,
-          "schedules": [
-            {
-              "dayOfWeek": 4,
-              "startTime": "11:00:00",
-              "endTime": "21:00:00"
-            },
-            {
-              "dayOfWeek": 5,
-              "startTime": "11:00:00",
-              "endTime": "21:00:00"
-            },
-            {
-              "dayOfWeek": 6,
-              "startTime": "11:00:00",
-              "endTime": "21:00:00"
-            },
-            {
-              "dayOfWeek": 0,
-              "startTime": "11:00:00",
-              "endTime": "18:00:00"
-            }
-          ],
-          "seasonStart": "2026-11-19",
-          "seasonEnd": "2026-12-20",
-          "occurrenceCount": 20
         },
         {
           "id": "holiday-market-collective",
@@ -436,11 +389,11 @@
           "id": "fresh-and-local-market",
           "title": "Fresh & Local Market + Kitchens",
           "summary": "A year-round indoor market and food hall in Avenida Village: about 40 local vendors and kitchens from 20-plus countries.",
-          "description": "Fresh & Local Market + Kitchens in Avenida Village is a year-round indoor market and food hall with about 40 local vendors: farm-store produce and meat, bakeries, and kitchens cooking dishes from more than 20 countries. Live music on Thursday to Saturday evenings. Open Thursday to Saturday 11 am to 8 pm and Sunday 11 am to 5 pm; confirm holiday hours with the market.",
-          "address": "12445 Lake Fraser Drive SE, Calgary, AB",
+          "description": "Year-round indoor local-food market and culinary marketplace in Avenida Village. The organization describes more than 275 local producers and around 40 culinary kitchens and food artisans. Open Thursday–Saturday 11 a.m.–8 p.m. and Sunday 11 a.m.–5 p.m.; confirm holiday hours before visiting.",
+          "address": "#426, 12445 Lake Fraser Drive SE, Calgary, AB T2J 7A4",
           "venue": "Avenida Village",
           "organizer": "Fresh & Local Market + Kitchens",
-          "sourceUrl": "https://www.avenuecalgary.com/restaurants-food/farmers-markets-in-and-around-calgary/",
+          "sourceUrl": "https://freshandlocal.ca/",
           "categories": [
             "market",
             "food"
@@ -453,7 +406,6 @@
           ],
           "amenities": [
             "food hall",
-            "free parking",
             "live music"
           ],
           "familyFriendly": true,
@@ -479,7 +431,194 @@
               "endTime": "17:00:00"
             }
           ],
-          "occurrenceCount": 12
+          "occurrenceCount": 36,
+          "neighbourhood": "Lake Bonavista"
+        },
+        {
+          "id": "makers-market-mall",
+          "title": "MAKERS Market Mall",
+          "summary": "A permanent indoor retail marketplace for independent Canadian makers.",
+          "description": "MAKERS Market Mall features jewellery, art, candles, apparel, home décor and gifts. This is a permanent maker retail location, not a dated craft fair. Contact marketmall@shopmakers.ca. The dates below follow regular store hours; confirm holiday exceptions directly before visiting.",
+          "address": "3625 Shaganappi Trail NW, Calgary, AB T3A 0E2",
+          "venue": "CF Market Mall",
+          "organizer": "MAKERS",
+          "sourceUrl": "https://www.shopmakers.ca/makers-market-mall",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "makers",
+            "retail",
+            "indoor",
+            "year-round"
+          ],
+          "amenities": [
+            "Indoor retail marketplace",
+            "Independent Canadian makers"
+          ],
+          "schedules": [
+            {
+              "dayOfWeek": 1,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 2,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 3,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 4,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "10:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            }
+          ],
+          "occurrenceCount": 28
+        },
+        {
+          "id": "makers-the-core",
+          "title": "MAKERS The CORE",
+          "summary": "A permanent indoor retail marketplace for independent Canadian makers.",
+          "description": "MAKERS The CORE features jewellery, art, candles, apparel, home décor and gifts. This is a permanent maker retail location, not a dated craft fair. Contact thecore@shopmakers.ca. The dates below follow regular store hours; confirm holiday exceptions directly before visiting.",
+          "address": "324 8 Avenue SW, Calgary, AB T2P 2Z2",
+          "venue": "The CORE",
+          "organizer": "MAKERS",
+          "sourceUrl": "https://www.shopmakers.ca/makers-the-core",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "makers",
+            "retail",
+            "indoor",
+            "year-round"
+          ],
+          "amenities": [
+            "Indoor retail marketplace",
+            "Independent Canadian makers"
+          ],
+          "schedules": [
+            {
+              "dayOfWeek": 1,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            },
+            {
+              "dayOfWeek": 2,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            },
+            {
+              "dayOfWeek": 3,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            },
+            {
+              "dayOfWeek": 4,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "10:00:00",
+              "endTime": "18:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "12:00:00",
+              "endTime": "17:00:00"
+            }
+          ],
+          "occurrenceCount": 28
+        },
+        {
+          "id": "makers-southcentre",
+          "title": "MAKERS Southcentre",
+          "summary": "A permanent indoor retail marketplace for independent Canadian makers.",
+          "description": "MAKERS Southcentre features jewellery, art, candles, apparel, home décor and gifts. This is a permanent maker retail location, not a dated craft fair. Contact southcentre@shopmakers.ca. The dates below follow regular store hours; confirm holiday exceptions directly before visiting.",
+          "address": "100 Anderson Road SE, Unit 152, Calgary, AB T2J 3V1",
+          "venue": "Southcentre Mall",
+          "organizer": "MAKERS",
+          "sourceUrl": "https://www.shopmakers.ca/makers-southcentre",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "makers",
+            "retail",
+            "indoor",
+            "year-round"
+          ],
+          "amenities": [
+            "Indoor retail marketplace",
+            "Independent Canadian makers"
+          ],
+          "schedules": [
+            {
+              "dayOfWeek": 1,
+              "startTime": "10:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 2,
+              "startTime": "10:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 3,
+              "startTime": "10:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 4,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 5,
+              "startTime": "10:00:00",
+              "endTime": "21:00:00"
+            },
+            {
+              "dayOfWeek": 6,
+              "startTime": "10:00:00",
+              "endTime": "20:00:00"
+            },
+            {
+              "dayOfWeek": 0,
+              "startTime": "11:00:00",
+              "endTime": "18:00:00"
+            }
+          ],
+          "occurrenceCount": 28
         }
       ],
       "autoPublish": true

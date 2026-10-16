@@ -35,7 +35,8 @@ export async function collectSources(log: (m: string) => void = console.log) {
         for (const r of await provider.fetch()) {
           try {
             const n = domain.normalizeRecord(r.input, source, r.id, now);
-            entities.push({ ...n.entity, status: 'published', verification: reviewed ? 'source-checked' : 'source-feed', verifiedAt: now, ...(r.cancelled ? { cancelled: true } : {}) });
+            const supporting = reviewed ? (r.supportingSources ?? []).filter(s => { try { const url = new URL(s.url); return s.kind === 'editorial' && url.protocol === 'https:' && !url.username && !url.password && typeof s.name === 'string'; } catch { return false; } }) : [];
+            entities.push({ ...n.entity, sources: [...n.entity.sources, ...supporting], status: 'published', verification: reviewed ? 'source-checked' : 'source-feed', verifiedAt: now, ...(r.cancelled ? { cancelled: true } : {}) });
             occurrences.push(...n.occurrences);
             ok++;
           } catch { /* invalid record: skipped, as in the ingest */ }

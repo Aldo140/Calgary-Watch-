@@ -8,7 +8,7 @@ export function indexableEntities(entities: readonly DiscoveryEntity[]): Discove
   return entities.filter(e => validateEntity(e) && publishedInventory(e) && sitemapInventory(e));
 }
 export function buildEntityJsonLd(entity: DiscoveryEntity, origin: string, occurrences: readonly MarketOccurrence[] = []): object {
-  const type = { event: 'Event', market: 'Place', business: entity.categories.includes('food') ? 'Restaurant' : 'LocalBusiness', guide: 'Article', neighbourhood: 'Place' }[entity.kind];
+  const type = { event: 'Event', market: 'Place', business: entity.categories.includes('food') && !entity.categories.some(c => c === 'market' || c === 'markets') ? 'Restaurant' : 'LocalBusiness', guide: 'Article', neighbourhood: 'Place' }[entity.kind];
   return { '@context': 'https://schema.org', '@type': type, name: entity.title, description: entity.summary, url: origin + entityPath(entity),
     ...(entity.image ? { image: new URL(entity.image.src, origin).href } : {}),
     ...(entity.kind === 'event' ? { startDate: entity.schedulePrecision==='date'?entity.start.slice(0,10):entity.start, endDate: entity.schedulePrecision==='date'?lastEventDate(entity.end):entity.end, eventStatus: `https://schema.org/${entity.cancelled ? 'EventCancelled' : 'EventScheduled'}`, location: { '@type': 'Place', name: entity.venue || entity.address, address: entity.address } } : {}),

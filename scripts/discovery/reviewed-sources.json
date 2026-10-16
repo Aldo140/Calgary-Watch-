@@ -1866,5 +1866,647 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "little-modern-2026",
+      "name": "Little Modern Market — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.littlemodernmarket.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "holiday-2026",
+        "input": {
+          "kind": "market",
+          "title": "Little Modern Market — Holiday Market",
+          "summary": "A free holiday makers market at the Red & White Club / Olympic Volunteer Centre at McMahon Stadium, with charity donations encouraged.",
+          "description": "Little Modern Market’s Holiday Market takes place November 21, 2026 at the Red & White Club / Olympic Volunteer Centre at McMahon Stadium, 10 a.m.–4 p.m. Free admission with an encouraged donation to the featured charity. Certified service dogs only. Confirm final hours and activities with the organizer.",
+          "address": "1833 Crowchild Trail NW, Calgary, AB",
+          "venue": "Red & White Club / Olympic Volunteer Centre, McMahon Stadium",
+          "organizer": "Little Modern Market",
+          "sourceUrl": "https://www.littlemodernmarket.com/apply",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Charity donations encouraged",
+            "Certified service dogs only"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "holiday-2026:2026-11-21:10:00:00",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        },
+        "supportingSources": [
+          {
+            "name": "YYC Buzz — November market hours (supplied source)",
+            "url": "https://www.yyc.buzz/events/calendar/2026/11",
+            "kind": "editorial"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "barn-artisan-2026",
+      "name": "The Barn Artisan Market — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "thebarnartisanmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "barn-autumn-2026",
+        "input": {
+          "kind": "market",
+          "title": "The Barn Artisan Market",
+          "summary": "Halloween Market October 25 and Christmas Market November 29, 2026, both 11 a.m.–4 p.m. Free admission and parking, with more than 30 local artisan vendors across two floors. Made-in-Alberta products; no MLM, direct sales or drop-shipping. These confirmed dates override any assumption that every edition falls on the fourth Sunday.",
+          "description": "Halloween Market October 25 and Christmas Market November 29, 2026, both 11 a.m.–4 p.m. Free admission and parking, with more than 30 local artisan vendors across two floors. Made-in-Alberta products; no MLM, direct sales or drop-shipping. These confirmed dates override any assumption that every edition falls on the fourth Sunday.",
+          "address": "224 Shawmeadows Road SW, Calgary, AB",
+          "venue": "Shawnessy Barn",
+          "organizer": "The Barn Artisan Market",
+          "sourceUrl": "https://thebarnartisanmarket.ca/",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Free parking",
+            "Two floors",
+            "Made in Alberta"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "barn-autumn-2026:2026-10-25:11:00:00",
+              "start": "2026-10-25T11:00:00-06:00",
+              "end": "2026-10-25T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "barn-autumn-2026:2026-11-29:11:00:00",
+              "start": "2026-11-29T11:00:00-06:00",
+              "end": "2026-11-29T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "crossroads-guest-2026",
+      "name": "Crossroads guest-market calendar — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.crossroadsmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "inglewood-night-2026",
+        "input": {
+          "kind": "market",
+          "title": "Inglewood Night Market at Crossroads",
+          "summary": "An evening market presented by Vibrant City Events at Crossroads Market.",
+          "description": "Presented by Vibrant City Events at Crossroads Market, November 13, 14, 20, 21, 27 and 28, 2026, 4–9 p.m. Crossroads is the host location. Check the organizer and venue for visitor details; Crossroads’ own holiday shopping hours may differ.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Vibrant City Events",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [],
+          "occurrences": [
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-13:16:00:00",
+              "start": "2026-11-13T16:00:00-06:00",
+              "end": "2026-11-13T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-14:16:00:00",
+              "start": "2026-11-14T16:00:00-06:00",
+              "end": "2026-11-14T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-20:16:00:00",
+              "start": "2026-11-20T16:00:00-06:00",
+              "end": "2026-11-20T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-21:16:00:00",
+              "start": "2026-11-21T16:00:00-06:00",
+              "end": "2026-11-21T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-27:16:00:00",
+              "start": "2026-11-27T16:00:00-06:00",
+              "end": "2026-11-27T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-28:16:00:00",
+              "start": "2026-11-28T16:00:00-06:00",
+              "end": "2026-11-28T21:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "crossroads-flea-2026",
+      "name": "Crossroads guest-market calendar — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.crossroadsmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "yyc-flea-2026",
+        "input": {
+          "kind": "market",
+          "title": "YYC Flea at Crossroads",
+          "summary": "YYC Flea at the heated/covered Crossroads Quonset, presented by Vibrant City Events.",
+          "description": "YYC Flea at the heated/covered Crossroads Quonset on November 15, 22 and 29, 2026, 10 a.m.–5 p.m. Hosted by Vibrant City Events. Crossroads is the venue; this listing does not grant Crossroads ownership of the guest market.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market heated/covered Quonset",
+          "organizer": "Vibrant City Events",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [],
+          "occurrences": [
+            {
+              "sourceRecordId": "yyc-flea-2026:2026-11-15:10:00:00",
+              "start": "2026-11-15T10:00:00-06:00",
+              "end": "2026-11-15T17:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "yyc-flea-2026:2026-11-22:10:00:00",
+              "start": "2026-11-22T10:00:00-06:00",
+              "end": "2026-11-22T17:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "yyc-flea-2026:2026-11-29:10:00:00",
+              "start": "2026-11-29T10:00:00-06:00",
+              "end": "2026-11-29T17:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "recurring-markets-calgary",
+      "name": "Calgary Winter Market — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "calgarywintermarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "calgary-winter-market",
+        "input": {
+          "kind": "market",
+          "title": "Calgary Winter Market",
+          "summary": "A ticketed European-inspired outdoor holiday market at Eau Claire Plaza, with 26 operating days from November 19 to December 24, 2026.",
+          "description": "European-inspired outdoor holiday market at Eau Claire Plaza. The organizer is Calgary Yuletide Festival Society. Open Thursday–Sunday November 19–December 13, then daily December 15–24, 2026 (26 operating days). Thursday–Saturday 11 a.m.–9 p.m.; Sundays 11 a.m.–6 p.m.; December 24 closes at 3 p.m. December 15, 16, 21, 22 and 23 are also operating dates; opening hours for those five dates are not listed here, so check the official website. Advance entry is listed at $8; confirm current ticket availability and prices before booking. Features include retail huts, food and beverages, entertainment, children’s activities, a carousel and Brauhaus tent.",
+          "address": "101 Barclay Parade SW, Calgary, AB T2P 4R3",
+          "venue": "Eau Claire Plaza",
+          "organizer": "Calgary Yuletide Festival Society",
+          "sourceUrl": "https://calgarywintermarket.ca/",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Outdoor market",
+            "Ticketed entry",
+            "Market huts",
+            "Entertainment",
+            "Family activities"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-19:11:00:00",
+              "start": "2026-11-19T11:00:00-06:00",
+              "end": "2026-11-19T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-20:11:00:00",
+              "start": "2026-11-20T11:00:00-06:00",
+              "end": "2026-11-20T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-21:11:00:00",
+              "start": "2026-11-21T11:00:00-06:00",
+              "end": "2026-11-21T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-22:11:00:00",
+              "start": "2026-11-22T11:00:00-06:00",
+              "end": "2026-11-22T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-26:11:00:00",
+              "start": "2026-11-26T11:00:00-06:00",
+              "end": "2026-11-26T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-27:11:00:00",
+              "start": "2026-11-27T11:00:00-06:00",
+              "end": "2026-11-27T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-28:11:00:00",
+              "start": "2026-11-28T11:00:00-06:00",
+              "end": "2026-11-28T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-29:11:00:00",
+              "start": "2026-11-29T11:00:00-06:00",
+              "end": "2026-11-29T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-03:11:00:00",
+              "start": "2026-12-03T11:00:00-06:00",
+              "end": "2026-12-03T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-04:11:00:00",
+              "start": "2026-12-04T11:00:00-06:00",
+              "end": "2026-12-04T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-05:11:00:00",
+              "start": "2026-12-05T11:00:00-06:00",
+              "end": "2026-12-05T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-06:11:00:00",
+              "start": "2026-12-06T11:00:00-06:00",
+              "end": "2026-12-06T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-10:11:00:00",
+              "start": "2026-12-10T11:00:00-06:00",
+              "end": "2026-12-10T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-11:11:00:00",
+              "start": "2026-12-11T11:00:00-06:00",
+              "end": "2026-12-11T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-12:11:00:00",
+              "start": "2026-12-12T11:00:00-06:00",
+              "end": "2026-12-12T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-13:11:00:00",
+              "start": "2026-12-13T11:00:00-06:00",
+              "end": "2026-12-13T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-17:11:00:00",
+              "start": "2026-12-17T11:00:00-06:00",
+              "end": "2026-12-17T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-18:11:00:00",
+              "start": "2026-12-18T11:00:00-06:00",
+              "end": "2026-12-18T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-19:11:00:00",
+              "start": "2026-12-19T11:00:00-06:00",
+              "end": "2026-12-19T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-20:11:00:00",
+              "start": "2026-12-20T11:00:00-06:00",
+              "end": "2026-12-20T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-24:11:00:00",
+              "start": "2026-12-24T11:00:00-06:00",
+              "end": "2026-12-24T15:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "ymca-winter-2026",
+      "name": "YMCA Calgary 2026 Winter Markets — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.ymcacalgary.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "shawnessy-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Shawnessy YMCA Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Shawnessy YMCA. Branch contact: shawnessy@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Shawnessy YMCA. Branch contact: shawnessy@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "400-333 Shawville Boulevard SE, Calgary, AB T2Y 4H3",
+          "venue": "Shawnessy YMCA",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "shawnessy-winter-2026:2026-11-21:10:00:00",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "seton-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Brookfield Residential YMCA at Seton Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Brookfield Residential YMCA at Seton. Branch contact: seton@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Brookfield Residential YMCA at Seton. Branch contact: seton@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "4995 Market Street SE, Calgary, AB T3M 2P9",
+          "venue": "Brookfield Residential YMCA at Seton",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "seton-winter-2026:2026-11-28:10:00:00",
+              "start": "2026-11-28T10:00:00-06:00",
+              "end": "2026-11-28T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "quarrypark-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Remington YMCA in Quarry Park Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Remington YMCA in Quarry Park. Branch contact: quarrypark@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Remington YMCA in Quarry Park. Branch contact: quarrypark@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "108 Quarry Park Road SE, Calgary, AB T2C 5R1",
+          "venue": "Remington YMCA in Quarry Park",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "quarrypark-winter-2026:2026-12-05:09:00:00",
+              "start": "2026-12-05T09:00:00-06:00",
+              "end": "2026-12-05T15:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "rockyridge-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Shane Homes YMCA at Rocky Ridge Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Shane Homes YMCA at Rocky Ridge. Branch contact: rockyridge@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Shane Homes YMCA at Rocky Ridge. Branch contact: rockyridge@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "11300 Rocky Ridge Road NW, Calgary, AB T3G 5H3",
+          "venue": "Shane Homes YMCA at Rocky Ridge",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "rockyridge-winter-2026:2026-12-05:09:00:00",
+              "start": "2026-12-05T09:00:00-06:00",
+              "end": "2026-12-05T15:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "rockyridge-winter-2026:2026-12-06:09:00:00",
+              "start": "2026-12-06T09:00:00-06:00",
+              "end": "2026-12-06T15:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "crossroads-santa-2026",
+      "name": "Crossroads calendar — user-supplied source research",
+      "approved": true,
+      "hosts": [
+        "www.crossroadsmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "santa-2026-12-05",
+        "input": {
+          "kind": "event",
+          "title": "Selfies with Santa at Crossroads",
+          "summary": "Santa photo opportunity at Crossroads Market; check the organizer for the time on this date.",
+          "description": "Selfies with Santa is listed at Crossroads Market on December 5, 12 and 19, 2026. Each date has its own schedule; check the official event page for the time, booking requirements and any admission conditions.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Crossroads Market",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "family",
+            "holiday"
+          ],
+          "tags": [
+            "Santa",
+            "photos"
+          ],
+          "start": "2026-12-05T00:00:00-06:00",
+          "end": "2026-12-06T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "santa-2026-12-12",
+        "input": {
+          "kind": "event",
+          "title": "Selfies with Santa at Crossroads",
+          "summary": "Santa photo opportunity at Crossroads Market; check the organizer for the time on this date.",
+          "description": "Selfies with Santa is listed at Crossroads Market on December 5, 12 and 19, 2026. Each date has its own schedule; check the official event page for the time, booking requirements and any admission conditions.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Crossroads Market",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "family",
+            "holiday"
+          ],
+          "tags": [
+            "Santa",
+            "photos"
+          ],
+          "start": "2026-12-12T00:00:00-06:00",
+          "end": "2026-12-13T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "santa-2026-12-19",
+        "input": {
+          "kind": "event",
+          "title": "Selfies with Santa at Crossroads",
+          "summary": "Santa photo opportunity at Crossroads Market; check the organizer for the time on this date.",
+          "description": "Selfies with Santa is listed at Crossroads Market on December 5, 12 and 19, 2026. Each date has its own schedule; check the official event page for the time, booking requirements and any admission conditions.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Crossroads Market",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "family",
+            "holiday"
+          ],
+          "tags": [
+            "Santa",
+            "photos"
+          ],
+          "start": "2026-12-19T00:00:00-06:00",
+          "end": "2026-12-20T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
   }
 ]

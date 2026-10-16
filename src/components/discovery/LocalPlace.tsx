@@ -3,7 +3,7 @@ import { claimPresentation } from '../../lib/claimPresentation';
 import { ListingArtwork } from '../entity/ListingArtwork';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, MapPin, Navigation, Phone, Quote, Share2, Store, Ticket } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, MapPin, Navigation, Phone, Mail, Quote, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { organizerEvents, organizerMarkets, organizationVisitAddress, publicOrganizationEvents } from '../../lib/organizations';
@@ -163,6 +163,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           {note?.since ? <div className="lp-fact"><small><Store size={14} aria-hidden="true" />Since</small><strong>{note.since}</strong></div> : null}
           {place.phone ? <a className="lp-fact" href={`tel:${place.phone.replace(/[^\d+]/g, '')}`}><small><Phone size={14} aria-hidden="true" />Call</small><strong>{place.phone}</strong></a> : null}
           {site ? <a className="lp-fact" href={site} target="_blank" rel="noopener noreferrer"><small><Globe size={14} aria-hidden="true" />Online</small><strong>{host(site)}</strong></a> : null}
+          {place.email ? <a className="lp-fact" href={`mailto:${place.email}`}><small><Mail size={14} aria-hidden="true" />Email</small><strong>{place.email}</strong></a> : null}
           {hours.length ? <div className="lp-fact"><small><Clock size={14} aria-hidden="true" />Hours</small><strong>{hours.slice(0, 2).map(([d, h]) => `${d} ${h}`).join(' · ')}</strong>{hours.length > 2 ? <span>More on their site</span> : null}</div> : null}
         </section>
 

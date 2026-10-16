@@ -27,7 +27,7 @@ export interface Market extends EntityBase, Location {
 }
 export interface MarketOccurrence { id: string; marketId: string; start: string; end: string; timezone: 'America/Edmonton'; cancelled: boolean; source: EntitySource }
 export interface Business extends EntityBase, Location {
-  kind: 'business'; name: string; phone?: string; website?: string; hours?: Record<string, string>;
+  kind: 'business'; name: string; phone?: string; email?: string; website?: string; hours?: Record<string, string>;
   priceLevel?: 1 | 2 | 3 | 4; images: EntityImage[]; socials: Record<string, string>; services: string[];
   claimed: boolean; partner: boolean; editorialSelection: boolean; offer?: string; sponsorshipDisclosure?: string;
 }

@@ -31,3 +31,5 @@ public/email-previews/
 
 /functions/organization-submit.cjs
 /functions/admin-member.cjs
+
+functions/approve-organization.cjs

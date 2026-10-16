@@ -10,3 +10,9 @@ exports.adminMemberAction=onCall({region:'northamerica-northeast1',maxInstances:
  try{return await require('./admin-member.cjs').adminMemberAction(getFirestore(process.env.DISCOVERY_DATABASE_ID||'(default)'),request.auth.uid,request.data,{email:request.auth.token.email,emailVerified:true});}
  catch(error){throw new HttpsError('failed-precondition',error.message||'Member changes could not be saved.');}
 });
+
+exports.approveOrganizationClaim=onCall({region:'northamerica-northeast1',maxInstances:3},async request=>{
+ if(!request.auth?.token.email_verified)throw new HttpsError('unauthenticated','Sign in with a verified email.');
+ try{return await require('./approve-organization.cjs').approveOrganizationClaim(getFirestore(process.env.DISCOVERY_DATABASE_ID||'(default)'),request.auth.uid,request.data,{email:request.auth.token.email,emailVerified:true});}
+ catch(error){throw new HttpsError('failed-precondition',error.message||'Approval could not be saved.');}
+});

@@ -1,5 +1,7 @@
 # Organization profiles and shared claims
 
+Historical rollout notes; current management/permission behavior is documented in [organization-workspaces.md](organization-workspaces.md), including management-only profiles for one-off organizers and organization-based Market HQ access.
+
 Implementation baseline: production `main` at `0836de9`. No outreach, approval emails, deployments or production record repairs were executed by this task.
 
 ## Profiles and URLs

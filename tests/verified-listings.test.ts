@@ -83,8 +83,10 @@ describe('verified state follows approved claims only', () => {
 
   it('approval in admin writes the public mark and closes every lead for the listing', () => {
     const panel = readFileSync(new URL('../src/components/admin/ClaimsPanel.tsx', import.meta.url), 'utf8');
-    assert.match(panel, /tx.update\(claimRef, writes.claim\)/);
-    assert.match(panel, /tx.set\(doc\(database, VERIFIED, c\.entityId\), writes.mark\)/);
+    assert.match(panel,/approveOrganizationClaim/);
+    const server=readFileSync(new URL('../scripts/claims/approve-organization.ts',import.meta.url),'utf8');
+    assert.match(server,/tx.update\(claimRef,writes.claim\)/);
+    assert.match(server,/tx.set\(db.collection\('verified_listings'\).doc\(c.entityId\),writes.mark\)/);
     assert.match(panel, /leads\?\.filter\(\(l\) => l\.entityId === c\.entityId\)/);
   });
 });
@@ -106,7 +108,7 @@ describe('the verified badge', () => {
 
   it('5. does not show on an unverified listing, which offers the claim instead', () => {
     assert.match(cta, /if \(verified\) \{\n    return <aside[^>]*><VerifiedBadge/);
-    assert.match(cta, /<Link to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}>Claim this listing/);
+    assert.match(cta, /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}>Claim organization profile for/);
     assert.deepEqual(guaranteeProblems(CLAIM_BENEFIT), []);
     assert.match(CLAIM_BENEFIT, /more weight/);
   });

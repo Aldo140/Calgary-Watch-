@@ -19,15 +19,16 @@ function compile(path: string, replacements: Record<string,string>) {
   return url(output);
 }
 const badge=compile('../src/components/entity/VerifiedBadge.tsx',{});
-const inventory=url(`export const discoveryRepository={list:()=>['event','market','business'].map(kind=>({id:kind+'-test',kind}))};`);
+const organizationModule=compile('../src/lib/claimOrganization.ts',{'../types/discovery':url('export {};')});
+const inventory=url(`export const discoveryRepository={list:()=>['event','market','business'].map(kind=>({id:kind+'-test',kind,title:'Test',organizer:'Test company',sources:[],updatedAt:'2026-10-16',status:'published'}))};`);
 for(const verified of [false,true]) {
   const state=url(`export const useVerifiedListing=()=>${verified};`);
-  const component=await import(compile('../src/components/entity/ClaimCta.tsx',{'../../data/discovery':inventory,'../../lib/claimsApi':state,'./VerifiedBadge':badge}));
+  const component=await import(compile('../src/components/entity/ClaimCta.tsx',{'../../data/discovery':inventory,'../../lib/claimsApi':state,'./VerifiedBadge':badge,'../../lib/claimOrganization':organizationModule}));
   for(const kind of ['event','market','business']) it(`${verified?'approved':'unclaimed'} ${kind} has consistent badge and claim presentation`,()=>{
     const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement('div',null,
       createElement(component.VerifiedMark,{entityId:kind+'-test'}),createElement(component.ClaimCta,{entityId:kind+'-test',kind,title:'Test'}))));
-    if(verified){assert.match(html,/Confirmed by the organization/);assert.match(html,/Suggest a correction/);assert.match(html,/Claimed by the organization/);assert.doesNotMatch(html,/Is this your|Claim it free|given more weight/);assert.doesNotMatch(html,/Claim this listing|href="\/claim\//);}
-    else{assert.match(html,new RegExp(`href="/claim/${kind}-test"`));assert.match(html,/Claim this listing/);assert.doesNotMatch(html,/>Verified</);}
+    if(verified){assert.match(html,/Confirmed by the organization/);assert.match(html,/Suggest a correction/);assert.match(html,/Claimed by the organization/);assert.doesNotMatch(html,/Is this your|Claim it free|given more weight/);assert.doesNotMatch(html,/Claim organization profile for/);assert.match(html,/Manage or request access/);}
+    else{assert.match(html,new RegExp(`href="/claim/${kind}-test"`));assert.match(html,/Claim organization profile for/);assert.doesNotMatch(html,/>Verified</);}
   });
   it(`missing entities cannot produce a claim link (${verified})`,()=>{
     const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement(component.ClaimCta,{entityId:'does-not-exist',kind:'business',title:'Missing'})));assert.equal(html,'');

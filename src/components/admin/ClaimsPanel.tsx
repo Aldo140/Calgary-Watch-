@@ -16,7 +16,7 @@ import { db } from '@/src/firebase';
 import { useAuth } from '@/src/components/FirebaseProvider';
 import { discoveryRepository } from '@/src/data/discovery';
 import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence, claimId, type ListingClaim, type ListingUpdate } from '@/src/lib/claims';
-import { claimApprovalWrites } from '@/src/lib/claimApproval';
+import {claimApprovalWrites} from '@/src/lib/claimApproval';
 import { APPROVAL_EMAILS_SINCE, type ApprovalEmailStatus } from '@/src/lib/claimApprovalEmail';
 import { businessAccountPatch, businessAccountsFromClaims } from '@/src/lib/businessAccount';
 import type { PartnerLead } from '@/src/types/ops';
@@ -75,25 +75,27 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       if (!approve) await updateDoc(doc(database, CLAIMS, claimId(c.uid, c.entityId)), { status: 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
         if (!entities.has(c.entityId)) throw new Error('This listing is not in the published inventory. Restore the canonical listing before approving.');
-        const result = await runTransaction(database, async tx => {
-          const claimRef = doc(database, CLAIMS, claimId(c.uid, c.entityId));
-          const accountRef = doc(database, 'users', c.uid);
-          const claimSnap = await tx.get(claimRef);
-          const accountSnap = await tx.get(accountRef);
-          if (!claimSnap.exists()) throw new Error('The claim no longer exists.');
-          const writes = claimApprovalWrites(claimSnap.data() as ListingClaim, accountSnap.data(), by, Date.now());
-          const chosen=scope[c.uid+'_'+c.entityId]??claimSnap.data().approvedOrganizationId;
-          const organization=chosen?entities.get(chosen):undefined;
-          if(chosen&&organization?.kind!=='business')throw Error('Select a published organization profile.');
-          if(chosen)Object.assign(writes.claim,{approvedOrganizationId:chosen});
-          tx.update(claimRef, writes.claim);
-          tx.set(doc(database, VERIFIED, c.entityId), writes.mark);
-          if(chosen&&organization)tx.set(doc(database,VERIFIED,chosen),{...writes.mark,entityId:chosen,title:organization.title,organizationId:chosen});
-          if(chosen)writes.account=businessAccountPatch({...accountSnap.data(),...writes.account},chosen,writes.account.businessSince);
-          tx.update(accountRef, writes.account);
-          return writes.account;
-        }, { maxAttempts: 1 });
+        const {getFunctions,httpsCallable}=await import('firebase/functions');
+        const chosen=scope[c.uid+'_'+c.entityId]||c.approvedOrganizationId;
+        const expand=Boolean(chosen&&entities.get(c.entityId)?.kind!=='business');
+        if(expand&&!window.confirm(`Confirm ${entities.get(chosen!)?.title??chosen} organization access and move this listing’s shared workspace and events? This also confirms organization access for every already-approved representative of ${c.entityTitle}. Existing approval/email history is retained and the weekly allowance is not reset.`))return;
+        const response=await httpsCallable<{uid:string;entityId:string;organizationId?:string;confirmSharedAccess?:boolean},{account:Record<string,unknown>;accounts:Array<{uid:string;account:Record<string,unknown>}>;moved:number}>(getFunctions(database.app,'northamerica-northeast1'),'approveOrganizationClaim')({uid:c.uid,entityId:c.entityId,...(chosen?{organizationId:chosen,confirmSharedAccess:expand}:{})}).catch(async(error)=>{
+          if((error as {code?:string}).code!=='functions/not-found')throw error;
+          if(expand)throw Error('Deploy the updated Firebase functions before expanding organization access. Nothing was changed.');
+          // Keep ordinary existing approvals working during a staged backend rollout.
+          const account=await runTransaction(database,async tx=>{
+            const claimRef=doc(database,CLAIMS,claimId(c.uid,c.entityId)),accountRef=doc(database,'users',c.uid);
+            const [claim,profile]=await Promise.all([tx.get(claimRef),tx.get(accountRef)]);
+            if(!claim.exists())throw Error('The claim no longer exists.');
+            const writes=claimApprovalWrites(claim.data() as ListingClaim,profile.data(),by,Date.now());
+            tx.update(claimRef,writes.claim);tx.update(accountRef,writes.account);tx.set(doc(database,VERIFIED,c.entityId),writes.mark);
+            return writes.account;
+          },{maxAttempts:1});
+          return {data:{account,accounts:[],moved:0}};
+        });
+        const result=response.data.account;
         adminUsers.patch(c.uid, result);
+        for(const peer of response.data.accounts??[])adminUsers.patch(peer.uid,peer.account);
         // The outreach pipeline learns the listing was claimed, so it stops pitching —
         // every lead for it (a listing can have a business lead and an organizer lead).
         for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
@@ -220,7 +222,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
-              <span>{c.approvedOrganizationId?`Organization: ${entities.get(c.approvedOrganizationId)?.title??c.approvedOrganizationId}`:entities.get(c.entityId)?.kind==='business'?'Organization profile and linked events':'Specific listing access only'}</span>
+              <span>{c.approvedOrganizationId?`Organization: ${entities.get(c.approvedOrganizationId)?.title??c.approvedOrganizationId}`:entities.get(c.entityId)?.kind==='business'?'Organization profile and linked events':'Organizer workspace for this listing; existing unrelated listings are excluded'}</span>
               <label>Confirm organization access <select value={scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep current scope</option>{[...entities.values()].filter(e=>e.kind==='business').map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label>
               <Link to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
               <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>{scope[c.uid+'_'+c.entityId]?'Save organization access & repair':'Repair verification & account'}</AdminButton>

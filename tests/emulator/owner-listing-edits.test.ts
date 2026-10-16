@@ -93,3 +93,24 @@ test('real organization transactions serialize two representatives against one w
     assert.equal(live.get('batchId'),rate.get('editId'));
   }finally{await admin.terminate();await deleteAdmin(app);}
 });
+
+test('organization approval unlocks only explicitly linked Market HQ and revocation removes access',async()=>{
+ const {initializeApp:initializeAdmin,deleteApp:deleteAdmin}=await import('firebase-admin/app');
+ const {getFirestore:getAdminDb}=await import('firebase-admin/firestore');
+ const app=initializeAdmin({projectId},'market-organization-access'),admin=getAdminDb(app);
+ try{
+  await admin.doc('organization_catalog/market-linked').set({entity:{id:'market-linked',kind:'market',organizerEntityId:'biz-test'}});
+  await admin.doc('organization_catalog/market-unrelated').set({entity:{id:'market-unrelated',kind:'market',organizerEntityId:'biz-other'}});
+  await admin.doc('market_vendor_contacts/market-linked__sample').set({marketId:'market-linked',email:'fixture@example.org'});
+  await admin.doc('market_vendor_contacts/market-unrelated__sample').set({marketId:'market-unrelated',email:'fixture@example.org'});
+  const owner=client('u1');assert.equal((await getDoc(doc(owner,'market_vendor_contacts','market-linked__sample'))).exists(),true);
+  await assert.rejects(getDoc(doc(owner,'market_vendor_contacts','market-unrelated__sample')),/permission/i);
+  await assert.rejects(setDoc(doc(owner,'organization_managers','u1_biz-other'),{uid:'u1',organizationId:'biz-other',claimId:'u1_fake',grantedAt:Date.now()}),/permission/i);
+  await admin.doc('listing_claims/u1_event-original').set({uid:'u1',entityId:'event-original',approvedOrganizationId:'biz-other',status:'approved'});
+  await admin.doc('organization_managers/u1_biz-other').set({uid:'u1',organizationId:'biz-other',claimId:'u1_event-original',grantedAt:Date.now()});
+  assert.equal((await getDoc(doc(owner,'market_vendor_contacts','market-unrelated__sample'))).exists(),true);
+  await admin.doc('listing_claims/u1_event-original').update({status:'rejected'});
+  await assert.rejects(getDoc(doc(owner,'market_vendor_contacts','market-unrelated__sample')),/permission/i);
+  await assert.rejects(setDoc(doc(owner,'organization_management_profiles','org-fake'),{entity:{title:'Injected'}}),/permission/i);
+ }finally{await admin.terminate();await deleteAdmin(app);}
+});

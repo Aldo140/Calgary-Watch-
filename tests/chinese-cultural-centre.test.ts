@@ -53,9 +53,9 @@ describe('Calgary Chinese Cultural Centre listing', () => {
     const claimLookup = repository.list().find(item => item.id === entityId && ['event', 'market', 'business'].includes(item.kind));
     assert.equal(claimLookup?.title, 'Calgary Chinese Cultural Centre');
     assert.match(app, /path="\/claim\/:id"/);
-    assert.match(claimPage, /Run \{entity\.title\}\? <em>Claim it\.<\/em>/);
+    assert.match(claimPage, /Manage <em>\{profile\?\.title\?\?entity.title\}/);
     assert.match(listingPage, /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" verifiedAt=\{place\.ownerVerifiedAt\} \/>/);
-    assert.match(claimCta, /to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}/);
+    assert.match(claimCta, /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}/);
     assert.equal(`/claim/${entity.id}`, '/claim/biz-calgary-chinese-cultural-centre');
   });
 });

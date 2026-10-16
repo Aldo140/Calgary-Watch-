@@ -1,6 +1,6 @@
 import { entityPath } from '../../lib/discovery';
 import { discoveryRepository } from '../../data/discovery';
-import { approvedOrganization } from '../../lib/organizationWorkspace';
+import {approvedManagementOrganization as approvedOrganization} from '../../lib/claimOrganization';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, BadgeCheck, Store } from 'lucide-react';
 import type { BusinessAccount } from '../../lib/businessAccount';
@@ -29,7 +29,7 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
     <section className="pd-card pd-biz" data-business={isBusiness} aria-labelledby="pd-biz">
       <p className="pd-kicker">{isBusiness ? <><BadgeCheck size={14} aria-hidden="true" /> Business account{business?.since ? ` · since ${formatSince(business.since, { month: 'short', year: 'numeric' })}` : ''}</> : <><Store size={14} aria-hidden="true" /> For organizers</>}</p>
       <h2 id="pd-biz">{organizations.length?'Your organization'+(organizations.length>1?'s':''):approved.length > 1 || (!approved.length && (business?.listings.length ?? 0) > 1) ? 'Your listings' : approved.length || business ? 'Your listing' : 'Your claim'}</h2>
-      {organizations.map(org=><article key={org.id} className="pd-biz-organization"><span className="pd-biz-org-label"><BadgeCheck size={15} aria-hidden="true"/> Confirmed organization access</span><h3>{org.title}</h3><p><strong>{upcomingByOrg.get(org.id)??0}</strong> upcoming events · Profile and programme management</p><p>Build your next update as a draft. Publish all your profile, market and event changes together once every seven days.</p><div className="pd-biz-acts"><Link className="pd-biz-btn" to={`/organization/${org.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>Manage organization &amp; events <ArrowUpRight size={15} aria-hidden="true"/></Link><Link className="pd-biz-btn" data-k="ghost" to={entityPath(org)}>Public profile</Link></div></article>)}
+      {organizations.map(org=><article key={org.id} className="pd-biz-organization"><span className="pd-biz-org-label"><BadgeCheck size={15} aria-hidden="true"/> {org.managementOnly?'Confirmed organizer access':'Confirmed organization access'}</span><h3>{org.title}</h3><p>{org.managementOnly?'Manage your listing and add events when needed. No extra public business page.':<><strong>{upcomingByOrg.get(org.id)??0}</strong> upcoming events · Profile and programme management</>}</p><p>Build your next update as a draft. Publish all your profile, market and event changes together once every seven days.</p><div className="pd-biz-acts"><Link className="pd-biz-btn" to={`/organization/${org.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>Manage organization &amp; events <ArrowUpRight size={15} aria-hidden="true"/></Link><Link className="pd-biz-btn" data-k="ghost" to={org.sourceListingId?(approved.find(c=>c.entityId===org.sourceListingId)?.entityPath??'/events'):entityPath(org)}>{org.managementOnly?'Public listing':'Public profile'}</Link></div></article>)}
       {organizations.length?<p className="pd-biz-note">Images are managed by CalgaryWatch. Your personal plans and email preferences are separate from organization management.</p>:null}
       {approved.length?<details className="pd-biz-history" open={!organizations.length}><summary>Approved listing access · {approved.length}</summary><ul className="pd-biz-list">
         {approved.map((c) => (
@@ -38,7 +38,7 @@ export function BusinessListings({ claims, business, previewUid }: { claims: Cla
             {!approvedOrganization(c,discoveryRepository.list())?<small>This approval covers this listing. Contact CalgaryWatch to confirm management of the whole organization.</small>:null}
             <span className="pd-biz-acts">
               {c.entityPath ? <Link to={c.entityPath} className="pd-biz-btn">View listing <ArrowUpRight size={15} aria-hidden="true" /></Link> : null}
-              <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-btn" data-k="ghost">Manage listing</Link>
+              <Link to={listingManagementPath(c.entityId, previewUid)} className="pd-biz-btn" data-k="ghost">Manage listing</Link>{!inventory.some(e=>e.id===c.entityId)&&!c.entityId.startsWith('biz-')?<Link to={`/organization/org-${encodeURIComponent(c.entityId)}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`} className="pd-biz-btn">Open saved organizer workspace</Link>:null}
             </span>
           </li>
         ))}

@@ -773,6 +773,13 @@ service cloud.firestore {
     // account per listing, so the id is the key.
     // Organization authority and live projections are validated by the callable server.
     match /admin_member_edits/{id} { allow read: if isAdmin(); allow write: if false; }
+    // Organizer contact details are private to the approved listing representative and admins.
+    match /organization_management_profiles/{sourceId} {
+      allow get: if isAdmin() || (isAuthenticated() &&
+        exists(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + sourceId)) &&
+        get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + sourceId)).data.status == 'approved');
+      allow list, write: if false;
+    }
     match /organization_catalog/{id} { allow read: if true; allow write: if false; }
     match /organization_live_content/{id} { allow read: if true; allow write: if false; }
     match /listing_claims/{id} {
@@ -881,10 +888,38 @@ service cloud.firestore {
     // A market's verified organizer (approved listing claim) or admin, who
     // runs it for markets on the managed service. Roster and published
     // lineups are public; vendor contacts, applications and messages are not.
+    function approvedClaimFor(uid, listingId) {
+      let path=/databases/$(database)/documents/listing_claims/$(uid + '_' + listingId);
+      return exists(path) && get(path).data.uid == uid && get(path).data.entityId == listingId && get(path).data.status == 'approved';
+    }
+    function organizationManager(organizationId) {
+      let path=/databases/$(database)/documents/organization_managers/$(request.auth.uid + '_' + organizationId);
+      return approvedClaimFor(request.auth.uid, organizationId) ||
+        (exists(path) && get(path).data.uid == request.auth.uid && get(path).data.organizationId == organizationId &&
+         get(/databases/$(database)/documents/listing_claims/$(get(path).data.claimId)).data.status == 'approved' &&
+         get(/databases/$(database)/documents/listing_claims/$(get(path).data.claimId)).data.uid == request.auth.uid &&
+         (get(/databases/$(database)/documents/listing_claims/$(get(path).data.claimId)).data.entityId == organizationId ||
+          get(/databases/$(database)/documents/listing_claims/$(get(path).data.claimId)).data.approvedOrganizationId == organizationId));
+    }
     function isOrganizerOf(marketId) {
+      let catalogue=/databases/$(database)/documents/organization_catalog/$(marketId);
       return isAuthenticated() && marketId is string &&
-             exists(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + marketId)) &&
-             get(/databases/$(database)/documents/listing_claims/$(request.auth.uid + '_' + marketId)).data.status == 'approved';
+        (approvedClaimFor(request.auth.uid, marketId) ||
+         (exists(catalogue) && get(catalogue).data.entity.kind == 'market' &&
+          'organizerEntityId' in get(catalogue).data.entity &&
+          organizationManager(get(catalogue).data.entity.organizerEntityId)));
+    }
+    match /organization_access_changes/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /organization_managers/{id} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create, update: if isAdmin() &&
+        hasOnlyAllowedFields(['uid','organizationId','claimId','grantedAt']) &&
+        id == request.resource.data.uid + '_' + request.resource.data.organizationId &&
+        getAfter(/databases/$(database)/documents/listing_claims/$(request.resource.data.claimId)).data.status == 'approved' &&
+        getAfter(/databases/$(database)/documents/listing_claims/$(request.resource.data.claimId)).data.uid == request.resource.data.uid &&
+        (getAfter(/databases/$(database)/documents/listing_claims/$(request.resource.data.claimId)).data.entityId == request.resource.data.organizationId ||
+         getAfter(/databases/$(database)/documents/listing_claims/$(request.resource.data.claimId)).data.approvedOrganizationId == request.resource.data.organizationId);
+      allow delete: if isAdmin();
     }
     function runsMarket(marketId) {
       return isAdmin() || isOrganizerOf(marketId);

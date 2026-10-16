@@ -18,7 +18,7 @@ export async function adminMemberAction(db:Firestore,actorUid:string,input:{subj
    const patch={neighborhood:draft.neighborhood.trim().slice(0,80),address:draft.address.trim().slice(0,160),inferredNeighborhood:draft.inferredNeighborhood.trim().slice(0,80),locationPreferenceType:draft.address.trim()?'address':'neighborhood',eventInterests:interests,...emailConsentPatch(before as any,{weekly:draft.weeklyDigestOptIn,events:draft.eventsDigestOptIn},now,'admin-member-edit'),preferencesUpdatedBy:actorUid,preferencesUpdateSource:'admin',plansUpdatedAt:now,profileUpdatedAt:now};
    tx.update(account,patch);audit={before:Object.fromEntries(Object.keys(patch).map(key=>[key,before[key]??null])),after:patch};
   }else{
-   if(typeof input.eventId!=='string'||! /^[a-z0-9-]{1,150}$/.test(input.eventId)||typeof input.on!=='boolean'||typeof input.start!=='string'||!Number.isFinite(Date.parse(input.start)))throw Error('Check the event RSVP.');
+   if(typeof input.eventId!=='string'||! /^[a-z0-9-]{1,200}$/.test(input.eventId)||typeof input.on!=='boolean'||typeof input.start!=='string'||!Number.isFinite(Date.parse(input.start)))throw Error('Check the event RSVP.');
    const ref=db.collection('event_rsvps').doc(`${input.subjectUid}_${input.eventId}`),countRef=db.collection('event_rsvp_counts').doc(input.eventId);
    const [rsvp,count]=await Promise.all([tx.get(ref),tx.get(countRef)]);
    if(rsvp.exists!==input.on){if(input.on)tx.set(ref,{uid:input.subjectUid,eventId:input.eventId,start:input.start,createdAt:now});else tx.delete(ref);tx.set(countRef,{count:Math.max(0,Number(count.get('count')??0)+(input.on?1:-1)),updatedAt:now},{merge:true});}

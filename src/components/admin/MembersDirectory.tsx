@@ -1,6 +1,6 @@
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { discoveryRepository } from '../../data/discovery';
-import { approvedOrganization } from '../../lib/organizationWorkspace';
+import {approvedManagementOrganization as approvedOrganization} from '../../lib/claimOrganization';
 import type { ListingClaim } from '../../lib/claims';
 import { entityPath } from '../../lib/discovery';
 /**
@@ -129,9 +129,9 @@ export function MembersDirectory() {
                       ) : <p className="text-xs" style={{ color: T.muted }}>No interests picked yet.</p>}
                       {m.business?<div className="rounded-lg border p-3 space-y-2"><strong>Approved management access</strong>
                         {(accessByUid.get(m.uid)??[]).length?(accessByUid.get(m.uid)??[]).map(c=>{const org=approvedOrganization(c,discoveryRepository.list());return <div key={c.entityId}>
-                          <p><strong>{org?.title??c.entityTitle}</strong> · {org?'Organization manager':'Specific listing only; organization access needs confirmation'}</p>
+                          <p><strong>{org?.title??c.entityTitle}</strong> · {org?.managementOnly?'Organizer workspace · scoped to this listing and events they add':org?'Organization manager':'Listing unavailable; review access'}</p>
                           <p>{c.role}{c.reviewedAt?` · approved ${new Date(c.reviewedAt).toLocaleDateString('en-CA')}`:''}</p>
-                          {org?<><p>{discoveryRepository.list().filter(e=>e.kind==='event'&&e.organizerEntityId===org.id&&!e.cancelled&&Date.parse(e.end)>Date.now()).length} upcoming linked events</p><Link to={`/organization/${org.id}?as=${encodeURIComponent(m.uid)}`}>Their organization workspace</Link> · <Link to={entityPath(org)}>Public organization profile</Link></>:<Link to={`/admin/partners`}>Confirm organization access in Claims</Link>}
+                          {org?<><p>{discoveryRepository.list().filter(e=>e.kind==='event'&&(e.organizerEntityId===org.id||e.id===org.sourceListingId)&&!e.cancelled&&Date.parse(e.end)>Date.now()).length} upcoming linked events</p><Link to={`/organization/${org.id}?as=${encodeURIComponent(m.uid)}`}>Their organization workspace</Link> · <Link to={org.sourceListingId?c.entityPath:entityPath(org)}>{org.managementOnly?'Public listing':'Public organization profile'}</Link></>:<Link to={`/admin/partners`}>Confirm organization access in Claims</Link>}
                           <p className="text-xs">Source approval: {c.entityTitle}</p>
                         </div>;}):<p>No approved claim loaded for this account. Review Claims before granting management access.</p>}
                       </div>:null}

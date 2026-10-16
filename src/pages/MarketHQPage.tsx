@@ -46,7 +46,7 @@ export default function MarketHQPage() {
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
   const adminMode=useAdminEditMode(isAdmin,`${user?.uid}:${previewUid}:${id}`);
   const claims = useMyClaims(previewUid ?? user?.uid);
-  const claim = claims?.find((c) => c.entityId === id);
+  const claim = claims?.find((c) => c.status==='approved'&&(c.entityId===id||market?.kind==='market'&&Boolean(market.organizerEntityId)&&(c.entityId===market.organizerEntityId||c.approvedOrganizationId===market.organizerEntityId)));
   // Development only: ?demo=1 renders sample data without Firebase.
   const demo = import.meta.env.DEV && params.has('demo');
   const organizer = demo || claim?.status === 'approved';

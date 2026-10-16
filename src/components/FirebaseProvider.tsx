@@ -11,7 +11,7 @@ import {
   signOut
 } from 'firebase/auth';
 import { auth, db, isFirebaseConfigured } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 
 interface AuthContextType {
@@ -46,7 +46,7 @@ async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean): Pro
         displayName: currentUser.displayName || 'Anonymous',
         email: currentUser.email || '',
         photoURL: currentUser.photoURL || '',
-        role: isApprovedAdmin ? 'admin' : 'user',
+        role: isApprovedAdmin || existing.data()?.role === 'admin' ? 'admin' : 'user',
         ...(existing.exists() && existing.data()?.createdAt ? {} : {
           createdAt: currentUser.metadata.creationTime
             ? new Date(currentUser.metadata.creationTime).getTime()
@@ -88,8 +88,9 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       console.error('Redirect sign-in result error:', error);
     });
 
+    let stopRole:(()=>void)|undefined;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      const isApprovedAdmin = currentUser ? isApprovedAdminEmail(currentUser.email) : false;
+      const isApprovedAdmin = currentUser ? currentUser.emailVerified && isApprovedAdminEmail(currentUser.email) : false;
 
       // Publish auth state IMMEDIATELY.
       //
@@ -99,7 +100,10 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       // users — and since Firestore retries a stalled request indefinitely
       // rather than throwing, a flaky mobile connection could leave
       // isAuthReady false forever and incidents would never load at all.
+      stopRole?.();
+      stopRole=undefined;
       setIsAdmin(isApprovedAdmin);
+      if(currentUser)stopRole=onSnapshot(doc(db!, 'users', currentUser.uid),snapshot=>{if(auth?.currentUser?.uid===currentUser.uid)setIsAdmin(isApprovedAdmin||currentUser.emailVerified&&snapshot.data()?.role==='admin');},()=>{if(auth?.currentUser?.uid===currentUser.uid)setIsAdmin(isApprovedAdmin);});
       setUser(currentUser);
       setLoading(false);
       setIsAuthReady(true);
@@ -112,7 +116,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return () => {unsubscribe();stopRole?.();};
   }, []);
 
   const signIn = async () => {

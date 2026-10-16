@@ -45,5 +45,5 @@ test('management preview selects member history and blocks submission',()=>{
   assert.match(manager,/loadOwnerEditor\(claim.entityId,subjectUid\)/);
   assert.match(manager,/if\(!user\|\|readOnly\|\|busy/);
   assert.match(manager,/disabled=\{readOnly\|\|locked\|\|busy/);
-  const hq=read('src/pages/MarketHQPage.tsx');assert.match(hq,/fieldset disabled=\{Boolean\(previewUid\)\}/);
+  const hq=read('src/pages/MarketHQPage.tsx');assert.match(hq,/fieldset disabled=\{isAdmin\?!adminMode.enabled:Boolean\(previewUid\)\}/);
 });

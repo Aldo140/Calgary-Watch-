@@ -1,3 +1,5 @@
+import {AdminAccessBar} from '../components/admin/AdminAccessBar';
+import {useAdminEditMode} from '../hooks/useAdminEditMode';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -42,12 +44,13 @@ export default function MarketHQPage() {
   const reduce = useReducedMotion();
   const market = useMemo(() => discoveryRepository.list().find((e) => e.id === id && e.kind === 'market'), [id]);
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
+  const adminMode=useAdminEditMode(isAdmin,`${user?.uid}:${previewUid}:${id}`);
   const claims = useMyClaims(previewUid ?? user?.uid);
   const claim = claims?.find((c) => c.entityId === id);
   // Development only: ?demo=1 renders sample data without Firebase.
   const demo = import.meta.env.DEV && params.has('demo');
   const organizer = demo || claim?.status === 'approved';
-  const allowed = previewUid ? organizer : organizer || isAdmin;
+  const allowed = isAdmin || organizer;
   const tab = (params.get('tab') as Tab) || 'lineup';
   const setTab = (t: Tab) => setParams((p) => { p.set('tab', t); return p; }, { replace: true });
 
@@ -106,7 +109,7 @@ export default function MarketHQPage() {
   return (
     <SiteLayout>
       <div className="cw-plans hq">
-        {previewUid ? <div className="cw-wrap"><p className="pl-adminview" role="status">Admin view — read-only. <Link to={`/plans?as=${encodeURIComponent(previewUid)}`}>Back to their dashboard</Link></p></div> : null}
+        {isAdmin?<div className="cw-wrap"><AdminAccessBar enabled={adminMode.enabled} onChange={adminMode.setEnabled} subject={`Market HQ · ${market.title}`}/></div>:null}
         <header className="cw-wrap hq-head">
           <motion.p className="pl-eyebrow" initial={reduce ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
             Market HQ · {organizer ? 'run by you' : 'run by CalgaryWatch'}
@@ -134,7 +137,7 @@ export default function MarketHQPage() {
         </header>
 
         <div className="cw-wrap hq-body">
-          <fieldset disabled={Boolean(previewUid)} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          <fieldset disabled={isAdmin?!adminMode.enabled:Boolean(previewUid)} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
               {tab === 'lineup' ? <LineupTab marketId={id} dates={dates} vendors={vendors ?? []} lineups={lineups ?? []} />

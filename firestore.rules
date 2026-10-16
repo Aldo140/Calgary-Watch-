@@ -772,6 +772,7 @@ service cloud.firestore {
     // the listing's own site, never trusted from this document). One claim per
     // account per listing, so the id is the key.
     // Organization authority and live projections are validated by the callable server.
+    match /admin_member_edits/{id} { allow read: if isAdmin(); allow write: if false; }
     match /organization_catalog/{id} { allow read: if true; allow write: if false; }
     match /organization_live_content/{id} { allow read: if true; allow write: if false; }
     match /listing_claims/{id} {

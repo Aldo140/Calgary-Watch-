@@ -18,12 +18,13 @@ test('normal member dashboard and signed-out setup are unchanged',()=>{
   assert.equal(plansView(true,readPlansProfile({eventInterests:['arts']}),false),'dashboard');
   assert.equal(plansView(false,null,false),'setup');
 });
-test('preview still uses the selected UID and does not mount the admin RSVP editor',()=>{
+test('preview uses the selected UID and requires explicit admin editing',()=>{
   const page=readFileSync(new URL('../src/pages/PlansPage.tsx',import.meta.url),'utf8');
   const dashboard=readFileSync(new URL('../src/components/plans/Dashboard.tsx',import.meta.url),'utf8');
   assert.match(page,/asUid = auth0.isAdmin/);
   assert.match(page,/asUid \?\? auth0.user\?\.uid/);
   assert.match(page,/useMyClaims\(subjectUid\)/);
-  assert.match(dashboard,/p.adminView != null \? <button[^>]+disabled/);
-  assert.match(page,/if \(asUid\) \{ setError\('Admin view is read-only/);
+  assert.match(dashboard,/p.adminEditEnabled&&p.previewUid\?<AdminGoingButton/);
+  assert.match(dashboard,/aria-label="Member RSVP — read-only"/);
+  assert.match(page,/if \(asUid&&!adminMode.enabled\) \{ setError\('Admin view is read-only/);
 });

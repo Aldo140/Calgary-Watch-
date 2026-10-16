@@ -1,3 +1,5 @@
+import {useAdminEditMode} from '../hooks/useAdminEditMode';
+import {adminMemberAction} from '../lib/adminMemberApi';
 import { useOrganizationLive } from '../lib/organizationLive';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -119,7 +121,8 @@ export default function PlansPage() {
     ? ({ uid: asUid, displayName: liveProfile.displayName ?? '', email: liveProfile.email ?? '', photoURL: liveProfile.photoURL ?? '' } as unknown as User)
     : null), [asUid, liveProfile]);
   const user = demo?.user ?? (asUid ? viewed : auth0.user);
-  const readOnly = Boolean(demo || asUid);
+  const adminMode=useAdminEditMode(auth0.isAdmin,`${auth0.user?.uid}:${asUid}`);
+  const readOnly = Boolean(demo || asUid&&!adminMode.enabled);
   const liveGoing = useMyGoing(subjectUid);
   const mine = demo ? { uid: 'demo', ids: demo.goingIds, ready: true } : liveGoing;
   const pending = usePendingOptOuts(subjectUid);
@@ -296,9 +299,9 @@ export default function PlansPage() {
     if (!user || !profile) return;
     // Event picks need something to pick from: ask for interests first.
     if (which === 'thursday' && !profile.eventInterests.length) { openEditor('interests'); setDraft((d) => ({ ...d, eventsDigestOptIn: true })); return; }
-    if (asUid) return;
+    if (asUid&&!adminMode.enabled) return;
     if (demo) { celebrateBadge(which === 'monday' ? 'monday-reader' : 'on-the-list'); return; }
-    await setEmailOptIn(user, profile, which === 'monday' ? { weekly: true } : { events: true });
+    if(asUid){await adminMemberAction({subjectUid:asUid,action:'profile',draft:{...draftFrom(profile,pending),...(which==='monday'?{weeklyDigestOptIn:true}:{eventsDigestOptIn:true})}});}else await setEmailOptIn(user, profile, which === 'monday' ? { weekly: true } : { events: true });
     setSavedAt(Date.now());
     celebrateBadge(which === 'monday' ? 'monday-reader' : 'on-the-list');
   };
@@ -307,14 +310,14 @@ export default function PlansPage() {
     if (id === 'home') return openEditor('home');
     if (id === 'interests') return openEditor('interests');
     if (id === 'plan') { document.getElementById('pd-picks')?.scrollIntoView({ behavior: 'smooth' }); return; }
-    if (asUid) return;
+    if (asUid&&!adminMode.enabled) return;
     if (id === 'share') { navigate('/submit'); return; }
     setBusy(id);
     try { await addEmail(id === 'monday' ? 'monday' : 'thursday'); } finally { setBusy(null); }
   };
 
   const save = async () => {
-    if (asUid) { setError('Admin view is read-only. Members change their own settings.'); return; }
+    if (asUid&&!adminMode.enabled) { setError('Admin view is read-only. Enable admin editing to save changes.'); return; }
     const current = demo ? demo.user : auth?.currentUser;
     if (!current) { pendingSave.current = true; await signIn(); if (!auth?.currentUser) pendingSave.current = false; return; }
     if (problem) { setError(problem); return; }
@@ -324,7 +327,8 @@ export default function PlansPage() {
       if (!demo) {
         let inferred = draft.inferredNeighborhood;
         if (draft.address.trim() && !inferred && !draft.neighborhood.trim()) inferred = await communityForAddress(draft.address).catch(() => '');
-        await savePlans(current, profile, { ...draft, inferredNeighborhood: inferred });
+        if(asUid)await adminMemberAction({subjectUid:asUid,action:'profile',draft:{...draft,inferredNeighborhood:inferred}});
+        else await savePlans(current, profile, { ...draft, inferredNeighborhood: inferred });
       }
       setSavedAt(Date.now());
       if (firstTime && unlocks.length) { setJoined(unlocks); celebrateBadge(unlocks[0]); }
@@ -370,16 +374,16 @@ export default function PlansPage() {
           picks={picks.picks} weekPicks={weekPicks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
           near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={demo ? demo.claims : myClaims ?? []} business={demo ? (demo.claims.length ? { since: Date.parse('2026-09-02'), listings: [demo.claims[0].entityId] } : null) : profile?.business}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
-          adminView={asUid ? profile?.displayName ?? '' : null} previewUid={asUid ?? undefined}
+          adminEditEnabled={adminMode.enabled} onAdminEditChange={adminMode.setEnabled} adminView={asUid ? profile?.displayName ?? '' : null} previewUid={asUid ?? undefined}
           notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}
           onDismissWelcome={() => setJoined(null)}
         />
         <SettingsSheet
           open={editing} focus={sheetFocus} user={user} memberSince={profile?.createdAt}
           draft={draft} setDraft={setDraft} suggestions={suggestions} communityCount={communities.length}
-          needsConsent={needsConsent} pending={pending} error={error} setError={setError} saving={saving} readOnly={Boolean(asUid)}
+          needsConsent={needsConsent} pending={pending} error={error} setError={setError} saving={saving} readOnly={Boolean(asUid&&!adminMode.enabled)}
           onToggleInterest={toggleInterest} onSave={() => void save()} onClose={closeSheet}
-          onSignOut={demo ? undefined : () => { setEditing(false); void logout(); }}
+          onSignOut={demo||asUid ? undefined : () => { setEditing(false); void logout(); }}
         />
       </SiteLayout>
     );

@@ -73,7 +73,7 @@ describe('Downstage claim and account state',()=>{
     assert.equal(needsApprovalEmail({...pending,status:'approved',reviewedAt:APPROVAL_EMAILS_SINCE+1}),true);
   });
   it('keeps the approved management page and dashboard on the same stable claim URL',()=>{
-    const page=read('src/pages/ClaimListingPage.tsx');assert.match(page,/claim\?\.status === 'approved'/);assert.match(page,/<ListingManagement claim=\{claim\}/);
+    const page=read('src/pages/ClaimListingPage.tsx');assert.match(page,/claim\?\.status === 'approved'/);assert.match(page,/<ListingManagement[^>]* claim=\{claim\?\?/);
     const dashboard=read('src/components/plans/BusinessListings.tsx');assert.match(dashboard,/listingManagementPath\(c.entityId, previewUid\)/);assert.match(dashboard,/Manage listing/);
   });
 });

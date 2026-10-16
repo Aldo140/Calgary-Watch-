@@ -14,8 +14,8 @@ function memory(){
  const data=new Map<string,any>();let failure=false;
  const ref=(path:string):any=>({path,id:path.split('/').at(-1)});
  const snap=(r:any):any=>({exists:data.has(r.path),id:r.id,data:()=>structuredClone(data.get(r.path)),get:(key:string)=>data.get(r.path)?.[key]});
- const collection=(name:string,filters:any[]=[],cap=1000):any=>({name,filters,cap,doc:(id:string)=>ref(name+'/'+id),where:(key:string,_op:string,value:any)=>collection(name,[...filters,[key,value]],cap),limit:(n:number)=>collection(name,filters,n)});
- const db:any={data,collection,failNext:()=>{failure=true;},runTransaction:async(fn:any)=>{const writes:any[]=[];const result=await fn({get:async(r:any)=>{if(r.path)return snap(r);const docs=[...data.keys()].filter(k=>k.startsWith(r.name+'/')&&r.filters.every(([key,v]:any)=>key.split('.').reduce((value:any,part:string)=>value?.[part],data.get(k))===v)).slice(0,r.cap).map(k=>snap(ref(k)));return{docs,size:docs.length};},set:(r:any,v:any)=>writes.push([r.path,v]),create:(r:any,v:any)=>{if(data.has(r.path))throw Error('Exists');writes.push([r.path,v]);}});if(failure){failure=false;throw Error('Quota exhausted');}writes.forEach(([k,v])=>data.set(k,structuredClone(v)));return result;}};
+ const collection=(name:string,filters:any[]=[],cap=1000):any=>({name,filters,cap,doc:(id:string='audit-'+data.size)=>ref(name+'/'+id),where:(key:string,_op:string,value:any)=>collection(name,[...filters,[key,value]],cap),limit:(n:number)=>collection(name,filters,n)});
+ const db:any={data,collection,failNext:()=>{failure=true;},runTransaction:async(fn:any)=>{const writes:any[]=[];const result=await fn({get:async(r:any)=>{if(r.path)return snap(r);const docs=[...data.keys()].filter(k=>k.startsWith(r.name+'/')&&r.filters.every(([key,v]:any)=>key.split('.').reduce((value:any,part:string)=>value?.[part],data.get(k))===v)).slice(0,r.cap).map(k=>snap(ref(k)));return{docs,size:docs.length};},set:(r:any,v:any)=>writes.push([r.path,v]),update:(r:any,v:any)=>writes.push([r.path,{...data.get(r.path),...v}]),delete:(r:any)=>writes.push([r.path,undefined]),create:(r:any,v:any)=>{if(data.has(r.path))throw Error('Exists');writes.push([r.path,v]);}});if(failure){failure=false;throw Error('Quota exhausted');}writes.forEach(([k,v])=>v===undefined?data.delete(k):data.set(k,structuredClone(v)));return result;}};
  data.set(`${ORGANIZATION_CATALOG}/${org.id}`,{entity:org});data.set(`${ORGANIZATION_CATALOG}/${event.id}`,{entity:event});data.set(`listing_claims/u_${org.id}`,{uid:'u',entityId:org.id,status:'approved'});return db;
 }
 test('one batch edits a profile, adds an event and removes an existing event; images remain intact',()=>{
@@ -95,3 +95,43 @@ test('pending event-only saves for another event in this organization block a ne
  const db=memory();db.data.set('owner_listing_edits/legacy',{uid:'v',rootId:event.id,entityId:event.id,status:'queued'});
  await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,operations:[add]},now),/previous save/);
 });
+
+test('any role-assigned admin can edit without a claim or weekly allowance, with accurate attribution',async()=>{
+ const db=memory();db.data.set('users/staff',{uid:'staff',role:'admin'});db.data.set(`owner_business_edit_limits/${org.id}`,{lastSubmittedAt:now-100,editId:'owner-save'});
+ const before=structuredClone(db.data.get(`owner_business_edit_limits/${org.id}`));
+ await submitOrganizationBatch(db,'staff',{organizationId:org.id,requestId:uuid,adminEdit:true,subjectUid:'u',operations:[{entityId:org.id,action:'edit',changes:{phone:'403-555-0199',image:{src:'https://example.org/approved.jpg',alt:'Approved art',credit:'Artist'}}}]},now);
+ assert.deepEqual(db.data.get(`owner_business_edit_limits/${org.id}`),before);
+ const receipt=db.data.get(`owner_listing_edits/${uuid}`);assert.equal(receipt.uid,'staff');assert.equal(receipt.subjectUid,'u');assert.equal(receipt.actorRole,'admin');
+ const live=db.data.get(`${ORGANIZATION_LIVE}/${org.id}`);assert.equal(live.adminMedia.image.credit,'Artist');assert.equal(live.submittedByAdmin,true);
+});
+test('members cannot enable admin mode by forging the flag or selected member UID',async()=>{
+ const db=memory();db.data.set('users/u',{uid:'u',role:'user'});
+ await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:uuid,adminEdit:true,subjectUid:'staff',operations:[add]},now),/Administrator access/);
+ assert.equal(db.data.has(`${ORGANIZATION_LIVE}/${id}`),false);
+});
+test('ordinary owner edits preserve admin-managed images and keep normal seven-day limits',async()=>{
+ const db=memory();db.data.set('users/staff',{role:'admin'});
+ await submitOrganizationBatch(db,'staff',{organizationId:org.id,requestId:uuid,adminEdit:true,operations:[{entityId:org.id,action:'edit',changes:{image:{src:'/images/approved.jpg',alt:'Approved'}}}]},now);
+ await submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'22345678-1234-1234-1234-123456789abc',operations:[{entityId:org.id,action:'edit',changes:{phone:'403-555-0111'}}]},now+1);
+ const projection=db.data.get(`${ORGANIZATION_LIVE}/${org.id}`);assert.equal(mergeOrganizationContent(all,[projection]).find(e=>e.id===org.id)!.image!.src,'/images/approved.jpg');
+ await assert.rejects(submitOrganizationBatch(db,'u',{organizationId:org.id,requestId:'32345678-1234-1234-1234-123456789abc',operations:[add]},now+2),/seven complete/);
+});
+test('admin updates supersede conflicting queued edits and release only their pending reservation',async()=>{
+ const db=memory();db.data.set('users/staff',{role:'admin'});db.data.set('owner_listing_edits/queued',{uid:'u',rootId:org.id,entityId:org.id,status:'queued'});db.data.set(`owner_listing_edit_limits/${org.id}`,{editId:'queued',lastSubmittedAt:new Date(now-1)});
+ await submitOrganizationBatch(db,'staff',{organizationId:org.id,requestId:uuid,adminEdit:true,operations:[{entityId:org.id,action:'edit',changes:{phone:'403'}}]},now);
+ assert.equal(db.data.get('owner_listing_edits/queued').status,'failed');assert.equal(db.data.has(`owner_listing_edit_limits/${org.id}`),false);assert.equal(db.data.has(`owner_business_edit_limits/${org.id}`),false);
+});
+test('admin member edits preserve identity, audit the actor and make RSVP counts idempotent',async()=>{
+ const {adminMemberAction}=await import('../scripts/claims/admin-member');const db=memory();db.data.set('users/staff',{role:'admin'});db.data.set('users/u',{uid:'u',email:'member@example.org',role:'user'});
+ const draft={neighborhood:'Dalhousie',address:'',inferredNeighborhood:'',weeklyDigestOptIn:false,eventsDigestOptIn:false,interests:[]};
+ await adminMemberAction(db,'staff',{subjectUid:'u',action:'profile',draft},{},now);
+ assert.equal(db.data.get('users/u').email,'member@example.org');assert.equal(db.data.get('users/u').role,'user');assert.equal(db.data.get('users/u').preferencesUpdatedBy,'staff');
+ const input={subjectUid:'u',action:'rsvp',eventId:event.id,start:(event as any).start,on:true};await adminMemberAction(db,'staff',input,{},now);await adminMemberAction(db,'staff',input,{},now+1);assert.equal(db.data.get(`event_rsvp_counts/${event.id}`).count,1);
+ await assert.rejects(adminMemberAction(db,'u',{subjectUid:'staff',action:'profile',draft},{},now),/Administrator access/);
+});
+
+ test('admin-created events do not invent an ownership verification',()=>{
+ const unclaimed={...org};delete unclaimed.ownerVerifiedAt;
+ const result=prepareOrganizationBatch(unclaimed,all,[add],now,true)[0].entity;
+ assert.equal(result.ownerVerifiedAt,undefined);assert.equal(result.verification,'source-checked');
+ });

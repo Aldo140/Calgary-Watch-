@@ -1,3 +1,5 @@
+import {AdminAccessBar} from '../admin/AdminAccessBar';
+import {AdminGoingButton} from './AdminGoingButton';
 import { BusinessListings as BusinessCard } from './BusinessListings';
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -107,6 +109,8 @@ export interface DashboardProps {
   onDismissWelcome?: () => void;
   /** Admin viewing someone else's dashboard. */
   adminView?: string | null;
+  adminEditEnabled?: boolean;
+  onAdminEditChange?:(enabled:boolean)=>void;
   previewUid?: string;
   /** Account creation, for the member card. */
   memberSince?: number;
@@ -120,7 +124,7 @@ export function MemberDashboard(props: DashboardProps) {
   return (
     <div className="pd cw-home2" data-layout={phone ? 'phone' : 'desk'}>
       {props.adminView !== undefined && props.adminView !== null ? (
-        <p className="pd-admin" role="status"><Shield size={15} aria-hidden="true" /> <span><strong>Admin view.</strong> You’re viewing {props.adminView || 'this member'}’s dashboard. Read-only.</span> <Link to="/admin?section=members">Back to Members &amp; plans</Link></p>
+        <AdminAccessBar enabled={Boolean(props.adminEditEnabled)} onChange={props.onAdminEditChange??(()=>{})} busy={Boolean(props.busy)} subject={`${props.adminView||'This member'}’s dashboard`}/>
       ) : null}
       <Sky {...props} phone={phone} />
       <div className="cw-wrap pd-sill">
@@ -787,7 +791,7 @@ function Tracklist(p: DashboardProps & { phone?: boolean }) {
               <span className="pd-track-where">{[item.venue || item.neighbourhood, pickDistance(item.distanceM)].filter(Boolean).join(' · ')}</span>
               <time className="pd-track-when" dateTime={item.start}>{pickWhenAt(item, p.now)}</time>
               <span className="pd-track-go">
-                {item.kind === 'event' ? (p.adminView != null ? <button type="button" className="cw-going-btn" disabled data-on={p.going.some(e => e.entityId === item.entityId)} aria-label="Member RSVP — read-only">{p.going.some(e => e.entityId === item.entityId) ? 'Going' : 'Not going'}</button> : <GoingButton eventId={item.entityId} start={item.start} compact />) : <Link to={item.path} className="pd-round" aria-label={`Open ${item.title}`}><ArrowUpRight size={18} /></Link>}
+                {item.kind === 'event' ? (p.adminView != null ? (p.adminEditEnabled&&p.previewUid?<AdminGoingButton uid={p.previewUid} eventId={item.entityId} start={item.start} on={p.going.some(e=>e.entityId===item.entityId)}/>:<button type="button" className="cw-going-btn" disabled data-on={p.going.some(e => e.entityId === item.entityId)} aria-label="Member RSVP — read-only">{p.going.some(e => e.entityId === item.entityId) ? 'Going' : 'Not going'}</button>) : <GoingButton eventId={item.entityId} start={item.start} compact />) : <Link to={item.path} className="pd-round" aria-label={`Open ${item.title}`}><ArrowUpRight size={18} /></Link>}
               </span>
             </li>
           ))}

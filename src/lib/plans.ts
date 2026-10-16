@@ -115,6 +115,7 @@ async function loadGoing(uid: string) {
   }
 }
 
+export const refreshGoingFor=loadGoing;
 export function useMyGoing(uid: string | undefined): GoingState {
   useEffect(() => {
     if (!uid) { if (going.uid !== null) emit({ uid: null, ids: new Set(), ready: false }); return; }

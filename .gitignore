@@ -30,3 +30,4 @@ brand/preview/
 public/email-previews/
 
 /functions/organization-submit.cjs
+/functions/admin-member.cjs

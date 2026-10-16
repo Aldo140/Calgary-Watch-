@@ -14,7 +14,8 @@ export function OwnerEditsPanel() {
     {error?<p role="alert">{error}</p>:null}
     {!rows.length?<p>No owner updates loaded.</p>:rows.map(row=><article key={row.id} className="border-t py-3 space-y-2">
       <div className="flex gap-2 items-center"><strong>{row.entityTitle}</strong><Chip tone={row.status==='failed'?'critical':row.status==='applied'?'ok':'attention'}>{row.status==='applied'?(row.publishedAt?'Published automatically':'Applied; awaiting release'):row.status==='failed'?'Could not apply':'Queued automatically'}</Chip>{row.notificationPending?<Chip tone="signal">New</Chip>:null}</div>
-      <Link to={`/plans?as=${encodeURIComponent(row.uid)}`}>View owner’s dashboard</Link>
+      {(row as OwnerEdit & {actorRole?:string}).actorRole==='admin'?<p>Administrator edit · actor {row.uid}. Business weekly allowance unchanged.</p>:null}
+      <Link to={`/plans?as=${encodeURIComponent((row as OwnerEdit & {subjectUid?:string}).subjectUid||row.uid)}`}>View member’s dashboard</Link>
       <p>{row.status==='failed'?row.error:(row as OwnerEdit & {live?:boolean}).live?'Published immediately as one organization submission. No approval required.':'No admin approval is required. Public pages update when the automatic Hosting release succeeds.'}</p>
       <p>{row.publicationWarning}</p>
       <dl>{Object.keys(row.changes).map(field=><div key={field}><dt><strong>{field}</strong></dt><dd>{row.before?`${JSON.stringify(row.before[field])} → `:''}{JSON.stringify(row.after?.[field]??row.changes[field])}</dd></div>)}</dl>

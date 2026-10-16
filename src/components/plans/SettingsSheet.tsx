@@ -95,7 +95,8 @@ export function SettingsSheet(p: SettingsSheetProps) {
               <button type="button" className="ss-x" onClick={p.onClose} aria-label="Close"><X size={20} /></button>
             </header>
 
-            <form className="ss-body" onSubmit={(e) => { e.preventDefault(); p.onSave(); }} noValidate>
+            <form className="ss-body" onSubmit={(e) => { e.preventDefault(); if(!p.readOnly)p.onSave(); }} noValidate>
+              <fieldset disabled={p.readOnly||p.saving} style={{border:0,padding:0,margin:0,minWidth:0}}>
               <section id="ss-home" className="ss-sec" aria-labelledby="ss-home-h">
                 <p className="ss-k">01 · Home</p>
                 <h3 id="ss-home-h">Where’s home?</h3>
@@ -189,6 +190,7 @@ export function SettingsSheet(p: SettingsSheetProps) {
                 {p.onSignOut && !p.readOnly ? <button type="button" className="ss-row ss-out" onClick={p.onSignOut}><LogOut size={18} aria-hidden="true" /><span><strong>Sign out</strong></span></button> : null}
               </section>
 
+              </fieldset>
               <footer className="ss-foot">
                 {p.error ? <p className="su-error" role="alert">{p.error}</p> : null}
                 <div className="ss-foot-row">

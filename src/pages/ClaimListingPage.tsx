@@ -1,3 +1,5 @@
+import {AdminAccessBar} from '../components/admin/AdminAccessBar';
+import {useAdminEditMode} from '../hooks/useAdminEditMode';
 import { approvedOrganization } from '../lib/organizationWorkspace';
 import { ListingManagement } from '../components/entity/ListingManagement';
 import { restoreClaimDraft } from '../lib/claimDraft';
@@ -41,6 +43,7 @@ function ClaimForm({ id }: { id: string }) {
   const [params] = useSearchParams();
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
   const subjectUid = previewUid ?? user?.uid;
+  const adminMode=useAdminEditMode(isAdmin,`${user?.uid}:${subjectUid}:${id}`);
   const reduce = useReducedMotion();
   const entity = useMemo(() => discoveryRepository.list().find((e) => e.id === id && !e.developmentOnly && ['event', 'market', 'business'].includes(e.kind)), [id]);
   const claims = useMyClaims(subjectUid);
@@ -104,7 +107,7 @@ function ClaimForm({ id }: { id: string }) {
   return (
     <SiteLayout>
       <div className="cw-plans cl-page">
-        {previewUid ? <div className="cw-wrap"><p className="pl-adminview" role="status"><strong>Admin view — read-only.</strong> This member’s listing management. <Link to={`/plans?as=${encodeURIComponent(previewUid)}`}>Back to their dashboard</Link></p></div> : null}
+        {isAdmin?<div className="cw-wrap"><AdminAccessBar enabled={adminMode.enabled} onChange={adminMode.setEnabled} subject={entity.title}/></div>:null}
         <header className="cw-wrap cl-head">
           <motion.p className="pl-eyebrow" {...rise(0)}>For organizers · free</motion.p>
           <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'?<>Manage <em>{entity.title}.</em></>:<>Run {entity.title}? <em>Claim it.</em></>}</motion.h1>
@@ -118,7 +121,7 @@ function ClaimForm({ id }: { id: string }) {
 
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
-            {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved' ? (
+            {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||isAdmin ? (
               <>
                 {entity.kind === 'market' ? (
                   <Link to={previewUid ? `/organizer/${encodeURIComponent(entity.id)}?as=${encodeURIComponent(previewUid)}` : `/organizer/${encodeURIComponent(entity.id)}`} className="hq-open">
@@ -126,8 +129,8 @@ function ClaimForm({ id }: { id: string }) {
                     <ArrowUpRight size={20} aria-hidden="true" />
                   </Link>
                 ) : null}
-                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>Your account is a business account.</strong> It manages this listing; you’ll see it on your <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
-                {claim&&approvedOrganization(claim,discoveryRepository.list())?<Link className="pl-btn" to={`/organization/${approvedOrganization(claim,discoveryRepository.list())!.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>Manage organization profile &amp; all events</Link>:<ListingManagement claim={claim} previewUid={previewUid} initialTargetId={entity.id} />}
+                <p className="cl-business"><BadgeCheck size={16} aria-hidden="true" /> <span><strong>{isAdmin?'Administrator listing access.':'Your account is a business account.'}</strong> {isAdmin?'This preview does not change ownership or approval. Open the selected account’s':'It manages this listing; you’ll see it on your'} <Link to={previewUid ? `/plans?as=${encodeURIComponent(previewUid)}` : "/plans"}>dashboard</Link>.</span></p>
+                {claim&&approvedOrganization(claim,discoveryRepository.list())?<Link className="pl-btn" to={`/organization/${approvedOrganization(claim,discoveryRepository.list())!.id}${previewUid?`?as=${encodeURIComponent(previewUid)}`:''}`}>Manage organization profile &amp; all events</Link>:<ListingManagement key={`${id}:${adminMode.enabled}`} claim={claim??{entityId:entity.id,entityTitle:entity.title}} previewUid={previewUid} initialTargetId={entity.id} adminEdit={adminMode.enabled} />}
               </>
             ) : verifiedListing ? (
               <section><VerifiedBadge /><p>This listing has been confirmed by its organization.</p><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${entity.title}`)}`}>Suggest a correction</a></section>

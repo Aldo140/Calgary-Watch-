@@ -655,3 +655,10 @@
 .pd-card[data-flash='true'] { animation: pd-flash 1.3s cubic-bezier(.2, 1.2, .4, 1); }
 @keyframes pd-flash { 0% { transform: none; } 25% { transform: translate(-3px, -3px) rotate(-.6deg); box-shadow: 9px 9px 0 var(--b-yellow), 9px 9px 0 2px var(--b-ink); } 100% { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .pd-card[data-flash='true'] { animation: none; outline: 3px solid var(--b-blue); outline-offset: 4px; } }
+.pd-biz-organization { display:grid; gap:12px; padding:22px; margin:18px 0; background:#fff5cc; border:1.5px solid var(--cw-text); border-radius:18px; }
+.pd-biz-organization h3 { margin:0; font:800 26px/1.1 var(--pl-display); overflow-wrap:anywhere; }
+.pd-biz-organization p { margin:0; line-height:1.6; }
+.pd-biz-org-label { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#185548; }
+.pd-biz-note { color:var(--cw-muted); font-size:13px; line-height:1.6; }
+.pd-biz-history { margin-top:18px; }
+.pd-biz-history summary { font-size:13px; font-weight:700; cursor:pointer; padding:12px 0; color:var(--cw-muted); }

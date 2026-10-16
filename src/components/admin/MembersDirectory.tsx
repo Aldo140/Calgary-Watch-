@@ -95,6 +95,7 @@ export function MembersDirectory() {
           <ul className="mt-2">
             {list.slice(0, shown).map((m) => {
               const isOpen = open === m.uid;
+              const organizationNames=[...new Set((accessByUid.get(m.uid)??[]).map(c=>approvedOrganization(c,discoveryRepository.list())?.title).filter(Boolean))];
               return (
                 <li key={m.uid} className="border-t" style={{ borderColor: T.line }}>
                   <button type="button" className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(isOpen ? null : m.uid)} aria-expanded={isOpen}>
@@ -107,6 +108,7 @@ export function MembersDirectory() {
                         {m.role === 'admin' ? <Chip tone="signal">Admin</Chip> : null}
                         {m.business ? <Chip tone="ok">Business</Chip> : null}
                       </span>
+                      {organizationNames.length?<span className="block text-xs font-semibold truncate" style={{color:T.ok}}>Manages {organizationNames.join(' · ')}</span>:m.business?<span className="block text-xs" style={{color:T.muted}}>Organization authority needs review</span>:null}
                       <span className="block text-xs truncate" style={{ color: T.muted }}>
                         {m.area ? <><MapPin size={11} className="inline -mt-0.5" /> {m.area} · </> : 'No area · '}{m.plan.kind === 'none' ? 'No email' : m.plan.name}
                       </span>

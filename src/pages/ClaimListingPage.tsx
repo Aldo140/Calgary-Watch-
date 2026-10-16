@@ -107,7 +107,7 @@ function ClaimForm({ id }: { id: string }) {
         {previewUid ? <div className="cw-wrap"><p className="pl-adminview" role="status"><strong>Admin view — read-only.</strong> This member’s listing management. <Link to={`/plans?as=${encodeURIComponent(previewUid)}`}>Back to their dashboard</Link></p></div> : null}
         <header className="cw-wrap cl-head">
           <motion.p className="pl-eyebrow" {...rise(0)}>For organizers · free</motion.p>
-          <motion.h1 className="cl-title" {...rise(1)}>Run {entity.title}? <em>Claim it.</em></motion.h1>
+          <motion.h1 className="cl-title" {...rise(1)}>{claim?.status==='approved'?<>Manage <em>{entity.title}.</em></>:<>Run {entity.title}? <em>Claim it.</em></>}</motion.h1>
           <motion.p className="cl-lead" {...rise(2)}>Keep your listing and linked events right: dates, descriptions, addresses and links. After verification, save one update every seven days per business. Changes publish automatically without admin approval; CalgaryWatch is notified. Images cannot be added, changed or deleted in the editor. Once your claim is approved, your listing shows that it’s confirmed by your organization.</motion.p>
           <motion.ol className="cl-steps" aria-label="How claiming works" {...rise(3)}>
             <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in with Google</li>

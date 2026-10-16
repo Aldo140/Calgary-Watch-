@@ -72,7 +72,8 @@ const local = (day: string, hhmm: string) => { const l = `${day}T${hhmm}:00`; re
  * series), at most eight each. Events outside the Calgary area or without an address
  * are left out; anything flagged 18+ loses a 'family' tag.
  */
-export function mapVisitCalgaryEvents(hits: VisitCalgaryHit[], places: Map<string, VisitCalgaryPlace>, now = Date.now(), windowDays = 60): SourceRecord[] {
+export const VISIT_CALGARY_WINDOW_DAYS=90;
+export function mapVisitCalgaryEvents(hits: VisitCalgaryHit[], places: Map<string, VisitCalgaryPlace>, now = Date.now(), windowDays = VISIT_CALGARY_WINDOW_DAYS): SourceRecord[] {
   const today = calgaryDay(now), horizon = addDays(today, windowDays);
   const out: SourceRecord[] = [];
   for (const hit of hits) {
@@ -164,7 +165,7 @@ export class VisitCalgaryProvider implements InventoryProvider {
       if (p + 1 >= (body.nbPages ?? 0)) break;
     }
     // Only events that could fall in the window need their page read.
-    const today = calgaryDay(Date.now()), horizon = addDays(today, 60);
+    const today = calgaryDay(Date.now()), horizon = addDays(today, VISIT_CALGARY_WINDOW_DAYS);
     const inWindow = (h: VisitCalgaryHit) => {
       const d = h.data ?? {};
       if (Array.isArray(d.event_dates) && d.event_dates.length) return d.event_dates.some(x => x >= today && x <= horizon);
@@ -182,7 +183,7 @@ export class VisitCalgaryProvider implements InventoryProvider {
       }));
     }
     const records = mapVisitCalgaryEvents(wanted, places);
-    console.log(`[${this.source.name}] ${hits.length} listed, ${wanted.length} in the next 60 days, ${records.length} Calgary-area record(s).`);
+    console.log(`[${this.source.name}] ${hits.length} listed, ${wanted.length} in the next ${VISIT_CALGARY_WINDOW_DAYS} days, ${records.length} Calgary-area record(s).`);
     return records;
   }
 }

@@ -31,6 +31,13 @@ export function reviewClaimScope(claim: PromotionClaim, entities: readonly Disco
   const listing = entities.find(entity => entity.id === claim.entityId);
   if (claim.approvedOrganizationId) {
     const organization = entities.find(entity => entity.kind === 'business' && entity.id === claim.approvedOrganizationId);
+    if (listing && (listing.kind === 'event' || listing.kind === 'market')) {
+      const canonical = listingOrganization(listing, entities);
+      if (canonical && canonical.id !== claim.approvedOrganizationId) return {
+        recommendation: 'organization', organizationId: canonical.id, organizationTitle: canonical.title,
+        evidence: [`The recorded scope is ${organization?.title ?? claim.approvedOrganizationId}, but the reviewed listing now names ${listing.organizer}.`, 'The replacement matches the exact organizer name and official source domain.'],
+      };
+    }
     return { recommendation: 'already-set', organizationId: claim.approvedOrganizationId, organizationTitle: organization?.title, evidence: ['Organization access is already recorded on this claim.'] };
   }
   if (listing?.kind === 'business') return { recommendation: 'organization', organizationId: listing.id, organizationTitle: listing.title, evidence: ['The claimed listing is the organization profile itself.'] };
@@ -54,12 +61,20 @@ export function planOrganizerPromotions(claims: readonly PromotionClaim[], entit
   return claims.filter(c => c.status === 'approved' && c.uid && c.entityId).map(c => {
     const base = { claimId: `${c.uid}_${c.entityId}`, uid: c.uid, entityId: c.entityId, entityTitle: c.entityTitle ?? c.entityId };
     const listing = entities.find(e => e.id === c.entityId);
-    if (listing?.kind === 'business' || c.approvedOrganizationId) {
+    if (listing?.kind === 'business') {
       const id = c.approvedOrganizationId ?? c.entityId;
       return { ...base, action: 'organization' as const, organizationId: id, organizationTitle: entities.find(e => e.id === id)?.title };
     }
     if (!listing || (listing.kind !== 'event' && listing.kind !== 'market')) return { ...base, action: 'missing-listing' as const };
     const org = listingOrganization(listing, entities);
+    // A corrected source relationship is authoritative over a stale historical
+    // grant. This is still exact-name + official-domain evidence, never a fuzzy
+    // reassignment, and approveOrganizationClaim records the access change.
+    if (c.approvedOrganizationId && org?.id !== c.approvedOrganizationId) {
+      if (org) return { ...base, action: 'promote' as const, organizationId: org.id, organizationTitle: org.title, organizer: listing.organizer };
+      return { ...base, action: 'organization' as const, organizationId: c.approvedOrganizationId, organizationTitle: entities.find(e => e.id === c.approvedOrganizationId)?.title };
+    }
+    if (c.approvedOrganizationId) return { ...base, action: 'organization' as const, organizationId: c.approvedOrganizationId, organizationTitle: entities.find(e => e.id === c.approvedOrganizationId)?.title };
     if (!org) return { ...base, action: 'no-organizer' as const, organizer: listing.organizer || undefined };
     return { ...base, action: 'promote' as const, organizationId: org.id, organizationTitle: org.title, organizer: listing.organizer };
   });

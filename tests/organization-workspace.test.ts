@@ -226,12 +226,16 @@ test('approved event claims move to their linked organizer; unlinked events keep
 });
 
 test('the two researched scopes resolve to their official organization profiles',async()=>{
- const {reviewClaimScope}=await import('../src/lib/organizerPromotion');
+ const {reviewClaimScope,planOrganizerPromotions}=await import('../src/lib/organizerPromotion');
  const dalhousie=all.find(e=>e.id==='b3bbb09ef98f18fa6f66383e98f1')!;
  const mercantile=all.find(e=>e.id==='6972906c904ecd4acb9407299e22')!;
  assert.equal(reviewClaimScope({uid:'dalhousie',entityId:dalhousie.id,status:'approved'},all).organizationId,'biz-dalhousie-community-association');
  assert.equal(reviewClaimScope({uid:'mercantile',entityId:mercantile.id,status:'approved'},all).organizationId,'biz-mercantile-on-9th');
  assert.notEqual((mercantile as any).organizerEntityId,'biz-inglewood-bia');
+ const stale=planOrganizerPromotions([{uid:'mercantile',entityId:mercantile.id,status:'approved',approvedOrganizationId:'biz-inglewood-bia'}],all)[0];
+ assert.equal(stale.action,'promote');assert.equal(stale.organizationId,'biz-mercantile-on-9th');
+ const staleReview=reviewClaimScope({uid:'mercantile',entityId:mercantile.id,status:'approved',approvedOrganizationId:'biz-inglewood-bia'},all);
+ assert.equal(staleReview.recommendation,'organization');assert.equal(staleReview.organizationId,'biz-mercantile-on-9th');assert.match(staleReview.evidence[0],/recorded scope/i);
 });
 test('promotion gives every representative organization access and the organizer the Verified mark, preserving history',async()=>{
  const {promoteOrganizerClaims}=await import('../scripts/claims/promote-organizer-claims');const db=memory();

@@ -36,7 +36,7 @@ For every event or market claim, use the evidence block in **Local partners → 
 2. Confirm the listing's official source domain belongs to that organization. A venue, neighbourhood, similarly named event or third-party calendar is not ownership evidence.
 3. If both match a published organization profile, accept the recommended organization scope. The claimant then manages that profile and its explicitly linked events and markets.
 4. If either signal is missing, keep listing-only access and research the organization's published contact. Create or correct the organization profile and listing relationship before expanding access.
-5. Deployment synchronizes the catalogue, then promotes existing approved claims. Review the workflow report for any failed migration; it preserves the original approval and email history.
+5. Deployment synchronizes the catalogue, then promotes existing approved claims. If reviewed source evidence corrects a former organizer relationship, the same step replaces that stale scope. Review the workflow report for any failed migration; it preserves the original approval and email history.
 
 The admin UI keeps manual scope selection behind **Review or change scope** for exceptional cases, while the visible recommendation records the signals used by the normal path.
 

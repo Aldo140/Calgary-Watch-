@@ -30,11 +30,14 @@ export function ClaimCta({ entityId, title, kind, verifiedAt }: { entityId: stri
   }
   const organization=claimOrganization(listing,discoveryRepository.list());
   const what = kind === 'business' ? 'business' : kind === 'market' ? 'market' : 'event';
+  const name = organization?.profile.title || title;
   return (
-    <aside className="cl-cta">
-      <p><strong>Own this listing?</strong> Claim {organization?.profile.title||title}’s organization profile free to manage this {what} and your events. One saved update every seven days per business; no admin approval needed. Images are managed by CalgaryWatch. {CLAIM_BENEFIT}</p>
-      {organization&&!organization.publicProfile?<p>One listing is enough. Your management profile is prefilled; claiming does not create a separate public business page.</p>:null}
-      <Link to={organizationClaimPath(listing,discoveryRepository.list())}>Claim organization profile for {organization?.profile.title||title} <ArrowUpRight size={16} aria-hidden="true" /></Link>
+    <aside className="cl-cta cl-cta-open">
+      <div className="cl-cta-copy">
+        <p className="cl-cta-title"><strong>Is this your {what}?</strong></p>
+        <p>Claim {name} free to keep its dates, hours and links right yourself. We check every claim by hand. {CLAIM_BENEFIT}</p>
+      </div>
+      <Link to={organizationClaimPath(listing,discoveryRepository.list())} aria-label={`Claim this listing for ${name}`}>Claim this listing <ArrowUpRight size={16} aria-hidden="true" /></Link>
     </aside>
   );
 }

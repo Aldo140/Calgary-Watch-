@@ -1,3 +1,4 @@
+import {adminTimestamp} from '../../lib/adminRecord';
 /**
  * Admin console primitives.
  *
@@ -519,8 +520,9 @@ export function RecordList<Row>({
 }
 
 /** Relative time, and the exact stamp on hover — both matter when moderating. */
-export function TimeAgo({ ts }: { ts?: number }) {
-  if (!ts) return <span style={{ color: T.muted }}>—</span>;
+export function TimeAgo({ ts:raw }: { ts?: unknown }) {
+  const ts=adminTimestamp(raw);
+  if (ts===undefined||ts===0) return <span style={{ color: T.muted }}>—</span>;
   const diff = Date.now() - ts;
   const mins = Math.floor(diff / 60000);
   const label =

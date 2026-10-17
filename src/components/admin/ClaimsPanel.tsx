@@ -1,3 +1,5 @@
+import {adminClaim} from '../../lib/adminContentRecords';
+import {adminObject,adminText,adminTimestamp} from '../../lib/adminRecord';
 import { Link } from 'react-router-dom';
 import { adminUsers } from '@/src/lib/adminStore';
 import { adminFirestoreActionError as firestoreActionError, isFirestoreQuotaError, QUOTA_COOLDOWN_MS } from '@/src/lib/firestoreErrors';
@@ -43,6 +45,8 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const[recordWarnings,setRecordWarnings]=useState<Record<string,number>>({});
+  const parseClaims=(docs:Array<{data:()=>unknown}>,key:string)=>{const parsed=docs.map(d=>adminClaim(d.data())).filter((c):c is ListingClaim=>!!c);setRecordWarnings(p=>({...p,[key]:docs.length-parsed.length}));return parsed;};
   const [loadErrors,setLoadErrors]=useState<Record<string,string>>({});
   const [attempt,setAttempt]=useState(0);
   const [blockedUntil, setBlockedUntil] = useState(0);
@@ -56,14 +60,14 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     const readFailed=(key:string,e:unknown)=>setLoadErrors(previous=>({...previous,[key]:firestoreActionError(e)}));
     const readOk=(key:string)=>setLoadErrors(previous=>({...previous,[key]:''}));
     const a = trackSubscription('claims:pending', () => onSnapshot(query(collection(db!, CLAIMS), where('status', '==', 'pending'), limit(100)),
-      (s) => {setClaims(s.docs.map((d) => d.data() as ListingClaim).sort((x, y) => x.createdAt - y.createdAt));readOk('Pending claims');},
+      (s) => {setClaims(parseClaims(s.docs,'Pending claims').sort((x, y) => x.createdAt - y.createdAt));readOk('Pending claims');},
       (e) => readFailed('Pending claims',e)));
     const b = trackSubscription('claims:updates', () => onSnapshot(query(collection(db!, UPDATES), where('status', '==', 'pending'), limit(100)),
-      (s) => {setUpdates(s.docs.map((d) => ({ ...(d.data() as ListingUpdate), id: d.id })).sort((x, y) => x.createdAt - y.createdAt));readOk('Legacy change requests');},
+      (s) => {setUpdates(s.docs.map((d) => ({ ...d.data(), id:d.id,entityTitle:adminText(d.data().entityTitle,'Listing change'),details:adminText(d.data().details),url:adminText(d.data().url),createdAt:adminTimestamp(d.data().createdAt)??0 } as ListingUpdate&{id:string})).sort((x, y) => x.createdAt - y.createdAt));readOk('Legacy change requests');},
       (e) => readFailed('Legacy change requests',e)));
     // Approved claims are what make a listing verified (badge and ranking weight, src/lib/verified.ts).
     const c = trackSubscription('claims:approved', () => onSnapshot(query(collection(db!, CLAIMS), where('status', '==', 'approved'), limit(300)),
-      (s) => {setVerified(s.docs.map((d) => d.data() as VerifiedClaim).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0)));readOk('Verified listings');},
+      (s) => {setVerified(parseClaims(s.docs,'Verified listings').sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0)));readOk('Verified listings');},
       (e) => readFailed('Verified listings',e)));
     return () => { a(); b(); c(); };
   }, [attempt]);
@@ -169,6 +173,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     >
       {notice ? <p role="status" className="p-4 text-sm" style={{ color: T.ok }}>{notice}</p> : null}
       {error ? <p role="alert" className="p-4 text-sm" style={{ color: T.critical }}>{error}</p> : null}
+      {Object.entries(recordWarnings).filter(([,count])=>count>0).map(([label,count])=><p key={label} role="status" className="p-4 text-sm">{label}: {count} records have incomplete identity or status and need repair. They cannot be approved from this screen.</p>)}
       {Object.values(loadErrors).some(Boolean)?<div role="alert" className="m-4 rounded-lg border p-3 text-sm space-y-2" style={{borderColor:T.line,color:T.critical}}>{Object.entries(loadErrors).filter(([,message])=>message).map(([label,message])=><p key={label}><strong>{label} unavailable.</strong> {message}</p>)}<AdminButton onClick={()=>setAttempt(n=>n+1)}>Retry loading claims</AdminButton></div>:null}
       {claims === null && !loadErrors['Pending claims'] ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
         : claims?.length===0 && updates?.length===0 && !Object.values(loadErrors).some(Boolean) ? <EmptyState icon={<BadgeCheck size={20} />} title="Nothing waiting" body="Claims arrive from the “Claim this listing” link on every listing, and from partner emails." />

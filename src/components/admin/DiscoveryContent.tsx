@@ -1,5 +1,7 @@
+import {adminSubmissionInput} from '../../lib/adminContentRecords';
+import {adminObject,adminText,adminTimestamp} from '../../lib/adminRecord';
 import {discoveryRepository} from '../../data/discovery';
-import {adminInventory,matchesAdminInventory,type AdminInventoryRow} from '../../lib/adminInventory';
+import {adminInventory,matchesAdminInventory,normalizeAdminInventoryRow,type AdminInventoryRow} from '../../lib/adminInventory';
 import {entityPath} from '../../lib/discovery';
 import {Link} from 'react-router-dom';
 import { firestoreActionError } from '@/src/lib/firestoreErrors';
@@ -35,7 +37,7 @@ const STATUS_TONE = { pending: 'attention', draft: 'neutral', published: 'ok', a
 export function DiscoveryContent() {
   const[search,setSearch]=useState('');
   const [records, setRecords] = useState<RecordRow[]>([]);
-  const [submissions, setSubmissions] = useState<EntitySubmission[]>([]);
+  const [submissions, setSubmissions] = useState<Array<EntitySubmission & {invalidInput?:boolean}>>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [queue, setQueue] = useState<QueuedAction[]>([]);
   const [filter, setFilter] = useState<(typeof STATUSES)[number]>('pending');
@@ -57,10 +59,10 @@ export function DiscoveryContent() {
       getDocs(collection(database, 'discovery_sources')),
       getDocs(query(collection(database, 'discovery_actions'), orderBy('createdAt', 'desc'), limit(8))).catch(() => null),
     ]);
-    setRecords(adminInventory([...events.docs, ...markets.docs].map((d)=>({...d.data(),id:d.id}) as RecordRow),discoveryRepository.list()));
-    setSubmissions(subs.docs.map((d) => d.data() as EntitySubmission));
-    setSources(srcs.docs.map((d) => d.data() as Source));
-    setQueue(actions ? actions.docs.map((d) => d.data() as QueuedAction) : []);
+    setRecords(adminInventory([...events.docs.map(d=>normalizeAdminInventoryRow(d.data(),d.id,'event')),...markets.docs.map(d=>normalizeAdminInventoryRow(d.data(),d.id,'market'))],discoveryRepository.list()));
+    setSubmissions(subs.docs.map(d=>{const raw=d.data(),input=adminSubmissionInput(raw.input);return {id:d.id,submittedBy:adminText(raw.submittedBy),status:'pending',createdAt:adminText(raw.createdAt),invalidInput:!input,input:input??{title:'Unreadable submission',summary:'This record has no supported event or market input. Review the source record before approving.'}} as EntitySubmission&{invalidInput?:boolean};}));
+    setSources(srcs.docs.map(d=>{const raw=d.data();return {id:d.id,name:adminText(raw.name,d.id),approved:raw.approved===true};}));
+    setQueue(actions ? actions.docs.map(d=>{const raw=d.data(),action=adminObject(raw.action);return {id:d.id,status:adminText(raw.status,'pending'),createdAt:adminTimestamp(raw.createdAt),error:adminText(raw.error),action:{action:adminText(action.action,'moderate'),kind:adminText(action.kind)}} as QueuedAction;}) : []);
     setLoaded(true);
   }
   useEffect(() => { void load().catch((e) => { setError(firestoreActionError(e)); setLoaded(true); }); }, []);
@@ -87,8 +89,8 @@ export function DiscoveryContent() {
     setError('');
     const snap = await getDocs(query(collection(db, 'discovery_source_records'), where('entityId', '==', r.id), limit(1))).catch(() => null);
     const source = snap?.docs[0]?.data() as Raw | undefined;
-    if (source) setEditor({ input: source.input, sourceId: source.sourceId, recordId: source.sourceRecordId, cancelled: source.cancelled });
-    else setError('The original source record for this listing is missing, so it can’t be edited here.');
+    if (source && adminSubmissionInput(source.input)) setEditor({ input: adminSubmissionInput(source.input), sourceId: source.sourceId, recordId: source.sourceRecordId, cancelled: source.cancelled });
+    else setError('The original source record is missing or has an unsupported format. Restore it before editing this listing.');
   }
 
   const counts = useMemo(() => Object.fromEntries(STATUSES.map((s) => [s, records.filter((r) => r.status === s && (kind === 'all' || r.kind === kind)).length])) as Record<string, number>, [records, kind]);
@@ -143,11 +145,11 @@ export function DiscoveryContent() {
                     <p className="text-sm font-semibold" style={{ color: T.ink }}>{s.input.title}</p>
                     <p className="text-xs line-clamp-2" style={{ color: T.muted }}>{s.input.summary}</p>
                     <p className="mt-1 text-[0.7rem]" style={{ fontFamily: mono, color: T.muted }}>
-                      {s.input.kind} · <TimeAgo ts={Date.parse(s.createdAt)} /> · <a href={s.input.sourceUrl} target="_blank" rel="noreferrer" className="underline">source <ExternalLink size={10} className="inline" /></a>
+                      {s.input.kind} · <TimeAgo ts={s.createdAt} /> · <a href={s.input.sourceUrl} target="_blank" rel="noreferrer" className="underline">source <ExternalLink size={10} className="inline" /></a>
                     </p>
                   </div>
                   <div className="flex gap-2 shrink-0">
-                    <AdminButton size="sm" tone="signal" onClick={() => setEditor({ input: s.input, sourceId: '', recordId: `submission-${s.id}`, submissionId: s.id })}>Check & approve</AdminButton>
+                    <AdminButton size="sm" tone="signal" disabled={busy||s.invalidInput} onClick={() => setEditor({ input: s.input, sourceId: '', recordId: `submission-${s.id}`, submissionId: s.id })}>Check & approve</AdminButton>
                     <AdminButton size="sm" variant="outline" tone="critical" disabled={busy} onClick={() => act({ action: 'review-submission', id: s.id, reject: true })}>Reject</AdminButton>
                   </div>
                 </li>
@@ -185,16 +187,17 @@ export function DiscoveryContent() {
                       <span className="text-[0.7rem]" style={{ fontFamily: mono, color: T.muted }}>verified {r.verifiedAt ? r.verifiedAt.slice(0, 10) : 'never'} · fetched {r.fetchedAt ? r.fetchedAt.slice(0, 10) : '—'}</span>
                       {r.sources.map((s) => <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className="text-[0.7rem] underline" style={{ color: T.signal }}>{s.name}</a>)}
                     </div>
+                    {r.moderationUnavailable?<p role="status" className="text-xs mt-2" style={{color:T.attention}}>Incomplete listing metadata. Open Edit to review its source before moderating.</p>:null}
                     {r.duplicateIds?.length ? <p className="mt-1.5 text-xs" style={{ color: T.attention }}>Possible duplicate of {r.duplicateIds.map((id) => records.find((e) => e.id === id)?.title || id).join(', ')}</p> : null}
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5 sm:pl-11">
-                  <Link to={entityPath(r)} className="inline-flex items-center px-3 py-2 font-semibold text-xs underline">Public listing</Link>
+                  <Link to={r.slug?entityPath(r):`/claim/${encodeURIComponent(r.id)}`} className="inline-flex items-center px-3 py-2 font-semibold text-xs underline">Public listing</Link>
                   {r.snapshotOnly?<><Chip>Published release</Chip><Link to={`/claim/${encodeURIComponent(r.id)}`} className="inline-flex items-center px-3 py-2 font-semibold text-xs underline">Open management access</Link></>:<>
                   <AdminButton size="sm" variant="outline" tone="neutral" disabled={busy} onClick={() => void openRecord(r)}>Edit</AdminButton>
                   {(['publish', 'draft', 'archive', 'cancel'] as const).filter((a) => !(a === 'publish' && r.status === 'published') && !(a === 'draft' && r.status === 'draft')).map((a) => (
                     <AdminButton key={a} size="sm" tone={a === 'publish' ? 'ok' : a === 'cancel' ? 'critical' : 'neutral'} variant={a === 'publish' ? 'solid' : 'outline'}
-                      disabled={busy || (a === 'publish' && !!r.duplicateIds?.length && !ack)}
+                      disabled={busy || r.moderationUnavailable || (a === 'publish' && !!r.duplicateIds?.length && !ack)}
                       onClick={() => act({ kind: r.kind, id: r.id, revision: r.revision, action: a, acknowledgeDuplicates: ack })}>
                       {ACTION_LABEL[a]}
                     </AdminButton>

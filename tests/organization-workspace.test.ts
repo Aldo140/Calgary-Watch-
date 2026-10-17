@@ -4,10 +4,10 @@ import { readFileSync } from 'node:fs';
 import { prepareOrganizationBatch, organizationEvent, approvedOrganization, mergeOrganizationContent, ORGANIZATION_CATALOG, ORGANIZATION_LIVE } from '../src/lib/organizationWorkspace';
 import { submitOrganizationBatch } from '../scripts/claims/organization-submit';
 import { publishedInventory } from '../src/lib/discoveryPublication';
-import type { Business, DiscoveryEntity } from '../src/types/discovery';
+import type { Business, DiscoveryEntity, Event } from '../src/types/discovery';
 const all=JSON.parse(readFileSync('src/generated/discovery-index.json','utf8')).entities as DiscoveryEntity[];
 const org=all.find(e=>e.id==='biz-downstage') as Business;
-const event=all.find(e=>e.kind==='event'&&e.organizerEntityId===org.id)!;
+const event=all.find((e):e is Event=>e.kind==='event'&&e.organizerEntityId===org.id)!;
 const uuid='12345678-1234-1234-1234-123456789abc',id=`${org.id}-event-${uuid}`,now=Date.parse('2026-10-16T18:00:00Z');
 const add={entityId:id,action:'add' as const,changes:{title:'An organization confirmed event',start:'2026-11-20T19:00:00-06:00',end:'2026-11-20T21:00:00-06:00',address:'205 8 Avenue SE, Calgary'}};
 function memory(){

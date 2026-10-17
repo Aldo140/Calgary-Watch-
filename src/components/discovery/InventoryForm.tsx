@@ -4,13 +4,15 @@ import { calgaryInstant } from '../../lib/discoveryCalendar';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const local = (iso: string) => {
+  if(!Number.isFinite(Date.parse(iso)))return '';
+
   const parts=Object.fromEntries(calgaryDateTimeFormat('sv-SE',{timeZone:'America/Edmonton',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)).map(p=>[p.type,p.value]));
   return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`;
 };
 const instant = (value: string) => { const [day,time]=value.split('T'); const [h,m]=time.split(':').map(Number); return new Date(calgaryInstant(day,h+m/60)).toISOString(); };
 export function InventoryForm({ initial, onSave, busy, label='Send for review', defaultKind }: { initial?: InventorySubmissionInput; onSave: (input:InventorySubmissionInput)=>Promise<void>; busy:boolean; label?:string; defaultKind?:'event'|'market' }) {
   const [kind,setKind]=useState<'event'|'market'>(initial?.kind || defaultKind || 'event');
-  const [dates,setDates]=useState(initial?.kind==='market' ? initial.occurrences.map(o=>({...o,start:local(o.start),end:local(o.end)})) : [{sourceRecordId:crypto.randomUUID(),start:initial?.kind==='event'?local(initial.start):'',end:initial?.kind==='event'?local(initial.end):'',cancelled:false}]);
+  const [dates,setDates]=useState(initial?.kind==='market' ? (initial.occurrences.length?initial.occurrences:[{sourceRecordId:crypto.randomUUID(),start:'',end:'',cancelled:false}]).map(o=>({...o,start:local(o.start),end:local(o.end)})) : [{sourceRecordId:crypto.randomUUID(),start:initial?.kind==='event'?local(initial.start):'',end:initial?.kind==='event'?local(initial.end):'',cancelled:false}]);
   const [error,setError]=useState('');
   async function submit(e:FormEvent<HTMLFormElement>) {
     e.preventDefault();setError('');const form=new FormData(e.currentTarget);const get=(k:string)=>String(form.get(k)||'').trim();

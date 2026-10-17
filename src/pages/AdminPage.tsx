@@ -1,11 +1,11 @@
 import { useAdminWorkload, type AdminWorkload } from '../hooks/useAdminWorkload';
 import { adminIncidents } from '../lib/adminStore';
 import { db } from '../firebase';
-const DiscoveryContent = lazy(() => import('../components/admin/DiscoveryContent').then(m => ({default:m.DiscoveryContent})));
-const DemandWorkspace = lazy(() => import('../components/admin/DemandWorkspace').then(m => ({default:m.DemandWorkspace})));
-const MembersWorkspace = lazy(() => import('../components/admin/MembersWorkspace').then(m => ({default:m.MembersWorkspace})));
-const OpsWorkspace = lazy(() => import('../components/admin/OpsWorkspace').then(m => ({default:m.OpsWorkspace})));
-const PartnersWorkspace = lazy(() => import('../components/admin/PartnersWorkspace').then(m => ({default:m.PartnersWorkspace})));
+import {DiscoveryContent} from '../components/admin/DiscoveryContent';
+import {DemandWorkspace} from '../components/admin/DemandWorkspace';
+import {MembersWorkspace} from '../components/admin/MembersWorkspace';
+import {OpsWorkspace} from '../components/admin/OpsWorkspace';
+import {PartnersWorkspace} from '../components/admin/PartnersWorkspace';
 /**
  * Calgary Watch — admin console.
  *
@@ -19,7 +19,7 @@ const PartnersWorkspace = lazy(() => import('../components/admin/PartnersWorkspa
  * numbers. Nothing is computed twice.
  */
 
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {ADMIN_SECTIONS,adminSection,type AdminSection} from '../lib/adminNavigation';
 import {AdminSectionBoundary} from '../components/admin/AdminSectionBoundary';
@@ -38,7 +38,7 @@ import { isFirebaseConfigured } from '@/src/firebase';
 import { useAdminData } from '@/src/hooks/useAdminData';
 import { AdminShell, type NavItem } from '@/src/components/admin/AdminShell';
 import { AttentionQueue } from '@/src/components/admin/AttentionQueue';
-const WeeklyEmailPlanner = lazy(() => import('../components/admin/WeeklyEmailPlanner').then(m => ({default:m.WeeklyEmailPlanner})));
+import {WeeklyEmailPlanner} from '../components/admin/WeeklyEmailPlanner';
 import {
   AdminButton, Chip, EmptyState, Field, Figure, Panel, RecordList, SkeletonRows,
   StatGrid, StatTile, StatusDot, T, TimeAgo, display, inputClass, inputStyle, mono,

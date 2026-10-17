@@ -34,7 +34,7 @@ Code inspection can identify broken paths and confusing defaults; it cannot esta
 
 - Queue count failures are isolated per source and keep last known successful values. Loading or unavailable queues never announce that the desk is clear.
 - Failed report, member, search, market-service, business-update and social-health reads are distinguished from empty collections. Relevant workspaces offer retries; shared errors identify their source.
-- Hidden outreach, social reports and member insights no longer mount their collection listeners on entry to claims, the post queue or the directory.
+- The admin route loads workspace code together to avoid stale per-workspace lazy chunks during releases. Hidden outreach, social reports and member insights still do not mount their collection listeners on entry to claims, the post queue or the directory.
 - Claim approval keeps the existing atomic account/claim/verification transaction and the newer default organization scope. Its CRM lookup works even when the separate outreach view has not been loaded.
 - Do-not-contact suppression and lead status are committed in one batch. A failed suppression write cannot silently mark only the lead as blocked.
 - Social brief requests handle duplicate clicks and write errors. Requested posts missing caption/alt text no longer crash. Invalid source URLs no longer crash rendering. Notes count as unsaved edits.
@@ -63,3 +63,9 @@ No real claims were approved, no emails were sent, and no production records wer
 - Production build, messaging worker, release marker, prerender and email preview generation.
 - Chromium: 25 section/view combinations at 1440, 768, 390 and 320 pixels (100 renders); no section crashes, page errors, unintended writes or document overflow.
 - Isolated browser actions cover navigation search, URL/back state, hidden-view subscriptions, mobile focus/scroll restoration, denied reads/retries, incomplete social drafts, future schedule validation, Calgary scheduling from a Pacific browser, atomic suppression success/failure, published inventory search and exact overview task destinations.
+
+## Production crash follow-up
+
+Search analytics, listing metadata and legacy timestamps must be decoded at read boundaries rather than trusted through TypeScript casts. Shared `TimeAgo` accepts numeric, ISO and Firestore timestamps and handles invalid dates without throwing. Listing adapters normalize optional sources/dates/duplicate metadata, show incomplete records and block unsupported moderation. Submission editors open incomplete dates as blank required fields; unsupported submission kinds cannot be approved. Claims preserve real identity and scope; missing identity/status is reported rather than guessed. These adapters do not migrate or modify stored records.
+
+Follow-up browser validation uses Vite production chunks in addition to isolated Firebase fixtures. Both Listings and Claims were exercised at four widths with missing source arrays, malformed submissions, missing queue actions, legacy timestamp objects, and pending/approved claim records. No production claims or data were changed.

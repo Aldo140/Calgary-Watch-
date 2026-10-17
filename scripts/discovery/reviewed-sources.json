@@ -2508,5 +2508,472 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "scouted-granary-road-2026",
+      "name": "Granary Road",
+      "approved": true,
+      "hosts": [
+        "www.granaryroad.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Granary Road Christmas Market 2026",
+          "summary": "Three festive weekends of local vendors, handmade gifts and family activities south of Calgary.",
+          "description": "November 28–29, December 5–6 and December 12–13, 10 a.m.–4 p.m. Admission is required; selected Christmas activity passes include market admission. Tractor rides, hot cocoa and marshmallows and outdoor campfires are listed as included with market admission. Photos with Santa and alpacas, festive goat yoga and Pancakes with Santa have their own passes. This is a Foothills County day trip outside Calgary; check current tickets before travelling. Pets are not allowed.",
+          "address": "226066 112 Street West, Foothills County, AB T1S 5S5",
+          "venue": "Granary Road",
+          "organizer": "Granary Road",
+          "sourceUrl": "https://www.granaryroad.com/christmas-market",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "amenities": [
+            "Local vendors",
+            "Admission required",
+            "Family activities"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-28",
+              "start": "2026-11-28T10:00:00-06:00",
+              "end": "2026-11-28T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-11-29",
+              "start": "2026-11-29T10:00:00-06:00",
+              "end": "2026-11-29T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-05",
+              "start": "2026-12-05T10:00:00-06:00",
+              "end": "2026-12-05T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-06",
+              "start": "2026-12-06T10:00:00-06:00",
+              "end": "2026-12-06T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-12",
+              "start": "2026-12-12T10:00:00-06:00",
+              "end": "2026-12-12T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-13",
+              "start": "2026-12-13T10:00:00-06:00",
+              "end": "2026-12-13T16:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "petFriendly": false,
+          "familyFriendly": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-bowness-community-association-2026",
+      "name": "Bowness Community Association",
+      "approved": true,
+      "hosts": [
+        "mybowness.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "holiday-craft-fair-2026",
+        "input": {
+          "kind": "market",
+          "title": "Bowness Holiday Craft Fair 2026",
+          "summary": "A free two-day neighbourhood fair for handmade gifts and seasonal finds.",
+          "description": "Shop a curated mix of local makers, artists and small businesses in the BCA Main Hall, November 14–15, 10 a.m.–4 p.m. Admission is free. Vendor applications have closed. Use craftfair@mybowness.com for fair inquiries; the association warns that messages impersonating its fair from unrelated Gmail accounts are scams.",
+          "address": "7904 43 Avenue NW, Calgary, AB T3B 4P9",
+          "venue": "BCA Main Hall",
+          "organizer": "Bowness Community Association",
+          "sourceUrl": "https://mybowness.com/craftfair/",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "amenities": [
+            "Free admission",
+            "Indoor",
+            "Local makers"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-14",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-11-15",
+              "start": "2026-11-15T10:00:00-06:00",
+              "end": "2026-11-15T16:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "familyFriendly": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-acadia-community-association-2026",
+      "name": "Acadia Community Association",
+      "approved": true,
+      "hosts": [
+        "www.acadiaca.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Acadia Christmas Market 2026",
+          "summary": "Free holiday shopping with local businesses at Acadia Recreation Complex.",
+          "description": "Saturday, November 14, 10 a.m.–4 p.m. in Rose Hall at Acadia Recreation Complex. Admission and parking are free. Browse local businesses and start holiday shopping in a neighbourhood setting. Questions can go to events@acadiaca.com.",
+          "address": "240 90 Avenue SE, Calgary, AB T2J 6P6",
+          "venue": "Acadia Recreation Complex — Rose Hall",
+          "organizer": "Acadia Community Association",
+          "sourceUrl": "https://www.acadiaca.com/christmas-market",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "amenities": [
+            "Free admission",
+            "Free parking",
+            "Indoor"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-14",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T16:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "familyFriendly": true,
+          "parking": "Free parking, according to the organizer."
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-silver-springs-community-association-2026",
+      "name": "Silver Springs Community Association",
+      "approved": true,
+      "hosts": [
+        "silverspringscommunity.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-craft-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Silver Springs Christmas Craft Market 2026",
+          "summary": "A free community market for handmade goods, unique gifts and local crafts.",
+          "description": "Saturday, November 14, 10 a.m.–3 p.m. at Silver Springs Community Centre. Browse a curated selection of local vendors under one roof. Free to attend and open to all. Contact administration@silverspringscommunity.ca for association inquiries.",
+          "address": "5720 Silver Ridge Drive NW, Calgary, AB T3B 5E5",
+          "venue": "Silver Springs Community Centre",
+          "organizer": "Silver Springs Community Association",
+          "sourceUrl": "https://silverspringscommunity.ca/events/christmas-craft-market",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "amenities": [
+            "Free admission",
+            "Indoor",
+            "Local crafts"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-14",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T15:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "familyFriendly": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-signatures-shows-2026",
+      "name": "Signatures Shows",
+      "approved": true,
+      "hosts": [
+        "signatures.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "festival-of-crafts-2026",
+        "input": {
+          "kind": "event",
+          "title": "Festival of Crafts 2026",
+          "summary": "A four-day handmade show with more than 140 Canadian artisans at the BMO Centre.",
+          "description": "October 29–November 1, 2026, in Hall F at Stampede Park’s BMO Centre. Discover handmade gifts, jewellery, home décor and gourmet foods from Canadian makers. Check the official show information and ticket page for daily opening hours, current prices and entry details before attending. Calgary show inquiries: smilner@signatures.ca.",
+          "address": "20 Round Up Way SE, Calgary, AB T2G 2W1",
+          "venue": "BMO Centre — Hall F",
+          "organizer": "Signatures Shows",
+          "sourceUrl": "https://signatures.ca/market/festival-of-crafts/",
+          "categories": [
+            "markets",
+            "arts",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "start": "2026-10-29T00:00:00-06:00",
+          "end": "2026-11-02T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "tickets": "https://signatures.ca/tickets/"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-millarville-racing-and-agricultural-society-2026",
+      "name": "Millarville Racing and Agricultural Society",
+      "approved": true,
+      "hosts": [
+        "millarvilleracetrack.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-market-2026-11-05",
+        "input": {
+          "kind": "event",
+          "title": "Millarville Christmas Market 2026 — First Weekend",
+          "summary": "A Foothills holiday-market day trip with local vendors, food trucks, music and family activities.",
+          "description": "The 2026 market opens November 5–8 and November 12–15. This listing covers November 5–8. Shopping spans indoor and outdoor spaces, including heated areas. Dress for the weather and suitable footwear. The Kids Only Shoppe opens Saturdays and Sundays for ages 5–12. Tickets are required; confirm entry times and current prices with the organizer. Check the organizer for each day’s opening hours. This location is outside Calgary.",
+          "address": "306097 192 Street W, Millarville, AB T0L 1K0",
+          "venue": "Millarville Racetrack",
+          "organizer": "Millarville Racing and Agricultural Society",
+          "sourceUrl": "https://millarvilleracetrack.com/annual-christmas-market/",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-11-05T00:00:00-06:00",
+          "end": "2026-11-09T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "tickets": "https://millarvilleracetrack.com/annual-christmas-market/"
+        }
+      },
+      {
+        "id": "christmas-market-2026-11-12",
+        "input": {
+          "kind": "event",
+          "title": "Millarville Christmas Market 2026 — Second Weekend",
+          "summary": "A Foothills holiday-market day trip with local vendors, food trucks, music and family activities.",
+          "description": "The 2026 market opens November 5–8 and November 12–15. This listing covers November 12–15. Shopping spans indoor and outdoor spaces, including heated areas. Dress for the weather and suitable footwear. The Kids Only Shoppe opens Saturdays and Sundays for ages 5–12. Tickets are required; confirm entry times and current prices with the organizer. Check the organizer for each day’s opening hours. This location is outside Calgary.",
+          "address": "306097 192 Street W, Millarville, AB T0L 1K0",
+          "venue": "Millarville Racetrack",
+          "organizer": "Millarville Racing and Agricultural Society",
+          "sourceUrl": "https://millarvilleracetrack.com/annual-christmas-market/",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-11-12T00:00:00-06:00",
+          "end": "2026-11-16T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "tickets": "https://millarvilleracetrack.com/annual-christmas-market/"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-triwood-community-association-2026",
+      "name": "Triwood Community Association",
+      "approved": true,
+      "hosts": [
+        "www.triwoodcommunity.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "halloween-skate-2026",
+        "input": {
+          "kind": "event",
+          "title": "Triwood Halloween Skate Night",
+          "summary": "A free neighbourhood skate with music, costumes and off-ice activities.",
+          "description": "Sunday, October 25, 5:30–6:30 p.m. at Triwood Arena. All ages and skating abilities are welcome; costumes are encouraged. The organizer lists light refreshments, face painting, colouring and a costume contest. RSVP through Triwood’s events page. Some loan equipment is available; ask programs@triwoodcommunity.com or 403-282-2677 ext. 103.",
+          "address": "2244 Chicoutimi Drive NW, Calgary, AB T2L 0W1",
+          "venue": "Triwood Arena",
+          "organizer": "Triwood Community Association",
+          "sourceUrl": "https://www.triwoodcommunity.com/events",
+          "categories": [
+            "family",
+            "community",
+            "recreation",
+            "holiday"
+          ],
+          "tags": [],
+          "start": "2026-10-25T17:30:00-06:00",
+          "end": "2026-10-25T18:30:00-06:00",
+          "pricing": "free"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-the-saskatoon-farm-2026",
+      "name": "The Saskatoon Farm",
+      "approved": true,
+      "hosts": [
+        "www.saskatoonfarm.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "felted-art-2026-10-23",
+        "input": {
+          "kind": "event",
+          "title": "Felted Art Workshop at The Saskatoon Farm",
+          "summary": "A small creative evening making felted wall art in the farm’s Red House.",
+          "description": "Friday, October 23, 6–9 p.m. in The Red House at The Saskatoon Farm. Food and drinks are available for purchase. Follow the organizer’s event page for tickets, current availability and workshop details. This is a Foothills County day trip outside Calgary.",
+          "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+          "venue": "The Red House, The Saskatoon Farm",
+          "organizer": "The Saskatoon Farm",
+          "sourceUrl": "https://www.saskatoonfarm.com/events-1/felted-art-workshop-1",
+          "categories": [
+            "arts",
+            "workshop",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-10-23T18:00:00-06:00",
+          "end": "2026-10-23T21:00:00-06:00",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "dia-de-los-muertos-2026",
+        "input": {
+          "kind": "event",
+          "title": "Día de los Muertos at The Saskatoon Farm",
+          "summary": "A greenhouse celebration with Mexican music, tacos, handmade vendors and Catrina face painting.",
+          "description": "Friday, October 30. The official calendar lists 6–11 p.m.; the detailed programme says the main-greenhouse event begins at 6:30 p.m., with music at 7 p.m. Confirm arrival time when booking. Tickets must be purchased online; no walk-ins. Children 10 and under enter free; food and drinks are extra. Liquor service is available, so arrange a safe ride home. The rest of the farm is closed during the event. This is outside Calgary in Foothills County.",
+          "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+          "venue": "Main Greenhouse, The Saskatoon Farm",
+          "organizer": "The Saskatoon Farm",
+          "sourceUrl": "https://www.saskatoonfarm.com/events-1/dia-de-los-muertos-celebration-2",
+          "categories": [
+            "arts",
+            "food",
+            "music",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-10-30T18:30:00-06:00",
+          "end": "2026-10-30T23:00:00-06:00",
+          "pricing": "paid"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-deerfoot-city-2026",
+      "name": "Deerfoot City",
+      "approved": true,
+      "hosts": [
+        "deerfootcity.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "boo-city-2026",
+        "input": {
+          "kind": "event",
+          "title": "Destination: Boo City — Trick-or-Treating & Spooky Science",
+          "summary": "A free Halloween evening along The Boulevard with treats and TELUS Spark science activities.",
+          "description": "October 24, 6–8 p.m.: dress up, follow the Boo-levard’s participating trick-or-treat stations and try hands-on spooky science from TELUS Spark. The separate pumpkin patch at The Food Lodge requires a food-bank donation while supplies last. Confirm pumpkin-patch opening hours directly before making an earlier visit. Event inquiries: gs@deerfootcity.ca.",
+          "address": "971 64 Avenue NE, Calgary, AB",
+          "venue": "The Boulevard, Deerfoot City",
+          "organizer": "Deerfoot City",
+          "sourceUrl": "https://deerfootcity.com/halloween/",
+          "categories": [
+            "family",
+            "community",
+            "holiday"
+          ],
+          "tags": [],
+          "start": "2026-10-24T18:00:00-06:00",
+          "end": "2026-10-24T20:00:00-06:00",
+          "pricing": "free"
+        }
+      }
+    ]
   }
 ]

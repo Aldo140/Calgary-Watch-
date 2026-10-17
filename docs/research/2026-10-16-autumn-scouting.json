@@ -1,0 +1,308 @@
+{
+  "researched_at": "2026-10-17T00:44:59.309327Z",
+  "scope": "Ten new organization profiles: nine researched live, ScreamFest from existing reviewed official-source inventory. Four new timed market masters and seven new events; existing ScreamFest events are linked, not duplicated.",
+  "profiles": [
+    {
+      "id": "biz-signatures-shows",
+      "name": "Signatures Shows",
+      "website": "https://signatures.ca/",
+      "email": "info@signatures.ca",
+      "profile_url": "https://calgarywatch.ca/local/signatures-shows",
+      "claim_url": "https://calgarywatch.ca/claim/biz-signatures-shows",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-millarville-racing-and-agricultural-society",
+      "name": "Millarville Racing and Agricultural Society",
+      "website": "https://millarvilleracetrack.com/",
+      "email": "office@mras-track.com",
+      "profile_url": "https://calgarywatch.ca/local/millarville-racing-and-agricultural-society",
+      "claim_url": "https://calgarywatch.ca/claim/biz-millarville-racing-and-agricultural-society",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-the-saskatoon-farm",
+      "name": "The Saskatoon Farm",
+      "website": "https://www.saskatoonfarm.com/",
+      "email": "hello@saskatoonfarm.com",
+      "profile_url": "https://calgarywatch.ca/local/the-saskatoon-farm",
+      "claim_url": "https://calgarywatch.ca/claim/biz-the-saskatoon-farm",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-granary-road",
+      "name": "Granary Road",
+      "website": "https://www.granaryroad.com/",
+      "email": "info@granaryroad.com",
+      "profile_url": "https://calgarywatch.ca/local/granary-road",
+      "claim_url": "https://calgarywatch.ca/claim/biz-granary-road",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-bowness-community-association",
+      "name": "Bowness Community Association",
+      "website": "https://mybowness.com/",
+      "email": "craftfair@mybowness.com",
+      "profile_url": "https://calgarywatch.ca/local/bowness-community-association",
+      "claim_url": "https://calgarywatch.ca/claim/biz-bowness-community-association",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-triwood-community-association",
+      "name": "Triwood Community Association",
+      "website": "https://www.triwoodcommunity.com/",
+      "email": "programs@triwoodcommunity.com",
+      "profile_url": "https://calgarywatch.ca/local/triwood-community-association",
+      "claim_url": "https://calgarywatch.ca/claim/biz-triwood-community-association",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-acadia-community-association",
+      "name": "Acadia Community Association",
+      "website": "https://www.acadiaca.com/",
+      "email": "events@acadiaca.com",
+      "profile_url": "https://calgarywatch.ca/local/acadia-community-association",
+      "claim_url": "https://calgarywatch.ca/claim/biz-acadia-community-association",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-silver-springs-community-association",
+      "name": "Silver Springs Community Association",
+      "website": "https://silverspringscommunity.ca/",
+      "email": "administration@silverspringscommunity.ca",
+      "profile_url": "https://calgarywatch.ca/local/silver-springs-community-association",
+      "claim_url": "https://calgarywatch.ca/claim/biz-silver-springs-community-association",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-deerfoot-city",
+      "name": "Deerfoot City",
+      "website": "https://deerfootcity.com/",
+      "email": "gs@deerfootcity.ca",
+      "profile_url": "https://calgarywatch.ca/local/deerfoot-city",
+      "claim_url": "https://calgarywatch.ca/claim/biz-deerfoot-city",
+      "evidence_basis": "official website fetched live"
+    },
+    {
+      "id": "biz-screamfest",
+      "name": "ScreamFest",
+      "website": "https://screamfest.ca/",
+      "email": null,
+      "profile_url": "https://calgarywatch.ca/local/screamfest",
+      "claim_url": "https://calgarywatch.ca/claim/biz-screamfest",
+      "evidence_basis": "existing reviewed inventory; not fetched live this turn"
+    }
+  ],
+  "listings": [
+    {
+      "id": "77a51bfb2d6785943f744e882370",
+      "title": "Granary Road Christmas Market 2026",
+      "kind": "market",
+      "organization_id": "biz-granary-road",
+      "source_url": "https://www.granaryroad.com/christmas-market",
+      "dates": [
+        "2026-11-28",
+        "2026-11-29",
+        "2026-12-05",
+        "2026-12-06",
+        "2026-12-12",
+        "2026-12-13"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/markets/granary-road-christmas-market-2026-77a51b"
+    },
+    {
+      "id": "17333ec53e04501191366c4af423",
+      "title": "Bowness Holiday Craft Fair 2026",
+      "kind": "market",
+      "organization_id": "biz-bowness-community-association",
+      "source_url": "https://mybowness.com/craftfair/",
+      "dates": [
+        "2026-11-14",
+        "2026-11-15"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/markets/bowness-holiday-craft-fair-2026-17333e"
+    },
+    {
+      "id": "63c6747ee86b481d36e7f15ab477",
+      "title": "Acadia Christmas Market 2026",
+      "kind": "market",
+      "organization_id": "biz-acadia-community-association",
+      "source_url": "https://www.acadiaca.com/christmas-market",
+      "dates": [
+        "2026-11-14"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/markets/acadia-christmas-market-2026-63c674"
+    },
+    {
+      "id": "4aa6d9b9b9366e9a63a5bdcba786",
+      "title": "Silver Springs Christmas Craft Market 2026",
+      "kind": "market",
+      "organization_id": "biz-silver-springs-community-association",
+      "source_url": "https://silverspringscommunity.ca/events/christmas-craft-market",
+      "dates": [
+        "2026-11-14"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/markets/silver-springs-christmas-craft-market-2026-4aa6d9"
+    },
+    {
+      "id": "7c3b49e1db0f90921c3dead1a3a9",
+      "title": "Festival of Crafts 2026",
+      "kind": "event",
+      "organization_id": "biz-signatures-shows",
+      "source_url": "https://signatures.ca/market/festival-of-crafts/",
+      "dates": [
+        "2026-10-29"
+      ],
+      "schedule_precision": "date",
+      "listing_url": "https://calgarywatch.ca/events/festival-of-crafts-2026-7c3b49"
+    },
+    {
+      "id": "5e6d4aebf525e878a5620b0f58fe",
+      "title": "Millarville Christmas Market 2026 — First Weekend",
+      "kind": "event",
+      "organization_id": "biz-millarville-racing-and-agricultural-society",
+      "source_url": "https://millarvilleracetrack.com/annual-christmas-market/",
+      "dates": [
+        "2026-11-05"
+      ],
+      "schedule_precision": "date",
+      "listing_url": "https://calgarywatch.ca/events/millarville-christmas-market-2026-first-weekend-5e6d4a"
+    },
+    {
+      "id": "4e151cf5c91115ad3dfbc44c66a5",
+      "title": "Millarville Christmas Market 2026 — Second Weekend",
+      "kind": "event",
+      "organization_id": "biz-millarville-racing-and-agricultural-society",
+      "source_url": "https://millarvilleracetrack.com/annual-christmas-market/",
+      "dates": [
+        "2026-11-12"
+      ],
+      "schedule_precision": "date",
+      "listing_url": "https://calgarywatch.ca/events/millarville-christmas-market-2026-second-weekend-4e151c"
+    },
+    {
+      "id": "5ee27b012e44dd7c4fc0f4a3e435",
+      "title": "Triwood Halloween Skate Night",
+      "kind": "event",
+      "organization_id": "biz-triwood-community-association",
+      "source_url": "https://www.triwoodcommunity.com/events",
+      "dates": [
+        "2026-10-25"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/events/triwood-halloween-skate-night-5ee27b"
+    },
+    {
+      "id": "6115e286ea997fa98695d1d9f07d",
+      "title": "Felted Art Workshop at The Saskatoon Farm",
+      "kind": "event",
+      "organization_id": "biz-the-saskatoon-farm",
+      "source_url": "https://www.saskatoonfarm.com/events-1/felted-art-workshop-1",
+      "dates": [
+        "2026-10-23"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/events/felted-art-workshop-at-the-saskatoon-farm-6115e2"
+    },
+    {
+      "id": "dfce9efc5f28cbb43b463135a7bd",
+      "title": "Día de los Muertos at The Saskatoon Farm",
+      "kind": "event",
+      "organization_id": "biz-the-saskatoon-farm",
+      "source_url": "https://www.saskatoonfarm.com/events-1/dia-de-los-muertos-celebration-2",
+      "dates": [
+        "2026-10-30"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/events/di-a-de-los-muertos-at-the-saskatoon-farm-dfce9e"
+    },
+    {
+      "id": "3a041d6c0375884175d8bed85b39",
+      "title": "Destination: Boo City — Trick-or-Treating & Spooky Science",
+      "kind": "event",
+      "organization_id": "biz-deerfoot-city",
+      "source_url": "https://deerfootcity.com/halloween/",
+      "dates": [
+        "2026-10-24"
+      ],
+      "schedule_precision": "time",
+      "listing_url": "https://calgarywatch.ca/events/destination-boo-city-trick-or-treating-spooky-science-3a041d"
+    }
+  ],
+  "evidence": [
+    {
+      "url": "https://mybowness.com/craftfair/",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "91fdf9d1e5d47cc195b1b63d15f742bc1eecd26e015a2eb122d4991c11acda28",
+      "excerpt": "Bowness Holiday Craft Fair November 14 & 15, 2026 10:00 AM – 4:00 PM BCA Main Hall, 7904 43 Ave NW Free Admission"
+    },
+    {
+      "url": "https://www.acadiaca.com/christmas-market",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "a7f791f188a0f64d13c5e5968fac106dd9c8a2990c5443cf0e5a438597d4208c",
+      "excerpt": "When: Saturday November 14, 2026 Time: 10:00 AM - 4:00 PM Location: Acadia Recreation Complex - Rose Hall FREE ADMISSION & PARKING"
+    },
+    {
+      "url": "https://silverspringscommunity.ca/events/christmas-craft-market",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "3a5395cd206171bcfd880fb955df0d1dc7ff7de85875b786bd7f447ac0696542",
+      "excerpt": "The Silver Springs Christmas Craft Market returns on November 14th from 10 am to 3 pm"
+    },
+    {
+      "url": "https://www.granaryroad.com/christmas-market",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "ffd51592d5b4663a0e82eaca72b79a851ad379a466d574313c85a8bdc9bc0c8b",
+      "excerpt": "All of our Christmas activities will be running on Saturdays & Sundays between 10am to 4pm from November 28 to December 13, 2026."
+    },
+    {
+      "url": "https://millarvilleracetrack.com/annual-christmas-market/",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "8171e375ee1d95f8e9c84ba407d7d7806609953d4c80c82e0b3118069f629c1f",
+      "excerpt": "November 5-8th  &  November 12-15th"
+    },
+    {
+      "url": "https://signatures.ca/market/festival-of-crafts/",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "e54b01c535f01d3dbd6d1e5c636504d120b29777718ada07349e18ac23e86c7a",
+      "excerpt": "October 29 – November 1, 2026"
+    },
+    {
+      "url": "https://www.triwoodcommunity.com/events",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "08de992dc21c51e62517c766b79d9a26df1654bc0409c9c97c3c795e8a3709b9",
+      "excerpt": "Sunday, October 25 from 5:30pm - 6:30pm"
+    },
+    {
+      "url": "https://www.saskatoonfarm.com/events-1/felted-art-workshop-1",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "d656a9e2d89c373fa9f89b05c9a5e45d40aa40d2670b46b3d615355c7f2f8241",
+      "excerpt": "Friday, October 23, 2026 6:00 PM 9:00 PM"
+    },
+    {
+      "url": "https://www.saskatoonfarm.com/events-1/dia-de-los-muertos-celebration-2",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "b6c153f782f89e2d315758c0ec0fed21e5e382a8484e891240898ae912876c30",
+      "excerpt": "The event begins at 6:30 pm in our Main Greenhouse."
+    },
+    {
+      "url": "https://deerfootcity.com/halloween/",
+      "retrieved_at": "2026-10-17T00:44:59.309327Z",
+      "html_sha256": "ebf08a5fc721d0450fb61c8193f8514f6ca7360d2484fa0cd0c12a758d0319e1",
+      "excerpt": "October 24th from 6-8PM"
+    }
+  ],
+  "limitations": [
+    "Art Market official site returned HTTP 406; no listing added.",
+    "Saskatoon Farm Christmas calendar still lists 2025: no 2026 dates inferred.",
+    "Triwood Christmas schedule is image-only on the fetched page: no Christmas dates inferred.",
+    "Festival of Crafts and Millarville have confirmed dates but no fetched public hours: use existing date-only event support rather than invented timed market occurrences. Millarville weekends stay separate.",
+    "Saskatoon Farm Día calendar says 6 p.m.; detailed programme says 6:30 p.m. Use detailed 6:30 p.m. with discrepancy disclosed.",
+    "Deerfoot pumpkin patch opens at either 2 p.m. or 3 p.m. in conflicting official text; only consistent 6–8 p.m. activity block published.",
+    "ScreamFest profile uses existing reviewed official-source events; no fresh site fetch or new dates claimed. No contact email available in stored evidence.",
+    "No new artwork copied, no ownership or partner grants, no outreach sent."
+  ]
+}

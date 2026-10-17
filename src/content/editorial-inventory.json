@@ -2704,6 +2704,507 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-16T00:00:00Z",
       "email": "media@ymcacalgary.org"
+    },
+    {
+      "id": "biz-signatures-shows",
+      "kind": "business",
+      "slug": "signatures-shows",
+      "title": "Signatures Shows",
+      "name": "Signatures Shows",
+      "website": "https://signatures.ca/",
+      "address": "Calgary, AB",
+      "summary": "Canadian handmade-market producer behind Calgary’s Festival of Crafts.",
+      "description": "Family-owned since 1980, Signatures brings together independent Canadian artists, artisans, makers and designers. Its Calgary show, Festival of Crafts, runs October 29–November 1, 2026 at the BMO Centre, Hall F. The event venue is separate from the organizer’s base. Calgary show inquiries can go to show manager Samantha Milner at smilner@signatures.ca.",
+      "categories": [
+        "markets",
+        "arts",
+        "shopping"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Signatures Shows — official website",
+          "url": "https://signatures.ca/about/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Signatures Shows — official website",
+          "url": "https://signatures.ca/market/festival-of-crafts/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://signatures.ca/"
+      },
+      "services": [
+        "Handmade shows",
+        "Artisan exhibitions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "info@signatures.ca"
+    },
+    {
+      "id": "biz-millarville-racing-and-agricultural-society",
+      "kind": "business",
+      "slug": "millarville-racing-and-agricultural-society",
+      "title": "Millarville Racing and Agricultural Society",
+      "name": "Millarville Racing and Agricultural Society",
+      "website": "https://millarvilleracetrack.com/",
+      "address": "306097 192 Street W, Millarville, AB T0L 1K0",
+      "summary": "A Foothills agricultural society hosting markets, fairs and community gatherings.",
+      "description": "A nearby day trip outside Calgary, the society hosts seasonal farmers’ markets, the Priddis & Millarville Fair, horse racing and community gatherings. Its 2026 Christmas Market runs November 5–8 and November 12–15. The summer market finished October 10; no unannounced future summer dates are listed.",
+      "categories": [
+        "markets",
+        "community",
+        "day-trip"
+      ],
+      "tags": [
+        "organizer",
+        "day-trip",
+        "outside-calgary"
+      ],
+      "sources": [
+        {
+          "name": "Millarville Racing and Agricultural Society — official website",
+          "url": "https://millarvilleracetrack.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Millarville Racing and Agricultural Society — official website",
+          "url": "https://millarvilleracetrack.com/annual-christmas-market/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://millarvilleracetrack.com/"
+      },
+      "services": [
+        "Seasonal markets",
+        "Agricultural fair",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "office@mras-track.com",
+      "phone": "403-931-3411"
+    },
+    {
+      "id": "biz-the-saskatoon-farm",
+      "kind": "business",
+      "slug": "the-saskatoon-farm",
+      "title": "The Saskatoon Farm",
+      "name": "The Saskatoon Farm",
+      "website": "https://www.saskatoonfarm.com/",
+      "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+      "summary": "A family-run Foothills farm with seasonal produce, a bakery, restaurant and greenhouse gatherings.",
+      "description": "Family-run since 1987, The Saskatoon Farm combines seasonal farm shopping, a bakery, restaurant and garden centre with workshops and celebrations. This is a day trip outside Calgary. Its upcoming official calendar includes an October 23 felted-art workshop and October 30 Día de los Muertos celebration. Check the farm’s seasonal updates before travelling; farmers’ market hours and winter closure are separate from event hours.",
+      "categories": [
+        "markets",
+        "food",
+        "day-trip"
+      ],
+      "tags": [
+        "organizer",
+        "day-trip",
+        "outside-calgary"
+      ],
+      "sources": [
+        {
+          "name": "The Saskatoon Farm — official website",
+          "url": "https://www.saskatoonfarm.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "The Saskatoon Farm — official website",
+          "url": "https://www.saskatoonfarm.com/events-1",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.saskatoonfarm.com/"
+      },
+      "services": [
+        "Seasonal produce",
+        "Bakery and restaurant",
+        "Workshops and celebrations"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "hello@saskatoonfarm.com",
+      "phone": "403-938-6245"
+    },
+    {
+      "id": "biz-granary-road",
+      "kind": "business",
+      "slug": "granary-road",
+      "title": "Granary Road",
+      "name": "Granary Road",
+      "website": "https://www.granaryroad.com/",
+      "address": "226066 112 Street West, Foothills County, AB T1S 5S5",
+      "summary": "A Foothills family destination with farm experiences, indoor exhibits and a Christmas market.",
+      "description": "A day trip south of Calgary, Granary Road’s 2026 Christmas Market runs on three weekends, November 28–29, December 5–6 and December 12–13, 10 a.m.–4 p.m. Market admission is required; selected Christmas activity passes include entry. The outdoor park and mini golf reopen in spring 2027, while the Fabulous & Fantastic Farm indoor exhibit opens weekends. Do not confuse indoor-exhibit admission with market admission.",
+      "categories": [
+        "markets",
+        "family",
+        "day-trip"
+      ],
+      "tags": [
+        "organizer",
+        "day-trip",
+        "outside-calgary"
+      ],
+      "sources": [
+        {
+          "name": "Granary Road — official website",
+          "url": "https://www.granaryroad.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Granary Road — official website",
+          "url": "https://www.granaryroad.com/christmas-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.granaryroad.com/"
+      },
+      "services": [
+        "Christmas market",
+        "Indoor farm exhibit",
+        "Family activities"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "info@granaryroad.com",
+      "phone": "403-453-7623"
+    },
+    {
+      "id": "biz-bowness-community-association",
+      "kind": "business",
+      "slug": "bowness-community-association",
+      "title": "Bowness Community Association",
+      "name": "Bowness Community Association",
+      "website": "https://mybowness.com/",
+      "address": "7904 43 Avenue NW, Calgary, AB T3B 4P9",
+      "summary": "A neighbourhood association with community programming, recreation and a local-maker holiday fair.",
+      "description": "Established in 1963, the BCA offers community events, programming and facility rentals. Its free Holiday Craft Fair brings handmade goods and local makers to the Main Hall on November 14–15, 2026, 10 a.m.–4 p.m. The official fair contact is craftfair@mybowness.com; vendor applications have closed.",
+      "categories": [
+        "markets",
+        "community"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Bowness Community Association — official website",
+          "url": "https://mybowness.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Bowness Community Association — official website",
+          "url": "https://mybowness.com/craftfair/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mybowness.com/"
+      },
+      "services": [
+        "Community programming",
+        "Holiday Craft Fair",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "craftfair@mybowness.com",
+      "phone": "403-288-8300"
+    },
+    {
+      "id": "biz-triwood-community-association",
+      "kind": "business",
+      "slug": "triwood-community-association",
+      "title": "Triwood Community Association",
+      "name": "Triwood Community Association",
+      "website": "https://www.triwoodcommunity.com/",
+      "address": "2244 Chicoutimi Drive NW, Calgary, AB T2L 0W1",
+      "summary": "A northwest community association with seasonal markets, recreation and neighbourhood events.",
+      "description": "Triwood offers community markets, fitness, social clubs, an arena, camps and facility rentals. Its free Halloween Skate Night takes place October 25, 2026. Check the organizer’s market calendar for seasonal editions and current details.",
+      "categories": [
+        "markets",
+        "community",
+        "recreation"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Triwood Community Association — official website",
+          "url": "https://www.triwoodcommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Triwood Community Association — official website",
+          "url": "https://www.triwoodcommunity.com/events",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Triwood Community Association — official website",
+          "url": "https://www.triwoodcommunity.com/farmers-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.triwoodcommunity.com/"
+      },
+      "services": [
+        "Seasonal markets",
+        "Arena and recreation",
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "programs@triwoodcommunity.com",
+      "phone": "403-282-2677 ext. 103"
+    },
+    {
+      "id": "biz-acadia-community-association",
+      "kind": "business",
+      "slug": "acadia-community-association",
+      "title": "Acadia Community Association",
+      "name": "Acadia Community Association",
+      "website": "https://www.acadiaca.com/",
+      "address": "240 90 Avenue SE, Calgary, AB T2J 6P6",
+      "summary": "A southeast community association hosting a free Christmas market and neighbourhood programming.",
+      "description": "The ACA supports neighbours through social and recreational programming, community advocacy and events. Its 2026 Christmas Market takes place November 14, 10 a.m.–4 p.m., in Rose Hall at the Acadia Recreation Complex. Admission and parking are free. Market questions: events@acadiaca.com.",
+      "categories": [
+        "markets",
+        "community"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Acadia Community Association — official website",
+          "url": "https://www.acadiaca.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Acadia Community Association — official website",
+          "url": "https://www.acadiaca.com/christmas-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.acadiaca.com/"
+      },
+      "services": [
+        "Community events",
+        "Christmas market",
+        "Recreation facilities"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "events@acadiaca.com",
+      "phone": "403-255-1252"
+    },
+    {
+      "id": "biz-silver-springs-community-association",
+      "kind": "business",
+      "slug": "silver-springs-community-association",
+      "title": "Silver Springs Community Association",
+      "name": "Silver Springs Community Association",
+      "website": "https://silverspringscommunity.ca/",
+      "address": "5720 Silver Ridge Drive NW, Calgary, AB T3B 5E5",
+      "summary": "A northwest nonprofit with community programmes and a free local-artisan Christmas market.",
+      "description": "Serving Silver Springs since 1975, the association offers programmes, rental spaces and events for neighbours of all ages. Its Christmas Craft Market runs November 14, 2026, 10 a.m.–3 p.m., with handmade goods, unique gifts and local crafts. The market is free to attend and open to all.",
+      "categories": [
+        "markets",
+        "community"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Silver Springs Community Association — official website",
+          "url": "https://silverspringscommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Silver Springs Community Association — official website",
+          "url": "https://silverspringscommunity.ca/events/christmas-craft-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://silverspringscommunity.ca/"
+      },
+      "services": [
+        "Christmas Craft Market",
+        "Community programmes",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "administration@silverspringscommunity.ca",
+      "phone": "403-288-2616"
+    },
+    {
+      "id": "biz-deerfoot-city",
+      "kind": "business",
+      "slug": "deerfoot-city",
+      "title": "Deerfoot City",
+      "name": "Deerfoot City",
+      "website": "https://deerfootcity.com/",
+      "address": "971 64 Avenue NE, Calgary, AB",
+      "summary": "An open-air shopping destination with seasonal family events along The Boulevard.",
+      "description": "Deerfoot City combines shopping, dining and entertainment with family-friendly seasonal programming. Destination: Boo City includes trick-or-treating and hands-on science on October 24, 2026, 6–8 p.m. Its pumpkin patch has separate hours and a food-bank donation requirement; confirm that schedule directly. Event and media inquiries are handled by the marketing team at gs@deerfootcity.ca.",
+      "categories": [
+        "shopping",
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Deerfoot City — official website",
+          "url": "https://deerfootcity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Deerfoot City — official website",
+          "url": "https://deerfootcity.com/contact/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Deerfoot City — official website",
+          "url": "https://deerfootcity.com/halloween/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://deerfootcity.com/"
+      },
+      "services": [
+        "Shopping and dining",
+        "Seasonal events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "gs@deerfootcity.ca",
+      "phone": "403-274-7024"
+    },
+    {
+      "id": "biz-screamfest",
+      "kind": "business",
+      "slug": "screamfest",
+      "title": "ScreamFest",
+      "name": "ScreamFest",
+      "website": "https://screamfest.ca/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary Halloween attraction with haunted houses, scare zones and midway rides.",
+      "description": "ScreamFest brings haunted attractions to GMC Stadium, Stampede Park on select October nights. Expect haunted houses, scare zones and midway rides; much of the experience is outdoors. Check the official site for tickets, age restrictions and the adults-only night. The show venue is listed on individual events, separate from this organizer profile.",
+      "categories": [
+        "nightlife",
+        "holiday"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest — existing reviewed event inventory",
+          "url": "https://screamfest.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://screamfest.ca/"
+      },
+      "services": [
+        "Halloween attraction",
+        "Haunted houses"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z"
     }
   ]
 }

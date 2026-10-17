@@ -1,4 +1,4 @@
-import {claimOrganization,organizationClaimPath} from '../../lib/claimOrganization';
+import {claimOrganization,listingOrganization,organizationClaimPath} from '../../lib/claimOrganization';
 import { discoveryRepository } from '../../data/discovery';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
@@ -13,7 +13,10 @@ import '../../styles/claim.css';
  */
 export function VerifiedMark({ entityId, verifiedAt }: { entityId: string; verifiedAt?: string }) {
   const verified = useVerifiedListing(entityId, Boolean(verifiedAt));
-  return verified ? <VerifiedBadge /> : null;
+  if (!verified) return null;
+  const all = discoveryRepository.list(), listing = all.find(e => e.id === entityId);
+  const organizer = listing && listing.kind !== 'business' ? listingOrganization(listing, all) : undefined;
+  return <VerifiedBadge organizer={organizer ? { title: organizer.title, to: `/local/${organizer.slug}` } : undefined} />;
 }
 
 /** At the foot of a listing: the invitation to claim it, or a correction link once claimed. */

@@ -5,13 +5,17 @@ import {businessAccountPatch} from '../../src/lib/businessAccount';
 import {claimId,type ListingClaim} from '../../src/lib/claims';
 import {ORGANIZATION_CATALOG,ORGANIZATION_LIVE} from '../../src/lib/organizationWorkspace';
 import {OWNER_BUSINESS_LIMITS,OWNER_LIMITS,OWNER_EDITS} from '../../src/lib/ownerListingEdits';
-/** Approval and expansion must not strand events in a former one-off workspace. */
-export async function approveOrganizationClaim(db:Firestore,actorUid:string,input:{uid:string;entityId:string;organizationId?:string;confirmSharedAccess?:boolean},identity:{email?:string;emailVerified?:boolean}={},now=Date.now()){
+/**
+ * Approval and expansion must not strand events in a former one-off workspace.
+ * `options.system` is for trusted server scripts only (promote-organizer-claims.ts);
+ * the callable never passes it.
+ */
+export async function approveOrganizationClaim(db:Firestore,actorUid:string,input:{uid:string;entityId:string;organizationId?:string;confirmSharedAccess?:boolean},identity:{email?:string;emailVerified?:boolean}={},now=Date.now(),options:{system?:boolean}={}){
  if(!input||typeof input.uid!=='string'||!input.uid||input.uid.includes('/')||input.uid.length>128||typeof input.entityId!=='string'||! /^[a-z0-9-]{1,120}$/.test(input.entityId)||input.organizationId!==undefined&&(typeof input.organizationId!=='string'||! /^[a-z0-9-]{1,120}$/.test(input.organizationId)))throw Error('Invalid approval.');
  return db.runTransaction(async tx=>{
   const claimRef=db.collection('listing_claims').doc(claimId(input.uid,input.entityId)),accountRef=db.collection('users').doc(input.uid);
   const [actor,claimSnapshot,account,source]=await Promise.all([tx.get(db.collection('users').doc(actorUid)),tx.get(claimRef),tx.get(accountRef),tx.get(db.collection(ORGANIZATION_CATALOG).doc(input.entityId))]);
-  if(!(actor.get('role')==='admin'||identity.emailVerified===true&&isApprovedAdminEmail(identity.email)))throw Error('Administrator access required.');
+  if(!(options.system===true||actor.get('role')==='admin'||identity.emailVerified===true&&isApprovedAdminEmail(identity.email)))throw Error('Administrator access required.');
   if(!claimSnapshot.exists)throw Error('The claim no longer exists.');
   const c=claimSnapshot.data() as ListingClaim;
   if(c.uid!==input.uid||c.entityId!==input.entityId)throw Error('Claim identity does not match.');

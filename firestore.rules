@@ -851,7 +851,7 @@ service cloud.firestore {
         request.resource.data.entityId is string && request.resource.data.entityId.size() <= 120 &&
         request.resource.data.entityTitle is string && request.resource.data.entityTitle.size() <= 200 &&
         request.resource.data.changes is map && request.resource.data.changes.size() > 0 && request.resource.data.changes.size() <= 30 &&
-        request.resource.data.changes.keys().hasOnly(['occurrences','title','summary','description','address','venue','neighbourhood','categories','tags','coordinates','website','phone','hours','socials','services','offer','priceLevel','start','end','pricing','priceRange','tickets','cancelled','organizer','amenities','parking','transit','petFriendly','familyFriendly']) &&
+        request.resource.data.changes.keys().hasOnly(['occurrences','title','summary','description','address','venue','neighbourhood','categories','tags','coordinates','website','email','phone','hours','socials','services','offer','priceLevel','start','end','pricing','priceRange','tickets','cancelled','organizer','amenities','parking','transit','petFriendly','familyFriendly']) &&
         request.resource.data.status == 'queued' && request.resource.data.notificationPending == false &&
         request.resource.data.createdAt == request.time &&
         getAfter(/databases/$(database)/documents/owner_listing_edit_limits/$(request.resource.data.rootId)).data.editId == editId &&

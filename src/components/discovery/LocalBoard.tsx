@@ -6,8 +6,8 @@ import { hoodOf, localLinks, type LocalLinks } from '../../lib/localLinks';
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
 import { LocalHero } from './LocalHero';
-import { ServicesDirectory, ServicesIndex } from './LocalServices';
-import { TEAR } from '../home/HomeHero';
+import { ServicesDirectory } from './LocalServices';
+import { WhitePages } from './WhitePages';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { byVerified } from '../../lib/verified';
 
@@ -38,18 +38,6 @@ function nextLabel(n: NonNullable<LocalLinks['next']>) {
 
 /** A round arrow, as on the homepage cards. */
 const Go = () => <span className="lx-go" aria-hidden="true"><ArrowUpRight size={18} /></span>;
-
-/** Small links under each card: the neighbourhood, what's on nearby, and any guide that passes it. */
-function LinkRail({ links }: { links: LocalLinks }) {
-  if (!links.hood && !links.next && !links.guides.length) return null;
-  return (
-    <div className="cw-loc-rail">
-      {links.hood ? <Link to={entityPath(links.hood)} className="cw-loc-tag cw-loc-tag-hood"><MapPin size={14} aria-hidden="true" />{links.hood.title}</Link> : null}
-      {links.next ? <Link to={links.next.path} className="cw-loc-tag cw-loc-tag-next"><CalendarDays size={14} aria-hidden="true" /><span><b>{nextLabel(links.next)}</b> {day.format(new Date(links.next.start))}</span></Link> : null}
-      {links.guides.slice(0, 1).map(g => <Link key={g.id} to={entityPath(g)} className="cw-loc-tag cw-loc-tag-guide"><Footprints size={14} aria-hidden="true" />In a guide</Link>)}
-    </div>
-  );
-}
 
 /** "Make a day of it": the pick's links as homepage-style tiles. */
 function DayPlan({ place, links }: { place: Business; links: LocalLinks }) {
@@ -172,51 +160,10 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
         ) : null}
       </div>
 
-      {book.length ? (
-        <section className="lx-book" aria-labelledby="lx-book">
-          <svg className="lx-edge lx-edge-top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={TEAR} /></svg>
-          <div className="cw-wrap">
-            <header className="lx-head lx-head-dark">
-              <div>
-                <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />{book.length} {book.length === 1 ? 'place' : 'places'} · {category ? cap(category) : 'Every quadrant'}</p>
-                <h2 id="lx-book">{category ? <>{cap(category)}, <mark>the locals’ way.</mark></> : <>The little <mark>black book.</mark></>}</h2>
-              </div>
-              <p>Where we’d send a friend. Every place is checked against its own official site before it goes in.</p>
-            </header>
-            <p className="lx-swipe" aria-hidden="true">Swipe the book <ArrowUpRight size={14} /></p>
-            <ul className={`lx-grid${book.length % 3 === 2 ? ' lx-grid-bento' : ''}`}>
-              {book.map((p, i) => {
-                const note = LOCAL_NOTES[p.id];
-                const quad = quadOf(p);
-                return (
-                  <li key={p.id} className="lx-card">
-                    <Link to={entityPath(p)} className="lx-card-main">
-                      <span className="lx-card-art">
-                        <ShopArt id={p.id} title={p.title} tags={p.tags} categories={p.categories} />
-                        <span className="lx-card-num">{pad(i + 1)}</span>
-                        {p.partner || p.editorialSelection ? <Stamp partner={p.partner} /> : null}
-                      </span>
-                      <span className="lx-card-body">
-                        <small className="lx-pickline">{note ? note.pick : `${cap(p.categories[0] ?? 'local')} · ${p.neighbourhood}`}</small>
-                        <strong>{p.title}</strong>
-                        <span className="lx-card-note">{note?.note ?? p.summary}</span>
-                        {note?.dontMiss.length ? <span className="lx-chips">{note.dontMiss.slice(0, 3).map(d => <i key={d}>{d}</i>)}</span> : null}
-                        <span className="lx-where"><MapPin size={14} aria-hidden="true" />{p.neighbourhood}{quad ? ` · ${quad}` : ''}{note?.since ? ` · ${note.since}` : ''}</span>
-                      </span>
-                    </Link>
-                    <LinkRail links={linksFor.get(p.id)!} />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <svg className="lx-edge lx-edge-bottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={TEAR} /></svg>
-        </section>
-      ) : !feature ? <div className="cw-wrap"><p className="cw-loc-empty">Nothing in this category yet. <Link to="/submit">Know a place we should add?</Link></p></div> : null}
+      {book.length ? <WhitePages places={book} everyPlace={everyPlace} category={category} />
+        : !feature ? <div className="cw-wrap"><p className="cw-loc-empty">Nothing in this category yet. <Link to="/local/recommend">Know a place we should add?</Link></p></div> : null}
 
       <div className="cw-wrap lx-wrap">
-        {!category ? <ServicesIndex places={everyPlace} /> : null}
-
         {!category && places.length > 1 ? (
           <section className="lx-map" aria-labelledby="lx-map">
             <header className="lx-head">

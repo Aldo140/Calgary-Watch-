@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  ArrowUpRight, Bug, Car, CarFront, CalendarClock, Disc3, Droplets, Fence, Flame, Hammer, House, KeyRound, Lightbulb,
+  ArrowUpRight, Bug, Car, CarFront, Disc3, Droplets, Fence, Flame, Hammer, House, KeyRound, Lightbulb,
   PawPrint, Scissors, Snowflake, Sparkles, Sprout, WashingMachine, Wrench, Zap, type LucideIcon,
 } from 'lucide-react';
 import type { Business } from '../../types/discovery';
@@ -14,30 +14,41 @@ const ICONS: Record<string, LucideIcon> = {
   tires: Disc3, glass: Car, tailoring: Scissors, repair: Wrench, pets: PawPrint,
 };
 const GROUPS = Object.keys(SERVICE_GROUPS) as ServiceGroup[];
-const MONTH = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long' });
 const calgaryMonth = (d: Date) => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'numeric' }).format(d));
 
-const recommendHref = (s: LocalService) => `mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Recommending a Calgary ${s.trades[0]}`)}&body=${encodeURIComponent('Name and website:\n\nWhy I’d recommend them:\n')}`;
+const recommendHref = (s: LocalService) => `/local/recommend?service=${s.id}`;
 
 function Icon({ id, size = 20 }: { id: string; size?: number }) {
   const I = ICONS[id] ?? Wrench;
   return <I size={size} aria-hidden="true" />;
 }
 
-/** What Calgarians book this month, so the directory answers "what should I sort out now?". */
-function BusyNow({ month, now }: { month: number; now: Date }) {
-  const busy = LOCAL_SERVICES.filter(s => inPeak(s, month));
-  if (!busy.length) return null;
-  return (
-    <div className="cw-svc-now">
-      <p><CalendarClock size={16} aria-hidden="true" /><b>{MONTH.format(now)} in Calgary:</b> book these before everyone else does</p>
-      <ul>{busy.map(s => <li key={s.id}><Link to={`/local/services#svc-${s.id}`}><Icon id={s.id} size={15} />{s.label}</Link></li>)}</ul>
-    </div>
-  );
-}
-
 const MONTHS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/**
+ * The next three months as three short cards: what to book now, next and after.
+ * Phones get this instead of the twelve-column grid, which stays one tap away.
+ */
+function Season({ month }: { month: number }) {
+  const months = [0, 1, 2].map(k => ((month - 1 + k) % 12) + 1);
+  const label = ['Book now', 'Next month', 'Coming up'];
+  return (
+    <ol className="cw-svc-season" aria-label="What to book over the next three months">
+      {months.map((m, k) => {
+        const due = LOCAL_SERVICES.filter(s => inPeak(s, m) && (k === 0 || !inPeak(s, months[k - 1])));
+        return (
+          <li key={m} className={k === 0 ? 'is-now' : undefined}>
+            <p><small>{label[k]}</small><b>{MONTH_NAMES[m - 1]}</b></p>
+            {due.length ? (
+              <ul>{due.map(s => <li key={s.id}><a href={`#svc-${s.id}`}><Icon id={s.id} size={15} />{s.label}</a></li>)}</ul>
+            ) : <span className="cw-svc-season-none">{k === 0 ? 'A quiet month. Good time for the small jobs.' : 'Nothing new starts its rush.'}</span>}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 /** Every service against the twelve months: when Calgarians book it most, with this month marked. */
 function ServiceYear({ month }: { month: number }) {
@@ -61,48 +72,18 @@ function ServiceYear({ month }: { month: number }) {
   );
 }
 
-/** A compact index of every service on the main Local page. */
-export function ServicesIndex({ places, now = new Date() }: { places: Business[]; now?: Date }) {
-  const month = calgaryMonth(now);
-  return (
-    <section className="cw-svc cw-svc-index" aria-labelledby="svc-index">
-      <div className="cw-loc-section-head">
-        <div>
-          <p className="lx-eyebrow">For the house, the yard and the car</p>
-          <h2 id="svc-index">Services <mark>Calgarians need.</mark></h2>
-        </div>
-        <p>Plumbers, furnace techs, snow removal and the rest, with what to ask before you hire. <Link to="/local/services">See every service <ArrowUpRight size={14} aria-hidden="true" /></Link></p>
-      </div>
-      <BusyNow month={month} now={now} />
-      <div className="cw-svc-groups">
-        {GROUPS.map(g => (
-          <div key={g} className={`cw-svc-group cw-svc-group-${g}`}>
-            <h3>{SERVICE_GROUPS[g].label}</h3>
-            <ul>
-              {LOCAL_SERVICES.filter(s => s.group === g).map(s => {
-                const n = places.filter(p => offersService(p, s)).length;
-                return (
-                  <li key={s.id}>
-                    <Link to={`/local/services#svc-${s.id}`}>
-                      <span className="cw-svc-ico"><Icon id={s.id} size={18} /></span>
-                      <span className="cw-svc-name">{s.label}<small>{n ? `${n} listed` : s.trades.slice(1).join(', ')}</small></span>
-                      {inPeak(s, month) ? <i className="cw-svc-busy">Busy now</i> : null}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /** The full directory on /local/services: every service with a hiring tip and how to fill it. */
 export function ServicesDirectory({ places, now = new Date() }: { places: Business[]; now?: Date }) {
   const month = calgaryMonth(now);
   const { hash } = useLocation();
+  // The year grid is open on wide screens and folded away on phones.
+  const [wide, setWide] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 900px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 900px)');
+    const on = () => setWide(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
   // Links from the index land on one service; scroll it into view once it renders.
   useEffect(() => {
     if (!hash.startsWith('#svc-')) return;
@@ -117,8 +98,11 @@ export function ServicesDirectory({ places, now = new Date() }: { places: Busine
         </div>
         <p>When Calgarians book each service, month by month. We only list a business after checking it against its own site; until a service has picks, you get the questions worth asking first.</p>
       </div>
-      <BusyNow month={month} now={now} />
-      <ServiceYear month={month} />
+      <Season month={month} />
+      <details className="cw-svc-year-more" open={wide}>
+        <summary>See the whole year, month by month</summary>
+        <ServiceYear month={month} />
+      </details>
       {GROUPS.map((g, gi) => (
         <div key={g} className={`cw-svc-block cw-svc-group-${g}`}>
           <h3 className="cw-svc-block-head"><i>{String(gi + 1).padStart(2, '0')}</i>{SERVICE_GROUPS[g].label}<small>{SERVICE_GROUPS[g].blurb}</small></h3>
@@ -138,7 +122,7 @@ export function ServicesDirectory({ places, now = new Date() }: { places: Busine
                     <ul className="cw-svc-listed">{listed.map(p => <li key={p.id}><Link to={entityPath(p)}>{p.title}<small>{p.neighbourhood}</small></Link></li>)}</ul>
                   ) : null}
                   <div className="cw-svc-actions">
-                    <a href={recommendHref(s)}>Recommend one</a>
+                    <Link to={recommendHref(s)}>Recommend one</Link>
                     <Link to="/partners">Get listed free <ArrowUpRight size={13} aria-hidden="true" /></Link>
                   </div>
                 </li>

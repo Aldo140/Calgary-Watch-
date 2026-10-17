@@ -19,3 +19,15 @@
   .sb-steps li, .sb-steps li:nth-child(2) { transform: none; }
   .cw-submit .pl-card { box-shadow: 4px 4px 0 #151515; }
 }
+
+/* /local/recommend: the White Pages recommendation form. */
+.cw-rec-form { display: grid; gap: 2px; max-width: 680px; padding: clamp(20px, 3vw, 32px); }
+.cw-rec-form .pl-field:first-child { margin-top: 0; }
+.cw-site .cw-rec-form select, .cw-site .cw-rec-form textarea {
+  width: 100%; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--cw-border); background: #fff; color: var(--cw-text); font: 400 16px/1.4 Inter, sans-serif;
+}
+.cw-site .cw-rec-form select { height: 52px; padding-block: 0; }
+.cw-site .cw-rec-form select:focus, .cw-site .cw-rec-form textarea:focus { outline: none; border-color: var(--cw-brand); box-shadow: 0 0 0 3px rgba(21, 84, 209, .18); }
+.cw-rec-form .pl-btn { justify-self: start; margin-top: 22px; }
+.cw-rec-fine { margin-top: 12px; font: 400 13px/1.45 Inter, sans-serif; color: var(--cw-muted); }
+@media (max-width: 640px) { .cw-rec-form .pl-btn { justify-self: stretch; justify-content: center; } }

@@ -15,6 +15,7 @@ import './styles/page-loader.css';
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
+const RecommendPage = lazy(() => import('@/src/pages/RecommendPage'));
 const OrganizationPage = lazy(() => import('@/src/pages/OrganizationPage'));
 const ClaimListingPage = lazy(() => import('@/src/pages/ClaimListingPage'));
 const MarketHQPage = lazy(() => import('@/src/pages/MarketHQPage'));
@@ -185,6 +186,7 @@ export default function App() {
           <Route path="/markets" element={<DiscoveryPage />} />
           <Route path="/markets/:slug" element={<DiscoveryPage />} />
           <Route path="/local" element={<DiscoveryPage />} />
+          <Route path="/local/recommend" element={<RecommendPage />} />
           <Route path="/local/:slug" element={<DiscoveryPage />} />
           <Route path="/guides" element={<DiscoveryPage />} />
           <Route path="/guides/:slug" element={<DiscoveryPage />} />

@@ -18,6 +18,7 @@ import type { LeadStatus, PartnerLead } from '@/src/types/ops';
 import { LOCAL_SERVICES, SERVICE_GROUPS, serviceById } from '@/src/data/localServices';
 import { ClaimsPanel } from './ClaimsPanel';
 import { MarketHQPanel } from './MarketHQPanel';
+import { RecommendationsPanel } from './RecommendationsPanel';
 import { AdminButton, Chip, EmptyState, Field, FilterChip, FilterRow, Panel, SkeletonRows, T, TimeAgo, inputClass, inputStyle, mono, type Tone } from './ui';
 
 type View = 'approve' | 'replies' | 'pipeline' | 'research' | 'closed';
@@ -217,6 +218,7 @@ export function PartnersWorkspace() {
     <div className="space-y-4">
       <OwnerEditsPanel />
       <ClaimsPanel leads={leads} />
+      <RecommendationsPanel />
       <MarketHQPanel />
       <Panel title="Partner outreach" subtitle="Emails that pass every rule are sent automatically (cancel any under In progress). Businesses come from real listings; replies wait for you; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>
         <div className="px-4 pt-3">

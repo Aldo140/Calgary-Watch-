@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, Footprints, MapPin, Navigation } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, Guide, Market, MarketOccurrence, Neighbourhood } from '../../types/discovery';
@@ -12,6 +13,9 @@ import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { byVerified } from '../../lib/verified';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
+
+/** The black book opens on this many places; the rest wait behind a "show all" button. */
+const BOOK_FIRST = 12;
 
 const QUADRANT_BOX: Record<string, [number, number]> = { NW: [0, 0], NE: [1, 0], SW: [0, 1], SE: [1, 1] };
 
@@ -118,6 +122,8 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
   const feature = !category && picks.length ? picks[week % picks.length] : undefined;
   const featureNote = feature ? LOCAL_NOTES[feature.id] : undefined;
   const book = places.filter(p => p !== feature);
+  const [bookOpen, setBookOpen] = useState(false);
+  const shownBook = bookOpen ? book : book.slice(0, BOOK_FIRST);
   const counts: Record<string, number> = { all: everyPlace.length };
   for (const c of LOCAL_CATEGORIES) counts[c] = everyPlace.filter(p => p.categories.includes(c)).length;
   const areas = new Set(everyPlace.map(p => p.neighbourhood).filter(Boolean)).size;
@@ -184,10 +190,11 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
               <p>Where we’d send a friend. Every place is checked against its own official site before it goes in.</p>
             </header>
             <p className="lx-swipe" aria-hidden="true">Swipe the book <ArrowUpRight size={14} /></p>
-            <ul className={`lx-grid${book.length % 3 === 2 ? ' lx-grid-bento' : ''}`}>
-              {book.map((p, i) => {
+            <ul className={`lx-grid${shownBook.length % 3 === 2 ? ' lx-grid-bento' : ''}`} id="lx-book-list">
+              {shownBook.map((p, i) => {
                 const note = LOCAL_NOTES[p.id];
                 const quad = quadOf(p);
+                const where = [p.neighbourhood, quad, note?.since].filter(Boolean).join(' · ');
                 return (
                   <li key={p.id} className="lx-card">
                     <Link to={entityPath(p)} className="lx-card-main">
@@ -197,11 +204,11 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
                         {p.partner || p.editorialSelection ? <Stamp partner={p.partner} /> : null}
                       </span>
                       <span className="lx-card-body">
-                        <small className="lx-pickline">{note ? note.pick : `${cap(p.categories[0] ?? 'local')} · ${p.neighbourhood}`}</small>
+                        <small className="lx-pickline">{note ? note.pick : [cap(p.categories[0] ?? 'local'), p.neighbourhood].filter(Boolean).join(' · ')}</small>
                         <strong>{p.title}</strong>
                         <span className="lx-card-note">{note?.note ?? p.summary}</span>
                         {note?.dontMiss.length ? <span className="lx-chips">{note.dontMiss.slice(0, 3).map(d => <i key={d}>{d}</i>)}</span> : null}
-                        <span className="lx-where"><MapPin size={14} aria-hidden="true" />{p.neighbourhood}{quad ? ` · ${quad}` : ''}{note?.since ? ` · ${note.since}` : ''}</span>
+                        {where ? <span className="lx-where"><MapPin size={14} aria-hidden="true" />{where}</span> : null}
                       </span>
                     </Link>
                     <LinkRail links={linksFor.get(p.id)!} />
@@ -209,6 +216,11 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
                 );
               })}
             </ul>
+            {book.length > BOOK_FIRST ? (
+              <button type="button" className="lx-book-more" aria-expanded={bookOpen} aria-controls="lx-book-list" onClick={() => setBookOpen(o => !o)}>
+                {bookOpen ? 'Show fewer' : `Show all ${book.length} places`}
+              </button>
+            ) : null}
           </div>
           <svg className="lx-edge lx-edge-bottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={TEAR} /></svg>
         </section>

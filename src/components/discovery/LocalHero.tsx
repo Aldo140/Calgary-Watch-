@@ -316,25 +316,53 @@ export function Traffic() {
 export function Street({ places, night, label }: { places: Business[]; night: boolean; label: string }) {
   const block = useRef<HTMLUListElement>(null);
   const [at, setAt] = useState(0);
+  const [shown, setShown] = useState(places.length);
+  const [ends, setEnds] = useState<{ start: boolean; end: boolean }>({ start: true, end: true });
   const [swiped, setSwiped] = useState(false);
 
-  // Phones swipe along the street; the counter says which shop is in front of you.
-  const onScroll = () => {
+  // The street scrolls sideways once it holds more shops than fit: a phone swipes it,
+  // a laptop gets arrows. The counter says which shops are in front of you.
+  const measure = () => {
     const el = block.current;
     if (!el) return;
     const first = el.firstElementChild as HTMLElement | null;
-    const step = first ? first.getBoundingClientRect().width : el.clientWidth;
-    setAt(Math.min(places.length - 1, Math.round(el.scrollLeft / Math.max(1, step))));
+    const step = Math.max(1, first ? first.getBoundingClientRect().width : el.clientWidth);
+    const max = el.scrollWidth - el.clientWidth;
+    setAt(Math.min(places.length - 1, Math.round(el.scrollLeft / step)));
+    setShown(Math.max(1, Math.min(places.length, Math.floor(el.clientWidth / step))));
+    setEnds({ start: el.scrollLeft <= 2, end: el.scrollLeft >= max - 2 });
     if (el.scrollLeft > step / 2) setSwiped(true);
   };
 
+  useEffect(() => {
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [places.length]);
+
+  const slide = (dir: 1 | -1) => {
+    const el = block.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * .8, behavior: 'smooth' });
+  };
+
+  const overflowing = !(ends.start && ends.end);
+  const last = Math.min(places.length, at + shown);
+
   return (
-    <div className="lx-street" data-swiped={swiped || undefined}>
-      <ul className="lx-block" aria-label={label} ref={block} onScroll={onScroll}>
+    <div className="lx-street" data-swiped={swiped || undefined} data-overflow={overflowing || undefined}>
+      {overflowing ? (
+        <div className="lx-street-nav">
+          <span className="lx-street-range" aria-live="polite">{at + 1}–{last} of {places.length}</span>
+          <button type="button" className="lx-street-arrow" onClick={() => slide(-1)} disabled={ends.start} aria-label="Earlier shops on the street">←</button>
+          <button type="button" className="lx-street-arrow" onClick={() => slide(1)} disabled={ends.end} aria-label="More shops on the street">→</button>
+        </div>
+      ) : null}
+      <ul className="lx-block" aria-label={label} ref={block} onScroll={measure}>
         {places.map((p, i) => {
           const up = UPPER[i % UPPER.length];
           return (
-            <li key={p.id} style={{ ['--i' as string]: i }}>
+            <li key={p.id} style={{ ['--i' as string]: Math.min(i, 12) }}>
               <Link to={entityPath(p)} className="lx-shop">
                 <Upper floors={up.floors} wall={up.wall} seed={i + 1} night={night} />
                 <span className="lx-shop-front">

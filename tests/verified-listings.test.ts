@@ -114,7 +114,7 @@ describe('the verified badge', () => {
 
   it('5. does not show on an unverified listing, which offers the claim instead', () => {
     assert.match(cta, /if \(verified\) \{\n    return <aside[^>]*><VerifiedBadge/);
-    assert.match(cta, /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}>Claim organization profile for/);
+    assert.match(cta, /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}[^>]*>Claim this listing/);
     assert.deepEqual(guaranteeProblems(CLAIM_BENEFIT), []);
     assert.match(CLAIM_BENEFIT, /more weight/);
   });

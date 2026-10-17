@@ -44,7 +44,7 @@ async function render({admin=false,user=true,emailVerified=true,claim=null,path=
  return renderToStaticMarkup(createElement(MemoryRouter,{initialEntries:[path]},createElement(Routes,null,createElement(Route,{path:'/claim/:id',element:createElement(component.default)}))));
 }
 test('new visitors get a claim form with email and Google account choices',async()=>{
- const html=await render({user:false});assert.match(html,/<form/);assert.match(html,/Sign in or create an account/);assert.match(html,/Create a free account with email or continue with Google/);assert.doesNotMatch(html,/Administrator listing access|Admin preview/);
+ const html=await render({user:false});assert.match(html,/<form/);assert.match(html,/Sign in or create an account/);assert.match(html,/create a free account with email or Google/);assert.doesNotMatch(html,/Administrator listing access|Admin preview/);
 });
 test('an existing personal or business account can apply without signing out or onboarding',async()=>{
  for(const path of ['/claim/festival','/claim/biz-festival','/claim/biz-festival?listing=linked-event']){

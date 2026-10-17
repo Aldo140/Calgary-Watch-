@@ -28,7 +28,7 @@ for(const verified of [false,true]) {
     const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement('div',null,
       createElement(component.VerifiedMark,{entityId:kind+'-test'}),createElement(component.ClaimCta,{entityId:kind+'-test',kind,title:'Test'}))));
     if(verified){assert.match(html,/Confirmed by the organization/);assert.match(html,/Suggest a correction/);assert.match(html,/Claimed by the organization/);assert.doesNotMatch(html,/Is this your|Claim it free|given more weight/);assert.doesNotMatch(html,/Claim organization profile for/);assert.match(html,/Manage or request access/);}
-    else{assert.match(html,new RegExp(`href="/claim/${kind}-test"`));assert.match(html,/Claim organization profile for/);assert.doesNotMatch(html,/>Verified</);}
+    else{assert.match(html,new RegExp(`href="/claim/${kind}-test"`));assert.match(html,/Claim this listing/);assert.match(html,/Is this your/);assert.doesNotMatch(html,/>Verified</);}
   });
   it(`missing entities cannot produce a claim link (${verified})`,()=>{
     const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement(component.ClaimCta,{entityId:'does-not-exist',kind:'business',title:'Missing'})));assert.equal(html,'');

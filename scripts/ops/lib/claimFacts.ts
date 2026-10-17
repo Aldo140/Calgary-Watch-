@@ -1,3 +1,4 @@
+import {profileIdentityProblems} from './profileIdentity';
 /**
  * What outreach may truthfully say about claiming a listing, as structured
  * facts. The template line, the Claude prompts and the final check all read
@@ -23,6 +24,7 @@ import type { Entity } from './posts';
 export const CLAIM_BASE = 'https://calgarywatch.ca/claim/';
 
 export interface ClaimFacts {
+  profileIdentity?:{recipientOrganization:string;entity:{id:string;kind:string;title:string;slug:string;name?:string;status?:string};publicUrl:string;problems:string[]};
   /** The listing the lead points at, when it is published. */
   entityId: string | null;
   /** That listing's kind (business, market, event), when published. */
@@ -51,16 +53,19 @@ export const NO_CLAIM: ClaimFacts = {
 export const claimUrlFor = (entityId: string) => `${CLAIM_BASE}${encodeURIComponent(entityId)}`;
 
 export function claimFactsFor(
-  lead: Pick<PartnerLead, 'entityId' | 'entityKind' | 'status'>,
+  lead: Pick<PartnerLead, 'entityId' | 'entityKind' | 'status'> & {businessName?:string},
   entity: Entity | undefined,
   verifiedIds: ReadonlySet<string> = new Set(),
 ): ClaimFacts {
   const hasPublishedEntity = Boolean(lead.entityId && entity && entity.id === lead.entityId
     && entity.status === 'published' && !entity.fixture && !entity.developmentOnly);
-  const verified = hasPublishedEntity && (verifiedIds.has(entity!.id) || Boolean(entity!.ownerVerifiedAt) || lead.status === 'claimed');
-  const claimable = hasPublishedEntity && !verified;
+  const verified = hasPublishedEntity && (verifiedIds.has(entity!.id) || Boolean(entity!.ownerVerifiedAt));
+  const publicUrl=entity?`https://calgarywatch.ca/${entity.kind==='business'?'local':'markets'}/${entity.slug}`:'';
+  const profileIdentity=entity&&['business','market'].includes(entity.kind)?{recipientOrganization:lead.businessName??'',entity,publicUrl,problems:profileIdentityProblems({recipientOrganization:lead.businessName??'',entity,profileUrl:publicUrl,claimUrl:claimUrlFor(entity.id)})}:undefined;
+  const claimable = hasPublishedEntity && !verified&&!profileIdentity?.problems.length;
   const organizationListed = hasPublishedEntity && LEAD_KINDS.has(entity!.kind) && lead.entityKind !== 'organizer' && lead.entityKind !== 'prospect';
   return {
+    ...(profileIdentity?{profileIdentity}:{}),
     entityId: hasPublishedEntity ? entity!.id : null,
     entityKind: hasPublishedEntity ? entity!.kind : null,
     hasPublishedEntity,
@@ -76,6 +81,7 @@ export function claimFactsFor(
 /** The facts as plain lines for a Claude prompt. */
 export function claimFactsText(f: ClaimFacts): string {
   return [
+    ...(f.profileIdentity?[`recipientOrganization: ${f.profileIdentity.recipientOrganization}`,`publicProfileUrl: ${f.profileIdentity.problems.length?'BLOCKED':f.profileIdentity.publicUrl}`,`profileIdentityValid: ${!f.profileIdentity.problems.length}`]:[]),
     `hasPublishedEntity: ${f.hasPublishedEntity}`,
     `entityId: ${f.entityId ?? 'none'}`,
     `entityKind: ${f.entityKind ?? 'none'}${f.hasPublishedEntity && !f.organizationListed ? ' (one of their events is listed; the organization itself has no listing)' : ''}`,
@@ -90,6 +96,7 @@ export function claimFactsText(f: ClaimFacts): string {
 /** Rules for any Claude prompt that writes to an organization. */
 export const CLAIM_RULES = [
   'Claim facts are given below. Follow them exactly:',
+  '- Organization names, entity IDs, public profile slugs and claim IDs must match the recipient organization. Never substitute another organization’s profile or claim URL.',
   '- Only invite them to claim the listing if claimable is true. If you do, use exactly claimUrl and no other claim link. Never invent or alter a link. You may also leave it out; the claim line is added for you.',
   '- Only mention the verified benefit if verificationBenefitEnabled is true. Then say it plainly: once verified, the listing is marked as verified on CalgaryWatch, and verified organizations get more weight or priority when we surface relevant recommendations and listings. Nothing more.',
   '- Never promise or imply guaranteed ranking, top ranking, guaranteed placement, always being shown first, guaranteed traffic or being featured everywhere.',
@@ -134,6 +141,14 @@ export function guaranteeProblems(body: string): string[] {
 /** Everything a message says about claiming and verification that the facts don't support. */
 export function claimLanguageProblems(body: string, f: ClaimFacts): string[] {
   const problems = guaranteeProblems(body);
+  const organizationLinks=[...body.matchAll(/(?:https?:\/\/(?:www\.)?calgarywatch\.ca)?\/(?:local|markets)\/[a-z0-9%_-]+(?:[?#][^\s<>\"')\]]*)?/gi)].map(m=>m[0].replace(/[.,;:!]+$/,''));
+  if(f.profileIdentity){problems.push(...f.profileIdentity.problems);for(const profileUrl of organizationLinks)problems.push(...profileIdentityProblems({recipientOrganization:f.profileIdentity.recipientOrganization,entity:f.profileIdentity.entity,profileUrl,claimUrl:f.claimUrl??undefined}));}
+  else if(organizationLinks.length)problems.push('Organization profile URL cannot be matched to the recipient organization.');
+  // A claim URL guard alone misses plain false claims in both subjects and bodies.
+  const saysListed = /\balready listed\b|\byour (?:CalgaryWatch )?(?:listing|profile)\b|\bwe(?:['’]ve| have)? added\b|\b(?:your profile|your listing) is live\b|\blisted on CalgaryWatch\b|\bclaim your (?:existing )?listing\b/i;
+  if (!f.hasPublishedEntity && saysListed.test(body)) problems.push('Claims an existing listing without a published entity.');
+  if (f.hasPublishedEntity && f.entityKind === 'event' && body.split(/[.!?\n]/).some(line => saysListed.test(line) && !/\bevent\b/i.test(line))) problems.push('Describes an organization listing when only an event is published.');
+  if (f.hasPublishedEntity && !f.organizationListed && /\byour (?:organization|company|business) (?:listing|profile)\b|\byour profile is live\b/i.test(body)) problems.push('An event listing is not an organization profile.');
   const links = [...body.matchAll(CLAIM_LINK)].map(m => `https://${m[0].replace(/[.,;:!?]+$/, '')}`);
   if (links.length && !f.claimable) problems.push('Offers a claim link for a listing that is not claimable.');
   else if (links.some(l => l !== f.claimUrl)) problems.push('Uses a claim link other than the listing’s own claim page.');

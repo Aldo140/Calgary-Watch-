@@ -1,3 +1,5 @@
+import { plansAreaPatch, plansSetupProblem } from './plansSetup';
+import { createSharedLiveValue, trackSubscription } from './readEfficiency';
 /**
  * Plans: event interests, "I'm going", and the Thursday picks email.
  *
@@ -30,14 +32,27 @@ export function rsvpId(uid: string, eventId: string): string {
   return `${uid}_${eventId}`;
 }
 
-/** Live view of the signed-in reader's profile. `null` while loading or signed out. */
+export type PlansProfileState = { profile: PlansProfile | null; status: 'loading' | 'ready' | 'missing' | 'error'; error?: string };
+const initialProfile: PlansProfileState = { profile: null, status: 'loading' };
+const profiles = new Map<string, ReturnType<typeof createSharedLiveValue<PlansProfileState>>>();
+const noProfile = createSharedLiveValue<PlansProfileState>(initialProfile, () => () => {});
+/** Shared state exposes read failures without presenting them as incomplete signup. */
+export function usePlansProfileState(uid: string | undefined): PlansProfileState {
+  let stream = uid ? profiles.get(uid) : noProfile;
+  if (!stream) {
+    const id = uid!;
+    stream = createSharedLiveValue<PlansProfileState>(initialProfile, publish => db
+      ? trackSubscription(`member:profile:${id}`, () => onSnapshot(doc(db!, 'users', id),
+        snap => publish(snap.exists() ? { profile: readPlansProfile(snap.data()), status: 'ready' } : { profile: null, status: 'missing' }),
+        error => publish({ profile: null, status: 'error', error: error.message })))
+      : () => { publish({ profile: null, status: 'error', error: 'Sign-in is not configured for this build.' }); });
+    profiles.set(id, stream);
+  }
+  return useSyncExternalStore(stream.subscribe, stream.getSnapshot, () => initialProfile);
+}
+/** Header, dashboard and nudges share the same private profile subscription. */
 export function usePlansProfile(uid: string | undefined): PlansProfile | null {
-  const [profile, setProfile] = useState<PlansProfile | null>(null);
-  useEffect(() => {
-    if (!uid || !db) { setProfile(null); return; }
-    return onSnapshot(doc(db, 'users', uid), (snap) => setProfile(readPlansProfile(snap.data())), () => setProfile(readPlansProfile(undefined)));
-  }, [uid]);
-  return profile;
+  return usePlansProfileState(uid).profile;
 }
 
 export interface PlansDraft {
@@ -58,19 +73,15 @@ export interface PlansDraft {
  */
 export async function savePlans(user: User, existing: PlansProfile | null, draft: PlansDraft): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
-  const neighborhood = draft.neighborhood.trim().slice(0, 80);
-  const address = draft.address.trim().slice(0, 160);
+  const problem = plansSetupProblem(draft, existing);
+  if (problem) throw Error(problem);
   const now = Date.now();
-  await setDoc(doc(db, 'users', user.uid), {
+  await setDoc(doc(db!, 'users', user.uid), {
     uid: user.uid,
     displayName: user.displayName || existing?.displayName || 'Calgary User',
     email: user.email || existing?.email || '',
     photoURL: user.photoURL || existing?.photoURL || '',
-    neighborhood,
-    address,
-    inferredNeighborhood: draft.inferredNeighborhood.trim().slice(0, 80),
-    locationPreferenceType: address ? 'address' : 'neighborhood',
-    piiConsentAt: existing?.piiConsentAt || now,
+    ...plansAreaPatch(draft, existing, now),
     onboardingCompletedAt: existing?.onboardingCompletedAt || now,
     eventInterests: draft.interests,
     ...emailConsentPatch(existing, { weekly: draft.weeklyDigestOptIn, events: draft.eventsDigestOptIn }, now),
@@ -93,7 +104,7 @@ const emit = (next: GoingState) => { going = next; listeners.forEach((l) => l())
 async function loadGoing(uid: string) {
   if (!db) return;
   try {
-    const snap = await getDocs(query(collection(db, RSVPS), where('uid', '==', uid), limit(500)));
+    const snap = await getDocs(query(collection(db!, RSVPS), where('uid', '==', uid), limit(500)));
     if (going.uid !== uid) return;
     emit({ uid, ids: new Set(snap.docs.map((d) => String(d.data().eventId))), ready: true });
   } catch {
@@ -101,6 +112,7 @@ async function loadGoing(uid: string) {
   }
 }
 
+export const refreshGoingFor=loadGoing;
 export function useMyGoing(uid: string | undefined): GoingState {
   useEffect(() => {
     if (!uid) { if (going.uid !== null) emit({ uid: null, ids: new Set(), ready: false }); return; }
@@ -113,8 +125,8 @@ export function useMyGoing(uid: string | undefined): GoingState {
 export async function setGoing(uid: string, eventId: string, start: string, on: boolean): Promise<void> {
   if (!db) throw new Error('Sign-in is unavailable right now.');
   const batch = writeBatch(db);
-  const rsvp = doc(db, RSVPS, rsvpId(uid, eventId));
-  const count = doc(db, RSVP_COUNTS, eventId);
+  const rsvp = doc(db!, RSVPS, rsvpId(uid, eventId));
+  const count = doc(db!, RSVP_COUNTS, eventId);
   if (on) batch.set(rsvp, { uid, eventId, start: start.slice(0, 40), createdAt: Date.now() });
   else batch.delete(rsvp);
   batch.set(count, { count: increment(on ? 1 : -1), updatedAt: Date.now() }, { merge: true });
@@ -135,7 +147,7 @@ export async function setGoing(uid: string, eventId: string, start: string, on: 
 export async function readGoingCount(eventId: string): Promise<number | undefined> {
   if (!db) return undefined;
   try {
-    const snap = await getDoc(doc(db, RSVP_COUNTS, eventId));
+    const snap = await getDoc(doc(db!, RSVP_COUNTS, eventId));
     const n = snap.data()?.count;
     return typeof n === 'number' && n > 0 ? n : 0;
   } catch {
@@ -147,7 +159,7 @@ export async function readGoingCount(eventId: string): Promise<number | undefine
 export async function readMyReportCount(uid: string): Promise<number | undefined> {
   if (!db) return undefined;
   try {
-    const snap = await getDocs(query(collection(db, 'incidents'), where('authorUid', '==', uid), where('visibility', '==', 'public'), limit(5)));
+    const snap = await getDocs(query(collection(db!, 'incidents'), where('authorUid', '==', uid), where('visibility', '==', 'public'), limit(5)));
     return snap.size;
   } catch {
     return undefined;
@@ -158,7 +170,7 @@ export async function readMyReportCount(uid: string): Promise<number | undefined
 export async function readMySubmissionCount(uid: string): Promise<number | undefined> {
   if (!db) return undefined;
   try {
-    const snap = await getDocs(query(collection(db, 'entity_submissions'), where('submittedBy', '==', uid), limit(5)));
+    const snap = await getDocs(query(collection(db!, 'entity_submissions'), where('submittedBy', '==', uid), limit(5)));
     return snap.size;
   } catch {
     return undefined;
@@ -181,7 +193,7 @@ export async function setEmailOptIn(
   const interests = change.addInterests?.length
     ? normalizeInterests([...(existing?.eventInterests ?? []), ...change.addInterests])
     : undefined;
-  await setDoc(doc(db, 'users', user.uid), {
+  await setDoc(doc(db!, 'users', user.uid), {
     uid: user.uid,
     displayName: user.displayName || existing?.displayName || 'Calgary User',
     email: user.email || existing?.email || '',

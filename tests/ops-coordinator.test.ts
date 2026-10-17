@@ -106,3 +106,29 @@ describe('notes from Telegram (/ig)', async () => {
     assert.equal(notesForPrompt([]), null);
   });
 });
+
+describe('publish backup (posts still go out when Firestore is out of quota)', async () => {
+  const { backupPosts, dueFromBackup } = await import('../scripts/ops/jobs/publishBackup');
+  const now = Date.parse('2026-10-13T19:00:00Z');
+  const post = (id: string, over: Record<string, unknown> = {}) => ({ id, brand: 'calgarydaily', status: 'approved', scheduledFor: now - 60_000, relevantUntil: null, caption: 'c', altText: 'a', imageUrl: 'https://x/i.jpg', imageUrls: [], videoUrl: null, ...over }) as never;
+
+  it('copies approved posts due within a day that have media', () => {
+    const out = backupPosts([post('a'), post('b', { status: 'drafted' }), post('c', { imageUrl: null }), post('d', { scheduledFor: now + 2 * 86_400_000 }), post('e', { relevantUntil: now - 1 })], now);
+    assert.deepEqual(out.map(p => p.id), ['a']);
+  });
+
+  it('publishes what is due once, skips late and future posts', () => {
+    const posts = backupPosts([post('due'), post('later', { scheduledFor: now + 3_600_000 }), post('late', { scheduledFor: now - 5 * 3_600_000 }), post('done')], now);
+    const b = { at: now, tokens: {}, posts, published: { done: { at: now - 1000, mediaId: '1', permalink: null, brand: 'calgarydaily' as const } } };
+    assert.deepEqual(dueFromBackup(b, now).map(p => p.id), ['due']);
+  });
+});
+
+describe('Claude request text', async () => {
+  const { wellFormed } = await import('../scripts/ops/lib/claude');
+  it('drops half an emoji left by cutting a caption', () => {
+    const cut = '📸 @albertahub'.slice(1);
+    assert.equal(JSON.stringify(wellFormed(cut)), JSON.stringify(' @albertahub'));
+    assert.equal(wellFormed('📸 ok'), '📸 ok');
+  });
+});

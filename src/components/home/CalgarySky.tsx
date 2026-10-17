@@ -54,7 +54,7 @@ const LANDMARKS = {
 };
 const TREES_X = [30, 90, 150, 215, 270, 330, 380, 1180, 1236, 1300, 1370, 1440, 1510, 1570];
 
-export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, cloudCover, windKph, precip, variant, now }: {
+export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, cloudCover, windKph, precip, variant, now, plane = true }: {
   palette: SkyPalette;
   sun: { altitude: number; azimuth: number };
   phase: number;
@@ -63,6 +63,8 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
   precip: SkyIcon | null;
   variant: SkyVariant;
   now: number;
+  /** The homepage flies its own banner-towing plane over the sky instead. */
+  plane?: boolean;
 }) {
   const view = VIEW[variant];
   const top = view.y;
@@ -175,6 +177,7 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
           </g>
         </g>
       ) : null}
+      {plane ? (
       <g transform={`translate(0 ${view.plane})`}>
         <g className="h-plane"><g transform={`scale(${view.size.plane})`}>
           {night < 0.5 ? <path d="M-230,1H-18" stroke="url(#hs-trail)" strokeWidth="2.5" /> : null}
@@ -184,6 +187,7 @@ export const CalgarySky = memo(function CalgarySky({ palette: p, sun, phase, clo
           {night > 0.3 ? <><circle className="h-strobe" cx="-7" cy="-9" r="1.8" fill="#ff5a4e" /><circle className="h-strobe h-strobe-2" cx="-7" cy="9" r="1.8" fill="#fff" /></> : null}
         </g></g>
       </g>
+      ) : null}
 
       <path d={ridge(FAR)} fill={p.far} />
       <path d={caps(FAR, 450)} fill={mix('#ffffff', p.top, 0.12 + night * 0.55)} />

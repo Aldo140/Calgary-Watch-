@@ -58,16 +58,16 @@ describe('rules contract', () => {
     assert.match(claims, /email_verified == true/);
     assert.match(claims, /allow update: if isAdmin\(\)/);
   });
-  it('only an approved claim can file a change, and only admin settles it', () => {
+  it('legacy requests are read-only for members; new owner edits use the weekly publisher', () => {
     const updates = rules.slice(rules.indexOf('match /listing_updates/'), rules.indexOf('match /verified_listings/'));
-    assert.match(updates, /listing_claims\/\$\(request\.auth\.uid \+ '_' \+ request\.resource\.data\.entityId\)\)\.data\.status == 'approved'/);
+    assert.match(updates, /allow create: if false/);
     assert.match(updates, /allow update: if isAdmin\(\)/);
     assert.match(updates, /allow delete: if false/);
   });
   it('the verified mark is public to read, admin to write', () => {
     const v = block('verified_listings');
-    assert.match(v, /allow read: if true/);
-    assert.match(v, /allow write: if isAdmin\(\)/);
+    assert.match(v, /listing_claims/);
+    assert.match(v, /allow create, update: if isAdmin\(\)/);
   });
   it('the client writes exactly the fields the rule allows', () => {
     const api = readFileSync(new URL('../src/lib/claimsApi.ts', import.meta.url), 'utf8');

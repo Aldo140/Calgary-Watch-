@@ -1,3 +1,4 @@
+import { useOrganizationLive } from '../lib/organizationLive';
 import { lazy, Suspense } from 'react';
 import { filterInventory, matchesText, matchesTonight } from '../lib/discoveryCalendar';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
@@ -28,6 +29,7 @@ const RankStrip = lazy(() => import('../components/check/RankStrip'));
 const EVENT_FILTERS: Array<[string, string]> = [['free', 'Free'], ['family', 'Family'], ['music', 'Music'], ['arts', 'Arts & theatre'], ['food', 'Food & drink'], ['sports', 'Sports'], ['outdoor', 'Outdoors'], ['talks', 'Talks'], ['indoor', 'Indoor']];
 
 export default function DiscoveryPage() {
+  const live=useOrganizationLive();
   const { pathname } = useLocation(); const [params] = useSearchParams();
   const [root, slug] = pathname.split('/').filter(Boolean);
   const section = DISCOVERY_SECTIONS.find(s => s.path === `/${root}`);
@@ -45,6 +47,7 @@ export default function DiscoveryPage() {
   if (within) items = items.filter(e => matchesText(e, within));
   const title = missing ? 'This page isn’t here yet.' : category ? `${category[0].toUpperCase()}${category.slice(1)} in Calgary` : quadrant ? `${quadrant} Calgary` : isTonight ? 'Tonight in Calgary' : period ? `${period === 'today' ? 'Today' : 'This weekend'} in Calgary` : `${section?.label || 'Discover'} in Calgary`;
   const relatedIds = entity?.kind === 'guide' ? entity.entries.map(e => e.entityId) : entity?.kind === 'neighbourhood' ? entity.entityIds : [];
+  if(missing&&!live.ready)return <SiteLayout><p role="status" className="cw-wrap">Checking newly published events…</p></SiteLayout>;
   if (root === 'guides' && !missing) {
     return <SiteLayout>{entity?.kind === 'guide'
       ? <GuideDetail guide={entity} all={all} occurrences={discoveryRepository.occurrences()} />

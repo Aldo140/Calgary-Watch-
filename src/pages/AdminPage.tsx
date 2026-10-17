@@ -19,7 +19,7 @@ import { PartnersWorkspace } from '../components/admin/PartnersWorkspace';
  * numbers. Nothing is computed twice.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -100,8 +100,12 @@ function Legend({ items }: { items: { label: string; value?: number; color: stri
 
 export default function AdminPage() {
   const { logout } = useAuth();
-  const [section, setSection] = useState<Section>('desk');
-  const d = useAdminData();
+  const [section, setSection] = useState<Section>(() => {
+    const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('section');
+    return ['desk','planner','reports','people','feeds','visitors','city','content','demand','partners','ops','members'].includes(requested ?? '') ? requested as Section : 'desk';
+  });
+  useEffect(() => { const url = new URL(window.location.href); url.searchParams.set('section', section); window.history.replaceState(null, '', url); }, [section]);
+  const d = useAdminData(section);
   const work = useAdminWorkload(Boolean(d.isAdmin));
 
   const failingFeeds = d.apiHealths.filter((a) =>
@@ -111,7 +115,7 @@ export default function AdminPage() {
   const navItems: NavItem[] = useMemo(() => {
     const contentWork = work.suggestions + work.failedActions + work.stuckActions;
     const needsAttention =
-      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds + contentWork + work.claims;
+      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds + contentWork + work.claims + work.ownerUpdates;
     return [
       { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined, group: 'Today' },
       { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText, group: 'Today' },
@@ -123,7 +127,7 @@ export default function AdminPage() {
       { id: 'demand', label: 'Search demand', short: 'Demand', icon: Search, group: 'Audience' },
       { id: 'content', label: 'Events & markets', short: 'Events', icon: CalendarDays, group: 'Content', count: contentWork, tone: work.failedActions || work.stuckActions ? 'critical' : 'attention' },
       { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot, group: 'Content' },
-      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Store, group: 'Content', count: work.claims, tone: 'attention' },
+      { id: 'partners', label: 'Local partners', short: 'Partners', icon: Store, group: 'Content', count: work.claims + work.ownerUpdates, tone: 'attention' },
       { id: 'city', label: 'City stats', short: 'City', icon: MapIcon, group: 'City' },
     ];
   }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds, work]);
@@ -185,12 +189,13 @@ export default function AdminPage() {
       onSignOut={logout}
       actions={
         <>
+          {work.error ? <span role="alert" className="text-xs text-red-700">{work.error}</span> : null}
           <Chip tone={d.loadingData ? 'attention' : 'ok'}>
             <StatusDot tone={d.loadingData ? 'attention' : 'ok'} pulse={d.loadingData} />
             {d.loadingData ? 'Syncing' : 'Live'}
           </Chip>
           {/* The archive is read once per tab; this re-reads it on demand. */}
-          <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton>
+          {['desk','reports','people'].includes(section) ? <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton> : null}
         </>
       }
     >
@@ -219,6 +224,7 @@ function deskTasks(work: AdminWorkload, openContent: () => void, openPartners?: 
   const tasks: Array<{ id: string; tone: 'attention' | 'critical'; kind: string; title: string; detail?: string; open: () => void }> = [];
   if (work.stuckActions) tasks.push({ id: 'stuck', tone: 'critical', kind: 'Moderation job', title: `${work.stuckActions} event change${work.stuckActions > 1 ? 's' : ''} queued over 2 hours`, detail: 'The hourly “Apply Discovery Moderation” workflow may not be running', open: openContent });
   if (work.failedActions) tasks.push({ id: 'failed', tone: 'critical', kind: 'Moderation failed', title: `${work.failedActions} event change${work.failedActions > 1 ? 's' : ''} couldn’t be applied`, detail: 'See the reason under Recent queued changes', open: openContent });
+  if (work.ownerUpdates && openPartners) tasks.push({ id: 'owner-updates', tone: 'attention', kind: 'Business updates', title: `${work.ownerUpdates} owner update notification${work.ownerUpdates > 1 ? 's' : ''}`, detail: 'Automatically applied updates or failures; no approval needed', open: openPartners });
   if (work.claims && openPartners) tasks.push({ id: 'claims', tone: 'attention', kind: 'Organizers', title: `${work.claims} listing claim${work.claims > 1 ? 's' : ''} or change${work.claims > 1 ? 's' : ''} waiting`, detail: 'Confirm who they are, or apply what they sent', open: openPartners });
   if (work.suggestions) tasks.push({ id: 'suggestions', tone: 'attention', kind: 'Suggestions', title: `${work.suggestions} event suggestion${work.suggestions > 1 ? 's' : ''} from residents`, detail: 'Check the source, then approve or reject', open: openContent });
   return tasks;

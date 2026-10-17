@@ -63,9 +63,9 @@ describe('Vertigo Theatre organization listing', () => {
 
   it('uses the existing claim CTA and route', () => {
     assert.match(read('src/App.tsx'), /path="\/claim\/:id"/);
-    assert.match(read('src/pages/ClaimListingPage.tsx'), /Run \{entity\.title\}\? <em>Claim it\.<\/em>/);
+    assert.match(read('src/pages/ClaimListingPage.tsx'), /Claim <em>\{profile\?\.title\?\?entity.title\}/);
     assert.match(read('src/components/discovery/LocalPlace.tsx'), /<ClaimCta entityId=\{place\.id\} title=\{place\.title\} kind="business" verifiedAt=\{place\.ownerVerifiedAt\} \/>/);
-    assert.match(read('src/components/entity/ClaimCta.tsx'), /to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}/);
+    assert.match(read('src/components/entity/ClaimCta.tsx'), /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}/);
   });
 
   it('prerenders a useful direct claim page for Firebase Hosting', () => {
@@ -99,9 +99,9 @@ describe('Vertigo Theatre organization listing', () => {
   it('renders the reusable organization-to-productions relationship', () => {
     const listing = read('src/components/entity/ListingDetail.tsx');
     const place = read('src/components/discovery/LocalPlace.tsx');
-    assert.match(place, /e\.sourceId === place\.sourceId/);
-    assert.match(place, /Coming up at <mark>\{name\}\.<\/mark>/);
-    assert.match(listing, /entity\.sourceId === event\.sourceId/);
+    assert.match(place, /organizerEvents\(place.id, all, now\)/);
+    assert.match(place, /Upcoming events from <mark>\{name\}\.<\/mark>/);
+    assert.match(listing, /organizerProfile\(event, all\)/);
     assert.match(listing, /<Link to=\{entityPath\(organization\)\}>\{event\.organizer\}<\/Link>/);
   });
 });

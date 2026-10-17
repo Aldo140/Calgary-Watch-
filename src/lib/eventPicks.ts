@@ -270,6 +270,38 @@ export function pickWhen(iso: string): string {
   return `${day} · ${time}`;
 }
 
+/**
+ * When to go, honestly: something that already opened and runs for a while
+ * ("On now · until Oct 24") reads by its closing date, never by an opening
+ * day months ago. Anything else reads by its start.
+ */
+export function isOnNow(item: { start: string; end: string }, now = Date.now()): boolean {
+  return Date.parse(item.start) <= now && Date.parse(item.end) > now;
+}
+
+export function pickWhenAt(item: { start: string; end: string }, now = Date.now()): string {
+  if (!isOnNow(item, now)) return pickWhen(item.start);
+  const until = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' }).format(new Date(item.end));
+  return `On now · until ${until}`;
+}
+
+/**
+ * The plan to lead with. A dated outing this week (a concert Friday) beats a
+ * months-long exhibition you can drop into any day; a short thing happening
+ * right now beats both. Runs that are on now come next, closing soonest first.
+ */
+export function nextUp<T extends { start: string; end: string }>(items: readonly T[], now = Date.now()): T | undefined {
+  const rank = (i: T) => {
+    const start = Date.parse(i.start), end = Date.parse(i.end);
+    if (start <= now) return end - start <= 1.5 * DAY_MS ? [0, start] : [2, end];
+    return start - now < 7 * DAY_MS ? [1, start] : [3, start];
+  };
+  return [...items].filter((i) => Date.parse(i.end) > now).sort((a, b) => {
+    const [ra, ka] = rank(a), [rb, kb] = rank(b);
+    return ra - rb || ka - kb;
+  })[0];
+}
+
 export function pickDistance(metres: number | null): string | null {
   if (metres === null) return null;
   if (metres < 1000) return 'In your area';
@@ -360,7 +392,9 @@ export function buildPlanTimeline(options: {
       ahead.push({ item, status, days, when: planWhen(status, days, start) });
     }
   }
-  ahead.sort((a, b) => (a.status === b.status ? 0 : a.status === 'live' ? -1 : 1) || Date.parse(a.item.start) - Date.parse(b.item.start));
+  // On now first, the one closing soonest at the top (catch it before it ends); then by start.
+  ahead.sort((a, b) => (a.status === b.status ? 0 : a.status === 'live' ? -1 : 1)
+    || (a.status === 'live' ? Date.parse(a.item.end) - Date.parse(b.item.end) : Date.parse(a.item.start) - Date.parse(b.item.start)));
   past.sort((a, b) => Date.parse(b.item.end) - Date.parse(a.item.end));
   return { ahead, past };
 }

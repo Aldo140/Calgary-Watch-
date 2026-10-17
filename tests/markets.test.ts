@@ -68,8 +68,12 @@ describe('vendor applications', () => {
 describe('rules contract', () => {
   const rules = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
   const block = (name: string, next: string) => rules.slice(rules.indexOf(`match /${name}/`), rules.indexOf(`match /${next}/`));
-  it('organizer means an approved claim on that market', () => {
-    assert.match(rules, /function isOrganizerOf\(marketId\)[\s\S]*?listing_claims\/\$\(request\.auth\.uid \+ '_' \+ marketId\)\)\.data\.status == 'approved'/);
+  it('market access requires an approved exact claim or a trusted linked organization grant', () => {
+    assert.match(rules,/approvedClaimFor\(request.auth.uid, marketId\)/);
+    assert.match(rules,/organizationManager\(get\(catalogue\).data.entity.organizerEntityId\)/);
+    assert.match(rules,/get\(path\).data.status == 'approved'/);
+    assert.match(rules,/listing_claims\/\$\(get\(path\).data.claimId\)\)\.data.uid == request.auth.uid/);
+    assert.match(rules,/match \/organization_managers\/\{id\}[\s\S]*?allow create, update: if isAdmin\(\)/);
   });
   it('roster is public; contacts are not', () => {
     assert.match(block('market_vendors', 'market_vendor_contacts'), /allow read: if true/);

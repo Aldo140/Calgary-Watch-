@@ -1,31 +1,33 @@
 /** Discovery documents are separate from incidents. Dates use ISO 8601 with an offset. */
 export type EntityKind = 'event' | 'market' | 'business' | 'guide' | 'neighbourhood';
 export interface EntitySource { name: string; url: string; retrievedAt?: string; kind: 'official' | 'editorial' | 'submission' | 'fixture' }
-export interface EntityImage { src: string; alt: string; credit?: string }
+export interface EntityImage { src: string; alt: string; credit?: string; presentation?: 'poster' }
 export interface EntityBase {
   id: string; kind: EntityKind; slug: string; title: string; summary: string; description: string;
   categories: string[]; tags: string[]; sources: EntitySource[]; image?: EntityImage;
-  status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked' | 'source-feed';
+  status: 'pending' | 'draft' | 'published' | 'archived'; verification: 'unverified' | 'source-checked' | 'source-feed' | 'organization-confirmed';
   verifiedAt?: string; fetchedAt?: string; sourceId?: string; sourceRecordId?: string;
   updatedAt: string; developmentOnly?: boolean; neighbourhood?: string;
   /** Set by the build only when an admin approved a listing claim for it (src/lib/verified.ts). Not the source check above. */
   ownerVerifiedAt?: string;
+  /** Server-applied content version, used only to acknowledge successful publication. */
+  ownerContentAppliedAt?: number;
   scores?: { featured?: number; editorial?: number; demand?: number; popularity?: number };
 }
 export interface Location { address: string; coordinates?: { lat: number; lng: number }; venue?: string }
 export interface Event extends EntityBase, Location {
   kind: 'event'; start: string; end: string; timezone: 'America/Edmonton';
-  endTimeEstimated?: boolean;
+  endTimeEstimated?: boolean; schedulePrecision?: 'date'; ticketSaleStatus?: 'not-on-sale' | 'on-sale' | 'unknown';
   pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string;
-  organizer: string; cancelled?: boolean;
+  organizer: string; organizerEntityId?: string; cancelled?: boolean;
 }
 export interface Market extends EntityBase, Location {
-  kind: 'market'; amenities: string[]; parking?: string; transit?: string;
+  kind: 'market'; organizerEntityId?: string; amenities: string[]; parking?: string; transit?: string;
   petFriendly?: boolean; familyFriendly?: boolean; organizer: string; vendorIds: string[]; images: EntityImage[];
 }
 export interface MarketOccurrence { id: string; marketId: string; start: string; end: string; timezone: 'America/Edmonton'; cancelled: boolean; source: EntitySource }
 export interface Business extends EntityBase, Location {
-  kind: 'business'; name: string; phone?: string; website?: string; hours?: Record<string, string>;
+  kind: 'business'; name: string; phone?: string; email?: string; website?: string; hours?: Record<string, string>;
   priceLevel?: 1 | 2 | 3 | 4; images: EntityImage[]; socials: Record<string, string>; services: string[];
   claimed: boolean; partner: boolean; editorialSelection: boolean; offer?: string; sponsorshipDisclosure?: string;
 }
@@ -47,7 +49,7 @@ export interface Neighbourhood extends EntityBase { kind: 'neighbourhood'; quadr
 export interface VendorAppearance { vendorId: string; marketOccurrenceId: string; source: EntitySource }
 export interface ClaimRequest { id: string; entityId: string; requesterUid: string; status: 'pending' | 'approved' | 'rejected'; createdAt: string }
 export interface SubmissionBase { title: string; summary: string; description: string; address: string; venue?: string; organizer: string; sourceUrl: string; categories: string[]; tags: string[]; neighbourhood?: string; image?: EntityImage; coordinates?: { lat: number; lng: number } }
-export interface EventSubmissionInput extends SubmissionBase { kind: 'event'; start: string; end: string; endTimeEstimated?: boolean; pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string }
+export interface EventSubmissionInput extends SubmissionBase { kind: 'event'; start: string; end: string; endTimeEstimated?: boolean; schedulePrecision?: 'date'; ticketSaleStatus?: 'not-on-sale' | 'on-sale' | 'unknown'; pricing: 'free' | 'paid' | 'unknown'; priceRange?: [number, number]; tickets?: string }
 export interface MarketSubmissionInput extends SubmissionBase { kind: 'market'; occurrences: { sourceRecordId: string; start: string; end: string; cancelled: boolean }[]; amenities: string[]; parking?: string; transit?: string; petFriendly?: boolean; familyFriendly?: boolean }
 export interface BusinessSubmissionInput extends SubmissionBase { kind: 'business'; website?: string }
 export type InventorySubmissionInput = EventSubmissionInput | MarketSubmissionInput;

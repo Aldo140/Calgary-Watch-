@@ -1272,5 +1272,1708 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "downstage",
+      "name": "Downstage",
+      "approved": true,
+      "hosts": [
+        "downstage.ca",
+        "www.downstage.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "dreaming-climate-consciousness-2026-10-23",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "new plays"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "Dreaming Climate Consciousness",
+          "summary": "Four short plays by Calgary playwrights, set in one shared, imagined climate future.",
+          "description": "Dreaming Climate Consciousness brings four new short plays by Calgary playwrights to Downstage’s stage at the Motel Theatre in the Werklund Centre, each one a window into the same collectively imagined climate future. It plays October 23 and 24. Showtimes and tickets are on Downstage’s current season page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/dreaming-climate-consciousness.jpg",
+            "alt": "Dreaming Climate Consciousness production artwork with a tree-ring landscape surrounded by people and animals",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
+          "start": "2026-10-23T00:00:00-06:00",
+          "end": "2026-10-24T00:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "dreaming-climate-consciousness-2026-10-24",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "new plays"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "Dreaming Climate Consciousness",
+          "summary": "Four short plays by Calgary playwrights, set in one shared, imagined climate future.",
+          "description": "Dreaming Climate Consciousness brings four new short plays by Calgary playwrights to Downstage’s stage at the Motel Theatre in the Werklund Centre, each one a window into the same collectively imagined climate future. It plays October 23 and 24. Showtimes and tickets are on Downstage’s current season page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/dreaming-climate-consciousness.jpg",
+            "alt": "Dreaming Climate Consciousness production artwork with a tree-ring landscape surrounded by people and animals",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
+          "start": "2026-10-24T00:00:00-06:00",
+          "end": "2026-10-25T00:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "creative-stretch-2026-27",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "workshop",
+            "weekly"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "free",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "Creative Stretch with Downstage",
+          "summary": "Downstage’s Monday Creative Stretch sessions at the Motel Theatre, running October to May.",
+          "description": "Creative Stretch is Downstage’s recurring Monday session at the Motel Theatre in the Werklund Centre, running most Mondays from October 19, 2026 to May 31, 2027. Check Downstage’s current season page for session times and any weeks off.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/creative-stretch.jpg",
+            "alt": "Creative Stretch production artwork with overlapping figures in motion on a pink background",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
+          "start": "2026-10-19T00:00:00-06:00",
+          "end": "2027-05-31T23:59:00-06:00",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "a-study-of-choices-2027",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "new plays"
+          ],
+          "categories": [
+            "arts"
+          ],
+          "organizer": "Downstage",
+          "pricing": "unknown",
+          "address": "205 8 Avenue SE, Calgary, AB",
+          "venue": "Motel Theatre, Werklund Centre",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://downstage.ca/currentseason/",
+          "title": "A Study of Choices",
+          "summary": "Three performers take the stage each night with no idea what awaits them, so no two shows are the same.",
+          "description": "In A Study of Choices, three performers arrive on stage each night without knowing what awaits them, interpreting instructions and improvised sound given to them in the moment, so no two performances are alike. It runs April 7 to 11, 2027 at the Motel Theatre in the Werklund Centre. Showtimes and tickets are on Downstage’s current season page.",
+          "image": {
+            "src": "https://calgarywatch.ca/images/downstage/a-study-of-choices.jpg",
+            "alt": "A Study of Choices production artwork with blue figures balancing across mustard-coloured lines",
+            "credit": "Artwork by Leetia Lyons",
+            "presentation": "poster"
+          },
+          "start": "2027-04-07T00:00:00-06:00",
+          "end": "2027-04-12T00:00:00-06:00",
+          "endTimeEstimated": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "atp-partner-season-2026-27",
+      "name": "Alberta Theatre Projects — user-supplied Werklund Centre inventory",
+      "approved": true,
+      "hosts": [
+        "www.werklundcentre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "evil-dead-the-musical",
+        "input": {
+          "kind": "event",
+          "title": "Evil Dead the Musical",
+          "summary": "Evil Dead the Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Evil Dead the Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-10-13T00:00:00-06:00",
+          "end": "2026-11-15T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "the-hobbit",
+        "input": {
+          "kind": "event",
+          "title": "The Hobbit",
+          "summary": "The Hobbit is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "The Hobbit is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-12-01T00:00:00-06:00",
+          "end": "2027-01-04T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "fifteen-dogs",
+        "input": {
+          "kind": "event",
+          "title": "Fifteen Dogs",
+          "summary": "Fifteen Dogs is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Fifteen Dogs is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-02T00:00:00-06:00",
+          "end": "2027-02-22T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "burning-mom",
+        "input": {
+          "kind": "event",
+          "title": "Burning Mom",
+          "summary": "Burning Mom is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Burning Mom is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-04-06T00:00:00-06:00",
+          "end": "2027-04-26T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "dream-a-canadian-musical",
+        "input": {
+          "kind": "event",
+          "title": "Dream: A Canadian Musical",
+          "summary": "Dream: A Canadian Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre.",
+          "description": "Dream: A Canadian Musical is presented by Alberta Theatre Projects at the Martha Cohen Theatre. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Martha Cohen Theatre, Calgary, Alberta",
+          "venue": "Martha Cohen Theatre",
+          "organizer": "Alberta Theatre Projects",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "arts"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-05-25T00:00:00-06:00",
+          "end": "2027-06-21T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "werklund-partner-season-2026-27",
+      "name": "Werklund Centre — user-supplied What’s On inventory",
+      "approved": true,
+      "hosts": [
+        "www.werklundcentre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "madonna-immaculate-collection",
+        "input": {
+          "kind": "event",
+          "title": "Madonna: The Immaculate Collection",
+          "summary": "Classic Albums Live performs Madonna’s The Immaculate Collection.",
+          "description": "Classic Albums Live performs Madonna’s The Immaculate Collection. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-10-23T00:00:00-06:00",
+          "end": "2026-10-24T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "a-pirates-life",
+        "input": {
+          "kind": "event",
+          "title": "A Pirate’s Life",
+          "summary": "Archaeologist Lisa Briggs explores famous treasures and pirates.",
+          "description": "Archaeologist Lisa Briggs explores famous treasures and pirates. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2026-11-01T00:00:00-06:00",
+          "end": "2026-11-03T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "diving-great-barrier-reef",
+        "input": {
+          "kind": "event",
+          "title": "Diving the Great Barrier Reef",
+          "summary": "Erika Woolsey discusses the Great Barrier Reef, coral spawning, reef loss and conservation.",
+          "description": "Erika Woolsey discusses the Great Barrier Reef, coral spawning, reef loss and conservation. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-01-24T00:00:00-06:00",
+          "end": "2027-01-26T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "fran-lebowitz",
+        "input": {
+          "kind": "event",
+          "title": "An Evening with Fran Lebowitz",
+          "summary": "An unscripted conversation with Fran Lebowitz featuring cultural commentary, wit and observations.",
+          "description": "An unscripted conversation with Fran Lebowitz featuring cultural commentary, wit and observations. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-05T00:00:00-06:00",
+          "end": "2027-02-06T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "changing-lens-saving-planet",
+        "input": {
+          "kind": "event",
+          "title": "Changing the Lens on Saving the Planet",
+          "summary": "Featuring Bertie Gregory and hosted by Jay Ingram.",
+          "description": "Featuring Bertie Gregory and hosted by Jay Ingram. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-19T00:00:00-06:00",
+          "end": "2027-02-20T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "van-halen-1984",
+        "input": {
+          "kind": "event",
+          "title": "Van Halen: 1984",
+          "summary": "Classic Albums Live performs Van Halen’s 1984 note-for-note and cut-for-cut.",
+          "description": "Classic Albums Live performs Van Halen’s 1984 note-for-note and cut-for-cut. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-02-26T00:00:00-06:00",
+          "end": "2027-02-27T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "earth-after-dark",
+        "input": {
+          "kind": "event",
+          "title": "Earth After Dark",
+          "summary": "Featuring Babak Tafreshi.",
+          "description": "Featuring Babak Tafreshi. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-03-14T00:00:00-06:00",
+          "end": "2027-03-16T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "yamato-tamayura",
+        "input": {
+          "kind": "event",
+          "title": "YAMATO TAMAYURA",
+          "summary": "Echoes of the Soul: a YAMATO Wadaiko drumming performance.",
+          "description": "Echoes of the Soul: a YAMATO Wadaiko drumming performance. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-03-31T00:00:00-06:00",
+          "end": "2027-04-01T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "saving-natures-symphony",
+        "input": {
+          "kind": "event",
+          "title": "Saving Nature’s Symphony",
+          "summary": "Acoustic biologist and National Geographic Explorer Dr. Ben Mirin combines animal sounds, conservation, storytelling and music.",
+          "description": "Acoustic biologist and National Geographic Explorer Dr. Ben Mirin combines animal sounds, conservation, storytelling and music. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-04-11T00:00:00-06:00",
+          "end": "2027-04-13T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "fleetwood-mac-rumours",
+        "input": {
+          "kind": "event",
+          "title": "Fleetwood Mac: Rumours",
+          "summary": "Classic Albums Live performs Fleetwood Mac’s Rumours live.",
+          "description": "Classic Albums Live performs Fleetwood Mac’s Rumours live. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-04-15T00:00:00-06:00",
+          "end": "2027-04-16T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "acdc-highway-to-hell",
+        "input": {
+          "kind": "event",
+          "title": "AC/DC: Highway to Hell",
+          "summary": "Classic Albums Live performs Highway to Hell note-for-note and cut-for-cut, followed by additional AC/DC songs.",
+          "description": "Classic Albums Live performs Highway to Hell note-for-note and cut-for-cut, followed by additional AC/DC songs. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "music"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-05-13T00:00:00-06:00",
+          "end": "2027-05-14T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "stories-saturday-night",
+        "input": {
+          "kind": "event",
+          "title": "Stories for a Saturday Night",
+          "summary": "An Evening with Ira Glass.",
+          "description": "An Evening with Ira Glass. Dates are the announced run; check the official programme for individual performances and showtimes.",
+          "address": "Jack Singer Concert Hall, Calgary, Alberta",
+          "venue": "Jack Singer Concert Hall",
+          "organizer": "Werklund Centre",
+          "sourceUrl": "https://www.werklundcentre.ca/",
+          "categories": [
+            "talks"
+          ],
+          "tags": [
+            "2026-27 season"
+          ],
+          "start": "2027-05-22T00:00:00-06:00",
+          "end": "2027-05-23T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "calgary-folk-festival-partner",
+      "name": "Calgary Folk Music Festival — user-supplied partner confirmation",
+      "approved": true,
+      "hosts": [
+        "www.calgaryfolkfest.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "calgary-folk-music-festival-2027",
+        "input": {
+          "kind": "event",
+          "title": "Calgary Folk Music Festival 2027",
+          "summary": "July 22–25, 2027. Tickets are not currently on sale; the lineup is still being built.",
+          "description": "Calgary Folk Music Festival confirmed July 22–25, 2027 in its partner response. Tickets are not currently on sale and the 2027 lineup is still being built. Check the official festival website for later lineup, ticket and venue updates. Daily performance times have not been supplied.",
+          "address": "Calgary, Alberta",
+          "organizer": "Calgary Folk Music Festival",
+          "sourceUrl": "https://www.calgaryfolkfest.com/",
+          "categories": [
+            "music",
+            "festival"
+          ],
+          "tags": [
+            "2027 festival",
+            "partner-confirmed dates"
+          ],
+          "start": "2027-07-22T00:00:00-06:00",
+          "end": "2027-07-26T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "ticketSaleStatus": "not-on-sale",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "little-modern-2026",
+      "name": "Little Modern Market — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.littlemodernmarket.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "holiday-2026",
+        "input": {
+          "kind": "market",
+          "title": "Little Modern Market — Holiday Market",
+          "summary": "A free holiday makers market at the Red & White Club / Olympic Volunteer Centre at McMahon Stadium, with charity donations encouraged.",
+          "description": "Little Modern Market’s Holiday Market takes place November 21, 2026 at the Red & White Club / Olympic Volunteer Centre at McMahon Stadium, 10 a.m.–4 p.m. Free admission with an encouraged donation to the featured charity. Certified service dogs only. Confirm final hours and activities with the organizer.",
+          "address": "1833 Crowchild Trail NW, Calgary, AB",
+          "venue": "Red & White Club / Olympic Volunteer Centre, McMahon Stadium",
+          "organizer": "Little Modern Market",
+          "sourceUrl": "https://www.littlemodernmarket.com/apply",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Charity donations encouraged",
+            "Certified service dogs only"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "holiday-2026:2026-11-21:10:00:00",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        },
+        "supportingSources": [
+          {
+            "name": "YYC Buzz — November market hours (supplied source)",
+            "url": "https://www.yyc.buzz/events/calendar/2026/11",
+            "kind": "editorial"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "barn-artisan-2026",
+      "name": "The Barn Artisan Market — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "thebarnartisanmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "barn-autumn-2026",
+        "input": {
+          "kind": "market",
+          "title": "The Barn Artisan Market",
+          "summary": "Halloween Market October 25 and Christmas Market November 29, 2026, both 11 a.m.–4 p.m. Free admission and parking, with more than 30 local artisan vendors across two floors. Made-in-Alberta products; no MLM, direct sales or drop-shipping. These confirmed dates override any assumption that every edition falls on the fourth Sunday.",
+          "description": "Halloween Market October 25 and Christmas Market November 29, 2026, both 11 a.m.–4 p.m. Free admission and parking, with more than 30 local artisan vendors across two floors. Made-in-Alberta products; no MLM, direct sales or drop-shipping. These confirmed dates override any assumption that every edition falls on the fourth Sunday.",
+          "address": "224 Shawmeadows Road SW, Calgary, AB",
+          "venue": "Shawnessy Barn",
+          "organizer": "The Barn Artisan Market",
+          "sourceUrl": "https://thebarnartisanmarket.ca/",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Free parking",
+            "Two floors",
+            "Made in Alberta"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "barn-autumn-2026:2026-10-25:11:00:00",
+              "start": "2026-10-25T11:00:00-06:00",
+              "end": "2026-10-25T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "barn-autumn-2026:2026-11-29:11:00:00",
+              "start": "2026-11-29T11:00:00-06:00",
+              "end": "2026-11-29T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "crossroads-guest-2026",
+      "name": "Crossroads guest-market calendar — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.crossroadsmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "inglewood-night-2026",
+        "input": {
+          "kind": "market",
+          "title": "Inglewood Night Market at Crossroads",
+          "summary": "An evening market presented by Vibrant City Events at Crossroads Market.",
+          "description": "Presented by Vibrant City Events at Crossroads Market, November 13, 14, 20, 21, 27 and 28, 2026, 4–9 p.m. Crossroads is the host location. Check the organizer and venue for visitor details; Crossroads’ own holiday shopping hours may differ.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Vibrant City Events",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [],
+          "occurrences": [
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-13:16:00:00",
+              "start": "2026-11-13T16:00:00-06:00",
+              "end": "2026-11-13T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-14:16:00:00",
+              "start": "2026-11-14T16:00:00-06:00",
+              "end": "2026-11-14T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-20:16:00:00",
+              "start": "2026-11-20T16:00:00-06:00",
+              "end": "2026-11-20T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-21:16:00:00",
+              "start": "2026-11-21T16:00:00-06:00",
+              "end": "2026-11-21T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-27:16:00:00",
+              "start": "2026-11-27T16:00:00-06:00",
+              "end": "2026-11-27T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "inglewood-night-2026:2026-11-28:16:00:00",
+              "start": "2026-11-28T16:00:00-06:00",
+              "end": "2026-11-28T21:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "crossroads-flea-2026",
+      "name": "Crossroads guest-market calendar — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.crossroadsmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "yyc-flea-2026",
+        "input": {
+          "kind": "market",
+          "title": "YYC Flea at Crossroads",
+          "summary": "YYC Flea at the heated/covered Crossroads Quonset, presented by Vibrant City Events.",
+          "description": "YYC Flea at the heated/covered Crossroads Quonset on November 15, 22 and 29, 2026, 10 a.m.–5 p.m. Hosted by Vibrant City Events. Crossroads is the venue; this listing does not grant Crossroads ownership of the guest market.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market heated/covered Quonset",
+          "organizer": "Vibrant City Events",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [],
+          "occurrences": [
+            {
+              "sourceRecordId": "yyc-flea-2026:2026-11-15:10:00:00",
+              "start": "2026-11-15T10:00:00-06:00",
+              "end": "2026-11-15T17:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "yyc-flea-2026:2026-11-22:10:00:00",
+              "start": "2026-11-22T10:00:00-06:00",
+              "end": "2026-11-22T17:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "yyc-flea-2026:2026-11-29:10:00:00",
+              "start": "2026-11-29T10:00:00-06:00",
+              "end": "2026-11-29T17:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "recurring-markets-calgary",
+      "name": "Calgary Winter Market — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "calgarywintermarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "calgary-winter-market",
+        "input": {
+          "kind": "market",
+          "title": "Calgary Winter Market",
+          "summary": "A ticketed European-inspired outdoor holiday market at Eau Claire Plaza, with 26 operating days from November 19 to December 24, 2026.",
+          "description": "European-inspired outdoor holiday market at Eau Claire Plaza. The organizer is Calgary Yuletide Festival Society. Open Thursday–Sunday November 19–December 13, then daily December 15–24, 2026 (26 operating days). Thursday–Saturday 11 a.m.–9 p.m.; Sundays 11 a.m.–6 p.m.; December 24 closes at 3 p.m. December 15, 16, 21, 22 and 23 are also operating dates; opening hours for those five dates are not listed here, so check the official website. Advance entry is listed at $8; confirm current ticket availability and prices before booking. Features include retail huts, food and beverages, entertainment, children’s activities, a carousel and Brauhaus tent.",
+          "address": "101 Barclay Parade SW, Calgary, AB T2P 4R3",
+          "venue": "Eau Claire Plaza",
+          "organizer": "Calgary Yuletide Festival Society",
+          "sourceUrl": "https://calgarywintermarket.ca/",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Outdoor market",
+            "Ticketed entry",
+            "Market huts",
+            "Entertainment",
+            "Family activities"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-19:11:00:00",
+              "start": "2026-11-19T11:00:00-06:00",
+              "end": "2026-11-19T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-20:11:00:00",
+              "start": "2026-11-20T11:00:00-06:00",
+              "end": "2026-11-20T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-21:11:00:00",
+              "start": "2026-11-21T11:00:00-06:00",
+              "end": "2026-11-21T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-22:11:00:00",
+              "start": "2026-11-22T11:00:00-06:00",
+              "end": "2026-11-22T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-26:11:00:00",
+              "start": "2026-11-26T11:00:00-06:00",
+              "end": "2026-11-26T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-27:11:00:00",
+              "start": "2026-11-27T11:00:00-06:00",
+              "end": "2026-11-27T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-28:11:00:00",
+              "start": "2026-11-28T11:00:00-06:00",
+              "end": "2026-11-28T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-11-29:11:00:00",
+              "start": "2026-11-29T11:00:00-06:00",
+              "end": "2026-11-29T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-03:11:00:00",
+              "start": "2026-12-03T11:00:00-06:00",
+              "end": "2026-12-03T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-04:11:00:00",
+              "start": "2026-12-04T11:00:00-06:00",
+              "end": "2026-12-04T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-05:11:00:00",
+              "start": "2026-12-05T11:00:00-06:00",
+              "end": "2026-12-05T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-06:11:00:00",
+              "start": "2026-12-06T11:00:00-06:00",
+              "end": "2026-12-06T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-10:11:00:00",
+              "start": "2026-12-10T11:00:00-06:00",
+              "end": "2026-12-10T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-11:11:00:00",
+              "start": "2026-12-11T11:00:00-06:00",
+              "end": "2026-12-11T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-12:11:00:00",
+              "start": "2026-12-12T11:00:00-06:00",
+              "end": "2026-12-12T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-13:11:00:00",
+              "start": "2026-12-13T11:00:00-06:00",
+              "end": "2026-12-13T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-17:11:00:00",
+              "start": "2026-12-17T11:00:00-06:00",
+              "end": "2026-12-17T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-18:11:00:00",
+              "start": "2026-12-18T11:00:00-06:00",
+              "end": "2026-12-18T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-19:11:00:00",
+              "start": "2026-12-19T11:00:00-06:00",
+              "end": "2026-12-19T21:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-20:11:00:00",
+              "start": "2026-12-20T11:00:00-06:00",
+              "end": "2026-12-20T18:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "calgary-winter-market:2026-12-24:11:00:00",
+              "start": "2026-12-24T11:00:00-06:00",
+              "end": "2026-12-24T15:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "ymca-winter-2026",
+      "name": "YMCA Calgary 2026 Winter Markets — user-supplied official-source research",
+      "approved": true,
+      "hosts": [
+        "www.ymcacalgary.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "shawnessy-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Shawnessy YMCA Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Shawnessy YMCA. Branch contact: shawnessy@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Shawnessy YMCA. Branch contact: shawnessy@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "400-333 Shawville Boulevard SE, Calgary, AB T2Y 4H3",
+          "venue": "Shawnessy YMCA",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "shawnessy-winter-2026:2026-11-21:10:00:00",
+              "start": "2026-11-21T10:00:00-06:00",
+              "end": "2026-11-21T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "seton-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Brookfield Residential YMCA at Seton Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Brookfield Residential YMCA at Seton. Branch contact: seton@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Brookfield Residential YMCA at Seton. Branch contact: seton@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "4995 Market Street SE, Calgary, AB T3M 2P9",
+          "venue": "Brookfield Residential YMCA at Seton",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "seton-winter-2026:2026-11-28:10:00:00",
+              "start": "2026-11-28T10:00:00-06:00",
+              "end": "2026-11-28T16:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "quarrypark-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Remington YMCA in Quarry Park Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Remington YMCA in Quarry Park. Branch contact: quarrypark@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Remington YMCA in Quarry Park. Branch contact: quarrypark@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "108 Quarry Park Road SE, Calgary, AB T2C 5R1",
+          "venue": "Remington YMCA in Quarry Park",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "quarrypark-winter-2026:2026-12-05:09:00:00",
+              "start": "2026-12-05T09:00:00-06:00",
+              "end": "2026-12-05T15:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      },
+      {
+        "id": "rockyridge-winter-2026",
+        "input": {
+          "kind": "market",
+          "title": "Shane Homes YMCA at Rocky Ridge Winter Market",
+          "summary": "Free-to-attend 2026 winter market featuring local vendors and products at Shane Homes YMCA at Rocky Ridge. Branch contact: rockyridge@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "description": "Free-to-attend 2026 winter market featuring local vendors and products at Shane Homes YMCA at Rocky Ridge. Branch contact: rockyridge@ymcacalgary.org. Check the official YMCA event page for current visitor information.",
+          "address": "11300 Rocky Ridge Road NW, Calgary, AB T3G 5H3",
+          "venue": "Shane Homes YMCA at Rocky Ridge",
+          "organizer": "YMCA Calgary",
+          "sourceUrl": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "categories": [
+            "markets",
+            "shopping"
+          ],
+          "tags": [
+            "local vendors"
+          ],
+          "amenities": [
+            "Free admission",
+            "Local vendors"
+          ],
+          "familyFriendly": true,
+          "occurrences": [
+            {
+              "sourceRecordId": "rockyridge-winter-2026:2026-12-05:09:00:00",
+              "start": "2026-12-05T09:00:00-06:00",
+              "end": "2026-12-05T15:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "rockyridge-winter-2026:2026-12-06:09:00:00",
+              "start": "2026-12-06T09:00:00-06:00",
+              "end": "2026-12-06T15:00:00-06:00",
+              "cancelled": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "crossroads-santa-2026",
+      "name": "Crossroads calendar — user-supplied source research",
+      "approved": true,
+      "hosts": [
+        "www.crossroadsmarket.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "santa-2026-12-05",
+        "input": {
+          "kind": "event",
+          "title": "Selfies with Santa at Crossroads",
+          "summary": "Santa photo opportunity at Crossroads Market; check the organizer for the time on this date.",
+          "description": "Selfies with Santa is listed at Crossroads Market on December 5, 12 and 19, 2026. Each date has its own schedule; check the official event page for the time, booking requirements and any admission conditions.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Crossroads Market",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "family",
+            "holiday"
+          ],
+          "tags": [
+            "Santa",
+            "photos"
+          ],
+          "start": "2026-12-05T00:00:00-06:00",
+          "end": "2026-12-06T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "santa-2026-12-12",
+        "input": {
+          "kind": "event",
+          "title": "Selfies with Santa at Crossroads",
+          "summary": "Santa photo opportunity at Crossroads Market; check the organizer for the time on this date.",
+          "description": "Selfies with Santa is listed at Crossroads Market on December 5, 12 and 19, 2026. Each date has its own schedule; check the official event page for the time, booking requirements and any admission conditions.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Crossroads Market",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "family",
+            "holiday"
+          ],
+          "tags": [
+            "Santa",
+            "photos"
+          ],
+          "start": "2026-12-12T00:00:00-06:00",
+          "end": "2026-12-13T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "santa-2026-12-19",
+        "input": {
+          "kind": "event",
+          "title": "Selfies with Santa at Crossroads",
+          "summary": "Santa photo opportunity at Crossroads Market; check the organizer for the time on this date.",
+          "description": "Selfies with Santa is listed at Crossroads Market on December 5, 12 and 19, 2026. Each date has its own schedule; check the official event page for the time, booking requirements and any admission conditions.",
+          "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+          "venue": "Crossroads Market",
+          "organizer": "Crossroads Market",
+          "sourceUrl": "https://www.crossroadsmarket.ca/events",
+          "categories": [
+            "family",
+            "holiday"
+          ],
+          "tags": [
+            "Santa",
+            "photos"
+          ],
+          "start": "2026-12-19T00:00:00-06:00",
+          "end": "2026-12-20T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "unknown"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-granary-road-2026",
+      "name": "Granary Road",
+      "approved": true,
+      "hosts": [
+        "www.granaryroad.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Granary Road Christmas Market 2026",
+          "summary": "Three festive weekends of local vendors, handmade gifts and family activities south of Calgary.",
+          "description": "November 28–29, December 5–6 and December 12–13, 10 a.m.–4 p.m. Admission is required; selected Christmas activity passes include market admission. Tractor rides, hot cocoa and marshmallows and outdoor campfires are listed as included with market admission. Photos with Santa and alpacas, festive goat yoga and Pancakes with Santa have their own passes. This is a Foothills County day trip outside Calgary; check current tickets before travelling. Pets are not allowed.",
+          "address": "226066 112 Street West, Foothills County, AB T1S 5S5",
+          "venue": "Granary Road",
+          "organizer": "Granary Road",
+          "sourceUrl": "https://www.granaryroad.com/christmas-market",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "amenities": [
+            "Local vendors",
+            "Admission required",
+            "Family activities"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-28",
+              "start": "2026-11-28T10:00:00-06:00",
+              "end": "2026-11-28T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-11-29",
+              "start": "2026-11-29T10:00:00-06:00",
+              "end": "2026-11-29T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-05",
+              "start": "2026-12-05T10:00:00-06:00",
+              "end": "2026-12-05T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-06",
+              "start": "2026-12-06T10:00:00-06:00",
+              "end": "2026-12-06T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-12",
+              "start": "2026-12-12T10:00:00-06:00",
+              "end": "2026-12-12T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-12-13",
+              "start": "2026-12-13T10:00:00-06:00",
+              "end": "2026-12-13T16:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "petFriendly": false,
+          "familyFriendly": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-bowness-community-association-2026",
+      "name": "Bowness Community Association",
+      "approved": true,
+      "hosts": [
+        "mybowness.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "holiday-craft-fair-2026",
+        "input": {
+          "kind": "market",
+          "title": "Bowness Holiday Craft Fair 2026",
+          "summary": "A free two-day neighbourhood fair for handmade gifts and seasonal finds.",
+          "description": "Shop a curated mix of local makers, artists and small businesses in the BCA Main Hall, November 14–15, 10 a.m.–4 p.m. Admission is free. Vendor applications have closed. Use craftfair@mybowness.com for fair inquiries; the association warns that messages impersonating its fair from unrelated Gmail accounts are scams.",
+          "address": "7904 43 Avenue NW, Calgary, AB T3B 4P9",
+          "venue": "BCA Main Hall",
+          "organizer": "Bowness Community Association",
+          "sourceUrl": "https://mybowness.com/craftfair/",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "amenities": [
+            "Free admission",
+            "Indoor",
+            "Local makers"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-14",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T16:00:00-06:00",
+              "cancelled": false
+            },
+            {
+              "sourceRecordId": "2026-11-15",
+              "start": "2026-11-15T10:00:00-06:00",
+              "end": "2026-11-15T16:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "familyFriendly": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-acadia-community-association-2026",
+      "name": "Acadia Community Association",
+      "approved": true,
+      "hosts": [
+        "www.acadiaca.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Acadia Christmas Market 2026",
+          "summary": "Free holiday shopping with local businesses at Acadia Recreation Complex.",
+          "description": "Saturday, November 14, 10 a.m.–4 p.m. in Rose Hall at Acadia Recreation Complex. Admission and parking are free. Browse local businesses and start holiday shopping in a neighbourhood setting. Questions can go to events@acadiaca.com.",
+          "address": "240 90 Avenue SE, Calgary, AB T2J 6P6",
+          "venue": "Acadia Recreation Complex — Rose Hall",
+          "organizer": "Acadia Community Association",
+          "sourceUrl": "https://www.acadiaca.com/christmas-market",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "amenities": [
+            "Free admission",
+            "Free parking",
+            "Indoor"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-14",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T16:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "familyFriendly": true,
+          "parking": "Free parking, according to the organizer."
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-silver-springs-community-association-2026",
+      "name": "Silver Springs Community Association",
+      "approved": true,
+      "hosts": [
+        "silverspringscommunity.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-craft-market-2026",
+        "input": {
+          "kind": "market",
+          "title": "Silver Springs Christmas Craft Market 2026",
+          "summary": "A free community market for handmade goods, unique gifts and local crafts.",
+          "description": "Saturday, November 14, 10 a.m.–3 p.m. at Silver Springs Community Centre. Browse a curated selection of local vendors under one roof. Free to attend and open to all. Contact administration@silverspringscommunity.ca for association inquiries.",
+          "address": "5720 Silver Ridge Drive NW, Calgary, AB T3B 5E5",
+          "venue": "Silver Springs Community Centre",
+          "organizer": "Silver Springs Community Association",
+          "sourceUrl": "https://silverspringscommunity.ca/events/christmas-craft-market",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "amenities": [
+            "Free admission",
+            "Indoor",
+            "Local crafts"
+          ],
+          "occurrences": [
+            {
+              "sourceRecordId": "2026-11-14",
+              "start": "2026-11-14T10:00:00-06:00",
+              "end": "2026-11-14T15:00:00-06:00",
+              "cancelled": false
+            }
+          ],
+          "familyFriendly": true
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-signatures-shows-2026",
+      "name": "Signatures Shows",
+      "approved": true,
+      "hosts": [
+        "signatures.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "festival-of-crafts-2026",
+        "input": {
+          "kind": "event",
+          "title": "Festival of Crafts 2026",
+          "summary": "A four-day handmade show with more than 140 Canadian artisans at the BMO Centre.",
+          "description": "October 29–November 1, 2026, in Hall F at Stampede Park’s BMO Centre. Discover handmade gifts, jewellery, home décor and gourmet foods from Canadian makers. Check the official show information and ticket page for daily opening hours, current prices and entry details before attending. Calgary show inquiries: smilner@signatures.ca.",
+          "address": "20 Round Up Way SE, Calgary, AB T2G 2W1",
+          "venue": "BMO Centre — Hall F",
+          "organizer": "Signatures Shows",
+          "sourceUrl": "https://signatures.ca/market/festival-of-crafts/",
+          "categories": [
+            "markets",
+            "arts",
+            "shopping",
+            "holiday"
+          ],
+          "tags": [],
+          "start": "2026-10-29T00:00:00-06:00",
+          "end": "2026-11-02T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "tickets": "https://signatures.ca/tickets/"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-millarville-racing-and-agricultural-society-2026",
+      "name": "Millarville Racing and Agricultural Society",
+      "approved": true,
+      "hosts": [
+        "millarvilleracetrack.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "christmas-market-2026-11-05",
+        "input": {
+          "kind": "event",
+          "title": "Millarville Christmas Market 2026 — First Weekend",
+          "summary": "A Foothills holiday-market day trip with local vendors, food trucks, music and family activities.",
+          "description": "The 2026 market opens November 5–8 and November 12–15. This listing covers November 5–8. Shopping spans indoor and outdoor spaces, including heated areas. Dress for the weather and suitable footwear. The Kids Only Shoppe opens Saturdays and Sundays for ages 5–12. Tickets are required; confirm entry times and current prices with the organizer. Check the organizer for each day’s opening hours. This location is outside Calgary.",
+          "address": "306097 192 Street W, Millarville, AB T0L 1K0",
+          "venue": "Millarville Racetrack",
+          "organizer": "Millarville Racing and Agricultural Society",
+          "sourceUrl": "https://millarvilleracetrack.com/annual-christmas-market/",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-11-05T00:00:00-06:00",
+          "end": "2026-11-09T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "tickets": "https://millarvilleracetrack.com/annual-christmas-market/"
+        }
+      },
+      {
+        "id": "christmas-market-2026-11-12",
+        "input": {
+          "kind": "event",
+          "title": "Millarville Christmas Market 2026 — Second Weekend",
+          "summary": "A Foothills holiday-market day trip with local vendors, food trucks, music and family activities.",
+          "description": "The 2026 market opens November 5–8 and November 12–15. This listing covers November 12–15. Shopping spans indoor and outdoor spaces, including heated areas. Dress for the weather and suitable footwear. The Kids Only Shoppe opens Saturdays and Sundays for ages 5–12. Tickets are required; confirm entry times and current prices with the organizer. Check the organizer for each day’s opening hours. This location is outside Calgary.",
+          "address": "306097 192 Street W, Millarville, AB T0L 1K0",
+          "venue": "Millarville Racetrack",
+          "organizer": "Millarville Racing and Agricultural Society",
+          "sourceUrl": "https://millarvilleracetrack.com/annual-christmas-market/",
+          "categories": [
+            "markets",
+            "shopping",
+            "holiday",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-11-12T00:00:00-06:00",
+          "end": "2026-11-16T00:00:00-06:00",
+          "schedulePrecision": "date",
+          "pricing": "paid",
+          "tickets": "https://millarvilleracetrack.com/annual-christmas-market/"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-triwood-community-association-2026",
+      "name": "Triwood Community Association",
+      "approved": true,
+      "hosts": [
+        "www.triwoodcommunity.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "halloween-skate-2026",
+        "input": {
+          "kind": "event",
+          "title": "Triwood Halloween Skate Night",
+          "summary": "A free neighbourhood skate with music, costumes and off-ice activities.",
+          "description": "Sunday, October 25, 5:30–6:30 p.m. at Triwood Arena. All ages and skating abilities are welcome; costumes are encouraged. The organizer lists light refreshments, face painting, colouring and a costume contest. RSVP through Triwood’s events page. Some loan equipment is available; ask programs@triwoodcommunity.com or 403-282-2677 ext. 103.",
+          "address": "2244 Chicoutimi Drive NW, Calgary, AB T2L 0W1",
+          "venue": "Triwood Arena",
+          "organizer": "Triwood Community Association",
+          "sourceUrl": "https://www.triwoodcommunity.com/events",
+          "categories": [
+            "family",
+            "community",
+            "recreation",
+            "holiday"
+          ],
+          "tags": [],
+          "start": "2026-10-25T17:30:00-06:00",
+          "end": "2026-10-25T18:30:00-06:00",
+          "pricing": "free"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-the-saskatoon-farm-2026",
+      "name": "The Saskatoon Farm",
+      "approved": true,
+      "hosts": [
+        "www.saskatoonfarm.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "felted-art-2026-10-23",
+        "input": {
+          "kind": "event",
+          "title": "Felted Art Workshop at The Saskatoon Farm",
+          "summary": "A small creative evening making felted wall art in the farm’s Red House.",
+          "description": "Friday, October 23, 6–9 p.m. in The Red House at The Saskatoon Farm. Food and drinks are available for purchase. Follow the organizer’s event page for tickets, current availability and workshop details. This is a Foothills County day trip outside Calgary.",
+          "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+          "venue": "The Red House, The Saskatoon Farm",
+          "organizer": "The Saskatoon Farm",
+          "sourceUrl": "https://www.saskatoonfarm.com/events-1/felted-art-workshop-1",
+          "categories": [
+            "arts",
+            "workshop",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-10-23T18:00:00-06:00",
+          "end": "2026-10-23T21:00:00-06:00",
+          "pricing": "unknown"
+        }
+      },
+      {
+        "id": "dia-de-los-muertos-2026",
+        "input": {
+          "kind": "event",
+          "title": "Día de los Muertos at The Saskatoon Farm",
+          "summary": "A greenhouse celebration with Mexican music, tacos, handmade vendors and Catrina face painting.",
+          "description": "Friday, October 30. The official calendar lists 6–11 p.m.; the detailed programme says the main-greenhouse event begins at 6:30 p.m., with music at 7 p.m. Confirm arrival time when booking. Tickets must be purchased online; no walk-ins. Children 10 and under enter free; food and drinks are extra. Liquor service is available, so arrange a safe ride home. The rest of the farm is closed during the event. This is outside Calgary in Foothills County.",
+          "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+          "venue": "Main Greenhouse, The Saskatoon Farm",
+          "organizer": "The Saskatoon Farm",
+          "sourceUrl": "https://www.saskatoonfarm.com/events-1/dia-de-los-muertos-celebration-2",
+          "categories": [
+            "arts",
+            "food",
+            "music",
+            "day-trip"
+          ],
+          "tags": [
+            "day-trip",
+            "outside-calgary"
+          ],
+          "start": "2026-10-30T18:30:00-06:00",
+          "end": "2026-10-30T23:00:00-06:00",
+          "pricing": "paid"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "scouted-deerfoot-city-2026",
+      "name": "Deerfoot City",
+      "approved": true,
+      "hosts": [
+        "deerfootcity.com"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "boo-city-2026",
+        "input": {
+          "kind": "event",
+          "title": "Destination: Boo City — Trick-or-Treating & Spooky Science",
+          "summary": "A free Halloween evening along The Boulevard with treats and TELUS Spark science activities.",
+          "description": "October 24, 6–8 p.m.: dress up, follow the Boo-levard’s participating trick-or-treat stations and try hands-on spooky science from TELUS Spark. The separate pumpkin patch at The Food Lodge requires a food-bank donation while supplies last. Confirm pumpkin-patch opening hours directly before making an earlier visit. Event inquiries: gs@deerfootcity.ca.",
+          "address": "971 64 Avenue NE, Calgary, AB",
+          "venue": "The Boulevard, Deerfoot City",
+          "organizer": "Deerfoot City",
+          "sourceUrl": "https://deerfootcity.com/halloween/",
+          "categories": [
+            "family",
+            "community",
+            "holiday"
+          ],
+          "tags": [],
+          "start": "2026-10-24T18:00:00-06:00",
+          "end": "2026-10-24T20:00:00-06:00",
+          "pricing": "free"
+        }
+      }
+    ]
   }
 ]

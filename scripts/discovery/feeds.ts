@@ -21,6 +21,7 @@ export async function collectSources(log: (m: string) => void = console.log) {
     const batches: { source: SourceConfig; records?: SourceRecord[] }[] = JSON.parse(await readFile(file, 'utf8'));
     for (const { source, records } of batches) {
       if (!reviewed && !source.autoPublish) continue;
+      if (process.env.DISCOVERY_OFFLINE === '1' && !reviewed && source.provider !== 'recurring-market') { log(`offline: skipped live source ${source.name}`); continue; }
       if (source.provider === 'ticketmaster' && !process.env.TICKETMASTER_API_KEY?.trim()) { log(`skip ${source.name}: no TICKETMASTER_API_KEY`); continue; }
       const provider: InventoryProvider = records ? new EditorialFileProvider(source, records)
         : source.provider === 'ics' ? new IcsFeedProvider(source)
@@ -34,7 +35,8 @@ export async function collectSources(log: (m: string) => void = console.log) {
         for (const r of await provider.fetch()) {
           try {
             const n = domain.normalizeRecord(r.input, source, r.id, now);
-            entities.push({ ...n.entity, status: 'published', verification: reviewed ? 'source-checked' : 'source-feed', verifiedAt: now, ...(r.cancelled ? { cancelled: true } : {}) });
+            const supporting = reviewed ? (r.supportingSources ?? []).filter(s => { try { const url = new URL(s.url); return s.kind === 'editorial' && url.protocol === 'https:' && !url.username && !url.password && typeof s.name === 'string'; } catch { return false; } }) : [];
+            entities.push({ ...n.entity, sources: [...n.entity.sources, ...supporting], status: 'published', verification: reviewed ? 'source-checked' : 'source-feed', verifiedAt: now, ...(r.cancelled ? { cancelled: true } : {}) });
             occurrences.push(...n.occurrences);
             ok++;
           } catch { /* invalid record: skipped, as in the ingest */ }

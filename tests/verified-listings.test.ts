@@ -83,8 +83,10 @@ describe('verified state follows approved claims only', () => {
 
   it('approval in admin writes the public mark and closes every lead for the listing', () => {
     const panel = readFileSync(new URL('../src/components/admin/ClaimsPanel.tsx', import.meta.url), 'utf8');
-    assert.match(panel, /status: approve \? 'approved' : 'rejected'/);
-    assert.match(panel, /if \(approve\) \{\s*await setDoc\(doc\(db, VERIFIED, c\.entityId\)/);
+    assert.match(panel,/approveOrganizationClaim/);
+    const server=readFileSync(new URL('../scripts/claims/approve-organization.ts',import.meta.url),'utf8');
+    assert.match(server,/tx.update\(claimRef,writes.claim\)/);
+    assert.match(server,/tx.set\(db.collection\('verified_listings'\).doc\(c.entityId\),writes.mark\)/);
     assert.match(panel, /leads\?\.filter\(\(l\) => l\.entityId === c\.entityId\)/);
   });
 });
@@ -105,8 +107,8 @@ describe('the verified badge', () => {
   });
 
   it('5. does not show on an unverified listing, which offers the claim instead', () => {
-    assert.match(cta, /if \(verified\) \{\n    return <p><a href=\{`mailto:/);
-    assert.match(cta, /<Link to=\{`\/claim\/\$\{encodeURIComponent\(entityId\)\}`\}>Claim this listing/);
+    assert.match(cta, /if \(verified\) \{\n    return <aside[^>]*><VerifiedBadge/);
+    assert.match(cta, /to=\{organizationClaimPath\(listing,discoveryRepository.list\(\)\)\}>Claim organization profile for/);
     assert.deepEqual(guaranteeProblems(CLAIM_BENEFIT), []);
     assert.match(CLAIM_BENEFIT, /more weight/);
   });
@@ -173,7 +175,7 @@ describe('ranking', () => {
 
 describe('outreach claim facts', () => {
   const sig = 'Aldo Ortiz\nFounder, CalgaryWatch';
-  const lead = (extra: Partial<PartnerLead> = {}) => ({ entityId: 'biz-vertigo-theatre', entityKind: 'business', status: 'new', ...extra }) as PartnerLead;
+  const lead = (extra: Partial<PartnerLead> = {}) => ({ businessName:'Vertigo Theatre', entityId: 'biz-vertigo-theatre', entityKind: 'business', status: 'new', ...extra }) as PartnerLead;
   const listed = { id: 'biz-vertigo-theatre', kind: 'business', title: 'Vertigo Theatre', slug: 'vertigo-theatre', status: 'published' };
 
   it('9. a real, claimable organization listing may mention verified priority', () => {
@@ -218,7 +220,6 @@ describe('outreach claim facts', () => {
     for (const f of [
       claimFactsFor(lead(), { ...listed, ...VERIFIED }),
       claimFactsFor(lead(), listed, new Set(['biz-vertigo-theatre'])),
-      claimFactsFor(lead({ status: 'claimed' }), listed),
     ]) {
       assert.equal(f.verified, true);
       assert.equal(f.claimable, false);

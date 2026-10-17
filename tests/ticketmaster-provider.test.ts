@@ -114,6 +114,21 @@ describe('Ticketmaster Calgary provider', () => {
       }
     });
 
+    it('splits dense windows and returns both complete halves without duplicate IDs', async (t) => {
+      let calls = 0;
+      t.mock.method(globalThis, 'fetch', async () => {
+        calls++;
+        return { ok: true, json: async () => calls === 1 ? { page: { totalPages: 6 } }
+          : { page: { totalPages: 1 }, _embedded: { events: [{ ...baseEvent, id: `half-${calls}` }, baseEvent] } } } as Response;
+      });
+      const original = process.env.TICKETMASTER_API_KEY; process.env.TICKETMASTER_API_KEY = 'test-key';
+      try {
+        const provider = new TicketmasterProvider({ id: 'tm', name: 'Ticketmaster', approved: true, hosts: ['www.ticketmaster.ca'], kind: 'official', provider: 'ticketmaster' });
+        assert.deepEqual((await provider.fetch()).map(r => r.id).sort(), ['abc','half-2','half-3']);
+        assert.equal(calls, 3);
+      } finally { if (original === undefined) delete process.env.TICKETMASTER_API_KEY; else process.env.TICKETMASTER_API_KEY = original; }
+    });
+
     it('never requests more than the safety cap of pages', async (t) => {
       const fetchMock = mock.fn(async (input: string | URL) => {
         const url = new URL(input);
@@ -123,8 +138,9 @@ describe('Ticketmaster Calgary provider', () => {
       const originalKey = process.env.TICKETMASTER_API_KEY; process.env.TICKETMASTER_API_KEY = 'test-key';
       try {
         const provider = new TicketmasterProvider({ id: 'ticketmaster-calgary', name: 'Ticketmaster', approved: true, hosts: ['www.ticketmaster.ca'], kind: 'official', provider: 'ticketmaster' });
-        await provider.fetch();
-        assert.equal(fetchMock.mock.callCount(), 10);
+        await assert.rejects(() => provider.fetch(), /too dense|request budget/);
+        assert.ok(fetchMock.mock.callCount() <= 40);
+        assert.ok(fetchMock.mock.calls.every(call => Number(new URL(call.arguments[0]).searchParams.get('page')) < 5));
       } finally {
         process.env.TICKETMASTER_API_KEY = originalKey;
       }

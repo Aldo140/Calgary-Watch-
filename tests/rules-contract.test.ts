@@ -465,7 +465,7 @@ describe('new inventory always lands pending, never auto-published', () => {
 
   it('the ingest CLI only writes to Firestore behind an explicit --write flag', () => {
     assert.ok(discoveryIngestSource.includes("process.argv.includes('--write')"));
-    assert.match(discoveryIngestSource, /if \(!write\) \{ console\.log/);
+    assert.match(discoveryIngestSource, /if \(!write\) \{[^}]*console\.log/);
   });
 
   it('re-ingesting an unchanged record does not bump its revision or reset its moderation status', () => {

@@ -79,7 +79,7 @@ export function GoingButton({ eventId, start, past = false, compact = false }: {
         {on && !compact ? <span className="cw-going-undo">Undo</span> : null}
       </button>
       <p className={compact && !error ? 'cw-sr' : 'cw-going-note'} role="status">
-        {error || tally || (!user ? 'Sign in with Google to save it to your plans.' : on ? 'Saved to your plans. Only the total is public.' : 'Only the total is public, never who’s going.')}
+        {error || tally || (!user ? 'Sign in or create an account to save it to your plans.' : on ? 'Saved to your plans. Only the total is public.' : 'Only the total is public, never who’s going.')}
       </p>
     </div>
   );

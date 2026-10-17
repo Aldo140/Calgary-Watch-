@@ -237,8 +237,10 @@ export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
 export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', '/plans', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
 
 export function getSeoConfig(pathname: string, repository: DiscoveryRepository = discoveryRepository): SeoConfig {
+  if(pathname.startsWith('/organization/'))return {title:'Manage your organization | CalgaryWatch',description:'Your verified organization profile and events workspace.',index:false,pageType:'WebPage'};
   const claimMatch = pathname.match(/^\/claim\/([^/]+)$/);
-  const claimId = claimMatch ? decodeURIComponent(claimMatch[1]) : undefined;
+  let claimId: string | undefined;
+  try { claimId = claimMatch ? decodeURIComponent(claimMatch[1]) : undefined; } catch { /* Malformed route remains noindex below. */ }
   const claimEntity = claimId
     ? repository.list().find(entity => entity.id === claimId && ['event', 'market', 'business'].includes(entity.kind))
     : undefined;

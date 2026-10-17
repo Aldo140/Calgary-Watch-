@@ -84,9 +84,11 @@ export function templatePitch(lead: PartnerLead, facts: string, sig: string): { 
     };
   }
   const listing = facts.split('\n')[0].replace(/^Listing: /, '');
+  const eventListing = /\(event\)/.test(listing);
+  const listingUrl = listing.match(/https:\/\/\S+/)?.[0];
   return {
-    subject: `CalgaryWatch has listed ${lead.businessName}`,
-    body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses. We've added ${listing.split(' (')[0]} using the details on your own website, and the listing links straight back to you.\n\nCould you take a quick look and tell me if anything is wrong or missing? You're also welcome to send schedule changes, cancellations or photos you'd like us to use.\n\nThe listing is free and always will be.\n\n${sig}`,
+    subject: eventListing ? `Your event on CalgaryWatch: ${listing.split(' (')[0]}` : `CalgaryWatch has listed ${lead.businessName}`,
+    body: `Hello ${lead.businessName} team,\n\nI'm Aldo, and I run CalgaryWatch, a free Calgary guide to events, markets and local businesses. We've added ${eventListing ? 'the event ' : ''}${listing.split(' (')[0]} using the details on your own website, and the listing links straight back to you${listingUrl ? `: ${listingUrl}` : '.'}\n\nCould you take a quick look and tell me if anything is wrong or missing? You're also welcome to send schedule changes, cancellations or photos you'd like us to use.\n\nThe listing is free and always will be.\n\n${sig}`,
     reasonRelevant: `The message is about ${lead.businessName}'s own listing on CalgaryWatch.`,
   };
 }
@@ -403,6 +405,12 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   }
   const send = (to: string, subject: string, text: string) => viaResend ? sendViaResend(cfg.sender, to, subject, text) : sendNew(to, subject, text);
   const sup = await loadSuppression(db);
+  // Resolve factual authority again immediately before every send, including edited drafts and replies.
+  const current = JSON.parse(await readFile(join(ROOT, 'src', 'generated', 'discovery-index.json'), 'utf8')) as DiscoveryIndex;
+  const verifiedNow = await loadVerifiedIds(db, current);
+  const currentById = new Map(current.entities.map(e => [e.id, e]));
+  const languageProblems = (lead: PartnerLead, subject: string, body: string) => claimLanguageProblems(`${subject}\n${body}`, claimFactsFor(lead, lead.entityId ? currentById.get(lead.entityId) : undefined, verifiedNow));
+
 
   // Replies the reviewer approved. Resend addresses the reply to whoever wrote, so it
   // needs no Outlook thread; one failed reply never stops the others or the first emails.
@@ -411,6 +419,8 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
     if (!lead.lastReply || lead.lastReply.sent || lead.doNotContact) continue;
     if (!viaResend && !lead.conversationId) { log(`reply not sent to ${lead.businessName}: no Outlook thread to reply in`); continue; }
     if (sup.emails.has(normalizeEmail(lead.lastReply.from))) continue;
+    const factualErrors = languageProblems(lead, lead.lastReply.suggestedSubject, lead.lastReply.suggestedBody);
+    if (factualErrors.length) { log(`Reply blocked for ${lead.businessName}: ${factualErrors.join(' ')}`); continue; }
     try {
       if (viaResend) await send(lead.lastReply.from, lead.lastReply.suggestedSubject || `Re: ${lead.lastReply.subject}`, lead.lastReply.suggestedBody);
       else await replyInThread(lead.conversationId!, lead.lastReply.suggestedBody);
@@ -432,7 +442,7 @@ export async function sendApproved(db: Firestore, now: number, log: Log): Promis
   const sendable: typeof approved = [];
   for (const doc of approved) {
     const lead = doc.data() as PartnerLead;
-    const blocker = sendBlocker(lead, sup.emails, sup.domains);
+    const blocker = sendBlocker(lead, sup.emails, sup.domains) || languageProblems(lead, lead.draftSubject, lead.draftBody).join(' ');
     if (blocker) {
       await doc.ref.update({ status: 'blocked', notes: blocker, updatedAt: now, history: push(event('status', `Not sent: ${blocker}`)) });
       log(`not sent to ${lead.businessName}: ${blocker}`);

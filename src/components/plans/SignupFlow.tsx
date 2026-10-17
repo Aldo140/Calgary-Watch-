@@ -1,3 +1,4 @@
+import { LocationShortcut } from './LocationShortcut';
 import React, { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -57,7 +58,7 @@ export function SignupSky({ editing, signedIn, area, onSignIn }: { editing: bool
         <h1 id="su-title">
           {editing ? <>Your Calgary, <Scribble>your way.</Scribble></> : <>Make Calgary <Scribble>yours.</Scribble></>}
         </h1>
-        <p className="su-lead">{editing ? 'Change your area, emails or interests. Your plans and badges stay put.' : 'Three quick questions, about a minute. Free.'}</p>
+        <p className="su-lead">{editing ? 'Change your area, emails or interests. Your plans and badges stay put.' : 'A few quick preferences. Location is optional. Free.'}</p>
         {!signedIn && !editing ? <p className="su-already">Already signed up? <button type="button" onClick={onSignIn}>Sign in</button></p> : null}
         <img className="su-mark" src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" width="160" height="160" aria-hidden="true" />
       </div>
@@ -83,7 +84,7 @@ export function EnvelopeArt() {
   );
 }
 
-const TILE_ICON: Record<EventInterestId, React.ComponentType<{ size?: number; strokeWidth?: number }>> = {
+export const TILE_ICON: Record<EventInterestId, React.ComponentType<{ size?: number; strokeWidth?: number }>> = {
   music: Music, arts: Palette, family: Baby, food: UtensilsCrossed, markets: Store,
   sports: Trophy, outdoors: Trees, learning: Mic, community: HeartHandshake, free: Ticket,
 };
@@ -119,6 +120,8 @@ export function SignupForm(p: SignupFormProps) {
   const reduce = useReducedMotion();
   const headRef = useRef<HTMLHeadingElement>(null);
   const shown = useRef(step);
+  const activeStep = useRef(step);
+  activeStep.current = step;
   const last = step === SIGNUP_STEPS.length - 1;
   const hasArea = Boolean(draft.neighborhood.trim() || draft.address.trim());
   const [byAddress, setByAddress] = useState(Boolean(draft.address));
@@ -134,7 +137,7 @@ export function SignupForm(p: SignupFormProps) {
   }, [step]);
 
   const blocker = step === 0
-    ? (!hasArea ? 'Add your neighbourhood or a street address to keep going.' : p.needsConsent && !draft.consent ? 'Tick the box so we can keep your area on file.' : '')
+    ? (hasArea && p.needsConsent && !draft.consent ? 'Tick the box to save your area, or skip location.' : '')
     : step === 2 && draft.eventsDigestOptIn && !draft.interests.length ? 'Pick at least one, or go back and untick event picks.' : '';
 
   const next = () => {
@@ -143,12 +146,12 @@ export function SignupForm(p: SignupFormProps) {
     if (last) p.onSubmit(); else p.setStep(step + 1);
   };
   const go = (i: number) => { if (i <= step) { p.setError(''); p.setStep(i); } };
-  const cta = p.saving ? 'Saving…' : !last ? 'Next' : p.signedIn ? (p.hasPlans ? 'Save changes' : 'Finish') : 'Continue with Google';
+  const cta = p.saving ? 'Saving…' : step === 0 && !hasArea ? 'Continue without location' : !last ? 'Next' : p.signedIn ? (p.hasPlans ? 'Save changes' : 'Finish') : 'Sign in or create an account';
 
   const both = draft.weeklyDigestOptIn && draft.eventsDigestOptIn;
   const picked = EVENT_INTERESTS.filter((i) => draft.interests.includes(i.id)).map((i) => i.label);
   const deck = [
-    { tone: 'navy', art: <RadarArt />, label: 'Home', value: p.area || (draft.address.trim() ? 'Street address' : 'Where’s home?') },
+    { tone: 'navy', art: <RadarArt />, label: 'Home', value: p.area || (draft.address.trim() ? 'Street address' : 'All Calgary') },
     { tone: 'cyan', art: <EnvelopeArt />, label: 'Emails', value: both ? 'Monday, all in one' : draft.weeklyDigestOptIn ? 'Safety, Mondays' : draft.eventsDigestOptIn ? 'Things to do, Thursdays' : 'None for now' },
     { tone: 'paper', art: <TicketArt />, label: 'Interests', value: picked.length ? (picked.length > 2 ? `${picked.slice(0, 2).join(', ')} +${picked.length - 2}` : picked.join(', ')) : 'What you’re into' },
   ];
@@ -186,12 +189,13 @@ export function SignupForm(p: SignupFormProps) {
           >
             {step === 0 ? (
               <div id="pl-step-home" className="su-q">
-                <h2 ref={headRef} tabIndex={-1}>Where’s home?</h2>
-                <p className="su-help">Your neighbourhood is enough. Everything starts near there.</p>
+                <h2 ref={headRef} tabIndex={-1}>Where’s home? <small>(optional)</small></h2>
+                <p className="su-help">Add a neighbourhood for nearby picks, or continue with all of Calgary. You can change this later.</p>
+                <LocationShortcut value={`${draft.neighborhood}|${draft.address}`} disabled={p.saving} onSelect={(neighborhood) => { if (activeStep.current !== 0) return; setByAddress(false); p.setError(''); setDraft(d => ({ ...d, neighborhood, address: '', inferredNeighborhood: '' })); }} />
                 {!byAddress ? (
                   <label className="su-input">
                     <Search size={20} aria-hidden="true" />
-                    <span className="sr-only">Neighbourhood</span>
+                    <span className="sr-only">Neighbourhood (optional)</span>
                     <input
                       value={draft.neighborhood}
                       onChange={(e) => { p.setError(''); setDraft((d) => ({ ...d, neighborhood: e.target.value, inferredNeighborhood: '' })); }}
@@ -205,7 +209,7 @@ export function SignupForm(p: SignupFormProps) {
                 ) : (
                   <label className="su-input">
                     <MapPin size={20} aria-hidden="true" />
-                    <span className="sr-only">Street address</span>
+                    <span className="sr-only">Street address (optional)</span>
                     <input
                       value={draft.address}
                       onChange={(e) => { p.setError(''); setDraft((d) => ({ ...d, address: e.target.value, inferredNeighborhood: '' })); }}
@@ -230,7 +234,7 @@ export function SignupForm(p: SignupFormProps) {
                       : <>{p.communityCount > 100 ? `All ${p.communityCount} Calgary communities. ` : ''}<button type="button" className="su-link" onClick={() => { setByAddress(true); setDraft((d) => ({ ...d, neighborhood: '', inferredNeighborhood: '' })); }}>Use a street address</button></>}
                   </p>
                 )}
-                {p.needsConsent ? (
+                {hasArea && p.needsConsent ? (
                   <label className="su-consent">
                     <input type="checkbox" checked={draft.consent} onChange={(e) => { p.setError(''); setDraft((d) => ({ ...d, consent: e.target.checked })); }} />
                     <span className="su-box" aria-hidden="true"><Check size={14} strokeWidth={3.5} /></span>
@@ -251,8 +255,8 @@ export function SignupForm(p: SignupFormProps) {
                     <span className="su-mail-art"><RadarArt /></span>
                     <span className="su-mail-text">
                       <small>Mondays</small>
-                      <strong>Safety near home</strong>
-                      <span>Police news, 311, outages and neighbours’ reports near you.</span>
+                      <strong>{hasArea ? 'Safety near home' : 'Calgary safety brief'}</strong>
+                      <span>Police news, 311, outages and neighbours’ reports. Citywide unless you add an area.</span>
                     </span>
                     <span className="su-tick" aria-hidden="true"><Check size={16} strokeWidth={3.5} /></span>
                   </label>
@@ -297,6 +301,8 @@ export function SignupForm(p: SignupFormProps) {
             <button type="button" className="su-back" onClick={() => { p.setError(''); p.setStep(step - 1); }}><ArrowLeft size={18} aria-hidden="true" /> Back</button>
           ) : p.editing ? (
             <button type="button" className="su-back" onClick={p.onCancel}>Cancel</button>
+          ) : step === 0 && hasArea ? (
+            <button type="button" className="su-back" onClick={() => { p.setError(''); setDraft(d => ({ ...d, neighborhood: '', address: '', inferredNeighborhood: '', consent: false })); p.setStep(1); }}>Skip location</button>
           ) : <span />}
           <button type="submit" className="su-next" data-last={last} disabled={p.saving || (last && p.disabled)}>
             {cta} <ArrowRight size={18} aria-hidden="true" />

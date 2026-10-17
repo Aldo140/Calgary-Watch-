@@ -1,3 +1,8 @@
+import { collection, getDocs, query, where, limit } from 'firebase/firestore';
+import { discoveryRepository } from '../../data/discovery';
+import {approvedManagementOrganization as approvedOrganization} from '../../lib/claimOrganization';
+import type { ListingClaim } from '../../lib/claims';
+import { entityPath } from '../../lib/discovery';
 /**
  * Every member, as a list built for a phone: search, filter by what they
  * signed up for, tap a row for the detail, and open the member's own
@@ -54,6 +59,10 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
 
 export function MembersDirectory() {
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [claims,setClaims]=useState<ListingClaim[]>([]);
+  const [accessError,setAccessError]=useState('');
+  useEffect(()=>{let active=true;if(db)void getDocs(query(collection(db,'listing_claims'),where('status','==','approved'),limit(500))).then(s=>{if(active){setClaims(s.docs.map(d=>d.data() as ListingClaim));if(s.size===500)setAccessError('Showing the first 500 approvals. Some organization associations may be omitted.');}}).catch(()=>{if(active)setAccessError('Organization approvals could not be loaded. Account flags alone do not confirm organization access.');});return()=>{active=false;};},[]);
+  const accessByUid=useMemo(()=>{const map=new Map<string,ListingClaim[]>();for(const c of claims)map.set(c.uid,[...(map.get(c.uid)??[]),c]);return map;},[claims]);
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [open, setOpen] = useState<string | null>(null);
@@ -64,27 +73,29 @@ export function MembersDirectory() {
     return adminUsers.subscribe(db, ({ rows: r, loading }) => { if (!loading || r.length) setRows(r as Row[]); });
   }, []);
 
-  const members = useMemo(() => (rows ?? []).map(shape).sort((a, b) => b.createdAt - a.createdAt), [rows]);
+  const members = useMemo(() => (rows ?? []).map(r=>{const member=shape(r);return {...member,business:member.business||(accessByUid.get(member.uid)?.length??0)>0};}).sort((a, b) => b.createdAt - a.createdAt), [rows,accessByUid]);
   const counts = useMemo(() => Object.fromEntries(FILTERS.map((f) => [f.id, members.filter(f.match).length])) as Record<Filter, number>, [members]);
   const needle = q.trim().toLowerCase();
   const list = members
     .filter(FILTERS.find((f) => f.id === filter)!.match)
-    .filter((m) => !needle || `${m.name} ${m.email} ${m.area}`.toLowerCase().includes(needle));
+    .filter((m) => !needle || `${m.name} ${m.email} ${m.area} ${(accessByUid.get(m.uid)??[]).map(c=>approvedOrganization(c,discoveryRepository.list())?.title??c.entityTitle).join(" ")}`.toLowerCase().includes(needle));
 
   return (
     <Panel title="All members" subtitle="Tap someone to see what they get, then open their dashboard exactly as they see it." padded={false}>
       <div className="px-4 pt-3 space-y-2">
-        <SearchField value={q} onChange={(v) => { setQ(v); setShown(30); }} placeholder="Name, email or neighbourhood" />
+        <SearchField value={q} onChange={(v) => { setQ(v); setShown(30); }} placeholder="Name, email, organization or neighbourhood" />
         <FilterRow>
           {FILTERS.map((f) => <FilterChip key={f.id} active={filter === f.id} onClick={() => { setFilter(f.id); setShown(30); }} count={counts[f.id]}>{f.label}</FilterChip>)}
         </FilterRow>
       </div>
+      {accessError?<p role="status" className="p-4 text-sm">{accessError}</p>:null}
       {rows === null ? <div className="p-4"><SkeletonRows /></div>
         : !list.length ? <EmptyState icon={<Users size={20} />} title="Nobody matches" body={needle ? 'Try a shorter search.' : 'Members appear here as they sign in.'} />
         : (
           <ul className="mt-2">
             {list.slice(0, shown).map((m) => {
               const isOpen = open === m.uid;
+              const organizationNames=[...new Set((accessByUid.get(m.uid)??[]).map(c=>approvedOrganization(c,discoveryRepository.list())?.title).filter(Boolean))];
               return (
                 <li key={m.uid} className="border-t" style={{ borderColor: T.line }}>
                   <button type="button" className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(isOpen ? null : m.uid)} aria-expanded={isOpen}>
@@ -97,6 +108,7 @@ export function MembersDirectory() {
                         {m.role === 'admin' ? <Chip tone="signal">Admin</Chip> : null}
                         {m.business ? <Chip tone="ok">Business</Chip> : null}
                       </span>
+                      {organizationNames.length?<span className="block text-xs font-semibold truncate" style={{color:T.ok}}>Manages {organizationNames.join(' · ')}</span>:m.business?<span className="block text-xs" style={{color:T.muted}}>Organization authority needs review</span>:null}
                       <span className="block text-xs truncate" style={{ color: T.muted }}>
                         {m.area ? <><MapPin size={11} className="inline -mt-0.5" /> {m.area} · </> : 'No area · '}{m.plan.kind === 'none' ? 'No email' : m.plan.name}
                       </span>
@@ -115,6 +127,14 @@ export function MembersDirectory() {
                       {m.interests.length ? (
                         <div className="flex flex-wrap gap-1.5">{m.interests.map((i) => <span key={i} className="text-[0.7rem] font-semibold px-2 py-1 rounded-full" style={{ background: '#FFF5CC', color: '#5A4A00' }}>{interestLabel(i)}</span>)}</div>
                       ) : <p className="text-xs" style={{ color: T.muted }}>No interests picked yet.</p>}
+                      {m.business?<div className="rounded-lg border p-3 space-y-2"><strong>Approved management access</strong>
+                        {(accessByUid.get(m.uid)??[]).length?(accessByUid.get(m.uid)??[]).map(c=>{const org=approvedOrganization(c,discoveryRepository.list());return <div key={c.entityId}>
+                          <p><strong>{org?.title??c.entityTitle}</strong> · {org?.managementOnly?'Organizer workspace · scoped to this listing and events they add':org?'Organization manager':'Listing unavailable; review access'}</p>
+                          <p>{c.role}{c.reviewedAt?` · approved ${new Date(c.reviewedAt).toLocaleDateString('en-CA')}`:''}</p>
+                          {org?<><p>{discoveryRepository.list().filter(e=>e.kind==='event'&&(e.organizerEntityId===org.id||e.id===org.sourceListingId)&&!e.cancelled&&Date.parse(e.end)>Date.now()).length} upcoming linked events</p><Link to={`/organization/${org.id}?as=${encodeURIComponent(m.uid)}`}>Their organization workspace</Link> · <Link to={org.sourceListingId?c.entityPath:entityPath(org)}>{org.managementOnly?'Public listing':'Public organization profile'}</Link></>:<Link to={`/admin/partners`}>Confirm organization access in Claims</Link>}
+                          <p className="text-xs">Source approval: {c.entityTitle}</p>
+                        </div>;}):<p>No approved claim loaded for this account. Review Claims before granting management access.</p>}
+                      </div>:null}
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <Link to={`/plans?as=${encodeURIComponent(m.uid)}`} className="inline-flex items-center justify-center gap-1.5 h-10 rounded-lg text-sm font-bold" style={{ background: T.ink, color: '#fff' }}>
                           <LayoutDashboard size={15} /> Their dashboard

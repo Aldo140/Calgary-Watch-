@@ -10,6 +10,11 @@ const now = Date.parse('2026-09-28T12:00:00-06:00');
 const hit = (slug: string, data: VisitCalgaryHit['data'], tax = ''): VisitCalgaryHit => ({ slug, permalink: `/events/${slug}`, data, searchable_taxonomies: tax });
 
 describe('Tourism Calgary events', () => {
+  it('includes Christmas and New Year’s Eve when planning in October, but bounds distant events',()=>{
+    const places=new Map([['holiday',{street:'1 Main St',locality:'Calgary',venue:'Fixture venue'}]]);
+    const records=mapVisitCalgaryEvents([hit('holiday',{title:'Fixture holiday shows',event_dates:['2026-12-24','2026-12-31','2027-01-15'],start_time:'19:00',end_time:'21:00'})],places,Date.parse('2026-10-16T12:00:00-06:00'));
+    assert.deepEqual(records.map(r=>(r.input as any).start.slice(0,10)),['2026-12-24','2026-12-31']);
+  });
   it('reads times in either clock', () => {
     assert.equal(vcTime('19:00'), '19:00'); assert.equal(vcTime('7:30 PM'), '19:30'); assert.equal(vcTime('12 am'), '00:00'); assert.equal(vcTime(null), null); assert.equal(vcTime('TBA'), null);
   });

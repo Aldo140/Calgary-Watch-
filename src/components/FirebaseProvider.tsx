@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
   User,
   onAuthStateChanged,
@@ -7,20 +7,30 @@ import {
   getRedirectResult,
   setPersistence,
   browserLocalPersistence,
-  GoogleAuthProvider,
-  signOut
+  GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendEmailVerification, sendPasswordResetEmail, updateProfile, reload, signOut
 } from 'firebase/auth';
 import { auth, db, isFirebaseConfigured } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
+import { AuthDialog } from './auth/AuthDialog';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  sendVerificationEmail: () => Promise<void>;
+  refreshCurrentUser: () => Promise<User | null>;
+  sendPasswordReset: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   isAuthReady: boolean;
   isAdmin: boolean;
+  isEmailVerified: boolean;
+  isSigningIn: boolean;
+  isAuthActionLoading: boolean;
   /** Build has VITE_FIREBASE_* vars (CI secrets or local .env). */
   isFirebaseConfigured: boolean;
 }
@@ -46,7 +56,10 @@ async function syncUserProfile(currentUser: User, isApprovedAdmin: boolean): Pro
         displayName: currentUser.displayName || 'Anonymous',
         email: currentUser.email || '',
         photoURL: currentUser.photoURL || '',
-        role: isApprovedAdmin ? 'admin' : 'user',
+        emailVerified: currentUser.emailVerified,
+        authProviders: currentUser.providerData.map(provider => provider.providerId),
+        updatedAt: Date.now(),
+        role: isApprovedAdmin || existing.data()?.role === 'admin' ? 'admin' : 'user',
         ...(existing.exists() && existing.data()?.createdAt ? {} : {
           createdAt: currentUser.metadata.creationTime
             ? new Date(currentUser.metadata.creationTime).getTime()
@@ -71,6 +84,9 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [, setAuthRevision] = useState(0);
+  const pendingAuth = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!auth || !db) {
@@ -88,8 +104,9 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       console.error('Redirect sign-in result error:', error);
     });
 
+    let stopRole:(()=>void)|undefined;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      const isApprovedAdmin = currentUser ? isApprovedAdminEmail(currentUser.email) : false;
+      const isApprovedAdmin = currentUser ? currentUser.emailVerified && isApprovedAdminEmail(currentUser.email) : false;
 
       // Publish auth state IMMEDIATELY.
       //
@@ -99,11 +116,16 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       // users — and since Firestore retries a stalled request indefinitely
       // rather than throwing, a flaky mobile connection could leave
       // isAuthReady false forever and incidents would never load at all.
+      stopRole?.();
+      stopRole=undefined;
       setIsAdmin(isApprovedAdmin);
+      if(currentUser)stopRole=onSnapshot(doc(db!, 'users', currentUser.uid),snapshot=>{if(auth?.currentUser?.uid===currentUser.uid)setIsAdmin(isApprovedAdmin||currentUser.emailVerified&&snapshot.data()?.role==='admin');},()=>{if(auth?.currentUser?.uid===currentUser.uid)setIsAdmin(isApprovedAdmin);});
       setUser(currentUser);
+      if (currentUser?.emailVerified) setAuthOpen(false);
       setLoading(false);
       setIsAuthReady(true);
       setIsSigningIn(false);
+      if (currentUser) pendingAuth.current?.();
 
       // Profile sync is best-effort and deliberately not awaited — nothing the
       // user sees depends on it completing.
@@ -112,10 +134,17 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return () => {unsubscribe();stopRole?.();};
   }, []);
 
-  const signIn = async () => {
+  const requireAuth = async () => {
+    if (auth?.currentUser) return;
+    setAuthOpen(true);
+    await new Promise<void>(resolve => { pendingAuth.current = resolve; });
+    pendingAuth.current = null;
+  };
+
+  const signInWithGoogleAccount = async () => {
     if (!auth) {
       console.warn(
         'Sign-in unavailable: Firebase env vars were not set at build time. See README / GitHub Actions secrets.'
@@ -152,8 +181,46 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
 
       console.error('Sign in error:', error);
       setIsSigningIn(false);
+      throw error;
     }
   };
+
+  const withAuthAction = async <T,>(action: () => Promise<T>): Promise<T> => {
+    if (!auth) throw new Error('Firebase is not configured.');
+    if (isSigningIn) throw new Error('An authentication action is already running.');
+    setIsSigningIn(true);
+    try { return await action(); } finally { setIsSigningIn(false); }
+  };
+  const signUpWithEmail = (email: string, password: string, displayName?: string) => withAuthAction(async () => {
+    const credential = await createUserWithEmailAndPassword(auth!, email, password);
+    if (displayName) await updateProfile(credential.user, { displayName });
+    await sendEmailVerification(credential.user);
+    setUser(credential.user);
+    void syncUserProfile(credential.user, false);
+  });
+  const signInWithEmailAccount = (email: string, password: string) => withAuthAction(async () => {
+    await signInWithEmailAndPassword(auth!, email, password);
+  });
+  const sendVerificationEmail = () => withAuthAction(async () => {
+    if (!auth?.currentUser) throw new Error('Sign in before requesting verification.');
+    await sendEmailVerification(auth.currentUser);
+  });
+  const refreshCurrentUser = () => withAuthAction(async () => {
+    if (!auth?.currentUser) return null;
+    await reload(auth.currentUser);
+    const refreshed = auth.currentUser;
+    setUser(refreshed);
+    setAuthRevision(value => value + 1);
+    if (refreshed) void syncUserProfile(refreshed, refreshed.emailVerified && isApprovedAdminEmail(refreshed.email));
+    return refreshed;
+  });
+  const sendPasswordReset = (email: string) => withAuthAction(async () => {
+    try { await sendPasswordResetEmail(auth!, email); }
+    catch (error) {
+      const code = error instanceof Error ? (error as Error & { code?: string }).code : '';
+      if (code !== 'auth/user-not-found') throw error;
+    }
+  });
 
   const logout = async () => {
     if (!auth) return;
@@ -169,14 +236,24 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
-        signIn,
+        signIn: requireAuth,
+        signInWithGoogle: signInWithGoogleAccount,
+        signUpWithEmail,
+        signInWithEmail: signInWithEmailAccount,
+        sendVerificationEmail,
+        refreshCurrentUser,
+        sendPasswordReset,
         logout,
         isAuthReady,
         isAdmin,
+        isEmailVerified: Boolean(user?.emailVerified),
+        isSigningIn,
+        isAuthActionLoading: isSigningIn,
         isFirebaseConfigured,
       }}
     >
       {children}
+      <AuthDialog open={authOpen} user={user} busy={isSigningIn} onClose={() => { setAuthOpen(false); pendingAuth.current?.(); pendingAuth.current=null; }} onGoogle={signInWithGoogleAccount} onSignIn={signInWithEmailAccount} onSignUp={signUpWithEmail} onReset={sendPasswordReset} onResend={sendVerificationEmail} onRefresh={refreshCurrentUser} onLogout={logout} />
     </AuthContext.Provider>
   );
 }

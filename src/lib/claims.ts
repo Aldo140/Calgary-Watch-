@@ -10,8 +10,8 @@
  * How trust works, without a server: the claim is a Firestore document the
  * claimant writes about themselves. The evidence below is computed again by
  * admin when reviewing, never trusted from the document. The strongest case
- * is a Google account at the organization's own domain (Google already
- * verified that address); a typed work email at the same domain is good but
+ * is an authenticated account with a verified address at the organization's
+ * own domain; a typed work email at the same domain is good but
  * unproven; a free-mail address needs a person to check.
  *
  * Pure, so the rules are tested without Firestore.
@@ -39,6 +39,7 @@ export interface ListingClaim {
   note: string;
   status: ClaimStatus;
   createdAt: number;
+  approvedOrganizationId?: string;
   reviewedAt?: number | null;
   reviewNote?: string;
 }
@@ -49,9 +50,9 @@ export const UPDATE_FIELDS: ReadonlyArray<{ id: UpdateField; label: string; hint
   { id: 'dates', label: 'Dates or hours', hint: 'New run dates, a schedule change, holiday hours.' },
   { id: 'location', label: 'Address or another location', hint: 'A corrected address, or a second branch.' },
   { id: 'link', label: 'The link we send people to', hint: 'Your homepage, tickets or a season page.' },
-  { id: 'photo', label: 'A photo you’d like us to use', hint: 'Email the original photo when you can, or share a link to an image you have the rights to.' },
+  { id: 'photo', label: 'A photo you’d like us to use', hint: 'Email original artwork/photos; use this request for context and an optional source URL.' },
   { id: 'description', label: 'How it’s described', hint: 'Facts we got wrong or left out.' },
-  { id: 'cancel', label: 'Cancelled or postponed', hint: 'We mark it right away so nobody shows up.' },
+  { id: 'cancel', label: 'Cancelled or postponed', hint: 'Tell us what changed so we can review and update the listing.' },
   { id: 'other', label: 'Something else', hint: 'Anything else that should change.' },
 ];
 
@@ -116,7 +117,7 @@ export function claimEvidence(input: { accountEmail: string; workEmail: string; 
 export const EVIDENCE_COPY: Record<ClaimEvidence, { label: string; tone: 'ok' | 'signal' | 'attention' | 'critical'; next: string }> = {
   'account-domain': { label: 'Signed in at the organization’s domain', tone: 'ok', next: 'Strongest proof. Approve unless something looks off.' },
   'work-domain': { label: 'Work email at the organization’s domain', tone: 'signal', next: 'Reply to the work email to confirm before approving.' },
-  'other-domain': { label: 'Email at a different domain', tone: 'attention', next: 'Could be an agency. Confirm with the organization’s published address.' },
+  'other-domain': { label: 'Different email and website domains', tone: 'attention', next: 'Organizations can use a different email domain. Confirm their authority through the organization’s published contact.' },
   'free-mail': { label: 'Personal email only', tone: 'attention', next: 'Confirm through the address on the organization’s own website.' },
   'no-source': { label: 'Listing has no official site to compare', tone: 'attention', next: 'Check by phone or the organization’s social accounts.' },
 };

@@ -15,6 +15,7 @@ import './styles/page-loader.css';
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
+const OrganizationPage = lazy(() => import('@/src/pages/OrganizationPage'));
 const ClaimListingPage = lazy(() => import('@/src/pages/ClaimListingPage'));
 const MarketHQPage = lazy(() => import('@/src/pages/MarketHQPage'));
 const VendorApplyPage = lazy(() => import('@/src/pages/VendorApplyPage'));
@@ -173,6 +174,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/submit" element={<SubmitDiscoveryPage />} />
+          <Route path="/organization/:id" element={<OrganizationPage />} />
           <Route path="/claim/:id" element={<ClaimListingPage />} />
           <Route path="/organizer/:id" element={<MarketHQPage />} />
           <Route path="/apply/:id" element={<VendorApplyPage />} />

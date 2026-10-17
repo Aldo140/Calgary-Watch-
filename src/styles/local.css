@@ -7,7 +7,7 @@
   --ink: #151515; --yellow: #ffdf4f; --cyan: #00c2e0; --blue: #1554d1; --navy: #06162f; --stamp: #d8433f;
   --paper: var(--cw-bg, #faf8f3); --card: #fffdf7; --muted: #4a4f57; --lilac: #dfe6fb;
   --display: 'Bricolage Grotesque', Inter, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
-  padding-bottom: clamp(56px, 7vw, 96px); overflow-x: clip;
+  padding-bottom: clamp(56px, 7vw, 96px); overflow-x: hidden; overflow-x: clip;
 }
 .cw-loc :where(h1, h2, h3, p, ul, ol) { margin: 0; }
 :where(.cw-loc ul, .cw-loc ol) { list-style: none; padding: 0; }
@@ -34,16 +34,33 @@
 .cw-home2 .lx-hero[data-tone='light'] .lx-cats a[aria-current='page'] { background: var(--h-sun); color: #151515; border-color: #151515; box-shadow: 3px 3px 0 #151515; }
 .cw-home2 .lx-hero .lx-cats a[aria-current='page'] i { background: #151515; color: #fff; }
 
-.lx-street { position: relative; margin-top: clamp(36px, 5vh, 64px); padding-bottom: clamp(70px, 7vw, 96px); }
-.lx-block {
-  position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: center;
-  padding: 0 clamp(16px, 3vw, 44px); margin: 0 auto; max-width: 1400px;
+/* The hero fills the first screen, and the street always stands on its bottom edge. */
+.cw-home2 .lx-hero:not(.lp-hero) { min-height: 100vh; min-height: 100svh; }
+.cw-home2 .lx-hero:not(.lp-hero) .lx-street { margin-top: auto; }
+@media (min-width: 1025px) {
+  .cw-home2 .lx-hero-inner > .lx-title { max-width: 13em; font-size: clamp(52px, 5vw, 92px); }
+  .cw-home2 .lx-hero .lx-title em { display: inline; }
 }
-.lx-block li { flex: 0 1 210px; min-width: 0; animation: lx-rise .7s cubic-bezier(.2, 1.1, .3, 1) both; animation-delay: calc(var(--i) * 70ms + 150ms); }
+
+/*
+ * The street: shops on the pavement, lamps on the kerb, then two lanes of traffic.
+ * --road is the pavement plus asphalt; --tear is the strip the torn paper edge eats.
+ */
+.lx-street {
+  --walk: 40px; --road: clamp(124px, 10vw, 150px); --tear: clamp(34px, 4vw, 60px);
+  position: relative; isolation: isolate; margin-top: clamp(28px, 4vh, 56px); padding-bottom: calc(var(--road) + var(--tear) - 6px);
+}
+.lx-block {
+  position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 clamp(16px, 3vw, 44px); margin: 0 auto; max-width: 1760px;
+}
+.lx-block li { position: relative; z-index: 1; flex: 0 1 200px; min-width: 0; animation: lx-rise .7s cubic-bezier(.2, 1.1, .3, 1) both; animation-delay: calc(var(--i) * 70ms + 150ms); }
 @keyframes lx-rise { from { transform: translateY(46px); opacity: 0; } }
 .lx-block li + li { margin-left: -2px; }
+.lx-block li:has(.lx-lamp) { z-index: 2; }
+.lx-block li:hover, .lx-block li:focus-within { z-index: 5; }
 .cw-loc .lx-shop { position: relative; display: flex; flex-direction: column; color: #151515; transition: transform .25s cubic-bezier(.2, .8, .2, 1); }
-.cw-loc .lx-shop:hover, .cw-loc .lx-shop:focus-visible { transform: translateY(-8px); z-index: 2; }
+.cw-loc .lx-shop:hover, .cw-loc .lx-shop:focus-visible { transform: translateY(-10px); z-index: 4; }
 .lx-upper { display: block; width: 100%; height: auto; border: 2px solid #151515; border-bottom: 0; }
 .lx-shop-front { position: relative; display: block; aspect-ratio: 400 / 260; border: 2px solid #151515; border-bottom: 0; background: #151515; }
 .lx-shop-front .cw-art { display: block; width: 100%; height: 100%; }
@@ -54,22 +71,69 @@
 }
 .lx-shop-flag-partner { background: #fff; text-transform: none; letter-spacing: 0; font-family: Inter, sans-serif; }
 .lx-shop-sign {
-  position: absolute; left: 50%; bottom: -26px; z-index: 2; transform: translateX(-50%) rotate(var(--sr, -1.5deg));
+  position: absolute; left: 50%; bottom: -30px; z-index: 2; transform: translateX(-50%) rotate(var(--sr, -1.5deg));
   display: flex; flex-direction: column; align-items: center; width: max-content; max-width: calc(100% - 12px); padding: 7px 12px 8px;
   border: 2px solid #151515; border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 #151515; text-align: center; text-wrap: balance;
-  transition: background .2s;
+  transition: background .2s, transform .25s;
 }
 .lx-block li:nth-child(even) .lx-shop-sign { --sr: 1.5deg; }
-.lx-shop-sign b { font: 800 15px/1.08 var(--display); letter-spacing: -.02em; }
-.lx-shop-sign small { font: 600 10px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: #4a4f57; }
-.lx-shop:hover .lx-shop-sign, .lx-shop:focus-visible .lx-shop-sign { background: var(--yellow); }
-/* The road: kerb, asphalt and a dashed centre line, under the whole block. */
+.lx-shop-sign b { font: 800 clamp(12px, 1.05vw, 16px)/1.05 var(--display); letter-spacing: -.02em; }
+.lx-shop-sign small { font: 600 clamp(9px, .72vw, 10px)/1.3 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: #4a4f57; }
+.lx-shop:hover .lx-shop-sign, .lx-shop:focus-visible .lx-shop-sign { background: var(--yellow); transform: translateX(-50%) rotate(0deg) scale(1.06); }
+
+/* Street lamps stand on the kerb in front of every other seam. */
+.lx-lamp { position: absolute; right: -16px; bottom: -36px; z-index: 3; width: 38px; height: auto; aspect-ratio: 40 / 150; overflow: visible; pointer-events: none; }
+.lx-lamp-glow { fill: #ffe39a; opacity: 0; transition: opacity .6s; }
+.lx-lamp-bulb { fill: #f4f1ea; stroke: #151515; stroke-width: 1.5; }
+.lx-hero[data-night] .lx-lamp-glow { opacity: .22; }
+.lx-hero[data-night] .lx-lamp-bulb { fill: #ffe39a; filter: drop-shadow(0 0 6px #ffd34d); }
+
+/* The road: pavement with joints, a kerb, then asphalt with a dashed centre line. */
 .lx-road {
-  position: absolute; left: 0; right: 0; bottom: 0; height: clamp(70px, 7vw, 96px); z-index: 0;
-  border-top: 10px solid #cfcac0; box-shadow: inset 0 2px 0 #151515;
-  background: linear-gradient(90deg, #ffdf4f 0 40px, transparent 40px 80px) 0 calc(50% - 8px) / 80px 4px repeat-x, #2b2f3a;
+  position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--road, 96px) + var(--tear, 0px)); z-index: 1; overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 58px, rgba(21, 21, 21, .14) 58px 60px) 0 0 / 100% var(--walk, 0px) no-repeat,
+    linear-gradient(#d9d3c6, #d9d3c6) 0 0 / 100% var(--walk, 0px) no-repeat,
+    linear-gradient(#151515, #151515) 0 var(--walk, 0px) / 100% 3px no-repeat,
+    linear-gradient(#a8a296, #a8a296) 0 calc(var(--walk, 0px) + 3px) / 100% 7px no-repeat,
+    linear-gradient(90deg, #ffdf4f 0 44px, transparent 44px 88px) 0 calc(var(--walk, 0px) + (var(--road, 96px) - var(--walk, 0px)) / 2 + 3px) / 88px 4px repeat-x,
+    #2b2f3a;
 }
 .lx-hero[data-night] .lx-road { background-color: #1c2030; }
+
+/* Traffic. Vehicles drive by animating left, so with motion turned off they sit parked at --park. */
+/*
+ * Traffic. Vehicles park at --park; where the browser supports container units they
+ * drive by animating transform (compositor only, no layout per frame). Off screen,
+ * the lanes pause.
+ */
+.lx-traffic { position: absolute; inset: 0; pointer-events: none; container-type: inline-size; }
+.lx-vehicle { position: absolute; left: var(--park, 50%); line-height: 0; transform-origin: 50% 100%; }
+.lx-vehicle svg { display: block; width: auto; height: auto; overflow: visible; }
+.lx-lane-near { bottom: calc(var(--tear, 0px) + 6px); z-index: 2; }
+.lx-lane-far { bottom: calc(var(--tear, 0px) + (var(--road, 96px) - var(--walk, 0px)) / 2 - 4px); z-index: 1; scale: .8; }
+.lx-lane-far svg { transform: scaleX(-1); }
+.lx-lane-far svg text { transform: scaleX(-1); transform-box: fill-box; transform-origin: center; }
+@supports (width: 1cqw) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lx-vehicle { left: 0; will-change: transform; }
+    .lx-lane-near { animation: lx-drive var(--dur) linear var(--delay) infinite; }
+    .lx-lane-far { animation: lx-drive-back var(--dur) linear var(--delay) infinite; }
+    .lx-traffic[data-paused] .lx-vehicle { animation-play-state: paused; }
+  }
+}
+@keyframes lx-drive { from { transform: translateX(-280px); } to { transform: translateX(100cqw); } }
+@keyframes lx-drive-back { from { transform: translateX(100cqw); } to { transform: translateX(-280px); } }
+.lx-win { fill: #bfe3f0; }
+.lx-beam { fill: #ffe39a; opacity: 0; }
+.lx-hero[data-night] .lx-win { fill: #ffd88a; }
+.lx-hero[data-night] .lx-beam { opacity: .4; }
+@media (prefers-reduced-motion: reduce) {
+  .lx-vehicle, .lx-vehicle svg { animation: none !important; }
+}
+
+/* Phones swipe along the street; desktop shows every shop at once. */
+.lx-swipe { display: none; }
 
 /* ── Section heads (the homepage's h2 with a marker) ─────────────────── */
 .lx-wrap { position: relative; }
@@ -316,16 +380,43 @@
   .cw-home2 .lx-hero { min-height: 0; padding-bottom: 0; }
   .cw-home2 .lx-hero .lx-title { display: block; font-size: clamp(44px, 12.4vw, 58px); max-width: none; }
   .cw-home2 .lx-summary { margin: 14px 0 18px; }
-  .lx-street { margin-top: 30px; padding-bottom: 74px; }
+  .cw-home2 .lx-hero .lx-title em { display: block; }
+  .cw-home2 .lx-hero:not(.lp-hero) .lx-title { font-size: clamp(38px, 10.6vw, 46px); }
+  .cw-home2 .lx-hero:not(.lp-hero) .lx-summary { font-size: 15px; margin: 12px 0 14px; }
+  .lx-street { --walk: 30px; --road: 112px; --tear: 34px; display: flex; flex-direction: column; margin-top: 22px; }
+  .lx-swipe {
+    order: -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 16px 14px;
+    font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  }
+  .lx-swipe-hint { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border-radius: 999px; background: rgba(4, 10, 28, .5); color: #fff; transition: opacity .4s; }
+  .lx-swipe-hint::after { content: '→'; font-size: 13px; animation: lx-nudge 1.2s ease-in-out infinite; }
+  @keyframes lx-nudge { 50% { transform: translateX(4px); } }
+  .lx-street[data-swiped] .lx-swipe-hint { opacity: 0; }
+  .lx-swipe-count { padding: 7px 11px; border: 2px solid #151515; border-radius: 999px; background: var(--yellow); color: #151515; box-shadow: 2px 2px 0 #151515; }
   .lx-block {
-    justify-content: flex-start; overflow-x: auto; overflow-y: visible; scroll-snap-type: x mandatory; scroll-padding: 0 16px;
-    padding: 18px 16px 34px; margin-bottom: -34px; scrollbar-width: none;
+    /* Horizontal only: overflow-y must not become a second scroll axis, or a vertical
+       swipe that starts on the street gets stuck there instead of scrolling the page. */
+    justify-content: flex-start; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x pan-y;
+    scroll-snap-type: x mandatory; scroll-padding: 0 16px;
+    padding: 18px 16px 40px; scrollbar-width: none;
+    /* The street is a flex column on phones, and auto side margins there would size this
+       to its content (every shop side by side) in Safari, blowing each shop up to fill it. */
+    width: 100%; max-width: none; margin: 0 0 -40px; align-self: stretch;
   }
   .lx-block::-webkit-scrollbar { display: none; }
-  .lx-block li { flex: 0 0 64%; scroll-snap-align: start; }
+  .lx-block li { flex: 0 0 48vw; scroll-snap-align: start; animation-name: lx-rise-x; }
+  @keyframes lx-rise-x { from { transform: translateX(60px); opacity: 0; } }
   .lx-block li:last-child { margin-right: 16px; }
-  .lx-shop-sign b { font-size: 15px; }
-  .lx-road { height: 74px; }
+  .lx-shop-sign b { font-size: 14px; }
+  .lx-shop-sign small { font-size: 9px; }
+  .lx-lamp { width: 22px; bottom: -26px; right: -11px; }
+  .lx-lane-near { scale: .56; }
+  .lx-lane-far { scale: .52; }
+  /* Lighter on phones: two fewer vehicles, and no big blurred glows to composite. */
+  .lx-lane-far.lx-v-van, .lx-lane-far.lx-v-car { display: none; }
+  .lx-hero[data-night] .lx-shop-front { box-shadow: none; }
+  .lx-hero[data-night] .lx-lamp-bulb { filter: none; }
+  .lx-beam { display: none; }
 
   .lx-head { margin: 56px 0 18px; gap: 10px; }
   .lx-head h2 { font-size: clamp(32px, 9.4vw, 40px); }
@@ -416,7 +507,7 @@
 .lp-building .cw-loc-stamp { top: auto; bottom: 34%; right: -30px; width: 116px; height: 116px; font-size: 27px; }
 .lp-building .cw-loc-stamp-partner { width: auto; height: auto; bottom: 40%; right: -16px; }
 .lp-plate {
-  position: absolute; left: 50%; bottom: -24px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  position: absolute; left: 50%; bottom: -30px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
   padding: 9px 14px; border: 2px solid #151515; border-radius: 12px; background: #fff; color: #151515; box-shadow: 3px 3px 0 #151515;
   transform: translateX(-50%) rotate(-1deg); font: 600 12px/1 var(--mono); letter-spacing: .03em; text-transform: uppercase;
 }
@@ -425,7 +516,7 @@
 .lp-lamp-bulb { fill: #fff6d6; }
 .lp-hero[data-night] .lp-lamp-glow { opacity: .55; }
 .lp-hero[data-night] .lp-lamp-bulb { fill: #ffd27a; }
-.lx-road.lp-road { position: relative; display: block; height: clamp(84px, 8vw, 110px); }
+.lx-road.lp-road { --road: clamp(84px, 8vw, 110px); --tear: clamp(34px, 4vw, 60px); position: relative; z-index: 0; display: block; height: calc(var(--road) + var(--tear)); }
 
 .lp-take { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(24px, 3vw, 40px); align-items: center; margin-top: clamp(72px, 8vw, 112px); }
 .lp-quote { position: relative; margin: 0; padding: clamp(28px, 4vw, 56px); border: 2px solid var(--ink); border-radius: 30px; background: var(--yellow); box-shadow: 10px 10px 0 var(--ink); transform: rotate(-.6deg); }
@@ -456,6 +547,14 @@
 .lp-fact span { font: 400 13.5px/1.4 Inter, sans-serif; color: rgba(255, 255, 255, .72); }
 
 .lp-story { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: clamp(24px, 5vw, 80px); margin-top: clamp(72px, 8vw, 120px); padding-top: clamp(28px, 3vw, 40px); border-top: 2px solid var(--ink); }
+.lp-season-art { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(300px, 1fr); gap: clamp(28px, 5vw, 72px); align-items: center; margin-top: clamp(54px, 7vw, 96px); padding: clamp(24px, 4vw, 52px); border-radius: 16px; background: var(--navy); color: #fff; }
+.lp-season-art header > p:not(.lx-eyebrow) { max-width: 35rem; color: #d7e2ef; font: 500 16px/1.6 Inter, sans-serif; }
+.lp-season-art h2 { margin: 10px 0 16px; max-width: 10ch; color: #fff; font: 800 clamp(42px, 5vw, 72px)/.94 var(--display); letter-spacing: -.035em; text-wrap: balance; }
+.lp-season-art .lx-eyebrow { color: var(--yellow); }
+.lp-season-art header .lp-btn { margin-top: 18px; }
+.lp-season-art .cw-listing-poster { width: 100%; max-width: 42rem; margin: 0 auto; }
+.lp-season-art .cw-listing-poster img { display: block; width: 100%; height: auto; object-fit: contain; }
+.lp-season-art .cw-listing-poster figcaption { margin-top: 10px; color: #d7e2ef; font: 600 12px/1.5 var(--mono); }
 .lp-story h2 { font: 800 clamp(48px, 6vw, 88px)/.9 var(--display); letter-spacing: -.05em; }
 .lp-story mark { color: inherit; background: linear-gradient(transparent 58%, var(--yellow) 58% 92%, transparent 92%); }
 .lp-story-body > p:first-child { font: 400 clamp(18px, 1.6vw, 21px)/1.6 Inter, sans-serif; color: var(--ink); }
@@ -495,7 +594,7 @@
 @media (max-width: 900px) {
   .lp-hero-in { grid-template-columns: minmax(0, 1fr); }
   .lp-building { justify-self: center; margin: 0; width: min(88%, 480px); }
-  .lp-take, .lp-story { grid-template-columns: minmax(0, 1fr); }
+  .lp-take, .lp-story, .lp-season-art { grid-template-columns: minmax(0, 1fr); }
   .lp-foot { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
@@ -509,7 +608,7 @@
   .lp-building .cw-loc-stamp { width: 84px; height: 84px; font-size: 19px; right: -14px; }
   .lp-lamp { display: none; }
   .lp-plate { font-size: 11px; max-width: calc(100% - 8px); white-space: normal; text-align: center; }
-  .lx-road.lp-road { height: 72px; }
+  .lx-road.lp-road { --road: 84px; --tear: 34px; }
 
   .lp-take { margin-top: 64px; }
   .lp-quote { padding: 30px 20px 24px; border-radius: 24px; box-shadow: 6px 6px 0 var(--ink); }
@@ -653,3 +752,18 @@
   .cw-svc-year-row > span[role='cell'] { height: 24px; }
   .cw-svc-year-key { padding-right: 14px; }
 }
+
+/* Visitor profile: get to the programme quickly without rendering every session. */
+.lp-profile-nav { display:flex; flex-wrap:wrap; gap:10px; padding:20px 0 30px; }
+.lp-profile-nav a { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:10px 16px; border:1px solid #c9d1d6; border-radius:999px; background:#fff; color:#06162f; font-size:13px; font-weight:650; text-decoration:none; }
+.lp-profile-nav a:hover { background:var(--profile-wash,#fff7d8); border-color:#06162f; }
+.lp-profile-nav span { background:var(--profile-accent,#ffdf4f); border-radius:999px; padding:2px 7px; font-size:11px; }
+.lp [id^='lp-'] { scroll-margin-top:100px; }
+.lp-programme-tools { display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:14px; margin:22px 0; }
+.lp-programme-tools label { display:grid; gap:7px; font:600 11px/1.3 var(--mono); }
+.lp-programme-tools :is(input,select) { width:100%; min-width:0; min-height:48px; padding:12px 14px; border:1px solid #aebbc4; border-radius:12px; background:#fff; color:#06162f; font:400 16px/1.3 Inter,sans-serif; }
+.lp-programme-footer { display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:center; margin:20px 0; }
+.lp-programme-footer p { font-size:13px; color:var(--muted); }
+.lp .lp-status { border-color:var(--profile-accent,#ffdf4f); }
+.lp :is(.lp-profile-nav a,.lp-programme-tools input,.lp-programme-tools select,.lp-programme-footer button):focus-visible { outline:3px solid #1554d1; outline-offset:3px; }
+@media(max-width:640px) { .lp-programme-tools { grid-template-columns:minmax(0,1fr); } .lp-profile-nav { gap:8px; padding:16px 0 24px; } .lp-profile-nav a { font-size:12px; padding:9px 12px; } .lp-programme-footer .lp-btn { width:100%; justify-content:center; } }

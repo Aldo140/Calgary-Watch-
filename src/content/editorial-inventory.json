@@ -1247,13 +1247,17 @@
         }
       ],
       "image": {
-        "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-        "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+        "src": "/images/downstage/downstage-2026-27-season.png",
+        "alt": "Downstage 2026–2027 season poster featuring artwork for From Scratch, Dreaming Climate Consciousness, A Study of Choices and Creative Stretch",
+        "credit": "Season artwork by Leetia Lyons",
+        "presentation": "poster"
       },
       "images": [
         {
-          "src": "/images/illustration/calgarywatch-start-weekend-v1.webp",
-          "alt": "Illustrated Calgary festival scene with performers and people gathering beside the river"
+          "src": "/images/downstage/downstage-2026-27-season.png",
+          "alt": "Downstage 2026–2027 season poster featuring artwork for From Scratch, Dreaming Climate Consciousness, A Study of Choices and Creative Stretch",
+          "credit": "Season artwork by Leetia Lyons",
+          "presentation": "poster"
         }
       ],
       "socials": {
@@ -1271,7 +1275,8 @@
       "status": "published",
       "verification": "source-checked",
       "verifiedAt": "2026-10-13T17:30:00-06:00",
-      "updatedAt": "2026-10-13T17:30:00-06:00"
+      "updatedAt": "2026-10-13T17:30:00-06:00",
+      "sourceId": "downstage"
     },
     {
       "id": "biz-ghost-river-theatre",
@@ -1334,6 +1339,1872 @@
       "verification": "source-checked",
       "verifiedAt": "2026-10-13T17:30:00-06:00",
       "updatedAt": "2026-10-13T17:30:00-06:00"
+    },
+    {
+      "id": "biz-theatre-calgary",
+      "kind": "business",
+      "slug": "theatre-calgary",
+      "title": "Theatre Calgary",
+      "name": "Theatre Calgary",
+      "website": "https://www.theatrecalgary.com/",
+      "address": "220 9 Avenue SE, Calgary, AB",
+      "summary": "Calgary theatre company presenting performances at the Max Bell Theatre.",
+      "description": "Find Theatre Calgary performances and follow its official website for the current season, tickets and production details. CalgaryWatch links associated performances below; individual dates and availability remain with the company.",
+      "neighbourhood": "Downtown",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "arts",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Theatre Calgary",
+          "url": "https://www.theatrecalgary.com/",
+          "kind": "official"
+        }
+      ],
+      "socials": {
+        "website": "https://www.theatrecalgary.com/"
+      },
+      "services": [],
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-15T00:00:00Z"
+    },
+    {
+      "id": "biz-alliance-francaise-calgary",
+      "kind": "business",
+      "slug": "alliance-francaise-calgary",
+      "title": "Alliance Française de Calgary",
+      "name": "Alliance Française de Calgary",
+      "website": "https://www.afcalgary.ca/",
+      "address": "Calgary, AB",
+      "summary": "Discover Alliance Française de Calgary through its official homepage.",
+      "description": "Use the organization’s homepage for its current activities and published information. CalgaryWatch links officially sourced associated events here when available. Check the official site for locations, schedules and registration.",
+      "neighbourhood": "",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "arts",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alliance Française de Calgary",
+          "url": "https://www.afcalgary.ca/",
+          "kind": "official"
+        }
+      ],
+      "socials": {
+        "website": "https://www.afcalgary.ca/"
+      },
+      "services": [],
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-15T00:00:00Z"
+    },
+    {
+      "id": "biz-werklund-centre",
+      "kind": "business",
+      "slug": "werklund-centre",
+      "title": "Werklund Centre",
+      "name": "Werklund Centre",
+      "website": "https://www.werklundcentre.ca/",
+      "address": "205 8 Avenue SE, Calgary, AB",
+      "summary": "Downtown Calgary performing arts centre, formerly Arts Commons.",
+      "description": "Werklund Centre is a home for performing arts in downtown Calgary. Visit its official website for current programming and visitor information. Events held in its venues are not automatically events organized by the centre; only officially attributed organizer events appear below.",
+      "neighbourhood": "Downtown",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "arts",
+        "organization",
+        "Arts Commons"
+      ],
+      "sources": [
+        {
+          "name": "Werklund Centre",
+          "url": "https://www.werklundcentre.ca/",
+          "kind": "official"
+        }
+      ],
+      "socials": {
+        "website": "https://www.werklundcentre.ca/"
+      },
+      "services": [],
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-15T00:00:00Z"
+    },
+    {
+      "id": "biz-inglewood-bia",
+      "kind": "business",
+      "slug": "inglewood-bia",
+      "title": "Inglewood Business Improvement Area",
+      "name": "Inglewood Business Improvement Area",
+      "summary": "The business improvement area organizing events and supporting local businesses in Inglewood.",
+      "description": "The business improvement area organizing events and supporting local businesses in Inglewood. Confirm upcoming dates with the organization’s official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "community"
+      ],
+      "sources": [
+        {
+          "name": "Inglewood Business Improvement Area",
+          "url": "https://www.inglewoodyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-15T20:13:12.146Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-15T20:13:12.146Z",
+      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "address": "Inglewood, Calgary",
+      "website": "https://www.inglewoodyyc.ca/",
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false
+    },
+    {
+      "id": "biz-dalhousie-community-association",
+      "kind": "business",
+      "slug": "dalhousie-community-association",
+      "title": "Dalhousie Community Association",
+      "name": "Dalhousie Community Association",
+      "summary": "The community association behind the Dalhousie Harvest Farmers’ Market.",
+      "description": "The community association behind the Dalhousie Harvest Farmers’ Market. Confirm upcoming dates with the organization’s official website.",
+      "categories": [
+        "services"
+      ],
+      "tags": [
+        "community"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.dalhousiecalgary.ca/farmersmarket-harvest/",
+          "kind": "official",
+          "retrievedAt": "2026-10-15T20:13:12.146Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-15T20:13:12.146Z",
+      "updatedAt": "2026-10-15T20:13:12.146Z",
+      "address": "5432 Dalhart Road NW, Calgary",
+      "website": "https://www.dalhousiecalgary.ca/",
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false
+    },
+    {
+      "id": "biz-alberta-theatre-projects",
+      "kind": "business",
+      "slug": "alberta-theatre-projects",
+      "title": "Alberta Theatre Projects",
+      "name": "Alberta Theatre Projects",
+      "website": "https://albertatheatreprojects.com/",
+      "address": "Martha Cohen Theatre, Calgary, Alberta",
+      "summary": "Alberta Theatre Projects presents theatre at the Martha Cohen Theatre in Calgary.",
+      "description": "Visit Alberta Theatre Projects’ official website for its current season, performance information and organization details. Its own productions appear below; events presented by other organizations at the same venue are not attributed to ATP.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "theatre",
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Theatre Projects",
+          "url": "https://albertatheatreprojects.com/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://albertatheatreprojects.com/"
+      },
+      "services": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": true,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-heritage-park",
+      "kind": "business",
+      "slug": "heritage-park",
+      "title": "Heritage Park Historical Village",
+      "name": "Heritage Park Historical Village",
+      "website": "https://heritagepark.ca/",
+      "address": "1900 Heritage Drive SW, Calgary, AB",
+      "summary": "A Calgary heritage attraction with ghost tours, seasonal activities and special events.",
+      "description": "Explore Heritage Park’s own programme of tours and seasonal events. Check the individual event page for admission, entry times and which areas are open.",
+      "categories": [
+        "family",
+        "heritage"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-13/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-14/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/culturally-speaking-calgary-general-hospital-its-part-in-the-calgary-story/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/homeschooler-days/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/calgary-ghost-tours/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-thursdays/2026-10-15/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-fridays/2026-10-16/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghost-teas/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-saturdays/2026-10-17/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghost-teas/2026-10-18/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-sundays/2026-10-18/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out-adult-night/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out-3/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out/2026-10-24/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghouls-night-out/2026-10-25/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-28/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-29/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-thursdays/2026-10-29/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-30/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-fridays/2026-10-30/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/ghosts-and-gourmet/2026-10-31/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/where-dark-things-dwell-saturdays/2026-10-31/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-11-07/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-11-21/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/homeschooler-days/2026-12-04/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Heritage Park events",
+          "url": "https://heritagepark.ca/events/the-history-keepers-tour-3/2026-12-05/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://heritagepark.ca/"
+      },
+      "services": [
+        "Seasonal events",
+        "Heritage experiences"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-the-confluence",
+      "kind": "business",
+      "slug": "the-confluence",
+      "title": "The Confluence Historic Site & Parkland",
+      "name": "The Confluence Historic Site & Parkland",
+      "website": "https://www.theconfluence.ca/",
+      "address": "750 9 Avenue SE, Calgary, AB",
+      "summary": "A Calgary gathering place for history, talks, creative workshops and cultural events.",
+      "description": "The Confluence’s programme includes talks, film nights, crafts and community gatherings. Find the events it organizes below and check its official pages for current registration and visitor information.",
+      "categories": [
+        "arts",
+        "heritage"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/the-inbetween-leader-book-launch",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-10-14",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales-oct15",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales-oct16",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creefiresidestories-oct17",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/truecrime26-oct17",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/creepytales",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-oct18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/deadlyab-oct18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/frightfulfamilyfavourites-paranorman",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/hdht-oct2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/ghosttrivia",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/truecrime2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/howtrueistrue-theconjuring2",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/deadlyab2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/frightfulfamilyfavourites-corpsebride",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/rocky-horror",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/halloween",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/beyond-the-history-books/nov-5-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/cjff-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/girlwintertour",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-nov15",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-11-18",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/pdworkshops-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/howtrueistrue-argo",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/classics-crafts-12-02",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/reeltalk-thedivorcee",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "The Confluence Historic Site & Parkland",
+          "url": "https://www.theconfluence.ca/events/tccc-dec13",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.theconfluence.ca/"
+      },
+      "services": [
+        "Talks and cultural events",
+        "Creative workshops"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-contemporary-calgary",
+      "kind": "business",
+      "slug": "contemporary-calgary",
+      "title": "Contemporary Calgary",
+      "name": "Contemporary Calgary",
+      "website": "https://www.contemporarycalgary.com/",
+      "address": "701 11 Street SW, Calgary, AB",
+      "summary": "Contemporary art exhibitions, artist talks and creative programmes in Calgary.",
+      "description": "Discover exhibitions and public programmes at Contemporary Calgary. Exhibition runs and separately scheduled talks or workshops may have different admission and registration requirements; use each official event page before visiting.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/ghazaleh-avarzamani-of-manual",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/adelita-husni-bey-agency",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/ghazaleh-avarzamani-churn-earn-burn-and-then-return",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/jane-jin-kaisen-burial-of-this-order",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/curtis-talwst-santiago-worlds-worlds-worlds",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/october-drop-in-art-making-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/october-open-studio-for-55-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/fluid-fest-2026-presented-by-springboard-performance",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/perspective-film-series-beauty-and-the-dogs-2017",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/damien-eagle-bear-when-you-see-it",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/exhibition-opening-damien-eagle-bear-when-you-see-it",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-tagalog-tour-oct-24",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-kids-press-into-fall",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/november-open-studio-for-55-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/free-first-thursday-nov-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/november-drop-in-art-making-2026",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-french-tour-nov-14",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        },
+        {
+          "name": "Contemporary Calgary",
+          "url": "https://www.contemporarycalgary.com/whats-on/contemporary-connections-ukrainian-tour-nov-21",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.contemporarycalgary.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Public programmes"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-opera",
+      "kind": "business",
+      "slug": "calgary-opera",
+      "title": "Calgary Opera",
+      "name": "Calgary Opera",
+      "website": "https://www.calgaryopera.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary opera productions and special performances.",
+      "description": "Calgary Opera presents staged productions and special performances. Locations vary by event; the Southern Alberta Jubilee Auditorium is a performance venue rather than an office address for this profile. Check the official production page for language, surtitles, dates and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Opera",
+          "url": "https://www.calgaryopera.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryopera.com/"
+      },
+      "services": [
+        "Opera performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-wordfest",
+      "kind": "business",
+      "slug": "wordfest",
+      "title": "Wordfest",
+      "name": "Wordfest",
+      "website": "https://wordfest.com/",
+      "address": "Calgary, AB",
+      "summary": "Author conversations and literary performances, including the Imaginairium festival.",
+      "description": "Wordfest brings writers and readers together through author conversations, literary performances and its Imaginairium festival. Events use several Calgary venues; check each listing for the actual location, admission and accessibility details.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Wordfest",
+          "url": "https://wordfest.com/festival/imaginairium/schedule/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://wordfest.com/"
+      },
+      "services": [
+        "Author conversations",
+        "Literary festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-alberta-ballet",
+      "kind": "business",
+      "slug": "alberta-ballet",
+      "title": "Alberta Ballet",
+      "name": "Alberta Ballet",
+      "website": "https://www.albertaballet.com/",
+      "address": "Calgary, AB",
+      "summary": "Ballet performances in Calgary, including The Nutcracker.",
+      "description": "Find Alberta Ballet’s Calgary performances and follow its official production pages for current dates and tickets. Performance venues are listed on the individual events; this organization profile does not present the Jubilee Auditorium as the company’s office.",
+      "categories": [
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Ballet",
+          "url": "https://www.albertaballet.com/shows/the-nutcracker",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.albertaballet.com/"
+      },
+      "services": [
+        "Ballet performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-farmers-market",
+      "kind": "business",
+      "slug": "calgary-farmers-market",
+      "title": "Calgary Farmers' Market",
+      "name": "Calgary Farmers' Market",
+      "website": "https://calgaryfarmersmarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "One market organization with South and West Calgary locations.",
+      "description": "Explore the South and West market locations below. Each location keeps its own address and scheduled market days; check the location’s official page for current hours and holiday exceptions.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/cfm-west/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        },
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://calgaryfarmersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryfarmersmarket.ca/"
+      },
+      "services": [
+        "Farmers markets",
+        "Local food"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-calgary-earth-market-society",
+      "kind": "business",
+      "slug": "calgary-earth-market-society",
+      "title": "Calgary Earth Market Society",
+      "name": "Calgary Earth Market Society",
+      "website": "https://www.farmersmakersmarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "Organizer of the Farmers & Makers Market at cSPACE.",
+      "description": "Find the Farmers & Makers Market at cSPACE below, with its own location and scheduled market days. The market is organized by Calgary Earth Market Society; cSPACE is the host location. Check the organizer’s page for seasonal changes.",
+      "categories": [
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "organization"
+      ],
+      "sources": [
+        {
+          "name": "Recurring Calgary community markets",
+          "url": "https://www.farmersmakersmarket.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T18:06:47.585Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.farmersmakersmarket.ca/"
+      },
+      "services": [
+        "Farmers and makers market"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-crossroads-market",
+      "kind": "business",
+      "slug": "crossroads-market",
+      "title": "Crossroads Market",
+      "name": "Crossroads Market",
+      "website": "https://www.crossroadsmarket.ca/",
+      "address": "1235 26 Avenue SE, Calgary, AB T2G 1R7",
+      "summary": "A year-round Calgary market for fresh food, independent vendors, local shopping and a food hall.",
+      "description": "Operating since 1987, Crossroads brings together fresh food, groceries, specialty vendors, restaurants and independent makers. The regular market opens Friday–Sunday, 9 a.m.–5 p.m., with free parking. Vendor applications are available through the organization. Guest markets at this location may have different organizers and hours.",
+      "categories": [
+        "markets",
+        "food",
+        "shopping"
+      ],
+      "tags": [
+        "farmers-market",
+        "makers",
+        "family-friendly",
+        "year-round"
+      ],
+      "sources": [
+        {
+          "name": "Crossroads Market — supplied source research",
+          "url": "https://www.crossroadsmarket.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crossroadsmarket.ca/"
+      },
+      "services": [
+        "Year-round market",
+        "Food hall",
+        "Vendor applications"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "email": "info@crossroadsmarket.ca",
+      "phone": "403-291-5208",
+      "hours": {
+        "Friday": "9 a.m.–5 p.m.",
+        "Saturday": "9 a.m.–5 p.m.",
+        "Sunday": "9 a.m.–5 p.m."
+      }
+    },
+    {
+      "id": "biz-hillhurst-sunnyside-community-association",
+      "kind": "business",
+      "slug": "hillhurst-sunnyside-community-association",
+      "title": "Hillhurst Sunnyside Community Association",
+      "name": "Hillhurst Sunnyside Community Association",
+      "website": "https://farmersmarket.hsca.ca/",
+      "address": "1320 5 Avenue NW, Calgary, AB T2N 0S2",
+      "summary": "The community organization behind Hillhurst Sunnyside Farmers’ Market.",
+      "description": "The HSCA farmers’ market connects neighbours with local food producers, artisans and makers. The year-round Wednesday market runs 3–7 p.m. The indoor season runs October 14, 2026–May 12, 2027. Sunnyside CTrain is about a five-minute walk away; check the market site for seasonal arrangements.",
+      "categories": [
+        "markets",
+        "food",
+        "community"
+      ],
+      "tags": [
+        "farmers-market",
+        "community",
+        "year-round",
+        "indoor-winter"
+      ],
+      "sources": [
+        {
+          "name": "Hillhurst Sunnyside Community Association — supplied source research",
+          "url": "https://farmersmarket.hsca.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://farmersmarket.hsca.ca/"
+      },
+      "services": [
+        "Farmers market",
+        "Local food and artisans"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "hours": {
+        "Wednesday": "3–7 p.m."
+      }
+    },
+    {
+      "id": "biz-little-modern-market",
+      "kind": "business",
+      "slug": "little-modern-market",
+      "title": "Little Modern Market",
+      "name": "Little Modern Market",
+      "website": "https://www.littlemodernmarket.com/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary pop-up market connecting local makers, artists, boutiques and small businesses.",
+      "description": "Established in 2016, Little Modern Market brings local makers, artists, boutiques and food vendors together with a community charity component, typically featuring 100–120 vendors per market. Its 2026 venue is the Red & White Club / Olympic Volunteer Centre at McMahon Stadium, 1833 Crowchild Trail NW. Admission is free with an encouraged donation to the featured charity. Certified service dogs only; check each edition for activities and workshops.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "makers",
+        "artisan-market",
+        "pop-up",
+        "family-friendly"
+      ],
+      "sources": [
+        {
+          "name": "Little Modern Market",
+          "url": "https://www.littlemodernmarket.com/",
+          "kind": "official"
+        },
+        {
+          "name": "2026 market venue and applications",
+          "url": "https://www.littlemodernmarket.com/apply",
+          "kind": "official"
+        },
+        {
+          "name": "Holiday market hours corroboration supplied by user",
+          "url": "https://www.yyc.buzz/events/calendar/2026/11",
+          "kind": "editorial"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.littlemodernmarket.com/"
+      },
+      "services": [
+        "Pop-up markets",
+        "Local business promotion"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-fresh-local-market-kitchens",
+      "kind": "business",
+      "slug": "fresh-local-market-kitchens",
+      "title": "Fresh & Local Market + Kitchens",
+      "name": "Fresh & Local Market + Kitchens",
+      "website": "https://freshandlocal.ca/",
+      "address": "#426, 12445 Lake Fraser Drive SE, Calgary, AB T2J 7A4",
+      "summary": "A year-round indoor local-food market and culinary marketplace in Avenida Village.",
+      "description": "Fresh & Local combines regional food producers, prepared food, culinary kitchens and specialty vendors. The organization describes more than 275 local producers and around 40 culinary kitchens and food artisans. Its 2026 food-festival programme included monthly celebrations through September. Follow the official news and events page for new programming.",
+      "categories": [
+        "markets",
+        "food"
+      ],
+      "tags": [
+        "food-hall",
+        "local-food",
+        "year-round",
+        "family-friendly"
+      ],
+      "sources": [
+        {
+          "name": "Fresh & Local",
+          "url": "https://freshandlocal.ca/",
+          "kind": "official"
+        },
+        {
+          "name": "Official news and events",
+          "url": "https://freshandlocal.ca/news-events/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://freshandlocal.ca/"
+      },
+      "services": [
+        "Indoor market",
+        "Culinary kitchens",
+        "Local producers"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "phone": "403-425-4155",
+      "hours": {
+        "Thursday": "11 a.m.–8 p.m.",
+        "Friday": "11 a.m.–8 p.m.",
+        "Saturday": "11 a.m.–8 p.m.",
+        "Sunday": "11 a.m.–5 p.m."
+      }
+    },
+    {
+      "id": "biz-makers",
+      "kind": "business",
+      "slug": "makers",
+      "title": "MAKERS",
+      "name": "MAKERS",
+      "website": "https://www.shopmakers.ca/",
+      "address": "Calgary, AB",
+      "summary": "Canadian maker marketplaces at Market Mall, The CORE and Southcentre.",
+      "description": "MAKERS showcases independent Canadian makers through permanent retail marketplaces featuring jewellery, art, candles, apparel, home décor and gifts. Calgary locations at Market Mall, The CORE and Southcentre keep their own hours and contact emails. These are permanent retail locations, not separately announced craft fairs. CrossIron Mills is outside this Calgary-only set.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "makers",
+        "artisan",
+        "indoor",
+        "year-round",
+        "retail"
+      ],
+      "sources": [
+        {
+          "name": "MAKERS Calgary contacts",
+          "url": "https://www.shopmakers.ca/contact",
+          "kind": "official"
+        },
+        {
+          "name": "Market Mall",
+          "url": "https://www.shopmakers.ca/makers-market-mall",
+          "kind": "official"
+        },
+        {
+          "name": "The CORE",
+          "url": "https://www.shopmakers.ca/makers-the-core",
+          "kind": "official"
+        },
+        {
+          "name": "Southcentre",
+          "url": "https://www.shopmakers.ca/makers-southcentre",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shopmakers.ca/"
+      },
+      "services": [
+        "Maker retail marketplaces",
+        "Independent Canadian goods"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-the-barn-artisan-market",
+      "kind": "business",
+      "slug": "the-barn-artisan-market",
+      "title": "The Barn Artisan Market",
+      "name": "The Barn Artisan Market",
+      "website": "https://thebarnartisanmarket.ca/",
+      "address": "Shawnessy Barn, 224 Shawmeadows Road SW, Calgary, AB",
+      "summary": "An artisan market at Shawnessy Barn with Alberta-made goods and a changing local vendor lineup.",
+      "description": "Established in January 2020, The Barn Artisan Market features more than 30 local vendors across two floors of Shawnessy Barn. Admission and parking are free. Products must be handcrafted, created or made in Alberta; MLM, direct sales and drop-shipping are excluded. The usual fourth-Sunday pattern has exceptions: the 2026 Christmas Market is November 29. Check the calendar below for confirmed market dates.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "artisan-market",
+        "makers",
+        "free",
+        "indoor",
+        "year-round"
+      ],
+      "sources": [
+        {
+          "name": "The Barn Artisan Market — supplied source research",
+          "url": "https://thebarnartisanmarket.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://thebarnartisanmarket.ca/"
+      },
+      "services": [
+        "Artisan markets",
+        "Made-in-Alberta products"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "email": "info@thebarnartisanmarket.ca"
+    },
+    {
+      "id": "biz-calgary-yuletide-festival-society",
+      "kind": "business",
+      "slug": "calgary-yuletide-festival-society",
+      "title": "Calgary Yuletide Festival Society",
+      "name": "Calgary Yuletide Festival Society",
+      "website": "https://calgarywintermarket.ca/",
+      "address": "Calgary, AB",
+      "summary": "The nonprofit organizer behind Calgary Winter Market at Eau Claire Plaza.",
+      "description": "Calgary Yuletide Festival Society organizes Calgary Winter Market, a European-inspired outdoor holiday market with retail huts, food and drinks, entertainment, children’s activities, a carousel and a Brauhaus tent. The 2026 edition runs on selected days November 19–December 24 at Eau Claire Plaza. The market location is listed separately from the organization’s base.",
+      "categories": [
+        "markets",
+        "community",
+        "holiday"
+      ],
+      "tags": [
+        "nonprofit",
+        "community",
+        "christmas-market",
+        "outdoor"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Winter Market",
+          "url": "https://calgarywintermarket.ca/",
+          "kind": "official"
+        },
+        {
+          "name": "Organizer contact page",
+          "url": "https://calgarywintermarket.ca/pages/contact",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgarywintermarket.ca/"
+      },
+      "services": [
+        "Seasonal holiday market"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z"
+    },
+    {
+      "id": "biz-ymca-calgary",
+      "kind": "business",
+      "slug": "ymca-calgary",
+      "title": "YMCA Calgary",
+      "name": "YMCA Calgary",
+      "website": "https://www.ymcacalgary.org/",
+      "address": "Association office: 200-1422 Kensington Road NW, Calgary, AB T2N 3P9",
+      "summary": "A Calgary nonprofit operating recreation centres, camps, child development and community programming.",
+      "description": "YMCA Calgary connects communities through recreation, camps, child development and community programmes. Its free 2026 Winter Markets bring local vendors to four branches across five dates. The Kensington address is the association office; each winter-market listing has its own branch location and contact email.",
+      "categories": [
+        "community",
+        "markets",
+        "family"
+      ],
+      "tags": [
+        "nonprofit",
+        "community",
+        "recreation",
+        "family"
+      ],
+      "sources": [
+        {
+          "name": "YMCA Calgary contacts (media email; branch contacts preferred for markets)",
+          "url": "https://www.ymcacalgary.org/about/contact-us",
+          "kind": "official"
+        },
+        {
+          "name": "2026 Winter Markets",
+          "url": "https://www.ymcacalgary.org/events/2026-winter-market",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.ymcacalgary.org/"
+      },
+      "services": [
+        "Recreation centres",
+        "Community programmes",
+        "Winter markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-16T00:00:00Z",
+      "email": "media@ymcacalgary.org"
+    },
+    {
+      "id": "biz-signatures-shows",
+      "kind": "business",
+      "slug": "signatures-shows",
+      "title": "Signatures Shows",
+      "name": "Signatures Shows",
+      "website": "https://signatures.ca/",
+      "address": "Calgary, AB",
+      "summary": "Canadian handmade-market producer behind Calgary’s Festival of Crafts.",
+      "description": "Family-owned since 1980, Signatures brings together independent Canadian artists, artisans, makers and designers. Its Calgary show, Festival of Crafts, runs October 29–November 1, 2026 at the BMO Centre, Hall F. The event venue is separate from the organizer’s base. Calgary show inquiries can go to show manager Samantha Milner at smilner@signatures.ca.",
+      "categories": [
+        "markets",
+        "arts",
+        "shopping"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Signatures Shows — official website",
+          "url": "https://signatures.ca/about/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Signatures Shows — official website",
+          "url": "https://signatures.ca/market/festival-of-crafts/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://signatures.ca/"
+      },
+      "services": [
+        "Handmade shows",
+        "Artisan exhibitions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "info@signatures.ca"
+    },
+    {
+      "id": "biz-millarville-racing-and-agricultural-society",
+      "kind": "business",
+      "slug": "millarville-racing-and-agricultural-society",
+      "title": "Millarville Racing and Agricultural Society",
+      "name": "Millarville Racing and Agricultural Society",
+      "website": "https://millarvilleracetrack.com/",
+      "address": "306097 192 Street W, Millarville, AB T0L 1K0",
+      "summary": "A Foothills agricultural society hosting markets, fairs and community gatherings.",
+      "description": "A nearby day trip outside Calgary, the society hosts seasonal farmers’ markets, the Priddis & Millarville Fair, horse racing and community gatherings. Its 2026 Christmas Market runs November 5–8 and November 12–15. The summer market finished October 10; no unannounced future summer dates are listed.",
+      "categories": [
+        "markets",
+        "community",
+        "day-trip"
+      ],
+      "tags": [
+        "organizer",
+        "day-trip",
+        "outside-calgary"
+      ],
+      "sources": [
+        {
+          "name": "Millarville Racing and Agricultural Society — official website",
+          "url": "https://millarvilleracetrack.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Millarville Racing and Agricultural Society — official website",
+          "url": "https://millarvilleracetrack.com/annual-christmas-market/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://millarvilleracetrack.com/"
+      },
+      "services": [
+        "Seasonal markets",
+        "Agricultural fair",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "office@mras-track.com",
+      "phone": "403-931-3411"
+    },
+    {
+      "id": "biz-the-saskatoon-farm",
+      "kind": "business",
+      "slug": "the-saskatoon-farm",
+      "title": "The Saskatoon Farm",
+      "name": "The Saskatoon Farm",
+      "website": "https://www.saskatoonfarm.com/",
+      "address": "#20, 80181 338 Avenue East, Foothills County, AB T1S 4S3",
+      "summary": "A family-run Foothills farm with seasonal produce, a bakery, restaurant and greenhouse gatherings.",
+      "description": "Family-run since 1987, The Saskatoon Farm combines seasonal farm shopping, a bakery, restaurant and garden centre with workshops and celebrations. This is a day trip outside Calgary. Its upcoming official calendar includes an October 23 felted-art workshop and October 30 Día de los Muertos celebration. Check the farm’s seasonal updates before travelling; farmers’ market hours and winter closure are separate from event hours.",
+      "categories": [
+        "markets",
+        "food",
+        "day-trip"
+      ],
+      "tags": [
+        "organizer",
+        "day-trip",
+        "outside-calgary"
+      ],
+      "sources": [
+        {
+          "name": "The Saskatoon Farm — official website",
+          "url": "https://www.saskatoonfarm.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "The Saskatoon Farm — official website",
+          "url": "https://www.saskatoonfarm.com/events-1",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.saskatoonfarm.com/"
+      },
+      "services": [
+        "Seasonal produce",
+        "Bakery and restaurant",
+        "Workshops and celebrations"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "hello@saskatoonfarm.com",
+      "phone": "403-938-6245"
+    },
+    {
+      "id": "biz-granary-road",
+      "kind": "business",
+      "slug": "granary-road",
+      "title": "Granary Road",
+      "name": "Granary Road",
+      "website": "https://www.granaryroad.com/",
+      "address": "226066 112 Street West, Foothills County, AB T1S 5S5",
+      "summary": "A Foothills family destination with farm experiences, indoor exhibits and a Christmas market.",
+      "description": "A day trip south of Calgary, Granary Road’s 2026 Christmas Market runs on three weekends, November 28–29, December 5–6 and December 12–13, 10 a.m.–4 p.m. Market admission is required; selected Christmas activity passes include entry. The outdoor park and mini golf reopen in spring 2027, while the Fabulous & Fantastic Farm indoor exhibit opens weekends. Do not confuse indoor-exhibit admission with market admission.",
+      "categories": [
+        "markets",
+        "family",
+        "day-trip"
+      ],
+      "tags": [
+        "organizer",
+        "day-trip",
+        "outside-calgary"
+      ],
+      "sources": [
+        {
+          "name": "Granary Road — official website",
+          "url": "https://www.granaryroad.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Granary Road — official website",
+          "url": "https://www.granaryroad.com/christmas-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.granaryroad.com/"
+      },
+      "services": [
+        "Christmas market",
+        "Indoor farm exhibit",
+        "Family activities"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "info@granaryroad.com",
+      "phone": "403-453-7623"
+    },
+    {
+      "id": "biz-bowness-community-association",
+      "kind": "business",
+      "slug": "bowness-community-association",
+      "title": "Bowness Community Association",
+      "name": "Bowness Community Association",
+      "website": "https://mybowness.com/",
+      "address": "7904 43 Avenue NW, Calgary, AB T3B 4P9",
+      "summary": "A neighbourhood association with community programming, recreation and a local-maker holiday fair.",
+      "description": "Established in 1963, the BCA offers community events, programming and facility rentals. Its free Holiday Craft Fair brings handmade goods and local makers to the Main Hall on November 14–15, 2026, 10 a.m.–4 p.m. The official fair contact is craftfair@mybowness.com; vendor applications have closed.",
+      "categories": [
+        "markets",
+        "community"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Bowness Community Association — official website",
+          "url": "https://mybowness.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Bowness Community Association — official website",
+          "url": "https://mybowness.com/craftfair/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mybowness.com/"
+      },
+      "services": [
+        "Community programming",
+        "Holiday Craft Fair",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "craftfair@mybowness.com",
+      "phone": "403-288-8300"
+    },
+    {
+      "id": "biz-triwood-community-association",
+      "kind": "business",
+      "slug": "triwood-community-association",
+      "title": "Triwood Community Association",
+      "name": "Triwood Community Association",
+      "website": "https://www.triwoodcommunity.com/",
+      "address": "2244 Chicoutimi Drive NW, Calgary, AB T2L 0W1",
+      "summary": "A northwest community association with seasonal markets, recreation and neighbourhood events.",
+      "description": "Triwood offers community markets, fitness, social clubs, an arena, camps and facility rentals. Its free Halloween Skate Night takes place October 25, 2026. Check the organizer’s market calendar for seasonal editions and current details.",
+      "categories": [
+        "markets",
+        "community",
+        "recreation"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Triwood Community Association — official website",
+          "url": "https://www.triwoodcommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Triwood Community Association — official website",
+          "url": "https://www.triwoodcommunity.com/events",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Triwood Community Association — official website",
+          "url": "https://www.triwoodcommunity.com/farmers-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.triwoodcommunity.com/"
+      },
+      "services": [
+        "Seasonal markets",
+        "Arena and recreation",
+        "Community events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "programs@triwoodcommunity.com",
+      "phone": "403-282-2677 ext. 103"
+    },
+    {
+      "id": "biz-acadia-community-association",
+      "kind": "business",
+      "slug": "acadia-community-association",
+      "title": "Acadia Community Association",
+      "name": "Acadia Community Association",
+      "website": "https://www.acadiaca.com/",
+      "address": "240 90 Avenue SE, Calgary, AB T2J 6P6",
+      "summary": "A southeast community association hosting a free Christmas market and neighbourhood programming.",
+      "description": "The ACA supports neighbours through social and recreational programming, community advocacy and events. Its 2026 Christmas Market takes place November 14, 10 a.m.–4 p.m., in Rose Hall at the Acadia Recreation Complex. Admission and parking are free. Market questions: events@acadiaca.com.",
+      "categories": [
+        "markets",
+        "community"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Acadia Community Association — official website",
+          "url": "https://www.acadiaca.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Acadia Community Association — official website",
+          "url": "https://www.acadiaca.com/christmas-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.acadiaca.com/"
+      },
+      "services": [
+        "Community events",
+        "Christmas market",
+        "Recreation facilities"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "events@acadiaca.com",
+      "phone": "403-255-1252"
+    },
+    {
+      "id": "biz-silver-springs-community-association",
+      "kind": "business",
+      "slug": "silver-springs-community-association",
+      "title": "Silver Springs Community Association",
+      "name": "Silver Springs Community Association",
+      "website": "https://silverspringscommunity.ca/",
+      "address": "5720 Silver Ridge Drive NW, Calgary, AB T3B 5E5",
+      "summary": "A northwest nonprofit with community programmes and a free local-artisan Christmas market.",
+      "description": "Serving Silver Springs since 1975, the association offers programmes, rental spaces and events for neighbours of all ages. Its Christmas Craft Market runs November 14, 2026, 10 a.m.–3 p.m., with handmade goods, unique gifts and local crafts. The market is free to attend and open to all.",
+      "categories": [
+        "markets",
+        "community"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Silver Springs Community Association — official website",
+          "url": "https://silverspringscommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Silver Springs Community Association — official website",
+          "url": "https://silverspringscommunity.ca/events/christmas-craft-market",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://silverspringscommunity.ca/"
+      },
+      "services": [
+        "Christmas Craft Market",
+        "Community programmes",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "administration@silverspringscommunity.ca",
+      "phone": "403-288-2616"
+    },
+    {
+      "id": "biz-deerfoot-city",
+      "kind": "business",
+      "slug": "deerfoot-city",
+      "title": "Deerfoot City",
+      "name": "Deerfoot City",
+      "website": "https://deerfootcity.com/",
+      "address": "971 64 Avenue NE, Calgary, AB",
+      "summary": "An open-air shopping destination with seasonal family events along The Boulevard.",
+      "description": "Deerfoot City combines shopping, dining and entertainment with family-friendly seasonal programming. Destination: Boo City includes trick-or-treating and hands-on science on October 24, 2026, 6–8 p.m. Its pumpkin patch has separate hours and a food-bank donation requirement; confirm that schedule directly. Event and media inquiries are handled by the marketing team at gs@deerfootcity.ca.",
+      "categories": [
+        "shopping",
+        "community",
+        "family"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "Deerfoot City — official website",
+          "url": "https://deerfootcity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Deerfoot City — official website",
+          "url": "https://deerfootcity.com/contact/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        },
+        {
+          "name": "Deerfoot City — official website",
+          "url": "https://deerfootcity.com/halloween/",
+          "kind": "official",
+          "retrievedAt": "2026-10-17T00:44:59.309327Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://deerfootcity.com/"
+      },
+      "services": [
+        "Shopping and dining",
+        "Seasonal events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z",
+      "email": "gs@deerfootcity.ca",
+      "phone": "403-274-7024"
+    },
+    {
+      "id": "biz-screamfest",
+      "kind": "business",
+      "slug": "screamfest",
+      "title": "ScreamFest",
+      "name": "ScreamFest",
+      "website": "https://screamfest.ca/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary Halloween attraction with haunted houses, scare zones and midway rides.",
+      "description": "ScreamFest brings haunted attractions to GMC Stadium, Stampede Park on select October nights. Expect haunted houses, scare zones and midway rides; much of the experience is outdoors. Check the official site for tickets, age restrictions and the adults-only night. The show venue is listed on individual events, separate from this organizer profile.",
+      "categories": [
+        "nightlife",
+        "holiday"
+      ],
+      "tags": [
+        "organizer"
+      ],
+      "sources": [
+        {
+          "name": "ScreamFest — existing reviewed event inventory",
+          "url": "https://screamfest.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://screamfest.ca/"
+      },
+      "services": [
+        "Halloween attraction",
+        "Haunted houses"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-17T00:44:59.309327Z"
     }
   ]
 }

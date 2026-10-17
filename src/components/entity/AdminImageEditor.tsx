@@ -1,0 +1,8 @@
+import type {EntityImage} from '../../types/discovery';
+export function AdminImageEditor({value,disabled,onChange}:{value:EntityImage|null|undefined;disabled:boolean;onChange:(value:EntityImage|null)=>void}){
+ const change=(key:keyof EntityImage,text:string)=>onChange({...value,src:value?.src??'',alt:value?.alt??'',[key]:text});
+ return <fieldset className="pl-step"><legend>Primary image · admin</legend><label className="pl-field"><span>Image URL or /images/ path</span><input value={value?.src??''} readOnly={disabled} onChange={e=>change('src',e.target.value)}/></label><label className="pl-field"><span>Alternative text</span><input value={value?.alt??''} readOnly={disabled} onChange={e=>change('alt',e.target.value)}/></label><label className="pl-field"><span>Artist / photographer credit</span><input value={value?.credit??''} readOnly={disabled} onChange={e=>change('credit',e.target.value)}/></label><button type="button" disabled={disabled||!value} onClick={()=>onChange(null)}>Remove image from listing</button></fieldset>;
+}
+export function AdminGalleryEditor({value,disabled,onChange}:{value:EntityImage[];disabled:boolean;onChange:(value:EntityImage[])=>void}){
+ return <fieldset className="pl-step"><legend>Gallery images · admin</legend>{value.map((item,index)=><div key={index}><h3>Gallery image {index+1}</h3><AdminImageEditor value={item} disabled={disabled} onChange={next=>onChange(next?value.map((current,i)=>i===index?next:current):value.filter((_,i)=>i!==index))}/></div>)}<button type="button" disabled={disabled||value.length>=30} onClick={()=>onChange([...value,{src:'',alt:''}])}>Add gallery image</button></fieldset>;
+}

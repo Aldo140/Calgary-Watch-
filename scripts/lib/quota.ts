@@ -16,6 +16,6 @@ export function isQuotaExhausted(error: unknown): boolean {
 
 /** Log a GitHub warning and end the process successfully. */
 export function exitForQuota(job: string): never {
-  console.log(`::warning title=${job} skipped::Firestore daily quota is exhausted. Nothing was lost; the next scheduled run catches up after the quota resets (midnight Pacific).`);
+  console.log(`::warning title=${job} skipped::Firestore daily quota is exhausted. Earlier completed operations may remain. Review the failed stage and rerun after quota resets (midnight Pacific).`);
   process.exit(0);
 }

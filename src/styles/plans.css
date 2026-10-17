@@ -680,3 +680,9 @@
 .pl-adminview svg { color: var(--pl-sun); }
 .pl-adminview strong { color: #fff; }
 .cw-site .pl-adminview a { margin-left: auto; color: var(--pl-sun); font-weight: 700; }
+.admin-access { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin:20px 0; padding:18px 22px; border-radius:16px; }
+.admin-access>div { flex:1 1 260px; }
+.admin-access p { margin:5px 0 0; font-size:13px; line-height:1.5; }
+.admin-access button { padding:10px 16px; border:1.5px solid #ffdf4f; border-radius:999px; background:#ffdf4f; color:#06162f; font-weight:800; }
+.admin-access button[aria-checked=true] { background:#fff; border-color:#fff; }
+.admin-access button:disabled { opacity:.6; }

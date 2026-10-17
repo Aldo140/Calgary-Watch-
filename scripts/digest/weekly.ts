@@ -90,7 +90,7 @@ function initFirebase(): Firestore {
   if (!getApps().length) {
     initializeApp({ credential: cert(JSON.parse(serviceAccountJson)) });
   }
-  return getFirestore();
+  return getFirestore(process.env.VITE_FIRESTORE_DATABASE_ID || '(default)');
 }
 
 // ── Unsubscribes ────────────────────────────────────────────────────────────

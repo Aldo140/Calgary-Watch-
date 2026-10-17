@@ -1,3 +1,4 @@
+import { useOrganizationLive } from '../lib/organizationLive';
 import { useMemo, useState } from 'react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { HomeHero } from '../components/home/HomeHero';
@@ -42,6 +43,7 @@ function withDemoPulse(pulse: LivePulse): LivePulse {
  * three type-based sections.
  */
 export default function DiscoveryHomePage() {
+  useOrganizationLive();
   const entities = discoveryRepository.list();
   const days = useMemo(() => weekAgenda(entities, discoveryRepository.occurrences()), [entities]);
   const weather = useCalgaryWeather();

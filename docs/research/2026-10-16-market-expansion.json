@@ -1,0 +1,184 @@
+{
+  "provenance": "User-supplied research, official URLs cited; no live website fetch claimed.",
+  "profiles": [
+    {
+      "id": "biz-crossroads-market",
+      "name": "Crossroads Market",
+      "website": "https://www.crossroadsmarket.ca/",
+      "email": "info@crossroadsmarket.ca",
+      "profile_url": "https://calgarywatch.ca/local/crossroads-market",
+      "claim_url": "https://calgarywatch.ca/claim/biz-crossroads-market"
+    },
+    {
+      "id": "biz-hillhurst-sunnyside-community-association",
+      "name": "Hillhurst Sunnyside Community Association",
+      "website": "https://farmersmarket.hsca.ca/",
+      "email": null,
+      "profile_url": "https://calgarywatch.ca/local/hillhurst-sunnyside-community-association",
+      "claim_url": "https://calgarywatch.ca/claim/biz-hillhurst-sunnyside-community-association"
+    },
+    {
+      "id": "biz-little-modern-market",
+      "name": "Little Modern Market",
+      "website": "https://www.littlemodernmarket.com/",
+      "email": null,
+      "profile_url": "https://calgarywatch.ca/local/little-modern-market",
+      "claim_url": "https://calgarywatch.ca/claim/biz-little-modern-market"
+    },
+    {
+      "id": "biz-fresh-local-market-kitchens",
+      "name": "Fresh & Local Market + Kitchens",
+      "website": "https://freshandlocal.ca/",
+      "email": null,
+      "profile_url": "https://calgarywatch.ca/local/fresh-local-market-kitchens",
+      "claim_url": "https://calgarywatch.ca/claim/biz-fresh-local-market-kitchens"
+    },
+    {
+      "id": "biz-makers",
+      "name": "MAKERS",
+      "website": "https://www.shopmakers.ca/",
+      "email": null,
+      "profile_url": "https://calgarywatch.ca/local/makers",
+      "claim_url": "https://calgarywatch.ca/claim/biz-makers"
+    },
+    {
+      "id": "biz-the-barn-artisan-market",
+      "name": "The Barn Artisan Market",
+      "website": "https://thebarnartisanmarket.ca/",
+      "email": "info@thebarnartisanmarket.ca",
+      "profile_url": "https://calgarywatch.ca/local/the-barn-artisan-market",
+      "claim_url": "https://calgarywatch.ca/claim/biz-the-barn-artisan-market"
+    },
+    {
+      "id": "biz-calgary-yuletide-festival-society",
+      "name": "Calgary Yuletide Festival Society",
+      "website": "https://calgarywintermarket.ca/",
+      "email": null,
+      "profile_url": "https://calgarywatch.ca/local/calgary-yuletide-festival-society",
+      "claim_url": "https://calgarywatch.ca/claim/biz-calgary-yuletide-festival-society"
+    },
+    {
+      "id": "biz-ymca-calgary",
+      "name": "YMCA Calgary",
+      "website": "https://www.ymcacalgary.org/",
+      "email": "media@ymcacalgary.org",
+      "profile_url": "https://calgarywatch.ca/local/ymca-calgary",
+      "claim_url": "https://calgarywatch.ca/claim/biz-ymca-calgary"
+    }
+  ],
+  "new_or_updated_reviewed_listings": [
+    {
+      "id": "936aa2b583f43cbb96012a0dd1a1",
+      "title": "Little Modern Market — Holiday Market",
+      "organizer": "Little Modern Market",
+      "dates": 1
+    },
+    {
+      "id": "2681fdb71b4ab6bcd29aaf47be66",
+      "title": "The Barn Artisan Market",
+      "organizer": "The Barn Artisan Market",
+      "dates": 2
+    },
+    {
+      "id": "67ce70d2a7c084cd3c1566096f86",
+      "title": "Inglewood Night Market at Crossroads",
+      "organizer": "Vibrant City Events",
+      "dates": 6
+    },
+    {
+      "id": "f1dc2962b12618987241107cb509",
+      "title": "YYC Flea at Crossroads",
+      "organizer": "Vibrant City Events",
+      "dates": 3
+    },
+    {
+      "id": "ef9a9e8453e7dfa21099a0dab63c",
+      "title": "Calgary Winter Market",
+      "organizer": "Calgary Yuletide Festival Society",
+      "dates": 21
+    },
+    {
+      "id": "c490a54ea74af6d680356bc189d0",
+      "title": "Shawnessy YMCA Winter Market",
+      "organizer": "YMCA Calgary",
+      "dates": 1
+    },
+    {
+      "id": "2aa09d3040b747a698e026b81c59",
+      "title": "Brookfield Residential YMCA at Seton Winter Market",
+      "organizer": "YMCA Calgary",
+      "dates": 1
+    },
+    {
+      "id": "9e4322b11f93570f113a118c09ae",
+      "title": "Remington YMCA in Quarry Park Winter Market",
+      "organizer": "YMCA Calgary",
+      "dates": 1
+    },
+    {
+      "id": "5f443f5fe898fad2ef5d47feab34",
+      "title": "Shane Homes YMCA at Rocky Ridge Winter Market",
+      "organizer": "YMCA Calgary",
+      "dates": 2
+    },
+    {
+      "id": "1a1ad2ea7a227dcd5056d6a57ef2",
+      "title": "Selfies with Santa at Crossroads",
+      "organizer": "Crossroads Market",
+      "dates": 1
+    },
+    {
+      "id": "4b3b6a935d1e43ca9d777e4ee405",
+      "title": "Selfies with Santa at Crossroads",
+      "organizer": "Crossroads Market",
+      "dates": 1
+    },
+    {
+      "id": "66af43edd6356411d912c2cbfe19",
+      "title": "Selfies with Santa at Crossroads",
+      "organizer": "Crossroads Market",
+      "dates": 1
+    }
+  ],
+  "winter_operating_dates": [
+    "2026-11-19",
+    "2026-11-20",
+    "2026-11-21",
+    "2026-11-22",
+    "2026-11-26",
+    "2026-11-27",
+    "2026-11-28",
+    "2026-11-29",
+    "2026-12-03",
+    "2026-12-04",
+    "2026-12-05",
+    "2026-12-06",
+    "2026-12-10",
+    "2026-12-11",
+    "2026-12-12",
+    "2026-12-13",
+    "2026-12-15",
+    "2026-12-16",
+    "2026-12-17",
+    "2026-12-18",
+    "2026-12-19",
+    "2026-12-20",
+    "2026-12-21",
+    "2026-12-22",
+    "2026-12-23",
+    "2026-12-24"
+  ],
+  "winter_dates_needing_hours": [
+    "2026-12-15",
+    "2026-12-16",
+    "2026-12-21",
+    "2026-12-22",
+    "2026-12-23"
+  ],
+  "existing_master_ids_preserved": [
+    "3e483396c1c2ea35ca05c3f284e3",
+    "d6d4476cb83f44b8639ea3ecfd7c",
+    "7f9cc882ba6d001cee153f0095d1",
+    "ef9a9e8453e7dfa21099a0dab63c"
+  ]
+}

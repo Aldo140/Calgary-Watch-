@@ -1,7 +1,7 @@
 /**
  * Business accounts: a CalgaryWatch account becomes a business account when an
  * admin approves a listing claim it made. Claiming already needs an account (a
- * Google sign-in with a verified email, enforced by firestore.rules), so the
+ * Firebase sign-in with a verified email, enforced by firestore.rules), so the
  * claimant always has a `users/{uid}` profile to mark.
  *
  * The mark lives on that profile: `accountType: 'business'`, the listings it
@@ -35,17 +35,17 @@ export function readBusinessAccount(data: Record<string, unknown> | undefined | 
 export function businessAccountPatch(existing: Record<string, unknown> | undefined | null, entityId: string, now: number): { accountType: typeof BUSINESS; businessListings: string[]; businessSince: number } {
   const current = readBusinessAccount(existing);
   const listings = [...new Set([...(current?.listings ?? []), entityId].filter(Boolean))];
-  return { accountType: BUSINESS, businessListings: listings, businessSince: current?.since || now };
+  return { accountType: BUSINESS, businessListings: listings, businessSince: current?.since && now > 0 ? Math.min(current.since, now) : current?.since || now };
 }
 
 /** Approved claims grouped by account: what every claimant's profile should say. */
-export function businessAccountsFromClaims(claims: ReadonlyArray<{ uid: string; entityId: string; status: string; reviewedAt?: number | null }>): Map<string, { listings: string[]; since: number }> {
+export function businessAccountsFromClaims(claims: ReadonlyArray<{ uid: string; entityId: string; approvedOrganizationId?: string; status: string; reviewedAt?: number | null }>): Map<string, { listings: string[]; since: number }> {
   const out = new Map<string, { listings: string[]; since: number }>();
   for (const c of claims) {
     if (c.status !== 'approved' || !c.uid || !c.entityId) continue;
     const at = typeof c.reviewedAt === 'number' ? c.reviewedAt : 0;
     const row = out.get(c.uid) ?? { listings: [], since: 0 };
-    if (!row.listings.includes(c.entityId)) row.listings.push(c.entityId);
+    for(const id of [c.entityId,c.approvedOrganizationId].filter((id):id is string=>Boolean(id)))if(!row.listings.includes(id))row.listings.push(id);
     if (at && (!row.since || at < row.since)) row.since = at;
     out.set(c.uid, row);
   }

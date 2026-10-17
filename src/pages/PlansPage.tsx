@@ -1,21 +1,29 @@
+import { plansSetupProblem } from '../lib/plansSetup';
+import { hasCompletedPlans } from '../lib/plansProfile';
+import {useAdminEditMode} from '../hooks/useAdminEditMode';
+import {adminMemberAction} from '../lib/adminMemberApi';
+import { useOrganizationLive } from '../lib/organizationLive';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { plansView } from '../lib/plansView';
 import { Shield } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { useMyClaims } from '../lib/claimsApi';
 import { SignupForm, SignupSky } from '../components/plans/SignupFlow';
-import { MemberDashboard } from '../components/plans/Dashboard';
+import { MemberDashboard, type Claim } from '../components/plans/Dashboard';
+import { SettingsSheet, type SettingsFocus } from '../components/plans/SettingsSheet';
 import { celebrateBadge } from '../components/plans/BadgeToast';
 import { discoveryRepository } from '../data/discovery';
+import { entityPath } from '../lib/discovery';
 import { NEIGHBOURHOOD_COORDS } from '../data/neighbourhoodCoords';
 import { computeBadges, orderBadges, type BadgeId } from '../lib/badges';
 import { emailPlan, nearHome, setupSteps, type SetupStepId } from '../lib/memberHome';
 import { useLivePulse } from '../hooks/useLivePulse';
 import { fetchCommunityBoundaries, findCommunityAt } from '../lib/communityLookup';
 import { buildEventPicks, buildPlanTimeline, normalizeInterests, neighbourhoodPoint, interestsFor, type EventInterestId } from '../lib/eventPicks';
-import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfile, type PlansDraft, type PlansProfile } from '../lib/plans';
+import { homeAreaOf, readMyReportCount, readMySubmissionCount, savePlans, setEmailOptIn, usePendingOptOuts, type PendingOptOuts, useMyGoing, usePlansProfileState, type PlansDraft, type PlansProfile } from '../lib/plans';
 import { resolveHomeLocation, useHomeLocation } from '../hooks/useHomeLocation';
 import { auth } from '../firebase';
 import '../styles/plans.css';
@@ -71,8 +79,8 @@ function requestedEmails(params: URLSearchParams): Pick<PlansDraft, 'weeklyDiges
   return { weeklyDigestOptIn: want !== 'thursday', eventsDigestOptIn: want !== 'monday' };
 }
 
-/** Development only: `/plans?demo=member|monday|new` renders a signed-in reader without Firebase. */
-function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; goingIds: Set<string> } | null {
+/** Development only: `/plans?demo=member|joined|business|monday|new` renders a signed-in reader without Firebase. */
+function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; goingIds: Set<string>; claims: Claim[]; joined: boolean } | null {
   const mode = import.meta.env.DEV ? params.get('demo') : null;
   return useMemo(() => {
     if (!mode) return null;
@@ -81,36 +89,42 @@ function useDemo(params: URLSearchParams): { user: User; profile: PlansProfile; 
     const profile: PlansProfile = {
       displayName: 'Vicky Penny', createdAt: Date.parse('2026-05-01'),
       neighborhood: set ? 'Beltline' : '', piiConsentAt: set ? 1 : undefined,
-      weeklyDigestOptIn: set, eventsDigestOptIn: mode === 'member',
+      weeklyDigestOptIn: set, eventsDigestOptIn: mode !== 'monday',
       eventInterests: set ? ['music', 'food'] : [],
     };
     const now = Date.now();
     const events = discoveryRepository.list().filter((e): e is Extract<typeof e, { kind: 'event' }> => e.kind === 'event');
-    const n = mode === 'member' ? 1 : 0;
+    const n = mode === 'member' || mode === 'business' ? 1 : 0;
     const soon = events.filter((e) => Date.parse(e.start) > now).slice(0, 3 * n);
     // A run that's on now and a few that already happened, so both halves of "Your plans" show.
     const live = events.filter((e) => Date.parse(e.start) < now && Date.parse(e.end) > now).slice(0, n);
     const past = events.filter((e) => Date.parse(e.end) < now).sort((a, b) => Date.parse(b.end) - Date.parse(a.end)).slice(0, 3 * n);
-    return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)) };
+    // A business account: one listing confirmed, one still being checked.
+    const venues = [...discoveryRepository.list().filter((e) => e.kind === 'market').slice(0, 1), ...discoveryRepository.list().filter((e) => e.kind === 'business').slice(0, 1)];
+    const claims = mode === 'business' ? venues.map((e, i) => ({ entityId: e.id, entityTitle: e.title, entityPath: entityPath(e), status: i ? 'pending' : 'approved' })) : [];
+    return { user, profile, goingIds: new Set([...soon, ...live, ...past].map((e) => e.id)), claims, joined: mode === 'joined' };
   }, [mode]);
 }
 
 export default function PlansPage() {
+  useOrganizationLive();
   const auth0 = useAuth();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const demo = useDemo(params);
   // Admin can open any member's dashboard read-only: /plans?as=<uid>.
   const asUid = auth0.isAdmin ? (params.get('as') || '').trim() || null : null;
-  const { signIn, isAuthReady, isFirebaseConfigured } = auth0;
+  const { signIn, logout, isAuthReady, isFirebaseConfigured } = auth0;
   const subjectUid = demo ? undefined : asUid ?? auth0.user?.uid;
-  const liveProfile = usePlansProfile(subjectUid);
+  const profileState = usePlansProfileState(subjectUid);
+  const liveProfile = profileState.profile;
   const profile = demo?.profile ?? liveProfile;
   const viewed = useMemo(() => (asUid && liveProfile
     ? ({ uid: asUid, displayName: liveProfile.displayName ?? '', email: liveProfile.email ?? '', photoURL: liveProfile.photoURL ?? '' } as unknown as User)
     : null), [asUid, liveProfile]);
   const user = demo?.user ?? (asUid ? viewed : auth0.user);
-  const readOnly = Boolean(demo || asUid);
+  const adminMode=useAdminEditMode(auth0.isAdmin,`${auth0.user?.uid}:${asUid}`);
+  const readOnly = Boolean(demo || asUid&&!adminMode.enabled);
   const liveGoing = useMyGoing(subjectUid);
   const mine = demo ? { uid: 'demo', ids: demo.goingIds, ready: true } : liveGoing;
   const pending = usePendingOptOuts(subjectUid);
@@ -121,11 +135,12 @@ export default function PlansPage() {
   // A first-time visitor starts with the email(s) the link they followed was about, visibly ticked.
   const [draft, setDraft] = useState<PlansDraft>(() => ({ ...EMPTY, ...requestedEmails(params), interests: normalizeInterests((params.get('interests') ?? '').split(',')) }));
   const [editing, setEditing] = useState(false);
+  const [sheetFocus, setSheetFocus] = useState<SettingsFocus | undefined>(undefined);
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [savedAt, setSavedAt] = useState<number | null>(null);
-  const [joined, setJoined] = useState<BadgeId[] | null>(null);
+  const [joined, setJoined] = useState<BadgeId[] | null>(() => (demo?.joined ? ['founding', 'neighbour', 'monday-reader', 'on-the-list'] as BadgeId[] : null));
   const [busy, setBusy] = useState<SetupStepId | null>(null);
   const [reportCount, setReportCount] = useState<number | undefined>(undefined);
   const [submissionCount, setSubmissionCount] = useState<number | undefined>(undefined);
@@ -136,26 +151,40 @@ export default function PlansPage() {
 
   useEffect(() => { document.title = 'Your CalgaryWatch | Emails, plans & badges'; }, []);
 
-  // Deep links from the account menu: ?edit=1 opens the editor, #id scrolls there once it exists.
-  const deepLinked = useRef(false);
+  // Deep links (account menu, emails): ?edit=1 opens settings, #id scrolls there once it exists.
+  // Runs on every navigation, so the menu works while you're already on this page.
+  const location = useLocation();
+  const firstLink = useRef(true);
   useEffect(() => {
-    if (deepLinked.current || !profile) return;
-    deepLinked.current = true;
-    if (params.get('edit') === '1' && !readOnly) { setDraft(draftFrom(profile, pending)); setEditing(true); }
-    const id = window.location.hash.slice(1);
-    if (id === 'emails') setStep(1); else if (id === 'pl-step-interests') setStep(2);
+    if (!profile) return;
+    const id = location.hash.slice(1);
+    const member = hasCompletedPlans(profile);
+    // Email and unsubscribe links point members at #emails or #area: those open settings too.
+    const focus: SettingsFocus | undefined = id === 'emails' ? 'emails' : id === 'pl-step-interests' || id === 'interests' ? 'interests' : id === 'home' || id === 'area' ? 'home' : undefined;
+    if ((params.get('edit') === '1' || focus) && !asUid && member) {
+      setDraft(draftFrom(profile, pending)); setError(''); setEditing(true);
+      setSheetFocus(focus);
+      // Drop the flag and hash so the same link can open settings again later.
+      const rest = new URLSearchParams(params); rest.delete('edit');
+      navigate({ search: rest.toString() ? `?${rest}` : '' }, { replace: true });
+      firstLink.current = false;
+      return;
+    }
+    if (firstLink.current) { if (id === 'emails') setStep(1); else if (id === 'pl-step-interests' || id === 'interests') setStep(2); }
+    firstLink.current = false;
     if (id) window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [Boolean(profile), location.key]);
 
   // Hydrate the form from the profile once per account, keeping anything the
   // reader picked before signing in.
   useEffect(() => {
     if (!user || !profile || hydratedFor.current === user.uid) return;
     hydratedFor.current = user.uid;
+    if (asUid) { setDraft(draftFrom(profile, pending)); return; }
     setDraft((local) => {
       const stored = draftFrom(profile, pending);
-      const fresh = !profile.piiConsentAt && !profile.eventInterests.length;
+      const fresh = !hasCompletedPlans(profile);
       // Keep what they chose before signing in; a brand-new account also keeps the ticked emails.
       return {
         ...stored,
@@ -181,10 +210,12 @@ export default function PlansPage() {
     return () => { live = false; };
   }, [user, demo]);
 
-  // Set up = has a home area on file (the one thing every email needs).
-  const hasPlans = Boolean(profile && (profile.piiConsentAt || profile.eventInterests.length));
-  const showForm = !user || !profile || !hasPlans || editing;
-  const dashboard = Boolean(user && profile && hasPlans);
+  // Finishing setup does not require a location or email subscription.
+  const hasPlans = hasCompletedPlans(profile);
+  // Members change settings in a sheet over the dashboard; the 3-step card is for signing up.
+  const view = plansView(Boolean(user), profile, Boolean(asUid), myClaims?.some(c => c.status === 'approved'));
+  const showForm = view === 'setup';
+  const dashboard = view === 'dashboard';
   const area = profile ? homeAreaOf(profile) : '';
   const entities = discoveryRepository.list();
   const occurrences = discoveryRepository.occurrences();
@@ -193,6 +224,11 @@ export default function PlansPage() {
   const picks = useMemo(
     () => buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area || draftArea, goingIds: mine.ids, days: 10, limit: 8 }),
     [entities, occurrences, interests, addressPoint, area, draftArea, mine.ids],
+  );
+  // Everything picked for the next ten days, so the dashboard can show any one day.
+  const weekPicks = useMemo(
+    () => (showForm ? [] : buildEventPicks({ entities, occurrences, interests, home: addressPoint, homeArea: area, goingIds: mine.ids, days: 10, limit: 80 }).picks),
+    [showForm, entities, occurrences, interests, addressPoint, area, mine.ids],
   );
   const timeline = useMemo(() => buildPlanTimeline({ entities, occurrences, goingIds: mine.ids }), [entities, occurrences, mine.ids]);
 
@@ -244,26 +280,27 @@ export default function PlansPage() {
 
   const hasArea = Boolean(draft.neighborhood.trim() || draft.address.trim());
   const needsConsent = hasArea && !profile?.piiConsentAt;
-  const problem = !hasArea ? 'Add your neighbourhood or address, so everything starts near home.'
-    : needsConsent && !draft.consent ? 'Tick the box so we can store your area.'
-    : draft.eventsDigestOptIn && !draft.interests.length ? 'Pick at least one interest for your event picks, or untick that email.'
-    : '';
-  const progress = [hasArea && (!needsConsent || draft.consent), draft.weeklyDigestOptIn || draft.eventsDigestOptIn, draft.interests.length > 0];
+  const problem = plansSetupProblem(draft, profile);
+  const progress = [!hasArea || (!needsConsent || draft.consent), draft.weeklyDigestOptIn || draft.eventsDigestOptIn, draft.interests.length > 0];
 
-  const openEditor = (focus?: 'interests' | 'home') => {
+  const openEditor = (focus?: SettingsFocus) => {
     setDraft(draftFrom(profile, pending));
+    setError('');
     setEditing(true);
-    setStep(focus === 'interests' ? 2 : 0);
+    setSheetFocus(focus);
+    if (hasPlans) return;
+    setStep(focus === 'interests' ? 2 : focus === 'emails' ? 1 : 0);
     requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
+  const closeSheet = () => { setEditing(false); setDraft(draftFrom(profile, pending)); setError(''); };
 
   const addEmail = async (which: 'monday' | 'thursday') => {
     if (!user || !profile) return;
     // Event picks need something to pick from: ask for interests first.
     if (which === 'thursday' && !profile.eventInterests.length) { openEditor('interests'); setDraft((d) => ({ ...d, eventsDigestOptIn: true })); return; }
-    if (asUid) return;
+    if (asUid&&!adminMode.enabled) return;
     if (demo) { celebrateBadge(which === 'monday' ? 'monday-reader' : 'on-the-list'); return; }
-    await setEmailOptIn(user, profile, which === 'monday' ? { weekly: true } : { events: true });
+    if(asUid){await adminMemberAction({subjectUid:asUid,action:'profile',draft:{...draftFrom(profile,pending),...(which==='monday'?{weeklyDigestOptIn:true}:{eventsDigestOptIn:true})}});}else await setEmailOptIn(user, profile, which === 'monday' ? { weekly: true } : { events: true });
     setSavedAt(Date.now());
     celebrateBadge(which === 'monday' ? 'monday-reader' : 'on-the-list');
   };
@@ -272,13 +309,14 @@ export default function PlansPage() {
     if (id === 'home') return openEditor('home');
     if (id === 'interests') return openEditor('interests');
     if (id === 'plan') { document.getElementById('pd-picks')?.scrollIntoView({ behavior: 'smooth' }); return; }
+    if (asUid&&!adminMode.enabled) return;
     if (id === 'share') { navigate('/submit'); return; }
     setBusy(id);
     try { await addEmail(id === 'monday' ? 'monday' : 'thursday'); } finally { setBusy(null); }
   };
 
   const save = async () => {
-    if (asUid) { setError('Admin view is read-only. Members change their own settings.'); return; }
+    if (asUid&&!adminMode.enabled) { setError('Admin view is read-only. Enable admin editing to save changes.'); return; }
     const current = demo ? demo.user : auth?.currentUser;
     if (!current) { pendingSave.current = true; await signIn(); if (!auth?.currentUser) pendingSave.current = false; return; }
     if (problem) { setError(problem); return; }
@@ -288,13 +326,14 @@ export default function PlansPage() {
       if (!demo) {
         let inferred = draft.inferredNeighborhood;
         if (draft.address.trim() && !inferred && !draft.neighborhood.trim()) inferred = await communityForAddress(draft.address).catch(() => '');
-        await savePlans(current, profile, { ...draft, inferredNeighborhood: inferred });
+        if(asUid)await adminMemberAction({subjectUid:asUid,action:'profile',draft:{...draft,inferredNeighborhood:inferred}});
+        else await savePlans(current, profile, { ...draft, inferredNeighborhood: inferred });
       }
       setSavedAt(Date.now());
       if (firstTime && unlocks.length) { setJoined(unlocks); celebrateBadge(unlocks[0]); }
       setEditing(false);
       setStep(0);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (firstTime) window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError('Your plans didn’t save. Check your connection and try again.');
     } finally {
@@ -316,17 +355,34 @@ export default function PlansPage() {
     : [];
   const first = (user?.displayName || '').split(' ')[0];
 
+  if (view === 'loading') return (
+    <SiteLayout><div className="cw-wrap" role="status" aria-live="polite">
+      {profileState.status === 'error' ? <p role="alert">Could not load this member’s dashboard: {profileState.error}</p>
+        : profileState.status === 'missing' ? <p>This member’s profile could not be found.</p>
+        : <p>Loading this member’s dashboard…</p>}
+      <Link to="/admin?section=members">Back to Members &amp; plans</Link>
+    </div></SiteLayout>
+  );
+
   if (dashboard && !showForm && user) {
     const images = new Map(entities.map((e) => [e.id, e.image?.src]));
     return (
       <SiteLayout>
         <MemberDashboard
           user={user} first={first} area={area} now={now} memberSince={profile?.createdAt}
-          picks={picks.picks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
-          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={myClaims ?? []} business={profile?.business}
+          picks={picks.picks} weekPicks={weekPicks} going={picks.going} timeline={timeline} considered={picks.considered} imageFor={(id) => images.get(id)}
+          near={near} nearReady={nearReady} badges={badges} steps={steps} plan={plan} claims={demo ? demo.claims : myClaims ?? []} business={demo ? (demo.claims.length ? { since: Date.parse('2026-09-02'), listings: [demo.claims[0].entityId] } : null) : profile?.business}
           busy={busy} onAct={(id) => void actOnStep(id)} onEdit={openEditor}
-          adminView={asUid ? profile?.displayName ?? '' : null}
+          adminEditEnabled={adminMode.enabled} onAdminEditChange={adminMode.setEnabled} adminView={asUid ? profile?.displayName ?? '' : null} previewUid={asUid ?? undefined}
           notice={joined ? { joined, text: savedSummary(profile) } : savedAt ? { joined: null, text: savedSummary(profile) } : null}
+          onDismissWelcome={() => setJoined(null)}
+        />
+        <SettingsSheet
+          open={editing} focus={sheetFocus} user={user} memberSince={profile?.createdAt}
+          draft={draft} setDraft={setDraft} suggestions={suggestions} communityCount={communities.length}
+          needsConsent={needsConsent} pending={pending} error={error} setError={setError} saving={saving} readOnly={Boolean(asUid&&!adminMode.enabled)}
+          onToggleInterest={toggleInterest} onSave={() => void save()} onClose={closeSheet}
+          onSignOut={demo||asUid ? undefined : () => { setEditing(false); void logout(); }}
         />
       </SiteLayout>
     );
@@ -373,5 +429,5 @@ function savedSummary(profile: PlansProfile | null): string {
   const plan = emailPlan(profile?.weeklyDigestOptIn === true, profile?.eventsDigestOptIn === true, Date.now());
   if (plan.kind === 'none' || !plan.next) return 'No emails for now; your picks and plans stay here.';
   const when = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'short', day: 'numeric' }).format(plan.next);
-  return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1]}.`;
+  return `Your first “${plan.name.replace(/^The /, '')}” email arrives ${when}, ${plan.cadence.split(', ')[1].replace(/\.$/, '')}.`;
 }

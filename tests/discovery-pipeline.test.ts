@@ -14,7 +14,7 @@ const event:EventSubmissionInput={kind:'event',title:'River Arts',summary:'Art w
 const market:MarketSubmissionInput={...event,kind:'market',amenities:[],occurrences:[{sourceRecordId:'saturday-1',start:event.start,end:event.end,cancelled:false}]} as unknown as MarketSubmissionInput;
 delete (market as unknown as Record<string,unknown>).start;delete (market as unknown as Record<string,unknown>).end;delete (market as unknown as Record<string,unknown>).pricing;
 const now=new Date();
-function published() {return {...domain.normalizeRecord(event,source,'e',now.toISOString()).entity,status:'published',verification:'source-checked',verifiedAt:now.toISOString()} as DiscoveryEntity;}
+function published() {return {...domain.normalizeRecord({...event,start:new Date(Date.now()+86400000).toISOString(),end:new Date(Date.now()+90000000).toISOString()},source,'e',now.toISOString()).entity,status:'published',verification:'source-checked',verifiedAt:now.toISOString()} as DiscoveryEntity;}
 
 describe('Strict submission and source boundaries',()=>{
   for(const field of ['status','verification','scores','partner','editorialSelection','verifiedAt','developmentOnly','id']) it(`rejects client-controlled ${field}`,()=>assert.throws(()=>domain.validateSubmission({...event,[field]:true})));
@@ -101,6 +101,14 @@ describe('Publication and SEO',()=>{
     assert.equal((buildEntityJsonLd(e,'https://calgarywatch.ca') as Record<string,unknown>).eventStatus,'https://schema.org/EventCancelled');
     assert.equal(filterInventory([e],[],undefined,undefined,new Date('2026-09-21T00:00:00Z')).length,0);
   });
+  it('keeps ended and cancelled events out of indexing and the sitemap',()=>{
+    const valid=published();
+    for (const e of [{...valid,end:'2020-01-01T00:00:00Z'},{...valid,cancelled:true}]) {
+      const repository=createDiscoveryRepository([e as DiscoveryEntity]);
+      assert.equal(getSeoConfig(`/events/${e.slug}`,repository).index,false);
+      assert.doesNotMatch(buildSitemap([],[e as DiscoveryEntity],'https://calgarywatch.ca'),/<url>/);
+    }
+  });
   it('generates market Place and dated Event data',()=>{
     const m=domain.normalizeRecord(market,source,'m');const json=buildEntityJsonLd(m.entity as DiscoveryEntity,'https://calgarywatch.ca',m.occurrences) as Record<string,any>;
     assert.equal(json['@type'],'Place');assert.equal(json.event[0].startDate,event.start);
@@ -146,13 +154,24 @@ describe('Calgary time windows',()=>{
 
 // Transaction-level contract: writes are buffered and committed only on success.
 function memoryStore() {
-  const data=new Map<string,any>();let seq=0;
+  const data=new Map<string,any>();const queries:any[]=[];let seq=0;
   const ref=(path:string):any=>({path,id:path.split('/').at(-1),get:async()=>snap(path)});
   const snap=(path:string)=>({exists:data.has(path),data:()=>data.get(path),ref:ref(path),id:path.split('/').at(-1)});
-  const col=(name:string):any=>({name,doc:(id=String(++seq))=>ref(`${name}/${id}`),where:(field:string,_op:string,value:unknown)=>({name,field,value})});
-  return {data,collection:col,runTransaction:async(fn:(tx:any)=>Promise<any>)=>{const writes:(()=>void)[]=[];const result=await fn({get:async(q:any)=>q.path?snap(q.path):{docs:[...data.keys()].filter(k=>k.startsWith(q.name+'/')&&(!q.field||data.get(k)[q.field]===q.value)).map(snap)},set:(r:any,v:any)=>writes.push(()=>data.set(r.path,v)),update:(r:any,v:any)=>writes.push(()=>data.set(r.path,{...data.get(r.path),...v}))});writes.forEach(f=>f());return result;}};
+  const col=(name:string,filters:any[]=[]):any=>({name,filters,doc:(id=String(++seq))=>ref(`${name}/${id}`),where:(field:string,op:string,value:unknown)=>col(name,[...filters,{field,op,value}])});
+  return {data,queries,collection:col,runTransaction:async(fn:(tx:any)=>Promise<any>)=>{const writes:(()=>void)[]=[];const result=await fn({get:async(q:any)=>(queries.push(q),q.path?snap(q.path):{docs:[...data.keys()].filter(k=>k.startsWith(q.name+'/')&&(q.filters??[]).every((f:any)=>f.op==='=='?data.get(k)[f.field]===f.value:f.op==='>='?data.get(k)[f.field]>=f.value:data.get(k)[f.field]<f.value)).map(snap)}),set:(r:any,v:any)=>writes.push(()=>data.set(r.path,v)),update:(r:any,v:any)=>writes.push(()=>data.set(r.path,{...data.get(r.path),...v}))});writes.forEach(f=>f());return result;}};
 }
 describe('Persistence lifecycle',()=>{
+  it('bounds duplicate reads by event date and preserves matches across timezone boundaries',async()=>{
+    const db=memoryStore();
+    for(let i=0;i<300;i++) db.data.set(`events/archive-${i}`,{...published(),id:`archive-${i}`,start:'2020-01-01T00:00:00Z'});
+    const first=await store.ingestRecord(db,{...event,start:'2026-09-27T00:00:00Z',end:'2026-09-27T03:00:00Z'},source,'one');
+    const second=await store.ingestRecord(db,event,{...source,id:'other'},'two');
+    assert.deepEqual(second.duplicateIds,[first.id]);
+    const eventQueries=db.queries.filter(q=>q.name==='events');
+    assert.ok(eventQueries.length>0); assert.ok(eventQueries.every(q=>q.filters.length===2));
+    assert.ok(db.queries.every(q=>q.name!=='market_occurrences'));
+  });
+
   it('repeated imports are idempotent; changes require another review',async()=>{
     const db=memoryStore();const a=await store.ingestRecord(db,event,source,'e');
     await store.moderate(db,{kind:'event',id:a.id,revision:a.revision,action:'publish'},'admin');

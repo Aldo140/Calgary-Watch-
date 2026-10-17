@@ -1,0 +1,33 @@
+name: Test owner listing rules
+on:
+  push:
+    branches: [main]
+    paths:
+      - firestore.rules
+      - tests/emulator/**
+      - .github/workflows/test-owner-listing-rules.yml
+  pull_request:
+    paths:
+      - firestore.rules
+      - tests/emulator/**
+      - .github/workflows/test-owner-listing-rules.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Validate ownership and atomic seven-day limits against Firestore
+        run: npx --yes firebase-tools@14.22.0 emulators:exec --only firestore --project demo-calgary-owner-edits "node --import tsx --test tests/emulator/owner-listing-edits.test.ts"

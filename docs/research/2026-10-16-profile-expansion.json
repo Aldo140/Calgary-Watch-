@@ -1,0 +1,160 @@
+{
+  "as_of": "2026-10-16",
+  "profiles": [
+    {
+      "id": "biz-heritage-park",
+      "name": "Heritage Park Historical Village",
+      "profile_path": "/local/heritage-park",
+      "claim_path": "/claim/biz-heritage-park",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "b93dfc05f833757f4aab427b017e",
+        "8749bfa3fb210e9cde56604699e0",
+        "feee9e928a9d0bedfe5a0cb11385",
+        "d08e225d627bd4834912cefa7410",
+        "78a61e1fd4812b02a66e64060fbd",
+        "9dfc30800ceaf924dbf36f25765d",
+        "ed7badb03dcd70000e7d6123faba",
+        "2f3e8d1754d6d0e0fab4e946c500",
+        "d03c5e2153fe96930974bc198682",
+        "65133efe763d1b2412dc616bbdc0",
+        "b604871539be53df73d4a31d3b89",
+        "efb83dc037be05e2d84e24b67932",
+        "e869e616c67f8616c68539a5c11b",
+        "a06eb727acef22bfc79a185295f4",
+        "d9753fabe0dda5b0664e58cc7e9c",
+        "d8850456a3cff3e991889f234980",
+        "2b91276b44d21dbc8d310a53a0e7",
+        "45bc8d7aa61076b3a1e88fce8729",
+        "e16b9bb2a3ecd93f91785c7de9c8",
+        "d8774970ebba4a44896c2b627e07",
+        "e94ede73df6b20ad489c9d00ba84",
+        "68b58d5b5d9b08ec89b1b0007120",
+        "0de5fadc26a12cf6672fb7fc98d5",
+        "8360824af9b175266bf79eac1dca",
+        "692111b04eef9173e4eb7f61ad26",
+        "fea7cfdd6882b8c24c285c441e9a",
+        "7073745554b5af868cb8f92ad2f8"
+      ]
+    },
+    {
+      "id": "biz-the-confluence",
+      "name": "The Confluence Historic Site & Parkland",
+      "profile_path": "/local/the-confluence",
+      "claim_path": "/claim/biz-the-confluence",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "9155e93f1be4a6d641cff87c617b",
+        "4c4ddf2b132e8202b1f478da38b8",
+        "fbc67f856a661bcf9b4467ec0a5b",
+        "b23be52cbe28e58dbc03edc29145",
+        "9f5e467bbbb17cd26667bfc5f856",
+        "01f4574070cdd256c6560b4c1db6",
+        "27020135e9e3f1c5aba254aa3d16",
+        "a3c37354b50d94dd05d9309bb341",
+        "caee75b15c7d628736cbbaf20f88",
+        "6fc1f2187992faa833d4d52fcb04",
+        "9de363d43357bc12b86c5d900e6d",
+        "6cb8d72fd61f1a27121584494922",
+        "8ecbf5ad2960469336fad7362606",
+        "21fb444a605bd7c6bbea83cdee83",
+        "a1c23074a65cce8d1378e100522b",
+        "6c06be4a048824bc714a2732c021",
+        "fdae7baf3bbf1c0a12c872887cf1",
+        "b4fb15178757e386e3e33ed45960",
+        "67ed4ba7c206a86c25f996af1fef",
+        "8ff4db723be75f0c004f92f8e4f7",
+        "394d152b8e38c08a96919d9f7779",
+        "9226bcd3bec6ee0a3b98712af169",
+        "d4f17c0003a1b6d9629a76a4bbcf",
+        "c78679465deb3e8eeb9750166272",
+        "ab0dfc97d60a8dced6bf4741531f",
+        "40a73caece9936e923841247e565",
+        "7e0ddfb3d9257d64cde5c5edabe6",
+        "b72c727424f7aad20fe790a74598"
+      ]
+    },
+    {
+      "id": "biz-contemporary-calgary",
+      "name": "Contemporary Calgary",
+      "profile_path": "/local/contemporary-calgary",
+      "claim_path": "/claim/biz-contemporary-calgary",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "549a424a18296d79022044222e56",
+        "92e9516589f0261f0dcd612da15d",
+        "5677d200e9e600aea758c16926bc",
+        "721acd25f02d7dd8112d748ea5cc",
+        "1cd7f3884bfb0976d8bab80b443b",
+        "bc26bdbd9b3b3142bdfc05e75b74",
+        "66fd0694f2fa0b5026e8a6a7b80e",
+        "41898bb7038c2d3e82bf704fdaf6",
+        "542b66af4a57b12e762657391757",
+        "c2ca8ed77aa58c8613345619eaba",
+        "ecda7f9745da9253161f2ce868f3",
+        "831969912b0bef4c67b7b8d8da78",
+        "0213db61bf6844364426a97ffb6f",
+        "09b75be8b1e1cfd411ebe7e4435a",
+        "4cb9b1b0e1beb8ee58ccf72dcda4",
+        "82cb1e92bae2874d57977c9de186",
+        "30ad695869b601b78ef7a1cf7198",
+        "cf64c4cefb9cfbdd15c41f31eeee"
+      ]
+    },
+    {
+      "id": "biz-calgary-opera",
+      "name": "Calgary Opera",
+      "profile_path": "/local/calgary-opera",
+      "claim_path": "/claim/biz-calgary-opera",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "8236578a276155bb28781730066e",
+        "6bb9a16f1f4ef801c1ef28fcb2c3",
+        "4decfcebd2b8e5acf6c2c3caa958"
+      ]
+    },
+    {
+      "id": "biz-wordfest",
+      "name": "Wordfest",
+      "profile_path": "/local/wordfest",
+      "claim_path": "/claim/biz-wordfest",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "a2733be9bcbe213b975f0e91c058",
+        "031bc5ef0032af5bd3aada3a7c4c",
+        "27a2c5e3ac84cf62f3e7d4bba188"
+      ]
+    },
+    {
+      "id": "biz-alberta-ballet",
+      "name": "Alberta Ballet",
+      "profile_path": "/local/alberta-ballet",
+      "claim_path": "/claim/biz-alberta-ballet",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "dd4ccc54b3301b60318da93a950a"
+      ]
+    },
+    {
+      "id": "biz-calgary-farmers-market",
+      "name": "Calgary Farmers' Market",
+      "profile_path": "/local/calgary-farmers-market",
+      "claim_path": "/claim/biz-calgary-farmers-market",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "f100f20bace6917b47385f90a0d2",
+        "2a55ade6e02d4308cc4f09f59f02"
+      ]
+    },
+    {
+      "id": "biz-calgary-earth-market-society",
+      "name": "Calgary Earth Market Society",
+      "profile_path": "/local/calgary-earth-market-society",
+      "claim_path": "/claim/biz-calgary-earth-market-society",
+      "provenance": "existing stored official records; no live recheck",
+      "stored_official_listing_ids": [
+        "ec8af09816f955c314652ffe376b"
+      ]
+    }
+  ]
+}

@@ -66,8 +66,8 @@ describe('Discovery routes and presentation', () => {
     const hosting = JSON.parse(readFileSync('firebase.json', 'utf8')).hosting;
     const noindexHeader = (source: string) => hosting.headers.some((rule: { source: string; headers: { key: string; value: string }[] }) => rule.source === source && rule.headers.some(h => h.key === 'X-Robots-Tag' && h.value.includes('noindex')));
     for (const section of DISCOVERY_SECTIONS) assert.equal(noindexHeader(`${section.path}/**`), section.path === '/local', section.path);
-    // Only the admin app falls back to index.html; every other unknown URL gets a real 404.
-    assert.deepEqual(hosting.rewrites.map((r: { source: string }) => r.source), ['/admin', '/admin/**']);
+    // Organization workspaces and newly published event URLs need SPA fallback between static releases.
+    assert.deepEqual(hosting.rewrites.map((r: { source: string }) => r.source), ['/admin', '/admin/**', '/organization/**', '/events/**']);
   });
   it('keeps new routes lazy and retains every existing route', () => {
     const app = readFileSync('src/App.tsx', 'utf8');

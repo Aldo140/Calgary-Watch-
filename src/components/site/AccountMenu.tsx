@@ -39,8 +39,8 @@ export function AccountMenu() {
 
   const items = [
     { to: '/plans', icon: LayoutDashboard, label: 'Your dashboard', note: 'Picks, plans and badges' },
-    { to: '/plans#pl-going-title', icon: Ticket, label: 'Your plans', note: 'What you said you’re going to' },
-    { to: '/plans?edit=1#emails', icon: Mail, label: 'Emails and area', note: 'What we send, and where home is' },
+    { to: '/plans#pd-next', icon: Ticket, label: 'Your plans', note: 'What you said you’re going to' },
+    { to: '/plans?edit=1', icon: Mail, label: 'Settings', note: 'Home, emails and interests' },
     ...((claims ?? []).length ? [{ to: `/claim/${encodeURIComponent(claims![0].entityId)}`, icon: BadgeCheck, label: claims!.length > 1 ? 'Your listings' : 'Your listing', note: claims![0].entityTitle }] : []),
     { to: '/map', icon: MapIcon, label: 'Live map', note: 'Alerts and quiet hours live here' },
     ...(isAdmin ? [{ to: '/admin', icon: Shield, label: 'Admin', note: 'The desk' }] : []),
@@ -68,7 +68,7 @@ export function AccountMenu() {
           >
             <div className="cw-acct-head">
               <span className="cw-acct-avatar cw-acct-avatar-lg">{avatar}</span>
-              <span><strong>{user.displayName || first}</strong><small>{user.email}</small></span>
+              <span><strong>{user.displayName || first}</strong><small>{user.email}</small><small>{user.emailVerified ? 'Email verified' : 'Email not verified'}</small></span>
             </div>
             {items.map((i) => (
               <Link key={i.label} to={i.to} role="menuitem" className="cw-acct-item">

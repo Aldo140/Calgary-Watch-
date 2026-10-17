@@ -1,3 +1,4 @@
+import { mergeOrganizationContent, mergeOrganizationOccurrences, type OrganizationProjection } from '../lib/organizationWorkspace';
 import inventory from '../generated/discovery-index.json';
 import type { MarketOccurrence } from '../types/discovery';
 import type { DiscoveryEntity, EntityBase } from '../types/discovery';
@@ -27,4 +28,8 @@ const isDevServer = Boolean(import.meta.env?.DEV);
 const entities = isDevServer
   ? [...(inventory.entities as DiscoveryEntity[]), ...discoveryFixtures]
   : (inventory.entities as DiscoveryEntity[]);
-export const discoveryRepository = createDiscoveryRepository(entities, inventory.occurrences as MarketOccurrence[], isDevServer);
+let activeRepository = createDiscoveryRepository(entities, inventory.occurrences as MarketOccurrence[], isDevServer);
+export const discoveryRepository: typeof activeRepository = {
+  list:()=>activeRepository.list(), occurrences:()=>activeRepository.occurrences(), find:(kind,slug)=>activeRepository.find(kind,slug),
+};
+export function setOrganizationContent(rows:OrganizationProjection[]){activeRepository=createDiscoveryRepository(mergeOrganizationContent(entities,rows),mergeOrganizationOccurrences(inventory.occurrences as MarketOccurrence[],rows),isDevServer);}

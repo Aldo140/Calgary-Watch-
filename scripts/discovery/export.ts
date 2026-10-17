@@ -1,4 +1,8 @@
-import { mkdir, rename, writeFile } from 'node:fs/promises';
+import {mergePartnerUpdates} from './partnerUpdates';
+import { mergeOrganizationContent, mergeOrganizationOccurrences, ORGANIZATION_LIVE, type OrganizationProjection } from '../../src/lib/organizationWorkspace';
+import { ownerEditTargets, applyOwnerOccurrences, applyOwnerContent, OWNER_CONTENT } from '../../src/lib/ownerListingEdits';
+import { associateOrganizers } from '../../src/lib/organizations';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import domain from '../../functions/discovery-domain.cjs';
 import { collectSources, editorialEntities } from './feeds';
 import { isCampusOnly } from '../../src/lib/eventRank';
@@ -16,7 +20,18 @@ import { applyOwnerVerification, ownerVerification, type ClaimRecord, type Verif
 type Entity = Record<string, unknown> & { id: string; kind: string; status?: string };
 
 const log = (m: string) => console.log(`[export] ${m}`);
+let cachedOrder: Map<string, number> | undefined;
 const feed = await collectSources(log);
+if (process.env.DISCOVERY_OFFLINE === '1') {
+  // Retain the checked-in snapshot when live feeds are deliberately unavailable.
+  // Reviewed updates win by exact ID; do not delete unrelated production inventory.
+  const cached = JSON.parse(await readFile('src/generated/discovery-index.json', 'utf8')) as { entities: Entity[]; occurrences: Entity[] };
+  cachedOrder = new Map(cached.entities.map((e, i) => [e.id, i]));
+  const ids = new Set(feed.entities.map(e => e.id));
+  for (const e of cached.entities) if (['event', 'market'].includes(e.kind) && !ids.has(e.id)) feed.entities.push(e);
+  const occurrences = new Set(feed.occurrences.map(o => o.id));
+  for (const o of cached.occurrences) if (!occurrences.has(o.id)) feed.occurrences.push(o);
+}
 
 let stored: { entities: Entity[]; occurrences: Entity[] } = { entities: [], occurrences: [] };
 let claims: { approved: ClaimRecord[]; marks: VerifiedMarkRecord[] } = { approved: [], marks: [] };
@@ -43,13 +58,13 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     const db = inventoryDatabase();
     const [approved, marks] = await Promise.race([
       Promise.all([
-        db.collection('listing_claims').where('status', '==', 'approved').select('entityId', 'status', 'reviewedAt').get(),
+        db.collection('listing_claims').where('status', '==', 'approved').select('entityId', 'status', 'reviewedAt', 'approvedOrganizationId').get(),
         db.collection('verified_listings').select('entityId', 'verifiedAt').get(),
       ]),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out after 30s')), 30_000).unref()),
     ]);
     claims = {
-      approved: approved.docs.map(d => ({ entityId: String(d.get('entityId') ?? ''), status: String(d.get('status') ?? ''), reviewedAt: d.get('reviewedAt') ?? null })),
+      approved: approved.docs.map(d => ({ entityId: String(d.get('entityId') ?? ''), ...(d.get('approvedOrganizationId')?{approvedOrganizationId:String(d.get('approvedOrganizationId'))}:{}), status: String(d.get('status') ?? ''), reviewedAt: d.get('reviewedAt') ?? null })),
       marks: marks.docs.map(d => ({ entityId: d.id, verifiedAt: d.get('verifiedAt') ?? null })),
     };
     log(`Verified listings: ${claims.approved.length} approved claims`);
@@ -62,6 +77,12 @@ for (const e of stored.entities) {
   if (e.status === 'published') byId.set(e.id, e);
   else if (e.status === 'draft' || e.status === 'archived') byId.delete(e.id);
 }
+// Reconcile partner confirmations before generic title/date deduplication can discard an older canonical ID.
+const partnerSourceIds=new Set(['atp-partner-season-2026-27','werklund-partner-season-2026-27','calgary-folk-festival-partner']);
+const blocked=new Set(stored.entities.filter(e=>e.status==='draft'||e.status==='archived').map(e=>e.id));
+const confirmations=feed.entities.filter(e=>e.kind==='event'&&partnerSourceIds.has(String(e.sourceId))&&!blocked.has(e.id));
+const reconciled=mergePartnerUpdates([...byId.values()] as unknown as import('../../src/types/discovery').DiscoveryEntity[],confirmations as unknown as import('../../src/types/discovery').Event[]);
+byId.clear();for(const entity of reconciled)byId.set(entity.id,entity as unknown as Entity);
 // The same listing can arrive from two sources (e.g. an automatic market schedule and a
 // hand-reviewed record). Keep the first: same kind, same title and, for events, same start.
 const norm = (v: unknown) => String(v ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -93,7 +114,26 @@ const snapshot = domain.publishSnapshot([...byId.values()], [...occById.values()
 const editorial = await editorialEntities();
 // Stamped last, over every source, so nothing a feed or entity document says about itself survives.
 const verified = ownerVerification(claims.approved, claims.marks);
-const entities = applyOwnerVerification([...editorial, ...snapshot.entities] as Entity[], verified);
+let entities:Entity[] = applyOwnerVerification(associateOrganizers(mergePartnerUpdates([...editorial,...snapshot.entities] as unknown as import('../../src/types/discovery').DiscoveryEntity[])), verified) as unknown as Entity[];
+// Applied owner edits win over feeds on every subsequent rebuild. Protected metadata is untouched.
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  const { inventoryDatabase } = await import('./firebase');
+  // Fail closed: never deploy a feed-only rebuild which silently erases accepted owner content.
+  const content = await inventoryDatabase().collection(OWNER_CONTENT).get();
+  const ownerRecords=content.docs.map(d => d.data() as {rootId:string;entityId:string;changes:Record<string,unknown>;appliedAt?:number}).filter(record=>ownerEditTargets(record.rootId,entities as unknown as import('../../src/types/discovery').DiscoveryEntity[]).some(e=>e.id===record.entityId));
+  snapshot.occurrences=applyOwnerOccurrences(snapshot.occurrences,ownerRecords);
+  entities = applyOwnerContent(entities as unknown as import('../../src/types/discovery').DiscoveryEntity[], ownerRecords) as unknown as Entity[];
+  log(`Owner content: ${content.size} applied listing overrides`);
+}
+if (cachedOrder) entities.sort((a, b) => (cachedOrder!.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (cachedOrder!.get(b.id) ?? Number.MAX_SAFE_INTEGER));
+if(process.env.FIREBASE_SERVICE_ACCOUNT){
+  const {inventoryDatabase}=await import('./firebase');
+  const live=await inventoryDatabase().collection(ORGANIZATION_LIVE).get();
+  entities=mergeOrganizationContent(entities as unknown as import('../../src/types/discovery').DiscoveryEntity[],live.docs.map(d=>d.data() as OrganizationProjection)) as unknown as Entity[];
+  snapshot.occurrences=mergeOrganizationOccurrences(snapshot.occurrences,live.docs.map(d=>d.data() as OrganizationProjection));
+  entities=applyOwnerVerification(entities,verified);
+  log(`Organization submissions: ${live.size} live records merged, including removals`);
+}
 const index = { ...snapshot, entities };
 const stamped = entities.filter(e => e.ownerVerifiedAt).length;
 if (stamped) log(`Marked ${stamped} listings verified`);

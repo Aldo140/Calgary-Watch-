@@ -12,9 +12,13 @@ const slugify = v => v.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-
 // editorial entry with no coordinates is still a valid listing. Image credit is retained
 // so displayed photography always carries visible provenance, never anonymous imagery.
 const image = v => {
-  if (!v || typeof v !== 'object' || Object.keys(v).some(k => !['src','alt','credit'].includes(k))) throw Error('Invalid image fields');
+  if (!v || typeof v !== 'object' || Object.keys(v).some(k => !['src','alt','credit','presentation'].includes(k))) throw Error('Invalid image fields');
   const out = { src: https(v.src), alt: text(v.alt, 300) };
   if (v.credit !== undefined) out.credit = text(v.credit, 200);
+  if (v.presentation !== undefined) {
+    if (v.presentation !== 'poster') throw Error('Invalid image presentation');
+    out.presentation = v.presentation;
+  }
   return out;
 };
 const coordinates = v => {
@@ -25,7 +29,7 @@ const coordinates = v => {
 function validateSubmission(input) {
   if (!input || !['event', 'market'].includes(input.kind)) throw Error('Only events and markets are supported');
   const common = ['kind','title','summary','description','address','venue','organizer','sourceUrl','categories','tags','neighbourhood','image','coordinates'];
-  const specific = input.kind === 'event' ? ['start','end','endTimeEstimated','pricing','priceRange','tickets'] : ['occurrences','amenities','parking','transit','petFriendly','familyFriendly'];
+  const specific = input.kind === 'event' ? ['start','end','endTimeEstimated','schedulePrecision','ticketSaleStatus','pricing','priceRange','tickets'] : ['occurrences','amenities','parking','transit','petFriendly','familyFriendly'];
   if (Object.keys(input).some(k => ![...common,...specific].includes(k))) throw Error('Submission contains privileged or unknown fields');
   for (const key of ['title','summary','description','address','organizer']) text(input[key], key === 'description' ? 5000 : 500);
   if (input.venue !== undefined) text(input.venue, 300);
@@ -35,6 +39,8 @@ function validateSubmission(input) {
   if (input.coordinates !== undefined) coordinates(input.coordinates);
   if (input.kind === 'event') {
     range(input); if (input.endTimeEstimated !== undefined && typeof input.endTimeEstimated !== 'boolean') throw Error('Invalid estimated end time flag'); if (!['free','paid','unknown'].includes(input.pricing)) throw Error('Invalid pricing');
+    if(input.schedulePrecision!==undefined&&input.schedulePrecision!=='date')throw Error('Invalid schedule precision');
+    if(input.ticketSaleStatus!==undefined&&!['not-on-sale','on-sale','unknown'].includes(input.ticketSaleStatus))throw Error('Invalid ticket sale status');
     if (input.tickets !== undefined) https(input.tickets);
     if (input.priceRange !== undefined && (!Array.isArray(input.priceRange) || input.priceRange.length !== 2 || input.priceRange.some(value => typeof value !== 'number' || !Number.isFinite(value) || value < 0) || input.priceRange[1] < input.priceRange[0])) throw Error('Invalid price range');
   }
@@ -59,7 +65,7 @@ function normalizeRecord(input, source, recordId, now = new Date().toISOString()
   const id = hash(`${source.id}:${recordId}`);
   const provenance = { name: source.name, url: https(input.sourceUrl), kind: source.kind || 'official', retrievedAt: now };
   const base = { id, kind: input.kind, slug: `${slugify(input.title) || input.kind}-${id.slice(0,6)}`, title: input.title.trim(), summary: input.summary.trim(), description: input.description.trim(), categories: strings(input.categories), tags: strings(input.tags), address: input.address.trim(), organizer: input.organizer.trim(), sources: [provenance], sourceId: source.id, sourceRecordId: recordId, fetchedAt: now, updatedAt: now, status: 'pending', verification: 'unverified', ...(input.venue ? { venue: input.venue.trim() } : {}), ...(input.neighbourhood ? { neighbourhood: input.neighbourhood } : {}), ...(input.image ? { image: image(input.image) } : {}), ...(input.coordinates ? { coordinates: coordinates(input.coordinates) } : {}) };
-  const entity = input.kind === 'event' ? { ...base, start: input.start, end: input.end, timezone: TIMEZONE, ...(input.endTimeEstimated ? { endTimeEstimated: true } : {}), pricing: input.pricing, ...(input.priceRange ? { priceRange: input.priceRange } : {}), ...(input.tickets ? { tickets: input.tickets } : {}), cancelled: false } : { ...base, amenities: input.amenities, vendorIds: [], images: [], ...Object.fromEntries(['parking','transit','petFriendly','familyFriendly'].filter(k => input[k] !== undefined).map(k => [k,input[k]])) };
+  const entity = input.kind === 'event' ? { ...base, start: input.start, end: input.end, timezone: TIMEZONE, ...(input.endTimeEstimated ? { endTimeEstimated: true } : {}), pricing: input.pricing, ...(input.schedulePrecision?{schedulePrecision:input.schedulePrecision}:{}), ...(input.ticketSaleStatus?{ticketSaleStatus:input.ticketSaleStatus}:{}), ...(input.priceRange ? { priceRange: input.priceRange } : {}), ...(input.tickets ? { tickets: input.tickets } : {}), cancelled: false } : { ...base, amenities: input.amenities, vendorIds: [], images: [], ...Object.fromEntries(['parking','transit','petFriendly','familyFriendly'].filter(k => input[k] !== undefined).map(k => [k,input[k]])) };
   const occurrences = input.kind === 'market' ? input.occurrences.map(o => ({ id: hash(`${id}:${o.sourceRecordId}`), marketId: id, sourceRecordId: o.sourceRecordId, start: o.start, end: o.end, cancelled: o.cancelled, timezone: TIMEZONE, source: provenance })) : [];
   return { entity, occurrences };
 }
@@ -112,7 +118,7 @@ function publishSnapshot(entities, occurrences, now = new Date()) {
   const ids = new Set(visible.map(e => e.id));
   const paths = new Set();
   for (const e of visible) { const key = `${e.kind}/${e.slug}`; if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(e.slug) || paths.has(key)) throw Error('Invalid or conflicting published slug'); paths.add(key); }
-  const fields = ['id','kind','slug','title','summary','description','categories','tags','sources','image','status','verification','verifiedAt','fetchedAt','updatedAt','sourceId','sourceRecordId','neighbourhood','address','coordinates','venue','start','end','timezone','pricing','priceRange','tickets','organizer','cancelled','amenities','parking','transit','petFriendly','familyFriendly','vendorIds','images'];
+  const fields = ['id','kind','slug','title','summary','description','categories','tags','sources','image','status','verification','verifiedAt','fetchedAt','updatedAt','sourceId','sourceRecordId','neighbourhood','address','coordinates','venue','start','end','endTimeEstimated','schedulePrecision','ticketSaleStatus','timezone','pricing','priceRange','tickets','organizer','cancelled','amenities','parking','transit','petFriendly','familyFriendly','vendorIds','images'];
   const publicEntities = visible.map(e => Object.fromEntries(fields.filter(k=>e[k]!==undefined).map(k=>[k,e[k]])));
   return { version: 1, generatedAt: now.toISOString(), entities: publicEntities, occurrences: occurrences.filter(o => ids.has(o.marketId) && Date.parse(o.end) > Date.parse(o.start)).map(o=>Object.fromEntries(['id','marketId','sourceRecordId','start','end','timezone','cancelled','source'].filter(k=>o[k]!==undefined).map(k=>[k,o[k]]))) };
 }

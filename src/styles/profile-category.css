@@ -1,0 +1,6 @@
+[data-profile-category] { --profile-accent:#ffdf4f; --profile-wash:#fff7d8; }
+[data-profile-category='stage'] { --profile-accent:#f7b4c9; --profile-wash:#fceef3; }
+[data-profile-category='music'] { --profile-accent:#bcb8f6; --profile-wash:#f0efff; }
+[data-profile-category='arts'] { --profile-accent:#96dedb; --profile-wash:#e8f7f6; }
+[data-profile-category='food'] { --profile-accent:#efc19a; --profile-wash:#fff2e7; }
+[data-profile-category='community'] { --profile-accent:#b9d9a1; --profile-wash:#f0f7e8; }

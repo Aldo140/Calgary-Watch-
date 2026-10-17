@@ -172,6 +172,7 @@ describe('finding a business address', () => {
   });
   it('decodes common obfuscation', () => {
     assert.deepEqual(extractEmails('hello [at] market.ca', 'market.ca'), ['hello@market.ca']);
+    assert.deepEqual(extractEmails('<img src="768x960_call-of-the-wild@2x-100-sm.me"> hi@wild.ca', 'wild.ca'), ['hi@wild.ca']);
     assert.deepEqual(extractEmails('hello&#64;market.ca', 'market.ca'), ['hello@market.ca']);
   });
   it('drops a phone number glued onto the front of an address', () => {

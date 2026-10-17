@@ -1,10 +1,11 @@
+import { hasCompletedPlans } from '../../lib/plansProfile';
 import { useMemo, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, MapPin } from 'lucide-react';
 import { useAuth } from '../FirebaseProvider';
 import { homeAreaOf, useMyGoing, usePlansProfile } from '../../lib/plans';
-import { buildEventPicks, pickWhen } from '../../lib/eventPicks';
+import { buildEventPicks, nextUp, pickWhenAt } from '../../lib/eventPicks';
 import { emailPlan, nearHome, partOfDay, setupPercent, setupSteps } from '../../lib/memberHome';
 import { neighbourhoodPoint } from '../../lib/eventPicks';
 import { computeBadges } from '../../lib/badges';
@@ -49,13 +50,35 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
 
   const enter = { initial: reduce ? false : { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { type: 'spring' as const, stiffness: 150, damping: 20 } };
 
+  // Signed in but never finished the three questions: send them back to finish, not to an empty dashboard.
+  if (user && profile && !hasCompletedPlans(profile)) {
+    const first = (user.displayName || '').split(' ')[0];
+    return (
+      <motion.section className="h-yours" data-state="guest" aria-labelledby="h-yours-title" {...enter}>
+        <div className="h-yours-copy">
+          <p className="h-yours-kicker"><span>Your CalgaryWatch</span><span className="h-yours-tag">Almost there</span></p>
+          <h2 id="h-yours-title">Almost yours{first ? <>, <Scribble>{first}.</Scribble></> : '.'}</h2>
+          <p className="h-yours-lead">You’re signed in. Choose any preferences you’d like—location is optional—and your dashboard fills in: what happened nearby, picks for the week and your plans.</p>
+          <div className="h-yours-actions">
+            <Link to="/plans" className="h-yours-go">Finish setting up <ArrowUpRight size={18} aria-hidden="true" /></Link>
+          </div>
+        </div>
+        <ul className="h-yours-deck">
+          <li className="h-deck h-deck-navy"><RadarArt /><strong>Where’s home?</strong><small>Step 1 of 3</small></li>
+          <li className="h-deck h-deck-cyan"><TicketArt /><strong>What to send</strong><small>Step 2 of 3</small></li>
+          <li className="h-deck h-deck-paper"><BadgeArt /><strong>What you’re into</strong><small>Step 3 of 3</small></li>
+        </ul>
+      </motion.section>
+    );
+  }
+
   if (user && profile) {
     const area = homeAreaOf(profile);
     const plan = emailPlan(profile.weeklyDigestOptIn === true, profile.eventsDigestOptIn, now);
     const reports = pulse?.reports;
     const near = nearHome(reports?.recent ?? [], neighbourhoodPoint(area), area);
     const nearReady = reports?.status === 'ready' || reports?.status === 'error';
-    const next = picks?.going[0];
+    const next = picks ? nextUp(picks.going, now) : undefined;
     const count = picks?.picks.length ?? 0;
     const pct = setupPercent(setupSteps({
       hasHomeArea: Boolean(area), weekly: profile.weeklyDigestOptIn === true, events: profile.eventsDigestOptIn,
@@ -102,7 +125,7 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
           <li className="h-deck h-deck-cyan">
             <TicketArt />
             <strong>{next ? next.title : 'No plans yet'}</strong>
-            <small>{next ? pickWhen(next.start) : 'Tap “I’m going” on anything'}</small>
+            <small>{next ? pickWhenAt(next, now) : 'Tap “I’m going” on anything'}</small>
           </li>
           <li className="h-deck h-deck-paper">
             <Ring pct={pct} />
@@ -123,7 +146,7 @@ export function HomeYours({ pulse }: { pulse?: LivePulse }) {
       <div className="h-yours-copy">
         <p className="h-yours-kicker"><span>Your CalgaryWatch</span><span className="h-yours-tag">Free</span></p>
         <h2 id="h-yours-title">Make Calgary <Scribble>yours.</Scribble></h2>
-        <p className="h-yours-lead">Tell us where home is and what you’re into. Get what happened nearby and what’s worth leaving the house for, in one Monday email.</p>
+        <p className="h-yours-lead">Choose your emails and interests. Add a neighbourhood for nearby picks, or explore all of Calgary.</p>
         <div className="h-yours-actions">
           <Link to="/plans" className="h-yours-go">Sign up free <ArrowUpRight size={18} aria-hidden="true" /></Link>
           <button type="button" className="h-yours-signin" onClick={async () => { await signIn(); navigate('/plans'); }}>I have an account</button>

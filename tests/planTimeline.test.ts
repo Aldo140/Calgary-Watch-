@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import type { Event, Market, MarketOccurrence } from '../src/types/discovery.ts';
-import { buildPlanTimeline, planWhen } from '../src/lib/eventPicks.ts';
+import { buildPlanTimeline, nextUp, pickWhenAt, planWhen } from '../src/lib/eventPicks.ts';
 
 function event(over: Partial<Event> & Pick<Event, 'id' | 'title' | 'start'>): Event {
   return {
@@ -60,5 +60,24 @@ describe('plan timeline', () => {
     assert.equal(planWhen('past', 0, 0), 'Earlier today');
     assert.equal(planWhen('past', -1, 0), 'Yesterday');
     assert.equal(planWhen('past', -10, 0), 'Last week');
+  });
+});
+
+describe('runs that are already open', () => {
+  const N = NOW.getTime();
+  const closingSoon = event({ id: 'soon', title: 'Closing soon', start: '2026-06-04T16:00:00Z', end: '2026-10-25T00:00:00Z' });
+
+  it('reads by its closing date, never the opening day months ago', () => {
+    assert.equal(pickWhenAt(run, N), 'On now · until Oct 31');
+    assert.match(pickWhenAt(thursday, N), /^Thu, Oct 15/);
+  });
+  it('lists open runs closing soonest first', () => {
+    const t = buildPlanTimeline({ entities: [run, closingSoon], occurrences: [], goingIds: new Set(['run', 'soon']), now: NOW });
+    assert.deepEqual(t.ahead.map((p) => p.item.entityId), ['soon', 'run']);
+  });
+  it('leads with a dated plan this week over an exhibition you can visit any day', () => {
+    const items = [run, tonight, march].map((e) => ({ start: e.start, end: e.end, id: e.id }));
+    assert.equal(nextUp(items, N)?.id, 'tonight');
+    assert.equal(nextUp([run, march].map((e) => ({ start: e.start, end: e.end, id: e.id })), N)?.id, 'run');
   });
 });

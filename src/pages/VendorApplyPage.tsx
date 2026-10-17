@@ -14,7 +14,7 @@ import '../styles/hq.css';
 
 /**
  * Apply to sell at a market. The organizer gets it in Market HQ and can add
- * the vendor to their roster in one tap. Registering is a Google sign-in, so
+ * the vendor to their roster in one tap. Registering uses Firebase sign-in, so
  * every application has a real, verified address behind it.
  */
 export default function VendorApplyPage() {
@@ -96,8 +96,8 @@ export default function VendorApplyPage() {
                 </fieldset>
                 {error ? <p className="pl-error" role="alert">{error}</p> : null}
                 <div className="pl-actions">
-                  <button type="submit" className="pl-btn" data-ready={!applicationProblem(d)} disabled={state === 'busy' || !isFirebaseConfigured}>{state === 'busy' ? 'Sending…' : user ? 'Send application' : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" /></button>
-                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? 'Goes straight to the organizer.' : 'A Google sign-in keeps applications real. What you typed is kept.'}</p>
+                  <button type="submit" className="pl-btn" data-ready={!applicationProblem(d)} disabled={state === 'busy' || !isFirebaseConfigured}>{state === 'busy' ? 'Sending…' : user ? 'Send application' : 'Sign in or create an account'} <ArrowUpRight size={18} aria-hidden="true" /></button>
+                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? 'Goes straight to the organizer.' : 'A free account keeps applications real. What you typed is kept.'}</p>
                 </div>
               </form>
             )}

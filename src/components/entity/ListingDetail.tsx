@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from 'react';
+import { eventArtwork, listingImageSrc, organizerProfile } from '../../lib/organizations';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation,
   Share2, ShieldCheck, Tag, Ticket, User,
 } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event } from '../../types/discovery';
-import { entityPath } from '../../lib/discovery';
+import { entityPath, startClock } from '../../lib/discovery';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { interestLabel, interestsFor, pickWhen, type EventInterestId } from '../../lib/eventPicks';
@@ -111,16 +112,14 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const today = dayKey.format(start) === dayKey.format(new Date(now));
   const sameDay = dayKey.format(start) === dayKey.format(end);
   const status = event.cancelled ? 'Cancelled by the organizer' : past ? 'This event has finished'
-    : on ? `On now · until ${time.format(end)}` : `${today ? 'Today' : dayLong.format(start)} · ${time.format(start)}`;
+    : on ? `On now · until ${time.format(end)}` : `${today ? 'Today' : dayLong.format(start)} · ${startClock(event.start, time)}`;
   const price = event.cancelled ? 'Cancelled' : event.pricing === 'free' ? 'Free' : event.priceRange ? `$${event.priceRange[0]}${event.priceRange[1] !== event.priceRange[0] ? `–$${event.priceRange[1]}` : ''}` : event.pricing === 'paid' ? 'Ticketed' : 'Check with the organizer';
   const cal = { id: event.id, title: event.title, start: event.start, end: event.end, location: [event.venue, event.address].filter(Boolean).join(', '), description: event.summary, url };
   const organizerSite = event.sources.find(s => s.kind === 'official')?.url ?? event.sources[0]?.url;
   const interests: EventInterestId[] = interestsFor(event).filter(i => i !== 'free');
   const open = !past && !event.cancelled;
-  const photo = /^https:\/\//.test(event.image?.src ?? '') ? event.image : undefined;
-  const organization = all.find((entity): entity is Business =>
-    entity.kind === 'business' && ((!!event.sourceId && entity.sourceId === event.sourceId) || entity.title === event.organizer)
-  );
+  const photo = eventArtwork(event, all);
+  const organization = organizerProfile(event, all);
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
   const seen = new Set([event.id, ...alsoOn.map(e => e.id)]);
@@ -160,13 +159,13 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
           <button type="button" className="mk-btn" onClick={download}><CalendarPlus size={17} aria-hidden="true" /> Add to calendar</button>
           <button type="button" className="mk-btn" onClick={() => void share()}>{shared ? <Check size={17} aria-hidden="true" /> : <Share2 size={17} aria-hidden="true" />} {shared ? 'Link copied' : 'Share'}</button>
         </> : <Link className="mk-btn mk-btn-sun" to="/events">See what’s on instead <ArrowRight size={17} aria-hidden="true" /></Link>}
-        art={photo ? <img className="ld-photo" src={photo.src} alt={photo.alt} width="1200" height="677" /> : <EventArt id={event.id} title={event.title} categories={event.categories} />}
+        art={photo ? <><img className={`ld-photo${photo.presentation === 'poster' ? ' is-poster' : ''}`} src={listingImageSrc(photo)} alt={photo.alt} width="1200" height="677" />{photo.credit ? <figcaption className="ld-photo-credit">{photo.credit}</figcaption> : null}</> : <EventArt id={event.id} title={event.title} categories={event.categories} />}
       />
 
       <div className="cw-wrap mk-page mk-dgrid">
         <div className="mk-dmain">
           <dl className="mk-facts">
-            <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{dayLong.format(start)}<span>{time.format(start)}{event.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${dayLong.format(end)}, `}${time.format(end)}`}</span></dd></div>
+            <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{dayLong.format(start)}<span>{startClock(event.start, time)}{event.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${dayLong.format(end)}, `}${time.format(end)}`}</span></dd></div>
             <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{event.venue || event.neighbourhood || 'See the organizer'}<span>{cleanAddress(event.address)}</span></dd></div>
             <div><dt><Tag size={16} aria-hidden="true" /> Price</dt><dd>{price}{event.pricing === 'unknown' ? <span>Not listed yet</span> : null}</dd></div>
             <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{organization ? <Link to={entityPath(organization)}>{event.organizer}</Link> : event.organizer}</dd></div>
@@ -212,6 +211,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
         </aside>
 
         <div className="mk-dfoot">
+          {organization ? <p><Link to={entityPath(organization)}>More from {organization.title} <ArrowRight size={16} aria-hidden="true" /></Link></p> : null}
           <SourceBadge entity={event} />
           <ClaimCta entityId={event.id} title={event.title} kind="event" verifiedAt={event.ownerVerifiedAt} />
         </div>

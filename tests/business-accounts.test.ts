@@ -63,7 +63,11 @@ describe('who can set it', () => {
 
   it('approving a claim in admin marks the claimant’s account', () => {
     const panel = read('src/components/admin/ClaimsPanel.tsx');
-    assert.match(panel, /if \(approve\) \{[\s\S]*?await markBusiness\(c\.uid, \[c\.entityId\]\)/);
+    assert.match(panel, /approveOrganizationClaim/);
+    const server=readFileSync(new URL('../scripts/claims/approve-organization.ts',import.meta.url),'utf8');
+    assert.match(server,/runTransaction/);
+    assert.match(server, /claimApprovalWrites/);
+    assert.match(server, /tx.update\(accountRef,writes.account\)/);
     assert.match(panel, /doc\(db, 'users', uid\)/);
   });
 });

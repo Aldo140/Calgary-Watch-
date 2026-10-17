@@ -19,6 +19,7 @@ import { EventArt, eventArtKind } from './ListingArt';
 import { MenuArt } from '../site/MenuArt';
 import { discoveryRepository } from '../../data/discovery';
 import { resolvePicks } from '../../lib/dateNight';
+import { eventArtwork, listingImageSrc } from '../../lib/organizations';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/home-v3.css';
@@ -51,6 +52,7 @@ function price(e: EventEntity) {
     const [lo, hi] = e.priceRange.map(n => `$${Math.round(n)}`);
     return lo === hi ? lo : `${lo}–${hi}`;
   }
+  if(e.ticketSaleStatus==='not-on-sale')return 'Tickets not yet on sale';
   return e.pricing === 'paid' ? 'Tickets' : null;
 }
 
@@ -66,8 +68,9 @@ function times(starts: string[]) {
 const place = (e: EventEntity) => [e.venue || e.address, e.venue && e.neighbourhood ? e.neighbourhood : ''].filter(Boolean).join(' · ');
 
 function Art({ e }: { e: EventEntity }) {
-  return e.image && /^https:\/\//.test(e.image.src)
-    ? <img src={e.image.src} alt={e.image.alt} loading="lazy" decoding="async" />
+  const image = eventArtwork(e, discoveryRepository.list());
+  return image
+    ? <img className={image.presentation === 'poster' ? 'is-poster' : undefined} src={listingImageSrc(image)} alt={image.alt} loading="lazy" decoding="async" />
     : <EventArt id={e.id} title={e.title} categories={e.categories} />;
 }
 
@@ -263,7 +266,7 @@ function Sky({ pick, today, children }: { pick?: EventEntity; today: string; chi
               <span className="ev-pick-tag"><Sparkles size={13} aria-hidden="true" /> {pickLabel}</span>
               <span className="ev-pick-art"><Art e={pick} /></span>
               <span className="ev-pick-body">
-                <small>{startClock(pick.start, clock)}{price(pick) ? ` · ${price(pick)}` : ''}</small>
+                <small>{pick.schedulePrecision==='date'?'Check official showtimes':startClock(pick.start, clock)}{price(pick) ? ` · ${price(pick)}` : ''}</small>
                 <strong>{pick.title}</strong>
                 <span>{place(pick)}</span>
               </span>
@@ -340,13 +343,13 @@ function Day({ day, today, heroPick }: { day: EventDay; today: string; heroPick?
 }
 
 function Lead({ entry, dupe }: { entry: DayEntry; dupe?: boolean }) {
-  const e = entry.event; const cost = price(e);
+  const e = entry.event; const cost = price(e); const image = eventArtwork(e, discoveryRepository.list());
   return (
     <Link to={entityPath(e)} className={`ev-lead-card${dupe ? ' is-dupe' : ''}`}>
-      <span className="ev-lead-art"><Art e={e} />{e.image?.credit ? <em>{e.image.credit}</em> : null}</span>
+      <span className="ev-lead-art"><Art e={e} />{image?.credit ? <em>{image.credit}</em> : null}</span>
       <span className="ev-lead-body">
         <span className="ev-lead-tag">Pick of the day</span>
-        <span className="ev-lead-time">{times(entry.starts)}</span>
+        <span className="ev-lead-time">{e.schedulePrecision==='date'?'Check official showtimes':times(entry.starts)}</span>
         <strong>{e.title}</strong>
         <span className="ev-lead-place">{place(e)}</span>
         <span className="ev-lead-foot">
@@ -364,7 +367,7 @@ function Row({ entry, dupe }: { entry: DayEntry; dupe?: boolean }) {
   return (
     <li className={dupe ? 'is-dupe' : undefined}>
       <Link to={entityPath(e)} className="ev-row">
-        <span className="ev-row-time">{times(entry.starts)}</span>
+        <span className="ev-row-time">{e.schedulePrecision==='date'?'Check official showtimes':times(entry.starts)}</span>
         <span className="ev-row-art"><Art e={e} /></span>
         <span className="ev-row-body">
           <strong>{e.title}</strong>

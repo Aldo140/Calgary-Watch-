@@ -1,3 +1,4 @@
+import { plansAreaPatch } from '../lib/plansSetup';
 import '../styles/map-brand.css';
 import '../styles/briefing.css';
 import { useState, useEffect, useCallback, useRef, useMemo, startTransition } from 'react';
@@ -81,8 +82,8 @@ type UserProfileSettings = {
   neighborhood?: string;
   inferredNeighborhood?: string;
   address?: string;
-  locationPreferenceType?: 'address' | 'neighborhood';
-  piiConsentAt?: number;
+  locationPreferenceType?: 'address' | 'neighborhood' | 'none';
+  piiConsentAt?: number | null;
   weeklyDigestOptIn?: boolean;
   weeklyDigestOptInAt?: number;
   /** Categories the reader chose for their weekly digest; empty/absent = all. */
@@ -1421,8 +1422,8 @@ export default function MapPage() {
     // inferredNeighborhood is set when user picks from ADDRESS_GUESSES autocomplete.
     // If they typed an address manually (no autocomplete pick), geocode it instead.
     let inferredNeighborhood = profileDraft.inferredNeighborhood.trim().slice(0, 80);
-    if (!profileDraft.piiConsent || (!neighborhood && !address)) {
-      setProfileSaveError('Please agree to the privacy obligations and add a neighbourhood or address.');
+    if ((neighborhood || address) && !profileDraft.piiConsent) {
+      setProfileSaveError('Agree to store your area, or leave location blank to continue with all Calgary.');
       return;
     }
 
@@ -1442,11 +1443,7 @@ export default function MapPage() {
         displayName: user.displayName || userProfile?.displayName || 'Calgary User',
         email: user.email || userProfile?.email || '',
         photoURL: user.photoURL || userProfile?.photoURL || '',
-        neighborhood,
-        address,
-        inferredNeighborhood,
-        locationPreferenceType: address ? 'address' : 'neighborhood',
-        piiConsentAt: userProfile?.piiConsentAt || Date.now(),
+        ...plansAreaPatch({ neighborhood, address, inferredNeighborhood, consent: profileDraft.piiConsent }, userProfile, Date.now()),
         onboardingCompletedAt: userProfile?.onboardingCompletedAt || Date.now(),
         weeklyDigestOptIn: profileDraft.weeklyDigestOptIn,
         weeklyDigestOptInAt: profileDraft.weeklyDigestOptIn
@@ -2441,7 +2438,7 @@ export default function MapPage() {
                   <p className="mt-3 text-sm leading-relaxed text-[#D5DFEB]">
                     {showProfileStep
                       ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
-                      : 'Continue with Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
+                      : 'Continue with email or Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
                   </p>
 
                   {showProfileStep && (
@@ -2459,10 +2456,10 @@ export default function MapPage() {
                   {!showProfileStep ? (
                     <div className="space-y-5">
                       <div>
-                        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#1F5C93]">Continue with Google</p>
+                        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#1F5C93]">Your CalgaryWatch account</p>
                         <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em] text-[#0B1F33]">Sign up or sign in securely</h3>
                         <p className="mt-2 text-sm leading-relaxed text-[#5A6B7D]">
-                          New to Calgary Watch? Google will create your account. Already registered? Google will sign you in. This panel will then ask for your privacy consent and neighbourhood or address.
+                          New to CalgaryWatch? Create an account with email or Google. Already registered? Sign in with the same method. This panel will then ask for your privacy consent and neighbourhood or address.
                         </p>
                       </div>
 
@@ -2899,6 +2896,7 @@ export default function MapPage() {
                             )}
                           </div>
 
+                          {(profileDraft.neighborhood.trim() || profileDraft.address.trim()) ? (
                           <label
                             className="flex cursor-pointer gap-3 p-4"
                             style={{ background: '#F7F3EA', border: '1.5px solid #C9D8E4' }}
@@ -2918,6 +2916,7 @@ export default function MapPage() {
                               </a>
                             </span>
                           </label>
+                          ) : <p className="text-sm">Location is optional. Leave it blank to see all of Calgary.</p>}
 
                           <label
                             className="flex cursor-pointer gap-3 p-4"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, Footprints, MapPin, Navigation } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, Guide, Market, MarketOccurrence, Neighbourhood } from '../../types/discovery';
@@ -8,14 +8,16 @@ import { LOCAL_NOTES } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
 import { LocalHero } from './LocalHero';
 import { ServicesDirectory, ServicesIndex } from './LocalServices';
-import { TEAR } from '../home/HomeHero';
+import { ComingUpBoard, ShelfDirectory, ShelfRibbon } from './LocalDirectory';
+import { boardRows, programmeOf, shelfOf, type ShelfId } from '../../lib/localShelves';
+import '../../styles/local-directory.css';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { byVerified } from '../../lib/verified';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 
-/** The black book opens on this many places; the rest wait behind a "show all" button. */
-const BOOK_FIRST = 12;
+/** Pins per quadrant before the rest fold into "+N more". */
+const PINS = 3;
 
 const QUADRANT_BOX: Record<string, [number, number]> = { NW: [0, 0], NE: [1, 0], SW: [0, 1], SE: [1, 1] };
 
@@ -42,18 +44,6 @@ function nextLabel(n: NonNullable<LocalLinks['next']>) {
 
 /** A round arrow, as on the homepage cards. */
 const Go = () => <span className="lx-go" aria-hidden="true"><ArrowUpRight size={18} /></span>;
-
-/** Small links under each card: the neighbourhood, what's on nearby, and any guide that passes it. */
-function LinkRail({ links }: { links: LocalLinks }) {
-  if (!links.hood && !links.next && !links.guides.length) return null;
-  return (
-    <div className="cw-loc-rail">
-      {links.hood ? <Link to={entityPath(links.hood)} className="cw-loc-tag cw-loc-tag-hood"><MapPin size={14} aria-hidden="true" />{links.hood.title}</Link> : null}
-      {links.next ? <Link to={links.next.path} className="cw-loc-tag cw-loc-tag-next"><CalendarDays size={14} aria-hidden="true" /><span><b>{nextLabel(links.next)}</b> {day.format(new Date(links.next.start))}</span></Link> : null}
-      {links.guides.slice(0, 1).map(g => <Link key={g.id} to={entityPath(g)} className="cw-loc-tag cw-loc-tag-guide"><Footprints size={14} aria-hidden="true" />In a guide</Link>)}
-    </div>
-  );
-}
 
 /** "Make a day of it": the pick's links as homepage-style tiles. */
 function DayPlan({ place, links }: { place: Business; links: LocalLinks }) {
@@ -106,24 +96,30 @@ function QuadMap() {
 }
 
 /**
- * Local: CalgaryWatch's own list of independent places. Picks are editorial and never
- * sold; a paid placement is always labelled "Featured partner" and never stamped a pick.
+ * Local: CalgaryWatch's directory of profiles, the organizers and independents behind the
+ * city, each on one shelf with what it has coming up. Picks are editorial and never sold;
+ * a paid placement is always labelled "Featured partner" and never stamped a pick.
  */
 export function LocalBoard({ items, all, occurrences, category }: { items: DiscoveryEntity[]; all: DiscoveryEntity[]; occurrences: readonly MarketOccurrence[]; category?: string }) {
-  const now = Date.now();
+  const [now] = useState(() => Date.now());
   const hoods = all.filter((e): e is Neighbourhood => e.kind === 'neighbourhood');
-  const everyPlace = all.filter((e): e is Business => e.kind === 'business');
+  const everyPlace = useMemo(() => all.filter((e): e is Business => e.kind === 'business'), [all]);
   const places = items.filter((e): e is Business => e.kind === 'business')
     .sort((a, b) => Number(b.partner) - Number(a.partner) || Number(b.editorialSelection) - Number(a.editorialSelection) || byVerified(a, b, now) || a.title.localeCompare(b.title));
   const linksFor = new Map(everyPlace.map(p => [p.id, localLinks(p, all, occurrences, LOCAL_NOTES[p.id], now)]));
-  const quadOf = (p: Business) => hoodOf(p, hoods)?.quadrant;
+  // The neighbourhood's quadrant, else the one in the street address ("1235 26 Avenue SE").
+  const quadOf = (p: Business) => hoodOf(p, hoods)?.quadrant ?? p.address?.match(/\b(NW|NE|SW|SE)\b/)?.[1];
   const picks = places.filter(p => p.editorialSelection && !p.partner);
   const week = isoWeek(new Date());
   const feature = !category && picks.length ? picks[week % picks.length] : undefined;
   const featureNote = feature ? LOCAL_NOTES[feature.id] : undefined;
-  const book = places.filter(p => p !== feature);
-  const [bookOpen, setBookOpen] = useState(false);
-  const shownBook = bookOpen ? book : book.slice(0, BOOK_FIRST);
+  const shelfOfId = useMemo(() => new Map(everyPlace.map(p => [p.id, shelfOf(p)])), [everyPlace]);
+  const shelfCounts = new Map<ShelfId, number>();
+  for (const p of places) shelfCounts.set(shelfOfId.get(p.id)!, (shelfCounts.get(shelfOfId.get(p.id)!) ?? 0) + 1);
+  const programmes = useMemo(() => new Map(everyPlace.map(p => [p.id, programmeOf(p.id, all, occurrences, now)])), [everyPlace, all, occurrences, now]);
+  const rows = boardRows(everyPlace, programmes);
+  const totalDates = [...programmes.values()].reduce((n, x) => n + x.count, 0);
+  const withDates = [...programmes.values()].filter(x => x.count).length;
   const counts: Record<string, number> = { all: everyPlace.length };
   for (const c of LOCAL_CATEGORIES) counts[c] = everyPlace.filter(p => p.categories.includes(c)).length;
   const areas = new Set(everyPlace.map(p => p.neighbourhood).filter(Boolean)).size;
@@ -136,7 +132,9 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
 
   return (
     <div className="cw-loc">
-      <LocalHero places={category ? places : everyPlace} category={category} counts={counts} areas={areas} />
+      <LocalHero places={category ? places : everyPlace} category={category} counts={counts} areas={areas} shelfCounts={category ? undefined : shelfCounts} />
+      <ShelfRibbon counts={shelfCounts} />
+      {!category ? <ComingUpBoard rows={rows} now={now} shelfOfId={shelfOfId} stats={{ profiles: everyPlace.length, shelves: shelfCounts.size, dates: totalDates, organizers: withDates }} /> : null}
 
       <div className="cw-wrap lx-wrap">
         {category === 'services' ? <ServicesDirectory places={everyPlace} /> : null}
@@ -176,55 +174,10 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
             <DayPlan place={feature} links={linksFor.get(feature.id)!} />
           </section>
         ) : null}
-      </div>
 
-      {book.length ? (
-        <section className="lx-book" aria-labelledby="lx-book">
-          <svg className="lx-edge lx-edge-top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={TEAR} /></svg>
-          <div className="cw-wrap">
-            <header className="lx-head lx-head-dark">
-              <div>
-                <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />{book.length} {book.length === 1 ? 'place' : 'places'} · {category ? cap(category) : 'Every quadrant'}</p>
-                <h2 id="lx-book">{category ? <>{cap(category)}, <mark>the locals’ way.</mark></> : <>The little <mark>black book.</mark></>}</h2>
-              </div>
-              <p>Where we’d send a friend. Every place is checked against its own official site before it goes in.</p>
-            </header>
-            <p className="lx-swipe" aria-hidden="true">Swipe the book <ArrowUpRight size={14} /></p>
-            <ul className={`lx-grid${shownBook.length % 3 === 2 ? ' lx-grid-bento' : ''}`} id="lx-book-list">
-              {shownBook.map((p, i) => {
-                const note = LOCAL_NOTES[p.id];
-                const quad = quadOf(p);
-                const where = [p.neighbourhood, quad, note?.since].filter(Boolean).join(' · ');
-                return (
-                  <li key={p.id} className="lx-card">
-                    <Link to={entityPath(p)} className="lx-card-main">
-                      <span className="lx-card-art">
-                        <ShopArt id={p.id} title={p.title} tags={p.tags} categories={p.categories} />
-                        <span className="lx-card-num">{pad(i + 1)}</span>
-                        {p.partner || p.editorialSelection ? <Stamp partner={p.partner} /> : null}
-                      </span>
-                      <span className="lx-card-body">
-                        <small className="lx-pickline">{note ? note.pick : [cap(p.categories[0] ?? 'local'), p.neighbourhood].filter(Boolean).join(' · ')}</small>
-                        <strong>{p.title}</strong>
-                        <span className="lx-card-note">{note?.note ?? p.summary}</span>
-                        {note?.dontMiss.length ? <span className="lx-chips">{note.dontMiss.slice(0, 3).map(d => <i key={d}>{d}</i>)}</span> : null}
-                        {where ? <span className="lx-where"><MapPin size={14} aria-hidden="true" />{where}</span> : null}
-                      </span>
-                    </Link>
-                    <LinkRail links={linksFor.get(p.id)!} />
-                  </li>
-                );
-              })}
-            </ul>
-            {book.length > BOOK_FIRST ? (
-              <button type="button" className="lx-book-more" aria-expanded={bookOpen} aria-controls="lx-book-list" onClick={() => setBookOpen(o => !o)}>
-                {bookOpen ? 'Show fewer' : `Show all ${book.length} places`}
-              </button>
-            ) : null}
-          </div>
-          <svg className="lx-edge lx-edge-bottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={TEAR} /></svg>
-        </section>
-      ) : !feature ? <div className="cw-wrap"><p className="cw-loc-empty">Nothing in this category yet. <Link to="/submit">Know a place we should add?</Link></p></div> : null}
+        {places.length ? <ShelfDirectory profiles={places} shelfOfId={shelfOfId} programmes={programmes} now={now} category={category} />
+          : <p className="cw-loc-empty">Nothing in this category yet. <Link to="/submit">Know a place we should add?</Link></p>}
+      </div>
 
       <div className="cw-wrap lx-wrap">
         {!category ? <ServicesIndex places={everyPlace} /> : null}
@@ -241,7 +194,7 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
             <div className="lx-quads">
               <QuadMap />
               {(['NW', 'NE', 'SW', 'SE'] as const).map(q => {
-                const here = places.filter(p => quadOf(p) === q);
+                const here = places.filter(p => quadOf(p) === q && !p.tags.includes('outside-calgary'));
                 const hoodCount = hoods.filter(h => h.quadrant === q).length;
                 return (
                   <div key={q} className={`lx-quad lx-quad-${q.toLowerCase()}${here.length ? ' has' : ''}`} style={{ gridColumn: QUADRANT_BOX[q][0] + 1, gridRow: QUADRANT_BOX[q][1] + 1 }}>
@@ -249,12 +202,13 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
                       <b>{q}</b>{hoodCount ? <small>{hoodCount} {hoodCount === 1 ? 'neighbourhood' : 'neighbourhoods'} <ArrowUpRight size={12} aria-hidden="true" /></small> : null}
                     </Link>
                     <div className="lx-pins">
-                      {here.map(p => (
+                      {here.slice(0, PINS).map(p => (
                         <Link key={p.id} to={entityPath(p)} className="lx-pin">
                           <span className="lx-pin-dot" aria-hidden="true"><MapPin size={16} /></span>
                           <span>{shortName(p.title)}<small>{p.neighbourhood}</small></span>
                         </Link>
                       ))}
+                      {here.length > PINS ? <a className="lx-pin lx-pin-more" href="#ld-dir"><span>+{here.length - PINS} more<small>on the shelves</small></span></a> : null}
                     </div>
                   </div>
                 );
@@ -304,28 +258,22 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
           </div>
         </section>
 
-        <section className="lx-pitch" aria-labelledby="lx-pitch">
+        <section className="lx-pitch ld-pitch" aria-labelledby="lx-pitch">
           <div className="lx-pitch-copy">
-            <p className="lx-eyebrow lx-eyebrow-ink">For Calgary businesses <span className="lx-free">Free</span></p>
-            <h2 id="lx-pitch">Run a place Calgarians <em>should know about?</em></h2>
-            <p>Every place here gets an illustrated storefront, a spot on this street, insider notes, and links to its neighbourhood, guides and nearby markets.</p>
+            <p className="lx-eyebrow lx-eyebrow-ink">For Calgary organizers and owners <span className="lx-free">Free</span></p>
+            <h2 id="lx-pitch">Is one of these <em>yours?</em></h2>
+            <p>Every profile is free. Claim yours and it becomes a verified organizer profile: you keep the details right, and every event and market you run carries your name.</p>
             <div className="lx-actions">
-              <Link className="lx-btn" to="/submit">Suggest a place <ArrowUpRight size={18} aria-hidden="true" /></Link>
-              <a className="lx-text-link" href="mailto:aldo@calgarywatch.ca?subject=Featured%20partner%20on%20CalgaryWatch%20Local">Ask about featured partner</a>
+              <Link className="lx-btn" to="/partners">Claim your profile <ArrowUpRight size={18} aria-hidden="true" /></Link>
+              <Link className="lx-text-link" to="/submit">Suggest someone we’re missing</Link>
             </div>
           </div>
-          <div className="lx-paths">
-            <div className="lx-path lx-path-pick">
-              <span className="lx-path-badge">Free</span>
-              <h3>Get picked</h3>
-              <p>We check your details against your official site and write it up. Picks can’t be bought.</p>
-            </div>
-            <div className="lx-path lx-path-partner">
-              <span className="lx-path-badge">Paid</span>
-              <h3>Featured partner</h3>
-              <p>A top spot with the same storefront, always labelled “Featured partner” and kept apart from our picks.</p>
-            </div>
-          </div>
+          <ol className="ld-steps">
+            <li><b>01</b><h3>Find your profile</h3><p>Open it from the shelves above and press “Claim this listing”.</p></li>
+            <li><b>02</b><h3>We check it’s you</h3><p>We check every claim by hand and match you to the organization.</p></li>
+            <li><b>03</b><h3>Run it yourself</h3><p>Keep your dates, hours and links right yourself. Your events show “Verified organizer”.</p></li>
+          </ol>
+          <p className="ld-pitch-foot">Our picks can’t be bought. Paid placement is always labelled “Featured partner”. <a href="mailto:aldo@calgarywatch.ca?subject=Featured%20partner%20on%20CalgaryWatch%20Local">Ask about featured partner</a></p>
         </section>
       </div>
     </div>

@@ -108,12 +108,12 @@
  * the lanes pause.
  */
 .lx-traffic { position: absolute; inset: 0; pointer-events: none; container-type: inline-size; }
-.lx-vehicle { position: absolute; left: var(--park, 50%); line-height: 0; transform-origin: 50% 100%; }
-.lx-vehicle svg { display: block; width: auto; height: auto; overflow: visible; }
+.lx-vehicle { position: absolute; left: var(--park, 50%); line-height: 0; }
+/* Size goes on the drawing, not the vehicle: a scale on the vehicle would also shrink
+   how far it drives and how far apart the lane spaces them. */
+.lx-vehicle svg { display: block; width: auto; height: auto; overflow: visible; transform-origin: 0 100%; scale: var(--size, 1); }
 .lx-lane-near { bottom: calc(var(--tear, 0px) + 6px); z-index: 2; }
-.lx-lane-far { bottom: calc(var(--tear, 0px) + (var(--road, 96px) - var(--walk, 0px)) / 2 - 4px); z-index: 1; scale: .8; }
-.lx-lane-far svg { transform: scaleX(-1); }
-.lx-lane-far svg text { transform: scaleX(-1); transform-box: fill-box; transform-origin: center; }
+.lx-lane-far { --size: .8; bottom: calc(var(--tear, 0px) + (var(--road, 96px) - var(--walk, 0px)) / 2 - 4px); z-index: 1; }
 @supports (width: 1cqw) {
   @media (prefers-reduced-motion: no-preference) {
     .lx-vehicle { left: 0; will-change: transform; }
@@ -383,8 +383,12 @@
   .cw-home2 .lx-hero .lx-title em { display: block; }
   .cw-home2 .lx-hero:not(.lp-hero) .lx-title { font-size: clamp(38px, 10.6vw, 46px); }
   .cw-home2 .lx-hero:not(.lp-hero) .lx-summary { font-size: 15px; margin: 12px 0 14px; }
+  .cw-home2 .lx-hero:not(.lp-hero) .lx-title { text-wrap: balance; }
+  /* Four filters fit on two rows; a sideways scroller hid the last one off the edge. */
+  .cw-home2 .lx-cats { flex-wrap: wrap; overflow: visible; margin: 14px 0 0; padding: 0; gap: 8px; }
   .lx-street { --walk: 30px; --road: 112px; --tear: 34px; display: flex; flex-direction: column; margin-top: 22px; }
-  .lx-swipe {
+  .cw-home2 .lx-hero:not(.lp-hero) .lx-street { margin-top: 22px; }
+  .lx-street > .lx-swipe {
     order: -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 16px 14px;
     font: 600 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
   }
@@ -410,8 +414,8 @@
   .lx-shop-sign b { font-size: 14px; }
   .lx-shop-sign small { font-size: 9px; }
   .lx-lamp { width: 22px; bottom: -26px; right: -11px; }
-  .lx-lane-near { scale: .56; }
-  .lx-lane-far { scale: .52; }
+  .lx-lane-near { --size: .56; }
+  .lx-lane-far { --size: .52; }
   /* Lighter on phones: two fewer vehicles, and no big blurred glows to composite. */
   .lx-lane-far.lx-v-van, .lx-lane-far.lx-v-car { display: none; }
   .lx-hero[data-night] .lx-shop-front { box-shadow: none; }
@@ -433,7 +437,7 @@
   .lx-day-tiles .lx-tile { flex: 0 0 78%; scroll-snap-align: start; box-shadow: 4px 4px 0 var(--ink); min-height: 150px; }
 
   .lx-book { margin-top: 84px; padding-bottom: 88px; }
-  .lx-swipe { display: inline-flex; align-items: center; gap: 4px; margin: -6px 0 14px !important; font: 600 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--yellow); }
+  .lx-book .lx-swipe { display: inline-flex; align-items: center; gap: 4px; margin: -6px 0 14px !important; font: 600 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--yellow); }
   .lx-grid { display: flex; gap: 14px; margin: 0 -16px; padding: 4px 16px 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px; scrollbar-width: none; }
   .lx-grid::-webkit-scrollbar { display: none; }
   .lx-card { flex: 0 0 84%; scroll-snap-align: start; box-shadow: 5px 5px 0 rgba(0, 0, 0, .55); }

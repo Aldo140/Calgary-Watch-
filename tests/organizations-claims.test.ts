@@ -9,6 +9,7 @@ import { claimFactsFor, claimLanguageProblems, NO_CLAIM } from '../scripts/ops/l
 import { entityPath, createDiscoveryRepository } from '../src/lib/discovery';
 import type { DiscoveryEntity, Event, Business } from '../src/types/discovery';
 import type { ListingClaim } from '../src/lib/claims';
+import { isReviewedReplacement } from '../src/lib/reviewedSource';
 const index = JSON.parse(readFileSync(new URL('../src/generated/discovery-index.json', import.meta.url), 'utf8'));
 const now = Date.parse('2026-10-15T12:00:00Z');
 const profile = index.entities.find((e: DiscoveryEntity) => e.id === 'biz-theatre-calgary') as Business;
@@ -57,6 +58,12 @@ describe('claim approval and Mercantile account regression', () => {
     const matches = index.entities.filter((e: DiscoveryEntity) => e.kind === 'event' && /Mercantile on 9th/i.test(e.title)); assert.equal(matches.length, 1);
     assert.equal(matches[0].id, claim().entityId); assert.equal(entityPath(matches[0]), claim().entityPath);
     assert.ok(createDiscoveryRepository(index.entities,index.occurrences).list().some(e=>e.id===claim().entityId));
+  });
+  it('lets the reviewed Mercantile correction replace its older stored source record', () => {
+    const reviewed={id:'6972906c904ecd4acb9407299e22',sourceId:'inglewood-bia',sourceRecordId:'mercantile-on-9th-2026-11-28',verification:'source-checked'};
+    assert.equal(isReviewedReplacement(reviewed,{...reviewed,verification:'source-feed'}),true);
+    assert.equal(isReviewedReplacement({...reviewed,sourceRecordId:'different'},reviewed),false);
+    assert.equal(isReviewedReplacement({...reviewed,verification:'source-feed'},reviewed),false);
   });
   for(const kind of ['event','market','business']) it(`${kind} uses one approval/claim model`, () => {
     const c={...claim(),entityId:`${kind}-id`}; const writes=claimApprovalWrites(c,{uid:c.uid},'admin',now);

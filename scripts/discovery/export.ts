@@ -7,13 +7,14 @@ import domain from '../../functions/discovery-domain.cjs';
 import { collectSources, editorialEntities } from './feeds';
 import { isCampusOnly } from '../../src/lib/eventRank';
 import { applyOwnerVerification, ownerVerification, type ClaimRecord, type VerifiedMarkRecord } from '../../src/lib/verified';
+import { isReviewedReplacement } from '../../src/lib/reviewedSource';
 
 /**
  * Builds src/generated/discovery-index.json for the site, from three inputs:
  *  1. Curated neighbourhoods, guides and local places (src/content/editorial-inventory.json).
  *  2. Events and markets fetched live from trusted organizer feeds at build time.
- *  3. Firestore: anything an editor published, and any draft/archive/cancel decision,
- *     which always overrides the feed copy of the same listing.
+ *  3. Firestore: anything an editor published, and any draft/archive/cancel decision.
+ *     A newer checked-in review of the exact source record can correct its stored copy.
  *  4. Firestore: approved listing claims, which mark a listing verified (src/lib/verified.ts).
  * Firestore is optional (local runs, outages); the build still ships 1 and 2.
  */
@@ -74,7 +75,9 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 // An editor's decision in Firestore wins over the feed copy of the same listing.
 const byId = new Map<string, Entity>(feed.entities.map(e => [e.id, e]));
 for (const e of stored.entities) {
-  if (e.status === 'published') byId.set(e.id, e);
+  // A checked-in reviewed correction for the exact same source record replaces
+  // its older ingested Firestore copy. Owner content is applied separately below.
+  if (e.status === 'published' && !isReviewedReplacement(byId.get(e.id), e)) byId.set(e.id, e);
   else if (e.status === 'draft' || e.status === 'archived') byId.delete(e.id);
 }
 // Reconcile partner confirmations before generic title/date deduplication can discard an older canonical ID.

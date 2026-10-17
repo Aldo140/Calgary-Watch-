@@ -50,7 +50,9 @@ export function mergeOrganizationContent(entities:readonly DiscoveryEntity[],row
     const {occurrences:_dates,...fields}=changes;
     const patch=Object.keys(fields).length?(row.submittedByAdmin?adminListingPatch:ownerEditPatch)(base,fields):{};
     const media=row.adminMedia&&Object.keys(row.adminMedia).length?adminListingPatch(base,row.adminMedia):{};
-    map.set(row.entityId,{...base,...patch,...media,...(managed?{organizerEntityId:row.organizationId}:{}),verifiedAt:row.entity.verifiedAt,verification:row.entity.verification,ownerVerifiedAt:row.entity.ownerVerifiedAt,updatedAt:row.entity.updatedAt});
+    const canonicalAssociation=(base.kind==='event'||base.kind==='market')?base.organizerEntityId:undefined;
+    const retainManagedAssociation=managed&&(!canonicalAssociation||canonicalAssociation===row.organizationId||row.createdInWorkspace===true);
+    map.set(row.entityId,{...base,...patch,...media,...(retainManagedAssociation?{organizerEntityId:row.organizationId}:{}),verifiedAt:row.entity.verifiedAt,verification:row.entity.verification,ownerVerifiedAt:row.entity.ownerVerifiedAt,updatedAt:row.entity.updatedAt});
   }
   return [...map.values()];
 }

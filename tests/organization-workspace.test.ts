@@ -173,6 +173,9 @@ test('private workspace events retain explicit server ownership after feed assoc
 test('an ordinary listing projection cannot override a canonical organizer association',()=>{
  const row={entityId:event.id,organizationId:'org-pretend',entity:{...event,title:'Wrong title',organizerEntityId:'org-pretend'},changes:{title:'Wrong title'},deleted:false,updatedAt:now,batchId:uuid};
  assert.equal(mergeOrganizationContent([event],[row])[0].title,event.title);
+ const stale={...row,workspaceAssociationConfirmed:true,submittedByAdmin:true};
+ const repaired=mergeOrganizationContent([event],[stale])[0] as Event;
+ assert.equal(repaired.title,'Wrong title');assert.equal(repaired.organizerEntityId,event.organizerEntityId);
 });
 test('legacy listing workspaces share the actual organization allowance rather than creating a second one',async()=>{
  const {standaloneOrganization}=await import('../src/lib/claimOrganization');const profile=standaloneOrganization(event as any),db=memory();

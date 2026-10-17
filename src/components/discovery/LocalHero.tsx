@@ -12,6 +12,7 @@ import { SkyGlyph } from '../home/WeekPlanner';
 import { ShopArt } from './ListingArt';
 import { useSkyOverlayRegistration } from '../../lib/skyOverlay';
 import { byVerified } from '../../lib/verified';
+import { SHELVES, type ShelfId } from '../../lib/localShelves';
 
 const dateline = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
 const shortDate = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
@@ -129,7 +130,7 @@ export function SkyDateline({ sky, where }: { sky: SkyState; where: string }) {
  * The /local hero: the homepage's live Calgary sky, with every place in the book
  * standing shoulder to shoulder along one street in front of downtown.
  */
-export function LocalHero({ places, category, counts, areas }: { places: Business[]; category?: string; counts: Record<string, number>; areas: number }) {
+export function LocalHero({ places, category, counts, areas, shelfCounts }: { places: Business[]; category?: string; counts: Record<string, number>; areas: number; shelfCounts?: Map<ShelfId, number> }) {
   const street = useMemo(() => places.slice().sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || byVerified(a, b) || a.title.localeCompare(b.title)), [places]);
   const total = counts.all ?? places.length;
 
@@ -140,16 +141,22 @@ export function LocalHero({ places, category, counts, areas }: { places: Busines
           <SkyDateline sky={sky} where="CalgaryWatch Local" />
           {category === 'services'
             ? <h1 id="lx-title" className="lx-title">The Calgarians to call <em>when something breaks.</em></h1>
-            : <h1 id="lx-title" className="lx-title">The places Calgarians <em>keep to themselves.</em></h1>}
+            : <h1 id="lx-title" className="lx-title">Calgary, by the people <em>who make it.</em></h1>}
           <p className="h-summary lx-summary">
             {category === 'services'
               ? 'Plumbers, furnace techs, snow removal and the rest, with what to ask before you hire. Picked by us, never sold.'
-              : <><b>{total} independent {total === 1 ? 'place' : 'places'}</b> in {areas} {areas === 1 ? 'neighbourhood' : 'neighbourhoods'}, each checked against its own site. Picked by us, never sold.</>}
+              : <><b>{total} {total === 1 ? 'profile' : 'profiles'}</b>: the stages, markets, galleries, community halls and corner shops behind the city, each checked against its own site. Picked by us, never sold.</>}
           </p>
-          <nav className="h-intents lx-cats" aria-label="Filter local places">
-            <Link to="/local" aria-current={!category ? 'page' : undefined}>Everything <i>{total}</i></Link>
-            {LOCAL_CATEGORIES.map(c => <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{cap(c)} <i>{counts[c] ?? 0}</i></Link>)}
-          </nav>
+          {shelfCounts ? (
+            <nav className="h-intents lx-cats ld-hero-shelves" aria-label="Jump to a shelf">
+              {SHELVES.filter(s => shelfCounts.get(s.id)).map(s => <a key={s.id} href={`#shelf-${s.id}`}>{s.label} <i>{shelfCounts.get(s.id)}</i></a>)}
+            </nav>
+          ) : (
+            <nav className="h-intents lx-cats" aria-label="Filter local places">
+              <Link to="/local" aria-current={!category ? 'page' : undefined}>Everything <i>{total}</i></Link>
+              {LOCAL_CATEGORIES.map(c => <Link key={c} to={`/local/${c}`} aria-current={category === c ? 'page' : undefined}>{cap(c)} <i>{counts[c] ?? 0}</i></Link>)}
+            </nav>
+          )}
         </div>
         {street.length ? <Scenery><Street places={street} night={sky.night} label="Every place in the book" /></Scenery> : null}
       </>}

@@ -28,6 +28,18 @@ An event or market is never verified on its own. When it is linked to a publishe
 
 Organization representatives can edit the profile's name, descriptions, address, website, contact email, phone, hours, social links, services and offer. Slug, verification, partner status, ranking and images stay with CalgaryWatch.
 
+### Scope review workflow
+
+For every event or market claim, use the evidence block in **Local partners → Claimed listings**:
+
+1. Confirm the listing names the organization as its organizer.
+2. Confirm the listing's official source domain belongs to that organization. A venue, neighbourhood, similarly named event or third-party calendar is not ownership evidence.
+3. If both match a published organization profile, accept the recommended organization scope. The claimant then manages that profile and its explicitly linked events and markets.
+4. If either signal is missing, keep listing-only access and research the organization's published contact. Create or correct the organization profile and listing relationship before expanding access.
+5. Deployment synchronizes the catalogue, then promotes existing approved claims. Review the workflow report for any failed migration; it preserves the original approval and email history.
+
+The admin UI keeps manual scope selection behind **Review or change scope** for exceptional cases, while the visible recommendation records the signals used by the normal path.
+
 ## Business accounts
 
 Claiming needs a CalgaryWatch account: the claim page asks for a Google sign-in, and the rules accept a claim only from a signed-in account with a verified email. When the claim is approved, that account becomes a **business account**: `accountType: 'business'`, the listings it manages (`businessListings`) and `businessSince` on `users/{uid}` (`src/lib/businessAccount.ts`).

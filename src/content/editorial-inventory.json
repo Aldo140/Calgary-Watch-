@@ -3205,6 +3205,56 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-17T00:44:59.309327Z"
+    },
+    {
+      "id": "biz-mercantile-on-9th",
+      "kind": "business",
+      "slug": "mercantile-on-9th",
+      "title": "The Mercantile on 9th",
+      "name": "The Mercantile on 9th",
+      "summary": "Inglewood's sustainability-minded seasonal artisan market, presented by The Apothecary in Inglewood.",
+      "description": "The Mercantile brings local makers, growers, artists and bakers together at the Alexandra Centre in Inglewood. The Apothecary in Inglewood created and presents the market.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "artisan market",
+        "local makers",
+        "sustainable",
+        "Inglewood"
+      ],
+      "sources": [
+        {
+          "name": "The Mercantile on 9th",
+          "url": "https://www.mercantileon9th.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T12:00:00.000Z"
+        },
+        {
+          "name": "The Apothecary in Inglewood",
+          "url": "https://the-apothecary.ca/pages/the-mercantile-on-9th",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T12:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T12:00:00.000Z",
+      "updatedAt": "2026-10-16T12:00:00.000Z",
+      "address": "922 9 Avenue SE, Calgary, AB",
+      "website": "https://www.mercantileon9th.ca/",
+      "email": "mercantile@the-apothecary.ca",
+      "images": [],
+      "socials": {
+        "instagram": "https://www.instagram.com/mercantileon9th/"
+      },
+      "services": [
+        "Seasonal artisan markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false
     }
   ]
 }

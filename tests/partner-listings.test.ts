@@ -122,7 +122,9 @@ describe('Mercantile on 9th', () => {
     const event = claimable(id);
     assert.equal(event?.kind, 'event');
     assert.equal(event && entityPath(event), '/events/mercantile-on-9th-697290');
-    assert.equal(generated.entities.filter(e => /mercantile on 9th/i.test(e.title)).length, 1);
+    assert.equal(generated.entities.filter(e => e.kind === 'event' && /mercantile on 9th/i.test(e.title)).length, 1);
+    assert.equal(event?.organizerEntityId, 'biz-mercantile-on-9th');
+    assert.equal(generated.entities.filter(e => e.id === 'biz-mercantile-on-9th' && e.kind === 'business').length, 1);
     assert.match(renderRouteHtml(shell, `/claim/${id}`, 'https://calgarywatch.ca'), /<h1>Run Mercantile on 9th\? Claim it\.<\/h1>/);
   });
 });

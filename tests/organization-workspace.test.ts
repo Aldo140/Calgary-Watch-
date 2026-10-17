@@ -214,13 +214,24 @@ test('failed approvals publish nothing and ordinary members cannot approve or ex
  assert.equal(db.data.get(`listing_claims/u_${org.id}`).status,'pending');assert.equal(db.data.has(`verified_listings/${org.id}`),false);assert.equal(db.data.get('users/u').accountType,undefined);
 });
 test('approved event claims move to their linked organizer; unlinked events keep their own workspace',async()=>{
- const {planOrganizerPromotions,promotionTargets,defaultOrganizationScope}=await import('../src/lib/organizerPromotion');
+ const {planOrganizerPromotions,promotionTargets,defaultOrganizationScope,reviewClaimScope}=await import('../src/lib/organizerPromotion');
  const loose=all.find(e=>(e.kind==='event'||e.kind==='market')&&!e.organizerEntityId&&e.status==='published')!;
  const rows=planOrganizerPromotions([{uid:'u',entityId:event.id,status:'approved'},{uid:'v',entityId:event.id,status:'approved'},{uid:'w',entityId:loose.id,status:'approved'},{uid:'x',entityId:org.id,status:'approved'},{uid:'y',entityId:event.id,status:'pending'},{uid:'z',entityId:event.id,status:'approved',approvedOrganizationId:org.id}],all);
  assert.deepEqual(rows.map(r=>r.action),['promote','promote','no-organizer','organization','organization']);
  assert.equal(rows[0].organizationId,org.id);
  assert.deepEqual(promotionTargets(rows).map(r=>r.uid),['u']);
  assert.equal(defaultOrganizationScope(event.id,all),org.id);assert.equal(defaultOrganizationScope(loose.id,all),undefined);assert.equal(defaultOrganizationScope(org.id,all),undefined);
+ const review=reviewClaimScope({uid:'u',entityId:event.id,status:'approved'},all);assert.equal(review.recommendation,'organization');assert.equal(review.organizationId,org.id);assert.equal(review.evidence.length,3);
+ const unlinked=reviewClaimScope({uid:'w',entityId:loose.id,status:'approved'},all);assert.equal(unlinked.recommendation,'listing-only');assert.match(unlinked.evidence[0],/No exact organizer link/);
+});
+
+test('the two researched scopes resolve to their official organization profiles',async()=>{
+ const {reviewClaimScope}=await import('../src/lib/organizerPromotion');
+ const dalhousie=all.find(e=>e.id==='b3bbb09ef98f18fa6f66383e98f1')!;
+ const mercantile=all.find(e=>e.id==='6972906c904ecd4acb9407299e22')!;
+ assert.equal(reviewClaimScope({uid:'dalhousie',entityId:dalhousie.id,status:'approved'},all).organizationId,'biz-dalhousie-community-association');
+ assert.equal(reviewClaimScope({uid:'mercantile',entityId:mercantile.id,status:'approved'},all).organizationId,'biz-mercantile-on-9th');
+ assert.notEqual((mercantile as any).organizerEntityId,'biz-inglewood-bia');
 });
 test('promotion gives every representative organization access and the organizer the Verified mark, preserving history',async()=>{
  const {promoteOrganizerClaims}=await import('../scripts/claims/promote-organizer-claims');const db=memory();

@@ -11826,8 +11826,8 @@
       "kind": "event",
       "slug": "mercantile-on-9th-697290",
       "title": "Mercantile on 9th",
-      "summary": "Inglewood's holiday street market: local makers and sustainable gifts along 9 Avenue SE.",
-      "description": "A one-day sustainable holiday market along 9 Avenue SE in Inglewood, 11 am to 6 pm, run by the Inglewood Business Improvement Area.",
+      "summary": "The Mercantile's indoor-outdoor holiday market of local makers, artists and bakers in Inglewood.",
+      "description": "A one-day holiday edition of The Mercantile, Calgary's sustainability-minded artisan market. Entry is free with a donation to a local charity.",
       "categories": [
         "market",
         "shopping",
@@ -11839,8 +11839,8 @@
       ],
       "sources": [
         {
-          "name": "Inglewood Business Improvement Area",
-          "url": "https://www.inglewoodyyc.ca/",
+          "name": "The Mercantile on 9th",
+          "url": "https://www.mercantileon9th.ca/vendors",
           "kind": "official",
           "retrievedAt": "2026-10-17T00:45:53.330Z"
         }
@@ -11853,15 +11853,15 @@
       "sourceId": "inglewood-bia",
       "sourceRecordId": "mercantile-on-9th-2026-11-28",
       "neighbourhood": "Inglewood",
-      "address": "9 Avenue SE, Calgary, AB",
-      "venue": "9 Avenue SE, Inglewood",
+      "address": "922 9 Avenue SE, Calgary, AB",
+      "venue": "Alexandra Centre Society",
       "start": "2026-11-28T11:00:00-07:00",
-      "end": "2026-11-28T18:00:00-07:00",
+      "end": "2026-11-28T16:00:00-07:00",
       "timezone": "America/Edmonton",
       "pricing": "free",
-      "organizer": "Inglewood BIA",
+      "organizer": "The Mercantile on 9th",
       "cancelled": false,
-      "organizerEntityId": "biz-inglewood-bia"
+      "organizerEntityId": "biz-mercantile-on-9th"
     },
     {
       "id": "23a7a3c1b052dbc5d7201637ebb0",
@@ -15656,6 +15656,56 @@
       "organizer": "Deerfoot City",
       "cancelled": false,
       "organizerEntityId": "biz-deerfoot-city"
+    },
+    {
+      "id": "biz-mercantile-on-9th",
+      "kind": "business",
+      "slug": "mercantile-on-9th",
+      "title": "The Mercantile on 9th",
+      "name": "The Mercantile on 9th",
+      "summary": "Inglewood's sustainability-minded seasonal artisan market, presented by The Apothecary in Inglewood.",
+      "description": "The Mercantile brings local makers, growers, artists and bakers together at the Alexandra Centre in Inglewood. The Apothecary in Inglewood created and presents the market.",
+      "categories": [
+        "markets",
+        "shopping"
+      ],
+      "tags": [
+        "artisan market",
+        "local makers",
+        "sustainable",
+        "Inglewood"
+      ],
+      "sources": [
+        {
+          "name": "The Mercantile on 9th",
+          "url": "https://www.mercantileon9th.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T12:00:00.000Z"
+        },
+        {
+          "name": "The Apothecary in Inglewood",
+          "url": "https://the-apothecary.ca/pages/the-mercantile-on-9th",
+          "kind": "official",
+          "retrievedAt": "2026-10-16T12:00:00.000Z"
+        }
+      ],
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-16T12:00:00.000Z",
+      "updatedAt": "2026-10-16T12:00:00.000Z",
+      "address": "922 9 Avenue SE, Calgary, AB",
+      "website": "https://www.mercantileon9th.ca/",
+      "email": "mercantile@the-apothecary.ca",
+      "images": [],
+      "socials": {
+        "instagram": "https://www.instagram.com/mercantileon9th/"
+      },
+      "services": [
+        "Seasonal artisan markets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false
     }
   ],
   "occurrences": [

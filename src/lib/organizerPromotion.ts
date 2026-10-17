@@ -15,6 +15,41 @@ export type PromotionRow = {
   organizationId?: string; organizationTitle?: string; organizer?: string;
 };
 
+export type ScopeReview = {
+  recommendation: 'organization' | 'listing-only' | 'already-set';
+  organizationId?: string;
+  organizationTitle?: string;
+  evidence: string[];
+};
+
+/**
+ * Gives the admin a reviewable explanation for the access decision. The linked
+ * organizer is already produced by associateOrganizers from an exact organizer
+ * name and official source domain; this function never widens that evidence.
+ */
+export function reviewClaimScope(claim: PromotionClaim, entities: readonly DiscoveryEntity[]): ScopeReview {
+  const listing = entities.find(entity => entity.id === claim.entityId);
+  if (claim.approvedOrganizationId) {
+    const organization = entities.find(entity => entity.kind === 'business' && entity.id === claim.approvedOrganizationId);
+    return { recommendation: 'already-set', organizationId: claim.approvedOrganizationId, organizationTitle: organization?.title, evidence: ['Organization access is already recorded on this claim.'] };
+  }
+  if (listing?.kind === 'business') return { recommendation: 'organization', organizationId: listing.id, organizationTitle: listing.title, evidence: ['The claimed listing is the organization profile itself.'] };
+  if (!listing || (listing.kind !== 'event' && listing.kind !== 'market')) return { recommendation: 'listing-only', evidence: ['No published event or market is available to connect to an organization.'] };
+  const organization = listingOrganization(listing, entities);
+  if (!organization) return { recommendation: 'listing-only', evidence: ['No exact organizer link is published. Keep access to this listing until the official relationship is documented.'] };
+  const official = listing.sources.find(source => source.kind === 'official');
+  let officialHost = '';
+  try { officialHost = official ? new URL(official.url).hostname.replace(/^www\./, '') : ''; } catch { /* invalid sources cannot become evidence */ }
+  return {
+    recommendation: 'organization', organizationId: organization.id, organizationTitle: organization.title,
+    evidence: [
+      `The listing names ${listing.organizer} as organizer.`,
+      officialHost ? `Its official source is ${officialHost}.` : 'The listing has an official organizer source.',
+      'The organizer profile matches both the exact organizer name and official source domain.',
+    ],
+  };
+}
+
 export function planOrganizerPromotions(claims: readonly PromotionClaim[], entities: readonly DiscoveryEntity[]): PromotionRow[] {
   return claims.filter(c => c.status === 'approved' && c.uid && c.entityId).map(c => {
     const base = { claimId: `${c.uid}_${c.entityId}`, uid: c.uid, entityId: c.entityId, entityTitle: c.entityTitle ?? c.entityId };

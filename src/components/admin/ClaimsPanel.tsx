@@ -19,7 +19,7 @@ import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence,
 import {claimApprovalWrites} from '@/src/lib/claimApproval';
 import { APPROVAL_EMAILS_SINCE, type ApprovalEmailStatus } from '@/src/lib/claimApprovalEmail';
 import { businessAccountPatch, businessAccountsFromClaims } from '@/src/lib/businessAccount';
-import { defaultOrganizationScope } from '@/src/lib/organizerPromotion';
+import { defaultOrganizationScope, reviewClaimScope } from '@/src/lib/organizerPromotion';
 import type { PartnerLead } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Panel, T, TimeAgo, mono } from './ui';
 
@@ -82,7 +82,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       if (approve) {
         if (!entities.has(c.entityId)) throw new Error('This listing is not in the published inventory. Restore the canonical listing before approving.');
         // Verification belongs to the organizer: a linked organization profile is the default scope.
-        const chosen=entities.get(c.entityId)?.kind==='business'?undefined:(scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??(c.status==='pending'?defaultOrganizationScope(c.entityId,[...entities.values()]):undefined))||undefined;
+        const chosen=entities.get(c.entityId)?.kind==='business'?undefined:(scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??defaultOrganizationScope(c.entityId,[...entities.values()]))||undefined;
         const expand=Boolean(chosen);
         let response: {data:{account:Record<string,unknown>;accounts:Array<{uid:string;account:Record<string,unknown>}>;moved:number}};
         if (expand) {
@@ -175,6 +175,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
 
       {claims?.map((c) => {
         const entity = entities.get(c.entityId);
+        const scopeReview = reviewClaimScope(c, [...entities.values()]);
         const ev = claimEvidence({ accountEmail: c.accountEmail, workEmail: c.workEmail, sources: entity?.sources ?? [] });
         const copy = EVIDENCE_COPY[ev];
         return (
@@ -191,14 +192,11 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             {entity?.kind==='business'?<div className="rounded-lg border p-3 text-sm" style={{borderColor:T.line,background:T.surface}}>
               <strong style={{color:T.ink}}>Organization access: {entity.title}</strong>
               <p className="mt-1" style={{color:T.muted}}>Approval lets this representative manage the organization profile and its linked events and markets. It does not give access to other organizations.</p>
-            </div>:<label className="grid gap-2 text-sm" style={{color:T.ink}}>
-              <span className="font-semibold">Organization management access</span>
-              <select aria-label="Organization management access" className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??defaultOrganizationScope(c.entityId,[...entities.values()])??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}>
-                <option value="">This listing’s organizer workspace only</option>
-                {[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title} — profile and linked events</option>)}
-              </select>
-              <span className="text-xs" style={{color:T.muted}}>Choose a wider organization only after confirming the claimant represents it. Sharing a venue does not establish ownership.</span>
-            </label>}
+            </div>:<div className="rounded-lg border p-3 text-sm space-y-2" style={{borderColor:T.line,background:T.surface,color:T.ink}}>
+              <div className="flex flex-wrap items-center gap-2"><Chip tone={scopeReview.recommendation==='organization'?'ok':'attention'}>{scopeReview.recommendation==='organization'?'Recommended':'Research required'}</Chip><strong>{scopeReview.organizationTitle?`Organization access: ${scopeReview.organizationTitle}`:'Keep listing-only access'}</strong></div>
+              <ul className="list-disc pl-5 text-xs space-y-1" style={{color:T.muted}}>{scopeReview.evidence.map(item=><li key={item}>{item}</li>)}</ul>
+              <details><summary className="cursor-pointer text-xs font-semibold" style={{color:T.signal}}>Review or change scope</summary><label className="mt-2 grid gap-2"><span className="sr-only">Organization management access</span><select aria-label="Organization management access" className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??defaultOrganizationScope(c.entityId,[...entities.values()])??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">This listing’s organizer workspace only</option>{[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title} — profile and linked events</option>)}</select><span className="text-xs" style={{color:T.muted}}>Only select a different organization after checking its published contact. A shared venue is not ownership.</span></label></details>
+            </div>}
             <div className="flex flex-wrap gap-2">
               <AdminButton tone="ok" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}><BadgeCheck size={15} /> Approve</AdminButton>
               <a className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: T.line, color: T.ink }}
@@ -238,18 +236,19 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             <span>Each claimant’s account is a business account. Claims approved before that existed can be brought in line here.</span>
             <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void markAllBusiness()}><BadgeCheck size={14} /> {busy === 'accounts' ? 'Marking…' : 'Mark business accounts'}</AdminButton>
           </div>
-          {verified.map((c) => (
-            <div key={c.entityId + c.uid} className="px-4 pb-3 text-xs flex flex-wrap gap-x-3 gap-y-1" style={{ color: T.muted }}>
+          {verified.map((c) => {
+            const scopeReview=reviewClaimScope(c,[...entities.values()]);
+            return <div key={c.entityId + c.uid} className="px-4 pb-4 text-xs flex flex-wrap gap-x-3 gap-y-2" style={{ color: T.muted }}>
               <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
               <span>{c.approvedOrganizationId?`Organization: ${entities.get(c.approvedOrganizationId)?.title??c.approvedOrganizationId}`:entities.get(c.entityId)?.kind==='business'?'Organization profile and linked events':'Organizer workspace for this listing; existing unrelated listings are excluded'}</span>
-              {entities.get(c.entityId)?.kind!=='business'?<label className="grid w-full max-w-xl gap-1">Confirm organization access <select aria-label={`Organization access for ${c.entityTitle}`} className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep current scope</option>{[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label>:null}
+              {entities.get(c.entityId)?.kind!=='business'&&scopeReview.recommendation!=='already-set'?<div className="w-full max-w-2xl rounded-lg border p-3 space-y-2" style={{borderColor:T.line,background:T.surface}}><div className="flex flex-wrap items-center gap-2"><Chip tone={scopeReview.recommendation==='organization'?'ok':'attention'}>{scopeReview.recommendation==='organization'?'Recommended scope':'Research required'}</Chip><strong style={{color:T.ink}}>{scopeReview.organizationTitle??'Listing-only access'}</strong></div><ul className="list-disc pl-5 space-y-1">{scopeReview.evidence.map(item=><li key={item}>{item}</li>)}</ul><details><summary className="cursor-pointer font-semibold" style={{color:T.signal}}>Review or change scope</summary><label className="mt-2 grid gap-1"><span className="sr-only">Confirm organization access</span><select aria-label={`Organization access for ${c.entityTitle}`} className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??scopeReview.organizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep listing-only access</option>{[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label></details></div>:null}
               <Link to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
-              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>{scope[c.uid+'_'+c.entityId]?'Save organization access & repair':'Repair verification & account'}</AdminButton>
+              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>{(scope[c.uid+'_'+c.entityId]??scopeReview.organizationId)?'Confirm recommended access':'Repair verification & account'}</AdminButton>
               {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
-            </div>
-          ))}
+            </div>;
+          })}
         </details>
       ) : null}
     </Panel>

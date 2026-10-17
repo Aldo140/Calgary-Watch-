@@ -48,3 +48,18 @@ export function summarizeDemand(rows: Array<{ q: string; results: number; ts: nu
   }
   return [...by.values()].sort((a, b) => b.searches - a.searches || b.lastAt - a.lastAt);
 }
+
+export interface SearchDemandRecord { q: string; results: number; ts: number }
+/** Firestore casts do not validate stored analytics, including legacy/admin-written rows. */
+export function readDemandRecords(values: readonly unknown[]): { rows: SearchDemandRecord[]; ignored: number } {
+  const rows: SearchDemandRecord[] = [];
+  for (const value of values) {
+    if (!value || typeof value !== 'object') continue;
+    const r = value as Record<string, unknown>;
+    if (typeof r.q !== 'string' || typeof r.results !== 'number' || !Number.isInteger(r.results) || r.results < 0 || r.results > 999 || typeof r.ts !== 'number' || !Number.isFinite(r.ts) || r.ts <= 0) continue;
+    const q = demandQuery(r.q);
+    if (!q) continue;
+    rows.push({ q, results: r.results, ts: r.ts });
+  }
+  return { rows, ignored: values.length - rows.length };
+}

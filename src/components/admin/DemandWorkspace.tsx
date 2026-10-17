@@ -3,7 +3,7 @@ import { collection, getDocs, limit, orderBy, query, where } from 'firebase/fire
 import { Link } from 'react-router-dom';
 import { Search, SearchX } from 'lucide-react';
 import { db } from '../../firebase';
-import { SEARCH_DEMAND, summarizeDemand, type DemandRow } from '../../lib/searchDemand';
+import { SEARCH_DEMAND, summarizeDemand, readDemandRecords, type DemandRow } from '../../lib/searchDemand';
 import { describeAnswer, parseSearchIntent } from '../../lib/searchIntent';
 import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, mono } from './ui';
 
@@ -19,6 +19,7 @@ export function DemandWorkspace() {
   const [days, setDays] = useState<(typeof WINDOWS)[number]>(30);
   const [rows, setRows] = useState<Array<{ q: string; results: number; ts: number }> | null>(null);
   const [error, setError] = useState('');
+  const [ignored,setIgnored]=useState(0);
   const [attempt,setAttempt]=useState(0);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export function DemandWorkspace() {
     let live = true;
     setRows(null); setError('');
     getDocs(query(collection(db, SEARCH_DEMAND), where('ts', '>=', Date.now() - days * 86_400_000), orderBy('ts', 'desc'), limit(2000)))
-      .then((snap) => { if (live) setRows(snap.docs.map((d) => d.data() as { q: string; results: number; ts: number })); })
+      .then((snap) => { if (live) {const parsed=readDemandRecords(snap.docs.map(d=>d.data()));setRows(parsed.rows);setIgnored(parsed.ignored);} })
       .catch((e) => { if (live) { setError(e instanceof Error ? e.message : 'Could not load searches.'); } });
     return () => { live = false; };
   }, [days,attempt]);
@@ -44,6 +45,7 @@ export function DemandWorkspace() {
         <span className="text-xs" style={{ color: T.muted }}>Anonymous: the words and the result count only.</span>
       </div>
       {error ? <Panel title="Couldn’t load searches"><AdminButton variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry searches</AdminButton><p className="p-4 text-sm" style={{ color: T.critical }}>{error} If this says permission denied, deploy the Firestore rules (Deploy Firebase Backend → rules).</p></Panel> : null}
+      {ignored>0&&!error?<p role="status" className="admin-read-warning">{ignored} invalid or unsupported search records were excluded. Totals below use valid records only.</p>:null}
       {!error&&<>
       <StatGrid>
         <StatTile label="Searches" value={rows ? total : null} hint={`Last ${days} days`} />
@@ -55,7 +57,7 @@ export function DemandWorkspace() {
         <Panel title="Looked for, not found" subtitle="What to list next. Each is a real search that came back empty.">
           {rows === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
             : misses.length ? <TermList rows={misses.slice(0, 25)} miss />
-            : <EmptyState icon={<SearchX size={20} />} title="Nothing missed" body="Every recent search found at least one listing." />}
+            : <EmptyState icon={<SearchX size={20} />} title={total?"Nothing missed":"No searches yet"} body={total?"Every recent search found at least one listing.":"Searches appear here once people use the site search."} />}
         </Panel>
         <Panel title="Most searched" subtitle="Open a term to see what a resident sees.">
           {rows === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
@@ -81,7 +83,11 @@ function TermList({ rows, miss = false }: { rows: DemandRow[]; miss?: boolean })
       {rows.map((r) => {
         // Searches recorded before search understood neighbourhoods, streets and
         // "yesterday police" stay at 0 found; say what the same words get today.
-        const now = r.lastResults === 0 ? describeAnswer(parseSearchIntent(r.q)) : null;
+        let now:string|null=null;
+        if(r.lastResults===0){
+          try{now=describeAnswer(parseSearchIntent(r.q));}
+          catch(error){console.warn('[admin search] Answer preview unavailable',error);}
+        }
         return (
           <li key={r.q} className="flex items-center gap-3 px-4 py-2.5">
             <div className="min-w-0 flex-1">

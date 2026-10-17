@@ -28,7 +28,7 @@ export function OwnerEditsPanel() {
     {loading?<p role="status">Loading business updates…</p>:null}
     {!loading&&!error&&rows?.length===0?<p>No business updates yet.</p>:null}
     {rows?.map(row=><article key={row.id} className="border-t py-3 space-y-2">
-      <div className="flex gap-2 items-center"><strong>{row.entityTitle}</strong><Chip tone={row.status==='failed'?'critical':row.status==='applied'?'ok':'attention'}>{row.status==='applied'?(row.publishedAt?'Published automatically':'Applied; awaiting release'):row.status==='failed'?'Could not apply':'Queued automatically'}</Chip>{row.notificationPending?<Chip tone="signal">New</Chip>:null}</div>
+      <div className="flex flex-wrap gap-2 items-center"><strong>{row.entityTitle}</strong><Chip tone={row.status==='failed'?'critical':row.status==='applied'?'ok':'attention'}>{row.status==='applied'?(row.publishedAt?'Published automatically':'Applied; awaiting release'):row.status==='failed'?'Could not apply':'Queued automatically'}</Chip>{row.notificationPending?<Chip tone="signal">New</Chip>:null}</div>
       {(row as OwnerEdit & {actorRole?:string}).actorRole==='admin'?<p>Administrator edit · actor {row.uid}. Business weekly allowance unchanged.</p>:null}
       <Link to={`/plans?as=${encodeURIComponent((row as OwnerEdit & {subjectUid?:string}).subjectUid||row.uid)}`}>View member’s dashboard</Link>
       <p>{row.status==='failed'?row.error:(row as OwnerEdit & {live?:boolean}).live?'Published immediately as one organization submission. No approval required.':'No admin approval is required. Public pages update when the automatic Hosting release succeeds.'}</p>

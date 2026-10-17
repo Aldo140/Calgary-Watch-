@@ -1,3 +1,7 @@
+import {discoveryRepository} from '../../data/discovery';
+import {adminInventory,matchesAdminInventory,type AdminInventoryRow} from '../../lib/adminInventory';
+import {entityPath} from '../../lib/discovery';
+import {Link} from 'react-router-dom';
 import { firestoreActionError } from '@/src/lib/firestoreErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
@@ -9,7 +13,7 @@ import { manageDiscovery } from '../../lib/discoveryApi';
 import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, T, TimeAgo, mono } from './ui';
 import '../../styles/discovery.css';
 
-type RecordRow = DiscoveryEntity & { revision: number; duplicateIds?: string[] };
+type RecordRow = AdminInventoryRow;
 type Raw = { entityId: string; input: InventorySubmissionInput; sourceId: string; sourceRecordId: string; cancelled: boolean };
 type Source = { id: string; name: string; approved: boolean };
 type QueuedAction = { id: string; status: 'pending' | 'applied' | 'failed'; createdAt: number; error?: string; action: { action?: string; id?: string; kind?: string } };
@@ -29,12 +33,13 @@ const STATUS_TONE = { pending: 'attention', draft: 'neutral', published: 'ok', a
  * record on every visit).
  */
 export function DiscoveryContent() {
+  const[search,setSearch]=useState('');
   const [records, setRecords] = useState<RecordRow[]>([]);
   const [submissions, setSubmissions] = useState<EntitySubmission[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [queue, setQueue] = useState<QueuedAction[]>([]);
   const [filter, setFilter] = useState<(typeof STATUSES)[number]>('pending');
-  const [kind, setKind] = useState<'all' | 'event' | 'market'>('all');
+  const [kind, setKind] = useState<'all' | 'event' | 'market' | 'business'>('all');
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState('');
@@ -44,7 +49,7 @@ export function DiscoveryContent() {
 
   async function load() {
     if (!db) { setLoaded(true); return; }
-    const database = db;
+    const database = db;setError('');
     const [events, markets, subs, srcs, actions] = await Promise.all([
       getDocs(collection(database, 'events')),
       getDocs(collection(database, 'markets')),
@@ -52,7 +57,7 @@ export function DiscoveryContent() {
       getDocs(collection(database, 'discovery_sources')),
       getDocs(query(collection(database, 'discovery_actions'), orderBy('createdAt', 'desc'), limit(8))).catch(() => null),
     ]);
-    setRecords([...events.docs, ...markets.docs].map((d) => d.data() as RecordRow));
+    setRecords(adminInventory([...events.docs, ...markets.docs].map((d)=>({...d.data(),id:d.id}) as RecordRow),discoveryRepository.list()));
     setSubmissions(subs.docs.map((d) => d.data() as EntitySubmission));
     setSources(srcs.docs.map((d) => d.data() as Source));
     setQueue(actions ? actions.docs.map((d) => d.data() as QueuedAction) : []);
@@ -87,7 +92,7 @@ export function DiscoveryContent() {
   }
 
   const counts = useMemo(() => Object.fromEntries(STATUSES.map((s) => [s, records.filter((r) => r.status === s && (kind === 'all' || r.kind === kind)).length])) as Record<string, number>, [records, kind]);
-  const shown = records.filter((r) => r.status === filter && (kind === 'all' || r.kind === kind)).sort((a, b) => (a.title > b.title ? 1 : -1));
+  const shown = records.filter((r) => r.status === filter && (kind === 'all' || r.kind === kind) && matchesAdminInventory(r,search)).sort((a, b) => (a.title > b.title ? 1 : -1));
   const approvedSources = sources.filter((s) => s.approved);
   const pendingQueue = queue.filter((q) => q.status === 'pending').length;
 
@@ -129,7 +134,7 @@ export function DiscoveryContent() {
       ) : null}
 
       <Panel title="Suggested by residents" subtitle="People waiting to hear back. Check the source, then approve or reject." action={submissions.length ? <Chip tone="attention">{submissions.length} waiting</Chip> : undefined}>
-        {!loaded ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+        {error?<p className="p-4">Suggestions could not be confirmed. Refresh to try again.</p>:!loaded ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
           : submissions.length ? (
             <ul className="divide-y" style={{ borderColor: T.line }}>
               {submissions.map((s) => (
@@ -151,13 +156,14 @@ export function DiscoveryContent() {
           ) : <EmptyState icon={<Inbox size={20} />} title="No suggestions waiting" body="When residents share an event or market from /submit, it lands here." />}
       </Panel>
 
-      <Panel title="Listings" subtitle="Imported from organizer feeds and saved here">
+      <Panel title="Listings" subtitle="Backend inventory plus published listings from this release. Published-only records link to their organization editor.">
         <div className="px-4 pt-3 space-y-2">
+          <label className="block text-xs font-semibold">Search listings<input aria-label="Search listings" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Name, organizer or source" className="block w-full border rounded-lg p-3 mt-1" /></label>
           <FilterRow>
             {STATUSES.map((s) => <FilterChip key={s} active={filter === s} onClick={() => setFilter(s)} count={counts[s]}>{s[0].toUpperCase() + s.slice(1)}</FilterChip>)}
           </FilterRow>
           <FilterRow>
-            {(['all', 'event', 'market'] as const).map((k) => <FilterChip key={k} active={kind === k} onClick={() => setKind(k)}>{k === 'all' ? 'Everything' : k === 'event' ? 'Events' : 'Markets'}</FilterChip>)}
+            {(['all', 'event', 'market','business'] as const).map((k) => <FilterChip key={k} active={kind === k} onClick={() => setKind(k)}>{k === 'all' ? 'Everything' : k === 'event' ? 'Events' : k==='business'?'Organizations & businesses':'Markets'}</FilterChip>)}
           </FilterRow>
           {filter === 'pending' && shown.some((r) => r.duplicateIds?.length) ? (
             <label className="flex items-center gap-2 text-xs font-semibold py-1" style={{ color: T.attention }}>
@@ -165,7 +171,7 @@ export function DiscoveryContent() {
             </label>
           ) : null}
         </div>
-        {shown.length ? (
+        {error?<p className="p-4">Inventory could not be refreshed. Existing data may be out of date.</p>:shown.length ? (
           <ul className="divide-y mt-2" style={{ borderColor: T.line }}>
             {shown.map((r) => (
               <li key={r.id} className="p-4">
@@ -183,6 +189,8 @@ export function DiscoveryContent() {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5 sm:pl-11">
+                  <Link to={entityPath(r)} className="inline-flex items-center px-3 py-2 font-semibold text-xs underline">Public listing</Link>
+                  {r.snapshotOnly?<><Chip>Published release</Chip><Link to={`/claim/${encodeURIComponent(r.id)}`} className="inline-flex items-center px-3 py-2 font-semibold text-xs underline">Open management access</Link></>:<>
                   <AdminButton size="sm" variant="outline" tone="neutral" disabled={busy} onClick={() => void openRecord(r)}>Edit</AdminButton>
                   {(['publish', 'draft', 'archive', 'cancel'] as const).filter((a) => !(a === 'publish' && r.status === 'published') && !(a === 'draft' && r.status === 'draft')).map((a) => (
                     <AdminButton key={a} size="sm" tone={a === 'publish' ? 'ok' : a === 'cancel' ? 'critical' : 'neutral'} variant={a === 'publish' ? 'solid' : 'outline'}
@@ -190,7 +198,7 @@ export function DiscoveryContent() {
                       onClick={() => act({ kind: r.kind, id: r.id, revision: r.revision, action: a, acknowledgeDuplicates: ack })}>
                       {ACTION_LABEL[a]}
                     </AdminButton>
-                  ))}
+                  ))}</>}
                 </div>
               </li>
             ))}

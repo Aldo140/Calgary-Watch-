@@ -1,3 +1,4 @@
+import {useAdminView} from '../../hooks/useAdminView';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { ThursdayPicksPanel, useThursdayData } from './ThursdayPicksPanel';
 import { EmailGallery, useEmailManifest } from './EmailGallery';
@@ -279,7 +280,7 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
   const emailCases = useEmailManifest();
   const [galleryFile, setGalleryFile] = useState('digest.html');
   const weeks = useMemo(() => upcomingDigestWeeks(Date.now(), 8), []);
-  const [plannerView, setPlannerView] = useState<PlannerView>('overview');
+  const [plannerView, setPlannerView] = useAdminView(['overview','emails','readers','compose','replies','rules'] as const,'overview');
   const [plans, setPlans] = useState<Record<string, DigestContribution>>({});
   const [selectedWeek, setSelectedWeek] = useState(weeks[0]?.weekKey ?? '');
   const [loadedPlan, setLoadedPlan] = useState<DigestContribution | null>(null);
@@ -742,6 +743,7 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
         ))}
       </nav>
 
+      {thursdayData.errors?.length?<div role="alert" className="admin-read-warning">{thursdayData.errors.join(' ')}</div>:null}
       {plannerView === 'emails' && <EmailGallery cases={emailCases} selected={galleryFile} onSelect={setGalleryFile} aboveFrame={(file) => (file === 'alert.html' ? <PushNotificationPreview /> : null)} />}
 
       {plannerView === 'replies' && <DigestReplyInbox />}
@@ -840,8 +842,8 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
           </div>
           <div className="ep-ready-row">
             <span className="ep-ready-icon" style={{ background: !PROOF_SERVICE_ENABLED ? '#ffe1de' : '#fff' }}><ShieldCheck size={17} /></span>
-            <div>{!PROOF_SERVICE_ENABLED ? <><h4 style={{ color: T.critical }}>Admin proof needs Firebase Blaze</h4><p>Cloud Functions is enabled, but Firebase is still on the free Spark plan. Upgrade, then deploy the proof function. Subscriber sends are separate and unaffected.</p></> : nextPlan && selectedWeek === nextWeek?.weekKey ? <DeliveryStatus request={latestTest} /> : <><h4>Admin proof</h4><p>{nextPlan ? 'Proof history is attached to the approved edition.' : 'Proofs are sent only when an opening note is published, updated or removed.'}</p></>}</div>
-            {!PROOF_SERVICE_ENABLED ? <a className="ep-btn" href="https://console.firebase.google.com/project/calgary-map-e70bb/usage/details" target="_blank" rel="noreferrer">Upgrade</a> : nextPlan && selectedWeek === nextWeek?.weekKey ? <button type="button" className="ep-btn" onClick={() => void resendTest()} disabled={dirty || hasRemoteChange || saveState === 'saving'}>{saveState === 'saving' ? <Loader2 size={13} className="motion-safe:animate-spin" /> : <Send size={13} />} Send test</button> : <span />}
+            <div>{!PROOF_SERVICE_ENABLED ? <><h4 style={{ color: T.critical }}>Admin proof service is not enabled</h4><p>Deploy the proof function, set the repository variable DIGEST_PROOF_ENABLED, and rebuild the site. This screen cannot determine the Firebase billing plan.</p></> : nextPlan && selectedWeek === nextWeek?.weekKey ? <DeliveryStatus request={latestTest} /> : <><h4>Admin proof</h4><p>{nextPlan ? 'Proof history is attached to the approved edition.' : 'Proofs are sent only when an opening note is published, updated or removed.'}</p></>}</div>
+            {!PROOF_SERVICE_ENABLED ? <a className="ep-btn" href="https://github.com/Aldo140/Calgary-Watch-/actions/workflows/deploy-firebase-backend.yml" target="_blank" rel="noreferrer">Backend setup</a> : nextPlan && selectedWeek === nextWeek?.weekKey ? <button type="button" className="ep-btn" onClick={() => void resendTest()} disabled={dirty || hasRemoteChange || saveState === 'saving'}>{saveState === 'saving' ? <Loader2 size={13} className="motion-safe:animate-spin" /> : <Send size={13} />} Send test</button> : <span />}
           </div>
           {message && <div className="ep-ready-row"><span /><p role="status" className="text-xs" style={{ color: toneColor[messageTone] }}>{message}</p><span /></div>}
         </section>
@@ -1073,7 +1075,7 @@ export function WeeklyEmailPlanner({ profiles: liveProfiles, profilesLoading: li
             <div className="border-t pt-4" style={{ borderColor: T.line }}>
               <div className="flex flex-wrap items-center gap-2">
                 <AdminButton type="submit" tone="signal" disabled={!canSubmit}>{saveState === 'saving' ? <><Loader2 size={14} className="motion-safe:animate-spin" /> Working…</> : <><Send size={14} /> Approve & send test</>}</AdminButton>
-                {loadedPlan && <AdminButton variant="outline" size="sm" onClick={() => void resendTest()} disabled={!PROOF_SERVICE_ENABLED || dirty || hasRemoteChange || saveState === 'saving'} title={!PROOF_SERVICE_ENABLED ? 'Upgrade Firebase to Blaze and deploy the proof function first' : undefined}><RefreshCw size={13} /> Send test again</AdminButton>}
+                {loadedPlan && <AdminButton variant="outline" size="sm" onClick={() => void resendTest()} disabled={!PROOF_SERVICE_ENABLED || dirty || hasRemoteChange || saveState === 'saving'} title={!PROOF_SERVICE_ENABLED ? 'Deploy the proof function and enable DIGEST_PROOF_ENABLED before rebuilding' : undefined}><RefreshCw size={13} /> Send test again</AdminButton>}
                 {loadedPlan && <AdminButton variant="ghost" tone="critical" size="sm" onClick={() => void unschedule()} disabled={dirty || hasRemoteChange || saveState === 'saving'}><Trash2 size={13} /> Remove note</AdminButton>}
               </div>
               <div className="mt-3 flex min-h-8 items-center gap-2">

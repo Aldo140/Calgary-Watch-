@@ -139,15 +139,15 @@ export function Panel({
 }) {
   return (
     <section
-      className={cn('rounded-2xl border overflow-hidden', className)}
+      className={cn('admin-panel rounded-2xl border overflow-hidden', className)}
       style={{ background: T.card, borderColor: T.line }}
     >
       {(title || action) && (
         <header
-          className="flex items-start justify-between gap-3 px-4 py-3 border-b"
+          className="admin-panel-header flex items-start justify-between gap-3 px-4 py-3 border-b"
           style={{ borderColor: T.line }}
         >
-          <div className="min-w-0">
+          <div className="admin-panel-heading min-w-0">
             {title && (
               <h2
                 className="text-[0.95rem] font-bold leading-tight truncate"
@@ -162,10 +162,10 @@ export function Panel({
               </p>
             )}
           </div>
-          {action && <div className="shrink-0">{action}</div>}
+          {action && <div className="admin-panel-action shrink-0">{action}</div>}
         </header>
       )}
-      <div className={padded ? 'p-4' : undefined}>{children}</div>
+      <div className={padded ? 'admin-panel-body admin-panel-padded p-4' : 'admin-panel-body'}>{children}</div>
     </section>
   );
 }

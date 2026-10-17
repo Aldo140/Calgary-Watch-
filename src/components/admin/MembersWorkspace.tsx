@@ -1,3 +1,6 @@
+import {useAdminView} from '../../hooks/useAdminView';
+import {WorkspaceTabs} from './WorkspaceTabs';
+import {adminFirestoreActionError} from '../../lib/firestoreErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getCountFromServer, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
@@ -20,12 +23,15 @@ type Counts = { accounts?: number; monday?: number; thursday?: number; withArea?
  * RSVP data; that stays private to each resident.
  */
 export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section: string) => void }) {
+  const [view,setView]=useAdminView(['directory','insights'] as const,'directory');
+  const [readErrors,setReadErrors]=useState<Record<string,string>>({});
+  const fail=(name:string,e:unknown)=>setReadErrors(p=>({...p,[name]:adminFirestoreActionError(e)}));
   const [counts, setCounts] = useState<Counts>({});
   const [thursday, setThursday] = useState<Array<{ eventInterests?: unknown; neighborhood?: string; inferredNeighborhood?: string }> | null>(null);
   const [planned, setPlanned] = useState<Array<{ id: string; count: number }> | null>(null);
 
   useEffect(() => {
-    if (!db) { setThursday([]); setPlanned([]); return; }
+    if (!db||view!=='insights') return;
     const database = db;
     const users = collection(database, 'users');
     // Server-side counts are cheapest, but a browser or rules hiccup must not
@@ -35,7 +41,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
       count(users),
       count(query(users, where('weeklyDigestOptIn', '==', true))),
       count(query(users, where('eventsDigestOptIn', '==', true))),
-      count(query(users, where('piiConsentAt', '>', 0))),
+      Promise.resolve(undefined),
       // A capped read stands in for the pending-suggestions count when it fails.
       getCountFromServer(query(collection(database, 'entity_submissions'), where('status', '==', 'pending')))
         .then((s) => s.data().count)
@@ -43,11 +49,11 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
     ]).then(([accounts, monday, thursday, withArea, suggestions]) => setCounts({ accounts, monday, thursday, withArea, suggestions }));
     getDocs(query(users, where('eventsDigestOptIn', '==', true), limit(500)))
       .then((s) => setThursday(s.docs.map((x) => x.data())))
-      .catch(() => setThursday([]));
+      .catch(e=>fail('Reader interests',e));
     getDocs(query(collection(database, 'event_rsvp_counts'), orderBy('count', 'desc'), limit(12)))
       .then((s) => setPlanned(s.docs.map((x) => ({ id: x.id, count: Number(x.data().count) || 0 })).filter((x) => x.count > 0)))
-      .catch(() => setPlanned([]));
-  }, []);
+      .catch(e=>fail('Event plans',e));
+  }, [view]);
 
   const interestMix = useMemo(() => {
     const tally = new Map<string, number>();
@@ -67,11 +73,11 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
 
   const entities = discoveryRepository.list();
   // Every tile has a fallback from data admin already holds, so none stays blank.
-  const allUsersLoaded = d.usersLoaded && d.users.length >= d.totalUsers;
+  const allUsersLoaded = d.usersLoaded && d.users.length < 200 && d.users.length >= d.totalUsers;
   const shown = {
-    accounts: counts.accounts ?? (d.usersLoaded ? d.totalUsers : undefined),
+    accounts: counts.accounts ?? (allUsersLoaded ? d.totalUsers : undefined),
     monday: counts.monday ?? (d.digestSubscribersLoaded ? d.digestSubscribers.length : undefined),
-    thursday: counts.thursday ?? thursday?.length,
+    thursday: counts.thursday ?? (thursday && thursday.length<500?thursday.length:undefined),
     withArea: counts.withArea ?? (allUsersLoaded ? d.users.filter((u) => (u.neighborhood || u.inferredNeighborhood || '').trim()).length : undefined),
     suggestions: counts.suggestions,
   };
@@ -79,6 +85,9 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
 
   return (
     <div className="space-y-4">
+      <WorkspaceTabs label="Member tools" value={view} onChange={setView} items={[{id:'directory',label:'Member directory',description:'Accounts, organizations and dashboards'},{id:'insights',label:'Audience insights',description:'Subscriptions, interests and plans'}]} />
+      {view==='directory'?<MembersDirectory />:<>
+      {Object.entries(readErrors).map(([name,error])=><p role="alert" key={name}>{name}: {error}</p>)}
       <StatGrid>
         <StatTile label="Accounts" value={shown.accounts} hint={shown.withArea !== undefined ? `${shown.withArea} with a home area (${pct(shown.withArea)}%)` : undefined} />
         <StatTile label="Monday email" value={shown.monday} tone="signal" hint={pct(shown.monday) !== undefined ? `${pct(shown.monday)}% of accounts` : undefined} onClick={() => onOpen('planner')} />
@@ -86,11 +95,11 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
         <StatTile label="Event suggestions waiting" value={shown.suggestions} tone={shown.suggestions ? 'attention' : 'neutral'} hint="Review in Events & markets" onClick={() => onOpen('content')} />
       </StatGrid>
 
-      <MembersDirectory />
+
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-        <Panel title="What event-picks readers are into" subtitle="Interests chosen by people who get event picks">
-          {thursday === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+        <Panel title="What event-picks readers are into" subtitle="Interests from up to 500 loaded event-picks readers">
+          {readErrors['Reader interests']?<p>Reader interests could not be loaded.</p>:thursday === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
             : !thursday.length ? <EmptyState icon={<CalendarHeart size={20} />} title="No Thursday readers yet" body="Interests appear here as people sign up on Your CalgaryWatch." />
             : (
               <ul className="p-4 space-y-2.5">
@@ -108,7 +117,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
         </Panel>
 
         <Panel title="Most planned" subtitle="Public “I’m going” totals">
-          {planned === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+          {readErrors['Event plans']?<p>Event plans could not be loaded.</p>:planned === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
             : !planned.length ? <EmptyState icon={<Ticket size={20} />} title="No plans yet" body="Totals appear once residents tap “I’m going” on events." />
             : (
               <ol className="divide-y" style={{ borderColor: T.line }}>
@@ -138,6 +147,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
           </ul>
         ) : <EmptyState icon={<MapPin size={20} />} title="No home areas yet" />}
       </Panel>
+      </>}
     </div>
   );
 }

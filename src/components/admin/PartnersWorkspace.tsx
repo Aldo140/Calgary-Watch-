@@ -1,3 +1,5 @@
+import {useAdminView} from '../../hooks/useAdminView';
+import {WorkspaceTabs} from './WorkspaceTabs';
 import { OwnerEditsPanel } from './OwnerEditsPanel';
 import { firestoreActionError } from '@/src/lib/firestoreErrors';
 /**
@@ -9,7 +11,7 @@ import { firestoreActionError } from '@/src/lib/firestoreErrors';
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { collection, doc, onSnapshot, orderBy, query, limit, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query, limit, setDoc, updateDoc, arrayUnion, writeBatch } from 'firebase/firestore';
 import { AlertTriangle, Ban, CheckCircle2, ExternalLink, Mail, Plus } from 'lucide-react';
 
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -61,10 +63,14 @@ function LeadCard({ lead }: { lead: PartnerLead }) {
   }
   async function doNotContact() {
     if (!db || !confirm(`Never contact ${lead.businessName}${lead.contactEmail ? ` (${lead.contactEmail})` : ''} again?`)) return;
-    if (lead.contactEmail) {
-      await setDoc(doc(db, 'outreach_suppression', await suppressionId(lead.contactEmail)), { email: lead.contactEmail.trim().toLowerCase(), reason: 'Marked do-not-contact in admin', leadId: lead.id, at: Date.now(), byEmail: by }).catch(() => undefined);
-    }
-    await update({ status: 'do-not-contact', doNotContact: true, history: note('Marked do-not-contact') });
+    if(busy)return;setBusy(true);setError('');
+    try{
+      const batch=writeBatch(db);
+      if(lead.contactEmail)batch.set(doc(db,'outreach_suppression',await suppressionId(lead.contactEmail)),{email:lead.contactEmail.trim().toLowerCase(),reason:'Marked do-not-contact in admin',leadId:lead.id,at:Date.now(),byEmail:by});
+      batch.update(doc(db,'partner_leads',lead.id),{status:'do-not-contact',doNotContact:true,history:note('Marked do-not-contact'),reviewedByEmail:by,updatedAt:Date.now()});
+      await batch.commit();
+    }catch(e){setError(firestoreActionError(e));}finally{setBusy(false);}
+
   }
 
   const drafting = lead.status === 'ready' || lead.status === 'follow-up-ready';
@@ -201,33 +207,37 @@ function AddLead() {
 }
 
 export function PartnersWorkspace() {
+  const [workspace,setWorkspace]=useAdminView(['claims','updates','outreach','markets'] as const,'claims');
   const [leads, setLeads] = useState<PartnerLead[] | null>(null);
   const [error, setError] = useState('');
+  const[attempt,setAttempt]=useState(0);
   const [view, setView] = useState<View>('approve');
   useEffect(() => {
-    if (!db) return;
+    if (!db||workspace!=='outreach') return;
     return onSnapshot(query(collection(db, 'partner_leads'), orderBy('updatedAt', 'desc'), limit(500)),
-      s => setLeads(s.docs.map(d => d.data() as PartnerLead)),
+      s => {setError('');setLeads(s.docs.map(d => ({...d.data(),id:d.id}) as PartnerLead));},
       e => setError(e.message.includes('permission') ? 'The operations rules are not deployed yet. Run "Deploy Firebase Backend" with target rules.' : e.message));
-  }, []);
+  }, [workspace,attempt]);
   const counts = useMemo(() => Object.fromEntries((Object.keys(VIEWS) as View[]).map(v => [v, (leads ?? []).filter(VIEWS[v].match).length])), [leads]);
   const shown = (leads ?? []).filter(VIEWS[view].match);
 
   return (
     <div className="space-y-4">
-      <OwnerEditsPanel />
-      <ClaimsPanel leads={leads} />
-      <MarketHQPanel />
+      <WorkspaceTabs label="Organization tools" value={workspace} onChange={setWorkspace} items={[{id:'claims',label:'Claims & verification',description:'Confirm organization access'},{id:'updates',label:'Business updates',description:'Changes already published'},{id:'outreach',label:'Partner outreach',description:'Contacts, drafts and replies'},{id:'markets',label:'Market HQ',description:'Managed market requests'}]} />
+      {workspace==='updates'&&<OwnerEditsPanel />}
+      {workspace==='claims'&&<ClaimsPanel leads={leads} />}
+      {workspace==='markets'&&<MarketHQPanel />}
+      {workspace==='outreach'&&<>
       <Panel title="Partner outreach" subtitle="Emails that pass every rule are sent automatically (cancel any under In progress). Businesses come from real listings; replies wait for you; paid placement stays off until the offer is final (brand/outreach.json)." padded={false}>
         <div className="px-4 pt-3">
           <FilterRow>{(Object.keys(VIEWS) as View[]).map(v => <FilterChip key={v} active={view === v} onClick={() => setView(v)} count={counts[v]}>{VIEWS[v].label}</FilterChip>)}</FilterRow>
         </div>
-        {error ? <p role="alert" className="p-4 text-sm" style={{ color: T.critical }}>{error}</p>
+        {error ? <div className="p-4 space-y-2"><p role="alert" className="text-sm" style={{ color: T.critical }}>{error}</p><AdminButton variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry loading</AdminButton></div>
           : !leads ? <div className="p-4"><SkeletonRows /></div>
           : !shown.length ? <EmptyState title={`Nothing in ${VIEWS[view].label.toLowerCase()}`} body={view === 'approve' ? 'The daily run drafts up to 10 new pitches from listed businesses and markets.' : undefined} />
           : <div>{shown.map(l => <LeadCard key={l.id} lead={l} />)}</div>}
         <AddLead />
-      </Panel>
+      </Panel></>}
     </div>
   );
 }

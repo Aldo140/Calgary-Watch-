@@ -1,3 +1,4 @@
+import {adminFirestoreActionError} from '../../lib/firestoreErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
 import { AlertTriangle, CalendarHeart, Eye, Mail, MapPin, Users } from 'lucide-react';
@@ -11,6 +12,7 @@ import { Chip, EmptyState, Figure, Panel, StatGrid, StatTile, T, mono } from './
 type Raw = Record<string, unknown> & { uid: string };
 
 export interface ThursdayData {
+  errors?:string[];
   thursday: Raw[] | null;
   accounts?: number;
   pendingUnsubs?: number;
@@ -24,6 +26,8 @@ export interface ThursdayData {
  * thousand profiles would double the cost for nothing.
  */
 export function useThursdayData(fixture?: Raw[]): ThursdayData {
+  const[readErrors,setReadErrors]=useState<Record<string,string>>({});
+  const fail=(name:string,e:unknown)=>setReadErrors(p=>({...p,[name]:`${name}: ${adminFirestoreActionError(e)}`}));
   const [thursday, setThursday] = useState<Raw[] | null>(null);
   const [accounts, setAccounts] = useState<number | undefined>();
   const [pendingUnsubs, setPendingUnsubs] = useState<number | undefined>();
@@ -32,18 +36,18 @@ export function useThursdayData(fixture?: Raw[]): ThursdayData {
 
   useEffect(() => {
     if (!db) { setThursday(fixture ?? []); setLedger([]); return; }
-    const database = db;
+    const database = db;setReadErrors({});
     getDocs(query(collection(database, 'users'), where('eventsDigestOptIn', '==', true), limit(1000)))
       .then((s) => setThursday(s.docs.map((d) => ({ ...d.data(), uid: d.id }))))
-      .catch(() => setThursday([]));
-    getCountFromServer(collection(database, 'users')).then((s) => setAccounts(s.data().count)).catch(() => {});
-    getCountFromServer(query(collection(database, 'events_digest_unsubscribes'), where('processedAt', '==', null))).then((s) => setPendingUnsubs(s.data().count)).catch(() => {});
+      .catch(e=>fail('Event-picks readers',e));
+    getCountFromServer(collection(database, 'users')).then((s) => setAccounts(s.data().count)).catch(e=>fail('Account count',e));
+    getCountFromServer(query(collection(database, 'events_digest_unsubscribes'), where('processedAt', '==', null))).then((s) => setPendingUnsubs(s.data().count)).catch(e=>fail('Pending unsubscribes',e));
     getDocs(query(collection(database, 'events_digest_sends'), where('weekKey', '==', week), limit(1000)))
       .then((s) => setLedger(s.docs.map((d) => d.data())))
-      .catch(() => setLedger([]));
+      .catch(e=>fail('Event-picks delivery log',e));
   }, [week, fixture]);
 
-  return { thursday, accounts, pendingUnsubs, ledger, week };
+  return { thursday, accounts, pendingUnsubs, ledger, week, errors:Object.values(readErrors) };
 }
 
 /**
@@ -84,6 +88,7 @@ export function ThursdayPicksPanel({ mondayProfiles, data }: { mondayProfiles: U
   const sent = (ledger ?? []).filter((l) => l.status === 'sent');
   const byMode = sent.reduce<Record<string, number>>((acc, l) => { const k = l.mode ?? 'picks'; acc[k] = (acc[k] ?? 0) + 1; return acc; }, {});
 
+  if(data.errors?.length)return <Panel title="Reader data could not be loaded">{data.errors.map(error=><p key={error} role="alert">{error}</p>)}</Panel>;
   return (
     <div className="space-y-4">
       <Panel title="Who is on which list" subtitle="Every account falls into exactly one of these. People on both lists get one email a week, on Monday. Each email offers the other list only to people not on it.">

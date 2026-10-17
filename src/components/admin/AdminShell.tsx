@@ -1,56 +1,29 @@
-/**
- * Admin console shell.
- *
- * Desktop gets a fixed dark rail: navigation is a persistent place you glance
- * at, not something you open. Mobile gets a bottom tab bar instead — an admin
- * moderating from a phone is holding it one-handed, and the top of a 6" screen
- * is the worst place to put the controls they use most.
- *
- * The rail carries live counts. If something needs attention, the number is on
- * screen before you decide where to click.
- */
-
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogOut, Menu, X } from 'lucide-react';
-import { cn } from '@/src/lib/utils';
-import { T, display, mono, toneColor, type Tone } from './ui';
-
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, LogOut, Menu, Search, X } from "lucide-react";
+import { matchesAdminNavigation } from "../../lib/adminNavigation";
+import { calgaryDateTimeFormat } from "../../lib/calgaryTz";
+import { toneColor, type Tone } from "./ui";
+import "../../styles/admin.css";
 export type NavItem = {
   id: string;
   label: string;
   short?: string;
   icon: React.ElementType;
-  /** Rendered beside the label. Omit when zero — a badge reading 0 is noise. */
   count?: number;
-  /** Colours the badge. Use attention/critical only when a human is needed. */
   tone?: Tone;
-  /** Navigates instead of switching the in-page section. */
   href?: string;
-  /** Rail heading this item sits under (Today, Audience, Content, City). */
   group?: string;
+  description?: string;
+  keywords?: string;
 };
-
-const calgaryNow = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-
-/** "Tue, Oct 6 · 9:41 a.m. Calgary", refreshed each minute. */
-function useCalgaryClock(): string {
-  const [now, setNow] = React.useState(() => Date.now());
-  React.useEffect(() => { const t = window.setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(t); }, []);
-  return calgaryNow.format(now).replace(/,\s(\d)/, ' · $1');
-}
-
-/** Items in order, with a heading inserted wherever the group changes. */
-function grouped(items: NavItem[]): Array<{ group?: string; items: NavItem[] }> {
-  const out: Array<{ group?: string; items: NavItem[] }> = [];
-  for (const item of items) {
-    const last = out[out.length - 1];
-    if (last && last.group === item.group) last.items.push(item);
-    else out.push({ group: item.group, items: [item] });
-  }
-  return out;
-}
-
+const clock = calgaryDateTimeFormat("en-CA", {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+});
 export function AdminShell({
   items,
   activeId,
@@ -71,297 +44,258 @@ export function AdminShell({
   onSignOut?: () => void;
 }) {
   const navigate = useNavigate();
-  const clock = useCalgaryClock();
-  const [moreOpen, setMoreOpen] = React.useState(false);
-  // A phone fits four tabs and a "More" button. Eleven tabs in one row left each
-  // about 35px wide with colliding labels. Every section stays one tap away in the
-  // More sheet, and More carries the counts of whatever it hides.
-  const primary = PRIMARY_TABS.map(id => items.find(i => i.id === id)).filter((i): i is NavItem => !!i);
-  const mobileItems = primary.length >= 3 ? primary : items.slice(0, 4);
-  const hidden = items.filter(i => !mobileItems.includes(i));
-  const hiddenCount = hidden.reduce((s, i) => s + (i.count ?? 0), 0);
-  const hiddenTone = hidden.find(i => i.count && i.tone)?.tone;
-  const moreActive = hidden.some(i => i.id === activeId);
-
-  const go = (item: NavItem) => { setMoreOpen(false); if (item.href) navigate(item.href); else onSelect(item.id); };
+  const [moreOpen, setMoreOpen] = React.useState(false),
+    [search, setSearch] = React.useState(""),
+    [now, setNow] = React.useState(Date.now());
+  const dialog = React.useRef<HTMLDivElement>(null),
+    trigger = React.useRef<HTMLButtonElement>(null),
+    main = React.useRef<HTMLElement>(null);
+  React.useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
   React.useEffect(() => {
     if (!moreOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMoreOpen(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.current?.querySelector<HTMLInputElement>("input")?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMoreOpen(false);
+        return;
+      }
+      if (e.key === "Tab") {
+        const nodes = [
+          ...(dialog.current?.querySelectorAll<HTMLElement>("button,a,input") ??
+            []),
+        ].filter(
+          (el) => el.getClientRects().length && !el.hasAttribute("disabled"),
+        );
+        const first = nodes[0],
+          last = nodes.at(-1);
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", key);
+      trigger.current?.focus();
+    };
   }, [moreOpen]);
-
-  return (
-    <div className="min-h-screen" style={{ background: T.surface }}>
-      {/* ── Desktop rail ── */}
-      <aside
-        className="hidden lg:flex fixed inset-y-0 left-0 w-[15.5rem] flex-col z-30"
-        style={{ background: T.rail }}
-      >
-        <div className="px-4 pt-5 pb-4">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold mb-4 transition-colors hover:text-white"
-            style={{ color: T.railText }}
+  const go = (item: NavItem) => {
+    setMoreOpen(false);
+    setSearch("");
+    if (item.href) navigate(item.href);
+    else onSelect(item.id);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      main.current?.focus({ preventScroll: true });
+    });
+  };
+  const filtered = items.filter((item) => matchesAdminNavigation(item, search));
+  const groups = [...new Set(filtered.map((i) => i.group || "Workspaces"))];
+  const nav = (mobile = false) => (
+    <>
+      <label className="admin-nav-search">
+        <Search size={16} />
+        <input
+          aria-label={mobile ? "Find an admin tool" : "Search admin tools"}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Find a tool or task…"
+        />
+        {search ? (
+          <button
+            type="button"
+            aria-label="Clear navigation search"
+            onClick={() => setSearch("")}
           >
-            <ArrowLeft size={13} /> Back to the site
-          </Link>
-          <div className="flex items-center gap-2.5">
-            <img src="/images/brand/calgarywatch-city-spark-v2.webp" width="34" height="34" alt="" className="rounded-full" style={{ boxShadow: '0 0 0 2px rgba(255,255,255,0.12)' }} />
-            <div>
-          <p
-            className="text-[0.6rem] font-semibold uppercase tracking-[0.18em]"
-            style={{ color: T.railText }}
-          >
-            Calgary Watch
-          </p>
-          {/* Colour is set inline, not via text-white: a global heading rule in
-              index.css was winning and rendering this near-black on the rail.
-              The name is fixed ("Admin console") so it does not echo the
-              section title already shown in the workspace header. */}
-          <p className="text-[1.1rem] font-bold" style={{ fontFamily: display, color: '#FFFFFF' }}>
-            Admin console
-          </p>
-            </div>
-          </div>
-          <p className="mt-3 text-[0.68rem] tabular-nums" style={{ fontFamily: mono, color: T.railText }}>{clock} · Calgary</p>
-        </div>
-
-        <nav className="flex-1 overflow-y-auto px-2.5 pb-4">
-          {grouped(items).map((section) => (
-          <div key={section.group ?? section.items[0].id} className="mb-3">
-          {section.group && (
-            <p className="px-3 pt-2 pb-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.2em]" style={{ color: 'rgba(154,164,178,0.7)' }}>{section.group}</p>
-          )}
-          <div className="space-y-0.5">
-          {section.items.map((item) => {
-            const active = item.id === activeId;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => go(item)}
-                aria-current={active ? 'page' : undefined}
-                className={cn(
-                  'w-full flex items-center gap-2.5 h-10 px-3 rounded-lg text-[0.82rem] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
-                )}
-                style={{
-                  background: active ? 'linear-gradient(90deg, rgba(44,111,181,0.28), rgba(255,255,255,0.06))' : 'transparent',
-                  color: active ? '#fff' : T.railText,
-                  outlineColor: T.signal,
-                  boxShadow: active ? `inset 3px 0 0 ${T.signal}` : undefined,
-                }}
-              >
-                <Icon size={16} className="shrink-0" />
-                <span className="flex-1 text-left truncate">{item.label}</span>
-                {!!item.count && (
-                  <span
-                    className="tabular-nums text-[0.68rem] font-bold px-1.5 py-0.5 rounded"
-                    style={{
-                      fontFamily: mono,
-                      color: item.tone ? toneColor[item.tone] : '#fff',
-                      background: item.tone ? `${toneColor[item.tone]}26` : 'rgba(255,255,255,0.12)',
-                    }}
-                  >
-                    {item.count}
+            <X size={14} />
+          </button>
+        ) : null}
+      </label>
+      {groups.map((group) => (
+        <div key={group} className="admin-nav-group">
+          <p>{group}</p>
+          {filtered
+            .filter((i) => (i.group || "Workspaces") === group)
+            .map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  aria-current={activeId === item.id ? "page" : undefined}
+                  onClick={() => go(item)}
+                  title={item.description}
+                >
+                  <Icon size={18} />
+                  <span>
+                    <strong>{item.label}</strong>
+                    {mobile && item.description ? (
+                      <small>{item.description}</small>
+                    ) : null}
                   </span>
-                )}
-              </button>
-            );
-          })}
+                  {!!item.count ? (
+                    <b
+                      style={{
+                        background: toneColor[item.tone ?? "attention"],
+                        color: item.tone === "attention" ? "#17212d" : "white",
+                      }}
+                    >
+                      {item.count > 99 ? "99+" : item.count}
+                    </b>
+                  ) : null}
+                </button>
+              );
+            })}
+        </div>
+      ))}
+      {!filtered.length ? (
+        <p className="admin-nav-empty">
+          No matching tools. Try “claims”, “email” or “reports”.
+        </p>
+      ) : null}
+    </>
+  );
+  const primary = ["desk", "partners", "members", "content"]
+    .map((id) => items.find((i) => i.id === id))
+    .filter((i): i is NavItem => !!i);
+  const moreActive = !primary.some((i) => i.id === activeId);
+  return (
+    <div className="admin-shell">
+      <a className="admin-skip" href="#admin-main">
+        Skip to workspace
+      </a>
+      <aside className="admin-rail" aria-label="Admin sidebar">
+        <Link className="admin-back" to="/">
+          <ArrowLeft size={15} />
+          Back to CalgaryWatch
+        </Link>
+        <div className="admin-brand">
+          <img
+            src="/images/brand/calgarywatch-city-spark-v2.webp"
+            width="40"
+            height="40"
+            alt=""
+          />
+          <div>
+            <small>CALGARYWATCH</small>
+            <strong>Admin workspace</strong>
           </div>
-          </div>
-          ))}
-        </nav>
-
-        {onSignOut && (
-          <div className="px-2.5 pb-4 border-t pt-3" style={{ borderColor: T.railLine }}>
-            <button
-              onClick={onSignOut}
-              className="w-full flex items-center gap-2.5 h-9 px-3 rounded-lg text-[0.8rem] font-semibold transition-colors hover:text-white"
-              style={{ color: T.railText }}
-            >
-              <LogOut size={15} /> Sign out
-            </button>
-          </div>
-        )}
+        </div>
+        <p className="admin-clock">{clock.format(now)} · Calgary</p>
+        <nav aria-label="Admin workspaces">{nav()}</nav>
+        {onSignOut ? (
+          <button className="admin-signout" type="button" onClick={onSignOut}>
+            <LogOut size={16} />
+            Sign out
+          </button>
+        ) : null}
       </aside>
-
-      {/* ── Workspace ── */}
-      <div className="lg:pl-[15.5rem]">
-        <header
-          className="sticky top-0 z-20 border-b backdrop-blur"
-          style={{ background: 'rgba(247,246,243,0.92)', borderColor: T.line }}
-        >
-          <div className="px-4 lg:px-7 py-3 flex items-center gap-3">
-            <Link
-              to="/"
-              className="lg:hidden shrink-0 h-9 w-9 grid place-items-center rounded-lg border"
-              style={{ borderColor: T.line, color: T.muted, background: T.card }}
-              aria-label="Back to the site"
-            >
-              <ArrowLeft size={16} />
-            </Link>
-            <div className="min-w-0 flex-1">
-              <h1
-                className="text-[1.05rem] lg:text-[1.3rem] font-bold leading-tight truncate"
-                style={{ fontFamily: display, color: T.ink }}
-              >
-                {title}
-              </h1>
-              {subtitle && (
-                <p className="text-xs line-clamp-2 lg:line-clamp-none lg:truncate" style={{ color: T.muted }}>
-                  {subtitle}
-                </p>
-              )}
-              <p className="lg:hidden text-[0.62rem] tabular-nums mt-0.5" style={{ fontFamily: mono, color: T.muted }}>{clock} · Calgary</p>
-            </div>
-            {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}
+      <div className="admin-canvas">
+        <header className="admin-header">
+          <button
+            className="admin-mobile-menu"
+            type="button"
+            ref={trigger}
+            aria-label="Open all admin tools"
+            aria-haspopup="dialog"
+            aria-expanded={moreOpen}
+            onClick={(e) => {trigger.current=e.currentTarget;setMoreOpen(true);}}
+          >
+            <Menu size={20} />
+          </button>
+          <div className="admin-heading">
+            <p>CalgaryWatch / Admin</p>
+            <h1>{title}</h1>
+            {subtitle ? <span>{subtitle}</span> : null}
           </div>
+          {actions ? (
+            <div className="admin-header-actions">{actions}</div>
+          ) : null}
         </header>
-
-        <main className="px-4 lg:px-7 py-4 lg:py-6 pb-24 lg:pb-10 space-y-4 max-w-[1400px]">
+        <main id="admin-main" tabIndex={-1} ref={main} className="admin-main">
           {children}
         </main>
       </div>
-
-      {/* ── Mobile tab bar ── */}
-      <nav
-        className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t"
-        style={{
-          background: T.rail,
-          borderColor: T.railLine,
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-      >
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: `repeat(${mobileItems.length + (hidden.length ? 1 : 0)}, minmax(0, 1fr))` }}
-        >
-          {mobileItems.map((item) => {
-            const active = item.id === activeId;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => go(item)}
-                aria-current={active ? 'page' : undefined}
-                className="relative flex flex-col items-center justify-center gap-1 h-16 focus-visible:outline-2 focus-visible:-outline-offset-2"
-                style={{ color: active ? '#fff' : T.railText, outlineColor: T.signal }}
-              >
-                <span className="relative">
-                  <Icon size={19} />
-                  {!!item.count && (
-                    <span
-                      className="absolute -top-1.5 -right-2.5 min-w-[1.05rem] h-[1.05rem] px-1 grid place-items-center rounded-full text-[0.6rem] font-bold tabular-nums"
-                      style={{
-                        fontFamily: mono,
-                        background: toneColor[item.tone ?? 'signal'],
-                        color: '#fff',
-                      }}
-                    >
-                      {item.count > 99 ? '99+' : item.count}
-                    </span>
-                  )}
-                </span>
-                <span className="text-[0.62rem] font-semibold leading-none">
-                  {item.short ?? item.label}
-                </span>
-                {active && (
-                  <span
-                    className="absolute top-0 inset-x-4 h-0.5 rounded-full"
-                    style={{ background: T.signal }}
-                  />
-                )}
-              </button>
-            );
-          })}
-          {hidden.length > 0 && (
+      <nav className="admin-mobile-tabs" aria-label="Frequent admin tools">
+        {primary.map((item) => {
+          const Icon = item.icon;
+          return (
             <button
-              onClick={() => setMoreOpen(o => !o)}
-              aria-expanded={moreOpen}
-              aria-controls="admin-more-sheet"
-              className="relative flex flex-col items-center justify-center gap-1 h-16 focus-visible:outline-2 focus-visible:-outline-offset-2"
-              style={{ color: moreActive || moreOpen ? '#fff' : T.railText, outlineColor: T.signal }}
+              type="button"
+              key={item.id}
+              aria-current={activeId === item.id ? "page" : undefined}
+              onClick={() => go(item)}
             >
-              <span className="relative">
-                <Menu size={19} />
-                {hiddenCount > 0 && (
-                  <span
-                    className="absolute -top-1.5 -right-2.5 min-w-[1.05rem] h-[1.05rem] px-1 grid place-items-center rounded-full text-[0.6rem] font-bold tabular-nums"
-                    style={{ fontFamily: mono, background: toneColor[hiddenTone ?? 'signal'], color: '#fff' }}
-                  >
-                    {hiddenCount > 99 ? '99+' : hiddenCount}
-                  </span>
-                )}
-              </span>
-              <span className="text-[0.62rem] font-semibold leading-none">More</span>
-              {moreActive && <span className="absolute top-0 inset-x-4 h-0.5 rounded-full" style={{ background: T.signal }} />}
+              <Icon size={19} />
+              <span>{item.short ?? item.label}</span>
+              {!!item.count ? (
+                <b>{item.count > 99 ? "99+" : item.count}</b>
+              ) : null}
             </button>
-          )}
-        </div>
+          );
+        })}
+        <button
+          type="button"
+          aria-label="More admin tools"
+          aria-current={moreActive ? "page" : undefined}
+          onClick={(e) => {trigger.current=e.currentTarget;setMoreOpen(true);}}
+        >
+          <Menu size={19} />
+          <span>All tools</span>
+        </button>
       </nav>
-
-      {/* ── Mobile "More" sheet: every section, with its count, plus sign out ── */}
-      {moreOpen && (
-        <div className="lg:hidden fixed inset-0 z-40" role="dialog" aria-modal="true" aria-label="All admin sections">
-          <button className="absolute inset-0 w-full h-full cursor-default" style={{ background: 'rgba(8,12,20,0.45)' }} aria-label="Close" onClick={() => setMoreOpen(false)} />
+      {moreOpen ? (
+        <div
+          className="admin-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setMoreOpen(false);
+          }}
+        >
           <div
-            id="admin-more-sheet"
-            className="absolute inset-x-0 bottom-0 rounded-t-2xl px-3 pt-3 max-h-[80vh] overflow-y-auto"
-            style={{ background: T.rail, paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+            className="admin-tool-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-tools-title"
+            ref={dialog}
           >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full" style={{ background: T.railLine }} />
-            <div className="flex items-center justify-between px-2 mb-2">
-              <p className="text-[0.95rem] font-bold" style={{ fontFamily: display, color: '#fff' }}>Admin console</p>
-              <button onClick={() => setMoreOpen(false)} className="h-9 w-9 grid place-items-center rounded-lg" style={{ color: T.railText }} aria-label="Close">
-                <X size={18} />
+            <div className="admin-dialog-heading">
+              <h2 id="admin-tools-title">All admin tools</h2>
+              <button
+                type="button"
+                aria-label="Close admin tools"
+                onClick={() => setMoreOpen(false)}
+              >
+                <X size={20} />
               </button>
             </div>
-            {grouped(items).map((section) => (
-            <div key={section.group ?? section.items[0].id} className="mb-2">
-            {section.group && <p className="px-2 pt-1 pb-1.5 text-[0.58rem] font-semibold uppercase tracking-[0.2em]" style={{ color: T.railText }}>{section.group}</p>}
-            <div className="grid grid-cols-2 gap-1.5">
-              {section.items.map((item) => {
-                const active = item.id === activeId;
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => go(item)}
-                    aria-current={active ? 'page' : undefined}
-                    className="flex items-center gap-2.5 min-h-12 px-3 rounded-xl text-left text-[0.85rem] font-semibold"
-                    style={{ background: active ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.04)', color: active ? '#fff' : T.railText }}
-                  >
-                    <Icon size={17} className="shrink-0" />
-                    <span className="flex-1 min-w-0 leading-tight">{item.label}</span>
-                    {!!item.count && (
-                      <span className="tabular-nums text-[0.68rem] font-bold px-1.5 py-0.5 rounded" style={{ fontFamily: mono, color: '#fff', background: toneColor[item.tone ?? 'signal'] }}>
-                        {item.count > 99 ? '99+' : item.count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            </div>
-            ))}
-            <div className="mt-3 pt-3 border-t flex gap-2" style={{ borderColor: T.railLine }}>
-              <Link to="/" className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-xl text-[0.82rem] font-semibold" style={{ color: T.railText, background: 'rgba(255,255,255,0.04)' }}>
-                <ArrowLeft size={15} /> Back to the site
-              </Link>
-              {onSignOut && (
-                <button onClick={() => { setMoreOpen(false); onSignOut(); }} className="flex-1 inline-flex items-center justify-center gap-2 h-11 rounded-xl text-[0.82rem] font-semibold" style={{ color: T.railText, background: 'rgba(255,255,255,0.04)' }}>
-                  <LogOut size={15} /> Sign out
+            {nav(true)}
+            <div className="admin-dialog-footer">
+              <Link to="/">Back to the site</Link>
+              {onSignOut ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMoreOpen(false);
+                    onSignOut();
+                  }}
+                >
+                  Sign out
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
-
-/** The four sections most used from a phone; everything else lives under More. */
-const PRIMARY_TABS = ['desk', 'members', 'reports', 'content'];

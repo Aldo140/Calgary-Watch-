@@ -41,7 +41,9 @@ export function AttentionQueue({
   restoringId,
   deletingId,
   tasks,
+  emptyStatus='clear',
 }: {
+  emptyStatus?:'loading'|'unavailable'|'clear';
   flagged: Incident[];
   pendingReview: Incident[];
   apiHealths: ApiHealth[];
@@ -162,7 +164,7 @@ export function AttentionQueue({
       title="Needs attention"
       subtitle={
         items.length === 0
-          ? 'Everything that would need a human is clear.'
+          ? emptyStatus==='clear'?'The checked queues have no open work.':emptyStatus==='loading'?'Checking the work queues…':'Some queues could not be checked. Review the errors above.'
           : `${items.length} open · ranked by urgency`
       }
       action={
@@ -172,8 +174,8 @@ export function AttentionQueue({
             {critical > 0 ? `${critical} urgent` : `${items.length}`}
           </Chip>
         ) : (
-          <Chip tone="ok">
-            <StatusDot tone="ok" /> Clear
+          <Chip tone={emptyStatus==='clear'?'ok':'attention'}>
+            <StatusDot tone={emptyStatus==='clear'?'ok':'attention'} /> {emptyStatus==='clear'?'Clear':emptyStatus==='loading'?'Checking':'Incomplete'}
           </Chip>
         )
       }
@@ -182,8 +184,8 @@ export function AttentionQueue({
       {items.length === 0 ? (
         <EmptyState
           icon={<CheckCircle2 size={26} />}
-          title="Desk is clear"
-          body="No flagged content, no unreviewed reports, and every data feed is answering. New work will appear here first."
+          title={emptyStatus==='clear'?'Desk is clear':emptyStatus==='loading'?'Checking for work':'Unable to confirm the desk is clear'}
+          body={emptyStatus==='clear'?'No open work in the checked queues. New work will appear here.':emptyStatus==='loading'?'Task counts are still loading.':'A failed read is not an empty inbox. Other tools remain available.'}
         />
       ) : (
         <ul className="divide-y divide-[#E4E2DC]">

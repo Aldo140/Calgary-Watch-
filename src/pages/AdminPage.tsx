@@ -1,11 +1,11 @@
 import { useAdminWorkload, type AdminWorkload } from '../hooks/useAdminWorkload';
 import { adminIncidents } from '../lib/adminStore';
 import { db } from '../firebase';
-import { DiscoveryContent } from '../components/admin/DiscoveryContent';
-import { DemandWorkspace } from '../components/admin/DemandWorkspace';
-import { MembersWorkspace } from '../components/admin/MembersWorkspace';
-import { OpsWorkspace } from '../components/admin/OpsWorkspace';
-import { PartnersWorkspace } from '../components/admin/PartnersWorkspace';
+const DiscoveryContent = lazy(() => import('../components/admin/DiscoveryContent').then(m => ({default:m.DiscoveryContent})));
+const DemandWorkspace = lazy(() => import('../components/admin/DemandWorkspace').then(m => ({default:m.DemandWorkspace})));
+const MembersWorkspace = lazy(() => import('../components/admin/MembersWorkspace').then(m => ({default:m.MembersWorkspace})));
+const OpsWorkspace = lazy(() => import('../components/admin/OpsWorkspace').then(m => ({default:m.OpsWorkspace})));
+const PartnersWorkspace = lazy(() => import('../components/admin/PartnersWorkspace').then(m => ({default:m.PartnersWorkspace})));
 /**
  * Calgary Watch — admin console.
  *
@@ -19,8 +19,10 @@ import { PartnersWorkspace } from '../components/admin/PartnersWorkspace';
  * numbers. Nothing is computed twice.
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import {ADMIN_SECTIONS,adminSection,type AdminSection} from '../lib/adminNavigation';
+import {AdminSectionBoundary} from '../components/admin/AdminSectionBoundary';
 import {
   ResponsiveContainer, PieChart, Pie, Cell,
   AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -36,7 +38,7 @@ import { isFirebaseConfigured } from '@/src/firebase';
 import { useAdminData } from '@/src/hooks/useAdminData';
 import { AdminShell, type NavItem } from '@/src/components/admin/AdminShell';
 import { AttentionQueue } from '@/src/components/admin/AttentionQueue';
-import { WeeklyEmailPlanner } from '@/src/components/admin/WeeklyEmailPlanner';
+const WeeklyEmailPlanner = lazy(() => import('../components/admin/WeeklyEmailPlanner').then(m => ({default:m.WeeklyEmailPlanner})));
 import {
   AdminButton, Chip, EmptyState, Field, Figure, Panel, RecordList, SkeletonRows,
   StatGrid, StatTile, StatusDot, T, TimeAgo, display, inputClass, inputStyle, mono,
@@ -46,7 +48,7 @@ import { INCIDENT_CATEGORIES } from '@/src/constants';
 import { summarizeDataSourceHealth } from '@/src/config/dataSources';
 import { cn } from '@/src/lib/utils';
 
-type Section = 'desk' | 'planner' | 'reports' | 'people' | 'feeds' | 'visitors' | 'city' | 'content' | 'demand' | 'partners' | 'ops' | 'members';
+type Section = AdminSection;
 
 const CHART_COLORS = ['#2C6FB5', '#C77F18', '#2F855A', '#C0392B', '#7C5CBF', '#0F8B8D'];
 
@@ -100,12 +102,13 @@ function Legend({ items }: { items: { label: string; value?: number; color: stri
 
 export default function AdminPage() {
   const { logout } = useAuth();
-  const [section, setSection] = useState<Section>(() => {
-    const requested = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('section');
-    return ['desk','planner','reports','people','feeds','visitors','city','content','demand','partners','ops','members'].includes(requested ?? '') ? requested as Section : 'desk';
+  const [params,setParams]=useSearchParams();
+  const section=adminSection(params.get('section'));
+  const setSection=(id:Section,view?:string,queue?:string)=>setParams(previous=>{
+    const next=new URLSearchParams(previous);next.set('section',id);next.delete('view');next.delete('queue');
+    if(view)next.set('view',view);if(queue)next.set('queue',queue);return next;
   });
-  useEffect(() => { const url = new URL(window.location.href); url.searchParams.set('section', section); window.history.replaceState(null, '', url); }, [section]);
-  const d = useAdminData(section);
+  const d=useAdminData(section==='members'&&params.get('view')!=='insights'?'members-directory':section);
   const work = useAdminWorkload(Boolean(d.isAdmin));
 
   const failingFeeds = d.apiHealths.filter((a) =>
@@ -115,37 +118,25 @@ export default function AdminPage() {
   const navItems: NavItem[] = useMemo(() => {
     const contentWork = work.suggestions + work.failedActions + work.stuckActions;
     const needsAttention =
-      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds + contentWork + work.claims + work.ownerUpdates;
-    return [
-      { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: needsAttention > 0 ? 'critical' : undefined, group: 'Today' },
+      d.flaggedIncidents.length + d.pendingReviewIncidents.length + failingFeeds + contentWork + work.claims + work.ownerUpdates + (work.socialReview??0) + (work.socialCorrections??0) + (work.readerReplies??0);
+    const current:NavItem[] = [
+      { id: 'desk', label: 'Watch desk', short: 'Desk', icon: LayoutDashboard, count: needsAttention, tone: failingFeeds || work.failedActions || work.stuckActions || d.flaggedIncidents.length ? 'critical' : 'attention', group: 'Today' },
       { id: 'reports', label: 'Reports', short: 'Reports', icon: FileText, group: 'Today' },
       { id: 'feeds', label: 'Data feeds', short: 'Feeds', icon: Zap, count: failingFeeds, tone: 'critical', group: 'Today' },
       { id: 'members', label: 'Members & plans', short: 'Members', icon: HeartHandshake, group: 'Audience' },
       { id: 'people', label: 'People', short: 'People', icon: Users, group: 'Audience' },
-      { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus, group: 'Audience' },
+      { id: 'planner', label: 'Email planner', short: 'Email', icon: MailPlus,count:work.readerReplies,tone:'attention', group: 'Audience' },
       { id: 'visitors', label: 'Visitors', short: 'Visitors', icon: Globe, group: 'Audience' },
       { id: 'demand', label: 'Search demand', short: 'Demand', icon: Search, group: 'Audience' },
       { id: 'content', label: 'Events & markets', short: 'Events', icon: CalendarDays, group: 'Content', count: contentWork, tone: work.failedActions || work.stuckActions ? 'critical' : 'attention' },
-      { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot, group: 'Content' },
+      { id: 'ops', label: 'Operations', short: 'Ops', icon: Bot,count:(work.socialReview??0)+(work.socialCorrections??0),tone:work.socialCorrections?'critical':'attention', group: 'Content' },
       { id: 'partners', label: 'Local partners', short: 'Partners', icon: Store, group: 'Content', count: work.claims + work.ownerUpdates, tone: 'attention' },
       { id: 'city', label: 'City stats', short: 'City', icon: MapIcon, group: 'City' },
     ];
+    return ADMIN_SECTIONS.map(def=>({...current.find(i=>i.id===def.id)!,label:def.title,description:def.description,keywords:def.keywords,group:def.group}));
   }, [d.flaggedIncidents.length, d.pendingReviewIncidents.length, failingFeeds, work]);
 
-  const titles: Record<Section, { title: string; subtitle: string }> = {
-    ops: { title: 'Operations', subtitle: 'Instagram posts for CalgaryWatch and CalgaryDaily, drafted by the agent and approved here' },
-    content: { title: 'Events & markets', subtitle: 'Resident suggestions, listings to verify, and what is published' },
-    members: { title: 'Members & plans', subtitle: 'Sign-ups, both emails, interests and what people are planning to go to' },
-    demand: { title: 'Search demand', subtitle: 'What Calgary searches for, and what it couldn’t find' },
-    partners: { title: 'Local partners', subtitle: 'Claims and commercial relationships, separate from editorial selections' },
-    desk: { title: 'Watch desk', subtitle: 'What needs a human right now' },
-    planner: { title: 'Email planner', subtitle: 'Who gets which email this week, what each one looks like, and the optional opening note' },
-    reports: { title: 'Reports', subtitle: 'What is being reported, where, and when' },
-    people: { title: 'People', subtitle: 'Who is signed up and who is contributing' },
-    feeds: { title: 'Data feeds', subtitle: 'Live status of the sources behind the map' },
-    visitors: { title: 'Visitors', subtitle: 'How people find and move through the site' },
-    city: { title: 'City stats', subtitle: 'Open-data crime figures and community safety scores' },
-  };
+  const selected=ADMIN_SECTIONS.find(item=>item.id===section)!;
 
   if (!d.isAuthReady) {
     return (
@@ -184,22 +175,26 @@ export default function AdminPage() {
       items={navItems}
       activeId={section}
       onSelect={(id) => setSection(id as Section)}
-      title={titles[section].title}
-      subtitle={titles[section].subtitle}
+      title={selected.title}
+      subtitle={selected.description}
       onSignOut={logout}
       actions={
         <>
-          {work.error ? <span role="alert" className="text-xs text-red-700">{work.error}</span> : null}
-          <Chip tone={d.loadingData ? 'attention' : 'ok'}>
+
+          <span className="admin-session-status"><Chip tone={d.loadingData ? 'attention' : 'neutral'}>
             <StatusDot tone={d.loadingData ? 'attention' : 'ok'} pulse={d.loadingData} />
-            {d.loadingData ? 'Syncing' : 'Live'}
-          </Chip>
+            {d.loadingData ? 'Loading reports' : 'Admin access'}
+          </Chip></span>
           {/* The archive is read once per tab; this re-reads it on demand. */}
           {['desk','reports','people'].includes(section) ? <AdminButton size="sm" variant="ghost" title="Re-read the full report archive" onClick={() => { if (db) void adminIncidents.refresh(db); }}><RefreshCw size={14} /><span className="hidden sm:inline">Refresh</span></AdminButton> : null}
         </>
       }
     >
-      {section === 'desk' && <DeskSection d={d} tasks={deskTasks(work, () => setSection('content'), () => setSection('partners'))} />}
+      {Object.keys(d.dataErrors).length?<details className="admin-read-warning"><summary>Some reports could not be loaded</summary>{Object.entries(d.dataErrors).map(([name,error])=><p key={name} role="alert"><strong>{name}:</strong> {error}</p>)}</details>:null}
+      {work.error ? <details className="admin-read-warning"><summary>Some task counts are unavailable</summary><p role="alert">{work.error}</p></details> : null}
+      <AdminSectionBoundary key={section}><Suspense fallback={<Panel title="Opening workspace"><SkeletonRows /></Panel>}>
+      {section==='desk'&&<div className="admin-quick-actions">{ADMIN_SECTIONS.filter(i=>['partners','content','members','planner','ops','feeds'].includes(i.id)).map(i=><button key={i.id} onClick={()=>setSection(i.id)}><strong>{i.title}</strong><span>{i.description}</span></button>)}</div>}
+      {section === 'desk' && <DeskSection d={d} work={work} tasks={deskTasks(work, () => setSection('content'), view => setSection('partners',view), queue=>setSection('ops','queue',queue),()=>setSection('planner','replies'))} />}
       {section === 'planner' && <WeeklyEmailPlanner profiles={d.digestSubscribers} profilesLoading={!d.digestSubscribersLoaded} profilesError={d.digestSubscribersError} />}
       {section === 'reports' && <ReportsSection d={d} />}
       {section === 'people' && <PeopleSection d={d} />}
@@ -211,6 +206,7 @@ export default function AdminPage() {
       {section === 'partners' && <PartnersWorkspace />}
       {section === 'demand' && <DemandWorkspace />}
       {section === 'members' && <MembersWorkspace d={d} onOpen={(id) => setSection(id as Section)} />}
+      </Suspense></AdminSectionBoundary>
     </AdminShell>
   );
 }
@@ -220,20 +216,25 @@ type D = ReturnType<typeof useAdminData>;
 // ── Watch desk ────────────────────────────────────────────────────────────────
 
 /** Content work for the desk queue, worded as what to do. */
-function deskTasks(work: AdminWorkload, openContent: () => void, openPartners?: () => void) {
+function deskTasks(work: AdminWorkload, openContent: () => void, openPartners?: (view?:string) => void, openSocial?:(queue:string)=>void, openReplies?:()=>void) {
   const tasks: Array<{ id: string; tone: 'attention' | 'critical'; kind: string; title: string; detail?: string; open: () => void }> = [];
   if (work.stuckActions) tasks.push({ id: 'stuck', tone: 'critical', kind: 'Moderation job', title: `${work.stuckActions} event change${work.stuckActions > 1 ? 's' : ''} queued over 2 hours`, detail: 'The hourly “Apply Discovery Moderation” workflow may not be running', open: openContent });
   if (work.failedActions) tasks.push({ id: 'failed', tone: 'critical', kind: 'Moderation failed', title: `${work.failedActions} event change${work.failedActions > 1 ? 's' : ''} couldn’t be applied`, detail: 'See the reason under Recent queued changes', open: openContent });
-  if (work.ownerUpdates && openPartners) tasks.push({ id: 'owner-updates', tone: 'attention', kind: 'Business updates', title: `${work.ownerUpdates} owner update notification${work.ownerUpdates > 1 ? 's' : ''}`, detail: 'Automatically applied updates or failures; no approval needed', open: openPartners });
-  if (work.claims && openPartners) tasks.push({ id: 'claims', tone: 'attention', kind: 'Organizers', title: `${work.claims} listing claim${work.claims > 1 ? 's' : ''} or change${work.claims > 1 ? 's' : ''} waiting`, detail: 'Confirm who they are, or apply what they sent', open: openPartners });
+  if (work.ownerUpdates && openPartners) tasks.push({ id: 'owner-updates', tone: 'attention', kind: 'Business updates', title: `${work.ownerUpdates} owner update notification${work.ownerUpdates > 1 ? 's' : ''}`, detail: 'Automatically applied updates or failures; no approval needed', open: () => openPartners('updates') });
+  if ((work.pendingClaims || work.legacyUpdates) && openPartners) tasks.push({ id: 'claims', tone: 'attention', kind: 'Organizers', title: `${(work.pendingClaims??0)+(work.legacyUpdates??0)} claims or listing changes waiting`, detail: 'Confirm who they are, or apply what they sent', open: () => openPartners('claims') });
   if (work.suggestions) tasks.push({ id: 'suggestions', tone: 'attention', kind: 'Suggestions', title: `${work.suggestions} event suggestion${work.suggestions > 1 ? 's' : ''} from residents`, detail: 'Check the source, then approve or reject', open: openContent });
+  if(work.marketRequests&&openPartners)tasks.push({id:'market-requests',tone:'attention',kind:'Market HQ',title:`${work.marketRequests} market service requests`,open:()=>openPartners('markets')});
+  if(work.socialCorrections&&openSocial)tasks.push({id:'social-corrections',tone:'critical',kind:'Instagram',title:`${work.socialCorrections} corrections to handle`,open:()=>openSocial('corrections')});
+  if(work.socialReview&&openSocial)tasks.push({id:'social-review',tone:'attention',kind:'Instagram',title:`${work.socialReview} drafts to review`,open:()=>openSocial('review')});
+  if(work.readerReplies&&openReplies)tasks.push({id:'reader-replies',tone:'attention',kind:'Email',title:`${work.readerReplies} reader replies to handle`,open:openReplies});
   return tasks;
 }
 
-function DeskSection({ d, tasks }: { d: D; tasks: ReturnType<typeof deskTasks> }) {
+function DeskSection({ d, work, tasks }: { d: D; work:AdminWorkload; tasks: ReturnType<typeof deskTasks> }) {
   return (
     <>
       <AttentionQueue
+        emptyStatus={work.loading||d.loadingData?'loading':work.error||Object.values(d.dataErrors).some(Boolean)?'unavailable':'clear'}
         tasks={tasks}
         flagged={d.flaggedIncidents}
         pendingReview={d.pendingReviewIncidents}
@@ -246,6 +247,7 @@ function DeskSection({ d, tasks }: { d: D; tasks: ReturnType<typeof deskTasks> }
         deletingId={d.deletingId}
       />
 
+      <details className="admin-overview-details"><summary>Reports, traffic & city overview</summary><div className="space-y-4 mt-3">
       <StatGrid>
         <StatTile label="Resident reports today" value={d.todayIncidents} tone="signal" hint="Community submissions · last 24 hours" />
         <StatTile label="Resident report history" value={d.totalIncidents} hint="Retained permanently" />
@@ -296,6 +298,7 @@ function DeskSection({ d, tasks }: { d: D; tasks: ReturnType<typeof deskTasks> }
         <StatTile label="Distinct reporters" value={d.uniqueReporterEmails} hint="Excludes anonymous and system" />
         <StatTile label="Avg safety score" value={d.averageSafety} unit="/100" tone="ok" hint="Across tracked communities" />
       </StatGrid>
+      </div></details>
     </>
   );
 }

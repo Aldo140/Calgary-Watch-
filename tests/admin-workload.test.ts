@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {emptyAdminWorkloadSources,readAdminWorkload} from '../src/lib/adminWorkload';
-const healthy=()=>({suggestions:async()=>3,queue:async()=>[{status:'failed',createdAt:100}],claims:async()=>2,updates:async()=>1,service:async()=>4,ownerUpdates:async()=>5});
+const healthy=()=>({suggestions:async()=>3,queue:async()=>[{status:'failed',createdAt:100}],claims:async()=>2,updates:async()=>1,service:async()=>4,ownerUpdates:async()=>5,socialReview:async()=>2,socialCorrections:async()=>1,readerReplies:async()=>4});
 test('a denied notification collection preserves successful claim and publishing counts',async()=>{
  const reads=healthy();reads.ownerUpdates=async()=>{throw {code:'permission-denied'};};
  const {sources,error}=await readAdminWorkload(reads,emptyAdminWorkloadSources());
- assert.equal(sources.claims,2);assert.equal(sources.suggestions,3);assert.equal(sources.queue.length,1);assert.equal(sources.updates+sources.service,5);assert.match(error,/Business update notifications unavailable/);assert.match(error,/rules/);
+ assert.equal(sources.socialReview,2);assert.equal(sources.socialCorrections,1);assert.equal(sources.readerReplies,4);assert.equal(sources.claims,2);assert.equal(sources.suggestions,3);assert.equal(sources.queue.length,1);assert.equal(sources.updates+sources.service,5);assert.match(error,/Business update notifications unavailable/);assert.match(error,/rules/);
 });
 test('failed counters retain their last good values and recovery clears the error',async()=>{
  const previous={...emptyAdminWorkloadSources(),ownerUpdates:8};const reads=healthy();reads.ownerUpdates=async()=>{throw Error('Offline');};

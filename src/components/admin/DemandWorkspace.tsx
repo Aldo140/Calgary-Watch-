@@ -19,6 +19,7 @@ export function DemandWorkspace() {
   const [days, setDays] = useState<(typeof WINDOWS)[number]>(30);
   const [rows, setRows] = useState<Array<{ q: string; results: number; ts: number }> | null>(null);
   const [error, setError] = useState('');
+  const [attempt,setAttempt]=useState(0);
 
   useEffect(() => {
     if (!db) { setRows([]); return; }
@@ -26,9 +27,9 @@ export function DemandWorkspace() {
     setRows(null); setError('');
     getDocs(query(collection(db, SEARCH_DEMAND), where('ts', '>=', Date.now() - days * 86_400_000), orderBy('ts', 'desc'), limit(2000)))
       .then((snap) => { if (live) setRows(snap.docs.map((d) => d.data() as { q: string; results: number; ts: number })); })
-      .catch((e) => { if (live) { setRows([]); setError(e instanceof Error ? e.message : 'Could not load searches.'); } });
+      .catch((e) => { if (live) { setError(e instanceof Error ? e.message : 'Could not load searches.'); } });
     return () => { live = false; };
-  }, [days]);
+  }, [days,attempt]);
 
   const terms = useMemo(() => summarizeDemand(rows ?? []), [rows]);
   const misses = terms.filter((t) => t.lastResults === 0);
@@ -42,7 +43,8 @@ export function DemandWorkspace() {
         ))}
         <span className="text-xs" style={{ color: T.muted }}>Anonymous: the words and the result count only.</span>
       </div>
-      {error ? <Panel title="Couldn’t load searches"><p className="p-4 text-sm" style={{ color: T.critical }}>{error} If this says permission denied, deploy the Firestore rules (Deploy Firebase Backend → rules).</p></Panel> : null}
+      {error ? <Panel title="Couldn’t load searches"><AdminButton variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry searches</AdminButton><p className="p-4 text-sm" style={{ color: T.critical }}>{error} If this says permission denied, deploy the Firestore rules (Deploy Firebase Backend → rules).</p></Panel> : null}
+      {!error&&<>
       <StatGrid>
         <StatTile label="Searches" value={rows ? total : null} hint={`Last ${days} days`} />
         <StatTile label="Distinct terms" value={rows ? terms.length : null} />
@@ -61,6 +63,7 @@ export function DemandWorkspace() {
             : <EmptyState icon={<Search size={20} />} title="No searches yet" body="Searches appear here once people use the site search." />}
         </Panel>
       </div>
+      </>}
     </div>
   );
 }

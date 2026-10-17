@@ -1,3 +1,8 @@
+import {useAdminView} from '../../hooks/useAdminView';
+import {useAdminDocument} from '../../hooks/useAdminDocument';
+import {formatAdminSchedule,parseAdminSchedule} from '../../lib/adminSchedule';
+import {WorkspaceTabs} from './WorkspaceTabs';
+import {AdminSnapshotNotice} from './AdminSnapshotNotice';
 import { firestoreActionError } from '@/src/lib/firestoreErrors';
 /**
  * Operations: the @calgarydaily post queue (CalgaryWatch's sister account; there
@@ -31,24 +36,25 @@ const STATUS_TONE: Partial<Record<PostStatus, Tone>> = {
 const BRAND_LABEL: Record<BrandId, string> = { calgarywatch: 'CalgaryWatch', calgarydaily: 'CalgaryDaily' };
 
 const when = (ms: number | null | undefined) => ms ? calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(ms)) : '—';
-/** datetime-local works in the browser's zone; admins are in Calgary, and the label says so. */
-const toLocalInput = (ms: number) => { const d = new Date(ms); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
+const sourceHost=(url:string)=>{try{return new URL(url).hostname;}catch{return url;}};
 
 function PostCard({ post }: { post: OpsPost }) {
   const { user } = useAuth();
-  const [caption, setCaption] = useState(post.caption);
-  const [alt, setAlt] = useState(post.altText);
-  const [at, setAt] = useState(toLocalInput(post.scheduledFor ?? post.suggestedFor ?? Date.now() + 3_600_000));
+  const [caption, setCaption] = useState(post.caption??'');
+  const [alt, setAlt] = useState(post.altText??'');
+  const [at, setAt] = useState(formatAdminSchedule(post.scheduledFor ?? post.suggestedFor ?? Date.now() + 3_600_000));
   const [note, setNote] = useState(post.note ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  useEffect(() => { setCaption(post.caption); setAlt(post.altText); }, [post.caption, post.altText]);
+  useEffect(() => { setCaption(post.caption??''); setAlt(post.altText??''); }, [post.caption, post.altText]);
 
   const editable = ['drafted', 'approved', 'failed', 'expired', 'rejected'].includes(post.status);
-  const dirty = caption !== post.caption || alt !== post.altText;
+  const dirty = caption !== (post.caption??'') || alt !== (post.altText??'') || note !== (post.note??'');
+  useEffect(()=>setAt(formatAdminSchedule(post.scheduledFor??post.suggestedFor??Date.now()+3_600_000)),[post.scheduledFor,post.suggestedFor]);
 
   async function save(patch: Partial<OpsPost>) {
-    if (!db || !user) return;
+    if (!db || !user || busy) return;
+    if(patch.status==='approved'&&(!Number.isFinite(patch.scheduledFor)||Number(patch.scheduledFor)<=Date.now())){setError('Choose a future date and time in Calgary before scheduling.');return;}
     setBusy(true); setError('');
     try {
       await updateDoc(doc(db, 'ops_queue', post.id), { caption, altText: alt, note, ...patch, reviewedByEmail: user.email ?? null, reviewedAt: Date.now(), updatedAt: Date.now() });
@@ -95,7 +101,7 @@ function PostCard({ post }: { post: OpsPost }) {
         <details className="text-xs rounded-lg border px-3 py-2" style={{ borderColor: T.line, color: T.muted }}>
           <summary className="cursor-pointer font-semibold" style={{ color: T.ink }}>Facts it was written from ({post.sourceUrls?.length ?? 0} source{post.sourceUrls?.length === 1 ? '' : 's'})</summary>
           <pre className="whitespace-pre-wrap mt-2 leading-relaxed" style={{ fontFamily: mono }}>{post.facts || post.requestUrl}</pre>
-          <div className="flex flex-wrap gap-2 mt-2">{post.sourceUrls?.map(u => <a key={u} href={u} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold" style={{ color: T.signal }}><Link2 size={12} />{new URL(u).hostname}</a>)}</div>
+          <div className="flex flex-wrap gap-2 mt-2">{post.sourceUrls?.map(u => <a key={u} href={u} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold" style={{ color: T.signal }}><Link2 size={12} />{sourceHost(u)}</a>)}</div>
         </details>
 
         <Field label={`Caption (${caption.length}/2200)`}>
@@ -119,13 +125,13 @@ function PostCard({ post }: { post: OpsPost }) {
 
         <div className="flex flex-wrap gap-2">
           {editable && post.status !== 'approved' && (
-            <AdminButton tone="ok" disabled={busy || !caption.trim()} onClick={() => save({ status: 'approved', scheduledFor: new Date(at).getTime(), error: null, attempts: 0 })}>
-              <CheckCircle2 size={15} /> Approve for {when(new Date(at).getTime())}
+            <AdminButton tone="ok" disabled={busy || !caption.trim()} onClick={() => save({ status: 'approved', scheduledFor: parseAdminSchedule(at), error: null, attempts: 0 })}>
+              <CheckCircle2 size={15} /> Approve for {when(parseAdminSchedule(at))}
             </AdminButton>
           )}
           {post.status === 'approved' && (
             <>
-              <AdminButton tone="signal" disabled={busy} onClick={() => save({ status: 'approved', scheduledFor: new Date(at).getTime() })}><Send size={15} /> Reschedule to {when(new Date(at).getTime())}</AdminButton>
+              <AdminButton tone="signal" disabled={busy} onClick={() => save({ status: 'approved', scheduledFor: parseAdminSchedule(at) })}><Send size={15} /> Reschedule to {when(parseAdminSchedule(at))}</AdminButton>
               <AdminButton variant="outline" disabled={busy} onClick={() => save({ status: 'drafted', scheduledFor: null })}>Unschedule</AdminButton>
             </>
           )}
@@ -133,10 +139,7 @@ function PostCard({ post }: { post: OpsPost }) {
           {editable && <AdminButton variant="outline" disabled={busy} onClick={() => save({ status: 'redraft' })} title="The next run writes and renders a new draft, using your note"><RefreshCw size={14} /> Redraft</AdminButton>}
           {editable && post.status !== 'rejected' && <AdminButton variant="outline" tone="critical" disabled={busy} onClick={() => save({ status: 'rejected' })}><XCircle size={14} /> Reject</AdminButton>}
           {post.status === 'needs-correction' && (
-            <AdminButton tone="ok" disabled={busy} onClick={async () => {
-              if (!db || !user) return;
-              await updateDoc(doc(db, 'ops_queue', post.id), { status: 'published', correction: null, reviewedByEmail: user.email ?? null, reviewedAt: Date.now(), updatedAt: Date.now() });
-            }}>I fixed it on Instagram</AdminButton>
+            <AdminButton tone="ok" disabled={busy} onClick={() => save({status:'published',correction:null})}>I fixed it on Instagram</AdminButton>
           )}
         </div>
         {post.status === 'approved' && <p className="text-xs" style={{ color: T.muted }}>Publishes at the first hourly run after {when(post.scheduledFor)}.</p>}
@@ -150,14 +153,15 @@ function BriefForm() {
   const [brand, setBrand] = useState<BrandId>('calgarydaily');
   const [url, setUrl] = useState('');
   const [note, setNote] = useState('');
+  const [sending,setSending]=useState(false);const[submitError,setSubmitError]=useState('');
   const [msg, setMsg] = useState('');
   async function submit() {
-    if (!db || !user) return;
+    if (!db || !user||sending) return;setSending(true);setSubmitError('');setMsg('');
     const id = `brief-${Date.now()}`;
     try {
       await setDoc(doc(db, 'ops_queue', id), { id, brand, status: 'requested', template: 'update', requestUrl: url.trim(), note: note.trim(), fingerprint: `${brand}|brief|${url.trim()}`.slice(0, 300), createdAt: Date.now(), updatedAt: Date.now(), reviewedByEmail: user.email ?? null });
       setUrl(''); setNote(''); setMsg('Queued. The next hourly run drafts it for review.');
-    } catch (e) { setMsg(e instanceof Error ? e.message : 'Could not queue'); }
+    } catch (e) { setSubmitError(firestoreActionError(e)); }finally{setSending(false);}
   }
   return (
     <Panel title="Draft a post from a page" subtitle="Paste a City of Calgary notice, organizer page or news source. The agent reads only that page, drafts, and waits for you.">
@@ -169,18 +173,21 @@ function BriefForm() {
         </Field>
         <Field label="Source URL (https)"><input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://newsroom.calgary.ca/…" className={inputClass} style={inputStyle} /></Field>
         <Field label="Angle (optional)"><input value={note} onChange={e => setNote(e.target.value)} maxLength={1000} className={inputClass} style={inputStyle} /></Field>
-        <AdminButton tone="signal" disabled={!/^https:\/\/.{4,}/.test(url.trim())} onClick={submit}>Queue brief</AdminButton>
+        <AdminButton tone="signal" disabled={sending||!/^https:\/\/.{4,}/.test(url.trim())} onClick={submit}>Queue brief</AdminButton>
       </div>
+      {submitError&&<p role="alert" className="text-sm mt-2">{submitError}</p>}
       {msg && <p className="text-xs mt-2" style={{ color: T.muted }}>{msg}</p>}
     </Panel>
   );
 }
 
 export function OpsHealthPanel() {
-  const [health, setHealth] = useState<OpsHealth | null>(null);
-  useEffect(() => db ? onSnapshot(doc(db, 'ops_health', 'latest'), s => setHealth(s.exists() ? s.data() as OpsHealth : null), () => setHealth(null)) : undefined, []);
+  const {data:health,error,loading,retry}=useAdminDocument<OpsHealth>('ops_health','latest');
+  if(loading)return <Panel title="Agent health"><SkeletonRows /></Panel>;
+  if(error)return <Panel title="Agent health"><p role="alert">{error}</p><AdminButton variant="outline" onClick={retry}>Retry report</AdminButton></Panel>;
   return (
     <Panel title="Agent health" subtitle={health ? `Checked ${when(health.checkedAt)}` : 'Written by the daily operations run'}>
+      <AdminSnapshotNotice updatedAt={health?.checkedAt} />
       {!health ? <p className="text-sm" style={{ color: T.muted }}>No health report yet. It appears after the first daily run (Operations Daily workflow).</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {health.items.map(i => (
@@ -217,14 +224,16 @@ function PerfTable({ title, rows }: { title: string; rows: PerformanceRow[] }) {
 
 /** What's working: written by the daily run from Instagram's own numbers (scripts/ops/jobs/insights.ts). */
 export function PerformancePanel() {
-  const [perf, setPerf] = useState<OpsPerformance | null>(null);
-  useEffect(() => db ? onSnapshot(doc(db, 'ops_health', 'performance'), s => setPerf(s.exists() ? s.data() as OpsPerformance : null), () => setPerf(null)) : undefined, []);
+  const {data:perf,error,loading,retry}=useAdminDocument<OpsPerformance>('ops_health','performance');
+  if(loading)return <Panel title="Social performance"><SkeletonRows /></Panel>;
+  if(error)return <Panel title="Social performance"><p role="alert">{error}</p><AdminButton variant="outline" onClick={retry}>Retry report</AdminButton></Panel>;
   const days = perf ? Object.keys(perf.followers).sort() : [];
   const latest = days.at(-1);
   const weekAgo = days.filter(d => latest && d <= new Date(Date.parse(latest) - 7 * 86_400_000).toISOString().slice(0, 10)).at(-1);
   const change = perf && latest && weekAgo ? perf.followers[latest] - perf.followers[weekAgo] : 0;
   return (
     <Panel title="How @calgarydaily is doing" subtitle={perf ? `Last 30 days · updated ${when(perf.updatedAt)}` : 'Written by the daily run from Instagram insights'}>
+      <AdminSnapshotNotice updatedAt={perf?.updatedAt} />
       {!perf ? <p className="text-sm" style={{ color: T.muted }}>No numbers yet. They appear after the next daily run.</p> : (
         <div className="space-y-4">
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
@@ -269,11 +278,13 @@ function HistoryTable({ title, rows }: { title: string; rows: HistoryGroup[] }) 
 
 /** Every post the account has ever made, ranked (scripts/ops/jobs/accountHistory.ts). */
 export function AccountHistoryPanel() {
-  const [h, setH] = useState<AccountHistory | null>(null);
-  useEffect(() => db ? onSnapshot(doc(db, 'ops_health', 'account_history'), s => setH(s.exists() ? s.data() as AccountHistory : null), () => setH(null)) : undefined, []);
+  const {data:h,error,loading,retry}=useAdminDocument<AccountHistory>('ops_health','account_history');
+  if(loading)return <Panel title="Account history"><SkeletonRows /></Panel>;
+  if(error)return <Panel title="Account history"><p role="alert">{error}</p><AdminButton variant="outline" onClick={retry}>Retry report</AdminButton></Panel>;
   const views = (r: HistoryRow) => r.views ?? r.reach ?? null;
   return (
     <Panel title="All-time @calgarydaily posts" subtitle={h ? `${h.totalPosts} posts, numbers for ${h.measuredPosts} · updated ${when(h.updatedAt)}` : 'Every post on the account, ranked by views'}>
+      <AdminSnapshotNotice updatedAt={h?.updatedAt} />
       {!h ? <p className="text-sm" style={{ color: T.muted }}>No history yet. It fills in over the next few daily runs.</p> : (
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
@@ -298,16 +309,18 @@ export function AccountHistoryPanel() {
 }
 
 export function OpsWorkspace() {
+  const[workspace,setWorkspace]=useAdminView(['queue','brief','health','performance','history'] as const,'queue');
   const [posts, setPosts] = useState<OpsPost[] | null>(null);
   const [error, setError] = useState('');
-  const [view, setView] = useState<View>('review');
+  const[attempt,setAttempt]=useState(0);
+  const [view, setView] = useAdminView(['review','scheduled','published','corrections','other'] as const,'review','queue');
 
   useEffect(() => {
-    if (!db) return;
+    if (!db||workspace!=='queue') return;
     return onSnapshot(query(collection(db, 'ops_queue'), orderBy('updatedAt', 'desc'), limit(300)),
-      s => setPosts(s.docs.map(d => d.data() as OpsPost)),
+      s => {setError('');setPosts(s.docs.map(d=>({...d.data(),id:d.id}) as OpsPost));},
       e => setError(e.message.includes('permission') ? 'The operations rules are not deployed yet. Run "Deploy Firebase Backend" with target rules.' : e.message));
-  }, []);
+  }, [workspace,attempt]);
 
   const counts = useMemo(() => Object.fromEntries((Object.keys(VIEWS) as View[]).map(v => [v, (posts ?? []).filter(p => VIEWS[v].statuses.includes(p.status)).length])), [posts]);
   const shown = (posts ?? [])
@@ -316,21 +329,23 @@ export function OpsWorkspace() {
 
   return (
     <div className="space-y-4">
-      <OpsHealthPanel />
-      <PerformancePanel />
-      <AccountHistoryPanel />
-      <BriefForm />
+      <WorkspaceTabs label="Social tools" value={workspace} onChange={setWorkspace} items={[{id:'queue',label:'Post queue',description:'Review, schedule and correct'},{id:'brief',label:'Request a draft',description:'Start from an official page'},{id:'health',label:'Automation health',description:'Connections and run status'},{id:'performance',label:'Performance',description:'Recent Instagram insights'},{id:'history',label:'Account history',description:'All-time published posts'}]} />
+      {workspace==='health'&&<OpsHealthPanel />}
+      {workspace==='performance'&&<PerformancePanel />}
+      {workspace==='history'&&<AccountHistoryPanel />}
+      {workspace==='brief'&&<BriefForm />}
+      {workspace==='queue'&&<>
       <Panel title="Instagram queue · @calgarydaily" subtitle="Drafted each morning from verified listings. Listing posts that pass the brand rules are scheduled automatically; everything else waits for you." padded={false}>
         <div className="px-4 pt-3 space-y-2">
           <FilterRow>
             {(Object.keys(VIEWS) as View[]).map(v => <FilterChip key={v} active={view === v} onClick={() => setView(v)} count={counts[v]}>{VIEWS[v].label}</FilterChip>)}
           </FilterRow>
         </div>
-        {error ? <p role="alert" className="p-4 text-sm" style={{ color: T.critical }}>{error}</p>
+        {error ? <div className="p-4 space-y-2"><p role="alert" className="text-sm" style={{ color: T.critical }}>{error}</p><AdminButton variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry loading</AdminButton></div>
           : !posts ? <div className="p-4"><SkeletonRows /></div>
           : !shown.length ? <EmptyState title={`Nothing in ${VIEWS[view].label.toLowerCase()}`} body={view === 'review' ? 'New drafts arrive after the daily run (about 7 am).' : undefined} />
           : <div>{shown.map(p => <PostCard key={p.id} post={p} />)}</div>}
-      </Panel>
+      </Panel></>}
       <p className="text-xs" style={{ color: T.muted, fontFamily: display }}>Accounts post at most their daily limit; images are brand templates, never photos. Brand rules live in brand/*.json.</p>
     </div>
   );

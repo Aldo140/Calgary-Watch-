@@ -18,7 +18,7 @@ import { db } from '@/src/firebase';
 import { adminUsers } from '@/src/lib/adminStore';
 import { interestLabel, normalizeInterests } from '@/src/lib/eventPicks';
 import { emailPlan } from '@/src/lib/memberHome';
-import { Chip, EmptyState, FilterChip, FilterRow, Panel, SearchField, SkeletonRows, T, TimeAgo, mono } from './ui';
+import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, SearchField, SkeletonRows, T, TimeAgo, mono } from './ui';
 
 type Row = { id: string; uid: string } & Record<string, unknown>;
 type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'business' | 'new';
@@ -58,6 +58,7 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
 ];
 
 export function MembersDirectory() {
+  const [directoryError,setDirectoryError]=useState('');
   const [rows, setRows] = useState<Row[] | null>(null);
   const [claims,setClaims]=useState<ListingClaim[]>([]);
   const [accessError,setAccessError]=useState('');
@@ -70,7 +71,7 @@ export function MembersDirectory() {
 
   useEffect(() => {
     if (!db) { setRows([]); return; }
-    return adminUsers.subscribe(db, ({ rows: r, loading }) => { if (!loading || r.length) setRows(r as Row[]); });
+    return adminUsers.subscribe(db, ({ rows: r, loading, error }) => { setDirectoryError(error??'');if (!loading || r.length) setRows(r as Row[]); });
   }, []);
 
   const members = useMemo(() => (rows ?? []).map(r=>{const member=shape(r);return {...member,business:member.business||(accessByUid.get(member.uid)?.length??0)>0};}).sort((a, b) => b.createdAt - a.createdAt), [rows,accessByUid]);
@@ -89,7 +90,7 @@ export function MembersDirectory() {
         </FilterRow>
       </div>
       {accessError?<p role="status" className="p-4 text-sm">{accessError}</p>:null}
-      {rows === null ? <div className="p-4"><SkeletonRows /></div>
+      {directoryError?<div className="p-4"><p role="alert">Members could not be loaded: {directoryError}</p><AdminButton variant="outline" onClick={()=>{if(db)void adminUsers.refresh(db);}}>Retry members</AdminButton></div>:rows === null ? <div className="p-4"><SkeletonRows /></div>
         : !list.length ? <EmptyState icon={<Users size={20} />} title="Nobody matches" body={needle ? 'Try a shorter search.' : 'Members appear here as they sign in.'} />
         : (
           <ul className="mt-2">
@@ -118,6 +119,7 @@ export function MembersDirectory() {
                   </button>
                   {isOpen ? (
                     <div className="px-4 pb-4 space-y-3">
+                      <p className="font-semibold">{m.name}</p>
                       <p className="text-xs break-all" style={{ fontFamily: mono, color: T.muted }}>{m.email || 'No email on file'}</p>
                       <div className="flex flex-wrap gap-1.5">
                         <Chip tone={m.weekly ? 'ok' : 'neutral'}>{m.weekly ? 'Safety brief on' : 'Safety brief off'}</Chip>
@@ -131,7 +133,7 @@ export function MembersDirectory() {
                         {(accessByUid.get(m.uid)??[]).length?(accessByUid.get(m.uid)??[]).map(c=>{const org=approvedOrganization(c,discoveryRepository.list());return <div key={c.entityId}>
                           <p><strong>{org?.title??c.entityTitle}</strong> · {org?.managementOnly?'Organizer workspace · scoped to this listing and events they add':org?'Organization manager':'Listing unavailable; review access'}</p>
                           <p>{c.role}{c.reviewedAt?` · approved ${new Date(c.reviewedAt).toLocaleDateString('en-CA')}`:''}</p>
-                          {org?<><p>{discoveryRepository.list().filter(e=>e.kind==='event'&&(e.organizerEntityId===org.id||e.id===org.sourceListingId)&&!e.cancelled&&Date.parse(e.end)>Date.now()).length} upcoming linked events</p><Link to={`/organization/${org.id}?as=${encodeURIComponent(m.uid)}`}>Their organization workspace</Link> · <Link to={org.sourceListingId?c.entityPath:entityPath(org)}>{org.managementOnly?'Public listing':'Public organization profile'}</Link></>:<Link to={`/admin/partners`}>Confirm organization access in Claims</Link>}
+                          {org?<><p>{discoveryRepository.list().filter(e=>e.kind==='event'&&(e.organizerEntityId===org.id||e.id===org.sourceListingId)&&!e.cancelled&&Date.parse(e.end)>Date.now()).length} upcoming linked events</p><Link to={`/organization/${org.id}?as=${encodeURIComponent(m.uid)}`}>Their organization workspace</Link> · <Link to={org.sourceListingId?c.entityPath:entityPath(org)}>{org.managementOnly?'Public listing':'Public organization profile'}</Link></>:<Link to={`/admin?section=partners`}>Confirm organization access in Claims</Link>}
                           <p className="text-xs">Source approval: {c.entityTitle}</p>
                         </div>;}):<p>No approved claim loaded for this account. Review Claims before granting management access.</p>}
                       </div>:null}

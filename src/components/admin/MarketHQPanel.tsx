@@ -1,3 +1,4 @@
+import {adminFirestoreActionError} from '../../lib/firestoreErrors';
 /**
  * Market HQ from the admin side: managed-service requests ("have
  * CalgaryWatch run it"), and a way into any market's HQ, since admin can do
@@ -16,15 +17,16 @@ type Req = { id: string; uid: string; marketId: string; marketTitle: string; pla
 
 export function MarketHQPanel() {
   const [reqs, setReqs] = useState<Req[] | null>(null);
+  const [error,setError]=useState('');const[busy,setBusy]=useState(false);const[attempt,setAttempt]=useState(0);
   const [q, setQ] = useState('');
   useEffect(() => {
     if (!db) return;
-    return onSnapshot(query(collection(db, SERVICE), limit(200)), (s) => setReqs(s.docs.map((d) => ({ ...(d.data() as Omit<Req, 'id'>), id: d.id })).sort((a, b) => b.createdAt - a.createdAt)), () => setReqs([]));
-  }, []);
+    return onSnapshot(query(collection(db, SERVICE), limit(200)), (s) => {setError('');setReqs(s.docs.map((d) => ({ ...(d.data() as Omit<Req, 'id'>), id: d.id })).sort((a, b) => b.createdAt - a.createdAt));}, e => setError(adminFirestoreActionError(e)));
+  }, [attempt]);
   const markets = useMemo(() => discoveryRepository.list().filter((e) => e.kind === 'market'), []);
   const found = q.trim().length >= 2 ? markets.filter((m) => m.title.toLowerCase().includes(q.trim().toLowerCase())).slice(0, 8) : [];
   const open = (reqs ?? []).filter((r) => r.status !== 'closed');
-  const setStatus = (r: Req, status: string) => db && updateDoc(doc(db, SERVICE, r.id), { status }).catch(() => undefined);
+  const setStatus=async(r:Req,status:string)=>{if(!db||busy)return;setBusy(true);setError('');try{await updateDoc(doc(db,SERVICE,r.id),{status});}catch(e){setError(adminFirestoreActionError(e));}finally{setBusy(false);}};
 
   return (
     <Panel title="Market HQ" subtitle={open.length ? `${open.filter((r) => r.status === 'new').length} new request${open.filter((r) => r.status === 'new').length === 1 ? '' : 's'} to run a market for them` : 'Markets that asked us to run vendors, lineups and messages for them.'} padded={false}>
@@ -34,7 +36,7 @@ export function MarketHQPanel() {
           {found.map((m) => <li key={m.id} className="flex items-center justify-between gap-2 text-sm"><span style={{ color: T.ink }}>{m.title}</span><Link to={`/organizer/${encodeURIComponent(m.id)}`} className="text-xs font-bold" style={{ color: T.signal }}>Open HQ →</Link></li>)}
         </ul>
       ) : null}
-      {reqs === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+      {error?<div className="p-4"><p role="alert">{error}</p><AdminButton variant="outline" onClick={()=>{setError('');setReqs(null);setAttempt(n=>n+1);}}>Retry requests</AdminButton></div>:reqs === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
         : !open.length ? <EmptyState icon={<Handshake size={20} />} title="No requests yet" body="Organizers ask from Market HQ → Plan & sharing." />
         : open.map((r) => (
           <article key={r.id} className="p-4 border-t space-y-2" style={{ borderColor: T.line }}>
@@ -46,9 +48,9 @@ export function MarketHQPanel() {
             {r.note ? <p className="text-sm" style={{ color: T.ink }}>“{r.note}”</p> : null}
             <div className="flex flex-wrap gap-2">
               <Link to={`/organizer/${encodeURIComponent(r.marketId)}`}><AdminButton tone="signal"><Store size={14} /> Open their HQ</AdminButton></Link>
-              {r.status === 'new' ? <AdminButton variant="outline" tone="ok" onClick={() => void setStatus(r, 'active')}>We’re running it</AdminButton> : null}
+              {r.status === 'new' ? <AdminButton variant="outline" tone="ok" disabled={busy} onClick={() => void setStatus(r, 'active')}>We’re running it</AdminButton> : null}
               <a className="inline-flex items-center text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: T.line, color: T.ink }} href={`mailto:${r.contact}?subject=${encodeURIComponent(`Running ${r.marketTitle} on Market HQ`)}`}>Email them</a>
-              <AdminButton variant="ghost" onClick={() => void setStatus(r, 'closed')}>Close</AdminButton>
+              <AdminButton variant="ghost" disabled={busy} onClick={() => void setStatus(r, 'closed')}>Close</AdminButton>
             </div>
           </article>
         ))}

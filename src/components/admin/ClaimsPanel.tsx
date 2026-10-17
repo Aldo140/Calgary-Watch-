@@ -10,7 +10,7 @@ import { trackSubscription } from '@/src/lib/readEfficiency';
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { collection, doc, getDoc, limit, onSnapshot, query, setDoc, updateDoc, runTransaction, where } from 'firebase/firestore';
+import { collection, doc, getDoc, limit, onSnapshot, query, setDoc, updateDoc, runTransaction, where , getDocs} from 'firebase/firestore';
 import { BadgeCheck, ExternalLink, Mail, X } from 'lucide-react';
 import { db } from '@/src/firebase';
 import { useAuth } from '@/src/components/FirebaseProvider';
@@ -110,7 +110,8 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
         for(const peer of response.data.accounts??[])adminUsers.patch(peer.uid,peer.account);
         // The outreach pipeline learns the listing was claimed, so it stops pitching —
         // every lead for it (a listing can have a business lead and an organizer lead).
-        for (const lead of leads?.filter((l) => l.entityId === c.entityId) ?? []) {
+        const matchingLeads=leads?.filter((l) => l.entityId === c.entityId)??await getDocs(query(collection(db,'partner_leads'),where('entityId','==',c.entityId),limit(100))).then(s=>s.docs.map(d=>({...d.data(),id:d.id}))).catch(()=>[]);
+        for (const lead of matchingLeads) {
           await updateDoc(doc(db!, 'partner_leads', lead.id), { status: 'claimed', updatedAt: Date.now() }).catch(() => undefined);
         }
       }

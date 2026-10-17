@@ -1,5 +1,5 @@
 import { adminDataNeeds } from '@/src/lib/adminDataNeeds';
-import { firestoreActionError } from '@/src/lib/firestoreErrors';
+import { adminFirestoreActionError as firestoreActionError } from '@/src/lib/firestoreErrors';
 import { trackSubscription, adminReadCache } from '@/src/lib/readEfficiency';
 /**
  * Shared admin data layer.
@@ -160,6 +160,8 @@ export function useAdminData(section = 'all') {
   const [digestSubscribersLoaded, setDigestSubscribersLoaded] = useState(false);
   const [digestSubscribersError, setDigestSubscribersError] = useState('');
   const [pageViewDocs, setPageViewDocs] = useState<PageViewDoc[]>([]);
+  const [dataErrors,setDataErrors]=useState<Record<string,string>>({});
+  const reportRead=useCallback((name:string,error?:unknown)=>setDataErrors(previous=>{const next={...previous};if(error)next[name]=typeof error==='string'?error:firestoreActionError(error);else delete next[name];return next;}),[]);
   const [loadingData, setLoadingData] = useState(true);
   const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
   const [totalPageViews, setTotalPageViews] = useState<number | null>(null);
@@ -314,7 +316,8 @@ export function useAdminData(section = 'all') {
   useEffect(() => {
     if (!needs.incidents) { setLoadingData(false); return; }
     if (!isAuthReady || !user || !isAdmin || !db) return;
-    return adminIncidents.subscribe(db, ({ rows, loading }) => {
+    return adminIncidents.subscribe(db, ({ rows, loading, error }) => {
+      reportRead('Report archive',error);
       setIncidents([...rows].sort((a, b) => b.timestamp - a.timestamp));
       setLoadingData(loading);
     });
@@ -323,15 +326,15 @@ export function useAdminData(section = 'all') {
   useEffect(() => {
     if (!isAuthReady || !user || !isAdmin || !db || !needs.stats) return;
     return trackSubscription('admin:community_stats', () => onSnapshot(collection(db!, 'community_stats'), snapshot => {
-      setCommunityStats(snapshot.docs.map(row => ({ id: row.id, ...row.data() } as CommunityStats & { id: string; deleted?: boolean })).filter(row => incidentVisibility(row) !== 'deleted'));
-    }));
+      reportRead('City scores');setCommunityStats(snapshot.docs.map(row => ({ id: row.id, ...row.data() } as CommunityStats & { id: string; deleted?: boolean })).filter(row => incidentVisibility(row) !== 'deleted'));
+    },e=>reportRead('City scores',e)));
   }, [isAuthReady, isAdmin, user?.uid, needs.stats]);
 
   useEffect(() => {
     if (!isAuthReady || !user || !isAdmin || !db || !needs.users) return;
     return trackSubscription('admin:recent_users', () => onSnapshot(query(collection(db!, 'users'), orderBy('createdAt', 'desc'), limit(200)), snapshot => {
-      setUsers(snapshot.docs.map(row => ({ ...row.data(), uid: row.id } as UserProfile))); setUsersLoaded(true);
-    }));
+      reportRead('Recent members');setUsers(snapshot.docs.map(row => ({ ...row.data(), uid: row.id } as UserProfile))); setUsersLoaded(true);
+    },e=>reportRead('Recent members',e)));
   }, [isAuthReady, isAdmin, user?.uid, needs.users]);
 
   useEffect(() => {
@@ -348,9 +351,9 @@ export function useAdminData(section = 'all') {
     const load = () => {
       if (document.hidden) return;
       void adminReadCache.read(`${user.uid}:page_views`, () => getDocs(query(collection(database, 'page_views'), orderBy('timestamp','desc'), limit(200))), 5 * 60_000)
-        .then(snap => { if (active) setPageViewDocs(snap.docs.map(d => d.data() as PageViewDoc)); }).catch(() => {});
+        .then(snap => { if (active){setPageViewDocs(snap.docs.map(d => d.data() as PageViewDoc));reportRead('Recent visits');} }).catch(e => {if(active)reportRead('Recent visits',e);});
       void adminReadCache.read(`${user.uid}:page_view_count`, () => getCountFromServer(collection(database, 'page_views')), 5 * 60_000)
-        .then(snap => { if (active) setTotalPageViews(snap.data().count); }).catch(() => { if (active) setTotalPageViews(null); });
+        .then(snap => { if (active){setTotalPageViews(snap.data().count);reportRead('Visit count');} }).catch(e => { if (active)reportRead('Visit count',e); });
     };
     load(); const timer = window.setInterval(load, 5 * 60_000);
     return () => { active = false; clearInterval(timer); };
@@ -360,15 +363,15 @@ export function useAdminData(section = 'all') {
     if (!isAuthReady || !user || !isAdmin || !db || !needs.users) return;
     let active = true;
     void adminReadCache.read(`${user.uid}:account_count`, () => getCountFromServer(collection(db!, 'users')), 5 * 60_000)
-      .then(snap => { if (active) setAccountCount(snap.data().count); }).catch(() => { if (active) setAccountCount(null); });
+      .then(snap => { if (active){setAccountCount(snap.data().count);reportRead('Account count');} }).catch(e => { if (active)reportRead('Account count',e); });
     return () => { active = false; };
   }, [isAuthReady, isAdmin, user?.uid, needs.users]);
 
   useEffect(() => {
     if (!isAuthReady || !user || !isAdmin || !db || !needs.flagged) return;
     return trackSubscription('admin:flagged', () => onSnapshot(query(collection(db!, 'incidents'), where('visibility','==','flagged'), orderBy('flagged_at','desc')), snapshot => {
-      setFlaggedIncidents(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Incident)));
-    }));
+      reportRead('Flagged reports');setFlaggedIncidents(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Incident)));
+    },e=>reportRead('Flagged reports',e)));
   }, [isAuthReady, isAdmin, user?.uid, needs.flagged]);
 
   // ── API health polling ────────────────────────────────────────────────────
@@ -420,10 +423,10 @@ export function useAdminData(section = 'all') {
       (snapshot) => {
         const next: Record<string, ScheduledHealthDoc> = {};
         snapshot.docs.forEach((row) => { next[row.id] = row.data() as ScheduledHealthDoc; });
-        setScheduledHealthDocs(next);
+        reportRead('Ingestion health');setScheduledHealthDocs(next);
         setHealthClock(Date.now());
       },
-      () => setScheduledHealthDocs({}),
+      e => reportRead('Ingestion health',e),
     ));
     const clock = setInterval(() => setHealthClock(Date.now()), 60_000);
     return () => { unsubscribe(); clearInterval(clock); };
@@ -860,7 +863,7 @@ export function useAdminData(section = 'all') {
         safety_score: Number(draft.safety_score || 0),
       });
       await writeAuditLog('community_stats_update', 'community_stats', statsId, draft);
-    } finally { setSavingStatsId(null); }
+    } catch(err){alert(firestoreActionError(err));} finally { setSavingStatsId(null); }
   };
 
   const softDeleteIncident = async (incidentId: string) => {
@@ -887,7 +890,7 @@ export function useAdminData(section = 'all') {
       await updateDoc(doc(db, 'incidents', incidentId), { verified_status: 'unverified' });
       adminIncidents.patch(incidentId, { verified_status: 'unverified' });
       await writeAuditLog('incident_update', 'incidents', incidentId, { verified_status: 'unverified' });
-    } catch (err) { console.error('Failed to approve incident:', err); }
+    } catch (err) { alert(firestoreActionError(err)); }
   };
 
   const softDeleteCommunityStats = async (statsId: string) => {
@@ -909,12 +912,13 @@ export function useAdminData(section = 'all') {
       const snap = await getDocs(collection(db, 'users'));
       setUsers(snap.docs.map(d => ({ ...d.data(), uid: d.id } as UserProfile)));
       setUsersLoaded(true);
-    } catch {}
+      reportRead('Recent members');
+    } catch(e) {reportRead('Recent members',e);}
     setIsRefreshingUsers(false);
   };
   return {
     // ── auth ──
-    user, isAuthReady, isAdmin,
+    user, isAuthReady, isAdmin, dataErrors,
     // ── raw collections ──
     incidents, communityStats, users, usersLoaded, digestSubscribers, digestSubscribersLoaded, digestSubscribersError,
     pageViewDocs, flaggedIncidents,

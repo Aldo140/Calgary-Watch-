@@ -1,3 +1,4 @@
+import {adminFirestoreActionError} from '../../lib/firestoreErrors';
 import { useEffect, useMemo, useState } from 'react';
 import {
   collection, doc, limit, onSnapshot, orderBy, query, updateDoc, writeBatch,
@@ -97,6 +98,7 @@ export function DigestReplyInbox() {
   const [health, setHealth] = useState<ReplyHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const[actionError,setActionError]=useState('');const[healthError,setHealthError]=useState('');const[attempt,setAttempt]=useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<'active' | 'unread' | 'handled' | 'archived'>('active');
   const [search, setSearch] = useState('');
@@ -104,7 +106,7 @@ export function DigestReplyInbox() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!db) return;
+    if (!db) return;setLoading(true);setLoadError('');setHealthError('');
     const repliesQuery = query(collection(db, 'digest_replies'), orderBy('receivedAt', 'desc'), limit(100));
     const stopReplies = onSnapshot(repliesQuery, (snapshot) => {
       const rows = snapshot.docs.map((row) => ({ id: row.id, ...row.data() } as DigestReply));
@@ -118,10 +120,10 @@ export function DigestReplyInbox() {
       setLoading(false);
     });
     const stopHealth = onSnapshot(doc(db, 'ingestion_health', 'resend_inbound'), (snapshot) => {
-      setHealth(snapshot.exists() ? snapshot.data() as ReplyHealth : null);
-    });
+      setHealth(snapshot.exists() ? snapshot.data() as ReplyHealth : null);setHealthError('');
+    },error=>setHealthError(adminFirestoreActionError(error)));
     return () => { stopReplies(); stopHealth(); };
-  }, []);
+  }, [attempt]);
 
   const selected = replies.find((reply) => reply.id === selectedId) ?? null;
   useEffect(() => { setNote(selected?.note ?? ''); }, [selected?.id, selected?.note]);
@@ -142,7 +144,7 @@ export function DigestReplyInbox() {
 
   async function updateReply(reply: DigestReply, patch: Record<string, unknown>, action: string) {
     if (!db || !user || saving) return;
-    setSaving(true);
+    setSaving(true);setActionError('');
     try {
       const batch = writeBatch(db);
       batch.update(doc(db, 'digest_replies', reply.id), { ...patch, updatedAt: Date.now() });
@@ -153,7 +155,7 @@ export function DigestReplyInbox() {
         changes: patch, metadata: { providerId: reply.providerId },
       });
       await batch.commit();
-    } finally {
+    } catch(error){setActionError(adminFirestoreActionError(error));} finally {
       setSaving(false);
     }
   }
@@ -163,7 +165,7 @@ export function DigestReplyInbox() {
     if (reply.status === 'unread' && db && user) {
       await updateDoc(doc(db, 'digest_replies', reply.id), {
         status: 'open', openedAt: Date.now(), updatedAt: Date.now(),
-      }).catch((error) => console.error('Could not mark reply open:', error));
+      }).catch((error) => setActionError(adminFirestoreActionError(error)));
     }
   }
 
@@ -174,7 +176,8 @@ export function DigestReplyInbox() {
       action={<div className="flex items-center gap-2"><Chip tone={unread ? 'attention' : 'ok'}>{unread} unread</Chip><Inbox size={16} style={{ color: T.muted }} /></div>}
       padded={false}
     >
-      <HealthStrip health={health} />
+      {healthError?<p role="alert" className="p-4">Reply ingestion status unavailable: {healthError}</p>:<HealthStrip health={health} />}
+      {actionError?<p role="alert" className="p-4">{actionError}</p>:null}
       <div className="border-b px-3 py-3 sm:px-4" style={{ borderColor: T.line }}>
         <div className="flex flex-wrap items-center gap-2">
           <label className="relative min-w-[14rem] flex-1">
@@ -193,7 +196,7 @@ export function DigestReplyInbox() {
       </div>
 
       {loadError ? (
-        <div className="px-5 py-12 text-center"><p className="text-sm font-bold" style={{ color: T.critical }}>{loadError}</p></div>
+        <div className="px-5 py-12 text-center"><p className="text-sm font-bold" style={{ color: T.critical }} role="alert">{loadError}</p><AdminButton variant="outline" onClick={()=>setAttempt(n=>n+1)}>Retry replies</AdminButton></div>
       ) : loading ? (
         <div className="space-y-2 p-4" aria-label="Loading replies">{[0, 1, 2].map((row) => <div key={row} className="h-16 motion-safe:animate-pulse rounded-lg" style={{ background: T.surface }} />)}</div>
       ) : replies.length === 0 ? (

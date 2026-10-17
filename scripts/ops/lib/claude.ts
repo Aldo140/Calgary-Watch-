@@ -19,6 +19,18 @@ function anthropic(): Anthropic {
   return client;
 }
 
+/** Whether Claude answers right now. A key can be set but out of credits, which stops new posts. */
+export async function claudeStatus(): Promise<{ ok: boolean; detail: string }> {
+  if (!claudeConfigured()) return { ok: false, detail: 'No ANTHROPIC_API_KEY; drafts use fixed templates.' };
+  try {
+    await anthropic().messages.create({ model: 'claude-haiku-5-5', max_tokens: 1, messages: [{ role: 'user', content: 'ok' }] });
+    return { ok: true, detail: 'Connected.' };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, detail: /credit balance/i.test(msg) ? 'Out of Anthropic credits: no new posts get planned or drafted until credits are added at console.anthropic.com (Plans & Billing).' : `Not answering: ${msg.slice(0, 200)}` };
+  }
+}
+
 // Spend metering. Anthropic has no balance API, so every call's usage is
 // priced here and written to ops_usage/{day} at the end of each run
 // (flushUsage), which is what the HQ dashboard's Money tab reads.

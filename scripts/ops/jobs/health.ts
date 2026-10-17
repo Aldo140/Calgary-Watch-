@@ -3,7 +3,7 @@
 import type { Firestore } from 'firebase-admin/firestore';
 import type { OpsHealth, OpsPerformance, OpsPost, PartnerLead } from '../../../src/types/ops';
 import { BRANDS, brandKit } from '../lib/brand';
-import { claudeConfigured } from '../lib/claude';
+import { claudeStatus } from '../lib/claude';
 import { COLLECTIONS } from '../lib/firebase';
 import { igAccount, igToken, tokenExpiry } from '../lib/instagram';
 import { currentToken, keepAlive } from './igTokens';
@@ -75,7 +75,7 @@ export async function checkHealth(db: Firestore | null, index: DiscoveryIndex, n
   } else {
     items.push({ id: 'scout', label: 'Instagram Scout', ok: false, detail: 'Not connected: add IG_DISCOVERY_TOKEN and IG_USER_ID to the repository secrets.' });
   }
-  items.push({ id: 'claude', label: 'Drafting (Claude)', ok: claudeConfigured(), detail: claudeConfigured() ? 'Connected.' : 'No ANTHROPIC_API_KEY; drafts use fixed templates.' });
+  items.push({ id: 'claude', label: 'Drafting (Claude)', ...await claudeStatus() });
   items.push({ id: 'outlook', label: 'Outreach mailbox', ok: outlookConfigured(), detail: outlookConfigured() ? 'Connected.' : 'Microsoft Graph app not configured (MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET); queued emails wait.' });
 
   const upcoming = happenings(index).filter(h => h.start > now && h.start < now + 7 * DAY).length;

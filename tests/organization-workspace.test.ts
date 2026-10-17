@@ -213,3 +213,35 @@ test('failed approvals publish nothing and ordinary members cannot approve or ex
  db.failNext();await assert.rejects(approveOrganizationClaim(db,'staff',{uid:'u',entityId:org.id},{},now),/Quota/);
  assert.equal(db.data.get(`listing_claims/u_${org.id}`).status,'pending');assert.equal(db.data.has(`verified_listings/${org.id}`),false);assert.equal(db.data.get('users/u').accountType,undefined);
 });
+test('approved event claims move to their linked organizer; unlinked events keep their own workspace',async()=>{
+ const {planOrganizerPromotions,promotionTargets,defaultOrganizationScope}=await import('../src/lib/organizerPromotion');
+ const loose=all.find(e=>(e.kind==='event'||e.kind==='market')&&!e.organizerEntityId&&e.status==='published')!;
+ const rows=planOrganizerPromotions([{uid:'u',entityId:event.id,status:'approved'},{uid:'v',entityId:event.id,status:'approved'},{uid:'w',entityId:loose.id,status:'approved'},{uid:'x',entityId:org.id,status:'approved'},{uid:'y',entityId:event.id,status:'pending'},{uid:'z',entityId:event.id,status:'approved',approvedOrganizationId:org.id}],all);
+ assert.deepEqual(rows.map(r=>r.action),['promote','promote','no-organizer','organization','organization']);
+ assert.equal(rows[0].organizationId,org.id);
+ assert.deepEqual(promotionTargets(rows).map(r=>r.uid),['u']);
+ assert.equal(defaultOrganizationScope(event.id,all),org.id);assert.equal(defaultOrganizationScope(loose.id,all),undefined);assert.equal(defaultOrganizationScope(org.id,all),undefined);
+});
+test('promotion gives every representative organization access and the organizer the Verified mark, preserving history',async()=>{
+ const {promoteOrganizerClaims}=await import('../scripts/claims/promote-organizer-claims');const db=memory();
+ for(const uid of ['u','v']){db.data.set(`users/${uid}`,{uid,role:'user',accountType:'business',businessSince:20,businessListings:[event.id]});db.data.set(`listing_claims/${uid}_${event.id}`,{uid,entityId:event.id,entityTitle:event.title,status:'approved',reviewedAt:100,reviewedBy:'aldo',approvalEmailStatus:'sent'});}
+ const claims=['u','v'].map(uid=>db.data.get(`listing_claims/${uid}_${event.id}`));
+ const report=await promoteOrganizerClaims(db,all,claims,false,now);
+ assert.deepEqual(report.results.map(r=>r.status),['planned']);assert.equal(db.data.get(`listing_claims/u_${event.id}`).approvedOrganizationId,undefined);
+ const applied=await promoteOrganizerClaims(db,all,claims,true,now);
+ assert.deepEqual(applied.results.map(r=>r.status),['promoted']);
+ for(const uid of ['u','v']){const c=db.data.get(`listing_claims/${uid}_${event.id}`);assert.equal(c.approvedOrganizationId,org.id);assert.equal(c.reviewedAt,100);assert.equal(c.reviewedBy,'aldo');assert.equal(c.approvalEmailStatus,'sent');assert.ok(db.data.get(`users/${uid}`).businessListings.includes(org.id));assert.equal(db.data.get(`organization_managers/${uid}_${org.id}`).organizationId,org.id);}
+ assert.equal(db.data.get(`verified_listings/${org.id}`).organizationId,org.id);
+ const again=await promoteOrganizerClaims(db,all,['u','v'].map(uid=>db.data.get(`listing_claims/${uid}_${event.id}`)),true,now);
+ assert.equal(again.results.length,0);
+});
+test('the system promotion bypass is not reachable as a member',async()=>{
+ const {approveOrganizationClaim}=await import('../scripts/claims/approve-organization');const db=memory();db.data.set('users/u',{uid:'u',role:'user'});db.data.set(`listing_claims/u_${event.id}`,{uid:'u',entityId:event.id,entityTitle:event.title,status:'approved',reviewedAt:100});
+ await assert.rejects(approveOrganizationClaim(db,'u',{uid:'u',entityId:event.id,organizationId:org.id,confirmSharedAccess:true},{},now),/Administrator access/);
+});
+test('organization profiles can set a contact email; slug, verification and images stay protected',()=>{
+ const rows=prepareOrganizationBatch(org,all,[{entityId:org.id,action:'edit',changes:{email:'hello@downstage.ca',title:'Downstage',description:'Updated',website:'https://downstage.ca/',socials:{instagram:'https://instagram.com/downstage'}}}],now);
+ assert.equal((rows[0].entity as Business).email,'hello@downstage.ca');
+ assert.throws(()=>prepareOrganizationBatch(org,all,[{entityId:org.id,action:'edit',changes:{email:'not an email'}}],now),/contact email/);
+ for(const field of ['ownerVerifiedAt','claimed','verification','partner'])assert.throws(()=>prepareOrganizationBatch(org,all,[{entityId:org.id,action:'edit',changes:{[field]:'x'}}],now));
+});

@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { MemoryRouter } from 'react-router-dom';
 
 import { VERIFICATION_PRIORITY_ENABLED, VERIFIED_WEIGHT, applyOwnerVerification, byVerified, isOwnerVerified, ownerVerification, verificationCounts, verifiedBoost } from '../src/lib/verified.ts';
 import { interestScore } from '../src/lib/eventRank.ts';
@@ -100,7 +101,12 @@ describe('the verified badge', () => {
     assert.match(html, /Confirmed by the organization/);
     assert.match(html, /aria-hidden="true"/); // the icon is decorative; the words carry it
     // Shown from the build's stamp, or the public mark for approvals since the build.
-    assert.match(cta, /useVerifiedListing\(entityId, Boolean\(verifiedAt\)\);\n  return verified \? <VerifiedBadge \/> : null;/);
+    assert.match(cta, /useVerifiedListing\(entityId, Boolean\(verifiedAt\)\);\n  if \(!verified\) return null;/);
+    // An event or market with a linked organization profile is verified through its organizer.
+    assert.match(cta, /listingOrganization\(listing, all\)/);
+    const organizer = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(VerifiedBadge, { organizer: { title: 'Downstage', to: '/local/downstage' } })));
+    assert.match(organizer, /<strong>Verified organizer<\/strong>/);
+    assert.match(organizer, /href="\/local\/downstage"[^>]*>Downstage</);
     for (const page of ['entity/ListingDetail.tsx', 'markets/MarketDetail.tsx', 'entity/EntityDetail.tsx']) {
       assert.match(readFileSync(new URL(`../src/components/${page}`, import.meta.url), 'utf8'), /<VerifiedMark entityId=\{[\w.]+\} verifiedAt=\{[\w.]+\} \/>/, page);
     }

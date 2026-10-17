@@ -18,6 +18,16 @@ None of these verify a listing: opening the claim page, signing in, submitting o
 
 Existing approved claims count automatically; nobody has to claim again. Nothing else (outreach contacts, partner status) is ever treated as verified.
 
+## Verification belongs to the organizer
+
+An event or market is never verified on its own. When it is linked to a published organization profile (`organizerEntityId`, set at export from an exact organizer name plus official domain), its approved claim is promoted to that organization: the claimant and the listing's other approved representatives manage the profile and all its linked events, and the organization carries the Verified mark. Event and market pages then show "Verified organizer · {organization}", linking to the profile.
+
+- New approvals: Claims defaults an event or market claim's scope to its linked organizer.
+- Existing approvals: `scripts/claims/promote-organizer-claims.ts --apply` runs after the catalogue sync on every Hosting deploy (deploy-firebase.yml). Without `--apply` it only reports. It keeps approval dates, reviewer, email history and the weekly allowance, and writes an `organization_access_changes` record.
+- An event with no linked organization profile keeps its management-only organizer workspace (`org-{listingId}`). Creating a public profile for it is an editorial decision; the script lists these.
+
+Organization representatives can edit the profile's name, descriptions, address, website, contact email, phone, hours, social links, services and offer. Slug, verification, partner status, ranking and images stay with CalgaryWatch.
+
 ## Business accounts
 
 Claiming needs a CalgaryWatch account: the claim page asks for a Google sign-in, and the rules accept a claim only from a signed-in account with a verified email. When the claim is approved, that account becomes a **business account**: `accountType: 'business'`, the listings it manages (`businessListings`) and `businessSince` on `users/{uid}` (`src/lib/businessAccount.ts`).

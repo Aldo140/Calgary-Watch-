@@ -9,7 +9,7 @@ export const OWNER_EDIT_INTERVAL = 7 * 86400000;
 export const OWNER_EDIT_POLICY = 'Save one update every seven days per business, shared across your profile and linked events. Change several fields in one save. Updates publish automatically without admin approval, normally after the next publishing run. CalgaryWatch is notified. You cannot add, change or delete images here; email us about images.';
 export type OwnerEdit = { uid: string; rootId: string; entityId: string; entityTitle: string; changes: Record<string, unknown>; status: 'queued' | 'applied' | 'failed'; createdAt: unknown; notificationPending: boolean; publicationPending?: boolean; publicationWarning?: string; nextPublicationAttemptAt?: number; publicationAttempts?: number; publishedAt?: number; error?: string; appliedAt?: number; before?: Record<string, unknown>; after?: Record<string, unknown> };
 const common = ['title','summary','description','address','venue','neighbourhood','categories','tags','coordinates'];
-const byKind = { business: ['website','phone','hours','socials','services','offer','priceLevel'], event: ['start','end','pricing','priceRange','tickets','cancelled','organizer'], market: ['occurrences','amenities','parking','transit','petFriendly','familyFriendly','organizer'] };
+const byKind = { business: ['website','email','phone','hours','socials','services','offer','priceLevel'], event: ['start','end','pricing','priceRange','tickets','cancelled','organizer'], market: ['occurrences','amenities','parking','transit','petFriendly','familyFriendly','organizer'] };
 export function ownerEditableFields(kind: string): string[] { return kind in byKind ? [...common,...byKind[kind as keyof typeof byKind]] : []; }
 export function ownerEditTargets(rootId: string, entities: readonly DiscoveryEntity[]): DiscoveryEntity[] {
   const root = entities.find(e=>e.id===rootId && ['business','event','market'].includes(e.kind) && e.status==='published');
@@ -44,6 +44,7 @@ export function ownerEditPatch(entity: DiscoveryEntity, changes: Record<string, 
       const max=key==='title'?200:key==='description'?12000:key==='summary'?500:['website','tickets'].includes(key)?2000:500;
       if(typeof value!=='string'||value.length>max||(['title','address'].includes(key)&&!value.trim()))throw Error(`Check ${key} (maximum ${max} characters).`);
       if(['website','tickets'].includes(key)&&!https(value.trim()))throw Error('Use a valid HTTPS link.');
+      if(key==='email'&&value.trim()&&!/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(value.trim()))throw Error('Use a valid contact email address.');
       if(key==='pricing'&&!['free','paid','unknown'].includes(value))throw Error('Choose free, paid or unknown.');
       if(['start','end'].includes(key)&&(!/(Z|[+-]\d\d:\d\d)$/.test(value)||!Number.isFinite(Date.parse(value))))throw Error('Event dates need a timezone offset, for example 2026-10-23T19:00:00-06:00.');
       out[key]=value.trim();

@@ -1,0 +1,47 @@
+import type { DiscoveryEntity } from '../types/discovery';
+import { listingOrganization } from './claimOrganization';
+
+/**
+ * Verification belongs to the organizer, not to one event. An approved claim
+ * for an event or market whose listing is linked (organizerEntityId, set at
+ * export from an exact organizer name plus official domain) to a published
+ * organization profile is promoted to manage that profile and its events.
+ * Nothing is inferred from a venue or a loose name match.
+ */
+export type PromotionClaim = { uid: string; entityId: string; entityTitle?: string; status: string; approvedOrganizationId?: string };
+export type PromotionRow = {
+  claimId: string; uid: string; entityId: string; entityTitle: string;
+  action: 'promote' | 'organization' | 'no-organizer' | 'missing-listing';
+  organizationId?: string; organizationTitle?: string; organizer?: string;
+};
+
+export function planOrganizerPromotions(claims: readonly PromotionClaim[], entities: readonly DiscoveryEntity[]): PromotionRow[] {
+  return claims.filter(c => c.status === 'approved' && c.uid && c.entityId).map(c => {
+    const base = { claimId: `${c.uid}_${c.entityId}`, uid: c.uid, entityId: c.entityId, entityTitle: c.entityTitle ?? c.entityId };
+    const listing = entities.find(e => e.id === c.entityId);
+    if (listing?.kind === 'business' || c.approvedOrganizationId) {
+      const id = c.approvedOrganizationId ?? c.entityId;
+      return { ...base, action: 'organization' as const, organizationId: id, organizationTitle: entities.find(e => e.id === id)?.title };
+    }
+    if (!listing || (listing.kind !== 'event' && listing.kind !== 'market')) return { ...base, action: 'missing-listing' as const };
+    const org = listingOrganization(listing, entities);
+    if (!org) return { ...base, action: 'no-organizer' as const, organizer: listing.organizer || undefined };
+    return { ...base, action: 'promote' as const, organizationId: org.id, organizationTitle: org.title, organizer: listing.organizer };
+  });
+}
+
+/**
+ * One promotion per source listing: approving it with shared access also moves
+ * every other approved representative of that listing.
+ */
+export function promotionTargets(rows: readonly PromotionRow[]): PromotionRow[] {
+  const seen = new Set<string>();
+  return rows.filter(r => r.action === 'promote' && !seen.has(r.entityId) && Boolean(seen.add(r.entityId)));
+}
+
+/** The admin's default when approving: the listing's linked organizer, if it has one. */
+export function defaultOrganizationScope(entityId: string, entities: readonly DiscoveryEntity[]): string | undefined {
+  const listing = entities.find(e => e.id === entityId);
+  if (!listing || (listing.kind !== 'event' && listing.kind !== 'market')) return;
+  return listingOrganization(listing, entities)?.id;
+}

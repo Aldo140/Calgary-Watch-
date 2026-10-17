@@ -19,6 +19,7 @@ import { CLAIMS, EVIDENCE_COPY, UPDATES, UPDATE_FIELDS, VERIFIED, claimEvidence,
 import {claimApprovalWrites} from '@/src/lib/claimApproval';
 import { APPROVAL_EMAILS_SINCE, type ApprovalEmailStatus } from '@/src/lib/claimApprovalEmail';
 import { businessAccountPatch, businessAccountsFromClaims } from '@/src/lib/businessAccount';
+import { defaultOrganizationScope } from '@/src/lib/organizerPromotion';
 import type { PartnerLead } from '@/src/types/ops';
 import { AdminButton, Chip, EmptyState, Panel, T, TimeAgo, mono } from './ui';
 
@@ -80,7 +81,8 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       if (!approve) await updateDoc(doc(database, CLAIMS, claimId(c.uid, c.entityId)), { status: 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
         if (!entities.has(c.entityId)) throw new Error('This listing is not in the published inventory. Restore the canonical listing before approving.');
-        const chosen=entities.get(c.entityId)?.kind==='business'?undefined:(scope[c.uid+'_'+c.entityId]||c.approvedOrganizationId);
+        // Verification belongs to the organizer: a linked organization profile is the default scope.
+        const chosen=entities.get(c.entityId)?.kind==='business'?undefined:(scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??(c.status==='pending'?defaultOrganizationScope(c.entityId,[...entities.values()]):undefined))||undefined;
         const expand=Boolean(chosen);
         let response: {data:{account:Record<string,unknown>;accounts:Array<{uid:string;account:Record<string,unknown>}>;moved:number}};
         if (expand) {
@@ -191,7 +193,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <p className="mt-1" style={{color:T.muted}}>Approval lets this representative manage the organization profile and its linked events and markets. It does not give access to other organizations.</p>
             </div>:<label className="grid gap-2 text-sm" style={{color:T.ink}}>
               <span className="font-semibold">Organization management access</span>
-              <select aria-label="Organization management access" className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}>
+              <select aria-label="Organization management access" className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??defaultOrganizationScope(c.entityId,[...entities.values()])??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}>
                 <option value="">This listing’s organizer workspace only</option>
                 {[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title} — profile and linked events</option>)}
               </select>

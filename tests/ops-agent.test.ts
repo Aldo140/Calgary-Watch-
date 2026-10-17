@@ -180,6 +180,10 @@ describe('finding a business address', () => {
     assert.deepEqual(extractEmails('264-7243info@sagetheatre.com', 'sagetheatre.com'), ['info@sagetheatre.com']);
     assert.deepEqual(extractEmails('team2024@market.ca', 'market.ca'), ['team2024@market.ca']);
   });
+  it('skips image file names that look like addresses', () => {
+    assert.deepEqual(extractEmails('<img src="/img/768x960_call-of-the-wild@2x-100-sm.me"> hello@wild.ca', 'wild.ca'), ['hello@wild.ca']);
+    assert.deepEqual(extractEmails('logo@2x.webp team@club.ca', 'club.ca'), ['team@club.ca']);
+  });
   it('detects no-solicitation notices', () => {
     assert.ok(hasNoSolicitationNotice('Please note: we do not accept unsolicited offers.', cfg));
     assert.ok(hasNoSolicitationNotice('NO SOLICITATION', cfg));

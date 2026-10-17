@@ -5,6 +5,7 @@
 // automatically and permanently through the suppression list.
 
 import { createHash } from 'node:crypto';
+import { resolveMx } from 'node:dns/promises';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { FieldValue, type Firestore } from 'firebase-admin/firestore';
@@ -135,6 +136,11 @@ export function adoptListings(leads: ReadonlyArray<Pick<PartnerLead, 'id' | 'ent
     if (id && !out.has(id)) { out.set(id, e); unlisted.delete(hostOf(site!)); }
   }
   return out;
+}
+
+/** Whether the address's domain has a mail server; an address without one can only bounce. */
+async function hasMailServer(email: string): Promise<boolean> {
+  try { return (await resolveMx(emailDomain(email))).some(r => r.exchange); } catch { return false; }
 }
 
 async function fetchText(url: string): Promise<string | null> {
@@ -283,6 +289,9 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
       else if (sup.emails.has(email) || sup.domains.has(emailDomain(email))) {
         await doc.ref.update({ status: 'do-not-contact', doNotContact: true, updatedAt: now, history: push(event('status', 'Address is on the suppression list.')) });
         continue;
+      } else if (!(await hasMailServer(email))) {
+        await doc.ref.update({ status: 'no-email', notes: `${emailDomain(email)} has no mail server, so ${email} can't receive email.`, updatedAt: now });
+        continue;
       } else if (html && extractEmails(html, hostOf(lead.emailSourceUrl)).includes(email)) found = { email, url: lead.emailSourceUrl };
       else {
         await doc.ref.update({ status: 'no-email', notes: `${email} was not found on ${lead.emailSourceUrl}; CASL implied consent needs the address to be published there.`, updatedAt: now });
@@ -297,8 +306,10 @@ export async function draftPitches(db: Firestore, index: DiscoveryIndex, now: nu
         if (!html) continue;
         const text = html.replace(/<[^>]+>/g, ' ');
         if (hasNoSolicitationNotice(text, cfg)) { notice = true; break; }
-        const email = extractEmails(html, host).find(e => !sup.emails.has(e) && !sup.domains.has(emailDomain(e)));
-        if (email && !found) found = { email, url };
+        if (found) continue;
+        for (const email of extractEmails(html, host).filter(e => !sup.emails.has(e) && !sup.domains.has(emailDomain(e)))) {
+          if (await hasMailServer(email)) { found = { email, url }; break; }
+        }
       }
     }
     const host = hostOf(lead.website ?? found?.url ?? '');

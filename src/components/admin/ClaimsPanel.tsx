@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { adminUsers } from '@/src/lib/adminStore';
-import { firestoreActionError, isFirestoreQuotaError, QUOTA_COOLDOWN_MS } from '@/src/lib/firestoreErrors';
+import { adminFirestoreActionError as firestoreActionError, isFirestoreQuotaError, QUOTA_COOLDOWN_MS } from '@/src/lib/firestoreErrors';
 import { trackSubscription } from '@/src/lib/readEfficiency';
 /**
  * Claimed listings: organizers who registered to manage their own listing,
@@ -42,6 +42,8 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [loadErrors,setLoadErrors]=useState<Record<string,string>>({});
+  const [attempt,setAttempt]=useState(0);
   const [blockedUntil, setBlockedUntil] = useState(0);
   const quotaWait = blockedUntil > Date.now();
   useEffect(() => { if (!blockedUntil) return; const timer = setTimeout(() => setBlockedUntil(0), Math.max(0, blockedUntil - Date.now())); return () => clearTimeout(timer); }, [blockedUntil]);
@@ -49,18 +51,21 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
 
   useEffect(() => {
     if (!db) return;
+    setLoadErrors({});
+    const readFailed=(key:string,e:unknown)=>setLoadErrors(previous=>({...previous,[key]:firestoreActionError(e)}));
+    const readOk=(key:string)=>setLoadErrors(previous=>({...previous,[key]:''}));
     const a = trackSubscription('claims:pending', () => onSnapshot(query(collection(db!, CLAIMS), where('status', '==', 'pending'), limit(100)),
-      (s) => setClaims(s.docs.map((d) => d.data() as ListingClaim).sort((x, y) => x.createdAt - y.createdAt)),
-      (e) => setError(e.message.includes('permission') ? 'Claim rules are not deployed yet. Run "Deploy Firebase Backend" with target rules.' : firestoreActionError(e))));
+      (s) => {setClaims(s.docs.map((d) => d.data() as ListingClaim).sort((x, y) => x.createdAt - y.createdAt));readOk('Pending claims');},
+      (e) => readFailed('Pending claims',e)));
     const b = trackSubscription('claims:updates', () => onSnapshot(query(collection(db!, UPDATES), where('status', '==', 'pending'), limit(100)),
-      (s) => setUpdates(s.docs.map((d) => ({ ...(d.data() as ListingUpdate), id: d.id })).sort((x, y) => x.createdAt - y.createdAt)),
-      (e) => setError(firestoreActionError(e))));
+      (s) => {setUpdates(s.docs.map((d) => ({ ...(d.data() as ListingUpdate), id: d.id })).sort((x, y) => x.createdAt - y.createdAt));readOk('Legacy change requests');},
+      (e) => readFailed('Legacy change requests',e)));
     // Approved claims are what make a listing verified (badge and ranking weight, src/lib/verified.ts).
     const c = trackSubscription('claims:approved', () => onSnapshot(query(collection(db!, CLAIMS), where('status', '==', 'approved'), limit(300)),
-      (s) => setVerified(s.docs.map((d) => d.data() as VerifiedClaim).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0))),
-      (e) => setError(firestoreActionError(e))));
+      (s) => {setVerified(s.docs.map((d) => d.data() as VerifiedClaim).sort((x, y) => (y.reviewedAt ?? 0) - (x.reviewedAt ?? 0)));readOk('Verified listings');},
+      (e) => readFailed('Verified listings',e)));
     return () => { a(); b(); c(); };
-  }, []);
+  }, [attempt]);
 
   const entities = useMemo(() => new Map(discoveryRepository.list().map((e) => [e.id, e])), []);
   const by = user?.email ?? 'admin';
@@ -75,24 +80,29 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
       if (!approve) await updateDoc(doc(database, CLAIMS, claimId(c.uid, c.entityId)), { status: 'rejected', reviewedAt: Date.now(), reviewedBy: by, reviewNote: note });
       if (approve) {
         if (!entities.has(c.entityId)) throw new Error('This listing is not in the published inventory. Restore the canonical listing before approving.');
-        const {getFunctions,httpsCallable}=await import('firebase/functions');
-        const chosen=scope[c.uid+'_'+c.entityId]||c.approvedOrganizationId;
-        const expand=Boolean(chosen&&entities.get(c.entityId)?.kind!=='business');
-        if(expand&&!window.confirm(`Confirm ${entities.get(chosen!)?.title??chosen} organization access and move this listing’s shared workspace and events? This also confirms organization access for every already-approved representative of ${c.entityTitle}. Existing approval/email history is retained and the weekly allowance is not reset.`))return;
-        const response=await httpsCallable<{uid:string;entityId:string;organizationId?:string;confirmSharedAccess?:boolean},{account:Record<string,unknown>;accounts:Array<{uid:string;account:Record<string,unknown>}>;moved:number}>(getFunctions(database.app,'northamerica-northeast1'),'approveOrganizationClaim')({uid:c.uid,entityId:c.entityId,...(chosen?{organizationId:chosen,confirmSharedAccess:expand}:{})}).catch(async(error)=>{
-          if((error as {code?:string}).code!=='functions/not-found')throw error;
-          if(expand)throw Error('Deploy the updated Firebase functions before expanding organization access. Nothing was changed.');
-          // Keep ordinary existing approvals working during a staged backend rollout.
+        const chosen=entities.get(c.entityId)?.kind==='business'?undefined:(scope[c.uid+'_'+c.entityId]||c.approvedOrganizationId);
+        const expand=Boolean(chosen);
+        let response: {data:{account:Record<string,unknown>;accounts:Array<{uid:string;account:Record<string,unknown>}>;moved:number}};
+        if (expand) {
+          if(!window.confirm(`Confirm ${entities.get(chosen!)?.title??chosen} organization access and move this listing’s shared workspace and events? This also confirms organization access for every already-approved representative of ${c.entityTitle}. Existing approval/email history is retained and the weekly allowance is not reset.`))return;
+          const {getFunctions,httpsCallable}=await import('firebase/functions');
+          response=await httpsCallable<{uid:string;entityId:string;organizationId?:string;confirmSharedAccess?:boolean},{account:Record<string,unknown>;accounts:Array<{uid:string;account:Record<string,unknown>}>;moved:number}>(getFunctions(database.app,'northamerica-northeast1'),'approveOrganizationClaim')({uid:c.uid,entityId:c.entityId,organizationId:chosen,confirmSharedAccess:true});
+        } else {
+          // Ordinary approval needs no callable or server-side catalogue sync.
+          // Firestore rules authorize the admin and enforce the atomic verification mark.
           const account=await runTransaction(database,async tx=>{
             const claimRef=doc(database,CLAIMS,claimId(c.uid,c.entityId)),accountRef=doc(database,'users',c.uid);
             const [claim,profile]=await Promise.all([tx.get(claimRef),tx.get(accountRef)]);
             if(!claim.exists())throw Error('The claim no longer exists.');
-            const writes=claimApprovalWrites(claim.data() as ListingClaim,profile.data(),by,Date.now());
+            const live=claim.data() as ListingClaim;
+            if(live.uid!==c.uid||live.entityId!==c.entityId)throw Error('The claim identity changed. Refresh before retrying.');
+            if(live.approvedOrganizationId&&!(entities.get(c.entityId)?.kind==='business'&&live.approvedOrganizationId===live.entityId))throw Error('This claim has organization access. Refresh and use the organization repair action.');
+            const writes=claimApprovalWrites(live,profile.data(),by,Date.now());
             tx.update(claimRef,writes.claim);tx.update(accountRef,writes.account);tx.set(doc(database,VERIFIED,c.entityId),writes.mark);
             return writes.account;
           },{maxAttempts:1});
-          return {data:{account,accounts:[],moved:0}};
-        });
+          response={data:{account,accounts:[],moved:0}};
+        }
         const result=response.data.account;
         adminUsers.patch(c.uid, result);
         for(const peer of response.data.accounts??[])adminUsers.patch(peer.uid,peer.account);
@@ -156,8 +166,9 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
     >
       {notice ? <p role="status" className="p-4 text-sm" style={{ color: T.ok }}>{notice}</p> : null}
       {error ? <p role="alert" className="p-4 text-sm" style={{ color: T.critical }}>{error}</p> : null}
-      {claims === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
-        : !claims.length && !updates?.length ? <EmptyState icon={<BadgeCheck size={20} />} title="Nothing waiting" body="Claims arrive from the “Claim this listing” link on every listing, and from partner emails." />
+      {Object.values(loadErrors).some(Boolean)?<div role="alert" className="m-4 rounded-lg border p-3 text-sm space-y-2" style={{borderColor:T.line,color:T.critical}}>{Object.entries(loadErrors).filter(([,message])=>message).map(([label,message])=><p key={label}><strong>{label} unavailable.</strong> {message}</p>)}<AdminButton onClick={()=>setAttempt(n=>n+1)}>Retry loading claims</AdminButton></div>:null}
+      {claims === null && !loadErrors['Pending claims'] ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+        : claims?.length===0 && updates?.length===0 && !Object.values(loadErrors).some(Boolean) ? <EmptyState icon={<BadgeCheck size={20} />} title="Nothing waiting" body="Claims arrive from the “Claim this listing” link on every listing, and from partner emails." />
         : null}
 
       {claims?.map((c) => {
@@ -175,9 +186,17 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
             <p className="text-xs" style={{ fontFamily: mono, color: T.muted }}>Signed in as {c.accountEmail} · work {c.workEmail}{c.phone ? ` · ${c.phone}` : ''}</p>
             <div className="flex flex-wrap items-center gap-2"><Chip tone={copy.tone}>{copy.label}</Chip><span className="text-xs" style={{ color: T.muted }}>{copy.next}</span></div>
             {c.note ? <p className="text-sm rounded-lg p-2" style={{ background: T.surface, color: T.ink }}>“{c.note}”</p> : null}
-            <label className="block text-sm">Organization management access (confirm their authority, not just the venue)
-              <select value={scope[c.uid+'_'+c.entityId]??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">This listing only{entity?.kind==='business'?' (organization profile includes its events)':''}</option>{[...entities.values()].filter(e=>e.kind==='business').map(e=><option key={e.id} value={e.id}>{e.title} — profile and all organization events</option>)}</select>
-            </label>
+            {entity?.kind==='business'?<div className="rounded-lg border p-3 text-sm" style={{borderColor:T.line,background:T.surface}}>
+              <strong style={{color:T.ink}}>Organization access: {entity.title}</strong>
+              <p className="mt-1" style={{color:T.muted}}>Approval lets this representative manage the organization profile and its linked events and markets. It does not give access to other organizations.</p>
+            </div>:<label className="grid gap-2 text-sm" style={{color:T.ink}}>
+              <span className="font-semibold">Organization management access</span>
+              <select aria-label="Organization management access" className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}>
+                <option value="">This listing’s organizer workspace only</option>
+                {[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title} — profile and linked events</option>)}
+              </select>
+              <span className="text-xs" style={{color:T.muted}}>Choose a wider organization only after confirming the claimant represents it. Sharing a venue does not establish ownership.</span>
+            </label>}
             <div className="flex flex-wrap gap-2">
               <AdminButton tone="ok" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}><BadgeCheck size={15} /> Approve</AdminButton>
               <a className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border" style={{ borderColor: T.line, color: T.ink }}
@@ -223,7 +242,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
               <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
               <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
               <span>{c.approvedOrganizationId?`Organization: ${entities.get(c.approvedOrganizationId)?.title??c.approvedOrganizationId}`:entities.get(c.entityId)?.kind==='business'?'Organization profile and linked events':'Organizer workspace for this listing; existing unrelated listings are excluded'}</span>
-              <label>Confirm organization access <select value={scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep current scope</option>{[...entities.values()].filter(e=>e.kind==='business').map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label>
+              {entities.get(c.entityId)?.kind!=='business'?<label className="grid w-full max-w-xl gap-1">Confirm organization access <select aria-label={`Organization access for ${c.entityTitle}`} className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??c.approvedOrganizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep current scope</option>{[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label>:null}
               <Link to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
               <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>{scope[c.uid+'_'+c.entityId]?'Save organization access & repair':'Repair verification & account'}</AdminButton>
               {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}

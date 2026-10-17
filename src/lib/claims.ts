@@ -117,7 +117,7 @@ export function claimEvidence(input: { accountEmail: string; workEmail: string; 
 export const EVIDENCE_COPY: Record<ClaimEvidence, { label: string; tone: 'ok' | 'signal' | 'attention' | 'critical'; next: string }> = {
   'account-domain': { label: 'Signed in at the organization’s domain', tone: 'ok', next: 'Strongest proof. Approve unless something looks off.' },
   'work-domain': { label: 'Work email at the organization’s domain', tone: 'signal', next: 'Reply to the work email to confirm before approving.' },
-  'other-domain': { label: 'Email at a different domain', tone: 'attention', next: 'Could be an agency. Confirm with the organization’s published address.' },
+  'other-domain': { label: 'Different email and website domains', tone: 'attention', next: 'Organizations can use a different email domain. Confirm their authority through the organization’s published contact.' },
   'free-mail': { label: 'Personal email only', tone: 'attention', next: 'Confirm through the address on the organization’s own website.' },
   'no-source': { label: 'Listing has no official site to compare', tone: 'attention', next: 'Check by phone or the organization’s social accounts.' },
 };

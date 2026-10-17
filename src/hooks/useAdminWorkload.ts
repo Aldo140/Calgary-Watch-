@@ -1,4 +1,4 @@
-import { firestoreActionError } from '@/src/lib/firestoreErrors';
+import {emptyAdminWorkloadSources,readAdminWorkload} from '@/src/lib/adminWorkload';
 import { useEffect, useState } from 'react';
 import { collection, getCountFromServer, getDocs, limit, query, where } from 'firebase/firestore';
 import { db } from '@/src/firebase';
@@ -25,6 +25,7 @@ export function useAdminWorkload(enabled: boolean): AdminWorkload {
     if (!enabled || !db) return;
     const database = db;
     let active = true; let pending = false;
+    let sources=emptyAdminWorkloadSources();
     const count = (q: Parameters<typeof getCountFromServer>[0]) => getCountFromServer(q).then((s) => s.data().count);
     // Single-field filters only, so no composite index has to be deployed
     // (the rules-only backend release does not create indexes). The queue is
@@ -34,23 +35,24 @@ export function useAdminWorkload(enabled: boolean): AdminWorkload {
     const load = () => {
       if (!active || pending || document.hidden) return;
       pending = true;
-      void Promise.all([
-      count(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'))),
-      queue(),
-      count(query(collection(database, 'listing_claims'), where('status', '==', 'pending'))),
-      count(query(collection(database, 'listing_updates'), where('status', '==', 'pending'))),
-      count(query(collection(database, 'market_service_requests'), where('status', '==', 'new'))),
-      count(query(collection(database, 'owner_listing_edits'), where('notificationPending', '==', true))),
-    ]).then(([suggestions, rows, claims, updates, service, ownerUpdates]) => {
-      if (!active) return;
-      const now = Date.now();
-      setW({
-        error: '', suggestions, ownerUpdates,
-        claims: claims + updates + service,
-        failedActions: rows.filter((r) => r.status === 'failed' && (r.createdAt ?? 0) > now - 7 * 86_400_000).length,
-        stuckActions: rows.filter((r) => r.status === 'pending' && (r.createdAt ?? now) < now - 2 * 3_600_000).length,
-      });
-    }).catch(error => { if (active) setW(previous => ({ ...previous, error: firestoreActionError(error) })); }).finally(() => { pending = false; });
+      void readAdminWorkload({
+        suggestions:()=>count(query(collection(database, 'entity_submissions'), where('status', '==', 'pending'))),
+        queue,
+        claims:()=>count(query(collection(database, 'listing_claims'), where('status', '==', 'pending'))),
+        updates:()=>count(query(collection(database, 'listing_updates'), where('status', '==', 'pending'))),
+        service:()=>count(query(collection(database, 'market_service_requests'), where('status', '==', 'new'))),
+        ownerUpdates:()=>count(query(collection(database, 'owner_listing_edits'), where('notificationPending', '==', true))),
+      },sources).then(result=>{
+        if (!active) return;
+        sources=result.sources;
+        const now = Date.now();
+        setW({
+          error:result.error,suggestions:sources.suggestions,ownerUpdates:sources.ownerUpdates,
+          claims:sources.claims+sources.updates+sources.service,
+          failedActions:sources.queue.filter(r=>r.status==='failed'&&(r.createdAt??0)>now-7*86_400_000).length,
+          stuckActions:sources.queue.filter(r=>r.status==='pending'&&(r.createdAt??now)<now-2*3_600_000).length,
+        });
+      }).finally(()=>{pending=false;});
     };
     load();
     const t = window.setInterval(load, 10 * 60 * 1000);

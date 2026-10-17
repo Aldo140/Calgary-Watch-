@@ -103,6 +103,8 @@
 .cl-main { min-width: 0; display: grid; gap: 18px; }
 .cl-page .cl-side { position: static; gap: 22px; min-width: 0; }
 .cl-account-note { margin: 0; padding: 16px 18px; border: 1px solid #cfd8dc; border-radius: 16px; background: #fff; color: #41505d; font-size: 13px; line-height: 1.6; }
+.cl-verify { display:flex;gap:14px;padding:18px;border:2px solid #8d6d00;border-radius:14px;background:#fff7d8;color:#162837; }
+.cl-verify>svg{flex:none;margin-top:2px}.cl-verify h2{margin:0;font:750 19px/1.2 var(--pl-display)}.cl-verify p{margin:6px 0 12px;font-size:13.5px;line-height:1.5}.cl-verify div>div{display:flex;flex-wrap:wrap;gap:8px}.cl-verify .pl-btn{min-height:42px;padding:0 14px;font-size:13px}.cl-verify .pl-btn-secondary{background:#fff;color:#06162f;box-shadow:none}
 .cl-context { padding: 20px 22px; border-left: 4px solid var(--cl-accent); border-radius: 0 18px 18px 0; background: #fff; }
 .cl-context h2 { margin: 6px 0 10px; font: 750 22px/1.2 var(--pl-display); }
 .cl-context p { margin: 8px 0 0; font-size: 13px; line-height: 1.6; color: #4a5562; }

@@ -66,7 +66,7 @@ export default function PartnersPage() {
               <section className="bp-card bp-card-wide pt-claim">
                 <span className="bp-card-icon"><BadgeCheck size={24} aria-hidden="true" /></span>
                 <h3>Claim your listing</h3>
-                <p>Sign in with Google, tell us who you are, and once we’ve confirmed it the listing is yours to keep right: dates and hours, photos, addresses and extra locations, and the link we send people to. Claimed listings show <strong>Managed by the organizer</strong>. It’s free, and it doesn’t buy placement.</p>
+                <p>Sign in with a verified email or Google, tell us who you are, and once we’ve confirmed it the listing is yours to keep right: dates and hours, photos, addresses and extra locations, and the link we send people to. Claimed listings show <strong>Managed by the organizer</strong>. It’s free, and it doesn’t buy placement.</p>
                 <ol className="pt-steps">
                   <li><b>1</b>Open your listing on CalgaryWatch</li>
                   <li><b>2</b>Tap “Claim this listing” at the bottom</li>

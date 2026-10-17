@@ -10,7 +10,7 @@ import { VerifiedBadge } from '../components/entity/VerifiedBadge';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowUpRight, BadgeCheck, CalendarClock, CalendarDays, Check, Clock, ImagePlus, Link2, Lock, MapPinned, ShieldCheck, Store, Theater, Music, Palette, Building2, UtensilsCrossed, Users } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, CalendarClock, CalendarDays, Check, Clock, ImagePlus, Link2, Lock, Mail, MapPinned, ShieldCheck, Store, Theater, Music, Palette, Building2, UtensilsCrossed, Users } from 'lucide-react';
 import { SiteLayout } from '../components/site/SiteLayout';
 import { useAuth } from '../components/FirebaseProvider';
 import { discoveryRepository } from '../data/discovery';
@@ -31,7 +31,7 @@ const PERKS = [
 ];
 
 /**
- * Anyone can request a claim with a new or existing Google account.
+ * Anyone can request a claim with a verified Google or email/password account.
  * Admin management is an explicit preview, separate from a personal claim.
  * Approval is still required before organization editing is granted.
  */
@@ -41,7 +41,7 @@ export default function ClaimListingPage() {
 }
 
 function ClaimForm({ id }: { id: string }) {
-  const { user, signIn, isFirebaseConfigured, isAdmin } = useAuth();
+  const { user, signIn, sendVerificationEmail, refreshCurrentUser, isAuthActionLoading, isFirebaseConfigured, isAdmin } = useAuth();
   const [params] = useSearchParams();
   const previewUid = isAdmin ? params.get('as')?.trim() || undefined : undefined;
   const adminView = isAdmin && (!!previewUid || params.get('view') === 'admin');
@@ -81,7 +81,7 @@ function ClaimForm({ id }: { id: string }) {
   useEffect(() => { try { sessionStorage.setItem(`claim-draft:${id}`, JSON.stringify(draft)); } catch { /* storage is optional */ } }, [id, draft]);
 
   useEffect(() => { document.title = entity ? `Claim ${entity.title} | CalgaryWatch` : 'Claim a listing | CalgaryWatch'; }, [entity]);
-  // Prefill from the Google account once signed in, without overwriting typing.
+  // Prefill from the authenticated account once signed in, without overwriting typing.
   useEffect(() => {
     if (!user) return;
     setDraft((d) => ({ ...d, name: d.name || user.displayName || '', workEmail: d.workEmail || user.email || '' }));
@@ -101,6 +101,7 @@ function ClaimForm({ id }: { id: string }) {
     const problem = claimProblem(draft);
     if (problem) { setError(problem); return; }
     if (!current) { pending.current = true; await signIn(); if (!auth?.currentUser) pending.current = false; return; }
+    if (!current.emailVerified) { setError('Verify your email before submitting this claim.'); return; }
     setBusy(true); setError('');
     try {
       await submitClaim(current, { id: entity.id, title: entity.title, path: entityPath(entity) }, draft);
@@ -152,7 +153,7 @@ function ClaimForm({ id }: { id: string }) {
           </div>
           <div className="cl-hero-stamp" aria-hidden="true"><span className="cl-stamp-icon"><CategoryIcon size={58} strokeWidth={1.6} /></span><span>Made for</span><strong>{profile?.title ?? entity.title}</strong><small>Your organization. One workspace.</small></div>
           <motion.ol className="cl-steps" aria-label="How claiming works" {...rise(3)}>
-            <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in with Google</li>
+            <li data-done={!!user}><span>{user ? <Check size={14} strokeWidth={3} /> : 1}</span> Sign in or create an account</li>
             <li data-done={!!claim}><span>{claim ? <Check size={14} strokeWidth={3} /> : 2}</span> Tell us who you are</li>
             <li data-done={claim?.status === 'approved'}><span>{claim?.status === 'approved' ? <Check size={14} strokeWidth={3} /> : 3}</span> We confirm, then it’s yours</li>
           </motion.ol>
@@ -161,7 +162,8 @@ function ClaimForm({ id }: { id: string }) {
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
             {claimLoadError ? <div role="alert" className="pl-error"><p>We couldn’t check existing claims. Your form is still here; this does not mean your account cannot claim this organization.</p><button type="button" className="pl-btn" onClick={() => window.location.reload()}>Reload and try again</button></div> : null}
-            {!claim&&!adminView ? <p className="cl-account-note">{user ? 'Already signed in? Use this account to request access—no new account or paid plan is needed.' : 'New here? Google sign-in creates your free account. Already have an account? Sign in with it and continue here.'} You can apply with a personal or work Google account; we confirm your authority before enabling changes.</p> : null}
+            {!claim&&!adminView ? <p className="cl-account-note">{user ? 'Use this account to request access—no new account or paid plan is needed.' : 'New here? Create a free account with email or continue with Google. Already have an account? Sign in and continue here.'} We require a verified email before a claim can be submitted, then confirm your authority before enabling changes.</p> : null}
+            {!claim&&!adminView&&user&&!user.emailVerified?<section className="cl-verify" aria-labelledby="cl-verify-title"><Mail size={22} aria-hidden="true"/><div><h2 id="cl-verify-title">Verify {user.email}</h2><p>Open the verification link in your inbox before submitting this claim. Your form and this listing stay right here.</p><div><button type="button" className="pl-btn" disabled={isAuthActionLoading} onClick={async()=>{setError('');const refreshed=await refreshCurrentUser();setError(refreshed?.emailVerified?'Email verified. You can submit your claim now.':'We haven’t seen the verification yet. Open the link, then check again.');}}>Check verification</button><button type="button" className="pl-btn pl-btn-secondary" disabled={isAuthActionLoading} onClick={async()=>{setError('');try{await sendVerificationEmail();setError('Verification email sent. Check your inbox and junk folder.');}catch{setError('We couldn’t resend that email yet. Wait a moment and try again.');}}}>Resend email</button></div></div></section>:null}
             {!claim&&!adminView&&profile?<section className="cl-context" aria-label="Prefilled organization profile"><p className="pl-kicker">Your prefilled organization profile</p><h2>{profile.title}</h2>{listing&&listing.id!==entity.id?<p>For your listing: <Link to={entityPath(listing)}>{listing.title}</Link></p>:null}<p>{profile.managementOnly?'Your management workspace starts with this listing. You can add events after approval, without creating a separate public company page.':'Manage this organization profile and its confirmed linked events after approval.'}</p>{profile.website?<a href={profile.website} target="_blank" rel="noopener noreferrer">Organization source ↗</a>:null}{profile.address?<p>{profile.address}</p>:null}<p>We confirm your authority before enabling edits. Existing unrelated listings are never added to your account automatically.</p></section>:null}
             {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||adminView ? (
               <>
@@ -193,7 +195,7 @@ function ClaimForm({ id }: { id: string }) {
               </section>
             ) : previewUid ? <p>This member has not claimed this listing.</p> : (
               <motion.form aria-label="Organization claim application" className="pl-form cl-form" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate {...rise(4)}>
-                <div className="cl-form-intro"><p className="pl-kicker">Your organization access</p><h2>Let’s make the introduction.</h2><p>A few details help us confirm you’re the right person. Personal and work Google accounts are welcome.</p></div>
+                <div className="cl-form-intro"><p className="pl-kicker">Your organization access</p><h2>Let’s make the introduction.</h2><p>A few details help us confirm you’re the right person. Use a verified personal or organization email.</p></div>
                 <>{verifiedListing?<p role="status"><VerifiedBadge /> This organization is already claimed. You can request access as another representative; existing managers keep their access while we review your request.</p>:null}</>
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">01</span> Who are you?</legend>
@@ -226,10 +228,10 @@ function ClaimForm({ id }: { id: string }) {
                 </fieldset>
                 {error ? <p className="pl-error" role="alert">{error}</p> : null}
                 <div className="pl-actions">
-                  <button type="submit" className="pl-btn" data-ready={!claimProblem(draft)} disabled={busy || !isFirebaseConfigured || Boolean(user&&!claims)}>
-                    {busy ? 'Sending…' : claimLoadError ? 'Claim check unavailable' : user && !claims ? 'Checking your claims…' : user ? verifiedListing?'Request organization access':'Claim organization profile' : 'Continue with Google'} <ArrowUpRight size={18} aria-hidden="true" />
+                  <button type="submit" className="pl-btn" data-ready={!claimProblem(draft)} disabled={busy || !isFirebaseConfigured || Boolean(user&&!claims) || Boolean(user&&!user.emailVerified)}>
+                    {busy ? 'Sending…' : claimLoadError ? 'Claim check unavailable' : user && !claims ? 'Checking your claims…' : user&&!user.emailVerified?'Verify email to continue':user ? verifiedListing?'Request organization access':'Claim organization profile' : 'Sign in or create an account'} <ArrowUpRight size={18} aria-hidden="true" />
                   </button>
-                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Continue with a new or existing Google account. Your form is kept through sign-in. No paid plan is needed; organization access starts after approval.'}</p>
+                  <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? claimTimeline(evidence) : 'Continue with email or Google. Your form and claim destination are kept through sign-in. No paid plan is needed; organization access starts after approval.'}</p>
                 </div>
               </motion.form>
             )}

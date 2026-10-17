@@ -104,7 +104,7 @@ is shown, but files are never downloaded automatically.
 | Maps | Leaflet + react-leaflet |
 | Database | Firebase Firestore |
 | Storage | Firebase Storage |
-| Auth | Firebase Auth (Google Sign-In) |
+| Auth | Firebase Auth (Google and Email/Password) |
 | Hosting | Firebase Hosting (calgarywatch.ca) |
 | CI/CD | GitHub Actions |
 | Charts | Recharts |
@@ -330,7 +330,7 @@ Every scheduled source writes its latest outcome, duration and produced-record c
 
 ### Prerequisites
 - Node.js 20+
-- A Firebase project with Firestore, Storage, and Google Auth enabled
+- A Firebase project with Firestore, Storage, Google Auth, and Email/Password Auth enabled
 
 ### Setup
 
@@ -389,7 +389,7 @@ npx tsx scripts/ingest/index.ts
 
 ### Firebase Setup (first-time)
 
-1. Enable Firestore, Storage, and Google Sign-In in Firebase Console
+1. Enable Firestore and Storage. In Firebase Console → Authentication → Sign-in method, enable both **Google** and **Email/Password** (the first Email/Password option; Email link/passwordless is not required). This provider setting cannot be enabled by repository code.
 2. Deploy security rules: `npx firebase-tools deploy --only firestore:rules,storage:rules`
 3. Add `https://calgarywatch.ca` to Authorized Domains in Firebase Console → Authentication → Settings
 4. Add `https://calgarywatch.ca/__/auth/handler` to OAuth Redirect URIs in Google Cloud Console

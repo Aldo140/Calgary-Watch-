@@ -2438,7 +2438,7 @@ export default function MapPage() {
                   <p className="mt-3 text-sm leading-relaxed text-[#D5DFEB]">
                     {showProfileStep
                       ? 'Choose your report area and privacy preferences. Your neighbourhood report appears each time you sign in.'
-                      : 'Continue with Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
+                      : 'Continue with email or Google to create an account or sign back in. Your account lets you post reports, save preferences, and receive neighbourhood-specific safety updates.'}
                   </p>
 
                   {showProfileStep && (
@@ -2456,10 +2456,10 @@ export default function MapPage() {
                   {!showProfileStep ? (
                     <div className="space-y-5">
                       <div>
-                        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#1F5C93]">Continue with Google</p>
+                        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#1F5C93]">Your CalgaryWatch account</p>
                         <h3 className="mt-2 font-display text-2xl font-black tracking-[-0.02em] text-[#0B1F33]">Sign up or sign in securely</h3>
                         <p className="mt-2 text-sm leading-relaxed text-[#5A6B7D]">
-                          New to Calgary Watch? Google will create your account. Already registered? Google will sign you in. This panel will then ask for your privacy consent and neighbourhood or address.
+                          New to CalgaryWatch? Create an account with email or Google. Already registered? Sign in with the same method. This panel will then ask for your privacy consent and neighbourhood or address.
                         </p>
                       </div>
 

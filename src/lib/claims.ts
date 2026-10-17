@@ -10,8 +10,8 @@
  * How trust works, without a server: the claim is a Firestore document the
  * claimant writes about themselves. The evidence below is computed again by
  * admin when reviewing, never trusted from the document. The strongest case
- * is a Google account at the organization's own domain (Google already
- * verified that address); a typed work email at the same domain is good but
+ * is an authenticated account with a verified address at the organization's
+ * own domain; a typed work email at the same domain is good but
  * unproven; a free-mail address needs a person to check.
  *
  * Pure, so the rules are tested without Firestore.

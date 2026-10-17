@@ -146,7 +146,7 @@ export function SignupForm(p: SignupFormProps) {
     if (last) p.onSubmit(); else p.setStep(step + 1);
   };
   const go = (i: number) => { if (i <= step) { p.setError(''); p.setStep(i); } };
-  const cta = p.saving ? 'Saving…' : step === 0 && !hasArea ? 'Continue without location' : !last ? 'Next' : p.signedIn ? (p.hasPlans ? 'Save changes' : 'Finish') : 'Continue with Google';
+  const cta = p.saving ? 'Saving…' : step === 0 && !hasArea ? 'Continue without location' : !last ? 'Next' : p.signedIn ? (p.hasPlans ? 'Save changes' : 'Finish') : 'Sign in or create an account';
 
   const both = draft.weeklyDigestOptIn && draft.eventsDigestOptIn;
   const picked = EVENT_INTERESTS.filter((i) => draft.interests.includes(i.id)).map((i) => i.label);

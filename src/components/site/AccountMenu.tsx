@@ -68,7 +68,7 @@ export function AccountMenu() {
           >
             <div className="cw-acct-head">
               <span className="cw-acct-avatar cw-acct-avatar-lg">{avatar}</span>
-              <span><strong>{user.displayName || first}</strong><small>{user.email}</small></span>
+              <span><strong>{user.displayName || first}</strong><small>{user.email}</small><small>{user.emailVerified ? 'Email verified' : 'Email not verified'}</small></span>
             </div>
             {items.map((i) => (
               <Link key={i.label} to={i.to} role="menuitem" className="cw-acct-item">

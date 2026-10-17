@@ -21,8 +21,8 @@ const organizationModule=compile('../src/lib/claimOrganization.ts');
 const event={id:'festival',kind:'event',slug:'festival-2027',title:'Festival 2027',organizer:'Festival',summary:'A music festival',description:'',sources:[{name:'Festival',kind:'official',url:'https://festival.ca/'}],status:'published',updatedAt:'2026-10-16',address:'Calgary',categories:[],tags:[]};
 const business={...event,id:'biz-festival',kind:'business',slug:'festival',name:'Festival',title:'Festival',socials:{},images:[],services:[]};
 const inventory=[event,business,{...event,id:'linked-event',organizerEntityId:business.id}];
-async function render({admin=false,user=true,claim=null,path='/claim/festival',verified=false,loading=false,failed=false}:{admin?:boolean;user?:boolean;claim?:Record<string,unknown>|null;path?:string;verified?:boolean;loading?:boolean;failed?:boolean}={}){
- const userData=user?{uid:'me',email:'me@gmail.com',emailVerified:true,displayName:'My account'}:null;
+async function render({admin=false,user=true,emailVerified=true,claim=null,path='/claim/festival',verified=false,loading=false,failed=false}:{admin?:boolean;user?:boolean;emailVerified?:boolean;claim?:Record<string,unknown>|null;path?:string;verified?:boolean;loading?:boolean;failed?:boolean}={}){
+ const userData=user?{uid:'me',email:'me@gmail.com',emailVerified,displayName:'My account'}:null;
  const component=await import(compile('../src/pages/ClaimListingPage.tsx',{
   '../lib/claimPresentation':compile('../src/lib/claimPresentation.ts'),
   '../lib/claimOrganization':organizationModule,
@@ -43,13 +43,16 @@ async function render({admin=false,user=true,claim=null,path='/claim/festival',v
  }));
  return renderToStaticMarkup(createElement(MemoryRouter,{initialEntries:[path]},createElement(Routes,null,createElement(Route,{path:'/claim/:id',element:createElement(component.default)}))));
 }
-test('new visitors get a claim form and free Google account continuation',async()=>{
- const html=await render({user:false});assert.match(html,/<form/);assert.match(html,/Continue with Google/);assert.match(html,/Google sign-in creates your free account/);assert.doesNotMatch(html,/Administrator listing access|Admin preview/);
+test('new visitors get a claim form with email and Google account choices',async()=>{
+ const html=await render({user:false});assert.match(html,/<form/);assert.match(html,/Sign in or create an account/);assert.match(html,/Create a free account with email or continue with Google/);assert.doesNotMatch(html,/Administrator listing access|Admin preview/);
 });
 test('an existing personal or business account can apply without signing out or onboarding',async()=>{
  for(const path of ['/claim/festival','/claim/biz-festival','/claim/biz-festival?listing=linked-event']){
   const html=await render({path});assert.match(html,/<form/);assert.match(html,/Claim organization profile/);assert.match(html,/no new account or paid plan is needed/);assert.doesNotMatch(html,/Administrator listing access/);
  }
+});
+test('an unverified email account sees recovery actions and cannot submit a claim',async()=>{
+ const html=await render({emailVerified:false});assert.match(html,/Verify me@gmail.com/);assert.match(html,/Check verification/);assert.match(html,/Resend email/);assert.match(html,/Verify email to continue/);assert.match(html,/<button[^>]*type="submit"[^>]*disabled/);
 });
 test('an admin opening an emailed claim link sees the actual application by default',async()=>{
  const html=await render({admin:true});assert.match(html,/<form/);assert.match(html,/Claim organization profile/);assert.match(html,/Open admin management/);assert.doesNotMatch(html,/Admin preview — read-only|Administrator listing access/);
@@ -102,7 +105,7 @@ test('the real submission API accepts a verified personal Google email without a
 });
 test('the submission API requires verified sign-in and a known listing before any write',async()=>{
  const before=writes.length;
- await assert.rejects(claimApi.submitClaim({uid:'bad',email:'bad@gmail.com',emailVerified:false},{id:event.id,title:event.title,path:'/events/festival-2027'},{}),/verified email/);
+ await assert.rejects(claimApi.submitClaim({uid:'bad',email:'bad@gmail.com',emailVerified:false},{id:event.id,title:event.title,path:'/events/festival-2027'},{}),/[Vv]erif.*email/);
  await assert.rejects(claimApi.submitClaim({uid:'good',email:'good@gmail.com',emailVerified:true},{id:'missing',title:'Missing',path:'/local/missing'},{}),/not published/);
  assert.equal(writes.length,before);
 });

@@ -64,8 +64,8 @@ export default function SubmitDiscoveryPage() {
           ) : !user ? (
             <section className="pl-card cw-submit-gate">
               <h2>Sign in to share a listing</h2>
-              <p>Google sign-in lets us follow up if a detail needs checking, and keeps spam off the calendar. It takes a few seconds.</p>
-              <button type="button" className="pl-btn" onClick={() => void signIn().catch((e) => setError(e.message))}>Continue with Google <ArrowUpRight size={18} aria-hidden="true" /></button>
+              <p>A free account lets us follow up if a detail needs checking, and keeps spam off the calendar. It takes a few seconds.</p>
+              <button type="button" className="pl-btn" onClick={() => void signIn().catch((e) => setError(e.message))}>Sign in or create an account <ArrowUpRight size={18} aria-hidden="true" /></button>
               {error ? <p className="pl-error" role="alert">{error}</p> : null}
             </section>
           ) : (

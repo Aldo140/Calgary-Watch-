@@ -1,7 +1,7 @@
 /**
  * Business accounts: a CalgaryWatch account becomes a business account when an
  * admin approves a listing claim it made. Claiming already needs an account (a
- * Google sign-in with a verified email, enforced by firestore.rules), so the
+ * Firebase sign-in with a verified email, enforced by firestore.rules), so the
  * claimant always has a `users/{uid}` profile to mark.
  *
  * The mark lives on that profile: `accountType: 'business'`, the listings it

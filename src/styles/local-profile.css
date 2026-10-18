@@ -1,0 +1,189 @@
+/*
+ * A Local profile, in the directory's language: its shelf colour (--tone, --tink) runs
+ * through the seal, the tab bar, the date tiles and the cards. Loaded before local.css,
+ * so rules that override it carry the .cw-loc.lp prefix.
+ */
+.lp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── Hero tags: status sticker + shelf ───────────────────────────────── */
+.lp-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: 4px 0 18px; }
+.cw-loc.lp .lp-tags .lp-status { margin: 0 !important; }
+.cw-loc.lp .lp-shelf {
+  display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px 4px 4px; border: 2px solid #151515; border-radius: 999px;
+  background: #fff; color: #151515; box-shadow: 3px 3px 0 #151515; text-shadow: none; font: 700 13px/1 Inter, sans-serif;
+  transition: transform .15s, box-shadow .15s;
+}
+.cw-loc.lp .lp-shelf:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #151515; }
+
+/* ── Sticky tabs ─────────────────────────────────────────────────────── */
+.lp-tabs {
+  position: sticky; top: var(--nav-h, 64px); z-index: 25; margin-top: -1px;
+  background: rgba(250, 248, 243, .92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--ink);
+}
+.lp-tabs-in { display: flex; gap: 6px; padding-top: 10px; padding-bottom: 10px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.lp-tabs-in::-webkit-scrollbar { display: none; }
+.cw-loc .lp-tabs a {
+  position: relative; flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 16px; border: 2px solid transparent;
+  border-radius: 999px; font: 700 14px/1 Inter, sans-serif; color: var(--ink); transition: background .2s, border-color .2s, color .2s;
+}
+.cw-loc .lp-tabs a:hover { border-color: var(--ink); }
+.cw-loc .lp-tabs a[aria-current] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.lp-tabs a span { min-width: 22px; padding: 4px 7px; border-radius: 999px; background: var(--tone); color: var(--tink); font: 700 11px/1 var(--mono); text-align: center; }
+
+/* ── At a glance ─────────────────────────────────────────────────────── */
+.cw-loc.lp .lp-essentials { margin-top: clamp(40px, 5vw, 64px); scroll-margin-top: 140px; box-shadow: 8px 8px 0 var(--tone); }
+.cw-loc.lp .lp-take + .lp-essentials, .cw-loc.lp .lp-disclosure + .lp-essentials { margin-top: clamp(56px, 6vw, 88px); }
+.cw-loc.lp .lp-fact-shelf { position: relative; background: var(--tone); color: var(--tink); }
+.cw-loc.lp .lp-fact-shelf small, .cw-loc.lp .lp-fact-shelf span { color: inherit; }
+.cw-loc.lp .lp-fact-shelf span { opacity: .8; }
+.cw-loc.lp a.lp-fact-shelf:hover { background: var(--tone); filter: brightness(1.06); }
+.lp-fact-count strong b { font: inherit; color: var(--yellow); font-variant-numeric: tabular-nums; }
+.lp-essentials .lp-fact { opacity: 1; transform: none; transition: opacity .5s, transform .55s cubic-bezier(.2, 1, .3, 1), background .15s; }
+.lp-essentials:not([data-seen]) .lp-fact { opacity: 0; transform: translateY(14px); }
+.lp-essentials .lp-fact:nth-child(2) { transition-delay: 70ms; }
+.lp-essentials .lp-fact:nth-child(3) { transition-delay: 140ms; }
+.lp-essentials .lp-fact:nth-child(4) { transition-delay: 210ms; }
+.lp-essentials .lp-fact:nth-child(n + 5) { transition-delay: 280ms; }
+
+/* Contact and hours: short lines, not one long headline. */
+.lp-fact-contact ul, .lp-fact-hours ul { display: grid; gap: 7px; }
+.cw-loc .lp-fact-contact a { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; font: 700 15px/1.3 Inter, sans-serif; color: #fff; overflow-wrap: anywhere; }
+.cw-loc .lp-fact-contact a:hover { color: var(--yellow); text-decoration: underline; text-underline-offset: 3px; }
+.lp-fact-contact a svg { flex: none; opacity: .7; }
+.lp-fact-hours li { display: flex; justify-content: space-between; gap: 12px; font: 500 14px/1.3 Inter, sans-serif; }
+.lp-fact-hours li b { font-weight: 700; }
+
+/* Every section clears the sticky tabs when jumped to. */
+.cw-loc.lp :is(#lp-programme, #lp-market-locations, #lp-about, #lp-around-here, #lp-contact) { scroll-margin-top: 130px; }
+
+/* ── Next up: the split-flap card ────────────────────────────────────── */
+.cw-loc .lp-nextup {
+  position: relative; display: grid; gap: 14px; margin-top: clamp(28px, 3vw, 40px); padding: clamp(22px, 3vw, 34px) clamp(22px, 3vw, 36px);
+  border: 2px solid var(--ink); border-radius: 26px; color: #fff; box-shadow: 8px 8px 0 var(--tone); overflow: hidden;
+  background: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, .07) 1px, transparent 0) 0 0 / 14px 14px, var(--navy);
+  transition: transform .18s, box-shadow .18s;
+}
+.cw-loc .lp-nextup:hover { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--tone); }
+.lp-nextup::after {
+  content: ''; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%;
+  background: var(--tone); opacity: .22; filter: blur(2px);
+}
+.lp-nextup-top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.lp-nextup-top small { font: 600 12px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .7); }
+.lp-nextup-top .ld-flap-status { justify-self: start; }
+.lp-nextup-when { display: flex; flex-wrap: wrap; gap: 8px; }
+.lp-nextup-when .ld-cell { font-size: clamp(18px, 2vw, 24px); padding: 9px 12px 8px; }
+.lp-nextup-title { position: relative; z-index: 1; max-width: 22ch; font: 800 clamp(30px, 3.8vw, 52px)/.98 var(--display); letter-spacing: -.04em; }
+.lp-nextup-where { display: inline-flex; align-items: center; gap: 6px; font: 500 15px/1.3 Inter, sans-serif; color: rgba(255, 255, 255, .78); }
+.lp-nextup-go {
+  position: absolute; right: clamp(20px, 3vw, 34px); bottom: clamp(20px, 3vw, 30px); z-index: 1; display: inline-flex; align-items: center; gap: 6px;
+  padding: 11px 16px; border: 2px solid var(--ink); border-radius: 999px; background: var(--yellow); color: var(--ink); font: 700 14px/1 Inter, sans-serif;
+}
+.lp-nextup:hover .lp-nextup-go svg { transform: rotate(45deg); }
+.lp-nextup-go svg { transition: transform .2s; }
+
+/* ── Programme tools ─────────────────────────────────────────────────── */
+.cw-loc.lp .lp-programme-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 0 0 22px; }
+.lp-find { flex: 1 1 280px; position: relative; display: flex; align-items: center; }
+.lp-find svg { position: absolute; left: 16px; color: var(--muted); pointer-events: none; }
+.cw-loc.lp .lp-find input {
+  width: 100%; min-height: 50px; padding: 12px 16px 12px 44px; border: 2px solid var(--ink); border-radius: 999px; background: #fff;
+  font: 400 16px/1.3 Inter, sans-serif; color: var(--ink); box-shadow: 3px 3px 0 var(--ink);
+}
+.lp-when { display: inline-flex; gap: 4px; padding: 4px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; box-shadow: 3px 3px 0 var(--ink); }
+.lp-when button { min-height: 38px; padding: 8px 14px; border: 0; border-radius: 999px; background: none; cursor: pointer; font: 700 13px/1 Inter, sans-serif; color: var(--ink); transition: background .15s, color .15s; }
+.lp-when button:hover { background: rgba(255, 223, 79, .45); }
+.lp-when button[aria-pressed='true'] { background: var(--ink); color: #fff; }
+.lp :is(.lp-when button, .lp-find input, .lp-tabs a):focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+/* ── Dates: calendar-page tiles in the shelf colour ──────────────────── */
+.cw-loc.lp .lp-dates time { position: relative; padding: 0 0 6px; overflow: hidden; background: #fff; border-radius: 14px; }
+.cw-loc.lp .lp-dates time small:first-child { align-self: stretch; padding: 5px 0 4px; margin-bottom: 4px; background: var(--tone); color: var(--tink); text-align: center; border-bottom: 2px solid var(--ink); }
+.cw-loc.lp .lp-dates time b { font-size: 28px; }
+.lp-runs > li { transition: background .15s; }
+.lp-on {
+  display: inline-flex; align-items: center; gap: 5px; margin-right: 8px; padding: 2px 8px; border-radius: 999px; background: #ff5a4e; color: #fff;
+  font: 700 10.5px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; font-style: normal; vertical-align: 1px;
+}
+.lp-on::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: ld-blink 1.2s ease-in-out infinite; }
+.lp-run-dates { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 0 !important; padding: 0 22px 18px calc(22px + 78px + 20px) !important; }
+.cw-loc .lp-run-dates a {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 11px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--paper);
+  font: 600 12px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .03em; transition: background .15s, transform .15s;
+}
+.cw-loc .lp-run-dates a:hover { background: var(--yellow); transform: translateY(-2px); }
+.lp-run-dates small { font: 500 11px/1.2 var(--mono); color: var(--muted); text-transform: none; }
+/* The chips sit inside .lp-dates rows; keep its row dividers off them. */
+.cw-loc .lp-run-dates li + li { border-top: 0; }
+.lp-run-more { align-self: center; font: 600 12px/1.2 var(--mono); color: var(--muted); }
+.cw-loc.lp .lp-none { margin-top: 40px; padding: 18px 20px; border: 2px dashed rgba(21, 21, 21, .35); border-radius: 18px; font: 400 15px/1.5 Inter, sans-serif; }
+.cw-loc.lp .lp-none a { color: var(--blue); font-weight: 700; text-decoration: underline; }
+
+/* ── Market locations ────────────────────────────────────────────────── */
+.lp-mkts { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 22px; }
+.cw-loc .lp-mkt {
+  position: relative; display: flex; flex-direction: column; height: 100%; border: 2px solid var(--ink); border-radius: 24px; overflow: hidden;
+  background: #fff; box-shadow: 6px 6px 0 var(--ink); transition: transform .18s, box-shadow .18s;
+}
+.cw-loc .lp-mkt:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--tone); }
+.lp-mkt-art { display: block; aspect-ratio: 16 / 10; overflow: hidden; border-bottom: 2px solid var(--ink); background: var(--tone); }
+.lp-mkt-art > * { width: 100%; height: 100%; }
+.lp-mkt-art :is(img, svg) { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.2, 1, .3, 1); }
+.lp-mkt:hover .lp-mkt-art :is(img, svg) { transform: scale(1.04); }
+.lp-mkt-body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 22px; }
+.lp-mkt-status { display: inline-flex; align-items: center; gap: 7px; font: 700 11.5px/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.lp-mkt-status.is-open { color: #c0392b; }
+.lp-mkt-status i { width: 8px; height: 8px; border-radius: 50%; background: #ff5a4e; animation: ld-blink 1.2s ease-in-out infinite; }
+.lp-mkt-body strong { font: 800 clamp(22px, 2vw, 26px)/1.08 var(--display); letter-spacing: -.03em; padding-right: 40px; }
+.lp-mkt-usual { font: 600 14px/1.3 Inter, sans-serif; }
+.lp-mkt-where { display: inline-flex; align-items: center; gap: 5px; font: 400 14px/1.3 Inter, sans-serif; color: var(--muted); }
+.cw-loc .lp-mkt .lx-go { top: auto; bottom: 18px; right: 18px; }
+/* One location gets the whole width: cover on the left, details on the right. */
+@media (min-width: 641px) {
+  .lp-mkts:has(> li:only-child) { grid-template-columns: minmax(0, 1fr); }
+  .lp-mkts:has(> li:only-child) .lp-mkt { flex-direction: row; }
+  .lp-mkts:has(> li:only-child) .lp-mkt-art { flex: 0 0 min(46%, 460px); aspect-ratio: 16 / 10; border-bottom: 0; border-right: 2px solid var(--ink); }
+  .lp-mkts:has(> li:only-child) .lp-mkt-body { justify-content: center; gap: 10px; padding: 28px 80px 28px 32px; }
+  .lp-mkts:has(> li:only-child) .lp-mkt-body strong { font-size: clamp(28px, 3vw, 40px); }
+}
+
+/* ── Around here: the shelf tile ─────────────────────────────────────── */
+.cw-loc.lp .lp-tile-shelf { background: var(--tone); color: var(--tink); }
+.cw-loc.lp .lp-tile-shelf > span:not(.lx-go), .cw-loc.lp .lp-tile-shelf small { color: inherit; opacity: .85; }
+
+/* ── More on the shelf ───────────────────────────────────────────────── */
+.lp-mates { position: relative; margin-top: clamp(88px, 9vw, 128px); padding: clamp(28px, 3vw, 44px) 0 clamp(64px, 7vw, 96px); background: var(--navy); color: #fff; }
+.lp-mates-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 48px; margin-bottom: clamp(26px, 3vw, 40px); }
+.lp-mates-head h2 { font: 800 clamp(38px, 5vw, 68px)/.95 var(--display); letter-spacing: -.045em; }
+.lp-mates-head mark { color: var(--tone); background: none; }
+.lp-mates[style*='#06162f'] .lp-mates-head mark { color: var(--yellow); }
+.lp-mates-head > p { max-width: 30em; font: 400 16px/1.5 Inter, sans-serif; color: rgba(255, 255, 255, .72); }
+.cw-loc .lp-mates .ld-card-main { color: var(--ink); }
+.cw-loc .lp-mates .lx-eyebrow { color: rgba(255, 255, 255, .72); }
+
+/* ── Foot: sources + claim ───────────────────────────────────────────── */
+.cw-loc.lp .lp-foot { align-items: stretch; }
+.cw-loc.lp .lp-foot > * { margin: 0; }
+.cw-loc.lp .lp-foot .cw-sources a { display: block; margin-top: 6px; }
+
+@media (max-width: 640px) {
+  .lp-tabs-in { gap: 4px; padding-top: 8px; padding-bottom: 8px; }
+  .cw-loc .lp-tabs a { min-height: 38px; padding: 8px 13px; font-size: 13px; }
+  .cw-loc.lp .lp-essentials { box-shadow: 5px 5px 0 var(--tone); }
+  .cw-loc .lp-nextup { padding-bottom: 82px; box-shadow: 5px 5px 0 var(--tone); }
+  .lp-nextup-go { left: 20px; right: auto; }
+  .lp-when { width: 100%; }
+  .lp-when button { flex: 1; padding: 8px 6px; font-size: 12.5px; }
+  .lp-run-dates { padding: 0 14px 16px 14px !important; gap: 6px; }
+  .cw-loc .lp-run-dates a { padding: 5px 8px; font-size: 11px; }
+  .lp-mkts { display: flex; gap: 14px; margin: 0 -16px; padding: 2px 16px 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-padding: 0 16px; scrollbar-width: none; }
+  .lp-mkts::-webkit-scrollbar { display: none; }
+  .lp-mkts > li { flex: 0 0 80vw; scroll-snap-align: start; }
+  .lp-mkts:has(> li:only-child) > li { flex-basis: 100%; }
+  .cw-loc .lp-mkt { box-shadow: 4px 4px 0 var(--ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-essentials:not([data-seen]) .lp-fact { opacity: 1; transform: none; }
+  .lp-on::before, .lp-mkt-status i { animation: none; }
+}

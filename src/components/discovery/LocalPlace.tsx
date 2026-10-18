@@ -1,23 +1,28 @@
 import '../../styles/profile-category.css';
+import '../../styles/local-directory.css';
+import '../../styles/local-profile.css';
 import { claimPresentation } from '../../lib/claimPresentation';
 import { ListingArtwork } from '../entity/ListingArtwork';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, MapPin, Navigation, Phone, Mail, Quote, Share2, Store, Ticket } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, Layers, MapPin, Navigation, Phone, Mail, Quote, Search, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { organizerEvents, organizerMarkets, organizationVisitAddress, publicOrganizationEvents } from '../../lib/organizations';
 import { localLinks } from '../../lib/localLinks';
-import { communityFor, directionsUrl, nextOpen } from '../../lib/marketDays';
+import { communityFor, directionsUrl } from '../../lib/marketDays';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { ShopArt } from './ListingArt';
-import { LiveSky, SkyDateline, Street, Traffic, Upper } from './LocalHero';
+import { LiveSky, SkyDateline, Traffic, Upper } from './LocalHero';
 import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
 import { SourceBadge } from '../entity/EntityDetail';
-import { TEAR } from '../home/HomeHero';
+import { programmeOf, seriesOf, shelfOf, SHELVES } from '../../lib/localShelves';
+import { CountUp, Seal, useSeen } from './LocalDirectory';
+import { MarketLocations, NextUp, ProfileTabs, ShelfMates, type ProfileTab } from './ProfileSections';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
+const short = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
 const mon = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short' });
 const dnum = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', day: 'numeric' });
 const wday = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short' });
@@ -27,8 +32,6 @@ const quadrant = (address = '') => address.match(/\b(NW|NE|SW|SE)\b/)?.[1] ?? nu
 const cleanAddress = (a = '') => a.replace(/,?\s*Calgary,?\s*AB.*$/i, '').replace(/,\s*AB$/, '');
 const pad = (n: number) => String(n).padStart(2, '0');
 const host = (url: string) => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; } };
-
-const MorePlacesStreet = memo(Street);
 
 const Go = () => <span className="lx-go" aria-hidden="true"><ArrowUpRight size={18} /></span>;
 
@@ -67,9 +70,14 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const markets = useMemo(() => organizerMarkets(place.id, all, now), [place.id, all, now]);
   const [eventSearch, setEventSearch] = useState('');
   const [eventDays, setEventDays] = useState(0);
-  const [eventCount, setEventCount] = useState(12);
-  useEffect(() => setEventCount(12), [eventSearch, eventDays, place.id]);
+  const [eventCount, setEventCount] = useState(8);
+  useEffect(() => setEventCount(8), [eventSearch, eventDays, place.id]);
   const programme = useMemo(() => publicOrganizationEvents(upcoming, eventSearch, eventDays, now), [upcoming, eventSearch, eventDays, now]);
+  // Repeat nights of one show read as one run with its dates underneath.
+  const runs = useMemo(() => seriesOf(programme), [programme]);
+  const ahead = useMemo(() => programmeOf(place.id, all, occurrences, now), [place.id, all, occurrences, now]);
+  const shelf = SHELVES.find(s => s.id === shelfOf(place))!;
+  const [glanceRef, glanceSeen] = useSeen<HTMLElement>(true);
   const presentation = claimPresentation(place);
   const hasVisitAddress = organizationVisitAddress(place.address);
   const url = `https://calgarywatch.ca${entityPath(place)}`;
@@ -94,21 +102,31 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const links = localLinks(place, all, occurrences, LOCAL_NOTES[place.id], now);
   const community = communityFor(place);
   const guide = links.guides[0];
-  const others = useMemo(() => all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly))
-    .sort((a, b) => Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title)), [all, place.id, place.developmentOnly]);
   const hours = place.hours ? Object.entries(place.hours) : [];
   const status = place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : `${place.categories[0] ? `${place.categories[0][0].toUpperCase()}${place.categories[0].slice(1)} · ` : ''}Local organization`);
+  const spot = ahead.onNow ?? ahead.next;
+  const tabs: ProfileTab[] = [
+    { id: 'lp-visitor-info', label: 'Overview' },
+    ...(markets.length ? [{ id: 'lp-market-locations', label: 'Markets', count: markets.length }] : []),
+    ...(upcoming.length ? [{ id: 'lp-programme', label: 'What’s on', count: upcoming.length }] : []),
+    { id: 'lp-about', label: 'Story' },
+    { id: 'lp-around-here', label: 'Around here' },
+    { id: 'lp-contact', label: 'Contact' },
+  ];
   let n = 0;
 
   return (
-    <div className="cw-loc lp" data-profile-category={presentation.key}>
+    <div className="cw-loc lp" data-profile-category={presentation.key} style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink } as CSSProperties}>
       <LiveSky className="lp-hero" labelledBy="lp-title">
         {sky => <>
           <div className="cw-wrap lp-hero-in">
             <div className="lp-hero-copy">
               <nav className="lp-crumbs" aria-label="Breadcrumb"><Link to="/">Home</Link><span aria-hidden="true">/</span><Link to="/local">Local</Link><span aria-hidden="true">/</span><span aria-current="page">{name}</span></nav>
               <SkyDateline sky={sky} where={place.neighbourhood || 'Calgary'} />
-              <p className={`lp-status${place.partner ? ' is-partner' : ''}`}>{status}</p>
+              <div className="lp-tags">
+                <p className={`lp-status${place.partner ? ' is-partner' : ''}`}>{status}</p>
+                <Link className="lp-shelf" to={`/local#shelf-${shelf.id}`}><Seal title={place.title} tone={shelf} size="s" />{shelf.label}</Link>
+              </div>
               <h1 id="lp-title" className="lp-title">{name}{branch ? <em>{branch}</em> : null}</h1>
               <VerifiedMark entityId={place.id} verifiedAt={place.ownerVerifiedAt} />
               <p className="h-summary lp-lead">{place.summary}</p>
@@ -121,7 +139,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
             </div>
             <figure className="lp-building">
               <Lamp />
-              <Upper floors={2} wall={place.editorialSelection ? '#d9634c' : '#2c5fc4'} seed={place.id.length} night={sky.night} />
+              <Upper floors={2} wall={shelf.tone} seed={place.id.length} night={sky.night} />
               <span className="lx-shop-front lp-front">
                 <ShopArt id={place.id} title={place.title} tags={place.tags} categories={place.categories} />
               </span>
@@ -134,8 +152,8 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
         </>}
       </LiveSky>
 
+      <ProfileTabs tabs={tabs} tone={shelf} />
       <div className="cw-wrap lx-wrap">
-        <nav className="lp-profile-nav" aria-label="Organization profile sections"><a href="#lp-visitor-info">Visitor information</a>{upcoming.length ? <a href="#lp-programme">Events <span>{upcoming.length}</span></a> : null}{markets.length ? <a href="#lp-market-locations">Markets <span>{markets.length}</span></a> : null}<a href="#lp-about">About</a><a href="#lp-contact">Contact &amp; organization access</a></nav>
         {note ? (
           <section className="lp-take" aria-labelledby="lp-take">
             <figure className="lp-quote">
@@ -154,18 +172,36 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
         ) : null}
         {place.partner ? <p className="lp-disclosure">Sponsored · {place.sponsorshipDisclosure || 'Featured partner placement. Payment does not imply editorial selection.'}</p> : null}
 
-        <section id="lp-visitor-info" className="lp-essentials" aria-label="The essentials">
+        <section id="lp-visitor-info" className="lp-essentials" aria-label="At a glance" ref={glanceRef} data-seen={glanceSeen || undefined}>
+          <Link className="lp-fact lp-fact-shelf" to={`/local#shelf-${shelf.id}`}>
+            <small><Layers size={14} aria-hidden="true" />On the shelf</small>
+            <strong>{shelf.label}</strong>
+            <span>{shelf.line}</span>
+          </Link>
+          {ahead.count ? <a className="lp-fact lp-fact-count" href={upcoming.length ? '#lp-programme' : '#lp-market-locations'}>
+            <small><CalendarDays size={14} aria-hidden="true" />Coming up</small>
+            <strong><b><CountUp to={ahead.count} on={glanceSeen} /></b> {ahead.count === 1 ? 'date' : 'dates'}</strong>
+            <span>{[ahead.onNow ? 'On now' : null, ahead.next ? `Next: ${day.format(new Date(ahead.next.start))}` : null].filter(Boolean).join(' · ')}{runs.length > 1 ? ` · ${runs.length} listings` : ''}</span>
+          </a> : null}
           {hasVisitAddress ? <a className="lp-fact lp-fact-where" href={directionsUrl(place)} target="_blank" rel="noopener noreferrer">
             <small><MapPin size={14} aria-hidden="true" />Where</small>
             <strong>{cleanAddress(place.address)}</strong>
-            <span>{place.neighbourhood}{q ? ` · ${q} Calgary` : ''} · Get directions</span>
-          </a> : <div className="lp-fact"><small><MapPin size={14} aria-hidden="true" />Locations</small><strong>Check each event or market</strong><span>This organization has no visitor street address listed.</span></div>}
+            <span>{[place.neighbourhood, q ? `${q} Calgary` : null, 'Get directions'].filter(Boolean).join(' · ')}</span>
+          </a> : markets.length ? <a className="lp-fact" href="#lp-market-locations"><small><MapPin size={14} aria-hidden="true" />Locations</small><strong>{markets.length} {markets.length === 1 ? 'market' : 'markets'}</strong><span>{[...new Set(markets.map(m => m.neighbourhood || cleanAddress(m.address)).filter(Boolean))].slice(0, 3).join(' · ')}</span></a>
+            : <div className="lp-fact"><small><MapPin size={14} aria-hidden="true" />Locations</small><strong>Check each event or market</strong><span>No single visitor address; each listing has its own.</span></div>}
           {note?.since ? <div className="lp-fact"><small><Store size={14} aria-hidden="true" />Since</small><strong>{note.since}</strong></div> : null}
-          {place.phone ? <a className="lp-fact" href={`tel:${place.phone.replace(/[^\d+]/g, '')}`}><small><Phone size={14} aria-hidden="true" />Call</small><strong>{place.phone}</strong></a> : null}
-          {site ? <a className="lp-fact" href={site} target="_blank" rel="noopener noreferrer"><small><Globe size={14} aria-hidden="true" />Online</small><strong>{host(site)}</strong></a> : null}
-          {place.email ? <a className="lp-fact" href={`mailto:${place.email}`}><small><Mail size={14} aria-hidden="true" />Email</small><strong>{place.email}</strong></a> : null}
-          {hours.length ? <div className="lp-fact"><small><Clock size={14} aria-hidden="true" />Hours</small><strong>{hours.slice(0, 2).map(([d, h]) => `${d} ${h}`).join(' · ')}</strong>{hours.length > 2 ? <span>More on their site</span> : null}</div> : null}
+          {place.phone || site || place.email ? <div className="lp-fact lp-fact-contact">
+            <small><Phone size={14} aria-hidden="true" />Get in touch</small>
+            <ul>
+              {place.phone ? <li><a href={`tel:${place.phone.replace(/[^\d+]/g, '')}`}><Phone size={15} aria-hidden="true" />{place.phone}</a></li> : null}
+              {site ? <li><a href={site} target="_blank" rel="noopener noreferrer"><Globe size={15} aria-hidden="true" />{host(site)}</a></li> : null}
+              {place.email ? <li><a href={`mailto:${place.email}`}><Mail size={15} aria-hidden="true" />{place.email}</a></li> : null}
+            </ul>
+          </div> : null}
+          {hours.length ? <div className="lp-fact lp-fact-hours"><small><Clock size={14} aria-hidden="true" />Hours</small><ul>{hours.slice(0, 3).map(([d, h]) => <li key={d}><b>{d}</b>{h}</li>)}</ul>{hours.length > 3 ? <span>More on their site</span> : null}</div> : null}
         </section>
+
+        {spot ? <NextUp date={spot} now={now} count={ahead.count} onNow={spot === ahead.onNow} /> : null}
 
         {place.image?.presentation === 'poster' ? (
           <section className="lp-season-art" aria-labelledby="lp-season-art">
@@ -176,6 +212,59 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
               {season ? <a className="lp-btn lp-btn-sun" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={17} aria-hidden="true" />View the season</a> : null}
             </header>
             <ListingArtwork image={place.image} />
+          </section>
+        ) : null}
+
+
+        {markets.length ? (
+          <section id="lp-market-locations" className="lp-upcoming" aria-labelledby="lp-markets">
+            <header className="lx-head"><div>
+              <p className="lx-eyebrow">From this organization</p>
+              <h2 id="lp-markets">Markets from <mark>{name}.</mark></h2>
+            </div><p>{markets.length > 1 ? `${markets.length} locations, each with its own days.` : 'Its market days, directions and official information.'} Pick one for every date.</p></header>
+            <MarketLocations markets={markets} occurrences={occurrences} now={now} />
+          </section>
+        ) : null}
+        {!upcoming.length && place.categories.includes('arts') ? <p className="lp-none">No upcoming events are listed right now. {site ? <a href={site} target="_blank" rel="noopener noreferrer">Check {host(site)} for the latest programme.</a> : 'Check their website for the latest programme.'}</p> : null}
+        {upcoming.length ? (
+          <section id="lp-programme" className="lp-upcoming" aria-labelledby="lp-upcoming">
+            <header className="lx-head">
+              <div>
+                <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />From the official season</p>
+                <h2 id="lp-upcoming">Upcoming events from <mark>{name}.</mark></h2>
+              </div>
+            </header>
+            <div className="lp-programme-tools">
+              <label className="lp-find"><Search size={17} aria-hidden="true" /><span className="lp-sr">Find an event</span><input type="search" value={eventSearch} placeholder="Find an event, venue or address" onChange={e => setEventSearch(e.target.value)} /></label>
+              <div className="lp-when" role="group" aria-label="When">
+                {([[0, 'All dates'], [7, 'Next 7 days'], [30, 'Next 30 days']] as const).map(([d, label]) => (
+                  <button key={d} type="button" aria-pressed={eventDays === d} onClick={() => setEventDays(d)}>{label}</button>
+                ))}
+              </div>
+            </div>
+            <ul className="lp-dates lp-runs">
+              {runs.slice(0, eventCount).map(run => {
+                const e = run.dates[0];
+                const last = run.dates[run.dates.length - 1];
+                const on = Date.parse(e.start) < now;
+                return (
+                  <li key={e.id}>
+                    <Link to={entityPath(e)}>
+                      <time dateTime={e.start}><small>{wday.format(new Date(e.start))}</small><b>{dnum.format(new Date(e.start))}</b><small>{mon.format(new Date(e.start))}</small></time>
+                      <span><strong>{run.title}</strong><em>{on ? <i className="lp-on">On now</i> : null}{run.dates.length > 1 ? `${run.dates.length} dates · ${short.format(new Date(e.start))} to ${short.format(new Date(last.start))}` : e.schedulePrecision === 'date' ? 'Check official showtimes' : hm.format(new Date(e.start))}{e.venue ? ` · ${e.venue}` : ''}</em></span>
+                      <Go />
+                    </Link>
+                    {run.dates.length > 1 ? (
+                      <ol className="lp-run-dates" aria-label={`Every date for ${run.title}`}>
+                        {run.dates.slice(0, 10).map(d => <li key={d.id}><Link to={entityPath(d)}><b>{wday.format(new Date(d.start))} {dnum.format(new Date(d.start))}</b>{d.schedulePrecision === 'date' ? null : <small>{hm.format(new Date(d.start))}</small>}</Link></li>)}
+                        {run.dates.length > 10 ? <li className="lp-run-more">+{run.dates.length - 10} more</li> : null}
+                      </ol>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="lp-programme-footer"><p role="status">{programme.length ? `${programme.length} ${programme.length === 1 ? 'date' : 'dates'} across ${runs.length} ${runs.length === 1 ? 'listing' : 'listings'}${runs.length > eventCount ? `, showing the first ${eventCount}` : ''}` : 'No matching events. Try another search or all dates.'}</p>{runs.length > eventCount ? <button type="button" className="lp-btn" onClick={() => setEventCount(count => count + 8)}>Show more</button> : null}</div>
           </section>
         ) : null}
 
@@ -197,51 +286,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           </div>
         </section>
 
-        {markets.length ? (
-          <section id="lp-market-locations" className="lp-upcoming" aria-labelledby="lp-markets">
-            <header className="lx-head"><div>
-              <p className="lx-eyebrow">From this organization</p>
-              <h2 id="lp-markets">Markets from <mark>{name}.</mark></h2>
-              <p>Choose a location for its market days, directions and official information.</p>
-            </div></header>
-            <ul className="lp-dates">
-              {markets.map(market => {
-                const next = nextOpen(market, occurrences, new Date(now));
-                return <li key={market.id}><Link to={entityPath(market)}>
-                  {next ? <time dateTime={next.start}><small>{wday.format(new Date(next.start))}</small><b>{dnum.format(new Date(next.start))}</b><small>{mon.format(new Date(next.start))}</small></time> : <Store size={32} aria-hidden="true" />}
-                  <span><strong>{market.title}</strong><em>{next ? `Next market: ${day.format(new Date(next.start))}` : 'Check the official website for upcoming dates'} · {market.address}</em></span>
-                  <Go />
-                </Link></li>;
-              })}
-            </ul>
-          </section>
-        ) : null}
-        {!upcoming.length && place.categories.includes('arts') ? <p>No upcoming events are currently listed. Check the official website for the latest programme.</p> : null}
-        {upcoming.length ? (
-          <section id="lp-programme" className="lp-upcoming" aria-labelledby="lp-upcoming">
-            <header className="lx-head">
-              <div>
-                <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />From the official season</p>
-                <h2 id="lp-upcoming">Upcoming events from <mark>{name}.</mark></h2>
-              </div>
-            </header>
-            <div className="lp-programme-tools"><label><span>Find an event</span><input type="search" value={eventSearch} placeholder="Event name, venue or address" onChange={e => setEventSearch(e.target.value)} /></label><label><span>When</span><select value={eventDays} onChange={e => setEventDays(Number(e.target.value))}><option value={0}>All upcoming dates</option><option value={7}>Next seven days</option><option value={30}>Next 30 days</option></select></label></div>
-            <ul className="lp-dates">
-              {programme.slice(0, eventCount).map(e => (
-                <li key={e.id}>
-                  <Link to={entityPath(e)}>
-                    <time dateTime={e.start}><small>{wday.format(new Date(e.start))}</small><b>{dnum.format(new Date(e.start))}</b><small>{mon.format(new Date(e.start))}</small></time>
-                    <span><strong>{e.title}</strong><em>{Date.parse(e.start) < now ? 'On now · ' : ''}{e.schedulePrecision==='date'?'Check official showtimes':hm.format(new Date(e.start))}{e.venue ? ` · ${e.venue}` : ''}</em></span>
-                    <Go />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="lp-programme-footer"><p role="status">{programme.length ? `Showing ${Math.min(eventCount, programme.length)} of ${programme.length} scheduled listings` : 'No matching events. Try another search or choose all upcoming dates.'}</p>{programme.length > eventCount ? <button type="button" className="lp-btn" onClick={() => setEventCount(count => count + 12)}>Show more events</button> : null}</div>
-          </section>
-        ) : null}
-
-        <section className="lp-around" aria-labelledby="lp-around">
+        <section id="lp-around-here" className="lp-around" aria-labelledby="lp-around">
           <header className="lx-head">
             <div>
               <p className="lx-eyebrow">{place.neighbourhood ? `Around ${place.neighbourhood}` : 'Around here'}</p>
@@ -282,6 +327,12 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
                 <Go />
               </Link>
             ) : null}
+            <Link to={`/local#shelf-${shelf.id}`} className="lx-tile lp-tile-shelf">
+              <small>{pad(++n)} · On Local</small>
+              <strong>More {shelf.label.toLowerCase()}</strong>
+              <span>{shelf.line}</span>
+              <Go />
+            </Link>
             <Link to="/map" className="lx-tile lx-tile-navy">
               <small>{pad(++n)} · Live</small>
               <strong>Check the live map</strong>
@@ -292,23 +343,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
         </section>
       </div>
 
-      {others.length ? (
-        <section className="lx-book lp-next" aria-labelledby="lp-next">
-          <svg className="lx-edge lx-edge-top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={TEAR} /></svg>
-          <div className="cw-wrap">
-            <header className="lx-head lx-head-dark">
-              <div>
-                <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />The rest of the block</p>
-                <h2 id="lp-next">Next door <mark>on the street.</mark></h2>
-              </div>
-              <p>Every other place in the little black book. <Link className="lp-all" to="/local">See them all on Local</Link></p>
-            </header>
-          </div>
-          <div className="lx-hero lp-night" data-night>
-            <MorePlacesStreet places={others} night label="More places in the book" />
-          </div>
-        </section>
-      ) : null}
+      <ShelfMates place={place} all={all} occurrences={occurrences} now={now} />
 
       <div id="lp-contact" className="cw-wrap lp-foot">
         <SourceBadge entity={place} />

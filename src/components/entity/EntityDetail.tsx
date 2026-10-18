@@ -10,7 +10,9 @@ import { MarketLineup } from './MarketLineup';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 
 const checkedOn = (v: string) => { const t = Date.parse(v); return Number.isFinite(t) ? calgaryDateTimeFormat('en-CA', { month: 'long', day: 'numeric', year: 'numeric' }).format(t) : v; };
-export function SourceBadge({ entity }: { entity: DiscoveryEntity }) { return <aside className="cw-sources"><h2>Know the source</h2><p>{entity.verification === 'source-checked' ? 'Source checked' : entity.verification === 'source-feed' ? `Listed from ${entity.sources[0]?.name ?? 'the organizer'}` : 'Not yet verified'} · Last checked {checkedOn(entity.verifiedAt || entity.updatedAt)}</p>{entity.sources.map((source, i) => <a key={i} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>)}</aside>; }
+export function SourceBadge({ entity }: { entity: DiscoveryEntity }) { return <aside className="cw-sources"><h2>Know the source</h2><p>{entity.verification === 'source-checked' ? 'Source checked' : entity.verification === 'source-feed' ? `Listed from ${entity.sources[0]?.name ?? 'the organizer'}` : 'Not yet verified'} · Last checked {checkedOn(entity.verifiedAt || entity.updatedAt)}</p>{distinctSources(entity.sources).map((source, i) => <a key={i} href={source.url} target="_blank" rel="noopener noreferrer">{source.name} ↗</a>)}</aside>; }
+/** One link per named source: an organizer's 27 event pages read as one "Heritage Park events" link. */
+function distinctSources<T extends { name: string }>(sources: readonly T[]): T[] { const seen = new Set<string>(); return sources.filter(s => !seen.has(s.name) && !!seen.add(s.name)); }
 export function EntityDetail({ entity, related, occurrences = [], all = [] }: { entity: DiscoveryEntity; related: DiscoveryEntity[]; occurrences?: readonly MarketOccurrence[]; all?: readonly DiscoveryEntity[] }) {
   const dates = entity.kind === 'market' ? upcomingOccurrences(occurrences, entity.id) : [];
   const next = dates.find(o => !o.cancelled);

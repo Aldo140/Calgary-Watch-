@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Bus, CalendarPlus, Car, Check, Clock, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Users } from 'lucide-react';
-import type { DiscoveryEntity, Market, MarketOccurrence } from '../../types/discovery';
+import type { Business, DiscoveryEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { pickWhen } from '../../lib/eventPicks';
@@ -15,9 +15,14 @@ import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
 import { SourceBadge } from '../entity/EntityDetail';
 import { MarketLineup } from '../entity/MarketLineup';
 import { MarketMap } from './MarketMap';
+import { Seal } from '../discovery/LocalDirectory';
+import { organizerMarkets } from '../../lib/organizations';
+import { shelfOf, SHELVES } from '../../lib/localShelves';
+import { isOwnerVerified } from '../../lib/verified';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
+import '../../styles/local-directory.css';
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -64,6 +69,11 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
     } catch { /* dismissed */ }
   };
 
+  // The organization behind the market, and the other locations it runs.
+  const org = market.organizerEntityId ? all.find((e): e is Business => e.kind === 'business' && e.id === market.organizerEntityId) : undefined;
+  const orgShelf = org ? SHELVES.find(s => s.id === shelfOf(org))! : undefined;
+  const sisters = org ? organizerMarkets(org.id, all, now.getTime()).filter(m => m.id !== market.id) : [];
+
   const goodFor = [
     market.familyFriendly ? 'Families' : null,
     ...market.amenities.filter(a => /accessible|kids/i.test(a)).map(a => cap(a)),
@@ -98,7 +108,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
         <div className="mk-dmain">
           <dl className="mk-facts">
             <div><dt><Clock size={16} aria-hidden="true" /> Usually</dt><dd>{pattern ? <>{pattern.dayText}<span>{pattern.hours}</span></> : 'Check with the organizer'}</dd></div>
-            <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{market.venue || market.title}<span>{market.address.replace(/, Calgary, AB$/, '')}</span></dd></div>
+            <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{market.venue || market.title}<span>{market.address.replace(/,?\s*Calgary,?\s*AB.*$/i, '')}</span></dd></div>
             <div><dt><Car size={16} aria-hidden="true" /> Parking</dt><dd>{market.parking ? market.parking.replace(/\.$/, '') : market.amenities.some(a => /parking/i.test(a)) ? 'Free parking' : 'Street parking nearby'}</dd></div>
             {market.transit ? <div><dt><Bus size={16} aria-hidden="true" /> Transit</dt><dd>{market.transit}</dd></div> : null}
             {goodFor.length ? <div><dt><Users size={16} aria-hidden="true" /> Good for</dt><dd>{goodFor.join(' · ')}</dd></div> : null}
@@ -130,6 +140,29 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
             {market.image?.credit ? <p className="mk-muted mk-photo-credit">Top image supplied by the organizer. {market.image.credit}</p> : null}
           </section>
 
+          {org && orgShelf ? (
+            <section className="mk-dsec mk-runby" aria-labelledby="mk-runby-title" style={{ ['--tone' as string]: orgShelf.tone, ['--tink' as string]: orgShelf.ink } as CSSProperties}>
+              <header className="mk-sec-head"><h2 id="mk-runby-title"><span>Who runs it</span></h2><p>{orgShelf.label} on Local</p></header>
+              <Link className="mk-runby-card" to={entityPath(org)}>
+                <Seal title={org.title} tone={orgShelf} />
+                <span className="mk-runby-copy">
+                  <small>{isOwnerVerified(org) ? 'Verified organizer' : 'The organizer'}</small>
+                  <strong>{org.title}</strong>
+                  <span>{org.summary}</span>
+                </span>
+                <span className="mk-runby-go">Their profile <ArrowUpRight size={16} aria-hidden="true" /></span>
+              </Link>
+              {sisters.length ? (
+                <ul className="mk-runby-sisters" aria-label={`Other markets from ${org.title}`}>
+                  {sisters.map(m => {
+                    const n = nextOpen(m, occurrences, now);
+                    return <li key={m.id}><Link to={entityPath(m)}><b>{shortName(m)}</b><small>{n ? (isOpen(n, now) ? 'Open now' : statusLine(n, now)) : 'Dates on their site'}{m.neighbourhood ? ` · ${m.neighbourhood}` : ''}</small><ArrowUpRight size={15} aria-hidden="true" /></Link></li>;
+                  })}
+                </ul>
+              ) : null}
+            </section>
+          ) : null}
+
           {take ? (
             <Link className="mk-take" to={entityPath(take.guide)}>
               <Quote size={26} aria-hidden="true" />
@@ -156,7 +189,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
 
         <aside className="mk-dside" aria-label="Around this market">
           <div className="mk-side-card">
-            <p className="mk-side-kicker"><MapIcon size={15} aria-hidden="true" /> {market.neighbourhood}{q ? `, ${q} Calgary` : ''}</p>
+            <p className="mk-side-kicker"><MapIcon size={15} aria-hidden="true" /> {[market.neighbourhood, q ? `${q} Calgary` : null].filter(Boolean).join(', ') || 'Calgary'}</p>
             <MarketMap markets={[market]} focusId={market.id} />
             <a className="mk-btn mk-btn-ink mk-wide" href={directionsUrl(market)} target="_blank" rel="noopener noreferrer"><Navigation size={16} aria-hidden="true" /> Get directions</a>
           </div>
@@ -173,7 +206,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
               <p className="mk-side-kicker">Other markets coming up</p>
               <ul>
                 {others.map(({ m, n }) => (
-                  <li key={m.id}><Link to={entityPath(m)}><span className="mk-others-day"><small>{weekdayShort.format(new Date(n.start))}</small><b>{dayNum.format(new Date(n.start))}</b></span><span><strong>{shortName(m)}</strong><small>{isOpen(n, now) ? 'Open now' : hours(n)} · {m.neighbourhood}</small></span></Link></li>
+                  <li key={m.id}><Link to={entityPath(m)}><span className="mk-others-day"><small>{weekdayShort.format(new Date(n.start))}</small><b>{dayNum.format(new Date(n.start))}</b></span><span><strong>{shortName(m)}</strong><small>{[isOpen(n, now) ? 'Open now' : hours(n), m.neighbourhood].filter(Boolean).join(' · ')}</small></span></Link></li>
                 ))}
               </ul>
               <Link className="mk-tile-link" to="/markets">Every market <ArrowRight size={15} aria-hidden="true" /></Link>

@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, BadgeCheck, Coffee, Drama, FerrisWheel, Ghost, MapPin, Palette, Search, Store, Tractor, Users, X, type LucideIcon } from 'lucide-react';
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
-import { SHELVES, type BoardRow, type Programme, type Shelf, type ShelfId } from '../../lib/localShelves';
+import { initials, SHELVES, type BoardRow, type Programme, type Shelf, type ShelfId } from '../../lib/localShelves';
+import { ProfileCover } from './ProfileCover';
+
+export { initials };
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { isOwnerVerified } from '../../lib/verified';
@@ -27,18 +30,13 @@ const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 const host = (url: string) => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; } };
 const clean = (s: string) => s.replace(/\./g, '').toUpperCase();
 /** Midnight starts are date-only listings; we show the day and leave the time blank. */
-const timeOf = (start: string, dateOnly: boolean) => (dateOnly || hour.format(new Date(start)) === '00:00' ? '' : clean(hm.format(new Date(start))));
-const dayOf = (start: string) => { const d = new Date(start); return `${clean(wday.format(d))} ${dnum.format(d)} ${clean(mon.format(d))}`; };
+export const timeOf = (start: string, dateOnly: boolean) => (dateOnly || hour.format(new Date(start)) === '00:00' ? '' : clean(hm.format(new Date(start))));
+export const dayOf = (start: string) => { const d = new Date(start); return `${clean(wday.format(d))} ${dnum.format(d)} ${clean(mon.format(d))}`; };
 
 /** Two letters for a profile's seal: "Vertigo Theatre" → VT, "MAKERS" → MA. */
-export function initials(title: string) {
-  const words = shortName(title).replace(/[’'&+]/g, ' ').split(/\s+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(the|of|and|de|at)$/i.test(w));
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-}
 
 /** Whole-section reveal: true once the element has scrolled into view (or straight away without IntersectionObserver). */
-function useSeen<T extends HTMLElement>(ready: boolean, margin = '0px 0px -12% 0px') {
+export function useSeen<T extends HTMLElement>(ready: boolean, margin = '0px 0px -12% 0px') {
   const ref = useRef<T>(null);
   const [seen, setSeen] = useState(false);
   useEffect(() => {
@@ -55,7 +53,7 @@ function useSeen<T extends HTMLElement>(ready: boolean, margin = '0px 0px -12% 0
 const reduced = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 /** A number that counts up once it's on screen. */
-function CountUp({ to, on }: { to: number; on: boolean }) {
+export function CountUp({ to, on }: { to: number; on: boolean }) {
   const [n, setN] = useState(to);
   useEffect(() => {
     if (!on || reduced() || to < 2) { setN(to); return; }
@@ -72,7 +70,7 @@ const FLAP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
  * Split-flap text: when the board comes on screen each line spins through letters and
  * settles left to right, like a departures board. Screen readers get the plain text.
  */
-function Flap({ text, on, delay = 0 }: { text: string; on: boolean; delay?: number }) {
+export function Flap({ text, on, delay = 0 }: { text: string; on: boolean; delay?: number }) {
   const [shown, setShown] = useState(text);
   useEffect(() => {
     if (!on || reduced()) { setShown(text); return; }
@@ -92,7 +90,7 @@ function Flap({ text, on, delay = 0 }: { text: string; on: boolean; delay?: numb
   return <span aria-hidden="true">{shown}</span>;
 }
 
-function statusOf(start: string, now: number) {
+export function statusOf(start: string, now: number) {
   const today = ymd.format(new Date(now));
   const d = ymd.format(new Date(start));
   if (d === today) return { label: 'Today', tone: 'now' };
@@ -176,7 +174,7 @@ export function ShelfRibbon({ counts }: { counts: Map<ShelfId, number> }) {
   );
 }
 
-function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shelf: Shelf; programme?: Programme; now: number; i: number }) {
+export function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shelf: Shelf; programme?: Programme; now: number; i: number }) {
   const note = LOCAL_NOTES[p.id];
   const verified = isOwnerVerified(p);
   const next = programme?.next;
@@ -185,7 +183,7 @@ function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shelf: Shel
     <li className="ld-card" style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink, ['--i' as string]: Math.min(i, 8) } as CSSProperties}>
       <Link to={entityPath(p)} className="ld-card-main">
         <span className="ld-card-top">
-          <Seal title={p.title} tone={shelf} />
+          <span className="ld-card-cover"><ProfileCover id={p.id} title={p.title} shelf={shelf} mini /></span>
           <span className="lx-go ld-card-go" aria-hidden="true"><ArrowUpRight size={18} /></span>
         </span>
         <strong className="ld-card-name">{p.title}</strong>
@@ -229,6 +227,14 @@ export function ShelfDirectory({ profiles, shelfOfId, programmes, now, category 
   const hits = visible.reduce((n, x) => n + x.list.length, 0);
   const root = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
+
+  // A profile's "See the whole shelf" link lands on /local#shelf-…; jump there once the shelves exist.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id.startsWith('shelf-')) return;
+    const t = window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: 'start' }), 60);
+    return () => clearTimeout(t);
+  }, []);
 
   // Scroll-spy: the rail lights the shelf whose heading has passed the upper third of the screen.
   useEffect(() => {

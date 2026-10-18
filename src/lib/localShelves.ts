@@ -22,6 +22,15 @@ export const SHELVES: Shelf[] = [
   { id: 'seasonal', label: 'Seasonal', line: 'Here for a season: haunted Octobers and Christmas markets.', tone: '#06162f', ink: '#fff' },
 ];
 
+const shortName = (title: string) => title.split(/\s+[—–-]\s+/)[0];
+
+/** Two letters for a profile's seal and cover: its first two words, skipping the little ones. */
+export function initials(title: string) {
+  const words = shortName(title).replace(/[’'&+]/g, ' ').split(/\s+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(the|of|and|de|at)$/i.test(w));
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 const has = (list: string[], ...words: string[]) => list.some(x => words.includes(x.toLowerCase()));
 
 /** Which shelf a profile belongs on. The first rule that matches wins. */
@@ -69,4 +78,36 @@ export function boardRows(profiles: readonly Business[], programmes: ReadonlyMap
     .flatMap(p => { const next = programmes.get(p.id)?.next; return next ? [{ ...next, profile: p }] : []; })
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
     .slice(0, limit);
+}
+
+/** A run of dates under one title: Ghosts and Gourmet on four nights is one row, not four. */
+export interface Series<T> { title: string; dates: T[] }
+
+/** "Where Dark Things Dwell (Fridays)" and "(Sundays)" are one run of the same show. */
+const runTitle = (title: string) => title.replace(/\s*\((?:mon|tues|wednes|thurs|fri|satur|sun)days?\)\s*/i, ' ').replace(/\s+-\s*/g, ' – ').replace(/\s{2,}/g, ' ').trim();
+
+/** Folds a programme into runs by title, in order of each run's first date. */
+export function seriesOf<T extends { title: string; start: string }>(items: readonly T[]): Series<T>[] {
+  const runs = new Map<string, Series<T>>();
+  for (const item of [...items].sort((a, b) => Date.parse(a.start) - Date.parse(b.start))) {
+    const key = runTitle(item.title).normalize('NFKC').toLocaleLowerCase('en-CA');
+    const run = runs.get(key);
+    if (run) run.dates.push(item); else runs.set(key, { title: runTitle(item.title), dates: [item] });
+  }
+  return [...runs.values()];
+}
+
+/**
+ * Who else is on a profile's shelf, for "More on the shelf": profiles with dates first,
+ * then our picks, then A to Z. Topped up from the rest of Local when a shelf is thin.
+ */
+export function shelfMates(place: Business, profiles: readonly Business[], programmes: ReadonlyMap<string, Programme>, limit = 8): Business[] {
+  const shelf = shelfOf(place);
+  const rank = (a: Business, b: Business) => Number(!!programmes.get(b.id)?.count) - Number(!!programmes.get(a.id)?.count)
+    || Number(b.editorialSelection) - Number(a.editorialSelection) || a.title.localeCompare(b.title);
+  const others = profiles.filter(p => p.id !== place.id);
+  const same = others.filter(p => shelfOf(p) === shelf).sort(rank);
+  const rest = others.filter(p => shelfOf(p) !== shelf).sort(rank);
+  // Whole rows of four on a laptop: one row unless the shelf can fill two.
+  return [...same, ...rest].slice(0, same.length > 4 ? limit : Math.min(limit, 4));
 }

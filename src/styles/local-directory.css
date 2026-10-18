@@ -271,3 +271,12 @@
   .ld-seal, .ld-cover, .cw-loc .ld-card-main, .cw-loc .ld-rail-list a { transition: none; }
 }
 .cw-loc .lx-pin-more { background: var(--yellow); }
+
+/* ── Mini covers on profile cards ────────────────────────────────────── */
+.ld-card-cover { display: block; width: 76px; flex: none; }
+.ld-card-cover .pc { border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-3deg); transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); }
+.ld-card-main:hover .ld-card-cover .pc { transform: rotate(4deg) scale(1.06); }
+.pc.is-mini .pc-mark, .pc.is-mini .pc-no, .pc.is-mini .pc-stamp, .pc.is-mini .pc-foot { display: none; }
+.pc.is-mini .pc-big { left: 0; right: 0; bottom: auto; top: 50%; transform: translateY(-50%); text-align: center; font-size: 46cqi; }
+.pc.is-mini .pc-art { opacity: .6; }
+@media (max-width: 640px) { .ld-card-cover { width: 64px; } }

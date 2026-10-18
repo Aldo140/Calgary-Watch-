@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { boardRows, programmeOf, SHELVES, shelfOf } from '../src/lib/localShelves.ts';
+import { boardRows, programmeOf, seriesOf, shelfMates, SHELVES, shelfOf } from '../src/lib/localShelves.ts';
 import { initials } from '../src/components/discovery/LocalDirectory.tsx';
 import { discoveryRepository } from '../src/data/discovery.ts';
 import type { Business, DiscoveryEntity, Event } from '../src/types/discovery.ts';
@@ -49,5 +49,30 @@ describe('Local shelves', () => {
     assert.equal(initials('MAKERS'), 'MA');
     assert.equal(initials('The Confluence Historic Site & Parkland'), 'CH');
     assert.equal(initials('Rosso Coffee Roasters — Inglewood'), 'RC');
+  });
+});
+
+describe('Profile programme', () => {
+  const row = (title: string, start: string) => ({ title, start });
+
+  it('folds repeat nights of a show into one run, weekday variants included', () => {
+    const runs = seriesOf([
+      row('Ghosts and Gourmet', '2026-10-29T18:00:00-06:00'),
+      row('Where Dark Things Dwell (Fridays)- Outdoor Escape Room', '2026-10-30T19:30:00-06:00'),
+      row('Ghosts and Gourmet', '2026-10-28T18:00:00-06:00'),
+      row('Where Dark Things Dwell (Sundays)- Outdoor Escape Room', '2026-10-18T19:00:00-06:00'),
+    ]);
+    assert.deepEqual(runs.map(r => [r.title, r.dates.length]), [['Where Dark Things Dwell – Outdoor Escape Room', 2], ['Ghosts and Gourmet', 2]]);
+    assert.equal(runs[1].dates[0].start, '2026-10-28T18:00:00-06:00');
+  });
+
+  it('fills "More on the shelf" with shelf-mates first, in whole rows', () => {
+    const stage = (id: string) => shop(id, `${id} Theatre`, ['arts'], ['theatre']);
+    const place = stage('a');
+    const others = [stage('b'), stage('c'), shop('d', 'Rosso Coffee', ['food'], ['coffee']), shop('e', 'Contemporary Calgary', ['arts']), shop('f', 'Some Gallery', ['arts'])];
+    const mates = shelfMates(place, [place, ...others], new Map());
+    assert.equal(mates.length, 4);
+    assert.deepEqual(mates.slice(0, 2).map(m => m.id), ['b', 'c']);
+    assert.ok(!mates.some(m => m.id === 'a'));
   });
 });

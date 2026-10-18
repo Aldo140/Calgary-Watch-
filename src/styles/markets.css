@@ -451,3 +451,32 @@
   .mk-dock > * { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 46px; border-radius: 999px; font: 800 14px/1 Inter, sans-serif; }
   .mk .mk-dock .is-main { background: var(--navy); color: var(--sun); }
 }
+
+/* ── Who runs it: the organizer's Local profile, in its shelf colour ── */
+.mk-runby-card {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 20px 22px;
+  border: 2px solid var(--ink); border-radius: 22px; background: #fff; box-shadow: 6px 6px 0 var(--tone); transition: transform .18s, box-shadow .18s;
+}
+.mk-runby-card:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--tone); }
+.mk-runby-card:hover .ld-seal { transform: rotate(-14deg) scale(1.06); }
+.mk-runby-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mk-runby-copy small { font: 700 11px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.mk-runby-copy strong { font: 800 clamp(21px, 2vw, 26px)/1.1 var(--display); letter-spacing: -.03em; }
+.mk-runby-copy > span { font: 400 14.5px/1.45 Inter, sans-serif; color: var(--muted); }
+.mk-runby-go {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 999px;
+  background: var(--tone); color: var(--tink); font: 700 14px/1 Inter, sans-serif; white-space: nowrap;
+}
+.mk-runby-sisters { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; margin-top: 16px !important; padding: 0; list-style: none; }
+.mk-runby-sisters a {
+  position: relative; display: flex; flex-direction: column; gap: 3px; padding: 12px 40px 12px 14px; border: 1.5px solid var(--ink); border-radius: 14px; background: var(--paper);
+  transition: background .15s, transform .15s;
+}
+.mk-runby-sisters a:hover { background: #fff; transform: translateY(-2px); }
+.mk-runby-sisters b { font: 700 15px/1.25 Inter, sans-serif; }
+.mk-runby-sisters small { font: 500 12.5px/1.3 Inter, sans-serif; color: var(--muted); }
+.mk-runby-sisters svg { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); }
+@media (max-width: 640px) {
+  .mk-runby-card { grid-template-columns: auto minmax(0, 1fr); padding: 16px; box-shadow: 4px 4px 0 var(--tone); }
+  .mk-runby-go { grid-column: 1 / -1; justify-self: start; }
+}

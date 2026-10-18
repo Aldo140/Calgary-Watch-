@@ -254,3 +254,33 @@ export function MeanwhileBoard({ place, shelf, site, siteLabel, all, occurrences
     </section>
   );
 }
+
+/**
+ * Every section marked data-reveal gets data-seen as it scrolls into view, so its heading
+ * rises in and its highlight wipes across. Without IntersectionObserver everything shows.
+ */
+export function useSectionReveal(key: string) {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const els = [...(root.current?.querySelectorAll<HTMLElement>('[data-reveal]') ?? [])];
+    if (typeof IntersectionObserver === 'undefined') { els.forEach(el => { el.dataset.seen = ''; }); return; }
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { (e.target as HTMLElement).dataset.seen = ''; io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -12% 0px' });
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, [key]);
+  return root;
+}
+
+/** The ribbon under a profile's hero: its name and facts going by in its shelf colour. */
+export function ProfileRibbon({ items }: { items: string[] }) {
+  const loop = [...items, ...items, ...items];
+  return (
+    <div className="ld-ribbon lp-ribbon" aria-hidden="true">
+      <div className="ld-ribbon-track">
+        {loop.map((t, i) => <span key={i}><img src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" width="26" height="26" loading="lazy" />{t}</span>)}
+      </div>
+    </div>
+  );
+}

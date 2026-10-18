@@ -19,7 +19,7 @@ import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
 import { SourceBadge } from '../entity/EntityDetail';
 import { programmeOf, seriesOf, shelfOf, SHELVES } from '../../lib/localShelves';
 import { CountUp, Seal, useSeen } from './LocalDirectory';
-import { MarketLocations, MeanwhileBoard, NextUp, ProfileSpread, ProfileTabs, ShelfMates, type ProfileTab } from './ProfileSections';
+import { MarketLocations, MeanwhileBoard, NextUp, ProfileRibbon, ProfileSpread, ProfileTabs, ShelfMates, useSectionReveal, type ProfileTab } from './ProfileSections';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const short = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
@@ -119,9 +119,11 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
     { id: 'lp-contact', label: 'Contact' },
   ];
   let n = 0;
+  const revealRef = useSectionReveal(place.id);
+  const ribbon = [name, shelf.label, ahead.count ? `${ahead.count} ${ahead.count === 1 ? 'date' : 'dates'} coming up` : note?.since ? `Since ${note.since}` : 'Calgary, Alberta', place.neighbourhood || (q ? `${q} Calgary` : 'Calgary'), 'CalgaryWatch Local'];
 
   return (
-    <div className="cw-loc lp" data-profile-category={presentation.key} style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink } as CSSProperties}>
+    <div ref={revealRef} className="cw-loc lp" data-profile-category={presentation.key} style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink } as CSSProperties}>
       <LiveSky className="lp-hero" labelledBy="lp-title">
         {sky => <>
           <div className="cw-wrap lp-hero-in">
@@ -156,11 +158,12 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           <div className="lx-road lp-road" aria-hidden="true"><Traffic /></div>
         </>}
       </LiveSky>
+      <ProfileRibbon items={ribbon} />
 
       <ProfileTabs tabs={tabs} tone={shelf} />
       <div className="cw-wrap lx-wrap">
         {note ? (
-          <section className="lp-take" aria-labelledby="lp-take">
+          <section className="lp-take" data-reveal aria-labelledby="lp-take">
             <figure className="lp-quote">
               <Quote className="lp-quote-mark" size={64} aria-hidden="true" />
               <p className="lx-eyebrow lx-eyebrow-ink" id="lp-take">{note.pick}</p>
@@ -222,7 +225,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
 
 
         {markets.length ? (
-          <section id="lp-market-locations" className="lp-upcoming" aria-labelledby="lp-markets">
+          <section id="lp-market-locations" className="lp-upcoming" data-reveal aria-labelledby="lp-markets">
             <header className="lx-head"><div>
               <p className="lx-eyebrow">From this organization</p>
               <h2 id="lp-markets">Markets from <mark>{name}.</mark></h2>
@@ -231,7 +234,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           </section>
         ) : null}
         {upcoming.length ? (
-          <section id="lp-programme" className="lp-upcoming" aria-labelledby="lp-upcoming">
+          <section id="lp-programme" className="lp-upcoming" data-reveal aria-labelledby="lp-upcoming">
             <header className="lx-head">
               <div>
                 <p className="lx-eyebrow"><span className="lx-dot" aria-hidden="true" />From the official season</p>
@@ -280,7 +283,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
 
         {noDates ? <MeanwhileBoard place={place} shelf={shelf} site={site} siteLabel={site ? host(site) : undefined} all={all} occurrences={occurrences} now={now} /> : null}
 
-        <section id="lp-around-here" className="lp-around" aria-labelledby="lp-around">
+        <section id="lp-around-here" className="lp-around" data-reveal aria-labelledby="lp-around">
           <header className="lx-head">
             <div>
               <p className="lx-eyebrow">{place.neighbourhood ? `Around ${place.neighbourhood}` : 'Around here'}</p>

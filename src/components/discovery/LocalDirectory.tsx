@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, BadgeCheck, Coffee, Drama, FerrisWheel, Ghost, MapPin, Palette, Search, Store, Tractor, Users, X, type LucideIcon } from 'lucide-react';
 import type { Business } from '../../types/discovery';
 import { entityPath, LOCAL_CATEGORIES } from '../../lib/discovery';
-import { SHELVES, type BoardRow, type Programme, type Shelf, type ShelfId } from '../../lib/localShelves';
+import { initials, SHELVES, type BoardRow, type Programme, type Shelf, type ShelfId } from '../../lib/localShelves';
+import { ProfileCover } from './ProfileCover';
+
+export { initials };
 import { LOCAL_NOTES } from '../../data/localNotes';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { isOwnerVerified } from '../../lib/verified';
@@ -31,11 +34,6 @@ export const timeOf = (start: string, dateOnly: boolean) => (dateOnly || hour.fo
 export const dayOf = (start: string) => { const d = new Date(start); return `${clean(wday.format(d))} ${dnum.format(d)} ${clean(mon.format(d))}`; };
 
 /** Two letters for a profile's seal: "Vertigo Theatre" → VT, "MAKERS" → MA. */
-export function initials(title: string) {
-  const words = shortName(title).replace(/[’'&+]/g, ' ').split(/\s+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(the|of|and|de|at)$/i.test(w));
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-}
 
 /** Whole-section reveal: true once the element has scrolled into view (or straight away without IntersectionObserver). */
 export function useSeen<T extends HTMLElement>(ready: boolean, margin = '0px 0px -12% 0px') {
@@ -185,7 +183,7 @@ export function ProfileCard({ p, shelf, programme, now, i }: { p: Business; shel
     <li className="ld-card" style={{ ['--tone' as string]: shelf.tone, ['--tink' as string]: shelf.ink, ['--i' as string]: Math.min(i, 8) } as CSSProperties}>
       <Link to={entityPath(p)} className="ld-card-main">
         <span className="ld-card-top">
-          <Seal title={p.title} tone={shelf} />
+          <span className="ld-card-cover"><ProfileCover id={p.id} title={p.title} shelf={shelf} mini /></span>
           <span className="lx-go ld-card-go" aria-hidden="true"><ArrowUpRight size={18} /></span>
         </span>
         <strong className="ld-card-name">{p.title}</strong>

@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { Shelf, ShelfId } from '../../lib/localShelves';
-import { initials } from './LocalDirectory';
+import { initials } from '../../lib/localShelves';
 
 const MARK = '/images/brand/calgarywatch-city-spark-v2.webp';
 
@@ -121,14 +121,14 @@ function Motif({ shelf, seed }: { shelf: ShelfId; seed: number }) {
  * profile has a striking piece of art whether or not it sent us a photo. Its shelf
  * picks the colour and the drawing; its initials and name make it its own.
  */
-export function ProfileCover({ id, title, shelf, number, stamp }: { id: string; title: string; shelf: Shelf; number: number; stamp?: string }) {
+export function ProfileCover({ id, title, shelf, number, stamp, mini }: { id: string; title: string; shelf: Shelf; number?: number; stamp?: string; mini?: boolean }) {
   const seed = seedOf(id);
   const style = { '--tone': shelf.tone, '--tink': shelf.ink, '--tilt': `${((seed % 5) - 2) * 0.6}deg` } as CSSProperties;
   return (
-    <div className={`pc pc-${shelf.id}`} style={style} aria-hidden="true">
+    <div className={`pc pc-${shelf.id}${mini ? ' is-mini' : ''}`} style={style} aria-hidden="true">
       <Motif shelf={shelf.id} seed={seed} />
       <span className="pc-mark"><img src={MARK} alt="" width="40" height="40" loading="lazy" />Local</span>
-      <span className="pc-no">No. {String(number).padStart(2, '0')}</span>
+      {number ? <span className="pc-no">No. {String(number).padStart(2, '0')}</span> : null}
       <span className="pc-big">{initials(title)}</span>
       {stamp ? <span className="pc-stamp">{stamp}</span> : null}
       <span className="pc-foot"><small>{shelf.label}</small><b>{title}</b></span>

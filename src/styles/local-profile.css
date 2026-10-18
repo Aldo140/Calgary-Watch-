@@ -282,3 +282,19 @@
   .pc-wheel { animation: none; }
   .lp-spread:not([data-seen]) .lp-spread-cover .pc, .lp-spread:not([data-seen]) .lp-offers li { opacity: 1; transform: none; }
 }
+
+/* ── Profile ribbon under the hero, in the shelf colour ──────────────── */
+.cw-loc.lp .lp-ribbon { background: var(--tone); margin-top: -10px; }
+.cw-loc.lp .lp-ribbon span { color: var(--tink); }
+.cw-loc.lp .lp-ribbon i { background: var(--tink); color: var(--tone); }
+.lp-ribbon .ld-ribbon-track { animation-duration: 38s; }
+
+/* ── Section reveal: headings rise and their highlight wipes in ──────── */
+.lp [data-reveal] h2 { transition: opacity .6s, transform .7s cubic-bezier(.2, 1, .3, 1); }
+.lp [data-reveal]:not([data-seen]) h2 { opacity: 0; transform: translateY(22px); }
+.lp [data-reveal] h2 mark { background-repeat: no-repeat; background-size: 100% 100%; transition: background-size .9s cubic-bezier(.6, 0, .2, 1) .25s; }
+.lp [data-reveal]:not([data-seen]) h2 mark { background-size: 0% 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .lp [data-reveal]:not([data-seen]) h2 { opacity: 1; transform: none; }
+  .lp [data-reveal]:not([data-seen]) h2 mark { background-size: 100% 100%; }
+}

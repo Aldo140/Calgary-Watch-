@@ -22,6 +22,15 @@ export const SHELVES: Shelf[] = [
   { id: 'seasonal', label: 'Seasonal', line: 'Here for a season: haunted Octobers and Christmas markets.', tone: '#06162f', ink: '#fff' },
 ];
 
+const shortName = (title: string) => title.split(/\s+[—–-]\s+/)[0];
+
+/** Two letters for a profile's seal and cover: its first two words, skipping the little ones. */
+export function initials(title: string) {
+  const words = shortName(title).replace(/[’'&+]/g, ' ').split(/\s+/).filter(w => /^[A-Za-z0-9]/.test(w) && !/^(the|of|and|de|at)$/i.test(w));
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 const has = (list: string[], ...words: string[]) => list.some(x => words.includes(x.toLowerCase()));
 
 /** Which shelf a profile belongs on. The first rule that matches wins. */

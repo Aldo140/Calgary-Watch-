@@ -1,0 +1,86 @@
+/*
+ * Neighbourhoods and Markets wearing the Local profile kit: the colour ribbon under the
+ * hero, the cover + story spread, drawn mini covers on cards and headings that rise in with
+ * a highlight wipe. The kit itself lives in local-profile.css and local-directory.css; this
+ * file only seats it on .nb and .mk pages.
+ */
+.mk { --yellow: var(--sun); }
+.mk-index { --tone: #3a8f74; --tink: #fff; }
+
+/* ── Ribbon ──────────────────────────────────────────────────────────── */
+:is(.nb, .mk) .lp-ribbon { margin-top: -10px; background: var(--tone, var(--yellow)); }
+:is(.nb, .mk) .lp-ribbon span { color: var(--tink, var(--ink)); }
+:is(.nb, .mk) .lp-ribbon .ld-ribbon-track { animation-duration: 38s; }
+.nb-detail .nb-glance { margin-top: clamp(40px, 5vw, 64px); }
+
+/* ── Spread ──────────────────────────────────────────────────────────── */
+:is(.nb, .mk) .lp-spread .lx-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; font: 600 12px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+:is(.nb, .mk) .lp-ledger a { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
+.nb .lp-spread { margin-top: clamp(56px, 7vw, 96px); }
+.nb .lp-spread-cover .pc-mark, .mk .lp-spread-cover .pc-mark { font-size: max(10px, 5.2cqi); }
+
+/* Market pages: the spread sits in the main column beside the map, so it runs smaller. */
+.lp-spread.is-compact { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: clamp(24px, 3vw, 40px); margin-top: clamp(40px, 5vw, 64px); }
+.lp-spread.is-compact .lp-spread-cover .pc { box-shadow: 10px 10px 0 var(--ink); }
+.lp-spread.is-compact .lp-spread-copy { gap: 18px; }
+.lp-spread.is-compact .lp-spread-copy h2 { font-size: clamp(38px, 3.8vw, 58px); }
+.lp-spread.is-compact .lp-spread-lead { font-size: clamp(19px, 1.6vw, 23px); }
+.lp-spread.is-compact .lp-spread-body { font-size: 16.5px; }
+.lp-spread.is-compact .lp-offers { grid-template-columns: repeat(auto-fill, minmax(min(100%, 120px), 1fr)); }
+.lp-spread.is-compact .lp-offers li { min-height: 100px; padding: 14px; font-size: 14px; }
+.lp-spread.is-compact .lp-ledger { grid-template-columns: minmax(0, 1fr); }
+.lp-spread.is-compact .lp-ledger > div { flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; padding: 11px 0; }
+.lp-spread.is-compact .lp-ledger dd { text-align: right; }
+.mk .lp-spread-links { align-items: center; }
+.mk .lp-spread-links .mk-photo-credit { margin: 0; }
+
+/* ── Drawn mini covers on cards ──────────────────────────────────────── */
+.nb-card-cover {
+  position: absolute; left: 14px; bottom: 12px; width: 64px; transform: rotate(-5deg);
+  transition: transform .35s cubic-bezier(.3, 1.6, .5, 1);
+}
+.nb-card-cover .pc, .nb-mini-cover .pc, .nb-listing-cover .pc { border-radius: 12px; box-shadow: 3px 3px 0 var(--ink); }
+.nb-card:hover .nb-card-cover { transform: rotate(4deg) scale(1.08); }
+.nb-mini { position: relative; }
+.nb .nb-mini .nb-mini-cover { position: absolute; left: 20px; top: 20px; display: block; width: 52px; padding: 0; transform: rotate(-4deg); }
+.nb-listing-cover { display: block; width: 54px; margin-bottom: 6px; transform: rotate(-3deg); transition: transform .35s cubic-bezier(.3, 1.6, .5, 1); }
+.nb-listing:hover .nb-listing-cover { transform: rotate(4deg) scale(1.06); }
+
+/* ── Headings rise in, highlight wipes across ────────────────────────── */
+.nb h2 mark { color: inherit; padding: 0 .04em; background: linear-gradient(transparent 58%, var(--yellow) 58% 92%, transparent 92%); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+:is(.nb, .mk) [data-reveal] h2 { transition: opacity .6s, transform .7s cubic-bezier(.2, 1, .3, 1); }
+:is(.nb, .mk) [data-reveal]:not([data-seen]) h2 { opacity: 0; transform: translateY(22px); }
+.nb [data-reveal] h2 mark { background-repeat: no-repeat; background-size: 100% 100%; transition: background-size .9s cubic-bezier(.6, 0, .2, 1) .25s; }
+.nb [data-reveal]:not([data-seen]) h2 mark { background-size: 0% 100%; }
+/* Markets' headings are stickers: they slap down instead. */
+.mk [data-reveal] .mk-sec-head h2 span { transition: transform .6s cubic-bezier(.3, 1.7, .5, 1) .15s; }
+.mk [data-reveal]:not([data-seen]) .mk-sec-head h2 span { transform: rotate(-9deg) scale(.7); }
+
+@media (max-width: 900px) {
+  .lp-spread.is-compact { grid-template-columns: minmax(0, 1fr); }
+  .lp-spread.is-compact .lp-spread-cover { position: static; width: min(100%, 360px); justify-self: start; }
+}
+@media (max-width: 700px) {
+  .nb-detail .nb-glance { margin-top: 32px; }
+  .nb-card-n { display: none; }
+  .nb-card-cover { left: 8px; bottom: 8px; width: 46px; }
+  .nb .nb-mini .nb-mini-cover { width: 40px; left: 16px; top: 16px; }
+  .nb .lp-spread { margin-top: 44px; }
+  .lp-spread.is-compact .lp-spread-cover { width: calc(100% - 14px); }
+  .lp-spread.is-compact .lp-spread-copy h2 { font-size: clamp(36px, 11vw, 48px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.nb, .mk) [data-reveal]:not([data-seen]) h2 { opacity: 1; transform: none; }
+  .nb [data-reveal]:not([data-seen]) h2 mark { background-size: 100% 100%; }
+  .mk [data-reveal]:not([data-seen]) .mk-sec-head h2 span { transform: rotate(-1.5deg); }
+  .nb-card-cover, .nb-listing-cover { transition: none; }
+}
+.nb-index .lp-ribbon + .nb-wrap > .cw-preview-note { margin-top: 36px; }
+/* The ribbon now sits where the facts card used to overlap the hero, so the card drops below it. */
+.mk-detail .lp-ribbon + .mk-page .mk-facts { margin-top: clamp(36px, 4vw, 52px) !important; }
+@media (min-width: 721px) { .mk-detail .lp-ribbon + .mk-page .mk-dside { margin-top: clamp(36px, 4vw, 52px); } }
+@media (max-width: 720px) { .mk-detail .lp-ribbon + .mk-page .mk-facts { margin-top: 28px !important; } }
+.mk-index .lp-ribbon + .mk-page .mk-week { margin-top: clamp(40px, 4vw, 56px); }
+@media (max-width: 720px) { .mk-index .lp-ribbon + .mk-page .mk-week { margin-top: 30px; border-radius: 22px 22px 0 0; border-top: 2px solid var(--ink); } }

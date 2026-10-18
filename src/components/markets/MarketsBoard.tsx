@@ -11,9 +11,13 @@ import { pickWhen } from '../../lib/eventPicks';
 import { MarketCover } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
 import { MarketMap } from './MarketMap';
+import { ProfileRibbon, useSectionReveal } from '../discovery/ProfileSections';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
+import '../../styles/local-directory.css';
+import '../../styles/local-profile.css';
+import '../../styles/story-pages.css';
 
 const DAY_MS = 86_400_000;
 
@@ -151,9 +155,14 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
     return `${period ? `/markets/${period}` : '/markets'}${next.size ? `?${next}` : ''}`;
   };
   const weekendPath = `/markets${period ? '' : '/this-weekend'}${params.size ? `?${params}` : ''}`;
+  const revealRef = useSectionReveal(`${period}-${type}-${query}`);
+  const ribbon = [
+    openNow.length ? `${openNow.length} open now` : null, `${fortnight} market ${fortnight === 1 ? 'day' : 'days'} in two weeks`,
+    ...markets.slice(0, 6).map(shortName), 'CalgaryWatch Markets',
+  ].filter((x): x is string => !!x);
 
   return (
-    <div className="mk cw-home2">
+    <div className="mk mk-index cw-home2" ref={revealRef}>
       <section className="mk-hero" aria-labelledby="mk-title">
         <Bunting />
         <div className="cw-wrap mk-hero-in">
@@ -176,9 +185,10 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
           <path d={TEAR} className="h-tear-paper" />
         </svg>
       </section>
+      <ProfileRibbon items={ribbon} />
 
       <div className="cw-wrap mk-page">
-        <section className="mk-week" aria-labelledby="mk-week-title">
+        <section className="mk-week" data-reveal aria-labelledby="mk-week-title">
           <header className="mk-sec-head">
             <h2 id="mk-week-title"><span>Your market week</span></h2>
             <p>Seven days, every market day. Tap one to plan it.</p>
@@ -207,7 +217,7 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
         </nav>
 
         <div className="mk-main">
-          <section className="mk-list" aria-labelledby="mk-list-title">
+          <section className="mk-list" data-reveal aria-labelledby="mk-list-title">
             <header className="mk-sec-head">
               <h2 id="mk-list-title"><span>{query ? `Matching “${query}”` : activeType ? activeType.label : period ? 'On this weekend' : 'Every market'}</span></h2>
               <p>{markets.length} {markets.length === 1 ? 'market' : 'markets'}, soonest first</p>
@@ -233,7 +243,7 @@ export function MarketsBoard({ items, all, occurrences, period, query }: {
           ) : null}
         </div>
 
-        <section className="mk-more" aria-labelledby="mk-more-title">
+        <section className="mk-more" data-reveal aria-labelledby="mk-more-title">
           <header className="mk-sec-head">
             <h2 id="mk-more-title"><span>Make a morning of it</span></h2>
             <p>Markets connect to the rest of CalgaryWatch.</p>

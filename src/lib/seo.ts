@@ -301,7 +301,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
         item: c.item,
       })),
     },
-    ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences()) } : {}),
+    ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences(), repository.list()) } : {}),
     ...(pathname === COMMUNITY_PATH
       ? {
           about: ['Calgary crime map', 'Calgary crime watch', 'Community watch', 'Calgary public safety map'],

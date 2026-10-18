@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, MapPin } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, BookOpen, Car, Drama, Ghost, GraduationCap, Landmark, MapPin, Music, Palette, Snowflake, Sparkles, Store, Tractor, UtensilsCrossed, Users, Coffee, Ticket, Baby, ShoppingBag, Sun, Wifi, type LucideIcon } from 'lucide-react';
 import type { Business, DiscoveryEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
-import { programmeOf, shelfMates, shelfOf, SHELVES, type ProfileNext, type Programme, type Shelf } from '../../lib/localShelves';
+import { boardRows, programmeOf, shelfMates, shelfOf, SHELVES, type ProfileNext, type Programme, type Shelf } from '../../lib/localShelves';
 import { isOpen, nextOpen, schedulePattern, statusLine, upcoming, weekdayShort } from '../../lib/marketDays';
 import { MarketCover } from './ListingArt';
-import { dayOf, Flap, ProfileCard, statusOf, timeOf, useSeen } from './LocalDirectory';
+import { dayOf, Flap, ProfileCard, Seal, statusOf, timeOf, useSeen } from './LocalDirectory';
+import { ProfileCover } from './ProfileCover';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
+import { isOwnerVerified } from '../../lib/verified';
 import { TEAR } from '../home/HomeHero';
 
 const shelfIndex = new Map(SHELVES.map(s => [s.id, s]));
@@ -137,6 +140,117 @@ export function ShelfMates({ place, all, occurrences, now }: { place: Business; 
           </ul>
         </div>
       </div>
+    </section>
+  );
+}
+
+/** An icon for each thing a profile offers, matched on its words. */
+const SERVICE_ICONS: [RegExp, LucideIcon][] = [
+  [/theat|stage|perform|opera|ballet|dance|play|myster|suspense|thriller/i, Drama], [/coffee|espresso|roast|caf|bean/i, Coffee], [/take ?out|to go|pick-?up/i, ShoppingBag], [/patio|outdoor|terrace/i, Sun], [/wi-?fi/i, Wifi],
+  [/food|kitchen|restaurant|bak|eat|dine|dining|brunch|pastr/i, UtensilsCrossed],
+  [/market|vendor|shop|retail|maker|craft|artisan|goods/i, Store], [/art|galler|exhibit|studio|creative/i, Palette], [/book|liter|read|author|writ/i, BookOpen],
+  [/kid|family|child|camp/i, Baby], [/music|concert|band|sound/i, Music], [/class|workshop|course|language|lesson|learn|educat/i, GraduationCap],
+  [/tour|heritage|histor|museum|culture|venue|rental|hall/i, Landmark], [/ghost|haunt|hallowe|scream|spook/i, Ghost], [/holiday|christmas|winter|yule|festive/i, Snowflake],
+  [/farm|pick|harvest|garden|agric|produce|fruit|berr/i, Tractor], [/park|parking/i, Car], [/ticket|season|show/i, Ticket], [/community|volunteer|member|neighbour|program/i, Users],
+];
+const iconFor = (s: string) => SERVICE_ICONS.find(([re]) => re.test(s))?.[1] ?? Sparkles;
+
+const longDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric', year: 'numeric' });
+const splitLead = (text: string) => { const m = text.match(/^(.+?[.!?])\s+(.+)$/s); return m && m[1].length > 30 ? [m[1], m[2]] as const : [text, ''] as const; };
+
+/**
+ * The profile spread: its drawn cover beside its story, set like a magazine page. The
+ * first sentence is the standfirst, what they offer becomes icon tiles, and the facts
+ * we hold about the profile sit underneath in a ledger.
+ */
+export function ProfileSpread({ place, name, shelf, number, quadrant, since, links }: {
+  place: Business; name: string; shelf: Shelf; number: number; quadrant: string | null; since?: string; links: ReactNode;
+}) {
+  const [ref, seen] = useSeen<HTMLElement>(true, '0px 0px -15% 0px');
+  const [lead, rest] = splitLead(place.description || place.summary);
+  const verified = isOwnerVerified(place);
+  const stamp = place.partner ? 'Partner' : verified ? 'Verified' : place.editorialSelection ? 'Our pick' : undefined;
+  const official = place.sources.find(src => src.kind === 'official');
+  const facts: [string, ReactNode][] = [
+    ['Shelf', <Link key="s" to={`/local#shelf-${shelf.id}`}>{shelf.label}</Link>],
+    ['Area', [place.neighbourhood, quadrant ? `${quadrant} Calgary` : null].filter(Boolean).join(' · ') || (shelf.id === 'day-trips' ? 'Outside Calgary' : 'Across Calgary')],
+    ...(since ? [['Since', since] as [string, ReactNode]] : []),
+    ['Listed from', official ? <a key="o" href={official.url} target="_blank" rel="noopener noreferrer">{official.name}</a> : 'Their public listings'],
+    ['Last checked', longDay.format(new Date(place.verifiedAt || place.updatedAt))],
+    ['Status', verified ? <span key="v" className="lp-ok"><BadgeCheck size={15} aria-hidden="true" />Run by the organization</span> : 'Not yet claimed'],
+  ];
+  return (
+    <section id="lp-about" className="lp-spread" ref={ref} data-seen={seen || undefined} aria-labelledby="lp-story">
+      <figure className="lp-spread-cover">
+        <ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} />
+        <figcaption>Cover art for {name}, drawn for CalgaryWatch Local.</figcaption>
+      </figure>
+      <div className="lp-spread-copy">
+        <p className="lx-eyebrow"><Seal title={place.title} tone={shelf} size="s" />From their own site</p>
+        <h2 id="lp-story">Meet <mark>{name}.</mark></h2>
+        <p className="lp-spread-lead">{lead}</p>
+        {rest ? <p className="lp-spread-body">{rest}</p> : null}
+        {place.services?.length ? (
+          <ul className="lp-offers" aria-label="What you’ll find">
+            {place.services.map((svc, i) => { const Icon = iconFor(svc); return <li key={svc} style={{ ['--i' as string]: i } as CSSProperties}><Icon size={22} aria-hidden="true" /><span>{svc}</span></li>; })}
+          </ul>
+        ) : null}
+        {links}
+        <dl className="lp-ledger">
+          {facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * For a profile with nothing dated: say so plainly, point to their own site, and keep the
+ * page alive with the next dates from the rest of its shelf on the split-flap board.
+ */
+export function MeanwhileBoard({ place, shelf, site, siteLabel, all, occurrences, now }: {
+  place: Business; shelf: Shelf; site?: string; siteLabel?: string; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[]; now: number;
+}) {
+  const rows = useMemo(() => {
+    const profiles = all.filter((e): e is Business => e.kind === 'business' && e.id !== place.id && (!e.developmentOnly || !!place.developmentOnly));
+    const programmes = new Map<string, Programme>(profiles.map(p => [p.id, programmeOf(p.id, all, occurrences, now)]));
+    const same = boardRows(profiles.filter(p => shelfOf(p) === shelf.id), programmes, 5);
+    return same.length >= 3 ? same : boardRows(profiles, programmes, 5);
+  }, [all, occurrences, now, place, shelf.id]);
+  const [ref, seen] = useSeen<HTMLElement>(rows.length > 0);
+  const sameShelf = rows.length > 0 && rows.every(r => shelfOf(r.profile) === shelf.id);
+  return (
+    <section id="lp-programme" className="lp-meanwhile ld-board" ref={ref} data-seen={seen || undefined} aria-labelledby="lp-meanwhile">
+      <div className="lp-meanwhile-head">
+        <div>
+          <p className="lx-eyebrow ld-eyebrow-light"><span className="lx-dot" aria-hidden="true" />Nothing dated here yet</p>
+          <h2 id="lp-meanwhile">Meanwhile, <mark>{sameShelf ? `on the ${shelf.label.toLowerCase()} shelf.` : 'on Local.'}</mark></h2>
+        </div>
+        {site ? <a className="lp-meanwhile-site" href={site} target="_blank" rel="noopener noreferrer">Their own programme on {siteLabel} <ArrowUpRight size={16} aria-hidden="true" /></a> : null}
+      </div>
+      {rows.length ? (
+        <div className="ld-flapboard">
+          <ol>
+            {rows.map((r, i) => {
+              const day = dayOf(r.start); const time = timeOf(r.start, r.dateOnly); const st = statusOf(r.start, now);
+              const tone = shelfIndex.get(shelfOf(r.profile))!;
+              return (
+                <li key={r.profile.id} className="ld-flap-row" style={{ ['--i' as string]: i } as CSSProperties}>
+                  <span className="ld-flap-when" aria-label={`${day}${time ? `, ${time}` : ''}`}>
+                    <b className="ld-cell"><Flap text={day} on={seen} delay={i * 90} /></b>
+                    {time ? <b className="ld-cell ld-cell-time"><Flap text={time} on={seen} delay={i * 90 + 120} /></b> : null}
+                  </span>
+                  <Link to={r.path} className="ld-flap-what" aria-label={r.title}>
+                    <b className="ld-cell ld-cell-wide"><Flap text={r.title.toUpperCase()} on={seen} delay={i * 90 + 60} /></b>
+                  </Link>
+                  <Link to={entityPath(r.profile)} className="ld-flap-from"><Seal title={r.profile.title} tone={tone} size="s" /><span>{r.profile.title.split(/\s+[—–-]\s+/)[0]}</span></Link>
+                  <span className={`ld-flap-status ld-st-${st.tone}`}>{st.label}</span>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -19,7 +19,7 @@ import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
 import { SourceBadge } from '../entity/EntityDetail';
 import { programmeOf, seriesOf, shelfOf, SHELVES } from '../../lib/localShelves';
 import { CountUp, Seal, useSeen } from './LocalDirectory';
-import { MarketLocations, NextUp, ProfileTabs, ShelfMates, type ProfileTab } from './ProfileSections';
+import { MarketLocations, MeanwhileBoard, NextUp, ProfileSpread, ProfileTabs, ShelfMates, type ProfileTab } from './ProfileSections';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const short = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
@@ -105,11 +105,16 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
   const hours = place.hours ? Object.entries(place.hours) : [];
   const status = place.partner ? 'Featured partner' : note?.pick ?? (place.editorialSelection ? 'Picked by CalgaryWatch' : `${place.categories[0] ? `${place.categories[0][0].toUpperCase()}${place.categories[0].slice(1)} · ` : ''}Local organization`);
   const spot = ahead.onNow ?? ahead.next;
+  // A profile with nothing dated shows its shelf's board instead, unless it's a shop: nobody expects a coffee roaster's programme.
+  const noDates = !upcoming.length && !markets.length && shelf.id !== 'coffee';
+  // Each profile's number in the directory, A to Z, printed on its cover.
+  const number = useMemo(() => all.filter(e => e.kind === 'business').sort((a, b) => a.title.localeCompare(b.title)).findIndex(e => e.id === place.id) + 1, [all, place.id]);
   const tabs: ProfileTab[] = [
     { id: 'lp-visitor-info', label: 'Overview' },
     ...(markets.length ? [{ id: 'lp-market-locations', label: 'Markets', count: markets.length }] : []),
     ...(upcoming.length ? [{ id: 'lp-programme', label: 'What’s on', count: upcoming.length }] : []),
     { id: 'lp-about', label: 'Story' },
+    ...(noDates ? [{ id: 'lp-programme', label: 'What’s on' }] : []),
     { id: 'lp-around-here', label: 'Around here' },
     { id: 'lp-contact', label: 'Contact' },
   ];
@@ -225,7 +230,6 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
             <MarketLocations markets={markets} occurrences={occurrences} now={now} />
           </section>
         ) : null}
-        {!upcoming.length && place.categories.includes('arts') ? <p className="lp-none">No upcoming events are listed right now. {site ? <a href={site} target="_blank" rel="noopener noreferrer">Check {host(site)} for the latest programme.</a> : 'Check their website for the latest programme.'}</p> : null}
         {upcoming.length ? (
           <section id="lp-programme" className="lp-upcoming" aria-labelledby="lp-upcoming">
             <header className="lx-head">
@@ -268,23 +272,13 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           </section>
         ) : null}
 
-        <section id="lp-about" className="lp-story" aria-labelledby="lp-story">
-          <header>
-            <p className="lx-eyebrow">From their own site</p>
-            <h2 id="lp-story">The <mark>story.</mark></h2>
-          </header>
-          <div className="lp-story-body">
-            <p>{place.description}</p>
-            {place.services?.length ? (
-              <>
-                <p className="lx-eyebrow">What you’ll find</p>
-                <ul className="lp-services">{place.services.map(s => <li key={s}>{s}</li>)}</ul>
-              </>
-            ) : null}
+        <ProfileSpread place={place} name={name} shelf={shelf} number={number} quadrant={q} since={note?.since}
+          links={season || experiences ? <p className="lp-spread-links">
             {season ? <a className="lx-text-link lp-season" href={season} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current season and tickets</a> : null}
             {experiences ? <a className="lx-text-link lp-season" href={experiences} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current and upcoming experiences</a> : null}
-          </div>
-        </section>
+          </p> : null} />
+
+        {noDates ? <MeanwhileBoard place={place} shelf={shelf} site={site} siteLabel={site ? host(site) : undefined} all={all} occurrences={occurrences} now={now} /> : null}
 
         <section id="lp-around-here" className="lp-around" aria-labelledby="lp-around">
           <header className="lx-head">

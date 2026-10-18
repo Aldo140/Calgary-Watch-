@@ -1,6 +1,6 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Bus, CalendarPlus, Car, Check, Clock, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import { Accessibility, ArrowRight, ArrowUpRight, BadgeCheck, Bus, CalendarPlus, Car, Check, Clock, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Store, Users, type LucideIcon } from 'lucide-react';
 import type { Business, DiscoveryEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
@@ -16,6 +16,9 @@ import { SourceBadge } from '../entity/EntityDetail';
 import { MarketLineup } from '../entity/MarketLineup';
 import { MarketMap } from './MarketMap';
 import { Seal } from '../discovery/LocalDirectory';
+import { ProfileCover } from '../discovery/ProfileCover';
+import { iconFor, ProfileRibbon, StorySpread, useSectionReveal } from '../discovery/ProfileSections';
+import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { organizerMarkets } from '../../lib/organizations';
 import { shelfOf, SHELVES } from '../../lib/localShelves';
 import { isOwnerVerified } from '../../lib/verified';
@@ -23,8 +26,13 @@ import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
 import '../../styles/local-directory.css';
+import '../../styles/local-profile.css';
+import '../../styles/story-pages.css';
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const longDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric', year: 'numeric' });
+const MARKETS_SHELF = SHELVES.find(s => s.id === 'markets')!;
+const amenityIcon = (a: string): LucideIcon => /accessib/i.test(a) ? Accessibility : /dog|pet/i.test(a) ? Dog : /indoor|hut|floor/i.test(a) ? Store : iconFor(a);
 
 /**
  * One market's page: is it on, when, how to get there, and what's around it.
@@ -74,13 +82,33 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
   const orgShelf = org ? SHELVES.find(s => s.id === shelfOf(org))! : undefined;
   const sisters = org ? organizerMarkets(org.id, all, now.getTime()).filter(m => m.id !== market.id) : [];
 
+  const revealRef = useSectionReveal(market.id);
+  const everyMarket = all.filter(e => e.kind === 'market');
+  const number = everyMarket.findIndex(m => m.id === market.id) + 1;
+  const confirmed = dates.filter(o => !o.cancelled).length;
+  const ribbon = [
+    shortName(market), open ? 'Open right now' : next ? `Next: ${statusLine(next, now)}` : 'Dates on their site',
+    confirmed ? `${confirmed} ${confirmed === 1 ? 'date' : 'dates'} coming up` : null, kind, [market.neighbourhood, q].filter(Boolean).join(' ') || null, 'CalgaryWatch Markets',
+  ].filter((x): x is string => !!x);
+  const official = market.sources.find(s => s.kind === 'official') ?? market.sources[0];
+  const verified = isOwnerVerified(market);
+  const stamp = verified ? 'Verified' : open ? 'Open now' : kind ?? undefined;
+  const facts: [string, ReactNode][] = [
+    ['Run by', org ? <Link key="o" to={entityPath(org)}>{org.title}</Link> : market.organizer || 'The organizer'],
+    ['Usually', pattern ? `${pattern.dayText}, ${pattern.hours}` : 'Check with the organizer'],
+    ['Area', [market.neighbourhood, q ? `${q} Calgary` : null].filter(Boolean).join(' · ') || 'Calgary'],
+    ['Listed from', official ? <a key="l" href={official.url} target="_blank" rel="noopener noreferrer">{official.name}</a> : 'The organizer'],
+    ['Last checked', longDay.format(new Date(market.verifiedAt || market.updatedAt))],
+    ['Status', verified ? <span key="v" className="lp-ok"><BadgeCheck size={15} aria-hidden="true" />Run by the organizer</span> : 'Not yet claimed'],
+  ];
+
   const goodFor = [
     market.familyFriendly ? 'Families' : null,
     ...market.amenities.filter(a => /accessible|kids/i.test(a)).map(a => cap(a)),
   ].filter(Boolean) as string[];
 
   return (
-    <div className="mk mk-detail cw-home2">
+    <div className="mk mk-detail cw-home2" ref={revealRef} style={{ ['--tone' as string]: MARKETS_SHELF.tone, ['--tink' as string]: MARKETS_SHELF.ink } as CSSProperties}>
       <section className={`mk-dhero${open ? ' is-open' : ''}`} aria-labelledby="mk-d-title">
         <div className="cw-wrap mk-dhero-in">
           <nav className="mk-crumbs" aria-label="Breadcrumb"><Link to="/">Home</Link><span aria-hidden="true">/</span><Link to="/markets">Markets</Link><span aria-hidden="true">/</span><span aria-current="page">{shortName(market)}</span></nav>
@@ -103,6 +131,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
           <path d={TEAR} className="h-tear-paper" />
         </svg>
       </section>
+      <ProfileRibbon items={ribbon} />
 
       <div className="cw-wrap mk-page mk-dgrid">
         <div className="mk-dmain">
@@ -115,7 +144,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
             {market.petFriendly !== undefined ? <div><dt><Dog size={16} aria-hidden="true" /> Dogs</dt><dd>{market.petFriendly ? 'Welcome' : 'Not permitted'}</dd></div> : null}
           </dl>
 
-          <section className="mk-dsec" aria-labelledby="mk-dates-title">
+          <section className="mk-dsec" data-reveal aria-labelledby="mk-dates-title">
             <header className="mk-sec-head"><h2 id="mk-dates-title"><span>Upcoming dates</span></h2><p>{dates.length ? `${dates.filter(o => !o.cancelled).length} confirmed · Calgary time` : 'None confirmed yet'}</p></header>
             {dates.length ? (
               <ol className="mk-dates">
@@ -132,16 +161,20 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
             {dates.length > 12 ? <p className="mk-muted">And {dates.length - 12} more dates after that.</p> : null}
           </section>
 
-          <section className="mk-dsec mk-about" aria-labelledby="mk-about-title">
-            <header className="mk-sec-head"><h2 id="mk-about-title"><span>What you’ll find</span></h2></header>
-            <p>{market.description}</p>
-            {market.amenities.length ? <p className="mk-amenities">{market.amenities.map(a => <span key={a} className="mk-tag">{cap(a)}</span>)}</p> : null}
-            {organizerSite ? <a className="mk-organizer" href={organizerSite} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" /> {market.organizer}’s site</a> : null}
-            {market.image?.credit ? <p className="mk-muted mk-photo-credit">Top image supplied by the organizer. {market.image.credit}</p> : null}
-          </section>
+          <StorySpread
+            id="mk-story" headingId="mk-about-title" name={shortName(market)} text={market.description || market.summary} compact
+            offers={market.amenities.map(cap)} iconOf={amenityIcon} facts={facts}
+            cover={<ProfileCover id={market.id} title={shortName(market)} shelf={{ ...MARKETS_SHELF, label: kind ? `${kind} market` : 'Market' }} number={number} stamp={stamp} brand="Markets" />}
+            caption={`Cover art for ${shortName(market)}, drawn for CalgaryWatch Markets.`}
+            eyebrow={<><MapPin size={15} aria-hidden="true" />{[market.neighbourhood, q].filter(Boolean).join(' ') || 'Calgary'} · No. {String(number).padStart(2, '0')}</>}
+            links={organizerSite || market.image?.credit ? <p className="lp-spread-links">
+              {organizerSite ? <a className="mk-organizer" href={organizerSite} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" /> {market.organizer}’s site</a> : null}
+              {market.image?.credit ? <span className="mk-muted mk-photo-credit">Top image supplied by the organizer. {market.image.credit}</span> : null}
+            </p> : undefined}
+          />
 
           {org && orgShelf ? (
-            <section className="mk-dsec mk-runby" aria-labelledby="mk-runby-title" style={{ ['--tone' as string]: orgShelf.tone, ['--tink' as string]: orgShelf.ink } as CSSProperties}>
+            <section className="mk-dsec mk-runby" data-reveal aria-labelledby="mk-runby-title" style={{ ['--tone' as string]: orgShelf.tone, ['--tink' as string]: orgShelf.ink } as CSSProperties}>
               <header className="mk-sec-head"><h2 id="mk-runby-title"><span>Who runs it</span></h2><p>{orgShelf.label} on Local</p></header>
               <Link className="mk-runby-card" to={entityPath(org)}>
                 <Seal title={org.title} tone={orgShelf} />
@@ -176,7 +209,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
           <MarketLineup marketId={market.id} />
 
           {next && sameDay.length ? (
-            <section className="mk-dsec" aria-labelledby="mk-same-title">
+            <section className="mk-dsec" data-reveal aria-labelledby="mk-same-title">
               <header className="mk-sec-head"><h2 id="mk-same-title"><span>Also on {relativeDay(next.start, now).toLowerCase() === 'today' ? 'today' : weekdayLong.format(new Date(next.start))}</span></h2><p>Make a day of it.</p></header>
               <ul className="mk-same">
                 {sameDay.map(e => (

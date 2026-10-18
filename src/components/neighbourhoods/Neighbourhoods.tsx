@@ -1,15 +1,23 @@
-import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, CalendarDays, Coffee, Eye, Mail, MapPin, Radio, ShoppingBasket } from 'lucide-react';
+import {
+  ArrowLeft, ArrowRight, ArrowUpRight, Baby, BookOpen, CalendarDays, Coffee, Eye, Footprints, Landmark, Mail, MapPin, Moon, Mountain, Palette, Radio,
+  ShoppingBag, ShoppingBasket, Sparkles, Store, Trees, UtensilsCrossed, type LucideIcon,
+} from 'lucide-react';
 import type { DiscoveryEntity, MarketOccurrence, Neighbourhood } from '../../types/discovery';
 import { QUADRANTS, entityPath } from '../../lib/discovery';
 import { closeCount, hoodCentre, linksFor, vibes, type HoodLinks, type Linked } from '../../lib/neighbourhoods';
 import { toSlug } from '../../lib/communityRank';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { TEAR } from '../home/HomeHero';
-import { SourceBadge } from '../entity/EntityDetail';
 import { HoodMap } from './HoodMap';
+import { ProfileCover } from '../discovery/ProfileCover';
+import { ProfileRibbon, StorySpread, useSectionReveal } from '../discovery/ProfileSections';
+import { shelfOf, SHELVES, type Shelf } from '../../lib/localShelves';
 import '../../styles/neighbourhoods.css';
+import '../../styles/local-directory.css';
+import '../../styles/local-profile.css';
+import '../../styles/story-pages.css';
 
 // The community awareness game, already part of the Neighbourhoods pages.
 const RankStrip = lazy(() => import('../check/RankStrip'));
@@ -21,6 +29,25 @@ const month = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', mon
 const clock = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit' });
 const decode = (s: string) => s.replace(/&#8211;/g, '–').replace(/&#8217;/g, '’').replace(/&amp;/g, '&');
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+const longDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric', year: 'numeric' });
+
+/** Each quadrant's colour, as a cover "shelf", so a neighbourhood's cover and ribbon wear it. */
+const QUAD_TONE: Record<string, [string, string]> = { NW: ['#00c2e0', '#151515'], SW: ['#1554d1', '#fff'], SE: ['#ff8a65', '#151515'], NE: ['#ffdf4f', '#151515'] };
+export function hoodShelf(h: Neighbourhood): Shelf {
+  const [tone, ink] = QUAD_TONE[h.quadrant] ?? QUAD_TONE.NE;
+  return { id: 'community', label: QUAD_NAME[h.quadrant] ? `${QUAD_NAME[h.quadrant]} Calgary` : 'Central Calgary', line: '', tone, ink };
+}
+const toneStyle = (s: Shelf) => ({ '--tone': s.tone, '--tink': s.ink }) as CSSProperties;
+
+/** A neighbourhood's drawn cover: the river through its street grid, in its quadrant's colour. */
+function HoodCover({ hood, number, mini }: { hood: Neighbourhood; number?: number; mini?: boolean }) {
+  return <ProfileCover id={hood.id} title={hood.title} shelf={hoodShelf(hood)} number={number} mini={mini} brand="Neighbourhoods" motif="streets" />;
+}
+
+const VIBE_ICONS: Record<string, LucideIcon> = {
+  Heritage: Landmark, Walkable: Footprints, 'Food & drink': UtensilsCrossed, Shopping: ShoppingBag, Arts: Palette, Nightlife: Moon,
+  Parks: Trees, Outdoors: Mountain, Family: Baby, Views: Mountain, Markets: Store,
+};
 
 function Tear({ className = '' }: { className?: string }) {
   return (
@@ -46,9 +73,11 @@ export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
   const shown = quadrant ? hoods.filter(h => h.quadrant === quadrant) : hoods;
   const preview = shown.some(h => h.developmentOnly);
   const perQuad = Object.fromEntries(QUADRANTS.map(q => [q, everyHood.filter(h => h.quadrant === q).length]));
+  const revealRef = useSectionReveal(quadrant ?? 'all');
+  const ribbon = [plural(everyHood.length, 'neighbourhood'), ...shown.map(h => `${h.title} · ${h.quadrant}`), 'CalgaryWatch Neighbourhoods'];
 
   return (
-    <div className="nb">
+    <div className="nb nb-index" ref={revealRef}>
       <section className="nb-hero" aria-labelledby="nb-title">
         <div className="nb-wrap nb-hero-grid">
           <div className="nb-hero-text">
@@ -71,6 +100,7 @@ export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
         </div>
         <Tear />
       </section>
+      <ProfileRibbon items={ribbon} />
 
       <div className="nb-wrap">
         {preview && <p className="cw-preview-note">Illustrative design previews. These are not confirmed listings.</p>}
@@ -85,6 +115,7 @@ export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
                       <img src={h.image?.src || '/images/photo/calgary1.webp'} alt="" loading={i < 3 ? 'eager' : 'lazy'} width="720" height="480" />
                       <QuadTag q={h.quadrant} />
                       <span className="nb-card-n" aria-hidden="true">{String(everyHood.indexOf(h) + 1).padStart(2, '0')}</span>
+                      <span className="nb-card-cover"><HoodCover hood={h} mini /></span>
                     </span>
                     <span className="nb-card-body">
                       <strong>{h.title}</strong>
@@ -109,8 +140,8 @@ export function NeighbourhoodsBoard({ hoods, all, occurrences, quadrant }: {
         )}
       </div>
 
-      <section className="nb-wrap nb-connect" aria-labelledby="nb-connect-title">
-        <h2 id="nb-connect-title">Look out for <span>your block.</span></h2>
+      <section className="nb-wrap nb-connect" data-reveal aria-labelledby="nb-connect-title">
+        <h2 id="nb-connect-title">Look out for <mark>your block.</mark></h2>
         <ul>
           <li><Link to="/map" className="nb-tile is-live"><Radio size={22} aria-hidden="true" /><b>The live map</b><span>Weather, traffic, outages and what neighbours reported, with the source on every pin.</span><i>Open the map <ArrowRight size={15} aria-hidden="true" /></i></Link></li>
           <li><Link to="/plans?email=monday#emails" className="nb-tile is-mail"><Mail size={22} aria-hidden="true" /><b>Monday, near home</b><span>A free email with what was reported within a walk, 3 km and 10 km of you.</span><i>Get it free <ArrowRight size={15} aria-hidden="true" /></i></Link></li>
@@ -152,12 +183,14 @@ function EventRow({ l, hood }: { l: Linked; hood: Neighbourhood }) {
   );
 }
 
+const coverShelf = (e: DiscoveryEntity) => SHELVES.find(x => x.id === (e.kind === 'business' ? shelfOf(e) : 'markets'))!;
+
 function ListingTile({ l, hood, icon }: { l: Linked; hood: Neighbourhood; icon: 'market' | 'place' }) {
   const at = l.when ? new Date(l.when) : undefined;
   return (
     <li>
       <Link to={entityPath(l.entity)} className={`nb-listing is-${icon}`}>
-        <span className="nb-listing-icon" aria-hidden="true">{icon === 'market' ? <ShoppingBasket size={20} /> : <Coffee size={20} />}</span>
+        <span className="nb-listing-cover"><ProfileCover id={l.entity.id} title={l.entity.title} shelf={coverShelf(l.entity)} mini /></span>
         <strong>{decode(l.entity.title)}</strong>
         <span className="nb-listing-sum">{l.entity.summary}</span>
         <span className="nb-listing-foot">
@@ -169,9 +202,9 @@ function ListingTile({ l, hood, icon }: { l: Linked; hood: Neighbourhood; icon: 
   );
 }
 
-function Section({ id, title, count, more, children }: { id: string; title: string; count?: string; more?: { to: string; label: string }; children: ReactNode }) {
+function Section({ id, title, count, more, children }: { id: string; title: ReactNode; count?: string; more?: { to: string; label: string }; children: ReactNode }) {
   return (
-    <section className="nb-sec" id={id} aria-labelledby={`${id}-title`}>
+    <section className="nb-sec" id={id} data-reveal aria-labelledby={`${id}-title`}>
       <header><h2 id={`${id}-title`}>{title}</h2>{count ? <span className="nb-sec-count">{count}</span> : null}{more ? <Link to={more.to} className="nb-more">{more.label} <ArrowRight size={15} aria-hidden="true" /></Link> : null}</header>
       {children}
     </section>
@@ -189,9 +222,26 @@ export function NeighbourhoodDetail({ hood, all, occurrences }: { hood: Neighbou
   const next = events[0] ?? markets[0];
   const c = closeCount(links);
   const tags = vibes(hood);
+  const revealRef = useSectionReveal(hood.id);
+  const shelf = hoodShelf(hood);
+  const number = everyHood.indexOf(hood) + 1;
+  const official = hood.sources.find(src => src.kind === 'official') ?? hood.sources[0];
+  const nearest = links.neighbours[0];
+  const ribbon = [
+    hood.title, shelf.label, c.events ? plural(c.events, 'event') + ' in or near' : 'Walks and history',
+    c.markets ? plural(c.markets, 'market') + ' close by' : null, c.places ? plural(c.places, 'local place') : null, ...tags, 'CalgaryWatch Neighbourhoods',
+  ].filter((x): x is string => !!x);
+  const facts: [string, ReactNode][] = [
+    ['Quadrant', <Link key="q" to={`/neighbourhoods?quadrant=${hood.quadrant}`}>{shelf.label}</Link>],
+    ['Close by', [c.events ? plural(c.events, 'event') : null, c.markets ? plural(c.markets, 'market') : null, c.places ? plural(c.places, 'place') : null].filter(Boolean).join(' · ') || 'Walks, history and views'],
+    ...(nearest ? [['Next door', <Link key="n" to={entityPath(nearest.hood)}>{nearest.hood.title}{nearest.km !== undefined ? `, ${nearest.km.toFixed(1)} km` : ''}</Link>] as [string, ReactNode]] : []),
+    ['Listed from', official ? <a key="o" href={official.url} target="_blank" rel="noopener noreferrer">{official.name}</a> : 'Public sources'],
+    ['Last checked', longDay.format(new Date(hood.verifiedAt || hood.updatedAt))],
+    ['On the map', <Link key="m" to={mapTo}>Live reports nearby</Link>],
+  ];
 
   return (
-    <div className="nb nb-detail">
+    <div className="nb nb-detail" ref={revealRef} style={toneStyle(shelf)}>
       <section className={`nb-hero nb-hood-hero q-${hood.quadrant.toLowerCase()}`} aria-labelledby="nb-hood-title">
         <img className="nb-hood-bg" src={hood.image?.src || '/images/photo/calgary1.webp'} alt="" aria-hidden="true" />
         <div className="nb-wrap nb-hood-grid">
@@ -213,6 +263,7 @@ export function NeighbourhoodDetail({ hood, all, occurrences }: { hood: Neighbou
         </div>
         <Tear />
       </section>
+      <ProfileRibbon items={ribbon} />
 
       <div className="nb-wrap">
         <div className="nb-glance" role="list" aria-label={`${hood.title} at a glance`}>
@@ -226,31 +277,38 @@ export function NeighbourhoodDetail({ hood, all, occurrences }: { hood: Neighbou
         </div>
 
         <nav className="nb-jump" aria-label="On this page">
-          <a href="#nb-on">What’s on</a><a href="#nb-markets">Markets</a><a href="#nb-places">Local</a>{links.guides.length ? <a href="#nb-guides">Guides</a> : null}<a href="#nb-watch">Look out</a><a href="#nb-next">Next door</a>
+          <a href="#nb-story">Story</a><a href="#nb-on">What’s on</a><a href="#nb-markets">Markets</a><a href="#nb-places">Local</a>{links.guides.length ? <a href="#nb-guides">Guides</a> : null}<a href="#nb-watch">Look out</a><a href="#nb-next">Next door</a>
         </nav>
+
+        <StorySpread
+          id="nb-story" headingId="nb-story-title" name={hood.title} text={hood.description || hood.summary} offers={tags} iconOf={v => VIBE_ICONS[v] ?? Sparkles} facts={facts}
+          cover={<HoodCover hood={hood} number={number} />}
+          caption={`Cover art for ${hood.title}, drawn for CalgaryWatch Neighbourhoods.`}
+          eyebrow={<><MapPin size={15} aria-hidden="true" />{QUAD_NAME[hood.quadrant] ?? hood.quadrant} Calgary · No. {String(number).padStart(2, '0')}</>}
+        />
 
         <div className="nb-body">
           <div className="nb-main">
-            <Section id="nb-on" title={`What’s on around ${hood.title}`} count={c.events ? `${c.events} in or near` : undefined} more={{ to: '/events', label: 'All events' }}>
+            <Section id="nb-on" title={<>What’s on around <mark>{hood.title}</mark></>} count={c.events ? `${c.events} in or near` : undefined} more={{ to: '/events', label: 'All events' }}>
               {events.length
                 ? <ol className="nb-rows">{events.map(l => <EventRow key={l.entity.id} l={l} hood={hood} />)}</ol>
                 : <p className="nb-none">Nothing is listed in or near {hood.title} right now. <Link to="/events/this-weekend">See this weekend across Calgary</Link>, or <Link to="/submit">tell us what’s on</Link>.</p>}
             </Section>
 
-            <Section id="nb-markets" title="Markets close by" more={{ to: '/markets', label: 'All markets' }}>
+            <Section id="nb-markets" title={<>Markets <mark>close by</mark></>} more={{ to: '/markets', label: 'All markets' }}>
               {markets.length
                 ? <ul className="nb-listings">{markets.map(l => <ListingTile key={l.entity.id} l={l} hood={hood} icon="market" />)}</ul>
                 : <p className="nb-none">No market with upcoming dates near {hood.title}. <Link to="/markets/this-weekend">Markets this weekend</Link>.</p>}
             </Section>
 
-            <Section id="nb-places" title="Local places worth knowing" more={{ to: '/local', label: 'All local' }}>
+            <Section id="nb-places" title={<>Local places <mark>worth knowing</mark></>} more={{ to: '/local', label: 'All local' }}>
               {places.length
                 ? <ul className="nb-listings">{places.map(l => <ListingTile key={l.entity.id} l={l} hood={hood} icon="place" />)}</ul>
                 : <p className="nb-none">We haven’t written up a place here yet. <Link to="/local">Browse local places</Link>, or <Link to="/submit">suggest one</Link>.</p>}
             </Section>
 
             {links.guides.length ? (
-              <Section id="nb-guides" title="Guides that pass through">
+              <Section id="nb-guides" title={<>Guides that <mark>pass through</mark></>}>
                 <ul className="nb-guides">{links.guides.map(g => (
                   <li key={g.id}><Link to={entityPath(g)} className="nb-guide" style={g.cover ? { background: `linear-gradient(135deg, ${g.cover.from}, ${g.cover.to})`, color: g.cover.ink } : undefined}>
                     <BookOpen size={20} aria-hidden="true" /><strong>{g.title}</strong>{g.facts ? <span>{g.facts.time} · {g.facts.cost}</span> : <span>{g.summary}</span>}<ArrowUpRight className="nb-row-go" size={18} aria-hidden="true" />
@@ -261,11 +319,6 @@ export function NeighbourhoodDetail({ hood, all, occurrences }: { hood: Neighbou
           </div>
 
           <aside className="nb-side">
-            <section className="nb-about" aria-labelledby="nb-about-title">
-              <h2 id="nb-about-title">About {hood.title}</h2>
-              <p>{hood.description}</p>
-              <SourceBadge entity={hood} />
-            </section>
             <section className="nb-watch" id="nb-watch" aria-labelledby="nb-watch-title">
               <p className="nb-watch-kicker"><span className="nb-pulse" aria-hidden="true" />Community awareness</p>
               <h2 id="nb-watch-title">Look out for {hood.title}.</h2>
@@ -284,15 +337,16 @@ export function NeighbourhoodDetail({ hood, all, occurrences }: { hood: Neighbou
 
       <div className="nb-wrap nb-rank"><Suspense fallback={null}><RankStrip focus={hood.title} /></Suspense></div>
 
-      <section className="nb-wrap nb-next" id="nb-next" aria-labelledby="nb-next-title">
+      <section className="nb-wrap nb-next" id="nb-next" data-reveal aria-labelledby="nb-next-title">
         <header className="nb-next-head">
-          <h2 id="nb-next-title">Next <span>door.</span></h2>
+          <h2 id="nb-next-title">Next <mark>door.</mark></h2>
           <Link to={`/neighbourhoods?quadrant=${hood.quadrant}`} className="nb-more">More in {hood.quadrant} <ArrowRight size={15} aria-hidden="true" /></Link>
         </header>
         <ul className="nb-next-list">
           {links.neighbours.slice(0, 4).map(({ hood: h, km: d }) => (
             <li key={h.id}><Link to={entityPath(h)} className={`nb-mini q-${h.quadrant.toLowerCase()}`}>
               <img src={h.image?.src || '/images/photo/calgary1.webp'} alt="" loading="lazy" width="320" height="220" />
+              <span className="nb-mini-cover"><HoodCover hood={h} mini /></span>
               <span><QuadTag q={h.quadrant} />{d !== undefined ? <small>{d.toFixed(1)} km</small> : null}</span>
               <strong>{h.title}</strong>
             </Link></li>

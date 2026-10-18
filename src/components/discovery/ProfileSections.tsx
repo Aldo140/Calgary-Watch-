@@ -153,7 +153,7 @@ const SERVICE_ICONS: [RegExp, LucideIcon][] = [
   [/tour|heritage|histor|museum|culture|venue|rental|hall/i, Landmark], [/ghost|haunt|hallowe|scream|spook/i, Ghost], [/holiday|christmas|winter|yule|festive/i, Snowflake],
   [/farm|pick|harvest|garden|agric|produce|fruit|berr/i, Tractor], [/park|parking/i, Car], [/ticket|season|show/i, Ticket], [/community|volunteer|member|neighbour|program/i, Users],
 ];
-const iconFor = (s: string) => SERVICE_ICONS.find(([re]) => re.test(s))?.[1] ?? Sparkles;
+export const iconFor = (s: string) => SERVICE_ICONS.find(([re]) => re.test(s))?.[1] ?? Sparkles;
 
 const longDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric', year: 'numeric' });
 const splitLead = (text: string) => { const m = text.match(/^(.+?[.!?])\s+(.+)$/s); return m && m[1].length > 30 ? [m[1], m[2]] as const : [text, ''] as const; };
@@ -166,8 +166,6 @@ const splitLead = (text: string) => { const m = text.match(/^(.+?[.!?])\s+(.+)$/
 export function ProfileSpread({ place, name, shelf, number, quadrant, since, links }: {
   place: Business; name: string; shelf: Shelf; number: number; quadrant: string | null; since?: string; links: ReactNode;
 }) {
-  const [ref, seen] = useSeen<HTMLElement>(true, '0px 0px -15% 0px');
-  const [lead, rest] = splitLead(place.description || place.summary);
   const verified = isOwnerVerified(place);
   const stamp = place.partner ? 'Partner' : verified ? 'Verified' : place.editorialSelection ? 'Our pick' : undefined;
   const official = place.sources.find(src => src.kind === 'official');
@@ -180,19 +178,39 @@ export function ProfileSpread({ place, name, shelf, number, quadrant, since, lin
     ['Status', verified ? <span key="v" className="lp-ok"><BadgeCheck size={15} aria-hidden="true" />Run by the organization</span> : 'Not yet claimed'],
   ];
   return (
-    <section id="lp-about" className="lp-spread" ref={ref} data-seen={seen || undefined} aria-labelledby="lp-story">
+    <StorySpread
+      id="lp-about" headingId="lp-story" name={name} text={place.description || place.summary} offers={place.services} links={links} facts={facts}
+      cover={<ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} />}
+      caption={`Cover art for ${name}, drawn for CalgaryWatch Local.`}
+      eyebrow={<><Seal title={place.title} tone={shelf} size="s" />From their own site</>}
+    />
+  );
+}
+
+/**
+ * The magazine spread itself, shared by Local profiles, neighbourhoods and markets: a drawn
+ * cover beside "Meet …", a standfirst, icon tiles and a ledger of the facts we hold.
+ */
+export function StorySpread({ id, headingId, cover, caption, eyebrow, name, text, offers, iconOf = iconFor, links, facts, compact }: {
+  id: string; headingId: string; cover: ReactNode; caption: string; eyebrow: ReactNode; name: string; text: string;
+  offers?: readonly string[]; iconOf?: (offer: string) => LucideIcon; links?: ReactNode; facts: [string, ReactNode][]; compact?: boolean;
+}) {
+  const [ref, seen] = useSeen<HTMLElement>(true, '0px 0px -15% 0px');
+  const [lead, rest] = splitLead(text);
+  return (
+    <section id={id} className={`lp-spread${compact ? ' is-compact' : ''}`} ref={ref} data-seen={seen || undefined} aria-labelledby={headingId}>
       <figure className="lp-spread-cover">
-        <ProfileCover id={place.id} title={name} shelf={shelf} number={number} stamp={stamp} />
-        <figcaption>Cover art for {name}, drawn for CalgaryWatch Local.</figcaption>
+        {cover}
+        <figcaption>{caption}</figcaption>
       </figure>
       <div className="lp-spread-copy">
-        <p className="lx-eyebrow"><Seal title={place.title} tone={shelf} size="s" />From their own site</p>
-        <h2 id="lp-story">Meet <mark>{name}.</mark></h2>
+        <p className="lx-eyebrow">{eyebrow}</p>
+        <h2 id={headingId}>Meet <mark>{name}.</mark></h2>
         <p className="lp-spread-lead">{lead}</p>
         {rest ? <p className="lp-spread-body">{rest}</p> : null}
-        {place.services?.length ? (
+        {offers?.length ? (
           <ul className="lp-offers" aria-label="What you’ll find">
-            {place.services.map((svc, i) => { const Icon = iconFor(svc); return <li key={svc} style={{ ['--i' as string]: i } as CSSProperties}><Icon size={22} aria-hidden="true" /><span>{svc}</span></li>; })}
+            {offers.map((svc, i) => { const Icon = iconOf(svc); return <li key={svc} style={{ ['--i' as string]: i } as CSSProperties}><Icon size={22} aria-hidden="true" /><span>{svc}</span></li>; })}
           </ul>
         ) : null}
         {links}

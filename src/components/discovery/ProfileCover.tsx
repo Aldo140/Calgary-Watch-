@@ -8,7 +8,7 @@ const MARK = '/images/brand/calgarywatch-city-spark-v2.webp';
 const seedOf = (id: string) => [...id].reduce((n, ch) => (n * 31 + ch.charCodeAt(0)) >>> 0, 7);
 
 /** One drawn motif per shelf, in a 100×100 box, ink on the shelf colour. */
-function Motif({ shelf, seed }: { shelf: ShelfId; seed: number }) {
+function Motif({ shelf, seed }: { shelf: ShelfId | 'streets'; seed: number }) {
   const s = (k: number) => ((seed >> k) & 7) / 7;
   let art: ReactNode;
   switch (shelf) {
@@ -100,6 +100,16 @@ function Motif({ shelf, seed }: { shelf: ShelfId; seed: number }) {
         <path d="M0 56 H100" stroke="currentColor" strokeWidth="2" opacity=".7" />
       </>;
       break;
+    case 'streets':
+      art = <>
+        {/* A neighbourhood from above: the river bending through a street grid, rooftops and a pin at its heart. */}
+        {Array.from({ length: 6 }, (_, i) => <path key={`v${i}`} d={`M${8 + i * 17 + s(i % 4) * 4} 0 V100`} stroke="currentColor" strokeWidth={i % 3 ? 1.2 : 2.6} opacity=".4" />)}
+        {Array.from({ length: 6 }, (_, i) => <path key={`h${i}`} d={`M0 ${10 + i * 17 + s((i + 2) % 4) * 4} H100`} stroke="currentColor" strokeWidth={i % 3 ? 1.2 : 2.6} opacity=".4" />)}
+        {Array.from({ length: 14 }, (_, i) => <rect key={`r${i}`} x={(i * 23 + seed) % 88 + 3} y={(i * 41 + seed * 3) % 84 + 3} width="7" height="5" rx="1" opacity=".55" />)}
+        <path d={`M-6 ${30 + s(1) * 20} C 30 ${10 + s(2) * 20}, 50 ${80 - s(3) * 20}, 106 ${52 + s(0) * 16}`} fill="none" stroke="currentColor" strokeWidth="11" strokeLinecap="round" opacity=".75" />
+        <path d={`M-6 ${30 + s(1) * 20} C 30 ${10 + s(2) * 20}, 50 ${80 - s(3) * 20}, 106 ${52 + s(0) * 16}`} fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 4" opacity=".9" className="pc-river" />
+      </>;
+      break;
     default:
       art = <>
         {/* A sky of snowflakes and stars for the seasonal shelf. */}
@@ -121,13 +131,17 @@ function Motif({ shelf, seed }: { shelf: ShelfId; seed: number }) {
  * profile has a striking piece of art whether or not it sent us a photo. Its shelf
  * picks the colour and the drawing; its initials and name make it its own.
  */
-export function ProfileCover({ id, title, shelf, number, stamp, mini }: { id: string; title: string; shelf: Shelf; number?: number; stamp?: string; mini?: boolean }) {
+export function ProfileCover({ id, title, shelf, number, stamp, mini, brand = 'Local', motif }: {
+  id: string; title: string; shelf: Shelf; number?: number; stamp?: string; mini?: boolean;
+  /** The section named beside the mark, and a drawing to use instead of the shelf's. Neighbourhoods and markets reuse the cover this way. */
+  brand?: string; motif?: 'streets';
+}) {
   const seed = seedOf(id);
   const style = { '--tone': shelf.tone, '--tink': shelf.ink, '--tilt': `${((seed % 5) - 2) * 0.6}deg` } as CSSProperties;
   return (
     <div className={`pc pc-${shelf.id}${mini ? ' is-mini' : ''}`} style={style} aria-hidden="true">
-      <Motif shelf={shelf.id} seed={seed} />
-      <span className="pc-mark"><img src={MARK} alt="" width="40" height="40" loading="lazy" />Local</span>
+      <Motif shelf={motif ?? shelf.id} seed={seed} />
+      <span className="pc-mark"><img src={MARK} alt="" width="40" height="40" loading="lazy" />{brand}</span>
       {number ? <span className="pc-no">No. {String(number).padStart(2, '0')}</span> : null}
       <span className="pc-big">{initials(title)}</span>
       {stamp ? <span className="pc-stamp">{stamp}</span> : null}

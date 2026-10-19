@@ -6,7 +6,7 @@ import { claimPresentation } from '../../lib/claimPresentation';
 import { ListingArtwork } from '../entity/ListingArtwork';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CalendarDays, Check, Clock, ExternalLink, Globe, Layers, MapPin, Navigation, Phone, Mail, Quote, Search, Share2, Store, Ticket } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, PhoneCall, Check, Clock, ExternalLink, Globe, Layers, MapPin, Navigation, Phone, Mail, Quote, Search, Share2, Store, Ticket } from 'lucide-react';
 import type { Business, DiscoveryEntity, Event, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { organizerEvents, organizerMarkets, organizationVisitAddress, publicOrganizationEvents } from '../../lib/organizations';
@@ -22,6 +22,7 @@ import { programmeOf, seriesOf, shelfOf, SHELVES } from '../../lib/localShelves'
 import { CountUp, Seal, useSeen } from './LocalDirectory';
 import { MarketLocations, MeanwhileBoard, NextUp, ProfileRibbon, ProfileSpread, ProfileTabs, ShelfMates, useSectionReveal, type ProfileTab } from './ProfileSections';
 import { ProfileCover } from './ProfileCover';
+import { OwnerPitch, PlanIt, StoryCard } from './ProfileExtras';
 import { isOwnerVerified } from '../../lib/verified';
 
 const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
@@ -130,6 +131,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
     [shelf.label.split(/\s+&\s+|\s+/)[0], 'Shelf'],
   ];
   const dockLine = spot ? `${spot === ahead.onNow ? 'On now' : 'Next'} · ${day.format(new Date(spot.start))}` : `${shelf.label} · ${area}`;
+  const shelfSize = useMemo(() => all.filter(e => e.kind === 'business' && !e.developmentOnly && shelfOf(e) === shelf.id).length, [all, shelf.id]);
   let n = 0;
   const revealRef = useSectionReveal(place.id);
   const ribbon = [name, shelf.label, ahead.count ? `${ahead.count} ${ahead.count === 1 ? 'date' : 'dates'} coming up` : note?.since ? `Since ${note.since}` : 'Calgary, Alberta', place.neighbourhood || (q ? `${q} Calgary` : 'Calgary'), 'CalgaryWatch Local'];
@@ -229,6 +231,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
         </section>
 
         {spot ? <NextUp date={spot} now={now} count={ahead.count} onNow={spot === ahead.onNow} /> : null}
+        {spot ? <PlanIt date={spot} place={place} /> : null}
 
         {place.image?.presentation === 'poster' ? (
           <section className="lp-season-art" aria-labelledby="lp-season-art">
@@ -300,6 +303,8 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
             {experiences ? <a className="lx-text-link lp-season" href={experiences} target="_blank" rel="noopener noreferrer"><Ticket size={15} aria-hidden="true" /> Current and upcoming experiences</a> : null}
           </p> : null} />
 
+        <StoryCard place={place} name={name} shelf={shelf} number={number} next={spot} area={area} url={url} />
+
         {noDates ? <MeanwhileBoard place={place} shelf={shelf} site={site} siteLabel={site ? host(site) : undefined} all={all} occurrences={occurrences} now={now} /> : null}
 
         <section id="lp-around-here" className="lp-around" data-reveal aria-labelledby="lp-around">
@@ -359,6 +364,8 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
         </section>
       </div>
 
+      <div className="cw-wrap"><OwnerPitch place={place} name={name} shelf={shelf} number={number} all={all} dates={ahead.count} mates={Math.max(0, shelfSize - 1)} /></div>
+
       <ShelfMates place={place} all={all} occurrences={occurrences} now={now} />
 
       <div id="lp-contact" className="cw-wrap lp-foot">
@@ -373,6 +380,7 @@ export function LocalPlace({ place, all, occurrences }: { place: Business; all: 
           <span className="lp-dock-meta" aria-hidden="true"><b>{name}</b><small>{dockLine}</small></span>
         </button>
         {hasVisitAddress ? <a href={directionsUrl(place)} target="_blank" rel="noopener noreferrer" className="is-main" aria-label="Directions"><Navigation size={19} aria-hidden="true" /></a> : upcoming.length ? <a href="#lp-programme" className="is-main" aria-label="Events"><CalendarDays size={19} aria-hidden="true" /></a> : markets.length ? <a href="#lp-market-locations" className="is-main" aria-label="Markets"><Store size={19} aria-hidden="true" /></a> : null}
+        {place.phone ? <a href={`tel:${place.phone.replace(/[^\d+]/g, '')}`} aria-label={`Call ${name}`}><PhoneCall size={19} aria-hidden="true" /></a> : null}
         {site ? <a href={site} target="_blank" rel="noopener noreferrer" aria-label="Their site"><ExternalLink size={19} aria-hidden="true" /></a> : null}
         <button type="button" onClick={() => void share()} aria-label={shared ? 'Link copied' : 'Share'}>{shared ? <Check size={19} aria-hidden="true" /> : <Share2 size={19} aria-hidden="true" />}</button>
       </div>

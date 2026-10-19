@@ -47,11 +47,11 @@ export function shelfOf(p: Pick<Business, 'title' | 'categories' | 'tags'>): She
   return 'culture';
 }
 
-export interface ProfileNext { title: string; path: string; start: string; end: string; venue?: string; dateOnly: boolean }
+export interface ProfileNext { title: string; path: string; start: string; end: string; venue?: string; dateOnly: boolean; /** Events only: the id RSVPs hang on, and the organizer's ticket link. */ eventId?: string; tickets?: string }
 /** What a profile has coming up: how many dates, and the next one. */
 export interface Programme { count: number; next?: ProfileNext; onNow?: ProfileNext }
 
-const asNext = (e: Event): ProfileNext => ({ title: e.title, path: entityPath(e), start: e.start, end: e.end, venue: e.venue ?? e.neighbourhood, dateOnly: e.schedulePrecision === 'date' });
+const asNext = (e: Event): ProfileNext => ({ title: e.title, path: entityPath(e), start: e.start, end: e.end, venue: e.venue ?? e.neighbourhood, dateOnly: e.schedulePrecision === 'date', eventId: e.id, tickets: e.ticketSaleStatus !== 'not-on-sale' ? e.tickets : undefined });
 
 /** A profile's programme: its own events, plus the open dates of markets it runs. */
 export function programmeOf(id: string, all: readonly DiscoveryEntity[], occurrences: readonly MarketOccurrence[], now = Date.now()): Programme {

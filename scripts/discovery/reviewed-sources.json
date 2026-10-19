@@ -1193,6 +1193,32 @@
           "neighbourhood": "Downtown",
           "endTimeEstimated": true
         }
+      },
+      {
+        "id": "schumann-strings-soundscapes-2026-10-30",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "orchestra",
+            "classical"
+          ],
+          "categories": [
+            "music",
+            "indoor"
+          ],
+          "organizer": "Calgary Philharmonic Orchestra",
+          "pricing": "paid",
+          "title": "Schumann, Strings + Soundscapes",
+          "summary": "A Classics series concert from the Calgary Phil, with a guest cellist.",
+          "description": "Part of the Calgary Phil’s 2026/27 Classics series at the Jack Singer Concert Hall, featuring a guest cellist. A seniors and students open rehearsal of the programme runs the same morning. Check the Calgary Phil’s concert page for the full programme and tickets.",
+          "address": "225 8 Avenue SE, Calgary, AB",
+          "venue": "Jack Singer Concert Hall, Werklund Centre",
+          "sourceUrl": "https://calgaryphil.com/events/calendar/",
+          "start": "2026-10-30T19:30:00-06:00",
+          "end": "2026-10-30T21:30:00-06:00",
+          "neighbourhood": "Downtown",
+          "endTimeEstimated": true
+        }
       }
     ]
   },
@@ -2972,6 +2998,48 @@
           "start": "2026-10-24T18:00:00-06:00",
           "end": "2026-10-24T20:00:00-06:00",
           "pricing": "free"
+        }
+      }
+    ]
+  },
+  {
+    "source": {
+      "id": "spiritus-chamber-choir",
+      "name": "Spiritus Chamber Choir",
+      "approved": true,
+      "hosts": [
+        "www.spirituschamberchoir.ca",
+        "spirituschamberchoir.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "the-turning-season-2026-11-08",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "choir",
+            "classical"
+          ],
+          "categories": [
+            "music",
+            "indoor"
+          ],
+          "organizer": "Spiritus Chamber Choir",
+          "pricing": "paid",
+          "title": "Spiritus Chamber Choir: The Turning Season",
+          "summary": "Spiritus opens its 30th season with an autumn concert.",
+          "description": "The first of four concerts in Spiritus Chamber Choir’s 2026–2027 season, its 30th. Tickets are $30, or $25 for students and seniors, and children under 12 get in free. Tickets are sold online through the choir’s ticket page.",
+          "address": "3602 8 Street SW, Calgary, AB",
+          "sourceUrl": "https://www.spirituschamberchoir.ca/tickets",
+          "tickets": "https://www.zeffy.com/en-CA/ticketing/the-turning-season",
+          "priceRange": [
+            0,
+            30
+          ],
+          "start": "2026-11-08T15:00:00-07:00",
+          "end": "2026-11-08T17:00:00-07:00"
         }
       }
     ]

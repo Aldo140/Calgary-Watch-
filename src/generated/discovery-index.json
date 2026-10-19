@@ -1808,7 +1808,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "7e0dfe7e538fb0cd65b0a778077a",
@@ -1849,7 +1850,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "d820b15597950428a7cbf77a9321",
@@ -1890,7 +1892,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "0c39ad33f5cf2903e4c9a98e4d29",
@@ -1931,7 +1934,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "60527135c849c0ccf17ed07a5b71",
@@ -1972,7 +1976,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "bdbbe3672bd4ba9882a3d84494b4",
@@ -2013,7 +2018,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "3f0bf48f8d2b3c6e7be7e00f2287",
@@ -2054,7 +2060,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "16c41f3539d3ddf412e8c8b06c6b",
@@ -2095,7 +2102,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "ea433cfce202ac3962a6a2ac48da",
@@ -2136,7 +2144,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "ca04a98a0862255017eab9879fd0",
@@ -2177,7 +2186,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "3c10f2a94c342af1279631c59c7c",
@@ -2218,7 +2228,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "0b76c774fbaca1f61e995f872b08",
@@ -2259,7 +2270,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "bc60b1d28ee9bc2df93703926133",
@@ -2295,7 +2307,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "73494dffc1e213fe231d61528292",
@@ -2336,7 +2349,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "b90341cb0cfbacb13e658ab0df45",
@@ -2377,7 +2391,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "9646db9a71234efd18312861cc4a",
@@ -2418,7 +2433,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "3d3b4f19a99277723f61c86411c4",
@@ -2459,7 +2475,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "7f1aab37d98d7aae1b8ed148addd",
@@ -2500,7 +2517,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "9f24f2c36e377f6d63240fd9350a",
@@ -2541,7 +2559,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "1e637c06892d3731c7f1cc34941d",
@@ -2582,7 +2601,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "2acbc9c71f0b87d81cf21b95b717",
@@ -2623,7 +2643,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "f5ac6d9545e2b88ea58cdb1ece49",
@@ -2664,7 +2685,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "8593c1d1309cd92ad251d06451df",
@@ -2705,7 +2727,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "1d2b08b83c09b84ad9400ca9a406",
@@ -2746,7 +2769,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "fa58259f6a0090b3157a5fa8ecf8",
@@ -2787,7 +2811,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "1ed9c99f4042bfbfa3d5be47b298",
@@ -2828,7 +2853,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "dd6b0a77dcf102b69fbb30fbc321",
@@ -2869,7 +2895,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "79ef1b01f7284f3e6d2a5dd2b39c",
@@ -2910,7 +2937,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "0d3bd1cac0c521f1b8b9c99abbd6",
@@ -2951,7 +2979,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "a65822dc466a6f1d2afc3e152418",
@@ -2992,7 +3021,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "787a24b9a8fad6990eff82b42bbc",
@@ -3033,7 +3063,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "7a5753e63a2a6478655db4e582e1",
@@ -3074,7 +3105,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "2f862be328807113d1c18c18fbea",
@@ -3115,7 +3147,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "cc9cf79d6b18fa41a1c061a0ddb0",
@@ -3156,7 +3189,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "b7f7243d442f3b70b44ed62218f5",
@@ -3197,7 +3231,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "de08ab43239dd38240c93f906cfd",
@@ -3238,7 +3273,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "335dabb3cfe15af3ee52b97e8290",
@@ -3279,7 +3315,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "702d3fbbd75f8c0ae322e41bd0fa",
@@ -3315,7 +3352,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "8745841e30213225dbeca6bb63f5",
@@ -3356,7 +3394,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "d752176c5d422c4fd1ef9311b7b3",
@@ -3397,7 +3436,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "672f5016a99b3e0bbf29c7a6f67c",
@@ -3438,7 +3478,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "a064e36fb52ef5ed0d7e7baeea45",
@@ -3479,7 +3520,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "3fd42d998a96d595f0918bfaebb9",
@@ -3520,7 +3562,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "e933f8eef8f4cf363cbebed50a1f",
@@ -3561,7 +3604,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "15e6cf629325aeca162ac1213889",
@@ -3602,7 +3646,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "bbd185933ce73cf9a5f649b72073",
@@ -3643,7 +3688,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "40653cf0f96c933a1148bc9d355d",
@@ -3684,7 +3730,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "fa32fb349bca400b33adf29c4079",
@@ -3725,7 +3772,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "3488756fa0f0844c6a337573d51b",
@@ -3766,7 +3814,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "3e8a389e350a4046349249518fdc",
@@ -3807,7 +3856,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "24bf35d28820e58b59ea231b9f67",
@@ -3848,7 +3898,8 @@
       "timezone": "America/Edmonton",
       "pricing": "paid",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "6c305a98f89edb5f302273560334",
@@ -3889,7 +3940,8 @@
       "timezone": "America/Edmonton",
       "pricing": "free",
       "organizer": "University of Calgary",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-university-of-calgary"
     },
     {
       "id": "2c54b196864c471cb9546e90c28a",
@@ -3930,7 +3982,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "63de71ec657b9c99ff90f4292ecf",
@@ -3971,7 +4024,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "0c807d3d78113ce48c6c331d8ed0",
@@ -4012,7 +4066,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "14d7646820b620bd5f9e52f156bb",
@@ -4053,7 +4108,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "93ac7bc41bb3e7797285eab40a26",
@@ -4094,7 +4150,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "4664fe6de263442acbc3ad81d133",
@@ -4135,7 +4192,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "681a4ba12915b0407dff86b7adff",
@@ -4176,7 +4234,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "8339540a14417ea7dd3492eb80d5",
@@ -4217,7 +4276,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "470a879725b677539868a6a80066",
@@ -4258,7 +4318,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "525233239169ff20ae9a95938041",
@@ -4299,7 +4360,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "a8067e1f3e739d1aa604f0cd9b8e",
@@ -4340,7 +4402,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "93025b25260d26d2525a6776601c",
@@ -4381,7 +4444,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "df1f69e5dc904e4f88ac588cb9e3",
@@ -4422,7 +4486,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "c42a77b3cd7181af69845571d0ac",
@@ -4463,7 +4528,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "9566caf039ccc918fab5205d458a",
@@ -4504,7 +4570,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "fa4be3294961f980a6d8abf08e1b",
@@ -4545,7 +4612,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "8f14f4c0ed1cba1a95d12f2deee4",
@@ -4586,7 +4654,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "1f55595265ed9bed14ff792739ba",
@@ -4627,7 +4696,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "a18c714cc4955b8a64087c9c83a2",
@@ -4668,7 +4738,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "792e5a86d9d924f5fdcac4f7db91",
@@ -4709,7 +4780,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "3390e6cd107367bcaa48e171a428",
@@ -4750,7 +4822,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "e5ab790d37b002c698bc0f8bae37",
@@ -4791,7 +4864,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "69080bef84632732b5ebeca0f854",
@@ -4832,7 +4906,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "8f0b71f44f2aad42f72880710c8a",
@@ -4873,7 +4948,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "045a888f83be2308990667931299",
@@ -4914,7 +4990,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "3dda0a2d9d2b85a63d1c2eb73e9b",
@@ -4955,7 +5032,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "e286e447c3bf582cc549f1addf81",
@@ -4996,7 +5074,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "3cd9e753296e1042424f3ef9b4e4",
@@ -5037,7 +5116,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "01d683ba5add2f3de89ff6bf18e9",
@@ -5078,7 +5158,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "f6270da795d114cd1d7e5159d1b8",
@@ -5119,7 +5200,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "bc890b538e57aaaeb1ecd7006f7f",
@@ -5160,7 +5242,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "540a332ef81e6cf31ba9ccd25f38",
@@ -5201,7 +5284,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "80bdd64220a61c9c10afda5cf227",
@@ -5242,7 +5326,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "c9942d1188921de4e7137f4bb17d",
@@ -5283,7 +5368,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "54f25fc7308e2824d8abf23891de",
@@ -5324,7 +5410,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "f38809aedd48037c41b8b7561d7f",
@@ -5365,7 +5452,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "b186e4db6ff73b03cccd2178425c",
@@ -5406,7 +5494,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "c4230acf4f71890266e67f3c1228",
@@ -5447,7 +5536,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "a05ed1c0ef615a814cf0c4a03cc5",
@@ -5488,7 +5578,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "9a7a2122591d64752594f167622d",
@@ -5529,7 +5620,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "5c129a63663da0ac3e3d9a250862",
@@ -5570,7 +5662,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "5607dd4d6f4e90b90461d74e34ec",
@@ -5611,7 +5704,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "c1e4456ee14d0c20426900ae456b",
@@ -5652,7 +5746,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "66889ec312a81339f03fa078c3c1",
@@ -5693,7 +5788,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "7e0326ee9601f134a4da329aa289",
@@ -5734,7 +5830,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "1e63d4ef173be4922eacbf529560",
@@ -5775,7 +5872,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "31a5aef8651d8f4205caa87b2ab9",
@@ -5816,7 +5914,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "e4af84d6690263a9d3699a708516",
@@ -5857,7 +5956,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "f170e9e4eff0eaf6f48c0f875a3b",
@@ -5898,7 +5998,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "c520a10024ec748dd6ab2927079b",
@@ -5939,7 +6040,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "c7aecf790362991bcdc08289f3da",
@@ -5980,7 +6082,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "782ca23b5551eacb4903de5fa2ff",
@@ -6021,7 +6124,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "5dc3cc1d56643c7b852036c1c7ae",
@@ -6062,7 +6166,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "93ee6aa3329715592902d17e1b07",
@@ -6103,7 +6208,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "645deddaeb5bb7d207320437a555",
@@ -6144,7 +6250,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "ec809e9ff06ad190b4dd78e72476",
@@ -6185,7 +6292,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "45f87575284722320d82d93abce1",
@@ -6226,7 +6334,8 @@
       "timezone": "America/Edmonton",
       "pricing": "unknown",
       "organizer": "Mount Royal University",
-      "cancelled": false
+      "cancelled": false,
+      "organizerEntityId": "biz-mount-royal-university"
     },
     {
       "id": "b93dfc05f833757f4aab427b017e",
@@ -15706,6 +15815,90 @@
       "claimed": false,
       "partner": false,
       "editorialSelection": false
+    },
+    {
+      "id": "biz-mount-royal-university",
+      "kind": "business",
+      "slug": "mount-royal-university",
+      "title": "Mount Royal University",
+      "name": "Mount Royal University",
+      "summary": "Public events from Mount Royal University, listed from its own calendar.",
+      "description": "Every date here comes from Mount Royal University’s public events calendar (events.mtroyal.ca). Check each event page for tickets, times and access.",
+      "categories": [
+        "sports",
+        "arts"
+      ],
+      "tags": [
+        "organizer",
+        "feed-profile"
+      ],
+      "sources": [
+        {
+          "name": "Mount Royal University public events",
+          "url": "https://events.mtroyal.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "address": "Calgary, AB",
+      "neighbourhood": "Lincoln Park",
+      "website": "https://events.mtroyal.ca/",
+      "images": [],
+      "socials": {
+        "website": "https://events.mtroyal.ca/"
+      },
+      "services": [
+        "Public events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-feed",
+      "verifiedAt": "2026-10-13T21:37:51.577Z",
+      "updatedAt": "2026-10-13T21:37:51.577Z"
+    },
+    {
+      "id": "biz-university-of-calgary",
+      "kind": "business",
+      "slug": "university-of-calgary",
+      "title": "University of Calgary",
+      "name": "University of Calgary",
+      "summary": "Public events from University of Calgary, listed from its own calendar.",
+      "description": "Every date here comes from University of Calgary’s public events calendar (events.ucalgary.ca). Check each event page for tickets, times and access.",
+      "categories": [
+        "arts",
+        "sports"
+      ],
+      "tags": [
+        "organizer",
+        "feed-profile"
+      ],
+      "sources": [
+        {
+          "name": "University of Calgary arts & culture events",
+          "url": "https://events.ucalgary.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-13T21:37:51.577Z"
+        }
+      ],
+      "address": "Calgary, AB",
+      "neighbourhood": "University Heights",
+      "website": "https://events.ucalgary.ca/",
+      "images": [],
+      "socials": {
+        "website": "https://events.ucalgary.ca/"
+      },
+      "services": [
+        "Public events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-feed",
+      "verifiedAt": "2026-10-13T21:37:51.577Z",
+      "updatedAt": "2026-10-13T21:37:51.577Z"
     }
   ],
   "occurrences": [

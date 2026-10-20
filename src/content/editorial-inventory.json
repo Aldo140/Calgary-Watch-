@@ -2379,6 +2379,11 @@
           "name": "Hillhurst Sunnyside Community Association — supplied source research",
           "url": "https://farmersmarket.hsca.ca/",
           "kind": "official"
+        },
+        {
+          "name": "Hillhurst Sunnyside Community Association",
+          "url": "https://www.hsca.ca/",
+          "kind": "official"
         }
       ],
       "images": [],
@@ -2387,17 +2392,19 @@
       },
       "services": [
         "Farmers market",
-        "Local food and artisans"
+        "Local food and artisans",
+        "Community gardens"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-16T00:00:00Z",
+      "updatedAt": "2026-10-20T00:00:00Z",
       "hours": {
         "Wednesday": "3–7 p.m."
-      }
+      },
+      "email": "farmersmarket@hsca.ca"
     },
     {
       "id": "biz-little-modern-market",
@@ -3255,6 +3262,197 @@
       "claimed": false,
       "partner": false,
       "editorialSelection": false
+    },
+    {
+      "id": "biz-calgary-philharmonic-orchestra",
+      "kind": "business",
+      "slug": "calgary-philharmonic-orchestra",
+      "title": "Calgary Philharmonic Orchestra",
+      "name": "Calgary Philharmonic Orchestra",
+      "website": "https://calgaryphil.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary’s orchestra, with a full season of concerts at the Jack Singer Concert Hall.",
+      "description": "The Calgary Philharmonic Orchestra presents its 2026/27 season mostly at the Jack Singer Concert Hall at Werklund Centre, with some concerts at other venues such as Mount Royal University’s Bella Concert Hall. Locations vary by concert; check the official concert page for the programme, times and tickets. Cpossibilities members aged 13 to 35 can buy discounted tickets to select concerts, and seniors and students can attend some open rehearsals.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "orchestra"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Philharmonic Orchestra",
+          "url": "https://calgaryphil.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        },
+        {
+          "name": "Calgary Philharmonic Orchestra — Cpossibilities",
+          "url": "https://calgaryphil.com/concerts/ticket-information/cpossibilities/",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        },
+        {
+          "name": "Calgary Philharmonic Orchestra — Open Rehearsals",
+          "url": "https://calgaryphil.com/explore-learn/education/open-rehearsals/",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryphil.com/"
+      },
+      "services": [
+        "Orchestral concerts",
+        "Open rehearsals",
+        "Cpossibilities (ages 13–35)"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-19T00:00:00Z"
+    },
+    {
+      "id": "biz-inside-out-theatre",
+      "kind": "business",
+      "slug": "inside-out-theatre",
+      "title": "Inside Out Theatre",
+      "name": "Inside Out Theatre",
+      "website": "https://www.insideouttheatre.com/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary disability theatre company, and the team behind the Good Host accessible performances.",
+      "description": "Inside Out Theatre is a disability theatre company in Calgary, equally invested in artistic excellence, community development and deepening our culture’s accessibility. Through its Good Host Program it works with other Calgary theatres on accessible performances of their shows. Its full list of events is on its official events page, which is the source CalgaryWatch uses for dates.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "accessibility"
+      ],
+      "sources": [
+        {
+          "name": "Inside Out Theatre — Events",
+          "url": "https://www.insideouttheatre.com/all-events",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.insideouttheatre.com/"
+      },
+      "services": [
+        "Theatre productions",
+        "Good Host accessible performances"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-19T00:00:00Z"
+    },
+    {
+      "id": "biz-spiritus-chamber-choir",
+      "kind": "business",
+      "slug": "spiritus-chamber-choir",
+      "title": "Spiritus Chamber Choir",
+      "name": "Spiritus Chamber Choir",
+      "website": "https://www.spirituschamberchoir.ca/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary chamber choir in its 30th season.",
+      "description": "Spiritus Chamber Choir is a Calgary chamber choir. Its 2026–2027 season, the choir’s 30th, runs across four concerts and opens with The Turning Season on November 8. Venues vary by concert; check the choir’s tickets page for dates, venues and prices.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "choir"
+      ],
+      "sources": [
+        {
+          "name": "Spiritus Chamber Choir",
+          "url": "https://www.spirituschamberchoir.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        },
+        {
+          "name": "Spiritus Chamber Choir — Tickets",
+          "url": "https://www.spirituschamberchoir.ca/tickets",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.spirituschamberchoir.ca/"
+      },
+      "services": [
+        "Choral concerts",
+        "Season tickets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-20T00:00:00Z"
+    },
+    {
+      "id": "biz-morpheus-theatre",
+      "kind": "business",
+      "slug": "morpheus-theatre",
+      "title": "Morpheus Theatre",
+      "name": "Morpheus Theatre",
+      "website": "https://www.morpheustheatre.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary community theatre staging comedies, mysteries and Gilbert and Sullivan at the Pumphouse Theatre.",
+      "description": "Morpheus Theatre is in its 32nd season of what it calls Shows Worth Seeing, with productions at the Pumphouse Theatre and a Gilbert and Sullivan comic opera to close each season. Its own website is kept current, so check its season page for show dates, times and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "community-theatre"
+      ],
+      "sources": [
+        {
+          "name": "Morpheus Theatre — season page",
+          "url": "https://www.morpheustheatre.ca/?page_id=9264",
+          "kind": "official",
+          "retrievedAt": "2026-10-20T23:30:00Z"
+        },
+        {
+          "name": "Morpheus Theatre",
+          "url": "https://www.morpheustheatre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-20T23:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.morpheustheatre.ca/"
+      },
+      "services": [
+        "Theatre productions",
+        "Season tickets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-20T00:00:00Z",
+      "email": "tickets@morpheustheatre.ca",
+      "phone": "403-246-2999"
     }
   ]
 }

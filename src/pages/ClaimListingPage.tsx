@@ -7,6 +7,7 @@ import { ListingManagement } from '../components/entity/ListingManagement';
 import { restoreClaimDraft } from '../lib/claimDraft';
 import { useVerifiedListing } from '../lib/claimsApi';
 import { VerifiedBadge } from '../components/entity/VerifiedBadge';
+import { VerifyEmailNotice } from '../components/auth/VerifyEmailNotice';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
@@ -119,8 +120,11 @@ function ClaimForm({ id }: { id: string }) {
       if (first) document.getElementById(`cl-${first}`)?.focus();
       return;
     }
-    if (!current) { pending.current = true; await signIn(); if (!auth?.currentUser) pending.current = false; return; }
-    if (!current.emailVerified) { setError('Verify your email before submitting this claim.'); return; }
+    // Most claimants are new here: open on "Create account" with their work email, so
+    // the account email matches the organization's domain and the claim checks itself.
+    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: draft.workEmail }); if (!auth?.currentUser) pending.current = false; return; }
+    // Unverified: keep the claim queued and send it the moment verification lands.
+    if (!current.emailVerified) { pending.current = true; setError('Verify your email before submitting this claim. We’ll send it as soon as you do.'); return; }
     setBusy(true); setError('');
     try {
       await submitClaim(current, { id: entity.id, title: entity.title, path: entityPath(entity) }, draft);
@@ -133,9 +137,9 @@ function ClaimForm({ id }: { id: string }) {
     }
   };
   useEffect(() => {
-    if (!previewUid && pending.current && user && claims) { pending.current = false; if (!claim) void send(); }
+    if (!previewUid && pending.current && user?.emailVerified && claims) { pending.current = false; setError(''); if (!claim) void send(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, claims]);
+  }, [user, user?.emailVerified, claims]);
 
   if (!entity) {
     return (
@@ -190,7 +194,7 @@ function ClaimForm({ id }: { id: string }) {
         <div className="cw-wrap cl-grid">
           <div className="cl-main">
             {claimLoadError ? <div role="alert" className="pl-error"><p>We couldn’t check existing claims. Your form is still here; this does not mean your account cannot claim this organization.</p><button type="button" className="pl-btn" onClick={() => window.location.reload()}>Reload and try again</button></div> : null}
-            {!claim&&!adminView&&user&&!user.emailVerified?<section className="cl-verify" aria-labelledby="cl-verify-title"><Mail size={22} aria-hidden="true"/><div><h2 id="cl-verify-title">Verify {user.email}</h2><p>Open the verification link in your inbox before submitting this claim. Your form and this listing stay right here.</p><div><button type="button" className="pl-btn" disabled={isAuthActionLoading} onClick={async()=>{setError('');const refreshed=await refreshCurrentUser();setError(refreshed?.emailVerified?'Email verified. You can submit your claim now.':'We haven’t seen the verification yet. Open the link, then check again.');}}>Check verification</button><button type="button" className="pl-btn pl-btn-secondary" disabled={isAuthActionLoading} onClick={async()=>{setError('');try{await sendVerificationEmail();setError('Verification email sent. Check your inbox and junk folder.');}catch{setError('We couldn’t resend that email yet. Wait a moment and try again.');}}}>Resend email</button></div></div></section>:null}
+            {!claim&&!adminView&&!previewUid?<VerifyEmailNotice action="submit this claim" />:null}
             {previewUid && !claims ? <p role="status">Loading this member’s claims…</p> : claim?.status === 'approved'||adminView ? (
               <>
                 {entity.kind === 'market' ? (

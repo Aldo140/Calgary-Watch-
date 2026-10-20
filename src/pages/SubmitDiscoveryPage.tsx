@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { VerifyEmailNotice } from '../components/auth/VerifyEmailNotice';
 import { ArrowUpRight, Clock, LinkIcon, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../components/FirebaseProvider';
 import { SiteLayout } from '../components/site/SiteLayout';
@@ -65,17 +66,19 @@ export default function SubmitDiscoveryPage() {
             <section className="pl-card cw-submit-gate">
               <h2>Sign in to share a listing</h2>
               <p>A free account lets us follow up if a detail needs checking, and keeps spam off the calendar. It takes a few seconds.</p>
-              <button type="button" className="pl-btn" onClick={() => void signIn().catch((e) => setError(e.message))}>Sign in or create an account <ArrowUpRight size={18} aria-hidden="true" /></button>
+              <button type="button" className="pl-btn" onClick={() => void signIn({ mode: 'signup' }).catch((e) => setError(e.message))}>Sign in or create an account <ArrowUpRight size={18} aria-hidden="true" /></button>
               {error ? <p className="pl-error" role="alert">{error}</p> : null}
             </section>
           ) : (
             <section className="pl-card cw-submit-form">
+              <VerifyEmailNotice action="send a listing" />
               {error ? <p className="pl-error" role="alert">{error}</p> : null}
               <InventoryForm
                 busy={busy}
                 defaultKind={defaultKind}
                 label={`Send my ${noun} for checking`}
                 onSave={async (input) => {
+                  if (!user.emailVerified) { setError('Verify your email first, then send it. Your listing stays filled in.'); return; }
                   setBusy(true); setError('');
                   try {
                     const before = await readMySubmissionCount(user.uid);

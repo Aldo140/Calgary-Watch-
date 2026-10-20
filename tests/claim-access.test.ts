@@ -23,6 +23,7 @@ const business={...event,id:'biz-festival',kind:'business',slug:'festival',name:
 const inventory=[event,business,{...event,id:'linked-event',organizerEntityId:business.id}];
 async function render({admin=false,user=true,emailVerified=true,claim=null,path='/claim/festival',verified=false,loading=false,failed=false}:{admin?:boolean;user?:boolean;emailVerified?:boolean;claim?:Record<string,unknown>|null;path?:string;verified?:boolean;loading?:boolean;failed?:boolean}={}){
  const userData=user?{uid:'me',email:'me@gmail.com',emailVerified,displayName:'My account'}:null;
+ const authModule=moduleUrl(`export const useAuth=()=>({user:${JSON.stringify(userData)},isAdmin:${admin},isFirebaseConfigured:true,signIn:()=>{throw Error('Rendering must not sign in')}});`);
  const component=await import(compile('../src/pages/ClaimListingPage.tsx',{
   '../lib/claimPresentation':compile('../src/lib/claimPresentation.ts'),
   '../lib/claimOrganization':organizationModule,
@@ -34,7 +35,8 @@ async function render({admin=false,user=true,emailVerified=true,claim=null,path=
   '../lib/claimsApi':moduleUrl(`export const useVerifiedListing=()=>${verified};export const useClaimLoadError=()=>${failed};export const useMyClaims=()=>${loading?'null':JSON.stringify(claim?[claim]:[])};export const submitClaim=()=>{throw Error('Rendering must not submit a claim')};`),
   '../components/entity/VerifiedBadge':compile('../src/components/entity/VerifiedBadge.tsx'),
   '../components/site/SiteLayout':moduleUrl('export const SiteLayout=({children})=>children;'),
-  '../components/FirebaseProvider':moduleUrl(`export const useAuth=()=>({user:${JSON.stringify(userData)},isAdmin:${admin},isFirebaseConfigured:true,signIn:()=>{throw Error('Rendering must not sign in')}});`),
+  '../components/FirebaseProvider':authModule,
+  '../components/auth/VerifyEmailNotice':compile('../src/components/auth/VerifyEmailNotice.tsx',{'../FirebaseProvider':authModule}),
   '../data/discovery':moduleUrl(`export const discoveryRepository={list:()=>${JSON.stringify(inventory)}};`),
   '../lib/discovery':moduleUrl("export const entityPath=e=>`/${e.kind==='business'?'local':e.kind==='market'?'markets':'events'}/${e.slug}`;"),
   '../lib/claims':claimsModule,
@@ -89,6 +91,7 @@ const firestoreMock=moduleUrl(`
  export const limit=()=>{};export const onSnapshot=()=>{};export const query=()=>{};export const where=()=>{};
 `);
 const claimApi=await import(compile('../src/lib/claimsApi.ts',{
+ './auth':moduleUrl('export const syncVerifiedToken=async()=>{};'),
  './readEfficiency':compile('../src/lib/readEfficiency.ts'),
  './listingUpdates':moduleUrl('export const listingUpdateRequest=()=>{};'),
  './claimApproval':moduleUrl('export const approvedPublicMark=()=>false;'),

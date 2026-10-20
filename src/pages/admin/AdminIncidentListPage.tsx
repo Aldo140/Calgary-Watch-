@@ -76,7 +76,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
         <h1 className="text-lg font-bold mb-1" style={{ fontFamily: display, color: T.ink }}>{blocked.title}</h1>
         <p className="text-sm mb-4" style={{ color: T.muted }}>{blocked.body}</p>
         <div className="flex gap-2 justify-center">
-          {blocked.cta === 'signin' && <AdminButton tone="signal" onClick={signIn}>Sign in</AdminButton>}
+          {blocked.cta === 'signin' && <AdminButton tone="signal" onClick={() => void signIn()}>Sign in</AdminButton>}
           <AdminButton variant="outline" onClick={() => navigate('/admin')}>Back to admin</AdminButton>
         </div>
       </div>

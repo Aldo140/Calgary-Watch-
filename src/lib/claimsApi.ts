@@ -1,3 +1,4 @@
+import { syncVerifiedToken } from './auth';
 import { createSharedLiveValue, trackSubscription } from './readEfficiency';
 import { listingUpdateRequest } from './listingUpdates';
 import { approvedPublicMark } from './claimApproval';
@@ -41,6 +42,7 @@ export async function submitClaim(user: User, entity: { id: string; title: strin
   const published = discoveryRepository.list().find(e => e.id === entity.id && ['event', 'market', 'business'].includes(e.kind) && !e.developmentOnly);
   if (!published || entityPath(published) !== entity.path) throw new Error('This listing is not published.');
   if (!user.emailVerified) throw new Error('Verify your email address before submitting a claim.');
+  await syncVerifiedToken(user);
   const claim: ListingClaim = {
     uid: user.uid,
     entityId: entity.id,

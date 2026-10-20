@@ -1,3 +1,4 @@
+import { syncVerifiedToken } from './auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -34,6 +35,7 @@ function calgaryDay(now = new Date()): string {
 }
 
 export async function submitDiscovery(input: unknown): Promise<DiscoveryResult> {
+  if (auth?.currentUser) await syncVerifiedToken(auth.currentUser);
   try {
     return { queued: false, data: await callable('submitDiscovery', input) };
   } catch (error) {

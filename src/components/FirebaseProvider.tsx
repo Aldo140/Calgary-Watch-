@@ -14,11 +14,13 @@ import { auth, db, isFirebaseConfigured } from '../firebase';
 import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { isApprovedAdminEmail } from '@/src/constants/admin';
 import { AuthDialog } from './auth/AuthDialog';
+import { continueUriRefused, returnLink, syncVerifiedToken, type AuthRequest } from '../lib/auth';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: () => Promise<void>;
+  /** Opens the sign-in dialog and resolves once someone is signed in or the dialog is closed. */
+  signIn: (request?: AuthRequest) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -36,17 +38,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-/**
- * Firestore and Storage rules read `email_verified` from the ID token, which
- * keeps its old value after the user clicks the verification link. `reload()`
- * only refreshes the profile, so mint a new token whenever the two disagree.
- */
-async function syncVerifiedToken(currentUser: User): Promise<void> {
-  if (!currentUser.emailVerified) return;
-  const token = await currentUser.getIdTokenResult();
-  if (token.claims.email_verified !== true) await currentUser.getIdToken(true);
-}
 
 /**
  * Mirror the signed-in user into the `users` collection.
@@ -96,6 +87,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [authRequest, setAuthRequest] = useState<AuthRequest>({});
   const [, setAuthRevision] = useState(0);
   const pendingAuth = useRef<(() => void) | null>(null);
 
@@ -149,8 +141,10 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     return () => {unsubscribe();stopRole?.();};
   }, []);
 
-  const requireAuth = async () => {
+  const requireAuth = async (request: AuthRequest = {}) => {
     if (auth?.currentUser) return;
+    // Guard against an event object when signIn is passed straight to onClick.
+    setAuthRequest({ mode: request?.mode, email: typeof request?.email === 'string' ? request.email : undefined });
     setAuthOpen(true);
     await new Promise<void>(resolve => { pendingAuth.current = resolve; });
     pendingAuth.current = null;
@@ -203,10 +197,16 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     setIsSigningIn(true);
     try { return await action(); } finally { setIsSigningIn(false); }
   };
+  const sendVerificationTo = async (account: User) => {
+    const settings = returnLink(window.location.href);
+    try { await sendEmailVerification(account, settings); }
+    catch (error) { if (!settings || !continueUriRefused(error)) throw error; await sendEmailVerification(account); }
+  };
   const signUpWithEmail = (email: string, password: string, displayName?: string) => withAuthAction(async () => {
     const credential = await createUserWithEmailAndPassword(auth!, email, password);
-    if (displayName) await updateProfile(credential.user, { displayName });
-    await sendEmailVerification(credential.user);
+    if (displayName) await updateProfile(credential.user, { displayName }).catch(error => console.error('Display name error:', error));
+    // The account exists now; a failed email is offered again from the verify screen.
+    await sendVerificationTo(credential.user).catch(error => console.error('Verification email error:', error));
     setUser(credential.user);
     void syncUserProfile(credential.user, false);
   });
@@ -215,7 +215,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   });
   const sendVerificationEmail = () => withAuthAction(async () => {
     if (!auth?.currentUser) throw new Error('Sign in before requesting verification.');
-    await sendEmailVerification(auth.currentUser);
+    await sendVerificationTo(auth.currentUser);
   });
   const refreshCurrentUser = () => withAuthAction(async () => {
     if (!auth?.currentUser) return null;
@@ -228,9 +228,11 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     return refreshed;
   });
   const sendPasswordReset = (email: string) => withAuthAction(async () => {
-    try { await sendPasswordResetEmail(auth!, email); }
+    const settings = returnLink(window.location.href);
+    try { await sendPasswordResetEmail(auth!, email, settings); }
     catch (error) {
       const code = error instanceof Error ? (error as Error & { code?: string }).code : '';
+      if (settings && continueUriRefused(error)) { await sendPasswordResetEmail(auth!, email).catch(retry => { if ((retry as { code?: string }).code !== 'auth/user-not-found') throw retry; }); return; }
       if (code !== 'auth/user-not-found') throw error;
     }
   });
@@ -266,7 +268,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-      <AuthDialog open={authOpen} user={user} busy={isSigningIn} onClose={() => { setAuthOpen(false); pendingAuth.current?.(); pendingAuth.current=null; }} onGoogle={signInWithGoogleAccount} onSignIn={signInWithEmailAccount} onSignUp={signUpWithEmail} onReset={sendPasswordReset} onResend={sendVerificationEmail} onRefresh={refreshCurrentUser} onLogout={logout} />
+      <AuthDialog open={authOpen} request={authRequest} user={user} busy={isSigningIn} onClose={() => { setAuthOpen(false); pendingAuth.current?.(); pendingAuth.current=null; }} onGoogle={signInWithGoogleAccount} onSignIn={signInWithEmailAccount} onSignUp={signUpWithEmail} onReset={sendPasswordReset} onResend={sendVerificationEmail} onRefresh={refreshCurrentUser} onLogout={logout} />
     </AuthContext.Provider>
   );
 }

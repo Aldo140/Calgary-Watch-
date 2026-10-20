@@ -1,3 +1,4 @@
+import { syncVerifiedToken } from './auth';
 import { useEffect, useState } from 'react';
 import { addDoc, collection, doc, getDocs, limit, onSnapshot, query, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import type { User } from 'firebase/auth';
@@ -95,6 +96,7 @@ export async function queueVendorMessage(user: User, m: Pick<VendorMessage, 'mar
 
 export async function submitApplication(user: User, market: { id: string; title: string }, d: ApplicationDraft): Promise<void> {
   if (!db) throw new Error('Unavailable');
+  await syncVerifiedToken(user);
   await addDoc(collection(db, APPLICATIONS), {
     uid: user.uid, marketId: market.id, marketTitle: market.title.slice(0, 160), businessName: d.businessName.trim().slice(0, 120), category: d.category.slice(0, 60),
     description: d.description.trim().slice(0, 1200), website: d.website.trim().slice(0, 300), instagram: d.instagram.trim().replace(/^@/, '').slice(0, 80),

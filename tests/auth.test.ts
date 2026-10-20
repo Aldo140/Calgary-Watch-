@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
-import { authErrorMessage, emailProblem, passwordProblem } from '../src/lib/auth';
+import { authErrorMessage, continueUriRefused, emailProblem, passwordProblem, returnLink } from '../src/lib/auth';
 
 describe('email authentication', () => {
   it('validates the signup fields without imposing extra password rules', () => {
@@ -21,9 +21,40 @@ describe('email authentication', () => {
     for (const api of ['createUserWithEmailAndPassword','signInWithEmailAndPassword','sendEmailVerification','sendPasswordResetEmail','updateProfile','reload','signInWithPopup','signInWithRedirect','browserLocalPersistence']) assert.match(provider, new RegExp(api));
   });
   it('refreshes the ID token after verification so rules see email_verified', () => {
-    const provider = readFileSync('src/components/FirebaseProvider.tsx', 'utf8');
-    assert.match(provider, /claims\.email_verified !== true\) await currentUser\.getIdToken\(true\)/);
-    assert.match(provider, /await reload\(auth\.currentUser\);[\s\S]{0,120}await syncVerifiedToken\(refreshed\)/);
+    assert.match(readFileSync('src/lib/auth.ts', 'utf8'), /claims\.email_verified !== true\) await user\.getIdToken\(true\)/);
+    assert.match(readFileSync('src/components/FirebaseProvider.tsx', 'utf8'), /await reload\(auth\.currentUser\);[\s\S]{0,120}await syncVerifiedToken\(refreshed\)/);
+    for (const file of ['src/lib/claimsApi.ts', 'src/lib/marketsApi.ts', 'src/lib/discoveryApi.ts']) assert.match(readFileSync(file, 'utf8'), /await syncVerifiedToken\(/, file);
+  });
+  it('brings people back to the page they were on from verification and reset emails', () => {
+    assert.deepEqual(returnLink('https://calgarywatch.ca/claim/barn?x=1#form'), { url: 'https://calgarywatch.ca/claim/barn?x=1' });
+    assert.deepEqual(returnLink('http://localhost:3000/plans'), { url: 'http://localhost:3000/plans' });
+    assert.equal(returnLink('http://example.com/'), undefined);
+    assert.equal(returnLink('not a url'), undefined);
+    assert.ok(continueUriRefused(Object.assign(new Error(), { code: 'auth/unauthorized-continue-uri' })));
+    assert.ok(!continueUriRefused(Object.assign(new Error(), { code: 'auth/too-many-requests' })));
+  });
+  it('explains a disabled provider, a blocked popup and a disabled account', () => {
+    for (const code of ['auth/operation-not-allowed', 'auth/popup-blocked', 'auth/user-disabled', 'auth/account-exists-with-different-credential']) {
+      const message = authErrorMessage(Object.assign(new Error(), { code }));
+      assert.doesNotMatch(message, /didn’t work|auth\//, code);
+    }
+  });
+  it('sends existing accounts from sign up to sign in and checks verification when the tab returns', () => {
+    const dialog = readFileSync('src/components/auth/AuthDialog.tsx', 'utf8');
+    assert.match(dialog, /auth\/email-already-in-use'\) \{ switchMode\('signin'\)/);
+    assert.match(dialog, /visibilitychange/);
+    assert.match(dialog, /request\.mode \?\? 'signin'/);
+  });
+  it('holds unverified claims and vendor applications, and sends them once verified', () => {
+    const claim = readFileSync('src/pages/ClaimListingPage.tsx', 'utf8');
+    assert.match(claim, /signIn\(\{ mode: 'signup', email: draft\.workEmail \}\)/);
+    assert.match(claim, /pending\.current && user\?\.emailVerified && claims/);
+    const vendor = readFileSync('src/pages/VendorApplyPage.tsx', 'utf8');
+    assert.match(vendor, /<VerifyEmailNotice action="send your application"/);
+    assert.match(vendor, /pending\.current && user\?\.emailVerified/);
+    const submit = readFileSync('src/pages/SubmitDiscoveryPage.tsx', 'utf8');
+    assert.match(submit, /<VerifyEmailNotice action="send a listing"/);
+    assert.match(submit, /if \(!user\.emailVerified\)/);
   });
   it('keeps verification enforced in the client and Firestore rules', () => {
     assert.match(readFileSync('src/lib/claimsApi.ts','utf8'), /!user\.emailVerified/);

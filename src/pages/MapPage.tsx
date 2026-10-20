@@ -2464,7 +2464,7 @@ export default function MapPage() {
                       </div>
 
                       <Button
-                        onClick={signIn}
+                        onClick={() => void signIn()}
                         className="h-12 w-full rounded-none bg-[#06162F] text-[#F2EFE8] hover:bg-[#1C2B3A]"
                       >
                         <GoogleIcon />

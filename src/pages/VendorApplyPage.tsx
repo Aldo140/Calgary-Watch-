@@ -10,6 +10,7 @@ import { myApplications, submitApplication } from '../lib/marketsApi';
 import { auth } from '../firebase';
 import '../styles/plans.css';
 import '../styles/claim.css';
+import { VerifyEmailNotice } from '../components/auth/VerifyEmailNotice';
 import '../styles/hq.css';
 
 /**
@@ -36,14 +37,16 @@ export default function VendorApplyPage() {
   const send = async () => {
     if (!market) return;
     const current = auth?.currentUser;
-    if (!current) { pending.current = true; await signIn(); if (!auth?.currentUser) pending.current = false; return; }
     const problem = applicationProblem(d);
     if (problem) { setError(problem); return; }
+    if (!current) { pending.current = true; await signIn({ mode: 'signup', email: d.email }); if (!auth?.currentUser) pending.current = false; return; }
+    // The rules only take applications from verified emails; send it once verification lands.
+    if (!current.emailVerified) { pending.current = true; setError('Verify your email to send this application. We’ll send it as soon as you do.'); return; }
     setState('busy'); setError('');
     try { await submitApplication(current, { id: market.id, title: market.title }, d); setState('sent'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     catch { setState('idle'); setError('That didn’t send. Try again in a moment.'); }
   };
-  useEffect(() => { if (pending.current && user) { pending.current = false; void send(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user]);
+  useEffect(() => { if (pending.current && user?.emailVerified) { pending.current = false; setError(''); void send(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user, user?.emailVerified]);
 
   if (!market) return <SiteLayout><div className="cw-wrap cl-page"><h1 className="cl-title">We couldn’t find that market.</h1><p className="cl-lead"><Link to="/markets">See Calgary markets</Link></p></div></SiteLayout>;
 
@@ -67,6 +70,8 @@ export default function VendorApplyPage() {
                 </div>
               </section>
             ) : (
+              <>
+              <VerifyEmailNotice action="send your application" />
               <form className="pl-form cl-form" onSubmit={(e) => { e.preventDefault(); void send(); }} noValidate>
                 <fieldset className="pl-step">
                   <legend><span className="pl-num">01</span> Your business</legend>
@@ -100,6 +105,7 @@ export default function VendorApplyPage() {
                   <p className="pl-fine pl-trust"><Lock size={12} aria-hidden="true" /> {user ? 'Goes straight to the organizer.' : 'A free account keeps applications real. What you typed is kept.'}</p>
                 </div>
               </form>
+              </>
             )}
           </div>
           <aside className="cl-side">

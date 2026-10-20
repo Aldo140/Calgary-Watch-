@@ -1,5 +1,8 @@
-import { useState, type ReactNode } from 'react';
-import { eventArtwork, listingImageSrc, organizerProfile } from '../../lib/organizations';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { eventArtwork, listingImageSrc, organizerEvents, organizerProfile } from '../../lib/organizations';
+import { shelfOf, SHELVES } from '../../lib/localShelves';
+import { isOwnerVerified } from '../../lib/verified';
+import { Seal } from '../discovery/LocalDirectory';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, CalendarPlus, Check, Clock, ExternalLink, Map as MapIcon, MapPin, Navigation,
@@ -21,6 +24,7 @@ import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
 import '../../styles/plans.css';
+import '../../styles/local-directory.css';
 import '../../styles/listing-detail.css';
 
 const dayLong = calgaryDateTimeFormat('en-CA', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -120,6 +124,8 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
   const open = !past && !event.cancelled;
   const photo = eventArtwork(event, all);
   const organization = organizerProfile(event, all);
+  const orgShelf = organization ? SHELVES.find(s => s.id === shelfOf(organization)) : undefined;
+  const orgNext = organization ? organizerEvents(organization.id, all, now).filter(e => e.id !== event.id) : [];
 
   const alsoOn = eventsSameDay(event.start, all.filter(e => e.id !== event.id), event.neighbourhood, 4);
   const seen = new Set([event.id, ...alsoOn.map(e => e.id)]);
@@ -168,7 +174,7 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
             <div><dt><Clock size={16} aria-hidden="true" /> When</dt><dd>{dayLong.format(start)}<span>{startClock(event.start, time)}{event.endTimeEstimated ? '' : ` – ${sameDay ? '' : `${dayLong.format(end)}, `}${time.format(end)}`}</span></dd></div>
             <div><dt><MapPin size={16} aria-hidden="true" /> Where</dt><dd>{event.venue || event.neighbourhood || 'See the organizer'}<span>{cleanAddress(event.address)}</span></dd></div>
             <div><dt><Tag size={16} aria-hidden="true" /> Price</dt><dd>{price}{event.pricing === 'unknown' ? <span>Not listed yet</span> : null}</dd></div>
-            <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{organization ? <Link to={entityPath(organization)}>{event.organizer}</Link> : event.organizer}</dd></div>
+            <div><dt><User size={16} aria-hidden="true" /> Organizer</dt><dd>{organization ? <><Link to={entityPath(organization)}>{event.organizer}</Link><span><Link to={entityPath(organization)}>See their profile</Link></span></> : event.organizer}</dd></div>
           </dl>
 
           {open && !event.developmentOnly ? <div className="ld-going"><GoingButton eventId={event.id} start={event.start} /></div> : null}
@@ -179,6 +185,26 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
             {interests.length ? <p className="mk-amenities">{interests.map(i => <Link key={i} className="mk-tag" to={`/events?filter=${i === 'outdoors' ? 'outdoor' : i === 'learning' ? 'talks' : i}`}>{interestLabel(i)}</Link>)}</p> : null}
             {organizerSite ? <a className="mk-organizer" href={organizerSite} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} aria-hidden="true" /> {event.organizer}’s page</a> : null}
           </section>
+
+          {organization && orgShelf ? (
+            <section className="mk-dsec mk-runby" aria-labelledby="ld-runby" style={{ ['--tone' as string]: orgShelf.tone, ['--tink' as string]: orgShelf.ink } as CSSProperties}>
+              <header className="mk-sec-head"><h2 id="ld-runby"><span>Who’s behind it</span></h2><p>{orgNext.length ? `${orgNext.length} more ${orgNext.length === 1 ? 'date' : 'dates'} from them` : `${orgShelf.label} on Local`}</p></header>
+              <Link className="mk-runby-card" to={entityPath(organization)}>
+                <Seal title={organization.title} tone={orgShelf} />
+                <span className="mk-runby-copy">
+                  <small>{isOwnerVerified(organization) ? 'Verified organizer' : 'The organizer'}</small>
+                  <strong>{organization.title}</strong>
+                  <span>{organization.summary}</span>
+                </span>
+                <span className="mk-runby-go">Their profile <ArrowUpRight size={16} aria-hidden="true" /></span>
+              </Link>
+              {orgNext.length ? (
+                <ul className="mk-runby-sisters" aria-label={`More from ${organization.title}`}>
+                  {orgNext.slice(0, 3).map(e => <li key={e.id}><Link to={entityPath(e)}><b>{e.title}</b><small>{pickWhen(e.start)}{e.venue ? ` · ${e.venue}` : ''}</small><ArrowUpRight size={15} aria-hidden="true" /></Link></li>)}
+                </ul>
+              ) : null}
+            </section>
+          ) : null}
 
           {open && !event.developmentOnly ? <ThursdayNudge interests={interests} /> : null}
 
@@ -211,7 +237,6 @@ export function EventDetail({ event, all }: { event: Event; all: readonly Discov
         </aside>
 
         <div className="mk-dfoot">
-          {organization ? <p><Link to={entityPath(organization)}>More from {organization.title} <ArrowRight size={16} aria-hidden="true" /></Link></p> : null}
           <SourceBadge entity={event} />
           <ClaimCta entityId={event.id} title={event.title} kind="event" verifiedAt={event.ownerVerifiedAt} />
         </div>

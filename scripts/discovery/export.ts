@@ -2,6 +2,7 @@ import {mergePartnerUpdates} from './partnerUpdates';
 import { mergeOrganizationContent, mergeOrganizationOccurrences, ORGANIZATION_LIVE, type OrganizationProjection } from '../../src/lib/organizationWorkspace';
 import { ownerEditTargets, applyOwnerOccurrences, applyOwnerContent, OWNER_CONTENT } from '../../src/lib/ownerListingEdits';
 import { associateOrganizers } from '../../src/lib/organizations';
+import { feedOrganizerProfiles } from '../../src/lib/feedOrganizers';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import domain from '../../functions/discovery-domain.cjs';
 import { collectSources, editorialEntities } from './feeds';
@@ -117,7 +118,12 @@ const snapshot = domain.publishSnapshot([...byId.values()], [...occById.values()
 const editorial = await editorialEntities();
 // Stamped last, over every source, so nothing a feed or entity document says about itself survives.
 const verified = ownerVerification(claims.approved, claims.marks);
-let entities:Entity[] = applyOwnerVerification(associateOrganizers(mergePartnerUpdates([...editorial,...snapshot.entities] as unknown as import('../../src/types/discovery').DiscoveryEntity[])), verified) as unknown as Entity[];
+const merged = mergePartnerUpdates([...editorial,...snapshot.entities] as unknown as import('../../src/types/discovery').DiscoveryEntity[]);
+// Organizers busy enough on their own calendars get a public profile on Local (src/lib/feedOrganizers.ts).
+// A profile an approved claim points at survives a thin month.
+const feedProfiles = feedOrganizerProfiles(merged, Date.now(), new Set(claims.approved.flatMap(c => [c.entityId, c.approvedOrganizationId ?? ''])));
+if (feedProfiles.length) log(`Organizer profiles from their own calendars: ${feedProfiles.map(p => p.title).join(', ')}`);
+let entities:Entity[] = applyOwnerVerification(associateOrganizers([...merged, ...feedProfiles]), verified) as unknown as Entity[];
 // Applied owner edits win over feeds on every subsequent rebuild. Protected metadata is untouched.
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   const { inventoryDatabase } = await import('./firebase');

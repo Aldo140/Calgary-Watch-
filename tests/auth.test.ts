@@ -20,6 +20,11 @@ describe('email authentication', () => {
     const provider = readFileSync('src/components/FirebaseProvider.tsx', 'utf8');
     for (const api of ['createUserWithEmailAndPassword','signInWithEmailAndPassword','sendEmailVerification','sendPasswordResetEmail','updateProfile','reload','signInWithPopup','signInWithRedirect','browserLocalPersistence']) assert.match(provider, new RegExp(api));
   });
+  it('refreshes the ID token after verification so rules see email_verified', () => {
+    const provider = readFileSync('src/components/FirebaseProvider.tsx', 'utf8');
+    assert.match(provider, /claims\.email_verified !== true\) await currentUser\.getIdToken\(true\)/);
+    assert.match(provider, /await reload\(auth\.currentUser\);[\s\S]{0,120}await syncVerifiedToken\(refreshed\)/);
+  });
   it('keeps verification enforced in the client and Firestore rules', () => {
     assert.match(readFileSync('src/lib/claimsApi.ts','utf8'), /!user\.emailVerified/);
     assert.match(readFileSync('firestore.rules','utf8'), /request\.auth\.token\.email_verified == true/);

@@ -38,6 +38,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 /**
+ * Firestore and Storage rules read `email_verified` from the ID token, which
+ * keeps its old value after the user clicks the verification link. `reload()`
+ * only refreshes the profile, so mint a new token whenever the two disagree.
+ */
+async function syncVerifiedToken(currentUser: User): Promise<void> {
+  if (!currentUser.emailVerified) return;
+  const token = await currentUser.getIdTokenResult();
+  if (token.claims.email_verified !== true) await currentUser.getIdToken(true);
+}
+
+/**
  * Mirror the signed-in user into the `users` collection.
  *
  * Runs in the background after auth state is published. Never block rendering
@@ -129,6 +140,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
 
       // Profile sync is best-effort and deliberately not awaited — nothing the
       // user sees depends on it completing.
+      if (currentUser) void syncVerifiedToken(currentUser).catch(error => console.error('Token refresh error:', error));
       if (currentUser && db) {
         void syncUserProfile(currentUser, isApprovedAdmin);
       }
@@ -209,6 +221,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
     if (!auth?.currentUser) return null;
     await reload(auth.currentUser);
     const refreshed = auth.currentUser;
+    if (refreshed) await syncVerifiedToken(refreshed);
     setUser(refreshed);
     setAuthRevision(value => value + 1);
     if (refreshed) void syncUserProfile(refreshed, refreshed.emailVerified && isApprovedAdminEmail(refreshed.email));

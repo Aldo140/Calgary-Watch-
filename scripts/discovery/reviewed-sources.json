@@ -3043,5 +3043,46 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "morpheus-theatre",
+      "name": "Morpheus Theatre",
+      "approved": true,
+      "hosts": [
+        "www.morpheustheatre.ca",
+        "morpheustheatre.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "its-a-wonderful-life-2026",
+        "input": {
+          "kind": "event",
+          "tags": [
+            "theatre",
+            "holiday",
+            "community theatre"
+          ],
+          "categories": [
+            "arts",
+            "indoor"
+          ],
+          "organizer": "Morpheus Theatre",
+          "pricing": "paid",
+          "address": "2140 Pumphouse Avenue SW, Calgary, AB",
+          "venue": "Pumphouse Theatre",
+          "sourceUrl": "https://www.morpheustheatre.ca/?page_id=9264",
+          "title": "Morpheus Theatre: It's a Wonderful Life",
+          "summary": "Morpheus Theatre's holiday show at the Pumphouse Theatre.",
+          "description": "Morpheus Theatre stages It's a Wonderful Life at the Pumphouse Theatre from December 11 to 19, 2026, as part of its 32nd season. Showtimes and tickets are on Morpheus Theatre's season page.",
+          "start": "2026-12-11T00:00:00-07:00",
+          "end": "2026-12-20T00:00:00-07:00",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true
+        }
+      }
+    ]
   }
 ]

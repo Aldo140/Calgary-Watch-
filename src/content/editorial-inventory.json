@@ -3404,6 +3404,55 @@
       "status": "published",
       "verification": "source-checked",
       "updatedAt": "2026-10-20T00:00:00Z"
+    },
+    {
+      "id": "biz-morpheus-theatre",
+      "kind": "business",
+      "slug": "morpheus-theatre",
+      "title": "Morpheus Theatre",
+      "name": "Morpheus Theatre",
+      "website": "https://www.morpheustheatre.ca/",
+      "address": "Calgary, AB",
+      "summary": "Calgary community theatre staging comedies, mysteries and Gilbert and Sullivan at the Pumphouse Theatre.",
+      "description": "Morpheus Theatre is in its 32nd season of what it calls Shows Worth Seeing, with productions at the Pumphouse Theatre and a Gilbert and Sullivan comic opera to close each season. Its own website is kept current, so check its season page for show dates, times and tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "community-theatre"
+      ],
+      "sources": [
+        {
+          "name": "Morpheus Theatre — season page",
+          "url": "https://www.morpheustheatre.ca/?page_id=9264",
+          "kind": "official",
+          "retrievedAt": "2026-10-20T23:30:00Z"
+        },
+        {
+          "name": "Morpheus Theatre",
+          "url": "https://www.morpheustheatre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-20T23:30:00Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.morpheustheatre.ca/"
+      },
+      "services": [
+        "Theatre productions",
+        "Season tickets"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-20T00:00:00Z",
+      "email": "tickets@morpheustheatre.ca",
+      "phone": "403-246-2999"
     }
   ]
 }

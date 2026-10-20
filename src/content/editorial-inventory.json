@@ -2379,6 +2379,11 @@
           "name": "Hillhurst Sunnyside Community Association — supplied source research",
           "url": "https://farmersmarket.hsca.ca/",
           "kind": "official"
+        },
+        {
+          "name": "Hillhurst Sunnyside Community Association",
+          "url": "https://www.hsca.ca/",
+          "kind": "official"
         }
       ],
       "images": [],
@@ -2387,17 +2392,19 @@
       },
       "services": [
         "Farmers market",
-        "Local food and artisans"
+        "Local food and artisans",
+        "Community gardens"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-16T00:00:00Z",
+      "updatedAt": "2026-10-20T00:00:00Z",
       "hours": {
         "Wednesday": "3–7 p.m."
-      }
+      },
+      "email": "farmersmarket@hsca.ca"
     },
     {
       "id": "biz-little-modern-market",
@@ -3371,6 +3378,12 @@
       ],
       "sources": [
         {
+          "name": "Spiritus Chamber Choir",
+          "url": "https://www.spirituschamberchoir.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-19T20:40:00Z"
+        },
+        {
           "name": "Spiritus Chamber Choir — Tickets",
           "url": "https://www.spirituschamberchoir.ca/tickets",
           "kind": "official",
@@ -3382,14 +3395,15 @@
         "website": "https://www.spirituschamberchoir.ca/"
       },
       "services": [
-        "Choral concerts"
+        "Choral concerts",
+        "Season tickets"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
       "status": "published",
       "verification": "source-checked",
-      "updatedAt": "2026-10-19T00:00:00Z"
+      "updatedAt": "2026-10-20T00:00:00Z"
     }
   ]
 }

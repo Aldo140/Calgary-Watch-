@@ -29,6 +29,7 @@ export function adminSubmissionInput(
       kind: "event",
       start: adminText(r.start),
       end: adminText(r.end),
+      ...(adminText(r.tickets) ? { tickets: adminText(r.tickets) } : {}),
       pricing:
         r.pricing === "free" || r.pricing === "paid" ? r.pricing : "unknown",
     };

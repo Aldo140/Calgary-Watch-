@@ -15845,6 +15845,191 @@
       "cancelled": false,
       "verifiedAt": "2026-10-21T21:36:39Z",
       "organizerEntityId": "biz-calgary-international-bluesfest"
+    },
+    {
+      "id": "biz-the-new-gallery",
+      "kind": "business",
+      "slug": "the-new-gallery",
+      "title": "The New Gallery",
+      "name": "The New Gallery",
+      "summary": "An artist-run contemporary art centre in Calgary’s Chinatown, with free exhibitions, public art and experimental programming.",
+      "description": "The New Gallery is an artist-run centre for contemporary art at 208 Centre Street S in Calgary’s Chinatown. Established in 1975 as the Clouds & Water Gallery and Visual Production Society, the charitable centre supports social and political art practices and invites audiences into artist-run culture.\n\nIts programme spans Main Space exhibitions, the street-facing Billboard 208, Mainframe online projects and public events. Visit the official site for exhibition texts, artist information and new programming. Admission is free.\n\nGallery hours are Wednesday–Saturday, noon–6 p.m.; the gallery is closed to the public during August. Opening receptions and other special events have their own hours.\n\nComing up: Riel Starr’s Otipemisiwak Fantasy runs October 23–December 12, 2026, with an opening reception on October 23, 6:30–9 p.m. The exhibition considers contemporary Métis culture through an Indigiqueer and Two-Spirit perspective. Billboard 208 currently features Michelle Ku’s Lo Bak Go; Mainframe presents Solving a Problem, curated by Mark Bedford. Dates for these latter projects are not published, so check their official pages before planning a visit.",
+      "address": "208 Centre Street S, Calgary, AB T2G 2B6",
+      "neighbourhood": "Chinatown",
+      "website": "https://www.thenewgallery.org/",
+      "email": "info@thenewgallery.org",
+      "phone": "403-233-2399",
+      "hours": {
+        "Wednesday": "12:00–18:00",
+        "Thursday": "12:00–18:00",
+        "Friday": "12:00–18:00",
+        "Saturday": "12:00–18:00"
+      },
+      "categories": [
+        "arts",
+        "gallery",
+        "culture"
+      ],
+      "tags": [
+        "contemporary art",
+        "artist-run centre",
+        "exhibitions",
+        "free",
+        "Chinatown",
+        "public art"
+      ],
+      "services": [
+        "Contemporary art exhibitions",
+        "Opening receptions and public programming",
+        "Billboard 208 public art",
+        "Mainframe online exhibitions"
+      ],
+      "socials": {
+        "website": "https://www.thenewgallery.org/",
+        "events": "https://www.thenewgallery.org/Events",
+        "instagram": "https://www.instagram.com/the_new_gallery/",
+        "facebook": "https://www.facebook.com/thenewgallery"
+      },
+      "images": [],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "verifiedAt": "2026-10-21T22:11:13Z",
+      "updatedAt": "2026-10-21T22:11:13Z",
+      "sources": [
+        {
+          "name": "The New Gallery",
+          "url": "https://www.thenewgallery.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        },
+        {
+          "name": "The New Gallery — about",
+          "url": "https://www.thenewgallery.org/About-The-New-Gallery",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        },
+        {
+          "name": "The New Gallery — contact and hours",
+          "url": "https://www.thenewgallery.org/Contact",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        },
+        {
+          "name": "The New Gallery — events",
+          "url": "https://www.thenewgallery.org/Events",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        },
+        {
+          "name": "Otipemisiwak Fantasy — Riel Starr",
+          "url": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        },
+        {
+          "name": "Lo Bak Go — Michelle Ku",
+          "url": "https://www.thenewgallery.org/Lo-Bak-Go-Michelle-Ku",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        },
+        {
+          "name": "Solving a Problem — Mark Bedford",
+          "url": "https://www.thenewgallery.org/Solving-a-Problem-Mark-Bedford",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        }
+      ]
+    },
+    {
+      "id": "fd87cdf64dacc5ab19b77d4f78b7",
+      "kind": "event",
+      "slug": "otipemisiwak-fantasy-riel-starr-fd87cd",
+      "title": "Otipemisiwak Fantasy — Riel Starr",
+      "summary": "Riel Starr explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective at The New Gallery.",
+      "description": "Riel Starr’s Otipemisiwak Fantasy runs October 23–December 12, 2026 in The New Gallery’s Main Space. The exhibition brings together historical and contemporary ways of making in a boudoir-like setting to consider Métis identity, gender, spirituality and imagined futures.\n\nThis is an exhibition date range, not continuous opening hours. Regular gallery visiting hours are Wednesday–Saturday, noon–6 p.m. Admission is free. A separate opening reception takes place October 23, 6:30–9 p.m.; see its event listing and the official exhibition page for details.",
+      "categories": [
+        "arts",
+        "exhibition"
+      ],
+      "tags": [
+        "contemporary art",
+        "Métis",
+        "Indigiqueer",
+        "Chinatown"
+      ],
+      "address": "208 Centre Street S, Calgary, AB T2G 2B6",
+      "organizer": "The New Gallery",
+      "sources": [
+        {
+          "name": "The New Gallery",
+          "url": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        }
+      ],
+      "sourceId": "the-new-gallery",
+      "sourceRecordId": "otipemisiwak-fantasy-riel-starr-2026",
+      "fetchedAt": "2026-10-21T22:11:13Z",
+      "updatedAt": "2026-10-21T22:11:13Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "The New Gallery — Main Space",
+      "neighbourhood": "Chinatown",
+      "start": "2026-10-23T00:00:00-06:00",
+      "end": "2026-12-13T00:00:00-07:00",
+      "timezone": "America/Edmonton",
+      "endTimeEstimated": true,
+      "pricing": "free",
+      "schedulePrecision": "date",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T22:11:13Z",
+      "organizerEntityId": "biz-the-new-gallery"
+    },
+    {
+      "id": "d57afcf9028c91f1b3f34f059bd4",
+      "kind": "event",
+      "slug": "otipemisiwak-fantasy-opening-reception-d57afc",
+      "title": "Otipemisiwak Fantasy — Opening Reception",
+      "summary": "An evening opening for Riel Starr’s exhibition at The New Gallery in Chinatown.",
+      "description": "The New Gallery hosts the opening reception for Riel Starr’s Otipemisiwak Fantasy on October 23, 2026, from 6:30 to 9 p.m. at 208 Centre Street S. The exhibition explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective. Admission to the gallery is free.\n\nThe exhibition continues through December 12 during regular Wednesday–Saturday gallery hours, noon–6 p.m. Check the official exhibition page for the artist statement and any programme updates.",
+      "categories": [
+        "arts",
+        "exhibition"
+      ],
+      "tags": [
+        "contemporary art",
+        "Métis",
+        "Indigiqueer",
+        "Chinatown"
+      ],
+      "address": "208 Centre Street S, Calgary, AB T2G 2B6",
+      "organizer": "The New Gallery",
+      "sources": [
+        {
+          "name": "The New Gallery",
+          "url": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T22:11:13Z"
+        }
+      ],
+      "sourceId": "the-new-gallery",
+      "sourceRecordId": "otipemisiwak-fantasy-opening-2026-10-23",
+      "fetchedAt": "2026-10-21T22:11:13Z",
+      "updatedAt": "2026-10-21T22:11:13Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "The New Gallery — Main Space",
+      "neighbourhood": "Chinatown",
+      "start": "2026-10-23T18:30:00-06:00",
+      "end": "2026-10-23T21:00:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "free",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T22:11:13Z",
+      "organizerEntityId": "biz-the-new-gallery"
     }
   ],
   "occurrences": [

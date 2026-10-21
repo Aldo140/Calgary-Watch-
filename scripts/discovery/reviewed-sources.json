@@ -3133,5 +3133,75 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "the-new-gallery",
+      "name": "The New Gallery",
+      "approved": true,
+      "hosts": [
+        "www.thenewgallery.org",
+        "thenewgallery.org"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "otipemisiwak-fantasy-riel-starr-2026",
+        "input": {
+          "kind": "event",
+          "categories": [
+            "arts",
+            "exhibition"
+          ],
+          "tags": [
+            "contemporary art",
+            "Métis",
+            "Indigiqueer",
+            "Chinatown"
+          ],
+          "organizer": "The New Gallery",
+          "venue": "The New Gallery — Main Space",
+          "address": "208 Centre Street S, Calgary, AB T2G 2B6",
+          "neighbourhood": "Chinatown",
+          "sourceUrl": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
+          "pricing": "free",
+          "title": "Otipemisiwak Fantasy — Riel Starr",
+          "summary": "Riel Starr explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective at The New Gallery.",
+          "description": "Riel Starr’s Otipemisiwak Fantasy runs October 23–December 12, 2026 in The New Gallery’s Main Space. The exhibition brings together historical and contemporary ways of making in a boudoir-like setting to consider Métis identity, gender, spirituality and imagined futures.\n\nThis is an exhibition date range, not continuous opening hours. Regular gallery visiting hours are Wednesday–Saturday, noon–6 p.m. Admission is free. A separate opening reception takes place October 23, 6:30–9 p.m.; see its event listing and the official exhibition page for details.",
+          "start": "2026-10-23T00:00:00-06:00",
+          "end": "2026-12-13T00:00:00-07:00",
+          "schedulePrecision": "date",
+          "endTimeEstimated": true
+        }
+      },
+      {
+        "id": "otipemisiwak-fantasy-opening-2026-10-23",
+        "input": {
+          "kind": "event",
+          "categories": [
+            "arts",
+            "exhibition"
+          ],
+          "tags": [
+            "contemporary art",
+            "Métis",
+            "Indigiqueer",
+            "Chinatown"
+          ],
+          "organizer": "The New Gallery",
+          "venue": "The New Gallery — Main Space",
+          "address": "208 Centre Street S, Calgary, AB T2G 2B6",
+          "neighbourhood": "Chinatown",
+          "sourceUrl": "https://www.thenewgallery.org/Otipemisiwak-Fantasy-Riel-Starr",
+          "pricing": "free",
+          "title": "Otipemisiwak Fantasy — Opening Reception",
+          "summary": "An evening opening for Riel Starr’s exhibition at The New Gallery in Chinatown.",
+          "description": "The New Gallery hosts the opening reception for Riel Starr’s Otipemisiwak Fantasy on October 23, 2026, from 6:30 to 9 p.m. at 208 Centre Street S. The exhibition explores contemporary Métis culture through an Indigiqueer and Two-Spirit perspective. Admission to the gallery is free.\n\nThe exhibition continues through December 12 during regular Wednesday–Saturday gallery hours, noon–6 p.m. Check the official exhibition page for the artist statement and any programme updates.",
+          "start": "2026-10-23T18:30:00-06:00",
+          "end": "2026-10-23T21:00:00-06:00"
+        }
+      }
+    ]
   }
 ]

@@ -9,6 +9,8 @@ import {
   AIRDRIE_GUIDE_FAQS,
   AIRDRIE_GUIDE_PATH,
 } from '@/src/content/airdrieCrimeMapGuide';
+import { BEST_CATEGORIES } from '@/src/content/bestOf';
+import { BEST_PATH, bestCategory, bestIndexJsonLd, bestItemListJsonLd, bestPath } from './bestOf';
 
 /**
  * Single source of truth for per-route SEO.
@@ -184,6 +186,18 @@ const HUBS: Record<string, { title: string; description: string }> = {
   '/neighbourhoods': { title: 'Calgary Neighbourhood Guides | CalgaryWatch', description: 'Guides to Calgary neighbourhoods like Inglewood, Kensington, the Beltline, Bridgeland and Marda Loop: what’s there and what’s on.' },
 };
 for (const [path, hub] of Object.entries(HUBS)) ROUTE_SEO[path] = { ...ROUTE_SEO[path], ...hub, index: true };
+// Best of Calgary (experiment, 2026-10-21): every fact is cited, so the lists are indexed.
+ROUTE_SEO[BEST_PATH] = {
+  title: 'Best of Calgary: Pho, Pizza & Trusted Local Services | CalgaryWatch',
+  description: 'Calgary’s best pho and pizza, ranked only by how many independent guides and awards name them, plus local window cleaners and junk haulers compared. Every fact cited, nothing paid for.',
+  index: true,
+  pageType: 'CollectionPage',
+  dateModified: '2026-10-21',
+  image: DEFAULT_IMAGE,
+};
+for (const c of BEST_CATEGORIES) {
+  ROUTE_SEO[bestPath(c)] = { title: c.seoTitle, description: c.seoDescription, index: true, pageType: 'CollectionPage', dateModified: c.updated, image: DEFAULT_IMAGE };
+}
 ROUTE_SEO['/search'] = { title: 'Search CalgaryWatch', description: 'Search a Calgary neighbourhood or street for recent reports, or find events, markets and local places.', index: false, pageType: 'CollectionPage' };
 for (const route of ['/events/today', '/events/this-weekend', '/markets/this-weekend', '/local/food', '/local/shopping', '/local/services', '/local/arts']) {
   ROUTE_SEO[route] = { ...ROUTE_SEO['/' + route.split('/')[1]], index: false, title: `${route.endsWith('this-weekend') ? 'This weekend' : route.endsWith('today') ? 'Today' : route.split('/').at(-1)} in Calgary | CalgaryWatch` };
@@ -226,6 +240,11 @@ export const ROUTE_BREADCRUMBS: Record<string, { name: string; item: string }[]>
     { name: 'For local businesses', item: `${PRODUCTION_ORIGIN}/partners` },
   ],
 };
+
+ROUTE_BREADCRUMBS[BEST_PATH] = [{ name: 'Home', item: `${PRODUCTION_ORIGIN}/` }, { name: 'Best of Calgary', item: `${PRODUCTION_ORIGIN}${BEST_PATH}` }];
+for (const c of BEST_CATEGORIES) {
+  ROUTE_BREADCRUMBS[bestPath(c)] = [...ROUTE_BREADCRUMBS[BEST_PATH], { name: c.label, item: `${PRODUCTION_ORIGIN}${bestPath(c)}` }];
+}
 
 /** Routes that get a prerendered HTML file. Excludes noindex routes like /admin. */
 export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
@@ -279,6 +298,8 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
   const hub = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`);
   const kind = hub?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;
+  const best = section === BEST_PATH.slice(1) ? (slug ? bestCategory(slug) : undefined) : undefined;
+  const bestList = best ? bestItemListJsonLd(best, origin) : pathname === BEST_PATH ? bestIndexJsonLd(origin) : undefined;
   const crumbs = ROUTE_BREADCRUMBS[pathname]
     ?? (entity ? listingBreadcrumbs(entity).map(c => ({ name: c.name, item: `${PRODUCTION_ORIGIN}${c.path}` }))
       : hub && !slug ? [ROUTE_BREADCRUMBS['/'][0], { name: hub.label, item: `${PRODUCTION_ORIGIN}${hub.path}` }]
@@ -308,6 +329,7 @@ export function buildPageJsonLd(pathname: string, origin: string, repository: Di
       })),
     },
     ...(entity && indexableEntities([entity]).length ? { mainEntity: buildEntityJsonLd(entity, origin, repository.occurrences(), repository.list()) } : {}),
+    ...(bestList ? { mainEntity: bestList } : {}),
     ...(pathname === COMMUNITY_PATH
       ? {
           about: ['Calgary crime map', 'Calgary crime watch', 'Community watch', 'Calgary public safety map'],

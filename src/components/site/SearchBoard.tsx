@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
 import { SearchAnswers } from './SearchAnswers';
@@ -27,6 +27,7 @@ const BROWSE: Array<{ to: string; label: string; note: string; icon: ReactNode }
   { to: '/neighbourhoods', label: 'Neighbourhoods', note: 'Quadrant by quadrant', icon: <Compass size={20} /> },
   { to: '/guides', label: 'Guides', note: 'Self-guided days out', icon: <BookOpen size={20} /> },
   { to: '/local', label: 'Local', note: 'Places worth knowing', icon: <MapPin size={20} /> },
+  { to: '/best', label: 'Best of Calgary', note: 'Pho, pizza and trades, cited', icon: <Trophy size={20} /> },
 ];
 
 const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'jazz', 'Kensington', 'free this weekend'];
@@ -46,12 +47,14 @@ function detail(e: DiscoveryEntity) {
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best = [] }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
   /** For a community search with no listings of its own: what's on nearby. */
   nearby?: { title: ReactNode; items: DiscoveryEntity[] };
+  /** Best of Calgary lists the search asks for ("pho", "junk removal"). */
+  best?: Array<{ to: string; label: string; note: string }>;
 }) {
   const listings = <><b>{listingCount}</b> {partial ? 'close ' : ''}{listingCount === 1 ? 'listing' : 'listings'}</>;
   const ready = <><b>{answers}</b> ready-made {answers === 1 ? 'answer' : 'answers'}</>;
@@ -76,6 +79,22 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
             </p>
             {didYouMean ? <p className="sx-dym">Did you mean <Link to={`/search?q=${encodeURIComponent(didYouMean)}`}>{didYouMean}</Link>?</p> : null}
             <SearchAnswers intent={intent} now={now} />
+            {best.length ? (
+              <section className="bp-section sx-group" aria-labelledby="sx-best">
+                <div className="bp-head"><h2 id="sx-best">Best of <span>Calgary</span></h2><Link className="bp-link" to="/best">All lists <ArrowRight size={15} aria-hidden="true" /></Link></div>
+                <ul className="sx-results">
+                  {best.map(b => (
+                    <li key={b.to}>
+                      <Link to={b.to} className="sx-result">
+                        <span className="sx-kind sx-kind-best">List</span>
+                        <span className="sx-result-copy"><strong>{b.label}</strong><small>{b.note}</small></span>
+                        <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
             {Object.entries(groups).map(([kind, entities]) => {
               const section = DISCOVERY_SECTIONS.find(s => s.kind === kind);
               return (

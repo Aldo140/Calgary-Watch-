@@ -266,6 +266,7 @@ export function LocalBoard({ items, all, occurrences, category }: { items: Disco
             <div className="lx-actions">
               <Link className="lx-btn" to="/partners">Claim your profile <ArrowUpRight size={18} aria-hidden="true" /></Link>
               <Link className="lx-text-link" to="/submit">Suggest someone we’re missing</Link>
+              <Link className="lx-text-link" to="/best">Best of Calgary: pho, pizza and trades</Link>
             </div>
           </div>
           <ol className="ld-steps">

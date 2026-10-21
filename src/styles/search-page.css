@@ -66,6 +66,7 @@
 .sx-kind-business { background: #efe3ff; }
 .sx-kind-guide { background: #d7f3f9; }
 .sx-kind-neighbourhood { background: var(--navy); color: #fff; }
+.sx-kind-best { background: #111214; color: var(--yellow, #ffdf4f); }
 .sx-result-copy { display: grid; gap: 4px; min-width: 0; }
 .sx-result-copy strong { font: 800 18px/1.2 var(--display); letter-spacing: -.02em; color: var(--ink); }
 .sx-result-copy small { font: 500 13px/1.3 var(--mono); color: var(--muted); }

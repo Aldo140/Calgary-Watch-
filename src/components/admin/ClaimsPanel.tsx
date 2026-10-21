@@ -43,6 +43,7 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
   const [updates, setUpdates] = useState<Array<ListingUpdate & { id: string }> | null>(null);
   const [scope,setScope]=useState<Record<string,string>>({});
   const [busy, setBusy] = useState('');
+  const [verifiedSearch, setVerifiedSearch] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const[recordWarnings,setRecordWarnings]=useState<Record<string,number>>({});
@@ -233,30 +234,49 @@ export function ClaimsPanel({ leads }: { leads: PartnerLead[] | null }) {
         </article>
       ))}
       {verified?.length ? (
-        <details className="border-t" style={{ borderColor: T.line }}>
-          <summary className="p-4 text-sm font-semibold cursor-pointer" style={{ color: T.ink }}>
-            <BadgeCheck size={14} className="inline -mt-0.5 mr-1" aria-hidden="true" />{verified.length} verified listing{verified.length === 1 ? '' : 's'}
-            <span className="font-normal" style={{ color: T.muted }}> · each has an approved claim, so it shows “Verified” and gets its ranking weight</span>
-          </summary>
-          <div className="px-4 pt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: T.muted }}>
-            <span>Each claimant’s account is a business account. Claims approved before that existed can be brought in line here.</span>
-            <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void markAllBusiness()}><BadgeCheck size={14} /> {busy === 'accounts' ? 'Marking…' : 'Mark business accounts'}</AdminButton>
+        <section aria-labelledby="verified-accounts-title" className="border-t p-4 sm:p-6" style={{ borderColor: T.line }}>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div><h2 id="verified-accounts-title" className="text-lg font-semibold" style={{color:T.ink}}>Verified business accounts</h2><p className="mt-1 text-sm" style={{color:T.muted}}>Approved representatives, their organization access and original claim messages.</p></div>
+            <Chip tone="ok"><BadgeCheck size={14} /> {new Set(verified.map(c=>c.uid)).size} accounts · {verified.length} approved claims</Chip>
           </div>
-          {verified.map((c) => {
+          <label className="mt-5 block max-w-xl text-sm font-medium" style={{color:T.ink}}>Find an organization or representative
+            <input type="search" value={verifiedSearch} onChange={e=>setVerifiedSearch(e.target.value)} placeholder="Organization, name or email" className="mt-2 w-full rounded-lg border bg-white px-3 py-2.5" style={{borderColor:T.line}} />
+          </label>
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+          {verified.filter(c=>[c.entityTitle,c.name,c.workEmail,c.accountEmail,entities.get(c.approvedOrganizationId??c.entityId)?.title].some(v=>v?.toLowerCase().includes(verifiedSearch.trim().toLowerCase()))).map((c) => {
             const scopeReview=reviewClaimScope(c,[...entities.values()]);
-            return <div key={c.entityId + c.uid} className="px-4 pb-4 text-xs flex flex-wrap gap-x-3 gap-y-2" style={{ color: T.muted }}>
-              <a href={c.entityPath} target="_blank" rel="noreferrer" className="font-semibold" style={{ color: T.ink }}>{c.entityTitle}</a>
-              <span>Verified {c.reviewedAt ? new Date(c.reviewedAt).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '(date not recorded)'}{c.reviewedBy ? ` by ${c.reviewedBy}` : ''}</span>
-              <span style={{ fontFamily: mono }}>{c.name} · {c.role} · {c.workEmail}</span>
-              {c.note ? <div className="w-full min-w-0 rounded-lg border p-3" style={{ borderColor: T.line, background: T.surface, color: T.ink }}><p className="text-xs font-semibold">Message submitted with claim</p><p className="mt-1 text-sm whitespace-pre-wrap break-words">{c.note}</p></div> : null}
-              <span>{c.approvedOrganizationId?`Organization: ${entities.get(c.approvedOrganizationId)?.title??c.approvedOrganizationId}`:entities.get(c.entityId)?.kind==='business'?'Organization profile and linked events':'Organizer workspace for this listing; existing unrelated listings are excluded'}</span>
-              {entities.get(c.entityId)?.kind!=='business'&&scopeReview.recommendation!=='already-set'?<div className="w-full max-w-2xl rounded-lg border p-3 space-y-2" style={{borderColor:T.line,background:T.surface}}><div className="flex flex-wrap items-center gap-2"><Chip tone={scopeReview.recommendation==='organization'?'ok':'attention'}>{scopeReview.recommendation==='organization'?'Recommended scope':'Research required'}</Chip><strong style={{color:T.ink}}>{scopeReview.organizationTitle??'Listing-only access'}</strong></div><ul className="list-disc pl-5 space-y-1">{scopeReview.evidence.map(item=><li key={item}>{item}</li>)}</ul><details><summary className="cursor-pointer font-semibold" style={{color:T.signal}}>Review or change scope</summary><label className="mt-2 grid gap-1"><span className="sr-only">Confirm organization access</span><select aria-label={`Organization access for ${c.entityTitle}`} className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line}} value={scope[c.uid+'_'+c.entityId]??scopeReview.organizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep listing-only access</option>{[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select></label></details></div>:null}
-              <Link to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
-              <AdminButton variant="ghost" disabled={Boolean(busy) || quotaWait} onClick={() => void decide(c, true)}>{(scope[c.uid+'_'+c.entityId]??scopeReview.organizationId)?'Confirm recommended access':'Repair verification & account'}</AdminButton>
-              {approvalEmailNote(c) ? <span style={{ color: c.approvalEmailStatus === 'failed' || c.approvalEmailStatus === 'skipped' ? T.critical : T.muted }}><Mail size={12} className="inline -mt-0.5 mr-1" aria-hidden="true" />{approvalEmailNote(c)}</span> : null}
-            </div>;
+            const entity=entities.get(c.entityId);
+            const organization=entities.get(c.approvedOrganizationId??(entity?.kind==='business'?entity.id:''));
+            const needsReview=!entity||entity.kind!=='business'&&scopeReview.recommendation!=='already-set';
+            return <article key={c.entityId+c.uid} className="min-w-0 rounded-xl border p-4 sm:p-5" style={{borderColor:T.line,background:T.surface,color:T.ink}}>
+              <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="min-w-0 text-base font-semibold break-words">{organization?.title??c.entityTitle}</h3><Chip tone="ok"><BadgeCheck size={13} /> Verified</Chip></div>
+              <p className="mt-1 text-xs" style={{color:T.muted}}>Approved {c.reviewedAt?new Date(c.reviewedAt).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}):'— date not recorded'}</p>
+              <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                <div className="min-w-0"><dt className="text-xs" style={{color:T.muted}}>Representative</dt><dd className="mt-1 font-medium break-words">{c.name}</dd><dd className="mt-1 text-xs" style={{color:T.muted}}>{c.role}</dd></div>
+                <div className="min-w-0"><dt className="text-xs" style={{color:T.muted}}>Contact</dt><dd className="mt-1 break-all">{c.workEmail?<a href={`mailto:${c.workEmail}`} className="underline" style={{color:T.signal}}>{c.workEmail}</a>:'Not recorded'}</dd>{c.phone?<dd className="mt-1"><a href={`tel:${c.phone.replace(/[^+0-9]/g,'')}`}>{c.phone}</a></dd>:null}</div>
+                <div className="sm:col-span-2"><dt className="text-xs" style={{color:T.muted}}>Management access</dt><dd className="mt-1">{organization?'Organization profile and linked events & markets':entity?'This listing’s organizer workspace':'Listing unavailable — review required'}</dd>{c.entityTitle!==organization?.title&&organization?<dd className="mt-1 text-xs" style={{color:T.muted}}>Originally claimed: {c.entityTitle}</dd>:null}</div>
+              </dl>
+              <div className="mt-4 rounded-lg border p-3" style={{borderColor:T.line}}><p className="text-xs font-semibold">Message submitted with claim</p><p className="mt-1 text-sm whitespace-pre-wrap break-words" style={{color:c.note?T.ink:T.muted}}>{c.note||'No message was included with this claim.'}</p></div>
+              <p className="mt-3 text-xs" style={{color:c.approvalEmailStatus==='failed'||c.approvalEmailStatus==='skipped'?T.critical:T.muted}}><Mail size={12} className="inline mr-1" />{approvalEmailNote(c)||'Approval email status not recorded'}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold" style={{background:T.ink,color:'#fff'}} to={`/plans?as=${encodeURIComponent(c.uid)}`}>View business dashboard</Link>
+                {c.entityPath?<a className="inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-semibold" style={{borderColor:T.line}} href={c.entityPath} target="_blank" rel="noreferrer">Public listing <ExternalLink size={13}/></a>:null}
+              </div>
+              <details className="mt-4 border-t pt-3 text-xs" style={{borderColor:T.line,color:T.muted}}><summary className="cursor-pointer font-semibold" style={{color:needsReview?T.critical:T.muted}}>{needsReview?'Access needs review · details & tools':'Approval details & access tools'}</summary>
+                <div className="mt-3 space-y-3">
+                  <p className="break-all">Signed in as: {c.accountEmail||'Not recorded'}</p><p>Approved by: {c.reviewedBy||'Not recorded'}</p>
+                  <p>{scopeReview.organizationTitle?`Scope: ${scopeReview.organizationTitle}`:'Scope: listing-only access'}</p>
+                  <ul className="list-disc pl-5 space-y-1">{scopeReview.evidence.map(item=><li key={item}>{item}</li>)}</ul>
+                  {entity&&entity.kind!=='business'?<label className="grid gap-2">Organization management access<select aria-label={`Organization access for ${c.entityTitle}`} className="w-full min-w-0 rounded-lg border bg-white px-3 py-2" style={{borderColor:T.line,color:T.ink}} value={scope[c.uid+'_'+c.entityId]??scopeReview.organizationId??''} onChange={e=>setScope(s=>({...s,[c.uid+'_'+c.entityId]:e.target.value}))}><option value="">Keep listing-only access</option>{[...entities.values()].filter(e=>e.kind==='business').sort((a,b)=>a.title.localeCompare(b.title)).map(e=><option key={e.id} value={e.id}>{e.title}</option>)}</select><span>Confirm authority against the organization’s official contact before changing access.</span></label>:null}
+                  <AdminButton variant="ghost" disabled={!entity||Boolean(busy)||quotaWait} onClick={()=>void decide(c,true)}>{(scope[c.uid+'_'+c.entityId]??scopeReview.organizationId)?'Confirm organization access':'Repair verification & account'}</AdminButton>
+                </div>
+              </details>
+            </article>;
           })}
-        </details>
+          </div>
+          {verifiedSearch&&!verified.some(c=>[c.entityTitle,c.name,c.workEmail,c.accountEmail,entities.get(c.approvedOrganizationId??c.entityId)?.title].some(v=>v?.toLowerCase().includes(verifiedSearch.trim().toLowerCase())))?<p className="py-6 text-sm" style={{color:T.muted}}>No verified accounts match your search.</p>:null}
+          <details className="mt-5 border-t pt-4 text-xs" style={{borderColor:T.line,color:T.muted}}><summary className="cursor-pointer font-semibold">Legacy account maintenance</summary><p className="my-3">Bring older business-account flags in line with approved claims. Existing approval and email history are preserved.</p><AdminButton variant="ghost" disabled={Boolean(busy)||quotaWait} onClick={()=>void markAllBusiness()}>{busy==='accounts'?'Checking accounts…':'Check business account flags'}</AdminButton></details>
+        </section>
       ) : null}
     </Panel>
   );

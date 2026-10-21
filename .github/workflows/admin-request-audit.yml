@@ -1,0 +1,38 @@
+name: Audit organizer requests (encrypted)
+on:
+  workflow_dispatch:
+    inputs:
+      recipient_certificate:
+        description: 'Base64 encoded public X.509 certificate for this audit recipient (never a private key)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Encrypt read-only request audit
+        env:
+          RECIPIENT_CERTIFICATE: ${{ inputs.recipient_certificate }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$RECIPIENT_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/recipient.pem"
+          openssl x509 -in "$RUNNER_TEMP/recipient.pem" -noout -checkend 0
+          npx tsx scripts/claims/admin-request-audit.ts | openssl cms -encrypt -binary -aes-256-cbc -outform DER -out "$RUNNER_TEMP/organizer-requests.cms" "$RUNNER_TEMP/recipient.pem"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-organizer-requests
+          path: ${{ runner.temp }}/organizer-requests.cms
+          retention-days: 1

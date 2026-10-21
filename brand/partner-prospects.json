@@ -420,6 +420,30 @@
       "website": "https://www.calgarybluesfest.com/",
       "category": "festival",
       "why": "Annual blues festival held each summer, with festival-week club shows."
+    },
+    {
+      "name": "Alcove Centre for the Arts",
+      "website": "https://www.alcoveartscentre.ca/",
+      "category": "arts",
+      "why": "Calgary community arts space with an online program schedule, creative workshops and community events."
+    },
+    {
+      "name": "Small Time Theatre",
+      "website": "https://smalltimetheatre.ca/",
+      "category": "arts",
+      "why": "Volunteer-led Calgary youth community theatre publishing season productions and ticket information."
+    },
+    {
+      "name": "Protospace",
+      "website": "https://protospace.ca/",
+      "category": "arts",
+      "why": "Non-profit Calgary makerspace holding public Tuesday evening open houses and equipment classes."
+    },
+    {
+      "name": "Calgary Allied Arts Foundation",
+      "website": "https://www.calgaryalliedartsfoundation.ca/",
+      "category": "arts",
+      "why": "Calgary arts nonprofit promoting artist programs and a 2026 Fuse33 Makerspace Residency application deadline."
     }
   ]
 }

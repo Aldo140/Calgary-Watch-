@@ -100,7 +100,9 @@ function BestCard({ thing, answer, where }: { thing: string; answer?: BestAnswer
         </p>
         <div className="cw-answer-actions">
           <a className="cw-answer-primary" href={maps} target="_blank" rel="noopener noreferrer">Compare ratings on Google Maps <ArrowUpRight size={16} aria-hidden="true" /></a>
-          <Link to="/submit">Know a great one? Tell us</Link>
+          {/* /submit takes events and markets only, so places come in by email, with a source, as on /best. */}
+          <a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Suggest a place for best ${thing}`)}`}>Know a great one? Tell us</a>
+          <Link to="/best">Best of Calgary lists</Link>
           {answer?.service ? <Link to="/local">Browse Local</Link> : null}
         </div>
       </div>

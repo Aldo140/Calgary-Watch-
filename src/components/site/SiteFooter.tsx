@@ -6,9 +6,9 @@ import { useAuth } from '../FirebaseProvider';
 import '../../styles/site-footer.css';
 
 const COLUMNS: Array<{ title: string; links: Array<[string, string, string?]> }> = [
-  { title: 'Get out', links: [['Events', '/events'], ['Markets', '/markets'], ['Date night', '/date-night'], ['Guides', '/guides'], ['Local', '/local'], ['Neighbourhoods', '/neighbourhoods']] },
+  { title: 'Get out', links: [['Events', '/events'], ['Markets', '/markets'], ['Date night', '/date-night'], ['Guides', '/guides'], ['Local', '/local'], ['Best of Calgary', '/best'], ['Neighbourhoods', '/neighbourhoods']] },
   { title: 'Stay in the know', links: [['Live map', '/map', 'live'], ['Community Watch', '/community'], ['Check your community', '/check-your-community'], ['Start a block watch', '/calgary-neighbourhood-watch'], ['Where pins come from', '/coverage']] },
-  { title: 'Get involved', links: [['Add an event or place', '/submit'], ['Run a market?', '/for-markets'], ['For businesses', '/partners'], ['Search the site', '/search']] },
+  { title: 'Get involved', links: [['Add an event or market', '/submit'], ['Run a market?', '/for-markets'], ['For businesses', '/partners'], ['Search the site', '/search']] },
   { title: 'CalgaryWatch', links: [['About us', '/about'], ['Your CalgaryWatch', '/plans'], ['Email preferences', '/plans'], ['Privacy', '/privacy']] },
 ];
 

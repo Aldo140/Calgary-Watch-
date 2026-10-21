@@ -42,6 +42,22 @@ export interface StreetGuess {
   likely?: CommunityMatch;
 }
 
+/** A named place that isn't a community: "westside" is the Westside Recreation Centre. */
+export interface Landmark {
+  name: string;
+  address: string;
+  /** Communities it sits in or between, by their bundled names. */
+  near: string[];
+  url: string;
+  keys: string[];
+}
+
+/** "best pho", "top 10 pizza places": someone asking for a recommendation. */
+export interface BestAsk {
+  /** What they want, as typed: "pho", "window cleaners". */
+  thing: string;
+}
+
 export interface SearchIntent {
   communities: CommunityMatch[];
   quadrant?: 'NW' | 'NE' | 'SW' | 'SE';
@@ -50,6 +66,8 @@ export interface SearchIntent {
   street: StreetGuess | null;
   /** "why…", "what's…": someone asking, not browsing. */
   question: boolean;
+  landmark?: Landmark;
+  best?: BestAsk;
 }
 
 // ─── Words ──────────────────────────────────────────────────────────────────
@@ -79,6 +97,19 @@ const TIME_WORDS: Array<[TimeKey, string[]]> = [
 const FILLER = new Set(['why', 'what', 'whats', 'is', 'are', 'was', 'there', 'so', 'much', 'many', 'a', 'an', 'the', 'in', 'on', 'at', 'near', 'by', 'of', 'for', 'to', 'and', 'or', 'calgary', 'yyc', 'my', 'area', 'neighbourhood', 'neighborhood', 'community', 'all', 'lot', 'lots', 'going', 'happened', 'did', 'does', 'any', 'some', 'around', 'it', 'i', 'me', 'us', 'ab', 'alberta', 'over', 'up', 'just', 'still', 'again']);
 
 const QUADRANTS = new Set(['nw', 'ne', 'sw', 'se']);
+
+/**
+ * Places people search by name that aren't communities. Only facts checked
+ * against the place's own site: address and the communities around it.
+ */
+export const LANDMARKS: Landmark[] = [
+  { name: 'Westside Recreation Centre', address: '2000 69 St SW', near: ['Springbank Hill', 'Aspen Woods'], url: 'https://www.westsiderec.com',
+    keys: ['westside', 'west side', 'westside rec', 'west side rec', 'westside recreation', 'westside recreation centre', 'westside rec centre'] },
+];
+
+const BEST_WORDS = new Set(['best', 'top', 'greatest', 'favourite', 'favorite']);
+/** Words around the thing that don't change what's being asked for. */
+const BEST_FILLER = new Set(['the', 'a', 'whats', 'what', 'who', 'where', 'is', 'are', 'has', 'most', 'rated', 'places', 'place', 'spots', 'spot', 'shops', 'shop', 'options', 'companies', 'company', 'services', 'service', 'calgary', 'yyc', 'ab', 'alberta', 'for', 'to', 'get', 'go']);
 
 /** Calgary registry suffixes (Property Assessments `address` column). */
 export const STREET_SUFFIX: Record<string, string> = {
@@ -204,10 +235,28 @@ export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
   for (const [key, phrases] of TIME_WORDS) {
     if (phrases.some(claim) && !time) time = timeWindow(key, now);
   }
-  const topics = (Object.keys(TOPIC_WORDS) as Topic[]).filter(t => TOPIC_WORDS[t].filter(claim).length > 0);
+  // "best pho places in calgary": the thing is everything after "best" up to "in"/"near".
+  let best: BestAsk | undefined;
+  const bestAt = words.findIndex(w => BEST_WORDS.has(w));
+  if (bestAt >= 0 && words.slice(0, bestAt).every(w => BEST_FILLER.has(w))) {
+    const stop = words.findIndex((w, i) => i > bestAt && (w === 'in' || w === 'near' || w === 'around' || w === 'by'));
+    const end = stop < 0 ? words.length : stop;
+    const thing = words.slice(bestAt + 1, end).filter((w, i) => !used[bestAt + 1 + i] && !(i === 0 && /^\d+$/.test(w)) && !BEST_FILLER.has(w));
+    if (thing.length) {
+      best = { thing: thing.join(' ') };
+      for (let k = 0; k < end; k++) used[k] = true;
+      if (stop >= 0) used[stop] = true;
+    }
+  }
+  const topics = best ? [] : (Object.keys(TOPIC_WORDS) as Topic[]).filter(t => TOPIC_WORDS[t].filter(claim).length > 0);
   const question = ['why', 'what', 'whats', 'how', 'who', 'is'].includes(words[0] ?? '');
   const quadrantWord = words.find(w => QUADRANTS.has(w));
   words.forEach((w, i) => { if (QUADRANTS.has(w) || FILLER.has(w)) used[i] = true; });
+
+  // A landmark is the whole of what's left: "westside", "westside rec".
+  const leftover = compact(words.filter((_, i) => !used[i]).join(' '));
+  const landmark = leftover ? LANDMARKS.find(l => l.keys.some(k => compact(k) === leftover)) : undefined;
+  if (landmark) used.fill(true);
 
   // Communities: longest unclaimed run first, so "spring bank hill" beats "hill".
   const communities: CommunityMatch[] = [];
@@ -246,7 +295,7 @@ export function parseSearchIntent(q: string, now = Date.now()): SearchIntent {
     }
   }
 
-  return { communities: communities.slice(0, 3), ...(quadrant ? { quadrant } : {}), time, topics, street, question };
+  return { communities: communities.slice(0, 3), ...(quadrant ? { quadrant } : {}), time, topics, street, question, ...(landmark ? { landmark } : {}), ...(best ? { best } : {}) };
 }
 
 /** A citywide "what's been reported" answer: a topic or a time, but no place. */
@@ -256,11 +305,12 @@ export function showsCitywide(intent: SearchIntent): boolean {
 
 /** How many ready-made answers a search gets, counted as results in Search demand. */
 export function answerCount(intent: SearchIntent): number {
-  return intent.communities.length + (intent.street ? 1 : 0) + (showsCitywide(intent) ? 1 : 0);
+  return intent.communities.length + (intent.street ? 1 : 0) + (intent.landmark ? 1 : 0) + (showsCitywide(intent) ? 1 : 0);
 }
 
 /** One line on what search now answers for a term, for the admin page. */
 export function describeAnswer(intent: SearchIntent): string | null {
+  if (intent.landmark) return intent.landmark.name;
   if (intent.street) return `Street${intent.street.likely ? ` in ${intent.street.likely.community.name}` : ''}`;
   if (intent.communities.length) return intent.communities.map(c => c.community.name).join(', ');
   if (showsCitywide(intent)) return `${intent.time?.label ?? 'Recent'} reports`;

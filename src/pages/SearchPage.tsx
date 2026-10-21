@@ -7,7 +7,7 @@ import type { Suggestion } from '../components/site/GlobalSearch';
 import { discoveryRepository } from '../data/discovery';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
 import { DISCOVERY_SECTIONS, entityPath, normalizeSearch } from '../lib/discovery';
-import { nearbyListings, searchListings } from '../lib/listingSearch';
+import { bestPicks, nearbyListings, searchListings, serviceFor } from '../lib/listingSearch';
 import { answerCount, normalizeWords, parseSearchIntent } from '../lib/searchIntent';
 import { recordSearch } from '../lib/searchDemand';
 
@@ -34,7 +34,11 @@ export default function SearchPage() {
   const now = useMemo(() => Date.now(), [q]);
   const results = useMemo(() => searchListings(all, occurrences, q, new Date(now)), [all, occurrences, q, now]);
   const intent = useMemo(() => parseSearchIntent(q, now), [q, now]);
-  const answers = q ? answerCount(intent) : 0;
+  const best = useMemo(() => intent.best
+    ? { picks: bestPicks(all, occurrences, intent.best.thing, new Date(now)), service: serviceFor(intent.best.thing) }
+    : undefined, [intent.best, all, occurrences, now]);
+  // "Best pho" counts as answered only when we list one, so Search demand still shows what to add.
+  const answers = q ? answerCount(intent) + (best?.picks.length ? 1 : 0) : 0;
   const resultCount = results.total + answers;
   const place = intent.communities[0]?.community;
   const nearby = useMemo(() => {
@@ -78,7 +82,7 @@ export default function SearchPage() {
 
   return (
     <SiteLayout>
-      <SearchBoard q={q} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
+      <SearchBoard key={q} q={q} best={best} intent={intent} now={now} groups={results.groups as Record<string, typeof all[number][]>}
         listingCount={results.total} resultCount={resultCount} answers={answers}
         partial={results.partial} didYouMean={results.didYouMean} suggest={suggest} nearby={nearby} />
     </SiteLayout>

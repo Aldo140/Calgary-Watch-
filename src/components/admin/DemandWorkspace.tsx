@@ -5,6 +5,8 @@ import { Search, SearchX } from 'lucide-react';
 import { db } from '../../firebase';
 import { SEARCH_DEMAND, summarizeDemand, readDemandRecords, type DemandRow } from '../../lib/searchDemand';
 import { describeAnswer, parseSearchIntent } from '../../lib/searchIntent';
+import { searchListings } from '../../lib/listingSearch';
+import { discoveryRepository } from '../../data/discovery';
 import { AdminButton, Chip, EmptyState, Panel, StatGrid, StatTile, T, mono } from './ui';
 
 const WINDOWS = [7, 30, 90] as const;
@@ -85,7 +87,11 @@ function TermList({ rows, miss = false }: { rows: DemandRow[]; miss?: boolean })
         // "yesterday police" stay at 0 found; say what the same words get today.
         let now:string|null=null;
         if(r.lastResults===0){
-          try{now=describeAnswer(parseSearchIntent(r.q));}
+          try{
+            now=describeAnswer(parseSearchIntent(r.q));
+            // Or a listing that exists now ("atp" finds Alberta Theatre Projects).
+            if(!now){const found=searchListings(discoveryRepository.list(),discoveryRepository.occurrences(),r.q);const hit=found.partial?undefined:Object.values(found.groups).flat()[0];if(hit)now=hit.title;}
+          }
           catch(error){console.warn('[admin search] Answer preview unavailable',error);}
         }
         return (

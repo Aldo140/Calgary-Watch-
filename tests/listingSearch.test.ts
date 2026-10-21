@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { correctQuery, daysFor, parseListingQuery, searchListings, stem } from '../src/lib/listingSearch';
+import { bestPicks, correctQuery, daysFor, expandAbbreviations, parseListingQuery, searchListings, serviceFor, stem } from '../src/lib/listingSearch';
 import type { DiscoveryEntity, MarketOccurrence } from '../src/types/discovery';
 
 // Thursday 2026-10-15, 10:00 in Calgary.
@@ -65,5 +65,24 @@ describe('listing search', () => {
     assert.equal(correctQuery('jaz lanturn', ENTITIES), 'jaz lantern');
     assert.equal(correctQuery('kensingtn', ENTITIES), 'kensington');
     assert.deepEqual(searchListings(ENTITIES, OCC, '   ', NOW).total, 0);
+  });
+
+  it('spells out short forms and keeps three letters a whole word', () => {
+    assert.equal(expandAbbreviations('ATP'), 'alberta theatre projects');
+    assert.equal(expandAbbreviations('jazz'), 'jazz');
+    const atp = { ...base, id: 'atp', slug: 'atp', kind: 'business', title: 'Alberta Theatre Projects', name: 'Alberta Theatre Projects', categories: ['arts'], tags: ['theatre'], services: [], images: [], socials: {}, claimed: false, partner: false, editorialSelection: false, address: '' } as unknown as DiscoveryEntity;
+    const photo = event('photo', 'Holiday Photos with Santa', '2026-10-20T18:00:00Z', { tags: ['photo'] });
+    assert.deepEqual(Object.values(searchListings([atp, photo], [], 'atp', NOW).groups).flat().map(e => e!.id), ['atp']);
+    assert.equal(searchListings([atp, photo], [], 'pho', NOW).total, 0, '"pho" is soup, not photos');
+    assert.equal(searchListings([atp, photo], [], 'phot', NOW).total, 1);
+  });
+
+  it('answers "best …" from listed places only, and names the Local service', () => {
+    assert.deepEqual(bestPicks(ENTITIES, OCC, 'coffee', NOW).map(e => e.id), ['cafe']);
+    assert.deepEqual(bestPicks(ENTITIES, OCC, 'jazz', NOW), [], 'events are not places to rank');
+    assert.equal(serviceFor('plumbers')?.id, 'plumbing');
+    assert.equal(serviceFor('snow removal')?.id, 'snow');
+    assert.equal(serviceFor('window cleaners'), undefined, 'not house cleaning');
+    assert.equal(serviceFor('pho'), undefined);
   });
 });

@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Bell, MapPin, Phone, Signpost, Siren } from 'lucide-react';
+import { ArrowUpRight, Bell, Building2, FlaskConical, Lightbulb, MapPin, Phone, Signpost, Siren, Star } from 'lucide-react';
 import { INCIDENT_CATEGORIES } from '../../constants';
 import { useLatestReports, type LatestReports } from '../../hooks/useLatestReports';
 import { fetchCommunityBoundaries, type CommunityBoundary } from '../../lib/communityLookup';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { formatRelativeTime } from '../../lib/format';
+import { entityPath } from '../../lib/discovery';
+import type { LocalService } from '../../data/localServices';
+import type { DiscoveryEntity } from '../../types/discovery';
 import {
   communityByName, reportsForIntent, showsCitywide, streetLookupUrls, summarizeStreetRows, wantsReports,
-  type CommunityMatch, type SearchIntent, type StreetAnswer, type StreetGuess, type Topic,
+  type CommunityMatch, type Landmark, type SearchIntent, type StreetAnswer, type StreetGuess, type Topic,
 } from '../../lib/searchIntent';
 import type { Incident } from '../../types';
 import '../../styles/search.css';
@@ -24,12 +27,14 @@ const day = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month
 const categoryLabel = (c: string) => INCIDENT_CATEGORIES.find(x => x.value === c)?.label ?? c;
 const categoryColor = (c: string) => INCIDENT_CATEGORIES.find(x => x.value === c)?.color ?? '#00c2e0';
 
-export function SearchAnswers({ intent, now }: { intent: SearchIntent; now: number }) {
-  const reports = useLatestReports(wantsReports(intent) || !!intent.street);
-  const boundaries = useBoundaries(intent.communities.length > 0);
-  if (!intent.communities.length && !intent.street && !showsCitywide(intent)) return null;
+export function SearchAnswers({ intent, now, best }: { intent: SearchIntent; now: number; best?: BestAnswer }) {
+  const reports = useLatestReports(wantsReports(intent) || !!intent.street || !!intent.landmark);
+  const boundaries = useBoundaries(intent.communities.length > 0 || !!intent.landmark);
+  if (!intent.communities.length && !intent.street && !intent.landmark && !intent.best && !showsCitywide(intent)) return null;
   return (
     <div className="cw-answers" aria-label="Answers for your search">
+      {intent.best && <BestCard thing={intent.best.thing} answer={best} where={intent.communities[0]?.community.name} />}
+      {intent.landmark && <LandmarkCard landmark={intent.landmark} reports={reports} boundaries={boundaries} now={now} />}
       {intent.street && <StreetCard street={intent.street} reports={reports} now={now} />}
       {intent.communities.map(c => <CommunityCard key={c.slug} match={c} intent={intent} reports={reports} boundaries={boundaries} now={now} />)}
       {showsCitywide(intent) && <CitywideCard intent={intent} reports={reports} now={now} />}
@@ -69,6 +74,87 @@ function CommunityCard({ match, intent, reports, boundaries, now }: { match: Com
       <ReportList title={`${answer.widened && answer.reports.length ? 'Latest' : answer.window.label}: ${topicNote} in ${community.name}`} answer={answer} reports={reports} now={now}
         empty={`Nothing has been posted about ${community.name}${reports.oldest ? ` since ${day.format(reports.oldest)}` : ''}. Quiet is good news.`}
         widenedNote={`Nothing ${answer.window.label.toLowerCase()}. The latest from ${community.name}:`} />
+    </section>
+  );
+}
+
+/* ── "Best pho": an experiment ─────────────────────────────────── */
+
+export interface BestAnswer { picks: DiscoveryEntity[]; service?: LocalService }
+
+const PICK_KIND: Record<string, string> = { business: 'Local', market: 'Market' };
+
+function BestCard({ thing, answer, where }: { thing: string; answer?: BestAnswer; where?: string }) {
+  const picks = answer?.picks ?? [];
+  const place = where ?? 'Calgary';
+  const maps = `https://www.google.com/maps/search/${encodeURIComponent(`${thing} in ${where ? `${where}, ` : ''}Calgary`)}`;
+  return (
+    <section className="cw-answer cw-answer-best" aria-labelledby="cw-best-title">
+      <div className="cw-answer-head">
+        <p className="cw-answer-eyebrow"><FlaskConical size={15} aria-hidden="true" /> New · Best in {place}</p>
+        <h2 id="cw-best-title" className="cw-best-title">Best {thing} <em>in {place}</em></h2>
+        <p className="cw-answer-lead">
+          Nobody pays to rank here. {picks.length
+            ? <>These are the places on CalgaryWatch that match, verified owners first.</>
+            : <>We haven’t listed any yet, so here’s where to compare, and how to tell us yours.</>}
+        </p>
+        <div className="cw-answer-actions">
+          <a className="cw-answer-primary" href={maps} target="_blank" rel="noopener noreferrer">Compare ratings on Google Maps <ArrowUpRight size={16} aria-hidden="true" /></a>
+          <Link to="/submit">Know a great one? Tell us</Link>
+          {answer?.service ? <Link to="/local">Browse Local</Link> : null}
+        </div>
+      </div>
+      <div className="cw-answer-reports">
+        {picks.length ? (
+          <>
+            <h3>On CalgaryWatch</h3>
+            <ol className="cw-best-picks">
+              {picks.map((e, i) => (
+                <li key={e.id}>
+                  <Link to={entityPath(e)}>
+                    <b className="cw-best-rank" aria-hidden="true">{i + 1}</b>
+                    <span><b>{e.title}</b><small>{[PICK_KIND[e.kind], e.neighbourhood].filter(Boolean).join(' · ')}</small></span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </>
+        ) : (
+          <div className="cw-best-empty">
+            <Star size={22} aria-hidden="true" />
+            <p><b>Your pick could be the first.</b> When a neighbour recommends one and we check it, it shows up here.</p>
+          </div>
+        )}
+        {answer?.service ? (
+          <p className="cw-best-tip"><Lightbulb size={16} aria-hidden="true" /><span><b>Before you hire {answer.service.label.toLowerCase()}:</b> {answer.service.tip}</span></p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+/* ── Landmark: "westside" ──────────────────────────────────────── */
+
+function LandmarkCard({ landmark, reports, boundaries, now }: { landmark: Landmark; reports: LatestReports; boundaries?: CommunityBoundary[]; now: number }) {
+  const near = landmark.near.map(n => communityByName(n)).filter((m): m is CommunityMatch => !!m);
+  const answer = useMemo(() => reportsForIntent(reports.incidents, { communities: near, time: null, topics: [], street: null, question: false }, now, boundaries, 4),
+    // `near` is rebuilt every render from the same landmark.
+    [reports.incidents, landmark, now, boundaries]);
+  const names = landmark.near.join(' and ');
+  return (
+    <section className="cw-answer cw-answer-place">
+      <div className="cw-answer-head">
+        <p className="cw-answer-eyebrow"><Building2 size={15} aria-hidden="true" /> Place</p>
+        <h2>{landmark.name}<span>{near[0]?.community.quadrant ?? 'Calgary'}</span></h2>
+        <p className="cw-answer-lead"><b>{landmark.address}</b>, between {names}.</p>
+        <div className="cw-answer-actions">
+          {near[0] ? <Link className="cw-answer-primary" to={`/map?area=${near[0].slug}`}>See the area on the live map <ArrowUpRight size={16} aria-hidden="true" /></Link> : null}
+          <a href={landmark.url} target="_blank" rel="noopener noreferrer">Hours and programs ↗</a>
+          {near.map(n => <Link key={n.slug} to={`/search?q=${encodeURIComponent(n.community.name.toLowerCase())}`}>{n.community.name}</Link>)}
+        </div>
+      </div>
+      <ReportList title={`Lately in ${names}`} answer={answer} reports={reports} now={now}
+        empty={`Nothing posted about ${names} lately. Quiet is good news.`} widenedNote={`The latest from ${names}:`} compact />
     </section>
   );
 }

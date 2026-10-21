@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, CalendarDays, Car, Compass, Map as MapIcon, MapPin, ShieldAlert, Sparkles, Store, Zap, Clock3, Heart, BookOpen, Trophy } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { GlobalSearch, type Suggestion } from './GlobalSearch';
-import { SearchAnswers } from './SearchAnswers';
+import { SearchAnswers, type BestAnswer } from './SearchAnswers';
 import { PageHero } from './PageHero';
 import type { SearchIntent } from '../../lib/searchIntent';
 import type { DiscoveryEntity } from '../../types/discovery';
@@ -34,6 +34,11 @@ const TRY = ['Beltline', '17 Ave SW', 'police yesterday', 'jazz', 'Kensington', 
 
 const when = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'short', month: 'short', day: 'numeric' });
 const KIND: Record<string, string> = { event: 'Event', market: 'Market', business: 'Local', guide: 'Guide', neighbourhood: 'Neighbourhood' };
+const KIND_ICON: Record<string, ReactNode> = {
+  event: <CalendarDays size={26} />, market: <Store size={26} />, business: <MapPin size={26} />, guide: <BookOpen size={26} />, neighbourhood: <Compass size={26} />,
+};
+/** Rows a group shows before "Show all", when every kind is on screen. */
+const PER_GROUP = 6;
 
 function detail(e: DiscoveryEntity) {
   const place = e.kind === 'event' || e.kind === 'market' || e.kind === 'business' ? e.neighbourhood || e.venue || e.address
@@ -42,24 +47,52 @@ function detail(e: DiscoveryEntity) {
   return { place, date };
 }
 
+function imageOf(e: DiscoveryEntity) {
+  return e.image ?? ('images' in e ? e.images?.[0] : undefined);
+}
+
+/** A run that repeats ("Frozen", eight shows) is one row, at its soonest date, with the rest counted. */
+export function collapseRepeats(entities: DiscoveryEntity[]): Array<{ e: DiscoveryEntity; more: number }> {
+  const out: Array<{ e: DiscoveryEntity; more: number }> = [];
+  const at = new Map<string, number>();
+  for (const e of entities) {
+    const key = `${e.kind}:${e.title.trim().toLowerCase()}`;
+    const i = at.get(key);
+    if (i === undefined) { at.set(key, out.length); out.push({ e, more: 0 }); } else out[i].more++;
+  }
+  return out;
+}
+
 /**
  * /search: a branded front door that answers first. Before a search it shows
  * the questions people actually bring here and every section to browse; after
  * one it leads with the ready-made answer, then listings grouped by kind.
  */
-export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best = [] }: {
+export function SearchBoard({ q, intent, now, groups, listingCount, resultCount, answers, partial = false, didYouMean, suggest, nearby, best, bestLists = [] }: {
   q: string; intent: SearchIntent; now: number; groups: Record<string, DiscoveryEntity[]>;
   listingCount: number; resultCount: number; answers: number;
   partial?: boolean; didYouMean?: string; suggest?: (q: string) => Suggestion[];
   /** For a community search with no listings of its own: what's on nearby. */
   nearby?: { title: ReactNode; items: DiscoveryEntity[] };
+  /** Listed places for a "best pho" search. */
+  best?: BestAnswer;
   /** Best of Calgary lists the search asks for ("pho", "junk removal"). */
-  best?: Array<{ to: string; label: string; note: string }>;
+  bestLists?: Array<{ to: string; label: string; note: string }>;
 }) {
-  const listings = <><b>{listingCount}</b> {partial ? 'close ' : ''}{listingCount === 1 ? 'listing' : 'listings'}</>;
+  const [tab, setTab] = useState<string>('all');
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  // Places already ranked in the "best pho" card aren't listed twice.
+  const picked = new Set(best?.picks.map(e => e.id));
+  const kinds = Object.keys(groups).filter(k => groups[k].some(e => !picked.has(e.id)));
+  const collapsed = Object.fromEntries(kinds.map(k => [k, collapseRepeats(groups[k].filter(e => !picked.has(e.id)))]));
+  const distinct = kinds.reduce((n, k) => n + collapsed[k].length, 0);
+  // The best match gets the spotlight, unless it's only a partial match.
+  const top = !partial && !intent.best && kinds.length ? collapsed[kinds[0]][0] : undefined;
+  const shown = tab === 'all' ? kinds : kinds.filter(k => k === tab);
+  const listings = <><b>{distinct}</b> {partial ? 'close ' : ''}{distinct === 1 ? 'listing' : 'listings'}</>;
   const ready = <><b>{answers}</b> ready-made {answers === 1 ? 'answer' : 'answers'}</>;
   return (
-    <div className="bp sx">
+    <div className={`bp sx${q ? ' sx-has-q' : ''}`}>
       <PageHero
         id="sx-title"
         kicker={q ? 'Search results' : 'Search CalgaryWatch'}
@@ -72,22 +105,34 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
       <div className="cw-wrap">
         {q ? (
           <>
-            <p className="sx-count" role="status">
-              {resultCount
-                ? <>{answers ? ready : null}{answers > 0 && listingCount > 0 ? ' and ' : null}{listingCount ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
-                : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
-            </p>
+            <div className="sx-bar">
+              <p className="sx-count" role="status">
+                {resultCount
+                  ? <>{bestLists.length ? <><b>{bestLists.length}</b> Best of Calgary {bestLists.length === 1 ? 'list' : 'lists'}{answers || distinct ? ', ' : null}</> : null}{answers ? ready : null}{answers > 0 && distinct > 0 ? ' and ' : null}{distinct ? listings : null}{partial ? '. Nothing matched every word, so these match most of them.' : null}</>
+                  : best && intent.best ? <>Nothing on CalgaryWatch for <b>“{intent.best.thing}”</b> yet. Here’s where to look.</>
+                  : <>Nothing matched <b>“{q}”</b> yet. Try a neighbourhood, a street, or one of these.</>}
+              </p>
+              {kinds.length > 1 ? (
+                <div className="sx-tabs" role="group" aria-label="Show results for">
+                  <button type="button" aria-pressed={tab === 'all'} onClick={() => setTab('all')}>All <span>{distinct}</span></button>
+                  {kinds.map(k => {
+                    const section = DISCOVERY_SECTIONS.find(x => x.kind === k);
+                    return <button type="button" key={k} aria-pressed={tab === k} onClick={() => setTab(k)}>{section?.label ?? KIND[k]} <span>{collapsed[k].length}</span></button>;
+                  })}
+                </div>
+              ) : null}
+            </div>
             {didYouMean ? <p className="sx-dym">Did you mean <Link to={`/search?q=${encodeURIComponent(didYouMean)}`}>{didYouMean}</Link>?</p> : null}
-            <SearchAnswers intent={intent} now={now} />
-            {best.length ? (
+            {tab === 'all' ? <SearchAnswers intent={intent} now={now} best={best} /> : null}
+            {bestLists.length && tab === 'all' ? (
               <section className="bp-section sx-group" aria-labelledby="sx-best">
                 <div className="bp-head"><h2 id="sx-best">Best of <span>Calgary</span></h2><Link className="bp-link" to="/best">All lists <ArrowRight size={15} aria-hidden="true" /></Link></div>
                 <ul className="sx-results">
-                  {best.map(b => (
+                  {bestLists.map(b => (
                     <li key={b.to}>
                       <Link to={b.to} className="sx-result">
-                        <span className="sx-kind sx-kind-best">List</span>
-                        <span className="sx-result-copy"><strong>{b.label}</strong><small>{b.note}</small></span>
+                        <span className="sx-thumb sx-thumb-best" aria-hidden="true"><Trophy size={26} /></span>
+                        <span className="sx-result-copy"><span className="sx-kind sx-kind-best">List</span><strong>{b.label}</strong><small>{b.note}</small></span>
                         <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
                       </Link>
                     </li>
@@ -95,25 +140,34 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
                 </ul>
               </section>
             ) : null}
-            {Object.entries(groups).map(([kind, entities]) => {
+            {top && tab === 'all' ? <TopHit e={top.e} more={top.more} /> : null}
+            {shown.map(kind => {
               const section = DISCOVERY_SECTIONS.find(s => s.kind === kind);
+              const rows = collapsed[kind].filter(r => !(tab === 'all' && r === top));
+              if (!rows.length) return null;
+              const limit = tab === 'all' && !open[kind] ? PER_GROUP : rows.length;
               return (
                 <section className="bp-section sx-group" key={kind} aria-labelledby={`sx-${kind}`}>
                   <div className="bp-head">
-                    <h2 id={`sx-${kind}`}>{section?.label}</h2>
+                    <h2 id={`sx-${kind}`}>{section?.label} <small className="sx-n">{collapsed[kind].length}</small></h2>
                     {section ? <Link className="bp-link" to={section.path}>All {section.label.toLowerCase()} <ArrowRight size={15} aria-hidden="true" /></Link> : null}
                   </div>
-                  <Rows entities={entities} />
+                  <Rows rows={rows.slice(0, limit)} />
+                  {rows.length > limit ? (
+                    <button type="button" className="sx-more" onClick={() => setOpen(o => ({ ...o, [kind]: true }))}>
+                      Show {rows.length - limit} more {(section?.label ?? '').toLowerCase()}
+                    </button>
+                  ) : null}
                 </section>
               );
             })}
             {nearby?.items.length ? (
               <section className="bp-section sx-group" aria-labelledby="sx-nearby">
                 <div className="bp-head"><h2 id="sx-nearby">{nearby.title}</h2><p>Nothing listed in this community yet, so here’s what’s closest.</p></div>
-                <Rows entities={nearby.items} />
+                <Rows rows={collapseRepeats(nearby.items)} />
               </section>
             ) : null}
-            {!resultCount ? <Starters title="Try one of these" /> : null}
+            {!resultCount && !best ? <Starters title="Try one of these" /> : null}
           </>
         ) : (
           <>
@@ -141,18 +195,50 @@ export function SearchBoard({ q, intent, now, groups, listingCount, resultCount,
   );
 }
 
-function Rows({ entities }: { entities: DiscoveryEntity[] }) {
+/** The picture, a date tile for an event without one, or the kind's icon. */
+function Thumb({ e, big = false }: { e: DiscoveryEntity; big?: boolean }) {
+  const [broken, setBroken] = useState(false);
+  const img = broken ? undefined : imageOf(e);
+  if (img) return <span className={`sx-thumb${big ? ' is-big' : ''}`}><img src={img.src} alt="" loading="lazy" onError={() => setBroken(true)} /></span>;
+  if (e.kind === 'event' && e.start) {
+    const parts = Object.fromEntries(when.formatToParts(new Date(e.start)).map(p => [p.type, p.value]));
+    return <span className={`sx-thumb sx-thumb-date${big ? ' is-big' : ''}`} aria-hidden="true"><small>{parts.weekday}</small><b>{parts.day}</b><small>{parts.month}</small></span>;
+  }
+  return <span className={`sx-thumb sx-thumb-${e.kind}${big ? ' is-big' : ''}`} aria-hidden="true">{KIND_ICON[e.kind]}</span>;
+}
+
+function TopHit({ e, more }: { e: DiscoveryEntity; more: number }) {
+  const { place, date } = detail(e);
+  return (
+    <section className="sx-top" aria-label="Best match">
+      <Link to={entityPath(e)} className="sx-top-card">
+        <Thumb e={e} big />
+        <span className="sx-top-copy">
+          <span className="sx-top-eyebrow"><span className={`sx-kind sx-kind-${e.kind}`}>{KIND[e.kind]}</span> Best match</span>
+          <strong>{e.title}</strong>
+          {date || place ? <small>{[date, place].filter(Boolean).join(' · ')}{more ? ` · +${more} more ${more === 1 ? 'date' : 'dates'}` : ''}</small> : null}
+          {e.summary ? <span className="sx-top-summary">{e.summary}</span> : null}
+          <span className="sx-top-go">Open <ArrowRight size={18} aria-hidden="true" /></span>
+        </span>
+      </Link>
+    </section>
+  );
+}
+
+function Rows({ rows }: { rows: Array<{ e: DiscoveryEntity; more: number }> }) {
   return (
     <ul className="sx-results">
-      {entities.map(e => {
+      {rows.map(({ e, more }) => {
         const { place, date } = detail(e);
         return (
           <li key={e.id}>
             <Link to={entityPath(e)} className="sx-result">
-              <span className={`sx-kind sx-kind-${e.kind}`}>{KIND[e.kind]}</span>
+              <Thumb e={e} />
               <span className="sx-result-copy">
+                <span className={`sx-kind sx-kind-${e.kind}`}>{KIND[e.kind]}</span>
                 <strong>{e.title}</strong>
                 {date || place ? <small>{[date, place].filter(Boolean).join(' · ')}</small> : null}
+                {more ? <small className="sx-more-dates">+{more} more {more === 1 ? 'date' : 'dates'}</small> : null}
               </span>
               <ArrowUpRight size={20} aria-hidden="true" className="sx-arrow" />
             </Link>

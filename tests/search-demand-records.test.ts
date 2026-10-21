@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {readDemandRecords,summarizeDemand} from '../src/lib/searchDemand';
+import {demandQuery,readDemandRecords,summarizeDemand} from '../src/lib/searchDemand';
 import {describeAnswer,parseSearchIntent} from '../src/lib/searchIntent';
 test('malformed analytics cannot reach term rendering or intent parsing',()=>{
  const invalid=[null,{}, {q:17,results:0,ts:1},{q:{term:'markets'},results:0,ts:1},{q:'markets',results:{count:0},ts:1},{q:'markets',results:NaN,ts:1},{q:'markets',results:0,ts:Infinity},{q:'markets',results:-1,ts:1},{q:'markets',results:0.5,ts:1},{q:'',results:0,ts:1}];
@@ -16,4 +16,9 @@ test('valid missed searches keep their query links and current-answer previews',
 });
 test('unsupported and contact-shaped records are counted as excluded',()=>{
  const parsed=readDemandRecords([{q:'hello@example.org',results:0,ts:1},{q:'markets',results:1000,ts:1},{q:'markets',results:0,ts:0}]);assert.equal(parsed.ignored,3);assert.deepEqual(parsed.rows,[]);
+});
+
+test('a pasted paragraph is never kept as a search',()=>{
+  assert.equal(demandQuery('work in the calgarywatch repository on the current production branch. this task'),null);
+  assert.equal(demandQuery('why so much police active tonight'),'why so much police active tonight');
 });

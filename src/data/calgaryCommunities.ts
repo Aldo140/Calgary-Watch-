@@ -51,7 +51,7 @@ const ROWS: Row[] = [
   ['Douglasdale/Glen', SE, ['douglasdale', 'douglas glen']], ['Dover', SE], ['Erin Woods', SE, ['erinwoods']], ['Fairview', SE],
   ['Forest Heights', SE], ['Forest Lawn', SE, ['international avenue']], ['Hotchkiss', SE], ['Inglewood', SE], ['Lake Bonavista', SE, ['bonavista']],
   ['Legacy', SE], ['Mahogany', SE], ['Maple Ridge', SE], ['McKenzie Lake', SE], ['McKenzie Towne', SE], ['Midnapore', SE],
-  ['New Brighton', SE], ['Ogden', SE], ['Parkland', SE], ['Penbrooke Meadows', SE, ['penbrooke']], ['Queensland', SE],
+  ['New Brighton', SE], ['Ogden', SE, ['millican', 'millican ogden', 'millican estates', 'lynnwood', 'lynnwood ridge']], ['Parkland', SE], ['Penbrooke Meadows', SE, ['penbrooke']], ['Queensland', SE],
   ['Quarry Park', SE], ['Ramsay', SE], ['Rangeview', SE], ['Riverbend', SE], ['Seton', SE], ['Southview', SE], ['Walden', SE],
   ['Willow Park', SE], ['Wolf Willow', SE], ['Red Carpet', SE], ['Erlton', SE], ['Victoria Park', SE], ['Sundance', SE], ['Chaparral', SE],
   // SW

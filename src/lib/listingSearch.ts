@@ -4,6 +4,7 @@ import { matchesTonight } from './discoveryCalendar';
 import { communityByName, editDistance, normalizeWords } from './searchIntent';
 import { CALGARY_COMMUNITIES } from '../data/calgaryCommunities';
 import { verifiedBoost } from './verified';
+import { LOCAL_SERVICES, type LocalService } from '../data/localServices';
 
 /**
  * Listing search for /search: what people type, not what a database wants.
@@ -62,6 +63,17 @@ const SYNONYMS: Record<string, string[]> = {
   talk: ['lecture', 'learning', 'workshop'], workshop: ['class', 'learning'], class: ['workshop'],
 };
 
+/** Short forms Calgarians type for organizations listed under their full name. */
+export const ABBREVIATIONS: Record<string, string> = {
+  atp: 'alberta theatre projects',
+};
+
+/** The query with known short forms spelled out: "atp" → "alberta theatre projects". */
+export function expandAbbreviations(q: string): string {
+  const words = normalizeWords(q);
+  return words.some(w => ABBREVIATIONS[w]) ? words.map(w => ABBREVIATIONS[w] ?? w).join(' ') : q;
+}
+
 const TIME_PHRASES: Array<[ListingWhen, string[][]]> = [
   ['this-weekend', [['this', 'weekend'], ['weekend']]],
   ['this-week', [['this', 'week'], ['week']]],
@@ -82,7 +94,7 @@ export function stem(w: string): string {
 }
 
 export function parseListingQuery(q: string): ListingQuery {
-  const raw = normalizeWords(q);
+  const raw = normalizeWords(expandAbbreviations(q));
   const used = raw.map(() => false);
   let when: ListingWhen | undefined;
   for (const [key, phrases] of TIME_PHRASES) {
@@ -139,7 +151,8 @@ const indexed = (e: DiscoveryEntity) => cache.get(e) ?? (cache.set(e, index(e)),
 function wordMatch(q: string, t: string, loose: boolean): number {
   if (q === t) return 1;
   if (!loose) return 0;
-  if (q.length >= 3 && t.startsWith(q)) return 0.8;
+  // Three letters is a whole word, not a prefix: "pho" isn't "photo".
+  if (q.length >= 4 && t.startsWith(q)) return 0.8;
   if (q.length < 5 || q[0] !== t[0]) return 0;
   const max = q.length >= 8 ? 2 : 1;
   return editDistance(q, t, max) <= max ? 0.55 : 0;
@@ -227,7 +240,7 @@ export function searchListings(entities: readonly DiscoveryEntity[], occurrences
 
   type Hit = { e: DiscoveryEntity; score: number; matched: number; at: number };
   const hits: Hit[] = [];
-  const phrase = normalizeWords(q).join(' ');
+  const phrase = normalizeWords(expandAbbreviations(q)).join(' ');
   // "Panorama Hills" is a place, not two keywords: listings have to name it.
   const placeName = query.words.length > 1 && COMMUNITY_PHRASES.has(phrase) ? phrase : null;
   for (const e of entities) {
@@ -324,4 +337,24 @@ export function nearbyListings(entities: readonly DiscoveryEntity[], occurrences
     .sort((a, b) => (a.e.kind === 'neighbourhood' ? 1 : 0) - (b.e.kind === 'neighbourhood' ? 1 : 0) || a.at - b.at)
     .filter((h, i, all) => all.findIndex(o => o.e.title === h.e.title) === i)
     .slice(0, max).map(h => h.e);
+}
+
+// ─── "Best …" ──────────────────────────────────────────────────────────────
+
+/**
+ * Listed places that answer "best pho" or "best plumbers": our own listings
+ * of places only, ranked like any search (verified a notch up). Never a paid
+ * ranking, and empty rather than a near miss.
+ */
+export function bestPicks(entities: readonly DiscoveryEntity[], occurrences: readonly MarketOccurrence[], thing: string, now = new Date(), max = 6): DiscoveryEntity[] {
+  const r = searchListings(entities, occurrences, thing, now);
+  if (r.partial) return [];
+  return [...(r.groups.business ?? []), ...(r.groups.market ?? [])].filter(e => !e.developmentOnly).slice(0, max);
+}
+
+/** The Local service a "best …" search names, when it's one of ours: "plumbers" → Plumbers. */
+export function serviceFor(thing: string): LocalService | undefined {
+  const key = normalizeWords(thing).map(stem).join(' ');
+  if (!key) return undefined;
+  return LOCAL_SERVICES.find(s => [s.label, ...s.trades, ...s.match].some(m => normalizeWords(m).map(stem).join(' ') === key));
 }

@@ -106,3 +106,30 @@ test('edit distance is capped', () => {
   assert.equal(editDistance('seton', 'setno'), 1);
   assert.equal(editDistance('abcdefgh', 'zzzzzzzz', 2), 3);
 });
+
+test('Oct 21 zero-result searches: Lynnwood is in Ogden, "westside" is the rec centre', () => {
+  assert.deepEqual(names('lynnwood'), ['Ogden']);
+  assert.deepEqual(names('lynn wood'), ['Ogden']);
+  assert.deepEqual(names('millican'), ['Ogden']);
+  const west = parseSearchIntent('westside', NOW);
+  assert.equal(west.landmark?.name, 'Westside Recreation Centre');
+  assert.deepEqual(west.communities, []);
+  assert.equal(west.street, null);
+  assert.equal(parseSearchIntent('westside rec', NOW).landmark?.name, 'Westside Recreation Centre');
+  assert.equal(parseSearchIntent('westgate', NOW).landmark, undefined);
+});
+
+test('"best …" reads the thing asked for and leaves the place', () => {
+  const best = (q: string) => parseSearchIntent(q, NOW).best?.thing;
+  assert.equal(best('best pho'), 'pho');
+  assert.equal(best('best pho places in calgary'), 'pho');
+  assert.equal(best('top 10 pizza spots'), 'pizza');
+  assert.equal(best('best window cleaners'), 'window cleaners');
+  assert.equal(best('whats the best junk removal company'), 'junk removal');
+  const local = parseSearchIntent('best pizza in beltline', NOW);
+  assert.equal(local.best?.thing, 'pizza');
+  assert.deepEqual(local.communities.map(c => c.community.name), ['Beltline']);
+  assert.equal(parseSearchIntent('best pizza place', NOW).street, null, '"place" is not a street suffix here');
+  assert.equal(best('police best'), undefined);
+  assert.equal(best('best'), undefined);
+});

@@ -189,6 +189,25 @@
   .cw-answer-actions .cw-answer-primary { transition: none; }
 }
 
+/* "Best pho in Calgary": a chart-style card on near-black, the place in yellow. */
+.cw-answer-best .cw-answer-head { background: #151515; color: #fff; }
+.cw-answer-best .cw-answer-eyebrow { color: #ffdf4f; }
+.cw-answer-best .cw-answer-primary { border-color: #ffdf4f; box-shadow: none; }
+.cw-answer h2.cw-best-title { display: block; }
+.cw-best-title em { display: inline-block; margin-top: 6px; padding: 0 .12em; font-style: normal; color: #151515; background: #ffdf4f; border-radius: 6px; }
+.cw-best-picks li a { align-items: center; }
+.cw-answer-reports .cw-best-rank { flex: none; width: 34px; font: 800 28px/1 var(--display, inherit); letter-spacing: -.04em; color: #1554d1; text-align: center; }
+.cw-best-empty { display: flex; gap: 14px; align-items: flex-start; padding: 18px; border: 2px dashed #151515; border-radius: 16px; background: #fff8d6; }
+.cw-best-empty svg { flex: none; margin-top: 2px; fill: #ffdf4f; }
+.cw-best-empty p { margin: 0; font-size: 15px; line-height: 1.5; color: #2b2e33; }
+.cw-best-tip { display: flex; gap: 10px; margin: 16px 0 0; padding: 14px 16px; border-radius: 14px; background: #eef4ff; font-size: 14px; line-height: 1.5; color: #2b2e33; }
+.cw-best-tip svg { flex: none; margin-top: 2px; color: #1554d1; }
+
+/* A named place ("westside"): cyan, like a map pin. */
+.cw-answer-place .cw-answer-head { background: #00c2e0; color: #06162f; }
+.cw-answer-place .cw-answer-eyebrow { color: #06162f; opacity: .75; }
+.cw-answer-place .cw-answer-primary { background: #06162f; color: #fff; }
+
 /* Popular searches */
 
 .cw-starters { margin: 22px 0 8px; }

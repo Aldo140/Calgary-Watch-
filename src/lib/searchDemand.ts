@@ -17,6 +17,8 @@ const SEEN_KEY = 'cw_searched';
 export function demandQuery(q: string): string | null {
   const t = q.normalize('NFKC').toLocaleLowerCase('en-CA').replace(/\s+/g, ' ').trim().slice(0, 80);
   if (t.length < 2 || /@|\d{6,}|https?:/.test(t)) return null;
+  // A pasted paragraph (someone's notes or a prompt) isn't a search: real ones are a few words.
+  if (t.split(' ').length > 8) return null;
   return t;
 }
 

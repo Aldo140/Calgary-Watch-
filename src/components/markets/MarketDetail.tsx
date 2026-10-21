@@ -1,27 +1,31 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Accessibility, ArrowRight, ArrowUpRight, BadgeCheck, Bus, CalendarPlus, Car, Check, Clock, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Store, Users, type LucideIcon } from 'lucide-react';
+import { Accessibility, ArrowRight, ArrowUpRight, BadgeCheck, Bus, CalendarPlus, Car, Check, Clock, Copy, Dog, ExternalLink, Map as MapIcon, MapPin, Navigation, Quote, Share2, ShieldCheck, Sparkles, Store, Users, type LucideIcon } from 'lucide-react';
 import type { Business, DiscoveryEntity, Market, MarketOccurrence } from '../../types/discovery';
 import { entityPath } from '../../lib/discovery';
 import { googleCalendarUrl, icsFile } from '../../lib/calendarFile';
 import { pickWhen } from '../../lib/eventPicks';
 import {
-  communityFor, dayNum, directionsUrl, eventsSameDay, guideTake, hours, isOpen, monthShort, neighbourhoodFor, nextOpen,
+  communityFor, countdown, dayNum, directionsUrl, eventsSameDay, guideTake, hours, isOpen, monthShort, neighbourhoodFor, nextOpen,
   quadrantOf, relativeDay, schedulePattern, season, shortName, statusLine, upcoming, weekdayLong, weekdayShort,
 } from '../../lib/marketDays';
 import { MarketCover } from '../discovery/ListingArt';
 import { TEAR } from '../home/HomeHero';
-import { ClaimCta, VerifiedMark } from '../entity/ClaimCta';
+import { VerifiedMark } from '../entity/ClaimCta';
+import { CLAIM_BENEFIT } from '../entity/VerifiedBadge';
 import { SourceBadge } from '../entity/EntityDetail';
 import { MarketLineup } from '../entity/MarketLineup';
 import { MarketMap } from './MarketMap';
 import { Seal } from '../discovery/LocalDirectory';
 import { ProfileCover } from '../discovery/ProfileCover';
-import { iconFor, ProfileRibbon, StorySpread, useSectionReveal } from '../discovery/ProfileSections';
+import { iconFor, StorySpread, useSectionReveal } from '../discovery/ProfileSections';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { organizerMarkets } from '../../lib/organizations';
 import { shelfOf, SHELVES } from '../../lib/localShelves';
-import { isOwnerVerified } from '../../lib/verified';
+import { isOwnerVerified, VERIFICATION_PRIORITY_ENABLED } from '../../lib/verified';
+import { useVerifiedListing } from '../../lib/claimsApi';
+import { organizationClaimPath } from '../../lib/claimOrganization';
+import '../../styles/claim.css';
 import '../../styles/home.css';
 import '../../styles/home-board.css';
 import '../../styles/markets.css';
@@ -31,6 +35,10 @@ import '../../styles/story-pages.css';
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const longDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric', year: 'numeric' });
+const fullDay = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekday: 'long', month: 'long', day: 'numeric' });
+const monthDayLong = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'long', day: 'numeric' });
+/** The hero carries one sentence; the full write-up lives in the story below. */
+const firstSentence = (text: string) => text.length <= 150 ? text : (text.split(/(?<=[.!?])\s+/)[0] || text);
 const MARKETS_SHELF = SHELVES.find(s => s.id === 'markets')!;
 const amenityIcon = (a: string): LucideIcon => /accessib/i.test(a) ? Accessibility : /dog|pet/i.test(a) ? Dog : /indoor|hut|floor/i.test(a) ? Store : iconFor(a);
 
@@ -41,6 +49,8 @@ const amenityIcon = (a: string): LucideIcon => /accessib/i.test(a) ? Accessibili
 export function MarketDetail({ market, all, occurrences }: { market: Market; all: readonly DiscoveryEntity[]; occurrences: readonly MarketOccurrence[] }) {
   const [now] = useState(() => new Date());
   const [shared, setShared] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [allDates, setAllDates] = useState(false);
   const dates = upcoming(market, occurrences, now);
   const next = nextOpen(market, occurrences, now);
   const open = isOpen(next, now);
@@ -52,7 +62,8 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
   const community = communityFor(market);
   const sameDay = next ? eventsSameDay(next.start, all, market.neighbourhood) : [];
   const url = `https://calgarywatch.ca${entityPath(market)}`;
-  const cal = next ? { id: `${market.id}-${next.id}`, title: market.title, start: next.start, end: next.end, location: [market.venue, market.address].filter(Boolean).join(', '), description: market.summary, url } : null;
+  const calFor = (o: MarketOccurrence) => ({ id: `${market.id}-${o.id}`, title: market.title, start: o.start, end: o.end, location: [market.venue, market.address].filter(Boolean).join(', '), description: market.summary, url });
+  const cal = next ? calFor(next) : null;
   const organizerSite = market.sources.find(s => s.kind === 'official')?.url;
   const others = all
     .filter((e): e is Market => e.kind === 'market' && e.id !== market.id)
@@ -70,6 +81,9 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch { /* blocked */ }
+  };
   const share = async () => {
     try {
       if (navigator.share) await navigator.share({ title: market.title, text: next ? `${market.title}, ${statusLine(next, now)}` : market.title, url });
@@ -86,20 +100,16 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
   const everyMarket = all.filter(e => e.kind === 'market');
   const number = everyMarket.findIndex(m => m.id === market.id) + 1;
   const confirmed = dates.filter(o => !o.cancelled).length;
-  const ribbon = [
-    shortName(market), open ? 'Open right now' : next ? `Next: ${statusLine(next, now)}` : 'Dates on their site',
-    confirmed ? `${confirmed} ${confirmed === 1 ? 'date' : 'dates'} coming up` : null, kind, [market.neighbourhood, q].filter(Boolean).join(' ') || null, 'CalgaryWatch Markets',
-  ].filter((x): x is string => !!x);
   const official = market.sources.find(s => s.kind === 'official') ?? market.sources[0];
-  const verified = isOwnerVerified(market);
+  // The build stamp, or a claim approved since the last build: the same answer the badge gives.
+  const verified = useVerifiedListing(market.id, isOwnerVerified(market));
+  const claimPath = organizationClaimPath(market, all);
   const stamp = verified ? 'Verified' : open ? 'Open now' : kind ?? undefined;
   const facts: [string, ReactNode][] = [
     ['Run by', org ? <Link key="o" to={entityPath(org)}>{org.title}</Link> : market.organizer || 'The organizer'],
-    ['Usually', pattern ? `${pattern.dayText}, ${pattern.hours}` : 'Check with the organizer'],
-    ['Area', [market.neighbourhood, q ? `${q} Calgary` : null].filter(Boolean).join(' · ') || 'Calgary'],
     ['Listed from', official ? <a key="l" href={official.url} target="_blank" rel="noopener noreferrer">{official.name}</a> : 'The organizer'],
     ['Last checked', longDay.format(new Date(market.verifiedAt || market.updatedAt))],
-    ['Status', verified ? <span key="v" className="lp-ok"><BadgeCheck size={15} aria-hidden="true" />Run by the organizer</span> : 'Not yet claimed'],
+    ['Status', verified ? <span key="v" className="lp-ok"><BadgeCheck size={15} aria-hidden="true" />Claimed by the organizer</span> : <Link key="c" to={claimPath}>Not yet claimed</Link>],
   ];
 
   const goodFor = [
@@ -113,11 +123,24 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
         <div className="cw-wrap mk-dhero-in">
           <nav className="mk-crumbs" aria-label="Breadcrumb"><Link to="/">Home</Link><span aria-hidden="true">/</span><Link to="/markets">Markets</Link><span aria-hidden="true">/</span><span aria-current="page">{shortName(market)}</span></nav>
           <div className="mk-dhero-copy">
-            <p className={`mk-status${open ? ' is-open' : ''}`}>{open ? <span className="cw-lb-pulse mk-pulse" aria-hidden="true" /> : <Clock size={15} aria-hidden="true" />}{next ? (open ? statusLine(next, now) : `Next: ${statusLine(next, now)}`) : 'No upcoming dates confirmed'}</p>
+            {next && !open
+              ? <p className="mk-dkicker"><img src="/images/brand/calgarywatch-city-spark-v2.webp" alt="" width="22" height="22" />{kind ? `${kind} market` : 'Market'} · {[market.neighbourhood, q].filter(Boolean).join(' ') || 'Calgary'}</p>
+              : <p className={`mk-status${open ? ' is-open' : ''}`}>{open ? <span className="cw-lb-pulse mk-pulse" aria-hidden="true" /> : <Clock size={15} aria-hidden="true" />}{next ? statusLine(next, now) : 'No upcoming dates confirmed'}</p>}
             <h1 id="mk-d-title">{market.title}</h1>
             <VerifiedMark entityId={market.id} verifiedAt={market.ownerVerifiedAt} />
-            <p className="mk-dlead">{market.summary}</p>
-            <p className="mk-dwhere"><MapPin size={16} aria-hidden="true" />{market.venue && !market.title.includes(market.venue) ? `${market.venue}, ` : ''}{market.neighbourhood}{q ? ` ${q}` : ''}{kind ? <span className="mk-tag is-light">{kind}</span> : null}</p>
+            <p className="mk-dlead">{firstSentence(market.summary)}</p>
+            <p className="mk-dwhere"><MapPin size={16} aria-hidden="true" />{market.venue && !market.title.includes(market.venue) ? `${market.venue}, ` : ''}{market.neighbourhood}{q ? ` ${q}` : ''}{kind && !(next && !open) ? <span className="mk-tag is-light">{kind}</span> : null}</p>
+            {next ? (
+              <a className={`mk-ticket${open ? ' is-open' : ''}`} href="#mk-dates-title">
+                <span className="mk-ticket-stub"><small>{weekdayShort.format(new Date(next.start))}</small><b>{dayNum.format(new Date(next.start))}</b><small>{monthShort.format(new Date(next.start))}</small></span>
+                <span className="mk-ticket-body">
+                  <small>{open ? 'On right now' : 'Next market'}</small>
+                  <strong>{fullDay.format(new Date(next.start))}</strong>
+                  <span>{hours(next)}<em>{countdown(next, now)}</em></span>
+                </span>
+                {confirmed > 1 ? <span className="mk-ticket-more">+{confirmed - 1}<small>more</small></span> : null}
+              </a>
+            ) : null}
             <div className="mk-dactions">
               <a className="mk-btn mk-btn-sun" href={directionsUrl(market)} target="_blank" rel="noopener noreferrer"><Navigation size={17} aria-hidden="true" /> Directions</a>
               {cal ? <button type="button" className="mk-btn" onClick={download}><CalendarPlus size={17} aria-hidden="true" /> Add {relativeDay(next!.start, now).toLowerCase() === 'today' ? 'today' : weekdayShort.format(new Date(next!.start))} to calendar</button> : null}
@@ -131,7 +154,6 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
           <path d={TEAR} className="h-tear-paper" />
         </svg>
       </section>
-      <ProfileRibbon items={ribbon} />
 
       <div className="cw-wrap mk-page mk-dgrid">
         <div className="mk-dmain">
@@ -147,18 +169,25 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
           <section className="mk-dsec" data-reveal aria-labelledby="mk-dates-title">
             <header className="mk-sec-head"><h2 id="mk-dates-title"><span>Upcoming dates</span></h2><p>{dates.length ? `${dates.filter(o => !o.cancelled).length} confirmed · Calgary time` : 'None confirmed yet'}</p></header>
             {dates.length ? (
-              <ol className="mk-dates">
-                {dates.slice(0, 12).map((o, i) => (
-                  <li key={o.id} className={`${o.cancelled ? 'is-cancelled' : ''}${i === 0 && !o.cancelled ? ' is-next' : ''}${isOpen(o, now) ? ' is-open' : ''}`}>
-                    <span className="mk-date-day">{weekdayShort.format(new Date(o.start))}</span>
-                    <b>{dayNum.format(new Date(o.start))}</b>
-                    <span className="mk-date-mon">{monthShort.format(new Date(o.start))}</span>
-                    <small>{o.cancelled ? 'Cancelled' : isOpen(o, now) ? 'Open now' : hours(o)}</small>
-                  </li>
-                ))}
+              <ol className="mk-tickets">
+                {dates.slice(0, allDates || dates.length <= 5 ? 12 : 4).map(o => {
+                  const d = new Date(o.start), live = isOpen(o, now), isNext = o.id === next?.id;
+                  return (
+                    <li key={o.id} className={`${o.cancelled ? 'is-cancelled' : ''}${isNext ? ' is-next' : ''}${live ? ' is-open' : ''}`}>
+                      <span className="mk-tk-date"><small>{weekdayShort.format(d)}</small><b>{dayNum.format(d)}</b><small>{monthShort.format(d)}</small></span>
+                      <span className="mk-tk-info">
+                        <small>{o.cancelled ? 'Cancelled' : live ? 'Open now' : isNext ? 'Next up' : countdown(o, now)}</small>
+                        <strong>{weekdayLong.format(d)}, {monthDayLong.format(d)}</strong>
+                        <span>{hours(o)}{isNext && !live ? ` · ${countdown(o, now)}` : ''}</span>
+                      </span>
+                      {o.cancelled ? null : <a className="mk-tk-cal" href={googleCalendarUrl(calFor(o))} target="_blank" rel="noopener noreferrer" aria-label={`Add ${fullDay.format(d)} to your calendar`}><CalendarPlus size={18} aria-hidden="true" /></a>}
+                    </li>
+                  );
+                })}
               </ol>
             ) : <p className="mk-muted">The organizer hasn’t published dates yet. {organizerSite ? <a href={organizerSite} target="_blank" rel="noopener noreferrer">Check their site</a> : null}</p>}
-            {dates.length > 12 ? <p className="mk-muted">And {dates.length - 12} more dates after that.</p> : null}
+            {dates.length > 5 && !allDates ? <button type="button" className="mk-btn mk-more-dates" onClick={() => setAllDates(true)}>See {Math.min(dates.length, 12) - 4} more dates</button> : null}
+            {allDates && dates.length > 12 ? <p className="mk-muted">And {dates.length - 12} more dates after that.</p> : null}
           </section>
 
           <StorySpread
@@ -206,7 +235,40 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
             </Link>
           ) : null}
 
-          <MarketLineup marketId={market.id} />
+          <MarketLineup marketId={market.id} sell={false} />
+
+          <section className="mk-dsec mk-desk" data-reveal aria-labelledby="mk-desk-title">
+            <header className="mk-sec-head"><h2 id="mk-desk-title"><span>Vendors &amp; organizers</span></h2><p>Free on CalgaryWatch</p></header>
+            <div className="mk-desk-grid">
+              <div className="mk-desk-card is-vendor">
+                <p className="mk-desk-kicker"><Store size={15} aria-hidden="true" /> For vendors</p>
+                <h3>Sell at {shortName(market)}.</h3>
+                <p>Send {org?.title ?? (market.organizer || 'the organizer')} your application in a couple of minutes. It goes straight to them.</p>
+                <Link className="mk-btn mk-btn-sun" to={`/apply/${encodeURIComponent(market.id)}`}>Apply as a vendor <ArrowUpRight size={16} aria-hidden="true" /></Link>
+              </div>
+              <div className={`mk-desk-card is-org${verified ? ' is-verified' : ''}`}>
+                <p className="mk-desk-kicker"><BadgeCheck size={15} aria-hidden="true" /> For the organizer</p>
+                {verified ? <>
+                  <h3>This page is run by its organizer.</h3>
+                  <p>{org?.title ?? market.organizer ?? 'The organizer'} claimed it and we confirmed them. Dates, hours and links come from their account.</p>
+                  <Link className="mk-btn" to={claimPath}>Manage or request access <ArrowUpRight size={16} aria-hidden="true" /></Link>
+                </> : <>
+                  <h3>Run {shortName(market)}? Make this page yours.</h3>
+                  <ul className="mk-desk-perks">
+                    <li><Check size={16} aria-hidden="true" /> Keep dates, hours and links right yourself</li>
+                    <li><Check size={16} aria-hidden="true" /> A Verified mark beside your name</li>
+                    {VERIFICATION_PRIORITY_ENABLED ? <li><Check size={16} aria-hidden="true" /> More weight when we surface listings</li> : null}
+                  </ul>
+                  <p className="mk-desk-fine" title={CLAIM_BENEFIT}>Free. We check every claim by hand.</p>
+                  <Link className="mk-btn mk-btn-sun" to={claimPath} aria-label={`Claim this listing for ${org?.title ?? market.title}`}>Claim this listing <ArrowUpRight size={16} aria-hidden="true" /></Link>
+                </>}
+                <div className="mk-desk-link">
+                  <span><small>Put it in your bio</small>calgarywatch.ca{entityPath(market)}</span>
+                  <button type="button" onClick={() => void copyLink()}>{copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />} {copied ? 'Copied' : 'Copy'}</button>
+                </div>
+              </div>
+            </div>
+          </section>
 
           {next && sameDay.length ? (
             <section className="mk-dsec" data-reveal aria-labelledby="mk-same-title">
@@ -249,7 +311,7 @@ export function MarketDetail({ market, all, occurrences }: { market: Market; all
 
         <div className="mk-dfoot">
           <SourceBadge entity={market} />
-          <ClaimCta entityId={market.id} title={market.title} kind="market" verifiedAt={market.ownerVerifiedAt} />
+          <p className="mk-correct"><a href={`mailto:aldo@calgarywatch.ca?subject=${encodeURIComponent(`Correction: ${market.title}`)}`}>Spot something out of date? Suggest a correction</a></p>
         </div>
       </div>
 

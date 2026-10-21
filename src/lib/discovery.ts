@@ -52,10 +52,27 @@ export interface DiscoveryRepository {
   find(kind: EntityKind, slug: string): DiscoveryEntity | undefined;
 }
 /** Feed text cleaned for display: decoded entities, no mojibake (cleanText.ts). */
+/**
+ * A source's public name. Reviewed-source names carry how we found them
+ * ("The Barn Artisan Market — user-supplied official-source research"); readers
+ * only need whose it is.
+ */
+export function publicSourceName(name: string): string {
+  const cut = name.replace(/\s+[—–-]\s+[^—–]*\b(?:supplied|research|inventory|confirmation|reviewed|scouting|export)\b[^—–]*$/i, '').trim();
+  return cut || name;
+}
+/** Sentences written for our own reviewers, never for readers. */
+const EDITORIAL_NOTE = /\b(?:override(?:s)? any assumption|user-supplied|official-source research|editor(?:’|')?s note|internal note|do not publish|for reviewers?)\b/i;
+/** Listing copy without notes-to-self that slipped in from source research. */
+export function stripEditorialNotes(text: string): string {
+  if (!text || !EDITORIAL_NOTE.test(text)) return text;
+  return text.split(/(?<=[.!?])\s+/).filter(s => !EDITORIAL_NOTE.test(s)).join(' ').trim();
+}
 function cleanEntity<T extends DiscoveryEntity>(e: T): T {
   const loc = e as T & { venue?: string; address?: string; organizer?: string };
   return {
-    ...e, title: cleanText(e.title), summary: cleanText(e.summary), description: cleanBlock(e.description),
+    ...e, title: cleanText(e.title), summary: stripEditorialNotes(cleanText(e.summary)), description: e.description ? cleanBlock(e.description).split('\n').map(stripEditorialNotes).join('\n') : e.description,
+    sources: e.sources.map(s => ({ ...s, name: publicSourceName(cleanText(s.name)) })),
     ...(e.neighbourhood ? { neighbourhood: cleanText(e.neighbourhood) } : {}),
     ...(loc.venue ? { venue: cleanText(loc.venue) } : {}),
     ...(loc.organizer ? { organizer: cleanText(loc.organizer) } : {}),

@@ -37,18 +37,49 @@ function hostJsonLd(entity: Event | Market, origin: string, all: readonly Discov
   const organizer = organizerJsonLd(entity, origin, all);
   return organizer ? { organizer, performer: organizer } : {};
 }
+/** A structured address when the listing's own address names Calgary; otherwise its text as given. */
+function addressJsonLd(address: string | undefined): object | string | undefined {
+  const text = address?.replace(/\s+/g, ' ').trim();
+  if (!text) return undefined;
+  const match = text.match(/^(.*?),?\s*Calgary,?\s*(?:AB|Alberta)\b,?\s*([A-Z]\d[A-Z] ?\d[A-Z]\d)?/i);
+  if (!match) return text;
+  const street = match[1].replace(/,\s*$/, '').trim();
+  return { '@type': 'PostalAddress', ...(street ? { streetAddress: street } : {}), addressLocality: 'Calgary', addressRegion: 'AB', ...(match[2] ? { postalCode: match[2].toUpperCase() } : {}), addressCountry: 'CA' };
+}
+const CALGARY = { '@type': 'City', name: 'Calgary', containedInPlace: { '@type': 'AdministrativeArea', name: 'Alberta' } };
+const geoJsonLd = (c?: { lat: number; lng: number }) => (c && Number.isFinite(c.lat) && Number.isFinite(c.lng) ? { geo: { '@type': 'GeoCoordinates', latitude: c.lat, longitude: c.lng } } : {});
+/** The place an event or market happens: venue name, structured address when we hold one, and coordinates. */
+function placeJsonLd(name: string, address: string, coordinates?: { lat: number; lng: number }): object {
+  const structured = addressJsonLd(address);
+  return { '@type': 'Place', name, ...(structured ? { address: structured } : {}), ...geoJsonLd(coordinates) };
+}
+/** Facts a business profile holds itself: address, phone, coordinates and its own links. */
+function businessJsonLd(b: Business): object {
+  const address = addressJsonLd(b.address);
+  const sameAs = [b.website, ...Object.values(b.socials ?? {})].filter((u): u is string => typeof u === 'string' && /^https:\/\//.test(u));
+  return { ...(address ? { address } : {}), ...(b.phone ? { telephone: b.phone } : {}), ...geoJsonLd(b.coordinates), ...(sameAs.length ? { sameAs: [...new Set(sameAs)] } : {}), areaServed: CALGARY };
+}
 export function buildEntityJsonLd(entity: DiscoveryEntity, origin: string, occurrences: readonly MarketOccurrence[] = [], all: readonly DiscoveryEntity[] = []): object {
   const offers = entity.kind === 'event' ? offersJsonLd(entity, origin + entityPath(entity)) : undefined;
   const type = { event: 'Event', market: 'Place', business: entity.categories.includes('food') && !entity.categories.some(c => c === 'market' || c === 'markets') ? 'Restaurant' : 'LocalBusiness', guide: 'Article', neighbourhood: 'Place' }[entity.kind];
   return { '@context': 'https://schema.org', '@type': type, name: entity.title, description: entity.summary, url: origin + entityPath(entity),
     ...(entity.image ? { image: new URL(entity.image.src, origin).href } : {}),
-    ...(entity.kind === 'event' ? { startDate: entity.schedulePrecision==='date'?entity.start.slice(0,10):entity.start, endDate: entity.schedulePrecision==='date'?lastEventDate(entity.end):entity.end, eventStatus: `https://schema.org/${entity.cancelled ? 'EventCancelled' : 'EventScheduled'}`, location: { '@type': 'Place', name: entity.venue || entity.address, address: entity.address }, ...hostJsonLd(entity, origin, all), ...(offers ? { offers } : {}) } : {}),
-    ...(entity.kind === 'market' ? { address: entity.address, event: occurrences.filter(o => o.marketId === entity.id).map(o => ({ '@type': 'Event', name: entity.title, startDate: o.start, endDate: o.end, eventStatus: `https://schema.org/${o.cancelled ? 'EventCancelled' : 'EventScheduled'}`, location: { '@type': 'Place', name: entity.title, address: entity.address }, url: origin + entityPath(entity), ...hostJsonLd(entity, origin, all), offers: { '@type': 'Offer', url: origin + entityPath(entity) } })) } : {}),
-    ...(entity.kind === 'guide' ? { headline: entity.title, dateModified: entity.updatedAt, mainEntity: { '@type': 'ItemList', itemListElement: entity.entries.map((entry, i) => ({ '@type': 'ListItem', position: i + 1, identifier: entry.entityId })) } } : {}),
+    ...(entity.kind === 'event' ? { startDate: entity.schedulePrecision==='date'?entity.start.slice(0,10):entity.start, endDate: entity.schedulePrecision==='date'?lastEventDate(entity.end):entity.end, eventStatus: `https://schema.org/${entity.cancelled ? 'EventCancelled' : 'EventScheduled'}`, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', location: placeJsonLd(entity.venue || entity.address, entity.address, entity.coordinates), ...hostJsonLd(entity, origin, all), ...(offers ? { offers } : {}), ...(entity.pricing === 'free' ? { isAccessibleForFree: true } : {}) } : {}),
+    ...(entity.kind === 'market' ? { address: addressJsonLd(entity.address) ?? entity.address, ...geoJsonLd(entity.coordinates), containedInPlace: CALGARY, event: occurrences.filter(o => o.marketId === entity.id).map(o => ({ '@type': 'Event', name: entity.title, startDate: o.start, endDate: o.end, eventStatus: `https://schema.org/${o.cancelled ? 'EventCancelled' : 'EventScheduled'}`, eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode', location: placeJsonLd(entity.venue || entity.title, entity.address, entity.coordinates), url: origin + entityPath(entity), ...hostJsonLd(entity, origin, all), offers: { '@type': 'Offer', url: origin + entityPath(entity) } })) } : {}),
+    ...(entity.kind === 'business' ? businessJsonLd(entity) : {}),
+    ...(entity.kind === 'neighbourhood' ? { containedInPlace: CALGARY } : {}),
+    ...(entity.kind === 'guide' ? { headline: entity.title, dateModified: entity.updatedAt, publisher: { '@type': 'Organization', name: 'CalgaryWatch', url: `${origin}/` }, mainEntity: { '@type': 'ItemList', itemListElement: entity.entries.map((entry, i) => ({ '@type': 'ListItem', position: i + 1, identifier: entry.entityId })) } } : {}),
   };
+}
+/** YYYY-MM-DD of the listing's last source check (or edit), when it is a real date. */
+export function lastChecked(e: DiscoveryEntity): string | undefined {
+  const t = Date.parse(e.verifiedAt || e.updatedAt || '');
+  return Number.isFinite(t) ? new Date(t).toISOString().slice(0, 10) : undefined;
 }
 export function buildSitemap(routes: string[], entities: readonly DiscoveryEntity[], origin: string): string {
   const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-  const paths = [...new Set([...routes, ...indexableEntities(entities).map(entityPath)])];
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map(p => `\n  <url><loc>${escape(origin + p)}</loc></url>`).join('')}\n</urlset>\n`;
+  // lastmod is the day we last checked the listing against its source, so crawlers can skip unchanged pages.
+  const modified = new Map(indexableEntities(entities).map(e => [entityPath(e), lastChecked(e)] as const));
+  const paths = [...new Set([...routes, ...modified.keys()])];
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map(p => `\n  <url><loc>${escape(origin + p)}</loc>${modified.get(p) ? `<lastmod>${modified.get(p)}</lastmod>` : ''}</url>`).join('')}\n</urlset>\n`;
 }

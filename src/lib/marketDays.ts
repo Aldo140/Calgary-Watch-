@@ -52,6 +52,22 @@ export function relativeDay(iso: string, now: Date) {
   return weekdayLong.format(new Date(iso));
 }
 
+/** Calgary calendar days from now until a date: 0 today, 1 tomorrow. */
+export function daysUntil(iso: string, now: Date) {
+  const day = (d: Date) => Date.parse(`${dayKey.format(d)}T12:00:00Z`);
+  return Math.round((day(new Date(iso)) - day(now)) / DAY_MS);
+}
+
+/** How far off a date is, for a ticket: "Open now", "Today", "In 4 days", "In 5 weeks". */
+export function countdown(o: Pick<MarketOccurrence, 'start' | 'end'>, now: Date) {
+  if (Date.parse(o.start) <= now.getTime() && Date.parse(o.end) > now.getTime()) return 'Open now';
+  const n = daysUntil(o.start, now);
+  if (n <= 0) return 'Today';
+  if (n === 1) return 'Tomorrow';
+  if (n < 14) return `In ${n} days`;
+  return `In ${Math.round(n / 7)} weeks`;
+}
+
 /** One line a person reads before deciding: open now, or when it's next on. */
 export function statusLine(next: MarketOccurrence | undefined, now: Date) {
   if (!next) return 'No dates listed yet';

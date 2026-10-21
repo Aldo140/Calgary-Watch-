@@ -5,6 +5,7 @@ import { entityPath } from '../src/lib/discovery';
 import { allShareCards, cardPath, shareCardFor, DEFAULT_SHARE_IMAGE } from '../src/lib/shareImage';
 import { getSeoConfig } from '../src/lib/seo';
 import { renderRouteHtml } from '../scripts/seo/rewriteHtml';
+import type { Event } from '../src/types/discovery';
 
 const shell = '<html><head><title>x</title><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /></head><body><div id="root"></div></body></html>';
 
@@ -18,7 +19,7 @@ test('every listing, hub and Best list has exactly one card file', () => {
 });
 
 test('an event card only states what the listing holds', () => {
-  const event = discoveryRepository.list().find(e => e.kind === 'event' && e.pricing === 'free' && e.venue)!;
+  const event = discoveryRepository.list().find((e): e is Event => e.kind === 'event' && e.pricing === 'free' && !!e.venue)!;
   const card = shareCardFor(entityPath(event), discoveryRepository)!;
   assert.equal(card.theme, 'event');
   assert.equal(card.title, event.title.replace(/\s+/g, ' ').trim());

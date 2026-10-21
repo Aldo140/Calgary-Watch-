@@ -123,7 +123,9 @@ const forever = <T,>() => new Promise<T>(() => undefined);
 export function lazyWithRecovery<T extends ComponentType<any>>(factory: () => Promise<{ default: T }>) {
   return lazy(async () => {
     try {
-      return await factory();
+      const mod = await factory();
+      if (!mod) throw new TypeError('Failed to fetch dynamically imported module (empty module)');
+      return mod;
     } catch (error) {
       if (!isChunkLoadError(error)) throw error;
       if (!isOffline()) {
@@ -143,16 +145,14 @@ export function lazyWithRecovery<T extends ComponentType<any>>(factory: () => Pr
 let installed = false;
 
 /**
- * Catch stale chunks that aren't page loads: Vite's preload helper, and any
- * other `import()` that fails outside a lazy component (the map's plugins,
- * Firebase modules loaded on demand).
+ * Catch stale chunks that aren't page loads: any `import()` that fails outside
+ * a lazy component (the map's plugins, Firebase modules loaded on demand).
+ * Vite's own vite:preloadError is left alone on purpose: preventing it makes
+ * the import resolve to undefined instead of failing, which breaks the page.
  */
 export function installChunkRecovery(): void {
   if (installed || typeof window === 'undefined') return;
   installed = true;
-  window.addEventListener('vite:preloadError', (event) => {
-    if (recoverFromStaleChunk()) event.preventDefault();
-  });
   window.addEventListener('unhandledrejection', (event) => {
     if (isChunkLoadError(event.reason) && recoverFromStaleChunk()) event.preventDefault();
   });

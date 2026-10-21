@@ -1,5 +1,6 @@
 import type { PlansDraft } from './plans';
 import type { PlansProfile } from './plansProfile';
+import { canonicalNeighborhood, looksLikeStreetAddress } from './homeArea';
 
 /** Area is optional; permission to store a supplied area remains explicit. */
 export function plansSetupProblem(draft: PlansDraft, existing: PlansProfile | null): string {
@@ -10,8 +11,12 @@ export function plansSetupProblem(draft: PlansDraft, existing: PlansProfile | nu
 }
 
 export function plansAreaPatch(draft: Pick<PlansDraft, 'neighborhood' | 'address' | 'inferredNeighborhood' | 'consent'>, existing: { piiConsentAt?: number | null } | null, now: number) {
-  const neighborhood = draft.neighborhood.trim().slice(0, 80);
-  const address = draft.address.trim().slice(0, 160);
+  // A street address typed into the neighbourhood box is saved as the address,
+  // where the Thursday email can place it; a community gets its proper spelling.
+  const typed = draft.neighborhood.trim();
+  const movedAddress = Boolean(typed && !draft.address.trim() && looksLikeStreetAddress(typed));
+  const neighborhood = movedAddress ? '' : canonicalNeighborhood(typed).slice(0, 80);
+  const address = (movedAddress ? typed : draft.address.trim()).slice(0, 160);
   const hasArea = Boolean(neighborhood || address);
   if (hasArea && !existing?.piiConsentAt && !draft.consent) throw Error('Permission is required to save your area.');
   return {

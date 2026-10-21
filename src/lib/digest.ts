@@ -13,6 +13,7 @@
 
 import type { Incident, IncidentCategory } from '@/src/types';
 import { calgaryDateTimeFormat } from './calgaryTz';
+import { canonicalNeighborhood, looksLikeStreetAddress } from './homeArea';
 
 /** Seven days, in ms. The digest's whole horizon. */
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -507,7 +508,10 @@ export function buildDigestSummary(options: {
   const previousSince = since - WEEK_MS;
   const contextSince = now - DIGEST_CONTEXT_MS;
 
-  const savedArea = (profile.neighborhood || profile.inferredNeighborhood || '').trim();
+  // A street address typed as the area is never printed as one ("in 123 main st");
+  // the sender places it as an address instead. Lower-case names read properly.
+  const typedArea = (profile.neighborhood || profile.inferredNeighborhood || '').trim();
+  const savedArea = looksLikeStreetAddress(typedArea) ? '' : canonicalNeighborhood(typedArea);
   // A chosen category set narrows every scope below; empty means no preference,
   // so the digest reads exactly as it did before anyone picked topics.
   const categories = options.categories ?? [];

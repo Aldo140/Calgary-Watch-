@@ -4787,6 +4787,2358 @@
       "verification": "source-checked",
       "updatedAt": "2026-10-21T00:32:35.000Z",
       "email": "tulene@17thave.ca"
+    },
+    {
+      "id": "biz-victoria-park-bia",
+      "kind": "business",
+      "slug": "victoria-park-bia",
+      "title": "Victoria Park Business Improvement Area",
+      "name": "Victoria Park Business Improvement Area",
+      "website": "https://www.victoriapark.org/",
+      "address": "1126 3 Street SE, Calgary, AB",
+      "summary": "The business association for Victoria Park, the district around the Stampede grounds and the Rivers District.",
+      "description": "The Victoria Park Business Improvement Area represents the restaurants, bars, shops and businesses in Victoria Park, east of the Beltline and next to the Stampede grounds. It promotes the district, keeps a business directory and supports street events through the year. Its own website lists member businesses and what's happening in the area.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "victoria-park"
+      ],
+      "sources": [
+        {
+          "name": "Victoria Park Business Improvement Area — official website",
+          "url": "https://www.victoriapark.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Business Improvement Areas",
+          "url": "https://www.calgary.ca/for-business/bias-in-calgary.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.victoriapark.org/"
+      },
+      "services": [
+        "District events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "david.low@victoriapark.org",
+      "phone": "403-650-4757"
+    },
+    {
+      "id": "biz-calgary-chinatown-bia",
+      "kind": "business",
+      "slug": "calgary-chinatown-bia",
+      "title": "Calgary Chinatown Business Improvement Area",
+      "name": "Calgary Chinatown Business Improvement Area",
+      "website": "https://www.calgarychinatown.com/",
+      "address": "Chinatown, Calgary, AB",
+      "summary": "The business association for Calgary's Chinatown, home to restaurants, bakeries, shops and cultural events downtown.",
+      "description": "The Calgary Chinatown Business Improvement Area supports the restaurants, grocers, bakeries and shops in Chinatown on the east side of downtown. It promotes the district and supports cultural celebrations and street events, including Lunar New Year and summer festivals. Event dates and the business directory are on its own website.",
+      "categories": [
+        "shopping",
+        "food",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "chinatown"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Chinatown Business Improvement Area — official website",
+          "url": "https://www.calgarychinatown.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Business Improvement Areas",
+          "url": "https://www.calgary.ca/for-business/bias-in-calgary.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarychinatown.com/"
+      },
+      "services": [
+        "District events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "ed@calgarychinatown.com"
+    },
+    {
+      "id": "biz-mainstreet-bowness-bia",
+      "kind": "business",
+      "slug": "mainstreet-bowness-bia",
+      "title": "Mainstreet Bowness Business Improvement Area",
+      "name": "Mainstreet Bowness Business Improvement Area",
+      "website": "https://www.mainstreetbowness.com/",
+      "address": "Bowness Road NW, Calgary, AB",
+      "summary": "The business association for the shops, cafés and services along Bowness Road in northwest Calgary.",
+      "description": "Mainstreet Bowness Business Improvement Area represents the local businesses along Bowness Road NW, a short walk from Bowness Park and the Bow River. It promotes the main street and supports seasonal community events. Member businesses and events are on its own website.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "bowness"
+      ],
+      "sources": [
+        {
+          "name": "Mainstreet Bowness Business Improvement Area — official website",
+          "url": "https://www.mainstreetbowness.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Business Improvement Areas",
+          "url": "https://www.calgary.ca/for-business/bias-in-calgary.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mainstreetbowness.com/"
+      },
+      "services": [
+        "District events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "kellie@mainstreetbowness.com"
+    },
+    {
+      "id": "biz-calgary-downtown-association",
+      "kind": "business",
+      "slug": "calgary-downtown-association",
+      "title": "Calgary Downtown Association",
+      "name": "Calgary Downtown Association",
+      "website": "https://www.downtowncalgary.com/",
+      "address": "Downtown, Calgary, AB",
+      "summary": "The business improvement area for Calgary's downtown core, covering Stephen Avenue and the surrounding blocks.",
+      "description": "The Calgary Downtown Association is the non-profit business improvement area for downtown Calgary, representing thousands of businesses across the core, including Stephen Avenue. It promotes downtown and runs and supports public events and activations through the year. Events and downtown business listings are on its own website.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "downtown"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Downtown Association — official website",
+          "url": "https://www.downtowncalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Business Improvement Areas",
+          "url": "https://www.calgary.ca/for-business/bias-in-calgary.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.downtowncalgary.com/"
+      },
+      "services": [
+        "Downtown events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "sheilat@downtowncalgary.com",
+      "phone": "403-215-1570"
+    },
+    {
+      "id": "biz-wallace-galleries",
+      "kind": "business",
+      "slug": "wallace-galleries",
+      "title": "Wallace Galleries",
+      "name": "Wallace Galleries",
+      "website": "https://www.wallacegalleries.com/",
+      "address": "Calgary, AB",
+      "summary": "A long-running Calgary commercial gallery showing contemporary Canadian painting and sculpture.",
+      "description": "Wallace Galleries is a Calgary art gallery that has represented Canadian painters and sculptors for decades, with regular solo and group exhibitions. Current exhibitions, hours and location are on the gallery's own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "gallery"
+      ],
+      "sources": [
+        {
+          "name": "Wallace Galleries — official website",
+          "url": "https://www.wallacegalleries.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.wallacegalleries.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Art sales"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@wallacegalleries.com",
+      "phone": "403-262-8050"
+    },
+    {
+      "id": "biz-alberta-craft-gallery-calgary",
+      "kind": "business",
+      "slug": "alberta-craft-gallery-calgary",
+      "title": "Alberta Craft Gallery & Shop (Calgary)",
+      "name": "Alberta Craft Gallery & Shop (Calgary)",
+      "website": "https://www.albertacraft.ab.ca/",
+      "address": "cSPACE Marda Loop, 1721 29 Avenue SW, Suite 280, Calgary, AB",
+      "summary": "The Alberta Craft Council's Calgary gallery and shop at cSPACE Marda Loop, showing work by Alberta craft artists.",
+      "description": "The Alberta Craft Council runs a gallery and shop at cSPACE Marda Loop with exhibitions and handmade work by Alberta artists in ceramics, glass, jewellery, textiles, wood and more. Exhibition dates and opening hours are on the council's own website.",
+      "categories": [
+        "arts",
+        "shopping"
+      ],
+      "tags": [
+        "organization",
+        "gallery",
+        "craft"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Craft Gallery & Shop (Calgary) — official website",
+          "url": "https://www.albertacraft.ab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.albertacraft.ab.ca/"
+      },
+      "services": [
+        "Exhibitions",
+        "Craft shop"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "corinne@albertacraft.ab.ca",
+      "phone": "587-391-0129"
+    },
+    {
+      "id": "biz-early-music-voices",
+      "kind": "business",
+      "slug": "early-music-voices",
+      "title": "Early Music Voices",
+      "name": "Early Music Voices",
+      "website": "https://earlymusicvoices.ca/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary concert society presenting medieval, renaissance and baroque music by local and touring artists.",
+      "description": "Early Music Voices is a Calgary concert society that presents early music from the medieval, renaissance and baroque periods, performed by local and visiting musicians. Its concert season, venues and tickets are on its own website.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "concerts",
+        "early-music"
+      ],
+      "sources": [
+        {
+          "name": "Early Music Voices — official website",
+          "url": "https://earlymusicvoices.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://earlymusicvoices.ca/"
+      },
+      "services": [
+        "Concert series"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@earlymusicvoices.ca",
+      "phone": "403-243-2332"
+    },
+    {
+      "id": "biz-funnyfest",
+      "kind": "business",
+      "slug": "funnyfest",
+      "title": "FunnyFest Calgary Comedy Festival",
+      "name": "FunnyFest Calgary Comedy Festival",
+      "website": "https://www.funnyfest.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's long-running comedy festival and stand-up competition.",
+      "description": "FunnyFest Calgary Comedy Festival runs stand-up shows and an annual comedy competition with dozens of comedians across multiple nights in Calgary. Show dates, venues and tickets are on its own website.",
+      "categories": [
+        "arts",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "comedy",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "FunnyFest Calgary Comedy Festival — official website",
+          "url": "https://www.funnyfest.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.funnyfest.com/"
+      },
+      "services": [
+        "Comedy festival",
+        "Stand-up shows"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "tickets@funnyfest.com",
+      "phone": "403-228-7888"
+    },
+    {
+      "id": "biz-masters-gallery",
+      "kind": "business",
+      "slug": "masters-gallery",
+      "title": "Masters Gallery",
+      "name": "Masters Gallery",
+      "website": "https://www.mastersgalleryltd.com/",
+      "address": "107, 2115 4 Street SW, Calgary, AB T2S 1W8",
+      "summary": "A Calgary gallery on 4th Street SW specializing in historical and contemporary Canadian art.",
+      "description": "Masters Gallery has shown historical and contemporary Canadian art since 1976, including work by the Group of Seven and Alberta painters. It holds regular exhibitions at its 4th Street SW gallery. Exhibitions and hours are on its own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "gallery"
+      ],
+      "sources": [
+        {
+          "name": "Masters Gallery — official website",
+          "url": "https://www.mastersgalleryltd.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mastersgalleryltd.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Art sales"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@mastersgalleryltd.com",
+      "phone": "403-245-2064"
+    },
+    {
+      "id": "biz-newzones-gallery",
+      "kind": "business",
+      "slug": "newzones-gallery",
+      "title": "Newzones Gallery",
+      "name": "Newzones Gallery",
+      "website": "https://newzones.com/",
+      "address": "730 11 Avenue SW, Calgary, AB",
+      "summary": "A contemporary art gallery on 11 Avenue SW representing Albertan and Canadian artists since 1992.",
+      "description": "Newzones is a contemporary art gallery in the Beltline that has represented Albertan, Canadian and international artists since 1992. It runs rotating exhibitions through the year. Current shows and hours are on its own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "gallery",
+        "beltline"
+      ],
+      "sources": [
+        {
+          "name": "Newzones Gallery — official website",
+          "url": "https://newzones.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://newzones.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Art sales"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@newzones.com",
+      "phone": "403-266-1972"
+    },
+    {
+      "id": "biz-paul-kuhn-gallery",
+      "kind": "business",
+      "slug": "paul-kuhn-gallery",
+      "title": "Paul Kuhn Gallery",
+      "name": "Paul Kuhn Gallery",
+      "website": "https://www.paulkuhngallery.com/",
+      "address": "724 11 Avenue SW, Calgary, AB T2R 0E4",
+      "summary": "A Beltline contemporary art gallery showing painting, sculpture and photography.",
+      "description": "Paul Kuhn Gallery is a contemporary art gallery on 11 Avenue SW showing painting, sculpture and photography by Canadian and international artists. Exhibitions and hours are on its own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "gallery",
+        "beltline"
+      ],
+      "sources": [
+        {
+          "name": "Paul Kuhn Gallery — official website",
+          "url": "https://www.paulkuhngallery.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Art Dealers Association of Canada — Paul Kuhn Gallery",
+          "url": "https://www.ad-ac.ca/paul-kuhn-gallery",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.paulkuhngallery.com/"
+      },
+      "services": [
+        "Exhibitions",
+        "Art sales"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "paul@paulkuhngallery.com",
+      "phone": "403-263-1162"
+    },
+    {
+      "id": "biz-calgary-heritage-initiative",
+      "kind": "business",
+      "slug": "calgary-heritage-initiative",
+      "title": "Calgary Heritage Initiative",
+      "name": "Calgary Heritage Initiative",
+      "website": "https://calgaryheritage.org/",
+      "address": "Calgary, AB",
+      "summary": "A volunteer society working to protect Calgary's historic buildings and places, with walks and public talks.",
+      "description": "The Calgary Heritage Initiative Society is a volunteer group that advocates for Calgary's historic buildings and places and shares their stories through public events, talks and walks. Upcoming events and ways to get involved are on its own website.",
+      "categories": [
+        "heritage",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "heritage"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Heritage Initiative — official website",
+          "url": "https://calgaryheritage.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryheritage.org/"
+      },
+      "services": [
+        "Heritage advocacy",
+        "Public talks and walks"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "contact@calgaryheritage.org"
+    },
+    {
+      "id": "biz-yuk-yuks-calgary",
+      "kind": "business",
+      "slug": "yuk-yuks-calgary",
+      "title": "Yuk Yuk's Calgary",
+      "name": "Yuk Yuk's Calgary",
+      "website": "https://www.yukyuks.com/calgary",
+      "address": "Elbow River Casino, 218 18 Avenue SE, Calgary, AB T2G 1L1",
+      "summary": "Yuk Yuk's stand-up comedy club in Victoria Park, with touring and local comedians most weeks.",
+      "description": "Yuk Yuk's Calgary is a stand-up comedy club at the Elbow River Casino in Victoria Park, with headliners, features and local comics on its weekly line-up. Show times and tickets are on its own website.",
+      "categories": [
+        "nightlife",
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "comedy",
+        "venue",
+        "victoria-park"
+      ],
+      "sources": [
+        {
+          "name": "Yuk Yuk's Calgary — official website",
+          "url": "https://www.yukyuks.com/calgary",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Victoria Park BIA — Yuk Yuk's Comedy Club",
+          "url": "https://victoriapark.org/listing/yuk-yuks-calgary",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.yukyuks.com/calgary"
+      },
+      "services": [
+        "Comedy shows"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "calgary@yukyuks.com"
+    },
+    {
+      "id": "biz-cliff-bungalow-mission-community-association",
+      "kind": "business",
+      "slug": "cliff-bungalow-mission-community-association",
+      "title": "Cliff Bungalow-Mission Community Association",
+      "name": "Cliff Bungalow-Mission Community Association",
+      "website": "https://www.cliffbungalowmission.com/",
+      "address": "2201 Cliff Street SW, Calgary, AB T2S 1W2",
+      "summary": "The community association for Cliff Bungalow and Mission in Calgary, with neighbourhood programs and events.",
+      "description": "The Cliff Bungalow-Mission Community Association is the volunteer-run association for residents of Cliff Bungalow and Mission. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "cliff-bungalow-mission"
+      ],
+      "sources": [
+        {
+          "name": "Cliff Bungalow-Mission Community Association — official website",
+          "url": "https://www.cliffbungalowmission.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.cliffbungalowmission.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "cbmca.president@gmail.com"
+    },
+    {
+      "id": "biz-bankview-community-association",
+      "kind": "business",
+      "slug": "bankview-community-association",
+      "title": "Bankview Community Association",
+      "name": "Bankview Community Association",
+      "website": "https://www.bankview.org/",
+      "address": "Bankview, Calgary, AB",
+      "summary": "The community association for Bankview in Calgary, with neighbourhood programs and events.",
+      "description": "The Bankview Community Association is the volunteer-run association for residents of Bankview. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "bankview"
+      ],
+      "sources": [
+        {
+          "name": "Bankview Community Association — official website",
+          "url": "https://www.bankview.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.bankview.org/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@bankview.org",
+      "phone": "403-244-2544"
+    },
+    {
+      "id": "biz-scarboro-community-association",
+      "kind": "business",
+      "slug": "scarboro-community-association",
+      "title": "Scarboro Community Association",
+      "name": "Scarboro Community Association",
+      "website": "https://www.scarborocommunity.com/",
+      "address": "Scarboro, Calgary, AB",
+      "summary": "The community association for Scarboro in Calgary, with neighbourhood programs and events.",
+      "description": "The Scarboro Community Association is the volunteer-run association for residents of Scarboro. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "scarboro"
+      ],
+      "sources": [
+        {
+          "name": "Scarboro Community Association — official website",
+          "url": "https://www.scarborocommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.scarborocommunity.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "hello@scarborocommunity.com"
+    },
+    {
+      "id": "biz-sunalta-community-association",
+      "kind": "business",
+      "slug": "sunalta-community-association",
+      "title": "Sunalta Community Association",
+      "name": "Sunalta Community Association",
+      "website": "https://www.sunalta.net/",
+      "address": "1627 10 Avenue SW, Calgary, AB",
+      "summary": "The community association for Sunalta in Calgary, with neighbourhood programs and events.",
+      "description": "The Sunalta Community Association is the volunteer-run association for residents of Sunalta. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "sunalta"
+      ],
+      "sources": [
+        {
+          "name": "Sunalta Community Association — official website",
+          "url": "https://www.sunalta.net/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sunalta.net/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@sunalta.net"
+    },
+    {
+      "id": "biz-crossroads-community-association",
+      "kind": "business",
+      "slug": "crossroads-community-association",
+      "title": "Crossroads Community Association",
+      "name": "Crossroads Community Association",
+      "website": "https://www.crossroadsyyc.com/",
+      "address": "Crossroads, Calgary, AB",
+      "summary": "The community association for Crossroads in Calgary, with neighbourhood programs and events.",
+      "description": "The Crossroads Community Association is the volunteer-run association for residents of Crossroads. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "crossroads"
+      ],
+      "sources": [
+        {
+          "name": "Crossroads Community Association — official website",
+          "url": "https://www.crossroadsyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 10 community associations",
+          "url": "https://www.calgary.ca/council/ward-10/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.crossroadsyyc.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "manager@crossroadsyyc.com"
+    },
+    {
+      "id": "biz-whitehorn-community-association",
+      "kind": "business",
+      "slug": "whitehorn-community-association",
+      "title": "Whitehorn Community Association",
+      "name": "Whitehorn Community Association",
+      "website": "https://www.whitehorncommunity.com/",
+      "address": "Whitehorn, Calgary, AB",
+      "summary": "The community association for Whitehorn in Calgary, with neighbourhood programs and events.",
+      "description": "The Whitehorn Community Association is the volunteer-run association for residents of Whitehorn. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "whitehorn"
+      ],
+      "sources": [
+        {
+          "name": "Whitehorn Community Association — official website",
+          "url": "https://www.whitehorncommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 10 community associations",
+          "url": "https://www.calgary.ca/council/ward-10/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.whitehorncommunity.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@whitehorncommunity.com"
+    },
+    {
+      "id": "biz-marlborough-community-association",
+      "kind": "business",
+      "slug": "marlborough-community-association",
+      "title": "Marlborough Community Association",
+      "name": "Marlborough Community Association",
+      "website": "https://www.calgarymarlborough.com/",
+      "address": "Marlborough, Calgary, AB",
+      "summary": "The community association for Marlborough in Calgary, with neighbourhood programs and events.",
+      "description": "The Marlborough Community Association is the volunteer-run association for residents of Marlborough. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "marlborough"
+      ],
+      "sources": [
+        {
+          "name": "Marlborough Community Association — official website",
+          "url": "https://www.calgarymarlborough.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 10 community associations",
+          "url": "https://www.calgary.ca/council/ward-10/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarymarlborough.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@calgarymarlborough.com",
+      "phone": "403-273-5894"
+    },
+    {
+      "id": "biz-pineridge-community-association",
+      "kind": "business",
+      "slug": "pineridge-community-association",
+      "title": "Pineridge Community Association",
+      "name": "Pineridge Community Association",
+      "website": "https://www.pineridgeyyc.ca/",
+      "address": "Pineridge, Calgary, AB",
+      "summary": "The community association for Pineridge in Calgary, with neighbourhood programs and events.",
+      "description": "The Pineridge Community Association is the volunteer-run association for residents of Pineridge. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "pineridge"
+      ],
+      "sources": [
+        {
+          "name": "Pineridge Community Association — official website",
+          "url": "https://www.pineridgeyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 10 community associations",
+          "url": "https://www.calgary.ca/council/ward-10/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.pineridgeyyc.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@pineridgeyyc.ca",
+      "phone": "403-280-2774"
+    },
+    {
+      "id": "biz-monterey-park-community-association",
+      "kind": "business",
+      "slug": "monterey-park-community-association",
+      "title": "Monterey Park Community Association",
+      "name": "Monterey Park Community Association",
+      "address": "Monterey Park, Calgary, AB",
+      "summary": "The community association for Monterey Park in Calgary, with neighbourhood programs and events.",
+      "description": "The Monterey Park Community Association is the volunteer-run association for residents of Monterey Park. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "monterey-park"
+      ],
+      "sources": [
+        {
+          "name": "City of Calgary — Ward 10 community associations",
+          "url": "https://www.calgary.ca/council/ward-10/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "monterey@telus.net",
+      "phone": "403-293-9299"
+    },
+    {
+      "id": "biz-marlborough-park-community-association",
+      "kind": "business",
+      "slug": "marlborough-park-community-association",
+      "title": "Marlborough Park Community Association",
+      "name": "Marlborough Park Community Association",
+      "address": "Marlborough Park, Calgary, AB",
+      "summary": "The community association for Marlborough Park in Calgary, with neighbourhood programs and events.",
+      "description": "The Marlborough Park Community Association is the volunteer-run association for residents of Marlborough Park. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "marlborough-park"
+      ],
+      "sources": [
+        {
+          "name": "City of Calgary — Ward 10 community associations",
+          "url": "https://www.calgary.ca/council/ward-10/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "marlpark.ap@shaw.ca",
+      "phone": "403-248-1775"
+    },
+    {
+      "id": "biz-elbow-park-residents-association",
+      "kind": "business",
+      "slug": "elbow-park-residents-association",
+      "title": "Elbow Park Residents Association",
+      "name": "Elbow Park Residents Association",
+      "website": "https://www.elbowpark.com/",
+      "address": "Elbow Park, Calgary, AB",
+      "summary": "The community association for Elbow Park in Calgary, with neighbourhood programs and events.",
+      "description": "The Elbow Park Residents Association is the volunteer-run association for residents of Elbow Park. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "elbow-park"
+      ],
+      "sources": [
+        {
+          "name": "Elbow Park Residents Association — official website",
+          "url": "https://www.elbowpark.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.elbowpark.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@elbowpark.com"
+    },
+    {
+      "id": "biz-erlton-community-association",
+      "kind": "business",
+      "slug": "erlton-community-association",
+      "title": "Erlton Community Association",
+      "name": "Erlton Community Association",
+      "address": "Erlton, Calgary, AB",
+      "summary": "The community association for Erlton in Calgary, with neighbourhood programs and events.",
+      "description": "The Erlton Community Association is the volunteer-run association for residents of Erlton. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "erlton"
+      ],
+      "sources": [
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "erltonpresident@gmail.com"
+    },
+    {
+      "id": "biz-mount-royal-community-association",
+      "kind": "business",
+      "slug": "mount-royal-community-association",
+      "title": "Mount Royal Community Association",
+      "name": "Mount Royal Community Association",
+      "website": "https://www.mrca.ca/",
+      "address": "Mount Royal, Calgary, AB",
+      "summary": "The community association for Mount Royal in Calgary, with neighbourhood programs and events.",
+      "description": "The Mount Royal Community Association is the volunteer-run association for residents of Mount Royal. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "mount-royal"
+      ],
+      "sources": [
+        {
+          "name": "Mount Royal Community Association — official website",
+          "url": "https://www.mrca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mrca.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@mrca.ca",
+      "phone": "403-437-0520"
+    },
+    {
+      "id": "biz-glamorgan-community-association",
+      "kind": "business",
+      "slug": "glamorgan-community-association",
+      "title": "Glamorgan Community Association",
+      "name": "Glamorgan Community Association",
+      "website": "https://www.myglamorgan.ca/",
+      "address": "Glamorgan, Calgary, AB",
+      "summary": "The community association for Glamorgan in Calgary, with neighbourhood programs and events.",
+      "description": "The Glamorgan Community Association is the volunteer-run association for residents of Glamorgan. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "glamorgan"
+      ],
+      "sources": [
+        {
+          "name": "Glamorgan Community Association — official website",
+          "url": "https://www.myglamorgan.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/glamorgan-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.myglamorgan.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@myglamorgan.ca",
+      "phone": "403-246-8218"
+    },
+    {
+      "id": "biz-auburn-bay-community-association",
+      "kind": "business",
+      "slug": "auburn-bay-community-association",
+      "title": "Auburn Bay Community Association",
+      "name": "Auburn Bay Community Association",
+      "website": "https://auburnbayca.ca/",
+      "address": "Auburn Bay, Calgary, AB",
+      "summary": "The community association for Auburn Bay in Calgary, with neighbourhood programs and events.",
+      "description": "The Auburn Bay Community Association is the volunteer-run association for residents of Auburn Bay. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "auburn-bay"
+      ],
+      "sources": [
+        {
+          "name": "Auburn Bay Community Association — official website",
+          "url": "https://auburnbayca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://auburnbayca.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@auburnbayca.ca",
+      "phone": "403-744-5301"
+    },
+    {
+      "id": "biz-copperfield-community-association",
+      "kind": "business",
+      "slug": "copperfield-community-association",
+      "title": "Copperfield Community Association",
+      "name": "Copperfield Community Association",
+      "website": "https://www.mycopperfield.ca/",
+      "address": "Copperfield, Calgary, AB",
+      "summary": "The community association for Copperfield in Calgary, with neighbourhood programs and events.",
+      "description": "The Copperfield Community Association is the volunteer-run association for residents of Copperfield. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "copperfield"
+      ],
+      "sources": [
+        {
+          "name": "Copperfield Community Association — official website",
+          "url": "https://www.mycopperfield.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/copperfield-mahogany-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mycopperfield.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@mycopperfield.ca",
+      "phone": "403-532-8864"
+    },
+    {
+      "id": "biz-mahogany-community-association",
+      "kind": "business",
+      "slug": "mahogany-community-association",
+      "title": "Mahogany Community Association",
+      "name": "Mahogany Community Association",
+      "website": "https://www.mahoganycommunity.ca/",
+      "address": "Mahogany, Calgary, AB",
+      "summary": "The community association for Mahogany in Calgary, with neighbourhood programs and events.",
+      "description": "The Mahogany Community Association is the volunteer-run association for residents of Mahogany. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "mahogany"
+      ],
+      "sources": [
+        {
+          "name": "Mahogany Community Association — official website",
+          "url": "https://www.mahoganycommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/mahogany-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mahoganycommunity.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@mahoganycommunity.ca",
+      "phone": "403-607-5025"
+    },
+    {
+      "id": "biz-highland-park-community-association",
+      "kind": "business",
+      "slug": "highland-park-community-association",
+      "title": "Highland Park Community Association",
+      "name": "Highland Park Community Association",
+      "website": "https://www.highlandparkcommunity.ca/",
+      "address": "3716 2 Street NW, Calgary, AB",
+      "summary": "The community association for Highland Park in Calgary, with neighbourhood programs and events.",
+      "description": "The Highland Park Community Association is the volunteer-run association for residents of Highland Park. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "highland-park"
+      ],
+      "sources": [
+        {
+          "name": "Highland Park Community Association — official website",
+          "url": "https://www.highlandparkcommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/highland-park-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.highlandparkcommunity.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "hallmanager@highlandparkcommunity.ca",
+      "phone": "403-276-6969"
+    },
+    {
+      "id": "biz-tuscany-community-association",
+      "kind": "business",
+      "slug": "tuscany-community-association",
+      "title": "Tuscany Community Association",
+      "name": "Tuscany Community Association",
+      "website": "https://www.tuscanyca.org/",
+      "address": "Tuscany, Calgary, AB",
+      "summary": "The community association for Tuscany in Calgary, with neighbourhood programs and events.",
+      "description": "The Tuscany Community Association is the volunteer-run association for residents of Tuscany. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "tuscany"
+      ],
+      "sources": [
+        {
+          "name": "Tuscany Community Association — official website",
+          "url": "https://www.tuscanyca.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/tuscany-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.tuscanyca.org/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "executiveadmin@tuscanyca.org"
+    },
+    {
+      "id": "biz-cranston-residents-association",
+      "kind": "business",
+      "slug": "cranston-residents-association",
+      "title": "Cranston Residents Association",
+      "name": "Cranston Residents Association",
+      "website": "https://cranstonra.ca/",
+      "address": "11 Cranarch Road SE, Calgary, AB T3M 0S8",
+      "summary": "The community association for Cranston in Calgary, with neighbourhood programs and events.",
+      "description": "The Cranston Residents Association is the volunteer-run association for residents of Cranston. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "cranston"
+      ],
+      "sources": [
+        {
+          "name": "Cranston Residents Association — official website",
+          "url": "https://cranstonra.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cranstonra.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@cranstonra.ca",
+      "phone": "403-781-6614"
+    },
+    {
+      "id": "biz-haysboro-community-association",
+      "kind": "business",
+      "slug": "haysboro-community-association",
+      "title": "Haysboro Community Association",
+      "name": "Haysboro Community Association",
+      "website": "https://haysboro.org/",
+      "address": "1204 89 Avenue SW, Calgary, AB T2V 0W4",
+      "summary": "The community association for Haysboro in Calgary, with neighbourhood programs and events.",
+      "description": "The Haysboro Community Association is the volunteer-run association for residents of Haysboro. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "haysboro"
+      ],
+      "sources": [
+        {
+          "name": "Haysboro Community Association — official website",
+          "url": "https://haysboro.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://haysboro.org/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@haysboro.org",
+      "phone": "403-253-1563"
+    },
+    {
+      "id": "biz-richmond-knob-hill-community-association",
+      "kind": "business",
+      "slug": "richmond-knob-hill-community-association",
+      "title": "Richmond Knob Hill Community Association",
+      "name": "Richmond Knob Hill Community Association",
+      "website": "https://www.richmondknobhill.ca/",
+      "address": "2433 26 Avenue SW, Calgary, AB T2T 5Y5",
+      "summary": "The community association for Richmond and Knob Hill in Calgary, with neighbourhood programs and events.",
+      "description": "The Richmond Knob Hill Community Association is the volunteer-run association for residents of Richmond and Knob Hill. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "richmond-knob-hill"
+      ],
+      "sources": [
+        {
+          "name": "Richmond Knob Hill Community Association — official website",
+          "url": "https://www.richmondknobhill.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.richmondknobhill.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@richmondknobhill.ca",
+      "phone": "403-263-6104"
+    },
+    {
+      "id": "biz-evanston-creekside-community-association",
+      "kind": "business",
+      "slug": "evanston-creekside-community-association",
+      "title": "Evanston-Creekside Community Association",
+      "name": "Evanston-Creekside Community Association",
+      "website": "https://www.eccacalgary.com/",
+      "address": "Evanston and Creekside, Calgary, AB",
+      "summary": "The community association for Evanston and Creekside in Calgary, with neighbourhood programs and events.",
+      "description": "The Evanston-Creekside Community Association is the volunteer-run association for residents of Evanston and Creekside. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "evanston-creekside"
+      ],
+      "sources": [
+        {
+          "name": "Evanston-Creekside Community Association — official website",
+          "url": "https://www.eccacalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/evanston-creekside-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.eccacalgary.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "president@eccacalgary.com"
+    },
+    {
+      "id": "biz-parkhill-community-association",
+      "kind": "business",
+      "slug": "parkhill-community-association",
+      "title": "Parkhill Community Association",
+      "name": "Parkhill Community Association",
+      "website": "https://www.parkhillstanleypark.ca/",
+      "address": "4013 Stanley Road SW, Calgary, AB T2S 2P5",
+      "summary": "The community association for Parkhill in Calgary, with neighbourhood programs and events.",
+      "description": "The Parkhill Community Association is the volunteer-run association for residents of Parkhill. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "parkhill"
+      ],
+      "sources": [
+        {
+          "name": "Parkhill Community Association — official website",
+          "url": "https://www.parkhillstanleypark.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.parkhillstanleypark.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "communications@parkhillstanleypark.ca",
+      "phone": "403-243-6211"
+    },
+    {
+      "id": "biz-canyon-meadows-community-association",
+      "kind": "business",
+      "slug": "canyon-meadows-community-association",
+      "title": "Canyon Meadows Community Association",
+      "name": "Canyon Meadows Community Association",
+      "website": "https://cmca.ca/",
+      "address": "844 Cantabrian Drive SW, Calgary, AB",
+      "summary": "The community association for Canyon Meadows in Calgary, with neighbourhood programs and events.",
+      "description": "The Canyon Meadows Community Association is the volunteer-run association for residents of Canyon Meadows. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "canyon-meadows"
+      ],
+      "sources": [
+        {
+          "name": "Canyon Meadows Community Association — official website",
+          "url": "https://cmca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 13 community associations",
+          "url": "https://www.calgary.ca/council/ward-13/community-associations.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cmca.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@cmca.ca",
+      "phone": "403-251-1715"
+    },
+    {
+      "id": "biz-woodcreek-community-association",
+      "kind": "business",
+      "slug": "woodcreek-community-association",
+      "title": "Woodcreek Community Association",
+      "name": "Woodcreek Community Association",
+      "website": "https://www.woodcreekcommunity.ca/",
+      "address": "Woodbine and Woodlands, Calgary, AB",
+      "summary": "The community association for Woodbine and Woodlands in Calgary, with neighbourhood programs and events.",
+      "description": "The Woodcreek Community Association is the volunteer-run association for residents of Woodbine and Woodlands. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "woodcreek"
+      ],
+      "sources": [
+        {
+          "name": "Woodcreek Community Association — official website",
+          "url": "https://www.woodcreekcommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/woodcreek-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.woodcreekcommunity.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "wca@woodcreekcommunity.ca",
+      "phone": "403-238-1611"
+    },
+    {
+      "id": "biz-rosscarrock-community-association",
+      "kind": "business",
+      "slug": "rosscarrock-community-association",
+      "title": "Rosscarrock Community Association",
+      "name": "Rosscarrock Community Association",
+      "website": "https://www.rosscarrock.org/",
+      "address": "Rosscarrock, Calgary, AB",
+      "summary": "The community association for Rosscarrock in Calgary, with neighbourhood programs and events.",
+      "description": "The Rosscarrock Community Association is the volunteer-run association for residents of Rosscarrock. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "rosscarrock"
+      ],
+      "sources": [
+        {
+          "name": "Rosscarrock Community Association — official website",
+          "url": "https://www.rosscarrock.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "City of Calgary — Ward 8 community associations",
+          "url": "https://www.calgary.ca/council/ward-8/communities.html",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.rosscarrock.org/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@rosscarrock.org",
+      "phone": "403-242-0212"
+    },
+    {
+      "id": "biz-saddle-ridge-community-association",
+      "kind": "business",
+      "slug": "saddle-ridge-community-association",
+      "title": "Saddle Ridge Community Association",
+      "name": "Saddle Ridge Community Association",
+      "website": "https://www.mysrca.ca/",
+      "address": "Saddle Ridge, Calgary, AB",
+      "summary": "The community association for Saddle Ridge in Calgary, with neighbourhood programs and events.",
+      "description": "The Saddle Ridge Community Association is the volunteer-run association for residents of Saddle Ridge. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "saddle-ridge"
+      ],
+      "sources": [
+        {
+          "name": "Saddle Ridge Community Association — official website",
+          "url": "https://www.mysrca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/saddle-ridge-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.mysrca.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "president@mysrca.ca",
+      "phone": "403-306-1883"
+    },
+    {
+      "id": "biz-taradale-community-association",
+      "kind": "business",
+      "slug": "taradale-community-association",
+      "title": "Taradale Community Association",
+      "name": "Taradale Community Association",
+      "address": "Taradale, Calgary, AB",
+      "summary": "The community association for Taradale in Calgary, with neighbourhood programs and events.",
+      "description": "The Taradale Community Association is the volunteer-run association for residents of Taradale. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "taradale"
+      ],
+      "sources": [
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/taradale-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {},
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "taradaleca@gmail.com",
+      "phone": "403-930-6188"
+    },
+    {
+      "id": "biz-falconridge-castleridge-community-association",
+      "kind": "business",
+      "slug": "falconridge-castleridge-community-association",
+      "title": "Falconridge/Castleridge Community Association",
+      "name": "Falconridge/Castleridge Community Association",
+      "website": "https://www.falconridgecastleridge.ca/",
+      "address": "95 Falshire Drive NE, Calgary, AB",
+      "summary": "The community association for Falconridge and Castleridge in Calgary, with neighbourhood programs and events.",
+      "description": "The Falconridge/Castleridge Community Association is the volunteer-run association for residents of Falconridge and Castleridge. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "falconridge-castleridge"
+      ],
+      "sources": [
+        {
+          "name": "Falconridge/Castleridge Community Association — official website",
+          "url": "https://www.falconridgecastleridge.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/falconridge-castleridge-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.falconridgecastleridge.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "manager@falconridgecastleridge.ca",
+      "phone": "403-280-4422"
+    },
+    {
+      "id": "biz-winston-heights-mountview-community-association",
+      "kind": "business",
+      "slug": "winston-heights-mountview-community-association",
+      "title": "Winston Heights-Mountview Community Association",
+      "name": "Winston Heights-Mountview Community Association",
+      "website": "https://winstonheights.ca/",
+      "address": "520 27 Avenue NE, Calgary, AB",
+      "summary": "The community association for Winston Heights and Mountview in Calgary, with neighbourhood programs and events.",
+      "description": "The Winston Heights-Mountview Community Association is the volunteer-run association for residents of Winston Heights and Mountview. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "winston-heights-mountview"
+      ],
+      "sources": [
+        {
+          "name": "Winston Heights-Mountview Community Association — official website",
+          "url": "https://winstonheights.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/winston-heights-mountview-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://winstonheights.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "hallmanager@winstonheights.ca",
+      "phone": "403-276-5474"
+    },
+    {
+      "id": "biz-fairview-community-association",
+      "kind": "business",
+      "slug": "fairview-community-association",
+      "title": "Fairview Community Association",
+      "name": "Fairview Community Association",
+      "website": "https://www.fairviewcommunity.ca/",
+      "address": "8038 Fairmount Drive SE, Calgary, AB",
+      "summary": "The community association for Fairview in Calgary, with neighbourhood programs and events.",
+      "description": "The Fairview Community Association is the volunteer-run association for residents of Fairview. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "fairview"
+      ],
+      "sources": [
+        {
+          "name": "Fairview Community Association — official website",
+          "url": "https://www.fairviewcommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/fairview-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.fairviewcommunity.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "office@fairviewcommunity.ca",
+      "phone": "403-252-5424"
+    },
+    {
+      "id": "biz-kingsland-community-association",
+      "kind": "business",
+      "slug": "kingsland-community-association",
+      "title": "Kingsland Community Association",
+      "name": "Kingsland Community Association",
+      "website": "https://www.kingslandcommunity.ca/",
+      "address": "505 78 Avenue SW, Calgary, AB",
+      "summary": "The community association for Kingsland in Calgary, with neighbourhood programs and events.",
+      "description": "The Kingsland Community Association is the volunteer-run association for residents of Kingsland. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "kingsland"
+      ],
+      "sources": [
+        {
+          "name": "Kingsland Community Association — official website",
+          "url": "https://www.kingslandcommunity.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/kingsland-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.kingslandcommunity.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "admin@kingslandcommunity.ca",
+      "phone": "403-255-1400"
+    },
+    {
+      "id": "biz-shawnessy-community-association",
+      "kind": "business",
+      "slug": "shawnessy-community-association",
+      "title": "Shawnessy Community Association",
+      "name": "Shawnessy Community Association",
+      "website": "https://www.shawnessy.ca/",
+      "address": "224 Shawmeadows Road SW, Calgary, AB",
+      "summary": "The community association for Shawnessy in Calgary, with neighbourhood programs and events.",
+      "description": "The Shawnessy Community Association is the volunteer-run association for residents of Shawnessy. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "shawnessy"
+      ],
+      "sources": [
+        {
+          "name": "Shawnessy Community Association — official website",
+          "url": "https://www.shawnessy.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/shawnessy-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.shawnessy.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "shawnessy.barn@gmail.com",
+      "phone": "403-254-1012"
+    },
+    {
+      "id": "biz-rocky-ridge-royal-oak-community-association",
+      "kind": "business",
+      "slug": "rocky-ridge-royal-oak-community-association",
+      "title": "Rocky Ridge Royal Oak Community Association",
+      "name": "Rocky Ridge Royal Oak Community Association",
+      "website": "https://rrroca.org/",
+      "address": "Rocky Ridge and Royal Oak, Calgary, AB",
+      "summary": "The community association for Rocky Ridge and Royal Oak in Calgary, with neighbourhood programs and events.",
+      "description": "The Rocky Ridge Royal Oak Community Association is the volunteer-run association for residents of Rocky Ridge and Royal Oak. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "rocky-ridge-royal-oak"
+      ],
+      "sources": [
+        {
+          "name": "Rocky Ridge Royal Oak Community Association — official website",
+          "url": "https://rrroca.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/rocky-ridge-royal-oak-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://rrroca.org/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@rrroca.org",
+      "phone": "403-879-2820"
+    },
+    {
+      "id": "biz-sandstone-macewan-community-association",
+      "kind": "business",
+      "slug": "sandstone-macewan-community-association",
+      "title": "Sandstone MacEwan Community Association",
+      "name": "Sandstone MacEwan Community Association",
+      "website": "https://www.sandstonemacewan.com/",
+      "address": "Sandstone Valley and MacEwan Glen, Calgary, AB",
+      "summary": "The community association for Sandstone Valley and MacEwan Glen in Calgary, with neighbourhood programs and events.",
+      "description": "The Sandstone MacEwan Community Association is the volunteer-run association for residents of Sandstone Valley and MacEwan Glen. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "sandstone-macewan"
+      ],
+      "sources": [
+        {
+          "name": "Sandstone MacEwan Community Association — official website",
+          "url": "https://www.sandstonemacewan.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.sandstonemacewan.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@sandstonemacewan.com"
+    },
+    {
+      "id": "biz-queensland-community-association",
+      "kind": "business",
+      "slug": "queensland-community-association",
+      "title": "Queensland Community Association",
+      "name": "Queensland Community Association",
+      "website": "https://www.queenslanddiamondcove.com/",
+      "address": "649 Queensland Drive SE, Calgary, AB",
+      "summary": "The community association for Queensland and Diamond Cove in Calgary, with neighbourhood programs and events.",
+      "description": "The Queensland Community Association is the volunteer-run association for residents of Queensland and Diamond Cove. It organizes community programs and seasonal events and speaks for the neighbourhood on local issues. Current programs, events and membership details are on the association's own website and social channels.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "queensland"
+      ],
+      "sources": [
+        {
+          "name": "Queensland Community Association — official website",
+          "url": "https://www.queenslanddiamondcove.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        },
+        {
+          "name": "Federation of Calgary Communities — community profile",
+          "url": "https://calgarycommunities.com/communities/queensland-community-association/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T20:40:00.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.queenslanddiamondcove.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T20:40:00.000Z",
+      "email": "info@queenslanddiamondcove.com",
+      "phone": "403-278-3366"
     }
   ]
 }

@@ -26,3 +26,9 @@ Added optional venue and HTTPS ticket/registration inputs to the public Inventor
 155 relevant tests passed using tsx's test runner, including new profile identity, exact claims, distinct date-range/timed events, ticket preservation, unrelated-entity denial, organization transactions, auth and rules contracts. TypeScript and production-build validation run before release. Production public routes/account-entry checks are recorded in the task report after deployment.
 
 No account created, claim submitted/approved, event submitted as a real user, email sent or newsletter subscription made. There is no authenticated production owner/admin session in this environment; live end-to-end account creation, private dashboard access and a real submission write cannot be claimed as tested. Existing automated handler and access tests cover these boundaries. Public browser checks must distinguish the working account-entry path from an actual authenticated publish.
+
+### Live backend finding
+
+October 21 checks: both northamerica-northeast1 submitDiscovery and submitOrganizationBatch endpoints return HTTP 404. The former has the existing pending-only direct Firestore fallback; the latter has no direct-write fallback (by design). Therefore do not promise immediate self-service workspace publication as live.
+
+The most recent functions release, GitHub run 39006986999, failed on October 17 with HTTP 403 from serviceusage.googleapis.com when checking cloudfunctions.googleapis.com: permission denied to get service. This is a deployment service-account IAM prerequisite, not evidence of a billing-plan failure. No IAM or billing settings changed. A project administrator must restore the service-usage access needed by the deployment identity, then run the existing backend release and verify authenticated owner submission. Until then the public moderated submission path is the entry point to share in outreach. Actual authenticated fallback writes remain untested here.

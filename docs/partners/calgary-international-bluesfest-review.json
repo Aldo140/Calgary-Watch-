@@ -1,71 +1,54 @@
 {
-  "status": "awaiting-official-source-and-production-verification",
+  "status": "official-sources-verified",
   "organizationId": "biz-calgary-international-bluesfest",
   "profileUrl": "https://calgarywatch.ca/local/calgary-international-bluesfest",
   "claimUrl": "https://calgarywatch.ca/claim/biz-calgary-international-bluesfest",
-  "linkStatus": "Reserved targets, not published or verified working links. Drafts are excluded from public and claim routes.",
-  "factsProvidedBy": "User request dated 2026-10-21; positive outreach response reported by the user. No ownership approval has been granted.",
+  "linkStatus": "Live production route verification follows Hosting deployment; results recorded in the final task report.",
+  "factsProvidedBy": "Initial facts supplied by the user; independently checked against official pages on 2026-10-21. Inclusion consent reported by the user; management ownership has not been approved.",
   "preparedAt": "2026-10-21T21:19:04Z",
   "officialChecks": {
-    "https://www.calgarybluesfest.com/": "Blocked: proxy CONNECT 403",
-    "https://www.calgarybluesfest.com/about-festival-information": "Not inspected: hostname blocked",
-    "https://www.calgarybluesfest.com/events": "Blocked: proxy CONNECT 403",
-    "https://www.calgarybluesfest.com/schedule": "Not inspected: hostname blocked",
-    "https://www.calgarybluesfest.com/contact": "Blocked: proxy CONNECT 403",
-    "https://www.calgarybluesfest.com/sponsors": "Not inspected: hostname blocked",
-    "https://calgarybluesfest.tickit.ca/": "Blocked: proxy CONNECT 403"
+    "https://www.calgarybluesfest.com/": "HTTP 200; inspected 2026-10-21",
+    "https://www.calgarybluesfest.com/about-festival-information": "HTTP 200; inspected 2026-10-21",
+    "https://www.calgarybluesfest.com/events": "HTTP 200; inspected 2026-10-21",
+    "https://www.calgarybluesfest.com/schedule": "HTTP 200; inspected 2026-10-21",
+    "https://www.calgarybluesfest.com/contact": "HTTP 200; inspected 2026-10-21",
+    "https://www.calgarybluesfest.com/sponsors": "HTTP 200; inspected 2026-10-21",
+    "https://calgarybluesfest.tickit.ca/": "HTTP 200; inspected 2026-10-21",
+    "https://www.calgarybluesfest.com/event/mr-blueberry-hill": "HTTP 200; inspected 2026-10-21",
+    "https://calgarybluesfest.tickit.ca/events/36665-mr-blueberry-hill": "HTTP 200; inspected visible listing and Event JSON-LD 2026-10-21"
   },
-  "candidateSource": {
-    "id": "calgary-bluesfest",
-    "name": "Calgary International Bluesfest",
-    "approved": false,
-    "hosts": [
-      "www.calgarybluesfest.com",
-      "calgarybluesfest.com",
-      "calgarybluesfest.tickit.ca"
-    ],
-    "kind": "official"
+  "verifiedAt": "2026-10-21T21:36:39Z",
+  "reviewedSourceId": "calgary-bluesfest",
+  "reviewedRecordIds": [
+    "mr-blueberry-hill-2027-02-12"
+  ],
+  "officialEventsPageUpcoming": [
+    "Mr. Blueberry Hill — February 12, 2027"
+  ],
+  "officialEventsPagePastExamples": [
+    "Tony D — October 15, 2026",
+    "Secondhand Dreamcar — October 8, 2026",
+    "2026 festival and festival-week dates — July 27–August 2, 2026"
+  ],
+  "ticketFacts": {
+    "url": "https://calgarybluesfest.tickit.ca/events/36665-mr-blueberry-hill",
+    "start": "2027-02-12T19:30:00-06:00",
+    "end": "2027-02-12T22:30:00-06:00",
+    "availability": "https://schema.org/InStock",
+    "basePriceCAD": 42.5,
+    "portalFeeCAD": 1.56,
+    "offerPriceBeforeTaxCAD": 44.06,
+    "taxIncluded": false,
+    "source": "Official Tickit event JSON-LD and visible ticket selector"
   },
-  "candidateRecords": [
-    {
-      "id": "mr-blueberry-hill-2027-02-12",
-      "input": {
-        "kind": "event",
-        "title": "Mr. Blueberry Hill",
-        "summary": "A Calgary International Bluesfest presentation at The GRAND on February 12, 2027. Confirm the performance time and ticket availability with the organizer.",
-        "description": "Calgary International Bluesfest presents Mr. Blueberry Hill at The GRAND in downtown Calgary. Check the official Calgary Bluesfest events page and ticket portal for the performance time, admission details and current availability.",
-        "categories": [
-          "music",
-          "arts"
-        ],
-        "tags": [
-          "blues",
-          "live music",
-          "concerts"
-        ],
-        "organizer": "Calgary International Bluesfest",
-        "address": "608 1 Street SW, Calgary, AB",
-        "venue": "The GRAND",
-        "neighbourhood": "Downtown",
-        "sourceUrl": "https://www.calgarybluesfest.com/events",
-        "tickets": "https://calgarybluesfest.tickit.ca/",
-        "start": "2027-02-12T00:00:00-06:00",
-        "end": "2027-02-13T00:00:00-06:00",
-        "schedulePrecision": "date",
-        "endTimeEstimated": true,
-        "pricing": "unknown",
-        "ticketSaleStatus": "unknown"
-      }
-    }
+  "releaseChecks": [
+    "Deploy this change and verify both production routes, the event, and signed-out/signed-in claim entry without submitting a real claim or sending mail."
   ],
-  "publicationChecklist": [
-    "Read every official events-page entry and ticket page; record exact event URLs and all confirmed upcoming performances.",
-    "Confirm Mr. Blueberry Hill date, start time, any doors time and current ticket status. Replace date-only boundaries with confirmed times only when supported; never invent an end time.",
-    "Check organization contact, charity/presenter description, mailing address and annual festival venue against official pages.",
-    "Check Firestore for an existing profile, events, claims, owner projections and outreach history before activating new identities. Current environment has no usable Firebase credentials.",
-    "Promote the profile to published/source-checked with a real verifiedAt timestamp after checking the sources; do not set claimed, partner or ownerVerifiedAt merely because inclusion was agreed.",
-    "After source verification, move candidateSource/candidateRecords to reviewed-sources.json with approved:true; normalization determines the stable event ID and association.",
-    "Rebuild/export, deploy and verify both actual public URLs, then test signed-out and signed-in claim flows without submitting a claim or sending email."
-  ],
-  "candidateDatePrecisionNote": "The candidate uses midnight-to-midnight calendar boundaries solely to represent the user-supplied February 12 date. These are not performance hours. schedulePrecision=date suppresses clock times; the event remains unpublished."
+  "publicFirestoreAudit": {
+    "canonicalCatalog": "Existing draft with the same canonical ID; preserved and activated",
+    "matchingOtherProfilesOrEvents": 0,
+    "organizationLiveContent": "404, no override found",
+    "verifiedListingMark": "404, no approved public mark found",
+    "privateClaims": "Not queried: authenticated admin access required"
+  }
 }

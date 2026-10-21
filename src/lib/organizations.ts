@@ -3,7 +3,7 @@ import { publishedInventory } from './discoveryPublication';
 
 /** Exact official provenance only. Venue names and fuzzy organizer names are never ownership. */
 const ORGANIZATIONS = [
-  {id:'biz-calgary-international-bluesfest',names:['Calgary International Bluesfest','Calgary Bluesfest','Calgary Blues Music Association','Calgary Blues Music Association (CBMA)'],hosts:['calgarybluesfest.com','calgarybluesfest.tickit.ca']},
+  {id:'biz-calgary-international-bluesfest',names:['Calgary International Bluesfest','Calgary International Blues Festival','Calgary Bluesfest','Calgary Blues Music Association','Calgary Blues Music Association (CBMA)'],hosts:['calgarybluesfest.com','calgarybluesfest.tickit.ca']},
   {id:'biz-inglewood-bia',names:['Inglewood BIA','Inglewood Business Improvement Area'],hosts:['inglewoodyyc.ca']},
   {id:'biz-dalhousie-community-association',names:['Dalhousie Community Association'],hosts:['dalhousiecalgary.ca']},
   { id: 'biz-alberta-theatre-projects', names: ['Alberta Theatre Projects'], hosts: ['albertatheatreprojects.com','werklundcentre.ca'] },

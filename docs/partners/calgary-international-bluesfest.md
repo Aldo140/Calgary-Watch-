@@ -1,64 +1,61 @@
-# Calgary International Bluesfest — publication review
+# Calgary International Bluesfest — source-reviewed organization
 
-Prepared October 21, 2026. **Not ready to email: the organization is a draft, not a published listing.**
+Official pages independently checked October 21, 2026. The earlier network restriction was resolved and the draft has been activated for publication.
 
-The user reports that the organization responded positively to outreach and agreed to inclusion. That agreement does not approve a management claim or justify a Verified badge.
+## Canonical identity and routes
 
-## Identity and intended links
+Organization ID: `biz-calgary-international-bluesfest`
 
-No matching organization or Bluesfest event was found in the current main branch's editorial inventory, generated discovery index or reviewed event sources. The existing `brand/partner-prospects.json` entry has the canonical name and official website; it is preserved. No additional prospect or outreach message was created.
+Profile: https://calgarywatch.ca/local/calgary-international-bluesfest
 
-Canonical organization ID: `biz-calgary-international-bluesfest`
+Organization claim: https://calgarywatch.ca/claim/biz-calgary-international-bluesfest
 
-Profile target: https://calgarywatch.ca/local/calgary-international-bluesfest
+Linked event: https://calgarywatch.ca/events/mr-blueberry-hill-2b9617
 
-Claim target: https://calgarywatch.ca/claim/biz-calgary-international-bluesfest
+Event ID: `2b9617993bafa202f5af8f0e3f88`, derived from source `calgary-bluesfest` and source record `mr-blueberry-hill-2027-02-12` through the existing normalization pipeline.
 
-These are **reserved route targets, not verified working production links**. The public repository correctly excludes the draft. The organization is authored in `src/content/editorial-inventory.json` and mirrored into `src/generated/discovery-index.json`. No unrelated exported inventory, IDs, claims or owner projections were changed.
+The user reports positive outreach consent. This is inclusion permission, not ownership approval or paid sponsorship. `claimed` and `partner` remain false, with no invented owner-verification stamp.
 
-Exact aliases in `src/lib/organizations.ts` cover Calgary International Bluesfest, Calgary Bluesfest, Calgary Blues Music Association and Calgary Blues Music Association (CBMA). Association still requires matching official source provenance; The Confluence and The GRAND are venues, not ownership evidence.
+## Duplicate and production-data audit
 
-## Prepared profile
+- Searched current main's codebase, editorial inventory, reviewed sources and generated index for Bluesfest, CBMA and Mr. Blueberry Hill.
+- Preserved the existing `brand/partner-prospects.json` entry; no second prospect or outreach message was created.
+- Read the publicly readable Firestore `organization_catalog`. The only matching organization was the same canonical draft created in the preceding staging commit. No matching alternate profile or related event was returned by exact-name/organizer queries.
+- The proposed event ID did not already exist in the public catalog. No organization live-content override or public verification mark existed for the canonical organization ID.
+- Private claims and outreach correspondence require authenticated admin access and were not read or changed. Existing identities and unrelated source, approval and owner history were preserved.
 
-- Canonical name: Calgary International Bluesfest.
-- Presented by: Calgary Blues Music Association (CBMA), described in the request as a registered charity incorporated in 2005.
-- Website: https://www.calgarybluesfest.com/
-- Contact: info@calgarybluesfest.com · 403-668-7144.
-- Annual festival venue: The Confluence, 750 9 Avenue SE, Calgary.
-- Administrative mailing address: #188, 6433a Bowness Road NW, Calgary, AB T3B 0E6.
-- Primary directory address: Calgary, AB. Neither the mailing address nor an occasional concert venue is misrepresented as a permanent visitor entrance.
-- Categories/tags cover music, arts, festivals, blues, performing arts, concerts and workshops.
-- Official events and ticket-portal links are included. No hours, amenities, social accounts, prices, sponsor names or unlicensed artwork were invented.
+## Verified official information
 
-The description clearly identifies the July 30–August 2, 2026 festival and July 27 festival-week start as historical. No 2027 summer festival dates are invented.
+The official contact page confirms info@calgarybluesfest.com, 403-668-7144, and #188, 6433a Bowness Road NW, Calgary, AB T3B 0E6. The profile labels that address for correspondence and does not map it as a visitor entrance.
 
-## Staged event
+The festival-information page confirms The Confluence, 750 9 Avenue SE as the festival venue. The sponsors page confirms that CBMA is a registered charity incorporated in 2005, with a mandate to preserve, foster and present blues music and musicians. It identifies CBMA as presenter and describes Walk Through Blues History, Blues in the Schools, workshops, concerts and other programming.
 
-`calgary-international-bluesfest-review.json` holds an **unapproved, inactive** source record for Mr. Blueberry Hill, February 12, 2027 at The GRAND, 608 1 Street SW. The source record is not in the live ingestion configuration, so scheduled exports cannot silently publish it.
+The official homepage and schedule still describe the **past** July 30–August 2, 2026 festival, with festival-week programming from July 27. No future summer festival dates were invented or imported as upcoming events. Historical festival hours, accessibility details and sponsor lists were not generalized into permanent organization attributes.
 
-The start and end values are midnight calendar boundaries solely to represent the supplied date, with `schedulePrecision: date` and `endTimeEstimated: true`. They are not claimed performance times. Pricing and ticket availability remain unknown. The official ticket portal is provided without asserting that tickets are available.
+All requested primary pages were read: homepage, festival information, events, schedule, contact, sponsors and ticket portal. The complete events list and ticket portal contain only one future performance as of the check: Mr. Blueberry Hill. Tony D (October 15, 2026), Secondhand Dreamcar (October 8, 2026) and the other archived entries are past.
 
-Once official details are checked, the existing normalization pipeline gives the event a stable source/record-based ID and associates it with the permanent organization. There is no need for a second organizer profile.
+## Confirmed event
 
-## Access blockers and uncompleted checks
+**Mr. Blueberry Hill** — February 12, 2027, **7:30–10:30 p.m. Calgary time**, The GRAND, 608 1 Street SW.
 
-Public requests to the official homepage, events page, contact page, ticket portal and CalgaryWatch returned proxy CONNECT 403. The official homepage was retried after the user's network-settings reply and remained blocked. The about, schedule and sponsors pages could not be inspected because their hostname is blocked.
+Kenny “Blues Boss” Wayne's Fats Domino tribute combines music and storytelling and was developed with the Alberta Playwrights Network. Copy is paraphrased from the official event page. The event-specific poster is referenced from the official site and credited to Calgary International Bluesfest; it does not replace the permanent organization's generated directory cover.
 
-The environment has no usable Firebase service-account credentials. Firestore, approved claims, owner projections and existing outreach history have **not** been audited against production. No production record was written, no claim was submitted and no email was sent.
+Official event: https://www.calgarybluesfest.com/event/mr-blueberry-hill
 
-Required network domains: `www.calgarybluesfest.com`, `calgarybluesfest.com`, `calgarybluesfest.tickit.ca`, `calgarywatch.ca`.
+Official tickets: https://calgarybluesfest.tickit.ca/events/36665-mr-blueberry-hill
 
-## Finish publication
+The ticket selector was active, with the Event JSON-LD reporting `InStock`. The page lists a CAD $42.50 base price; structured offer data separately lists $1.56 in fees ($44.06 before tax). The listing states that fees/taxes may apply and directs readers to the official checkout for the final total. No checkout, reservation or purchase was attempted.
 
-1. Read the complete official events page, schedule and ticket pages. Confirm Mr. Blueberry Hill's exact listing URL, start time, doors time if provided, current sale/availability status, and any additional upcoming performances.
-2. Check official contact, festival information and presenter details against the supplied facts. Keep mailing and festival locations separate.
-3. Read production organization/event/claim/owner-projection records and preserve any canonical existing identity or approved history found there.
-4. Replace unconfirmed candidate details. Approve the candidate source, move it into the existing reviewed-sources pipeline, and promote the organization to `published`/`source-checked` with a genuine verification timestamp. Do not set `claimed`, `partner` or `ownerVerifiedAt` merely for inclusion consent.
-5. Export/build/deploy. Verify the real profile, event and exact organization claim URLs; test signed-out and signed-in claim entry without submitting a real claim or sending mail.
-6. Return the two **actually verified** production links for the owner's email approval.
+The exact source-provided ISO times, `2027-02-12T19:30:00-06:00` to `2027-02-12T22:30:00-06:00`, replace the former date-only placeholders. Availability is a source-check snapshot, not a guarantee of future stock.
 
-## Validation completed
+## Claim flow
 
-79 relevant tests passed: Bluesfest identity/content/publication gating, exact claim targeting, official organizer aliases, historical date exclusion, organization/claim access, existing partner listings and directory shelves. Activation tests use explicit in-memory reviewed copies; they do not claim that the draft is currently public or that a live official page was checked.
+The business profile has one permanent claim target. Its linked event resolves to that same organization claim, with an optional listing-context parameter. Exact official provenance is required for association; sharing The Confluence or The GRAND is not ownership evidence.
 
-TypeScript passed after installing the current lockfile dependencies. Vite build and prerender passed; 774 pages were generated, with the Bluesfest draft absent from public/claim artifacts as intended. Share-card generation completed (379 cards) and email-preview generation completed (22 previews); neither sends email.
+A representative can enter the claim page signed out or with an existing account. Existing email/Google account creation and sign-in are reused; verified email and administrative authority confirmation are still required. Positive outreach consent does not auto-approve management access. No real claim, account registration or verification email was submitted during testing.
+
+## Validation and release checks
+
+Relevant tests cover canonical identity, source approval, contact/address separation, actual event dates and stable ID, exact claim targeting, official aliases, historical-date exclusion, claim access, existing partner listings, directory shelves and structured event data. TypeScript and the production build/prerender are checked before release.
+
+After the Hosting workflow completes, verify profile, claim and event HTTP responses, inspect rendered profile/programme and ticket links, and check the signed-out claim page on phone/desktop. Live verification results are recorded in the task's final report. No outbound email job is part of this release.

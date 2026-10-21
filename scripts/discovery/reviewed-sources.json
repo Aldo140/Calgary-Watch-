@@ -3084,5 +3084,54 @@
         }
       }
     ]
+  },
+  {
+    "source": {
+      "id": "calgary-bluesfest",
+      "name": "Calgary International Bluesfest",
+      "approved": true,
+      "hosts": [
+        "www.calgarybluesfest.com",
+        "calgarybluesfest.com",
+        "calgarybluesfest.tickit.ca"
+      ],
+      "kind": "official"
+    },
+    "records": [
+      {
+        "id": "mr-blueberry-hill-2027-02-12",
+        "input": {
+          "kind": "event",
+          "title": "Mr. Blueberry Hill",
+          "summary": "Kenny “Blues Boss” Wayne brings his Fats Domino tribute to The GRAND, presented by Calgary International Bluesfest.",
+          "description": "Mr. Blueberry Hill is Kenny “Blues Boss” Wayne’s musical tribute to Fats Domino, combining blues and boogie-woogie with storytelling. Developed with the Alberta Playwrights Network, the show imagines Domino auditioning a band for a Canadian tour and celebrates his lasting influence. Calgary International Bluesfest presents the premiere at The GRAND on February 12, 2027, from 7:30 to 10:30 p.m.\n\nThe official ticket page currently offers tickets at CAD $42.50 before portal fees and applicable taxes. Confirm the final checkout total and current availability through the official ticket link.",
+          "categories": [
+            "music",
+            "arts"
+          ],
+          "tags": [
+            "blues",
+            "live music",
+            "concerts"
+          ],
+          "organizer": "Calgary International Bluesfest",
+          "address": "608 1 Street SW, Calgary, AB",
+          "venue": "The GRAND",
+          "neighbourhood": "Downtown",
+          "sourceUrl": "https://www.calgarybluesfest.com/event/mr-blueberry-hill",
+          "tickets": "https://calgarybluesfest.tickit.ca/events/36665-mr-blueberry-hill",
+          "start": "2027-02-12T19:30:00-06:00",
+          "end": "2027-02-12T22:30:00-06:00",
+          "pricing": "paid",
+          "ticketSaleStatus": "on-sale",
+          "image": {
+            "src": "https://cdn.prod.website-files.com/66451398019d71c7ad36f6aa/6a98704db88bdfd57c97928d_mrblueberry.png",
+            "alt": "Mr. Blueberry Hill world-premiere poster for February 12, 2027 at The GRAND in Calgary",
+            "credit": "Calgary International Bluesfest · official event artwork",
+            "presentation": "poster"
+          }
+        }
+      }
+    ]
   }
 ]

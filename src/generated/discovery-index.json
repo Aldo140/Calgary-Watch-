@@ -15714,7 +15714,7 @@
       "name": "Calgary International Bluesfest",
       "title": "Calgary International Bluesfest",
       "summary": "Blues on Calgary stages: an annual summer festival at The Confluence, plus concerts, workshops and community programming presented by the Calgary Blues Music Association.",
-      "description": "Calgary International Bluesfest brings blues music and related traditions to Calgary through festival performances, concerts, workshops and community programming. It is presented by the Calgary Blues Music Association (CBMA), a registered charitable organization incorporated in 2005.\n\nThe annual festival takes place at The Confluence, 750 9 Avenue SE. Other performances use their own venues, so check the address on each event before heading out. The 2026 festival ran July 30–August 2, with festival-week events beginning July 27; those dates are past, and no next-edition festival dates are confirmed here.\n\nFor upcoming performances, use the official events page and Calgary Bluesfest ticket portal. Mr. Blueberry Hill is listed for February 12, 2027 at The GRAND, 608 1 Street SW; confirm the show time and current ticket availability with the organizer.\n\nAdministrative mailing address: #188, 6433a Bowness Road NW, Calgary, AB T3B 0E6. This is the mailing address, not the festival venue or a concert entrance.",
+      "description": "Calgary International Bluesfest brings blues music and related traditions to Calgary through festival performances, concerts, workshops and community programming. It is presented by the Calgary Blues Music Association (CBMA), a registered charity incorporated in 2005 to preserve, foster and present blues music and musicians.\n\nThe annual summer festival takes place at The Confluence, 750 9 Avenue SE. CBMA also presents concerts, Walk Through Blues History, Blues in the Schools and music workshops throughout the year. Those performances use their own venues: check each event for its address, times and tickets.\n\nThe 2026 festival ran July 30–August 2, with festival-week programming beginning July 27. Those dates are historical; the official site has not yet announced the next summer festival dates. Use the events page for upcoming performances and the official ticket portal for current availability.\n\nAdministrative mailing address: #188, 6433a Bowness Road NW, Calgary, AB T3B 0E6. This is for correspondence, not a festival entrance or concert venue.",
       "categories": [
         "music",
         "arts",
@@ -15739,47 +15739,112 @@
         {
           "name": "Calgary International Bluesfest",
           "url": "https://www.calgarybluesfest.com/",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
         },
         {
           "name": "Calgary International Bluesfest — festival information",
           "url": "https://www.calgarybluesfest.com/about-festival-information",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
         },
         {
           "name": "Calgary International Bluesfest — events",
           "url": "https://www.calgarybluesfest.com/events",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
         },
         {
           "name": "Calgary International Bluesfest — contact",
           "url": "https://www.calgarybluesfest.com/contact",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
         },
         {
           "name": "Calgary Bluesfest official ticket portal",
           "url": "https://calgarybluesfest.tickit.ca/",
-          "kind": "official"
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
+        },
+        {
+          "name": "Calgary Blues Music Association — presenter and charity information",
+          "url": "https://www.calgarybluesfest.com/sponsors",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
         }
       ],
       "images": [],
       "socials": {
         "website": "https://www.calgarybluesfest.com/",
         "events": "https://www.calgarybluesfest.com/events",
-        "tickets": "https://calgarybluesfest.tickit.ca/"
+        "tickets": "https://calgarybluesfest.tickit.ca/",
+        "instagram": "https://www.instagram.com/calgarybluesfest/",
+        "facebook": "https://www.facebook.com/calgarybluesfest"
       },
       "services": [
         "Annual blues festival",
-        "Live concerts",
-        "Blues workshops",
-        "Community music programming"
+        "Concerts and special performances",
+        "Music workshops",
+        "Walk Through Blues History",
+        "Blues in the Schools"
       ],
       "claimed": false,
       "partner": false,
       "editorialSelection": false,
-      "status": "draft",
-      "verification": "unverified",
-      "updatedAt": "2026-10-21T21:19:04Z"
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T21:36:39Z",
+      "verifiedAt": "2026-10-21T21:36:39Z"
+    },
+    {
+      "id": "2b9617993bafa202f5af8f0e3f88",
+      "kind": "event",
+      "slug": "mr-blueberry-hill-2b9617",
+      "title": "Mr. Blueberry Hill",
+      "summary": "Kenny “Blues Boss” Wayne brings his Fats Domino tribute to The GRAND, presented by Calgary International Bluesfest.",
+      "description": "Mr. Blueberry Hill is Kenny “Blues Boss” Wayne’s musical tribute to Fats Domino, combining blues and boogie-woogie with storytelling. Developed with the Alberta Playwrights Network, the show imagines Domino auditioning a band for a Canadian tour and celebrates his lasting influence. Calgary International Bluesfest presents the premiere at The GRAND on February 12, 2027, from 7:30 to 10:30 p.m.\n\nThe official ticket page currently offers tickets at CAD $42.50 before portal fees and applicable taxes. Confirm the final checkout total and current availability through the official ticket link.",
+      "categories": [
+        "music",
+        "arts"
+      ],
+      "tags": [
+        "blues",
+        "live music",
+        "concerts"
+      ],
+      "address": "608 1 Street SW, Calgary, AB",
+      "organizer": "Calgary International Bluesfest",
+      "sources": [
+        {
+          "name": "Calgary International Bluesfest",
+          "url": "https://www.calgarybluesfest.com/event/mr-blueberry-hill",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T21:36:39Z"
+        }
+      ],
+      "sourceId": "calgary-bluesfest",
+      "sourceRecordId": "mr-blueberry-hill-2027-02-12",
+      "fetchedAt": "2026-10-21T21:36:39Z",
+      "updatedAt": "2026-10-21T21:36:39Z",
+      "status": "published",
+      "verification": "source-checked",
+      "venue": "The GRAND",
+      "neighbourhood": "Downtown",
+      "image": {
+        "src": "https://cdn.prod.website-files.com/66451398019d71c7ad36f6aa/6a98704db88bdfd57c97928d_mrblueberry.png",
+        "alt": "Mr. Blueberry Hill world-premiere poster for February 12, 2027 at The GRAND in Calgary",
+        "credit": "Calgary International Bluesfest · official event artwork",
+        "presentation": "poster"
+      },
+      "start": "2027-02-12T19:30:00-06:00",
+      "end": "2027-02-12T22:30:00-06:00",
+      "timezone": "America/Edmonton",
+      "pricing": "paid",
+      "ticketSaleStatus": "on-sale",
+      "tickets": "https://calgarybluesfest.tickit.ca/events/36665-mr-blueberry-hill",
+      "cancelled": false,
+      "verifiedAt": "2026-10-21T21:36:39Z",
+      "organizerEntityId": "biz-calgary-international-bluesfest"
     }
   ],
   "occurrences": [

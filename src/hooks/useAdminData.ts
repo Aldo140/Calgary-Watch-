@@ -40,6 +40,8 @@ import {
   type DataSourceDefinition,
   type DataSourceOperationalStatus,
 } from '@/src/config/dataSources';
+import { SCHEDULER_SLACK_MINUTES } from '@/src/lib/feedHealth';
+import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 
 export type UserProfile = {
   uid: string;
@@ -190,7 +192,9 @@ export function useAdminData(section = 'all') {
     if (!doc) return emptyHealth(source);
     const checkedAt = coerceTimestamp(doc.checkedAt);
     const lastSuccessAt = coerceTimestamp(doc.lastSuccessAt);
-    const staleAfterMs = (source.staleAfterMinutes ?? 90) * 60_000;
+    // Missing the cron window is normal on GitHub's scheduler (see feedHealth);
+    // only a gap longer than it has ever left counts as stale.
+    const staleAfterMs = SCHEDULER_SLACK_MINUTES * 60_000;
     const rawStatus = doc.status ?? 'error';
     const status: ApiHealth['status'] =
       rawStatus !== 'disabled' && checkedAt > 0 && healthClock - checkedAt > staleAfterMs
@@ -383,10 +387,15 @@ export function useAdminData(section = 'all') {
         const start = Date.now();
         try {
           if (!source.checkUrl) throw new Error('No health-check URL configured');
-          const res = await fetch(source.checkUrl, { signal: AbortSignal.timeout(12_000) });
+          // Traffic goes through the same fallback the map uses, so the probe
+          // reports what visitors actually get.
+          const data = source.id === 'calgary_traffic'
+            ? (await fetchCalgaryTraffic(10, { signal: AbortSignal.timeout(12_000) })).rows
+            : await fetch(source.checkUrl, { signal: AbortSignal.timeout(12_000) }).then((res) => {
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return res.json();
+            });
           const ms = Date.now() - start;
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
           const count = Array.isArray(data) ? data.length : (data ? 1 : 0);
           const checkedAt = Date.now();
           return {
@@ -446,13 +455,10 @@ export function useAdminData(section = 'all') {
     const fetchLiveCounts = async () => {
       try {
         const [trafficRes, res311] = await Promise.allSettled([
-          fetch('https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt%20DESC'),
+          fetchCalgaryTraffic(60),
           fetch("https://data.calgary.ca/resource/iahh-g8bj.json?$limit=50&$where=status_description%3D'Open'&$order=requested_date%20DESC"),
         ]);
-        if (trafficRes.status === 'fulfilled' && trafficRes.value.ok) {
-          const data = await trafficRes.value.json();
-          setLiveTrafficCount(Array.isArray(data) ? data.length : 0);
-        }
+        if (trafficRes.status === 'fulfilled') setLiveTrafficCount(trafficRes.value.rows.length);
         if (res311.status === 'fulfilled' && res311.value.ok) {
           const data = await res311.value.json();
           setLive311Count(Array.isArray(data) ? data.length : 0);

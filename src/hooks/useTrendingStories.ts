@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { db } from '@/src/firebase';
 import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 import {
   type StorySourceType,
   type QuadrantCode,
@@ -29,12 +30,9 @@ export function useTrendingStories() {
         setIsLoading(true);
 
         // 1. Fetch live City of Calgary Open Data traffic incidents
-        const openDataRes = await fetch(
-          'https://data.calgary.ca/resource/35ra-9556.json?$limit=3&$order=start_dt%20DESC',
-          { headers: { 'Accept': 'application/json' } }
-        );
-
-        const openDataItems = openDataRes.ok ? await openDataRes.json() : [];
+        const openDataItems: any[] = await fetchCalgaryTraffic<any>(3, { headers: { 'Accept': 'application/json' } })
+          .then((r) => r.rows)
+          .catch(() => []);
 
         // 2. Fetch live Firestore incidents if DB is active
         let firestoreItems: any[] = [];

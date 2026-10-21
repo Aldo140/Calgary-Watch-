@@ -3,7 +3,7 @@ export const ADMIN_SECTIONS = [
   {
     id: "desk",
     title: "Overview",
-    description: "Claims, moderation and publishing work that needs attention.",
+    description: "How CalgaryWatch is growing, and what needs you today.",
     group: "Daily work",
     keywords: "home watch desk tasks pending queue",
   },

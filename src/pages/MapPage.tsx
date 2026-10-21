@@ -52,6 +52,7 @@ import { applySuppression, useSuppressedIds } from '@/src/lib/suppression';
 import { getDistance } from '@/src/lib/geo';
 import { classify311Service } from '@/src/lib/three11';
 import DesktopMapBrandMark from '@/src/components/DesktopMapBrandMark';
+import { fetchCalgaryTraffic } from '@/src/lib/calgaryTraffic';
 
 function getCalgaryQuadrant(lat: number, lng: number) {
   const northSouth = lat >= CALGARY_CENTER.lat ? 'N' : 'S';
@@ -295,11 +296,7 @@ function useOfficialOpenData(isAuthReady: boolean) {
 
       // ── Traffic — isolated so a failure never blocks 311 ──────────────────
       try {
-        const trafficRes = await fetch(
-          'https://data.calgary.ca/resource/35ra-9556.json?$limit=60&$order=start_dt%20DESC'
-        );
-        if (!trafficRes.ok) throw new Error(`Traffic API ${trafficRes.status}`);
-        const trafficData: any[] = await trafficRes.json();
+        const { rows: trafficData } = await fetchCalgaryTraffic<any>(60);
 
         for (const item of trafficData) {
           const lat = parseFloat(item.latitude);

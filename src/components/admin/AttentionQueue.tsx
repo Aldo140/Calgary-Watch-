@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { Incident } from '@/src/types';
 import type { ApiHealth } from '@/src/hooks/useAdminData';
 import { canPermanentlyDeleteIncident } from '@/src/lib/adminIncidentPolicy';
+import { readFeed } from '@/src/lib/feedHealth';
 import { AdminButton, Chip, EmptyState, Panel, StatusDot, T, TimeAgo, display, type Tone } from './ui';
 
 type QueueItem = {
@@ -102,28 +103,21 @@ export function AttentionQueue({
     });
   }
 
-  // 2. Source failures and stale scheduled runs — the map is quietly missing
-  // a layer until this is fixed. Optional sources awaiting setup stay visible
-  // in Data feeds without turning the whole desk red.
+  // 2. Source failures the owner can act on. A scheduled job that GitHub is
+  // simply running late is expected (see lib/feedHealth) and is summarised on
+  // the overview instead, so "urgent" keeps meaning something.
+  const now = Date.now();
   for (const api of apiHealths) {
-    if (api.status === 'disabled' && api.optional) continue;
-    if (api.status !== 'error' && api.status !== 'slow' && api.status !== 'stale' && api.status !== 'disabled') continue;
-    const critical = api.status === 'error' || api.status === 'stale';
+    const reading = readFeed(api, now);
+    if (!reading.actionable) continue;
     items.push({
       id: `api-${api.id}`,
-      rank: critical ? 1 : api.status === 'disabled' ? 2 : 3,
-      tone: critical ? 'critical' : 'attention',
-      icon: critical ? WifiOff : Zap,
-      kind: api.status === 'stale' ? 'Ingest stale' : api.status === 'error' ? 'Feed down' : api.status === 'disabled' ? 'Setup required' : 'Feed slow',
+      rank: reading.urgent ? 1 : 3,
+      tone: reading.urgent ? 'critical' : 'attention',
+      icon: reading.urgent ? WifiOff : Zap,
+      kind: reading.verdict === 'stale' ? 'Feed stopped' : api.status === 'disabled' ? 'Setup required' : api.healthMode === 'direct' ? 'City API' : 'Feed down',
       title: api.name,
-      detail:
-        api.status === 'stale'
-          ? `No scheduled check-in within ${api.staleAfterMinutes ?? 90} minutes`
-          : api.status === 'disabled'
-            ? (api.setupHint ?? api.error ?? 'Configuration is incomplete')
-          : api.status === 'error'
-          ? (api.error ?? 'Not responding')
-          : `Responded in ${api.responseMs}ms`,
+      detail: reading.note,
       ts: api.lastChecked ?? undefined,
     });
   }
@@ -206,7 +200,7 @@ export function AttentionQueue({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Chip tone={item.tone}>{item.kind}</Chip>
-                    <TimeAgo ts={item.ts} />
+                    {item.ts ? <TimeAgo ts={item.ts} /> : null}
                   </div>
                   <p
                     className="text-[0.88rem] font-semibold mt-1 leading-snug break-words"

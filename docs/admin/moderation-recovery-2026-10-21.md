@@ -15,7 +15,7 @@ The October 21 19:25 UTC moderation run (39661532634) completed with zero pendin
 - Queue requests use stable content fingerprints so repeated requests/tabs do not create repeated pending decisions. Failed decisions retain history and can be explicitly retried.
 - Bounded live queue status refreshes the listings after processing, pauses while hidden and reports read failures. Rows show the listing name, waiting/processed/failed state and the difference between importing for review and a successful website release. Pending decisions disable repeated approval clicks.
 - Listings render 24 at a time with search and show-more; dates and venue help distinguish repeated performances.
-- The separate `Apply listing decisions (no email)` workflow processes the existing administrator queue, shares its concurrency lock, requests a release when needed, and never invokes vendor/claim email scripts. Its 15-minute schedule remains subject to GitHub scheduling delays. The existing hourly email workflow is unchanged.
+- The separate `Apply listing decisions (no email)` workflow processes the existing administrator queue, shares its concurrency lock, requests a release when needed, and never invokes vendor/claim email scripts. It is manual and requires an explicit APPLY confirmation. Automatic approval review rejected executing it because it could apply all queued decisions; no run was dispatched. The existing hourly workflow is unchanged.
 
 ## Official context checked
 

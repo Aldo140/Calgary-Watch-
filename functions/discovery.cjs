@@ -1,7 +1,7 @@
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { getFirestore } = require('firebase-admin/firestore');
 const { validateSubmission, hash } = require('./discovery-domain.cjs');
-const { ingestRecord, moderate } = require('./discovery-store.cjs');
+const { ingestRecord, moderate, reviewSubmission } = require('./discovery-store.cjs');
 const options = { region: 'northamerica-northeast1', maxInstances: 5 };
 function database() { return getFirestore(process.env.DISCOVERY_DATABASE_ID || '(default)'); }
 async function assertAdmin(db, auth) {
@@ -37,17 +37,7 @@ exports.manageDiscovery = onCall(options, async request => {
       const result = await ingestRecord(db,data.input,source,data.recordId,{ cancelled: data.cancelled });
       return result;
     }
-    if (data.action === 'review-submission') {
-      const ref = db.collection('entity_submissions').doc(data.id);
-      const submission = (await ref.get()).data();
-      if (!submission) throw Error('Submission missing');
-      if (data.reject) { await ref.update({ status:'rejected', reviewedBy:request.auth.uid }); return { id:data.id }; }
-      const source = (await db.collection('discovery_sources').doc(data.sourceId).get()).data();
-      // The administrator supplies a checked, editable DTO; the original suggestion stays private.
-      const result = await ingestRecord(db,data.input,source,`submission-${data.id}`);
-      await ref.update({ status:'approved', entityId:result.id, reviewedBy:request.auth.uid });
-      return result;
-    }
+    if (['review-submission','publish-submission'].includes(data.action)) return await reviewSubmission(db, data, request.auth.uid);
     return await moderate(db,data,request.auth.uid);
   } catch(e) { throw new HttpsError('failed-precondition',e.message); }
 });

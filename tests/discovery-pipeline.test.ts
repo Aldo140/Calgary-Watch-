@@ -158,7 +158,7 @@ describe('Calgary time windows',()=>{
 // Transaction-level contract: writes are buffered and committed only on success.
 function memoryStore() {
   const data=new Map<string,any>();const queries:any[]=[];let seq=0;
-  const ref=(path:string):any=>({path,id:path.split('/').at(-1),get:async()=>snap(path)});
+  const ref=(path:string):any=>({path,id:path.split('/').at(-1),get:async()=>snap(path),set:async(v:any)=>{data.set(path,v);},update:async(v:any)=>{data.set(path,{...data.get(path),...v});}});
   const snap=(path:string)=>({exists:data.has(path),data:()=>data.get(path),ref:ref(path),id:path.split('/').at(-1)});
   const col=(name:string,filters:any[]=[]):any=>({name,filters,doc:(id=String(++seq))=>ref(`${name}/${id}`),where:(field:string,op:string,value:unknown)=>col(name,[...filters,{field,op,value}])});
   return {data,queries,collection:col,runTransaction:async(fn:(tx:any)=>Promise<any>)=>{const writes:(()=>void)[]=[];const result=await fn({get:async(q:any)=>(queries.push(q),q.path?snap(q.path):{docs:[...data.keys()].filter(k=>k.startsWith(q.name+'/')&&(q.filters??[]).every((f:any)=>f.op==='=='?data.get(k)[f.field]===f.value:f.op==='>='?data.get(k)[f.field]>=f.value:data.get(k)[f.field]<f.value)).map(snap)}),set:(r:any,v:any)=>writes.push(()=>data.set(r.path,v)),update:(r:any,v:any)=>writes.push(()=>data.set(r.path,{...data.get(r.path),...v}))});writes.forEach(f=>f());return result;}};
@@ -240,4 +240,34 @@ describe('Trusted feeds publish without an editor',()=>{
     const db=memoryStore();const a=await store.ingestRecord(db,event,{...feed,kind:'editorial'},'e');
     assert.equal(db.data.get(`events/${a.id}`).status,'pending');
   });
+});
+
+
+describe('Administrator submission approval and publication',()=>{
+ function pending(){const db=memoryStore();db.data.set('entity_submissions/suggestion',{status:'pending',input:event});db.data.set('discovery_sources/organizer',source);return db;}
+ it('one checked approval publishes and only then marks the submission approved',async()=>{
+  const db=pending();const result=await store.reviewSubmission(db,{action:'publish-submission',id:'suggestion',sourceId:source.id,input:event},'admin');
+  assert.equal(result.stage,'verified');assert.equal(db.data.get(`events/${result.id}`).status,'published');assert.equal(db.data.get(`events/${result.id}`).verification,'source-checked');assert.equal(db.data.get('entity_submissions/suggestion').status,'approved');
+  const retry=await store.reviewSubmission(db,{action:'publish-submission',id:'suggestion',sourceId:source.id,input:event},'admin');assert.equal(retry.id,result.id);assert.equal([...db.data.keys()].filter(k=>k.startsWith('events/')).length,1);
+ });
+ it('legacy queued decisions retain their original import-for-review meaning',async()=>{
+  const db=pending();const out=await store.reviewSubmission(db,{action:'review-submission',id:'suggestion',sourceId:source.id,input:event},'admin');assert.equal(out.stage,'needs-review');assert.equal(db.data.get(`events/${out.id}`).status,'pending');
+ });
+ it('an unacknowledged duplicate cannot be reported as approved',async()=>{
+  const db=pending();await store.ingestRecord(db,event,{...source,id:'another'},'existing');
+  await assert.rejects(()=>store.reviewSubmission(db,{action:'publish-submission',id:'suggestion',sourceId:source.id,input:event},'admin'),/duplicate/i);assert.equal(db.data.get('entity_submissions/suggestion').status,'pending');assert.ok([...db.data.entries()].filter(([k])=>k.startsWith('events/')).every(([,v])=>v.status!=='published'));
+ });
+ it('a reviewed official page can establish a source without a separate configuration screen',async()=>{
+  const db=pending();const out=await store.reviewSubmission(db,{action:'publish-submission',id:'suggestion',confirmOfficialSource:true,input:event},'admin');assert.equal(out.stage,'verified');assert.equal(db.data.get(`events/${out.id}`).sources[0].url,event.sourceUrl);
+  const sources=[...db.data.entries()].filter(([k])=>k.startsWith('discovery_sources/reviewed-'));assert.equal(sources.length,1);assert.deepEqual(sources[0][1].hosts,['example.org']);
+ });
+ it('invalid source confirmation creates no approved source or event',async()=>{
+  const db=pending();await assert.rejects(()=>store.reviewSubmission(db,{action:'publish-submission',id:'suggestion',confirmOfficialSource:true,input:{...event,sourceUrl:'http://example.org/event'}},'admin'));assert.equal([...db.data.keys()].filter(k=>k.startsWith('events/')).length,0);assert.equal(db.data.get('entity_submissions/suggestion').status,'pending');
+ });
+});
+
+describe('Moderation-only recovery release boundary',()=>{
+ it('processes administrator decisions without dispatching any email sender',()=>{
+  const workflow=readFileSync('.github/workflows/listing-decisions.yml','utf8');assert.match(workflow,/npm run discovery:actions/);assert.match(workflow,/group: discovery-actions/);assert.doesNotMatch(workflow,/send-approval-emails|send-vendor-messages|RESEND_API_KEY/);
+ });
 });

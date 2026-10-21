@@ -35,18 +35,8 @@ async function run() {
         const source = (await db.collection('discovery_sources').doc(String(action.sourceId)).get()).data();
         if (!source) throw Error('Choose an approved source');
         result = await store.ingestRecord(db, action.input, source, action.recordId, { cancelled: action.cancelled });
-      } else if (action.action === 'review-submission') {
-        const ref = db.collection('entity_submissions').doc(String(action.id));
-        if (!(await ref.get()).exists) throw Error('Submission missing');
-        if (action.reject) {
-          await ref.update({ status: 'rejected', reviewedBy: adminUid });
-        } else {
-          const source = (await db.collection('discovery_sources').doc(String(action.sourceId)).get()).data();
-          if (!source) throw Error('Choose an approved source');
-          const out = await store.ingestRecord(db, action.input, source, `submission-${action.id}`);
-          await ref.update({ status: 'approved', entityId: out.id, reviewedBy: adminUid });
-          result = out;
-        }
+      } else if (['review-submission','publish-submission'].includes(action.action??'')) {
+        result = await store.reviewSubmission(db, action, adminUid);
       } else {
         result = await store.moderate(db, action as Parameters<typeof store.moderate>[1], adminUid);
       }
@@ -58,6 +48,7 @@ async function run() {
       const message = error instanceof Error ? error.message : String(error);
       await doc.ref.update({ status: 'failed', failedAt: Date.now(), error: message.slice(0, 500) });
       log(`failed ${doc.id}: ${message}`);
+      console.log(`::warning title=Listing decision failed::${doc.id}: ${message.replace(/[\r\n]/g,' ')}`);
     }
   }
   log(`${applied} applied, ${pending.size - applied} failed or skipped.`);

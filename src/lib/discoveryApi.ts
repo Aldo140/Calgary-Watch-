@@ -1,6 +1,6 @@
 import { syncVerifiedToken } from './auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { withoutUndefined } from './firestoreSafe';
 
@@ -65,11 +65,24 @@ export async function manageDiscovery(data: Record<string, unknown>): Promise<Di
     return { queued: false, data: await callable('manageDiscovery', data) };
   } catch (error) {
     if (!functionMissing(error) || !db || !auth?.currentUser) throw error;
-    const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await setDoc(doc(db, 'discovery_actions', id), {
-      id, action: withoutUndefined(data), adminUid: auth.currentUser.uid, adminEmail: auth.currentUser.email ?? '', status: 'pending', createdAt: Date.now(),
-    });
-    return { queued: true };
+    const clean=withoutUndefined(data);
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(clean)));
+    const fingerprint=Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,32);
+    const stable=doc(db,'discovery_actions',`${auth.currentUser.uid}_${fingerprint}`);
+    const prior=await getDoc(stable);
+    if(prior.exists()&&prior.get('status')==='pending')return {queued:true};
+    if(prior.exists()&&prior.get('status')==='applied')return {queued:false,data:prior.get('result')};
+    // Failed requests retain their audit history. An explicit retry gets a new ID.
+    const ref=prior.exists()?doc(db,'discovery_actions',`${stable.id}_${crypto.randomUUID()}`):stable;
+    try{
+      await setDoc(ref,{id:ref.id,action:clean,adminUid:auth.currentUser.uid,adminEmail:auth.currentUser.email??'',status:'pending',createdAt:Date.now()});
+    }catch(writeError){
+      // Two tabs can race to create the same decision; rules forbid overwrites.
+      const raced=await getDoc(ref);
+      if(!raced.exists()||!['pending','applied'].includes(raced.get('status')))throw writeError;
+      return {queued:raced.get('status')==='pending',data:raced.get('result')};
+    }
+    return {queued:true};
   }
 }
 

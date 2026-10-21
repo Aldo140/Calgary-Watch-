@@ -80,4 +80,42 @@ async function moderate(db, { kind, id, action, revision, acknowledgeDuplicates 
     return { id, ...patch };
   });
 }
-module.exports = { ingestRecord, moderate, collectionFor };
+
+/** Administrator-only adapter shared by the callable and queued moderation worker. */
+async function reviewSubmission(db, data, uid) {
+  if (typeof data.id !== 'string' || !data.id || data.id.includes('/') || data.id.length > 240) throw Error('Invalid submission identity');
+  const ref = db.collection('entity_submissions').doc(data.id);
+  const submission = (await ref.get()).data();
+  if (!submission) throw Error('Submission missing');
+  if (data.reject) {
+    if (submission.status !== 'pending') throw Error('This submission was already reviewed. Refresh before changing it.');
+    await ref.update({ status: 'rejected', reviewedBy: uid });
+    return { submissionId: data.id, stage: 'rejected' };
+  }
+  let source;
+  if (data.confirmOfficialSource === true) {
+    // Only an authenticated administrator reaches this adapter. Never accept arbitrary
+    // source objects or privileged fields from the public event submission path.
+    const url = new URL(data.input.sourceUrl);
+    if (url.protocol !== 'https:' || url.username || url.password) throw Error('Use the official HTTPS organizer page');
+    source = { id: `reviewed-${hash(url.origin).slice(0,20)}`, name: `${String(data.input.organizer).slice(0,150)} — reviewed official source`, approved: true, kind: 'official', hosts: [url.hostname] };
+    // Validate everything before recording the administrator's source decision.
+    normalizeRecord(data.input, source, `submission-${data.id}`);
+    await db.collection('discovery_sources').doc(source.id).set(source);
+  } else {
+    if (typeof data.sourceId !== 'string' || !data.sourceId || data.sourceId.includes('/')) throw Error('Choose a matching approved source or confirm the official organizer page');
+    source = (await db.collection('discovery_sources').doc(data.sourceId).get()).data();
+    if (!source) throw Error('Approved source missing');
+  }
+  const out = await ingestRecord(db, data.input, source, `submission-${data.id}`);
+  if (data.action === 'publish-submission') {
+    // Publication is a separate checked transaction. If it fails (duplicates,
+    // revision conflict, source), the suggestion stays pending and nothing is
+    // incorrectly reported as approved. A retry reuses the canonical event ID.
+    await moderate(db, { kind: data.input.kind, id: out.id, revision: out.revision, action: 'publish', acknowledgeDuplicates: data.acknowledgeDuplicates === true }, uid);
+  }
+  await ref.update({ status: 'approved', entityId: out.id, reviewedBy: uid });
+  return { ...out, submissionId: data.id, kind: data.input.kind, stage: data.action === 'publish-submission' ? 'verified' : 'needs-review' };
+}
+
+module.exports = { ingestRecord, moderate, reviewSubmission, collectionFor };

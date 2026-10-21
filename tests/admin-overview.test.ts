@@ -105,7 +105,8 @@ describe('overview numbers', () => {
   });
 
   it('keeps late feeds out of the attention queue', () => {
-    const api = { id: 'calgary_311', name: 'Calgary 311 property reports', shortName: '311', ...scheduled(min(190)) };
+    // The queue reads the real clock, so this check-in is relative to it.
+    const api = { id: 'calgary_311', name: 'Calgary 311 property reports', shortName: '311', ...scheduled(Date.now() - 190 * 60_000) };
     const html = renderToStaticMarkup(React.createElement(AttentionQueue, {
       flagged: [], pendingReview: [], apiHealths: [api as never], onRestore() {}, onDelete() {}, onApprove() {}, onHide() {}, restoringId: null, deletingId: null,
     }));

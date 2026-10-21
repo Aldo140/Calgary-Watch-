@@ -3,7 +3,8 @@ import { GUIDE_FAQS, GUIDE_PATH } from '@/src/content/neighbourhoodWatchGuide';
 import { COMMUNITY_FAQS, COMMUNITY_PATH } from '@/src/content/communityWatch';
 import { DISCOVERY_SECTIONS, type DiscoveryRepository } from './discovery';
 import { discoveryRepository } from '../data/discovery';
-import { buildEntityJsonLd, indexableEntities } from './discoverySeo';
+import { buildEntityJsonLd, indexableEntities, lastChecked } from './discoverySeo';
+import { listingBreadcrumbs, listingDescription, listingTitle } from './listingSeo';
 import {
   AIRDRIE_GUIDE_FAQS,
   AIRDRIE_GUIDE_PATH,
@@ -173,12 +174,13 @@ export const ROUTE_SEO: Record<string, SeoConfig> = {
 for (const section of DISCOVERY_SECTIONS) {
   ROUTE_SEO[section.path] = { title: `${section.label} in Calgary | CalgaryWatch`, description: `Explore Calgary ${section.label.toLowerCase()}. Our first verified collection is being prepared.`, index: false, pageType: 'CollectionPage', image: DEFAULT_IMAGE };
 }
-// The hubs with real, source-checked content are indexed (owner decision 2026-09-28). /local stays
-// out until it has more than a handful of places; single listings follow discoveryIndexingEnabled.
+// The hubs with real, source-checked content are indexed (owner decision 2026-09-28; /local joined
+// 2026-10-21 once it had 42 sourced profiles). Single listings follow discoveryIndexingEnabled.
 const HUBS: Record<string, { title: string; description: string }> = {
   '/events': { title: 'Events in Calgary This Week | CalgaryWatch', description: 'What’s on in Calgary: theatre, concerts, talks, festivals and family events, each checked against the organizer’s own listing. Updated every day.' },
   '/markets': { title: 'Calgary Farmers’ Markets & Makers’ Markets | CalgaryWatch', description: 'Calgary farmers’ and makers’ markets with their next real dates and hours, from Crossroads and Calgary Farmers’ Market to seasonal Christmas markets.' },
   '/guides': { title: 'Calgary Guides: Walks, Markets & Neighbourhoods | CalgaryWatch', description: 'Self-guided days out in Calgary: the Bow River walk, a free day downtown, the city’s farmers’ markets, and Inglewood and Ramsay on foot.' },
+  '/local': { title: 'Local Calgary Places, Venues & Organizers | CalgaryWatch', description: 'Calgary theatres, markets, cafés, community associations and the organizers behind local events, each with its address, official links and what’s coming up.' },
   '/neighbourhoods': { title: 'Calgary Neighbourhood Guides | CalgaryWatch', description: 'Guides to Calgary neighbourhoods like Inglewood, Kensington, the Beltline, Bridgeland and Marda Loop: what’s there and what’s on.' },
 };
 for (const [path, hub] of Object.entries(HUBS)) ROUTE_SEO[path] = { ...ROUTE_SEO[path], ...hub, index: true };
@@ -254,7 +256,7 @@ export function getSeoConfig(pathname: string, repository: DiscoveryRepository =
   const [section, slug] = pathname.split('/').filter(Boolean);
   const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;
-  if (entity) return { title: `${entity.title} | CalgaryWatch`, description: entity.summary, index: discoveryIndexingEnabled && INDEXED_DISCOVERY_KINDS.has(entity.kind) && indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
+  if (entity) return { title: listingTitle(entity, repository.list()), description: listingDescription(entity, repository.occurrences(), repository.list()), ...(lastChecked(entity) ? { dateModified: lastChecked(entity) } : {}), index: discoveryIndexingEnabled && INDEXED_DISCOVERY_KINDS.has(entity.kind) && indexableEntities([entity]).length > 0, pageType: 'WebPage', image: entity.image ? new URL(entity.image.src, PRODUCTION_ORIGIN).href : DEFAULT_IMAGE };
   return ROUTE_SEO[pathname] ?? { title: 'Listing unavailable | CalgaryWatch', description: 'This listing has not been published or could not be found.', index: false, pageType: 'WebPage' };
 }
 
@@ -273,10 +275,14 @@ export const ROBOTS_NOINDEX = 'noindex, nofollow';
 export function buildPageJsonLd(pathname: string, origin: string, repository: DiscoveryRepository = discoveryRepository): object {
   const config = getSeoConfig(pathname, repository);
   const pageUrl = pageUrlFor(pathname, origin);
-  const crumbs = ROUTE_BREADCRUMBS[pathname] ?? ROUTE_BREADCRUMBS['/'];
   const [section, slug] = pathname.split('/').filter(Boolean);
-  const kind = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`)?.kind;
+  const hub = DISCOVERY_SECTIONS.find(s => s.path === `/${section}`);
+  const kind = hub?.kind;
   const entity = kind && slug ? repository.find(kind, slug) : undefined;
+  const crumbs = ROUTE_BREADCRUMBS[pathname]
+    ?? (entity ? listingBreadcrumbs(entity).map(c => ({ name: c.name, item: `${PRODUCTION_ORIGIN}${c.path}` }))
+      : hub && !slug ? [ROUTE_BREADCRUMBS['/'][0], { name: hub.label, item: `${PRODUCTION_ORIGIN}${hub.path}` }]
+      : ROUTE_BREADCRUMBS['/']);
 
   return {
     '@context': 'https://schema.org',

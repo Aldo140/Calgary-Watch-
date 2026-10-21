@@ -15,6 +15,7 @@ import { buildEventPicks, neighbourhoodPoint, type EventInterestId, type EventPi
 import { eventsEmailMode, type EventsEmailMode } from '../../src/lib/eventsDigest.js';
 import { createDiscoveryRepository } from '../../src/lib/discovery.js';
 import { resolveHomeLocation } from '../../src/hooks/useHomeLocation.js';
+import { canonicalNeighborhood, looksLikeStreetAddress } from '../../src/lib/homeArea.js';
 import type { DiscoveryEntity, MarketOccurrence } from '../../src/types/discovery.js';
 import { LINEUPS, VENDORS, lineupSummary, type Lineup, type Vendor } from '../../src/lib/markets.js';
 
@@ -123,9 +124,14 @@ export async function readerPicks(opts: {
   fallbackLimit?: number;
   geocode: Map<string, Point | null>;
 }): Promise<ReaderPicks> {
-  const area = opts.neighbourhood.trim();
+  // Older profiles can hold a street address in the neighbourhood field: place
+  // it as an address, and never print it as an area name. Areas typed in lower
+  // case ("copperfield") read properly in the email.
+  const typed = opts.neighbourhood.trim();
+  const typedAddress = Boolean(typed && looksLikeStreetAddress(typed));
+  const area = typedAddress ? '' : canonicalNeighborhood(typed);
   let home: Point | null = null;
-  const address = opts.address.trim();
+  const address = opts.address.trim() || (typedAddress ? typed : '');
   if (address) {
     if (!opts.geocode.has(address)) opts.geocode.set(address, await resolveHomeLocation(address));
     home = opts.geocode.get(address) ?? null;

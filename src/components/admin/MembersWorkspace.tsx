@@ -3,17 +3,25 @@ import {WorkspaceTabs} from './WorkspaceTabs';
 import {adminFirestoreActionError} from '../../lib/firestoreErrors';
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getCountFromServer, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
+import inventory from '../../generated/discovery-index.json';
 import { Link } from 'react-router-dom';
 import { CalendarHeart, Mail, MapPin, Ticket, Users } from 'lucide-react';
 import { db } from '../../firebase';
 import { discoveryRepository } from '../../data/discovery';
 import { EVENT_INTERESTS, normalizeInterests, pickWhen } from '../../lib/eventPicks';
 import { entityPath } from '../../lib/discovery';
+import { RSVPS } from '../../lib/plans';
+import { SUPPLY_DAYS, interestSupply, tallyAreas, tallyPlans, type Planned } from '../../lib/memberInsights';
+import type { DiscoveryEntity } from '../../types/discovery';
 import { Chip, EmptyState, Figure, Panel, StatGrid, StatTile, T, TimeAgo, mono } from './ui';
 import type { AdminData } from '../../hooks/useAdminData';
 import { MembersDirectory } from './MembersDirectory';
 
 type Counts = { accounts?: number; monday?: number; thursday?: number; withArea?: number; suggestions?: number };
+const dayFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', month: 'short', day: 'numeric' });
+
+/** Every listing the export knows, including ones that have ended or aged out, so old plans keep their names. */
+const exported = new Map((inventory.entities as Array<{ id: string; title: string }>).map((e) => [e.id, e]));
 
 /**
  * Members & plans: who signed up for what, what they're into, and which
@@ -28,7 +36,7 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
   const fail=(name:string,e:unknown)=>setReadErrors(p=>({...p,[name]:adminFirestoreActionError(e)}));
   const [counts, setCounts] = useState<Counts>({});
   const [thursday, setThursday] = useState<Array<{ eventInterests?: unknown; neighborhood?: string; inferredNeighborhood?: string }> | null>(null);
-  const [planned, setPlanned] = useState<Array<{ id: string; count: number }> | null>(null);
+  const [planned, setPlanned] = useState<{ upcoming: Planned[]; past: Planned[] } | null>(null);
 
   useEffect(() => {
     if (!db||view!=='insights') return;
@@ -50,8 +58,8 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
     getDocs(query(users, where('eventsDigestOptIn', '==', true), limit(500)))
       .then((s) => setThursday(s.docs.map((x) => x.data())))
       .catch(e=>fail('Reader interests',e));
-    getDocs(query(collection(database, 'event_rsvp_counts'), orderBy('count', 'desc'), limit(12)))
-      .then((s) => setPlanned(s.docs.map((x) => ({ id: x.id, count: Number(x.data().count) || 0 })).filter((x) => x.count > 0)))
+    getDocs(query(collection(database, RSVPS), orderBy('start', 'desc'), limit(1000)))
+      .then((s) => setPlanned(tallyPlans(s.docs.map((x) => x.data()))))
       .catch(e=>fail('Event plans',e));
   }, [view]);
 
@@ -62,16 +70,11 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
   }, [thursday]);
   const maxInterest = Math.max(1, ...interestMix.map((i) => i.n));
 
-  const areas = useMemo(() => {
-    const tally = new Map<string, number>();
-    for (const u of d.users) {
-      const a = (u.neighborhood || u.inferredNeighborhood || '').trim();
-      if (a) tally.set(a, (tally.get(a) ?? 0) + 1);
-    }
-    return [...tally.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-  }, [d.users]);
+  const homes = useMemo(() => tallyAreas(d.users), [d.users]);
 
   const entities = discoveryRepository.list();
+  const supply = useMemo(() => interestSupply(entities, discoveryRepository.occurrences()), [entities]);
+  const titleOf = (id: string) => { const live = entities.find((x) => x.id === id); return { live, title: live?.title ?? exported.get(id)?.title }; };
   // Every tile has a fallback from data admin already holds, so none stays blank.
   const allUsersLoaded = d.usersLoaded && d.users.length < 200 && d.users.length >= d.totalUsers;
   const shown = {
@@ -98,56 +101,94 @@ export function MembersWorkspace({ d, onOpen }: { d: AdminData; onOpen: (section
 
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-        <Panel title="What event-picks readers are into" subtitle="Interests from up to 500 loaded event-picks readers">
+        <Panel title="What event-picks readers are into" subtitle={`Readers who chose each interest, against listings that match it in the next ${SUPPLY_DAYS} days`}>
           {readErrors['Reader interests']?<p>Reader interests could not be loaded.</p>:thursday === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
             : !thursday.length ? <EmptyState icon={<CalendarHeart size={20} />} title="No Thursday readers yet" body="Interests appear here as people sign up on Your CalgaryWatch." />
             : (
+              <>
               <ul className="p-4 space-y-2.5">
-                {interestMix.map((i) => (
-                  <li key={i.id} className="grid grid-cols-[8.5rem_1fr_2.5rem] items-center gap-3">
-                    <span className="text-[0.8rem] font-semibold truncate" style={{ color: T.ink }}>{i.label}</span>
-                    <span className="h-2 rounded-full" style={{ background: `${T.signal}1A` }}>
-                      <span className="block h-full rounded-full" style={{ width: `${(i.n / maxInterest) * 100}%`, background: T.signal }} />
-                    </span>
-                    <span className="text-right text-xs tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{i.n}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-        </Panel>
-
-        <Panel title="Most planned" subtitle="Public “I’m going” totals">
-          {readErrors['Event plans']?<p>Event plans could not be loaded.</p>:planned === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
-            : !planned.length ? <EmptyState icon={<Ticket size={20} />} title="No plans yet" body="Totals appear once residents tap “I’m going” on events." />
-            : (
-              <ol className="divide-y" style={{ borderColor: T.line }}>
-                {planned.map((p, n) => {
-                  const e = entities.find((x) => x.id === p.id);
+                <li className="grid grid-cols-[8.5rem_1fr_2.5rem_4.5rem] items-center gap-3 text-[0.65rem] uppercase tracking-wide" style={{ fontFamily: mono, color: T.muted }} aria-hidden="true">
+                  <span>Interest</span><span /><span className="text-right">Readers</span><span className="text-right">Listed</span>
+                </li>
+                {interestMix.map((i) => {
+                  const listed = supply.get(i.id) ?? 0;
+                  // Wanted by someone, but too little on the calendar to fill a Thursday email.
+                  const thin = i.n > 0 && listed < 5;
                   return (
-                    <li key={p.id} className="flex items-center gap-3 px-4 py-2.5">
-                      <span className="w-5 text-xs tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{String(n + 1).padStart(2, '0')}</span>
-                      <div className="min-w-0 flex-1">
-                        {e ? <Link to={entityPath(e)} target="_blank" className="block text-sm font-semibold truncate hover:underline" style={{ color: T.ink }}>{e.title}</Link>
-                          : <span className="block text-sm font-semibold truncate" style={{ color: T.muted }}>Past or unpublished listing</span>}
-                        {e && e.kind === 'event' ? <span className="text-[0.7rem]" style={{ fontFamily: mono, color: T.muted }}>{pickWhen(e.start)}</span> : null}
-                      </div>
-                      <Figure value={p.count} size="sm" tone="signal" />
+                    <li key={i.id} className="grid grid-cols-[8.5rem_1fr_2.5rem_4.5rem] items-center gap-3">
+                      <span className="text-[0.8rem] font-semibold truncate" style={{ color: T.ink }}>{i.label}</span>
+                      <span className="h-2 rounded-full" style={{ background: `${T.signal}1A` }}>
+                        <span className="block h-full rounded-full" style={{ width: `${(i.n / maxInterest) * 100}%`, background: T.signal }} />
+                      </span>
+                      <span className="text-right text-xs tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{i.n}</span>
+                      <span className="text-right text-xs tabular-nums" style={{ fontFamily: mono, color: thin ? T.attention : T.muted }} title={thin ? 'Fewer than 5 matching listings in the window' : undefined}>{listed}{thin ? ' · thin' : ''}</span>
                     </li>
                   );
                 })}
-              </ol>
+              </ul>
+              {thursday.length < 30 ? <p className="px-4 pb-4 text-xs" style={{ color: T.muted }}>Only {thursday.length} {thursday.length === 1 ? 'reader has' : 'readers have'} picked interests, so one sign-up moves this order. Read it as a hint, not a ranking.</p> : null}
+              </>
+            )}
+        </Panel>
+
+        <Panel title="Most planned" subtitle="“I’m going” taps, coming up first">
+          {readErrors['Event plans']?<p>Event plans could not be loaded.</p>:planned === null ? <p className="p-4 text-sm" style={{ color: T.muted }}>Loading…</p>
+            : !planned.upcoming.length && !planned.past.length ? <EmptyState icon={<Ticket size={20} />} title="No plans yet" body="Totals appear once residents tap “I’m going” on events." />
+            : (
+              <div>
+                {planned.upcoming.length ? <PlanList rows={planned.upcoming.slice(0, 8)} titleOf={titleOf} /> : <p className="px-4 pt-4 text-sm" style={{ color: T.muted }}>Nothing coming up has a plan on it yet.</p>}
+                {planned.past.length ? (
+                  <>
+                    <p className="px-4 pt-4 pb-1 text-[0.65rem] uppercase tracking-wide" style={{ fontFamily: mono, color: T.muted }}>Already happened · {planned.past.reduce((n, p) => n + p.count, 0)} plans on {planned.past.length} {planned.past.length === 1 ? 'listing' : 'listings'}</p>
+                    <PlanList rows={planned.past.slice(0, 4)} titleOf={titleOf} past />
+                  </>
+                ) : null}
+              </div>
             )}
         </Panel>
       </div>
 
-      <Panel title="Where members live" subtitle={`Home areas across the ${d.users.length} most recent accounts`}>
-        {areas.length ? (
-          <ul className="p-4 flex flex-wrap gap-2">
-            {areas.map(([a, n]) => <li key={a}><Chip tone="neutral"><MapPin size={11} /> {a} <b style={{ fontFamily: mono }}>{n}</b></Chip></li>)}
-          </ul>
+      <Panel title="Where members live" subtitle={`Home areas across the ${d.users.length} most recent accounts, matched to Calgary communities`}>
+        {homes.areas.length ? (
+          <div className="p-4 space-y-3">
+            <ul className="flex flex-wrap gap-2" aria-label="By quadrant">
+              {homes.quadrants.map(([q, n]) => <li key={q}><Chip tone="signal">{q} <b style={{ fontFamily: mono }}>{n}</b></Chip></li>)}
+            </ul>
+            <ul className="flex flex-wrap gap-2" aria-label="By community">
+              {homes.areas.slice(0, 16).map(([a, n]) => <li key={a}><Chip tone="neutral"><MapPin size={11} /> {a} <b style={{ fontFamily: mono }}>{n}</b></Chip></li>)}
+            </ul>
+            {homes.addresses || homes.unmatched ? (
+              <p className="text-xs" style={{ color: T.muted }}>
+                {homes.addresses ? `${homes.addresses} typed a street address as their area; it isn’t shown here, and their emails now place it as an address. ` : ''}
+                {homes.unmatched ? `${homes.unmatched} didn’t match a Calgary community name.` : ''}
+              </p>
+            ) : null}
+          </div>
         ) : <EmptyState icon={<MapPin size={20} />} title="No home areas yet" />}
       </Panel>
       </>}
     </div>
+  );
+}
+
+function PlanList({ rows, titleOf, past = false }: { rows: Planned[]; titleOf: (id: string) => { live?: DiscoveryEntity; title?: string }; past?: boolean }) {
+  return (
+    <ol className="divide-y" style={{ borderColor: T.line }}>
+      {rows.map((p, n) => {
+        const { live, title } = titleOf(p.id);
+        const when = Number.isFinite(Date.parse(p.start)) ? (past ? `Was ${dayFmt.format(new Date(p.start))}` : pickWhen(p.start)) : '';
+        return (
+          <li key={p.id} className="flex items-center gap-3 px-4 py-2.5" style={past ? { opacity: 0.7 } : undefined}>
+            <span className="w-5 text-xs tabular-nums" style={{ fontFamily: mono, color: T.muted }}>{String(n + 1).padStart(2, '0')}</span>
+            <div className="min-w-0 flex-1">
+              {live && !past ? <Link to={entityPath(live)} target="_blank" className="block text-sm font-semibold truncate hover:underline" style={{ color: T.ink }}>{live.title}</Link>
+                : <span className="block text-sm font-semibold truncate" style={{ color: title ? T.ink : T.muted }}>{title ?? 'Listing no longer in the export'}</span>}
+              {when ? <span className="text-[0.7rem]" style={{ fontFamily: mono, color: T.muted }}>{when}</span> : null}
+            </div>
+            <Figure value={p.count} size="sm" tone="signal" />
+          </li>
+        );
+      })}
+    </ol>
   );
 }

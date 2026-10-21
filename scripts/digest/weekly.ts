@@ -60,6 +60,7 @@ import {
 import { buildDigestAudienceForecast, normalizeDigestContribution, type DigestContribution } from '../../src/lib/digestPlanner.js';
 import { aggregateFeedback, type IncidentFeedback } from '../../src/lib/feedback.js';
 import { resolveHomeLocation, type HomeLocation } from '../../src/hooks/useHomeLocation.js';
+import { looksLikeStreetAddress } from '../../src/lib/homeArea.js';
 import { assertBrandingComplete, combinedEmailContent, renderCombinedHtml, renderCombinedText, renderDigestHtml, renderDigestText, renderWelcomeHtml, renderWelcomeText, type DigestBranding } from './render.js';
 import { normalizeInterests, type EventInterestId, type Point } from '../../src/lib/eventPicks.js';
 import { allUnsubscribeUrl, eventsConsentRefusal, eventsUnsubscribeUrl } from '../../src/lib/eventsDigest.js';
@@ -437,7 +438,8 @@ async function run(): Promise<void> {
     }
 
     try {
-      const address = profile._address.trim();
+      const typedArea = (profile.neighborhood ?? '').trim();
+      const address = profile._address.trim() || (looksLikeStreetAddress(typedArea) ? typedArea : '');
       let home: HomeLocation | null = null;
       if (address) {
         if (!geocodeCache.has(address)) {

@@ -3453,6 +3453,1340 @@
       "updatedAt": "2026-10-20T00:00:00Z",
       "email": "tickets@morpheustheatre.ca",
       "phone": "403-246-2999"
+    },
+    {
+      "id": "biz-pumphouse-theatres",
+      "kind": "business",
+      "slug": "pumphouse-theatres",
+      "title": "Pumphouse Theatres",
+      "name": "Pumphouse Theatres",
+      "website": "https://pumphousetheatre.ca/",
+      "address": "2140 Pumphouse Avenue SW, Calgary, AB T3C 3P5",
+      "summary": "Two theatres in Calgary's historic water pumphouse beside the Bow River, home to independent and community productions.",
+      "description": "Pumphouse Theatres runs two performance spaces in a converted 1913 pumping station near the Bow River in Sunalta. Independent and community companies rent the stages for plays, musicals and festivals through the year, so the line-up changes show by show. Check the Pumphouse's own website for what's on and how to get tickets.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "venue"
+      ],
+      "sources": [
+        {
+          "name": "Pumphouse Theatres — official website",
+          "url": "https://pumphousetheatre.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://pumphousetheatre.ca/"
+      },
+      "services": [
+        "Theatre venue",
+        "Stage rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "operations@pumphousetheatre.ca",
+      "phone": "403-263-0079"
+    },
+    {
+      "id": "biz-calgary-underground-film-festival",
+      "kind": "business",
+      "slug": "calgary-underground-film-festival",
+      "title": "Calgary Underground Film Festival",
+      "name": "Calgary Underground Film Festival",
+      "website": "https://calgaryundergroundfilm.org/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's festival of cult, genre, documentary and offbeat independent film, held each spring.",
+      "description": "The Calgary Underground Film Festival (CUFF) screens independent features, shorts and documentaries that sit outside the mainstream, from horror and comedy to music films. The main festival runs each spring, with special screenings through the year. Dates, programme and passes are announced on CUFF's own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Underground Film Festival — official website",
+          "url": "https://calgaryundergroundfilm.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryundergroundfilm.org/"
+      },
+      "services": [
+        "Film festival",
+        "Special screenings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "cuff@calgaryundergroundfilm.org"
+    },
+    {
+      "id": "biz-calgary-queer-arts-society",
+      "kind": "business",
+      "slug": "calgary-queer-arts-society",
+      "title": "Calgary Queer Arts Society",
+      "name": "Calgary Queer Arts Society",
+      "website": "https://www.calgaryqueerartssociety.com/",
+      "address": "Calgary, AB",
+      "summary": "The society behind Fairy Tales Queer Art & Film Festival, Calgary's long-running 2SLGBTQIA+ film festival.",
+      "description": "The Calgary Queer Arts Society (formerly the Fairy Tales Presentation Society) presents Fairy Tales Queer Art & Film Festival each spring, with feature films, shorts, art and community events by and about 2SLGBTQIA+ people. The 2026 festival ran May 13 to 17 at Contemporary Calgary. Future dates are announced on the society's own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "film",
+        "festival",
+        "2slgbtqia+"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Queer Arts Society — official website",
+          "url": "https://www.calgaryqueerartssociety.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgaryqueerartssociety.com/"
+      },
+      "services": [
+        "Fairy Tales Queer Art & Film Festival",
+        "Community screenings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "administration@calgaryqueerartssociety.com",
+      "phone": "403-244-1956"
+    },
+    {
+      "id": "biz-kensington-sinfonia",
+      "kind": "business",
+      "slug": "kensington-sinfonia",
+      "title": "Kensington Sinfonia",
+      "name": "Kensington Sinfonia",
+      "website": "https://kensingtonsinfonia.ca/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary orchestra bringing classical concerts to neighbourhood stages across the city.",
+      "description": "Kensington Sinfonia is a Calgary orchestra and registered charity that performs a season of classical concerts, including appearances in the National Music Centre's King Eddy Classical series. Concert dates, venues and tickets are posted on the orchestra's own website.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "orchestra",
+        "classical"
+      ],
+      "sources": [
+        {
+          "name": "Kensington Sinfonia — official website",
+          "url": "https://kensingtonsinfonia.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://kensingtonsinfonia.ca/"
+      },
+      "services": [
+        "Orchestral concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "kensingtonsinfonia@gmail.com"
+    },
+    {
+      "id": "biz-marda-loop-bia",
+      "kind": "business",
+      "slug": "marda-loop-bia",
+      "title": "Marda Loop Business Improvement Area",
+      "name": "Marda Loop Business Improvement Area",
+      "website": "https://www.visitmardaloop.com/",
+      "address": "Marda Loop, Calgary, AB",
+      "summary": "The business association for Marda Loop's shops, restaurants and services in southwest Calgary.",
+      "description": "The Marda Loop Business Improvement Area supports the independent shops, cafés, restaurants and services along 33 and 34 Avenue SW and the surrounding streets. It promotes the district and runs seasonal street events. Its own website lists member businesses and upcoming events.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "marda-loop"
+      ],
+      "sources": [
+        {
+          "name": "Marda Loop Business Improvement Area — official website",
+          "url": "https://www.visitmardaloop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.visitmardaloop.com/"
+      },
+      "services": [
+        "District events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@visitmardaloop.com",
+      "phone": "403-685-5667"
+    },
+    {
+      "id": "biz-kensington-bia",
+      "kind": "business",
+      "slug": "kensington-bia",
+      "title": "Kensington Business Improvement Area",
+      "name": "Kensington Business Improvement Area",
+      "website": "https://kensingtonyyc.com/",
+      "address": "Kensington, Calgary, AB",
+      "summary": "The business association for Kensington Road and 10 Street NW, one of Calgary's oldest shopping villages.",
+      "description": "The Kensington BIA represents the independent shops, cafés, restaurants and services in the Kensington village on 10 Street NW and Kensington Road NW. It promotes the area and organizes seasonal events in the neighbourhood. Its own website has the business directory and event news.",
+      "categories": [
+        "shopping",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "kensington"
+      ],
+      "sources": [
+        {
+          "name": "Kensington Business Improvement Area — official website",
+          "url": "https://kensingtonyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://kensingtonyyc.com/"
+      },
+      "services": [
+        "District events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "office@kensingtonyyc.com",
+      "phone": "403-969-3216"
+    },
+    {
+      "id": "biz-calgary-boys-choir",
+      "kind": "business",
+      "slug": "calgary-boys-choir",
+      "title": "The Calgary Boys' Choir",
+      "name": "The Calgary Boys' Choir",
+      "website": "https://calgaryboyschoir.com/",
+      "address": "1638 30 Avenue SW, Calgary, AB T2T 1P4",
+      "summary": "A Calgary choir for boys and young men, with training programs and a season of public concerts.",
+      "description": "The Calgary Boys' Choir trains young singers through a range of choirs and performs concerts in Calgary and on tour. Families can try a class before registering. Concert dates and registration details are on the choir's own website.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "choir",
+        "youth"
+      ],
+      "sources": [
+        {
+          "name": "The Calgary Boys' Choir — official website",
+          "url": "https://calgaryboyschoir.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryboyschoir.com/"
+      },
+      "services": [
+        "Choir programs",
+        "Concerts"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@calgaryboyschoir.com"
+    },
+    {
+      "id": "biz-calaway-park",
+      "kind": "business",
+      "slug": "calaway-park",
+      "title": "Calaway Park",
+      "name": "Calaway Park",
+      "website": "https://www.calawaypark.com/",
+      "address": "245033 Range Road 33, Calgary, AB T3Z 2E9",
+      "summary": "Western Canada's largest outdoor amusement park, just west of Calgary off the Trans-Canada Highway.",
+      "description": "Calaway Park is a seasonal amusement park with rides, games, live entertainment and a campground on the western edge of Calgary. It opens in late spring and runs through the summer, with fall weekend events. Season dates, hours and passes are on the park's own website.",
+      "categories": [
+        "family",
+        "recreation"
+      ],
+      "tags": [
+        "organization",
+        "amusement-park",
+        "seasonal",
+        "day-trip"
+      ],
+      "sources": [
+        {
+          "name": "Calaway Park — official website",
+          "url": "https://www.calawaypark.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calawaypark.com/"
+      },
+      "services": [
+        "Amusement rides",
+        "Season passes",
+        "Group bookings",
+        "Campground"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@calawaypark.com",
+      "phone": "403-240-3822"
+    },
+    {
+      "id": "biz-butterfield-acres",
+      "kind": "business",
+      "slug": "butterfield-acres",
+      "title": "Butterfield Acres Children's Farm",
+      "name": "Butterfield Acres Children's Farm",
+      "website": "https://butterfieldacres.com/",
+      "address": "254077 Rocky Ridge Road NW, Calgary, AB",
+      "summary": "A hands-on children's farm in northwest Calgary where kids meet and feed the animals.",
+      "description": "Butterfield Acres is a working children's farm on Rocky Ridge Road NW with animals to meet, wagon rides and seasonal programs, including fall harvest and pumpkin events. It is open seasonally, from spring into the fall. Current hours and events are on the farm's own website.",
+      "categories": [
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "farm",
+        "seasonal",
+        "kids"
+      ],
+      "sources": [
+        {
+          "name": "Butterfield Acres Children's Farm — official website",
+          "url": "https://butterfieldacres.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://butterfieldacres.com/"
+      },
+      "services": [
+        "Farm visits",
+        "School programs",
+        "Birthday parties"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "office@butterfieldacres.com",
+      "phone": "403-239-0638"
+    },
+    {
+      "id": "biz-calgary-farmyard",
+      "kind": "business",
+      "slug": "calgary-farmyard",
+      "title": "Calgary Farmyard",
+      "name": "Calgary Farmyard",
+      "website": "https://calgaryfarmyard.com/",
+      "address": "Township Road 224, Rocky View County, AB",
+      "summary": "Southern Alberta's big corn maze and fun farm, a short drive east of Calgary.",
+      "description": "Calgary Farmyard runs a corn maze and family fun farm in Rocky View County, with farm activities, games and fall events in season. It opens for the summer and fall, and closes for winter. Dates, hours and tickets are on its own website.",
+      "categories": [
+        "family",
+        "day-trip"
+      ],
+      "tags": [
+        "organization",
+        "corn-maze",
+        "seasonal",
+        "farm"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Farmyard — official website",
+          "url": "https://calgaryfarmyard.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://calgaryfarmyard.com/"
+      },
+      "services": [
+        "Corn maze",
+        "Fun farm",
+        "Fall events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@calgaryfarmyard.com",
+      "phone": "403-648-2719"
+    },
+    {
+      "id": "biz-brentwood-community-association",
+      "kind": "business",
+      "slug": "brentwood-community-association",
+      "title": "Brentwood Community Association",
+      "name": "Brentwood Community Association",
+      "website": "https://brentwoodcommunity.com/",
+      "address": "5107 33 Street NW, Calgary, AB T2L 1V3",
+      "summary": "The northwest community association behind Brentwood's programs, hall and fall Christmas craft market.",
+      "description": "The Brentwood Community Association runs programs, events and its community hall for neighbours in Brentwood, and hosts a Christmas craft market each November. Dates, programs and hall bookings are on the association's own website.",
+      "categories": [
+        "community",
+        "markets"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "brentwood"
+      ],
+      "sources": [
+        {
+          "name": "Brentwood Community Association — official website",
+          "url": "https://brentwoodcommunity.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://brentwoodcommunity.com/"
+      },
+      "services": [
+        "Christmas craft market",
+        "Community programs",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "office@brentwoodcommunity.com",
+      "phone": "403-284-3477"
+    },
+    {
+      "id": "biz-leighton-art-centre",
+      "kind": "business",
+      "slug": "leighton-art-centre",
+      "title": "Leighton Art Centre",
+      "name": "Leighton Art Centre",
+      "website": "https://leightoncentre.org/",
+      "address": "282027 144 Street W, Foothills County, AB",
+      "summary": "A gallery, historic house museum and art school in the foothills southwest of Calgary.",
+      "description": "The Leighton Art Centre is the former home and studio of artists A.C. and Barbara Leighton, now a public gallery, museum and art school set in the foothills southwest of Calgary. It runs exhibitions, art classes, school programs and summer camps, and admission is by donation. Hours and programs are on the centre's own website.",
+      "categories": [
+        "arts",
+        "day-trip"
+      ],
+      "tags": [
+        "organization",
+        "gallery",
+        "heritage",
+        "art-classes"
+      ],
+      "sources": [
+        {
+          "name": "Leighton Art Centre — official website",
+          "url": "https://leightoncentre.org/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://leightoncentre.org/"
+      },
+      "services": [
+        "Exhibitions",
+        "Art classes",
+        "School programs",
+        "Summer camps"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@leightoncentre.org",
+      "phone": "403-931-3633"
+    },
+    {
+      "id": "biz-calgary-youth-orchestra",
+      "kind": "business",
+      "slug": "calgary-youth-orchestra",
+      "title": "Calgary Youth Orchestra",
+      "name": "Calgary Youth Orchestra",
+      "website": "https://cyo.ab.ca/",
+      "address": "4825 Mount Royal Gate SW, Calgary, AB T3E 6K6",
+      "summary": "Calgary's youth symphony orchestra, giving young musicians a full concert season.",
+      "description": "The Calgary Youth Orchestra gives young musicians orchestral training and a season of public concerts. It is based at Mount Royal University's Conservatory. Concert dates and audition information are on the orchestra's own website.",
+      "categories": [
+        "arts",
+        "music"
+      ],
+      "tags": [
+        "organization",
+        "orchestra",
+        "youth",
+        "classical"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Youth Orchestra — official website",
+          "url": "https://cyo.ab.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cyo.ab.ca/"
+      },
+      "services": [
+        "Youth orchestra",
+        "Concerts",
+        "Auditions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "cyo@mtroyal.ca",
+      "phone": "403-440-5978"
+    },
+    {
+      "id": "biz-village-brewery",
+      "kind": "business",
+      "slug": "village-brewery",
+      "title": "Village Brewery",
+      "name": "Village Brewery",
+      "website": "https://villagebrewery.com/",
+      "address": "12A Street SE, Calgary, AB",
+      "summary": "A community-minded Calgary craft brewery with a taproom that hosts live music and fundraisers.",
+      "description": "Village Brewery is a Calgary craft brewery known for its community partnerships, with a taproom that hosts live music, launches and fundraisers and can be booked for private events. Taproom hours and upcoming events are on the brewery's own website.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "taproom"
+      ],
+      "sources": [
+        {
+          "name": "Village Brewery — official website",
+          "url": "https://villagebrewery.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://villagebrewery.com/"
+      },
+      "services": [
+        "Taproom",
+        "Private events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@villagebrewery.com",
+      "phone": "403-243-3327"
+    },
+    {
+      "id": "biz-expo-latino",
+      "kind": "business",
+      "slug": "expo-latino",
+      "title": "Expo Latino Festival",
+      "name": "Expo Latino Festival",
+      "website": "https://expolatino.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's long-running summer festival of Latin American music, dance, food and culture.",
+      "description": "Expo Latino is presented by the Hispanic Arts Society and celebrates Latin American culture with live music, dance, food and family activities each summer. The festival has run for three decades. Dates, line-up and tickets are posted on the festival's own website.",
+      "categories": [
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "latin-american",
+        "music"
+      ],
+      "sources": [
+        {
+          "name": "Expo Latino Festival — official website",
+          "url": "https://expolatino.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://expolatino.com/"
+      },
+      "services": [
+        "Summer festival",
+        "Live music",
+        "Program advertising"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "media@expolatino.com",
+      "phone": "403-200-0021"
+    },
+    {
+      "id": "biz-taste-of-calgary",
+      "kind": "business",
+      "slug": "taste-of-calgary",
+      "title": "Taste of Calgary",
+      "name": "Taste of Calgary",
+      "website": "https://tasteofcalgary.com/",
+      "address": "Calgary, AB",
+      "summary": "Calgary's summer food festival, with sample-size dishes from local restaurants and live music.",
+      "description": "Taste of Calgary is an outdoor food festival held each summer, where local restaurants and food vendors serve sample-size dishes alongside drinks and live entertainment. The 2026 festival ran from July 30 to August 3. Next year's dates and vendors are announced on the festival's own website.",
+      "categories": [
+        "food",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "festival",
+        "food"
+      ],
+      "sources": [
+        {
+          "name": "Taste of Calgary — official website",
+          "url": "https://tasteofcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://tasteofcalgary.com/"
+      },
+      "services": [
+        "Summer food festival"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "taste@tasteofcalgary.com",
+      "phone": "403-453-7424"
+    },
+    {
+      "id": "biz-stage-west-calgary",
+      "kind": "business",
+      "slug": "stage-west-calgary",
+      "title": "Stage West Theatre Restaurant",
+      "name": "Stage West Theatre Restaurant",
+      "website": "https://www.stagewestcalgary.com/",
+      "address": "727 42 Avenue SE, Calgary, AB T2G 1Y8",
+      "summary": "Calgary's dinner theatre, pairing a buffet with professional comedies and musicals.",
+      "description": "Stage West is a professional dinner theatre in southeast Calgary where a buffet dinner comes with a full stage production, usually a comedy or musical, plus a holiday show each winter. Current shows, times and reservations are on Stage West's own website and through its box office.",
+      "categories": [
+        "arts",
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "dinner-theatre",
+        "theatre"
+      ],
+      "sources": [
+        {
+          "name": "Stage West Theatre Restaurant — official website",
+          "url": "https://www.stagewestcalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.stagewestcalgary.com/"
+      },
+      "services": [
+        "Dinner theatre",
+        "Holiday shows",
+        "Group bookings"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "mail@stagewestcalgary.com",
+      "phone": "403-243-6642"
+    },
+    {
+      "id": "biz-calgary-young-peoples-theatre",
+      "kind": "business",
+      "slug": "calgary-young-peoples-theatre",
+      "title": "Calgary Young People's Theatre",
+      "name": "Calgary Young People's Theatre",
+      "website": "https://cypt.ca/",
+      "address": "Calgary, AB",
+      "summary": "A Calgary youth theatre school with acting classes and full productions for young performers.",
+      "description": "Calgary Young People's Theatre trains young actors through classes, camps and productions staged for the public. Class registration and show dates are posted on its own website.",
+      "categories": [
+        "arts",
+        "family"
+      ],
+      "tags": [
+        "organization",
+        "theatre",
+        "youth",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Young People's Theatre — official website",
+          "url": "https://cypt.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://cypt.ca/"
+      },
+      "services": [
+        "Youth theatre classes",
+        "Productions",
+        "Camps"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "cypt@cypt.ca",
+      "phone": "403-242-7118"
+    },
+    {
+      "id": "biz-calgary-tower",
+      "kind": "business",
+      "slug": "calgary-tower",
+      "title": "Calgary Tower",
+      "name": "Calgary Tower",
+      "website": "https://www.calgarytower.com/",
+      "address": "101 9 Avenue SW, Calgary, AB T2P 1J9",
+      "summary": "The downtown landmark with a glass-floor observation deck and event space 191 metres up.",
+      "description": "The Calgary Tower opened in 1968 and has an observation deck with a glass floor, a restaurant and event space above downtown. It hosts seasonal events and private bookings outside the busy summer season, plus group tours. Hours and tickets are on the Tower's own website.",
+      "categories": [
+        "family",
+        "heritage"
+      ],
+      "tags": [
+        "organization",
+        "attraction",
+        "venue",
+        "downtown"
+      ],
+      "sources": [
+        {
+          "name": "Calgary Tower — official website",
+          "url": "https://www.calgarytower.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarytower.com/"
+      },
+      "services": [
+        "Observation deck",
+        "Private events",
+        "Group tours"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "events@calgarytower.com",
+      "phone": "403-266-7171"
+    },
+    {
+      "id": "biz-alberta-printmakers",
+      "kind": "business",
+      "slug": "alberta-printmakers",
+      "title": "Alberta Printmakers",
+      "name": "Alberta Printmakers",
+      "website": "https://www.albertaprintmakers.com/",
+      "address": "4025 4 Street SE, Calgary, AB T2G 2W4",
+      "summary": "A Calgary artist-run printmaking studio with workshops, exhibitions and open studio access.",
+      "description": "Alberta Printmakers is an artist-run society with a shared printmaking studio in southeast Calgary. It offers workshops, exhibitions, residencies and studio memberships for printmakers at every level. Workshop and exhibition dates are on its own website.",
+      "categories": [
+        "arts"
+      ],
+      "tags": [
+        "organization",
+        "printmaking",
+        "gallery",
+        "classes"
+      ],
+      "sources": [
+        {
+          "name": "Alberta Printmakers — official website",
+          "url": "https://www.albertaprintmakers.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.albertaprintmakers.com/"
+      },
+      "services": [
+        "Printmaking workshops",
+        "Studio membership",
+        "Exhibitions"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "director@albertaprintmakers.com",
+      "phone": "403-287-1056"
+    },
+    {
+      "id": "biz-last-best-brewing",
+      "kind": "business",
+      "slug": "last-best-brewing",
+      "title": "Last Best Brewing & Distilling",
+      "name": "Last Best Brewing & Distilling",
+      "website": "https://www.lastbestbrewing.com/",
+      "address": "607 11 Avenue SW, Calgary, AB",
+      "summary": "A Beltline brewery, distillery and restaurant on 11 Avenue SW.",
+      "description": "Last Best Brewing & Distilling brews beer and distils spirits on site in the Beltline, with a restaurant and bar that also takes private event bookings. Hours, menus and events are on its own website.",
+      "categories": [
+        "food",
+        "nightlife"
+      ],
+      "tags": [
+        "organization",
+        "brewery",
+        "distillery",
+        "beltline"
+      ],
+      "sources": [
+        {
+          "name": "Last Best Brewing & Distilling — official website",
+          "url": "https://www.lastbestbrewing.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.lastbestbrewing.com/"
+      },
+      "services": [
+        "Brewpub",
+        "Private events"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "talktous@lastbestbrewing.com",
+      "phone": "587-353-7387"
+    },
+    {
+      "id": "biz-marda-loop-communities-association",
+      "kind": "business",
+      "slug": "marda-loop-communities-association",
+      "title": "Marda Loop Communities Association",
+      "name": "Marda Loop Communities Association",
+      "website": "https://mardaloop.com/",
+      "address": "3130 16 Street SW, Calgary, AB T2T 4G7",
+      "summary": "The community association for Altadore, South Calgary and Garrison Woods, with a hall, programs and events.",
+      "description": "The Marda Loop Communities Association serves Altadore, South Calgary and Garrison Woods with community programs, events and a hall for rent. Its office is open by appointment. Programs and events are on the association's own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "marda-loop"
+      ],
+      "sources": [
+        {
+          "name": "Marda Loop Communities Association — official website",
+          "url": "https://mardaloop.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mardaloop.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@mardaloop.com",
+      "phone": "403-244-5411"
+    },
+    {
+      "id": "biz-inglewood-community-association",
+      "kind": "business",
+      "slug": "inglewood-community-association",
+      "title": "Inglewood Community Association",
+      "name": "Inglewood Community Association",
+      "website": "https://icacalgary.com/",
+      "address": "1740 24 Avenue SE, Calgary, AB",
+      "summary": "The community association for Inglewood, Calgary's oldest neighbourhood, with a hall, programs and events.",
+      "description": "The Inglewood Community Association runs programs, community events and a hall for residents of Inglewood. It is separate from the Inglewood BIA, which represents the 9 Avenue SE businesses. Programs and bookings are on the association's own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "inglewood"
+      ],
+      "sources": [
+        {
+          "name": "Inglewood Community Association — official website",
+          "url": "https://icacalgary.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://icacalgary.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@icacalgary.com",
+      "phone": "403-264-3835"
+    },
+    {
+      "id": "biz-parkdale-community-association",
+      "kind": "business",
+      "slug": "parkdale-community-association",
+      "title": "Parkdale Community Association",
+      "name": "Parkdale Community Association",
+      "website": "https://parkdaleyyc.com/",
+      "address": "3512 5 Avenue NW, Calgary, AB",
+      "summary": "The northwest community association for Parkdale, with a community hall, programs and events.",
+      "description": "The Parkdale Community Association runs community programs and events and manages the Parkdale community hall for residents. Programs, events and hall bookings are on the association's own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "parkdale"
+      ],
+      "sources": [
+        {
+          "name": "Parkdale Community Association — official website",
+          "url": "https://parkdaleyyc.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://parkdaleyyc.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "office@parkdaleyyc.com",
+      "phone": "403-283-5767"
+    },
+    {
+      "id": "biz-beltline-neighbourhoods-association",
+      "kind": "business",
+      "slug": "beltline-neighbourhoods-association",
+      "title": "Beltline Neighbourhoods Association",
+      "name": "Beltline Neighbourhoods Association",
+      "website": "https://beltlineyyc.ca/",
+      "address": "Beltline, Calgary, AB",
+      "summary": "The volunteer community association for the Beltline, Calgary's densest inner-city neighbourhood.",
+      "description": "The Beltline Neighbourhoods Association is the volunteer-run community association for the Beltline, covering Connaught and Victoria. It organizes neighbourhood events, works on planning and safety issues and connects residents. Events and meetings are posted on its own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "beltline"
+      ],
+      "sources": [
+        {
+          "name": "Beltline Neighbourhoods Association — official website",
+          "url": "https://beltlineyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://beltlineyyc.ca/"
+      },
+      "services": [
+        "Neighbourhood events",
+        "Planning and advocacy"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "president@beltlineyyc.ca"
+    },
+    {
+      "id": "biz-mount-pleasant-community-association",
+      "kind": "business",
+      "slug": "mount-pleasant-community-association",
+      "title": "Mount Pleasant Community Association",
+      "name": "Mount Pleasant Community Association",
+      "website": "https://mpca.ca/",
+      "address": "602 22 Avenue NW, Calgary, AB",
+      "summary": "The northwest community association for Mount Pleasant, with a hall, programs and events.",
+      "description": "The Mount Pleasant Community Association runs programs and events and manages the community hall for residents of Mount Pleasant. Programs, events and hall bookings are on the association's own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "mount-pleasant"
+      ],
+      "sources": [
+        {
+          "name": "Mount Pleasant Community Association — official website",
+          "url": "https://mpca.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://mpca.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "hallmanager@mpca.ca",
+      "phone": "403-282-1314"
+    },
+    {
+      "id": "biz-crescent-heights-community-association",
+      "kind": "business",
+      "slug": "crescent-heights-community-association",
+      "title": "Crescent Heights Community Association",
+      "name": "Crescent Heights Community Association",
+      "website": "https://crescentheightsyyc.ca/",
+      "address": "1101 2 Street NW, Calgary, AB",
+      "summary": "The community association for Crescent Heights, above the Bow River north of downtown.",
+      "description": "The Crescent Heights Community Association runs programs and events and manages the community hall for residents of Crescent Heights. Programs, events and bookings are on the association's own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "crescent-heights"
+      ],
+      "sources": [
+        {
+          "name": "Crescent Heights Community Association — official website",
+          "url": "https://crescentheightsyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://crescentheightsyyc.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "info@crescentheightsyyc.ca",
+      "phone": "403-276-1002"
+    },
+    {
+      "id": "biz-killarney-glengarry-community-association",
+      "kind": "business",
+      "slug": "killarney-glengarry-community-association",
+      "title": "Killarney-Glengarry Community Association",
+      "name": "Killarney-Glengarry Community Association",
+      "website": "https://killarneyglengarry.com/",
+      "address": "2828 28 Street SW, Calgary, AB",
+      "summary": "The southwest community association for Killarney and Glengarry, with a community centre and programs.",
+      "description": "The Killarney-Glengarry Community Association runs a community centre with programs, events and facility rentals for residents of Killarney and Glengarry. Programs and bookings are on the association's own website.",
+      "categories": [
+        "community",
+        "recreation"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "killarney"
+      ],
+      "sources": [
+        {
+          "name": "Killarney-Glengarry Community Association — official website",
+          "url": "https://killarneyglengarry.com/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://killarneyglengarry.com/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Facility rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "gm@kgca.ca",
+      "phone": "403-246-6668"
+    },
+    {
+      "id": "biz-renfrew-community-association",
+      "kind": "business",
+      "slug": "renfrew-community-association",
+      "title": "Renfrew Community Association",
+      "name": "Renfrew Community Association",
+      "website": "https://renfrewyyc.ca/",
+      "address": "811 Radford Road NE, Calgary, AB",
+      "summary": "The northeast community association for Renfrew, with a community centre, programs and events.",
+      "description": "The Renfrew Community Association runs community programs and events and manages the community centre on Radford Road NE. Programs, events and bookings are on the association's own website.",
+      "categories": [
+        "community"
+      ],
+      "tags": [
+        "organizer",
+        "community-association",
+        "renfrew"
+      ],
+      "sources": [
+        {
+          "name": "Renfrew Community Association — official website",
+          "url": "https://renfrewyyc.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://renfrewyyc.ca/"
+      },
+      "services": [
+        "Community programs",
+        "Events",
+        "Hall rentals"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "contact@renfrewyyc.ca",
+      "phone": "403-230-7055"
+    },
+    {
+      "id": "biz-17th-avenue-district",
+      "kind": "business",
+      "slug": "17th-avenue-district",
+      "title": "17th Avenue Retail & Entertainment District",
+      "name": "17th Avenue Retail & Entertainment District",
+      "website": "https://17thave.ca/",
+      "address": "17 Avenue SW, Calgary, AB",
+      "summary": "The business improvement area for 17 Avenue SW, one of Calgary's busiest dining and shopping streets.",
+      "description": "The 17th Avenue Retail & Entertainment District is the business improvement area for the shops, restaurants, bars and services along 17 Avenue SW, with around 700 businesses. It promotes the avenue and its events. Its own website has the business directory and event news.",
+      "categories": [
+        "shopping",
+        "nightlife",
+        "community"
+      ],
+      "tags": [
+        "organization",
+        "bia",
+        "17th-avenue"
+      ],
+      "sources": [
+        {
+          "name": "17th Avenue Retail & Entertainment District — official website",
+          "url": "https://17thave.ca/",
+          "kind": "official",
+          "retrievedAt": "2026-10-21T00:32:35.000Z"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://17thave.ca/"
+      },
+      "services": [
+        "District events",
+        "Business directory"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "published",
+      "verification": "source-checked",
+      "updatedAt": "2026-10-21T00:32:35.000Z",
+      "email": "tulene@17thave.ca"
     }
   ]
 }

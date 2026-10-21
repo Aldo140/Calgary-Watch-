@@ -5,14 +5,22 @@
 
 import { AccountCompanion } from './components/auth/AccountCompanion';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { lazy, Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef, type ReactNode } from 'react';
 import SeoManager from '@/src/components/SeoManager';
 import { db } from '@/src/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import './styles/page-loader.css';
+import { ErrorBoundary } from '@/src/components/ErrorBoundary';
+import { installChunkRecovery, lazyWithRecovery as lazy, restoreRecoveredScroll } from '@/src/lib/chunkRecovery';
+import { isUpdateReady, startVersionWatch } from '@/src/lib/appVersion';
+import { logProductEvent } from '@/src/lib/productEvents';
+
+installChunkRecovery();
+startVersionWatch();
 
 // Lazy-load every page so the initial bundle stays minimal and module-eval
 // failures (e.g. GSAP/Leaflet on Safari) are isolated to their own chunk.
+// `lazy` here is lazyWithRecovery, which rides out deploys and dropped connections.
 const LandingPage = lazy(() => import('@/src/pages/DiscoveryHomePage'));
 const CommunityPage = lazy(() => import('@/src/pages/CommunityPage'));
 const SubmitDiscoveryPage = lazy(() => import('@/src/pages/SubmitDiscoveryPage'));
@@ -161,8 +169,36 @@ function PageLoader() {
 function SplashDone() {
   useEffect(() => {
     (window as Window & { __cwSplashDone?: () => void }).__cwSplashDone?.();
+    restoreRecoveredScroll();
+    try {
+      const raw = sessionStorage.getItem('cw-chunk-reload');
+      if (raw) logProductEvent('stale_chunk_recovered', { area: (location.pathname.split('/')[1] || 'home').slice(0, 32) });
+    } catch { /* storage blocked */ }
   }, []);
   return null;
+}
+
+/**
+ * When a deploy has landed since this tab opened, the next page change loads
+ * the new build for real instead of in-app, so the tab never asks for a file
+ * the deploy replaced. The URL is already the new page, so a reload lands there.
+ */
+function BuildSwap() {
+  const { pathname } = useLocation();
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    if (!isUpdateReady()) return;
+    try { sessionStorage.setItem('cw-splash', '1'); } catch { /* ignore */ }
+    window.location.reload();
+  }, [pathname]);
+  return null;
+}
+
+/** Page-level boundary: keyed on the route, so Back or a link clears a crashed page. */
+function RouteBoundary({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  return <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>;
 }
 
 export default function App() {
@@ -172,6 +208,8 @@ export default function App() {
       <PageTracker />
       <SeoManager />
       <AccountCompanion />
+      <BuildSwap />
+      <RouteBoundary>
       <Suspense fallback={<PageLoader />}>
         <SplashDone />
         <Routes>
@@ -216,6 +254,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
+      </RouteBoundary>
     </BrowserRouter>
   );
 }

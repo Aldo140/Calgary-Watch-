@@ -83,6 +83,7 @@
     "autoprefixer": "^10.4.21",
     "firebase-admin": "^13.7.0",
     "satori": "^0.33.5",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

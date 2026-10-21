@@ -79,6 +79,12 @@ jobs:
       - name: Publish the listings index for the ops agents
         run: cp src/generated/discovery-index.json dist/discovery-index.json
 
+      # Firebase replaces the whole site on deploy. Carry the last week of
+      # hashed page files forward so tabs opened before this deploy can still
+      # open pages instead of hitting "Failed to fetch dynamically imported module".
+      - name: Keep earlier builds' page files for open tabs
+        run: node scripts/deploy/keep-previous-assets.mjs
+
       # Publish the UI before backend provisioning. This keeps ordinary site
       # releases available even when a Google Cloud IAM or Secret Manager
       # change needs attention.

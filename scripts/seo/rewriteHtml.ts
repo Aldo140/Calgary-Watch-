@@ -39,6 +39,8 @@ import {
 import { weekAgenda } from '../../src/lib/discoveryCalendar.js';
 import type { DiscoveryEntity } from '../../src/types/discovery';
 import { calgaryDateTimeFormat } from '../../src/lib/calgaryTz.js';
+import { BEST_CATEGORIES } from '../../src/content/bestOf.js';
+import { BEST_PATH, bestCategory, bestPath, publishersOf, rankPlaces, sourceOf, sourcesFor } from '../../src/lib/bestOf.js';
 
 /**
  * Where a route's static HTML is written, relative to dist/.
@@ -209,6 +211,7 @@ function routeSections(pathname: string, now: Date): string {
  * it is not crawler-only content or a separate keyword variant.
  */
 export function buildStaticRouteBody(pathname: string, now = new Date()): string {
+  if (pathname === BEST_PATH || pathname.startsWith(`${BEST_PATH}/`)) return bestStaticBody(pathname);
   if (pathname === AIRDRIE_GUIDE_PATH) {
     const comparisons = AIRDRIE_MAP_COMPARISON.map((row) => `
       <tr>
@@ -375,6 +378,25 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
   if (!summary) return '';
   const links = summary.links.map(([href, label]) => staticLink(href, label)).join(' · ');
   return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>${escapeText(summary.heading)}</h1><p>${escapeText(summary.copy)}</p><p>${links}</p>${routeSections(pathname, now)}</article></main>`;
+}
+
+/** /best and /best/:slug, mirroring BestOfPage: the ordered list with its sources. */
+function bestStaticBody(pathname: string): string {
+  const c = bestCategory(pathname.split('/')[2]);
+  if (!c) {
+    if (pathname !== BEST_PATH) return '';
+    const lists = BEST_CATEGORIES.map(x => `<li>${staticLink(bestPath(x), x.kind === 'food' ? `Best ${x.noun} in Calgary` : `${x.label} in Calgary`)}</li>`).join('');
+    return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><h1>The best of Calgary. Cited, never bought.</h1><p>Where to get pho and pizza, and who to call for windows and junk. Every place is here because someone independent named it or because it publishes what it does. Every fact links to its source.</p><ul>${lists}</ul><p>${staticLink('/local', 'Browse Local')} · ${staticLink('/partners', 'How we work with businesses')}</p></article></main>`;
+  }
+  const rows = rankPlaces(c.places).map(p => {
+    const named = p.namedBy.map(id => sourceOf(id)).filter(Boolean).map(s => staticLink(s!.url, `${s!.publisher} ${s!.published.slice(0, 4)}`)).join(', ');
+    const facts = p.facts.map(f => `<li>${escapeText(f.text)} (${f.self ? staticLink(f.source, 'their site') : staticLink(sourceOf(f.source)?.url ?? '', sourceOf(f.source)?.publisher ?? '')})</li>`).join('');
+    const where = [p.address, p.area].filter(Boolean).join(' · ');
+    return `<li><h2>${escapeText(p.name)}</h2>${where ? `<p>${escapeText(where)}</p>` : ''}${publishersOf(p).length ? `<p>Named by ${named}</p>` : ''}${facts ? `<ul>${facts}</ul>` : ''}${p.website ? `<p>${staticLink(p.website, `${p.name} website`)}</p>` : ''}</li>`;
+  }).join('');
+  const sources = sourcesFor(c).map(s => `<li>${staticLink(s.url, `${s.publisher}: ${s.title}`)}</li>`).join('');
+  const title = c.kind === 'food' ? `Best ${c.noun} in Calgary.` : `${c.label} in Calgary, compared.`;
+  return `<main data-prerendered-route="${escapeAttr(pathname)}"><article><p>Best of Calgary · Updated ${escapeText(c.updated)}</p><h1>${escapeText(title)}</h1><p>${escapeText(c.lead)}</p><ol>${rows}</ol><h2>${c.kind === 'food' ? 'Before you go' : 'Before you book'}</h2><ul>${c.tips.map(t => `<li>${escapeText(t)}</li>`).join('')}</ul>${sources ? `<h2>Sources</h2><ul>${sources}</ul>` : ''}<p>${staticLink(BEST_PATH, 'All Best of Calgary lists')} · ${staticLink('/local', 'Browse Local')}</p></article></main>`;
 }
 
 /** Place route content inside the React mount point for the first response. */

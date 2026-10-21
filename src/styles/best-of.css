@@ -1,0 +1,169 @@
+/*
+ * Best of Calgary (/best). A chart, not a directory: near-black page, album
+ * covers, big rank numbers, in CalgaryWatch colours (sign-up yellow marker,
+ * cyan focus, brand blue). Every rule sits under `.bo` to outrank the
+ * `.cw-site` element margins and link colours.
+ */
+.bo {
+  --bg: #111214; --bg-2: #1a1c20; --bg-3: #24272c; --line: rgba(255, 255, 255, .1);
+  --text: #fff; --sub: #b4b8bf; --dim: #8b9099;
+  --cyan: #00c2e0; --yellow: #ffdf4f; --blue: #1554d1;
+  --display: 'Bricolage Grotesque', Inter, sans-serif;
+  background: var(--bg); color: var(--text); font-family: Inter, Arial, sans-serif;
+  padding-bottom: 72px; overflow-x: clip;
+}
+:where(.bo) :where(h1, h2, h3, p, ul, ol, figure) { margin: 0; }
+:where(.bo) :where(ul, ol) { list-style: none; padding: 0; }
+.bo a { color: inherit; text-decoration: none; }
+.bo :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; border-radius: 4px; }
+.bo .bo-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.bo mark { background: none; color: var(--yellow); }
+.bo .bo-wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+
+/* The whole page goes dark, nav and footer included. */
+.cw-site:has(.bo) { background: #111214; }
+.cw-site:has(.bo) .cw-nav:not([data-open='true']) { --nav-ink: #fff; --nav-bg: rgba(17, 18, 20, .86); border-bottom-color: rgba(255, 255, 255, .06); }
+.cw-site:has(.bo) .cw-nav:not([data-open='true']) .cw-nav-cta { background: #fff; color: #000; }
+.cw-site:has(.bo) .cw-footer { background: #000; border-top-color: rgba(255, 255, 255, .08); color: #fff; }
+.cw-site:has(.bo) .cw-footer-top p, .cw-site:has(.bo) .cw-footer-bottom { color: #a7a7a7; border-top-color: rgba(255, 255, 255, .1); }
+.cw-site:has(.bo) .cw-footer a { color: #d6d6d6; }
+
+/* ── Covers ─────────────────────────────────────────────────────────────── */
+.bo .bo-cover { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 8px; color: var(--ink, #fff); background: linear-gradient(145deg, var(--from), var(--to)); container-type: inline-size; isolation: isolate; box-shadow: 0 10px 40px rgba(0, 0, 0, .45); }
+.bo .bo-cover svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.bo .bo-cover::after { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(120% 90% at 0% 100%, rgba(0, 0, 0, .35), transparent 62%); }
+.bo .bo-m-fill { fill: rgba(255, 255, 255, .92); }
+.bo .bo-m-cut { fill: none; stroke: rgba(0, 0, 0, .18); stroke-width: 5; stroke-linecap: round; }
+.bo .bo-m-line { fill: none; stroke: rgba(255, 255, 255, .9); stroke-width: 6; stroke-linecap: round; }
+.bo .bo-m-soft { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 5; stroke-linecap: round; }
+.bo .bo-m-dot { fill: var(--from); opacity: .85; }
+.bo .bo-m-frame { fill: rgba(255, 255, 255, .14); stroke: rgba(255, 255, 255, .9); stroke-width: 6; }
+.bo .bo-m-wheel { fill: #111; stroke: rgba(255, 255, 255, .9); stroke-width: 5; }
+.bo .bo-cover-mark { position: absolute; left: 6%; top: 6%; display: flex; align-items: center; gap: 2.4cqi; font: 800 max(9px, 6cqi)/1 var(--display); letter-spacing: -.01em; }
+.bo .bo-cover-mark img { width: max(16px, 11cqi); height: auto; aspect-ratio: 1; border-radius: 22%; box-shadow: 0 1px 6px rgba(0, 0, 0, .25); }
+.bo .bo-cover-word { position: absolute; left: 6%; right: 4%; bottom: 5%; font: 800 clamp(14px, 22cqi, 200px)/.85 var(--display); letter-spacing: -.06em; text-shadow: 0 2px 18px rgba(0, 0, 0, .25); overflow-wrap: anywhere; }
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.bo .bo-hero { padding: clamp(28px, 6vw, 72px) 0 clamp(24px, 4vw, 44px); background: radial-gradient(80% 120% at 85% 0%, rgba(21, 84, 209, .45), transparent 60%), linear-gradient(180deg, #0a1730, var(--bg)); }
+.bo .bo-hero-cat { background: linear-gradient(180deg, color-mix(in srgb, var(--from) 70%, #000) 0%, color-mix(in srgb, var(--from) 22%, var(--bg)) 70%, var(--bg) 100%); }
+.bo .bo-kicker { font: 800 13px Inter, sans-serif; letter-spacing: .04em; text-transform: uppercase; color: var(--sub); }
+.bo .bo-kicker a { color: #fff; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .35); }
+.bo h1 { font: 800 clamp(38px, 6.4vw, 84px)/.95 var(--display); letter-spacing: -.045em; margin-top: 12px; text-wrap: balance; }
+.bo .bo-lead { margin-top: 16px; max-width: 60ch; font-size: clamp(16px, 1.6vw, 19px); line-height: 1.5; color: #dfe3e8; }
+.bo .bo-meta { margin-top: 18px; font-size: 14px; color: var(--sub); line-height: 1.5; }
+.bo .bo-meta b { color: #fff; }
+
+.bo .bo-hero-grid { display: grid; grid-template-columns: clamp(200px, 22vw, 260px) 1fr; gap: clamp(20px, 3.5vw, 44px); align-items: end; }
+.bo .bo-cover.is-hero { animation: bo-pop .6s cubic-bezier(.2, 1.2, .3, 1) both; }
+@keyframes bo-pop { from { opacity: 0; transform: scale(.92); } }
+
+.bo .bo-hero-index { display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: center; }
+.bo .bo-hero-stack { position: relative; height: clamp(260px, 30vw, 380px); }
+.bo .bo-stack-item { position: absolute; width: 52%; top: calc(var(--i) * 9%); left: calc(var(--i) * 15%); transform: rotate(calc((var(--i) - 1.5) * 5deg)); animation: bo-deal .7s calc(var(--i) * 90ms) cubic-bezier(.2, 1.1, .3, 1) both; }
+@keyframes bo-deal { from { opacity: 0; transform: translateY(30px) rotate(0); } }
+
+/* ── Chips ──────────────────────────────────────────────────────────────── */
+.bo .bo-chips { display: flex; gap: 8px; overflow-x: auto; padding: 18px 0 6px; scrollbar-width: none; position: sticky; top: var(--cw-nav-h, 64px); z-index: 5; background: linear-gradient(var(--bg) 80%, transparent); }
+.bo .bo-chips::-webkit-scrollbar { display: none; }
+.bo .bo-chip { flex: none; padding: 9px 16px; border-radius: 999px; background: var(--bg-3); font: 700 14px Inter, sans-serif; white-space: nowrap; transition: background .12s; }
+.bo .bo-chip:hover { background: #33373e; }
+.bo .bo-chip.is-on { background: #fff; color: #000; }
+
+/* ── List ───────────────────────────────────────────────────────────────── */
+.bo .bo-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; align-items: start; margin-top: 18px; }
+.bo .bo-list { counter-reset: none; display: grid; gap: 2px; }
+.bo .bo-row { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 14px; padding: 22px 18px 22px 8px; border-radius: 10px; transition: background .15s; }
+.bo .bo-row:hover { background: var(--bg-2); }
+.bo .bo-row + .bo-row { border-top: 1px solid var(--line); }
+.bo .bo-row:hover, .bo .bo-row:hover + .bo-row { border-top-color: transparent; }
+.bo .bo-rank { font: 800 58px/.9 var(--display); letter-spacing: -.06em; text-align: right; color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, .55); font-variant-numeric: tabular-nums; }
+.bo .bo-list:not(.is-az) .bo-row:nth-child(-n + 3) .bo-rank { color: var(--yellow); -webkit-text-stroke: 0; }
+.bo .bo-row h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font: 800 clamp(21px, 2.2vw, 26px)/1.1 var(--display); letter-spacing: -.02em; }
+.bo .bo-verified { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; background: rgba(0, 194, 224, .16); color: var(--cyan); font: 700 12px Inter, sans-serif; letter-spacing: 0; }
+.bo .bo-where { display: flex; align-items: flex-start; gap: 6px; margin-top: 6px; color: var(--sub); font-size: 14px; line-height: 1.4; }
+.bo .bo-where svg { flex: none; margin-top: 2px; }
+.bo .bo-named { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; font-size: 13px; color: var(--dim); }
+.bo .bo-named a { padding: 3px 9px; border-radius: 999px; background: rgba(255, 223, 79, .14); color: var(--yellow); font-weight: 700; }
+.bo .bo-named a:hover { background: rgba(255, 223, 79, .24); }
+.bo .bo-facts { display: grid; gap: 6px; margin-top: 12px; font-size: 15.5px; line-height: 1.5; color: #e6e8eb; }
+.bo .bo-cite { margin-left: 2px; font-size: 12.5px; color: var(--dim); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: rgba(255, 255, 255, .25); white-space: nowrap; }
+.bo .bo-cite:hover { color: #fff; }
+.bo .bo-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.bo .bo-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .28); font: 700 14px Inter, sans-serif; transition: transform .12s, background .12s, border-color .12s; }
+.bo .bo-btn:hover { border-color: #fff; transform: scale(1.03); }
+.bo .bo-btn-hi { background: var(--yellow); border-color: var(--yellow); color: #111; }
+.bo .bo-btn-hi:hover { background: #ffe97a; border-color: #ffe97a; }
+
+/* ── Side cards ─────────────────────────────────────────────────────────── */
+.bo .bo-side { display: grid; gap: 14px; position: sticky; top: calc(var(--cw-nav-h, 64px) + 70px); }
+.bo .bo-card { padding: 20px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); }
+.bo .bo-card h2 { font: 800 19px/1.15 var(--display); letter-spacing: -.02em; margin-bottom: 10px; }
+.bo .bo-card p { font-size: 14.5px; line-height: 1.55; color: #d3d7dc; }
+.bo .bo-card p + p { margin-top: 10px; }
+.bo .bo-card a { color: #fff; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255, 255, 255, .35); }
+.bo .bo-how { background: linear-gradient(160deg, #0d2350, var(--bg-2) 70%); border-color: rgba(21, 84, 209, .5); }
+.bo .bo-tips { display: grid; gap: 10px; }
+.bo .bo-tips li { position: relative; padding-left: 18px; font-size: 14.5px; line-height: 1.5; color: #d3d7dc; }
+.bo .bo-tips li::before { content: ''; position: absolute; left: 0; top: .55em; width: 8px; height: 8px; border-radius: 2px; background: var(--yellow); }
+.bo .bo-sources { display: grid; gap: 10px; font-size: 14px; line-height: 1.4; }
+.bo .bo-sources a { text-decoration: none; color: #d3d7dc; }
+.bo .bo-sources a b { color: #fff; margin-right: 4px; }
+.bo .bo-sources a:hover { color: #fff; text-decoration: underline; }
+.bo .bo-sources small { display: block; color: var(--dim); margin-top: 2px; }
+
+/* ── Owner band, shelves, rules ─────────────────────────────────────────── */
+.bo .bo-band { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; margin-top: 48px; padding: clamp(22px, 3.5vw, 36px); border-radius: 18px; background: linear-gradient(120deg, #1554d1, #0b2c73); }
+.bo .bo-band h2 { font: 800 clamp(26px, 3vw, 36px)/1 var(--display); letter-spacing: -.035em; }
+.bo .bo-band p { margin-top: 10px; max-width: 54ch; color: #dce6ff; line-height: 1.5; }
+.bo .bo-band-ctas { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+
+.bo .bo-more, .bo .bo-section { margin-top: 48px; }
+.bo .bo-more h2, .bo .bo-head h2 { font: 800 clamp(26px, 3vw, 34px)/1 var(--display); letter-spacing: -.035em; }
+.bo .bo-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin-bottom: 18px; }
+.bo .bo-head p { color: var(--sub); font-size: 15px; }
+.bo .bo-more h2 { margin-bottom: 18px; }
+.bo .bo-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+.bo .bo-shelf-card { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: var(--bg-2); transition: background .15s, transform .15s; }
+.bo .bo-shelf-card:hover { background: var(--bg-3); transform: translateY(-3px); }
+.bo .bo-shelf-card strong { margin-top: 6px; font: 800 18px/1.15 var(--display); letter-spacing: -.02em; }
+.bo .bo-shelf-card small { color: var(--sub); font-size: 13.5px; }
+
+.bo .bo-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+.bo .bo-split .bo-head { display: block; min-height: 3.6em; }
+.bo .bo-split .bo-head p { margin-top: 8px; }
+.bo .bo-split .bo-shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.bo .bo-rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.bo .bo-rules li { display: grid; gap: 6px; padding: 20px; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line); }
+.bo .bo-rules b { font: 800 44px/1 var(--display); color: var(--yellow); }
+.bo .bo-rules strong { font: 800 19px/1.2 var(--display); }
+.bo .bo-rules span { color: var(--sub); line-height: 1.5; font-size: 15px; }
+
+/* ── Phones: the cover shrinks beside the title, the list goes full width ── */
+@media (max-width: 899px) {
+  .bo .bo-layout { grid-template-columns: 1fr; gap: 24px; }
+  .bo .bo-side { position: static; }
+  .bo .bo-hero-index { grid-template-columns: 1fr; gap: 8px; }
+  .bo .bo-hero-stack { height: 200px; margin-top: 18px; }
+  .bo .bo-stack-item { width: 42%; left: calc(var(--i) * 19%); }
+  .bo .bo-band { grid-template-columns: 1fr; }
+  .bo .bo-band-ctas { justify-content: flex-start; }
+  .bo .bo-rules { grid-template-columns: 1fr; }
+  .bo .bo-split { grid-template-columns: 1fr; }
+  .bo .bo-split .bo-head { min-height: 0; }
+}
+@media (max-width: 599px) {
+  .bo .bo-hero-grid { grid-template-columns: 1fr; gap: 18px; }
+  .bo .bo-cover.is-hero { width: min(62vw, 240px); margin-inline: auto; }
+  .bo h1 { font-size: clamp(38px, 11.5vw, 52px); }
+  .bo .bo-row { grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 18px 4px; }
+  .bo .bo-rank { font-size: 40px; }
+  .bo .bo-actions .bo-btn { flex: 1 1 0; }
+  .bo .bo-shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .bo .bo-shelf-card { padding: 8px; }
+  .bo .bo-band-ctas .bo-btn { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bo .bo-cover.is-hero, .bo .bo-stack-item { animation: none; }
+  .bo .bo-btn, .bo .bo-shelf-card { transition: none; }
+}

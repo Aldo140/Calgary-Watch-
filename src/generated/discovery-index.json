@@ -15706,6 +15706,80 @@
       "claimed": false,
       "partner": false,
       "editorialSelection": false
+    },
+    {
+      "id": "biz-calgary-international-bluesfest",
+      "kind": "business",
+      "slug": "calgary-international-bluesfest",
+      "name": "Calgary International Bluesfest",
+      "title": "Calgary International Bluesfest",
+      "summary": "Blues on Calgary stages: an annual summer festival at The Confluence, plus concerts, workshops and community programming presented by the Calgary Blues Music Association.",
+      "description": "Calgary International Bluesfest brings blues music and related traditions to Calgary through festival performances, concerts, workshops and community programming. It is presented by the Calgary Blues Music Association (CBMA), a registered charitable organization incorporated in 2005.\n\nThe annual festival takes place at The Confluence, 750 9 Avenue SE. Other performances use their own venues, so check the address on each event before heading out. The 2026 festival ran July 30–August 2, with festival-week events beginning July 27; those dates are past, and no next-edition festival dates are confirmed here.\n\nFor upcoming performances, use the official events page and Calgary Bluesfest ticket portal. Mr. Blueberry Hill is listed for February 12, 2027 at The GRAND, 608 1 Street SW; confirm the show time and current ticket availability with the organizer.\n\nAdministrative mailing address: #188, 6433a Bowness Road NW, Calgary, AB T3B 0E6. This is the mailing address, not the festival venue or a concert entrance.",
+      "categories": [
+        "music",
+        "arts",
+        "festivals"
+      ],
+      "tags": [
+        "blues",
+        "live music",
+        "concerts",
+        "performing arts",
+        "live entertainment",
+        "festival",
+        "workshops",
+        "organization",
+        "organizer"
+      ],
+      "address": "Calgary, AB",
+      "website": "https://www.calgarybluesfest.com/",
+      "email": "info@calgarybluesfest.com",
+      "phone": "403-668-7144",
+      "sources": [
+        {
+          "name": "Calgary International Bluesfest",
+          "url": "https://www.calgarybluesfest.com/",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary International Bluesfest — festival information",
+          "url": "https://www.calgarybluesfest.com/about-festival-information",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary International Bluesfest — events",
+          "url": "https://www.calgarybluesfest.com/events",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary International Bluesfest — contact",
+          "url": "https://www.calgarybluesfest.com/contact",
+          "kind": "official"
+        },
+        {
+          "name": "Calgary Bluesfest official ticket portal",
+          "url": "https://calgarybluesfest.tickit.ca/",
+          "kind": "official"
+        }
+      ],
+      "images": [],
+      "socials": {
+        "website": "https://www.calgarybluesfest.com/",
+        "events": "https://www.calgarybluesfest.com/events",
+        "tickets": "https://calgarybluesfest.tickit.ca/"
+      },
+      "services": [
+        "Annual blues festival",
+        "Live concerts",
+        "Blues workshops",
+        "Community music programming"
+      ],
+      "claimed": false,
+      "partner": false,
+      "editorialSelection": false,
+      "status": "draft",
+      "verification": "unverified",
+      "updatedAt": "2026-10-21T21:19:04Z"
     }
   ],
   "occurrences": [

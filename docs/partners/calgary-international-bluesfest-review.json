@@ -1,0 +1,71 @@
+{
+  "status": "awaiting-official-source-and-production-verification",
+  "organizationId": "biz-calgary-international-bluesfest",
+  "profileUrl": "https://calgarywatch.ca/local/calgary-international-bluesfest",
+  "claimUrl": "https://calgarywatch.ca/claim/biz-calgary-international-bluesfest",
+  "linkStatus": "Reserved targets, not published or verified working links. Drafts are excluded from public and claim routes.",
+  "factsProvidedBy": "User request dated 2026-10-21; positive outreach response reported by the user. No ownership approval has been granted.",
+  "preparedAt": "2026-10-21T21:19:04Z",
+  "officialChecks": {
+    "https://www.calgarybluesfest.com/": "Blocked: proxy CONNECT 403",
+    "https://www.calgarybluesfest.com/about-festival-information": "Not inspected: hostname blocked",
+    "https://www.calgarybluesfest.com/events": "Blocked: proxy CONNECT 403",
+    "https://www.calgarybluesfest.com/schedule": "Not inspected: hostname blocked",
+    "https://www.calgarybluesfest.com/contact": "Blocked: proxy CONNECT 403",
+    "https://www.calgarybluesfest.com/sponsors": "Not inspected: hostname blocked",
+    "https://calgarybluesfest.tickit.ca/": "Blocked: proxy CONNECT 403"
+  },
+  "candidateSource": {
+    "id": "calgary-bluesfest",
+    "name": "Calgary International Bluesfest",
+    "approved": false,
+    "hosts": [
+      "www.calgarybluesfest.com",
+      "calgarybluesfest.com",
+      "calgarybluesfest.tickit.ca"
+    ],
+    "kind": "official"
+  },
+  "candidateRecords": [
+    {
+      "id": "mr-blueberry-hill-2027-02-12",
+      "input": {
+        "kind": "event",
+        "title": "Mr. Blueberry Hill",
+        "summary": "A Calgary International Bluesfest presentation at The GRAND on February 12, 2027. Confirm the performance time and ticket availability with the organizer.",
+        "description": "Calgary International Bluesfest presents Mr. Blueberry Hill at The GRAND in downtown Calgary. Check the official Calgary Bluesfest events page and ticket portal for the performance time, admission details and current availability.",
+        "categories": [
+          "music",
+          "arts"
+        ],
+        "tags": [
+          "blues",
+          "live music",
+          "concerts"
+        ],
+        "organizer": "Calgary International Bluesfest",
+        "address": "608 1 Street SW, Calgary, AB",
+        "venue": "The GRAND",
+        "neighbourhood": "Downtown",
+        "sourceUrl": "https://www.calgarybluesfest.com/events",
+        "tickets": "https://calgarybluesfest.tickit.ca/",
+        "start": "2027-02-12T00:00:00-06:00",
+        "end": "2027-02-13T00:00:00-06:00",
+        "schedulePrecision": "date",
+        "endTimeEstimated": true,
+        "pricing": "unknown",
+        "ticketSaleStatus": "unknown"
+      }
+    }
+  ],
+  "publicationChecklist": [
+    "Read every official events-page entry and ticket page; record exact event URLs and all confirmed upcoming performances.",
+    "Confirm Mr. Blueberry Hill date, start time, any doors time and current ticket status. Replace date-only boundaries with confirmed times only when supported; never invent an end time.",
+    "Check organization contact, charity/presenter description, mailing address and annual festival venue against official pages.",
+    "Check Firestore for an existing profile, events, claims, owner projections and outreach history before activating new identities. Current environment has no usable Firebase credentials.",
+    "Promote the profile to published/source-checked with a real verifiedAt timestamp after checking the sources; do not set claimed, partner or ownerVerifiedAt merely because inclusion was agreed.",
+    "After source verification, move candidateSource/candidateRecords to reviewed-sources.json with approved:true; normalization determines the stable event ID and association.",
+    "Rebuild/export, deploy and verify both actual public URLs, then test signed-out and signed-in claim flows without submitting a claim or sending email."
+  ],
+  "candidateDatePrecisionNote": "The candidate uses midnight-to-midnight calendar boundaries solely to represent the user-supplied February 12 date. These are not performance hours. schedulePrecision=date suppresses clock times; the event remains unpublished."
+}

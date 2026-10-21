@@ -1,17 +1,76 @@
 {
+  "id": "/",
+  "name": "CalgaryWatch: What's happening in Calgary",
   "short_name": "CalgaryWatch",
-  "name": "CalgaryWatch — City Discovery and Live Awareness",
+  "description": "Events, markets, local places and live city updates for Calgary.",
+  "lang": "en-CA",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf8f3",
+  "theme_color": "#06162f",
+  "categories": [
+    "lifestyle",
+    "news",
+    "travel"
+  ],
   "icons": [
     {
-      "src": "./images/brand/calgarywatch-city-spark-v2.webp",
-      "type": "image/webp",
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
-  "start_url": ".",
-  "background_color": "#020617",
-  "display": "standalone",
-  "theme_color": "#020617",
-  "description": "Events, markets, local places and live city updates for Calgary."
+  "shortcuts": [
+    {
+      "name": "Events this week",
+      "short_name": "Events",
+      "url": "/events?source=pwa",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Markets",
+      "url": "/markets?source=pwa",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Live map",
+      "url": "/map?source=pwa",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }

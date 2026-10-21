@@ -495,7 +495,22 @@ export function renderRouteHtml(shell: string, pathname: string, origin: string)
   html = upsertMeta(html, 'property', 'og:title', config.title);
   html = upsertMeta(html, 'property', 'og:description', config.description);
   html = upsertMeta(html, 'property', 'og:url', pageUrl);
-  if (config.image) html = upsertMeta(html, 'property', 'og:image', config.image);
+  if (config.image) {
+    html = upsertMeta(html, 'property', 'og:image', config.image);
+    html = upsertMeta(html, 'name', 'twitter:image', config.image);
+    if (config.imageWidth && config.imageHeight) {
+      html = upsertMeta(html, 'property', 'og:image:width', String(config.imageWidth));
+      html = upsertMeta(html, 'property', 'og:image:height', String(config.imageHeight));
+    } else {
+      // A listing's own photo has its own size; a wrong size makes Facebook crop it badly.
+      html = html.replace(/\s*<meta[^>]*property=["']og:image:(?:width|height)["'][^>]*>/gi, '');
+    }
+    if (config.imageAlt) {
+      html = upsertMeta(html, 'property', 'og:image:alt', config.imageAlt);
+      html = upsertMeta(html, 'name', 'twitter:image:alt', config.imageAlt);
+    }
+    html = upsertMeta(html, 'property', 'og:image:type', config.image.endsWith('.jpg') ? 'image/jpeg' : config.image.endsWith('.png') ? 'image/png' : 'image/webp');
+  }
 
   html = upsertMeta(html, 'name', 'twitter:title', config.title);
   html = upsertMeta(html, 'name', 'twitter:description', config.description);

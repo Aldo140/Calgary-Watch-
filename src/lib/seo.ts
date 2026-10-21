@@ -11,6 +11,7 @@ import {
 } from '@/src/content/airdrieCrimeMapGuide';
 import { BEST_CATEGORIES } from '@/src/content/bestOf';
 import { BEST_PATH, bestCategory, bestIndexJsonLd, bestItemListJsonLd, bestPath } from './bestOf';
+import { DEFAULT_SHARE_ALT, DEFAULT_SHARE_IMAGE, SHARE_CARD, shareCardFor } from './shareImage';
 
 /**
  * Single source of truth for per-route SEO.
@@ -35,10 +36,14 @@ export interface SeoConfig {
   pageType: PageSchemaType;
   dateModified?: string;
   image?: string;
+  /** Link-preview image details; set together with `image` when its size is known. */
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 }
 
 export const PRODUCTION_ORIGIN = 'https://calgarywatch.ca';
-export const DEFAULT_IMAGE = 'https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp';
+export const DEFAULT_IMAGE = DEFAULT_SHARE_IMAGE;
 const LAST_MOD = '2026-08-13';
 const SEO_REFRESH_MOD = '2026-08-29';
 
@@ -257,7 +262,20 @@ export const PRERENDER_ROUTES = Object.entries(ROUTE_SEO)
  */
 export const PRERENDER_OUTPUT_ROUTES = [...PRERENDER_ROUTES, '/unsubscribe', '/plans', ...Object.keys(ROUTE_SEO).filter(route => DISCOVERY_SECTIONS.some(s => route.startsWith(s.path)) || route === '/search')];
 
+/**
+ * The SEO config for a route, with its link-preview card: listings, hubs and
+ * Best of Calgary lists get their own generated card (src/lib/shareImage.ts),
+ * everything else the site picture, both with size and alt text.
+ */
 export function getSeoConfig(pathname: string, repository: DiscoveryRepository = discoveryRepository): SeoConfig {
+  const config = routeSeoConfig(pathname, repository);
+  const card = shareCardFor(pathname, repository);
+  if (card) return { ...config, image: `${PRODUCTION_ORIGIN}${card.path}`, imageAlt: card.alt, imageWidth: SHARE_CARD.width, imageHeight: SHARE_CARD.height };
+  if (config.image === DEFAULT_IMAGE) return { ...config, imageAlt: DEFAULT_SHARE_ALT, imageWidth: SHARE_CARD.width, imageHeight: SHARE_CARD.height };
+  return config;
+}
+
+function routeSeoConfig(pathname: string, repository: DiscoveryRepository): SeoConfig {
   if(pathname.startsWith('/organization/'))return {title:'Manage your organization | CalgaryWatch',description:'Your verified organization profile and events workspace.',index:false,pageType:'WebPage'};
   const claimMatch = pathname.match(/^\/claim\/([^/]+)$/);
   let claimId: string | undefined;

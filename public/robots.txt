@@ -46,6 +46,9 @@ User-agent: Googlebot-Image
 Allow: /images/
 Allow: /icon.svg
 Allow: /icon.webp
+Allow: /favicon.ico
+Allow: /favicon.svg
+Allow: /og/
 
 # Polite crawl delay for non-Google bots
 User-agent: Bingbot

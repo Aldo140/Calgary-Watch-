@@ -4,10 +4,12 @@ import { useLocation } from 'react-router-dom';
 import {
   ROBOTS_INDEX,
   ROBOTS_NOINDEX,
+  DEFAULT_IMAGE,
   buildPageJsonLd,
   getSeoConfig,
   pageUrlFor,
 } from '@/src/lib/seo';
+import { DEFAULT_SHARE_ALT } from '@/src/lib/shareImage';
 
 /**
  * Keeps the live document's SEO tags in sync as the user navigates.
@@ -81,8 +83,10 @@ export default function SeoManager() {
     setMeta('og:title', 'property', config.title);
     setMeta('og:description', 'property', config.description);
     setMeta('og:url', 'property', pageUrl);
-    setMeta('og:image', 'property', config.image ?? 'https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp');
-    setMeta('twitter:image', 'name', config.image ?? 'https://calgarywatch.ca/images/hero/calgarywatch-social-v1.webp');
+    setMeta('og:image', 'property', config.image ?? DEFAULT_IMAGE);
+    setMeta('twitter:image', 'name', config.image ?? DEFAULT_IMAGE);
+    setMeta('og:image:alt', 'property', config.imageAlt ?? DEFAULT_SHARE_ALT);
+    setMeta('twitter:image:alt', 'name', config.imageAlt ?? DEFAULT_SHARE_ALT);
 
     setMeta('twitter:title', 'name', config.title);
     setMeta('twitter:description', 'name', config.description);

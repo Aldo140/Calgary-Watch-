@@ -80,7 +80,8 @@ if (config.apiKey && config.messagingSenderId) {
     var n = (payload && payload.notification) || {};
     self.registration.showNotification(n.title || 'Calgary Watch', {
       body: n.body || '',
-      icon: '/icon.webp',
+      icon: '/icon-192.png',
+      badge: '/favicon-32.png',
       data: (payload && payload.data) || {},
     });
   });

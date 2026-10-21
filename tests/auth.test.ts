@@ -2,7 +2,32 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { organizationForEmail } from '../src/lib/orgMatch';
-import { authErrorMessage, continueUriRefused, emailProblem, inboxLink, passwordProblem, returnLink, suggestEmail } from '../src/lib/auth';
+import { authErrorMessage, continueUriRefused, emailProblem, inboxLink, nameProblem, passwordProblem, realName, returnLink, suggestEmail } from '../src/lib/auth';
+
+describe('member names', () => {
+  it('never counts the placeholder as a name', () => {
+    assert.equal(realName('Anonymous'), '');
+    assert.equal(realName(' anonymous '), '');
+    assert.equal(realName(undefined), '');
+    assert.equal(realName('  Clare   Preuss '), 'Clare Preuss');
+    assert.match(nameProblem(''), /name/);
+    assert.equal(nameProblem('Paula'), '');
+  });
+  it('asks for a name on email sign-up, first, and never overwrites a real one with Anonymous', () => {
+    const dialog = readFileSync('src/components/auth/AuthDialog.tsx', 'utf8');
+    assert.doesNotMatch(dialog, /Optional\. Organizers see it/);
+    assert.ok(dialog.indexOf('Your name<input') < dialog.indexOf('Email address'), 'name comes before email');
+    assert.match(dialog, /nameProblem\(name\)/);
+    const provider = readFileSync('src/components/FirebaseProvider.tsx', 'utf8');
+    assert.match(provider, /realName\(currentUser\.displayName\) \|\| realName\(nameHint\) \|\| realName\(existing\.data\(\)\?\.displayName\) \|\| 'Anonymous'/);
+    assert.match(provider, /syncUserProfile\(currentUser, isApprovedAdmin, signupName\.current\)/);
+  });
+  it('only keeps the dialog on "check your inbox" for pages that need a verified email', () => {
+    assert.match(readFileSync('src/components/FirebaseProvider.tsx', 'utf8'), /if \(!authRequest\.verify && auth\?\.currentUser\) \{ setAuthOpen\(false\)/);
+    for (const file of ['src/pages/ClaimListingPage.tsx', 'src/pages/VendorApplyPage.tsx', 'src/pages/SubmitDiscoveryPage.tsx']) assert.match(readFileSync(file, 'utf8'), /verify: true/, file);
+    assert.doesNotMatch(readFileSync('src/pages/PlansPage.tsx', 'utf8'), /verify: true/);
+  });
+});
 
 describe('email authentication', () => {
   it('validates the signup fields without imposing extra password rules', () => {

@@ -18,10 +18,11 @@ import { db } from '@/src/firebase';
 import { adminUsers } from '@/src/lib/adminStore';
 import { interestLabel, normalizeInterests } from '@/src/lib/eventPicks';
 import { emailPlan } from '@/src/lib/memberHome';
+import { realName } from '@/src/lib/auth';
 import { AdminButton, Chip, EmptyState, FilterChip, FilterRow, Panel, SearchField, SkeletonRows, T, TimeAgo, mono } from './ui';
 
 type Row = { id: string; uid: string } & Record<string, unknown>;
-type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'business' | 'new';
+type Filter = 'all' | 'both' | 'monday' | 'events' | 'none' | 'no-area' | 'no-name' | 'business' | 'new';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const num = (v: unknown) => (typeof v === 'number' ? v : 0);
@@ -32,7 +33,9 @@ function shape(r: Row) {
   const area = (str(r.neighborhood) || str(r.inferredNeighborhood)).trim();
   return {
     uid: r.uid || r.id,
-    name: str(r.displayName) || 'Calgary neighbour',
+    // Accounts that never gave a name show their email, so admin can still tell them apart.
+    name: realName(r.displayName) || str(r.email) || 'No name yet',
+    named: Boolean(realName(r.displayName)),
     email: str(r.email),
     photo: str(r.photoURL),
     area,
@@ -53,6 +56,7 @@ const FILTERS: Array<{ id: Filter; label: string; match: (m: ReturnType<typeof s
   { id: 'events', label: 'Event picks only', match: (m) => !m.weekly && m.events },
   { id: 'none', label: 'No email', match: (m) => !m.weekly && !m.events },
   { id: 'no-area', label: 'No home area', match: (m) => !m.area },
+  { id: 'no-name', label: 'No name', match: (m) => !m.named },
   { id: 'business', label: 'Business accounts', match: (m) => m.business },
   { id: 'new', label: 'New this week', match: (m) => m.createdAt > Date.now() - 7 * 86_400_000 },
 ];

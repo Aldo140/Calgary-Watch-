@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowUpRight, Eye, EyeOff, Mail, ShieldCheck, X } from 'lucide-react';
 import type { User } from 'firebase/auth';
-import { authCode, authErrorMessage, emailProblem, inboxLink, passwordProblem, readLastSignIn, suggestEmail, type AuthMode, type AuthRequest, type LastSignIn } from '../../lib/auth';
+import { authCode, authErrorMessage, emailProblem, inboxLink, nameProblem, passwordProblem, readLastSignIn, suggestEmail, type AuthMode, type AuthRequest, type LastSignIn } from '../../lib/auth';
 import '../../styles/auth.css';
 
 type Props = {
   open: boolean; request: AuthRequest; user: User | null; busy: boolean; onClose: () => void;
   onGoogle: () => Promise<void>; onSignIn: (email: string, password: string) => Promise<void>;
-  onSignUp: (email: string, password: string, name?: string) => Promise<void>;
+  onSignUp: (email: string, password: string, name: string) => Promise<void>;
   onReset: (email: string) => Promise<void>; onResend: () => Promise<void>;
   onRefresh: () => Promise<User | null>; onLogout: () => Promise<void>;
 };
@@ -34,6 +34,7 @@ export function AuthDialog({ open, request, user, busy, onClose, onGoogle, onSig
     const remembered = readLastSignIn(); setLast(remembered);
     setMode(request.mode ?? (remembered ? 'signin' : 'signup'));
     setEmail(e => request.email?.trim() || e || (remembered?.method === 'email' ? remembered.email ?? '' : ''));
+    setName(n => request.name?.trim() || n);
     setPassword(''); setError(''); setNotice('');
   }, [open, request]);
   const verified = user?.emailVerified;
@@ -54,10 +55,11 @@ export function AuthDialog({ open, request, user, busy, onClose, onGoogle, onSig
   } };
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    if (mode === 'signup') { const np = nameProblem(name); if (np) { setError(np); return; } }
     const ep = emailProblem(email); if (ep) { setError(ep); return; }
     if (mode === 'reset') { void run(async () => { await onReset(email.trim()); setNotice('If an account exists for this email, we’ve sent reset instructions. The link brings you back here.'); }); return; }
     const pp = passwordProblem(password); if (pp) { setError(pp); return; }
-    void run(() => mode === 'signup' ? onSignUp(email.trim(), password, name.trim() || undefined) : onSignIn(email.trim(), password));
+    void run(() => mode === 'signup' ? onSignUp(email.trim(), password, name.trim()) : onSignIn(email.trim(), password));
   };
   const resend = () => void run(async()=>{await onResend();setCooldown(45);setNotice('Verification email sent. Check your inbox and junk folder.');});
   const typo = suggestEmail(email);
@@ -85,10 +87,10 @@ export function AuthDialog({ open, request, user, busy, onClose, onGoogle, onSig
           <div className="auth-or"><span>or use email</span></div>
         </>:null}
         <form onSubmit={submit} noValidate>
+          {mode==='signup'?<label>Your name<input autoComplete="name" autoCapitalize="words" enterKeyHint="next" value={name} onChange={e=>setName(e.target.value)} /></label>:null}
           <label>Email address {last?.method==='email'&&mode==='signin'&&email===last.email?<span className="auth-last">Last used</span>:null}<input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={e=>setEmail(e.target.value)} /></label>
           {typo?<p className="auth-typo">Did you mean <button type="button" onClick={()=>setEmail(typo)}>{typo}</button>?</p>:null}
           {mode!=='reset'?<label>Password <span className="auth-password"><input type={show?'text':'password'} autoComplete={mode==='signup'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)} /><button type="button" onClick={()=>setShow(v=>!v)} aria-label={show?'Hide password':'Show password'}>{show?<EyeOff size={18}/>:<Eye size={18}/>}</button></span>{mode==='signup'?<small>At least 6 characters. Tap the eye to check it.</small>:null}</label>:null}
-          {mode==='signup'?<label>Your name <small>Optional. Organizers see it on claims.</small><input autoComplete="name" value={name} onChange={e=>setName(e.target.value)} /></label>:null}
           {error?<p className="auth-error" role="alert">{error}{mode==='signin'&&authCodeIsCredential(error)?<> <button type="button" className="auth-inline" onClick={()=>switchMode('reset')}>Reset it now</button></>:null}</p>:null}
           {notice?<p className="auth-notice" role="status">{notice}</p>:null}
           <button className="auth-primary" type="submit" disabled={busy}>{busy?'Please wait…':mode==='signup'?'Create free account':mode==='reset'?'Send reset link':'Sign in'}</button>

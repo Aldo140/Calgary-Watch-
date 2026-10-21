@@ -1,0 +1,31 @@
+name: Backfill Member Names
+
+# Manual only. Fills "Anonymous" member records from the name on their Auth
+# profile, a listing claim or a market application. Run the dry run first.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Count without writing (leave checked for the first run)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Keep both branches non-empty: `x && '' || 'y'` always yields 'y' (see backfill-visibility.yml).
+      - run: npx tsx scripts/claims/backfill-member-names.ts ${{ inputs.dry_run && '--dry-run' || '--commit' }}
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}

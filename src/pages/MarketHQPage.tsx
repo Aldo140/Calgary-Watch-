@@ -79,7 +79,7 @@ export default function MarketHQPage() {
             <p className="cl-lead">Vendors, weekly lineups, applications and vendor emails, with every lineup shown to shoppers on CalgaryWatch.</p>
             <div className="hq-gate">
               {!user ? (
-                <button type="button" className="pl-btn" disabled={!isFirebaseConfigured} onClick={() => void signIn({ mode: 'signin', title: 'Open Market HQ.', intro: `Sign in with the account that claimed ${market.title}.` })}>Sign in to open Market HQ <ArrowUpRight size={18} aria-hidden="true" /></button>
+                <button type="button" className="pl-btn" disabled={!isFirebaseConfigured} onClick={() => void signIn({ mode: 'signin', verify: true, title: 'Open Market HQ.', intro: `Sign in with the account that claimed ${market.title}.` })}>Sign in to open Market HQ <ArrowUpRight size={18} aria-hidden="true" /></button>
               ) : claim?.status === 'pending' ? (
                 <p className="cl-status" data-state="pending"><span><strong>Your claim is being confirmed.</strong> Market HQ opens as soon as it’s approved.</span></p>
               ) : (

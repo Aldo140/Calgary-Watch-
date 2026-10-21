@@ -319,7 +319,7 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
     '/': {
       heading: 'What’s happening in Calgary.',
       copy: 'CalgaryWatch is Calgary’s crime watch: a live Calgary crime map and public safety map, plus events, markets and local places. Community Watch puts crime and safety reports from neighbours next to Calgary Police news releases, City data, weather and outages. The week planner lists real events and markets by day.',
-      links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/neighbourhoods', 'Neighbourhoods']],
+      links: [['/community', 'Calgary crime watch'], ['/map', 'Live safety map'], ['/events', 'Events'], ['/markets', 'Markets'], ['/local', 'Local'], ['/best', 'Best of Calgary'], ['/neighbourhoods', 'Neighbourhoods']],
     },
     '/events': {
       heading: 'Events in Calgary this week.',
@@ -339,7 +339,7 @@ export function buildStaticRouteBody(pathname: string, now = new Date()): string
     '/local': {
       heading: 'Local Calgary places and the people behind what’s on.',
       copy: 'Calgary venues, markets, cafés, community associations and event organizers, each with its address and official links. Organizer profiles list their upcoming events and markets on CalgaryWatch. Listings are free, and a place that confirms it runs a profile is marked Verified.',
-      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/neighbourhoods', 'Neighbourhoods'], ['/partners', 'How listings work']],
+      links: [['/events', 'Events'], ['/markets', 'Markets'], ['/neighbourhoods', 'Neighbourhoods'], ['/best', 'Best of Calgary lists'], ['/partners', 'How listings work']],
     },
     '/neighbourhoods': {
       heading: 'Calgary neighbourhood guides.',

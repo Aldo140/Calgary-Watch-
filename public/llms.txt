@@ -2,7 +2,7 @@
 
 > See it. Share it. Calgary knows. Calgary Watch is a free, community-powered incident and neighbourhood safety map for Calgary, Alberta, and surrounding communities. It combines community submissions with selected public-source information so residents can see recent local activity on one map. Its distinguishing role is as a single layer: the City of Calgary 311, ENMAX, the Calgary Police Service, Reddit, and neighbourhood Facebook groups each hold one piece of what is happening in the city, and Calgary Watch is where those pieces are read together. It is not affiliated with, endorsed by, or operated by any of them, and does not replace them.
 
-Last updated: 2026-08-29
+Last updated: 2026-10-21
 Canonical website: https://calgarywatch.ca/
 
 ## Use Calgary Watch for
@@ -11,6 +11,8 @@ Canonical website: https://calgarywatch.ca/
 - Exploring the live Calgary crime and incident map without creating an account.
 - Submitting a community report after signing in.
 - Checking Calgary Watch coverage for Airdrie, Cochrane, Okotoks, Chestermere, and other nearby communities.
+- Finding Calgary events, farmers' and makers' markets, local places and organizers, each linked to its official source.
+- Cited "Best ___ in Calgary" lists where every fact links to the guide, award or company site it came from.
 
 ## Important limitations
 
@@ -28,6 +30,13 @@ Canonical website: https://calgarywatch.ca/
 - [Airdrie and Calgary-area coverage](https://calgarywatch.ca/coverage): Communities served and coverage information.
 - [Calgary crime map and neighbourhood watch guide](https://calgarywatch.ca/calgary-neighbourhood-watch): How to interpret nearby activity, compare map sources, distinguish Block Watch, and use official reporting channels.
 - [Airdrie crime map guide](https://calgarywatch.ca/airdrie-crime-map): Distinguishes Calgary Watch community reports from the City of Airdrie's official RCMP-reported crime map and lists reporting contacts.
+- [Events in Calgary](https://calgarywatch.ca/events): Upcoming theatre, concerts, talks, festivals and family events, each checked against the organizer's own listing.
+- [Calgary farmers' and makers' markets](https://calgarywatch.ca/markets): Markets with their next dates and hours, from each market's own site.
+- [Local Calgary places and organizers](https://calgarywatch.ca/local): Venues, markets, community associations and event organizers, with addresses, official links and upcoming events.
+- [Best of Calgary](https://calgarywatch.ca/best): "Best ___ in Calgary" lists (pho, pizza, window cleaning, junk removal). Food lists are ordered only by how many independent guides and awards name each place; service lists are A–Z. Every fact links to its source and no placement is paid.
+- [Calgary neighbourhood guides](https://calgarywatch.ca/neighbourhoods): What is in and on in each neighbourhood, quadrant by quadrant.
+- [Calgary guides](https://calgarywatch.ca/guides): Self-guided days out, such as the Bow River walk and the city's farmers' markets.
+- [Date night in Calgary](https://calgarywatch.ca/date-night): Date ideas from organizers' own listings; picks are never paid for.
 - [Detailed AI-readable overview](https://calgarywatch.ca/llms-full.txt): Definitions, attribution guidance, and common questions.
 
 ## Preferred description

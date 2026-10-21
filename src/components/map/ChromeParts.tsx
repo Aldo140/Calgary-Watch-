@@ -1,0 +1,152 @@
+import type { ReactNode } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { HelpCircle, LayoutDashboard, LogOut, Settings } from 'lucide-react';
+import { MAP_TIME_WINDOWS, type MapTimeWindow } from '@/src/lib/mapTimeWindow';
+import { cn } from '@/src/lib/utils';
+
+/**
+ * Small pieces of the /map frame shared by the desktop command bar and the
+ * phone chrome. Styles: src/styles/map-chrome.css (`lv-` classes).
+ */
+
+/** Red-pulse "Live" pill, the same signal as the site nav's Live link. */
+export function LivePill({ label = 'Live' }: { label?: string }) {
+  return (
+    <span className="lv-live">
+      <span className="lv-pulse" aria-hidden="true" />
+      {label}
+    </span>
+  );
+}
+
+/**
+ * "Latest report 2 min ago", from the newest real report timestamp.
+ * Says plainly when nothing has loaded instead of inventing a time.
+ */
+export function freshnessLabel(newest: number | null, now: number): string {
+  if (newest === null) return 'No reports loaded yet';
+  const mins = Math.max(0, Math.floor((now - newest) / 60_000));
+  if (mins < 1) return 'Latest report just now';
+  if (mins < 60) return `Latest report ${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `Latest report ${hrs} h ago`;
+  const days = Math.floor(hrs / 24);
+  return `Latest report ${days} day${days === 1 ? '' : 's'} ago`;
+}
+
+/** The word shown after a count: "15 reports · Tonight". */
+export function windowWord(w: MapTimeWindow): string {
+  if (w === 'all') return 'All loaded';
+  return MAP_TIME_WINDOWS.find((o) => o.id === w)?.label ?? 'All loaded';
+}
+
+/** Tonight · 24h · Yesterday · 7 days · All, as pressed chips. */
+export function WhenChips({
+  value,
+  onChange,
+  className,
+  size,
+}: {
+  value: MapTimeWindow;
+  onChange: (w: MapTimeWindow) => void;
+  className?: string;
+  size?: 'sm';
+}) {
+  return (
+    <div className={cn('lv-chips lv-when', className)} role="group" aria-label="Time window for the map and the feed">
+      {MAP_TIME_WINDOWS.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          className={cn('lv-chip', size === 'sm' && 'lv-chip-sm')}
+          aria-pressed={value === o.id}
+          title={o.hint}
+          onClick={() => onChange(o.id)}
+        >
+          {o.short}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Unread count, capped so it never overflows its badge. */
+export function UnreadBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return <span className="lv-badge" aria-hidden="true">{count > 9 ? '9+' : count}</span>;
+}
+
+/** Spoken name for the bell, including the unread count. */
+export function bellLabel(count: number): string {
+  return count > 0 ? `Notifications, ${count > 9 ? 'more than 9' : count} unread` : 'Notifications';
+}
+
+type MenuUser = { displayName?: string | null; email?: string | null };
+
+/** The one account menu, used by both the desktop bar and the phone rail. */
+export function UserMenu({
+  open,
+  user,
+  isAdmin,
+  onAdmin,
+  onSettings,
+  onTour,
+  onSignOut,
+  className,
+  motionFrom = 'down',
+}: {
+  open: boolean;
+  user: MenuUser;
+  isAdmin: boolean;
+  onAdmin: () => void;
+  onSettings: () => void;
+  onTour: () => void;
+  onSignOut: () => void;
+  className?: string;
+  motionFrom?: 'down' | 'side';
+}) {
+  const offset = motionFrom === 'side' ? { x: 8, y: 0 } : { x: 0, y: 8 };
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, ...offset }}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          exit={{ opacity: 0, ...offset }}
+          transition={{ duration: 0.16 }}
+          className={cn('lv-pop lv-menu', className)}
+          role="menu"
+          aria-label="Account"
+        >
+          <div className="lv-menu-who">
+            <p>{user.displayName || 'Your account'}</p>
+            <p>{user.email}</p>
+          </div>
+          {isAdmin && (
+            <MenuItem tone="admin" icon={<LayoutDashboard size={16} />} onClick={onAdmin}>Admin portal</MenuItem>
+          )}
+          <MenuItem icon={<Settings size={16} />} onClick={onSettings}>Settings</MenuItem>
+          <MenuItem icon={<HelpCircle size={16} />} onClick={onTour}>App tour</MenuItem>
+          <MenuItem icon={<LogOut size={16} />} onClick={onSignOut}>Sign out</MenuItem>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function MenuItem({ icon, children, onClick, tone }: { icon: ReactNode; children: ReactNode; onClick: () => void; tone?: 'admin' }) {
+  return (
+    <button type="button" role="menuitem" className="lv-menu-item" data-tone={tone} onClick={onClick}>
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+/** Avatar content for an account button: photo, or the first initial. */
+export function AvatarFace({ user }: { user: { photoURL?: string | null; displayName?: string | null; email?: string | null } }) {
+  if (user.photoURL) {
+    return <img src={user.photoURL} alt="" referrerPolicy="no-referrer" crossOrigin="anonymous" />;
+  }
+  return <span className="lv-sq-initial">{(user.displayName?.[0] ?? user.email?.[0] ?? 'U').toUpperCase()}</span>;
+}

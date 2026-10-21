@@ -1,89 +1,46 @@
-import { AreaIntelligence, CommunityStats } from '@/src/types';
-// MOCK_INCIDENTS intentionally removed — the app now uses only real
-// user-submitted reports and data ingested by the pipeline in
-// scripts/ingest/. Do NOT re-add fake incidents here.
+import { AreaIntelligence } from '@/src/types';
+// MOCK_INCIDENTS and MOCK_COMMUNITY_STATS were removed. The map uses only real
+// user-submitted reports and data ingested by the pipeline in scripts/ingest/.
+// Do NOT re-add fake incidents, invented percentages or random figures here:
+// the area panel is read as fact by residents.
 
-export const MOCK_COMMUNITY_STATS: CommunityStats[] = [
-  {
-    community: 'Beltline',
-    month: 'March 2024',
-    violent_crime: 12,
-    property_crime: 45,
-    disorder_calls: 78,
-    safety_score: 68,
-  },
-  {
-    community: 'Kensington',
-    month: 'March 2024',
-    violent_crime: 4,
-    property_crime: 22,
-    disorder_calls: 34,
-    safety_score: 82,
-  },
-  {
-    community: 'Bridgeland',
-    month: 'March 2024',
-    violent_crime: 6,
-    property_crime: 28,
-    disorder_calls: 41,
-    safety_score: 79,
-  },
-  {
-    community: 'Mission',
-    month: 'March 2024',
-    violent_crime: 5,
-    property_crime: 31,
-    disorder_calls: 45,
-    safety_score: 75,
-  },
-  {
-    community: 'Inglewood',
-    month: 'March 2024',
-    violent_crime: 7,
-    property_crime: 35,
-    disorder_calls: 52,
-    safety_score: 72,
-  },
-  {
-    community: 'Bowness',
-    month: 'March 2024',
-    violent_crime: 3,
-    property_crime: 18,
-    disorder_calls: 25,
-    safety_score: 88,
-  },
-  {
-    community: 'Downtown',
-    month: 'March 2024',
-    violent_crime: 15,
-    property_crime: 55,
-    disorder_calls: 92,
-    safety_score: 62,
-  },
-];
+const TWO_HOURS = 2 * 60 * 60 * 1000;
+const ONE_DAY = 24 * 60 * 60 * 1000;
 
-export function getAreaIntelligence(communityName: string): AreaIntelligence {
-  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
-  const baseStats = MOCK_COMMUNITY_STATS.find(s => s.community === communityName) || MOCK_COMMUNITY_STATS[0];
+interface AreaIncident {
+  neighborhood?: string;
+  timestamp: number;
+}
+
+/**
+ * The baseline for the area panel, built only from reports already on the map.
+ *
+ * The richer figures (311 totals, yearly trends, city position) are layered on
+ * by MapPage when the 311 proxy has a row for this community. When it does
+ * not, the panel says less rather than inventing anything.
+ */
+export function getAreaIntelligence(
+  communityName: string,
+  incidents: readonly AreaIncident[] = [],
+  now: number = Date.now(),
+): AreaIntelligence {
+  const key = communityName.toLowerCase().trim();
+  const here = incidents.filter((i) => (i.neighborhood ?? '').toLowerCase().trim() === key);
+  const lastDay = here.filter((i) => now - i.timestamp <= ONE_DAY && i.timestamp <= now + 60_000);
+  const lastTwoHours = lastDay.filter((i) => now - i.timestamp <= TWO_HOURS);
+
+  const liveOverlayInsight = lastTwoHours.length > 0
+    ? `${lastTwoHours.length} ${lastTwoHours.length === 1 ? 'report' : 'reports'} on the map from ${communityName} in the last 2 hours.`
+    : '';
 
   return {
     communityName,
-    safetyScore: baseStats.safety_score,
-    description: `${communityName} is a ${baseStats.safety_score > 75 ? 'vibrant and safe' : 'dynamic'} neighborhood in Calgary. Recent data shows a ${baseStats.safety_score > 75 ? 'low' : 'moderate'} rate of incidents compared to the city average.`,
-    activeIncidents: Math.floor(Math.random() * 5 + 1),
-    trend: baseStats.safety_score > 75 ? 'improving' : 'stable',
-    monthlyTrends: months.map((month, idx) => ({
-      month,
-      violent_crime: Math.max(0, baseStats.violent_crime + Math.floor(Math.random() * 6 - 3)),
-      property_crime: Math.max(0, baseStats.property_crime + Math.floor(Math.random() * 10 - 5)),
-      disorder_calls: Math.max(0, baseStats.disorder_calls + Math.floor(Math.random() * 20 - 10)),
-    })),
-    insights: [
-      `↑ ${Math.floor(Math.random() * 15 + 5)}% increase in property crime in ${communityName} this month`,
-      `Safety score of ${baseStats.safety_score} is ${baseStats.safety_score > 75 ? 'above' : 'near'} the city average`,
-      'Consistent with historical trends for this season',
-      communityName === 'Beltline' || communityName === 'Downtown' ? 'High density area with frequent disorder calls' : 'Residential area with lower incident density',
-    ],
-    liveOverlayInsight: '3 live reports in last 2 hours (unusual activity for this time of day).',
+    safetyScore: 0,
+    description: `What neighbours and public sources reported in ${communityName}.`,
+    activeIncidents: lastDay.length,
+    trend: 'stable',
+    monthlyTrends: [],
+    insights: [],
+    liveOverlayInsight,
   };
 }

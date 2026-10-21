@@ -80,12 +80,36 @@ export const SURFACE = {
  * anywhere a resident reads an incident — the map, the sheet, the briefing.
  */
 export const CATEGORY = {
-  emergency: '#C0392B',
-  crime: '#B5442F',
-  traffic: '#C07A2A',
-  infrastructure: '#3E7D8C',
-  weather: '#6A63A8',
+  emergency: '#D7261E',
+  crime: '#E4572E',
+  traffic: '#E8920C',
+  infrastructure: '#1554D1',
+  weather: '#0094B3',
   gas: '#2E8B7A',
+} as const;
+
+/**
+ * The live-map brand, shared with the rest of calgarywatch.ca (home, community,
+ * neighbourhoods, /local). Navy live-sky chrome, brand blue for action, sign-up
+ * yellow for the one thing we want people to do, cyan for the wordmark dot.
+ * Red stays reserved for emergencies and the live pulse.
+ */
+export const LIVE = {
+  navy: '#06162F',
+  navy2: '#0B2348',
+  glow: '#123A7A',
+  blue: '#1554D1',
+  blueDeep: '#0E3FA3',
+  yellow: '#FFDF4F',
+  yellowSoft: '#FFF5CC',
+  cyan: '#00C2E0',
+  cyanOnNavy: '#9FE9F5',
+  ink: '#151515',
+  paper: '#FAF8F3',
+  muted: '#565A61',
+  onNavy: '#E8EEF8',
+  onNavyMuted: '#A9B8D0',
+  pulse: '#FF5A4E',
 } as const;
 
 export type CategoryKey = keyof typeof CATEGORY;
@@ -136,28 +160,28 @@ export const CHART_SERIES = {
  */
 export const MAP = {
   /** Panel and card surface. Was also #FFFFFF, #FFFCF6, #F8FAFC. */
-  panel: '#FFFDF8',
+  panel: '#FFFFFF',
   /** The page behind the panels. Was also #F5F2E9, #F7F6F3. */
-  paper: '#F7F3EA',
+  paper: '#FAF8F3',
   /** Tinted surface for a selected or hovered row. Was also #EAF1F6, #EEF4F8. */
-  tint: '#E8F3FC',
+  tint: '#EAF0FC',
 
   /** Primary text. Was also #1E293B, #0F172A, #020617. */
-  ink: '#1C2B3A',
+  ink: '#151515',
   /** Deep chrome ink — headers and the map's own furniture. Was also #0A1628, #0F1E3D. */
-  inkDeep: '#0B1F33',
+  inkDeep: '#06162F',
   /** Secondary text. Was also #52697D, #6B8296, #64748B, #475569. */
-  muted: '#5A6B7D',
+  muted: '#565A61',
   /** Tertiary text — timestamps, counts. */
-  faint: '#9AA6B2',
+  faint: '#8A8F98',
 
   /** Hairline on paper. Was also #D9D2C3, #F0EBDD. */
-  line: '#E7E0D2',
+  line: '#E6E1D6',
   /** Hairline on the cooler map chrome. Was also #D8E2EA, #D9E2E8, #E2E8F0. */
-  lineCool: '#C9D8E4',
+  lineCool: '#D5DCE8',
 
   /** Interactive accent. Was also #286FAF, #2563EB. */
-  accent: '#4A90D9',
+  accent: '#1554D1',
   /** Positive / live. Was also #059669, #34D399, #22C55E. */
   ok: '#2E8B7A',
   /** Warning. Was also #EA580C, #B45309, #92400E. */

@@ -1,4 +1,5 @@
 import {
+  type ReactNode,
   forwardRef,
   useCallback,
   useEffect,
@@ -8,16 +9,17 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Search, X, ChevronDown, Plus, Activity, Layers, Siren, AlertCircle, Car, Construction, CloudRain } from 'lucide-react';
-import { TimeWindowFilter, type TimeWindow } from '@/src/components/TimeWindowFilter';
+import { Search, X, ChevronDown, ChevronUp, Plus, Activity, Layers, Siren, AlertCircle, Car, Construction, CloudRain } from 'lucide-react';
+import type { MapTimeWindow } from '@/src/lib/mapTimeWindow';
+import { windowWord } from '@/src/components/map/ChromeParts';
 import { Incident, IncidentCategory, isCommunityFacingIncident, isPubliclyVisible } from '@/src/types';
-import { cn, publicAsset } from '@/src/lib/utils';
+import { cn } from '@/src/lib/utils';
 import { useNeighborhoodPulse, RISK_CONFIG } from '@/src/hooks/useNeighborhoodPulse';
 import IncidentRow from '@/src/components/IncidentRow';
 import { useSheetDrag, type SheetState } from '@/src/hooks/useSheetDrag';
 import { isRecentIncident, resolveDefaultSort, shouldAutoResolveNearest, sortIncidents, type SortBy } from '@/src/lib/feed';
 import { getDistance } from '@/src/lib/geo';
-import { MAP } from '@/src/lib/tokens';
+import { CATEGORY, LIVE, MAP } from '@/src/lib/tokens';
 
 const SORT_KEY = 'cw_sortBy';
 const FEED_FILTER_KEY = 'cw_feedFilter';
@@ -53,12 +55,12 @@ const P = {
 };
 
 const CATEGORY_OPTIONS = [
-  { id: 'all' as const,            label: 'All',     Icon: Layers,       color: '#1C2B3A' },
-  { id: 'emergency' as const,      label: 'SOS',     Icon: Siren,        color: '#C0392B' },
-  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: '#C0392B' },
-  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: '#C77F18' },
-  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: '#4A90D9' },
-  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: '#0284C7' },
+  { id: 'all' as const,            label: 'All',     Icon: Layers,       color: LIVE.ink },
+  { id: 'emergency' as const,      label: 'Emergency', Icon: Siren,        color: CATEGORY.emergency },
+  { id: 'crime' as const,          label: 'Crime',   Icon: AlertCircle,  color: CATEGORY.crime },
+  { id: 'traffic' as const,        label: 'Traffic', Icon: Car,          color: CATEGORY.traffic },
+  { id: 'infrastructure' as const, label: 'Infra',   Icon: Construction, color: CATEGORY.infrastructure },
+  { id: 'weather' as const,        label: 'Weather', Icon: CloudRain,    color: CATEGORY.weather },
 ] as const;
 
 export interface MapSheetRef {
@@ -78,8 +80,9 @@ export interface MobileMapSheetProps {
   incidents: Incident[];
   /** The one derived feed count, shared with the chrome badge. */
   feedCount: number;
-  timeWindow?: TimeWindow;
-  onTimeWindowChange?: (v: TimeWindow) => void;
+  /** The page's time window; the chrome's chips change it, the sheet names it. */
+  timeWindow?: MapTimeWindow;
+  onTimeWindowChange?: (v: MapTimeWindow) => void;
   selectedCategory: IncidentCategory | 'all';
   onCategoryChange: (c: IncidentCategory | 'all') => void;
   state: SheetState;
@@ -94,14 +97,19 @@ export interface MobileMapSheetProps {
   activeIncidentId?: string | null;
   /** Report form open or a pin being placed — translate fully offscreen. */
   hidden: boolean;
+  /**
+   * Shown at the top of the raised sheet. MapPage mounts <NowBriefing />
+   * here ("Tonight near Seton: …") so the first thing the list says is one
+   * honest sentence about the window.
+   */
+  briefing?: ReactNode;
 }
 
 const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function MobileMapSheet(
   {
     incidents,
     feedCount,
-    timeWindow,
-    onTimeWindowChange,
+    timeWindow = 'all',
     selectedCategory,
     onCategoryChange,
     state,
@@ -115,6 +123,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     onReportPress,
     activeIncidentId,
     hidden,
+    briefing,
   },
   ref,
 ) {
@@ -167,7 +176,12 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
     measure();
     window.addEventListener('resize', measure);
     window.addEventListener('orientationchange', measure);
+    // The masthead's height also moves when web fonts arrive or the count
+    // wraps; without this the rail could rest a few pixels short.
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    if (observer && mastheadRef.current) observer.observe(mastheadRef.current);
     return () => {
+      observer?.disconnect();
       window.removeEventListener('resize', measure);
       window.removeEventListener('orientationchange', measure);
     };
@@ -384,90 +398,69 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       // the chrome — is deliberate: it keeps Home, near-me, notifications and
       // account tappable in the band the sheet doesn't cover, while nothing
       // floats over the sheet's own masthead/search row where it does.
-      className="fixed inset-x-0 bottom-0 z-[52] flex flex-col lg:hidden"
+      className="lv-sheet fixed inset-x-0 bottom-0 z-[52] flex flex-col lg:hidden"
       style={{
-        height: `${RAISED_FRACTION * 100}vh`,
-        background: P.paper,
-        boxShadow: '0 -4px 12px rgba(11,31,51,0.16)',
+        // Raised, it stops just under the phone chrome so the time chips and
+        // search entry stay reachable above it.
+        height: `min(${RAISED_FRACTION * 100}vh, calc(100dvh - var(--cw-chrome-h, 0px) - 10px))`,
         transform: `translateY(${translate})`,
         transition: isDragging || reducedMotion ? 'none' : 'transform 320ms cubic-bezier(0.32, 0.72, 0, 1)',
         pointerEvents: hidden ? 'none' : undefined,
       }}
     >
-      {/* ── Masthead. Always the drag zone; touch-action is scoped here and
-             nowhere else, which is the whole point of not using vaul. ──── */}
+      {/* ── Masthead (navy peek bar). Always the drag zone; touch-action is
+             scoped here and nowhere else. ─────────────────────────────── */}
       <div
         ref={mastheadRef}
         {...headerHandlers}
-        className="relative shrink-0 overflow-hidden"
-        style={{ background: P.ground, touchAction: 'none' }}
+        className="lv-sheet-head lv-sky shrink-0"
       >
-        <img
-          src={publicAsset('images/illustration/calgary-bow-emblem.webp')}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-5 -top-6 h-32 w-32 select-none object-contain opacity-[0.18]"
-          style={{ filter: 'invert(1)' }}
-        />
-
-        <div className="relative flex justify-center pt-2 pb-1.5">
-          <div className="w-10 h-1" style={{ background: 'rgba(242,239,232,0.42)' }} />
-        </div>
+        <button
+          type="button"
+          className="lv-sheet-handle"
+          onClick={() => onStateChange(isRaised ? 'rail' : 'raised')}
+          aria-label={isRaised ? 'Lower the feed' : 'Open the feed'}
+          aria-expanded={isRaised}
+          tabIndex={-1}
+        >
+          <span aria-hidden="true" />
+        </button>
 
         {!isRaised ? (
-          <div className="relative flex items-center justify-between px-4 pb-3">
-            <button
-              type="button"
-              onClick={() => onStateChange('raised')}
-              // The accessible name must contain the visible label (WCAG
-              // 2.5.3) — folding the count into the label rather than
-              // dropping aria-label keeps the "open the feed" action verb a
-              // screen-reader user would otherwise lose.
-              aria-label={`${feedCount} live report${feedCount !== 1 ? 's' : ''} — open the feed`}
-              aria-expanded={isRaised}
-              className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
-            >
-              <span className="relative flex h-2 w-2 items-center justify-center">
-                <span className="absolute inset-0 animate-ping opacity-70" style={{ background: P.live }} />
-                <span className="relative h-2 w-2" style={{ background: P.live }} />
+          <button
+            type="button"
+            onClick={() => onStateChange('raised')}
+            // The accessible name contains the visible label (WCAG 2.5.3).
+            aria-label={`${feedCount} report${feedCount !== 1 ? 's' : ''}, ${windowWord(timeWindow)}: open the feed`}
+            aria-expanded={isRaised}
+            className="lv-sheet-peek"
+          >
+            <span className="min-w-0">
+              <span className="lv-sheet-count block">
+                {feedCount} report{feedCount !== 1 ? 's' : ''}
               </span>
-              <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.2em]" style={{ color: P.onGround }}>
-                {feedCount} live report{feedCount !== 1 ? 's' : ''}
-              </span>
-            </button>
-            {/* A sibling of the expand button, never nested inside it. Nesting
-                interactive elements breaks keyboard and screen-reader
-                behaviour — the same fix this codebase already made to the
-                notification card in MapPage. */}
-            <button
-              type="button"
-              onClick={onReportPress}
-              className="ml-3 flex h-9 shrink-0 items-center gap-1.5 px-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.16em] transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none"
-              style={{ background: P.onGround, color: P.ground, boxShadow: `4px 4px 0 ${P.accent}` }}
-            >
-              <Plus size={11} />
-              Report
-            </button>
-          </div>
+              <span className="lv-sheet-window block">{windowWord(timeWindow)}</span>
+            </span>
+            <span className="lv-sheet-open" aria-hidden="true">
+              See the list <ChevronUp size={15} strokeWidth={2.6} />
+            </span>
+          </button>
         ) : (
-          <div className="relative flex items-end justify-between gap-3 px-4 pb-2.5">
+          <div className="lv-sheet-raised">
             <div className="min-w-0">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: P.eyebrow }}>
-                51.05°N · 114.07°W
+              <p className="font-mono text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: LIVE.cyanOnNavy }}>
+                {feedCount} report{feedCount !== 1 ? 's' : ''} · {windowWord(timeWindow)}
               </p>
-              <h2 className="mt-1 font-display text-[21px] font-black uppercase leading-[0.9] tracking-[-0.035em]" style={{ color: P.onGround }}>
-                Calgary Watch
-              </h2>
+              <h2>What neighbours reported</h2>
             </div>
             <button
               type="button"
               onClick={() => onStateChange('rail')}
               aria-label="Lower the feed"
               aria-expanded={isRaised}
-              className="flex h-9 w-9 shrink-0 items-center justify-center"
-              style={{ color: P.eyebrow }}
+              className="lv-sheet-down"
             >
-              <ChevronDown size={18} />
+              <ChevronDown size={20} />
             </button>
           </div>
         )}
@@ -475,9 +468,9 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
 
       {/* ── Search. Mounted at the rail as well as raised, so focus() can run
              synchronously inside the chrome's tap. ─────────────────────── */}
-      <div className="flex shrink-0 items-center gap-2 px-3 pt-2.5 pb-2">
-        <div className="flex h-11 flex-1 items-center gap-2 px-3" style={{ background: P.card, border: `1.5px solid ${P.line}` }}>
-          <Search size={15} className="shrink-0" style={{ color: P.soft }} />
+      <div className="flex shrink-0 items-center gap-2 px-4 pt-3.5 pb-2.5">
+        <label className="lv-sheet-input">
+          <Search size={17} className="shrink-0" style={{ color: LIVE.ink }} />
           <input
             ref={inputRef}
             type="text"
@@ -486,28 +479,20 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             onFocus={() => onStateChange('raised')}
             placeholder="Search reports or neighbourhoods…"
             aria-label="Search reports or neighbourhoods"
-            className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none"
-            style={{ color: P.ink }}
           />
           {search && (
-            <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="shrink-0" style={{ color: P.soft }}>
-              <X size={14} />
+            <button type="button" onClick={() => setSearch('')} aria-label="Clear search" className="shrink-0 grid size-7 place-items-center rounded-full" style={{ color: LIVE.ink }}>
+              <X size={15} />
             </button>
           )}
-        </div>
+        </label>
       </div>
 
-      {/* Category chips — the only copy in the app now.
-          At rail, this row sits translated below the viewport (position:
-          fixed, so nothing scrolls it into view) but stays mounted for the
-          same reason the whole sheet does — see the section-level `inert`
-          comment above. `inert` removes it from the tab order and hit-testing
-          at rail without unmounting it. Never gate the search wrapper this
-          way: its input's synchronous focus() is the only thing that opens
-          the iOS keyboard from raiseAndFocusSearch, and `inert` would block
-          that focus() call outright. */}
-      <div className="shrink-0 px-3 pb-2" inert={state === 'rail'}>
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+      {/* Category chips. Kept mounted at the rail (offscreen) but `inert`, so
+          they leave the tab order without unmounting. Never gate the search
+          wrapper this way: its synchronous focus() opens the iOS keyboard. */}
+      <div className="shrink-0 px-4 pb-2.5" inert={state === 'rail'}>
+        <div className="lv-chips pb-1">
           {CATEGORY_OPTIONS.map(({ id, label, Icon, color }) => {
             const count = id === 'all'
               ? incidents.filter((i) => isPubliclyVisible(i)).length
@@ -519,118 +504,91 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => onCategoryChange(id as IncidentCategory | 'all')}
-                className="flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap border-[1.5px] px-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] transition-transform active:scale-[0.98]"
-                style={isSelected
-                  ? { background: color, borderColor: color, color: '#fff' }
-                  : { background: P.paper, borderColor: P.line, color: P.soft }}
+                className="lv-chip lv-sheet-cat"
               >
-                <Icon size={12} style={{ color: isSelected ? '#fff' : color }} />
+                <Icon size={14} strokeWidth={2.3} style={{ color: isSelected ? '#fff' : color }} />
                 <span>{label}</span>
-                <span
-                  className="px-1 py-0.5 font-sans text-[10px] font-black tabular-nums tracking-normal"
-                  style={isSelected ? { background: 'rgba(255,255,255,0.22)', color: '#fff' } : { background: P.card, color: P.soft }}
-                >
-                  {count}
-                </span>
+                <span className="lv-n">{count}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Filters — raised only. */}
+      {/* Filters — raised only. The time window lives in the phone chrome
+          above the sheet, where it also drives the map. */}
       {isRaised && (
-        <div className="shrink-0 space-y-2 px-3 pb-3" style={{ borderBottom: `1px solid ${P.line}` }}>
-          <div className="flex items-center justify-between gap-2">
-            <label className="font-mono text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: P.soft }}>
-              Sort
-              <select
-                value={sortBy}
-                onChange={(e) => handleSortChange(e.target.value as SortBy)}
-                className="ml-2 h-7 cursor-pointer px-2 text-[10px] font-bold focus:outline-none"
-                style={{ background: P.paper, border: `1.5px solid ${P.line}`, color: P.ink }}
-              >
-                <option value="nearest" disabled={!hasLocation}>
-                  {hasLocation ? 'Nearest First' : 'Nearest (needs location)'}
-                </option>
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="verified">Most Verified</option>
-              </select>
-            </label>
-          </div>
-
-          {onTimeWindowChange && timeWindow && (
-            <div className="pb-1">
-              <TimeWindowFilter value={timeWindow} onChange={onTimeWindowChange} />
-            </div>
+        <div className="shrink-0 flex flex-wrap items-center gap-2 px-4 pb-3" style={{ borderBottom: `2px solid ${LIVE.ink}` }}>
+          <label className="flex items-center gap-2 text-[12.5px] font-semibold" style={{ color: LIVE.muted }}>
+            Sort
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value as SortBy)}
+              className="lv-sheet-select cursor-pointer"
+            >
+              <option value="nearest" disabled={!hasLocation}>
+                {hasLocation ? 'Nearest first' : 'Nearest (needs location)'}
+              </option>
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="verified">Most confirmed</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            aria-pressed={feedFilter === 'community'}
+            onClick={() => handleFeedFilterChange(feedFilter === 'community' ? null : 'community')}
+            className="lv-chip lv-chip-sm"
+          >
+            Neighbours only
+          </button>
+          <button
+            type="button"
+            aria-pressed={feedFilter === 'recent'}
+            onClick={() => handleFeedFilterChange(feedFilter === 'recent' ? null : 'recent')}
+            className="lv-chip lv-chip-sm"
+          >
+            Last 2 h
+          </button>
+          {hasActiveFilters && (
+            <button type="button" onClick={clearAllFilters} className="lv-link text-[12.5px]">
+              Clear filters
+            </button>
           )}
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              aria-pressed={feedFilter === 'community'}
-              onClick={() => handleFeedFilterChange(feedFilter === 'community' ? null : 'community')}
-              className="h-7 border-[1.5px] px-3 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-transform active:scale-95"
-              style={feedFilter === 'community'
-                ? { background: 'rgba(46,139,122,0.14)', borderColor: 'rgba(46,139,122,0.45)', color: '#1F6D5F' }
-                : { background: P.paper, borderColor: P.line, color: P.soft }}
-            >
-              Community only
-            </button>
-            <button
-              type="button"
-              aria-pressed={feedFilter === 'recent'}
-              onClick={() => handleFeedFilterChange(feedFilter === 'recent' ? null : 'recent')}
-              className="h-7 border-[1.5px] px-3 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-transform active:scale-95"
-              style={feedFilter === 'recent'
-                ? { background: P.ink, borderColor: P.ink, color: P.paper }
-                : { background: P.paper, borderColor: P.line, color: P.soft }}
-            >
-              Last 2 h
-            </button>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="h-7 border-[1.5px] px-3 font-mono text-[10px] font-bold uppercase tracking-[0.14em] transition-transform active:scale-95"
-                style={{ borderColor: P.line, color: '#8E2B23', background: P.paper }}
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
         </div>
       )}
 
       {/* Scrollable list. Drags only from scrollTop 0 and only downward.
-          At rail, up to 60 incident rows and the pulse buttons stay mounted
-          but translated offscreen with no visible focus ring reachable —
-          `inert` pulls them out of the tab order and hit-testing without
-          unmounting them, matching the chips row above. */}
+          `inert` at the rail keeps offscreen rows out of the tab order. */}
       <div
         {...listHandlers}
         ref={scrollRef}
         inert={state === 'rail'}
-        className="flex-1 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] no-scrollbar"
+        className="flex-1 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] no-scrollbar"
         style={{
           overflowY: isRaised ? 'auto' : 'hidden',
           overscrollBehavior: 'contain',
         }}
       >
+        {/* ── Briefing slot: <NowBriefing /> from MapPage. Hidden while
+               searching so results come first. ─────────────────────────── */}
+        {isRaised && briefing && !debouncedSearch && (
+          <div className="lv-briefing-slot">{briefing}</div>
+        )}
+
         {neighborhoodResults.length > 0 && (
-          <div className="mb-2 mt-2">
+          <div className="mb-2 mt-3 space-y-1.5">
             {neighborhoodResults.map((name) => (
               <button
                 key={name}
                 type="button"
                 onClick={() => handleNeighborhood(name)}
-                className="mb-1 flex w-full items-center gap-3 px-3 py-2.5 text-left"
-                style={{ background: 'rgba(74,144,217,0.09)', border: `1.5px solid rgba(74,144,217,0.40)` }}
+                className="flex w-full items-center gap-3 rounded-[14px] px-3.5 py-2.5 text-left"
+                style={{ background: LIVE.yellowSoft, border: `2px solid ${LIVE.ink}` }}
               >
                 <span className="min-w-0 flex-1">
-                  <span className="block text-xs font-black" style={{ color: P.ink }}>{name}</span>
-                  <span className="block text-[10px]" style={{ color: P.soft }}>Fly to area</span>
+                  <span className="block text-[14px] font-bold" style={{ color: LIVE.ink }}>{name}</span>
+                  <span className="block text-[12px]" style={{ color: LIVE.muted }}>Show this area</span>
                 </span>
               </button>
             ))}
@@ -638,11 +596,11 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
         )}
 
         {isRaised && neighborhoodPulse.length > 0 && !debouncedSearch && (
-          <div className="mb-2 py-3" style={{ borderBottom: `1px solid ${P.line}` }}>
+          <div className="mb-1 py-3" style={{ borderBottom: `1px solid ${MAP.lineCool}` }}>
             <div className="mb-2 flex items-center gap-1.5">
-              <Activity size={12} style={{ color: MAP.ok }} />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em]" style={{ color: P.soft }}>
-                Live area pulse · 2 h
+              <Activity size={13} style={{ color: LIVE.blue }} />
+              <span className="font-mono text-[11.5px] font-semibold uppercase tracking-[0.08em]" style={{ color: LIVE.muted }}>
+                Reported in the last 2 h
               </span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -653,13 +611,13 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
                     key={name}
                     type="button"
                     onClick={() => handleNeighborhood(name)}
-                    className={cn('flex h-7 items-center gap-1.5 px-2.5 text-[10px] font-bold', cfg.bg)}
-                    style={{ border: `1.5px solid ${P.line}` }}
-                    title={`${count} incident${count !== 1 ? 's' : ''} in the last 2h`}
+                    className={cn('flex h-8 items-center gap-1.5 rounded-full px-3 text-[12px] font-bold', cfg.bg)}
+                    style={{ border: `2px solid ${LIVE.ink}` }}
+                    title={`${count} report${count !== 1 ? 's' : ''} in the last 2 h`}
                   >
                     <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', cfg.dot)} />
-                    <span style={{ color: P.ink }}>{name}</span>
-                    <span className={cn('font-black tabular-nums', cfg.text)}>{count}</span>
+                    <span style={{ color: LIVE.ink }}>{name}</span>
+                    <span className="font-black tabular-nums" style={{ color: LIVE.ink }}>{count}</span>
                   </button>
                 );
               })}
@@ -667,7 +625,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
           </div>
         )}
 
-        <p className="mb-2 mt-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: P.soft }}>
+        <p className="mb-2 mt-3 font-mono text-[11.5px] font-semibold uppercase tracking-[0.08em]" style={{ color: LIVE.muted }}>
           {filteredIncidents.length === 0
             ? 'No reports found'
             : `${filteredIncidents.length} report${filteredIncidents.length !== 1 ? 's' : ''}`}
@@ -678,6 +636,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             <IncidentRow
               key={incident.id}
               incident={incident}
+              photoUrl={incident.image_url}
               distanceKm={distanceFor(incident)}
               isActive={activeIncidentId === incident.id}
               onSelect={handleSelect}
@@ -685,23 +644,25 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
           ))
         ) : (
           <div className="flex flex-col items-center justify-center space-y-3 py-10 text-center">
-            <div className="flex h-16 w-16 items-center justify-center" style={{ background: P.card, border: `1.5px solid ${P.line}` }}>
-              <Search size={26} style={{ color: P.soft }} />
+            <div className="grid h-14 w-14 place-items-center rounded-[16px]" style={{ background: LIVE.yellowSoft, border: `2px solid ${LIVE.ink}` }}>
+              <Search size={24} style={{ color: LIVE.ink }} />
             </div>
             {hasActiveFilters ? (
               <>
                 <div>
-                  <p className="font-display text-base font-black uppercase tracking-[-0.02em]" style={{ color: P.ink }}>No reports match</p>
-                  <p className="mt-1 text-xs" style={{ color: P.soft }}>Try clearing your filters or searching a different term.</p>
+                  <p className="font-display text-[18px] font-extrabold tracking-[-0.02em]" style={{ color: LIVE.ink }}>No reports match</p>
+                  <p className="mt-1 text-[13px]" style={{ color: LIVE.muted }}>Try clearing your filters or searching a different word.</p>
                 </div>
-                <button type="button" onClick={clearAllFilters} className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: '#2F6FB0' }}>
+                <button type="button" onClick={clearAllFilters} className="lv-link text-[13px]">
                   Clear all filters
                 </button>
               </>
             ) : (
               <div>
-                <p className="font-display text-base font-black uppercase tracking-[-0.02em]" style={{ color: P.ink }}>All clear right now</p>
-                <p className="mt-1 max-w-[200px] text-xs" style={{ color: P.soft }}>No incidents in Calgary at the moment.</p>
+                <p className="font-display text-[18px] font-extrabold tracking-[-0.02em]" style={{ color: LIVE.ink }}>Nothing posted in this window</p>
+                <p className="mx-auto mt-1 max-w-[250px] text-[13px]" style={{ color: LIVE.muted }}>
+                  Quiet maps are normal, and an empty map isn&rsquo;t proof nothing happened.
+                </p>
               </div>
             )}
           </div>
@@ -712,8 +673,7 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
             type="button"
             onClick={onLoadMore}
             disabled={isLoadingMore}
-            className="mt-2 w-full py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] disabled:cursor-not-allowed disabled:opacity-60"
-            style={{ border: `1.5px solid ${P.line}`, background: P.paper, color: P.ink }}
+            className="lv-btn lv-btn-ghost lv-btn-block mt-3"
           >
             {isLoadingMore ? 'Loading more…' : 'Load older reports'}
           </button>
@@ -721,15 +681,15 @@ const MobileMapSheet = forwardRef<MapSheetRef, MobileMapSheetProps>(function Mob
       </div>
 
       {isRaised && (
-        <div className="shrink-0 px-3 py-3" style={{ borderTop: `1px solid ${P.line}`, background: P.paper }}>
+        <div className="shrink-0 px-4 pt-3 pb-[max(0.875rem,env(safe-area-inset-bottom))]" style={{ borderTop: `2px solid ${LIVE.ink}`, background: '#fff' }}>
           <button
             type="button"
             onClick={onReportPress}
-            className="flex h-12 w-[calc(100%-4px)] items-center justify-center gap-2 font-display text-[13px] font-black uppercase tracking-[0.02em] transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none"
-            style={{ background: P.ground, color: P.onGround, boxShadow: `4px 4px 0 ${P.accent}` }}
+            className="lv-btn lv-btn-primary lv-btn-block"
+            style={{ width: 'calc(100% - 4px)' }}
           >
-            <Plus size={15} />
-            Report an incident
+            <Plus size={17} strokeWidth={2.6} />
+            Post a report
           </button>
         </div>
       )}

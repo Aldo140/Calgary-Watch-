@@ -8,10 +8,11 @@ const fmt = calgaryDateTimeFormat('en-CA', { timeZone: 'America/Edmonton', weekd
 
 /**
  * On a market's listing: the next published lineup from Market HQ (who's
- * coming, and the organizer's note), plus "Sell here?" for vendors. Two
+ * coming, and the organizer's note), plus "Sell here?" for vendors unless
+ * the page has its own vendor call (`sell={false}`). Two
  * small public reads; nothing renders until a lineup exists.
  */
-export function MarketLineup({ marketId }: { marketId: string }) {
+export function MarketLineup({ marketId, sell = true }: { marketId: string; sell?: boolean }) {
   const lineups = usePublishedLineups(marketId);
   const vendors = useVendors(lineups?.length ? marketId : undefined);
   const now = Date.now() - 12 * 3_600_000;
@@ -36,10 +37,10 @@ export function MarketLineup({ marketId }: { marketId: string }) {
           ) : null}
         </section>
       ) : null}
-      <aside className="cl-cta hq-sell">
+      {sell ? <aside className="cl-cta hq-sell">
         <p><Store size={16} aria-hidden="true" /> <strong>Sell here?</strong> Apply to the organizer in a couple of minutes.</p>
         <Link to={`/apply/${encodeURIComponent(marketId)}`}>Apply as a vendor <ArrowUpRight size={16} aria-hidden="true" /></Link>
-      </aside>
+      </aside> : null}
     </>
   );
 }

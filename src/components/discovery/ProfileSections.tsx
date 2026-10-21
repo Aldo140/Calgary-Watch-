@@ -10,6 +10,7 @@ import { dayOf, Flap, ProfileCard, Seal, statusOf, timeOf, useSeen } from './Loc
 import { ProfileCover } from './ProfileCover';
 import { calgaryDateTimeFormat } from '../../lib/calgaryTz';
 import { isOwnerVerified } from '../../lib/verified';
+import { useVerifiedListing } from '../../lib/claimsApi';
 import { TEAR } from '../home/HomeHero';
 
 const shelfIndex = new Map(SHELVES.map(s => [s.id, s]));
@@ -166,7 +167,8 @@ const splitLead = (text: string) => { const m = text.match(/^(.+?[.!?])\s+(.+)$/
 export function ProfileSpread({ place, name, shelf, number, quadrant, since, links }: {
   place: Business; name: string; shelf: Shelf; number: number; quadrant: string | null; since?: string; links: ReactNode;
 }) {
-  const verified = isOwnerVerified(place);
+  // The same answer the Verified badge gives, including claims approved since the last build.
+  const verified = useVerifiedListing(place.id, isOwnerVerified(place));
   const stamp = place.partner ? 'Partner' : verified ? 'Verified' : place.editorialSelection ? 'Our pick' : undefined;
   const official = place.sources.find(src => src.kind === 'official');
   const facts: [string, ReactNode][] = [
